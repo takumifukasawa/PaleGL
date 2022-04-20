@@ -1,4 +1,4 @@
-import { GPU } from "./GL/GPU.js";
+import { GPU } from "../GL/GPU.js";
 
 export class ForwardRenderer {
   #canvas;

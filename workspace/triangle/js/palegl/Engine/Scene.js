@@ -1,4 +1,4 @@
-import { Actor } from "./Actor.js";
+import { Actor } from "./Actor/Actor.js";
 
 export class Scene {
   actors;
