@@ -7,6 +7,7 @@ import { Shader } from "./GL/Shader.js";
 import { Material } from "./Engine/Material.js";
 import { Geometry } from "./Engine/Geometry.js";
 import { MeshActor } from "./Engine/Actor/MeshActor.js";
+import { Attribute } from "./Engine/Attribute.js";
 
 const PaleGL = {
   Scene,
@@ -18,6 +19,7 @@ const PaleGL = {
   Material,
   Geometry,
   MeshActor,
+  Attribute,
 };
 
 export default PaleGL;

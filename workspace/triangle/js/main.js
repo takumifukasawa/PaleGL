@@ -7,37 +7,49 @@ const scene = new PaleGL.Scene();
 const camera = new PaleGL.Camera();
 
 const vertexShader = `#version 300 es
-out vec4 position;
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+
 void main() {
-  position = vec4(0, 0, 0, 1);
+  gl_Position = vec4(aPosition, 1);
 }
 `;
 
 const fragmentShader = `#version 300 es
-out vec4 color;
+
+precision mediump float;
+
+out vec4 outColor;
+
 void main() {
-  color = vec4(1, 0, 0, 1);
+  outColor = vec4(1, 1, 1, 1);
 }
 `;
 
-const gl = renderer.gl;
 const material = new PaleGL.Material({
   gpu: renderer.gpu,
   vertexShader,
   fragmentShader,
+  primitiveType: PaleGL.GPU.PrimitiveTypes.Triangles,
 });
 const geometry = new PaleGL.Geometry({
-  attributes: {
-    positions: {
+  gpu: renderer.gpu,
+  attributes: [
+    new PaleGL.Attribute({
+      type: PaleGL.Attribute.Types.Position,
+      location: 0,
+      stride: 3,
       // prettier-ignore
       data: [
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
+        // left bottom
+        -0.5, -0.5, 0,
+        0.5, -0.5, 0,
+        -0.5, 0.5, 0,
       ],
-    },
-  },
+    }),
+  ],
 });
 const meshActor = new PaleGL.MeshActor({ geometry, material });
 
@@ -46,8 +58,9 @@ scene.add(meshActor);
 const onWindowResize = (width, height) => {};
 
 const onTick = () => {
+  renderer.clear();
   renderer.render(scene, camera);
-  requestAnimationFrame(onTick);
+  // requestAnimationFrame(onTick);
 };
 
 window.addEventListener("resize", onWindowResize);
