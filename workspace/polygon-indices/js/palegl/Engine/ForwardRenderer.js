@@ -25,6 +25,12 @@ export class ForwardRenderer {
     this.#ratio = ratio;
   }
 
+  /**
+   * set canvas size
+   * @param {*} width
+   * @param {*} height
+   * ratioに合わせる場合は、canvasのサイズとgl.viewportを大きなサイズで確保しておき、canvasのstyleで縮める
+   */
   setSize(width, height) {
     this.#width = width;
     this.#height = height;
