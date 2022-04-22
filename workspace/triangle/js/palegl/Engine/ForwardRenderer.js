@@ -5,6 +5,7 @@ export class ForwardRenderer {
   #gpu;
   #width;
   #height;
+  #ratio = 1;
 
   get gl() {
     return this.#gpu.gl;
@@ -20,10 +21,18 @@ export class ForwardRenderer {
     this.#gpu = new GPU({ gl });
   }
 
+  setPixelRatio(ratio) {
+    this.#ratio = ratio;
+  }
+
   setSize(width, height) {
     this.#width = width;
     this.#height = height;
-    this.#gpu.setSize(this.#width, this.#height);
+    this.#canvas.width = this.#width * this.#ratio;
+    this.#canvas.height = this.#height * this.#ratio;
+    this.#canvas.style.width = `${this.#width}px`;
+    this.#canvas.style.height = `${this.#height}px`;
+    this.#gpu.setSize(this.#width * this.#ratio, this.#height * this.#ratio);
   }
 
   clear() {
@@ -40,7 +49,8 @@ export class ForwardRenderer {
 
   renderMeshActor(meshActor) {
     const { geometry, material } = meshActor;
-    console.log(material, geometry);
+    // for debug
+    // console.log(material, geometry);
     this.#gpu.setShader(material.shader);
     this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
     this.#gpu.setupRenderStates({ material });

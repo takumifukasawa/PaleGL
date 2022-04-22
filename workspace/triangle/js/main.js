@@ -3,6 +3,8 @@ import PaleGL from "./palegl/index.js";
 const canvas = document.getElementById("js-canvas");
 
 const renderer = new PaleGL.ForwardRenderer(canvas);
+renderer.setPixelRatio(window.devicePixelRatio);
+
 const scene = new PaleGL.Scene();
 const camera = new PaleGL.Camera();
 
@@ -78,11 +80,11 @@ scene.add(meshActor);
 const onWindowResize = () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  canvas.width = width * 2;
-  canvas.height = height * 2;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-  renderer.setSize(width * 2, height * 2);
+  // canvas.width = width * 2;
+  // canvas.height = height * 2;
+  // canvas.style.width = `${width}px`;
+  // canvas.style.height = `${height}px`;
+  renderer.setSize(width, height);
 };
 
 const onTick = () => {
