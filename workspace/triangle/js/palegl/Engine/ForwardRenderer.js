@@ -23,6 +23,7 @@ export class ForwardRenderer {
   setSize(width, height) {
     this.#width = width;
     this.#height = height;
+    this.#gpu.setSize(this.#width, this.#height);
   }
 
   clear() {
