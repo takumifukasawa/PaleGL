@@ -60,7 +60,12 @@ export class ForwardRenderer {
     this.#gpu.setShader(material.shader);
     this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
     this.#gpu.setupRenderStates({ material });
-    this.#gpu.draw(geometry.vertexCount, material.primitiveType);
+    if (geometry.indices) {
+      this.#gpu.setIndices(geometry.indices);
+      this.#gpu.draw(geometry.indices.length, material.primitiveType);
+    } else {
+      this.#gpu.draw(geometry.vertexCount, material.primitiveType);
+    }
     this.#gpu.flush();
     this.#gpu.resetData();
   }

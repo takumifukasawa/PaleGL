@@ -2,6 +2,7 @@ export class GPU {
   #gl;
   #shader;
   #vao;
+  #indices;
 
   static PrimitiveTypes = {
     Points: "Points",
@@ -25,9 +26,14 @@ export class GPU {
     this.#vao = vao;
   }
 
+  setIndices(indices) {
+    this.#indices = indices;
+  }
+
   resetData() {
     this.#shader = null;
     this.#vao = null;
+    this.#indices = null;
   }
 
   setSize(width, height) {
@@ -58,7 +64,7 @@ export class GPU {
     this.#gl.flush();
   }
 
-  draw(vertexCount, primitiveType, startVertexOffset = 0) {
+  draw(drawCount, primitiveType, startVertexOffset = 0) {
     const gl = this.gl;
     const program = this.#shader.glObject;
 
@@ -72,6 +78,15 @@ export class GPU {
 
     gl.bindVertexArray(this.#vao.glObject);
 
-    gl.drawArrays(primitives[primitiveType], startVertexOffset, vertexCount);
+    if (this.#indices) {
+      gl.drawElements(
+        primitives[primitiveType],
+        drawCount,
+        gl.UNSIGNED_SHORT,
+        startVertexOffset
+      );
+    } else {
+      gl.drawArrays(primitives[primitiveType], startVertexOffset, drawCount);
+    }
   }
 }

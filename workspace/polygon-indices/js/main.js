@@ -56,6 +56,8 @@ const geometry = new PaleGL.Geometry({
         0.5, -0.5, 0,
         // left top
         -0.5, 0.5, 0,
+        // right top
+        0.5, 0.5, 0,
       ],
     }),
     // color
@@ -69,9 +71,12 @@ const geometry = new PaleGL.Geometry({
         0, 1, 0,
         // left top
         0, 0, 1,
+        // right top
+        1, 1, 1,
       ],
     }),
   ],
+  indices: [0, 1, 2, 2, 1, 3],
 });
 const meshActor = new PaleGL.MeshActor({ geometry, material });
 

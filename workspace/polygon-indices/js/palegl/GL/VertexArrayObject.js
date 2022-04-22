@@ -7,7 +7,7 @@ export class VertexArrayObject extends GLObject {
     return this.#vao;
   }
 
-  constructor({ gl, attributes }) {
+  constructor({ gl, attributes, indices }) {
     super();
 
     this.#vao = gl.createVertexArray();
@@ -24,7 +24,15 @@ export class VertexArrayObject extends GLObject {
       gl.vertexAttribPointer(location, stride, gl.FLOAT, false, 0, 0);
     });
 
-    // TODO: set index
+    if (indices) {
+      const ibo = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+      gl.bufferData(
+        gl.ELEMENT_ARRAY_BUFFER,
+        new Int16Array(indices),
+        gl.STATIC_DRAW
+      );
+    }
 
     // unbind
     gl.bindVertexArray(null);
