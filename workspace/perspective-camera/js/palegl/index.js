@@ -10,6 +10,7 @@ import { PerspectiveCamera } from "./Engine/PerspectiveCamera.js";
 import { Material } from "./Engine/Material.js";
 import { Geometry } from "./Engine/Geometry.js";
 import { MeshActor } from "./Engine/Actor/MeshActor.js";
+import { CameraActor } from "./Engine/Actor/CameraActor.js";
 import { Attribute } from "./Engine/Attribute.js";
 
 // import math
@@ -28,6 +29,7 @@ const PaleGL = {
   Material,
   Geometry,
   MeshActor,
+  CameraActor,
   Attribute,
   // math
   Vector3,

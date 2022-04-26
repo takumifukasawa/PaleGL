@@ -7,7 +7,9 @@ const renderer = new PaleGL.ForwardRenderer(canvas);
 renderer.setPixelRatio(window.devicePixelRatio);
 
 const scene = new PaleGL.Scene();
-const camera = new PaleGL.PerspectiveCamera();
+const perspectiveCameraActor = new PaleGL.CameraActor({
+  camera: new PaleGL.PerspectiveCamera(45, 1, 0.1, 1),
+});
 
 const vertexShader = `#version 300 es
 
@@ -17,6 +19,9 @@ layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aColor;
 
 out vec3 vColor;
+
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
 
 void main() {
   vColor = aColor;
@@ -47,10 +52,6 @@ const material = new PaleGL.Material({
     uTime: {
       type: Material.UniformTypes.Float,
       data: 0,
-    },
-    uModelMatrix: {
-      type: Material.UniformTypes.Matrix4fv,
-      data: PaleGL.Matrix4x4.identity(),
     },
     uViewMatrix: {
       type: Material.UniformTypes.Matrix4fv,
@@ -111,12 +112,13 @@ const onWindowResize = () => {
   // canvas.style.width = `${width}px`;
   // canvas.style.height = `${height}px`;
   renderer.setSize(width, height);
+  perspectiveCameraActor.setSize({ width, height });
 };
 
 const onTick = () => {
   material.uniforms.uTime.data = performance.now();
   renderer.clear();
-  renderer.render(scene, camera);
+  renderer.render(scene, perspectiveCameraActor);
   requestAnimationFrame(onTick);
 };
 

@@ -45,22 +45,37 @@ export class ForwardRenderer {
     this.#gpu.clear();
   }
 
-  render(scene, camera) {
+  render(scene, cameraActor) {
     const meshActors = scene.getMeshActors();
+    // TODO: manager sort order
     meshActors.forEach((meshActor) => {
-      this.renderMeshActor(meshActor);
+      this.renderMeshActor(meshActor, cameraActor);
     });
-    // console.log(meshActors);
   }
 
-  renderMeshActor(meshActor) {
+  renderMeshActor(meshActor, cameraActor) {
     const { geometry, material } = meshActor;
     // for debug
     // console.log(material, geometry);
+
     this.#gpu.setShader(material.shader);
+
     this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
+
+    // send uniforms values
+    if (material.uniforms.uViewMatrix) {
+      material.uniforms.uViewMatrix.data = cameraActor.camera.cameraMatrix
+        .clone()
+        .inverse();
+    }
+    if (material.uniforms.uProjectionMatrix) {
+      material.uniforms.uProjectionMatrix.data =
+        cameraActor.camera.projectionMatrix.clone().inverse();
+    }
     this.#gpu.setUniforms(material.uniforms);
+
     this.#gpu.setupRenderStates({ material });
+
     if (geometry.indices) {
       this.#gpu.setIndices(geometry.indices);
       this.#gpu.draw(geometry.indices.length, material.primitiveType);
