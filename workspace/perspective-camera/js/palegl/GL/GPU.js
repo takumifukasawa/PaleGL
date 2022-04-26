@@ -1,8 +1,11 @@
+import { Material } from "../Engine/Material.js";
+
 export class GPU {
   #gl;
   #shader;
   #vao;
   #indices;
+  #uniforms;
 
   static PrimitiveTypes = {
     Points: "Points",
@@ -28,6 +31,10 @@ export class GPU {
 
   setIndices(indices) {
     this.#indices = indices;
+  }
+
+  setUniforms(uniforms) {
+    this.#uniforms = uniforms;
   }
 
   resetData() {
@@ -68,15 +75,48 @@ export class GPU {
     const gl = this.gl;
     const program = this.#shader.glObject;
 
+    // set shader
     gl.useProgram(program);
+
+    // set vertex
+    gl.bindVertexArray(this.#vao.glObject);
+
+    // set uniform
+    const uniformsKeys = Object.keys(this.#uniforms);
+    for (let i = 0; i < uniformsKeys.length; i++) {
+      const name = uniformsKeys[i];
+      const { type, data } = this.#uniforms[name];
+      const location = gl.getUniformLocation(program, name);
+      switch (type) {
+        case Material.UniformTypes.Float:
+          gl.uniform1f(location, data);
+          break;
+        case Material.UniformTypes.Matrix4fv:
+          // 第二引数はtransposeのフラグ。必ずfalseにする必要がある
+          if (Array.isArray(data)) {
+            // 配列をuniformで渡す場合は一次元にする必要があるのでflatなどで対処
+            gl.uniformMatrix4fv(
+              location,
+              false,
+              data.map((m) => m.getArray()).flat()
+            );
+          } else {
+            gl.uniformMatrix4fv(location, false, data.getArray());
+          }
+          break;
+        case Material.UniformTypes.Vector3f:
+          gl.uniform3fv(location, data.getArray());
+          break;
+        default:
+          throw "invalid uniform type";
+      }
+    }
 
     const primitives = {
       [GPU.PrimitiveTypes.Points]: gl.POINTS,
       [GPU.PrimitiveTypes.Lines]: gl.LINES,
       [GPU.PrimitiveTypes.Triangles]: gl.TRIANGLES,
     };
-
-    gl.bindVertexArray(this.#vao.glObject);
 
     if (this.#indices) {
       gl.drawElements(

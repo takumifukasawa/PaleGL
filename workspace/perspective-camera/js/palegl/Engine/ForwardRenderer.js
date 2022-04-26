@@ -59,6 +59,7 @@ export class ForwardRenderer {
     // console.log(material, geometry);
     this.#gpu.setShader(material.shader);
     this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
+    this.#gpu.setUniforms(material.uniforms);
     this.#gpu.setupRenderStates({ material });
     if (geometry.indices) {
       this.#gpu.setIndices(geometry.indices);

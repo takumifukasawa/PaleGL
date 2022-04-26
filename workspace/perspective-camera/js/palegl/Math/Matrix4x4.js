@@ -1,6 +1,6 @@
 import { Vector3 } from "./Vector3.js";
 
-export class Matrix4 {
+export class Matrix4x4 {
   // prettier-ignore
   constructor(
     m00, m01, m02, m03,
@@ -29,7 +29,7 @@ export class Matrix4 {
 
   static zero() {
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       0, 0, 0, 0,
       0, 0, 0, 0,
       0, 0, 0, 0,
@@ -39,7 +39,7 @@ export class Matrix4 {
 
   static identity() {
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       1, 0, 0, 0,
       0, 1, 0, 0,
       0, 0, 1, 0,
@@ -49,7 +49,7 @@ export class Matrix4 {
 
   static createTranslationMatrix(v) {
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       1, 0, 0, 0,
       0, 1, 0, 0,
       0, 0, 1, 0,
@@ -72,7 +72,7 @@ export class Matrix4 {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       1, 0, 0, 0,
       0, c, -s, 0,
       0, s, c, 0,
@@ -83,7 +83,7 @@ export class Matrix4 {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       c, 0, -s, 0,
       0, 1, 0, 0,
       s, 0, c, 0,
@@ -95,7 +95,7 @@ export class Matrix4 {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       c, -s, 0, 0,
       s, c, 0, 0,
       0, 0, 1, 0,
@@ -135,7 +135,7 @@ export class Matrix4 {
 
   static createScalingMatrix(s) {
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       s.x, 0, 0, 0,
       0, s.y, 0, 0,
       0, 0, s.z, 0,
@@ -158,7 +158,7 @@ export class Matrix4 {
     const r = Vector3.crossVectors(up.normalize(), f).normalize();
     const u = Vector3.crossVectors(f, r);
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       r.x, r.y, r.z, 0,
       u.x, u.y, u.z, 0,
       f.x, f.y, f.z, 0,
@@ -178,7 +178,7 @@ export class Matrix4 {
 
   static cloneMatrix(m) {
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       m.m00, m.m01, m.m02, m.m03,
       m.m10, m.m11, m.m12, m.m13,
       m.m20, m.m21, m.m22, m.m23,
@@ -187,7 +187,7 @@ export class Matrix4 {
   }
 
   clone() {
-    return Matrix4.cloneMatrix(this);
+    return Matrix4x4.cloneMatrix(this);
   }
 
   copyFromMatrix(m) {
@@ -259,7 +259,7 @@ export class Matrix4 {
   }
 
   static multiplyMatrices(...matrices) {
-    const m = Matrix4.identity();
+    const m = Matrix4x4.identity();
 
     for (let i = matrices.length - 1; i >= 0; i--) {
       m.multiplyMatrix(matrices[i]);
@@ -467,7 +467,7 @@ export class Matrix4 {
     const m31 = -(top + bottom) / (top - bottom);
     const m32 = -(far + near) / (far - near);
     // prettier-ignore
-    return new Matrix4(
+    return new Matrix4x4(
       m00, 0, 0, 0,
       0, m11 , 0, 0,
       0, 0, m22, 0,
@@ -481,7 +481,7 @@ export class Matrix4 {
     const f = 1 / Math.tan(fov / 2);
     const nf = 1 / (near - far);
 
-    const pjm = Matrix4.identity();
+    const pjm = Matrix4x4.identity();
 
     pjm.m00 = f / aspect; // aspect ... w / h
     pjm.m01 = 0;

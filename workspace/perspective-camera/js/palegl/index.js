@@ -6,7 +6,7 @@ import { Shader } from "./GL/Shader.js";
 import { Engine } from "./Engine/Engine.js";
 import { ForwardRenderer } from "./Engine/ForwardRenderer.js";
 import { Scene } from "./Engine/Scene.js";
-import { Camera } from "./Engine/Camera.js";
+import { PerspectiveCamera } from "./Engine/PerspectiveCamera.js";
 import { Material } from "./Engine/Material.js";
 import { Geometry } from "./Engine/Geometry.js";
 import { MeshActor } from "./Engine/Actor/MeshActor.js";
@@ -24,7 +24,7 @@ const PaleGL = {
   Engine,
   ForwardRenderer,
   Scene,
-  Camera,
+  PerspectiveCamera,
   Material,
   Geometry,
   MeshActor,

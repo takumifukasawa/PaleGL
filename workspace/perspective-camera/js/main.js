@@ -1,3 +1,4 @@
+import { Material } from "./palegl/Engine/Material.js";
 import PaleGL from "./palegl/index.js";
 
 const canvas = document.getElementById("js-canvas");
@@ -6,7 +7,7 @@ const renderer = new PaleGL.ForwardRenderer(canvas);
 renderer.setPixelRatio(window.devicePixelRatio);
 
 const scene = new PaleGL.Scene();
-const camera = new PaleGL.Camera();
+const camera = new PaleGL.PerspectiveCamera();
 
 const vertexShader = `#version 300 es
 
@@ -30,8 +31,10 @@ precision mediump float;
 in vec3 vColor;
 out vec4 outColor;
 
+uniform float uTime;
+
 void main() {
-  outColor = vec4(vColor, 1);
+  outColor = vec4(vec3(uTime / 1000.), 1);
 }
 `;
 
@@ -40,6 +43,24 @@ const material = new PaleGL.Material({
   vertexShader,
   fragmentShader,
   primitiveType: PaleGL.GPU.PrimitiveTypes.Triangles,
+  uniforms: {
+    uTime: {
+      type: Material.UniformTypes.Float,
+      data: 0,
+    },
+    uModelMatrix: {
+      type: Material.UniformTypes.Matrix4fv,
+      data: PaleGL.Matrix4x4.identity(),
+    },
+    uViewMatrix: {
+      type: Material.UniformTypes.Matrix4fv,
+      data: PaleGL.Matrix4x4.identity(),
+    },
+    uProjectionMatrix: {
+      type: Material.UniformTypes.Matrix4fv,
+      data: PaleGL.Matrix4x4.identity(),
+    },
+  },
 });
 const geometry = new PaleGL.Geometry({
   gpu: renderer.gpu,
@@ -93,9 +114,10 @@ const onWindowResize = () => {
 };
 
 const onTick = () => {
+  material.uniforms.uTime.data = performance.now();
   renderer.clear();
   renderer.render(scene, camera);
-  // requestAnimationFrame(onTick);
+  requestAnimationFrame(onTick);
 };
 
 onWindowResize();
