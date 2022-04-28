@@ -1,5 +1,9 @@
 import { Vector3 } from "./Vector3.js";
 
+/**
+ * 4x4行列
+ * 列オーダー
+ */
 export class Matrix4x4 {
   // prettier-ignore
   constructor(
@@ -152,6 +156,7 @@ export class Matrix4x4 {
 
   // 右手座標系での方向ベクトル
   // inverseされることでviewMatrixとして使う
+  // TODO: 多分計算が変なので直す
   static createLookAtCameraMatrix(eye, center, up) {
     // f: 実際のforwardとは逆なことに注意. inverseされるため
     const f = Vector3.subVectors(eye, center).normalize();
@@ -231,7 +236,7 @@ export class Matrix4x4 {
   }
 
   // AxB
-  // れつオーダーなので B->Aでかける
+  // 列オーダーなので B->Aでかける
   multiplyMatrix(targetMatrix) {
     const a = this.clone();
     const b = targetMatrix.clone();

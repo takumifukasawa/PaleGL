@@ -8,8 +8,9 @@ renderer.setPixelRatio(window.devicePixelRatio);
 
 const scene = new PaleGL.Scene();
 const perspectiveCameraActor = new PaleGL.CameraActor({
-  camera: new PaleGL.PerspectiveCamera(45, 1, 0.1, 1),
+  camera: new PaleGL.PerspectiveCamera(90, 1, 0.1, 2),
 });
+perspectiveCameraActor.setPosition(new PaleGL.Vector3(0, 0, 1));
 
 const vertexShader = `#version 300 es
 
@@ -25,7 +26,7 @@ uniform mat4 uProjectionMatrix;
 
 void main() {
   vColor = aColor;
-  gl_Position = vec4(aPosition, 1);
+  gl_Position = uProjectionMatrix * uViewMatrix * vec4(aPosition, 1);
 }
 `;
 
@@ -39,7 +40,8 @@ out vec4 outColor;
 uniform float uTime;
 
 void main() {
-  outColor = vec4(vec3(uTime / 1000.), 1);
+  outColor = vec4(vColor, 1);
+  // outColor = vec4(vec3(uTime / 1000.), 1);
 }
 `;
 
@@ -116,7 +118,12 @@ const onWindowResize = () => {
 };
 
 const onTick = () => {
-  material.uniforms.uTime.data = performance.now();
+  // TODO: sceneかengineに移したい
+  meshActor.update();
+  perspectiveCameraActor.update();
+
+  meshActor.material.uniforms.uTime.data = performance.now();
+
   renderer.clear();
   renderer.render(scene, perspectiveCameraActor);
   requestAnimationFrame(onTick);

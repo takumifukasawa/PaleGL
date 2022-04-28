@@ -64,13 +64,19 @@ export class ForwardRenderer {
 
     // send uniforms values
     if (material.uniforms.uViewMatrix) {
-      material.uniforms.uViewMatrix.data = cameraActor.camera.cameraMatrix
+      // actorから引っ張ってくればいいはず
+      material.uniforms.uViewMatrix.data = cameraActor.transform.modelMatrix
         .clone()
         .inverse();
+      // material.uniforms.uViewMatrix.data =
+      //   cameraActor.camera.cameraMatrix.clone();
     }
     if (material.uniforms.uProjectionMatrix) {
+      // inverseしなくてよかったかも
       material.uniforms.uProjectionMatrix.data =
-        cameraActor.camera.projectionMatrix.clone().inverse();
+        cameraActor.camera.projectionMatrix.clone();
+      // material.uniforms.uProjectionMatrix.data =
+      //   cameraActor.camera.projectionMatrix.clone().inverse();
     }
     this.#gpu.setUniforms(material.uniforms);
 

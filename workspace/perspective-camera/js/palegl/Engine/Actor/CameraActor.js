@@ -30,4 +30,9 @@ export class CameraActor extends Actor {
       this.#camera.updateProjectionMatrix({ aspect });
     }
   }
+
+  update() {
+    super.update();
+    this.#camera.cameraMatrix = this.transform.modelMatrix.clone().inverse();
+  }
 }
