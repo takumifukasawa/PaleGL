@@ -2,7 +2,6 @@ import { Vector3 } from "./Vector3.js";
 
 /**
  * 4x4行列
- * 列オーダー
  */
 export class Matrix4x4 {
   // prettier-ignore
