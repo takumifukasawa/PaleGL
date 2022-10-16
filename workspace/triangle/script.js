@@ -1,7 +1,11 @@
-﻿import {GPU} from "./PaleGL/GPU.js";
-import {Shader} from "./PaleGL/Shader.js";
-import {VertexArrayObject} from "./PaleGL/VertexArrayObject.js";
-import {AttributeTypes, PrimitiveTypes} from "./PaleGL/constants.js";
+﻿import {GPU} from "./PaleGL/Core/GPU.js";
+import {Shader} from "./PaleGL/Core/Shader.js";
+import {VertexArrayObject} from "./PaleGL/Core/VertexArrayObject.js";
+import {AttributeTypes, PrimitiveTypes} from "./PaleGL/Core/constants.js";
+import {Vector3} from "./PaleGL/Math/Vector3.js";
+
+const v = new Vector3(1, 2, 3);
+console.log(v.x)
 
 const canvas = document.getElementById("js-canvas");
 
@@ -40,13 +44,11 @@ const shader = new Shader({gpu, vertexShader, fragmentShader});
 const vao = new VertexArrayObject({
     gpu, attributes: [
         {
-            type: AttributeTypes.Position,
             data: [
-                0, 0.2, 0,
-                0.2, 0.4, 0,
-                0.2, 0, 0
+                -0.5, 0.5, 0,
+                0.5, 0.5, 0,
+                0.5, -0.5, 0
             ],
-            stride: 3,
             location: 0,
             size: 3
         }

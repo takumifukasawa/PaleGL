@@ -16,13 +16,15 @@ export class VertexArrayObject extends GLObject {
         // bind vertex array to webgl context
         gl.bindVertexArray(this.#vao);
         
-        attributes.forEach((attribute, i) => {
-            const { data, stride, location, size, offset } = attribute;
+        attributes.forEach((attribute) => {
+            const { data, size, location, } = attribute;
             const vbo = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(location);
-            gl.vertexAttribPointer(location, stride, gl.FLOAT, false, 0, 0);
+            // stride is always 0 because buffer is not interleaved.
+            // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointerk
+            gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
         });
 
         // unbind vertex array to webgl context
