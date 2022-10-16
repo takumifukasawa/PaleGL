@@ -22,7 +22,7 @@ export class Geometry {
             });
         });
 
-        this.vertexArrayObject = new VertexArrayObject({gpu, attributes})
+        this.vertexArrayObject = new VertexArrayObject({gpu, attributes: this.attributes})
         if (indices) {
             this.indexBufferObject = new IndexBufferObject({gpu, indices})
             this.indices = indices;

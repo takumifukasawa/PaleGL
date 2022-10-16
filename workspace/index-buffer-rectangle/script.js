@@ -35,7 +35,6 @@ out vec4 outColor;
 
 void main() {
     outColor = vec4(vColor, 1);
-    outColor = vec4(1, 0, 0, 1);
 }
 `;
 
@@ -65,9 +64,18 @@ const geometry = new Geometry({
             ],
             size: 3
         },
+        color: {
+            data: [
+                1, 0, 0,
+                0, 1, 0,
+                0, 0, 1,
+                1, 1, 0
+            ],
+            size: 3
+        }
     },
     indices: [0, 2, 1, 0, 3, 2],
-    drawCount: 6 
+    drawCount: 6
 });
 
 const material = new Material({gpu, vertexShader, fragmentShader, primitiveType: PrimitiveTypes.Triangles});
@@ -76,35 +84,6 @@ const mesh = new Mesh(geometry, material);
 
 scene.add(mesh);
 
-// const shader = new Shader({gpu, vertexShader, fragmentShader});
-// 
-// const vao = new VertexArrayObject({
-//     gpu, attributes: [
-//         {
-//             // -----------------------------
-//             // 0 ---- 1
-//             // |      |
-//             // |      |
-//             // 3 ---- 2
-//             // -----------------------------
-//             data: [
-//                 -0.5, 0.5, 0,
-//                 0.5, 0.5, 0,
-//                 0.5, -0.5, 0,
-//                 -0.5, -0.5, 0
-//             ],
-//             location: 0,
-//             size: 3
-//         }
-//     ]
-// });
-
-// const ibo = new IndexBufferObject({gl, indices: [0, 2, 1, 0, 3, 2]})
-
 gpu.setSize(512, 512);
 
 renderer.render(scene);
-
-// gpu.setShader(shader);
-// gpu.setVertexArrayObject(vao);
-// gpu.draw(3, PrimitiveTypes.Triangles, 0);

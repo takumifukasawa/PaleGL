@@ -6,19 +6,20 @@ export class VertexArrayObject extends GLObject {
     get glObject() {
         return this.#vao;
     }
-    
-    constructor({ gpu, attributes }) {
+
+    constructor({gpu, attributes}) {
         super();
-       
+
         const gl = gpu.gl;
         this.#vao = gl.createVertexArray();
-       
+
+
         // bind vertex array to webgl context
         gl.bindVertexArray(this.#vao);
-        
+
         Object.keys(attributes).forEach(key => {
             const attribute = attributes[key];
-            const { data, size, location, } = attribute;
+            const {data, size, location} = attribute;
             const vbo = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
