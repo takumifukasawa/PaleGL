@@ -1,11 +1,7 @@
 ﻿import {GPU} from "./PaleGL/Core/GPU.js";
 import {Shader} from "./PaleGL/Core/Shader.js";
 import {VertexArrayObject} from "./PaleGL/Core/VertexArrayObject.js";
-import {AttributeTypes, PrimitiveTypes} from "./PaleGL/Core/constants.js";
-import {Vector3} from "./PaleGL/Math/Vector3.js";
-
-const v = new Vector3(1, 2, 3);
-console.log(v.x)
+import {PrimitiveTypes} from "./PaleGL/Core/constants.js";
 
 const canvas = document.getElementById("js-canvas");
 
