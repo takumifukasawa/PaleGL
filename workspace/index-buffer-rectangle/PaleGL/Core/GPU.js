@@ -31,6 +31,12 @@ export class GPU {
         this.gl.flush();
     }
     
+    clear(r, g, b, a) {
+        const gl = this.gl;
+        gl.clearColor(r, g, b, a);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+    
     #getGLPrimitive(primitiveType) {
         const gl = this.gl;
         switch(primitiveType) {

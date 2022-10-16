@@ -8,6 +8,14 @@
     setSize(width, height) {
         this.#gpu.setSize(width, height);
     }
+    
+    flush() {
+        this.#gpu.flush();
+    }
+    
+    clear(r, g, b, a) {
+        this.#gpu.clear(r, g, b, a);
+    }
 
     render(scene, camera) {
         scene.children.forEach(mesh => {

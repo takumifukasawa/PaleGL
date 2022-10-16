@@ -86,4 +86,5 @@ scene.add(mesh);
 
 renderer.setSize(512, 512);
 
+renderer.clear(0, 0, 0, 1);
 renderer.render(scene);
