@@ -4,6 +4,10 @@
     constructor({gpu}) {
         this.#gpu = gpu;
     }
+    
+    setSize(width, height) {
+        this.#gpu.setSize(width, height);
+    }
 
     render(scene, camera) {
         scene.children.forEach(mesh => {

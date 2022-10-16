@@ -84,6 +84,6 @@ const mesh = new Mesh(geometry, material);
 
 scene.add(mesh);
 
-gpu.setSize(512, 512);
+renderer.setSize(512, 512);
 
 renderer.render(scene);
