@@ -63,10 +63,10 @@ const geometry = new Geometry({
             // 3 ---- 2
             // -----------------------------
             data: [
-                -0.2, 0.2, 0.5,
-                0.2, 0.2, 0.5,
-                0.2, -0.2, 0.5,
-                -0.2, -0.2, 0.5
+                -0.2, 0.2, -0.1,
+                0.2, 0.2, -0.1,
+                0.2, -0.2, -0.1,
+                -0.2, -0.2, -0.1
             ],
             size: 3
         },
@@ -92,7 +92,8 @@ const material = new Material({
     uniforms: {
         uProjectionMatrix: {
             type: UniformTypes.Matrix4,
-            value: perspectiveMatrix
+            value: perspectiveMatrix.transpose()
+            // value: perspectiveMatrix
         }
     }
 });
