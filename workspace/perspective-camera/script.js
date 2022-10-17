@@ -9,7 +9,7 @@ import {ForwardRenderer} from "./PaleGL/Core/ForwardRenderer.js";
 import {Mesh} from "./PaleGL/Core/Mesh.js";
 import {Geometry} from "./PaleGL/Core/Geometry.js";
 import {Material} from "./PaleGL/Core/Material.js";
-import {Matrix4x4} from "./PaleGL/Math/Matrix4x4.js";
+import {Matrix4} from "./PaleGL/Math/Matrix4.js";
 
 const canvas = document.getElementById("js-canvas");
 
@@ -18,13 +18,14 @@ const vertexShader = `#version 300 es
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aColor;
 
+uniform mat4 uWorldMatrix;
 uniform mat4 uProjectionMatrix;
 
 out vec3 vColor;
 
 void main() {
     vColor = aColor;
-    gl_Position = uProjectionMatrix * vec4(aPosition, 1);
+    gl_Position = uProjectionMatrix * uWorldMatrix * vec4(aPosition, 1);
     // gl_Position = vec4(aPosition, 1);
 }
 `;
@@ -50,7 +51,7 @@ const scene = new Scene();
 
 const renderer = new ForwardRenderer({gpu});
 
-const perspectiveMatrix = Matrix4x4.getPerspectiveMatrix(60, 1, 0.1, 1);
+const perspectiveMatrix = Matrix4.getPerspectiveMatrix(60, 1, 0.1, 1);
 
 const geometry = new Geometry({
     gpu,
@@ -84,15 +85,24 @@ const geometry = new Geometry({
     drawCount: 6
 });
 
+const translateMatrix = Matrix4.translateMatrix(new Vector3(1, 2, 3))
+const scaleMatrix = Matrix4.scaleMatrix(new Vector3(1, 2, 3))
+const worldMatrix = Matrix4.multiplyMatrices(translateMatrix, scaleMatrix);
+worldMatrix.log();
+
 const material = new Material({
     gpu,
     vertexShader,
     fragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
     uniforms: {
+        uWorldMatrix: {
+            type: UniformTypes.Matrix4,
+            value: worldMatrix
+        },
         uProjectionMatrix: {
             type: UniformTypes.Matrix4,
-            value: perspectiveMatrix.transpose()
+            value: perspectiveMatrix
             // value: perspectiveMatrix
         }
     }

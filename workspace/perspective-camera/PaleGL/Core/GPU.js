@@ -60,7 +60,7 @@ export class GPU {
         switch (uniformType) {
             case UniformTypes.Matrix4:
                 const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
-                gl.uniformMatrix4fv(location, false, value.elements);
+                gl.uniformMatrix4fv(location, false, value.transpose().elements);
                 break;
         }
     }

@@ -1,6 +1,7 @@
 ﻿import {Vector3} from "./Vector3.js";
 
-export class Matrix4x4 {
+// row order
+export class Matrix4 {
     elements;
     
     get m00() {
@@ -146,7 +147,7 @@ export class Matrix4x4 {
     }
 
     static identity() {
-        return new Matrix4x4(
+        return new Matrix4(
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -154,10 +155,63 @@ export class Matrix4x4 {
         );
     }
     
-    translate(v3) {
+    translate(v) {
+        this.m03 += v.x;
+        this.m13 += v.y;
+        this.m23 += v.z;
+        return this;
     }
     
-    multiply(matrix4x4) {
+    static translateMatrix(v) {
+        return Matrix4.identity().translate(v);
+    }
+    
+    scale(v) {
+        this.m00 *= v.x;
+        this.m11 *= v.y;
+        this.m22 *= v.z;
+        return this;
+    }
+    
+    static scaleMatrix(v) {
+        return Matrix4.identity().scale(v);
+    }
+    
+    static multiplyMatrices(...matrices) {
+        const m = Matrix4.identity();
+        matrices.forEach(matrix => { m.multiply(matrix); });
+        console.log(m, matrices)
+        return m;
+    }
+    
+    multiply(m1, m2) {
+        const m = Matrix4.identity();
+
+        // r0
+        m.m00 = m1.m00 * m2.m00 + m1.m01 * m2.m10 + m1.m02 * m2.m20 + m1.m03 * m2.m30;
+        m.m01 = m1.m00 * m2.m01 + m1.m01 * m2.m11 + m1.m02 * m2.m21 + m1.m03 * m2.m31;
+        m.m02 = m1.m00 * m2.m02 + m1.m01 * m2.m12 + m1.m02 * m2.m22 + m1.m03 * m2.m32;
+        m.m03 = m1.m00 * m2.m03 + m1.m01 * m2.m13 + m1.m02 * m2.m23 + m1.m03 * m2.m33;
+
+        // r1
+        m.m10 = m1.m10 * m2.m00 + m1.m11 * m2.m10 + m1.m12 * m2.m20 + m1.m13 * m2.m30;
+        m.m11 = m1.m10 * m2.m01 + m1.m11 * m2.m11 + m1.m12 * m2.m21 + m1.m13 * m2.m31;
+        m.m12 = m1.m10 * m2.m02 + m1.m11 * m2.m12 + m1.m12 * m2.m22 + m1.m13 * m2.m32;
+        m.m13 = m1.m10 * m2.m03 + m1.m11 * m2.m13 + m1.m12 * m2.m23 + m1.m13 * m2.m33;
+
+        // r2
+        m.m20 = m1.m20 * m2.m00 + m1.m21 * m2.m10 + m1.m22 * m2.m20 + m1.m23 * m2.m30;
+        m.m21 = m1.m20 * m2.m01 + m1.m21 * m2.m11 + m1.m22 * m2.m21 + m1.m23 * m2.m31;
+        m.m22 = m1.m20 * m2.m02 + m1.m21 * m2.m12 + m1.m22 * m2.m22 + m1.m23 * m2.m32;
+        m.m23 = m1.m20 * m2.m03 + m1.m21 * m2.m13 + m1.m22 * m2.m23 + m1.m23 * m2.m33;
+
+        // r3
+        m.m30 = m1.m30 * m2.m00 + m1.m31 * m2.m10 + m1.m32 * m2.m20 + m1.m33 * m2.m30;
+        m.m31 = m1.m30 * m2.m01 + m1.m31 * m2.m11 + m1.m32 * m2.m21 + m1.m33 * m2.m31;
+        m.m32 = m1.m30 * m2.m02 + m1.m31 * m2.m12 + m1.m32 * m2.m22 + m1.m33 * m2.m32;
+        m.m33 = m1.m30 * m2.m03 + m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33;
+       
+        return m;
     }
     
 
@@ -207,7 +261,7 @@ export class Matrix4x4 {
         const f = 1 / Math.tan(fov / 2);
         const nf = 1 / (near - far);
 
-        const pjm = new Matrix4x4();
+        const pjm = new Matrix4();
 
         // pjm.elements[0] = f / aspect;
         // pjm.elements[1] = 0;
@@ -242,12 +296,22 @@ export class Matrix4x4 {
         pjm.elements[8] = 0;
         pjm.elements[9] = 0;
         pjm.elements[10] = (far + near) * nf;
-        pjm.elements[11] = 2 * far * near * nf;;
+        pjm.elements[11] = 2 * far * near * nf;
         pjm.elements[12] = 0;
         pjm.elements[13] = 0;
         pjm.elements[14] = -1; 
         pjm.elements[15] = 0;
 
         return pjm;
+    }
+    
+    log()
+    {
+        console.log(`--------------------
+${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},
+${this.m10}, ${this.m11}, ${this.m12}, ${this.m13},
+${this.m20}, ${this.m21}, ${this.m22}, ${this.m23},
+${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
+--------------------`);
     }
 }
