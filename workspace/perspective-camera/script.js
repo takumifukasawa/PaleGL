@@ -25,7 +25,9 @@ out vec3 vColor;
 
 void main() {
     vColor = aColor;
-    gl_Position = uProjectionMatrix * uWorldMatrix * vec4(aPosition, 1);
+    // gl_Position = uProjectionMatrix * uWorldMatrix * vec4(aPosition, 1);
+    // gl_Position = uProjectionMatrix * vec4(aPosition, 1);
+    gl_Position = uWorldMatrix * vec4(aPosition, 1);
     // gl_Position = vec4(aPosition, 1);
 }
 `;
@@ -85,10 +87,6 @@ const geometry = new Geometry({
     drawCount: 6
 });
 
-const translateMatrix = Matrix4.translateMatrix(new Vector3(1, 2, 3))
-const scaleMatrix = Matrix4.scaleMatrix(new Vector3(1, 2, 3))
-const worldMatrix = Matrix4.multiplyMatrices(translateMatrix, scaleMatrix);
-worldMatrix.log();
 
 const material = new Material({
     gpu,
@@ -98,12 +96,11 @@ const material = new Material({
     uniforms: {
         uWorldMatrix: {
             type: UniformTypes.Matrix4,
-            value: worldMatrix
+            value: Matrix4.identity()
         },
         uProjectionMatrix: {
             type: UniformTypes.Matrix4,
             value: perspectiveMatrix
-            // value: perspectiveMatrix
         }
     }
 });
@@ -114,5 +111,21 @@ scene.add(mesh);
 
 renderer.setSize(512, 512);
 
-renderer.clear(0, 0, 0, 1);
-renderer.render(scene);
+const tick = (time) => {
+    renderer.clear(0, 0, 0, 1);
+    
+    const scaleMatrix = Matrix4.scaleMatrix(new Vector3(2, 1, 1))
+    const rotationMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180))
+    // const translateMatrix = Matrix4.translateMatrix(new Vector3(Math.sin(time / 1000) * 0, 0, 0))
+    const translateMatrix = Matrix4.translateMatrix(new Vector3(0.2, 0, 0))
+    // const worldMatrix = Matrix4.multiplyMatrices(scaleMatrix, rotationMatrix, translateMatrix);
+    const worldMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
+    // worldMatrix.log();
+    material.uniforms.uWorldMatrix.value = worldMatrix;
+    
+    renderer.render(scene);
+
+    requestAnimationFrame(tick);
+}
+
+requestAnimationFrame(tick);

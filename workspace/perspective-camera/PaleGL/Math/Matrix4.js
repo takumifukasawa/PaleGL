@@ -155,37 +155,44 @@ export class Matrix4 {
         );
     }
     
-    translate(v) {
-        this.m03 += v.x;
-        this.m13 += v.y;
-        this.m23 += v.z;
-        return this;
-    }
-    
     static translateMatrix(v) {
-        return Matrix4.identity().translate(v);
-    }
-    
-    scale(v) {
-        this.m00 *= v.x;
-        this.m11 *= v.y;
-        this.m22 *= v.z;
-        return this;
+        return new Matrix4(
+            1, 0, 0, v.x,
+            0, 1, 0, v.y,
+            0, 0, 1, v.z,
+            0, 0, 0, 1
+        );
     }
     
     static scaleMatrix(v) {
-        return Matrix4.identity().scale(v);
+        return new Matrix4(
+            v.x, 0, 0, 0,
+            0, v.y, 0, 0,
+            0, 0, v.z, 0,
+            0, 0, 0, 1
+        );
+    }
+    
+    static rotateZMatrix(rad) {
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        return new Matrix4(
+            c, -s, 0, 0,
+            s, c, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
     }
     
     static multiplyMatrices(...matrices) {
         const m = Matrix4.identity();
-        matrices.forEach(matrix => { m.multiply(matrix); });
-        console.log(m, matrices)
+        matrices.forEach(matrix => m.multiply(matrix));
         return m;
     }
     
-    multiply(m1, m2) {
+    multiply(m2) {
         const m = Matrix4.identity();
+        const m1 = this;
 
         // r0
         m.m00 = m1.m00 * m2.m00 + m1.m01 * m2.m10 + m1.m02 * m2.m20 + m1.m03 * m2.m30;
@@ -210,8 +217,30 @@ export class Matrix4 {
         m.m31 = m1.m30 * m2.m01 + m1.m31 * m2.m11 + m1.m32 * m2.m21 + m1.m33 * m2.m31;
         m.m32 = m1.m30 * m2.m02 + m1.m31 * m2.m12 + m1.m32 * m2.m22 + m1.m33 * m2.m32;
         m.m33 = m1.m30 * m2.m03 + m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33;
+        
+        this.copy(m);
        
-        return m;
+        return this;
+    }
+    
+    copy(m) {
+        this.m00 = m.m00;
+        this.m01 = m.m01;
+        this.m02 = m.m02;
+        this.m03 = m.m03;
+        this.m10 = m.m10;
+        this.m11 = m.m11;
+        this.m12 = m.m12;
+        this.m13 = m.m13;
+        this.m20 = m.m20;
+        this.m21 = m.m21;
+        this.m22 = m.m22;
+        this.m23 = m.m23;
+        this.m30 = m.m30;
+        this.m31 = m.m31;
+        this.m32 = m.m32;
+        this.m33 = m.m33;
+        return this;
     }
     
 
