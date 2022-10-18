@@ -114,13 +114,15 @@ renderer.setSize(512, 512);
 const tick = (time) => {
     renderer.clear(0, 0, 0, 1);
     
+    const rootMatrix = Matrix4.rotateZMatrix((time / 1000 * 30) * (Math.PI / 180));
+    
     const scaleMatrix = Matrix4.scaleMatrix(new Vector3(2, 1, 1))
     const rotationMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180))
-    // const translateMatrix = Matrix4.translateMatrix(new Vector3(Math.sin(time / 1000) * 0, 0, 0))
-    const translateMatrix = Matrix4.translateMatrix(new Vector3(0.2, 0, 0))
-    // const worldMatrix = Matrix4.multiplyMatrices(scaleMatrix, rotationMatrix, translateMatrix);
-    const worldMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
-    // worldMatrix.log();
+    const translateMatrix = Matrix4.translateMatrix(new Vector3(0.5, 0, 0))
+    const localMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
+    
+    const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
+ 
     material.uniforms.uWorldMatrix.value = worldMatrix;
     
     renderer.render(scene);

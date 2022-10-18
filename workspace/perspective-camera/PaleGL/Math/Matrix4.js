@@ -1,6 +1,12 @@
 ﻿import {Vector3} from "./Vector3.js";
 
-// row order
+// memory layout is column order
+// (num) ... element index
+// 00(0), 01(4), 02(8), 03(12),
+// 10(1), 11(5), 12(9), 13(13),
+// 20(2), 21(6), 22(10), 23(14),
+// 30(3), 31(7), 32(11), 33(15),
+
 export class Matrix4 {
     elements;
     
@@ -132,17 +138,26 @@ export class Matrix4 {
         return this.elements[15] = value;
     }
 
+    // row-order in constructor args
     constructor(
-        m00 = 0, m01 = 0, m02 = 0, m03 = 0,
-        m10 = 0, m11 = 0, m12 = 0, m13 = 0,
-        m20 = 0, m21 = 0, m22 = 0, m23 = 0,
-        m30 = 0, m31 = 0, m32 = 0, m33 = 0,
+        n00, n01, n02, n03,
+        n10, n11, n12, n13,
+        n20, n21, n22, n23,
+        n30, n31, n32, n33,
+        // m00 = 0, m01 = 0, m02 = 0, m03 = 0,
+        // m10 = 0, m11 = 0, m12 = 0, m13 = 0,
+        // m20 = 0, m21 = 0, m22 = 0, m23 = 0,
+        // m30 = 0, m31 = 0, m32 = 0, m33 = 0,
     ) {
         this.elements = new Float32Array([
-            m00, m01, m02, m03,
-            m10, m11, m12, m13,
-            m20, m21, m22, m23,
-            m30, m31, m32, m33,
+            n00, n10, n20, n30,
+            n01, n11, n21, n31,
+            n02, n12, n22, n32,
+            n03, n13, n23, n33
+            // m00, m01, m02, m03,
+            // m10, m11, m12, m13,
+            // m20, m21, m22, m23,
+            // m30, m31, m32, m33,
         ]);
     }
 
@@ -191,32 +206,51 @@ export class Matrix4 {
     }
     
     multiply(m2) {
-        const m = Matrix4.identity();
         const m1 = this;
+        
+        const e1 = m1.elements;
+        const e2 = m2.elements; 
+        
+        const ma00 = e1[0], ma01 = e1[4], ma02 = e1[8], ma03 = e1[12];
+        const ma10 = e1[1], ma11 = e1[5], ma12 = e1[9], ma13 = e1[13];
+        const ma20 = e1[2], ma21 = e1[6], ma22 = e1[10], ma23 = e1[14];
+        const ma30 = e1[3], ma31 = e1[7], ma32 = e1[11], ma33 = e1[15];
 
+        const mb00 = e2[0], mb01 = e2[4], mb02 = e2[8], mb03 = e2[12];
+        const mb10 = e2[1], mb11 = e2[5], mb12 = e2[9], mb13 = e2[13];
+        const mb20 = e2[2], mb21 = e2[6], mb22 = e2[10], mb23 = e2[14];
+        const mb30 = e2[3], mb31 = e2[7], mb32 = e2[11], mb33 = e2[15];
+       
         // r0
-        m.m00 = m1.m00 * m2.m00 + m1.m01 * m2.m10 + m1.m02 * m2.m20 + m1.m03 * m2.m30;
-        m.m01 = m1.m00 * m2.m01 + m1.m01 * m2.m11 + m1.m02 * m2.m21 + m1.m03 * m2.m31;
-        m.m02 = m1.m00 * m2.m02 + m1.m01 * m2.m12 + m1.m02 * m2.m22 + m1.m03 * m2.m32;
-        m.m03 = m1.m00 * m2.m03 + m1.m01 * m2.m13 + m1.m02 * m2.m23 + m1.m03 * m2.m33;
+        const m00 = ma00 * mb00 + ma01 * mb10 + ma02 * mb20 + ma03 * mb30;
+        const m01 = ma00 * mb01 + ma01 * mb11 + ma02 * mb21 + ma03 * mb31;
+        const m02 = ma00 * mb02 + ma01 * mb12 + ma02 * mb22 + ma03 * mb32;
+        const m03 = ma00 * mb03 + ma01 * mb13 + ma02 * mb23 + ma03 * mb33;
 
         // r1
-        m.m10 = m1.m10 * m2.m00 + m1.m11 * m2.m10 + m1.m12 * m2.m20 + m1.m13 * m2.m30;
-        m.m11 = m1.m10 * m2.m01 + m1.m11 * m2.m11 + m1.m12 * m2.m21 + m1.m13 * m2.m31;
-        m.m12 = m1.m10 * m2.m02 + m1.m11 * m2.m12 + m1.m12 * m2.m22 + m1.m13 * m2.m32;
-        m.m13 = m1.m10 * m2.m03 + m1.m11 * m2.m13 + m1.m12 * m2.m23 + m1.m13 * m2.m33;
+        const m10 = ma10 * mb00 + ma11 * mb10 + ma12 * mb20 + ma13 * mb30;
+        const m11 = ma10 * mb01 + ma11 * mb11 + ma12 * mb21 + ma13 * mb31;
+        const m12 = ma10 * mb02 + ma11 * mb12 + ma12 * mb22 + ma13 * mb32;
+        const m13 = ma10 * mb03 + ma11 * mb13 + ma12 * mb23 + ma13 * mb33;
 
         // r2
-        m.m20 = m1.m20 * m2.m00 + m1.m21 * m2.m10 + m1.m22 * m2.m20 + m1.m23 * m2.m30;
-        m.m21 = m1.m20 * m2.m01 + m1.m21 * m2.m11 + m1.m22 * m2.m21 + m1.m23 * m2.m31;
-        m.m22 = m1.m20 * m2.m02 + m1.m21 * m2.m12 + m1.m22 * m2.m22 + m1.m23 * m2.m32;
-        m.m23 = m1.m20 * m2.m03 + m1.m21 * m2.m13 + m1.m22 * m2.m23 + m1.m23 * m2.m33;
+        const m20 = ma20 * mb00 + ma21 * mb10 + ma22 * mb20 + ma23 * mb30;
+        const m21 = ma20 * mb01 + ma21 * mb11 + ma22 * mb21 + ma23 * mb31;
+        const m22 = ma20 * mb02 + ma21 * mb12 + ma22 * mb22 + ma23 * mb32;
+        const m23 = ma20 * mb03 + ma21 * mb13 + ma22 * mb23 + ma23 * mb33;
 
         // r3
-        m.m30 = m1.m30 * m2.m00 + m1.m31 * m2.m10 + m1.m32 * m2.m20 + m1.m33 * m2.m30;
-        m.m31 = m1.m30 * m2.m01 + m1.m31 * m2.m11 + m1.m32 * m2.m21 + m1.m33 * m2.m31;
-        m.m32 = m1.m30 * m2.m02 + m1.m31 * m2.m12 + m1.m32 * m2.m22 + m1.m33 * m2.m32;
-        m.m33 = m1.m30 * m2.m03 + m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33;
+        const m30 = ma30 * mb00 + ma31 * mb10 + ma32 * mb20 + ma33 * mb30;
+        const m31 = ma30 * mb01 + ma31 * mb11 + ma32 * mb21 + ma33 * mb31;
+        const m32 = ma30 * mb02 + ma31 * mb12 + ma32 * mb22 + ma33 * mb32;
+        const m33 = ma30 * mb03 + ma31 * mb13 + ma32 * mb23 + ma33 * mb33;
+        
+        const m = new Matrix4(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        );
         
         this.copy(m);
        
@@ -242,7 +276,6 @@ export class Matrix4 {
         this.m33 = m.m33;
         return this;
     }
-    
 
     // 00, 01, 02, 03
     // 10, 11, 12, 13
@@ -292,28 +325,6 @@ export class Matrix4 {
 
         const pjm = new Matrix4();
 
-        // pjm.elements[0] = f / aspect;
-        // pjm.elements[1] = 0;
-        // pjm.elements[2] = 0;
-        // pjm.elements[3] = 0;
-        // pjm.elements[4] = 0;
-        // pjm.elements[5] = f;
-        // pjm.elements[6] = 0;
-        // pjm.elements[7] = 0;
-        // pjm.elements[8] = 0;
-        // pjm.elements[9] = 0;
-        // pjm.elements[10] = (far + near) * nf;
-        // pjm.elements[11] = -1;
-        // pjm.elements[12] = 0;
-        // pjm.elements[13] = 0;
-        // pjm.elements[14] = 2 * far * near * nf;
-        // pjm.elements[15] = 0;
-        
-        // 0, 1, 2, 3 
-        // 4, 5, 6, 7
-        // 8, 9, 10, 11
-        // 12, 13, 14, 15
-
         pjm.elements[0] = f / aspect;
         pjm.elements[1] = 0;
         pjm.elements[2] = 0;
@@ -325,11 +336,33 @@ export class Matrix4 {
         pjm.elements[8] = 0;
         pjm.elements[9] = 0;
         pjm.elements[10] = (far + near) * nf;
-        pjm.elements[11] = 2 * far * near * nf;
+        pjm.elements[11] = -1;
         pjm.elements[12] = 0;
         pjm.elements[13] = 0;
-        pjm.elements[14] = -1; 
+        pjm.elements[14] = 2 * far * near * nf;
         pjm.elements[15] = 0;
+        
+        // 0, 1, 2, 3 
+        // 4, 5, 6, 7
+        // 8, 9, 10, 11
+        // 12, 13, 14, 15
+
+        // pjm.elements[0] = f / aspect;
+        // pjm.elements[1] = 0;
+        // pjm.elements[2] = 0;
+        // pjm.elements[3] = 0;
+        // pjm.elements[4] = 0;
+        // pjm.elements[5] = f;
+        // pjm.elements[6] = 0;
+        // pjm.elements[7] = 0;
+        // pjm.elements[8] = 0;
+        // pjm.elements[9] = 0;
+        // pjm.elements[10] = (far + near) * nf;
+        // pjm.elements[11] = 2 * far * near * nf;
+        // pjm.elements[12] = 0;
+        // pjm.elements[13] = 0;
+        // pjm.elements[14] = -1; 
+        // pjm.elements[15] = 0;
 
         return pjm;
     }
@@ -337,10 +370,10 @@ export class Matrix4 {
     log()
     {
         console.log(`--------------------
-${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},
-${this.m10}, ${this.m11}, ${this.m12}, ${this.m13},
-${this.m20}, ${this.m21}, ${this.m22}, ${this.m23},
-${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
+${this.m00}, ${this.m10}, ${this.m20}, ${this.m30},
+${this.m01}, ${this.m11}, ${this.m21}, ${this.m31},
+${this.m02}, ${this.m12}, ${this.m22}, ${this.m32},
+${this.m03}, ${this.m13}, ${this.m23}, ${this.m33},
 --------------------`);
     }
 }
