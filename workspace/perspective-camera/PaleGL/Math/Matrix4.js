@@ -170,7 +170,7 @@ export class Matrix4 {
         );
     }
     
-    static translateMatrix(v) {
+    static translationMatrix(v) {
         return new Matrix4(
             1, 0, 0, v.x,
             0, 1, 0, v.y,
@@ -179,7 +179,7 @@ export class Matrix4 {
         );
     }
     
-    static scaleMatrix(v) {
+    static scalingMatrix(v) {
         return new Matrix4(
             v.x, 0, 0, 0,
             0, v.y, 0, 0,
@@ -188,7 +188,7 @@ export class Matrix4 {
         );
     }
     
-    static rotateZMatrix(rad) {
+    static rotationZMatrix(rad) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
         return new Matrix4(
@@ -277,10 +277,6 @@ export class Matrix4 {
         return this;
     }
 
-    // 00, 01, 02, 03
-    // 10, 11, 12, 13
-    // 20, 21, 22, 23
-    // 30, 31, 32, 33
     transpose()
     {
         const m01 = this.m01;
@@ -438,6 +434,7 @@ export class Matrix4 {
     
     log()
     {
+        // col order to row order
         console.log(`--------------------
 ${this.m00}, ${this.m10}, ${this.m20}, ${this.m30},
 ${this.m01}, ${this.m11}, ${this.m21}, ${this.m31},

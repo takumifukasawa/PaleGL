@@ -119,7 +119,7 @@ scene.add(mesh);
 
 renderer.setSize(512, 512);
 
-const cameraWorldMatrix = Matrix4.translateMatrix(new Vector3(0, 0, 5));
+const cameraWorldMatrix = Matrix4.translationMatrix(new Vector3(0, 0, 5));
 
 const viewMatrix = cameraWorldMatrix.invert();
 
@@ -127,24 +127,24 @@ const tick = (time) => {
     renderer.clear(0, 0, 0, 1);
   
     const rootTransform = new Transform();
-    rootTransform.rotateZ((time / 1000 * 30) * (Math.PI / 180));
+    rootTransform.rotateZ(time / 1000 * 20);
     
     const childTransform = new Transform();
-    childTransform.scale(new Vector3(2, 1, 1));
-    childTransform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
-    childTransform.translate(new Vector3(0.5, 0, 0));
+    childTransform.setScale(new Vector3(2, 1, 1));
+    // childTransform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
+    childTransform.translate(new Vector3(2, 0, 0));
     
-    // const localMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
-    // const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
+    rootTransform.updateMatrix();
     
-    const worldMatrix = Matrix4.multiplyMatrices(rootTransform.worldMatrix, childTransform.localMatrix);
+    childTransform.parent = rootTransform;
+    childTransform.updateMatrix(); 
     
     material.uniforms.uViewMatrix.value = viewMatrix;
-    material.uniforms.uWorldMatrix.value = worldMatrix;
+    material.uniforms.uWorldMatrix.value = childTransform.worldMatrix;
     
     renderer.render(scene);
 
-    // requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
 }
 
 requestAnimationFrame(tick);
