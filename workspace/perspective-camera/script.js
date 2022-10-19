@@ -19,15 +19,18 @@ layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aColor;
 
 uniform mat4 uWorldMatrix;
+uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 out vec3 vColor;
 
 void main() {
     vColor = aColor;
-    // gl_Position = uProjectionMatrix * uWorldMatrix * vec4(aPosition, 1);
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
+    //gl_Position = uProjectionMatrix * uWorldMatrix * vec4(aPosition, 1);
+    // gl_Position = uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
     // gl_Position = uProjectionMatrix * vec4(aPosition, 1);
-    gl_Position = uWorldMatrix * vec4(aPosition, 1);
+    // gl_Position = uWorldMatrix * vec4(aPosition, 1);
     // gl_Position = vec4(aPosition, 1);
 }
 `;
@@ -53,7 +56,7 @@ const scene = new Scene();
 
 const renderer = new ForwardRenderer({gpu});
 
-const perspectiveMatrix = Matrix4.getPerspectiveMatrix(60, 1, 0.1, 1);
+const perspectiveMatrix = Matrix4.getPerspectiveMatrix(60 * Math.PI / 180, 1, 0.1, 10);
 
 const geometry = new Geometry({
     gpu,
@@ -66,10 +69,10 @@ const geometry = new Geometry({
             // 3 ---- 2
             // -----------------------------
             data: [
-                -0.2, 0.2, -0.1,
-                0.2, 0.2, -0.1,
-                0.2, -0.2, -0.1,
-                -0.2, -0.2, -0.1
+                -1, 1, 0,
+                1, 1, 0,
+                1, -1, 0,
+                -1, -1, 0
             ],
             size: 3
         },
@@ -98,6 +101,10 @@ const material = new Material({
             type: UniformTypes.Matrix4,
             value: Matrix4.identity()
         },
+        uViewMatrix: {
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity()
+        },
         uProjectionMatrix: {
             type: UniformTypes.Matrix4,
             value: perspectiveMatrix
@@ -111,23 +118,28 @@ scene.add(mesh);
 
 renderer.setSize(512, 512);
 
+const cameraWorldMatrix = Matrix4.translateMatrix(new Vector3(0, 0, 5));
+
+const viewMatrix = cameraWorldMatrix.invert();
+
 const tick = (time) => {
     renderer.clear(0, 0, 0, 1);
     
-    const rootMatrix = Matrix4.rotateZMatrix((time / 1000 * 30) * (Math.PI / 180));
+    const rootMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180));
     
     const scaleMatrix = Matrix4.scaleMatrix(new Vector3(2, 1, 1))
     const rotationMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180))
-    const translateMatrix = Matrix4.translateMatrix(new Vector3(0.5, 0, 0))
+    const translateMatrix = Matrix4.translateMatrix(new Vector3(0, 0, 0))
     const localMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
-    
-    const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
  
+    const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
+    
+    material.uniforms.uViewMatrix.value = viewMatrix;
     material.uniforms.uWorldMatrix.value = worldMatrix;
     
     renderer.render(scene);
 
-    requestAnimationFrame(tick);
+    // requestAnimationFrame(tick);
 }
 
 requestAnimationFrame(tick);
