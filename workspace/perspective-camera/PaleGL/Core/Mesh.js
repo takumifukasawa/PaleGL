@@ -1,11 +1,10 @@
-﻿import {Transform} from "./Transform.js";
+﻿import {Actor} from "./Actor.js";
 
-export class Mesh {
-    transform;
+export class Mesh extends Actor {
     geometry;
     material;
     constructor(geometry, material) {
-        this.transform = new Transform();
+        super();
         this.geometry = geometry;
         this.material = material;
     }

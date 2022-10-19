@@ -3,11 +3,21 @@ import {Matrix4} from "../Math/Matrix4.js";
 
 export class Transform {
     parent;
+    actor;
+    children = [];
     #worldMatrix = Matrix4.identity();
     #localMatrix = Matrix4.identity();
     position = Vector3.zero();
     rotation = Vector3.zero(); // degree vector
     scale = Vector3.one();
+    
+    get childCount() {
+        return this.children.length;
+    }
+    
+    get hasChild() {
+        return this.childCount > 0;
+    }
     
     get worldMatrix() {
         return this.#worldMatrix;
@@ -15,6 +25,10 @@ export class Transform {
     
     get localMatrix() {
         return this.#localMatrix;
+    }
+    
+    addChild(child) {
+        this.children.push(child);
     }
     
     updateMatrix() {

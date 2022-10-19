@@ -11,6 +11,7 @@ import {Geometry} from "./PaleGL/Core/Geometry.js";
 import {Material} from "./PaleGL/Core/Material.js";
 import {Matrix4} from "./PaleGL/Math/Matrix4.js";
 import {Transform} from "./PaleGL/Core/Transform.js";
+import {Actor} from "./PaleGL/Core/Actor.js";
 
 const canvas = document.getElementById("js-canvas");
 
@@ -97,25 +98,9 @@ const material = new Material({
     vertexShader,
     fragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
-    uniforms: {
-        uWorldMatrix: {
-            type: UniformTypes.Matrix4,
-            value: Matrix4.identity()
-        },
-        uViewMatrix: {
-            type: UniformTypes.Matrix4,
-            value: Matrix4.identity()
-        },
-        uProjectionMatrix: {
-            type: UniformTypes.Matrix4,
-            value: perspectiveMatrix
-        }
-    }
 });
 
 const mesh = new Mesh(geometry, material);
-
-scene.add(mesh);
 
 renderer.setSize(512, 512);
 
@@ -123,25 +108,22 @@ const cameraWorldMatrix = Matrix4.translationMatrix(new Vector3(0, 0, 5));
 
 const viewMatrix = cameraWorldMatrix.invert();
 
+const rootActor = new Actor();
+rootActor.addChild(mesh);
+
+scene.add(rootActor);
+
 const tick = (time) => {
-    renderer.clear(0, 0, 0, 1);
-  
-    const rootTransform = new Transform();
-    rootTransform.rotateZ(time / 1000 * 20);
-    
-    const childTransform = new Transform();
-    childTransform.setScale(new Vector3(2, 1, 1));
-    // childTransform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
-    childTransform.translate(new Vector3(2, 0, 0));
-    
-    rootTransform.updateMatrix();
-    
-    childTransform.parent = rootTransform;
-    childTransform.updateMatrix(); 
-    
     material.uniforms.uViewMatrix.value = viewMatrix;
-    material.uniforms.uWorldMatrix.value = childTransform.worldMatrix;
-    
+    material.uniforms.uProjectionMatrix.value = perspectiveMatrix;
+
+    rootActor.transform.rotateZ(time / 1000 * 20);
+
+    mesh.transform.setScale(new Vector3(2, 1, 1));
+    mesh.transform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
+    mesh.transform.translate(new Vector3(2, 0, 0));
+
+    renderer.clear(0, 0, 0, 1);
     renderer.render(scene);
 
     requestAnimationFrame(tick);
