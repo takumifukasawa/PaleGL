@@ -10,6 +10,7 @@ import {Mesh} from "./PaleGL/Core/Mesh.js";
 import {Geometry} from "./PaleGL/Core/Geometry.js";
 import {Material} from "./PaleGL/Core/Material.js";
 import {Matrix4} from "./PaleGL/Math/Matrix4.js";
+import {Transform} from "./PaleGL/Core/Transform.js";
 
 const canvas = document.getElementById("js-canvas");
 
@@ -124,15 +125,19 @@ const viewMatrix = cameraWorldMatrix.invert();
 
 const tick = (time) => {
     renderer.clear(0, 0, 0, 1);
+  
+    const rootTransform = new Transform();
+    rootTransform.rotateZ((time / 1000 * 30) * (Math.PI / 180));
     
-    const rootMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180));
+    const childTransform = new Transform();
+    childTransform.scale(new Vector3(2, 1, 1));
+    childTransform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
+    childTransform.translate(new Vector3(0.5, 0, 0));
     
-    const scaleMatrix = Matrix4.scaleMatrix(new Vector3(2, 1, 1))
-    const rotationMatrix = Matrix4.rotateZMatrix((time / 1000 * 0) * (Math.PI / 180))
-    const translateMatrix = Matrix4.translateMatrix(new Vector3(0, 0, 0))
-    const localMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
- 
-    const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
+    // const localMatrix = Matrix4.multiplyMatrices(translateMatrix, rotationMatrix, scaleMatrix);
+    // const worldMatrix = Matrix4.multiplyMatrices(rootMatrix, localMatrix);
+    
+    const worldMatrix = Matrix4.multiplyMatrices(rootTransform.worldMatrix, childTransform.localMatrix);
     
     material.uniforms.uViewMatrix.value = viewMatrix;
     material.uniforms.uWorldMatrix.value = worldMatrix;
