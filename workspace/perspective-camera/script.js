@@ -14,7 +14,9 @@ import {Transform} from "./PaleGL/Core/Transform.js";
 import {Actor} from "./PaleGL/Core/Actor.js";
 import {PerspectiveCamera} from "./PaleGL/Core/PerspectiveCamera.js";
 
-const canvas = document.getElementById("js-canvas");
+const wrapperElement = document.getElementById("wrapper");
+
+const canvasElement = document.getElementById("js-canvas");
 
 const vertexShader = `#version 300 es
 
@@ -51,13 +53,18 @@ void main() {
 }
 `;
 
-const gl = canvas.getContext('webgl2');
+const gl = canvasElement.getContext('webgl2');
 
 const gpu = new GPU({gl});
 
 const scene = new Scene();
 
-const renderer = new ForwardRenderer({gpu, canvas});
+const renderer = new ForwardRenderer({
+        gpu,
+        canvas: canvasElement,
+        pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    }
+);
 
 const boxPosition_0 = [-0.5, 0.5, 0.5];
 const boxPosition_1 = [-0.5, -0.5, 0.5];
@@ -67,7 +74,7 @@ const boxPosition_4 = [0.5, 0.5, -0.5];
 const boxPosition_5 = [0.5, -0.5, -0.5];
 const boxPosition_6 = [-0.5, 0.5, -0.5];
 const boxPosition_7 = [-0.5, -0.5, -0.5];
- 
+
 const boxGeometry = new Geometry({
     gpu,
     attributes: {
@@ -180,8 +187,8 @@ scene.add(perspectiveCamera);
 perspectiveCamera.transform.setTranslate(new Vector3(0, 0, 5));
 
 const onWindowResize = () => {
-    width = canvas.offsetWidth;
-    height = canvas.offsetHeight;
+    width = wrapperElement.offsetWidth;
+    height = wrapperElement.offsetHeight;
 
     perspectiveCamera.setSize(width, height);
     renderer.setSize(width, height);
@@ -193,13 +200,13 @@ onWindowResize();
 
 const tick = (time) => {
 
-    // rootActor.transform.setRotateZ(time / 1000 * 20);
+    rootActor.transform.setRotateZ(time / 1000 * 20);
 
     // mesh.transform.setScale(new Vector3(1, 0.5, 0.5));
-    mesh.transform.setRotateX(time / 1000 * 30);
-    // mesh.transform.setRotateY(-time / 1000 * 30);
-    // mesh.transform.setRotateZ(time / 1000 * -30);
-    // mesh.transform.setTranslate(new Vector3(2, 0, 0));
+    mesh.transform.setRotateX(time / 1000 * 10);
+    mesh.transform.setRotateY(time / 1000 * 14);
+    mesh.transform.setRotateZ(time / 1000 * 18);
+    mesh.transform.setTranslate(new Vector3(1.4, 0, 0));
 
     renderer.clear(0, 0, 0, 1);
     renderer.render(scene, perspectiveCamera);

@@ -3,18 +3,24 @@
 export class ForwardRenderer {
     #gpu;
     canvas;
+    pixelRatio;
 
-    constructor({gpu, canvas}) {
+    constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
         this.canvas = canvas;
+        this.pixelRatio = pixelRatio;
     }
 
     setSize(width, height) {
-        this.#gpu.setSize(width, height);
-        this.canvas.width = width;
-        this.canvas.height = height;
+        const canvasWidth = Math.floor(width * this.pixelRatio);
+        const canvasHeight = Math.floor(height * this.pixelRatio);
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
+        this.canvas.style.width = `${width}px`;
+        this.canvas.style.height = `${height}px`;
+        this.#gpu.setSize(canvasWidth, canvasHeight);
     }
-
+    
     flush() {
         this.#gpu.flush();
     }

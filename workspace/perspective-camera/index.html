@@ -11,19 +11,25 @@
             margin: 0;
             padding: 0;
         }
-        canvas {
-            display: block;
+
+        #wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
         }
+
+        canvas {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-<canvas id="js-canvas" width="512" height="512"></canvas>
+<div id="wrapper">
+    <canvas id="js-canvas"></canvas>
+</div>
 
 <script type="module" src="./script.js"></script>
 
