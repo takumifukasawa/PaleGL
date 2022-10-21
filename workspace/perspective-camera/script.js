@@ -57,7 +57,7 @@ const gpu = new GPU({gl});
 
 const scene = new Scene();
 
-const renderer = new ForwardRenderer({gpu});
+const renderer = new ForwardRenderer({gpu, canvas});
 
 const boxPosition_0 = [-0.5, 0.5, 0.5];
 const boxPosition_1 = [-0.5, -0.5, 0.5];
@@ -183,12 +183,8 @@ const onWindowResize = () => {
     width = canvas.offsetWidth;
     height = canvas.offsetHeight;
 
-    canvas.width = width;
-    canvas.height = height;
-
+    perspectiveCamera.setSize(width, height);
     renderer.setSize(width, height);
-
-    perspectiveCamera.updateProjectionMatrix(width / height);
 };
 
 window.addEventListener('resize', onWindowResize);

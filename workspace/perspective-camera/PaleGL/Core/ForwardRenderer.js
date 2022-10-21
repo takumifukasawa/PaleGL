@@ -2,13 +2,17 @@
 
 export class ForwardRenderer {
     #gpu;
+    canvas;
 
-    constructor({gpu}) {
+    constructor({gpu, canvas}) {
         this.#gpu = gpu;
+        this.canvas = canvas;
     }
 
     setSize(width, height) {
         this.#gpu.setSize(width, height);
+        this.canvas.width = width;
+        this.canvas.height = height;
     }
 
     flush() {
