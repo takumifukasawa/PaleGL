@@ -167,17 +167,33 @@ const material = new Material({
 // const mesh = new Mesh(geometry, material);
 const mesh = new Mesh(boxGeometry, material);
 
-renderer.setSize(512, 512);
+let width, height;
 
 const rootActor = new Actor();
 rootActor.addChild(mesh);
 
 scene.add(rootActor);
 
-const perspectiveCamera = new PerspectiveCamera(60 * Math.PI / 180, 1, 0.1, 10);
+const perspectiveCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 scene.add(perspectiveCamera);
 
 perspectiveCamera.transform.setTranslate(new Vector3(0, 0, 5));
+
+const onWindowResize = () => {
+    width = canvas.offsetWidth;
+    height = canvas.offsetHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    renderer.setSize(width, height);
+
+    perspectiveCamera.updateProjectionMatrix(width / height);
+};
+
+window.addEventListener('resize', onWindowResize);
+
+onWindowResize();
 
 const tick = (time) => {
 
