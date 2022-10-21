@@ -119,7 +119,7 @@ const tick = (time) => {
 
     rootActor.transform.rotateZ(time / 1000 * 20);
 
-    mesh.transform.setScale(new Vector3(2, 1, 1));
+    mesh.transform.setScale(new Vector3(1, 0.5, 0.5));
     mesh.transform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
     mesh.transform.translate(new Vector3(2, 0, 0));
 
