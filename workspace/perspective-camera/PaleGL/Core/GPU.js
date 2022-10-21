@@ -68,6 +68,13 @@ export class GPU {
     draw(drawCount, primitiveType, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
+       
+        // culling
+        gl.enable(gl.CULL_FACE);
+       
+        // depth for opaque
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
 
         gl.useProgram(this.#shader.glObject);
 

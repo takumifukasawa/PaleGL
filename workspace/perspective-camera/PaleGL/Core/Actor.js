@@ -11,4 +11,8 @@ export class Actor {
         this.transform.addChild(child);
         child.transform.parent = this.transform;
     }
+    
+    updateTransform() {
+        this.transform.updateMatrix();
+    }
 }

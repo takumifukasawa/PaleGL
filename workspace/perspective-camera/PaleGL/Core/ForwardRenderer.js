@@ -21,7 +21,8 @@ export class ForwardRenderer {
     
     render(scene, camera) {
         // update all actors matrix
-        scene.traverse((actor) => { actor.transform.updateMatrix() })
+        // TODO: scene 側でやった方がよい？
+        scene.traverse((actor) => actor.updateTransform())
         
         // draw 
         scene.traverse((actor) => {
@@ -34,6 +35,12 @@ export class ForwardRenderer {
             // TODO: material 側でやった方がよい？
             if(mesh.material.uniforms.uWorldMatrix) {
                 mesh.material.uniforms.uWorldMatrix.value = mesh.transform.worldMatrix;
+            }
+            if(mesh.material.uniforms.uViewMatrix) {
+                mesh.material.uniforms.uViewMatrix.value = camera.viewMatrix;
+            }
+            if(mesh.material.uniforms.uProjectionMatrix) {
+                mesh.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
             
             // vertex

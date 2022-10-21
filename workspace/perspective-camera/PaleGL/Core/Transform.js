@@ -33,8 +33,11 @@ export class Transform {
     
     updateMatrix() {
         const translationMatrix = Matrix4.translationMatrix(this.position);
-        // TODO: rotation matrix
-        const rotationMatrix = Matrix4.rotationZMatrix(this.rotation.z / 180 * Math.PI);
+        const rotationXMatrix = Matrix4.rotationXMatrix(this.rotation.x / 180 * Math.PI);
+        const rotationYMatrix = Matrix4.rotationYMatrix(this.rotation.y / 180 * Math.PI);
+        const rotationZMatrix = Matrix4.rotationZMatrix(this.rotation.z / 180 * Math.PI);
+        // roll(Z), pitch(X), yaw(Y)
+        const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
         const scalingMatrix = Matrix4.scalingMatrix(this.scale);
         this.#localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
         this.#worldMatrix = this.parent
@@ -45,12 +48,20 @@ export class Transform {
     setScale(s) {
         this.scale = s;
     }
+    
+    setRotateX(degree) {
+        this.rotation.x = degree;
+    }
+    
+    setRotateY(degree) {
+        this.rotation.y = degree;
+    }
 
-    rotateZ(degree) {
+    setRotateZ(degree) {
         this.rotation.z = degree;
     }
 
-    translate(v) {
+    setTranslate(v) {
         this.position = v;
     }
 }

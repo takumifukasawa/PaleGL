@@ -12,6 +12,7 @@ import {Material} from "./PaleGL/Core/Material.js";
 import {Matrix4} from "./PaleGL/Math/Matrix4.js";
 import {Transform} from "./PaleGL/Core/Transform.js";
 import {Actor} from "./PaleGL/Core/Actor.js";
+import {PerspectiveCamera} from "./PaleGL/Core/PerspectiveCamera.js";
 
 const canvas = document.getElementById("js-canvas");
 
@@ -58,23 +59,108 @@ const scene = new Scene();
 
 const renderer = new ForwardRenderer({gpu});
 
-const perspectiveMatrix = Matrix4.getPerspectiveMatrix(60 * Math.PI / 180, 1, 0.1, 10);
+const boxPosition_0 = [-0.5, 0.5, 0.5];
+const boxPosition_1 = [-0.5, -0.5, 0.5];
+const boxPosition_2 = [0.5, 0.5, 0.5];
+const boxPosition_3 = [0.5, -0.5, 0.5];
+const boxPosition_4 = [0.5, 0.5, -0.5];
+const boxPosition_5 = [0.5, -0.5, -0.5];
+const boxPosition_6 = [-0.5, 0.5, -0.5];
+const boxPosition_7 = [-0.5, -0.5, -0.5];
+ 
+const boxGeometry = new Geometry({
+    gpu,
+    attributes: {
+        // -----------------------------
+        //    
+        //   6 ---- 4
+        //  /|     /|
+        // 0 ---- 2 |
+        // | 7 -- | 5
+        // |/     |/
+        // 1 ---- 3
+        // -----------------------------
+        position: {
+            data: [
+                // front
+                ...boxPosition_0, ...boxPosition_1, ...boxPosition_2,
+                ...boxPosition_2, ...boxPosition_1, ...boxPosition_3,
+                // right
+                ...boxPosition_2, ...boxPosition_3, ...boxPosition_4,
+                ...boxPosition_4, ...boxPosition_3, ...boxPosition_5,
+                // back
+                ...boxPosition_4, ...boxPosition_5, ...boxPosition_6,
+                ...boxPosition_6, ...boxPosition_5, ...boxPosition_7,
+                // left
+                ...boxPosition_6, ...boxPosition_7, ...boxPosition_0,
+                ...boxPosition_0, ...boxPosition_7, ...boxPosition_1,
+                // top
+                ...boxPosition_6, ...boxPosition_0, ...boxPosition_4,
+                ...boxPosition_4, ...boxPosition_0, ...boxPosition_2,
+                // bottom
+                ...boxPosition_1, ...boxPosition_7, ...boxPosition_3,
+                ...boxPosition_3, ...boxPosition_7, ...boxPosition_5,
+            ],
+            size: 3,
+        },
+        color: {
+            data: [
+                // front: red
+                ...[...new Array(6)].map(i => ([1, 0, 0])).flat(),
+                // right: blue
+                ...[...new Array(6)].map(i => ([0, 1, 0])).flat(),
+                // back: green
+                ...[...new Array(6)].map(i => ([0, 0, 1])).flat(),
+                // left: yellow
+                ...[...new Array(6)].map(i => ([1, 1, 0])).flat(),
+                // top: purple
+                ...[...new Array(6)].map(i => ([1, 0, 1])).flat(),
+                // bottom: aqua
+                ...[...new Array(6)].map(i => ([0, 1, 1])).flat(),
+            ],
+            size: 3
+        },
+    },
+    // indices: [
+    //     // front
+    //     0, 1, 2,
+    //     2, 1, 3,
+    //     // right
+    //     2, 3, 4,
+    //     4, 3, 5,
+    //     // back
+    //     4, 5, 6
+    //     6, 5, 7,
+    //     // left
+    //     6, 7, 0,
+    //     0, 7, 1,
+    //     // top
+    //     6, 0, 4,
+    //     4, 0, 2,
+    //     // bottom
+    //     1, 7, 3,
+    //     3, 7, 5
+    // ],
+    drawCount: 3 * 2 * 6 // vertex count
+});
 
 const geometry = new Geometry({
     gpu,
     attributes: {
         position: {
             // -----------------------------
-            // 0 ---- 1
-            // |      |
-            // |      |
-            // 3 ---- 2
+            // 0 ---- 2
+            // |    / |
+            // |   /  |
+            // |  /   |
+            // | /    |
+            // 1 ---- 3
             // -----------------------------
             data: [
                 -1, 1, 0,
+                -1, -1, 0,
                 1, 1, 0,
                 1, -1, 0,
-                -1, -1, 0
             ],
             size: 3
         },
@@ -88,7 +174,7 @@ const geometry = new Geometry({
             size: 3
         }
     },
-    indices: [0, 2, 1, 0, 3, 2],
+    indices: [0, 1, 2, 2, 1, 3],
     drawCount: 6
 });
 
@@ -100,31 +186,34 @@ const material = new Material({
     primitiveType: PrimitiveTypes.Triangles,
 });
 
-const mesh = new Mesh(geometry, material);
+// const mesh = new Mesh(geometry, material);
+const mesh = new Mesh(boxGeometry, material);
 
 renderer.setSize(512, 512);
-
-const cameraWorldMatrix = Matrix4.translationMatrix(new Vector3(0, 0, 5));
-
-const viewMatrix = cameraWorldMatrix.invert();
 
 const rootActor = new Actor();
 rootActor.addChild(mesh);
 
 scene.add(rootActor);
 
+const perspectiveCamera = new PerspectiveCamera(60 * Math.PI / 180, 1, 0.1, 10);
+scene.add(perspectiveCamera);
+
+perspectiveCamera.transform.setTranslate(new Vector3(0, 0, 5));
+
 const tick = (time) => {
-    material.uniforms.uViewMatrix.value = viewMatrix;
-    material.uniforms.uProjectionMatrix.value = perspectiveMatrix;
 
-    rootActor.transform.rotateZ(time / 1000 * 20);
+    // rootActor.transform.setRotateZ(time / 1000 * 20);
 
-    mesh.transform.setScale(new Vector3(1, 0.5, 0.5));
-    mesh.transform.rotateZ((time / 1000 * 0) * (Math.PI / 180))
-    mesh.transform.translate(new Vector3(2, 0, 0));
+    // mesh.transform.setScale(new Vector3(1, 0.5, 0.5));
+    // mesh.transform.setRotateX(time / 1000 * 30);
+    // mesh.transform.setRotateY(-time / 1000 * 30);
+    mesh.transform.setRotateY(45);
+    // mesh.transform.setRotateZ(time / 1000 * -30);
+    // mesh.transform.setTranslate(new Vector3(2, 0, 0));
 
     renderer.clear(0, 0, 0, 1);
-    renderer.render(scene);
+    renderer.render(scene, perspectiveCamera);
 
     requestAnimationFrame(tick);
 }

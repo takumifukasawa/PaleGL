@@ -188,6 +188,28 @@ export class Matrix4 {
         );
     }
     
+    static rotationXMatrix(rad) {
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        return new Matrix4(
+            1, 0, 0, 0, 
+            0, c, -s, 0, 
+            0, s, c, 0, 
+            0, 0, 0, 1
+        );
+    }
+    
+    static rotationYMatrix(rad) {
+       const c = Math.cos(rad);
+       const s = Math.sin(rad);
+       return new Matrix4(
+           c, 0, s, 0, 
+           0, 1, 0, 0, 
+           -s, 0, c, 0, 
+           0, 0, 0, 1
+       );
+    }
+    
     static rotationZMatrix(rad) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
@@ -276,9 +298,29 @@ export class Matrix4 {
         this.m33 = m.m33;
         return this;
     }
+    
+    clone() {
+        const m = Matrix4.identity();
+        m.m00 = this.m00;
+        m.m01 = this.m01;
+        m.m02 = this.m02;
+        m.m03 = this.m03;
+        m.m10 = this.m10;
+        m.m11 = this.m11;
+        m.m12 = this.m12;
+        m.m13 = this.m13;
+        m.m20 = this.m20;
+        m.m21 = this.m21;
+        m.m22 = this.m22;
+        m.m23 = this.m23;
+        m.m30 = this.m30;
+        m.m31 = this.m31;
+        m.m32 = this.m32;
+        m.m33 = this.m33;
+        return m;
+    }
 
-    transpose()
-    {
+    transpose() {
         const m01 = this.m01;
         const m10 = this.m10;
         this.m01 = m10;
