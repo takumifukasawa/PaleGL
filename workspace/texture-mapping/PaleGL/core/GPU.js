@@ -82,7 +82,8 @@ export class GPU {
                     gl.uniformMatrix4fv(location, false, uniform.value.elements);
                     break;
                 case UniformTypes.Texture:
-                    gl.activeTexture(gl[`TEXTURE${activeTextureIndex}`]);
+                    const activeTextureKey = gl[`TEXTURE${activeTextureIndex}`];
+                    gl.activeTexture(activeTextureKey);
                     gl.bindTexture(gl.TEXTURE_2D, uniform.value.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
@@ -91,7 +92,7 @@ export class GPU {
                     throw "invalid uniform type";
             }
         });
-
+        
         // set vertex
         gl.bindVertexArray(this.#vao.glObject);
 

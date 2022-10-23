@@ -24,18 +24,18 @@ const vertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aColor;
+layout (location = 2) in float aTextureIndex;
 
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 out vec2 vUv;
-out vec3 vColor;
+out float vTextureIndex;
 
 void main() {
     vUv = aUv;
-    vColor = aColor;
+    vTextureIndex = aTextureIndex;
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
 }
 `;
@@ -45,17 +45,35 @@ const fragmentShader = `#version 300 es
 precision mediump float;
 
 in vec2 vUv;
-in vec3 vColor;
+in float vTextureIndex;
 
 out vec4 outColor;
 
-uniform sampler2D uTextureUv;
+uniform sampler2D uDirZPlusMap;
+uniform sampler2D uDirXPlusMap;
+uniform sampler2D uDirZMinusMap;
+uniform sampler2D uDirXMinusMap;
+uniform sampler2D uDirYPlusMap;
+uniform sampler2D uDirYMinusMap;
 
 void main() {
-    vec4 textureColor = texture(uTextureUv, vUv);
+    vec4 textureColor = vec4(0, 0, 0, 1);
+
+    if(vTextureIndex < 0.5) {
+        textureColor = texture(uDirZPlusMap, vUv);
+    } else if(vTextureIndex < 1.5) {
+        textureColor = texture(uDirXPlusMap, vUv);
+    } else if(vTextureIndex < 2.5) {
+        textureColor = texture(uDirZMinusMap, vUv);
+    } else if(vTextureIndex < 3.5) {
+        textureColor = texture(uDirXMinusMap, vUv);
+    } else if(vTextureIndex < 4.5) {
+        textureColor = texture(uDirYPlusMap, vUv);
+    } else {
+        textureColor = texture(uDirYMinusMap, vUv);
+    }
+
     outColor = textureColor;
-    // outColor = vec4(vColor, 1);
-    // outColor = vec4(vUv, 1, 1);
 }
 `;
 
@@ -110,22 +128,31 @@ const boxGeometry = new Geometry({
             ],
             size: 3,
         },
-        color: {
+        uv: {
+            data: (new Array(6)).fill(0).map(() => ([
+                0, 0,
+                0, 1,
+                1, 0,
+                1, 1
+            ])).flat(),
+            size: 2
+        },
+        textureIndex: {
             data: [
-                // front: red
-                ...(new Array(4)).fill(0).map(() => ([1, 0, 0])).flat(),
-                // right: blue
-                ...(new Array(4)).fill(0).map(() => ([0, 1, 0])).flat(),
-                // back: green
-                ...(new Array(4)).fill(0).map(() => ([0, 0, 1])).flat(),
-                // left: yellow
-                ...(new Array(4)).fill(0).map(() => ([1, 1, 0])).flat(),
-                // top: purple
-                ...(new Array(4)).fill(0).map(() => ([1, 0, 1])).flat(),
-                // bottom: aqua
-                ...(new Array(4)).fill(0).map(() => ([0, 1, 1])).flat(),
+                // front: z minus
+                ...(new Array(4)).fill(0),
+                // right: x plus
+                ...(new Array(4)).fill(1),
+                // back: z plus
+                ...(new Array(4)).fill(2),
+                // back: x minus
+                ...(new Array(4)).fill(3),
+                // back: y plus
+                ...(new Array(4)).fill(4),
+                // back: y minus
+                ...(new Array(4)).fill(5),
             ],
-            size: 3
+            size: 1
         },
     },
     indices: Array.from(Array(6).keys()).map(i => ([
@@ -178,28 +205,49 @@ const geometry = new Geometry({
     drawCount: 6
 });
 
+const images = {
+    uDirZMinusMap: {
+        src: "./images/dir-z-minus.png",
+    },
+    uDirXPlusMap: {
+        src: "./images/dir-x-plus.png",
+    },
+    uDirZPlusMap: {
+        src: "./images/dir-z-plus.png",
+    },
+    uDirXMinusMap: {
+        src: "./images/dir-x-minus.png",
+    },
+    uDirYMinusMap: {
+        src: "./images/dir-y-minus.png",
+    },
+    uDirYPlusMap: {
+        src: "./images/dir-y-plus.png",
+    },
+};
 
 const material = new Material({
     gpu,
     vertexShader,
     fragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
-    uniforms: {
-        uTextureUv: {
-            type: UniformTypes.Texture,
-            value: null
-        }
-    }
 });
 
-(async () => {
-    const img = await loadImg("./uv-map.jpg");
-    const texture = new Texture({ gpu, img });
-    material.uniforms.uTextureUv.value = texture;
-})();
+Promise.all(Object.keys(images).map(async (key) => {
+    const data = images[key];
+    const img = await loadImg(data.src);
+    return { key, img }
+})).then(data => {
+    data.forEach(({ key , img }) => {
+        material.uniforms[key] = {
+            type: UniformTypes.Texture,
+            value: new Texture({gpu, img})
+        }
+    });
+});
 
-const mesh = new Mesh(geometry, material);
-// const mesh = new Mesh(boxGeometry, material);
+// const mesh = new Mesh(geometry, material);
+const mesh = new Mesh(boxGeometry, material);
 
 let width, height;
 
@@ -230,7 +278,7 @@ const tick = (time) => {
     // rootActor.transform.setRotationZ(time / 1000 * 20);
 
     // mesh.transform.setRotationX(time / 1000 * 10);
-    // mesh.transform.setRotationY(time / 1000 * 14);
+    mesh.transform.setRotationY(time / 1000 * 14);
     // mesh.transform.setRotationZ(time / 1000 * 18);
     // mesh.transform.setTranslation(new Vector3(1.4, 0, 0));
 

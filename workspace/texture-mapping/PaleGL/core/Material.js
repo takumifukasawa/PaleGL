@@ -17,6 +17,7 @@ export class Material {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.primitiveType = primitiveType;
 
+        // TODO: シェーダーごとにわける？
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,
