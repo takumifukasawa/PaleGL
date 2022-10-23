@@ -24,7 +24,6 @@ const vertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
-layout (location = 2) in float aTextureIndex;
 
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
@@ -35,7 +34,7 @@ out float vTextureIndex;
 
 void main() {
     vUv = aUv;
-    vTextureIndex = aTextureIndex;
+    vTextureIndex = floor(float(gl_VertexID) / 4.);
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
 }
 `;
@@ -136,23 +135,6 @@ const boxGeometry = new Geometry({
                 1, 1
             ])).flat(),
             size: 2
-        },
-        textureIndex: {
-            data: [
-                // front: z minus
-                ...(new Array(4)).fill(0),
-                // right: x plus
-                ...(new Array(4)).fill(1),
-                // back: z plus
-                ...(new Array(4)).fill(2),
-                // back: x minus
-                ...(new Array(4)).fill(3),
-                // back: y plus
-                ...(new Array(4)).fill(4),
-                // back: y minus
-                ...(new Array(4)).fill(5),
-            ],
-            size: 1
         },
     },
     indices: Array.from(Array(6).keys()).map(i => ([
@@ -277,7 +259,7 @@ const tick = (time) => {
 
     // rootActor.transform.setRotationZ(time / 1000 * 20);
 
-    // mesh.transform.setRotationX(time / 1000 * 10);
+    mesh.transform.setRotationX(time / 1000 * 10);
     mesh.transform.setRotationY(time / 1000 * 14);
     // mesh.transform.setRotationZ(time / 1000 * 18);
     // mesh.transform.setTranslation(new Vector3(1.4, 0, 0));
