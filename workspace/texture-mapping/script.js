@@ -20,7 +20,7 @@ const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
 
-const vertexShader = `#version 300 es
+const boxVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -39,7 +39,7 @@ void main() {
 }
 `;
 
-const fragmentShader = `#version 300 es
+const boxFragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -73,6 +73,36 @@ void main() {
     }
 
     outColor = textureColor;
+}
+`;
+
+const planeVertexShader = `#version 300 es
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aUv;
+
+uniform mat4 uWorldMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+
+out vec2 vUv;
+
+void main() {
+    vUv = aUv;
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
+}
+`;
+
+const planeFragmentShader = `#version 300 es
+
+precision mediump float;
+
+in vec2 vUv;
+
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(vUv, 1., 1.);
 }
 `;
 
@@ -144,7 +174,7 @@ const boxGeometry = new Geometry({
     drawCount: 6 * 6 // indices count
 });
 
-const geometry = new Geometry({
+const planeGeometry = new Geometry({
     gpu,
     // -----------------------------
     // 0 ---- 2
@@ -208,10 +238,17 @@ const images = {
     },
 };
 
-const material = new Material({
+const boxMaterial = new Material({
     gpu,
-    vertexShader,
-    fragmentShader,
+    vertexShader: boxVertexShader,
+    fragmentShader: boxFragmentShader,
+    primitiveType: PrimitiveTypes.Triangles,
+});
+
+const planeMaterial = new Material({
+    gpu,
+    vertexShader: planeVertexShader,
+    fragmentShader: planeFragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
 });
 
@@ -221,22 +258,23 @@ Promise.all(Object.keys(images).map(async (key) => {
     return { key, img }
 })).then(data => {
     data.forEach(({ key , img }) => {
-        material.uniforms[key] = {
+        boxMaterial.uniforms[key] = {
             type: UniformTypes.Texture,
             value: new Texture({gpu, img})
         }
     });
 });
 
-// const mesh = new Mesh(geometry, material);
-const mesh = new Mesh(boxGeometry, material);
+const boxMesh = new Mesh(boxGeometry, boxMaterial);
+const planeMesh = new Mesh(planeGeometry, planeMaterial);
 
 let width, height;
 
 const rootActor = new Actor();
-rootActor.addChild(mesh);
+rootActor.addChild(boxMesh);
 
 scene.add(rootActor);
+scene.add(planeMesh);
 
 const perspectiveCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 scene.add(perspectiveCamera);
@@ -256,13 +294,12 @@ window.addEventListener('resize', onWindowResize);
 onWindowResize();
 
 const tick = (time) => {
-
     // rootActor.transform.setRotationZ(time / 1000 * 20);
 
-    mesh.transform.setRotationX(time / 1000 * 10);
-    mesh.transform.setRotationY(time / 1000 * 14);
-    // mesh.transform.setRotationZ(time / 1000 * 18);
-    // mesh.transform.setTranslation(new Vector3(1.4, 0, 0));
+    boxMesh.transform.setRotationX(time / 1000 * 10);
+    boxMesh.transform.setRotationY(time / 1000 * 14);
+    
+    planeMesh.transform.setTranslation(new Vector3(0, 0, -1));
 
     renderer.clear(0, 0, 0, 1);
     renderer.render(scene, perspectiveCamera);
