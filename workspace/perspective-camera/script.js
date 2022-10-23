@@ -184,7 +184,7 @@ scene.add(rootActor);
 const perspectiveCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 scene.add(perspectiveCamera);
 
-perspectiveCamera.transform.setTranslate(new Vector3(0, 0, 5));
+perspectiveCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -200,13 +200,12 @@ onWindowResize();
 
 const tick = (time) => {
 
-    rootActor.transform.setRotateZ(time / 1000 * 20);
+    rootActor.transform.setRotationZ(time / 1000 * 20);
 
-    // mesh.transform.setScale(new Vector3(1, 0.5, 0.5));
-    mesh.transform.setRotateX(time / 1000 * 10);
-    mesh.transform.setRotateY(time / 1000 * 14);
-    mesh.transform.setRotateZ(time / 1000 * 18);
-    mesh.transform.setTranslate(new Vector3(1.4, 0, 0));
+    mesh.transform.setRotationX(time / 1000 * 10);
+    mesh.transform.setRotationY(time / 1000 * 14);
+    mesh.transform.setRotationZ(time / 1000 * 18);
+    mesh.transform.setTranslation(new Vector3(1.4, 0, 0));
 
     renderer.clear(0, 0, 0, 1);
     renderer.render(scene, perspectiveCamera);

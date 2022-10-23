@@ -45,23 +45,23 @@ export class Transform {
             : this.localMatrix;
     }
 
-    setScale(s) {
+    setScaling(s) {
         this.scale = s;
     }
     
-    setRotateX(degree) {
+    setRotationX(degree) {
         this.rotation.x = degree;
     }
     
-    setRotateY(degree) {
+    setRotationY(degree) {
         this.rotation.y = degree;
     }
 
-    setRotateZ(degree) {
+    setRotationZ(degree) {
         this.rotation.z = degree;
     }
 
-    setTranslate(v) {
+    setTranslation(v) {
         this.position = v;
     }
 }
