@@ -300,6 +300,8 @@ const tick = (time) => {
     boxMesh.transform.setRotationY(time / 1000 * 14);
     
     planeMesh.transform.setTranslation(new Vector3(0, 0, -1));
+    planeMesh.transform.setRotationZ(time / 1000 * 10);
+    planeMesh.transform.setScaling(new Vector3(2, 2, 2));
 
     renderer.clear(0, 0, 0, 1);
     renderer.render(scene, perspectiveCamera);
