@@ -106,7 +106,7 @@ uniform sampler2D uSceneTexture;
 
 void main() {
     vec4 color = texture(uSceneTexture, vUv);
-    outColor = vec4(vUv, 1., 1.);
+    outColor = color;
 }
 `;
 
@@ -257,18 +257,25 @@ const boxMaterial2 = new Material({
     vertexShader: box2VertexShader,
     fragmentShader: box2FragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
+    uniforms: {
+        uSceneTexture: {
+            type: UniformTypes.Texture,
+            value: null
+        }
+    }
 });
 
 Promise.all(Object.keys(images).map(async (key) => {
+    boxMaterial1.uniforms[key] = {
+        type: UniformTypes.Texture,
+        value: null
+    };
     const data = images[key];
     const img = await loadImg(data.src);
     return { key, img }
 })).then(data => {
     data.forEach(({ key , img }) => {
-        boxMaterial1.uniforms[key] = {
-            type: UniformTypes.Texture,
-            value: new Texture({gpu, img})
-        }
+        boxMaterial1.uniforms[key].value = new Texture({gpu, img});
     });
 });
 
@@ -288,14 +295,14 @@ viewportScene.add(perspectiveCamera2);
 perspectiveCamera1.transform.setTranslation(new Vector3(0, 0, 5));
 perspectiveCamera2.transform.setTranslation(new Vector3(0, 0, 5));
 
-// const renderTarget = new RenderTarget({ gpu });
+const renderTarget = new RenderTarget({ gpu });
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
 
-    // renderTarget.setSize(width, height);
+    renderTarget.setSize(width, height);
     perspectiveCamera1.setSize(aspect);
     perspectiveCamera2.setSize(aspect);
     renderer.setSize(width, height);
@@ -314,15 +321,15 @@ const tick = (time) => {
     
     boxMesh2.transform.setRotationZ(time / 1000 * 10);
  
-    // renderer.setRenderTarget(renderTarget);
-    renderer.clear(0, 0, 0, 1);
+    renderer.setRenderTarget(renderTarget);
+    renderer.clear(1, 1, 1, 1);
     renderer.render(captureScene, perspectiveCamera1);
     
-    // // render viewport scene
-    // 
-    // renderer.setRenderTarget(null);
-    // renderer.clear(0, 0, 0, 1);
-    // renderer.render(viewportScene, perspectiveCamera2);
+    // render viewport scene
+    renderer.setRenderTarget(null);
+    renderer.clear(0, 0, 0, 1);
+    boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
+    renderer.render(viewportScene, perspectiveCamera2);
     
     // loop
 

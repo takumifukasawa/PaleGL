@@ -23,7 +23,7 @@ export class Texture extends GLObject {
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
 
-        this.#img = img;
+        this.#img = img || null;
 
         this.#texture = gl.createTexture();
 
@@ -65,7 +65,7 @@ export class Texture extends GLObject {
 
         if (width && height) {
             // for render target
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
         } else {
             // set img to texture
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
@@ -78,7 +78,7 @@ export class Texture extends GLObject {
     setSize(width, height) {
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+        // gl.bindTexture(gl.TEXTURE_2D, null);
     }
 }

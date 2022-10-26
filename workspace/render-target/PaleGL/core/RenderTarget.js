@@ -33,6 +33,10 @@ export class RenderTarget {
             this.#texture.glObject,
             0
         );
+       
+        // unbind
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
     
     setSize(width, height) {

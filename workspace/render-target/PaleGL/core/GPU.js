@@ -1,4 +1,15 @@
 ﻿import {PrimitiveTypes, UniformTypes} from "./constants.js";
+import {Texture} from "./Texture.js";
+
+const createWhite1x1 = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 1;
+    canvas.height = 1;
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, 1, 1);
+    return canvas;
+};
 
 export class GPU {
     gl;
@@ -6,9 +17,11 @@ export class GPU {
     #vao;
     #ibo;
     #uniforms;
+    dummyTexture;
 
     constructor({gl}) {
         this.gl = gl;
+        this.dummyTexture = new Texture({ gpu: this, img: createWhite1x1() });
     }
 
     setShader(shader) {
@@ -73,9 +86,6 @@ export class GPU {
         // uniforms
         Object.keys(this.#uniforms).forEach(uniformName => {
             const uniform = this.#uniforms[uniformName];
-            if(!uniform.value) {
-                return;
-            }
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
             switch (uniform.type) {
                 case UniformTypes.Matrix4:
@@ -84,7 +94,7 @@ export class GPU {
                 case UniformTypes.Texture:
                     const activeTextureKey = gl[`TEXTURE${activeTextureIndex}`];
                     gl.activeTexture(activeTextureKey);
-                    gl.bindTexture(gl.TEXTURE_2D, uniform.value.glObject);
+                    gl.bindTexture(gl.TEXTURE_2D, uniform.value ? uniform.value.glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
                     break;
