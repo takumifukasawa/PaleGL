@@ -121,8 +121,7 @@ const viewportScene = new Scene();
 const renderer = new ForwardRenderer({
         gpu,
         canvas: canvasElement,
-        // pixelRatio: Math.min(window.devicePixelRatio, 1.5)
-        pixelRatio: 1
+        pixelRatio: Math.min(window.devicePixelRatio, 1.5)
     }
 );
 
@@ -297,14 +296,14 @@ viewportScene.add(viewportCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
-const renderTarget = new RenderTarget({ gpu, width: 512, height: 512 });
+const renderTarget = new RenderTarget({ gpu });
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
 
-    // renderTarget.setSize(512, 512);
+    renderTarget.setSize(width, height);
     captureSceneCamera.setSize(-2 * aspect, 2 * aspect, -2, 2, );
     viewportCamera.setSize(aspect);
     renderer.setSize(width, height);
@@ -327,7 +326,7 @@ const tick = (time) => {
     renderer.clear(1, 1, 1, 1);
     renderer.render(captureScene, captureSceneCamera);
     
-    // // render viewport scene
+    // render viewport scene
     renderer.setRenderTarget(null);
     renderer.clear(0, 0, 0, 1);
     boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
