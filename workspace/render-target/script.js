@@ -15,12 +15,13 @@ import {Actor} from "./PaleGL/Core/Actor.js";
 import {PerspectiveCamera} from "./PaleGL/Core/PerspectiveCamera.js";
 import {Texture} from "./PaleGL/core/Texture.js";
 import {loadImg} from "./PaleGL/utils/loadImg.js";
+import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
 
-const boxVertexShader = `#version 300 es
+const box1VertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -39,7 +40,7 @@ void main() {
 }
 `;
 
-const boxFragmentShader = `#version 300 es
+const box1FragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -76,7 +77,7 @@ void main() {
 }
 `;
 
-const planeVertexShader = `#version 300 es
+const box2VertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -93,7 +94,7 @@ void main() {
 }
 `;
 
-const planeFragmentShader = `#version 300 es
+const box2FragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -101,7 +102,10 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+uniform sampler2D uSceneTexture;
+
 void main() {
+    vec4 color = texture(uSceneTexture, vUv);
     outColor = vec4(vUv, 1., 1.);
 }
 `;
@@ -110,7 +114,8 @@ const gl = canvasElement.getContext('webgl2');
 
 const gpu = new GPU({gl});
 
-const scene = new Scene();
+const captureScene = new Scene();
+const viewportScene = new Scene();
 
 const renderer = new ForwardRenderer({
         gpu,
@@ -128,51 +133,53 @@ const boxPosition_5 = [0.5, -0.5, -0.5];
 const boxPosition_6 = [-0.5, 0.5, -0.5];
 const boxPosition_7 = [-0.5, -0.5, -0.5];
 
-const boxGeometry = new Geometry({
-    gpu,
-    attributes: {
-        // -----------------------------
-        //    
-        //   6 ---- 4
-        //  /|     /|
-        // 0 ---- 2 |
-        // | 7 -- | 5
-        // |/     |/
-        // 1 ---- 3
-        // -----------------------------
-        position: {
-            data: [
-                // front
-                ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
-                // right
-                ...boxPosition_2, ...boxPosition_3, ...boxPosition_4, ...boxPosition_5,
-                // back
-                ...boxPosition_4, ...boxPosition_5, ...boxPosition_6, ...boxPosition_7,
-                // left
-                ...boxPosition_6, ...boxPosition_7, ...boxPosition_0, ...boxPosition_1,
-                // top
-                ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
-                // bottom
-                ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
-            ],
-            size: 3,
+const createBoxGeometry = () => {
+    return new Geometry({
+        gpu,
+        attributes: {
+            // -----------------------------
+            //    
+            //   6 ---- 4
+            //  /|     /|
+            // 0 ---- 2 |
+            // | 7 -- | 5
+            // |/     |/
+            // 1 ---- 3
+            // -----------------------------
+            position: {
+                data: [
+                    // front
+                    ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
+                    // right
+                    ...boxPosition_2, ...boxPosition_3, ...boxPosition_4, ...boxPosition_5,
+                    // back
+                    ...boxPosition_4, ...boxPosition_5, ...boxPosition_6, ...boxPosition_7,
+                    // left
+                    ...boxPosition_6, ...boxPosition_7, ...boxPosition_0, ...boxPosition_1,
+                    // top
+                    ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
+                    // bottom
+                    ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
+                ],
+                size: 3,
+            },
+            uv: {
+                data: (new Array(6)).fill(0).map(() => ([
+                    0, 0,
+                    0, 1,
+                    1, 0,
+                    1, 1
+                ])).flat(),
+                size: 2
+            },
         },
-        uv: {
-            data: (new Array(6)).fill(0).map(() => ([
-                0, 0,
-                0, 1,
-                1, 0,
-                1, 1
-            ])).flat(),
-            size: 2
-        },
-    },
-    indices: Array.from(Array(6).keys()).map(i => ([
-        i * 4 + 0, i * 4 + 1, i * 4 + 2,
-        i * 4 + 2, i * 4 + 1, i * 4 + 3,
-    ])).flat(),
-    drawCount: 6 * 6 // indices count
-});
+        indices: Array.from(Array(6).keys()).map(i => ([
+            i * 4 + 0, i * 4 + 1, i * 4 + 2,
+            i * 4 + 2, i * 4 + 1, i * 4 + 3,
+        ])).flat(),
+        drawCount: 6 * 6 // indices count
+    });
+};
 
 const planeGeometry = new Geometry({
     gpu,
@@ -238,17 +245,17 @@ const images = {
     },
 };
 
-const boxMaterial = new Material({
+const boxMaterial1 = new Material({
     gpu,
-    vertexShader: boxVertexShader,
-    fragmentShader: boxFragmentShader,
+    vertexShader: box1VertexShader,
+    fragmentShader: box1FragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
 });
 
-const planeMaterial = new Material({
+const boxMaterial2 = new Material({
     gpu,
-    vertexShader: planeVertexShader,
-    fragmentShader: planeFragmentShader,
+    vertexShader: box2VertexShader,
+    fragmentShader: box2FragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
 });
 
@@ -258,35 +265,39 @@ Promise.all(Object.keys(images).map(async (key) => {
     return { key, img }
 })).then(data => {
     data.forEach(({ key , img }) => {
-        boxMaterial.uniforms[key] = {
+        boxMaterial1.uniforms[key] = {
             type: UniformTypes.Texture,
             value: new Texture({gpu, img})
         }
     });
 });
 
-const boxMesh = new Mesh(boxGeometry, boxMaterial);
-const planeMesh = new Mesh(planeGeometry, planeMaterial);
+const boxMesh1 = new Mesh(createBoxGeometry(), boxMaterial1);
+const boxMesh2 = new Mesh(createBoxGeometry(), boxMaterial2);
 
 let width, height;
 
-const rootActor = new Actor();
-rootActor.addChild(boxMesh);
+captureScene.add(boxMesh1);
+viewportScene.add(boxMesh2);
 
-scene.add(rootActor);
-scene.add(planeMesh);
+const perspectiveCamera1 = new PerspectiveCamera(60, 1, 0.1, 10);
+const perspectiveCamera2 = new PerspectiveCamera(60, 1, 0.1, 10);
+captureScene.add(perspectiveCamera1);
+viewportScene.add(perspectiveCamera2);
 
-const perspectiveCamera = new PerspectiveCamera(60, 1, 0.1, 10);
-scene.add(perspectiveCamera);
+perspectiveCamera1.transform.setTranslation(new Vector3(0, 0, 5));
+perspectiveCamera2.transform.setTranslation(new Vector3(0, 0, 5));
 
-perspectiveCamera.transform.setTranslation(new Vector3(0, 0, 5));
+// const renderTarget = new RenderTarget({ gpu });
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
 
-    perspectiveCamera.setSize(aspect);
+    // renderTarget.setSize(width, height);
+    perspectiveCamera1.setSize(aspect);
+    perspectiveCamera2.setSize(aspect);
     renderer.setSize(width, height);
 };
 
@@ -295,17 +306,25 @@ window.addEventListener('resize', onWindowResize);
 onWindowResize();
 
 const tick = (time) => {
-    // rootActor.transform.setRotationZ(time / 1000 * 20);
 
-    boxMesh.transform.setRotationX(time / 1000 * 10);
-    boxMesh.transform.setRotationY(time / 1000 * 14);
+    // render capture scene
     
-    planeMesh.transform.setTranslation(new Vector3(0, 0, -1));
-    planeMesh.transform.setRotationZ(time / 1000 * 10);
-    planeMesh.transform.setScaling(new Vector3(2, 2, 2));
-
+    boxMesh1.transform.setRotationX(time / 1000 * 10);
+    boxMesh1.transform.setRotationY(time / 1000 * 14);
+    
+    boxMesh2.transform.setRotationZ(time / 1000 * 10);
+ 
+    // renderer.setRenderTarget(renderTarget);
     renderer.clear(0, 0, 0, 1);
-    renderer.render(scene, perspectiveCamera);
+    renderer.render(captureScene, perspectiveCamera1);
+    
+    // // render viewport scene
+    // 
+    // renderer.setRenderTarget(null);
+    // renderer.clear(0, 0, 0, 1);
+    // renderer.render(viewportScene, perspectiveCamera2);
+    
+    // loop
 
     requestAnimationFrame(tick);
 }

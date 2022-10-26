@@ -4,6 +4,7 @@ export class ForwardRenderer {
     #gpu;
     canvas;
     pixelRatio;
+    #renderTarget;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
@@ -19,6 +20,16 @@ export class ForwardRenderer {
         this.canvas.style.width = `${width}px`;
         this.canvas.style.height = `${height}px`;
         this.#gpu.setSize(canvasWidth, canvasHeight);
+    }
+    
+    setRenderTarget(renderTarget) {
+        const gl = this.#gpu.gl;
+        this.#renderTarget = renderTarget;
+        if(this.#renderTarget) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.#renderTarget.framebuffer.glObject);
+        } else {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        }
     }
     
     flush() {

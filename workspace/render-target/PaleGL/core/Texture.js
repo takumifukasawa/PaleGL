@@ -4,6 +4,7 @@ import {TextureFilterTypes, TextureWrapTypes} from "./constants.js";
 export class Texture extends GLObject {
     #texture;
     #img;
+    #gpu;
 
     get glObject() {
         return this.#texture;
@@ -19,7 +20,8 @@ export class Texture extends GLObject {
     }) {
         super();
 
-        const gl = gpu.gl;
+        this.#gpu = gpu;
+        const gl = this.#gpu.gl;
 
         this.#img = img;
 
@@ -61,8 +63,8 @@ export class Texture extends GLObject {
                 break;
         }
 
-        // for render target
         if (width && height) {
+            // for render target
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         } else {
             // set img to texture
@@ -70,6 +72,13 @@ export class Texture extends GLObject {
         }
 
         // unbind img
+        // gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+    
+    setSize(width, height) {
+        const gl = this.#gpu.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this.#texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 }
