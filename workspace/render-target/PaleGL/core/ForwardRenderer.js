@@ -27,10 +27,24 @@ export class ForwardRenderer {
     setRenderTarget(renderTarget) {
         const gl = this.#gpu.gl;
         this.#renderTarget = renderTarget;
+        
         if(this.#renderTarget) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.#renderTarget.framebuffer.glObject);
+
+            const x = Math.floor((this.#realWidth - this.#renderTarget.width) / 2);
+            const y = Math.floor((this.#realHeight - this.#renderTarget.height) / 2);
+            gl.enable(gl.SCISSOR_TEST);
+            gl.scissor(x, y, this.#renderTarget.width, this.#renderTarget.height);
+            // gl.scissor(x, y, this.#realWidth, this.#realHeight);
+            // console.log(gl.getParameter(gl.SCISSOR_BOX))
+            // this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight)
+            
         } else {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+            gl.disable(gl.SCISSOR_TEST);
+            // gl.enable(gl.SCISSOR_TEST);
+            // this.#gpu.gl.scissor(0, 0, this.#realWidth, this.#realHeight);
         }
     }
     
@@ -43,23 +57,7 @@ export class ForwardRenderer {
     }
     
     render(scene, camera) {
-        const gl = this.#gpu.gl;
-        if(this.#renderTarget) {
-            const x = (this.#realWidth - this.#renderTarget.width) / 2;
-            const y = (this.#realHeight - this.#renderTarget.height) / 2;
-            gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(x, y, this.#renderTarget.width, this.#renderTarget.height);
-            // gl.scissor(x, y, this.#realWidth, this.#realHeight);
-            // console.log(x, y, gl.getParameter(gl.SCISSOR_BOX))
-            // this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight)
-        } else {
-            gl.disable(gl.SCISSOR_TEST);
-            // gl.disable(gl.SCISSOR_TEST);
-            // this.#gpu.gl.scissor(0, 0, this.#realWidth, this.#realHeight);
-            // console.log(gl.getParameter(gl.SCISSOR_BOX))
-            // this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
-        }
-        
+       
         // update all actors matrix
         // TODO: scene 側でやった方がよい？
         scene.traverse((actor) => actor.updateTransform())

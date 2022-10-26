@@ -296,14 +296,16 @@ viewportScene.add(viewportCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
-const renderTarget = new RenderTarget({ gpu });
+const renderTarget = new RenderTarget({ gpu, width: 512, height: 512 });
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
 
-    renderTarget.setSize(width, height);
+    // TODO: ないとなぜか切れ端が残ったりする
+    renderTarget.setSize(512, 512);
+    
     captureSceneCamera.setSize(-2 * aspect, 2 * aspect, -2, 2, );
     viewportCamera.setSize(aspect);
     renderer.setSize(width, height);
@@ -322,15 +324,15 @@ const tick = (time) => {
     
     boxMesh2.transform.setRotationZ(time / 1000 * 10);
  
-    renderer.setRenderTarget(renderTarget);
+    // renderer.setRenderTarget(renderTarget);
     renderer.clear(1, 1, 1, 1);
     renderer.render(captureScene, captureSceneCamera);
     
-    // render viewport scene
-    renderer.setRenderTarget(null);
-    renderer.clear(0, 0, 0, 1);
-    boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
-    renderer.render(viewportScene, viewportCamera);
+    // // render viewport scene
+    // renderer.setRenderTarget(null);
+    // renderer.clear(0, 0, 0, 1);
+    // boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
+    // renderer.render(viewportScene, viewportCamera);
     
     // loop
 
