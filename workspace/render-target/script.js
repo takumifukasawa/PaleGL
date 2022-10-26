@@ -16,6 +16,7 @@ import {PerspectiveCamera} from "./PaleGL/Core/PerspectiveCamera.js";
 import {Texture} from "./PaleGL/core/Texture.js";
 import {loadImg} from "./PaleGL/utils/loadImg.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
+import {OrthographicCamera} from "./PaleGL/core/OrthographicCamera.js";
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -287,13 +288,13 @@ let width, height;
 captureScene.add(boxMesh1);
 viewportScene.add(boxMesh2);
 
-const perspectiveCamera1 = new PerspectiveCamera(60, 1, 0.1, 10);
-const perspectiveCamera2 = new PerspectiveCamera(60, 1, 0.1, 10);
-captureScene.add(perspectiveCamera1);
-viewportScene.add(perspectiveCamera2);
+const captureSceneCamera = new OrthographicCamera(-2, 2, -2, 2, 0.1, 10);
+const viewportCamera = new PerspectiveCamera(60, 1, 0.1, 10);
+captureScene.add(captureSceneCamera);
+viewportScene.add(viewportCamera);
 
-perspectiveCamera1.transform.setTranslation(new Vector3(0, 0, 5));
-perspectiveCamera2.transform.setTranslation(new Vector3(0, 0, 5));
+captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
+viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
 const renderTarget = new RenderTarget({ gpu });
 
@@ -303,8 +304,8 @@ const onWindowResize = () => {
     const aspect = width / height;
 
     renderTarget.setSize(width, height);
-    perspectiveCamera1.setSize(aspect);
-    perspectiveCamera2.setSize(aspect);
+    captureSceneCamera.setSize(-2 * aspect, 2 * aspect, -2, 2, );
+    viewportCamera.setSize(aspect);
     renderer.setSize(width, height);
 };
 
@@ -323,13 +324,13 @@ const tick = (time) => {
  
     renderer.setRenderTarget(renderTarget);
     renderer.clear(1, 1, 1, 1);
-    renderer.render(captureScene, perspectiveCamera1);
+    renderer.render(captureScene, captureSceneCamera);
     
     // render viewport scene
     renderer.setRenderTarget(null);
     renderer.clear(0, 0, 0, 1);
     boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
-    renderer.render(viewportScene, perspectiveCamera2);
+    renderer.render(viewportScene, viewportCamera);
     
     // loop
 
