@@ -12,4 +12,13 @@ export const AttributeTypes = {
 export const UniformTypes = {
     Matrix4: 0,
     Texture: 1,
-}
+};
+
+export const TextureWrapTypes = {
+    Repeat: 0,
+    ClampToEdge: 1,
+};
+
+export const TextureFilterTypes = {
+    Linear: 0,
+};
