@@ -40,7 +40,8 @@ export class GPU {
         this.#uniforms = uniforms;
     }
 
-    setSize(width, height) {
+    setSize(width, height, x = 0, y = 0) {
+        // this.gl.viewport(x, y, width, height);
         this.gl.viewport(0, 0, width, height);
     }
 

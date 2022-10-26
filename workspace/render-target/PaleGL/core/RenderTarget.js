@@ -5,6 +5,8 @@ import {Framebuffer} from "./Framebuffer.js";
 export class RenderTarget {
     #texture;
     #framebuffer;
+    width;
+    height;
     
     get texture() {
         return this.#texture;
@@ -16,6 +18,9 @@ export class RenderTarget {
     
     constructor({ gpu, width = 1, height = 1 }) {
         const gl = gpu.gl;
+        
+        this.width = width;
+        this.height = height;
 
         this.#framebuffer = new Framebuffer({ gpu });
         
@@ -40,6 +45,8 @@ export class RenderTarget {
     }
     
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
         this.#texture.setSize(width, height);
     }
 }

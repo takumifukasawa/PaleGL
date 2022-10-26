@@ -5,6 +5,8 @@ export class ForwardRenderer {
     canvas;
     pixelRatio;
     #renderTarget;
+    #realWidth;
+    #realHeight;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
@@ -13,13 +15,15 @@ export class ForwardRenderer {
     }
 
     setSize(width, height) {
-        const canvasWidth = Math.floor(width * this.pixelRatio);
-        const canvasHeight = Math.floor(height * this.pixelRatio);
-        this.canvas.width = canvasWidth;
-        this.canvas.height = canvasHeight;
+        const realWidth = Math.floor(width * this.pixelRatio);
+        const realHeight = Math.floor(height * this.pixelRatio);
+        this.#realWidth = realWidth;
+        this.#realHeight = realHeight;
+        this.canvas.width = this.#realWidth;
+        this.canvas.height = this.#realHeight;
         this.canvas.style.width = `${width}px`;
         this.canvas.style.height = `${height}px`;
-        this.#gpu.setSize(canvasWidth, canvasHeight);
+        this.#gpu.setSize(this.#realWidth, this.#realHeight);
     }
     
     setRenderTarget(renderTarget) {
@@ -41,6 +45,15 @@ export class ForwardRenderer {
     }
     
     render(scene, camera) {
+        // if(this.#renderTarget) {
+        //     const x = (this.#realWidth - this.#renderTarget.width) / 2;
+        //     const y = (this.#realHeight - this.#renderTarget.height) / 2;
+        //     this.#gpu.setSize(this.#renderTarget.width, this.#renderTarget.height, x, y);
+        // } else {
+        //     // TODO: dirty flag
+        //     this.#gpu.setSize(this.#realWidth, this.#realHeight);
+        // }
+        
         // update all actors matrix
         // TODO: scene 側でやった方がよい？
         scene.traverse((actor) => actor.updateTransform())
