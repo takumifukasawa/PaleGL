@@ -281,7 +281,7 @@ Promise.all(Object.keys(images).map(async (key) => {
 });
 
 const boxMesh1 = new Mesh(createBoxGeometry(), boxMaterial1);
-const boxMesh2 = new Mesh(createBoxGeometry(), boxMaterial2);
+const boxMesh2 = new Mesh(planeGeometry, boxMaterial2);
 
 let width, height;
 
@@ -296,7 +296,7 @@ viewportScene.add(viewportCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
-const renderTarget = new RenderTarget({ gpu, width: 512, height: 512 });
+const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -325,12 +325,12 @@ const tick = (time) => {
     boxMesh2.transform.setRotationZ(time / 1000 * 10);
  
     // renderer.setRenderTarget(renderTarget);
-    renderer.clear(1, 1, 1, 1);
+    renderer.clear(1, 1, 0, 1);
     renderer.render(captureScene, captureSceneCamera);
     
     // // render viewport scene
     // renderer.setRenderTarget(null);
-    // renderer.clear(0, 0, 0, 1);
+    // renderer.clear(0.1, 0.1, 0.1, 1);
     // boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
     // renderer.render(viewportScene, viewportCamera);
     
