@@ -197,11 +197,11 @@ viewportScene.add(fullQuadMesh);
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
 
-const viewportCamera = new PerspectiveCamera(60, 1, 0.1, 10);
+const viewportCamera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
 viewportScene.add(viewportCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
-viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
+viewportCamera.transform.setTranslation(new Vector3(0, 0, 1));
 
 const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 
@@ -216,7 +216,7 @@ const onWindowResize = () => {
     renderTarget.setSize(width, height);
 
     captureSceneCamera.setSize(aspect);
-    viewportCamera.setSize(aspect);
+    // viewportCamera.setSize(aspect);
  
     renderer.setSize(width, height);
 };
