@@ -2,19 +2,17 @@
 import {Scene} from "../Scene.js";
 
 export class PostProcess {
-    #orthographicCamera;
-    #scene;
-    #passes;
+    #orthographicCamera = new OrthographicCamera(-1, 1, -1, 1, -1, 1);
+    #scene = new Scene();
+    #passes = [];
     
     constructor({ gpu }) {
-        this.#orthographicCamera = new OrthographicCamera(-1, 1, -1, 1, -1, 1);
-        this.#scene = new Scene();
-        this.#passes = [];
     }
     
-    addPass() {
+    addPass(pass) {
+        this.#passes = pass;
     }
   
-    render() {
+    render(scene, camera) {
     }
 }

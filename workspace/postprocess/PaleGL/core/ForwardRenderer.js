@@ -31,18 +31,8 @@ export class ForwardRenderer {
         if(this.#renderTarget) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.#renderTarget.framebuffer.glObject);
             gl.viewport(0, 0, this.#renderTarget.width, this.#renderTarget.height);
-
-            // let x = Math.floor((this.#realWidth - this.#renderTarget.width) / 2);
-            // let y = Math.floor((this.#realHeight - this.#renderTarget.height) / 2);
-            // gl.viewport(x, y, this.#renderTarget.width, this.#renderTarget.height);
-            // // console.log(x, y, this.#renderTarget.width, this.#renderTarget.height);
-            // // gl.scissor(x, y, this.#realWidth, this.#realHeight);
-            // // this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight)
-            
         } else {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            // gl.disable(gl.SCISSOR_TEST);
-            // this.#gpu.gl.scissor(0, 0, this.#realWidth, this.#realHeight);
             gl.viewport(0, 0, this.#realWidth, this.#realHeight);
         }
     }

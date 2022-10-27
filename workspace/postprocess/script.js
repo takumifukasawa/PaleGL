@@ -25,7 +25,7 @@ const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
 
-const box1VertexShader = `#version 300 es
+const cubeVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -81,24 +81,20 @@ void main() {
 }
 `;
 
-const box2VertexShader = `#version 300 es
+const fullQuadVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
-
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
 
 out vec2 vUv;
 
 void main() {
     vUv = aUv;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
+    gl_Position = vec4(aPosition, 1);
 }
 `;
 
-const box2FragmentShader = `#version 300 es
+const fullQuadFragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -109,7 +105,8 @@ out vec4 outColor;
 uniform sampler2D uSceneTexture;
 
 void main() {
-    vec4 color = texture(uSceneTexture, vUv);
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    vec4 color = textureColor * vec4(1, 0.3, 0.3, 1);
     outColor = color;
 }
 `;
@@ -124,6 +121,7 @@ const viewportScene = new Scene();
 const renderer = new ForwardRenderer({
         gpu,
         canvas: canvasElement,
+        // pixelRatio: 2 // force
         pixelRatio: Math.min(window.devicePixelRatio, 1.5)
     }
 );
@@ -154,15 +152,15 @@ const images = {
 
 const cubeMaterial = new Material({
     gpu,
-    vertexShader: box1VertexShader,
+    vertexShader: cubeVertexShader,
     fragmentShader: box1FragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
 });
 
-const boxMaterial2 = new Material({
+const fullQuadMaterial = new Material({
     gpu,
-    vertexShader: box2VertexShader,
-    fragmentShader: box2FragmentShader,
+    vertexShader: fullQuadVertexShader,
+    fragmentShader: fullQuadFragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
     uniforms: {
         uSceneTexture: {
@@ -186,16 +184,17 @@ Promise.all(Object.keys(images).map(async (key) => {
     });
 });
 
-const boxMesh1 = new Mesh(new BoxGeometry({ gpu }), cubeMaterial);
-// const boxMesh2 = new Mesh(planeGeometry, boxMaterial2);
-const boxMesh2 = new Mesh(new BoxGeometry({ gpu }), boxMaterial2);
+const boxMesh = new Mesh(new BoxGeometry({ gpu }), cubeMaterial);
+// const fullQuadMesh = new Mesh(planeGeometry, fullQuadMaterial);
+const fullQuadMesh = new Mesh(new PlaneGeometry({ gpu }), fullQuadMaterial);
 
 let width, height;
 
-captureScene.add(boxMesh1);
-viewportScene.add(boxMesh2);
+captureScene.add(boxMesh);
+viewportScene.add(fullQuadMesh);
 
-const captureSceneCamera = new OrthographicCamera(-2, 2, -2, 2, 0.1, 10);
+// const captureSceneCamera = new OrthographicCamera(-2, 2, -2, 2, 0.1, 10);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
 
 const viewportCamera = new PerspectiveCamera(60, 1, 0.1, 10);
@@ -204,7 +203,7 @@ viewportScene.add(viewportCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
-const renderTarget = new RenderTarget({ gpu, width: 512, height: 512 });
+const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 
 captureSceneCamera.setRenderTarget(renderTarget);
 captureSceneCamera.setClearColor(new Vector4(1, 1, 0, 1));
@@ -213,8 +212,12 @@ const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
+    
+    renderTarget.setSize(width, height);
 
+    captureSceneCamera.setSize(aspect);
     viewportCamera.setSize(aspect);
+ 
     renderer.setSize(width, height);
 };
 
@@ -226,11 +229,11 @@ const tick = (time) => {
 
     // render capture scene
     
-    boxMesh1.transform.setRotationX(time / 1000 * 10);
-    boxMesh1.transform.setRotationY(time / 1000 * 14);
+    boxMesh.transform.setRotationX(time / 1000 * 10);
+    boxMesh.transform.setRotationY(time / 1000 * 14);
     
-    boxMesh2.transform.setRotationY(time / 1000 * 12);
-    boxMesh2.transform.setRotationZ(time / 1000 * 10);
+    // fullQuadMesh.transform.setRotationY(time / 1000 * 12);
+    // fullQuadMesh.transform.setRotationZ(time / 1000 * 10);
  
     // renderer.setRenderTarget(renderTarget);
     // renderer.clear(1, 1, 0, 1);
@@ -239,7 +242,7 @@ const tick = (time) => {
     // // render viewport scene
     // renderer.setRenderTarget(null);
     // renderer.clear(0.1, 0.1, 0.1, 1);
-    boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
+    fullQuadMaterial.uniforms.uSceneTexture.value = renderTarget.texture;
     renderer.render(viewportScene, viewportCamera);
     
     // loop
