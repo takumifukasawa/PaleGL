@@ -24,7 +24,7 @@ export class ForwardRenderer {
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
     
-    setRenderTarget(renderTarget) {
+    #setRenderTarget(renderTarget) {
         const gl = this.#gpu.gl;
         this.#renderTarget = renderTarget;
         
@@ -56,6 +56,15 @@ export class ForwardRenderer {
     }
     
     render(scene, camera) {
+        this.#setRenderTarget(camera.renderTarget);
+            
+        // TODO: refactor
+        this.clear(
+            camera.clearColor.x,
+            camera.clearColor.y,
+            camera.clearColor.z,
+            camera.clearColor.w
+        );
        
         // update all actors matrix
         // TODO: scene 側でやった方がよい？

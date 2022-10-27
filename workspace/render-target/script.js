@@ -3,6 +3,7 @@ import {Shader} from "./PaleGL/Core/Shader.js";
 import {VertexArrayObject} from "./PaleGL/Core/VertexArrayObject.js";
 import {AttributeTypes, PrimitiveTypes, UniformTypes} from "./PaleGL/Core/constants.js";
 import {Vector3} from "./PaleGL/Math/Vector3.js";
+import {Vector4} from "./PaleGL/Math/Vector4.js";
 import {IndexBufferObject} from "./PaleGL/Core/IndexBufferObject.js";
 import {Scene} from "./PaleGL/Core/Scene.js";
 import {ForwardRenderer} from "./PaleGL/Core/ForwardRenderer.js";
@@ -290,24 +291,24 @@ captureScene.add(boxMesh1);
 viewportScene.add(boxMesh2);
 
 const captureSceneCamera = new OrthographicCamera(-2, 2, -2, 2, 0.1, 10);
-const viewportCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
+
+const viewportCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 viewportScene.add(viewportCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
-const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
-renderTarget.setSize(512, 512);
+const renderTarget = new RenderTarget({ gpu, width: 512, height: 512 });
+
+captureSceneCamera.setRenderTarget(renderTarget);
+captureSceneCamera.setClearColor(new Vector4(1, 1, 0, 1));
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
     const aspect = width / height;
 
-    // TODO: ないとなぜか切れ端が残ったりする
-    // renderTarget.setSize(512, 512);
-    
     viewportCamera.setSize(aspect);
     renderer.setSize(width, height);
 };
@@ -326,13 +327,13 @@ const tick = (time) => {
     boxMesh2.transform.setRotationY(time / 1000 * 12);
     boxMesh2.transform.setRotationZ(time / 1000 * 10);
  
-    renderer.setRenderTarget(renderTarget);
-    renderer.clear(1, 1, 0, 1);
+    // renderer.setRenderTarget(renderTarget);
+    // renderer.clear(1, 1, 0, 1);
     renderer.render(captureScene, captureSceneCamera);
     
     // // render viewport scene
-    renderer.setRenderTarget(null);
-    renderer.clear(0.1, 0.1, 0.1, 1);
+    // renderer.setRenderTarget(null);
+    // renderer.clear(0.1, 0.1, 0.1, 1);
     boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
     renderer.render(viewportScene, viewportCamera);
     
