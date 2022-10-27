@@ -246,7 +246,7 @@ const images = {
     },
 };
 
-const boxMaterial1 = new Material({
+const cubeMaterial = new Material({
     gpu,
     vertexShader: box1VertexShader,
     fragmentShader: box1FragmentShader,
@@ -267,7 +267,7 @@ const boxMaterial2 = new Material({
 });
 
 Promise.all(Object.keys(images).map(async (key) => {
-    boxMaterial1.uniforms[key] = {
+    cubeMaterial.uniforms[key] = {
         type: UniformTypes.Texture,
         value: null
     };
@@ -276,12 +276,13 @@ Promise.all(Object.keys(images).map(async (key) => {
     return { key, img }
 })).then(data => {
     data.forEach(({ key , img }) => {
-        boxMaterial1.uniforms[key].value = new Texture({gpu, img});
+        cubeMaterial.uniforms[key].value = new Texture({gpu, img});
     });
 });
 
-const boxMesh1 = new Mesh(createBoxGeometry(), boxMaterial1);
-const boxMesh2 = new Mesh(planeGeometry, boxMaterial2);
+const boxMesh1 = new Mesh(createBoxGeometry(), cubeMaterial);
+// const boxMesh2 = new Mesh(planeGeometry, boxMaterial2);
+const boxMesh2 = new Mesh(createBoxGeometry(), boxMaterial2);
 
 let width, height;
 
@@ -297,6 +298,7 @@ captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 viewportCamera.transform.setTranslation(new Vector3(0, 0, 5));
 
 const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
+renderTarget.setSize(512, 512);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -304,9 +306,8 @@ const onWindowResize = () => {
     const aspect = width / height;
 
     // TODO: ないとなぜか切れ端が残ったりする
-    renderTarget.setSize(512, 512);
+    // renderTarget.setSize(512, 512);
     
-    captureSceneCamera.setSize(-2 * aspect, 2 * aspect, -2, 2, );
     viewportCamera.setSize(aspect);
     renderer.setSize(width, height);
 };
@@ -322,17 +323,18 @@ const tick = (time) => {
     boxMesh1.transform.setRotationX(time / 1000 * 10);
     boxMesh1.transform.setRotationY(time / 1000 * 14);
     
+    boxMesh2.transform.setRotationY(time / 1000 * 12);
     boxMesh2.transform.setRotationZ(time / 1000 * 10);
  
-    // renderer.setRenderTarget(renderTarget);
+    renderer.setRenderTarget(renderTarget);
     renderer.clear(1, 1, 0, 1);
     renderer.render(captureScene, captureSceneCamera);
     
     // // render viewport scene
-    // renderer.setRenderTarget(null);
-    // renderer.clear(0.1, 0.1, 0.1, 1);
-    // boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
-    // renderer.render(viewportScene, viewportCamera);
+    renderer.setRenderTarget(null);
+    renderer.clear(0.1, 0.1, 0.1, 1);
+    boxMaterial2.uniforms.uSceneTexture.value = renderTarget.texture;
+    renderer.render(viewportScene, viewportCamera);
     
     // loop
 

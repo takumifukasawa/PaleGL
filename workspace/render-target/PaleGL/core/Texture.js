@@ -16,7 +16,8 @@ export class Texture extends GLObject {
         width, height,
         mipmap = false,
         minFilter = TextureFilterTypes.Linear, magFilter = TextureFilterTypes.Linear,
-        wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge
+        wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge,
+        flipY = false,
     }) {
         super();
 
@@ -69,6 +70,11 @@ export class Texture extends GLObject {
         } else {
             // set img to texture
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+        }
+
+        // flipY
+        if (this.#img || flipY) {
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         }
 
         // unbind img
