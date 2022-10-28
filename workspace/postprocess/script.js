@@ -203,7 +203,7 @@ captureScene.add(captureSceneCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 // viewportCamera.transform.setTranslation(new Vector3(0, 0, 1));
 
-const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
+// const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 
 // captureSceneCamera.setRenderTarget(renderTarget);
 captureSceneCamera.setClearColor(new Vector4(1, 1, 0, 1));
@@ -233,14 +233,16 @@ void main() {
 }
 `}));
 
+captureSceneCamera.setPostProcess(postProcess);
+
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
-    const aspect = width / height;
+    // const aspect = width / height;
     
-    renderTarget.setSize(width, height);
+    // renderTarget.setSize(width, height);
 
-    captureSceneCamera.setSize(aspect);
+    captureSceneCamera.setSize(width, height);
     // viewportCamera.setSize(aspect);
  
     renderer.setSize(width, height);
@@ -258,11 +260,11 @@ const tick = (time) => {
     boxMesh.transform.setRotationX(time / 1000 * 10);
     boxMesh.transform.setRotationY(time / 1000 * 14);
     
-    // renderer.render(captureScene, captureSceneCamera);
+    renderer.render(captureScene, captureSceneCamera);
     // fullQuadMaterial.uniforms.uSceneTexture.value = renderTarget.texture;
     // renderer.render(viewportScene, viewportCamera);
     
-    postProcess.render(captureScene, captureSceneCamera);
+    // postProcess.render(captureScene, captureSceneCamera);
     
     // loop
 

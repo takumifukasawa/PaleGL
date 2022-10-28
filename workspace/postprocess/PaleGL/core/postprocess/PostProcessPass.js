@@ -21,14 +21,14 @@ void main() {
 `;
 
 export class PostProcessPass {
-    #scene = new Scene();
+    // #scene = new Scene();
     #geometry;
     #material;
-    #camera;
-    renderToScreen = false;
+    // #camera;
+    // renderToScreen = false;
     renderTarget;
-    #fullQuadMesh;
-
+    mesh;
+    
     constructor({ gpu, vertexShader = baseVertexShader, fragmentShader, uniforms }) {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
@@ -45,22 +45,23 @@ export class PostProcessPass {
             },
             primitiveType: PrimitiveTypes.Triangles
         });
-        this.#fullQuadMesh = new Mesh(this.#geometry, this.#material); 
-        this.#scene.add(this.#fullQuadMesh);
+        this.mesh = new Mesh(this.#geometry, this.#material); 
+        // this.#scene.add(this.mesh);
         
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
         
-        this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-        this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
+        // this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+        // this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
     }
   
     setSize(width, height) {
+        // this.#camera.setSize(width, height);
         this.renderTarget.setSize(width, height);
     }
-    
-    render(renderer, prevPassRenderTarget) {
-        this.#camera.setRenderTarget(this.renderToScreen ? null : this.renderTarget);
-        this.#material.uniforms.uSceneTexture.value = prevPassRenderTarget.texture;
-        renderer.render(this.#scene, this.#camera);
-    }
+
+    // render(prevPassRenderTarget) {
+    //     // this.#camera.setRenderTarget(this.renderToScreen ? null : this.renderTarget);
+    //     this.#material.uniforms.uSceneTexture.value = prevPassRenderTarget.texture;
+    //     // renderer.render(this.#scene, this.#camera);
+    // }
 }

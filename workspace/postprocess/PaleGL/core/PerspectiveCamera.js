@@ -15,8 +15,9 @@ export class PerspectiveCamera extends Camera {
         this.setSize(aspect);
     }
     
-    setSize(aspect) {
-        this.aspect = aspect;
+    setSize(width, height) {
+        super.setSize(width, height);
+        this.aspect = width / height;
         this.#updateProjectionMatrix();
     }
     

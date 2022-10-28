@@ -7,14 +7,17 @@ export class OrthographicCamera extends Camera {
         super();
         this.near = near;
         this.far = far;
-        this.setSize(left, right, bottom, top);
+        this.setSize(1, 1, left, right, bottom, top);
     }
     
-    setSize(left, right, top, bottom) {
-        this.left = left;
-        this.right = right;
-        this.bottom = bottom;
-        this.top = top;
+    setSize(width, height, left, right, top, bottom) {
+        super.setSize(width, height);
+        if(left && right && top && bottom) {
+            this.left = left;
+            this.right = right;
+            this.bottom = bottom;
+            this.top = top;
+        }
         this.#updateProjectionMatrix();
     }
     
