@@ -22,6 +22,7 @@ import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
 import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
 import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
 import {CopyPass} from "./PaleGL/core/postprocess/CopyPass.js";
+import {FragmentPass} from "./PaleGL/core/postprocess/FragmentPass.js";
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -208,7 +209,29 @@ const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 captureSceneCamera.setClearColor(new Vector4(1, 1, 0, 1));
 
 const postProcess = new PostProcess({ gpu, renderer });
-postProcess.addPass(new CopyPass({ gpu }));
+// postProcess.addPass(new CopyPass({ gpu }));
+postProcess.addPass(new FragmentPass({ gpu, fragmentShader: `#version 300 es
+precision mediump float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uSceneTexture;
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    outColor = textureColor;
+    outColor.r *= 0.2;
+}
+`}));
+postProcess.addPass(new FragmentPass({ gpu, fragmentShader: `#version 300 es
+precision mediump float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uSceneTexture;
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    outColor = textureColor;
+    outColor.g *= 0.2;
+}
+`}));
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
