@@ -2,13 +2,20 @@
 import {Scene} from "../Scene.js";
 import {RenderTarget} from "../RenderTarget.js";
 import {Vector3} from "../../math/Vector3.js";
+import {Mesh} from "../Mesh.js";
+import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
 
 export class PostProcess {
     // #scene = new Scene();
     #sceneCamera;
     passes = [];
     renderTarget;
-    camera;
+    #camera;
+    #mesh;
+    
+    get mesh() {
+        return this.#mesh;
+    }
     
     // get firstPass() {
     //     return this.#passes[0];
@@ -28,12 +35,20 @@ export class PostProcess {
     
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
-        this.camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-        this.camera.transform.setTranslation(new Vector3(0, 0, 1));
+        this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+        this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
+        this.#mesh = new Mesh(
+            new PlaneGeometry({ gpu }),
+            null,
+        );
     }
-    
+  
+    // setMaterial(material) {
+    //     this.mesh.material = material;
+    // }
+ 
     setSize(width, height) {
-        this.camera.setSize(width, height);
+        this.#camera.setSize(width, height);
         this.renderTarget.setSize(width, height);
         this.passes.forEach(pass => pass.setSize(width, height));
     }
@@ -54,4 +69,34 @@ export class PostProcess {
     //         pass.render(renderer, i === 0 ? sceneRenderTarget : this.passes[i - 1].renderTarget);
     //     });
     // }
+    
+    render(renderer) {
+        this.#camera.updateTransform();
+        let prevRenderTarget = this.renderTarget;
+        // TODO
+        // - filterでenabledなpassのみ抽出
+        this.passes.forEach((pass, i) => {
+            const isLastPass = i === this.passes.length - 1;
+            if(isLastPass) {
+                renderer.setRenderTarget(this.#camera.renderTarget);
+            } else {
+                renderer.setRenderTarget(pass.renderTarget);
+            }
+            renderer.clear(
+                this.#camera.clearColor.x,
+                this.#camera.clearColor.y,
+                this.#camera.clearColor.z,
+                this.#camera.clearColor.w
+            );
+            // this.#setRenderTarget(renderToScreen
+            //     ? null
+            //     : pass.renderTarget
+            // );
+            pass.mesh.updateTransform();
+            pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            renderer.renderMesh(pass.mesh);
+            prevRenderTarget = pass.renderTarget;
+        });
+        
+    }
 }

@@ -24,7 +24,7 @@ export class ForwardRenderer {
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
     
-    #setRenderTarget(renderTarget) {
+    setRenderTarget(renderTarget) {
         const gl = this.#gpu.gl;
         this.#renderTarget = renderTarget;
         
@@ -47,9 +47,9 @@ export class ForwardRenderer {
     
     render(scene, camera) {
         if(camera.enabledPostProcess) {
-            this.#setRenderTarget(camera.postProcess.renderTarget);
+            this.setRenderTarget(camera.postProcess.renderTarget);
         } else {
-            this.#setRenderTarget(camera.renderTarget);
+            this.setRenderTarget(camera.renderTarget);
         }
 
         // TODO: refactor
@@ -83,7 +83,7 @@ export class ForwardRenderer {
                 mesh.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
             
-            this.#renderMesh(mesh);
+            this.renderMesh(mesh);
             
             // // vertex
             // this.#gpu.setVertexArrayObject(mesh.geometry.vertexArrayObject);
@@ -100,37 +100,38 @@ export class ForwardRenderer {
         
         // TODO: postprocessに渡してもよい
         if(camera.enabledPostProcess) {
-            const { postProcess } = camera;
-            camera.updateTransform();
-            let prevRenderTarget = postProcess.renderTarget;
-            // TODO
-            // - filterでenabledなpassのみ抽出
-            postProcess.passes.forEach((pass, i) => {
-                const isLastPass = i === postProcess.passes.length - 1;
-                if(isLastPass) {
-                    this.#setRenderTarget(camera.renderTarget);
-                } else {
-                    this.#setRenderTarget(pass.renderTarget);
-                }
-                this.clear(
-                    postProcess.camera.clearColor.x,
-                    postProcess.camera.clearColor.y,
-                    postProcess.camera.clearColor.z,
-                    postProcess.camera.clearColor.w
-                );
-                // this.#setRenderTarget(renderToScreen
-                //     ? null
-                //     : pass.renderTarget
-                // );
-                pass.mesh.updateTransform();
-                pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-                this.#renderMesh(pass.mesh);
-                prevRenderTarget = pass.renderTarget;
-            });
+            camera.postProcess.render(this);
+            // const { postProcess } = camera;
+            // camera.updateTransform();
+            // let prevRenderTarget = postProcess.renderTarget;
+            // // TODO
+            // // - filterでenabledなpassのみ抽出
+            // postProcess.passes.forEach((pass, i) => {
+            //     const isLastPass = i === postProcess.passes.length - 1;
+            //     if(isLastPass) {
+            //         this.setRenderTarget(camera.renderTarget);
+            //     } else {
+            //         this.setRenderTarget(pass.renderTarget);
+            //     }
+            //     this.clear(
+            //         postProcess.camera.clearColor.x,
+            //         postProcess.camera.clearColor.y,
+            //         postProcess.camera.clearColor.z,
+            //         postProcess.camera.clearColor.w
+            //     );
+            //     // this.setRenderTarget(renderToScreen
+            //     //     ? null
+            //     //     : pass.renderTarget
+            //     // );
+            //     pass.mesh.updateTransform();
+            //     pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            //     this.renderMesh(pass.mesh);
+            //     prevRenderTarget = pass.renderTarget;
+            // });
         }
     }
 
-    #renderMesh(mesh) {
+    renderMesh(mesh) {
         // vertex
         this.#gpu.setVertexArrayObject(mesh.geometry.vertexArrayObject);
         if (mesh.geometry.indexBufferObject) {
