@@ -78,6 +78,8 @@ export class GPU {
         // depth for opaque
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
+        
+        // TODO: blending ...
 
         gl.useProgram(this.#shader.glObject);
         
