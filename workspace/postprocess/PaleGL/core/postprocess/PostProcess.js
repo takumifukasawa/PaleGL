@@ -70,7 +70,7 @@ export class PostProcess {
     //     });
     // }
     
-    render(renderer) {
+    render(renderer, sceneCamera) {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
         // TODO
@@ -78,7 +78,7 @@ export class PostProcess {
         this.passes.forEach((pass, i) => {
             const isLastPass = i === this.passes.length - 1;
             if(isLastPass) {
-                renderer.setRenderTarget(this.#camera.renderTarget);
+                renderer.setRenderTarget(sceneCamera.renderTarget);
             } else {
                 renderer.setRenderTarget(pass.renderTarget);
             }

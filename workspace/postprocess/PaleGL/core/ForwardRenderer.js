@@ -100,7 +100,7 @@ export class ForwardRenderer {
         
         // TODO: postprocessに渡してもよい
         if(camera.enabledPostProcess) {
-            camera.postProcess.render(this);
+            camera.postProcess.render(this, camera);
             // const { postProcess } = camera;
             // camera.updateTransform();
             // let prevRenderTarget = postProcess.renderTarget;
