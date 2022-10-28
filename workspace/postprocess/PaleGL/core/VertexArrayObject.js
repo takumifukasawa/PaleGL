@@ -25,7 +25,7 @@ export class VertexArrayObject extends GLObject {
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(location);
             // stride is always 0 because buffer is not interleaved.
-            // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointerk
+            // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
             gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
         });
 

@@ -1,7 +1,7 @@
 ﻿export class Attribute {
-    data;
-    location;
-    size;
+    data; // data
+    location; // layout location index
+    size; // data per vertex. ex) position: 3, uv: 2
     offset;
     
     constructor({ data, location, size, offset = 0 }) {

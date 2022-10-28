@@ -25,10 +25,10 @@ export class PlaneGeometry extends Geometry {
                 },
                 uv: {
                     data: [
-                        0, 0,
                         0, 1,
-                        1, 0,
+                        0, 0,
                         1, 1,
+                        1, 0,
                     ],
                     size: 2
                 },

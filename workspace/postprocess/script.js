@@ -1,27 +1,16 @@
 ﻿import {GPU} from "./PaleGL/Core/GPU.js";
-import {Shader} from "./PaleGL/Core/Shader.js";
-import {VertexArrayObject} from "./PaleGL/Core/VertexArrayObject.js";
-import {AttributeTypes, PrimitiveTypes, UniformTypes} from "./PaleGL/Core/constants.js";
+import {PrimitiveTypes, UniformTypes} from "./PaleGL/Core/constants.js";
 import {Vector3} from "./PaleGL/Math/Vector3.js";
 import {Vector4} from "./PaleGL/Math/Vector4.js";
-import {IndexBufferObject} from "./PaleGL/Core/IndexBufferObject.js";
 import {Scene} from "./PaleGL/Core/Scene.js";
 import {ForwardRenderer} from "./PaleGL/Core/ForwardRenderer.js";
 import {Mesh} from "./PaleGL/Core/Mesh.js";
-// import {Geometry} from "./PaleGL/Core/Geometry.js";
 import {Material} from "./PaleGL/Core/Material.js";
-import {Matrix4} from "./PaleGL/Math/Matrix4.js";
-import {Transform} from "./PaleGL/Core/Transform.js";
-import {Actor} from "./PaleGL/Core/Actor.js";
 import {PerspectiveCamera} from "./PaleGL/Core/PerspectiveCamera.js";
 import {Texture} from "./PaleGL/core/Texture.js";
 import {loadImg} from "./PaleGL/utils/loadImg.js";
-import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
-import {OrthographicCamera} from "./PaleGL/core/OrthographicCamera.js";
 import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
-import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
 import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
-import {CopyPass} from "./PaleGL/core/postprocess/CopyPass.js";
 import {FragmentPass} from "./PaleGL/core/postprocess/FragmentPass.js";
 
 let width, height;
@@ -83,6 +72,7 @@ void main() {
     }
 
     outColor = textureColor;
+    // outColor = vec4(vUv, 1, 1);
 }
 `;
 
@@ -91,7 +81,6 @@ const gl = canvasElement.getContext('webgl2');
 const gpu = new GPU({gl});
 
 const captureScene = new Scene();
-const viewportScene = new Scene();
 
 const renderer = new ForwardRenderer({
         gpu,

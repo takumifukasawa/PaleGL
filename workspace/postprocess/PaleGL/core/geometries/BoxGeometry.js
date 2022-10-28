@@ -43,10 +43,10 @@ export class BoxGeometry extends Geometry {
                 },
                 uv: {
                     data: (new Array(6)).fill(0).map(() => ([
-                        0, 0,
                         0, 1,
+                        0, 0,
+                        1, 1,
                         1, 0,
-                        1, 1
                     ])).flat(),
                     size: 2
                 },
