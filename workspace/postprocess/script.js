@@ -20,6 +20,8 @@ import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 import {OrthographicCamera} from "./PaleGL/core/OrthographicCamera.js";
 import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
 import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
+import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
+import {CopyPass} from "./PaleGL/core/postprocess/CopyPass.js";
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -126,9 +128,6 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const boxGeometry = new BoxGeometry({ gpu });
-const planeGeometry = new PlaneGeometry({ gpu });
-
 const images = {
     uDirZMinusMap: {
         src: "./images/dir-z-minus.png",
@@ -157,18 +156,18 @@ const cubeMaterial = new Material({
     primitiveType: PrimitiveTypes.Triangles,
 });
 
-const fullQuadMaterial = new Material({
-    gpu,
-    vertexShader: fullQuadVertexShader,
-    fragmentShader: fullQuadFragmentShader,
-    primitiveType: PrimitiveTypes.Triangles,
-    uniforms: {
-        uSceneTexture: {
-            type: UniformTypes.Texture,
-            value: null
-        }
-    }
-});
+// const fullQuadMaterial = new Material({
+//     gpu,
+//     vertexShader: fullQuadVertexShader,
+//     fragmentShader: fullQuadFragmentShader,
+//     primitiveType: PrimitiveTypes.Triangles,
+//     uniforms: {
+//         uSceneTexture: {
+//             type: UniformTypes.Texture,
+//             value: null
+//         }
+//     }
+// });
 
 Promise.all(Object.keys(images).map(async (key) => {
     cubeMaterial.uniforms[key] = {
@@ -186,27 +185,30 @@ Promise.all(Object.keys(images).map(async (key) => {
 
 const boxMesh = new Mesh(new BoxGeometry({ gpu }), cubeMaterial);
 // const fullQuadMesh = new Mesh(planeGeometry, fullQuadMaterial);
-const fullQuadMesh = new Mesh(new PlaneGeometry({ gpu }), fullQuadMaterial);
+// const fullQuadMesh = new Mesh(new PlaneGeometry({ gpu }), fullQuadMaterial);
 
 let width, height;
 
 captureScene.add(boxMesh);
-viewportScene.add(fullQuadMesh);
+// viewportScene.add(fullQuadMesh);
 
 // const captureSceneCamera = new OrthographicCamera(-2, 2, -2, 2, 0.1, 10);
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
 
-const viewportCamera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-viewportScene.add(viewportCamera);
+// const viewportCamera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+// viewportScene.add(viewportCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
-viewportCamera.transform.setTranslation(new Vector3(0, 0, 1));
+// viewportCamera.transform.setTranslation(new Vector3(0, 0, 1));
 
 const renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
 
-captureSceneCamera.setRenderTarget(renderTarget);
+// captureSceneCamera.setRenderTarget(renderTarget);
 captureSceneCamera.setClearColor(new Vector4(1, 1, 0, 1));
+
+const postProcess = new PostProcess({ gpu, renderer });
+postProcess.addPass(new CopyPass({ gpu }));
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -219,6 +221,7 @@ const onWindowResize = () => {
     // viewportCamera.setSize(aspect);
  
     renderer.setSize(width, height);
+    postProcess.setSize(width, height);
 };
 
 window.addEventListener('resize', onWindowResize);
@@ -232,18 +235,11 @@ const tick = (time) => {
     boxMesh.transform.setRotationX(time / 1000 * 10);
     boxMesh.transform.setRotationY(time / 1000 * 14);
     
-    // fullQuadMesh.transform.setRotationY(time / 1000 * 12);
-    // fullQuadMesh.transform.setRotationZ(time / 1000 * 10);
- 
-    // renderer.setRenderTarget(renderTarget);
-    // renderer.clear(1, 1, 0, 1);
-    renderer.render(captureScene, captureSceneCamera);
+    // renderer.render(captureScene, captureSceneCamera);
+    // fullQuadMaterial.uniforms.uSceneTexture.value = renderTarget.texture;
+    // renderer.render(viewportScene, viewportCamera);
     
-    // // render viewport scene
-    // renderer.setRenderTarget(null);
-    // renderer.clear(0.1, 0.1, 0.1, 1);
-    fullQuadMaterial.uniforms.uSceneTexture.value = renderTarget.texture;
-    renderer.render(viewportScene, viewportCamera);
+    postProcess.render(captureScene, captureSceneCamera);
     
     // loop
 

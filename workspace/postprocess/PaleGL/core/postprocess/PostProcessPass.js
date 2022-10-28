@@ -1,33 +1,66 @@
 ﻿import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
 import {Material} from "../Material.js";
+import {OrthographicCamera} from "../OrthographicCamera.js";
+import {Vector3} from "../../math/Vector3.js";
+import {RenderTarget} from "../RenderTarget.js";
+import {Scene} from "../Scene.js";
+import {Mesh} from "../Mesh.js";
+import {PrimitiveTypes, UniformTypes} from "../constants.js";
 
 const baseVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
 
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-
 out vec2 vUv;
 
 void main() {
     vUv = aUv;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
+    gl_Position = vec4(aPosition, 1);
 }
 `;
 
 export class PostProcessPass {
+    #scene = new Scene();
     #geometry;
-    material;
+    #material;
+    #camera;
+    renderToScreen = false;
+    renderTarget;
+    #fullQuadMesh;
 
-    constructor({ gpu, vertexShader = baseVertexShader, fragmentShader }) {
+    constructor({ gpu, vertexShader = baseVertexShader, fragmentShader, uniforms }) {
+        // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
-        this.material = new Material({
+        this.#material = new Material({
             gpu,
             vertexShader,
-            fragmentShader
+            fragmentShader,
+            uniforms: {
+                ...uniforms, 
+                uSceneTexture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                }
+            },
+            primitiveType: PrimitiveTypes.Triangles
         });
+        this.#fullQuadMesh = new Mesh(this.#geometry, this.#material); 
+        this.#scene.add(this.#fullQuadMesh);
+        
+        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
+        
+        this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+        this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
+    }
+  
+    setSize(width, height) {
+        this.renderTarget.setSize(width, height);
+    }
+    
+    render(renderer, prevPassRenderTarget) {
+        this.#camera.setRenderTarget(this.renderToScreen ? null : this.renderTarget);
+        this.#material.uniforms.uSceneTexture.value = prevPassRenderTarget.texture;
+        renderer.render(this.#scene, this.#camera);
     }
 }
