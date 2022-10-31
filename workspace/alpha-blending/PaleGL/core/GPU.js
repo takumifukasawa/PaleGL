@@ -79,7 +79,8 @@ export class GPU {
         // depth test
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
-      
+     
+        // TODO: renderer側でやるべき？
         // blend
         // gl.blendFunc(src, dest)
         // - src: current draw
