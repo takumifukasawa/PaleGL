@@ -14,6 +14,7 @@ const styleRules = [
     `, `
 .${elementClassName} {    
     font-size: 10px;
+    font-weight: bold;
     display: flex;
     align-items: center;
 }

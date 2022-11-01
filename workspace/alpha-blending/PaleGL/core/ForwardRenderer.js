@@ -1,4 +1,6 @@
-﻿export class ForwardRenderer {
+﻿import {BlendTypes} from "./constants.js";
+
+export class ForwardRenderer {
     #gpu;
     canvas;
     pixelRatio;
@@ -60,16 +62,31 @@
        
         // update all actors matrix
         // TODO: scene 側でやった方がよい？
-        scene.traverse((actor) => actor.updateTransform())
-        
-        // draw 
+        scene.traverse((actor) => actor.updateTransform());
+      
+        const opaqueQueueMeshActors = [];
+        const transparentQueueMeshActors = [];
         scene.traverse((actor) => {
             if(!actor.geometry || !actor.material) {
                 return;
             }
-            
-            const mesh = actor;
-
+            switch(actor.material.blendType) {
+                case BlendTypes.Opaque:
+                    opaqueQueueMeshActors.push(actor)
+                    break;
+                case BlendTypes.Transparent:
+                case BlendTypes.Additive:
+                    transparentQueueMeshActors.push(actor);
+                    break;
+                default:
+                    throw "invalid blend types";
+            }
+        });
+        
+        const sortedMeshActors = [...opaqueQueueMeshActors, ...transparentQueueMeshActors];
+        
+        // draw 
+        sortedMeshActors.forEach(mesh => {
             // TODO: material 側でやった方がよい？
             if(mesh.material.uniforms.uWorldMatrix) {
                 mesh.material.uniforms.uWorldMatrix.value = mesh.transform.worldMatrix;
