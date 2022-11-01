@@ -28,3 +28,9 @@ export const BlendTypes = {
     Transparent: "Transparent",
     Additive: "Additive",
 };
+
+export const RenderQueues = {
+    Skybox: 1,
+    Opaque: 2,
+    Transparent: 3
+};

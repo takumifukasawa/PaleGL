@@ -1,11 +1,12 @@
 ﻿import {Shader} from "./../Shader.js";
-import {BlendTypes, UniformTypes, PrimitiveTypes} from "./../constants.js";
+import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues} from "./../constants.js";
 import {Matrix4} from "../../math/Matrix4.js";
 
 export class Material {
     shader;
     primitiveType;
     blendType;
+    renderQueue;
     uniforms = {};
 
     static UniformTypes = {
@@ -14,10 +15,35 @@ export class Material {
         Vector3f: "Vector3f",
     };
 
-    constructor({gpu, vertexShader, fragmentShader, primitiveType, blendType, uniforms = {}}) {
+    constructor({
+        gpu,
+        vertexShader,
+        fragmentShader,
+        primitiveType,
+        blendType,
+        renderQueue,
+        uniforms = {}
+    }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
+
+        if(!!renderQueue) {
+            this.renderQueue = renderQueue;
+        } else {
+            switch(this.blendType) {
+                case BlendTypes.Opaque:
+                    this.renderQueue = RenderQueues.Opaque;
+                    break;
+                case BlendTypes.Transparent: 
+                    this.renderQueue = RenderQueues.Transparent;
+                    break;
+            }
+        }
+        
+        if(!this.renderQueue) {
+            throw "invalid render queue";
+        }
 
         // TODO: シェーダーごとにわける？
         const commonUniforms = {

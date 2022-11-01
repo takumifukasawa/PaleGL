@@ -66,24 +66,38 @@ export class ForwardRenderer {
       
         const opaqueQueueMeshActors = [];
         const transparentQueueMeshActors = [];
+        
+        const sortedMeshActors = [];
         scene.traverse((actor) => {
-            if(!actor.geometry || !actor.material) {
+            if (!actor.geometry || !actor.material) {
                 return;
             }
-            switch(actor.material.blendType) {
-                case BlendTypes.Opaque:
-                    opaqueQueueMeshActors.push(actor)
-                    break;
-                case BlendTypes.Transparent:
-                case BlendTypes.Additive:
-                    transparentQueueMeshActors.push(actor);
-                    break;
-                default:
-                    throw "invalid blend types";
-            }
+            sortedMeshActors.push(actor);
         });
         
-        const sortedMeshActors = [...opaqueQueueMeshActors, ...transparentQueueMeshActors];
+        sortedMeshActors.sort((a, b) => {
+            if (a.material.renderQueue < b.material.renderQueue) {
+                return -1;
+            }
+            if (a.material.renderQueue > b.material.renderQueue) {
+                return 1;
+            }
+            return 0;
+        });
+        
+        // switch(actor.material.blendType) {
+        //     case BlendTypes.Opaque:
+        //         opaqueQueueMeshActors.push(actor)
+        //         break;
+        //     case BlendTypes.Transparent:
+        //     case BlendTypes.Additive:
+        //         transparentQueueMeshActors.push(actor);
+        //         break;
+        //     default:
+        //         throw "invalid blend types";
+        // }
+        
+        // const sortedMeshActors = [...opaqueQueueMeshActors, ...transparentQueueMeshActors];
         
         // draw 
         sortedMeshActors.forEach(mesh => {
