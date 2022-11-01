@@ -1,3 +1,33 @@
+const wrapperClassName = "debugger-gui-wrapper";
+const elementClassName = "debugger-gui-element";
+const elementLabelClassName = "debugger-gui-element-label";
+const styleRules = [
+    `
+.${wrapperClassName} {
+    background-color: rgb(200 200 255 / 70%);
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    box-sizing: border-box;
+    padding: 10px;
+}
+    `, `
+.${elementClassName} {    
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+}
+    `, `
+.${elementClassName} select {
+    font-size: 10px;
+}
+    `, `
+.${elementLabelClassName} {
+    margin-right: 1em;
+}  
+`
+];
+
 export class DebuggerGUI {
 
     static DebuggerTypes = {
@@ -12,26 +42,23 @@ export class DebuggerGUI {
     }
 
     constructor() {
+        const styleElement = document.createElement("style");
+        document.head.appendChild(styleElement);
+        styleRules.forEach(rules => {
+            styleElement.sheet.insertRule(rules, styleElement.sheet.cssRules.length);
+        });
+
         this.#domElement = document.createElement("div");
-        this.#domElement.style = `
-background-color: rgb(200 200 255 / 70%);
-position: absolute;
-top: 0px;
-right: 0px;
-box-sizing: border-box;
-padding: 10px;
-`;
+        this.#domElement.classList.add(wrapperClassName);
     }
 
     add(type, { label, options, onChange, initialExec = true }) {
         const element = document.createElement("div");
-        element.classList.add("debugger-gui-element");
-        element.style = `
-display: flex;
-`;
+        element.classList.add(elementClassName);
 
         const labelWrapperElement = document.createElement("div");
         const labelTextElement = document.createElement("p");
+        labelTextElement.classList.add(elementLabelClassName);
         labelTextElement.textContent = label;
         
         element.appendChild(labelTextElement);
