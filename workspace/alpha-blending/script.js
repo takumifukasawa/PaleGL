@@ -13,8 +13,10 @@ import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
 import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
 import {FragmentPass} from "./PaleGL/core/postprocess/FragmentPass.js";
 import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
+import {DebuggerGUI} from "./DebuggerGUI/index.js";
 
 let width, height;
+
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -118,7 +120,7 @@ const boxMaterial = new Material({
     primitiveType: PrimitiveTypes.Triangles,
 });
 
-const backgroundVertexShader = `#version 300 es
+const planeVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -136,7 +138,7 @@ void main() {
 }
 `;
 
-const backgroundFragmentShader = `#version 300 es
+const planeFragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -149,18 +151,18 @@ void main() {
 }
 `;
 
-const backgroundMaterial = new Material({
+const planeMaterial = new Material({
     gpu,
-    vertexShader: backgroundVertexShader,
-    fragmentShader: backgroundFragmentShader,
+    vertexShader: planeVertexShader,
+    fragmentShader: planeFragmentShader,
     blendType: BlendTypes.Transparent
 });
 
-const boxMesh = new Mesh(new BoxGeometry({ gpu }), boxMaterial);
-const backgroundMesh = new Mesh(new PlaneGeometry({ gpu }), backgroundMaterial);
+const boxMesh = new Mesh(new BoxGeometry({gpu}), boxMaterial);
+const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
 
 captureScene.add(boxMesh);
-captureScene.add(backgroundMesh);
+captureScene.add(planeMesh);
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
@@ -168,8 +170,9 @@ captureScene.add(captureSceneCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
-const postProcess = new PostProcess({ gpu, renderer });
-postProcess.addPass(new FragmentPass({ gpu, fragmentShader: `#version 300 es
+const postProcess = new PostProcess({gpu, renderer});
+postProcess.addPass(new FragmentPass({
+    gpu, fragmentShader: `#version 300 es
 precision mediump float;
 in vec2 vUv;
 out vec4 outColor;
@@ -179,8 +182,10 @@ void main() {
     outColor = textureColor;
     outColor.r *= 0.5;
 }
-`}));
-postProcess.addPass(new FragmentPass({ gpu, fragmentShader: `#version 300 es
+`
+}));
+postProcess.addPass(new FragmentPass({
+    gpu, fragmentShader: `#version 300 es
 precision mediump float;
 in vec2 vUv;
 out vec4 outColor;
@@ -190,16 +195,17 @@ void main() {
     outColor = textureColor;
     outColor.g *= 0.5;
 }
-`}));
+`
+}));
 
 // captureSceneCamera.setPostProcess(postProcess);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
-    
+
     captureSceneCamera.setSize(width, height);
-    
+
     renderer.setSize(width, height);
     postProcess.setSize(width, height);
 };
@@ -209,10 +215,10 @@ const tick = (time) => {
     boxMesh.transform.setRotationX(time / 1000 * 10);
     boxMesh.transform.setRotationY(time / 1000 * 14);
 
-    backgroundMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
-    
+    planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
+
     renderer.render(captureScene, captureSceneCamera);
-    
+
     // loop
 
     requestAnimationFrame(tick);
@@ -226,13 +232,36 @@ const main = async () => {
         };
         const data = images[key];
         const img = await loadImg(data.src);
-        return { key, img }
+        return {key, img}
     })).then(data => {
-        data.forEach(({ key , img }) => {
+        data.forEach(({key, img}) => {
             boxMaterial.uniforms[key].value = new Texture({gpu, img});
         });
     });
-    
+
+    const debuggerGUI = new DebuggerGUI();
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.PullDown, {
+        options: [
+            {
+                label: "Opaque",
+                value: BlendTypes.Opaque,
+            },
+            {
+                label: "Transparent",
+                value: BlendTypes.Transparent,
+                isDefault: true
+            },
+            {
+                label: "Additive",
+                value: BlendTypes.Additive
+            },
+        ],
+        onChange: (blendType) => {
+            planeMaterial.blendType = blendType;
+        }
+    });
+    wrapperElement.appendChild(debuggerGUI.domElement);
+
     onWindowResize();
 
     window.addEventListener('resize', onWindowResize);

@@ -1,30 +1,30 @@
 ﻿
 export const PrimitiveTypes = {
-    Points: 1,
-    Lines: 2,
-    Triangles: 3
+    Points: "Points",
+    Lines: "Lines",
+    Triangles: "Triangles"
 };
 
 export const AttributeTypes = {
-    Position: 0,
+    Position: "Position",
 };
 
 export const UniformTypes = {
-    Matrix4: 1,
-    Texture: 2,
+    Matrix4: "Matrix4",
+    Texture: "Texture"
 };
 
 export const TextureWrapTypes = {
-    Repeat: 1,
-    ClampToEdge: 2,
+    Repeat: "Repeat",
+    ClampToEdge: "ClampToEdge",
 };
 
 export const TextureFilterTypes = {
-    Linear: 0,
+    Linear: "Linear",
 };
 
 export const BlendTypes = {
-    Opaque: 1,
-    Transparent: 2,
-    Additive: 3,
+    Opaque: "Opaque",
+    Transparent: "Transparent",
+    Additive: "Additive",
 };
