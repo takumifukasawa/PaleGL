@@ -13,7 +13,7 @@ import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
 import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
 import {FragmentPass} from "./PaleGL/core/postprocess/FragmentPass.js";
 import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
-import {DebuggerGUI} from "./DebuggerGUI/index.js";
+import {DebuggerGUI} from "./DebuggerGUI.js";
 
 let width, height;
 
@@ -241,6 +241,7 @@ const main = async () => {
 
     const debuggerGUI = new DebuggerGUI();
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.PullDown, {
+        label: "Plane Blending",
         options: [
             {
                 label: "Opaque",

@@ -14,17 +14,28 @@ export class DebuggerGUI {
     constructor() {
         this.#domElement = document.createElement("div");
         this.#domElement.style = `
-background-color: white;
-width: 200px;
-height: 200px;
+background-color: rgb(200 200 255 / 70%);
 position: absolute;
-top: 0;
-left: 0;        
+top: 0px;
+right: 0px;
+box-sizing: border-box;
+padding: 10px;
 `;
     }
 
-    add(type, { options, onChange, initialExec = true }) {
+    add(type, { label, options, onChange, initialExec = true }) {
         const element = document.createElement("div");
+        element.classList.add("debugger-gui-element");
+        element.style = `
+display: flex;
+`;
+
+        const labelWrapperElement = document.createElement("div");
+        const labelTextElement = document.createElement("p");
+        labelTextElement.textContent = label;
+        
+        element.appendChild(labelTextElement);
+
         switch (type) {
             // options ... array
             // [ { type, value },,, ]
