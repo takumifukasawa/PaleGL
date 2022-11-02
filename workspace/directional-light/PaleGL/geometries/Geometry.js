@@ -1,6 +1,6 @@
-﻿import {Attribute} from "./../Attribute.js";
-import {VertexArrayObject} from "./../VertexArrayObject.js";
-import {IndexBufferObject} from "./../IndexBufferObject.js";
+﻿import {Attribute} from "./../core/Attribute.js";
+import {VertexArrayObject} from "./../core/VertexArrayObject.js";
+import {IndexBufferObject} from "./../core/IndexBufferObject.js";
 
 export class Geometry {
     attributes;

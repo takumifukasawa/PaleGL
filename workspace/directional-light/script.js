@@ -5,14 +5,14 @@ import {Vector4} from "./PaleGL/math/Vector4.js";
 import {Scene} from "./PaleGL/core/Scene.js";
 import {ForwardRenderer} from "./PaleGL/core/ForwardRenderer.js";
 import {Mesh} from "./PaleGL/core/Mesh.js";
-import {Material} from "./PaleGL/core/materials/Material.js";
+import {Material} from "./PaleGL/materials/Material.js";
 import {PerspectiveCamera} from "./PaleGL/core/PerspectiveCamera.js";
 import {Texture} from "./PaleGL/core/Texture.js";
 import {loadImg} from "./PaleGL/utils/loadImg.js";
-import {BoxGeometry} from "./PaleGL/core/geometries/BoxGeometry.js";
-import {PostProcess} from "./PaleGL/core/postprocess/PostProcess.js";
-import {FragmentPass} from "./PaleGL/core/postprocess/FragmentPass.js";
-import {PlaneGeometry} from "./PaleGL/core/geometries/PlaneGeometry.js";
+import {BoxGeometry} from "./PaleGL/geometries/BoxGeometry.js";
+import {PostProcess} from "./PaleGL/postprocess/PostProcess.js";
+import {FragmentPass} from "./PaleGL/postprocess/FragmentPass.js";
+import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
 let width, height;
@@ -179,24 +179,24 @@ out vec4 outColor;
 uniform sampler2D uSceneTexture;
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
-    float avg = (textureColor.r + textureColor.g + textureColor.b) * 0.3333;
-    outColor = vec4(avg, avg, avg, 1);
+    outColor = textureColor;
+    outColor.r *= 0.2;
 }
 `
 }));
-// postProcess.addPass(new FragmentPass({
-//     gpu, fragmentShader: `#version 300 es
-// precision mediump float;
-// in vec2 vUv;
-// out vec4 outColor;
-// uniform sampler2D uSceneTexture;
-// void main() {
-//     vec4 textureColor = texture(uSceneTexture, vUv);
-//     outColor = textureColor;
-//     outColor.g *= 0.5;
-// }
-// `
-// }));
+postProcess.addPass(new FragmentPass({
+    gpu, fragmentShader: `#version 300 es
+precision mediump float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uSceneTexture;
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    outColor = textureColor;
+    outColor.g *= 0.5;
+}
+`
+}));
 
 captureSceneCamera.setPostProcess(postProcess);
 

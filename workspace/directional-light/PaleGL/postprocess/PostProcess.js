@@ -1,27 +1,16 @@
-﻿import {OrthographicCamera} from "./../OrthographicCamera.js";
-import {RenderTarget} from "../RenderTarget.js";
-import {Vector3} from "../../math/Vector3.js";
-import {Mesh} from "../Mesh.js";
-import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
+﻿import {OrthographicCamera} from "./../core/OrthographicCamera.js";
+import {RenderTarget} from "../core/RenderTarget.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class PostProcess {
     passes = [];
     renderTarget;
     #camera;
-    // #mesh;
-    
-    // get mesh() {
-    //     return this.#mesh;
-    // }
     
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepth: true });
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
-        // this.#mesh = new Mesh(
-        //     new PlaneGeometry({ gpu }),
-        //     null,
-        // );
     }
  
     setSize(width, height) {

@@ -1,8 +1,8 @@
 ﻿import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
 import {Material} from "../materials/Material.js";
-import {RenderTarget} from "../RenderTarget.js";
-import {Mesh} from "../Mesh.js";
-import {PrimitiveTypes, UniformTypes} from "../constants.js";
+import {RenderTarget} from "../core/RenderTarget.js";
+import {Mesh} from "../core/Mesh.js";
+import {PrimitiveTypes, UniformTypes} from "../core/constants.js";
 
 const baseVertexShader = `#version 300 es
 
@@ -39,7 +39,6 @@ export class PostProcessPass {
             },
             primitiveType: PrimitiveTypes.Triangles
         });
-        console.log(this.#material)
         this.mesh = new Mesh(this.#geometry, this.#material); 
         
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
