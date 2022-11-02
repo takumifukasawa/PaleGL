@@ -62,7 +62,7 @@ export class Material {
             uNormalMatrix: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
-            }
+            },
         };
 
         this.uniforms = {...commonUniforms, ...uniforms};

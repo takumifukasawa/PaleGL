@@ -69,20 +69,26 @@ export class ForwardRenderer {
             opaque: [],
             transparent: [],
         };
+        const lightActors = [];
 
         scene.traverse((actor) => {
-            if(actor.type !== ActorTypes.Mesh) return;
-            
-            switch (actor.material.blendType) {
-                case BlendTypes.Opaque:
-                    meshActorsEachQueue.opaque.push(actor);
+            switch(actor.type) {
+                case ActorTypes.Mesh:
+                    switch (actor.material.blendType) {
+                        case BlendTypes.Opaque:
+                            meshActorsEachQueue.opaque.push(actor);
+                            break;
+                        case BlendTypes.Transparent:
+                        case BlendTypes.Additive:
+                            meshActorsEachQueue.transparent.push(actor);
+                            break;
+                        default:
+                            throw "invalid blend type";
+                    }
                     break;
-                case BlendTypes.Transparent:
-                case BlendTypes.Additive:
-                    meshActorsEachQueue.transparent.push(actor);
+                case ActorTypes.Light:
+                    lightActors.push(actor);
                     break;
-                default:
-                    throw "invalid blend type";
             }
         });
 
@@ -105,22 +111,25 @@ export class ForwardRenderer {
             if (mesh.material.uniforms.uNormalMatrix) {
                 mesh.material.uniforms.uNormalMatrix.value = mesh.transform.worldMatrix.clone().invert().transpose();
             }
-            if (mesh.material.uniforms.uDirectionalLight) {
-                // TODO: 一旦直接渡してる
-                mesh.material.uniforms.uDirectionalLight = {
-                    type: UniformTypes.Struct,
-                    value: {
-                        direction: {
-                            type: UniformTypes.Vector3,
-                            value: new Vector3(1, 1, 1),
-                        },
-                        intensity: {
-                            type: UniformTypes.Float,
-                            value: 1
+            
+            // TODO: light actor の中で lightの種類別に処理を分ける
+            lightActors.forEach(light => {
+                if (mesh.material.uniforms.uDirectionalLight) {
+                    mesh.material.uniforms.uDirectionalLight = {
+                        type: UniformTypes.Struct,
+                        value: {
+                            direction: {
+                                type: UniformTypes.Vector3,
+                                value: light.transform.position,
+                            },
+                            intensity: {
+                                type: UniformTypes.Float,
+                                value: light.intensity,
+                            }
                         }
                     }
                 }
-            }
+            });
 
             this.renderMesh(mesh);
         });

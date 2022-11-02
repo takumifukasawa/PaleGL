@@ -165,6 +165,7 @@ captureScene.add(boxMesh);
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
+directionalLight.transform.setTranslation(new Vector3(1, 1, 1));
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
