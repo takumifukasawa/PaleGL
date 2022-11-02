@@ -27,16 +27,20 @@ const boxVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
+layout (location = 2) in vec3 aNormal;
 
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uNormalMatrix;
 
 out vec2 vUv;
 out float vTextureIndex;
+out vec3 vNormal;
 
 void main() {
     vUv = aUv;
+    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
     vTextureIndex = floor(float(gl_VertexID) / 4.);
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
 }
@@ -47,6 +51,7 @@ const boxFragmentShader = `#version 300 es
 precision mediump float;
 
 in vec2 vUv;
+in vec3 vNormal;
 in float vTextureIndex;
 
 out vec4 outColor;
@@ -80,10 +85,13 @@ void main() {
     } else {
         textureColor = texture(uDirYMinusMap, vUv);
     }
+   
+    vec3 normal = normalize(vNormal);
+    vec3 lightDirection = normalize(uDirectionalLight.direction);
+    float diffuseRate = dot(normal, lightDirection);
 
     outColor = textureColor;
-    // outColor = vec4(vUv, 1, 1);
-    outColor = vec4(uDirectionalLight.intensity, 1, 1, 1);
+    outColor = vec4(vec3(diffuseRate), 1);
 }
 `;
 

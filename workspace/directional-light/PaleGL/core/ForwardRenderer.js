@@ -102,6 +102,9 @@ export class ForwardRenderer {
             if (mesh.material.uniforms.uProjectionMatrix) {
                 mesh.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
+            if (mesh.material.uniforms.uNormalMatrix) {
+                mesh.material.uniforms.uNormalMatrix.value = mesh.transform.worldMatrix.clone().invert().transpose();
+            }
             if (mesh.material.uniforms.uDirectionalLight) {
                 // TODO: 一旦直接渡してる
                 mesh.material.uniforms.uDirectionalLight = {

@@ -58,6 +58,10 @@ export class Material {
             uProjectionMatrix: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
+            },
+            uNormalMatrix: {
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity()
             }
         };
 

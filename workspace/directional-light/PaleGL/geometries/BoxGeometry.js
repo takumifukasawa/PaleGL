@@ -12,6 +12,15 @@ export class BoxGeometry extends Geometry {
         const boxPosition_6 = [-0.5, 0.5, -0.5];
         const boxPosition_7 = [-0.5, -0.5, -0.5];
 
+        const normals = [
+            [0, 0, 1], // front
+            [1, 0, 0], // right
+            [0, 0, -1], // back
+            [-1, 0, 0], // left
+            [0, 1, 0], // top
+            [0, -1, 0], // bottom
+        ];
+        
         super({
             gpu,
             attributes: {
@@ -50,6 +59,10 @@ export class BoxGeometry extends Geometry {
                     ])).flat(),
                     size: 2
                 },
+                normal: {
+                    data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
+                    size: 3
+                }
             },
             indices: Array.from(Array(6).keys()).map(i => ([
                 i * 4 + 0, i * 4 + 1, i * 4 + 2,
