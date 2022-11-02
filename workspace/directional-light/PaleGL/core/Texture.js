@@ -1,5 +1,5 @@
 ﻿import {GLObject} from "./GLObject.js";
-import {TextureFilterTypes, TextureWrapTypes} from "./constants.js";
+import {TextureFilterTypes, TextureWrapTypes} from "./../constants.js";
 
 export class Texture extends GLObject {
     #texture;

@@ -1,5 +1,5 @@
 ﻿import {GPU} from "./PaleGL/core/GPU.js";
-import {BlendTypes, PrimitiveTypes, UniformTypes} from "./PaleGL/core/constants.js";
+import {BlendTypes, PrimitiveTypes, UniformTypes} from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
 import {Scene} from "./PaleGL/core/Scene.js";
@@ -14,6 +14,7 @@ import {PostProcess} from "./PaleGL/postprocess/PostProcess.js";
 import {FragmentPass} from "./PaleGL/postprocess/FragmentPass.js";
 import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
+import {DirectionalLight} from "./PaleGL/lights/DirectionalLight.js";
 
 let width, height;
 
@@ -142,6 +143,9 @@ const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
 
 captureScene.add(planeMesh);
 captureScene.add(boxMesh);
+
+const directionalLight = new DirectionalLight();
+captureScene.add(directionalLight);
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);

@@ -2,7 +2,7 @@
 import {Material} from "../materials/Material.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../core/Mesh.js";
-import {PrimitiveTypes, UniformTypes} from "../core/constants.js";
+import {PrimitiveTypes, UniformTypes} from "../constants.js";
 
 const baseVertexShader = `#version 300 es
 

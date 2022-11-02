@@ -1,5 +1,5 @@
 ﻿import {Actor} from "./Actor.js";
-import {ActorTypes} from "./constants.js";
+import {ActorTypes} from "./../constants.js";
 
 export class Mesh extends Actor {
     geometry;

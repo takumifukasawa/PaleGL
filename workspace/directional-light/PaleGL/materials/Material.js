@@ -1,5 +1,5 @@
 ﻿import {Shader} from "./../core/Shader.js";
-import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues} from "./../core/constants.js";
+import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 
 export class Material {

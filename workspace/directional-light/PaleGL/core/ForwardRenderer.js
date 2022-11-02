@@ -1,4 +1,4 @@
-﻿import {BlendTypes} from "./constants.js";
+﻿import {BlendTypes} from "./../constants.js";
 
 export class ForwardRenderer {
     #gpu;

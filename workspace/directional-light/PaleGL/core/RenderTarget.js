@@ -2,7 +2,7 @@
 import { Texture } from "./Texture.js";
 import {Framebuffer} from "./Framebuffer.js";
 import {Renderbuffer} from "./Renderbuffer.js";
-import {RenderbufferTypes} from "./constants.js";
+import {RenderbufferTypes} from "./../constants.js";
 
 export class RenderTarget {
     #texture;

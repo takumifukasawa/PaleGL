@@ -1,4 +1,4 @@
-﻿import {BlendTypes, PrimitiveTypes, UniformTypes} from "./constants.js";
+﻿import {BlendTypes, PrimitiveTypes, UniformTypes} from "./../constants.js";
 import {Texture} from "./Texture.js";
 
 const createWhite1x1 = () => {

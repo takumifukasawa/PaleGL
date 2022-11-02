@@ -1,5 +1,5 @@
 ﻿import {Transform} from "./Transform.js";
-import {ActorTypes} from "./constants.js";
+import {ActorTypes} from "./../constants.js";
 
 export class Actor {
     transform = new Transform();

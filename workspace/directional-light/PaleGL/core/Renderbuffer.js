@@ -1,5 +1,5 @@
 ﻿import {GLObject} from "./GLObject.js";
-import {RenderbufferTypes} from "./constants.js";
+import {RenderbufferTypes} from "./../constants.js";
 
 export class Renderbuffer extends GLObject {
     #gpu;
