@@ -1,10 +1,13 @@
 ﻿import {Transform} from "./Transform.js";
+import {ActorTypes} from "./constants.js";
 
 export class Actor {
     transform = new Transform();
+    type;
     
-    constructor() {
+    constructor(type) {
         this.transform.actor = this;
+        this.type = type || ActorTypes.Null;
     }
     
     addChild(child) {

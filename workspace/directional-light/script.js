@@ -92,27 +92,6 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const images = {
-    uDirZMinusMap: {
-        src: "./images/dir-z-minus.png",
-    },
-    uDirXPlusMap: {
-        src: "./images/dir-x-plus.png",
-    },
-    uDirZPlusMap: {
-        src: "./images/dir-z-plus.png",
-    },
-    uDirXMinusMap: {
-        src: "./images/dir-x-minus.png",
-    },
-    uDirYMinusMap: {
-        src: "./images/dir-y-minus.png",
-    },
-    uDirYPlusMap: {
-        src: "./images/dir-y-plus.png",
-    },
-};
-
 const boxMaterial = new Material({
     gpu,
     vertexShader: boxVertexShader,
@@ -198,7 +177,7 @@ void main() {
 `
 }));
 
-captureSceneCamera.setPostProcess(postProcess);
+// captureSceneCamera.setPostProcess(postProcess);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -226,6 +205,27 @@ const tick = (time) => {
 }
 
 const main = async () => {
+    const images = {
+        uDirZMinusMap: {
+            src: "./images/dir-z-minus.png",
+        },
+        uDirXPlusMap: {
+            src: "./images/dir-x-plus.png",
+        },
+        uDirZPlusMap: {
+            src: "./images/dir-z-plus.png",
+        },
+        uDirXMinusMap: {
+            src: "./images/dir-x-minus.png",
+        },
+        uDirYMinusMap: {
+            src: "./images/dir-y-minus.png",
+        },
+        uDirYPlusMap: {
+            src: "./images/dir-y-plus.png",
+        },
+    };
+   
     await Promise.all(Object.keys(images).map(async (key) => {
         boxMaterial.uniforms[key] = {
             type: UniformTypes.Texture,

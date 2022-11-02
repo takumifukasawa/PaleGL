@@ -38,3 +38,9 @@ export const RenderQueues = {
 export const RenderbufferTypes = {
     Depth: "Depth",
 };
+
+export const ActorTypes = {
+    Null: "Null",
+    Mesh: "Mesh",
+    Light: "Light",
+};
