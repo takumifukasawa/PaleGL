@@ -1,6 +1,8 @@
 const wrapperClassName = "debugger-gui-wrapper";
 const elementClassName = "debugger-gui-element";
 const elementLabelClassName = "debugger-gui-element-label";
+
+// TODO: 各elementのstyleに持たせる
 const styleRules = [
     `
 .${wrapperClassName} {
