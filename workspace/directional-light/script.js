@@ -89,9 +89,10 @@ void main() {
     vec3 normal = normalize(vNormal);
     vec3 lightDirection = normalize(uDirectionalLight.direction);
     float diffuseRate = dot(normal, lightDirection);
+    
+    vec3 diffuseColor = textureColor.xyz * diffuseRate;
 
-    outColor = textureColor;
-    outColor = vec4(vec3(diffuseRate), 1);
+    outColor = vec4(diffuseColor, 1);
 }
 `;
 
