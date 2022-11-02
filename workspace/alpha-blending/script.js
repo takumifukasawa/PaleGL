@@ -161,8 +161,8 @@ const planeMaterial = new Material({
 const boxMesh = new Mesh(new BoxGeometry({gpu}), boxMaterial);
 const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
 
-captureScene.add(boxMesh);
 captureScene.add(planeMesh);
+captureScene.add(boxMesh);
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
