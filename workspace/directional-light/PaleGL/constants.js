@@ -11,7 +11,10 @@ export const AttributeTypes = {
 
 export const UniformTypes = {
     Matrix4: "Matrix4",
-    Texture: "Texture"
+    Texture: "Texture",
+    Vector3: "Vector3",
+    Struct: "Struct",
+    Float: "Float"
 };
 
 export const TextureWrapTypes = {

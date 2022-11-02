@@ -58,6 +58,12 @@ uniform sampler2D uDirXMinusMap;
 uniform sampler2D uDirYPlusMap;
 uniform sampler2D uDirYMinusMap;
 
+struct DirectionalLight {
+    vec3 direction;
+    float intensity;
+};
+uniform DirectionalLight uDirectionalLight;
+
 void main() {
     vec4 textureColor = vec4(0, 0, 0, 1);
 
@@ -77,6 +83,7 @@ void main() {
 
     outColor = textureColor;
     // outColor = vec4(vUv, 1, 1);
+    outColor = vec4(uDirectionalLight.intensity, 1, 1, 1);
 }
 `;
 
@@ -98,6 +105,9 @@ const boxMaterial = new Material({
     vertexShader: boxVertexShader,
     fragmentShader: boxFragmentShader,
     primitiveType: PrimitiveTypes.Triangles,
+    uniforms: {
+        uDirectionalLight: {}
+    }
 });
 
 const planeVertexShader = `#version 300 es

@@ -1,4 +1,5 @@
-﻿import {BlendTypes} from "./../constants.js";
+﻿import {ActorTypes, BlendTypes, UniformTypes} from "./../constants.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class ForwardRenderer {
     #gpu;
@@ -70,9 +71,8 @@ export class ForwardRenderer {
         };
 
         scene.traverse((actor) => {
-            if (!actor.geometry || !actor.material) {
-                return;
-            }
+            if(actor.type !== ActorTypes.Mesh) return;
+            
             switch (actor.material.blendType) {
                 case BlendTypes.Opaque:
                     meshActorsEachQueue.opaque.push(actor);
@@ -101,6 +101,22 @@ export class ForwardRenderer {
             }
             if (mesh.material.uniforms.uProjectionMatrix) {
                 mesh.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+            }
+            if (mesh.material.uniforms.uDirectionalLight) {
+                // TODO: 一旦直接渡してる
+                mesh.material.uniforms.uDirectionalLight = {
+                    type: UniformTypes.Struct,
+                    value: {
+                        direction: {
+                            type: UniformTypes.Vector3,
+                            value: new Vector3(1, 1, 1),
+                        },
+                        intensity: {
+                            type: UniformTypes.Float,
+                            value: 1
+                        }
+                    }
+                }
             }
 
             this.renderMesh(mesh);

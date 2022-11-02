@@ -113,17 +113,31 @@ export class GPU {
         // uniforms
         Object.keys(this.#uniforms).forEach(uniformName => {
             const uniform = this.#uniforms[uniformName];
-            const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
+            let location;
             switch (uniform.type) {
                 case UniformTypes.Matrix4:
+                    location = gl.getUniformLocation(this.#shader.glObject, uniformName);
                     gl.uniformMatrix4fv(location, false, uniform.value.elements);
                     break;
                 case UniformTypes.Texture:
+                    location = gl.getUniformLocation(this.#shader.glObject, uniformName);
                     const activeTextureKey = gl[`TEXTURE${activeTextureIndex}`];
                     gl.activeTexture(activeTextureKey);
                     gl.bindTexture(gl.TEXTURE_2D, uniform.value ? uniform.value.glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
+                    break;
+                case UniformTypes.Struct:
+                    Object.keys(uniform.value).forEach(key => {
+                        location = gl.getUniformLocation(this.#shader.glObject, `${uniformName}.${key}`);
+                        switch(uniform.value[key].type) {
+                            case UniformTypes.Vector3:
+                                gl.uniform3fv(location, uniform.value[key].value.elements);
+                                break;
+                            case UniformTypes.Float:
+                                gl.uniform1f(location, uniform.value[key].value);
+                        }
+                    });
                     break;
                 default:
                     throw "invalid uniform type";
