@@ -68,6 +68,7 @@ export class GPU {
         }
     }
     
+   
     draw(drawCount, primitiveType, blendType, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
@@ -109,38 +110,40 @@ export class GPU {
         gl.useProgram(this.#shader.glObject);
         
         let activeTextureIndex = 0;
-
-        // uniforms
-        Object.keys(this.#uniforms).forEach(uniformName => {
-            const uniform = this.#uniforms[uniformName];
-            let location;
-            switch (uniform.type) {
+    
+        const setUniformValue = (type, uniformName, value) => {
+            const gl = this.gl;
+            const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
+            switch(type) {
+                case UniformTypes.Float:
+                    gl.uniform1f(location, value);
+                    break;
+                case UniformTypes.Vector3:
+                    gl.uniform3fv(location, value.elements);
+                    break;
                 case UniformTypes.Matrix4:
-                    location = gl.getUniformLocation(this.#shader.glObject, uniformName);
-                    gl.uniformMatrix4fv(location, false, uniform.value.elements);
+                    // arg 2 ... use transpose.
+                    gl.uniformMatrix4fv(location, false, value.elements);
                     break;
                 case UniformTypes.Texture:
-                    location = gl.getUniformLocation(this.#shader.glObject, uniformName);
                     const activeTextureKey = gl[`TEXTURE${activeTextureIndex}`];
                     gl.activeTexture(activeTextureKey);
-                    gl.bindTexture(gl.TEXTURE_2D, uniform.value ? uniform.value.glObject : this.dummyTexture.glObject);
+                    gl.bindTexture(gl.TEXTURE_2D, value ? value.glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
                     break;
-                case UniformTypes.Struct:
-                    Object.keys(uniform.value).forEach(key => {
-                        location = gl.getUniformLocation(this.#shader.glObject, `${uniformName}.${key}`);
-                        switch(uniform.value[key].type) {
-                            case UniformTypes.Vector3:
-                                gl.uniform3fv(location, uniform.value[key].value.elements);
-                                break;
-                            case UniformTypes.Float:
-                                gl.uniform1f(location, uniform.value[key].value);
-                        }
-                    });
-                    break;
                 default:
                     throw "invalid uniform type";
+            }
+        };
+ 
+        // uniforms
+        Object.keys(this.#uniforms).forEach(uniformName => {
+            const uniform = this.#uniforms[uniformName];
+            if(uniform.type === UniformTypes.Struct) {
+                Object.keys(uniform.value).forEach(key => setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value));
+            } else {
+                setUniformValue(uniform.type, uniformName, uniform.value);
             }
         });
         
