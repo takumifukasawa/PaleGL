@@ -1,5 +1,5 @@
 ﻿export class Color {
-    elements;
+    elements; // each 0~1
     
     get r() {
         return this.elements[0];

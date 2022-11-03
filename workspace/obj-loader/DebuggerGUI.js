@@ -3,6 +3,7 @@ export class DebuggerGUI {
     static DebuggerTypes = {
         PullDown: "PullDown",
         Color: "Color",
+        CheckBox: "CheckBox",
     };
 
     #domElement;
@@ -87,7 +88,20 @@ export class DebuggerGUI {
                 }
                 break;
                 
-            case DebuggerGUI.DebuggerTypes.Color:
+            case DebuggerGUI.DebuggerTypes.CheckBox:
+                const checkBoxInput = document.createElement("input");
+                checkBoxInput.type = "checkbox";
+                checkBoxInput.checked = !!initialValue;
+                checkBoxInput.addEventListener("change", () => {
+                    onChange(checkBoxInput.checked);
+                });
+                debuggerInputElement.appendChild(checkBoxInput);
+                if(initialExec) {
+                    onChange(checkBoxInput.checked);
+                }
+                break;
+
+             case DebuggerGUI.DebuggerTypes.Color:
                 const colorPickerInput = document.createElement("input");
                 colorPickerInput.type = "color";
                 colorPickerInput.addEventListener("change", (e) => {

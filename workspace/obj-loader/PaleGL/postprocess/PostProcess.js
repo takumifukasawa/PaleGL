@@ -6,6 +6,7 @@ export class PostProcess {
     passes = [];
     renderTarget;
     #camera;
+    enabled = true;
     
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepth: true });

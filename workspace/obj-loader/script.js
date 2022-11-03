@@ -229,7 +229,7 @@ void main() {
 `
 }));
 
-// captureSceneCamera.setPostProcess(postProcess);
+captureSceneCamera.setPostProcess(postProcess);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -320,6 +320,8 @@ const main = async () => {
         })
     );
     captureScene.add(objMesh);
+    
+    captureSceneCamera.postProcess.enabled = false;
    
     // await Promise.all(Object.keys(images).map(async (key) => {
     //     boxMaterial.uniforms[key] = {
@@ -379,6 +381,13 @@ const main = async () => {
         onChange: (value) => {
             const color = Color.fromHex(value);
             objMesh.material.uniforms.uAmbientColor.value = color;
+        }
+    });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.CheckBox, {
+        label: "Enabled Post Process",
+        initialValue: captureSceneCamera.postProcess.enabled,
+        onChange: (value) => {
+            captureSceneCamera.postProcess.enabled = value;
         }
     });
     

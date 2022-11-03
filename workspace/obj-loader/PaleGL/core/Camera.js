@@ -15,7 +15,10 @@ export class Camera extends Actor {
     }
     
     get enabledPostProcess() {
-        return this.postProcess != null;
+        if(!this.postProcess) {
+            return false;
+        }
+        return this.postProcess.enabled;
     }
     
     // get postProcessRenderTarget() {
