@@ -208,7 +208,7 @@ uniform sampler2D uSceneTexture;
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     outColor = textureColor;
-    outColor.r *= 0.5;
+    outColor.r *= 0.8;
 }
 `
 }));
@@ -221,12 +221,12 @@ uniform sampler2D uSceneTexture;
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     outColor = textureColor;
-    outColor.g *= 0.5;
+    outColor.g *= 0.8;
 }
 `
 }));
 
-// captureSceneCamera.setPostProcess(postProcess);
+captureSceneCamera.setPostProcess(postProcess);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;

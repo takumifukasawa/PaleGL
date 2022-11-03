@@ -46,7 +46,7 @@ export class Material {
             throw "invalid render queue";
         }
 
-        // TODO: シェーダーごとにわける？
+        // TODO: シェーダーごとにわける？(postprocessの場合はいらないuniformなどがある
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,
@@ -67,7 +67,7 @@ export class Material {
             // TODO: viewmatrixから引っ張ってきてもよい
             uViewPosition: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero
+                value: Vector3.zero()
             }
         };
 
