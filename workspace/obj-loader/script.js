@@ -177,21 +177,10 @@ out vec4 outColor;
 uniform sampler2D uSceneTexture;
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
-    outColor = textureColor;
-    outColor.r *= 0.8;
-}
-`
-}));
-postProcess.addPass(new FragmentPass({
-    gpu, fragmentShader: `#version 300 es
-precision mediump float;
-in vec2 vUv;
-out vec4 outColor;
-uniform sampler2D uSceneTexture;
-void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
-    outColor = textureColor;
-    outColor.g *= 0.8;
+    float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
+    float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
+    float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
+    outColor = vec4(r, g, b, 1);
 }
 `
 }));
