@@ -359,6 +359,9 @@ const main = async () => {
             planeMaterial.blendType = blendType;
         }
     });
+    
+    debuggerGUI.addBorderSpacer();
+
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Obj Base Color",
         initialValue: objMesh.material.uniforms.uBaseColor.value.getHexCoord(),
@@ -375,6 +378,9 @@ const main = async () => {
             objMesh.material.uniforms.uAmbientColor.value = color;
         }
     });
+
+    debuggerGUI.addBorderSpacer();
+
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Light Color",
         initialValue: directionalLight.color.getHexCoord(),
@@ -413,6 +419,9 @@ const main = async () => {
             directionalLight.transform.position.z = value;
         }
     });
+    
+    debuggerGUI.addBorderSpacer();
+
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.CheckBox, {
         label: "Enabled Post Process",
         initialValue: captureSceneCamera.postProcess.enabled,

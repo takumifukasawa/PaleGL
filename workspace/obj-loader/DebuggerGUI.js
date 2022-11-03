@@ -4,11 +4,10 @@ export class DebuggerGUI {
         PullDown: "PullDown",
         Color: "Color",
         CheckBox: "CheckBox",
-        Slider: "Slider"
+        Slider: "Slider",
     };
 
     #domElement;
-    #debuggers = [];
 
     get domElement() {
         return this.#domElement;
@@ -22,7 +21,7 @@ export class DebuggerGUI {
             top: 0px;
             right: 0px;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 0px 10px 10px 10px;
             display: grid;
             justify-items: start;
         `;
@@ -40,13 +39,13 @@ export class DebuggerGUI {
         minValue = null,
         maxValue = null,
         stepValue = null
-    }) {
+    } = {}) {
         const debuggerContentElement = document.createElement("div");
         debuggerContentElement.style.cssText = `
             font-size: 10px;
             font-weight: bold;
             box-sizing: border-box;
-            padding: 8px;
+            padding-top: 8px;
         `;
 
         const labelWrapperElement = document.createElement("div");
@@ -128,8 +127,6 @@ export class DebuggerGUI {
                 }
                 break;
 
-            // options .. object 
-            // { min, max }
             case DebuggerGUI.DebuggerTypes.Slider:
                 const sliderValueView = document.createElement("p");
                 const sliderInput = document.createElement("input");
@@ -168,11 +165,23 @@ export class DebuggerGUI {
                     updateCurrentValueView();
                 }
                 break;
-                    
+                
             default:
                 throw "invalid debugger type";
         }
 
         this.#domElement.appendChild(debuggerContentElement);
+    }
+    
+    addBorderSpacer() {
+        const borderElement = document.createElement("hr");
+        borderElement.style.cssText = `
+            width: 100%;
+            height: 1px;
+            border: none;
+            border-top: 1px solid black;
+            margin: 8px 0 4px 0;
+        `;
+        this.#domElement.appendChild(borderElement);
     }
 }
