@@ -82,7 +82,9 @@ export class DebuggerGUI {
                 selectElement.addEventListener("change", (e) => {
                     onChange(selectElement.value);
                 });
+                
                 debuggerInputElement.appendChild(selectElement);
+                
                 if (initialValue) {
                     selectElement.value = initialValue;
                 }
@@ -98,7 +100,9 @@ export class DebuggerGUI {
                 checkBoxInput.addEventListener("change", () => {
                     onChange(checkBoxInput.checked);
                 });
+                
                 debuggerInputElement.appendChild(checkBoxInput);
+                
                 if (initialExec) {
                     onChange(checkBoxInput.checked);
                 }
@@ -113,7 +117,9 @@ export class DebuggerGUI {
                 colorPickerInput.addEventListener("input", (e) => {
                     onInput ? onInput(colorPickerInput.value) : onChange(colorPickerInput.value);
                 });
+                
                 debuggerInputElement.appendChild(colorPickerInput);
+                
                 if (initialValue) {
                     colorPickerInput.value = initialValue;
                 }
@@ -125,7 +131,18 @@ export class DebuggerGUI {
             // options .. object 
             // { min, max }
             case DebuggerGUI.DebuggerTypes.Slider:
+                const sliderValueView = document.createElement("p");
                 const sliderInput = document.createElement("input");
+                
+                const updateCurrentValueView = () => {
+                    sliderValueView.textContent = `value: ${sliderInput.value}`;
+                }
+                
+                const onUpdateSlider = () => {
+                    updateCurrentValueView();
+                    return Number(sliderInput.value)
+                };
+
                 sliderInput.type = "range";
                 sliderInput.min = minValue;
                 sliderInput.max = maxValue;
@@ -133,17 +150,22 @@ export class DebuggerGUI {
                     sliderInput.step = stepValue;
                 }
                 sliderInput.addEventListener("change", (e) => {
-                    onChange(Number(sliderInput.value));
+                    return onUpdateSlider();
                 });
                 sliderInput.addEventListener("input", (e) => {
-                    onInput ? onInput(Number(sliderInput.value)) : onChange(Number(sliderInput.value));
+                    onInput ? onInput(onUpdateSlider()) : onChange(onUpdateSlider());
                 });
+                
+                debuggerInputElement.appendChild(sliderValueView);
                 debuggerInputElement.appendChild(sliderInput);
+                
                 if(initialValue) {
                     sliderInput.value = initialValue;
                 }
                 if(initialExec) {
-                    onChange(Number(sliderInput.value));
+                    onChange(onUpdateSlider());
+                } else {
+                    updateCurrentValueView();
                 }
                 break;
                     

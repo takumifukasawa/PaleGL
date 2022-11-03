@@ -277,10 +277,10 @@ const main = async () => {
             src: "./images/dir-y-plus.png",
         },
     };
-    
+
     const objData = await loadObj("./sphere-32-32.obj");
     // const objData = await loadObj("./monkey.obj");
-   
+
     const objMesh = new Mesh(
         new Geometry({
             gpu,
@@ -299,7 +299,7 @@ const main = async () => {
                 },
             },
             indices: objData.indices,
-            drawCount: objData.indices.length 
+            drawCount: objData.indices.length
         }),
         new Material({
             gpu,
@@ -320,9 +320,9 @@ const main = async () => {
         })
     );
     captureScene.add(objMesh);
-    
+
     captureSceneCamera.postProcess.enabled = false;
-   
+
     // await Promise.all(Object.keys(images).map(async (key) => {
     //     boxMaterial.uniforms[key] = {
     //         type: UniformTypes.Texture,
@@ -368,14 +368,6 @@ const main = async () => {
         }
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
-        label: "Light Color",
-        initialValue: directionalLight.color.getHexCoord(),
-        onChange: (value) => {
-            const color = Color.fromHex(value);
-            directionalLight.color = color;
-        }
-    });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Ambient Color",
         initialValue: objMesh.material.uniforms.uAmbientColor.value.getHexCoord(),
         onChange: (value) => {
@@ -383,11 +375,12 @@ const main = async () => {
             objMesh.material.uniforms.uAmbientColor.value = color;
         }
     });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.CheckBox, {
-        label: "Enabled Post Process",
-        initialValue: captureSceneCamera.postProcess.enabled,
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+        label: "Light Color",
+        initialValue: directionalLight.color.getHexCoord(),
         onChange: (value) => {
-            captureSceneCamera.postProcess.enabled = value;
+            const color = Color.fromHex(value);
+            directionalLight.color = color;
         }
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
@@ -420,7 +413,14 @@ const main = async () => {
             directionalLight.transform.position.z = value;
         }
     });
-    
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.CheckBox, {
+        label: "Enabled Post Process",
+        initialValue: captureSceneCamera.postProcess.enabled,
+        onChange: (value) => {
+            captureSceneCamera.postProcess.enabled = value;
+        }
+    });
+
     wrapperElement.appendChild(debuggerGUI.domElement);
 
     onWindowResize();
