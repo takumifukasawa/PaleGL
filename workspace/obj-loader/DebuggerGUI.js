@@ -1,11 +1,8 @@
-const wrapperClassName = "debugger-gui-wrapper";
-const elementClassName = "debugger-gui-element";
-const elementLabelClassName = "debugger-gui-element-label";
-
 export class DebuggerGUI {
 
     static DebuggerTypes = {
-        PullDown: "PullDown"
+        PullDown: "PullDown",
+        Color: "Color",
     };
 
     #domElement;
@@ -17,8 +14,6 @@ export class DebuggerGUI {
 
     constructor() {
         this.#domElement = document.createElement("div");
-        this.#domElement.classList.add(wrapperClassName);
-        
         this.#domElement.style.cssText = `
             background-color: rgb(200 200 255 / 70%);
             position: absolute;
@@ -29,26 +24,29 @@ export class DebuggerGUI {
         `;
     }
 
-    add(type, { label, options, onChange, initialExec = true }) {
-        const element = document.createElement("div");
-        element.classList.add(elementClassName);
-        element.style.cssText = `
+    add(type, { label, options = null, onChange, initialExec = true }) {
+        const debuggerContentElement = document.createElement("div");
+        debuggerContentElement.style.cssText = `
             font-size: 10px;
             font-weight: bold;
             display: flex;
             align-items: center;
+            box-sizing: border-box;
+            padding: 8px;
         `;
 
         const labelWrapperElement = document.createElement("div");
         const labelTextElement = document.createElement("p");
-        labelTextElement.classList.add(elementLabelClassName);
         labelTextElement.style.cssText = `
             margin-right: 1em;
         `;
         labelTextElement.textContent = label;
 
         labelWrapperElement.appendChild(labelTextElement);
-        element.appendChild(labelWrapperElement);
+        debuggerContentElement.appendChild(labelWrapperElement);
+        
+        const debuggerInputElement = document.createElement("div");
+        debuggerContentElement.appendChild(debuggerInputElement);
 
         switch (type) {
             // options ... array
@@ -70,16 +68,28 @@ export class DebuggerGUI {
                 selectElement.addEventListener("change", (e) => {
                     onChange(selectElement.value);
                 });
-                element.appendChild(selectElement);
-                // initial exec
+                debuggerInputElement.appendChild(selectElement);
                 if(initialExec) {
                     onChange(selectElement.value);
                 }
                 break;
+                
+            case DebuggerGUI.DebuggerTypes.Color:
+                const colorPickerInput = document.createElement("input");
+                colorPickerInput.type = "color";
+                colorPickerInput.addEventListener("change", (e) => {
+                    onChange(colorPickerInput.value);
+                });
+                debuggerInputElement.appendChild(colorPickerInput);
+                if(initialExec) {
+                    onChange(colorPickerInput.value);
+                }
+                break;
+                    
             default:
                 throw "invalid debugger type";
         }
 
-        this.#domElement.appendChild(element);
+        this.#domElement.appendChild(debuggerContentElement);
     }
 }

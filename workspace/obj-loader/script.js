@@ -345,6 +345,11 @@ const main = async () => {
             planeMaterial.blendType = blendType;
         }
     });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+        label: "Obj Base Color",
+        onChange: () => {
+        }
+    });
     wrapperElement.appendChild(debuggerGUI.domElement);
 
     onWindowResize();
