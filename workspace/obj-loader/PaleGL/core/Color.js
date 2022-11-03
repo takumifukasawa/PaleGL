@@ -17,12 +17,47 @@
         return this.elements[3];
     }
     
+    get r255() {
+        return this.elements[0] * 255;
+    }
+
+    get g255() {
+        return this.elements[1] * 255;
+    }
+
+    get b255() {
+        return this.elements[2] * 255;
+    }
+
+    get a255() {
+        return this.elements[3] * 255;
+    }
+    
     constructor(r, g, b, a) {
         this.set(r, g, b, a);
     }
     
     set(r, g, b, a) {
         this.elements = new Float32Array([r, g, b, a]);
+    }
+    
+    getRGB() {
+        return {
+            r: this.r255,
+            g: this.g255,
+            b: this.a255,
+        }
+    }
+    
+    getHexCoord(withHash = true) {
+        const rgb = this.getRGB();
+        const r = rgb.r.toString(16);
+        const g = rgb.g.toString(16);
+        const b = rgb.b.toString(16);
+        const str = withHash ? `#${r}${g}${b}` : `${r}${g}${b}`;
+        // for debug
+        // console.log(rgb, str, this.r, this.g, this.b)
+        return str;
     }
     
     static white() {
@@ -36,7 +71,7 @@
     static fromRGB(r, g, b, a) {
         return new Color(r / 255, g / 255, b / 255, 1);
     }
-   
+    
     // hex ... #rrggbb or rrggbb
     static fromHex(hex) {
         const coord = hex.slice(0, 1) === "#" ? hex.slice(1) : hex;

@@ -359,7 +359,7 @@ const main = async () => {
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Obj Base Color",
-        initialValue: "#ffffff",
+        initialValue: objMesh.material.uniforms.uBaseColor.value.getHexCoord(),
         onChange: (value) => {
             const color = Color.fromHex(value);
             objMesh.material.uniforms.uBaseColor.value = color;
@@ -367,7 +367,7 @@ const main = async () => {
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Light Color",
-        initialValue: "#ffffff",
+        initialValue: directionalLight.color.getHexCoord(),
         onChange: (value) => {
             const color = Color.fromHex(value);
             directionalLight.color = color;
@@ -375,7 +375,7 @@ const main = async () => {
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Ambient Color",
-        initialValue: "#000000",
+        initialValue: objMesh.material.uniforms.uAmbientColor.value.getHexCoord(),
         onChange: (value) => {
             const color = Color.fromHex(value);
             objMesh.material.uniforms.uAmbientColor.value = color;
