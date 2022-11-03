@@ -1,6 +1,7 @@
 ﻿import {GLObject} from "./GLObject.js";
 import {TextureFilterTypes, TextureWrapTypes} from "./../constants.js";
 
+// TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
     #texture;
     #img;

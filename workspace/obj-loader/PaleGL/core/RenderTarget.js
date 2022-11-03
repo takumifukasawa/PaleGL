@@ -30,7 +30,8 @@ export class RenderTarget {
         if(useDepth) {
             this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width: 1, height: 1 });
         }
-        
+       
+        // depth as render buffer
         if(this.#depthRenderbuffer) {
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
         }
@@ -41,7 +42,8 @@ export class RenderTarget {
             height: this.height,
             mipmap: false,
         });
-    
+   
+        // color as texture
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0,
