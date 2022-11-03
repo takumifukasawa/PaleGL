@@ -43,6 +43,13 @@
         return this;
     }
     
+    negate() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        return this;
+    }
+    
     static zero() {
         return new Vector3(0, 0, 0);
     }

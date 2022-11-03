@@ -510,6 +510,7 @@ export class Matrix4 {
     }
     
     static getLookAtMatrix(eye, center, up = new Vector3(0, 1, 0)) {
+        // TODO: fix axis for basic actors lookat
         const f = Vector3.subVectors(eye, center).normalize();
         const r = Vector3.crossVectors(up.normalize(), f).normalize();
         const u = Vector3.crossVectors(f, r);
