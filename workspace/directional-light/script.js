@@ -37,12 +37,15 @@ uniform mat4 uNormalMatrix;
 out vec2 vUv;
 out float vTextureIndex;
 out vec3 vNormal;
+out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
     vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
     vTextureIndex = floor(float(gl_VertexID) / 4.);
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
+    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
+    vWorldPosition = worldPosition.xyz;
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
 
@@ -51,8 +54,9 @@ const boxFragmentShader = `#version 300 es
 precision mediump float;
 
 in vec2 vUv;
-in vec3 vNormal;
 in float vTextureIndex;
+in vec3 vNormal;
+in vec3 vWorldPosition;
 
 out vec4 outColor;
 
@@ -62,10 +66,12 @@ uniform sampler2D uDirZMinusMap;
 uniform sampler2D uDirXMinusMap;
 uniform sampler2D uDirYPlusMap;
 uniform sampler2D uDirYMinusMap;
+uniform vec3 uViewPosition;
 
 struct DirectionalLight {
     vec3 direction;
     float intensity;
+    vec3 color;
 };
 uniform DirectionalLight uDirectionalLight;
 
@@ -86,13 +92,26 @@ void main() {
         textureColor = texture(uDirYMinusMap, vUv);
     }
    
-    vec3 normal = normalize(vNormal);
-    vec3 lightDirection = normalize(uDirectionalLight.direction);
-    float diffuseRate = dot(normal, lightDirection);
-    
-    vec3 diffuseColor = textureColor.xyz * diffuseRate;
+    vec3 N = normalize(vNormal);
+    vec3 L = normalize(uDirectionalLight.direction);
+    float diffuseRate = clamp(dot(N, L), 0., 1.);
+    vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color;
 
-    outColor = vec4(diffuseColor, 1);
+    vec3 P = vWorldPosition;
+    vec3 E = uViewPosition;
+    vec3 PtoL = L; // for directional light
+    vec3 PtoE = normalize(E - P);
+    vec3 H = normalize(PtoL + PtoE);
+    float specularPower = 16.;
+    float specularRate = clamp(dot(H, N), 0., 1.);
+    specularRate = pow(specularRate, specularPower);
+    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color;
+    
+    vec3 ambientColor = vec3(.1);
+    
+    vec3 resultColor = diffuseColor + specularColor + ambientColor;
+
+    outColor = vec4(resultColor, 1);
 }
 `;
 
@@ -166,6 +185,8 @@ captureScene.add(boxMesh);
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
 directionalLight.transform.setTranslation(new Vector3(1, 1, 1));
+directionalLight.intensity = 1;
+directionalLight.color = new Vector3(1, 1, 1);
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
@@ -183,7 +204,7 @@ uniform sampler2D uSceneTexture;
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     outColor = textureColor;
-    outColor.r *= 0.2;
+    outColor.r *= 0.5;
 }
 `
 }));

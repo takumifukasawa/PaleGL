@@ -1,6 +1,7 @@
 ﻿import {Shader} from "./../core/Shader.js";
 import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class Material {
     shader;
@@ -63,6 +64,11 @@ export class Material {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
+            // TODO: viewmatrixから引っ張ってきてもよい
+            uViewPosition: {
+                type: UniformTypes.Vector3,
+                value: Vector3.zero
+            }
         };
 
         this.uniforms = {...commonUniforms, ...uniforms};

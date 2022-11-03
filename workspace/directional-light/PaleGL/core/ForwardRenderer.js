@@ -91,6 +91,8 @@ export class ForwardRenderer {
                     break;
             }
         });
+        
+        // TODO: depth sort 
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
@@ -111,7 +113,10 @@ export class ForwardRenderer {
             if (mesh.material.uniforms.uNormalMatrix) {
                 mesh.material.uniforms.uNormalMatrix.value = mesh.transform.worldMatrix.clone().invert().transpose();
             }
-            
+            if(mesh.material.uniforms.uViewPosition) {
+                mesh.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
+            }
+
             // TODO: light actor の中で lightの種類別に処理を分ける
             lightActors.forEach(light => {
                 if (mesh.material.uniforms.uDirectionalLight) {
@@ -125,6 +130,10 @@ export class ForwardRenderer {
                             intensity: {
                                 type: UniformTypes.Float,
                                 value: light.intensity,
+                            },
+                            color: {
+                                type: UniformTypes.Vector3,
+                                value: light.color
                             }
                         }
                     }

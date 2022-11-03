@@ -137,6 +137,10 @@ export class Matrix4 {
     set m33(value) {
         return this.elements[15] = value;
     }
+    
+    get position() {
+        return new Vector3(this.m30, this.m31, this.m32);
+    }
 
     // row-order in constructor args
     constructor(
