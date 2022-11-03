@@ -2,35 +2,6 @@ const wrapperClassName = "debugger-gui-wrapper";
 const elementClassName = "debugger-gui-element";
 const elementLabelClassName = "debugger-gui-element-label";
 
-// TODO: 各elementのstyleに持たせる
-const styleRules = [
-    `
-.${wrapperClassName} {
-    background-color: rgb(200 200 255 / 70%);
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    box-sizing: border-box;
-    padding: 10px;
-}
-    `, `
-.${elementClassName} {    
-    font-size: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-}
-    `, `
-.${elementClassName} select {
-    font-size: 10px;
-}
-    `, `
-.${elementLabelClassName} {
-    margin-right: 1em;
-}  
-`
-];
-
 export class DebuggerGUI {
 
     static DebuggerTypes = {
@@ -45,32 +16,48 @@ export class DebuggerGUI {
     }
 
     constructor() {
-        const styleElement = document.createElement("style");
-        document.head.appendChild(styleElement);
-        styleRules.forEach(rules => {
-            styleElement.sheet.insertRule(rules, styleElement.sheet.cssRules.length);
-        });
-
         this.#domElement = document.createElement("div");
         this.#domElement.classList.add(wrapperClassName);
+        
+        this.#domElement.style.cssText = `
+            background-color: rgb(200 200 255 / 70%);
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            box-sizing: border-box;
+            padding: 10px;
+        `;
     }
 
     add(type, { label, options, onChange, initialExec = true }) {
         const element = document.createElement("div");
         element.classList.add(elementClassName);
+        element.style.cssText = `
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        `;
 
         const labelWrapperElement = document.createElement("div");
         const labelTextElement = document.createElement("p");
         labelTextElement.classList.add(elementLabelClassName);
+        labelTextElement.style.cssText = `
+            margin-right: 1em;
+        `;
         labelTextElement.textContent = label;
-        
-        element.appendChild(labelTextElement);
+
+        labelWrapperElement.appendChild(labelTextElement);
+        element.appendChild(labelWrapperElement);
 
         switch (type) {
             // options ... array
             // [ { type, value },,, ]
             case DebuggerGUI.DebuggerTypes.PullDown:
                 const selectElement = document.createElement("select");
+                selectElement.style.cssText = `
+                    font-size: 10px;
+                `;
                 options.forEach(option => {
                     const optionElement = document.createElement("option");
                     optionElement.value = option.value;
@@ -90,7 +77,7 @@ export class DebuggerGUI {
                 }
                 break;
             default:
-                break;
+                throw "invalid debugger type";
         }
 
         this.#domElement.appendChild(element);
