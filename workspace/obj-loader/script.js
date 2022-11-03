@@ -390,6 +390,36 @@ const main = async () => {
             captureSceneCamera.postProcess.enabled = value;
         }
     });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+        label: "Directional Light: position x",
+        initialValue: directionalLight.transform.position.x,
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        onChange: (value) => {
+            directionalLight.transform.position.x = value;
+        }
+    });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+        label: "Directional Light: position y",
+        initialValue: directionalLight.transform.position.y,
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        onChange: (value) => {
+            directionalLight.transform.position.y = value;
+        }
+    });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+        label: "Directional Light: position z",
+        initialValue: directionalLight.transform.position.z,
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        onChange: (value) => {
+            directionalLight.transform.position.z = value;
+        }
+    });
     
     wrapperElement.appendChild(debuggerGUI.domElement);
 

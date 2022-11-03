@@ -4,6 +4,7 @@ export class DebuggerGUI {
         PullDown: "PullDown",
         Color: "Color",
         CheckBox: "CheckBox",
+        Slider: "Slider"
     };
 
     #domElement;
@@ -29,11 +30,16 @@ export class DebuggerGUI {
 
     add(type, {
         label,
-        options = null,
         onChange,
         onInput = null,
         initialValue = null,
-        initialExec = true
+        initialExec = true,
+        // for select
+        options = null,
+        // for slider
+        minValue = null,
+        maxValue = null,
+        stepValue = null
     }) {
         const debuggerContentElement = document.createElement("div");
         debuggerContentElement.style.cssText = `
@@ -69,25 +75,22 @@ export class DebuggerGUI {
                     optionElement.value = option.value;
                     optionElement.label = option.label;
                     selectElement.appendChild(optionElement);
-                    if(option.isDefault) {
+                    if (option.isDefault) {
                         selectElement.value = option.value;
                     }
                 });
                 selectElement.addEventListener("change", (e) => {
                     onChange(selectElement.value);
                 });
-                selectElement.addEventListener("input", (e) => {
-                    onInput ? onInput(selectElement.value) : onChange(selectElement.value);
-                });
                 debuggerInputElement.appendChild(selectElement);
-                if(initialValue) {
+                if (initialValue) {
                     selectElement.value = initialValue;
                 }
-                if(initialExec) {
+                if (initialExec) {
                     onChange(selectElement.value);
                 }
                 break;
-                
+
             case DebuggerGUI.DebuggerTypes.CheckBox:
                 const checkBoxInput = document.createElement("input");
                 checkBoxInput.type = "checkbox";
@@ -96,12 +99,12 @@ export class DebuggerGUI {
                     onChange(checkBoxInput.checked);
                 });
                 debuggerInputElement.appendChild(checkBoxInput);
-                if(initialExec) {
+                if (initialExec) {
                     onChange(checkBoxInput.checked);
                 }
                 break;
 
-             case DebuggerGUI.DebuggerTypes.Color:
+            case DebuggerGUI.DebuggerTypes.Color:
                 const colorPickerInput = document.createElement("input");
                 colorPickerInput.type = "color";
                 colorPickerInput.addEventListener("change", (e) => {
@@ -111,11 +114,36 @@ export class DebuggerGUI {
                     onInput ? onInput(colorPickerInput.value) : onChange(colorPickerInput.value);
                 });
                 debuggerInputElement.appendChild(colorPickerInput);
-                if(initialValue) {
+                if (initialValue) {
                     colorPickerInput.value = initialValue;
                 }
-                if(initialExec) {
+                if (initialExec) {
                     onChange(colorPickerInput.value);
+                }
+                break;
+
+            // options .. object 
+            // { min, max }
+            case DebuggerGUI.DebuggerTypes.Slider:
+                const sliderInput = document.createElement("input");
+                sliderInput.type = "range";
+                sliderInput.min = minValue;
+                sliderInput.max = maxValue;
+                if(stepValue !== null) {
+                    sliderInput.step = stepValue;
+                }
+                sliderInput.addEventListener("change", (e) => {
+                    onChange(Number(sliderInput.value));
+                });
+                sliderInput.addEventListener("input", (e) => {
+                    onInput ? onInput(Number(sliderInput.value)) : onChange(Number(sliderInput.value));
+                });
+                debuggerInputElement.appendChild(sliderInput);
+                if(initialValue) {
+                    sliderInput.value = initialValue;
+                }
+                if(initialExec) {
+                    onChange(Number(sliderInput.value));
                 }
                 break;
                     
