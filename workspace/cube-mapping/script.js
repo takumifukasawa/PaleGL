@@ -146,9 +146,8 @@ mat2 rotate(float r) {
     return mat2(c, s, -s, c);
 }
 
-vec4 sampleCube(samplerCube cubeMap, vec3 v) {
-    // v.xz *= rotate(1.5707);
-    v.xz *= rotate(0.);
+vec4 sampleCube(samplerCube cubeMap, vec3 v, float rot) {
+    v.xz *= rotate(rot);
     v.x *= -1.;    
     return texture(cubeMap, v);
 }
@@ -160,7 +159,7 @@ void main() {
     // vec3 r = reflect(EtoP, N);
     // vec4 textureColor = texture(uCubeTexture, r);
     // pattern 2
-    vec4 textureColor = sampleCube(uCubeTexture, N);
+    vec4 textureColor = sampleCube(uCubeTexture, N, 0.);
     outColor = textureColor;
 }
 `;
