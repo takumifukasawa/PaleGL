@@ -17,6 +17,7 @@ import {DebuggerGUI} from "./DebuggerGUI.js";
 import {DirectionalLight} from "./PaleGL/lights/DirectionalLight.js";
 import {loadObj} from "./PaleGL/utils/loadObj.js";
 import {Geometry} from "./PaleGL/geometries/Geometry.js";
+import {Color} from "./PaleGL/core/Color.js";
 
 let width, height;
 
@@ -68,11 +69,13 @@ uniform sampler2D uDirXMinusMap;
 uniform sampler2D uDirYPlusMap;
 uniform sampler2D uDirYMinusMap;
 uniform vec3 uViewPosition;
+uniform vec4 uBaseColor;
+uniform vec4 uAmbientColor;
 
 struct DirectionalLight {
     vec3 direction;
     float intensity;
-    vec3 color;
+    vec4 color;
 };
 uniform DirectionalLight uDirectionalLight;
 
@@ -94,12 +97,12 @@ void main() {
     }
 
     // vec4 baseColor = textureColor;
-    vec4 baseColor = vec4(1, 0, 0, 1);
+    vec4 baseColor = uBaseColor;
    
     vec3 N = normalize(vNormal);
     vec3 L = normalize(uDirectionalLight.direction);
     float diffuseRate = clamp(dot(N, L), 0., 1.);
-    vec3 diffuseColor = baseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color;
+    vec3 diffuseColor = baseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
 
     vec3 P = vWorldPosition;
     vec3 E = uViewPosition;
@@ -109,9 +112,9 @@ void main() {
     float specularPower = 64.;
     float specularRate = clamp(dot(H, N), 0., 1.);
     specularRate = pow(specularRate, specularPower);
-    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color;
+    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
     
-    vec3 ambientColor = vec3(.1);
+    vec3 ambientColor = uAmbientColor.xyz;
     
     vec3 resultColor = diffuseColor + specularColor + ambientColor;
 
@@ -190,7 +193,7 @@ const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
 directionalLight.transform.setTranslation(new Vector3(1, 1, 1));
 directionalLight.intensity = 1;
-directionalLight.color = new Vector3(1, 1, 1);
+directionalLight.color = Color.white();
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
 captureScene.add(captureSceneCamera);
@@ -226,7 +229,7 @@ void main() {
 `
 }));
 
-captureSceneCamera.setPostProcess(postProcess);
+// captureSceneCamera.setPostProcess(postProcess);
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -303,7 +306,15 @@ const main = async () => {
             fragmentShader: boxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
             uniforms: {
-                uDirectionalLight: {}
+                uDirectionalLight: {},
+                uBaseColor: {
+                    type: UniformTypes.Color,
+                    value: Color.white(),
+                },
+                uAmbientColor: {
+                    type: UniformTypes.Color,
+                    value: Color.black()
+                }
             }
         })
     );
@@ -347,9 +358,29 @@ const main = async () => {
     });
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
         label: "Obj Base Color",
-        onChange: () => {
+        initialValue: "#ffffff",
+        onChange: (value) => {
+            const color = Color.fromHex(value);
+            objMesh.material.uniforms.uBaseColor.value = color;
         }
     });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+        label: "Light Color",
+        initialValue: "#ffffff",
+        onChange: (value) => {
+            const color = Color.fromHex(value);
+            directionalLight.color = color;
+        }
+    });
+    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+        label: "Ambient Color",
+        initialValue: "#000000",
+        onChange: (value) => {
+            const color = Color.fromHex(value);
+            objMesh.material.uniforms.uAmbientColor.value = color;
+        }
+    });
+    
     wrapperElement.appendChild(debuggerGUI.domElement);
 
     onWindowResize();

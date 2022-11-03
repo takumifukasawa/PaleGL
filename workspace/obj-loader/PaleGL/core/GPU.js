@@ -125,6 +125,9 @@ export class GPU {
                     // arg 2 ... use transpose.
                     gl.uniformMatrix4fv(location, false, value.elements);
                     break;
+                case UniformTypes.Color:
+                    gl.uniform4fv(location, value.elements);
+                    break;
                 case UniformTypes.Texture:
                     const activeTextureKey = gl[`TEXTURE${activeTextureIndex}`];
                     gl.activeTexture(activeTextureKey);

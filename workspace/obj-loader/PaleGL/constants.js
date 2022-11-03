@@ -14,7 +14,8 @@ export const UniformTypes = {
     Texture: "Texture",
     Vector3: "Vector3",
     Struct: "Struct",
-    Float: "Float"
+    Float: "Float",
+    Color: "Color"
 };
 
 export const TextureWrapTypes = {

@@ -21,16 +21,23 @@ export class DebuggerGUI {
             right: 0px;
             box-sizing: border-box;
             padding: 10px;
+            display: grid;
+            justify-items: start;
         `;
     }
 
-    add(type, { label, options = null, onChange, initialExec = true }) {
+    add(type, {
+        label,
+        options = null,
+        onChange,
+        onInput = null,
+        initialValue = null,
+        initialExec = true
+    }) {
         const debuggerContentElement = document.createElement("div");
         debuggerContentElement.style.cssText = `
             font-size: 10px;
             font-weight: bold;
-            display: flex;
-            align-items: center;
             box-sizing: border-box;
             padding: 8px;
         `;
@@ -68,7 +75,13 @@ export class DebuggerGUI {
                 selectElement.addEventListener("change", (e) => {
                     onChange(selectElement.value);
                 });
+                selectElement.addEventListener("input", (e) => {
+                    onInput ? onInput(selectElement.value) : onChange(selectElement.value);
+                });
                 debuggerInputElement.appendChild(selectElement);
+                if(initialValue) {
+                    selectElement.value = initialValue;
+                }
                 if(initialExec) {
                     onChange(selectElement.value);
                 }
@@ -80,7 +93,13 @@ export class DebuggerGUI {
                 colorPickerInput.addEventListener("change", (e) => {
                     onChange(colorPickerInput.value);
                 });
+                colorPickerInput.addEventListener("input", (e) => {
+                    onInput ? onInput(colorPickerInput.value) : onChange(colorPickerInput.value);
+                });
                 debuggerInputElement.appendChild(colorPickerInput);
+                if(initialValue) {
+                    colorPickerInput.value = initialValue;
+                }
                 if(initialExec) {
                     onChange(colorPickerInput.value);
                 }

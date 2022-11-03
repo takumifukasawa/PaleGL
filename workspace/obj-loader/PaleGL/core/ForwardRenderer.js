@@ -132,7 +132,7 @@ export class ForwardRenderer {
                                 value: light.intensity,
                             },
                             color: {
-                                type: UniformTypes.Vector3,
+                                type: UniformTypes.Color,
                                 value: light.color
                             }
                         }
