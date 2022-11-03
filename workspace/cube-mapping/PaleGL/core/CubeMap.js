@@ -24,8 +24,6 @@ export class CubeMap extends GLObject {
         
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.#texture);
         
-        console.log(images)
-      
         Object.keys(images).forEach((key) => {
             let axis = null;
             switch(key) {

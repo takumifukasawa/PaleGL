@@ -77,6 +77,21 @@ struct DirectionalLight {
 };
 uniform DirectionalLight uDirectionalLight;
 
+uniform samplerCube uCubeTexture;
+
+mat2 rotate(float r) {
+    float c = cos(r);
+    float s = sin(r);
+    return mat2(c, s, -s, c);
+}
+
+vec4 sampleCube(samplerCube cubeMap, vec3 v) {
+    // v.xz *= rotate(1.57);
+    // v.xz *= rotate(0.);
+    v.x *= -1.;    
+    return texture(cubeMap, v);
+}
+
 void main() {
     vec4 baseColor = uBaseColor;
    
@@ -98,6 +113,10 @@ void main() {
     vec3 ambientColor = uAmbientColor.xyz;
     
     vec3 resultColor = diffuseColor + specularColor + ambientColor;
+    
+    // vec3 cubeColor = sampleCube(uCubeTexture, N).xyz;
+    vec3 cubeColor = texture(uCubeTexture, reflect(-PtoE, N)).xyz;
+    resultColor = mix(resultColor, cubeColor, .2);
 
     outColor = vec4(resultColor, 1);
 }
@@ -146,8 +165,9 @@ mat2 rotate(float r) {
     return mat2(c, s, -s, c);
 }
 
-vec4 sampleCube(samplerCube cubeMap, vec3 v, float rot) {
-    v.xz *= rotate(rot);
+vec4 sampleCube(samplerCube cubeMap, vec3 v) {
+    // v.xz *= rotate(1.57);
+    // v.xz *= rotate(0.);
     v.x *= -1.;    
     return texture(cubeMap, v);
 }
@@ -159,7 +179,7 @@ void main() {
     // vec3 r = reflect(EtoP, N);
     // vec4 textureColor = texture(uCubeTexture, r);
     // pattern 2
-    vec4 textureColor = sampleCube(uCubeTexture, N, 0.);
+    vec4 textureColor = sampleCube(uCubeTexture, N);
     outColor = textureColor;
 }
 `;
@@ -271,9 +291,9 @@ captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
 
 const tick = (time) => {
     if(objMesh) {
-        objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
-        objMesh.transform.setRotationY(time / 1000 * 10);
-        objMesh.transform.setScaling(new Vector3(0.8, 0.8, 0.8))
+        // objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
+        // objMesh.transform.setRotationY(time / 1000 * 10);
+        objMesh.transform.setScaling(new Vector3(4, 4, 1))
     }
   
     const cameraPosition = Vector3.addVectors(
@@ -296,28 +316,30 @@ const tick = (time) => {
 }
 
 const main = async () => {
-    const objData = await loadObj("./models/monkey.obj");
+    // const objData = await loadObj("./models/monkey.obj");
+    const objData = await loadObj("./models/sphere-32-32.obj");
 
     objMesh = new Mesh(
-        new Geometry({
-            gpu,
-            attributes: {
-                position: {
-                    data: objData.positions.flat(),
-                    size: 3
-                },
-                uv: {
-                    data: objData.uvs.flat(),
-                    size: 2,
-                },
-                normal: {
-                    data: objData.normals.flat(),
-                    size: 3
-                },
-            },
-            indices: objData.indices,
-            drawCount: objData.indices.length
-        }),
+        new BoxGeometry({ gpu }),
+        //new Geometry({
+        //    gpu,
+        //    attributes: {
+        //        position: {
+        //            data: objData.positions.flat(),
+        //            size: 3
+        //        },
+        //        uv: {
+        //            data: objData.uvs.flat(),
+        //            size: 2,
+        //        },
+        //        normal: {
+        //            data: objData.normals.flat(),
+        //            size: 3
+        //        },
+        //    },
+        //    indices: objData.indices,
+        //    drawCount: objData.indices.length
+        //}),
         new Material({
             gpu,
             vertexShader: objModelVertexShader,
@@ -332,6 +354,10 @@ const main = async () => {
                 uAmbientColor: {
                     type: UniformTypes.Color,
                     value: Color.black()
+                },
+                uCubeTexture: {
+                    type: UniformTypes.CubeMap,
+                    value: null
                 }
             }
         })
@@ -394,6 +420,7 @@ const main = async () => {
     );
     captureScene.add(skyboxMesh);
     skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
+    objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
     captureSceneCamera.postProcess.enabled = false;
 
