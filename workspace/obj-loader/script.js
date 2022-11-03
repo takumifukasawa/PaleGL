@@ -279,6 +279,7 @@ const main = async () => {
     };
     
     const objData = await loadObj("./sphere-32-32.obj");
+    // const objData = await loadObj("./monkey.obj");
    
     const objMesh = new Mesh(
         new Geometry({
