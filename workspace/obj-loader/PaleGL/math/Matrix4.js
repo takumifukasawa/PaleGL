@@ -142,7 +142,6 @@ export class Matrix4 {
         return new Vector3(this.m30, this.m31, this.m32);
     }
 
-    // row-order in constructor args
     constructor(
         n00, n01, n02, n03,
         n10, n11, n12, n13,
@@ -153,16 +152,32 @@ export class Matrix4 {
         // m20 = 0, m21 = 0, m22 = 0, m23 = 0,
         // m30 = 0, m31 = 0, m32 = 0, m33 = 0,
     ) {
+        this.set(
+            n00, n01, n02, n03,
+            n10, n11, n12, n13,
+            n20, n21, n22, n23,
+            n30, n31, n32, n33
+        );
+    }
+
+    // row-order in constructor args
+    set(
+        n00, n01, n02, n03,
+        n10, n11, n12, n13,
+        n20, n21, n22, n23,
+        n30, n31, n32, n33,
+    ) {
         this.elements = new Float32Array([
-            n00, n10, n20, n30,
-            n01, n11, n21, n31,
-            n02, n12, n22, n32,
-            n03, n13, n23, n33
-            // m00, m01, m02, m03,
-            // m10, m11, m12, m13,
-            // m20, m21, m22, m23,
-            // m30, m31, m32, m33,
+           n00, n10, n20, n30,
+           n01, n11, n21, n31,
+           n02, n12, n22, n32,
+           n03, n13, n23, n33
+           // m00, m01, m02, m03,
+           // m10, m11, m12, m13,
+           // m20, m21, m22, m23,
+           // m30, m31, m32, m33,
         ]);
+        return this;
     }
 
     static identity() {
@@ -492,6 +507,19 @@ export class Matrix4 {
         }
         
         return pjm;
+    }
+    
+    static getLookAtMatrix(eye, center, up = new Vector3(0, 1, 0)) {
+        const f = Vector3.subVectors(eye, center).normalize();
+        const r = Vector3.crossVectors(up.normalize(), f).normalize();
+        const u = Vector3.crossVectors(f, r);
+        const result = new Matrix4(
+            r.x, u.x, f.x, eye.x,
+            r.y, u.y, f.y, eye.y,
+            r.z, u.z, f.z, eye.z,
+            0, 0, 0, 1,
+        );
+        return result;
     }
     
     log()

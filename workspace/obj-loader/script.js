@@ -20,12 +20,18 @@ import {Geometry} from "./PaleGL/geometries/Geometry.js";
 import {Color} from "./PaleGL/core/Color.js";
 
 let width, height;
+let objMesh;
+const targetCameraPosition = {
+    x: 0,
+    y: 0,
+    z: 5,
+}
 
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
 
-const boxVertexShader = `#version 300 es
+const objModelVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -37,37 +43,28 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 
 out vec2 vUv;
-out float vTextureIndex;
 out vec3 vNormal;
 out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
     vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vTextureIndex = floor(float(gl_VertexID) / 4.);
     vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
 
-const boxFragmentShader = `#version 300 es
+const objModelFragmentShader = `#version 300 es
 
 precision mediump float;
 
 in vec2 vUv;
-in float vTextureIndex;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
 out vec4 outColor;
 
-uniform sampler2D uDirZPlusMap;
-uniform sampler2D uDirXPlusMap;
-uniform sampler2D uDirZMinusMap;
-uniform sampler2D uDirXMinusMap;
-uniform sampler2D uDirYPlusMap;
-uniform sampler2D uDirYMinusMap;
 uniform vec3 uViewPosition;
 uniform vec4 uBaseColor;
 uniform vec4 uAmbientColor;
@@ -80,23 +77,6 @@ struct DirectionalLight {
 uniform DirectionalLight uDirectionalLight;
 
 void main() {
-    vec4 textureColor = vec4(0, 0, 0, 1);
-
-    if(vTextureIndex < 0.5) {
-        textureColor = texture(uDirZPlusMap, vUv);
-    } else if(vTextureIndex < 1.5) {
-        textureColor = texture(uDirXPlusMap, vUv);
-    } else if(vTextureIndex < 2.5) {
-        textureColor = texture(uDirZMinusMap, vUv);
-    } else if(vTextureIndex < 3.5) {
-        textureColor = texture(uDirXMinusMap, vUv);
-    } else if(vTextureIndex < 4.5) {
-        textureColor = texture(uDirYPlusMap, vUv);
-    } else {
-        textureColor = texture(uDirYMinusMap, vUv);
-    }
-
-    // vec4 baseColor = textureColor;
     vec4 baseColor = uBaseColor;
    
     vec3 N = normalize(vNormal);
@@ -134,16 +114,6 @@ const renderer = new ForwardRenderer({
         pixelRatio: Math.min(window.devicePixelRatio, 1.5)
     }
 );
-
-const boxMaterial = new Material({
-    gpu,
-    vertexShader: boxVertexShader,
-    fragmentShader: boxFragmentShader,
-    primitiveType: PrimitiveTypes.Triangles,
-    uniforms: {
-        uDirectionalLight: {}
-    }
-});
 
 const planeVertexShader = `#version 300 es
 
@@ -183,11 +153,8 @@ const planeMaterial = new Material({
     blendType: BlendTypes.Transparent
 });
 
-// const boxMesh = new Mesh(new BoxGeometry({gpu}), boxMaterial);
 const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
-
 captureScene.add(planeMesh);
-// captureScene.add(boxMesh);
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
@@ -195,7 +162,7 @@ directionalLight.transform.setTranslation(new Vector3(1, 1, 1));
 directionalLight.intensity = 1;
 directionalLight.color = Color.white();
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 10);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
@@ -231,6 +198,13 @@ void main() {
 
 captureSceneCamera.setPostProcess(postProcess);
 
+const onMouseMove = (e) => {
+    const nx = (e.clientX / width) * 2 - 1;
+    const ny = (e.clientY / height) * 2 - 1;
+    targetCameraPosition.x = nx * 2;
+    targetCameraPosition.y = ny * 2;
+};
+
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
@@ -241,13 +215,27 @@ const onWindowResize = () => {
     postProcess.setSize(width, height);
 };
 
+captureSceneCamera.transform.position = new Vector3(0, 0, 5);
+captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
 
 const tick = (time) => {
-    // boxMesh.transform.setRotationX(time / 1000 * 10);
-    // boxMesh.transform.setRotationY(time / 1000 * 14);
-    // boxMesh.transform.setScaling(new Vector3(1.5, 1.5, 1.5));
+    if(objMesh) {
+        objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
+        objMesh.transform.setRotationY(time / 1000 * 10);
+        objMesh.transform.setScaling(new Vector3(0.8, 0.8, 0.8))
+    }
+  
+    const cameraPosition = Vector3.addVectors(
+        captureSceneCamera.transform.position,
+        new Vector3(
+            (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
+            (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
+            (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
+        )
+    );
+    captureSceneCamera.transform.position = cameraPosition;
 
-    planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
+    // planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
 
     renderer.render(captureScene, captureSceneCamera);
 
@@ -257,31 +245,9 @@ const tick = (time) => {
 }
 
 const main = async () => {
-    const images = {
-        uDirZMinusMap: {
-            src: "./images/dir-z-minus.png",
-        },
-        uDirXPlusMap: {
-            src: "./images/dir-x-plus.png",
-        },
-        uDirZPlusMap: {
-            src: "./images/dir-z-plus.png",
-        },
-        uDirXMinusMap: {
-            src: "./images/dir-x-minus.png",
-        },
-        uDirYMinusMap: {
-            src: "./images/dir-y-minus.png",
-        },
-        uDirYPlusMap: {
-            src: "./images/dir-y-plus.png",
-        },
-    };
+    const objData = await loadObj("./monkey.obj");
 
-    const objData = await loadObj("./sphere-32-32.obj");
-    // const objData = await loadObj("./monkey.obj");
-
-    const objMesh = new Mesh(
+    objMesh = new Mesh(
         new Geometry({
             gpu,
             attributes: {
@@ -303,8 +269,8 @@ const main = async () => {
         }),
         new Material({
             gpu,
-            vertexShader: boxVertexShader,
-            fragmentShader: boxFragmentShader,
+            vertexShader: objModelVertexShader,
+            fragmentShader: objModelFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
             uniforms: {
                 uDirectionalLight: {},
@@ -322,20 +288,6 @@ const main = async () => {
     captureScene.add(objMesh);
 
     captureSceneCamera.postProcess.enabled = false;
-
-    // await Promise.all(Object.keys(images).map(async (key) => {
-    //     boxMaterial.uniforms[key] = {
-    //         type: UniformTypes.Texture,
-    //         value: null
-    //     };
-    //     const data = images[key];
-    //     const img = await loadImg(data.src);
-    //     return {key, img}
-    // })).then(data => {
-    //     data.forEach(({key, img}) => {
-    //         boxMaterial.uniforms[key].value = new Texture({gpu, img});
-    //     });
-    // });
 
     const debuggerGUI = new DebuggerGUI();
     debuggerGUI.add(DebuggerGUI.DebuggerTypes.PullDown, {
@@ -432,9 +384,11 @@ const main = async () => {
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 
+    window.addEventListener("mousemove", onMouseMove);
+    
     onWindowResize();
-
     window.addEventListener('resize', onWindowResize);
+    
     requestAnimationFrame(tick);
 }
 
