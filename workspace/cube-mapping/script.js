@@ -114,6 +114,7 @@ void main() {
     // vec3 cubeColor = sampleCube(uCubeTexture, N).xyz;
     // vec3 cubeColor = sampleCube(uCubeTexture, reflect(-PtoE, N)).xyz;
     vec3 ct = reflect(-PtoE, N);
+    // ct *= vec3(1., 1., -1.);
     ct *= vec3(1., 1., -1.);
     vec3 cubeColor = texture(uCubeTexture, ct).xyz;
     // resultColor = mix(resultColor, cubeColor, 1.);
@@ -203,7 +204,7 @@ void main() {
     // pattern 2
     // vec4 textureColor = sampleCube(uCubeTexture, N);
     vec3 t = -(normalize(vRawNormal));
-    t.x *= -1.;
+    t *= vec3(1., 1., -1.);
     vec4 textureColor = texture(uCubeTexture, t);
     
     // pattern 3
@@ -438,7 +439,6 @@ const main = async () => {
         .then(result => {
             const data = {};
             result.forEach(({ key, img }) => data[key] = img);
-            console.log(data)
             cubeMap = new CubeMap({ gpu, images: data });
         });
     
