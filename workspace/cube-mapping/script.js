@@ -2,6 +2,7 @@
 import {BlendTypes, CubeMapAxis, PrimitiveTypes, UniformTypes} from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
+import {Matrix4} from "./PaleGL/math/Matrix4.js";
 import {Scene} from "./PaleGL/core/Scene.js";
 import {ForwardRenderer} from "./PaleGL/core/ForwardRenderer.js";
 import {Mesh} from "./PaleGL/core/Mesh.js";
@@ -22,6 +23,7 @@ import {CubeMap} from "./PaleGL/core/CubeMap.js";
 
 let width, height;
 let objMesh;
+let skyboxMesh;
 const targetCameraPosition = {
     x: 0,
     y: 0,
@@ -88,7 +90,7 @@ mat2 rotate(float r) {
 vec4 sampleCube(samplerCube cubeMap, vec3 v) {
     // v.xz *= rotate(1.57);
     // v.xz *= rotate(0.);
-    v.x *= -1.;    
+    // v.x *= -1.;    
     return texture(cubeMap, v);
 }
 
@@ -108,16 +110,23 @@ void main() {
     float specularPower = 64.;
     float specularRate = clamp(dot(H, N), 0., 1.);
     specularRate = pow(specularRate, specularPower);
+    
+    // vec3 cubeColor = sampleCube(uCubeTexture, N).xyz;
+    // vec3 cubeColor = sampleCube(uCubeTexture, reflect(-PtoE, N)).xyz;
+    vec3 ct = reflect(-PtoE, N);
+    ct *= vec3(1., 1., -1.);
+    vec3 cubeColor = texture(uCubeTexture, ct).xyz;
+    // resultColor = mix(resultColor, cubeColor, 1.);
+
     vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+    specularColor = cubeColor.xyz;
     
     vec3 ambientColor = uAmbientColor.xyz;
     
     vec3 resultColor = diffuseColor + specularColor + ambientColor;
     
-    // vec3 cubeColor = sampleCube(uCubeTexture, N).xyz;
-    vec3 cubeColor = texture(uCubeTexture, reflect(-PtoE, N)).xyz;
-    resultColor = mix(resultColor, cubeColor, .2);
-
+    resultColor = cubeColor.xyz;
+    
     outColor = vec4(resultColor, 1);
 }
 `;
@@ -135,10 +144,14 @@ uniform mat4 uNormalMatrix;
 
 out vec2 vUv;
 out vec3 vNormal;
+out vec3 vRawNormal;
+out vec3 vLocalPosition;
 out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
+    vLocalPosition = aPosition;
+    vRawNormal = aNormal;
     vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
     vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
@@ -152,10 +165,13 @@ precision mediump float;
 
 in vec2 vUv;
 in vec3 vNormal;
+in vec3 vRawNormal;
 in vec3 vWorldPosition;
+in vec3 vLocalPosition;
 
 uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
+// uniform mat4 uViewDirectionProjectionInverse;
 
 out vec4 outColor;
 
@@ -166,21 +182,43 @@ mat2 rotate(float r) {
 }
 
 vec4 sampleCube(samplerCube cubeMap, vec3 v) {
-    // v.xz *= rotate(1.57);
+    // v.xz *= rotate(3.14);
     // v.xz *= rotate(0.);
-    v.x *= -1.;    
+    // v.xz *= rotate(0.);
+    // v.x *= -1.;    
+    v.z *= -1.;
     return texture(cubeMap, v);
 }
 
 void main() {
     vec3 N = normalize(vNormal);
+
     // pattern 1
+    // N *= -1.;
     // vec3 EtoP = normalize(vWorldPosition - uViewPosition);
-    // vec3 r = reflect(EtoP, N);
+    // vec3 r = reflect(-EtoP, N);
+    // r.x *= -1.;
     // vec4 textureColor = texture(uCubeTexture, r);
+
     // pattern 2
-    vec4 textureColor = sampleCube(uCubeTexture, N);
+    // vec4 textureColor = sampleCube(uCubeTexture, N);
+    vec3 t = -(normalize(vRawNormal));
+    t.x *= -1.;
+    vec4 textureColor = texture(uCubeTexture, t);
+    
+    // pattern 3
+    // vec3 p = vLocalPosition;
+    // p.x *= -1.;
+    // vec4 textureColor = sampleCube(uCubeTexture, p);
+    // vec4 textureColor = texture(uCubeTexture, p);
+    
+    // pattern4
+    // vec4 t = uViewDirectionProjectionInverse * vec4(vLocalPosition, 1.);
+    // vec4 textureColor = texture(uCubeTexture, normalize(t.xyz / t.w));
+
     outColor = textureColor;
+    
+    // outColor = vec4(uViewPosition.y, 0, 0, 1);
 }
 `;
 
@@ -236,7 +274,7 @@ const planeMaterial = new Material({
 });
 
 const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
-captureScene.add(planeMesh);
+// captureScene.add(planeMesh);
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
@@ -272,8 +310,8 @@ captureSceneCamera.setPostProcess(postProcess);
 const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = (e.clientY / height) * 2 - 1;
-    targetCameraPosition.x = nx * 2;
-    targetCameraPosition.y = ny * 2;
+    targetCameraPosition.x = nx * 20;
+    targetCameraPosition.y = -ny * 20;
 };
 
 const onWindowResize = () => {
@@ -290,12 +328,12 @@ captureSceneCamera.transform.position = new Vector3(0, 0, 5);
 captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
 
 const tick = (time) => {
-    if(objMesh) {
-        // objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
-        // objMesh.transform.setRotationY(time / 1000 * 10);
-        objMesh.transform.setScaling(new Vector3(4, 4, 1))
-    }
-  
+    // if(objMesh) {
+    //     // objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
+    //     // objMesh.transform.setRotationY(time / 1000 * 10);
+    //     objMesh.transform.setScaling(new Vector3(10, 10, 10))
+    // }
+    
     const cameraPosition = Vector3.addVectors(
         captureSceneCamera.transform.position,
         new Vector3(
@@ -305,6 +343,16 @@ const tick = (time) => {
         )
     );
     captureSceneCamera.transform.position = cameraPosition;
+    
+    // if(skyboxMesh) {
+    //     const m = captureSceneCamera.transform.worldMatrix.clone();
+    //     m.invert();
+    //     m.elements[12] = 0;
+    //     m.elements[13] = 0;
+    //     m.elements[14] = 0;
+    //     skyboxMesh.material.uniforms.uViewDirectionProjectionInverse.value = m; 
+    //     // m.log();
+    // }
 
     // planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
 
@@ -318,28 +366,29 @@ const tick = (time) => {
 const main = async () => {
     // const objData = await loadObj("./models/monkey.obj");
     const objData = await loadObj("./models/sphere-32-32.obj");
+    // const objData = await loadObj("./models/skybox-32-32-outer.obj");
 
     objMesh = new Mesh(
-        new BoxGeometry({ gpu }),
-        //new Geometry({
-        //    gpu,
-        //    attributes: {
-        //        position: {
-        //            data: objData.positions.flat(),
-        //            size: 3
-        //        },
-        //        uv: {
-        //            data: objData.uvs.flat(),
-        //            size: 2,
-        //        },
-        //        normal: {
-        //            data: objData.normals.flat(),
-        //            size: 3
-        //        },
-        //    },
-        //    indices: objData.indices,
-        //    drawCount: objData.indices.length
-        //}),
+        // new BoxGeometry({ gpu }),
+        new Geometry({
+            gpu,
+            attributes: {
+                position: {
+                    data: objData.positions.flat(),
+                    size: 3
+                },
+                uv: {
+                    data: objData.uvs.flat(),
+                    size: 2,
+                },
+                normal: {
+                    data: objData.normals.flat(),
+                    size: 3
+                },
+            },
+            indices: objData.indices,
+            drawCount: objData.indices.length
+        }),
         new Material({
             gpu,
             vertexShader: objModelVertexShader,
@@ -365,6 +414,12 @@ const main = async () => {
     captureScene.add(objMesh);
     
     const images = {
+        // [CubeMapAxis.PositiveX]: "./images/px.png",
+        // [CubeMapAxis.NegativeX]: "./images/nx.png",
+        // [CubeMapAxis.PositiveY]: "./images/py.png",
+        // [CubeMapAxis.NegativeY]: "./images/ny.png",
+        // [CubeMapAxis.PositiveZ]: "./images/pz.png",
+        // [CubeMapAxis.NegativeZ]: "./images/nz.png",
         [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
         [CubeMapAxis.NegativeX]: "./images/dir-x-minus.png",
         [CubeMapAxis.PositiveY]: "./images/dir-y-plus.png",
@@ -374,6 +429,7 @@ const main = async () => {
     };
    
     let cubeMap;
+    // const skyboxObjData = await loadObj("./models/skybox-32-32-outer.obj");
     const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
     await Promise.all(Object.keys(images).map(async(key) => {
             const img = await loadImg(images[key]);
@@ -382,10 +438,11 @@ const main = async () => {
         .then(result => {
             const data = {};
             result.forEach(({ key, img }) => data[key] = img);
+            console.log(data)
             cubeMap = new CubeMap({ gpu, images: data });
         });
     
-    const skyboxMesh = new Mesh(
+    skyboxMesh = new Mesh(
         new Geometry({
             gpu,
             attributes: {
@@ -414,7 +471,11 @@ const main = async () => {
                 uCubeTexture: {
                     type: UniformTypes.CubeMap,
                     value: cubeMap
-                }
+                },
+                // uViewDirectionProjectionInverse: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity()
+                // }
             }
         })
     );
