@@ -9,17 +9,19 @@ import {Mesh} from "./PaleGL/core/Mesh.js";
 import {Material} from "./PaleGL/materials/Material.js";
 import {PerspectiveCamera} from "./PaleGL/core/PerspectiveCamera.js";
 import {Texture} from "./PaleGL/core/Texture.js";
-import {loadImg} from "./PaleGL/utils/loadImg.js";
+import {loadImg} from "./PaleGL/loaders/loadImg.js";
 import {BoxGeometry} from "./PaleGL/geometries/BoxGeometry.js";
 import {PostProcess} from "./PaleGL/postprocess/PostProcess.js";
 import {FragmentPass} from "./PaleGL/postprocess/FragmentPass.js";
 import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 import {DirectionalLight} from "./PaleGL/lights/DirectionalLight.js";
-import {loadObj} from "./PaleGL/utils/loadObj.js";
+import {loadObj} from "./PaleGL/loaders/loadObj.js";
 import {Geometry} from "./PaleGL/geometries/Geometry.js";
 import {Color} from "./PaleGL/core/Color.js";
 import {CubeMap} from "./PaleGL/core/CubeMap.js";
+import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
+import {Skybox} from "./PaleGL/core/Skybox.js";
 
 let width, height;
 let objMesh;
@@ -70,7 +72,6 @@ out vec4 outColor;
 
 uniform vec3 uViewPosition;
 uniform samplerCube uCubeTexture;
-uniform float uCubeMapRotationRadian;
 
 mat2 rotate(float r) {
     float c = cos(r);
@@ -104,7 +105,7 @@ void main() {
     // pattern_4: reverse x and rotate
     vec3 reflectDir = reflect(-PtoE, N);
     reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(uCubeMapRotationRadian); // default: 3.14
+    reflectDir.xz *= rotate(3.14);
     vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
 
     // ----------------------------------------------------------
@@ -112,68 +113,6 @@ void main() {
     // ----------------------------------------------------------
    
     outColor = vec4(cubeColor, 1);
-}
-`;
-
-const skyboxVertexShader = `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aNormal;
-
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
-
-out vec2 vUv;
-out vec3 vNormal;
-out vec3 vRawNormal;
-out vec3 vLocalPosition;
-out vec3 vWorldPosition;
-
-void main() {
-    vUv = aUv;
-    vLocalPosition = aPosition;
-    vRawNormal = aNormal;
-    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
-    vWorldPosition = worldPosition.xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-}
-`;
-
-const skyboxFragmentShader = `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-in vec3 vNormal;
-in vec3 vRawNormal;
-in vec3 vWorldPosition;
-in vec3 vLocalPosition;
-
-uniform samplerCube uCubeTexture;
-uniform vec3 uViewPosition;
-uniform float uCubeMapRotationRadian;
-
-out vec4 outColor;
-
-mat2 rotate(float r) {
-    float c = cos(r);
-    float s = sin(r);
-    return mat2(c, s, -s, c);
-}
-
-void main() {
-    vec3 N = normalize(vNormal);
-
-    vec3 reflectDir = -N;
-    reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(uCubeMapRotationRadian); // default: 3.14
-    vec4 textureColor = texture(uCubeTexture, reflectDir);
-    
-    outColor = textureColor;
 }
 `;
 
@@ -262,15 +201,15 @@ const main = async () => {
             gpu,
             attributes: {
                 position: {
-                    data: objData.positions.flat(),
+                    data: objData.positions,
                     size: 3
                 },
                 uv: {
-                    data: objData.uvs.flat(),
+                    data: objData.uvs,
                     size: 2,
                 },
                 normal: {
-                    data: objData.normals.flat(),
+                    data: objData.normals,
                     size: 3
                 },
             },
@@ -287,10 +226,6 @@ const main = async () => {
                     type: UniformTypes.CubeMap,
                     value: null
                 },
-                uCubeMapRotationRadian: {
-                    type: UniformTypes.Float,
-                    value: 3.14
-                }
             }
         })
     );
@@ -304,77 +239,19 @@ const main = async () => {
         [CubeMapAxis.PositiveZ]: "./images/dir-z-plus.png",
         [CubeMapAxis.NegativeZ]: "./images/dir-z-minus.png",
     };
-   
-    let cubeMap;
-    const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
-    await Promise.all(Object.keys(images).map(async(key) => {
-            const img = await loadImg(images[key]);
-            return { key, img };
-        }))
-        .then(result => {
-            const data = {};
-            result.forEach(({ key, img }) => data[key] = img);
-            cubeMap = new CubeMap({ gpu, images: data });
-        });
     
-    skyboxMesh = new Mesh(
-        new Geometry({
-            gpu,
-            attributes: {
-                position: {
-                    data: skyboxObjData.positions.flat(),
-                    size: 3
-                },
-                uv: {
-                    data: skyboxObjData.uvs.flat(),
-                    size: 2,
-                },
-                normal: {
-                    data: skyboxObjData.normals.flat(),
-                    size: 3
-                },
-            },
-            indices: skyboxObjData.indices,
-            drawCount: skyboxObjData.indices.length
-        }),
-        new Material({
-            gpu,
-            vertexShader: skyboxVertexShader,
-            fragmentShader: skyboxFragmentShader,
-            primitiveType: PrimitiveTypes.Triangles,
-            uniforms: {
-                uCubeTexture: {
-                    type: UniformTypes.CubeMap,
-                    value: cubeMap
-                },
-                uCubeMapRotationRadian: {
-                    type: UniformTypes.Float,
-                    value: 3.14
-                }
-            }
-        })
-    );
+    const cubeMap = await loadCubeMap({ gpu, images });
+    skyboxMesh = new Skybox({ gpu, cubeMap });
+    await skyboxMesh.load({ gpu });
+
     captureScene.add(skyboxMesh);
     skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
+    
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();
-
-    debuggerGUI.addSliderDebugger({
-        label: "Cube Map Rotation Radian",
-        initialValue: objMesh.material.uniforms.uCubeMapRotationRadian.value,
-        minValue: 0,
-        maxValue: 6.28,
-        stepValue: 0.01,
-        onChange: (value) => {
-            objMesh.material.uniforms.uCubeMapRotationRadian.value = value;
-            skyboxMesh.material.uniforms.uCubeMapRotationRadian.value = value;
-        },
-    });
-    
-    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",

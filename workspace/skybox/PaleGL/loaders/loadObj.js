@@ -121,21 +121,10 @@ export async function loadObj(path) {
         );
     });
    
-    // return array each vertex
-    // # positions
-    // [ [p0.x, p0.y, p0.z], [p1.x, p1.y, p1.z]... ]
-    // # uvs
-    // [ [uv0.x, uv0.y], [uv1.x, uv1.y]... ]
-    // # normals
-    // [ [n0.x, n0.y, n0.z], [n1.x, n1.y, n1.z]... ]
-    //
-    // return flatten indices
-    // # indices
-    // [ indices0, indices1, indices2... ]
     return {
-        positions,
-        uvs,
-        normals,
+        positions: positions.flat(),
+        uvs: uvs.flat(),
+        normals: normals.flat(),
         indices
     }
 }
