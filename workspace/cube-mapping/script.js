@@ -205,6 +205,7 @@ void main() {
     // vec4 textureColor = sampleCube(uCubeTexture, N);
     vec3 t = -(normalize(vRawNormal));
     t *= vec3(1., 1., -1.);
+    // t *= vec3(-1., 1., 1.);
     vec4 textureColor = texture(uCubeTexture, t);
     
     // pattern 3
