@@ -87,13 +87,6 @@ mat2 rotate(float r) {
     return mat2(c, s, -s, c);
 }
 
-vec4 sampleCube(samplerCube cubeMap, vec3 v) {
-    // v.xz *= rotate(1.57);
-    // v.xz *= rotate(0.);
-    // v.x *= -1.;    
-    return texture(cubeMap, v);
-}
-
 void main() {
     vec4 baseColor = uBaseColor;
    
@@ -110,15 +103,26 @@ void main() {
     float specularPower = 64.;
     float specularRate = clamp(dot(H, N), 0., 1.);
     specularRate = pow(specularRate, specularPower);
-    
-    // vec3 cubeColor = sampleCube(uCubeTexture, N).xyz;
-    // vec3 cubeColor = sampleCube(uCubeTexture, reflect(-PtoE, N)).xyz;
-    vec3 ct = reflect(-PtoE, N);
-    // ct *= vec3(1., 1., -1.);
-    ct *= vec3(1., 1., -1.);
-    vec3 cubeColor = texture(uCubeTexture, ct).xyz;
-    // resultColor = mix(resultColor, cubeColor, 1.);
+  
+    // pattern_1: raw
+    // vec3 reflectDir = reflect(-PtoE, N);
+    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
+   
+    // pattern_2: reverse x
+    // reflectDir *= vec3(-1., 1., 1.);
+    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
 
+    // pattern_3: reverse x and z
+    // vec3 reflectDir = reflect(-PtoE, N);
+    // reflectDir *= vec3(-1., 1., -1.);
+    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
+
+    // pattern_4: reverse x and rotate
+    vec3 reflectDir = reflect(-PtoE, N);
+    reflectDir.x *= -1.;
+    reflectDir.xz *= rotate(3.14);
+    vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
+    
     vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
     specularColor = cubeColor.xyz;
     
@@ -172,7 +176,6 @@ in vec3 vLocalPosition;
 
 uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
-// uniform mat4 uViewDirectionProjectionInverse;
 
 out vec4 outColor;
 
@@ -182,45 +185,15 @@ mat2 rotate(float r) {
     return mat2(c, s, -s, c);
 }
 
-vec4 sampleCube(samplerCube cubeMap, vec3 v) {
-    // v.xz *= rotate(3.14);
-    // v.xz *= rotate(0.);
-    // v.xz *= rotate(0.);
-    // v.x *= -1.;    
-    v.z *= -1.;
-    return texture(cubeMap, v);
-}
-
 void main() {
     vec3 N = normalize(vNormal);
 
-    // pattern 1
-    // N *= -1.;
-    // vec3 EtoP = normalize(vWorldPosition - uViewPosition);
-    // vec3 r = reflect(-EtoP, N);
-    // r.x *= -1.;
-    // vec4 textureColor = texture(uCubeTexture, r);
-
-    // pattern 2
-    // vec4 textureColor = sampleCube(uCubeTexture, N);
-    vec3 t = -(normalize(vRawNormal));
-    t *= vec3(1., 1., -1.);
-    // t *= vec3(-1., 1., 1.);
-    vec4 textureColor = texture(uCubeTexture, t);
+    vec3 reflectDir = -N;
+    reflectDir.x *= -1.;
+    reflectDir.xz *= rotate(3.14);
+    vec4 textureColor = texture(uCubeTexture, reflectDir);
     
-    // pattern 3
-    // vec3 p = vLocalPosition;
-    // p.x *= -1.;
-    // vec4 textureColor = sampleCube(uCubeTexture, p);
-    // vec4 textureColor = texture(uCubeTexture, p);
-    
-    // pattern4
-    // vec4 t = uViewDirectionProjectionInverse * vec4(vLocalPosition, 1.);
-    // vec4 textureColor = texture(uCubeTexture, normalize(t.xyz / t.w));
-
     outColor = textureColor;
-    
-    // outColor = vec4(uViewPosition.y, 0, 0, 1);
 }
 `;
 
@@ -346,16 +319,6 @@ const tick = (time) => {
     );
     captureSceneCamera.transform.position = cameraPosition;
     
-    // if(skyboxMesh) {
-    //     const m = captureSceneCamera.transform.worldMatrix.clone();
-    //     m.invert();
-    //     m.elements[12] = 0;
-    //     m.elements[13] = 0;
-    //     m.elements[14] = 0;
-    //     skyboxMesh.material.uniforms.uViewDirectionProjectionInverse.value = m; 
-    //     // m.log();
-    // }
-
     // planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
 
     renderer.render(captureScene, captureSceneCamera);
@@ -366,9 +329,7 @@ const tick = (time) => {
 }
 
 const main = async () => {
-    // const objData = await loadObj("./models/monkey.obj");
     const objData = await loadObj("./models/sphere-32-32.obj");
-    // const objData = await loadObj("./models/skybox-32-32-outer.obj");
 
     objMesh = new Mesh(
         // new BoxGeometry({ gpu }),
@@ -473,10 +434,6 @@ const main = async () => {
                     type: UniformTypes.CubeMap,
                     value: cubeMap
                 },
-                // uViewDirectionProjectionInverse: {
-                //     type: UniformTypes.Matrix4,
-                //     value: Matrix4.identity()
-                // }
             }
         })
     );
