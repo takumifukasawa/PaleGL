@@ -70,7 +70,6 @@ out vec4 outColor;
 
 uniform vec3 uViewPosition;
 uniform samplerCube uCubeTexture;
-uniform float uCubeMapRotationRadian;
 
 mat2 rotate(float r) {
     float c = cos(r);
@@ -104,7 +103,7 @@ void main() {
     // pattern_4: reverse x and rotate
     vec3 reflectDir = reflect(-PtoE, N);
     reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(uCubeMapRotationRadian); // default: 3.14
+    reflectDir.xz *= rotate(3.14);
     vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
 
     // ----------------------------------------------------------
@@ -155,7 +154,6 @@ in vec3 vLocalPosition;
 
 uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
-uniform float uCubeMapRotationRadian;
 
 out vec4 outColor;
 
@@ -170,7 +168,7 @@ void main() {
 
     vec3 reflectDir = -N;
     reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(uCubeMapRotationRadian); // default: 3.14
+    reflectDir.xz *= rotate(3.14);
     vec4 textureColor = texture(uCubeTexture, reflectDir);
     
     outColor = textureColor;
@@ -287,10 +285,6 @@ const main = async () => {
                     type: UniformTypes.CubeMap,
                     value: null
                 },
-                uCubeMapRotationRadian: {
-                    type: UniformTypes.Float,
-                    value: 3.14
-                }
             }
         })
     );
@@ -347,10 +341,6 @@ const main = async () => {
                     type: UniformTypes.CubeMap,
                     value: cubeMap
                 },
-                uCubeMapRotationRadian: {
-                    type: UniformTypes.Float,
-                    value: 3.14
-                }
             }
         })
     );
@@ -361,18 +351,6 @@ const main = async () => {
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();
-
-    debuggerGUI.addSliderDebugger({
-        label: "Cube Map Rotation Radian",
-        initialValue: objMesh.material.uniforms.uCubeMapRotationRadian.value,
-        minValue: 0,
-        maxValue: 6.28,
-        stepValue: 0.01,
-        onChange: (value) => {
-            objMesh.material.uniforms.uCubeMapRotationRadian.value = value;
-            skyboxMesh.material.uniforms.uCubeMapRotationRadian.value = value;
-        },
-    });
     
     debuggerGUI.addBorderSpacer();
 
