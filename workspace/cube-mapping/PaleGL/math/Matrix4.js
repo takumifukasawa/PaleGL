@@ -1,11 +1,12 @@
 ﻿import {Vector3} from "./Vector3.js";
 
-// memory layout is column order
+// memory layout is column order.
+// setter and getter are row order.
 // (num) ... element index
-// 00(0), 01(4), 02(8), 03(12),
-// 10(1), 11(5), 12(9), 13(13),
-// 20(2), 21(6), 22(10), 23(14),
-// 30(3), 31(7), 32(11), 33(15),
+// m00(0), m01(4), m02(8), m03(12),
+// m10(1), m11(5), m12(9), m13(13),
+// m20(2), m21(6), m22(10), m23(14),
+// m30(3), m31(7), m32(11), m33(15),
 
 export class Matrix4 {
     elements;
@@ -75,67 +76,67 @@ export class Matrix4 {
     }
     
     set m00(value) {
-        this.elements[0] = value;
+        this.elements[0]= value;
     }
 
     set m01(value) {
-        this.elements[4] = value;
+        this.elements[4]= value;
     }
 
     set m02(value) {
-        this.elements[8] = value;
+        this.elements[8]= value;
     }
 
     set m03(value) {
-        this.elements[12] = value;
+        this.elements[12]= value;
     }
 
     set m10(value) {
-        this.elements[1] = value;
+        this.elements[1]= value;
     }
 
     set m11(value) {
-        this.elements[5] = value;
+        this.elements[5]= value;
     }
 
     set m12(value) {
-        return this.elements[9] = value;
+        return this.elements[9]= value;
     }
 
     set m13(value) {
-        return this.elements[13] = value;
+        return this.elements[13]= value;
     }
 
     set m20(value) {
-        return this.elements[2] = value;
+        return this.elements[2]= value;
     }
 
     set m21(value) {
-        return this.elements[6] = value;
+        return this.elements[6]= value;
     }
 
     set m22(value) {
-        return this.elements[10] = value;
+        return this.elements[10]= value;
     }
 
     set m23(value) {
-        return this.elements[14] = value;
+        return this.elements[14]= value;
     }
 
     set m30(value) {
-        return this.elements[3] = value;
+        return this.elements[3]= value;
     }
 
     set m31(value) {
-        return this.elements[7] = value;
+        return this.elements[7]= value;
     }
 
     set m32(value) {
-        return this.elements[11] = value;
+        return this.elements[11]= value;
     }
 
     set m33(value) {
-        return this.elements[15] = value;
+        return this.elements[15]= value;
     }
     
     get position() {
@@ -172,7 +173,7 @@ export class Matrix4 {
            n01, n11, n21, n31,
            n02, n12, n22, n32,
            n03, n13, n23, n33
-        ]);
+       ]);
         return this;
     }
 
@@ -375,10 +376,10 @@ export class Matrix4 {
         // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
         const te = this.elements,
 
-            n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ], n41 = te[ 3 ],
-            n12 = te[ 4 ], n22 = te[ 5 ], n32 = te[ 6 ], n42 = te[ 7 ],
-            n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ], n43 = te[ 11 ],
-            n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ], n44 = te[ 15 ],
+            n11 = te[0], n21 = te[1], n31 = te[2], n41 = te[3],
+            n12 = te[4], n22 = te[5], n32 = te[6], n42 = te[7],
+            n13 = te[8], n23 = te[9], n33 = te[10], n43 = te[11],
+            n14 = te[12], n24 = te[13], n34 = te[14], n44 = te[15],
 
             t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
             t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
@@ -387,29 +388,29 @@ export class Matrix4 {
 
         const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
-        if ( det === 0 ) return new Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+        if (det === 0) return new Matrix4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         const detInv = 1 / det;
 
-        te[ 0 ] = t11 * detInv;
-        te[ 1 ] = ( n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44 ) * detInv;
-        te[ 2 ] = ( n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44 ) * detInv;
-        te[ 3 ] = ( n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43 ) * detInv;
+        te[0]= t11 * detInv;
+        te[1]= (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * detInv;
+        te[2]= (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * detInv;
+        te[3]= (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * detInv;
 
-        te[ 4 ] = t12 * detInv;
-        te[ 5 ] = ( n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44 ) * detInv;
-        te[ 6 ] = ( n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44 ) * detInv;
-        te[ 7 ] = ( n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43 ) * detInv;
+        te[4]= t12 * detInv;
+        te[5]= (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * detInv;
+        te[6]= (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * detInv;
+        te[7]= (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * detInv;
 
-        te[ 8 ] = t13 * detInv;
-        te[ 9 ] = ( n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44 ) * detInv;
-        te[ 10 ] = ( n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44 ) * detInv;
-        te[ 11 ] = ( n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43 ) * detInv;
+        te[8]= t13 * detInv;
+        te[9]= (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * detInv;
+        te[10]= (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * detInv;
+        te[11]= (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * detInv;
 
-        te[ 12 ] = t14 * detInv;
-        te[ 13 ] = ( n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34 ) * detInv;
-        te[ 14 ] = ( n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34 ) * detInv;
-        te[ 15 ] = ( n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33 ) * detInv;
+        te[12]= t14 * detInv;
+        te[13]= (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * detInv;
+        te[14]= (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * detInv;
+        te[15]= (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * detInv;
 
         return this;
     }
@@ -465,27 +466,27 @@ export class Matrix4 {
        
         // row-order
         // // https://github.com/toji/gl-matrix/blob/master/src/mat4.js
-        // pjm.elements[0] = f / aspect; // m00
-        // pjm.elements[1] = 0; // m10
-        // pjm.elements[2] = 0; // m20
-        // pjm.elements[3] = 0; // m30
-        // pjm.elements[4] = 0; // m01
-        // pjm.elements[5] = f; // m11
-        // pjm.elements[6] = 0; // m21
-        // pjm.elements[7] = 0; // m31
-        // pjm.elements[8] = 0; // m02
-        // pjm.elements[9] = 0; // m12
-        // pjm.elements[11] = -1; // m32
-        // pjm.elements[12] = 0; // m03
-        // pjm.elements[13] = 0; // m13
-        // pjm.elements[15] = 0; // m33
+        // pjm.elements[0]= f / aspect; // m00
+        // pjm.elements[1]= 0; // m10
+        // pjm.elements[2]= 0; // m20
+        // pjm.elements[3]= 0; // m30
+        // pjm.elements[4]= 0; // m01
+        // pjm.elements[5]= f; // m11
+        // pjm.elements[6]= 0; // m21
+        // pjm.elements[7]= 0; // m31
+        // pjm.elements[8]= 0; // m02
+        // pjm.elements[9]= 0; // m12
+        // pjm.elements[11]= -1; // m32
+        // pjm.elements[12]= 0; // m03
+        // pjm.elements[13]= 0; // m13
+        // pjm.elements[15]= 0; // m33
         // if (far != null && far !== Infinity) {
         //     const nf = 1 / (near - far);
-        //     pjm.elements[10] = (far + near) * nf; // m22
-        //     pjm.elements[14] = 2 * far * near * nf; // m23
+        //     pjm.elements[10]= (far + near) * nf; // m22
+        //     pjm.elements[14]= 2 * far * near * nf; // m23
         // } else {
-        //     pjm.elements[10] = -1; // m22
-        //     pjm.elements[14] = -2 * near; // m23
+        //     pjm.elements[10]= -1; // m22
+        //     pjm.elements[14]= -2 * near; // m23
         // }
         
         return pjm;
