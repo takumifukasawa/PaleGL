@@ -69,16 +69,6 @@ in vec3 vWorldPosition;
 out vec4 outColor;
 
 uniform vec3 uViewPosition;
-uniform vec4 uBaseColor;
-uniform vec4 uAmbientColor;
-
-struct DirectionalLight {
-    vec3 direction;
-    float intensity;
-    vec4 color;
-};
-uniform DirectionalLight uDirectionalLight;
-
 uniform samplerCube uCubeTexture;
 
 mat2 rotate(float r) {
@@ -88,21 +78,14 @@ mat2 rotate(float r) {
 }
 
 void main() {
-    vec4 baseColor = uBaseColor;
-   
     vec3 N = normalize(vNormal);
-    vec3 L = normalize(uDirectionalLight.direction);
-    float diffuseRate = clamp(dot(N, L), 0., 1.);
-    vec3 diffuseColor = baseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
     vec3 P = vWorldPosition;
     vec3 E = uViewPosition;
-    vec3 PtoL = L; // for directional light
     vec3 PtoE = normalize(E - P);
-    vec3 H = normalize(PtoL + PtoE);
-    float specularPower = 64.;
-    float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower);
+ 
+    // ----------------------------------------------------------
+    // begin: for cube map sample pattern
+    // ----------------------------------------------------------
   
     // pattern_1: raw
     // vec3 reflectDir = reflect(-PtoE, N);
@@ -122,18 +105,12 @@ void main() {
     reflectDir.x *= -1.;
     reflectDir.xz *= rotate(3.14);
     vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
-    
-    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-    specularColor = cubeColor.xyz;
-    
-    vec3 ambientColor = uAmbientColor.xyz;
-    
-    vec3 resultColor = diffuseColor + specularColor + ambientColor;
+
+    // ----------------------------------------------------------
+    // end: for cube map sample pattern
+    // ----------------------------------------------------------
    
-    // NOTE: override result
-    resultColor = cubeColor.xyz;
-    
-    outColor = vec4(resultColor, 1);
+    outColor = vec4(cubeColor, 1);
 }
 `;
 
@@ -211,53 +188,6 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const planeVertexShader = `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-
-out vec2 vUv;
-out float vTextureIndex;
-
-void main() {
-    vUv = aUv;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1);
-}
-`;
-
-const planeFragmentShader = `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-
-out vec4 outColor;
-
-void main() {
-    outColor = vec4(vUv, 1, 0.5);
-}
-`;
-
-const planeMaterial = new Material({
-    gpu,
-    vertexShader: planeVertexShader,
-    fragmentShader: planeFragmentShader,
-    blendType: BlendTypes.Transparent
-});
-
-const planeMesh = new Mesh(new PlaneGeometry({gpu}), planeMaterial);
-// captureScene.add(planeMesh);
-
-const directionalLight = new DirectionalLight();
-captureScene.add(directionalLight);
-directionalLight.transform.setTranslation(new Vector3(1, 1, 1));
-directionalLight.intensity = 1;
-directionalLight.color = Color.white();
-
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 200);
 captureScene.add(captureSceneCamera);
 
@@ -304,12 +234,6 @@ captureSceneCamera.transform.position = new Vector3(0, 0, 5);
 captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
 
 const tick = (time) => {
-    // if(objMesh) {
-    //     // objMesh.transform.setTranslation(new Vector3(0, 0, -0.5));
-    //     // objMesh.transform.setRotationY(time / 1000 * 10);
-    //     objMesh.transform.setScaling(new Vector3(10, 10, 10))
-    // }
-    
     const cameraPosition = Vector3.addVectors(
         captureSceneCamera.transform.position,
         new Vector3(
@@ -320,8 +244,6 @@ const tick = (time) => {
     );
     captureSceneCamera.transform.position = cameraPosition;
     
-    // planeMesh.transform.setTranslation(new Vector3(0, 0, Math.sin(time / 1000)));
-
     renderer.render(captureScene, captureSceneCamera);
 
     // loop
@@ -359,31 +281,16 @@ const main = async () => {
             fragmentShader: objModelFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
             uniforms: {
-                uDirectionalLight: {},
-                uBaseColor: {
-                    type: UniformTypes.Color,
-                    value: Color.white(),
-                },
-                uAmbientColor: {
-                    type: UniformTypes.Color,
-                    value: Color.black()
-                },
                 uCubeTexture: {
                     type: UniformTypes.CubeMap,
                     value: null
-                }
+                },
             }
         })
     );
     captureScene.add(objMesh);
     
     const images = {
-        // [CubeMapAxis.PositiveX]: "./images/px.png",
-        // [CubeMapAxis.NegativeX]: "./images/nx.png",
-        // [CubeMapAxis.PositiveY]: "./images/py.png",
-        // [CubeMapAxis.NegativeY]: "./images/ny.png",
-        // [CubeMapAxis.PositiveZ]: "./images/pz.png",
-        // [CubeMapAxis.NegativeZ]: "./images/nz.png",
         [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
         [CubeMapAxis.NegativeX]: "./images/dir-x-minus.png",
         [CubeMapAxis.PositiveY]: "./images/dir-y-plus.png",
@@ -393,7 +300,6 @@ const main = async () => {
     };
    
     let cubeMap;
-    // const skyboxObjData = await loadObj("./models/skybox-32-32-outer.obj");
     const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
     await Promise.all(Object.keys(images).map(async(key) => {
             const img = await loadImg(images[key]);
@@ -445,91 +351,10 @@ const main = async () => {
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();
-    debuggerGUI.addPullDownDebugger({
-        label: "Plane Blending",
-        options: [
-            {
-                label: "Opaque",
-                value: BlendTypes.Opaque,
-            },
-            {
-                label: "Transparent",
-                value: BlendTypes.Transparent,
-                isDefault: true
-            },
-            {
-                label: "Additive",
-                value: BlendTypes.Additive
-            },
-        ],
-        onChange: (blendType) => {
-            planeMaterial.blendType = blendType;
-        }
-    });
     
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addColorDebugger({
-        label: "Obj Base Color",
-        initialValue: objMesh.material.uniforms.uBaseColor.value.getHexCoord(),
-        onChange: (value) => {
-            const color = Color.fromHex(value);
-            objMesh.material.uniforms.uBaseColor.value = color;
-        }
-    });
-    debuggerGUI.addColorDebugger({
-        label: "Ambient Color",
-        initialValue: objMesh.material.uniforms.uAmbientColor.value.getHexCoord(),
-        onChange: (value) => {
-            const color = Color.fromHex(value);
-            objMesh.material.uniforms.uAmbientColor.value = color;
-        }
-    });
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addColorDebugger({
-        label: "Light Color",
-        initialValue: directionalLight.color.getHexCoord(),
-        onChange: (value) => {
-            const color = Color.fromHex(value);
-            directionalLight.color = color;
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "Directional Light: position x",
-        initialValue: directionalLight.transform.position.x,
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        onChange: (value) => {
-            directionalLight.transform.position.x = value;
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "Directional Light: position y",
-        initialValue: directionalLight.transform.position.y,
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        onChange: (value) => {
-            directionalLight.transform.position.y = value;
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "Directional Light: position z",
-        initialValue: directionalLight.transform.position.z,
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        onChange: (value) => {
-            directionalLight.transform.position.z = value;
-        }
-    });
-    
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addCheckBoxDebugger({
+    debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",
         initialValue: captureSceneCamera.postProcess.enabled,
         onChange: (value) => {

@@ -1,12 +1,5 @@
 export class DebuggerGUI {
 
-    static DebuggerTypes = {
-        PullDown: "PullDown",
-        Color: "Color",
-        CheckBox: "CheckBox",
-        Slider: "Slider",
-    };
-
     #domElement;
 
     get domElement() {
@@ -125,7 +118,7 @@ export class DebuggerGUI {
         this.#domElement.appendChild(wrapperElement);
     }
     
-    addCheckBoxDebugger({
+    addToggleDebugger({
         label,
         onChange,
         onInput = null,
