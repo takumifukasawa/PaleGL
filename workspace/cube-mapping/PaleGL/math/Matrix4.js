@@ -15,19 +15,19 @@ export class Matrix4 {
     }
     
     get m01() {
-        return this.elements[1];
+        return this.elements[4];
     }
     
     get m02() {
-        return this.elements[2];
+        return this.elements[8];
     }
     
     get m03() {
-        return this.elements[3];
+        return this.elements[12];
     }
 
     get m10() {
-        return this.elements[4];
+        return this.elements[11];
     }
 
     get m11() {
@@ -35,19 +35,19 @@ export class Matrix4 {
     }
 
     get m12() {
-        return this.elements[6];
+        return this.elements[9];
     }
 
     get m13() {
-        return this.elements[7];
+        return this.elements[13];
     }
     
     get m20() {
-        return this.elements[8];
+        return this.elements[2];
     }
 
     get m21() {
-        return this.elements[9];
+        return this.elements[6];
     }
 
     get m22() {
@@ -55,19 +55,19 @@ export class Matrix4 {
     }
 
     get m23() {
-        return this.elements[11];
+        return this.elements[14];
     }
 
     get m30() {
-        return this.elements[12];
+        return this.elements[3];
     }
 
     get m31() {
-        return this.elements[13];
+        return this.elements[7];
     }
 
     get m32() {
-        return this.elements[14];
+        return this.elements[11];
     }
 
     get m33() {
@@ -79,19 +79,19 @@ export class Matrix4 {
     }
 
     set m01(value) {
-        this.elements[1] = value;
+        this.elements[4] = value;
     }
 
     set m02(value) {
-        this.elements[2] = value;
+        this.elements[8] = value;
     }
 
     set m03(value) {
-        this.elements[3] = value;
+        this.elements[12] = value;
     }
 
     set m10(value) {
-        this.elements[4] = value;
+        this.elements[1] = value;
     }
 
     set m11(value) {
@@ -99,19 +99,19 @@ export class Matrix4 {
     }
 
     set m12(value) {
-        return this.elements[6] = value;
+        return this.elements[9] = value;
     }
 
     set m13(value) {
-        return this.elements[7] = value;
+        return this.elements[13] = value;
     }
 
     set m20(value) {
-        return this.elements[8] = value;
+        return this.elements[2] = value;
     }
 
     set m21(value) {
-        return this.elements[9] = value;
+        return this.elements[6] = value;
     }
 
     set m22(value) {
@@ -119,19 +119,19 @@ export class Matrix4 {
     }
 
     set m23(value) {
-        return this.elements[11] = value;
+        return this.elements[14] = value;
     }
 
     set m30(value) {
-        return this.elements[12] = value;
+        return this.elements[3] = value;
     }
 
     set m31(value) {
-        return this.elements[13] = value;
+        return this.elements[7] = value;
     }
 
     set m32(value) {
-        return this.elements[14] = value;
+        return this.elements[11] = value;
     }
 
     set m33(value) {
@@ -139,7 +139,7 @@ export class Matrix4 {
     }
     
     get position() {
-        return new Vector3(this.m30, this.m31, this.m32);
+        return new Vector3(this.m03, this.m13, this.m23);
     }
 
     constructor(
@@ -172,10 +172,6 @@ export class Matrix4 {
            n01, n11, n21, n31,
            n02, n12, n22, n32,
            n03, n13, n23, n33
-           // m00, m01, m02, m03,
-           // m10, m11, m12, m13,
-           // m20, m21, m22, m23,
-           // m30, m31, m32, m33,
         ]);
         return this;
     }
@@ -434,77 +430,63 @@ export class Matrix4 {
         );
     }
 
+    // ref
+    // https://developer.mozilla.org/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection
     // fov ... rad
     // aspect ... w / h
     static getPerspectiveMatrix(fov, aspect, near, far) {
         const f = 1 / Math.tan(fov / 2);
-        const nf = 1 / (near - far);
+        // const nf = 1 / (near - far);
 
         const pjm = new Matrix4();
 
-        // https://developer.mozilla.org/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection
-        // pjm.elements[0] = f / aspect;
-        // pjm.elements[1] = 0;
-        // pjm.elements[2] = 0;
-        // pjm.elements[3] = 0;
-        // pjm.elements[4] = 0;
-        // pjm.elements[5] = f;
-        // pjm.elements[6] = 0;
-        // pjm.elements[7] = 0;
-        // pjm.elements[8] = 0;
-        // pjm.elements[9] = 0;
-        // pjm.elements[10] = (far + near) * nf;
-        // pjm.elements[11] = -1;
-        // pjm.elements[12] = 0;
-        // pjm.elements[13] = 0;
-        // pjm.elements[14] = 2 * far * near * nf;
-        // pjm.elements[15] = 0;
-        
-        // 0, 1, 2, 3 
-        // 4, 5, 6, 7
-        // 8, 9, 10, 11
-        // 12, 13, 14, 15
-
-        // pjm.elements[0] = f / aspect;
-        // pjm.elements[1] = 0;
-        // pjm.elements[2] = 0;
-        // pjm.elements[3] = 0;
-        // pjm.elements[4] = 0;
-        // pjm.elements[5] = f;
-        // pjm.elements[6] = 0;
-        // pjm.elements[7] = 0;
-        // pjm.elements[8] = 0;
-        // pjm.elements[9] = 0;
-        // pjm.elements[10] = (far + near) * nf;
-        // pjm.elements[11] = 2 * far * near * nf;
-        // pjm.elements[12] = 0;
-        // pjm.elements[13] = 0;
-        // pjm.elements[14] = -1; 
-        // pjm.elements[15] = 0;
-
-        // https://github.com/toji/gl-matrix/blob/master/src/mat4.js
-        pjm.elements[0] = f / aspect;
-        pjm.elements[1] = 0;
-        pjm.elements[2] = 0;
-        pjm.elements[3] = 0;
-        pjm.elements[4] = 0;
-        pjm.elements[5] = f;
-        pjm.elements[6] = 0;
-        pjm.elements[7] = 0;
-        pjm.elements[8] = 0;
-        pjm.elements[9] = 0;
-        pjm.elements[11] = -1;
-        pjm.elements[12] = 0;
-        pjm.elements[13] = 0;
-        pjm.elements[15] = 0;
+        pjm.m00 = f / aspect;
+        pjm.m10 = 0;
+        pjm.m20 = 0;
+        pjm.m30 = 0;
+        pjm.m01 = 0;
+        pjm.m11 = f;
+        pjm.m21 = 0;
+        pjm.m31 = 0;
+        pjm.m02 = 0;
+        pjm.m12 = 0;
+        pjm.m32 = -1;
+        pjm.m03 = 0;
+        pjm.m13 = 0;
+        pjm.m33 = 0;
         if (far != null && far !== Infinity) {
             const nf = 1 / (near - far);
-            pjm.elements[10] = (far + near) * nf;
-            pjm.elements[14] = 2 * far * near * nf;
+            pjm.m22 = (far + near) * nf;
+            pjm.m23 = 2 * far * near * nf;
         } else {
-            pjm.elements[10] = -1;
-            pjm.elements[14] = -2 * near;
+            pjm.m22 = -1;
+            pjm.m23 = -2 * near;
         }
+       
+        // row-order
+        // // https://github.com/toji/gl-matrix/blob/master/src/mat4.js
+        // pjm.elements[0] = f / aspect; // m00
+        // pjm.elements[1] = 0; // m10
+        // pjm.elements[2] = 0; // m20
+        // pjm.elements[3] = 0; // m30
+        // pjm.elements[4] = 0; // m01
+        // pjm.elements[5] = f; // m11
+        // pjm.elements[6] = 0; // m21
+        // pjm.elements[7] = 0; // m31
+        // pjm.elements[8] = 0; // m02
+        // pjm.elements[9] = 0; // m12
+        // pjm.elements[11] = -1; // m32
+        // pjm.elements[12] = 0; // m03
+        // pjm.elements[13] = 0; // m13
+        // pjm.elements[15] = 0; // m33
+        // if (far != null && far !== Infinity) {
+        //     const nf = 1 / (near - far);
+        //     pjm.elements[10] = (far + near) * nf; // m22
+        //     pjm.elements[14] = 2 * far * near * nf; // m23
+        // } else {
+        //     pjm.elements[10] = -1; // m22
+        //     pjm.elements[14] = -2 * near; // m23
+        // }
         
         return pjm;
     }
@@ -525,12 +507,11 @@ export class Matrix4 {
     
     log()
     {
-        // col order to row order
         console.log(`--------------------
-${this.m00}, ${this.m10}, ${this.m20}, ${this.m30},
-${this.m01}, ${this.m11}, ${this.m21}, ${this.m31},
-${this.m02}, ${this.m12}, ${this.m22}, ${this.m32},
-${this.m03}, ${this.m13}, ${this.m23}, ${this.m33},
+${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},
+${this.m10}, ${this.m11}, ${this.m12}, ${this.m13},
+${this.m20}, ${this.m21}, ${this.m22}, ${this.m23},
+${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
 --------------------`);
     }
 }
