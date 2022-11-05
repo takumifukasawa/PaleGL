@@ -129,7 +129,8 @@ void main() {
     vec3 ambientColor = uAmbientColor.xyz;
     
     vec3 resultColor = diffuseColor + specularColor + ambientColor;
-    
+   
+    // NOTE: override result
     resultColor = cubeColor.xyz;
     
     outColor = vec4(resultColor, 1);
@@ -444,7 +445,7 @@ const main = async () => {
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.PullDown, {
+    debuggerGUI.addPullDownDebugger({
         label: "Plane Blending",
         options: [
             {
@@ -468,7 +469,7 @@ const main = async () => {
     
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+    debuggerGUI.addColorDebugger({
         label: "Obj Base Color",
         initialValue: objMesh.material.uniforms.uBaseColor.value.getHexCoord(),
         onChange: (value) => {
@@ -476,7 +477,7 @@ const main = async () => {
             objMesh.material.uniforms.uBaseColor.value = color;
         }
     });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+    debuggerGUI.addColorDebugger({
         label: "Ambient Color",
         initialValue: objMesh.material.uniforms.uAmbientColor.value.getHexCoord(),
         onChange: (value) => {
@@ -487,7 +488,7 @@ const main = async () => {
 
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Color, {
+    debuggerGUI.addColorDebugger({
         label: "Light Color",
         initialValue: directionalLight.color.getHexCoord(),
         onChange: (value) => {
@@ -495,7 +496,7 @@ const main = async () => {
             directionalLight.color = color;
         }
     });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+    debuggerGUI.addSliderDebugger({
         label: "Directional Light: position x",
         initialValue: directionalLight.transform.position.x,
         minValue: -5,
@@ -505,7 +506,7 @@ const main = async () => {
             directionalLight.transform.position.x = value;
         }
     });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+    debuggerGUI.addSliderDebugger({
         label: "Directional Light: position y",
         initialValue: directionalLight.transform.position.y,
         minValue: -5,
@@ -515,7 +516,7 @@ const main = async () => {
             directionalLight.transform.position.y = value;
         }
     });
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.Slider, {
+    debuggerGUI.addSliderDebugger({
         label: "Directional Light: position z",
         initialValue: directionalLight.transform.position.z,
         minValue: -5,
@@ -528,7 +529,7 @@ const main = async () => {
     
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.add(DebuggerGUI.DebuggerTypes.CheckBox, {
+    debuggerGUI.addCheckBoxDebugger({
         label: "Enabled Post Process",
         initialValue: captureSceneCamera.postProcess.enabled,
         onChange: (value) => {
