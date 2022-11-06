@@ -95,7 +95,9 @@ export class ForwardRenderer {
         });
 
         // update all actors matrix
-        // TODO: scene 側でやった方がよい？
+        // TODO
+        // - scene 側でやった方がよい？
+        // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         scene.traverse((actor) => actor.updateTransform());
         
         // TODO: depth sort 
@@ -108,16 +110,8 @@ export class ForwardRenderer {
         sortedMeshActors.forEach(meshActor => {
             switch(meshActor.type) {
                 case ActorTypes.Skybox:
-                    meshActor.transform.setTranslation(camera.transform.position);
-                    meshActor.updateTransform();
-                    // const viewDirectionMatrix = camera.transform.worldMatrix.clone().invert();
-                    const viewDirectionMatrix = camera.viewMatrix.clone();
-                    // skyboxMesh.transform.setScaling(new Vector3(5, 5, 5));
-                    
-                    viewDirectionMatrix.setTranslation(new Vector3(camera.far * 2, camera.far * 2, camera.far * 2));
-                    const viewDirectionProjectionInverseMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix.clone(), viewDirectionMatrix.clone()).invert();
-                    // meshActor.material.uniforms.uViewDirectionProjectionInverse.value = viewDirectionProjectionInverseMatrix;
-                    // meshActor.material.uniforms.uViewDirectionMatrix.value = viewDirectionMatrix;
+                    // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+                    meshActor.updateTransform(camera);
                     break;
             }
             

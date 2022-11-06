@@ -128,7 +128,7 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 100);
+const captureSceneCamera = new PerspectiveCamera(90, 1, 0.1, 100);
 captureScene.add(captureSceneCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));

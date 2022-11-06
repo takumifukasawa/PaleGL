@@ -82,6 +82,10 @@
         );
     }
     
+    static fill(value) {
+        return new Vector3(value, value, value);
+    }
+    
     log() {
          // col order to row order
         console.log(`--------------------
