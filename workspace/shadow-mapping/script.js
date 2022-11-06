@@ -1,5 +1,5 @@
 ﻿import {GPU} from "./PaleGL/core/GPU.js";
-import {BlendTypes, CubeMapAxis, PrimitiveTypes, UniformTypes} from "./PaleGL/constants.js";
+import {BlendTypes, CubeMapAxis, FaceSide, PrimitiveTypes, UniformTypes} from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
 import {Matrix4} from "./PaleGL/math/Matrix4.js";
@@ -25,6 +25,7 @@ import {Skybox} from "./PaleGL/core/Skybox.js";
 
 let width, height;
 let objMesh;
+let floorPlaneMesh;
 const targetCameraPosition = {
     x: 0,
     y: 0,
@@ -183,6 +184,12 @@ const tick = (time) => {
         )
     );
     captureSceneCamera.transform.position = cameraPosition;
+
+    if(floorPlaneMesh) {
+        floorPlaneMesh.transform.setRotationY(time);
+        floorPlaneMesh.transform.lookAt(cameraPosition);
+    }
+    
     
     renderer.render(captureScene, captureSceneCamera);
 
@@ -230,12 +237,18 @@ const main = async () => {
     );
     
     const images = {
-        [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
-        [CubeMapAxis.NegativeX]: "./images/dir-x-minus.png",
-        [CubeMapAxis.PositiveY]: "./images/dir-y-plus.png",
-        [CubeMapAxis.NegativeY]: "./images/dir-y-minus.png",
-        [CubeMapAxis.PositiveZ]: "./images/dir-z-plus.png",
-        [CubeMapAxis.NegativeZ]: "./images/dir-z-minus.png",
+        [CubeMapAxis.PositiveX]: "./images/px.png",
+        [CubeMapAxis.NegativeX]: "./images/nx.png",
+        [CubeMapAxis.PositiveY]: "./images/py.png",
+        [CubeMapAxis.NegativeY]: "./images/ny.png",
+        [CubeMapAxis.PositiveZ]: "./images/pz.png",
+        [CubeMapAxis.NegativeZ]: "./images/nz.png",
+        // [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
+        // [CubeMapAxis.NegativeX]: "./images/dir-x-minus.png",
+        // [CubeMapAxis.PositiveY]: "./images/dir-y-plus.png",
+        // [CubeMapAxis.NegativeY]: "./images/dir-y-minus.png",
+        // [CubeMapAxis.PositiveZ]: "./images/dir-z-plus.png",
+        // [CubeMapAxis.NegativeZ]: "./images/dir-z-minus.png",
     };
   
     const cubeMap = await loadCubeMap({ gpu, images });
@@ -244,10 +257,10 @@ const main = async () => {
         gpu, cubeMap
     });
     
-    const billboardImg = await loadImg("./images/uv-checker.png");
-    const billboardTexture = new Texture({ gpu, img: billboardImg });
+    const floorImg = await loadImg("./images/uv-checker.png");
+    const floorTexture = new Texture({ gpu, img: floorImg });
     
-    const billboardPlaneMesh = new Mesh(
+    floorPlaneMesh = new Mesh(
         new PlaneGeometry({ gpu }),
         new Material({
             gpu,
@@ -285,19 +298,21 @@ const main = async () => {
             uniforms: {
                 uBillboardTexture: {
                     type: UniformTypes.Texture,
-                    value: billboardTexture
+                    value: floorTexture
                 }
-            }
+            },
         })
     );
-    
+
+    captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
-    captureScene.add(billboardPlaneMesh);
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
-    billboardPlaneMesh.transform.setScaling(new Vector3(3, 3, 3))
+    floorPlaneMesh.transform.setScaling(Vector3.fill(2));
+    // floorPlaneMesh.transform.setRotationX(-90);
+    // floorPlaneMesh.transform.setTranslation(new Vector3(0, -5, 0));
     
     captureSceneCamera.postProcess.enabled = false;
 

@@ -1,5 +1,6 @@
 ﻿import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {ActorTypes} from "../constants.js";
 
 export class Transform {
     parent;
@@ -35,10 +36,15 @@ export class Transform {
     updateMatrix() {
         // TODO: lookatとの併用これで合ってる？
         if(this.lookAtTarget) {
-            // TODO: pass up vector
-            const lookAtMatrix = Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
+            // TODO:
+            // - pass up vector
+            // - enabled scaling
+            const lookAtMatrix = this.actor.type === ActorTypes.Camera
+                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up(), true)
+                : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
-            this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
+            // this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
+            this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix);
         } else {
             const translationMatrix = Matrix4.translationMatrix(this.position);
             const rotationXMatrix = Matrix4.rotationXMatrix(this.rotation.x / 180 * Math.PI);

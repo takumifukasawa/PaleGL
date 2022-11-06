@@ -499,9 +499,10 @@ export class Matrix4 {
         return pjm;
     }
     
-    static getLookAtMatrix(eye, center, up = new Vector3(0, 1, 0)) {
-        // TODO: fix axis for basic actors lookat
-        const f = Vector3.subVectors(eye, center).normalize();
+    static getLookAtMatrix(eye, center, up = new Vector3(0, 1, 0), inverseForward = false) {
+        const f = inverseForward
+            ? Vector3.subVectors(eye, center).normalize() // ex. 主にカメラ。投影の関係で逆になるので。
+            : Vector3.subVectors(center, eye).normalize();
         const r = Vector3.crossVectors(up.normalize(), f).normalize();
         const u = Vector3.crossVectors(f, r);
         const result = new Matrix4(

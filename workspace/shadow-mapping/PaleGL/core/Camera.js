@@ -2,6 +2,7 @@
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector4} from "../math/Vector4.js";
 import {RenderTarget} from "./RenderTarget.js";
+import {ActorTypes} from "../constants.js";
 
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity();
@@ -38,7 +39,7 @@ export class Camera extends Actor {
     }
     
     constructor({ clearColor, postProcess } = {}) {
-        super();
+        super(ActorTypes.Camera);
         this.clearColor = clearColor || new Vector4(0, 0, 0, 1);
         this.#postProcess = postProcess;
     }

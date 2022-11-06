@@ -48,7 +48,8 @@ export const ActorTypes = {
     Null: "Null",
     Mesh: "Mesh",
     Light: "Light",
-    Skybox: "Skybox"
+    Skybox: "Skybox",
+    Camera: "Camera",
 };
 
 export const CubeMapAxis = {

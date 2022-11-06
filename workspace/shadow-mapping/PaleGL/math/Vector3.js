@@ -50,12 +50,20 @@
         return this;
     }
     
+    clone() {
+        return new Vector3(this.x, this.y, this.z);
+    }
+    
     static zero() {
         return new Vector3(0, 0, 0);
     }
 
     static one() {
         return new Vector3(1, 1, 1);
+    }
+    
+    static up() {
+        return new Vector3(0, 1, 0);
     }
     
     static addVectors(v1, v2) {
