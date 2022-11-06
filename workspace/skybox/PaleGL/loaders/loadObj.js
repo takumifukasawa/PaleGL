@@ -2,7 +2,10 @@
 export async function loadObj(path) {
     const response = await fetch(path);
     const content = await response.text();
-    
+    return parseObj(content);
+}
+
+export function parseObj(content) {
     const rawPositions = [];
     const rawNormals = [];
     const rawUvs = [];

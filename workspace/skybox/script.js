@@ -242,8 +242,6 @@ const main = async () => {
     
     const cubeMap = await loadCubeMap({ gpu, images });
     skyboxMesh = new Skybox({ gpu, cubeMap });
-    await skyboxMesh.load({ gpu });
-
     captureScene.add(skyboxMesh);
     skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
     
