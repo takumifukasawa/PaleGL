@@ -185,9 +185,9 @@ const tick = (time) => {
     );
     captureSceneCamera.transform.position = cameraPosition;
 
-    if(floorPlaneMesh) {
-        floorPlaneMesh.transform.lookAt(cameraPosition);
-    }
+    // if(floorPlaneMesh) {
+    //     floorPlaneMesh.transform.lookAt(cameraPosition);
+    // }
     
     renderer.render(captureScene, captureSceneCamera);
 
@@ -308,9 +308,9 @@ const main = async () => {
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
-    floorPlaneMesh.transform.setScaling(Vector3.fill(2));
-    // floorPlaneMesh.transform.setRotationX(-90);
-    // floorPlaneMesh.transform.setTranslation(new Vector3(0, -5, 0));
+    floorPlaneMesh.transform.setScaling(Vector3.fill(20));
+    floorPlaneMesh.transform.setRotationX(-90);
+    floorPlaneMesh.transform.setTranslation(new Vector3(0, -5, 0));
     
     captureSceneCamera.postProcess.enabled = false;
 
