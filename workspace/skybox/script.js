@@ -248,6 +248,7 @@ const main = async () => {
     captureScene.add(objMesh);
     
     skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
+    // skyboxMesh.transform.setScaling(new Vector3(30, 30, 30));
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
