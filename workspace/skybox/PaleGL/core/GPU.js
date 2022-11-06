@@ -53,6 +53,8 @@ export class GPU {
         // TODO: mask設定は外側からやった方がよい気がする
         gl.depthMask(true);
         gl.colorMask(true, true, true, true);
+        gl.enable(gl.CULL_FACE);
+        gl.enable(gl.DEPTH_TEST);
         gl.clearColor(r, g, b, a);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
@@ -76,37 +78,37 @@ export class GPU {
         const gl = this.gl;
        
         // culling
-        // TODO: cull type
         switch(faceSide) {
             case FaceSide.Front:
                 gl.enable(gl.CULL_FACE);
                 gl.cullFace(gl.BACK);
+                gl.frontFace(gl.CCW);
                 break;
             case FaceSide.Back:
                 gl.enable(gl.CULL_FACE);
                 gl.cullFace(gl.FRONT);
+                gl.frontFace(gl.CCW);
                 break;
             case FaceSide.Double:
                 gl.disable(gl.CULL_FACE);
+                gl.frontFace(gl.CCW);
                 break;
             default:
                 throw "invalid face side";
         }
 
-        // depth test
-        // TODO: fix depth test
-        if(depthTest) {
-            gl.enable(gl.DEPTH_TEST);
-            gl.depthFunc(gl.ALWAYS); // TODO: set by arg
-        } else {
-            gl.disable(gl.DEPTH_TEST);
-        }
-        
         // depth write
         gl.depthMask(depthWrite);
         // for debug
         // console.log(gl.getParameter(gl.DEPTH_WRITEMASK));
-        
+
+        // depth test
+        if(depthTest) {
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL); // TODO: set by arg
+        } else {
+            gl.disable(gl.DEPTH_TEST);
+        }
      
         // TODO: renderer側でやるべき？
         // blend
@@ -116,7 +118,7 @@ export class GPU {
         switch(blendType) {
             case BlendTypes.Opaque:
                 gl.disable(gl.BLEND);
-                // for enabled blend
+                // pattern_2: for enabled blend
                 // gl.enable(gl.BLEND);
                 // gl.blendFunc(gl.ONE, gl.ZERO);
                 break;
