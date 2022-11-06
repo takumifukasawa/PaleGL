@@ -8,6 +8,7 @@ import {CubeMap} from "./../core/CubeMap.js";
 import {BoxGeometry} from "../geometries/BoxGeometry.js";
 import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {Vector3} from "../math/Vector3.js";
 
 // 法線が内側を向いた単位立方体
 const geometryObjText = `
@@ -166,11 +167,14 @@ export class Skybox extends Mesh {
         
         super(geometry, material, ActorTypes.Skybox);
     }
-    
+   
+    // TODO: renderer側で2回走らないようにする
     updateTransform(camera) {
-        this.transform.setTranslation(camera.transform.position);
-        // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
-        this.transform.setScaling(Vector3.fill(camera.far / 1.733));
+        if(camera) {
+            this.transform.setTranslation(camera.transform.position);
+            // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
+            this.transform.setScaling(Vector3.fill(camera.far / 1.733));
+        }
         super.updateTransform();
     }
 }
