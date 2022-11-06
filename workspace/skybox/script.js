@@ -295,6 +295,8 @@ import {loadObj} from "./PaleGL/loaders/loadObj.js";
 import {Geometry} from "./PaleGL/geometries/Geometry.js";
 import {Color} from "./PaleGL/core/Color.js";
 import {CubeMap} from "./PaleGL/core/CubeMap.js";
+import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
+import {Skybox} from "./PaleGL/core/Skybox.js";
 
 let width, height;
 let objMesh;
@@ -563,7 +565,6 @@ const main = async () => {
             }
         })
     );
-    captureScene.add(objMesh);
     
     const images = {
         [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
@@ -573,54 +574,54 @@ const main = async () => {
         [CubeMapAxis.PositiveZ]: "./images/dir-z-plus.png",
         [CubeMapAxis.NegativeZ]: "./images/dir-z-minus.png",
     };
-   
-    let cubeMap;
-    const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
-    await Promise.all(Object.keys(images).map(async(key) => {
-            const img = await loadImg(images[key]);
-            return { key, img };
-        }))
-        .then(result => {
-            const data = {};
-            result.forEach(({ key, img }) => data[key] = img);
-            cubeMap = new CubeMap({ gpu, images: data });
-        });
+  
+    // const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
     
-    skyboxMesh = new Mesh(
-        new Geometry({
-            gpu,
-            attributes: {
-                position: {
-                    data: skyboxObjData.positions,
-                    size: 3
-                },
-                uv: {
-                    data: skyboxObjData.uvs,
-                    size: 2,
-                },
-                normal: {
-                    data: skyboxObjData.normals,
-                    size: 3
-                },
-            },
-            indices: skyboxObjData.indices,
-            drawCount: skyboxObjData.indices.length
-        }),
-        new Material({
-            gpu,
-            vertexShader: skyboxVertexShader,
-            fragmentShader: skyboxFragmentShader,
-            primitiveType: PrimitiveTypes.Triangles,
-            uniforms: {
-                uCubeTexture: {
-                    type: UniformTypes.CubeMap,
-                    value: cubeMap
-                },
-            }
-        })
-    );
+    const cubeMap = await loadCubeMap({ gpu, images });
+    
+    // skyboxMesh = new Mesh(
+    //     new Geometry({
+    //         gpu,
+    //         attributes: {
+    //             position: {
+    //                 data: skyboxObjData.positions,
+    //                 size: 3
+    //             },
+    //             uv: {
+    //                 data: skyboxObjData.uvs,
+    //                 size: 2,
+    //             },
+    //             normal: {
+    //                 data: skyboxObjData.normals,
+    //                 size: 3
+    //             },
+    //         },
+    //         indices: skyboxObjData.indices,
+    //         drawCount: skyboxObjData.indices.length
+    //     }),
+    //     new Material({
+    //         gpu,
+    //         vertexShader: skyboxVertexShader,
+    //         fragmentShader: skyboxFragmentShader,
+    //         primitiveType: PrimitiveTypes.Triangles,
+    //         uniforms: {
+    //             uCubeTexture: {
+    //                 type: UniformTypes.CubeMap,
+    //                 value: cubeMap
+    //             },
+    //         }
+    //     })
+    // );
+    
+    skyboxMesh = new Skybox({
+        gpu, cubeMap
+    });
+    
     captureScene.add(skyboxMesh);
+    captureScene.add(objMesh);
+    
     skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
+    
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     
     captureSceneCamera.postProcess.enabled = false;
