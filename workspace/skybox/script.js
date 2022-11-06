@@ -128,7 +128,7 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 200);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 100);
 captureScene.add(captureSceneCamera);
 
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
@@ -246,9 +246,6 @@ const main = async () => {
     
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
-    
-    skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
-    // skyboxMesh.transform.setScaling(new Vector3(30, 30, 30));
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     

@@ -78,12 +78,13 @@ export class Texture extends GLObject {
             // html image coord -> gl texture coord
             // (0, 0) - (1, 0)     (0, 1) - (1, 1)
             //   |         |         |         |
-            // (0, 0) - (1, 0)     (0, 0) - (1, 0)
+            // (0, 1) - (1, 1)     (0, 0) - (1, 0)
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         } else {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
         }
 
+        // TODO: あった方がよい？
         // unbind img
         // gl.bindTexture(gl.TEXTURE_2D, null);
     }

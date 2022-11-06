@@ -9,6 +9,8 @@ export class Camera extends Actor {
     renderTarget;
     clearColor; // TODO: color class
     #postProcess;
+    near;
+    far;
     
     get postProcess() {
         return this.#postProcess;

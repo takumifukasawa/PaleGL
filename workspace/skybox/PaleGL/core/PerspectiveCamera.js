@@ -4,8 +4,6 @@ import {Matrix4} from "../math/Matrix4.js";
 export class PerspectiveCamera extends Camera {
     fov;
     aspect;
-    near;
-    far;
     
     constructor(fov, aspect, near, far) {
         super();

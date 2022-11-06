@@ -142,7 +142,7 @@ export class Matrix4 {
     get position() {
         return new Vector3(this.m03, this.m13, this.m23);
     }
-
+    
     constructor(
         n00, n01, n02, n03,
         n10, n11, n12, n13,
@@ -184,6 +184,13 @@ export class Matrix4 {
             0, 0, 1, 0,
             0, 0, 0, 1,
         );
+    }
+    
+    setTranslation(v) {
+        this.m03 = v.x;
+        this.m13 = v.y;
+        this.m23 = v.z;
+        return this;
     }
     
     static translationMatrix(v) {

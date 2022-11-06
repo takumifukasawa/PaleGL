@@ -6,6 +6,8 @@ import {loadObj, parseObj} from "./../loaders/loadObj.js";
 import {Geometry} from "./../geometries/Geometry.js";
 import {CubeMap} from "./../core/CubeMap.js";
 import {BoxGeometry} from "../geometries/BoxGeometry.js";
+import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
+import {Matrix4} from "../math/Matrix4.js";
 
 let geometryObjText = `
 # Blender 3.3.1
@@ -5125,6 +5127,8 @@ f 6/12/8 2/6/2 4/10/5
 
 const skyboxVertexShader = `#version 300 es
 
+precision mediump float;
+
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
 layout (location = 2) in vec3 aNormal;
@@ -5133,6 +5137,7 @@ uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
+uniform mat4 uViewDirectionMatrix;
 
 out vec2 vUv;
 out vec3 vNormal;
@@ -5147,8 +5152,12 @@ void main() {
     vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
     vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
+    // default
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-    // gl_Position = vec4(aPosition, 1.);
+    // plane
+    // gl_Position = vec4(aPosition.xy, 1., 1.);
+    // gl_Position = uProjectionMatrix * uViewDirectionMatrix * vec4(aPosition, 1.);
+    // gl_Position = uProjectionMatrix * uViewDirectionMatrix * vec4(aPosition, 1.);
 }
 `;
 
@@ -5164,6 +5173,8 @@ in vec3 vLocalPosition;
 
 uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
+uniform mat4 uViewDirectionProjectionInverse;
+uniform mat4 uViewDirectionMatrix;
 
 out vec4 outColor;
 
@@ -5174,14 +5185,23 @@ mat2 rotate(float r) {
 }
 
 void main() {
+    // pattern_1: use normal
     vec3 N = normalize(vNormal);
-
     vec3 reflectDir = -N;
     reflectDir.x *= -1.;
     reflectDir.xz *= rotate(3.14);
     vec4 textureColor = texture(uCubeTexture, reflectDir);
-    
     outColor = textureColor;
+
+    // pattern_2
+    // vec4 cubeMapDir = uViewDirectionProjectionInverse * vec4(vLocalPosition, 1.);
+    // vec4 textureColor = texture(uCubeTexture, cubeMapDir.xyz / cubeMapDir.w);
+    // outColor = textureColor;
+    // outColor = vec4(vec3(step(0., (cubeMapDir.xyz / cubeMapDir.w).x)), 1.);
+    
+    // vec4 cubeMapDir = uViewDirectionMatrix * vec4(vLocalPosition, 1.);
+    // vec4 textureColor = texture(uCubeTexture, cubeMapDir.xyz / cubeMapDir.w);
+    // outColor = textureColor;
 }
 `;
 
@@ -5207,6 +5227,7 @@ export class Skybox extends Mesh {
             indices: skyboxObjData.indices,
             drawCount: skyboxObjData.indices.length
         });
+        // const geometry = new PlaneGeometry({ gpu });
         
         const material = new Material({
             gpu,
@@ -5220,6 +5241,14 @@ export class Skybox extends Mesh {
                     type: UniformTypes.CubeMap,
                     value: cubeMap
                 },
+                uViewDirectionProjectionInverse: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity(),
+                },
+                uViewDirectionMatrix: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity(),
+                }
             }
         });
         

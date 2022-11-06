@@ -1,5 +1,6 @@
 ﻿import {ActorTypes, BlendTypes, UniformTypes} from "./../constants.js";
 import {Vector3} from "../math/Vector3.js";
+import {Matrix4} from "../math/Matrix4.js";
 
 export class ForwardRenderer {
     #gpu;
@@ -60,12 +61,9 @@ export class ForwardRenderer {
             camera.clearColor.z,
             camera.clearColor.w
         );
-
-        // update all actors matrix
-        // TODO: scene 側でやった方がよい？
-        scene.traverse((actor) => actor.updateTransform());
         
         const meshActorsEachQueue = {
+            skybox: [], // maybe only one
             opaque: [],
             transparent: [],
         };
@@ -74,6 +72,9 @@ export class ForwardRenderer {
         scene.traverse((actor) => {
             switch(actor.type) {
                 case ActorTypes.Skybox:
+                    meshActorsEachQueue.skybox.push(actor);
+                    // actor.transform.parent = camera.transform;
+                    break;
                 case ActorTypes.Mesh:
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:
@@ -92,6 +93,10 @@ export class ForwardRenderer {
                     break;
             }
         });
+
+        // update all actors matrix
+        // TODO: scene 側でやった方がよい？
+        scene.traverse((actor) => actor.updateTransform());
         
         // TODO: depth sort 
 
@@ -100,28 +105,43 @@ export class ForwardRenderer {
         const sortedMeshActors = Object.keys(meshActorsEachQueue).map(key => (meshActorsEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
 
         // draw 
-        sortedMeshActors.forEach(mesh => {
+        sortedMeshActors.forEach(meshActor => {
+            switch(meshActor.type) {
+                case ActorTypes.Skybox:
+                    meshActor.transform.setTranslation(camera.transform.position);
+                    meshActor.updateTransform();
+                    // const viewDirectionMatrix = camera.transform.worldMatrix.clone().invert();
+                    const viewDirectionMatrix = camera.viewMatrix.clone();
+                    // skyboxMesh.transform.setScaling(new Vector3(5, 5, 5));
+                    
+                    viewDirectionMatrix.setTranslation(new Vector3(camera.far * 2, camera.far * 2, camera.far * 2));
+                    const viewDirectionProjectionInverseMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix.clone(), viewDirectionMatrix.clone()).invert();
+                    // meshActor.material.uniforms.uViewDirectionProjectionInverse.value = viewDirectionProjectionInverseMatrix;
+                    // meshActor.material.uniforms.uViewDirectionMatrix.value = viewDirectionMatrix;
+                    break;
+            }
+            
             // TODO: material 側でやった方がよい？
-            if (mesh.material.uniforms.uWorldMatrix) {
-                mesh.material.uniforms.uWorldMatrix.value = mesh.transform.worldMatrix;
+            if (meshActor.material.uniforms.uWorldMatrix) {
+                meshActor.material.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
             }
-            if (mesh.material.uniforms.uViewMatrix) {
-                mesh.material.uniforms.uViewMatrix.value = camera.viewMatrix;
+            if (meshActor.material.uniforms.uViewMatrix) {
+                meshActor.material.uniforms.uViewMatrix.value = camera.viewMatrix;
             }
-            if (mesh.material.uniforms.uProjectionMatrix) {
-                mesh.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+            if (meshActor.material.uniforms.uProjectionMatrix) {
+                meshActor.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
-            if (mesh.material.uniforms.uNormalMatrix) {
-                mesh.material.uniforms.uNormalMatrix.value = mesh.transform.worldMatrix.clone().invert().transpose();
+            if (meshActor.material.uniforms.uNormalMatrix) {
+                meshActor.material.uniforms.uNormalMatrix.value = meshActor.transform.worldMatrix.clone().invert().transpose();
             }
-            if(mesh.material.uniforms.uViewPosition) {
-                mesh.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
+            if(meshActor.material.uniforms.uViewPosition) {
+                meshActor.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
             }
 
             // TODO: light actor の中で lightの種類別に処理を分ける
             lightActors.forEach(light => {
-                if (mesh.material.uniforms.uDirectionalLight) {
-                    mesh.material.uniforms.uDirectionalLight = {
+                if (meshActor.material.uniforms.uDirectionalLight) {
+                    meshActor.material.uniforms.uDirectionalLight = {
                         type: UniformTypes.Struct,
                         value: {
                             direction: {
@@ -141,7 +161,7 @@ export class ForwardRenderer {
                 }
             });
 
-            this.renderMesh(mesh);
+            this.renderMesh(meshActor);
         });
 
         if (camera.enabledPostProcess) {

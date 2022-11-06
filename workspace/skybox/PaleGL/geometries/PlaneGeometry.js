@@ -32,15 +32,15 @@ export class PlaneGeometry extends Geometry {
                     ],
                     size: 2
                 },
-                color: {
+                normal: {
                     data: [
-                        1, 0, 0,
-                        0, 1, 0,
                         0, 0, 1,
-                        1, 1, 0
+                        0, 0, 1,
+                        0, 0, 1,
+                        0, 0, 1,
                     ],
                     size: 3
-                }
+                },
             },
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
