@@ -186,10 +186,8 @@ const tick = (time) => {
     captureSceneCamera.transform.position = cameraPosition;
 
     if(floorPlaneMesh) {
-        floorPlaneMesh.transform.setRotationY(time);
         floorPlaneMesh.transform.lookAt(cameraPosition);
     }
-    
     
     renderer.render(captureScene, captureSceneCamera);
 
