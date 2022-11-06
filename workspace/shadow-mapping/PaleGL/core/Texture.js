@@ -73,7 +73,6 @@ export class Texture extends GLObject {
             // (0, 1) - (1, 1)     (0, 0) - (1, 0)
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         } else {
-            console.log(this.#img, !!this.#img)
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
         }
 
