@@ -86,7 +86,7 @@ export class Skybox extends Mesh {
     }
 
     async load({ gpu }) {
-        const skyboxObjData = await loadObj("./models/skybox-32-32.obj");
+        const skyboxObjData = await loadObj("./models/skybox-cube.obj");
         this.geometry = new Geometry({
             gpu,
             attributes: {
