@@ -1,5 +1,5 @@
 ﻿import {Shader} from "./../core/Shader.js";
-import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues} from "./../constants.js";
+import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 
@@ -9,6 +9,10 @@ export class Material {
     blendType;
     renderQueue;
     uniforms = {};
+    depthTest;
+    depthWrite;
+    culling;
+    faceSide;
 
     static UniformTypes = {
         Float: "Float",
@@ -21,6 +25,9 @@ export class Material {
         vertexShader,
         fragmentShader,
         primitiveType,
+        depthTest = null,
+        depthWrite = null,
+        faceSide = FaceSide.Front,
         blendType,
         renderQueue,
         uniforms = {}
@@ -28,6 +35,11 @@ export class Material {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
+        
+        this.depthTest = depthTest !== null ? depthTest : true;
+        this.depthWrite = depthWrite;
+        
+        this.faceSide = faceSide;
 
         if(!!renderQueue) {
             this.renderQueue = renderQueue;

@@ -229,7 +229,6 @@ const main = async () => {
             }
         })
     );
-    captureScene.add(objMesh);
     
     const images = {
         [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
@@ -242,11 +241,15 @@ const main = async () => {
     
     const cubeMap = await loadCubeMap({ gpu, images });
     skyboxMesh = new Skybox({ gpu, cubeMap });
-    captureScene.add(skyboxMesh);
-    skyboxMesh.transform.setScaling(new Vector3(100, 100, 100));
-    
+    skyboxMesh.transform.setScaling(new Vector3(3, 3, 3));
+   
+    objMesh.transform.setTranslation(new Vector3(5, 0, 0));
+
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
-    
+
+    captureScene.add(objMesh);
+    captureScene.add(skyboxMesh);
+
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();

@@ -1,4 +1,4 @@
-﻿import {BlendTypes, PrimitiveTypes, UniformTypes} from "./../constants.js";
+﻿import {BlendTypes, FaceSide, PrimitiveTypes, UniformTypes} from "./../constants.js";
 import {Texture} from "./Texture.js";
 
 const createWhite1x1 = () => {
@@ -50,6 +50,9 @@ export class GPU {
 
     clear(r, g, b, a) {
         const gl = this.gl;
+        // TODO: mask設定は外側からやった方がよい気がする
+        gl.depthMask(true);
+        gl.colorMask(true, true, true, true);
         gl.clearColor(r, g, b, a);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
@@ -67,19 +70,43 @@ export class GPU {
                 throw "invalid primitive type";
         }
     }
-    
    
-    draw(drawCount, primitiveType, blendType, startOffset = 0) {
+    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
        
         // culling
         // TODO: cull type
-        gl.enable(gl.CULL_FACE);
+        switch(faceSide) {
+            case FaceSide.Front:
+                gl.enable(gl.CULL_FACE);
+                gl.cullFace(gl.BACK);
+                break;
+            case FaceSide.Back:
+                gl.enable(gl.CULL_FACE);
+                gl.cullFace(gl.FRONT);
+                break;
+            case FaceSide.Double:
+                gl.disable(gl.CULL_FACE);
+                break;
+            default:
+                throw "invalid face side";
+        }
 
         // depth test
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
+        // TODO: fix depth test
+        if(depthTest) {
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.ALWAYS); // TODO: set by arg
+        } else {
+            gl.disable(gl.DEPTH_TEST);
+        }
+        
+        // depth write
+        gl.depthMask(depthWrite);
+        // for debug
+        // console.log(gl.getParameter(gl.DEPTH_WRITEMASK));
+        
      
         // TODO: renderer側でやるべき？
         // blend
@@ -88,18 +115,16 @@ export class GPU {
         // - dest: drawn 
         switch(blendType) {
             case BlendTypes.Opaque:
-                gl.depthMask(true);
                 gl.disable(gl.BLEND);
                 // for enabled blend
+                // gl.enable(gl.BLEND);
                 // gl.blendFunc(gl.ONE, gl.ZERO);
                 break;
             case BlendTypes.Transparent:
-                gl.depthMask(false);
                 gl.enable(gl.BLEND);
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
                 break;
             case BlendTypes.Additive:
-                gl.depthMask(false);
                 gl.enable(gl.BLEND);
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                 break;

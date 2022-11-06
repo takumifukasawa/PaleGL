@@ -64,7 +64,7 @@ export class ForwardRenderer {
         // update all actors matrix
         // TODO: scene 側でやった方がよい？
         scene.traverse((actor) => actor.updateTransform());
-
+        
         const meshActorsEachQueue = {
             opaque: [],
             transparent: [],
@@ -73,6 +73,7 @@ export class ForwardRenderer {
 
         scene.traverse((actor) => {
             switch(actor.type) {
+                case ActorTypes.Skybox:
                 case ActorTypes.Mesh:
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:
@@ -158,11 +159,36 @@ export class ForwardRenderer {
         this.#gpu.setShader(mesh.material.shader);
         // uniforms
         this.#gpu.setUniforms(mesh.material.uniforms);
+      
+        // setup depth write (depth mask)
+        let depthWrite;
+        if(mesh.material.depthWrite !== null) {
+            depthWrite = mesh.material.depthWrite;
+        } else {
+            switch(mesh.material.blendType) {
+                case BlendTypes.Opaque:
+                    depthWrite = true;
+                    break;
+                case BlendTypes.Transparent:
+                case BlendTypes.Additive:
+                    depthWrite = false;
+                    break;
+                default:
+                    throw "invalid depth write";
+            }
+        }
+        
+        // setup depth test
+        const depthTest = mesh.material.depthTest;
+        
         // draw
         this.#gpu.draw(
             mesh.geometry.drawCount,
             mesh.material.primitiveType,
-            mesh.material.blendType
+            depthTest,
+            depthWrite,
+            mesh.material.blendType,
+            mesh.material.faceSide,
         );
     }
 }

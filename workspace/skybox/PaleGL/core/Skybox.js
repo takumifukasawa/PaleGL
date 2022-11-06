@@ -1,5 +1,5 @@
 import {Mesh} from "./../core/Mesh.js";
-import {UniformTypes,PrimitiveTypes} from "./../constants.js";
+import {UniformTypes, PrimitiveTypes, ActorTypes} from "./../constants.js";
 import {Material} from "./../materials/Material.js";
 import {loadImg} from "./../loaders/loadImg.js";
 import {loadObj, parseObj} from "./../loaders/loadObj.js";
@@ -80,6 +80,7 @@ void main() {
     vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    // gl_Position = vec4(aPosition, 1.);
 }
 `;
 
@@ -144,6 +145,8 @@ export class Skybox extends Mesh {
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
+            depthTest: false,
+            depthWrite: false,
             uniforms: {
                 uCubeTexture: {
                     type: UniformTypes.CubeMap,
@@ -151,7 +154,7 @@ export class Skybox extends Mesh {
                 },
             }
         });
-
-        super(geometry, material);
+        
+        super(geometry, material, ActorTypes.Skybox);
     }
 }

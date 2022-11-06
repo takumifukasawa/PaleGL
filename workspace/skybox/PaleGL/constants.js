@@ -48,6 +48,7 @@ export const ActorTypes = {
     Null: "Null",
     Mesh: "Mesh",
     Light: "Light",
+    Skybox: "Skybox"
 };
 
 export const CubeMapAxis = {
@@ -57,4 +58,16 @@ export const CubeMapAxis = {
     NegativeY: "NegativeY",
     PositiveZ: "PositiveZ",
     NegativeZ: "NegativeZ",
-}
+};
+
+// export const CameraClearType = {
+//     Skybox: "Skybox",
+//     Color: "Color",
+//     // TODO: type for NONE
+// };
+
+export const FaceSide = {
+    Front: "Front",
+    Back: "Back",
+    Double: "Double"
+};
