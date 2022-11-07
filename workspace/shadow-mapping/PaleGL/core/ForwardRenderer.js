@@ -99,6 +99,8 @@ export class ForwardRenderer {
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         scene.traverse((actor) => actor.updateTransform());
+
+        scene.traverse((actor) => actor.afterUpdatedTransform());
         
         // TODO: depth sort 
 

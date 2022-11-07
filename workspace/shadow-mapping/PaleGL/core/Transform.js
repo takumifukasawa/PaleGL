@@ -12,31 +12,44 @@ export class Transform {
     position = Vector3.zero();
     rotation = Vector3.zero(); // degree vector
     scale = Vector3.one();
-    lookAtTarget = null; // v
-    
+    lookAtTarget = null; // world v
+
     get childCount() {
         return this.children.length;
     }
-    
+
     get hasChild() {
         return this.childCount > 0;
     }
-    
+
     get worldMatrix() {
         return this.#worldMatrix;
     }
-    
+
     get localMatrix() {
         return this.#localMatrix;
     }
-    
+
+    get localPosition() {
+        return this.position.clone();
+    }
+
+    get worldPosition() {
+        return this.#worldMatrix.position;
+    }
+
+    get worldForward() {
+        return new Vector3(this.#worldMatrix.m02, this.#worldMatrix.m12, this.#worldMatrix.m22).normalize();
+    }
+
     addChild(child) {
         this.children.push(child);
     }
-    
+
+    // TODO: 引数でworldMatrixとdirty_flagを渡すべきな気がする
     updateMatrix() {
         // TODO: lookatとの併用これで合ってる？
-        if(this.lookAtTarget) {
+        if (this.lookAtTarget) {
             // TODO:
             // - pass up vector
             const lookAtMatrix = this.actor.type === ActorTypes.Camera
@@ -63,11 +76,11 @@ export class Transform {
     setScaling(s) {
         this.scale = s;
     }
-    
+
     setRotationX(degree) {
         this.rotation.x = degree;
     }
-    
+
     setRotationY(degree) {
         this.rotation.y = degree;
     }
@@ -79,11 +92,11 @@ export class Transform {
     setTranslation(v) {
         this.position = v;
     }
-    
+
     lookAt(lookAtTarget) {
         this.lookAtTarget = lookAtTarget;
     }
-    
+
     // lookAt(center, up = new Vector3(0, 1, 0)) {
     //     console.log(this.#localMatrix.clone())
     //     this.#localMatrix.lookAt(center, up);

@@ -18,4 +18,7 @@ export class Actor {
     updateTransform() {
         this.transform.updateMatrix();
     }
+    
+    afterUpdatedTransform() {
+    }
 }

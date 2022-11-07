@@ -3,6 +3,7 @@ import {Matrix4} from "../math/Matrix4.js";
 import {Vector4} from "../math/Vector4.js";
 import {RenderTarget} from "./RenderTarget.js";
 import {ActorTypes} from "../constants.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity();
@@ -12,18 +13,23 @@ export class Camera extends Actor {
     #postProcess;
     near;
     far;
-    
+
+    // TODO: 本当はtransformから取得したいが
+    get cameraForward() {
+        return new Vector3(this.viewMatrix.m20, this.viewMatrix.m21, this.viewMatrix.m22).negate().normalize();
+    }
+
     get postProcess() {
         return this.#postProcess;
     }
-    
+
     get enabledPostProcess() {
-        if(!this.postProcess) {
+        if (!this.postProcess) {
             return false;
         }
         return this.postProcess.enabled;
     }
-    
+
     // get postProcessRenderTarget() {
     //     if(!this.postProcess) {
     //         return null;
@@ -32,42 +38,47 @@ export class Camera extends Actor {
     // }
 
     get renderTarget() {
-        if(this.renderTarget) {
+        if (this.renderTarget) {
             return this.renderTarget;
         }
         return null;
     }
-    
-    constructor({ clearColor, postProcess } = {}) {
+
+    constructor({clearColor, postProcess} = {}) {
         super(ActorTypes.Camera);
         this.clearColor = clearColor || new Vector4(0, 0, 0, 1);
         this.#postProcess = postProcess;
     }
-    
+
     setSize(width, height) {
-        if(!this.#postProcess) {
+        if (!this.#postProcess) {
             return;
         }
-        if(this.renderTarget) {
+        if (this.renderTarget) {
             this.#postProcess.setSize(this.renderTarget.width, this.renderTarget.height);
         } else {
             this.#postProcess.setSize(width, height);
         }
     }
-    
+
     setPostProcess(postProcess) {
         this.#postProcess = postProcess;
     }
-    
+
     setClearColor(clearColor) {
         this.clearColor = clearColor;
     }
-    
+
     updateTransform() {
         super.updateTransform();
+        this.viewMatrix = this.transform.worldMatrix.clone().invert();
     }
-    
+
     setRenderTarget(renderTarget) {
         this.renderTarget = renderTarget;
+    }
+
+    #updateProjectionMatrix() {
+        throw "should implementation";
     }
 }

@@ -22,6 +22,7 @@ import {Color} from "./PaleGL/core/Color.js";
 import {CubeMap} from "./PaleGL/core/CubeMap.js";
 import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
 import {Skybox} from "./PaleGL/core/Skybox.js";
+import {ArrowHelper} from "./PaleGL/core/ArrowHelper.js";
 
 let width, height;
 let objMesh;
@@ -135,6 +136,14 @@ captureScene.add(captureSceneCamera);
 captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
+const directionalLight = new DirectionalLight();
+captureScene.add(directionalLight);
+directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
+directionalLight.transform.lookAt(new Vector3(0, 0, 0));
+
+const directionalForwardArrow = new ArrowHelper({ gpu });
+directionalLight.addChild(directionalForwardArrow);
+
 const postProcess = new PostProcess({gpu, renderer});
 postProcess.addPass(new FragmentPass({
     gpu, fragmentShader: `#version 300 es
@@ -190,6 +199,9 @@ const tick = (time) => {
     // }
     
     renderer.render(captureScene, captureSceneCamera);
+    
+    // captureSceneCamera.transform.worldForward.log();
+    // captureSceneCamera.cameraForward.log()
 
     // loop
 
