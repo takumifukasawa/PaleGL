@@ -140,6 +140,7 @@ directionalLight.transform.lookAt(new Vector3(0, 0, 0));
 const directionalForwardArrow = new ArrowHelper({ gpu });
 // directionalLight.addChild(directionalForwardArrow);
 directionalLight.shadowCamera.addChild(directionalForwardArrow);
+directionalLight.castShadow = true;
 
 const postProcess = new PostProcess({gpu, renderer});
 postProcess.addPass(new FragmentPass({

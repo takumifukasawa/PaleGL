@@ -48,20 +48,7 @@ export class ForwardRenderer {
     }
 
     render(scene, camera) {
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget);
-        } else {
-            this.setRenderTarget(camera.renderTarget);
-        }
-
-        // TODO: refactor
-        this.clear(
-            camera.clearColor.x,
-            camera.clearColor.y,
-            camera.clearColor.z,
-            camera.clearColor.w
-        );
-        
+       
         const meshActorsEachQueue = {
             skybox: [], // maybe only one
             opaque: [],
@@ -110,8 +97,66 @@ export class ForwardRenderer {
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
         const sortedMeshActors = Object.keys(meshActorsEachQueue).map(key => (meshActorsEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        
+        // ------------------------------------------------------------------------------
+        // shadow pass
+        // ------------------------------------------------------------------------------
 
-        // draw 
+        lightActors.forEach(lightActor => {
+            if(!lightActor.castShadow) {
+                return;
+            }
+            this.setRenderTarget(lightActor.shadowCamera.renderTarget);
+            this.clear(0, 0, 0, 1);
+            
+        });
+
+        // ------------------------------------------------------------------------------
+        // scene pass
+        // ------------------------------------------------------------------------------
+        
+        if (camera.enabledPostProcess) {
+            this.setRenderTarget(camera.postProcess.renderTarget);
+        } else {
+            this.setRenderTarget(camera.renderTarget);
+            sortedMeshActors.forEach(meshActor => {
+                // skybox は shadowmapに描画しない
+                switch(meshActor.type) {
+                    case ActorTypes.Skybox:
+                        return;
+                        break;
+                }
+                
+                // TODO: materialはdepth用に置き換え
+                
+                // TODO: material 側でやった方がよい？
+                if (meshActor.material.uniforms.uWorldMatrix) {
+                    meshActor.material.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
+                }
+                if (meshActor.material.uniforms.uViewMatrix) {
+                    meshActor.material.uniforms.uViewMatrix.value = camera.viewMatrix;
+                }
+                if (meshActor.material.uniforms.uProjectionMatrix) {
+                    meshActor.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+                }
+                if(meshActor.material.uniforms.uViewPosition) {
+                    meshActor.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
+                }
+
+                this.renderMesh(meshActor.geometry, meshActor.material);
+            });
+           
+            
+        }
+
+        // TODO: refactor
+        this.clear(
+            camera.clearColor.x,
+            camera.clearColor.y,
+            camera.clearColor.z,
+            camera.clearColor.w
+        );
+        
         sortedMeshActors.forEach(meshActor => {
             switch(meshActor.type) {
                 case ActorTypes.Skybox:
@@ -160,7 +205,7 @@ export class ForwardRenderer {
                 }
             });
 
-            this.renderMesh(meshActor);
+            this.renderMesh(meshActor.geometry, meshActor.material);
         });
 
         if (camera.enabledPostProcess) {
@@ -168,25 +213,25 @@ export class ForwardRenderer {
         }
     }
 
-    renderMesh(mesh) {
-        mesh.geometry.update();
+    renderMesh(geometry, material) {
+        geometry.update();
 
         // vertex
-        this.#gpu.setVertexArrayObject(mesh.geometry.vertexArrayObject);
-        if (mesh.geometry.indexBufferObject) {
-            this.#gpu.setIndexBufferObject(mesh.geometry.indexBufferObject);
+        this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
+        if (geometry.indexBufferObject) {
+            this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
         }
         // material
-        this.#gpu.setShader(mesh.material.shader);
+        this.#gpu.setShader(material.shader);
         // uniforms
-        this.#gpu.setUniforms(mesh.material.uniforms);
+        this.#gpu.setUniforms(material.uniforms);
       
         // setup depth write (depth mask)
         let depthWrite;
-        if(mesh.material.depthWrite !== null) {
-            depthWrite = mesh.material.depthWrite;
+        if(material.depthWrite !== null) {
+            depthWrite = material.depthWrite;
         } else {
-            switch(mesh.material.blendType) {
+            switch(material.blendType) {
                 case BlendTypes.Opaque:
                     depthWrite = true;
                     break;
@@ -200,16 +245,16 @@ export class ForwardRenderer {
         }
         
         // setup depth test
-        const depthTest = mesh.material.depthTest;
+        const depthTest = material.depthTest;
         
         // draw
         this.#gpu.draw(
-            mesh.geometry.drawCount,
-            mesh.material.primitiveType,
+            geometry.drawCount,
+            material.primitiveType,
             depthTest,
             depthWrite,
-            mesh.material.blendType,
-            mesh.material.faceSide,
+            material.blendType,
+            material.faceSide,
         );
     }
 }

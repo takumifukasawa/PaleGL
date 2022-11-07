@@ -68,7 +68,7 @@ export class RenderTarget {
                     0
                 );
                 break;
-             case RenderTargetTypes.RGBA:
+             case RenderTargetTypes.Depth:
                 // depth as texture
                 gl.framebufferTexture2D(
                     gl.FRAMEBUFFER,

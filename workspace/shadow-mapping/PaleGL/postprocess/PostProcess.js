@@ -44,7 +44,7 @@ export class PostProcess {
             );
             pass.mesh.updateTransform();
             pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-            renderer.renderMesh(pass.mesh);
+            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
             prevRenderTarget = pass.renderTarget;
         });
     }
