@@ -2,6 +2,7 @@
 import {VertexArrayObject} from "./../core/VertexArrayObject.js";
 import {IndexBufferObject} from "./../core/IndexBufferObject.js";
 
+// NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 export class Geometry {
     attributes;
     vertexCount;
@@ -10,25 +11,48 @@ export class Geometry {
     indices;
     drawCount;
 
-    constructor({gpu, attributes, indices, drawCount}) {
+    #gpu;
+
+    constructor({gpu, attributes, indices, drawCount, immediateCreate = true }) {
+        this.#gpu = gpu;
+
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
             const attribute = attributes[key];
             this.attributes[key] = new Attribute({
                 data: attribute.data,
-                location: attribute.location ?? i,
+                location: attribute.location || i,
                 size: attribute.size,
-                offset: attribute.offset
+                offset: attribute.offset,
+                usage: attribute.usage,
             });
         });
+        
+        this.drawCount = drawCount;
 
-        this.vertexArrayObject = new VertexArrayObject({gpu, attributes: this.attributes})
         if (indices) {
-            this.indexBufferObject = new IndexBufferObject({gpu, indices})
             this.indices = indices;
         }
 
-        this.drawCount = drawCount;
-        
+        if(immediateCreate) {
+            this.#createGeometry({ gpu })
+        }
+    }
+    
+    #createGeometry({ gpu }) {
+        this.vertexArrayObject = new VertexArrayObject({gpu, attributes: this.attributes})
+        if (this.indices) {
+            this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
+        }
+    }
+    
+    update() {
+        if(!this.vertexArrayObject) {
+            this.#createGeometry({ gpu: this.#gpu })
+        }
+    }
+
+    updateAttribute(key, data) {
+        this.vertexArrayObject.updateAttribute(key, data);
     }
 }

@@ -14,7 +14,10 @@ export class Actor {
         this.transform.addChild(child);
         child.transform.parent = this.transform;
     }
-    
+
+    update({ gpu }) {
+    }
+
     updateTransform() {
         this.transform.updateMatrix();
     }

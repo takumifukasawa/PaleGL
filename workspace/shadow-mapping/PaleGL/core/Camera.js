@@ -2,8 +2,11 @@
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector4} from "../math/Vector4.js";
 import {RenderTarget} from "./RenderTarget.js";
-import {ActorTypes} from "../constants.js";
+import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
+import {Material} from "../materials/Material.js";
+import {Geometry} from "../geometries/Geometry.js";
+import {Mesh} from "./Mesh.js";
 
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity();
@@ -13,6 +16,8 @@ export class Camera extends Actor {
     #postProcess;
     near;
     far;
+    visibleFrustum = false;
+    #visibleFrustumMesh;
 
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
@@ -72,6 +77,59 @@ export class Camera extends Actor {
 
     setClearColor(clearColor) {
         this.clearColor = clearColor;
+    }
+    
+    update({ gpu }) {
+        super.update({ gpu });
+        if(this.#visibleFrustumMesh) {
+            this.#visibleFrustumMesh.geometry.updateAttribute("position", [...[0,0,0], ...[Math.sin(performance.now() / 1000) * 5,5,0]]);
+        }
+        if(this.visibleFrustum && !this.#visibleFrustumMesh) {
+            this.#visibleFrustumMesh = new Mesh(
+                new Geometry({
+                    gpu,
+                    attributes: {
+                        position: {
+                            data: [
+                                ...[0, 0, 0],
+                                ...[0, 5, 0],
+                            ],
+                            size: 3,
+                            usageType: AttributeUsageType.DynamicDraw
+                        }
+                    },
+                    drawCount: 2
+                }),
+                new Material({
+                    gpu,
+                    vertexShader: `#version 300 es
+                    
+                    layout (location = 0) in vec3 aPosition;
+                   
+                    uniform mat4 uWorldMatrix;
+                    uniform mat4 uViewMatrix;
+                    uniform mat4 uProjectionMatrix;
+                    
+                    void main() {
+                        gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    }
+                    `,
+                    fragmentShader: `#version 300 es
+                   
+                    precision mediump float;
+                    
+                    out vec4 outColor;
+                    
+                    void main() {
+                        outColor = vec4(0, 1., 0, 1.);
+                    }
+                    `,
+                    primitiveType: PrimitiveTypes.Lines,
+                    blendType: BlendTypes.Transparent,
+                }),
+            );
+            this.addChild(this.#visibleFrustumMesh);
+        }
     }
 
     updateTransform() {

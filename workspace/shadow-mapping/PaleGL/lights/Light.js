@@ -11,7 +11,7 @@ export class Light extends Actor {
     constructor() {
         super(ActorTypes.Light);
     }
-    
+
     setShadowSize() {
         throw "should implementation";
     }

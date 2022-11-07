@@ -72,3 +72,8 @@ export const FaceSide = {
     Back: "Back",
     Double: "Double"
 };
+
+export const AttributeUsageType = {
+    StaticDraw: "StaticDraw",
+    DynamicDraw: "DynamicDraw"
+}

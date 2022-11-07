@@ -94,6 +94,9 @@ export class ForwardRenderer {
             }
         });
 
+        // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
+        scene.traverse((actor) => actor.update({ gpu: this.#gpu }));
+
         // update all actors matrix
         // TODO
         // - scene 側でやった方がよい？
@@ -166,6 +169,8 @@ export class ForwardRenderer {
     }
 
     renderMesh(mesh) {
+        mesh.geometry.update();
+
         // vertex
         this.#gpu.setVertexArrayObject(mesh.geometry.vertexArrayObject);
         if (mesh.geometry.indexBufferObject) {

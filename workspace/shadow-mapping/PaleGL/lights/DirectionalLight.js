@@ -10,6 +10,7 @@ export class DirectionalLight extends Light {
         this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 1);
         // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
         this.shadowCamera.transform.setRotationY(180);
+        this.shadowCamera.visibleFrustum = true;
         this.addChild(this.shadowCamera);
     }
   
