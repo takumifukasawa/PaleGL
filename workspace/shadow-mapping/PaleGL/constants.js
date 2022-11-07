@@ -87,3 +87,8 @@ export const AttributeUsageType = {
     StaticDraw: "StaticDraw",
     DynamicDraw: "DynamicDraw"
 }
+
+export const RenderTargetTypes = {
+    RGBA: "RGBA",
+    Depth: "Depth"
+}

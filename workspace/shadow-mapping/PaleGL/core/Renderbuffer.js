@@ -29,6 +29,9 @@ export class Renderbuffer extends GLObject {
             default:
                 throw "invalid render buffer type.";
         }
+        
+        // TODO: あったほうがいいけど、RenderTargetの時はない方が便利
+        // gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
     
     setSize(width, height) {
@@ -41,5 +44,7 @@ export class Renderbuffer extends GLObject {
                 gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
                 break;
         }
+        
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
 }

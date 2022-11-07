@@ -2,7 +2,7 @@
 import { Texture } from "./Texture.js";
 import {Framebuffer} from "./Framebuffer.js";
 import {Renderbuffer} from "./Renderbuffer.js";
-import {RenderbufferTypes} from "./../constants.js";
+import {RenderbufferTypes, RenderTargetTypes, TextureTypes} from "./../constants.js";
 
 export class RenderTarget {
     #texture;
@@ -19,7 +19,7 @@ export class RenderTarget {
         return this.#framebuffer;
     }
     
-    constructor({ gpu, textureFormat, width = 1, height = 1, useDepthBuffer }) {
+    constructor({ gpu, type = RenderTargetTypes.RGBA, width = 1, height = 1, useDepthBuffer = false }) {
         this.width = width;
         this.height = height;
         
@@ -36,21 +36,51 @@ export class RenderTarget {
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
         }
         
+        let textureType;
+        switch(type) {
+            case RenderTargetTypes.RGBA:
+                textureType = TextureTypes.RGBA;
+                break;
+            case RenderTargetTypes.Depth:
+                textureType = TextureTypes.Depth;
+                break;
+            default:
+                throw "invalid texture type";
+        }
+        
         this.#texture = new Texture({
             gpu,
             width: this.width,
             height: this.height,
             mipmap: false,
+            type: textureType
         });
-   
-        // color as texture
-        gl.framebufferTexture2D(
-            gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0,
-            gl.TEXTURE_2D,
-            this.#texture.glObject,
-            0
-        );
+       
+        // set texture to render buffer
+        switch(type) {
+            case RenderTargetTypes.RGBA:
+                // color as texture
+                gl.framebufferTexture2D(
+                    gl.FRAMEBUFFER,
+                    gl.COLOR_ATTACHMENT0,
+                    gl.TEXTURE_2D,
+                    this.#texture.glObject,
+                    0
+                );
+                break;
+             case RenderTargetTypes.RGBA:
+                // depth as texture
+                gl.framebufferTexture2D(
+                    gl.FRAMEBUFFER,
+                    gl.DEPTH_ATTACHMENT,
+                    gl.TEXTURE_2D,
+                    this.#texture.glObject,
+                    0
+                );
+                break;
+            default:
+                throw "invalid type";
+        }
        
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
