@@ -19,7 +19,7 @@ export class RenderTarget {
         return this.#framebuffer;
     }
     
-    constructor({ gpu, width = 1, height = 1, useDepthBuffer }) {
+    constructor({ gpu, textureFormat, width = 1, height = 1, useDepthBuffer }) {
         this.width = width;
         this.height = height;
         

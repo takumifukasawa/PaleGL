@@ -23,6 +23,11 @@ export const UniformTypes = {
     Color: "Color"
 };
 
+export const TextureTypes = {
+    RGBA: "RGBA",
+    Depth: "Depth",
+}
+
 export const TextureWrapTypes = {
     Repeat: "Repeat",
     ClampToEdge: "ClampToEdge",
@@ -77,6 +82,7 @@ export const FaceSide = {
     Double: "Double"
 };
 
+// TODO: rename Type"s"
 export const AttributeUsageType = {
     StaticDraw: "StaticDraw",
     DynamicDraw: "DynamicDraw"
