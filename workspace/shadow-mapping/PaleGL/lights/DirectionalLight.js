@@ -12,7 +12,7 @@ export class DirectionalLight extends Light {
         this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 1);
         // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
         this.shadowCamera.transform.setRotationY(180);
-        this.shadowCamera.visibleFrustum = true;
+        // this.shadowCamera.visibleFrustum = true;
         this.addChild(this.shadowCamera);
     }
   
@@ -31,8 +31,8 @@ export class DirectionalLight extends Light {
         // - cast shadow が有効な時だけ生成したい
         // - もしくは、外側からshadowmap渡してもよい
         if(this.castShadow && !this.shadowMap) {
-            this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
-            console.log(this.shadowMap)
+            // this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
+            this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.RGBA });
         }
     }
     

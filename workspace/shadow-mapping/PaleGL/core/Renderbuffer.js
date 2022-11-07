@@ -30,7 +30,7 @@ export class Renderbuffer extends GLObject {
                 throw "invalid render buffer type.";
         }
         
-        // TODO: あったほうがいいけど、RenderTargetの時はない方が便利
+        // TODO: あったほうがよい？
         // gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
     

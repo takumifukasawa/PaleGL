@@ -1,6 +1,7 @@
 ﻿import {ActorTypes, BlendTypes, UniformTypes} from "./../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {Material} from "../materials/Material.js";
 
 export class ForwardRenderer {
     #gpu;
@@ -9,11 +10,32 @@ export class ForwardRenderer {
     #renderTarget;
     #realWidth;
     #realHeight;
+    #shadowMaterial;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
+        
+        this.#shadowMaterial = new Material({
+            gpu,
+            vertexShader: `#version 300 es
+            layout (location = 0) in vec3 aPosition;
+            uniform mat4 uWorldMatrix;
+            uniform mat4 uViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            void main() {
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+            }
+            `,
+            fragmentShader: `#version 300 es
+            precision mediump float;
+            out vec4 outColor;
+            void main() {
+                outColor = vec4(1., 0., 0., 1.);
+            }
+            `
+        })
     }
 
     setSize(width, height) {
@@ -88,6 +110,7 @@ export class ForwardRenderer {
         // TODO
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+        // - やっぱりcomponentシステムにした方が良い気もする
         scene.traverse((actor) => actor.updateTransform());
 
         scene.traverse((actor) => actor.afterUpdatedTransform());
@@ -109,17 +132,7 @@ export class ForwardRenderer {
             this.setRenderTarget(lightActor.shadowCamera.renderTarget);
             this.clear(0, 0, 0, 1);
             
-        });
-
-        // ------------------------------------------------------------------------------
-        // scene pass
-        // ------------------------------------------------------------------------------
-        
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget);
-        } else {
-            this.setRenderTarget(camera.renderTarget);
-            sortedMeshActors.forEach(meshActor => {
+            meshActorsEachQueue.opaque.forEach(meshActor => {
                 // skybox は shadowmapに描画しない
                 switch(meshActor.type) {
                     case ActorTypes.Skybox:
@@ -142,11 +155,20 @@ export class ForwardRenderer {
                 if(meshActor.material.uniforms.uViewPosition) {
                     meshActor.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
                 }
-
-                this.renderMesh(meshActor.geometry, meshActor.material);
+                
+                this.renderMesh(meshActor.geometry, this.#shadowMaterial);
             });
-           
-            
+        });
+
+        // ------------------------------------------------------------------------------
+        // scene pass
+        // ------------------------------------------------------------------------------
+       
+       console.log(camera.enabledPostProcess, camera.renderTarget) 
+        if (camera.enabledPostProcess) {
+            this.setRenderTarget(camera.postProcess.renderTarget);
+        } else {
+            this.setRenderTarget(camera.renderTarget);
         }
 
         // TODO: refactor

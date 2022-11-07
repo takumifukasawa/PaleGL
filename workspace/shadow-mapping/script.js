@@ -23,6 +23,8 @@ import {CubeMap} from "./PaleGL/core/CubeMap.js";
 import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
 import {Skybox} from "./PaleGL/core/Skybox.js";
 import {ArrowHelper} from "./PaleGL/core/ArrowHelper.js";
+import {OrthographicCamera} from "./PaleGL/core/OrthographicCamera.js";
+import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 
 let width, height;
 let objMesh;
@@ -133,14 +135,61 @@ captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
 const directionalLight = new DirectionalLight();
-captureScene.add(directionalLight);
+// TODO: needs
+// captureScene.add(directionalLight);
 directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
+// directionalLight.shadowCamera.visibleFrustum = true;
 directionalLight.transform.lookAt(new Vector3(0, 0, 0));
 
 const directionalForwardArrow = new ArrowHelper({ gpu });
 // directionalLight.addChild(directionalForwardArrow);
 directionalLight.shadowCamera.addChild(directionalForwardArrow);
 directionalLight.castShadow = true;
+
+const shadowMapPlane = new Mesh(
+    new PlaneGeometry({ gpu }),
+    new Material({
+        gpu,
+        vertexShader: `#version 300 es
+        layout (location = 0) in vec3 aPosition;
+        layout (location = 1) in vec2 aUv;
+        uniform mat4 uWorldMatrix;
+        uniform mat4 uViewMatrix;
+        uniform mat4 uProjectionMatrix;
+        out vec2 vUv;
+        void main() {
+            vUv = aUv;
+            gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+        }
+        `,
+        fragmentShader: `#version 300 es
+        precision mediump float;
+        in vec2 vUv;
+        uniform sampler2D uShadowMap;
+        out vec4 outColor;
+        void main() {
+            outColor = vec4(vUv, 1., 1.);
+            outColor = texture(uShadowMap, vUv);
+        }
+        `,
+        uniforms: {
+            uShadowMap: {
+                type: UniformTypes.Texture,
+                value: null
+            }
+        }
+    })
+);
+shadowMapPlane.transform.setTranslation(new Vector3(0, 8, 0));
+shadowMapPlane.transform.setScaling(Vector3.fill(2));
+captureScene.add(shadowMapPlane);
+
+const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
+testOrtho.visibleFrustum = true;
+testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
+testOrtho.transform.lookAt(new Vector3(0, 0, 0));
+testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: true }));
+captureScene.add(testOrtho);
 
 const postProcess = new PostProcess({gpu, renderer});
 postProcess.addPass(new FragmentPass({
@@ -173,6 +222,7 @@ const onWindowResize = () => {
     height = wrapperElement.offsetHeight;
 
     captureSceneCamera.setSize(width, height);
+    testOrtho.setSize(width, height);
 
     renderer.setSize(width, height);
     postProcess.setSize(width, height);
@@ -195,8 +245,16 @@ const tick = (time) => {
     // if(floorPlaneMesh) {
     //     floorPlaneMesh.transform.lookAt(cameraPosition);
     // }
-    
+
+    if(directionalLight.shadowMap) {
+        // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
+    }
+    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.texture;
+  
+    renderer.render(captureScene, testOrtho);
     renderer.render(captureScene, captureSceneCamera);
+    
+    return;
     
     // captureSceneCamera.transform.worldForward.log()
     

@@ -24,6 +24,7 @@ export class Shader extends GLObject {
         // check shader info log
         const vsInfo = gl.getShaderInfoLog(vs);
         if(vsInfo.length > 0) {
+            console.error("[Shader] vertex shader has error")
             throw vsInfo;
         }
 
@@ -38,6 +39,7 @@ export class Shader extends GLObject {
         const fsInfo = gl.getShaderInfoLog(fs);
         // check shader info log
         if(fsInfo.length > 0) {
+            console.error("[Shader] fragment shader has error")
             throw fsInfo;
         }
         
