@@ -9,7 +9,7 @@ export class PostProcess {
     enabled = true;
     
     constructor({ gpu }) {
-        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepth: true });
+        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
     }

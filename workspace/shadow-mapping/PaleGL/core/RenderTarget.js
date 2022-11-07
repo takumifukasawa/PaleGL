@@ -19,7 +19,7 @@ export class RenderTarget {
         return this.#framebuffer;
     }
     
-    constructor({ gpu, width = 1, height = 1, useDepth }) {
+    constructor({ gpu, width = 1, height = 1, useDepthBuffer }) {
         this.width = width;
         this.height = height;
         
@@ -27,7 +27,7 @@ export class RenderTarget {
 
         this.#framebuffer = new Framebuffer({ gpu });
         
-        if(useDepth) {
+        if(useDepthBuffer) {
             this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width: 1, height: 1 });
         }
        
