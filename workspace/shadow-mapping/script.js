@@ -138,8 +138,8 @@ captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
-// directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
-// directionalLight.transform.lookAt(new Vector3(0, 0, 0));
+directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
+directionalLight.transform.lookAt(new Vector3(0, 0, 0));
 
 const directionalForwardArrow = new ArrowHelper({ gpu });
 // directionalLight.addChild(directionalForwardArrow);

@@ -2,7 +2,11 @@
 export const PrimitiveTypes = {
     Points: "Points",
     Lines: "Lines",
-    Triangles: "Triangles"
+    LineLoop: "LineLoop",
+    LineStrip: "LineStrip",
+    Triangles: "Triangles",
+    TriangleStrip: "TriangleStrip",
+    TriangleFan: "TriangleFan",
 };
 
 export const AttributeTypes = {

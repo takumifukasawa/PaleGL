@@ -26,9 +26,9 @@ export class DirectionalLight extends Light {
     
     afterUpdatedTransform() {
         super.afterUpdatedTransform();
+        // TODO: for debug shadow camera
         this.shadowCamera.near = 1;
-        this.shadowCamera.far = 10;
+        this.shadowCamera.far = 20;
         this.shadowCamera.setSize(1, 1, -5, 5, -5, 5);
-        const frustumWorldPositions = this.shadowCamera.getFrustumWorldPositions();
     }
 }

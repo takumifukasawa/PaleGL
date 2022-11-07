@@ -80,25 +80,38 @@ export class Camera extends Actor {
     }
     
     update({ gpu }) {
+        
         super.update({ gpu });
-        if(this.#visibleFrustumMesh) {
-            this.#visibleFrustumMesh.geometry.updateAttribute("position", [...[0,0,0], ...[Math.sin(performance.now() / 1000) * 5,5,0]]);
-        }
+        
         if(this.visibleFrustum && !this.#visibleFrustumMesh) {
             this.#visibleFrustumMesh = new Mesh(
                 new Geometry({
                     gpu,
                     attributes: {
                         position: {
-                            data: [
-                                ...[0, 0, 0],
-                                ...[0, 5, 0],
-                            ],
+                            data: new Array(3 * 8),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
                         }
                     },
-                    drawCount: 2
+                    drawCount: 2 * 12,
+                    indices: [
+                        // near clip
+                        0, 1,
+                        1, 3,
+                        3, 2,
+                        2, 0,
+                        // far clip
+                        4, 5,
+                        5, 7,
+                        7, 6,
+                        6, 4,
+                        // bridge
+                        0, 4,
+                        1, 5,
+                        2, 6,
+                        3, 7
+                    ]
                 }),
                 new Material({
                     gpu,
@@ -126,9 +139,26 @@ export class Camera extends Actor {
                     `,
                     primitiveType: PrimitiveTypes.Lines,
                     blendType: BlendTypes.Transparent,
+                    depthWrite: false
                 }),
             );
             this.addChild(this.#visibleFrustumMesh);
+        }
+        
+        if(this.#visibleFrustumMesh) {
+            const frustumPositions = this.getFrustumLocalPositions();
+            this.#visibleFrustumMesh.geometry.updateAttribute("position", [
+                // near clip
+                ...frustumPositions.nearLeftTop.elements,
+                ...frustumPositions.nearLeftBottom.elements,
+                ...frustumPositions.nearRightTop.elements,
+                ...frustumPositions.nearRightBottom.elements,
+                // far clip
+                ...frustumPositions.farLeftTop.elements,
+                ...frustumPositions.farLeftBottom.elements,
+                ...frustumPositions.farRightTop.elements,
+                ...frustumPositions.farRightBottom.elements,
+            ]);
         }
     }
 

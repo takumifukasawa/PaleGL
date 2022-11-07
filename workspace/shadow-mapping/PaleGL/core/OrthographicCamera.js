@@ -39,7 +39,7 @@ export class OrthographicCamera extends Camera {
         const halfHeight = (Math.abs(this.top) + Math.abs(this.right)) / 2;
 
         const nearClipCenter = localForward.clone().scale(this.near);
-        const farClipCenter = localForward.clone().scale(this.near + this.far);
+        const farClipCenter = localForward.clone().scale(this.far);
         
         const clipRightOffset = localRight.clone().scale(halfWidth);
         const clipUpOffset = localUp.clone().scale(halfHeight);
