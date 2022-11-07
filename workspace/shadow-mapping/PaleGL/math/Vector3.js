@@ -43,6 +43,13 @@
         return this;
     }
     
+    add(s) {
+        this.x += s;
+        this.y += s;
+        this.z += s;
+        return this;
+    }
+    
     negate() {
         this.x *= -1;
         this.y *= -1;
@@ -50,8 +57,30 @@
         return this;
     }
     
+    scale(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+        return this;
+    }
+    
     clone() {
         return new Vector3(this.x, this.y, this.z);
+    }
+    
+    multiplyMatrix4(m) {
+        const tmpX = this.x;
+        const tmpY = this.y;
+        const tmpZ = this.z;
+        const tmpW = 1;
+        const x = m.m00 * tmpX + m.m01 * tmpY + m.m02 * tmpZ * m.m03 * tmpW;
+        const y = m.m10 * tmpX + m.m11 * tmpY + m.m12 * tmpZ * m.m13 * tmpW;
+        const z = m.m20 * tmpX + m.m21 * tmpY + m.m22 * tmpZ * m.m23 * tmpW;
+        const w = m.m30 * tmpX + m.m31 * tmpY + m.m32 * tmpZ * m.m33 * tmpW;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
     }
     
     static zero() {
@@ -66,12 +95,26 @@
         return new Vector3(0, 1, 0);
     }
     
-    static addVectors(v1, v2) {
-        return new Vector3(
-            v1.x + v2.x,
-            v1.y + v2.y,
-            v1.z + v2.z
-        );
+    static back() {
+        return new Vector3(0, 0, -1);
+    }
+    
+    static forward() {
+        return new Vector3(0, 0, 1);
+    }
+    
+    static right() {
+        return new Vector3(1, 0, 0);
+    }
+    
+    static addVectors(...vectors) {
+        const v = Vector3.zero();
+        vectors.forEach(elem => {
+            v.x += elem.x;
+            v.y += elem.y;
+            v.z += elem.z;
+        });
+        return v;
     }
     
     static subVectors(v1, v2) {

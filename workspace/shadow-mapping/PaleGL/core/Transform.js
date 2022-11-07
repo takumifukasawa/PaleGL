@@ -37,6 +37,14 @@ export class Transform {
     get worldPosition() {
         return this.#worldMatrix.position;
     }
+    
+    get worldRight() {
+        return new Vector3(this.#worldMatrix.m00, this.#worldMatrix.m10, this.#worldMatrix.m20).normalize();
+    }
+
+    get worldUp() {
+        return new Vector3(this.#worldMatrix.m01, this.#worldMatrix.m11, this.#worldMatrix.m21).normalize();
+    }
 
     get worldForward() {
         return new Vector3(this.#worldMatrix.m02, this.#worldMatrix.m12, this.#worldMatrix.m22).normalize();

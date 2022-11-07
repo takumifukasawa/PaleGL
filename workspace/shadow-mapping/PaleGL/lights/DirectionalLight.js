@@ -7,7 +7,7 @@ export class DirectionalLight extends Light {
     constructor() {
         super();
 
-        this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 1, 2);
+        this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 1);
         // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
         this.shadowCamera.transform.setRotationY(180);
         this.addChild(this.shadowCamera);
@@ -25,5 +25,9 @@ export class DirectionalLight extends Light {
     
     afterUpdatedTransform() {
         super.afterUpdatedTransform();
+        this.shadowCamera.near = 1;
+        this.shadowCamera.far = 10;
+        this.shadowCamera.setSize(1, 1, -5, 5, -5, 5);
+        const frustumWorldPositions = this.shadowCamera.getFrustumWorldPositions();
     }
 }
