@@ -27,11 +27,7 @@ import {ArrowHelper} from "./PaleGL/core/ArrowHelper.js";
 let width, height;
 let objMesh;
 let floorPlaneMesh;
-const targetCameraPosition = {
-    x: 0,
-    y: 0,
-    z: 5,
-}
+const targetCameraPosition = new Vector3(0, 5, 10);
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -181,8 +177,8 @@ const onWindowResize = () => {
     postProcess.setSize(width, height);
 };
 
-captureSceneCamera.transform.position = new Vector3(0, 0, 5);
-captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
+captureSceneCamera.transform.position = targetCameraPosition.clone();
+captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
 const tick = (time) => {
     const cameraPosition = Vector3.addVectors(
@@ -322,10 +318,12 @@ const main = async () => {
     captureScene.add(objMesh);
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
+    objMesh.transform.setTranslation(new Vector3(0, 2, 0));
+    objMesh.transform.setScaling(new Vector3(2, 2, 2));
     
     floorPlaneMesh.transform.setScaling(Vector3.fill(20));
     floorPlaneMesh.transform.setRotationX(-90);
-    floorPlaneMesh.transform.setTranslation(new Vector3(0, -5, 0));
+    floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
     
     captureSceneCamera.postProcess.enabled = false;
 
