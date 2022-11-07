@@ -8,8 +8,8 @@ export class DirectionalLight extends Light {
         super();
 
         this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 1, 2);
-        this.shadowCamera.transform.lookAt(new Vector3(0, 0, 0));
-        // this.shadowCamera = new PerspectiveCamera(60, 1, 1, 2);
+        // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
+        this.shadowCamera.transform.setRotationY(180);
         this.addChild(this.shadowCamera);
     }
   
@@ -25,17 +25,5 @@ export class DirectionalLight extends Light {
     
     afterUpdatedTransform() {
         super.afterUpdatedTransform();
-        // this.shadowCamera.transform.setTranslation(new Vector3(0, 0, 0));
-        // this.shadowCamera.transform.lookAt(Vector3.addVectors(this.transform.worldPosition, this.transform.worldForward));
-        // this.shadowCamera.transform.lookAt(this.transform.worldForward);
-        // this.shadowCamera.updateTransform()
-        // console.log("========================")
-        // this.shadowCamera.transform.parent.worldMatrix.log()
-        // 合ってる
-        // this.transform.worldForward.log()
-        // 間違ってる
-        // this.shadowCamera.cameraForward.log();
-        // 合ってる
-        // this.shadowCamera.transform.worldForward.log();
     }
 }

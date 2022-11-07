@@ -14,8 +14,10 @@ export class Camera extends Actor {
     near;
     far;
 
-    // TODO: 本当はtransformから取得したいが
     get cameraForward() {
+        // 見た目のforwardと逆になる値で正しい
+        // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
+        // なぜなら、projection行列でzを反転させるため
         return new Vector3(this.viewMatrix.m20, this.viewMatrix.m21, this.viewMatrix.m22).negate().normalize();
     }
 

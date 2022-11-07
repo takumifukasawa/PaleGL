@@ -24,4 +24,9 @@ export class OrthographicCamera extends Camera {
     #updateProjectionMatrix() {
         this.projectionMatrix = Matrix4.getOrthographicMatrix(this.left, this.right, this.top, this.bottom, this.near, this.far);
     }
+    
+    updateTransform() {
+        super.updateTransform();
+        // this.transform.worldForward.log()
+    }
 }

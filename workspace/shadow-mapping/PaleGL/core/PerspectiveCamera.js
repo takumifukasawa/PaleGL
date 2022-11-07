@@ -23,4 +23,8 @@ export class PerspectiveCamera extends Camera {
     #updateProjectionMatrix() {
         this.projectionMatrix = Matrix4.getPerspectiveMatrix(this.fov * Math.PI / 180, this.aspect, this.near, this.far);
     }
+
+    afterUpdatedTransform() {
+        super.afterUpdatedTransform();
+    }
 }
