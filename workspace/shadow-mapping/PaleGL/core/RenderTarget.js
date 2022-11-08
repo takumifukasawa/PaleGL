@@ -82,7 +82,7 @@ export class RenderTarget {
             default:
                 throw "invalid type";
         }
-       
+        
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
         if(this.#depthRenderbuffer) {

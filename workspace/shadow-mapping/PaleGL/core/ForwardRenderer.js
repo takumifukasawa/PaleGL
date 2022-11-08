@@ -164,7 +164,6 @@ export class ForwardRenderer {
         // scene pass
         // ------------------------------------------------------------------------------
        
-       console.log(camera.enabledPostProcess, camera.renderTarget) 
         if (camera.enabledPostProcess) {
             this.setRenderTarget(camera.postProcess.renderTarget);
         } else {
@@ -233,6 +232,10 @@ export class ForwardRenderer {
         if (camera.enabledPostProcess) {
             camera.postProcess.render(this, camera);
         }
+        
+        console.log(this.#renderTarget)
+        
+        this.setRenderTarget(null);
     }
 
     renderMesh(geometry, material) {

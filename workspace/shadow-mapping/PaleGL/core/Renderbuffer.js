@@ -31,7 +31,7 @@ export class Renderbuffer extends GLObject {
         }
         
         // TODO: あったほうがよい？
-        // gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
     
     setSize(width, height) {

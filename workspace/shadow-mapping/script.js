@@ -232,7 +232,11 @@ const onWindowResize = () => {
 captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
+let i = 0;
+
 const tick = (time) => {
+    console.log("===========");
+    
     const cameraPosition = Vector3.addVectors(
         captureSceneCamera.transform.position,
         new Vector3(
@@ -250,12 +254,17 @@ const tick = (time) => {
     if(directionalLight.shadowMap) {
         // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
     }
-    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.texture;
   
     renderer.render(captureScene, testOrtho);
-    renderer.render(captureScene, captureSceneCamera);
     
-    return;
+    renderer.render(captureScene, captureSceneCamera);
+
+    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.texture;
+   
+    i++;
+    if(i >= 2) {
+        return;
+    }
     
     // captureSceneCamera.transform.worldForward.log()
     

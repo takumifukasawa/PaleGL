@@ -198,5 +198,9 @@ export class GPU {
         } else { // draw by array
             gl.drawArrays(glPrimitiveType, startOffset, drawCount);
         }
+       
+        // unbind when end render
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     }
 }
