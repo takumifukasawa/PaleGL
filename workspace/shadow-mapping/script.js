@@ -254,15 +254,15 @@ const tick = (time) => {
         // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
     }
     
-    console.log("======================")
+    // console.log("======================")
     
     renderer.render(captureScene, testOrtho);
+
+    testOrtho.renderTarget.swap();
 
     shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read;
 
     renderer.render(captureScene, captureSceneCamera);
-
-    testOrtho.renderTarget.swap();
    
     i++;
     if(i >= 2) {

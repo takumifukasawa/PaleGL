@@ -1,15 +1,15 @@
 
 import {RenderTarget} from "./RenderTarget.js";
 import {RenderTargetTypes} from "../constants.js";
+import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
-export class DoubleBuffer {
+export class DoubleBuffer extends  AbstractRenderTarget {
     #renderTargets = [];
     
     currentReadIndex = 0;
     
-    isSwappable = true;
-    
     constructor(renderTargetOptions) {
+        super({ isSwappable: true });
         for(let i = 0; i < 2; i++) {
             this.#renderTargets.push(new RenderTarget(renderTargetOptions));
         }

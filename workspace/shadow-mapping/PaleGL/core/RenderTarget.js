@@ -2,8 +2,9 @@
 import {Framebuffer} from "./Framebuffer.js";
 import {Renderbuffer} from "./Renderbuffer.js";
 import {RenderbufferTypes, RenderTargetTypes, TextureTypes} from "./../constants.js";
+import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
-export class RenderTarget {
+export class RenderTarget extends AbstractRenderTarget {
     // #texture;
     #framebuffer;
     #depthRenderbuffer;
@@ -19,6 +20,14 @@ export class RenderTarget {
         return this.#framebuffer;
     }
     
+    read() {
+        return this;
+    }
+    
+    write() {
+        return this;
+    }
+    
     constructor({
         gpu,
         type = RenderTargetTypes.RGBA,
@@ -26,6 +35,8 @@ export class RenderTarget {
         height = 1,
         useDepthBuffer = false,
     }) {
+        super();
+        
         this.width = width;
         this.height = height;
 

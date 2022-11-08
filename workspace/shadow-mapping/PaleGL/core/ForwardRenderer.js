@@ -7,7 +7,6 @@ export class ForwardRenderer {
     #gpu;
     canvas;
     pixelRatio;
-    #renderTarget;
     #realWidth;
     #realHeight;
     #shadowMaterial;
@@ -50,11 +49,10 @@ export class ForwardRenderer {
 
     setRenderTarget(renderTarget) {
         const gl = this.#gpu.gl;
-        this.#renderTarget = renderTarget;
 
-        if (this.#renderTarget) {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.#renderTarget.framebuffer.glObject);
-            gl.viewport(0, 0, this.#renderTarget.width, this.#renderTarget.height);
+        if (renderTarget) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderTarget.framebuffer.glObject);
+            gl.viewport(0, 0, renderTarget.width, renderTarget.height);
         } else {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, this.#realWidth, this.#realHeight);
@@ -129,7 +127,7 @@ export class ForwardRenderer {
             if(!lightActor.castShadow) {
                 return;
             }
-            this.setRenderTarget(lightActor.shadowCamera.renderTarget);
+            this.setRenderTarget(lightActor.shadowCamera.renderTarget.write());
             this.clear(0, 0, 0, 1);
             
             meshActorsEachQueue.opaque.forEach(meshActor => {
@@ -163,12 +161,11 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
         // scene pass
         // ------------------------------------------------------------------------------
-       
+     
         if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget);
+            this.setRenderTarget(camera.postProcess.renderTarget.write());
         } else {
-            this.setRenderTarget(camera.writeRenderTarget);
-            console.log(camera.writeRenderTarget)
+            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write() : null);
         }
 
         // TODO: refactor
