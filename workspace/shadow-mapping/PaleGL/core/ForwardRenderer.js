@@ -232,10 +232,9 @@ export class ForwardRenderer {
         if (camera.enabledPostProcess) {
             camera.postProcess.render(this, camera);
         }
-        
-        console.log(this.#renderTarget)
-        
-        this.setRenderTarget(null);
+       
+        // NOTE: ない方がよい？
+        // this.setRenderTarget(null);
     }
 
     renderMesh(geometry, material) {

@@ -188,7 +188,7 @@ const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
 testOrtho.visibleFrustum = true;
 testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
 testOrtho.transform.lookAt(new Vector3(0, 0, 0));
-testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: true }));
+testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: true, useDoubleBuffer: true }));
 // testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
 captureScene.add(testOrtho);
 
@@ -235,8 +235,6 @@ captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 let i = 0;
 
 const tick = (time) => {
-    console.log("===========");
-    
     const cameraPosition = Vector3.addVectors(
         captureSceneCamera.transform.position,
         new Vector3(
@@ -254,16 +252,17 @@ const tick = (time) => {
     if(directionalLight.shadowMap) {
         // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
     }
-  
-    renderer.render(captureScene, testOrtho);
     
-    renderer.render(captureScene, captureSceneCamera);
+    renderer.render(captureScene, testOrtho);
 
     shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.texture;
+    testOrtho.renderTarget.flip();
+    
+    renderer.render(captureScene, captureSceneCamera);
    
     i++;
     if(i >= 2) {
-        return;
+        // return;
     }
     
     // captureSceneCamera.transform.worldForward.log()
