@@ -25,6 +25,7 @@ import {Skybox} from "./PaleGL/core/Skybox.js";
 import {ArrowHelper} from "./PaleGL/core/ArrowHelper.js";
 import {OrthographicCamera} from "./PaleGL/core/OrthographicCamera.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
+import {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.js";
 
 let width, height;
 let objMesh;
@@ -188,7 +189,7 @@ const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
 testOrtho.visibleFrustum = true;
 testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
 testOrtho.transform.lookAt(new Vector3(0, 0, 0));
-testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: true, useDoubleBuffer: true }));
+testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true, useDoubleBuffer: true }));
 // testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
 captureScene.add(testOrtho);
 
@@ -253,12 +254,15 @@ const tick = (time) => {
         // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
     }
     
+    console.log("======================")
+    
     renderer.render(captureScene, testOrtho);
 
-    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.texture;
-    testOrtho.renderTarget.flip();
-    
+    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read;
+
     renderer.render(captureScene, captureSceneCamera);
+
+    testOrtho.renderTarget.swap();
    
     i++;
     if(i >= 2) {

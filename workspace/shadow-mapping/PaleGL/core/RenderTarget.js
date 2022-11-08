@@ -9,25 +9,23 @@ export class RenderTarget {
     #depthRenderbuffer;
     width;
     height;
-    #textures = [];
-    currentIndex = 0;
+    #texture;
 
     get texture() {
-        return this.#textures[this.currentIndex];
+        return this.#texture;
     }
 
     get framebuffer() {
         return this.#framebuffer;
     }
-
+    
     constructor({
-                    gpu,
-                    type = RenderTargetTypes.RGBA,
-                    width = 1,
-                    height = 1,
-                    useDepthBuffer = false,
-                    useDoubleBuffer = false
-                }) {
+        gpu,
+        type = RenderTargetTypes.RGBA,
+        width = 1,
+        height = 1,
+        useDepthBuffer = false,
+    }) {
         this.width = width;
         this.height = height;
 
@@ -37,7 +35,6 @@ export class RenderTarget {
 
         if (useDepthBuffer) {
             this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
-            // this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width: 1, height: 1 });
         }
 
         // depth as render buffer
@@ -57,43 +54,35 @@ export class RenderTarget {
                 throw "invalid texture type";
         }
 
-        const textureNum = useDoubleBuffer ? 2 : 1;
-        for (let i = 0; i < textureNum; i++) {
-            const texture = new Texture({
-                gpu,
-                width: this.width,
-                height: this.height,
-                mipmap: false,
-                type: textureType
-            });
-            this.#textures.push(texture);
-        }
+        this.#texture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: textureType
+        });
 
         // set texture to render buffer
         switch (type) {
             case RenderTargetTypes.RGBA:
-                this.#textures.forEach(texture => {
-                    // color as texture
-                    gl.framebufferTexture2D(
-                        gl.FRAMEBUFFER,
-                        gl.COLOR_ATTACHMENT0,
-                        gl.TEXTURE_2D,
-                        texture.glObject,
-                        0
-                    );
-                });
+                // color as texture
+                gl.framebufferTexture2D(
+                    gl.FRAMEBUFFER,
+                    gl.COLOR_ATTACHMENT0,
+                    gl.TEXTURE_2D,
+                    this.#texture.glObject,
+                    0
+                );
                 break;
             case RenderTargetTypes.Depth:
-                this.#textures.forEach(texture => {
-                    // depth as texture
-                    gl.framebufferTexture2D(
-                        gl.FRAMEBUFFER,
-                        gl.DEPTH_ATTACHMENT,
-                        gl.TEXTURE_2D,
-                        texture.glObject,
-                        0
-                    );
-                });
+                // depth as texture
+                gl.framebufferTexture2D(
+                    gl.FRAMEBUFFER,
+                    gl.DEPTH_ATTACHMENT,
+                    l.TEXTURE_2D,
+                    this.#texture.glObject,
+                    0
+                );
                 break;
             default:
                 throw "invalid type";
@@ -110,18 +99,9 @@ export class RenderTarget {
     setSize(width, height) {
         this.width = width;
         this.height = height;
-        this.#textures.forEach(texture => {
-            texture.setSize(this.width, this.height);
-        });
+        this.#texture.setSize(this.width, this.height);
         if (this.#depthRenderbuffer) {
             this.#depthRenderbuffer.setSize(width, height);
         }
-    }
-
-    flip() {
-        if(this.#textures.length < 2) {
-            return;
-        }
-        this.currentIndex = (this.currentIndex + 1) % 2;
     }
 }

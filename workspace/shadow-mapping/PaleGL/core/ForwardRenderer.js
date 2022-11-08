@@ -167,7 +167,8 @@ export class ForwardRenderer {
         if (camera.enabledPostProcess) {
             this.setRenderTarget(camera.postProcess.renderTarget);
         } else {
-            this.setRenderTarget(camera.renderTarget);
+            this.setRenderTarget(camera.writeRenderTarget);
+            console.log(camera.writeRenderTarget)
         }
 
         // TODO: refactor

@@ -11,7 +11,7 @@ import {Mesh} from "./Mesh.js";
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity();
     projectionMatrix = Matrix4.identity();
-    renderTarget;
+    #renderTarget;
     clearColor; // TODO: color class
     #postProcess;
     near;
@@ -48,8 +48,13 @@ export class Camera extends Actor {
     // }
 
     get renderTarget() {
-        if (this.renderTarget) {
-            return this.renderTarget;
+        return this.#renderTarget;
+    }
+
+    get writeRenderTarget() {
+        if (this.#renderTarget) {
+            // for double buffer
+            return this.#renderTarget.isSwappable ? this.#renderTarget.write() : this.#renderTarget;
         }
         return null;
     }
@@ -64,8 +69,8 @@ export class Camera extends Actor {
         if (!this.#postProcess) {
             return;
         }
-        if (this.renderTarget) {
-            this.#postProcess.setSize(this.renderTarget.width, this.renderTarget.height);
+        if (this.#renderTarget) {
+            this.#postProcess.setSize(this.#renderTarget.width, this.#renderTarget.height);
         } else {
             this.#postProcess.setSize(width, height);
         }
@@ -168,7 +173,7 @@ export class Camera extends Actor {
     }
 
     setRenderTarget(renderTarget) {
-        this.renderTarget = renderTarget;
+        this.#renderTarget = renderTarget;
     }
 
     #updateProjectionMatrix() {
