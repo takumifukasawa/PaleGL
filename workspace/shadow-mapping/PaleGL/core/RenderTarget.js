@@ -28,7 +28,8 @@ export class RenderTarget {
         this.#framebuffer = new Framebuffer({ gpu });
         
         if(useDepthBuffer) {
-            this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width: 1, height: 1 });
+            this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height });
+            // this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width: 1, height: 1 });
         }
        
         // depth as render buffer

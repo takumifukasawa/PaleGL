@@ -189,6 +189,7 @@ testOrtho.visibleFrustum = true;
 testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
 testOrtho.transform.lookAt(new Vector3(0, 0, 0));
 testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: true }));
+// testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
 captureScene.add(testOrtho);
 
 const postProcess = new PostProcess({gpu, renderer});
