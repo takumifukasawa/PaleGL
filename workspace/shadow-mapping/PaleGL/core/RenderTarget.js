@@ -6,6 +6,7 @@ import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 export class RenderTarget extends AbstractRenderTarget {
     // #texture;
+    name;
     #framebuffer;
     #depthRenderbuffer;
     width;
@@ -30,12 +31,15 @@ export class RenderTarget extends AbstractRenderTarget {
     
     constructor({
         gpu,
+        name,
         type = RenderTargetTypes.RGBA,
         width = 1,
         height = 1,
         useDepthBuffer = false,
     }) {
         super();
+        
+        this.name = name;
         
         this.width = width;
         this.height = height;

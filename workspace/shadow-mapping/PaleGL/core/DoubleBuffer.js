@@ -11,7 +11,9 @@ export class DoubleBuffer extends  AbstractRenderTarget {
     constructor(renderTargetOptions) {
         super({ isSwappable: true });
         for(let i = 0; i < 2; i++) {
-            this.#renderTargets.push(new RenderTarget(renderTargetOptions));
+            this.#renderTargets.push(new RenderTarget(
+                { ...renderTargetOptions, ...({ name: "hoge " + i }) }
+            ));
         }
     }
     

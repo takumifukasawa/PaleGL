@@ -189,7 +189,7 @@ const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
 testOrtho.visibleFrustum = true;
 testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
 testOrtho.transform.lookAt(new Vector3(0, 0, 0));
-testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true, useDoubleBuffer: true }));
+testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true }));
 // testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
 captureScene.add(testOrtho);
 
@@ -254,14 +254,11 @@ const tick = (time) => {
         // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
     }
     
-    // console.log("======================")
-    
     renderer.render(captureScene, testOrtho);
 
     testOrtho.renderTarget.swap();
 
-    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read;
-
+    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read().texture;
     renderer.render(captureScene, captureSceneCamera);
    
     i++;
