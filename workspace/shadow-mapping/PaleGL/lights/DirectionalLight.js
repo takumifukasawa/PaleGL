@@ -40,7 +40,7 @@ export class DirectionalLight extends Light {
         super.afterUpdatedTransform();
         // TODO: for debug shadow camera
         this.shadowCamera.near = 1;
-        this.shadowCamera.far = 20;
-        this.shadowCamera.setSize(1, 1, -5, 5, -5, 5);
+        this.shadowCamera.far = 40;
+        this.shadowCamera.setSize(1, 1, -10, 10, -10, 10);
     }
 }
