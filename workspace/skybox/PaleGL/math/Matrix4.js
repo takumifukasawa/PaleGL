@@ -28,7 +28,7 @@ export class Matrix4 {
     }
 
     get m10() {
-        return this.elements[11];
+        return this.elements[1];
     }
 
     get m11() {
