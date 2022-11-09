@@ -139,22 +139,20 @@ export class ForwardRenderer {
                         break;
                 }
                 
-                // TODO: materialはdepth用に置き換え
-                
+                // const material = meshActor.material;
+                const targetMaterial = this.#shadowMaterial;
+               
                 // TODO: material 側でやった方がよい？
-                if (meshActor.material.uniforms.uWorldMatrix) {
-                    meshActor.material.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
+                if (targetMaterial.uniforms.uWorldMatrix) {
+                    targetMaterial.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
                 }
-                if (meshActor.material.uniforms.uViewMatrix) {
-                    meshActor.material.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
+                if (targetMaterial.uniforms.uViewMatrix) {
+                    targetMaterial.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
                 }
-                if (meshActor.material.uniforms.uProjectionMatrix) {
-                    meshActor.material.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
+                if (targetMaterial.uniforms.uProjectionMatrix) {
+                    targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
-                if(meshActor.material.uniforms.uViewPosition) {
-                    meshActor.material.uniforms.uViewPosition.value = lightActor.shadowCamera.transform.worldMatrix.position;
-                }
-                
+               
                 this.renderMesh(meshActor.geometry, this.#shadowMaterial);
                 // this.renderMesh(meshActor.geometry, meshActor.material);
             });
@@ -187,27 +185,29 @@ export class ForwardRenderer {
                     break;
             }
             
+            const targetMaterial = meshActor.material;
+            
             // TODO: material 側でやった方がよい？
-            if (meshActor.material.uniforms.uWorldMatrix) {
-                meshActor.material.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
+            if (targetMaterial.uniforms.uWorldMatrix) {
+                targetMaterial.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
             }
-            if (meshActor.material.uniforms.uViewMatrix) {
-                meshActor.material.uniforms.uViewMatrix.value = camera.viewMatrix;
+            if (targetMaterial.uniforms.uViewMatrix) {
+                targetMaterial.uniforms.uViewMatrix.value = camera.viewMatrix;
             }
-            if (meshActor.material.uniforms.uProjectionMatrix) {
-                meshActor.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+            if (targetMaterial.uniforms.uProjectionMatrix) {
+                targetMaterial.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
-            if (meshActor.material.uniforms.uNormalMatrix) {
-                meshActor.material.uniforms.uNormalMatrix.value = meshActor.transform.worldMatrix.clone().invert().transpose();
+            if (targetMaterial.uniforms.uNormalMatrix) {
+                targetMaterial.uniforms.uNormalMatrix.value = meshActor.transform.worldMatrix.clone().invert().transpose();
             }
-            if(meshActor.material.uniforms.uViewPosition) {
-                meshActor.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
+            if(targetMaterial.uniforms.uViewPosition) {
+                targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
             }
 
             // TODO: light actor の中で lightの種類別に処理を分ける
             lightActors.forEach(light => {
-                if (meshActor.material.uniforms.uDirectionalLight) {
-                    meshActor.material.uniforms.uDirectionalLight = {
+                if (targetMaterial.uniforms.uDirectionalLight) {
+                    targetMaterial.uniforms.uDirectionalLight = {
                         type: UniformTypes.Struct,
                         value: {
                             direction: {
@@ -224,6 +224,23 @@ export class ForwardRenderer {
                             }
                         }
                     }
+                }
+                
+                if(targetMaterial.uniforms.uTextureProjectionMatrix && light.shadowCamera) {
+                    // clip coord (-1 ~ 1) to uv (0 ~ 1)
+                    const textureMatrix = new Matrix4(
+                       0.5, 0, 0, 0.5,
+                       0, 0.5, 0, 0.5,
+                       0, 0, 0.5, 0.5,
+                       0, 0, 0, 1
+                    );
+                    const textureProjectionMatrix = Matrix4.multiplyMatrices(
+                        textureMatrix,
+                        light.shadowCamera.projectionMatrix.clone(),
+                        light.shadowCamera.viewMatrix.clone()
+                    );
+                     
+                    targetMaterial.uniforms.uTextureProjectionMatrix.value = textureProjectionMatrix;
                 }
             });
 

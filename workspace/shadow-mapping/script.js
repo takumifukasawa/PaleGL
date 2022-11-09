@@ -139,13 +139,13 @@ const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
 directionalLight.castShadow = true;
 directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
-directionalLight.shadowCamera.visibleFrustum = true;
+// directionalLight.shadowCamera.visibleFrustum = true;
 directionalLight.transform.lookAt(new Vector3(0, 0, 0));
 
-const directionalForwardArrow = new ArrowHelper({ gpu });
+// const directionalForwardArrow = new ArrowHelper({ gpu });
 // directionalLight.addChild(directionalForwardArrow);
-directionalLight.shadowCamera.addChild(directionalForwardArrow);
-directionalLight.castShadow = true;
+// directionalLight.shadowCamera.addChild(directionalForwardArrow);
+// directionalLight.castShadow = true;
 
 const shadowMapPlane = new Mesh(
     new PlaneGeometry({ gpu }),
@@ -167,11 +167,12 @@ const shadowMapPlane = new Mesh(
         precision mediump float;
         in vec2 vUv;
         uniform sampler2D uShadowMap;
+        uniform mat4 uTextureProjectionMatrix;
         out vec4 outColor;
         void main() {
             vec4 textureColor = texture(uShadowMap, vUv);
             float depth = textureColor.r;
-            outColor = vec4(vUv, 1., 1.);
+            // outColor = uTextureProjectionMatrix * vec4(vUv, 1., 1.);
             // outColor = vec4(textureColor.rgb, 1.);
             outColor = vec4(vec3(depth), 1.);
         }
@@ -180,11 +181,15 @@ const shadowMapPlane = new Mesh(
             uShadowMap: {
                 type: UniformTypes.Texture,
                 value: null
+            },
+            uTextureProjectionMatrix: {
+                type: UniformTypes.Matrix4,
+                value: null
             }
         }
     })
 );
-shadowMapPlane.transform.setTranslation(new Vector3(0, 8, 0));
+shadowMapPlane.transform.setTranslation(new Vector3(0, 12, 0));
 shadowMapPlane.transform.setScaling(Vector3.fill(2));
 captureScene.add(shadowMapPlane);
 
@@ -262,6 +267,7 @@ const tick = (time) => {
 
     if(directionalLight.shadowMap) {
         shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read().texture;
+        floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read().texture;
     }
     
     
@@ -354,12 +360,16 @@ const main = async () => {
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
+            uniform mat4 uTextureProjectionMatrix;
             
             out vec2 vUv;
+            out vec4 vProjectionUv;
 
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.);
+                vProjectionUv = uTextureProjectionMatrix * worldPosition;
+                gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
             }
             `,
             fragmentShader: `#version 300 es
@@ -367,20 +377,34 @@ const main = async () => {
             precision mediump float;
             
             uniform sampler2D uBillboardTexture;
-            
+            uniform sampler2D uShadowMap;
+           
+            in vec4 vProjectionUv; 
             in vec2 vUv;
             
             out vec4 outColor;
             
             void main() {
                 outColor = texture(uBillboardTexture, vUv);
-                // outColor = vec4(vUv, 1., 1.);
+                vec3 projectionUv = vProjectionUv.xyz / vProjectionUv.w;
+                vec4 projectionShadowColor = texture(uShadowMap, projectionUv.xy);
+                float sceneDepth = projectionShadowColor.r;
+                // outColor = vec4(vec3(sceneDepth), 1.);
+                outColor = texture(uBillboardTexture, projectionUv.xy);
             }
             `,
             uniforms: {
                 uBillboardTexture: {
                     type: UniformTypes.Texture,
                     value: floorTexture
+                },
+                uShadowMap: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                uTextureProjectionMatrix: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity()
                 }
             },
         })
@@ -394,7 +418,7 @@ const main = async () => {
     objMesh.transform.setTranslation(new Vector3(0, 2, 0));
     objMesh.transform.setScaling(new Vector3(2, 2, 2));
     
-    floorPlaneMesh.transform.setScaling(Vector3.fill(5));
+    floorPlaneMesh.transform.setScaling(Vector3.fill(10));
     floorPlaneMesh.transform.setRotationX(-90);
     floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
     
