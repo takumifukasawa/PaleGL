@@ -397,6 +397,33 @@ const main = async () => {
     captureSceneCamera.postProcess.enabled = false;
 
     const debuggerGUI = new DebuggerGUI();
+    
+    objMesh.transform.position.log();
+   
+    debuggerGUI.addSliderDebugger({
+        label: "obj position x",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: objMesh.transform.position.x,
+        onChange: (value) => {
+            const p = objMesh.transform.position;
+            objMesh.transform.setTranslation(new Vector3(value, p.y, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "obj position z",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: objMesh.transform.position.z,
+        onChange: (value) => {
+            const p = objMesh.transform.position;
+            objMesh.transform.setTranslation(new Vector3(p.x, p.y, value))
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",

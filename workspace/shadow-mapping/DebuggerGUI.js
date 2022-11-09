@@ -78,7 +78,7 @@ export class DebuggerGUI {
             onChange(selectElement.value);
         });
 
-        if (initialValue) {
+        if (initialValue !== null) {
             selectElement.value = initialValue;
         }
         if (initialExec) {
@@ -107,7 +107,7 @@ export class DebuggerGUI {
             onInput ? onInput(colorPickerInput.value) : onChange(colorPickerInput.value);
         });
 
-        if (initialValue) {
+        if (initialValue !== null) {
             colorPickerInput.value = initialValue;
         }
         if (initialExec) {
@@ -179,7 +179,7 @@ export class DebuggerGUI {
             onInput ? onInput(onUpdateSlider()) : onChange(onUpdateSlider());
         });
 
-        if (initialValue) {
+        if (initialValue !== null) {
             sliderInput.value = initialValue;
         }
         if (initialExec) {
