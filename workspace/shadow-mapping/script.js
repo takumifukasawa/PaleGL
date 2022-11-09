@@ -32,6 +32,10 @@ let objMesh;
 let floorPlaneMesh;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
+const states = {
+    shadowBias: 0.01,
+}
+
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
@@ -380,6 +384,7 @@ const main = async () => {
             
             uniform sampler2D uBillboardTexture;
             uniform sampler2D uShadowMap;
+            uniform float uShadowBias;
            
             in vec4 vShadowMapProjectionUv; 
             in vec2 vUv;
@@ -393,7 +398,7 @@ const main = async () => {
                 float sceneDepth = projectionShadowColor.r;
                 float depthFromLight = projectionUv.z;
            
-                float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - 0.01), 0., 1.);
+                float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - uShadowBias), 0., 1.);
                 float shadowAreaRect =
                     step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
                     step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
@@ -415,6 +420,10 @@ const main = async () => {
                 uShadowMap: {
                     type: UniformTypes.Texture,
                     value: null,
+                },
+                uShadowBias: {
+                    type: UniformTypes.Float,
+                    value: states.shadowBias
                 },
                 uShadowMapProjectionMatrix: {
                     type: UniformTypes.Matrix4,
@@ -548,6 +557,17 @@ const main = async () => {
         onChange: (value) => {
             directionalLight.shadowCamera.far = value;
             directionalLight.shadowCamera.updateProjectionMatrix();
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "shadow bias",
+        minValue: 0,
+        maxValue: 0.1,
+        stepValue: 0.001,
+        initialValue: states.shadowBias,
+        onChange: (value) => {
+            floorPlaneMesh.material.uniforms.uShadowBias.value = value;
         }
     });
     

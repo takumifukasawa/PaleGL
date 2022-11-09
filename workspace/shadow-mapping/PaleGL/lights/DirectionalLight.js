@@ -30,9 +30,10 @@ export class DirectionalLight extends Light {
         // TODO:
         // - cast shadow が有効な時だけ生成したい
         // - もしくは、外側からshadowmap渡してもよい
+        // - ShadowMap class があってもよいかもしれない
         if(this.castShadow && !this.shadowMap) {
             // this.shadowMap = new DoubleBuffer({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
-            this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
+            this.shadowMap = new RenderTarget({ gpu, width: 512, height: 512, type: RenderTargetTypes.Depth });
         }
     }
     
