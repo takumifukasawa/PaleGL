@@ -137,15 +137,17 @@ captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
-directionalLight.castShadow = true;
 directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
-// directionalLight.shadowCamera.visibleFrustum = true;
 directionalLight.transform.lookAt(new Vector3(0, 0, 0));
+directionalLight.shadowCamera.visibleFrustum = true;
+directionalLight.castShadow = true;
+directionalLight.shadowCamera.near = 1;
+directionalLight.shadowCamera.far = 20;
+directionalLight.shadowCamera.setSize(null, null, -10, 10, -10, 10);
 
-// const directionalForwardArrow = new ArrowHelper({ gpu });
-// directionalLight.addChild(directionalForwardArrow);
-// directionalLight.shadowCamera.addChild(directionalForwardArrow);
-// directionalLight.castShadow = true;
+const directionalForwardArrow = new ArrowHelper({ gpu });
+directionalLight.addChild(directionalForwardArrow);
+directionalLight.shadowCamera.addChild(directionalForwardArrow);
 
 const shadowMapPlane = new Mesh(
     new PlaneGeometry({ gpu }),
@@ -167,12 +169,12 @@ const shadowMapPlane = new Mesh(
         precision mediump float;
         in vec2 vUv;
         uniform sampler2D uShadowMap;
-        uniform mat4 uTextureProjectionMatrix;
+        uniform mat4 uShadowMapProjectionMatrix;
         out vec4 outColor;
         void main() {
             vec4 textureColor = texture(uShadowMap, vUv);
             float depth = textureColor.r;
-            // outColor = uTextureProjectionMatrix * vec4(vUv, 1., 1.);
+            // outColor = uShadowMapProjectionMatrix * vec4(vUv, 1., 1.);
             // outColor = vec4(textureColor.rgb, 1.);
             outColor = vec4(vec3(depth), 1.);
         }
@@ -182,14 +184,14 @@ const shadowMapPlane = new Mesh(
                 type: UniformTypes.Texture,
                 value: null
             },
-            uTextureProjectionMatrix: {
+            uShadowMapProjectionMatrix: {
                 type: UniformTypes.Matrix4,
                 value: null
             }
         }
     })
 );
-shadowMapPlane.transform.setTranslation(new Vector3(0, 12, 0));
+shadowMapPlane.transform.setTranslation(new Vector3(0, 6, 0));
 shadowMapPlane.transform.setScaling(Vector3.fill(2));
 captureScene.add(shadowMapPlane);
 
@@ -360,15 +362,15 @@ const main = async () => {
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
-            uniform mat4 uTextureProjectionMatrix;
+            uniform mat4 uShadowMapProjectionMatrix;
             
             out vec2 vUv;
-            out vec4 vProjectionUv;
+            out vec4 vShadowMapProjectionUv;
 
             void main() {
                 vUv = aUv;
                 vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.);
-                vProjectionUv = uTextureProjectionMatrix * worldPosition;
+                vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
                 gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
             }
             `,
@@ -379,18 +381,30 @@ const main = async () => {
             uniform sampler2D uBillboardTexture;
             uniform sampler2D uShadowMap;
            
-            in vec4 vProjectionUv; 
+            in vec4 vShadowMapProjectionUv; 
             in vec2 vUv;
             
             out vec4 outColor;
             
             void main() {
                 outColor = texture(uBillboardTexture, vUv);
-                vec3 projectionUv = vProjectionUv.xyz / vProjectionUv.w;
+                vec3 projectionUv = vShadowMapProjectionUv.xyz / vShadowMapProjectionUv.w;
                 vec4 projectionShadowColor = texture(uShadowMap, projectionUv.xy);
                 float sceneDepth = projectionShadowColor.r;
-                // outColor = vec4(vec3(sceneDepth), 1.);
-                outColor = texture(uBillboardTexture, projectionUv.xy);
+                float depthFromLight = projectionUv.z;
+           
+                float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - 0.01), 0., 1.);
+                float shadowAreaRect =
+                    step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
+                    step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
+                    step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
+                
+                float shadowRate = shadowOccluded * shadowAreaRect;
+                
+                vec4 baseColor = vec4(.1, .1, .1, 1.);
+                vec4 shadowColor = vec4(0., 0., 0., 1.);
+                vec4 resultColor = mix(baseColor, shadowColor, shadowRate);
+                outColor = resultColor;
             }
             `,
             uniforms: {
@@ -402,7 +416,7 @@ const main = async () => {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTextureProjectionMatrix: {
+                uShadowMapProjectionMatrix: {
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity()
                 }
@@ -411,14 +425,14 @@ const main = async () => {
     );
 
     captureScene.add(floorPlaneMesh);
-    // captureScene.add(skyboxMesh);
+    captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     objMesh.transform.setTranslation(new Vector3(0, 2, 0));
     objMesh.transform.setScaling(new Vector3(2, 2, 2));
     
-    floorPlaneMesh.transform.setScaling(Vector3.fill(10));
+    floorPlaneMesh.transform.setScaling(Vector3.fill(20));
     floorPlaneMesh.transform.setRotationX(-90);
     floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
     
@@ -449,6 +463,94 @@ const main = async () => {
         }
     });
 
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addSliderDebugger({
+        label: "light position x",
+        minValue: -15,
+        maxValue: 15,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.x,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(value, p.y, p.z))
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "light position y",
+        minValue: 1,
+        maxValue: 15,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.y,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(p.x, value, p.z))
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "light position z",
+        minValue: -15,
+        maxValue: 15,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.z,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(p.x, p.y, value))
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "shadow camera width",
+        minValue: 1,
+        maxValue: 40,
+        stepValue: 0.01,
+        initialValue: Math.abs(directionalLight.shadowCamera.left),
+        onChange: (value) => {
+            directionalLight.shadowCamera.left = -value / 2;
+            directionalLight.shadowCamera.right = value / 2;
+            directionalLight.shadowCamera.updateProjectionMatrix();
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "shadow camera height",
+        minValue: 1,
+        maxValue: 40,
+        stepValue: 0.01,
+        initialValue: Math.abs(directionalLight.shadowCamera.top),
+        onChange: (value) => {
+            directionalLight.shadowCamera.bottom = -value / 2;
+            directionalLight.shadowCamera.top = value / 2;
+            directionalLight.shadowCamera.updateProjectionMatrix();
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "shadow camera near clip",
+        minValue: 0.01,
+        maxValue: 40,
+        stepValue: 0.01,
+        initialValue: directionalLight.shadowCamera.near,
+        onChange: (value) => {
+            directionalLight.shadowCamera.near = value;
+            directionalLight.shadowCamera.updateProjectionMatrix();
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "shadow camera near far",
+        minValue: 0.01,
+        maxValue: 40,
+        stepValue: 0.01,
+        initialValue: directionalLight.shadowCamera.far,
+        onChange: (value) => {
+            directionalLight.shadowCamera.far = value;
+            directionalLight.shadowCamera.updateProjectionMatrix();
+        }
+    });
+    
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({

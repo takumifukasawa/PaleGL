@@ -136,7 +136,6 @@ export class ForwardRenderer {
                 switch(meshActor.type) {
                     case ActorTypes.Skybox:
                         return;
-                        break;
                 }
                 
                 // const material = meshActor.material;
@@ -156,7 +155,6 @@ export class ForwardRenderer {
                 this.renderMesh(meshActor.geometry, this.#shadowMaterial);
                 // this.renderMesh(meshActor.geometry, meshActor.material);
             });
-            if(lightActor.shadowMap.isSwappable) lightActor.shadowMap.swap();
         });
 
         // ------------------------------------------------------------------------------
@@ -204,7 +202,9 @@ export class ForwardRenderer {
                 targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
             }
 
-            // TODO: light actor の中で lightの種類別に処理を分ける
+            // TODO:
+            // - light actor の中で lightの種類別に処理を分ける
+            // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意 
             lightActors.forEach(light => {
                 if (targetMaterial.uniforms.uDirectionalLight) {
                     targetMaterial.uniforms.uDirectionalLight = {
@@ -226,7 +226,7 @@ export class ForwardRenderer {
                     }
                 }
                 
-                if(targetMaterial.uniforms.uTextureProjectionMatrix && light.shadowCamera) {
+                if(targetMaterial.uniforms.uShadowMapProjectionMatrix && light.shadowCamera) {
                     // clip coord (-1 ~ 1) to uv (0 ~ 1)
                     const textureMatrix = new Matrix4(
                        0.5, 0, 0, 0.5,
@@ -239,8 +239,9 @@ export class ForwardRenderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-                     
-                    targetMaterial.uniforms.uTextureProjectionMatrix.value = textureProjectionMatrix;
+                    
+                    // TODO: directional light の構造体に持たせた方がいいかもしれない
+                    targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
                 }
             });
 
