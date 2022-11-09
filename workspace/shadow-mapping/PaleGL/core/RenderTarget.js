@@ -94,7 +94,7 @@ export class RenderTarget extends AbstractRenderTarget {
                 gl.framebufferTexture2D(
                     gl.FRAMEBUFFER,
                     gl.DEPTH_ATTACHMENT,
-                    l.TEXTURE_2D,
+                    gl.TEXTURE_2D,
                     this.#texture.glObject,
                     0
                 );

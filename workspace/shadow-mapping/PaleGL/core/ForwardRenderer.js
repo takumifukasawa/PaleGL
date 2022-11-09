@@ -31,7 +31,7 @@ export class ForwardRenderer {
             precision mediump float;
             out vec4 outColor;
             void main() {
-                outColor = vec4(1., 0., 0., 1.);
+                outColor = vec4(1., 1., 1., 1.);
             }
             `
         })
@@ -127,7 +127,8 @@ export class ForwardRenderer {
             if(!lightActor.castShadow) {
                 return;
             }
-            this.setRenderTarget(lightActor.shadowCamera.renderTarget.write());
+            this.setRenderTarget(lightActor.shadowMap.write());
+            // console.log(lightActor.shadowMap.write())
             this.clear(0, 0, 0, 1);
             
             meshActorsEachQueue.opaque.forEach(meshActor => {
@@ -145,17 +146,19 @@ export class ForwardRenderer {
                     meshActor.material.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
                 }
                 if (meshActor.material.uniforms.uViewMatrix) {
-                    meshActor.material.uniforms.uViewMatrix.value = camera.viewMatrix;
+                    meshActor.material.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
                 }
                 if (meshActor.material.uniforms.uProjectionMatrix) {
-                    meshActor.material.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+                    meshActor.material.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
                 if(meshActor.material.uniforms.uViewPosition) {
-                    meshActor.material.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
+                    meshActor.material.uniforms.uViewPosition.value = lightActor.shadowCamera.transform.worldMatrix.position;
                 }
                 
                 this.renderMesh(meshActor.geometry, this.#shadowMaterial);
+                // this.renderMesh(meshActor.geometry, meshActor.material);
             });
+            if(lightActor.shadowMap.isSwappable) lightActor.shadowMap.swap();
         });
 
         // ------------------------------------------------------------------------------
@@ -166,7 +169,6 @@ export class ForwardRenderer {
             this.setRenderTarget(camera.postProcess.renderTarget.write());
         } else {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write() : null);
-            // console.log(camera.renderTarget ? camera.renderTarget.write() : null)
         }
 
         // TODO: refactor

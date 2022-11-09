@@ -136,10 +136,10 @@ captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
 captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
 
 const directionalLight = new DirectionalLight();
-// TODO: needs
-// captureScene.add(directionalLight);
+captureScene.add(directionalLight);
+directionalLight.castShadow = true;
 directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
-// directionalLight.shadowCamera.visibleFrustum = true;
+directionalLight.shadowCamera.visibleFrustum = true;
 directionalLight.transform.lookAt(new Vector3(0, 0, 0));
 
 const directionalForwardArrow = new ArrowHelper({ gpu });
@@ -169,8 +169,11 @@ const shadowMapPlane = new Mesh(
         uniform sampler2D uShadowMap;
         out vec4 outColor;
         void main() {
+            vec4 textureColor = texture(uShadowMap, vUv);
+            float depth = textureColor.r;
             outColor = vec4(vUv, 1., 1.);
-            outColor = texture(uShadowMap, vUv);
+            // outColor = vec4(textureColor.rgb, 1.);
+            outColor = vec4(vec3(depth), 1.);
         }
         `,
         uniforms: {
@@ -185,13 +188,13 @@ shadowMapPlane.transform.setTranslation(new Vector3(0, 8, 0));
 shadowMapPlane.transform.setScaling(Vector3.fill(2));
 captureScene.add(shadowMapPlane);
 
-const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
-testOrtho.visibleFrustum = true;
-testOrtho.transform.setTranslation(new Vector3(5, 5, 0));
-testOrtho.transform.lookAt(new Vector3(0, 0, 0));
-testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true }));
+// const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
+// testOrtho.visibleFrustum = true;
+// testOrtho.transform.setTranslation(new Vector3(-5, 5, 0));
+// testOrtho.transform.lookAt(new Vector3(0, 0, 0));
+// testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true }));
 // testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
-captureScene.add(testOrtho);
+// captureScene.add(testOrtho);
 
 const postProcess = new PostProcess({gpu, renderer});
 postProcess.addPass(new FragmentPass({
@@ -224,7 +227,7 @@ const onWindowResize = () => {
     height = wrapperElement.offsetHeight;
 
     captureSceneCamera.setSize(width, height);
-    testOrtho.setSize(width, height);
+    // testOrtho.setSize(width, height);
 
     renderer.setSize(width, height);
     postProcess.setSize(width, height);
@@ -250,17 +253,18 @@ const tick = (time) => {
     //     floorPlaneMesh.transform.lookAt(cameraPosition);
     // }
 
+   
+    // renderer.render(captureScene, testOrtho);
+    // testOrtho.renderTarget.swap();
+
+    // shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read().texture;
+    renderer.render(captureScene, captureSceneCamera);
+
     if(directionalLight.shadowMap) {
-        // shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.texture;
+        shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read().texture;
     }
     
-    renderer.render(captureScene, testOrtho);
-
-    testOrtho.renderTarget.swap();
-
-    shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read().texture;
-    renderer.render(captureScene, captureSceneCamera);
-   
+    
     i++;
     if(i >= 2) {
         // return;
@@ -383,14 +387,14 @@ const main = async () => {
     );
 
     captureScene.add(floorPlaneMesh);
-    captureScene.add(skyboxMesh);
+    // captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
     
     objMesh.material.uniforms.uCubeTexture.value = cubeMap;
     objMesh.transform.setTranslation(new Vector3(0, 2, 0));
     objMesh.transform.setScaling(new Vector3(2, 2, 2));
     
-    floorPlaneMesh.transform.setScaling(Vector3.fill(20));
+    floorPlaneMesh.transform.setScaling(Vector3.fill(5));
     floorPlaneMesh.transform.setRotationX(-90);
     floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
     
@@ -398,8 +402,6 @@ const main = async () => {
 
     const debuggerGUI = new DebuggerGUI();
     
-    objMesh.transform.position.log();
-   
     debuggerGUI.addSliderDebugger({
         label: "obj position x",
         minValue: -10,

@@ -3,6 +3,7 @@ import {OrthographicCamera} from "../core/OrthographicCamera.js";
 import {PerspectiveCamera} from "../core/PerspectiveCamera.js";
 import {Vector3} from "../math/Vector3.js";
 import {RenderTarget} from "../core/RenderTarget.js";
+import {DoubleBuffer} from "../core/DoubleBuffer.js";
 import {RenderTargetTypes} from "../constants.js";
 
 export class DirectionalLight extends Light {
@@ -31,8 +32,7 @@ export class DirectionalLight extends Light {
         // - cast shadow が有効な時だけ生成したい
         // - もしくは、外側からshadowmap渡してもよい
         if(this.castShadow && !this.shadowMap) {
-            // this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
-            this.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.RGBA });
+            this.shadowMap = new DoubleBuffer({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
         }
     }
     
