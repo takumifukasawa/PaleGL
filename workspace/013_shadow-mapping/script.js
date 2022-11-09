@@ -34,6 +34,8 @@ const targetCameraPosition = new Vector3(0, 5, 10);
 
 const states = {
     shadowBias: 0.01,
+    shadowMapWidth: 1024,
+    shadowMapHeight: 1024,
 }
 
 const wrapperElement = document.getElementById("wrapper");
@@ -230,7 +232,7 @@ const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = (e.clientY / height) * 2 - 1;
     targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = -ny * 20;
+    targetCameraPosition.y = ny * 10 + 12;
 };
 
 const onWindowResize = () => {
@@ -568,6 +570,45 @@ const main = async () => {
         initialValue: states.shadowBias,
         onChange: (value) => {
             floorPlaneMesh.material.uniforms.uShadowBias.value = value;
+        }
+    });
+ 
+    // NOTE: manually once update for debugger
+    directionalLight.update({ gpu });
+    debuggerGUI.addPullDownDebugger({
+        label: "shadow map width",
+        options: [
+            { value: "16" },
+            { value: "32" },
+            { value: "64" },
+            { value: "128" },
+            { value: "256" },
+            { value: "512" },
+            { value: "1024" },
+            { value: "2048" },
+        ],
+        initialValue: states.shadowMapWidth,
+        onChange: (value) => {
+            states.shadowMapWidth = value;
+            directionalLight.shadowMap.setSize(states.shadowMapWidth, states.shadowMapHeight);
+        }
+    });
+    debuggerGUI.addPullDownDebugger({
+        label: "shadow map height",
+        options: [
+            { value: "16" },
+            { value: "32" },
+            { value: "64" },
+            { value: "128" },
+            { value: "256" },
+            { value: "512" },
+            { value: "1024" },
+            { value: "2048" },
+        ],
+        initialValue: states.shadowMapHeight,
+        onChange: (value) => {
+            states.shadowMapHeight = value;
+            directionalLight.shadowMap.setSize(states.shadowMapWidth, states.shadowMapHeight);
         }
     });
     

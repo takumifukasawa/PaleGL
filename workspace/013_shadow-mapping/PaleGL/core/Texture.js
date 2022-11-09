@@ -141,7 +141,7 @@ export class Texture extends GLObject {
                 break;
             case TextureTypes.Depth:
                 // for render target
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.RGBA, gl.DEPTH_COMPONENT, this.#img);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 break;
             default:
                 throw "invalid type";

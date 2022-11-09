@@ -49,7 +49,7 @@ export class DebuggerGUI {
     }
 
     // options ... array
-    // [ { type, value },,, ]
+    // [ { label?, value },,, ]
     addPullDownDebugger({
         label,
         onChange,
@@ -68,7 +68,7 @@ export class DebuggerGUI {
         options.forEach(option => {
             const optionElement = document.createElement("option");
             optionElement.value = option.value;
-            optionElement.label = option.label;
+            optionElement.label = option.label || option.value;
             selectElement.appendChild(optionElement);
             if (option.isDefault) {
                 selectElement.value = option.value;
