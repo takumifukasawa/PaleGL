@@ -17,14 +17,14 @@ export class Actor {
         this.transform.addChild(child);
         child.transform.parent = this.transform;
     }
+    
+    fixedUpdate({ gpu, fixedTime, fixedDeltaTime }) {
+    }
 
-    update({ gpu }) {
+    update({ gpu, time, deltaTime }) {
     }
 
     updateTransform() {
         this.transform.updateMatrix();
-    }
-    
-    afterUpdatedTransform() {
     }
 }

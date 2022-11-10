@@ -36,7 +36,7 @@ export class DirectionalLight extends Light {
         }
     }
     
-    afterUpdatedTransform() {
-        super.afterUpdatedTransform();
-    }
+    // afterUpdatedTransform() {
+    //     super.afterUpdatedTransform();
+    // }
 }

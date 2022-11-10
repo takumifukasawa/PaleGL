@@ -5,10 +5,12 @@ export class Engine {
     #renderer;
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
-    #renderFrameTimer;
+    // #renderFrameTimer;
     #onFixedUpdate;
     #onUpdate;
     #onRender;
+    #scene;
+    #gpu;
     
     get renderer() {
         return this.#renderer;
@@ -22,24 +24,29 @@ export class Engine {
         this.#onRender = value;
     }
     
-    constructor({ renderer, onFixedUpdate, onUpdate, onRender }) {
+    constructor({ gpu, renderer, onFixedUpdate, onUpdate, onRender }) {
+        this.#gpu = gpu;
         this.#renderer = renderer;
 
         // TODO: 外からfps変えられるようにしたい
         this.#fixedUpdateFrameTimer = new TimeAccumulator(60, this.fixedUpdate.bind(this));
         this.#updateFrameTimer = new TimeSkipper(60, this.update.bind(this));
-        this.#renderFrameTimer = new TimeSkipper(60, this.render.bind(this));
+        // this.#renderFrameTimer = new TimeSkipper(60, this.render.bind(this));
 
         this.#onFixedUpdate = onFixedUpdate;
         this.#onUpdate = onUpdate;
         this.#onRender = onRender;
     }
     
+    setScene(scene) {
+        this.#scene = scene;
+    }
+    
     start() {
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
-        this.#renderFrameTimer.start(t);
+        // this.#renderFrameTimer.start(t);
         requestAnimationFrame(this.tick.bind(this));
     }
 
@@ -47,12 +54,28 @@ export class Engine {
         if(this.#onFixedUpdate) {
             this.#onFixedUpdate({ fixedTime, fixedDeltaTime });
         }
+        
+        this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+
+        // update all actors matrix
+        // TODO
+        // - scene 側でやった方がよい？
+        // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+        // - やっぱりcomponentシステムにした方が良い気もする
+        this.#scene.traverse((actor) => actor.updateTransform());
+
+        // this.#scene.traverse((actor) => actor.afterUpdatedTransform());
     }
 
     update(time, deltaTime) {
         if(this.#onUpdate) {
             this.#onUpdate({ time, deltaTime });
         }
+
+        // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
+        this.#scene.traverse((actor) => actor.update({ gpu: this.#gpu, time, deltaTime }));
+        
+        this.render();
     }
     
     render() {
@@ -64,7 +87,7 @@ export class Engine {
     tick(time) {
         this.#fixedUpdateFrameTimer.exec(time / 1000);
         this.#updateFrameTimer.exec(time / 1000);
-        this.#renderFrameTimer.exec(time / 1000);
+        // this.#renderFrameTimer.exec(time / 1000);
         requestAnimationFrame(this.tick.bind(this));
     }
 }

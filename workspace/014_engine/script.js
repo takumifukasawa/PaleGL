@@ -136,7 +136,9 @@ const renderer = new ForwardRenderer({
     }
 );
 
-const engine = new Engine(renderer);
+const engine = new Engine({ gpu, renderer });
+
+engine.setScene(captureScene);
 
 const captureSceneCamera = new PerspectiveCamera(90, 1, 0.1, 100);
 captureScene.add(captureSceneCamera);
