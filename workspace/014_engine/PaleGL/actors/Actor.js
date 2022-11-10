@@ -18,6 +18,9 @@ export class Actor {
         child.transform.parent = this.transform;
     }
     
+    setSize(width, height) {
+    }
+    
     fixedUpdate({ gpu, fixedTime, fixedDeltaTime }) {
     }
 

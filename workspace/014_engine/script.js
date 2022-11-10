@@ -244,11 +244,13 @@ const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
 
-    captureSceneCamera.setSize(width, height);
-    // testOrtho.setSize(width, height);
+    // captureSceneCamera.setSize(width, height);
+    // // testOrtho.setSize(width, height);
 
-    renderer.setSize(width, height);
-    postProcess.setSize(width, height);
+    // renderer.setSize(width, height);
+    // postProcess.setSize(width, height);
+    
+    engine.setSize(width, height);
 };
 
 captureSceneCamera.transform.position = targetCameraPosition.clone();

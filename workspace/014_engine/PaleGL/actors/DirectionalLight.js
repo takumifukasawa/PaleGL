@@ -16,8 +16,8 @@ export class DirectionalLight extends Light {
         this.addChild(this.shadowCamera);
     }
   
-    setSize(width, height) {
-    }
+    // setSize(width, height) {
+    // }
 
     // TODO: shadow map のサイズに応じてorthoのサイズ調整すべき？
     // setShadowSize(width, height, near, far) {

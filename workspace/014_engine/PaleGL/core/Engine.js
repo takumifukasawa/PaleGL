@@ -49,6 +49,11 @@ export class Engine {
         // this.#renderFrameTimer.start(t);
         requestAnimationFrame(this.tick.bind(this));
     }
+    
+    setSize(width, height) {
+        this.#scene.traverse((actor) => actor.setSize(width, height));
+        this.#renderer.setSize(width, height);
+    }
 
     fixedUpdate(fixedTime, fixedDeltaTime) {
         if(this.#onFixedUpdate) {
