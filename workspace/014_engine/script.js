@@ -26,6 +26,7 @@ import {ArrowHelper} from "./PaleGL/actors/ArrowHelper.js";
 import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 import {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.js";
+import {Engine} from "./PaleGL/core/Engine.js";
 
 let width, height;
 let objMesh;
@@ -134,6 +135,8 @@ const renderer = new ForwardRenderer({
         pixelRatio: Math.min(window.devicePixelRatio, 1.5)
     }
 );
+
+const engine = new Engine(renderer);
 
 const captureSceneCamera = new PerspectiveCamera(90, 1, 0.1, 100);
 captureScene.add(captureSceneCamera);
@@ -248,51 +251,6 @@ const onWindowResize = () => {
 
 captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
-
-let i = 0;
-
-const tick = (time) => {
-    const cameraPosition = Vector3.addVectors(
-        captureSceneCamera.transform.position,
-        new Vector3(
-            (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
-            (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
-            (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
-        )
-    );
-    captureSceneCamera.transform.position = cameraPosition;
-
-    // if(floorPlaneMesh) {
-    //     floorPlaneMesh.transform.lookAt(cameraPosition);
-    // }
-
-   
-    // renderer.render(captureScene, testOrtho);
-    // testOrtho.renderTarget.swap();
-
-    // shadowMapPlane.material.uniforms.uShadowMap.value = testOrtho.renderTarget.read().texture;
-    renderer.render(captureScene, captureSceneCamera);
-
-    if(directionalLight.shadowMap) {
-        shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-        floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-    }
-    
-    
-    i++;
-    if(i >= 2) {
-        // return;
-    }
-    
-    // captureSceneCamera.transform.worldForward.log()
-    
-    // captureSceneCamera.transform.worldForward.log();
-    // captureSceneCamera.cameraForward.log()
-
-    // loop
-
-    requestAnimationFrame(tick);
-}
 
 const main = async () => {
     const objData = await loadObj("./models/sphere-32-32.obj");
@@ -629,7 +587,28 @@ const main = async () => {
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
     
-    requestAnimationFrame(tick);
+    engine.onUpdate = () => {
+        const cameraPosition = Vector3.addVectors(
+            captureSceneCamera.transform.position,
+            new Vector3(
+                (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
+                (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
+                (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
+            )
+        );
+        captureSceneCamera.transform.position = cameraPosition;
+    }
+    
+    engine.onRender = () => {
+        renderer.render(captureScene, captureSceneCamera);
+
+        if(directionalLight.shadowMap) {
+            shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+            floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+        }       
+    }
+    
+    engine.start();
 }
 
 main();
