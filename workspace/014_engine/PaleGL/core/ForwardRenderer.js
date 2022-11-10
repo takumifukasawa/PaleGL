@@ -225,18 +225,6 @@ export class ForwardRenderer {
             }
         });
 
-        // // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        // scene.traverse((actor) => actor.update({gpu: this.#gpu}));
-
-        // // update all actors matrix
-        // // TODO
-        // // - scene 側でやった方がよい？
-        // // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
-        // // - やっぱりcomponentシステムにした方が良い気もする
-        // scene.traverse((actor) => actor.updateTransform());
-
-        // scene.traverse((actor) => actor.afterUpdatedTransform());
-
         // TODO: depth sort 
 
         // sort by render queue
