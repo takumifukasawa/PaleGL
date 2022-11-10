@@ -149,6 +149,17 @@ captureSceneCamera.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(0, 0, 5));
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
+captureSceneCamera.onFixedUpdate = ({ actor }) => {
+    const cameraPosition = Vector3.addVectors(
+        actor.transform.position,
+        new Vector3(
+            (targetCameraPosition.x - actor.transform.position.x) * 0.1,
+            (targetCameraPosition.y - actor.transform.position.y) * 0.1,
+            (targetCameraPosition.z - actor.transform.position.z) * 0.1
+        )
+    );
+    actor.transform.position = cameraPosition;
+}
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
@@ -425,16 +436,7 @@ const main = async () => {
     window.addEventListener('resize', onWindowResize);
     
     engine.onUpdate = () => {
-        const cameraPosition = Vector3.addVectors(
-            captureSceneCamera.transform.position,
-            new Vector3(
-                (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
-                (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
-                (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
-            )
-        );
-        captureSceneCamera.transform.position = cameraPosition;
-
+        // TODO: receive shadow な material には自動でセットしたい
         if(directionalLight.shadowMap) {
             shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
             floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
