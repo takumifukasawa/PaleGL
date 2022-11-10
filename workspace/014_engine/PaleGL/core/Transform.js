@@ -1,6 +1,7 @@
 ﻿import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {ActorTypes} from "../constants.js";
+import {Rotator} from "../math/Rotator.js";
 
 // TODO: 外側から各種propertyを取得するときはmatrix更新した方がいい？
 export class Transform {
@@ -10,7 +11,7 @@ export class Transform {
     #worldMatrix = Matrix4.identity();
     #localMatrix = Matrix4.identity();
     position = Vector3.zero();
-    rotation = Vector3.zero(); // degree vector
+    rotation = Rotator.zero(); // degree vector
     scale = Vector3.one();
     lookAtTarget = null; // world v
 
@@ -30,9 +31,9 @@ export class Transform {
         return this.#localMatrix;
     }
 
-    get localPosition() {
-        return this.position.clone();
-    }
+    // get localPosition() {
+    //     return this.position.clone();
+    // }
 
     get worldPosition() {
         return this.#worldMatrix.position;
@@ -56,21 +57,21 @@ export class Transform {
 
     // TODO: 引数でworldMatrixとdirty_flagを渡すべきな気がする
     updateMatrix() {
-        // TODO: lookatとの併用これで合ってる？
         if (this.lookAtTarget) {
             // TODO:
-            // - pass up vector
+            // - up vector 渡せるようにする
+            // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix = this.actor.type === ActorTypes.Camera
                 ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up(), true)
                 : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
-            // this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix);
         } else {
             const translationMatrix = Matrix4.translationMatrix(this.position);
-            const rotationXMatrix = Matrix4.rotationXMatrix(this.rotation.x / 180 * Math.PI);
-            const rotationYMatrix = Matrix4.rotationYMatrix(this.rotation.y / 180 * Math.PI);
-            const rotationZMatrix = Matrix4.rotationZMatrix(this.rotation.z / 180 * Math.PI);
+            const rotationAxes = this.rotation.getAxes();
+            const rotationXMatrix = Matrix4.rotationXMatrix(rotationAxes.x / 180 * Math.PI);
+            const rotationYMatrix = Matrix4.rotationYMatrix(rotationAxes.y / 180 * Math.PI);
+            const rotationZMatrix = Matrix4.rotationZMatrix(rotationAxes.z / 180 * Math.PI);
             // roll(Z), pitch(X), yaw(Y)
             const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
@@ -86,15 +87,18 @@ export class Transform {
     }
 
     setRotationX(degree) {
-        this.rotation.x = degree;
+        // this.rotation.x = degree;
+        this.rotation.setRotationX(degree);
     }
 
     setRotationY(degree) {
-        this.rotation.y = degree;
+        // this.rotation.y = degree;
+        this.rotation.setRotationY(degree);
     }
 
     setRotationZ(degree) {
-        this.rotation.z = degree;
+        // this.rotation.z = degree;
+        this.rotation.setRotationZ(degree);
     }
 
     setTranslation(v) {
