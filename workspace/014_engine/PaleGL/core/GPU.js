@@ -141,6 +141,7 @@ export class GPU {
         const setUniformValue = (type, uniformName, value) => {
             const gl = this.gl;
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
+            // TODO: nullなとき,値がおかしいときはセットしない
             switch(type) {
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
@@ -149,7 +150,7 @@ export class GPU {
                     gl.uniform3fv(location, value.elements);
                     break;
                 case UniformTypes.Matrix4:
-                    // arg 2 ... use transpose.
+                    // arg[1] ... use transpose.
                     gl.uniformMatrix4fv(location, false, value.elements);
                     break;
                 case UniformTypes.Color:

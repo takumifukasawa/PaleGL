@@ -92,6 +92,7 @@ export class Material {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
+            // TODO: shadow map class を作って bias 持たせた方がよい
             uShadowBias: {
                 type: UniformTypes.Float,
                 value: 0.01

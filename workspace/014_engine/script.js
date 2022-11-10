@@ -552,16 +552,16 @@ function initDebugger() {
         }
     });
 
-    debuggerGUI.addSliderDebugger({
-        label: "shadow bias",
-        minValue: 0,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: states.shadowBias,
-        onChange: (value) => {
-            floorPlaneMesh.material.uniforms.uShadowBias.value = value;
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "shadow bias",
+    //     minValue: 0,
+    //     maxValue: 0.1,
+    //     stepValue: 0.001,
+    //     initialValue: states.shadowBias,
+    //     onChange: (value) => {
+    //         floorPlaneMesh.material.uniforms.uShadowBias.value = value;
+    //     }
+    // });
  
     // NOTE: manually once update for debugger
     directionalLight.update({ gpu });
