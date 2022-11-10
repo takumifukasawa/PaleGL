@@ -1,6 +1,4 @@
-﻿import {Actor} from "./Actor.js";
-import {Mesh} from "./Mesh.js";
-import {ArrowGeometry} from "../geometries/ArrowGeometry.js";
+﻿import {Mesh} from "./Mesh.js";
 import {Material} from "../materials/Material.js";
 import {parseObj} from "../loaders/loadObj.js";
 import {Geometry} from "../geometries/Geometry.js";
@@ -212,13 +210,4 @@ export class AxisHelper extends Mesh {
         });
         super({ geometry, material });
     }
-    
-    // setPosition(p) {
-    //     this.transform.setTranslation(p);
-    // }
-
-    setDirection(p) {
-        this.transform.lookAt(p);
-    }
-
 }
