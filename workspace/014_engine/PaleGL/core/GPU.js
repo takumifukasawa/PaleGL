@@ -156,23 +156,27 @@ export class GPU {
                     gl.uniform4fv(location, value.elements);
                     break;
                 case UniformTypes.Texture:
-                    gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                    gl.bindTexture(
-                        gl.TEXTURE_2D,
-                        value ? value.glObject : this.dummyTexture.glObject
-                    );
-                    gl.uniform1i(location, activeTextureIndex);
-                    activeTextureIndex++;
+                    if(value) {
+                        gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                        gl.bindTexture(
+                            gl.TEXTURE_2D,
+                            value ? value.glObject : this.dummyTexture.glObject
+                        );
+                        gl.uniform1i(location, activeTextureIndex);
+                        activeTextureIndex++;
+                    }
                     break;
                 case UniformTypes.CubeMap:
-                    gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                    gl.bindTexture(
-                        gl.TEXTURE_CUBE_MAP,
-                        // TODO: needs dummy texture for cubemap ?
-                        value ? value.glObject : this.dummyTexture.glObject
-                    );
-                    gl.uniform1i(location, activeTextureIndex);
-                    activeTextureIndex++;
+                    if(value) {
+                        gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                        gl.bindTexture(
+                            gl.TEXTURE_CUBE_MAP,
+                            // TODO: needs dummy texture for cubemap ?
+                            value ? value.glObject : this.dummyTexture.glObject
+                        );
+                        gl.uniform1i(location, activeTextureIndex);
+                        activeTextureIndex++;
+                    }
                     break;
                 default:
                     throw "invalid uniform type";

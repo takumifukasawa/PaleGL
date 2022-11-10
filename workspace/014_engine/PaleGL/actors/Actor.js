@@ -39,9 +39,10 @@ export class Actor {
     }
     
     #tryStart({ gpu }) {
-        if(!this.isStarted) {
+        if(this.isStarted) {
             return;
         }
+        this.isStarted = true;
         this.start({ gpu });
     }
 
@@ -55,21 +56,21 @@ export class Actor {
     
     start({ gpu }) {
         if(this.#onStart) {
-            this.#onStart({ gpu });
+            this.#onStart({ actor: this, gpu });
         }
     }
     
     fixedUpdate({ gpu, fixedTime, fixedDeltaTime }) {
         this.#tryStart({ gpu });
         if(this.#onFixedUpdate) {
-            this.#onFixedUpdate({ gpu, fixedTime, fixedDeltaTime });
+            this.#onFixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
         }
     }
 
     update({ gpu, time, deltaTime }) {
         this.#tryStart({ gpu });
         if(this.#onUpdate) {
-            this.#onUpdate({ gpu, time, deltaTime });
+            this.#onUpdate({ actor: this, gpu, time, deltaTime });
         }
     }
 }

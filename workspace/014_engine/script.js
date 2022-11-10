@@ -31,6 +31,7 @@ import {Engine} from "./PaleGL/core/Engine.js";
 let width, height;
 let objMesh;
 let floorPlaneMesh;
+let cubeMap;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
 const states = {
@@ -142,20 +143,25 @@ engine.setScene(captureScene);
 
 const captureSceneCamera = new PerspectiveCamera(90, 1, 0.1, 100);
 captureScene.add(captureSceneCamera);
+captureScene.mainCamera = captureSceneCamera;
 
-captureSceneCamera.transform.setTranslation(new Vector3(0, 0, 5));
-captureSceneCamera.setClearColor(new Vector4(0, 0, 0, 1));
+captureSceneCamera.onStart = ({ actor }) => {
+    actor.transform.setTranslation(new Vector3(0, 0, 5));
+    actor.setClearColor(new Vector4(0, 0, 0, 1));
+}
 
 const directionalLight = new DirectionalLight();
 captureScene.add(directionalLight);
-directionalLight.transform.setTranslation(new Vector3(5, 5, 5));
-directionalLight.transform.lookAt(new Vector3(0, 0, 0));
-directionalLight.shadowCamera.visibleFrustum = true;
-directionalLight.castShadow = true;
-directionalLight.shadowCamera.near = 1;
-directionalLight.shadowCamera.far = 20;
-directionalLight.shadowCamera.setSize(null, null, -10, 10, -10, 10);
-directionalLight.shadowMap = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
+directionalLight.onStart = ({ actor }) => {
+    actor.transform.setTranslation(new Vector3(5, 5, 5));
+    actor.transform.lookAt(new Vector3(0, 0, 0));
+    actor.shadowCamera.visibleFrustum = true;
+    actor.castShadow = true;
+    actor.shadowCamera.near = 1;
+    actor.shadowCamera.far = 20;
+    actor.shadowCamera.setSize(null, null, -10, 10, -10, 10);
+    actor.shadowMap = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
+}
 
 const directionalForwardArrow = new ArrowHelper({ gpu });
 directionalLight.addChild(directionalForwardArrow);
@@ -203,9 +209,12 @@ const shadowMapPlane = new Mesh(
         }
     })
 );
-shadowMapPlane.transform.setTranslation(new Vector3(0, 6, 0));
-shadowMapPlane.transform.setScaling(Vector3.fill(2));
 captureScene.add(shadowMapPlane);
+
+shadowMapPlane.onStart = ({ actor }) => {
+    actor.transform.setTranslation(new Vector3(0, 6, 0));
+    actor.transform.setScaling(Vector3.fill(2));
+}
 
 // const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
 // testOrtho.visibleFrustum = true;
@@ -302,15 +311,9 @@ const main = async () => {
         [CubeMapAxis.NegativeY]: "./images/ny.png",
         [CubeMapAxis.PositiveZ]: "./images/pz.png",
         [CubeMapAxis.NegativeZ]: "./images/nz.png",
-        // [CubeMapAxis.PositiveX]: "./images/dir-x-plus.png",
-        // [CubeMapAxis.NegativeX]: "./images/dir-x-minus.png",
-        // [CubeMapAxis.PositiveY]: "./images/dir-y-plus.png",
-        // [CubeMapAxis.NegativeY]: "./images/dir-y-minus.png",
-        // [CubeMapAxis.PositiveZ]: "./images/dir-z-plus.png",
-        // [CubeMapAxis.NegativeZ]: "./images/dir-z-minus.png",
     };
   
-    const cubeMap = await loadCubeMap({ gpu, images });
+    cubeMap = await loadCubeMap({ gpu, images });
     
     const skyboxMesh = new Skybox({
         gpu, cubeMap
@@ -401,16 +404,49 @@ const main = async () => {
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
+
+    objMesh.onStart = () => {
+        objMesh.material.uniforms.uCubeTexture.value = cubeMap;
+        objMesh.transform.setTranslation(new Vector3(0, 2, 0));
+        objMesh.transform.setScaling(new Vector3(2, 2, 2));
+    }
     
-    objMesh.material.uniforms.uCubeTexture.value = cubeMap;
-    objMesh.transform.setTranslation(new Vector3(0, 2, 0));
-    objMesh.transform.setScaling(new Vector3(2, 2, 2));
-    
-    floorPlaneMesh.transform.setScaling(Vector3.fill(20));
-    floorPlaneMesh.transform.setRotationX(-90);
-    floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
+    floorPlaneMesh.onStart = () => {
+        floorPlaneMesh.transform.setScaling(Vector3.fill(20));
+        floorPlaneMesh.transform.setRotationX(-90);
+        floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
+    }
     
     captureSceneCamera.postProcess.enabled = false;
+    
+    window.addEventListener("mousemove", onMouseMove);
+    
+    onWindowResize();
+    window.addEventListener('resize', onWindowResize);
+    
+    engine.onUpdate = () => {
+        const cameraPosition = Vector3.addVectors(
+            captureSceneCamera.transform.position,
+            new Vector3(
+                (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
+                (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
+                (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
+            )
+        );
+        captureSceneCamera.transform.position = cameraPosition;
+
+        if(directionalLight.shadowMap) {
+            shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+            floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+        }
+    }
+    
+    engine.start();
+    
+    initDebugger();
+}
+
+function initDebugger() {
 
     const debuggerGUI = new DebuggerGUI();
     
@@ -553,6 +589,9 @@ const main = async () => {
         initialValue: states.shadowMapWidth,
         onChange: (value) => {
             states.shadowMapWidth = value;
+            if(!directionalLight.shadowMap) {
+                return;
+            }
             directionalLight.shadowMap.setSize(states.shadowMapWidth, states.shadowMapHeight);
         }
     });
@@ -571,6 +610,9 @@ const main = async () => {
         initialValue: states.shadowMapHeight,
         onChange: (value) => {
             states.shadowMapHeight = value;
+            if(!directionalLight.shadowMap) {
+                return;
+            }
             directionalLight.shadowMap.setSize(states.shadowMapWidth, states.shadowMapHeight);
         }
     });
@@ -586,32 +628,6 @@ const main = async () => {
     });
 
     wrapperElement.appendChild(debuggerGUI.domElement);
-
-    window.addEventListener("mousemove", onMouseMove);
-    
-    onWindowResize();
-    window.addEventListener('resize', onWindowResize);
-    
-    engine.onUpdate = () => {
-        const cameraPosition = Vector3.addVectors(
-            captureSceneCamera.transform.position,
-            new Vector3(
-                (targetCameraPosition.x - captureSceneCamera.transform.position.x) * 0.1,
-                (targetCameraPosition.y - captureSceneCamera.transform.position.y) * 0.1,
-                (targetCameraPosition.z - captureSceneCamera.transform.position.z) * 0.1
-            )
-        );
-        captureSceneCamera.transform.position = cameraPosition;
-
-        if(directionalLight.shadowMap) {
-            shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-            floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-        }
-    }
-    
-    captureScene.mainCamera = captureSceneCamera;
-    
-    engine.start();
 }
 
 main();
