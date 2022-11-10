@@ -178,7 +178,6 @@ export class AxisHelper extends Mesh {
             indices: objData.indices,
             drawCount: objData.indices.length
         });
-        // const geometry = new ArrowGeometry({ gpu });
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
