@@ -226,6 +226,14 @@ shadowMapPlane.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(0, 6, 0));
     actor.transform.setScaling(Vector3.fill(2));
 }
+shadowMapPlane.onUpdate = ({ actor }) => {
+    if(!directionalLight.shadowMap) {
+        return;
+    }
+    // for debug
+    actor.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+}
+ 
 
 // const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
 // testOrtho.visibleFrustum = true;
@@ -314,6 +322,11 @@ const main = async () => {
             }
         })
     );
+    objMesh.onStart = ({ actor }) => {
+        actor.material.uniforms.uCubeTexture.value = cubeMap;
+        actor.transform.setTranslation(new Vector3(0, 2, 0));
+        actor.transform.setScaling(new Vector3(2, 2, 2));
+    }
     
     const images = {
         [CubeMapAxis.PositiveX]: "./images/px.png",
@@ -411,23 +424,16 @@ const main = async () => {
             },
         })
     );
-
+    floorPlaneMesh.onStart = ({ actor }) => {
+        actor.transform.setScaling(Vector3.fill(20));
+        actor.transform.setRotationX(-90);
+        actor.transform.setTranslation(new Vector3(0, 0, 0));
+    }
+ 
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
 
-    objMesh.onStart = () => {
-        objMesh.material.uniforms.uCubeTexture.value = cubeMap;
-        objMesh.transform.setTranslation(new Vector3(0, 2, 0));
-        objMesh.transform.setScaling(new Vector3(2, 2, 2));
-    }
-    
-    floorPlaneMesh.onStart = () => {
-        floorPlaneMesh.transform.setScaling(Vector3.fill(20));
-        floorPlaneMesh.transform.setRotationX(-90);
-        floorPlaneMesh.transform.setTranslation(new Vector3(0, 0, 0));
-    }
-    
     captureSceneCamera.postProcess.enabled = false;
     
     window.addEventListener("mousemove", onMouseMove);
@@ -438,7 +444,6 @@ const main = async () => {
     engine.onUpdate = () => {
         // TODO: receive shadow な material には自動でセットしたい
         if(directionalLight.shadowMap) {
-            shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
             floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
         }
     }
