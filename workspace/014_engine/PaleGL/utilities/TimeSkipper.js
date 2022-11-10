@@ -17,16 +17,11 @@ export class TimeSkipper {
     // time [sec]
     exec(time) {
         const interval = 1 / this.targetFPS;
-        if(time > this.#lastTime) {
-            let deltaTime = 0;
-            // TODO: たくさん時間が空いたときにwhileが回りすぎてしまうので最適化
-            while(true) {
-                this.#lastTime += interval;
-                deltaTime += interval;
-                if((time - interval) < this.#lastTime) {
-                    break;
-                }
-            }
+        if((time - interval) >= this.#lastTime) {
+            const elapsedTime = time - this.#lastTime;
+            const n = Math.floor(elapsedTime / interval);
+            const deltaTime = interval * n;
+            this.#lastTime += deltaTime;
             this.#callback(this.#lastTime, deltaTime);
         }
     }
