@@ -28,9 +28,9 @@ export class ArrowHelper extends Mesh {
         super({ geometry, material });
     }
     
-    setPosition(p) {
-        this.transform.setTranslation(p);
-    }
+    // setPosition(p) {
+    //     this.transform.setTranslation(p);
+    // }
 
     setDirection(p) {
         this.transform.lookAt(p);
