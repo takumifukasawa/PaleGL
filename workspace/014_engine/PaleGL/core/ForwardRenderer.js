@@ -51,11 +51,11 @@ export class ForwardRenderer {
         const gl = this.#gpu.gl;
 
         if (renderTarget) {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, renderTarget.framebuffer.glObject);
-            gl.viewport(0, 0, renderTarget.width, renderTarget.height);
+            this.#gpu.setFramebuffer(renderTarget.framebuffer)
+            this.#gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
         } else {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.viewport(0, 0, this.#realWidth, this.#realHeight);
+            this.#gpu.setFramebuffer(null)
+            this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
         }
     }
 

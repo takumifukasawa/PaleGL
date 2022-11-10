@@ -43,6 +43,13 @@ export class GPU {
     setSize(x, y, width, height) {
         this.gl.viewport(x, y, width, height);
     }
+    
+    setFramebuffer(framebuffer) {
+        const gl = this.gl;
+        !!framebuffer
+            ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
+            : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
 
     flush() {
         this.gl.flush();
