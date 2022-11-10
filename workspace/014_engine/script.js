@@ -22,7 +22,6 @@ import {Color} from "./PaleGL/math/Color.js";
 import {CubeMap} from "./PaleGL/core/CubeMap.js";
 import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
 import {Skybox} from "./PaleGL/actors/Skybox.js";
-import {ArrowHelper} from "./PaleGL/actors/ArrowHelper.js";
 import {AxisHelper} from "./PaleGL/actors/AxisHelper.js";
 import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
@@ -36,7 +35,7 @@ let cubeMap;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
 const states = {
-    shadowBias: 0.01,
+    // shadowBias: 0.01,
     shadowMapWidth: 1024,
     shadowMapHeight: 1024,
 }
@@ -177,6 +176,7 @@ directionalLight.onStart = ({ actor }) => {
 
 const directionalLightShadowCameraAxisHelper = new AxisHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxisHelper);
+// captureScene.add(directionalLightShadowCameraAxisHelper);
 
 const shadowMapPlane = new Mesh({
     geometry: new PlaneGeometry({gpu}),
