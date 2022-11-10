@@ -1,5 +1,5 @@
 ﻿import {GPU} from "./PaleGL/core/GPU.js";
-import {BlendTypes, CubeMapAxis, FaceSide, PrimitiveTypes, UniformTypes} from "./PaleGL/constants.js";
+import {BlendTypes, CubeMapAxis, FaceSide, PrimitiveTypes, UniformTypes, RenderTargetTypes} from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
 import {Matrix4} from "./PaleGL/math/Matrix4.js";
@@ -155,6 +155,7 @@ directionalLight.castShadow = true;
 directionalLight.shadowCamera.near = 1;
 directionalLight.shadowCamera.far = 20;
 directionalLight.shadowCamera.setSize(null, null, -10, 10, -10, 10);
+directionalLight.shadowMap = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
 
 const directionalForwardArrow = new ArrowHelper({ gpu });
 directionalLight.addChild(directionalForwardArrow);
@@ -601,16 +602,14 @@ const main = async () => {
             )
         );
         captureSceneCamera.transform.position = cameraPosition;
-    }
-    
-    engine.onRender = () => {
-        renderer.render(captureScene, captureSceneCamera);
 
         if(directionalLight.shadowMap) {
             shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
             floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-        }       
+        }
     }
+    
+    captureScene.mainCamera = captureSceneCamera;
     
     engine.start();
 }

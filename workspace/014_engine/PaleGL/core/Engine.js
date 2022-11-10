@@ -8,7 +8,6 @@ export class Engine {
     // #renderFrameTimer;
     #onFixedUpdate;
     #onUpdate;
-    #onRender;
     #scene;
     #gpu;
     
@@ -20,11 +19,7 @@ export class Engine {
         this.#onUpdate = value;
     }
     
-    set onRender(value) {
-        this.#onRender = value;
-    }
-    
-    constructor({ gpu, renderer, onFixedUpdate, onUpdate, onRender }) {
+    constructor({ gpu, renderer, onFixedUpdate, onUpdate }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
 
@@ -35,7 +30,6 @@ export class Engine {
 
         this.#onFixedUpdate = onFixedUpdate;
         this.#onUpdate = onUpdate;
-        this.#onRender = onRender;
     }
     
     setScene(scene) {
@@ -84,9 +78,7 @@ export class Engine {
     }
     
     render() {
-        if(this.#onRender) {
-            this.#onRender();
-        }
+        this.#renderer.render(this.#scene, this.#scene.mainCamera);
     }
     
     tick(time) {

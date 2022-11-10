@@ -1,6 +1,7 @@
 ﻿
 export class Scene {
     children = []; // transform hierarchy
+    mainCamera;
     
     add(actor) {
         this.children.push(actor.transform);

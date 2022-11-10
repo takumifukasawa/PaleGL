@@ -15,28 +15,4 @@ export class DirectionalLight extends Light {
         this.shadowCamera.transform.setRotationY(180);
         this.addChild(this.shadowCamera);
     }
-  
-    // setSize(width, height) {
-    // }
-
-    // TODO: shadow map のサイズに応じてorthoのサイズ調整すべき？
-    // setShadowSize(width, height, near, far) {
-    //     this.shadowCamera.setSize(-width, width, -height, height);
-    //     this.shadowCamera.near = near;
-    //     this.shadowCamera.far = far;
-    // }
- 
-    update({ gpu }) {
-        // TODO:
-        // - cast shadow が有効な時だけ生成したい
-        // - 外側からshadowmap渡してもよい
-        // - ShadowMap class があってもよいかもしれない
-        if(this.castShadow && !this.shadowMap) {
-            this.shadowMap = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
-        }
-    }
-    
-    // afterUpdatedTransform() {
-    //     super.afterUpdatedTransform();
-    // }
 }
