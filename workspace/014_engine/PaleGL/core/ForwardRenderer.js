@@ -127,7 +127,7 @@ export class ForwardRenderer {
             if(!lightActor.castShadow) {
                 return;
             }
-            this.setRenderTarget(lightActor.shadowMap.write());
+            this.setRenderTarget(lightActor.shadowMap.write);
             // console.log(lightActor.shadowMap.write())
             this.clear(0, 0, 0, 1);
             
@@ -162,9 +162,9 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
      
         if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget.write());
+            this.setRenderTarget(camera.postProcess.renderTarget.write);
         } else {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write() : null);
+            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }
 
         // TODO: refactor

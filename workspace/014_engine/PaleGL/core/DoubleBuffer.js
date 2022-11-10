@@ -3,7 +3,7 @@ import {RenderTarget} from "./RenderTarget.js";
 import {RenderTargetTypes} from "../constants.js";
 import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
-export class DoubleBuffer extends  AbstractRenderTarget {
+export class DoubleBuffer extends AbstractRenderTarget {
     #renderTargets = [];
     
     currentReadIndex = 0;
@@ -12,7 +12,7 @@ export class DoubleBuffer extends  AbstractRenderTarget {
         super({ isSwappable: true });
         for(let i = 0; i < 2; i++) {
             this.#renderTargets.push(new RenderTarget(
-                { ...renderTargetOptions, ...({ name: "hoge " + i }) }
+                { ...renderTargetOptions, ...({ name: `double-buffer_${i}` }) }
             ));
         }
     }
@@ -21,11 +21,11 @@ export class DoubleBuffer extends  AbstractRenderTarget {
         this.#renderTargets.forEach(renderTarget => renderTarget.setSize(width, height));
     }
 
-    read() {
+    get read() {
         return this.#renderTargets[this.currentReadIndex];
     }
     
-    write() {
+    get write() {
         return this.#renderTargets[this.currentReadIndex ^ 1];
     }
 

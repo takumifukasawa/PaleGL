@@ -274,8 +274,8 @@ const tick = (time) => {
     renderer.render(captureScene, captureSceneCamera);
 
     if(directionalLight.shadowMap) {
-        shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read().texture;
-        floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read().texture;
+        shadowMapPlane.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
+        floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
     }
     
     

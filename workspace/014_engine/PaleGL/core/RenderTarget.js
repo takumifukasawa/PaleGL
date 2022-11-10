@@ -21,11 +21,11 @@ export class RenderTarget extends AbstractRenderTarget {
         return this.#framebuffer;
     }
     
-    read() {
+    get read() {
         return this;
     }
     
-    write() {
+    get write() {
         return this;
     }
     
