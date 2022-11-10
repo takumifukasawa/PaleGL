@@ -6,7 +6,6 @@ import {Geometry} from "../geometries/Geometry.js";
 const geometryData = `
 # Blender 3.3.1
 # www.blender.org
-mtllib untitled.mtl
 o Cube
 v 2.000000 0.031250 -0.031250
 v 2.000000 -0.031250 -0.031250
