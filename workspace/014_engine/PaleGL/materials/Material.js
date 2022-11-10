@@ -13,6 +13,7 @@ export class Material {
     depthWrite;
     culling;
     faceSide;
+    receiveShadow;
 
     static UniformTypes = {
         Float: "Float",
@@ -21,40 +22,42 @@ export class Material {
     };
 
     constructor({
-        gpu,
-        vertexShader,
-        fragmentShader,
-        primitiveType,
-        depthTest = null,
-        depthWrite = null,
-        faceSide = FaceSide.Front,
-        blendType,
-        renderQueue,
-        uniforms = {}
-    }) {
+                    gpu,
+                    vertexShader,
+                    fragmentShader,
+                    primitiveType,
+                    depthTest = null,
+                    depthWrite = null,
+                    faceSide = FaceSide.Front,
+                    receiveShadow = false,
+                    blendType,
+                    renderQueue,
+                    uniforms = {}
+                }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
-        
+
         this.depthTest = depthTest !== null ? depthTest : true;
         this.depthWrite = depthWrite;
-        
-        this.faceSide = faceSide;
 
-        if(!!renderQueue) {
+        this.faceSide = faceSide;
+        this.receiveShadow = !!receiveShadow;
+
+        if (!!renderQueue) {
             this.renderQueue = renderQueue;
         } else {
-            switch(this.blendType) {
+            switch (this.blendType) {
                 case BlendTypes.Opaque:
                     this.renderQueue = RenderQueues.Opaque;
                     break;
-                case BlendTypes.Transparent: 
+                case BlendTypes.Transparent:
                     this.renderQueue = RenderQueues.Transparent;
                     break;
             }
         }
-        
-        if(!this.renderQueue) {
+
+        if (!this.renderQueue) {
             throw "invalid render queue";
         }
 
@@ -80,6 +83,18 @@ export class Material {
             uViewPosition: {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero()
+            },
+            uShadowMap: {
+                type: UniformTypes.Texture,
+                value: null,
+            },
+            uShadowMapProjectionMatrix: {
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity()
+            },
+            uShadowBias: {
+                type: UniformTypes.Float,
+                value: 0.01
             }
         };
 

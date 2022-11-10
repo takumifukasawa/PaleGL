@@ -165,7 +165,7 @@ export class Skybox extends Mesh {
             }
         });
         
-        super(geometry, material, ActorTypes.Skybox);
+        super({ geometry, material, actorType: ActorTypes.Skybox });
     }
    
     // TODO: renderer側で2回走らないようにする

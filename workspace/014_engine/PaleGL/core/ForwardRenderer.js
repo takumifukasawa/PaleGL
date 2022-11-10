@@ -67,19 +67,12 @@ export class ForwardRenderer {
         this.#gpu.clear(r, g, b, a);
     }
 
-    #shadowPass(castShadowLightActors, opaqueMeshActors) {
+    #shadowPass(castShadowLightActors, castShadowMeshActors) {
         castShadowLightActors.forEach(lightActor => {
             this.setRenderTarget(lightActor.shadowMap.write);
-            // console.log(lightActor.shadowMap.write())
             this.clear(0, 0, 0, 1);
 
-            opaqueMeshActors.forEach(meshActor => {
-                // skybox は shadowmapに描画しない
-                switch (meshActor.type) {
-                    case ActorTypes.Skybox:
-                        return;
-                }
-
+            castShadowMeshActors.forEach(meshActor => {
                 // const material = meshActor.material;
                 const targetMaterial = this.#shadowMaterial;
 
@@ -93,9 +86,8 @@ export class ForwardRenderer {
                 if (targetMaterial.uniforms.uProjectionMatrix) {
                     targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
-
-                this.renderMesh(meshActor.geometry, this.#shadowMaterial);
-                // this.renderMesh(meshActor.geometry, meshActor.material);
+                
+                this.renderMesh(meshActor.geometry, targetMaterial);
             });
         });
     }
@@ -119,6 +111,12 @@ export class ForwardRenderer {
             }
 
             const targetMaterial = meshActor.material;
+
+            // reset
+            // NOTE: 余計なresetとかしない方がいい気がする
+            // if(targetMaterial.uniforms.uShadowMap) {
+            //     targetMaterial.uniforms.uShadowMap.value = null;
+            // }
 
             // TODO: material 側でやった方がよい？
             if (targetMaterial.uniforms.uWorldMatrix) {
@@ -161,7 +159,11 @@ export class ForwardRenderer {
                     }
                 }
 
-                if (targetMaterial.uniforms.uShadowMapProjectionMatrix && light.shadowCamera) {
+                if (
+                    targetMaterial.uniforms.uShadowMapProjectionMatrix &&
+                    targetMaterial.receiveShadow &&
+                    light.castShadow
+                ) {
                     // clip coord (-1 ~ 1) to uv (0 ~ 1)
                     const textureMatrix = new Matrix4(
                         0.5, 0, 0, 0.5,
@@ -175,8 +177,14 @@ export class ForwardRenderer {
                         light.shadowCamera.viewMatrix.clone()
                     );
 
-                    // TODO: directional light の構造体に持たせた方がいいかもしれない
-                    targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
+                    // TODO:
+                    // - directional light の構造体に持たせた方がいいかもしれない
+                    if(targetMaterial.uniforms.uShadowMap) {
+                        targetMaterial.uniforms.uShadowMap.value = light.shadowMap.read.texture;
+                    }
+                    if(targetMaterial.uniforms.uShadowMapProjectionMatrix) {
+                        targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
+                    }
                 }
             });
 
@@ -234,15 +242,23 @@ export class ForwardRenderer {
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
         const sortedMeshActors = Object.keys(meshActorsEachQueue).map(key => (meshActorsEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
-
+        
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
       
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
         
-        if(castShadowLightActors.length > 0 && meshActorsEachQueue.opaque.length > 0) {
-            this.#shadowPass(castShadowLightActors, meshActorsEachQueue.opaque);
+        if(castShadowLightActors.length > 0) {
+            const castShadowMeshActors = sortedMeshActors.filter(meshActor => {
+                if(meshActor.type === ActorTypes.Skybox) {
+                    return false;
+                }
+                return meshActor.castShadow;
+            });
+            if(castShadowMeshActors.length > 0) {
+                this.#shadowPass(castShadowLightActors, castShadowMeshActors);
+            }
         }
 
         // ------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import {VertexArrayObject} from "./../core/VertexArrayObject.js";
 import {IndexBufferObject} from "./../core/IndexBufferObject.js";
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
+// TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 export class Geometry {
     attributes;
     vertexCount;

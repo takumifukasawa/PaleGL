@@ -39,7 +39,7 @@ export class PostProcessPass {
             },
             primitiveType: PrimitiveTypes.Triangles
         });
-        this.mesh = new Mesh(this.#geometry, this.#material); 
+        this.mesh = new Mesh({ geometry: this.#geometry, material: this.#material }); 
         
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
     }

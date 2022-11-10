@@ -25,7 +25,7 @@ export class ArrowHelper extends Mesh {
             }
             `
         });
-        super(geometry, material);
+        super({ geometry, material });
     }
     
     setPosition(p) {

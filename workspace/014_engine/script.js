@@ -178,9 +178,9 @@ const directionalForwardArrow = new ArrowHelper({ gpu });
 directionalLight.addChild(directionalForwardArrow);
 directionalLight.shadowCamera.addChild(directionalForwardArrow);
 
-const shadowMapPlane = new Mesh(
-    new PlaneGeometry({ gpu }),
-    new Material({
+const shadowMapPlane = new Mesh({
+    geometry: new PlaneGeometry({gpu}),
+    material: new Material({
         gpu,
         vertexShader: `#version 300 es
         layout (location = 0) in vec3 aPosition;
@@ -215,11 +215,12 @@ const shadowMapPlane = new Mesh(
             },
             uShadowMapProjectionMatrix: {
                 type: UniformTypes.Matrix4,
-                value: null
+                value: Matrix4.identity()
             }
         }
-    })
-);
+    }),
+    castShadow: true
+});
 captureScene.add(shadowMapPlane);
 
 shadowMapPlane.onStart = ({ actor }) => {
@@ -288,9 +289,8 @@ captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 const main = async () => {
     const objData = await loadObj("./models/sphere-32-32.obj");
 
-    objMesh = new Mesh(
-        // new BoxGeometry({ gpu }),
-        new Geometry({
+    objMesh = new Mesh({
+        geometry: new Geometry({
             gpu,
             attributes: {
                 position: {
@@ -307,9 +307,10 @@ const main = async () => {
                 },
             },
             indices: objData.indices,
-            drawCount: objData.indices.length
+            drawCount: objData.indices.length,
+            castShadow: true,
         }),
-        new Material({
+        material: new Material({
             gpu,
             vertexShader: objModelVertexShader,
             fragmentShader: objModelFragmentShader,
@@ -320,8 +321,9 @@ const main = async () => {
                     value: null
                 },
             }
-        })
-    );
+        }),
+        castShadow: true
+    });
     objMesh.onStart = ({ actor }) => {
         actor.material.uniforms.uCubeTexture.value = cubeMap;
         actor.transform.setTranslation(new Vector3(0, 2, 0));
@@ -346,9 +348,9 @@ const main = async () => {
     const floorImg = await loadImg("./images/uv-checker.png");
     const floorTexture = new Texture({ gpu, img: floorImg });
     
-    floorPlaneMesh = new Mesh(
-        new PlaneGeometry({ gpu }),
-        new Material({
+    floorPlaneMesh = new Mesh({
+        geometry: new PlaneGeometry({gpu}),
+        material: new Material({
             gpu,
             vertexShader: `#version 300 es
             
@@ -409,21 +411,10 @@ const main = async () => {
                     type: UniformTypes.Texture,
                     value: floorTexture
                 },
-                uShadowMap: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                uShadowBias: {
-                    type: UniformTypes.Float,
-                    value: states.shadowBias
-                },
-                uShadowMapProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity()
-                }
             },
+            receiveShadow: true
         })
-    );
+    });
     floorPlaneMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(20));
         actor.transform.setRotationX(-90);
@@ -440,13 +431,6 @@ const main = async () => {
     
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
-    
-    engine.onUpdate = () => {
-        // TODO: receive shadow な material には自動でセットしたい
-        if(directionalLight.shadowMap) {
-            floorPlaneMesh.material.uniforms.uShadowMap.value = directionalLight.shadowMap.read.texture;
-        }
-    }
     
     engine.start();
     

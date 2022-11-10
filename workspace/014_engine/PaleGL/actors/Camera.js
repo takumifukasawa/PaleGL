@@ -89,8 +89,8 @@ export class Camera extends Actor {
         super.update({ gpu });
         
         if(this.visibleFrustum && !this.#visibleFrustumMesh) {
-            this.#visibleFrustumMesh = new Mesh(
-                new Geometry({
+            this.#visibleFrustumMesh = new Mesh({
+                geometry: new Geometry({
                     gpu,
                     attributes: {
                         position: {
@@ -118,7 +118,7 @@ export class Camera extends Actor {
                         3, 7
                     ]
                 }),
-                new Material({
+                material: new Material({
                     gpu,
                     vertexShader: `#version 300 es
                     
@@ -145,8 +145,8 @@ export class Camera extends Actor {
                     primitiveType: PrimitiveTypes.Lines,
                     blendType: BlendTypes.Transparent,
                     depthWrite: false
-                }),
-            );
+                })
+            });
             this.addChild(this.#visibleFrustumMesh);
         }
         
