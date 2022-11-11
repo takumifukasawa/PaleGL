@@ -5,8 +5,9 @@ export async function loadGLTF(path) {
    
     // for debug
     // console.log(gltf);
-
-    const targetScene = gltf.scenes[gltf.scene];
+    
+    // gltf.scene ... default scene index
+    // const targetScene = gltf.scenes[gltf.scene];
     
     // accessor の component type は gl の format と値が同じ
     // console.log('gl.BYTE', gl.BYTE); // 5120
@@ -29,7 +30,8 @@ export async function loadGLTF(path) {
         return { byteLength: buffer.byteLength, binBufferData };
     }));
 
-    targetScene.nodes.forEach(node => {
+    gltf.scenes.forEach(scene => {
+        scene.nodes.forEach(node => {
         const targetNode = gltf.nodes[node];
         const mesh = gltf.meshes[targetNode.mesh];
         mesh.primitives.forEach(primitive => {
@@ -44,8 +46,8 @@ export async function loadGLTF(path) {
             if(primitive.indices) {
                 meshAccessors.indices = { accessor: gltf.accessors[primitive.indices] };
             }
-            meshAccessors.attributes.forEach(meshAccessor => {
-                const { attributeName, accessor } = meshAccessor;
+            meshAccessors.attributes.forEach(attributeAccessor => {
+                const { attributeName, accessor } = attributeAccessor;
                 // NOTE: accessor = {buffer, byteLength, byteOffset, target }
                 const bufferView = gltf.bufferViews[accessor.bufferView];
                 const { binBufferData } = binBufferDataList[bufferView.buffer];
@@ -74,6 +76,7 @@ export async function loadGLTF(path) {
                 indices = new Uint16Array(slicedBuffer);
             }
         });
+    });
     });
 
     const data = {
