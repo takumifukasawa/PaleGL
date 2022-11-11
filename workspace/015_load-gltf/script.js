@@ -288,10 +288,8 @@ captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
 const main = async () => {
-    const gltfData = await loadGLTF("./models/ico-sphere.gltf");
-    // const gltfData = await loadGLTF("./models/cube-gltf.gltf");
-    
-    const objData = await loadObj("./models/sphere-32-32.obj");
+    const objData = await loadGLTF("./models/ico-sphere.gltf");
+    // const objData = await loadObj("./models/sphere-32-32.obj");
     objMesh = new Mesh({
         geometry: new Geometry({
             gpu,
