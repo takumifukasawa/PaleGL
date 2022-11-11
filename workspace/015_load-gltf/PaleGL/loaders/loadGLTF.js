@@ -4,7 +4,7 @@ export async function loadGLTF(path) {
     const gltf = await response.json();
    
     // for debug
-    // console.log(gltf);
+    console.log(gltf);
     
     // gltf.scene ... default scene index
     // const targetScene = gltf.scenes[gltf.scene];
@@ -32,51 +32,51 @@ export async function loadGLTF(path) {
 
     gltf.scenes.forEach(scene => {
         scene.nodes.forEach(node => {
-        const targetNode = gltf.nodes[node];
-        const mesh = gltf.meshes[targetNode.mesh];
-        mesh.primitives.forEach(primitive => {
-            const meshAccessors = {
-                attributes: [],
-                indices: null
-            }
-            Object.keys(primitive.attributes).forEach(attributeName => {
-                const accessorIndex = primitive.attributes[attributeName];
-                meshAccessors.attributes.push({ attributeName, accessor: gltf.accessors[accessorIndex] });
-            });
-            if(primitive.indices) {
-                meshAccessors.indices = { accessor: gltf.accessors[primitive.indices] };
-            }
-            meshAccessors.attributes.forEach(attributeAccessor => {
-                const { attributeName, accessor } = attributeAccessor;
-                // NOTE: accessor = {buffer, byteLength, byteOffset, target }
-                const bufferView = gltf.bufferViews[accessor.bufferView];
-                const { binBufferData } = binBufferDataList[bufferView.buffer];
-                const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
-                const data = new Float32Array(slicedBuffer);
-                switch(attributeName) {
-                    case "POSITION":
-                        positions = data;
-                        break;
-                    case "NORMAL":
-                        normals = data;
-                        break;
-                    case "TEXCOORD_0":
-                        uvs = data;
-                        break;
-                    default:
-                        throw "invalid attribute name";
+            const targetNode = gltf.nodes[node];
+            const mesh = gltf.meshes[targetNode.mesh];
+            mesh.primitives.forEach(primitive => {
+                const meshAccessors = {
+                    attributes: [],
+                    indices: null
+                }
+                Object.keys(primitive.attributes).forEach(attributeName => {
+                    const accessorIndex = primitive.attributes[attributeName];
+                    meshAccessors.attributes.push({ attributeName, accessor: gltf.accessors[accessorIndex] });
+                });
+                if(primitive.indices) {
+                    meshAccessors.indices = { accessor: gltf.accessors[primitive.indices] };
+                }
+                meshAccessors.attributes.forEach(attributeAccessor => {
+                    const { attributeName, accessor } = attributeAccessor;
+                    // NOTE: accessor = {buffer, byteLength, byteOffset, target }
+                    const bufferView = gltf.bufferViews[accessor.bufferView];
+                    const { binBufferData } = binBufferDataList[bufferView.buffer];
+                    const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
+                    const data = new Float32Array(slicedBuffer);
+                    switch(attributeName) {
+                        case "POSITION":
+                            positions = data;
+                            break;
+                        case "NORMAL":
+                            normals = data;
+                            break;
+                        case "TEXCOORD_0":
+                            uvs = data;
+                            break;
+                        default:
+                            throw "invalid attribute name";
+                    }
+                });
+                if(meshAccessors.indices) {
+                    const { attributeName, accessor } = meshAccessors.indices;
+                    // NOTE: accessor = {buffer, byteLength, byteOffset, target }
+                    const bufferView = gltf.bufferViews[accessor.bufferView];
+                    const { binBufferData } = binBufferDataList[bufferView.buffer];
+                    const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
+                    indices = new Uint16Array(slicedBuffer);
                 }
             });
-            if(meshAccessors.indices) {
-                const { attributeName, accessor } = meshAccessors.indices;
-                // NOTE: accessor = {buffer, byteLength, byteOffset, target }
-                const bufferView = gltf.bufferViews[accessor.bufferView];
-                const { binBufferData } = binBufferDataList[bufferView.buffer];
-                const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
-                indices = new Uint16Array(slicedBuffer);
-            }
         });
-    });
     });
 
     const data = {
@@ -87,7 +87,7 @@ export async function loadGLTF(path) {
     }
    
     // for debug
-    console.log(data)
+    // console.log(data)
     
     return data;
 }
