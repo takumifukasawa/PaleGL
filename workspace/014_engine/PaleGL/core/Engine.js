@@ -41,7 +41,6 @@ export class Engine {
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
         // this.#renderFrameTimer.start(t);
-        requestAnimationFrame(this.tick.bind(this));
     }
     
     setSize(width, height) {
@@ -80,11 +79,10 @@ export class Engine {
     render() {
         this.#renderer.render(this.#scene, this.#scene.mainCamera);
     }
-    
-    tick(time) {
+   
+    // time [sec]
+    run(time) {
         this.#fixedUpdateFrameTimer.exec(time / 1000);
         this.#updateFrameTimer.exec(time / 1000);
-        // this.#renderFrameTimer.exec(time / 1000);
-        requestAnimationFrame(this.tick.bind(this));
     }
 }

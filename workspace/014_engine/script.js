@@ -431,8 +431,14 @@ const main = async () => {
     
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
+   
+    const tick = (time) => {
+        engine.run(time);
+        requestAnimationFrame(tick);
+    }
     
     engine.start();
+    requestAnimationFrame(tick);
     
     initDebugger();
 }
