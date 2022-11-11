@@ -22,12 +22,13 @@ import {Color} from "./PaleGL/math/Color.js";
 import {CubeMap} from "./PaleGL/core/CubeMap.js";
 import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.js";
 import {Skybox} from "./PaleGL/actors/Skybox.js";
-import {AxisHelper} from "./PaleGL/actors/AxisHelper.js";
+import {AxesHelper} from "./PaleGL/actors/AxesHelper.js";
 import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 import {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.js";
 import {Engine} from "./PaleGL/core/Engine.js";
 
+let debuggerGUI;
 let width, height;
 let objMesh;
 let floorPlaneMesh;
@@ -174,9 +175,8 @@ directionalLight.onStart = ({ actor }) => {
     actor.shadowMap = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
 }
 
-const directionalLightShadowCameraAxisHelper = new AxisHelper({ gpu });
-directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxisHelper);
-// captureScene.add(directionalLightShadowCameraAxisHelper);
+const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
+directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const shadowMapPlane = new Mesh({
     geometry: new PlaneGeometry({gpu}),
@@ -426,12 +426,16 @@ const main = async () => {
     captureScene.add(objMesh);
 
     captureSceneCamera.postProcess.enabled = false;
-    
+   
     window.addEventListener("mousemove", onMouseMove);
     
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
-   
+  
+    engine.onBeforeUpdate = () => {
+        if(!debuggerGUI) initDebugger();
+    };
+    
     const tick = (time) => {
         engine.run(time);
         requestAnimationFrame(tick);
@@ -439,13 +443,11 @@ const main = async () => {
     
     engine.start();
     requestAnimationFrame(tick);
-    
-    initDebugger();
 }
 
 function initDebugger() {
 
-    const debuggerGUI = new DebuggerGUI();
+    debuggerGUI = new DebuggerGUI();
     
     debuggerGUI.addSliderDebugger({
         label: "obj position x",

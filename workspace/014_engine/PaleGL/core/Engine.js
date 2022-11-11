@@ -6,8 +6,8 @@ export class Engine {
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
     // #renderFrameTimer;
-    #onFixedUpdate;
-    #onUpdate;
+    #onBeforeFixedUpdate;
+    #onBeforeUpdate;
     #scene;
     #gpu;
     
@@ -15,11 +15,11 @@ export class Engine {
         return this.#renderer;
     }
     
-    set onUpdate(value) {
-        this.#onUpdate = value;
+    set onBeforeUpdate(value) {
+        this.#onBeforeUpdate = value;
     }
     
-    constructor({ gpu, renderer, onFixedUpdate, onUpdate }) {
+    constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
 
@@ -28,8 +28,8 @@ export class Engine {
         this.#updateFrameTimer = new TimeSkipper(60, this.update.bind(this));
         // this.#renderFrameTimer = new TimeSkipper(60, this.render.bind(this));
 
-        this.#onFixedUpdate = onFixedUpdate;
-        this.#onUpdate = onUpdate;
+        this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
+        this.#onBeforeUpdate = onBeforeUpdate;
     }
     
     setScene(scene) {
@@ -49,8 +49,8 @@ export class Engine {
     }
 
     fixedUpdate(fixedTime, fixedDeltaTime) {
-        if(this.#onFixedUpdate) {
-            this.#onFixedUpdate({ fixedTime, fixedDeltaTime });
+        if(this.#onBeforeFixedUpdate) {
+            this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
         
         this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
@@ -66,8 +66,8 @@ export class Engine {
     }
 
     update(time, deltaTime) {
-        if(this.#onUpdate) {
-            this.#onUpdate({ time, deltaTime });
+        if(this.#onBeforeUpdate) {
+            this.#onBeforeUpdate({ time, deltaTime });
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
