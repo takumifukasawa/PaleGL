@@ -2,8 +2,9 @@
 export async function loadGLTF(path) {
     const response = await fetch(path);
     const gltf = await response.json();
-    
-    console.log(gltf);
+   
+    // for debug
+    // console.log(gltf);
 
     const targetScene = gltf.scenes[gltf.scene];
     
@@ -31,7 +32,6 @@ export async function loadGLTF(path) {
     targetScene.nodes.forEach(node => {
         const targetNode = gltf.nodes[node];
         const mesh = gltf.meshes[targetNode.mesh];
-        console.log(targetNode, mesh)
         mesh.primitives.forEach(primitive => {
             const meshAccessors = {
                 attributes: [],
@@ -82,6 +82,9 @@ export async function loadGLTF(path) {
         uvs,
         indices
     }
-    
+   
+    // for debug
     console.log(data)
+    
+    return data;
 }
