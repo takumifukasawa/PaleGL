@@ -266,7 +266,7 @@ captureSceneCamera.setPostProcess(postProcess);
 
 const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
-    const ny = (e.clientY / height) * 2 - 1;
+    const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
     targetCameraPosition.y = ny * 10 + 12;
 };
@@ -288,7 +288,8 @@ captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
 const main = async () => {
-    const meshData = await loadGLTF("./models/cube-gltf.gltf");
+    const meshData = await loadGLTF("./models/ico-sphere.gltf");
+    // const meshData = await loadGLTF("./models/cube-gltf.gltf");
     // const meshData = await loadObj("./models/sphere-32-32.obj");
 
     objMesh = new Mesh({
