@@ -35,7 +35,7 @@ export class Geometry {
             this.indices = indices;
         }
 
-        if(immediateCreate) {
+        if(gpu && immediateCreate) {
             this.#createGeometry({ gpu })
         }
     }

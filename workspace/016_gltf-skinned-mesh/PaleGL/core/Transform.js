@@ -3,7 +3,9 @@ import {Matrix4} from "../math/Matrix4.js";
 import {ActorTypes} from "../constants.js";
 import {Rotator} from "../math/Rotator.js";
 
-// TODO: 外側から各種propertyを取得するときはmatrix更新した方がいい？
+// TODO: 
+// - 外側から各種propertyを取得するときはmatrix更新した方がいい？
+// - NodeBaseを継承
 export class Transform {
     parent;
     actor;
