@@ -222,7 +222,6 @@ const shadowMapPlane = new Mesh({
     }),
     castShadow: true
 });
-captureScene.add(shadowMapPlane);
 
 shadowMapPlane.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(0, 6, 0));
@@ -268,7 +267,8 @@ const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = ny * 10 + 12;
+    // targetCameraPosition.y = ny * 10 + 12;
+    targetCameraPosition.y = ny * 20;
 };
 
 const onWindowResize = () => {
@@ -288,10 +288,47 @@ captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
 const main = async () => {
+    console.log("----------------------------------------");
     // const aData = await loadGLTF({ gpu, path: "./models/ico-sphere.gltf" });
-    console.log("----------")
-    const bData = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
+    const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
+    captureScene.add(gltfActor);
+    gltfActor.transform.children[0].material = new Material({
+        gpu,
+        vertexShader: `#version 300 es
+        
+        layout(location = 0) in vec3 aPosition;
+        layout(location = 1) in vec2 aUv;
+
+        uniform mat4 uWorldMatrix;
+        uniform mat4 uViewMatrix;
+        uniform mat4 uProjectionMatrix;
+        
+        out vec2 vUv;
+
+        void main() {
+            vUv = aUv;
+            gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+        }
+        `,
+        fragmentShader: `#version 300 es
+        
+        precision mediump float;
+        
+        in vec2 vUv;
+        
+        out vec4 outColor;
+
+        void main() {
+            outColor = vec4(vUv, 1., 1.);
+        }
+        `,
+        faceSide: FaceSide.Double
+    });
+    console.log(gltfActor);
+    console.log(gltfActor.transform.children[0])
+    
+    console.log("----------------------------------------");
     
     const objData = await loadObj("./models/sphere-32-32.obj");
     objMesh = new Mesh({
@@ -331,7 +368,7 @@ const main = async () => {
     });
     objMesh.onStart = ({ actor }) => {
         actor.material.uniforms.uCubeTexture.value = cubeMap;
-        actor.transform.setTranslation(new Vector3(0, 2, 0));
+        actor.transform.setTranslation(new Vector3(0, 2, -5));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
@@ -425,7 +462,8 @@ const main = async () => {
         actor.transform.setRotationX(-90);
         actor.transform.setTranslation(new Vector3(0, 0, 0));
     }
- 
+
+    // captureScene.add(shadowMapPlane);
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);

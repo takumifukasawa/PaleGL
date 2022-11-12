@@ -207,6 +207,7 @@ export class ForwardRenderer {
                     // actor.transform.parent = camera.transform;
                     break;
                 case ActorTypes.Mesh:
+                case ActorTypes.SkinnedMesh:
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:
                             meshActorsEachQueue.opaque.push(actor);

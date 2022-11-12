@@ -130,6 +130,7 @@ export async function loadGLTF({ gpu, path }) {
         console.log("root bone", rootBone)
         
         const geometry = new Geometry({
+            gpu,
             attributes: {
                 position: {
                     data: positions,
@@ -194,7 +195,7 @@ export async function loadGLTF({ gpu, path }) {
         });
     });
     
-    console.log(rootActor)
+    // console.log(rootActor)
     
     return rootActor;
     

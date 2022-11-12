@@ -5,7 +5,7 @@ import {Rotator} from "../math/Rotator.js";
 
 export class NodeBase {
     name;
-    parent;
+    parent = null;
     children = [];
     
     constructor({ name }) {
