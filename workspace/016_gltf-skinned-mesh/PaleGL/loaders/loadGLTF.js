@@ -117,18 +117,10 @@ export async function loadGLTF({ gpu, path }) {
                 }
                 return bone;
             };
-            // NOTE: joints の 0番目が root bone のはず？
+            
+            // NOTE: joints の 0番目が常に root bone のはず？
             const rootBone = createBone(skin.joints[0]);
             console.log(rootBone);
-            // skin.joints.forEach((jointIndex, loopIndex) => {
-            //     if(loopIndex === 0) {
-            //         rootBone = new Bone(gltf.nodes[jointIndex]);
-            //     } else {
-            //         // joint node
-            //         const jointNode = gltf.nodes[jointIndex];
-            //         console.log(jointNode)
-            //     }
-            // });
         }
         
         return {
