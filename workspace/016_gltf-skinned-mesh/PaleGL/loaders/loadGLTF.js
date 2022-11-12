@@ -1,6 +1,9 @@
 
 import {Actor} from "../actors/Actor.js";
 import {Bone} from "../core/Bone.js";
+import {SkinnedMesh} from "../actors/SkinnedMesh.js";
+import {Geometry} from "../geometries/Geometry.js";
+import {Mesh} from "../actors/Mesh.js";
 
 export async function loadGLTF({ gpu, path }) {
     const response = await fetch(path);
@@ -34,6 +37,7 @@ export async function loadGLTF({ gpu, path }) {
         const bufferView = gltf.bufferViews[accessor.bufferView];
         const {binBufferData} = binBufferDataList[bufferView.buffer];
         const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
+        return slicedBuffer;
     }
     
     const createMesh = ({ meshIndex, skinIndex = null }) => {
@@ -43,6 +47,7 @@ export async function loadGLTF({ gpu, path }) {
         let indices = null;
         let joints = null;
         let weights = null;
+        let rootBone = null;
         
         console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
 
@@ -69,7 +74,6 @@ export async function loadGLTF({ gpu, path }) {
                 // const data = new Float32Array(slicedBuffer);
                 const bufferData = getBufferData(accessor);
                 const data = new Float32Array(bufferData);
-                // console.log(attributeName)
                 switch (attributeName) {
                     case "POSITION":
                         positions = data;
@@ -101,7 +105,7 @@ export async function loadGLTF({ gpu, path }) {
                 indices = new Uint16Array(bufferData);
             }
         });
-       
+        
         if(skinIndex !== null) {
             console.log("[loadGLTF.createMesh] mesh has skin");
             // gltf.skins
@@ -110,30 +114,65 @@ export async function loadGLTF({ gpu, path }) {
             const createBone = (nodeIndex, parentBone) => {
                 const node = gltf.nodes[nodeIndex];
                 const bone = new Bone({ name: node.name });
+                if(parentBone) {
+                    parentBone.addChild(bone);
+                }
                 if(node.children) {
-                    node.children
-                        .map(childNodeIndex => createBone(childNodeIndex, bone))
-                        .forEach(childBone => bone.addChild(childBone));
+                    node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
+                    // node.children
+                    //     .map(childNodeIndex => createBone(childNodeIndex, bone))
+                    //     .forEach(childBone => bone.addChild(childBone));
                 }
                 return bone;
             };
             
             // NOTE: joints の 0番目が常に root bone のはず？
-            const rootBone = createBone(skin.joints[0]);
-            console.log(rootBone);
+            rootBone = createBone(skin.joints[0]);
         }
         
-        return {
-            positions,
-            normals,
-            uvs,
-            indices
-        }
+        console.log("root bone", rootBone)
+        
+        const geometry = new Geometry({
+            attributes: {
+                position: {
+                    data: positions,
+                    size: 3,
+                },
+                normal: {
+                    data: normals,
+                    size: 3
+                },
+                uv: {
+                    data: uvs,
+                    size: 3
+                },
+                // bone があるならjointとweightもあるはず
+                ...(rootBone ? {
+                    joint: {
+                        data: joints,
+                        size: 4,
+                    },
+                    weight: {
+                        data: weights,
+                        size: 4,
+                    }
+                } : {}),
+            },
+            indices,
+            drawCount: indices.length
+        });
+        
+        return rootBone
+            ? new SkinnedMesh({ geometry, bones: rootBone })
+            : new Mesh({ geometry })
     }
     
     const findNode = (node) => {
         const targetNode = gltf.nodes[node];
-        console.log("[loadGLTF.findNode] target node", targetNode);
+
+        // for debug
+        // console.log("[loadGLTF.findNode] target node", targetNode);
+
         if(targetNode.hasOwnProperty("children")) {
             targetNode.children.forEach(targetNode => findNode(targetNode));
             return;
@@ -141,23 +180,26 @@ export async function loadGLTF({ gpu, path }) {
         // mesh node
         if(targetNode.hasOwnProperty("mesh")) {
             // TODO: fix multi mesh
-            mesh = createMesh({
+            const mesh = createMesh({
                 meshIndex: targetNode.mesh,
                 skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
             });
+            rootActor.addChild(mesh);
         }
-        // skin node
-        if(targetNode.hasOwnProperty("skin")) {
-        }
+        // // skin node
+        // if(targetNode.hasOwnProperty("skin")) {
+        // }
     }
-   
-    let mesh;
 
     gltf.scenes.forEach(scene => {
         scene.nodes.forEach(node => {
             findNode(node)
         });
     });
+    
+    console.log(rootActor)
+    
+    return rootActor;
     
     // const data = {
     //     positions: mesh.positions,

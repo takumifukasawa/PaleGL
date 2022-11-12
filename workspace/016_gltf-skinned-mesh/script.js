@@ -291,6 +291,7 @@ const main = async () => {
     // const aData = await loadGLTF({ gpu, path: "./models/ico-sphere.gltf" });
     console.log("----------")
     const bData = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
+    // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
     
     const objData = await loadObj("./models/sphere-32-32.obj");
     objMesh = new Mesh({

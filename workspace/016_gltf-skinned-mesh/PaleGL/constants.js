@@ -56,6 +56,7 @@ export const RenderbufferTypes = {
 export const ActorTypes = {
     Null: "Null",
     Mesh: "Mesh",
+    SkinnedMesh: "SkinnedMesh",
     Light: "Light",
     Skybox: "Skybox",
     Camera: "Camera",
