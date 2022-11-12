@@ -119,9 +119,6 @@ export async function loadGLTF({ gpu, path }) {
                 }
                 if(node.children) {
                     node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
-                    // node.children
-                    //     .map(childNodeIndex => createBone(childNodeIndex, bone))
-                    //     .forEach(childBone => bone.addChild(childBone));
                 }
                 return bone;
             };
