@@ -586,7 +586,10 @@ const createRawSkinnedMesh = async () => {
         }),
         bones: rootBone
     });
-    skinnedMesh.onUpdate = ({ time }) => {
+    skinnedMesh.onUpdate = ({ actor, time }) => {
+        // actor.transform.setTranslation(new Vector3(Math.cos(time) * 3, 0, Math.sin(time) * 3));
+        // actor.transform.setScaling(new Vector3(3, 3, 3))
+        actor.transform.setRotationY(time * 100);
         updateBone(time)
     }
     
