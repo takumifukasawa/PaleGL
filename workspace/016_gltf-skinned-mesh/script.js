@@ -291,91 +291,153 @@ captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
 const createRawSkinnedMesh = async () => {
     const rootActor = new Actor();
-    
-    const boxPosition_0 = [-0.5, 1, 0.5];
-    const boxPosition_1 = [-0.5, 0, 0.5];
-    const boxPosition_2 = [0.5, 1, 0.5];
-    const boxPosition_3 = [0.5, 0, 0.5];
-    const boxPosition_4 = [0.5, 1, -0.5];
-    const boxPosition_5 = [0.5, 0, -0.5];
-    const boxPosition_6 = [-0.5, 1, -0.5];
-    const boxPosition_7 = [-0.5, 0, -0.5];
 
-    const normals = [
-        [0, 0, 1], // front
-        [1, 0, 0], // right
-        [0, 0, -1], // back
-        [-1, 0, 0], // left
-        [0, 1, 0], // top
-        [0, -1, 0], // bottom
+    // -----------------------------
+    //   22 --- 23
+    //  /|     /|
+    // 20 --- 21|
+    // | 18 --| 19
+    // |/     |/|
+    // 16 --- 17|
+    // | 14 --| 15
+    // |/|    |/|
+    // 12 --- 13|
+    // | 10 --| 11
+    // |/|    |/|
+    // 8 ---- 9 |
+    // | 6 ---| 7
+    // |/|    |/|
+    // 4 ---- 5 |
+    // | 2 -- | 3
+    // |/     |/
+    // 0 ---- 1
+    // -----------------------------
+   
+    const boxFaces = [
+        [0, 2, 1, 1, 2, 3], // bottom
+        
+        [4, 0, 5, 5, 0, 1], // front_1
+        [5, 1, 7, 7, 1, 3], // right_1
+        [7, 3, 6, 6, 3, 2], // back_1
+        [6, 2, 4, 4, 2, 0], // left_1
+        
+        [8, 4, 9, 9, 4, 5], // front_2
+        [9, 5, 11, 11, 5, 7], // right_2
+        [11, 7, 10, 10, 7, 6], // back_2
+        [10, 6, 8, 8, 6, 4], // left_2
+        
+        [12, 8, 13, 13, 8, 9], // front_3
+        [13, 9, 15, 15, 9, 11], // right_3
+        [15, 11, 14, 14, 11, 10], // back_3
+        [14, 10, 12, 12, 10, 8], // left_3
+
+        [16, 12, 17, 17, 12, 13], // front_4
+        [17, 13, 19, 19, 13, 15], // right_4
+        [19, 15, 18, 18, 15, 14], // back_4
+        [18, 14, 16, 16, 14, 12], // left_4
+
+        [20, 16, 21, 21, 16, 17], // front_4
+        [21, 17, 23, 23, 17, 19], // right_4
+        [23, 19, 22, 22, 19, 18], // back_4
+        [22, 18, 20, 20, 18, 16], // left_4
+        
+        [22, 20, 23, 23, 20, 21], // top
     ];
-
+    
+    const indices = [...boxFaces].flat();
+   
+    const boxPositions = [
+        [-0.5, 0, 0.5], // 0
+        [0.5, 0, 0.5], // 1
+        [-0.5, 0, -0.5], // 2
+        [0.5, 0, -0.5], // 3
+        [-0.5, 1, 0.5], // 4
+        [0.5, 1, 0.5], // 5
+        [-0.5, 1, -0.5], // 6
+        [0.5, 1, -0.5], // 7
+        [-0.5, 2, 0.5], // 8
+        [0.5, 2, 0.5], // 9
+        [-0.5, 2, -0.5], // 10
+        [0.5, 2, -0.5], // 11
+        [-0.5, 3, 0.5], // 12
+        [0.5, 3, 0.5], // 13
+        [-0.5, 3, -0.5], // 14
+        [0.5, 3, -0.5], // 15
+        [-0.5, 4, 0.5], // 16
+        [0.5, 4, 0.5], // 17
+        [-0.5, 4, -0.5], // 18
+        [0.5, 4, -0.5], // 19
+        [-0.5, 5, 0.5], // 20
+        [0.5, 5, 0.5], // 21
+        [-0.5, 5, -0.5], // 22
+        [0.5, 5, -0.5], // 23
+    ]; 
+    
+    const colors = [
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(255, 0, 0))),
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(0, 255, 0))),
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(0, 0, 255))),
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(255, 255, 0))),
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(0, 255, 255))),
+        ...(new Array(4).fill(0).map(() => Color.fromRGB(255, 0, 255))),
+    ];
+    
+    // const normals = [
+    //     [0, 0, 1], // front
+    //     [1, 0, 0], // right
+    //     [0, 0, -1], // back
+    //     [-1, 0, 0], // left
+    //     [0, 1, 0], // top
+    //     [0, -1, 0], // bottom
+    // ];
+    
+    // const positions = indices.map((index, i) => boxPositions[index]).flat();
+    
     const skinnedMesh = new SkinnedMesh({
         gpu,
         geometry: new Geometry({
             gpu,   
             attributes: {
-                // -----------------------------
-                //    
-                //   6 ---- 4
-                //  /|     /|
-                // 0 ---- 2 |
-                // | 7 -- | 5
-                // |/     |/
-                // 1 ---- 3
-                // -----------------------------
                 position: {
-                    data: [
-                        // front
-                        ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
-                        // right
-                        ...boxPosition_2, ...boxPosition_3, ...boxPosition_4, ...boxPosition_5,
-                        // back
-                        ...boxPosition_4, ...boxPosition_5, ...boxPosition_6, ...boxPosition_7,
-                        // left
-                        ...boxPosition_6, ...boxPosition_7, ...boxPosition_0, ...boxPosition_1,
-                        // top
-                        ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
-                        // bottom
-                        ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
-                    ],
+                    data: boxPositions.flat(),
                     size: 3,
                 },
-                uv: {
-                    data: (new Array(6)).fill(0).map(() => ([
-                        0, 1,
-                        0, 0,
-                        1, 1,
-                        1, 0,
-                    ])).flat(),
-                    size: 2
-                },
-                normal: {
-                    data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
-                    size: 3
+                color: {
+                    data: colors.map(color => [color.r, color.g, color.b]).flat(),
+                    size: 3 
                 }
+                // uv: {
+                //     data: (new Array(boxFaces.length)).fill(0).map(() => ([
+                //         1, 0,
+                //         0, 0,
+                //         1, 1,
+                //         0, 1,
+                //     ])).flat(),
+                //     size: 2
+                // },
+                // normal: {
+                //     data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
+                //     size: 3
+                // }
             },
-            indices: Array.from(Array(6).keys()).map(i => ([
-                i * 4 + 0, i * 4 + 1, i * 4 + 2,
-                i * 4 + 2, i * 4 + 1, i * 4 + 3,
-            ])).flat(),
-            drawCount: 6 * 6 // indices count
+            indices,
+            drawCount: indices.length
         }),
         material: new Material({
             gpu,
             vertexShader: `#version 300 es
             
             layout(location = 0) in vec3 aPosition;
-            layout(location = 1) in vec2 aUv;
+            layout(location = 1) in vec3 aColor;
 
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
             
-            out vec2 vUv;
-
+            out vec3 vColor;
+            
             void main() {
-                vUv = aUv;
+                vColor = aColor;
                 gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
             }
             `,
@@ -383,12 +445,12 @@ const createRawSkinnedMesh = async () => {
             
             precision mediump float;
             
-            in vec2 vUv;
+            in vec3 vColor;
             
             out vec4 outColor;
 
             void main() {
-                outColor = vec4(vUv, 1., 1.);
+                outColor = vec4(vColor, 1.);
             }
             `,
         })
