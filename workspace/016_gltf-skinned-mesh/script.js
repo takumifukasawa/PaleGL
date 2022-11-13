@@ -293,6 +293,8 @@ const createRawSkinnedMesh = async () => {
     const rootActor = new Actor();
 
     // -----------------------------
+    // # position indices
+    // -----------------------------
     //   22 --- 23
     //  /|     /|
     // 20 --- 21|
@@ -312,6 +314,50 @@ const createRawSkinnedMesh = async () => {
     // |/     |/
     // 0 ---- 1
     // -----------------------------
+
+    // -----------------------------
+    // # bone indices (front view)
+    // -----------------------------
+    // 20 --- 21
+    // |      |
+    // |  b4  |
+    // |      |
+    // 16 --- 17
+    // |      |
+    // |  b3  |
+    // |      |
+    // 12 --- 13
+    // |      |
+    // |  b2  |
+    // |      |
+    // 8 ---- 9
+    // |      |
+    // |  b1  |
+    // |      |
+    // 4 ---- 5
+    // |      |
+    // |  b0  |
+    // |      |
+    // 0 ---- 1
+    // -----------------------------
+   
+    const boneIndicesEachHeight = [
+        [0, 0, 0, 0], // b0
+        [0, 1, 0, 0], // b0,b1
+        [1, 2, 0, 0], // b1,b2
+        [2, 3, 0, 0], // b2,b3
+        [3, 4, 0, 0], // b3,b4
+        [4, 0, 0, 0], // b3,b4
+    ];
+    
+    const boneWeightsEachHeight = [
+        [1, 0, 0, 0],
+        [0.5, 0.5, 0, 0],
+        [0.5, 0.5, 0, 0],
+        [0.5, 0.5, 0, 0],
+        [0.5, 0.5, 0, 0],
+        [1, 0, 0, 0],
+    ];
    
     const boxFaces = [
         [0, 2, 1, 1, 2, 3], // bottom
@@ -405,7 +451,15 @@ const createRawSkinnedMesh = async () => {
                 color: {
                     data: colors.map(color => [color.r, color.g, color.b]).flat(),
                     size: 3 
-                }
+                },
+                boneIndices: {
+                    data: (new Array(6 * 4).fill(0).map((elem, i) => boneIndicesEachHeight[Math.floor(i / 4)])).flat(),
+                    size:4
+                },
+                boneWeights: {
+                    data: (new Array(6 * 4).fill(0).map((elem, i) => boneWeightsEachHeight[Math.floor(i / 4)])).flat(),
+                    size:4
+                },
                 // uv: {
                 //     data: (new Array(boxFaces.length)).fill(0).map(() => ([
                 //         1, 0,
@@ -429,6 +483,8 @@ const createRawSkinnedMesh = async () => {
             
             layout(location = 0) in vec3 aPosition;
             layout(location = 1) in vec3 aColor;
+            layout(location = 2) in vec4 aBoneIndices;
+            layout(location = 3) in vec4 aBoneWeights;
 
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
