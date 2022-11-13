@@ -1,5 +1,13 @@
 ﻿import {GPU} from "./PaleGL/core/GPU.js";
-import {BlendTypes, CubeMapAxis, FaceSide, PrimitiveTypes, UniformTypes, RenderTargetTypes} from "./PaleGL/constants.js";
+import {
+    BlendTypes,
+    CubeMapAxis,
+    FaceSide,
+    PrimitiveTypes,
+    UniformTypes,
+    RenderTargetTypes,
+    AttributeUsageType
+} from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
 import {Matrix4} from "./PaleGL/math/Matrix4.js";
@@ -433,10 +441,11 @@ const createRawSkinnedMesh = async () => {
     rootBone.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 0.5, 0)); // offset
     
     const childBone1 = new Bone({ name: "child_bone_1" });
-    const bone1m = Matrix4.multiplyMatrices(
-        Matrix4.translationMatrix(new Vector3(0, 1, 0)),
-        Matrix4.rotationZMatrix(45 * Math.PI / 180)
-    );
+    const bone1m = Matrix4.translationMatrix(new Vector3(0, 1, 0));
+    // const bone1m = Matrix4.multiplyMatrices(
+    //     Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+    //     Matrix4.rotationZMatrix(45 * Math.PI / 180)
+    // );
     childBone1.offsetMatrix = bone1m; // offset from parent (root bone)
     rootBone.addChild(childBone1);
 
@@ -482,6 +491,7 @@ const createRawSkinnedMesh = async () => {
                 position: {
                     data: boxPositions.flat(),
                     size: 3,
+                    usage: AttributeUsageType.DynamicDraw
                 },
                 color: {
                     data: colors.map(color => [color.r, color.g, color.b]).flat(),
@@ -531,12 +541,13 @@ const createRawSkinnedMesh = async () => {
             
             void main() {
                 vColor = aColor;
-                mat4 skinMatrix =
-                     uJointMatrices[int(aBoneIndices[0])] * uBoneOffsetMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                     uJointMatrices[int(aBoneIndices[1])] * uBoneOffsetMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                     uJointMatrices[int(aBoneIndices[2])] * uBoneOffsetMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                     uJointMatrices[int(aBoneIndices[3])] * uBoneOffsetMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                // mat4 skinMatrix =
+                //      uJointMatrices[int(aBoneIndices[0])] * uBoneOffsetMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                //      uJointMatrices[int(aBoneIndices[1])] * uBoneOffsetMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                //      uJointMatrices[int(aBoneIndices[2])] * uBoneOffsetMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                //      uJointMatrices[int(aBoneIndices[3])] * uBoneOffsetMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
             }
             `,
             fragmentShader: `#version 300 es

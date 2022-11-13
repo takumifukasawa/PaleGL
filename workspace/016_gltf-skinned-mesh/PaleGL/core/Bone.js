@@ -36,7 +36,6 @@ export class Bone extends NodeBase {
         this.#jointMatrix = !!parentBone
             ? Matrix4.multiplyMatrices(this.offsetMatrix, parentBone.jointMatrix)
             : this.offsetMatrix;
-        this.#jointMatrix.log()
         this.children.forEach(childBone => childBone.calcJointMatrix(this));
     }
     

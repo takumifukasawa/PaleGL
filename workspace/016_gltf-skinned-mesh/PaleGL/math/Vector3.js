@@ -73,10 +73,10 @@
         const tmpY = this.y;
         const tmpZ = this.z;
         const tmpW = 1;
-        const x = m.m00 * tmpX + m.m01 * tmpY + m.m02 * tmpZ * m.m03 * tmpW;
-        const y = m.m10 * tmpX + m.m11 * tmpY + m.m12 * tmpZ * m.m13 * tmpW;
-        const z = m.m20 * tmpX + m.m21 * tmpY + m.m22 * tmpZ * m.m23 * tmpW;
-        const w = m.m30 * tmpX + m.m31 * tmpY + m.m32 * tmpZ * m.m33 * tmpW;
+        const x = m.m00 * tmpX + m.m01 * tmpY + m.m02 * tmpZ + m.m03 * tmpW;
+        const y = m.m10 * tmpX + m.m11 * tmpY + m.m12 * tmpZ + m.m13 * tmpW;
+        const z = m.m20 * tmpX + m.m21 * tmpY + m.m22 * tmpZ + m.m23 * tmpW;
+        const w = m.m30 * tmpX + m.m31 * tmpY + m.m32 * tmpZ + m.m33 * tmpW;
         this.x = x;
         this.y = y;
         this.z = z;
