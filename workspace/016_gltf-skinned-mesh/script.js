@@ -28,6 +28,8 @@ import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.js";
 import {RenderTarget} from "./PaleGL/core/RenderTarget.js";
 import {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.js";
 import {Engine} from "./PaleGL/core/Engine.js";
+import {Actor} from "./PaleGL/actors/Actor.js";
+import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.js";
 
 let debuggerGUI;
 let width, height;
@@ -287,12 +289,119 @@ const onWindowResize = () => {
 captureSceneCamera.transform.position = targetCameraPosition.clone();
 captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
 
-const main = async () => {
-    console.log("----------------------------------------");
+const createRawSkinnedMesh = async () => {
+    const rootActor = new Actor();
+    
+    const boxPosition_0 = [-0.5, 1, 0.5];
+    const boxPosition_1 = [-0.5, 0, 0.5];
+    const boxPosition_2 = [0.5, 1, 0.5];
+    const boxPosition_3 = [0.5, 0, 0.5];
+    const boxPosition_4 = [0.5, 1, -0.5];
+    const boxPosition_5 = [0.5, 0, -0.5];
+    const boxPosition_6 = [-0.5, 1, -0.5];
+    const boxPosition_7 = [-0.5, 0, -0.5];
+
+    const normals = [
+        [0, 0, 1], // front
+        [1, 0, 0], // right
+        [0, 0, -1], // back
+        [-1, 0, 0], // left
+        [0, 1, 0], // top
+        [0, -1, 0], // bottom
+    ];
+
+    const skinnedMesh = new SkinnedMesh({
+        gpu,
+        geometry: new Geometry({
+            gpu,   
+            attributes: {
+                // -----------------------------
+                //    
+                //   6 ---- 4
+                //  /|     /|
+                // 0 ---- 2 |
+                // | 7 -- | 5
+                // |/     |/
+                // 1 ---- 3
+                // -----------------------------
+                position: {
+                    data: [
+                        // front
+                        ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
+                        // right
+                        ...boxPosition_2, ...boxPosition_3, ...boxPosition_4, ...boxPosition_5,
+                        // back
+                        ...boxPosition_4, ...boxPosition_5, ...boxPosition_6, ...boxPosition_7,
+                        // left
+                        ...boxPosition_6, ...boxPosition_7, ...boxPosition_0, ...boxPosition_1,
+                        // top
+                        ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
+                        // bottom
+                        ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
+                    ],
+                    size: 3,
+                },
+                uv: {
+                    data: (new Array(6)).fill(0).map(() => ([
+                        0, 1,
+                        0, 0,
+                        1, 1,
+                        1, 0,
+                    ])).flat(),
+                    size: 2
+                },
+                normal: {
+                    data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
+                    size: 3
+                }
+            },
+            indices: Array.from(Array(6).keys()).map(i => ([
+                i * 4 + 0, i * 4 + 1, i * 4 + 2,
+                i * 4 + 2, i * 4 + 1, i * 4 + 3,
+            ])).flat(),
+            drawCount: 6 * 6 // indices count
+        }),
+        material: new Material({
+            gpu,
+            vertexShader: `#version 300 es
+            
+            layout(location = 0) in vec3 aPosition;
+            layout(location = 1) in vec2 aUv;
+
+            uniform mat4 uWorldMatrix;
+            uniform mat4 uViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            
+            out vec2 vUv;
+
+            void main() {
+                vUv = aUv;
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+            }
+            `,
+            fragmentShader: `#version 300 es
+            
+            precision mediump float;
+            
+            in vec2 vUv;
+            
+            out vec4 outColor;
+
+            void main() {
+                outColor = vec4(vUv, 1., 1.);
+            }
+            `,
+        })
+    });
+    
+    rootActor.addChild(skinnedMesh);
+    return rootActor;
+};
+
+const createGLTFSkinnedMesh = async () => {
     // const aData = await loadGLTF({ gpu, path: "./models/ico-sphere.gltf" });
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
-    captureScene.add(gltfActor);
     gltfActor.transform.children[0].material = new Material({
         gpu,
         vertexShader: `#version 300 es
@@ -325,11 +434,19 @@ const main = async () => {
         `,
         faceSide: FaceSide.Double
     });
+    
     console.log(gltfActor);
     console.log(gltfActor.transform.children[0])
     
+    return gltfActor;
+}
+
+const main = async () => {
     console.log("----------------------------------------");
-    
+    captureScene.add(await createRawSkinnedMesh());
+    // captureScene.add(await createGLTFSkinnedMesh());
+    console.log("----------------------------------------");
+   
     const objData = await loadObj("./models/sphere-32-32.obj");
     objMesh = new Mesh({
         geometry: new Geometry({
