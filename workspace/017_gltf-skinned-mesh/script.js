@@ -494,7 +494,7 @@ const createRawSkinnedMesh = async () => {
                 position: {
                     data: boxPositions.flat(),
                     size: 3,
-                    usage: AttributeUsageType.DynamicDraw
+                    // usage: AttributeUsageType.DynamicDraw
                 },
                 color: {
                     data: colors.map(color => [color.r, color.g, color.b]).flat(),
@@ -537,20 +537,23 @@ const createRawSkinnedMesh = async () => {
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
-            uniform mat4[5] uBoneOffsetMatrices;
+            // uniform mat4[5] uBoneOffsetMatrices;
             uniform mat4[5] uJointMatrices;
             
             out vec3 vColor;
             
             void main() {
                 vColor = aColor;
-                // mat4 skinMatrix =
-                //      uJointMatrices[int(aBoneIndices[0])] * uBoneOffsetMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                //      uJointMatrices[int(aBoneIndices[1])] * uBoneOffsetMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                //      uJointMatrices[int(aBoneIndices[2])] * uBoneOffsetMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                //      uJointMatrices[int(aBoneIndices[3])] * uBoneOffsetMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+
+                mat4 skinMatrix =
+                     uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                     uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                     uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                     uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                
+                // pre calc skinning in cpu
+                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -566,10 +569,10 @@ const createRawSkinnedMesh = async () => {
             }
             `,
             uniforms: {
-                uBoneOffsetMatrices: {
-                    type: UniformTypes.Matrix4Array,
-                    value: null
-                },
+                // uBoneOffsetMatrices: {
+                //     type: UniformTypes.Matrix4Array,
+                //     value: null
+                // },
                 uJointMatrices: {
                     type: UniformTypes.Matrix4Array,
                     value: null
