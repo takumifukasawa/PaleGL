@@ -160,6 +160,12 @@ export class GPU {
                     // arg[1] ... use transpose.
                     gl.uniformMatrix4fv(location, false, value.elements);
                     break;
+                case UniformTypes.Matrix4Array:
+                    if(value) {
+                        // arg[1] ... use transpose.
+                        gl.uniformMatrix4fv(location, false, value.map(v => [...v.elements]).flat());
+                    }
+                    break;
                 case UniformTypes.Color:
                     gl.uniform4fv(location, value.elements);
                     break;

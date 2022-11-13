@@ -30,6 +30,7 @@ import {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.js";
 import {Engine} from "./PaleGL/core/Engine.js";
 import {Actor} from "./PaleGL/actors/Actor.js";
 import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.js";
+import {Bone} from "./PaleGL/core/Bone.js";
 
 let debuggerGUI;
 let width, height;
@@ -428,16 +429,34 @@ const createRawSkinnedMesh = async () => {
         ...(new Array(4).fill(0).map(() => Color.fromRGB(255, 0, 255))),
     ];
     
-    // const normals = [
-    //     [0, 0, 1], // front
-    //     [1, 0, 0], // right
-    //     [0, 0, -1], // back
-    //     [-1, 0, 0], // left
-    //     [0, 1, 0], // top
-    //     [0, -1, 0], // bottom
-    // ];
+    const rootBone = new Bone({ name: "root_bone" });
+    rootBone.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 0.5, 0)); // offset
+    const childBone1 = new Bone({ name: "child_bone_1" });
+    childBone1.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (root bone)
+    rootBone.addChild(childBone1);
+    const childBone2 = new Bone({ name: "child_bone_2" });
+    childBone2.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 1)
+    childBone1.addChild(childBone2);
+    const childBone3 = new Bone({ name: "child_bone_3" });
+    childBone3.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 2)
+    childBone2.addChild(childBone3);
+    const childBone4 = new Bone({ name: "child_bone_4" });
+    childBone4.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 3)
+    childBone3.addChild(childBone4);
     
-    // const positions = indices.map((index, i) => boxPositions[index]).flat();
+    rootBone.calcBoneOffsetMatrix();
+    
+    // const createBone = (nodeIndex, parentBone) => {
+    //     const node = gltf.nodes[nodeIndex];
+    //     const bone = new Bone({ name: node.name });
+    //     if(parentBone) {
+    //         parentBone.addChild(bone);
+    //     }
+    //     if(node.children) {
+    //         node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
+    //     }
+    //     return bone;
+    // };
     
     const skinnedMesh = new SkinnedMesh({
         gpu,
@@ -489,12 +508,18 @@ const createRawSkinnedMesh = async () => {
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
+            uniform mat4[5] uBoneOffsetMatrices;
             
             out vec3 vColor;
             
             void main() {
                 vColor = aColor;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                mat4 skinMatrix =
+                    aBoneWeights.x * uBoneOffsetMatrices[int(aBoneIndices[0])] +
+                    aBoneWeights.y * uBoneOffsetMatrices[int(aBoneIndices[1])] +
+                    aBoneWeights.z * uBoneOffsetMatrices[int(aBoneIndices[2])] +
+                    aBoneWeights.w * uBoneOffsetMatrices[int(aBoneIndices[3])];
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -509,7 +534,14 @@ const createRawSkinnedMesh = async () => {
                 outColor = vec4(vColor, 1.);
             }
             `,
-        })
+            uniforms: {
+                uBoneOffsetMatrices: {
+                    type: UniformTypes.Matrix4Array,
+                    value: null
+                }
+            }
+        }),
+        bones: rootBone
     });
     
     rootActor.addChild(skinnedMesh);

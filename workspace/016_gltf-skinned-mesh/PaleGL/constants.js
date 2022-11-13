@@ -15,12 +15,13 @@ export const AttributeTypes = {
 
 export const UniformTypes = {
     Matrix4: "Matrix4",
+    Matrix4Array: "Matrix4Array",
     Texture: "Texture",
     CubeMap: "CubeMap",
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
-    Color: "Color"
+    Color: "Color",
 };
 
 export const TextureTypes = {

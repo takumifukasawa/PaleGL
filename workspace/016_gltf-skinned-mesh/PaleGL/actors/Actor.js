@@ -54,20 +54,20 @@ export class Actor {
     // actor lifecycle
     // -----------------------------------------------------------------
     
-    start({ gpu }) {
+    start({ gpu } = {}) {
         if(this.#onStart) {
             this.#onStart({ actor: this, gpu });
         }
     }
     
-    fixedUpdate({ gpu, fixedTime, fixedDeltaTime }) {
+    fixedUpdate({ gpu, fixedTime, fixedDeltaTime } = {}) {
         this.#tryStart({ gpu });
         if(this.#onFixedUpdate) {
             this.#onFixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
         }
     }
 
-    update({ gpu, time, deltaTime }) {
+    update({ gpu, time, deltaTime } = {}) {
         this.#tryStart({ gpu });
         if(this.#onUpdate) {
             this.#onUpdate({ actor: this, gpu, time, deltaTime });
