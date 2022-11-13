@@ -210,10 +210,14 @@ export class GPU {
         // set vertex
         gl.bindVertexArray(this.#vao.glObject);
 
-        if (this.#ibo) { // draw by indices
+        if (this.#ibo) {
+            // draw by indices
+            // drawCount ... use indices count
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
             gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
-        } else { // draw by array
+        } else {
+            // draw by array
+            // draw count ... use vertex num
             gl.drawArrays(glPrimitiveType, startOffset, drawCount);
         }
        

@@ -6,6 +6,7 @@ export class Bone extends NodeBase {
     #poseMatrix; // 初期姿勢行列
     #boneOffsetMatrix; // 初期姿勢行列の逆行列
     #jointMatrix = Matrix4.identity();
+    index;
     
     get boneOffsetMatrix() {
         return this.#boneOffsetMatrix;
@@ -19,8 +20,9 @@ export class Bone extends NodeBase {
         return this.#jointMatrix;
     }
 
-    constructor(options) {
+    constructor({ index, ...options }) {
         super(options);
+        this.index = index;
     }
 
     calcBoneOffsetMatrix(parentBone) {
