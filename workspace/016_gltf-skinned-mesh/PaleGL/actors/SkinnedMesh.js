@@ -11,6 +11,7 @@ export class SkinnedMesh extends Mesh {
     
     start() {
         this.material.uniforms.uBoneOffsetMatrices.value = this.getBoneOffsetMatrices();
+        this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
     }
 
     getBoneOffsetMatrices() {
@@ -20,5 +21,15 @@ export class SkinnedMesh extends Mesh {
             matrices.push(m);
         });
         return matrices;
+    }
+    
+    getBoneJointMatrices() {
+        const matrices = [];
+        this.bones.traverse((bone) => {
+            const m = bone.jointMatrix.clone();
+            // const m = bone.boneOffsetMatrix.clone();
+            matrices.push(m);
+        });
+        return matrices;        
     }
 }

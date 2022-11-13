@@ -431,20 +431,36 @@ const createRawSkinnedMesh = async () => {
     
     const rootBone = new Bone({ name: "root_bone" });
     rootBone.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 0.5, 0)); // offset
+    
     const childBone1 = new Bone({ name: "child_bone_1" });
-    childBone1.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (root bone)
+    const bone1m = Matrix4.multiplyMatrices(
+        Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+        Matrix4.rotationZMatrix(45 * Math.PI / 180)
+    );
+    childBone1.offsetMatrix = bone1m; // offset from parent (root bone)
     rootBone.addChild(childBone1);
+
     const childBone2 = new Bone({ name: "child_bone_2" });
-    childBone2.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 1)
+    const bone2m = Matrix4.translationMatrix(new Vector3(0, 1, 0));
+    // const bone2m = Matrix4.multiplyMatrices(
+    //     Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+    //     Matrix4.rotationZMatrix(45 * Math.PI / 180)
+    // );
+    childBone2.offsetMatrix = bone2m; // offset from parent (child bone 1)
     childBone1.addChild(childBone2);
+
     const childBone3 = new Bone({ name: "child_bone_3" });
     childBone3.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 2)
     childBone2.addChild(childBone3);
+
     const childBone4 = new Bone({ name: "child_bone_4" });
     childBone4.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 3)
     childBone3.addChild(childBone4);
     
     rootBone.calcBoneOffsetMatrix();
+    rootBone.calcJointMatrix();
+    
+    console.log(rootBone)
     
     // const createBone = (nodeIndex, parentBone) => {
     //     const node = gltf.nodes[nodeIndex];
@@ -509,16 +525,17 @@ const createRawSkinnedMesh = async () => {
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
             uniform mat4[5] uBoneOffsetMatrices;
+            uniform mat4[5] uJointMatrices;
             
             out vec3 vColor;
             
             void main() {
                 vColor = aColor;
                 mat4 skinMatrix =
-                    aBoneWeights.x * uBoneOffsetMatrices[int(aBoneIndices[0])] +
-                    aBoneWeights.y * uBoneOffsetMatrices[int(aBoneIndices[1])] +
-                    aBoneWeights.z * uBoneOffsetMatrices[int(aBoneIndices[2])] +
-                    aBoneWeights.w * uBoneOffsetMatrices[int(aBoneIndices[3])];
+                     uJointMatrices[int(aBoneIndices[0])] * uBoneOffsetMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                     uJointMatrices[int(aBoneIndices[1])] * uBoneOffsetMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                     uJointMatrices[int(aBoneIndices[2])] * uBoneOffsetMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                     uJointMatrices[int(aBoneIndices[3])] * uBoneOffsetMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
                 gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
             }
             `,
@@ -538,7 +555,11 @@ const createRawSkinnedMesh = async () => {
                 uBoneOffsetMatrices: {
                     type: UniformTypes.Matrix4Array,
                     value: null
-                }
+                },
+                uJointMatrices: {
+                    type: UniformTypes.Matrix4Array,
+                    value: null
+                },
             }
         }),
         bones: rootBone
