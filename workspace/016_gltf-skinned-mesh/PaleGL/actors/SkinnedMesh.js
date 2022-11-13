@@ -10,6 +10,8 @@ export class SkinnedMesh extends Mesh {
     boneIndices = [];
     boneWeights = [];
     
+    boneOffsetMatrices;
+    
     constructor({bones, ...options}) {
         super({ ...options, actorType: ActorTypes.SkinnedMesh });
         this.bones = bones;
@@ -44,16 +46,26 @@ export class SkinnedMesh extends Mesh {
        
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
+        
     }
     
-    start() {
-        this.material.uniforms.uBoneOffsetMatrices.value = this.getBoneOffsetMatrices();
-        this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
-    // }
-    // 
-    // update({ gpu }) {
+    start(options) {
+        super.start(options);
+        this.bones.calcBoneOffsetMatrix();
+        this.bones.calcJointMatrix();
+        
+        this.boneOffsetMatrices = this.getBoneOffsetMatrices();
+        // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
+        // this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
+    }
+    
+    update(options) {
+        super.update(options);
+        
+        this.bones.calcJointMatrix();
+        
         // NOTE: test update skinning by cpu
-        const boneOffsetMatrices = this.getBoneOffsetMatrices();
+        const boneOffsetMatrices = this.boneOffsetMatrices;
         const boneJointMatrices = this.getBoneJointMatrices();
         const newPositions = [];
         for(let i = 0; i < this.positions.length; i++) {
@@ -66,15 +78,19 @@ export class SkinnedMesh extends Mesh {
             const np = Vector3.addVectors(
                 p.clone()
                     .multiplyMatrix4(boneOffsetMatrices[boneIndices[0]])
+                    .multiplyMatrix4(boneJointMatrices[boneIndices[0]])
                     .scale(boneWeights[0]),
                 p.clone()
                     .multiplyMatrix4(boneOffsetMatrices[boneIndices[1]])
+                    .multiplyMatrix4(boneJointMatrices[boneIndices[1]])
                     .scale(boneWeights[1]),
                 p.clone()
                     .multiplyMatrix4(boneOffsetMatrices[boneIndices[2]])
+                    .multiplyMatrix4(boneJointMatrices[boneIndices[2]])
                     .scale(boneWeights[2]),
                 p.clone()
                     .multiplyMatrix4(boneOffsetMatrices[boneIndices[3]])
+                    .multiplyMatrix4(boneJointMatrices[boneIndices[3]])
                     .scale(boneWeights[3]),
             );
             newPositions.push(np);
@@ -101,4 +117,5 @@ export class SkinnedMesh extends Mesh {
         });
         return matrices;        
     }
+    
 }

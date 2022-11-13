@@ -356,7 +356,7 @@ const createRawSkinnedMesh = async () => {
         [1, 2, 0, 0], // b1,b2
         [2, 3, 0, 0], // b2,b3
         [3, 4, 0, 0], // b3,b4
-        [4, 0, 0, 0], // b3,b4
+        [4, 0, 0, 0], // b4
     ];
     
     const boneWeightsEachHeight = [
@@ -442,19 +442,11 @@ const createRawSkinnedMesh = async () => {
     
     const childBone1 = new Bone({ name: "child_bone_1" });
     const bone1m = Matrix4.translationMatrix(new Vector3(0, 1, 0));
-    // const bone1m = Matrix4.multiplyMatrices(
-    //     Matrix4.translationMatrix(new Vector3(0, 1, 0)),
-    //     Matrix4.rotationZMatrix(45 * Math.PI / 180)
-    // );
     childBone1.offsetMatrix = bone1m; // offset from parent (root bone)
     rootBone.addChild(childBone1);
 
     const childBone2 = new Bone({ name: "child_bone_2" });
     const bone2m = Matrix4.translationMatrix(new Vector3(0, 1, 0));
-    // const bone2m = Matrix4.multiplyMatrices(
-    //     Matrix4.translationMatrix(new Vector3(0, 1, 0)),
-    //     Matrix4.rotationZMatrix(45 * Math.PI / 180)
-    // );
     childBone2.offsetMatrix = bone2m; // offset from parent (child bone 1)
     childBone1.addChild(childBone2);
 
@@ -466,10 +458,25 @@ const createRawSkinnedMesh = async () => {
     childBone4.offsetMatrix = Matrix4.translationMatrix(new Vector3(0, 1, 0)); // offset from parent (child bone 3)
     childBone3.addChild(childBone4);
     
-    rootBone.calcBoneOffsetMatrix();
-    rootBone.calcJointMatrix();
-    
-    console.log(rootBone)
+    const updateBone = (time) => {
+        const rot = (Math.sin(time) * 45) * Math.PI / 180;
+        childBone1.offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+            Matrix4.rotationZMatrix(rot)
+        );
+        childBone2.offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+            Matrix4.rotationZMatrix(rot)
+        );
+        childBone3.offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+            Matrix4.rotationZMatrix(rot)
+        );
+        childBone4.offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(new Vector3(0, 1, 0)),
+            Matrix4.rotationZMatrix(rot)
+        );
+    }
     
     // const createBone = (nodeIndex, parentBone) => {
     //     const node = gltf.nodes[nodeIndex];
@@ -575,6 +582,9 @@ const createRawSkinnedMesh = async () => {
         }),
         bones: rootBone
     });
+    skinnedMesh.onUpdate = ({ time }) => {
+        updateBone(time)
+    }
     
     rootActor.addChild(skinnedMesh);
     return rootActor;
