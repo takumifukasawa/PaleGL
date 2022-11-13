@@ -113,7 +113,7 @@ export async function loadGLTF({ gpu, path }) {
             
             const createBone = (nodeIndex, parentBone) => {
                 const node = gltf.nodes[nodeIndex];
-                const bone = new Bone({ name: node.name });
+                const bone = new Bone({ name: node.name, index: nodeIndex });
                 if(parentBone) {
                     parentBone.addChild(bone);
                 }
@@ -160,9 +160,9 @@ export async function loadGLTF({ gpu, path }) {
             drawCount: indices.length
         });
         
-        return rootBone
-            ? new SkinnedMesh({ geometry, bones: rootBone })
-            : new Mesh({ geometry })
+        // return rootBone
+        //     ? new SkinnedMesh({ geometry, bones: rootBone })
+        //     : new Mesh({ geometry })
     }
     
     const findNode = (node) => {
@@ -182,7 +182,7 @@ export async function loadGLTF({ gpu, path }) {
                 meshIndex: targetNode.mesh,
                 skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
             });
-            rootActor.addChild(mesh);
+            // rootActor.addChild(mesh);
         }
         // // skin node
         // if(targetNode.hasOwnProperty("skin")) {

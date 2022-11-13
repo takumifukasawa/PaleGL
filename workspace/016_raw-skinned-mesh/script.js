@@ -591,44 +591,43 @@ const createRawSkinnedMesh = async () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    // const aData = await loadGLTF({ gpu, path: "./models/ico-sphere.gltf" });
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
-    gltfActor.transform.children[0].material = new Material({
-        gpu,
-        vertexShader: `#version 300 es
-        
-        layout(location = 0) in vec3 aPosition;
-        layout(location = 1) in vec2 aUv;
+    // gltfActor.transform.children[0].material = new Material({
+    //     gpu,
+    //     vertexShader: `#version 300 es
+    //     
+    //     layout(location = 0) in vec3 aPosition;
+    //     layout(location = 1) in vec2 aUv;
 
-        uniform mat4 uWorldMatrix;
-        uniform mat4 uViewMatrix;
-        uniform mat4 uProjectionMatrix;
-        
-        out vec2 vUv;
+    //     uniform mat4 uWorldMatrix;
+    //     uniform mat4 uViewMatrix;
+    //     uniform mat4 uProjectionMatrix;
+    //     
+    //     out vec2 vUv;
 
-        void main() {
-            vUv = aUv;
-            gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-        }
-        `,
-        fragmentShader: `#version 300 es
-        
-        precision mediump float;
-        
-        in vec2 vUv;
-        
-        out vec4 outColor;
+    //     void main() {
+    //         vUv = aUv;
+    //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+    //     }
+    //     `,
+    //     fragmentShader: `#version 300 es
+    //     
+    //     precision mediump float;
+    //     
+    //     in vec2 vUv;
+    //     
+    //     out vec4 outColor;
 
-        void main() {
-            outColor = vec4(vUv, 1., 1.);
-        }
-        `,
-        faceSide: FaceSide.Double
-    });
+    //     void main() {
+    //         outColor = vec4(vUv, 1., 1.);
+    //     }
+    //     `,
+    //     faceSide: FaceSide.Double
+    // });
     
     console.log(gltfActor);
-    console.log(gltfActor.transform.children[0])
+    // console.log(gltfActor.transform.children[0])
     
     return gltfActor;
 }
@@ -637,6 +636,7 @@ const main = async () => {
     console.log("----------------------------------------");
     captureScene.add(await createRawSkinnedMesh());
     // captureScene.add(await createGLTFSkinnedMesh());
+    await createGLTFSkinnedMesh();
     console.log("----------------------------------------");
    
     const objData = await loadObj("./models/sphere-32-32.obj");
