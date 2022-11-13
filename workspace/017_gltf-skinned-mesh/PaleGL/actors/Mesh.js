@@ -4,12 +4,20 @@ import {ActorTypes} from "./../constants.js";
 export class Mesh extends Actor {
     geometry;
     material;
+    depthMaterial;
     castShadow;
     
-    constructor({ geometry, material, actorType = ActorTypes.Mesh, castShadow = false }) {
+    constructor({
+        geometry,
+        material,
+        depthMaterial = null,
+        actorType = ActorTypes.Mesh,
+        castShadow = false
+    }) {
         super(actorType);
         this.geometry = geometry;
         this.material = material;
+        this.depthMaterial = depthMaterial;
         this.castShadow = !!castShadow;
     }
 }
