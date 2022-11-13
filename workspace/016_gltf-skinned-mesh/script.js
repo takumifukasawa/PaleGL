@@ -464,10 +464,6 @@ const createRawSkinnedMesh = async () => {
             Matrix4.translationMatrix(new Vector3(0, 1, 0)),
             Matrix4.rotationZMatrix(rot)
         );
-        // childBone1.offsetMatrix = Matrix4.multiplyMatrices(
-        //     childBone1.poseMatrix,
-        //     Matrix4.rotationZMatrix(rot),
-        // );
         childBone2.offsetMatrix = Matrix4.multiplyMatrices(
             Matrix4.translationMatrix(new Vector3(0, 1, 0)),
             Matrix4.rotationZMatrix(rot)
@@ -476,10 +472,6 @@ const createRawSkinnedMesh = async () => {
             Matrix4.translationMatrix(new Vector3(0, 1, 0)),
             Matrix4.rotationZMatrix(rot)
         );
-        // childBone4.offsetMatrix = Matrix4.multiplyMatrices(
-        //     Matrix4.translationMatrix(new Vector3(0, 1, 0)),
-        //     Matrix4.rotationZMatrix(rot)
-        // );
     }
     
     // const createBone = (nodeIndex, parentBone) => {
@@ -589,7 +581,7 @@ const createRawSkinnedMesh = async () => {
     skinnedMesh.onUpdate = ({ actor, time }) => {
         // actor.transform.setTranslation(new Vector3(Math.cos(time) * 3, 0, Math.sin(time) * 3));
         // actor.transform.setScaling(new Vector3(3, 3, 3))
-        actor.transform.setRotationY(time * 100);
+        // actor.transform.setRotationY(time * 100);
         updateBone(time)
     }
     
