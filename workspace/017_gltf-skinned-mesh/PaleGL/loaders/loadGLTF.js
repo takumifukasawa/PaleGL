@@ -6,6 +6,7 @@ import {Mesh} from "../actors/Mesh.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {AnimationClip} from "../core/AnimationClip.js";
+import {AnimationClipTypes} from "../constants";
 
 export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
@@ -242,13 +243,13 @@ export async function loadGLTF({gpu, path}) {
                 const outputAccessor = gltf.accessors[sampler.output];
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
-                let elementsNum;
+                let elementSize;
                 switch(outputAccessor.type) {
                     case "VEC3":
-                        elementsNum = 3;
+                        elementSize = 3;
                         break;
                     case "VEC4":
-                        elementsNum = 4;
+                        elementSize = 4;
                         break;
                     default:
                         throw "invalid accessor type";
@@ -263,7 +264,8 @@ export async function loadGLTF({gpu, path}) {
                     end: inputAccessor.max,
                     frames: inputData,
                     frameCount: inputAccessor.count,
-                    elementsNum
+                    elementSize,
+                    type: channel.target.path === "rotation" ? AnimationClipTypes.Rotator : AnimationClipTypes.Vector3
                 });
                 return animationClip;
             });

@@ -649,19 +649,21 @@ const createGLTFSkinnedMesh = async () => {
     gltfActor.onStart = ({ actor }) => {
         if(actor.animationClips) {
             actor.animationClips.forEach(animationClip => {
-                // TODO: this is dummy time
-                animationClip.play(performance.now() / 1000);
+                animationClip.loop = true;
+                animationClip.play();
             });
         }
     };
-    gltfActor.onUpdate = ({ actor }) => {
+    gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
         if(actor.animationClips) {
             actor.animationClips.forEach(animationClip => {
                 // TODO: this is dummy time
-                animationClip.update(performance.now() / 1000);
+                animationClip.update(fixedDeltaTime);
             });
         }
     };
+    // TODO: remove. it's for debugging
+    gltfActor.animationClips = [gltfActor.animationClips[0]];
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
     gltfActor.transform.children[0].transform.children[0].material = new Material({
         gpu,

@@ -94,3 +94,9 @@ export const RenderTargetTypes = {
     RGBA: "RGBA",
     Depth: "Depth"
 }
+
+export const AnimationClipTypes = {
+    Vector3: "Vector3",
+    Rotator: "Rotator",
+    Scalar: "Scalar"
+}
