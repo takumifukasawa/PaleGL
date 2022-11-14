@@ -647,7 +647,7 @@ const createRawSkinnedMesh = async () => {
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
-    gltfActor.transform.children[0].material = new Material({
+    gltfActor.transform.children[0].transform.children[0].material = new Material({
         gpu,
         vertexShader: `#version 300 es
             
@@ -702,7 +702,7 @@ const createGLTFSkinnedMesh = async () => {
             },
         }
     });
-    // gltfActor.transform.children[0].depthMaterial = new Material({
+    // gltfActor.transform.children[0].transform.children[0].material = new Material({
     //     gpu,
     //     vertexShader: `#version 300 es
     //         
@@ -763,7 +763,6 @@ const main = async () => {
     console.log("----------------------------------------");
     // captureScene.add(await createRawSkinnedMesh());
     captureScene.add(await createGLTFSkinnedMesh());
-    // await createGLTFSkinnedMesh();
     console.log("----------------------------------------");
    
     const objData = await loadObj("./models/sphere-32-32.obj");

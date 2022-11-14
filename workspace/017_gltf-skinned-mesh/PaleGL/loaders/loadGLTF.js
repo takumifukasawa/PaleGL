@@ -15,6 +15,8 @@ export async function loadGLTF({gpu, path}) {
     // for debug
     console.log(gltf);
 
+    const cacheNodes = [];
+
     // gltf.scene ... default scene index
     // const targetScene = gltf.scenes[gltf.scene];
 
@@ -40,8 +42,33 @@ export async function loadGLTF({gpu, path}) {
         const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
         return slicedBuffer;
     }
+    
+    const createBone = (nodeIndex, parentBone) => {
+        const node = gltf.nodes[nodeIndex];
+        // NOTE:
+        // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
+        // - indexをふり直しても良い
+        const bone = new Bone({name: node.name, index: nodeIndex});
+        cacheNodes[nodeIndex] = bone;
+       
+        const offsetMatrix = Matrix4.multiplyMatrices(
+            node.translation ? Matrix4.translationMatrix(Vector3.fromArray(node.translation)) : Matrix4.identity(),
+            Matrix4.identity(),
+            Matrix4.identity()
+        );
+        bone.offsetMatrix = offsetMatrix;
+        
+        if (parentBone) {
+            parentBone.addChild(bone);
+        }
+        if (node.children) {
+            node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
+        }
 
-    const createMesh = ({meshIndex, skinIndex = null}) => {
+        return bone;
+    };
+
+    const createMesh = ({nodeIndex, meshIndex, skinIndex = null}) => {
         let positions = null;
         let normals = null;
         let uvs = null;
@@ -111,36 +138,13 @@ export async function loadGLTF({gpu, path}) {
             // gltf.skins
             const skin = gltf.skins[skinIndex];
 
-            const createBone = (nodeIndex, parentBone) => {
-                const node = gltf.nodes[nodeIndex];
-                // NOTE:
-                // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
-                // - indexをふり直しても良い
-                const bone = new Bone({name: node.name, index: nodeIndex});
-               
-                const offsetMatrix = Matrix4.multiplyMatrices(
-                    node.translation ? Matrix4.translationMatrix(Vector3.fromArray(node.translation)) : Matrix4.identity(),
-                    Matrix4.identity(),
-                    Matrix4.identity()
-                );
-                bone.offsetMatrix = offsetMatrix;
-                
-                if (parentBone) {
-                    parentBone.addChild(bone);
-                }
-                if (node.children) {
-                    node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
-                }
-                return bone;
-            };
-
             // NOTE: joints の 0番目が常に root bone のはず？
             rootBone = createBone(skin.joints[0]);
 
             rootBone.calcBoneOffsetMatrix();
             rootBone.calcJointMatrix();
         }
-
+        
         // console.log("root bone", rootBone)
         // console.log(positions, normals, uvs, joints, weights)
 
@@ -175,41 +179,83 @@ export async function loadGLTF({gpu, path}) {
             drawCount: indices.length
         });
         
-        // return new Mesh({ geometry })
         return rootBone
             ? new SkinnedMesh({ geometry, bones: rootBone })
             : new Mesh({ geometry })
     }
 
-    const findNode = (node) => {
-        const targetNode = gltf.nodes[node];
-
+    const findNode = (nodeIndex, parentActor) => {
+        const targetNode = gltf.nodes[nodeIndex];
+        
         // for debug
         // console.log("[loadGLTF.findNode] target node", targetNode);
+        
+        const hasChildren = targetNode.hasOwnProperty("children");
+        const hasMesh = targetNode.hasOwnProperty("mesh");
 
-        if (targetNode.hasOwnProperty("children")) {
-            targetNode.children.forEach(targetNode => findNode(targetNode));
+        // anchor actor (null actor)
+        if (hasChildren && !hasMesh) {
+            const anchorActor = new Actor();
+            parentActor.addChild(anchorActor);
+            cacheNodes[nodeIndex] = anchorActor;
+            targetNode.children.forEach(targetNode => findNode(targetNode, anchorActor));
             return;
         }
-        // mesh node
-        if (targetNode.hasOwnProperty("mesh")) {
+
+        // mesh actor
+        if (hasMesh) {
             // TODO: fix multi mesh
             const mesh = createMesh({
+                nodeIndex,
                 meshIndex: targetNode.mesh,
                 skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
             });
-            rootActor.addChild(mesh);
+            cacheNodes[nodeIndex] = mesh;
+            
+            parentActor.addChild(mesh);
         }
-        // // skin node
-        // if(targetNode.hasOwnProperty("skin")) {
-        // }
     }
 
     gltf.scenes.forEach(scene => {
         scene.nodes.forEach(node => {
-            findNode(node)
+            findNode(node, rootActor)
         });
     });
+    
+    const createAnimationClips = () => {
+        if(gltf.animations && gltf.animations.length < 1) {
+            return [];
+        }
+        return gltf.animations.map(animation => {
+            return animation.channels.map(channel => {
+                const sampler = animation.samplers[channel.sampler];
+                const inputAccessor = gltf.accessors[sampler.input];
+                const inputBufferData = getBufferData(inputAccessor);
+                const inputData = new Float32Array(inputBufferData);
+                const outputAccessor = gltf.accessors[sampler.output];
+                const outputBufferData = getBufferData(outputAccessor);
+                const outputData = new Float32Array(outputBufferData);
+                const animationClip = new AnimationClip({
+                    name: channel.target.path,
+                    interpolation: sampler.interpolation,
+                    type: outputAccessor.type,
+                    data: outputData,
+                    start: inputAccessor.min,
+                    end: inputAccessor.max,
+                    frames: inputData,
+                    frameCount: inputAccessor.count
+                });
+                return animationClip;
+            });
+        });
+    }
+
+    console.log("------------")
+    console.log(cacheNodes)
+    const animationClips = createAnimationClips();
+    console.log(animationClips);
+    console.log(rootActor);
+    console.log("------------")
 
     // console.log(rootActor)
 
@@ -226,4 +272,33 @@ export async function loadGLTF({gpu, path}) {
     // // console.log(data)
     // 
     // return data;
+}
+
+class AnimationClip {
+    name;
+    interpolation;
+    type;
+    #data;
+    start;
+    end;
+    frames;
+    frameCount;
+    
+    get data() {
+        return this.#data;
+    }
+
+    constructor({ name, interpolation, type, data, start, end, frames, frameCount }) {
+        this.name = name;
+        this.interpolation = interpolation;
+        this.type = type;
+        this.#data = data;
+        this.start = start;
+        this.end = end;
+        this.frames = frames;
+        this.frameCount = frameCount;
+    }
+}
+
+class AnimationData {
 }
