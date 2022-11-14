@@ -2,9 +2,9 @@
 import {Matrix4} from "../math/Matrix4.js";
 
 export class Bone extends NodeBase {
-    offsetMatrix; // 初期姿勢のボーンローカル座標
-    #poseMatrix; // 初期姿勢行列
-    #boneOffsetMatrix; // 初期姿勢行列の逆行列
+    offsetMatrix = Matrix4.identity(); // 初期姿勢のボーンローカル座標
+    #poseMatrix = Matrix4.identity(); // 初期姿勢行列
+    #boneOffsetMatrix = Matrix4.identity(); // 初期姿勢行列の逆行列
     #jointMatrix = Matrix4.identity();
     index;
     

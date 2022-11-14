@@ -579,7 +579,6 @@ const createRawSkinnedMesh = async () => {
                 },
             }
         }),
-        
         depthMaterial: new Material({
             gpu,
             vertexShader: `#version 300 es
@@ -605,6 +604,8 @@ const createRawSkinnedMesh = async () => {
                 
                 // pre calc skinning in cpu
                 // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                
+                // gl_Position = uProjectionMatrix * uViewMatrix * vec4(aPosition, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -639,46 +640,120 @@ const createRawSkinnedMesh = async () => {
         updateBone(time)
     }
     
-    rootActor.addChild(skinnedMesh);
+    // rootActor.addChild(skinnedMesh);
     return rootActor;
 };
 
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
-    // gltfActor.transform.children[0].material = new Material({
-    //     gpu,
-    //     vertexShader: `#version 300 es
-    //     
-    //     layout(location = 0) in vec3 aPosition;
-    //     layout(location = 1) in vec2 aUv;
+    console.log()
+    gltfActor.transform.children[0].material = new Material({
+        gpu,
+        vertexShader: `#version 300 es
+            
+            layout(location = 0) in vec3 aPosition;
+            layout(location = 1) in vec3 aNormal;
+            layout(location = 2) in vec2 aUv;
+            // layout(location = 3) in vec4 aBoneIndices;
+            // layout(location = 4) in vec4 aBoneWeights;
 
-    //     uniform mat4 uWorldMatrix;
-    //     uniform mat4 uViewMatrix;
-    //     uniform mat4 uProjectionMatrix;
-    //     
-    //     out vec2 vUv;
+            uniform mat4 uWorldMatrix;
+            uniform mat4 uViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            // // uniform mat4[5] uBoneOffsetMatrices;
+            // uniform mat4[5] uJointMatrices;
+            
+            out vec2 vUv;
+            
+            void main() {
+                vUv = aUv;
 
-    //     void main() {
-    //         vUv = aUv;
-    //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-    //     }
-    //     `,
-    //     fragmentShader: `#version 300 es
-    //     
-    //     precision mediump float;
-    //     
-    //     in vec2 vUv;
-    //     
-    //     out vec4 outColor;
+                // mat4 skinMatrix =
+                //      uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                //      uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                //      uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                //      uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                
+                // pre calc skinning in cpu
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+            }
+            `,
+        fragmentShader: `#version 300 es
+            
+            precision mediump float;
+            
+            in vec2 vUv;
+            
+            out vec4 outColor;
 
-    //     void main() {
-    //         outColor = vec4(vUv, 1., 1.);
-    //     }
-    //     `,
-    //     faceSide: FaceSide.Double
-    // });
-    
+            void main() {
+                outColor = vec4(vUv, 1., 1.);
+            }
+            `,
+        uniforms: {
+            // uBoneOffsetMatrices: {
+            //     type: UniformTypes.Matrix4Array,
+            //     value: null
+            // },
+            uJointMatrices: {
+                type: UniformTypes.Matrix4Array,
+                value: null
+            },
+        }
+    });
+    gltfActor.transform.children[0].depthMaterial = new Material({
+        gpu,
+        vertexShader: `#version 300 es
+            
+            layout(location = 0) in vec3 aPosition;
+            layout(location = 1) in vec3 aColor;
+            layout(location = 2) in vec4 aBoneIndices;
+            layout(location = 3) in vec4 aBoneWeights;
+
+            uniform mat4 uWorldMatrix;
+            uniform mat4 uViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            // uniform mat4[5] uBoneOffsetMatrices;
+            uniform mat4[5] uJointMatrices;
+            
+            void main() {
+                mat4 skinMatrix =
+                     uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                     uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                     uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                     uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                
+                // pre calc skinning in cpu
+                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                
+                // gl_Position = uProjectionMatrix * uViewMatrix * vec4(aPosition, 1.);
+            }
+            `,
+        fragmentShader: `#version 300 es
+            
+            precision mediump float;
+            
+            out vec4 outColor;
+
+            void main() {
+                outColor = vec4(1., 1., 1., 1.);
+            }
+            `,
+        uniforms: {
+            // uBoneOffsetMatrices: {
+            //     type: UniformTypes.Matrix4Array,
+            //     value: null
+            // },
+            uJointMatrices: {
+                type: UniformTypes.Matrix4Array,
+                value: null
+            },
+        }
+    });
+
     console.log(gltfActor);
     // console.log(gltfActor.transform.children[0])
     
@@ -688,7 +763,7 @@ const createGLTFSkinnedMesh = async () => {
 const main = async () => {
     console.log("----------------------------------------");
     captureScene.add(await createRawSkinnedMesh());
-    // captureScene.add(await createGLTFSkinnedMesh());
+    captureScene.add(await createGLTFSkinnedMesh());
     await createGLTFSkinnedMesh();
     console.log("----------------------------------------");
    

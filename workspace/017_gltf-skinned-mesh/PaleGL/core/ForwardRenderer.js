@@ -9,14 +9,14 @@ export class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
-    #shadowMaterial;
+    #depthMaterial;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
 
-        this.#shadowMaterial = new Material({
+        this.#depthMaterial = new Material({
             gpu,
             vertexShader: `#version 300 es
             layout (location = 0) in vec3 aPosition;
@@ -74,7 +74,7 @@ export class ForwardRenderer {
 
             castShadowMeshActors.forEach(meshActor => {
                 // const material = meshActor.material;
-                const targetMaterial = this.#shadowMaterial;
+                const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
 
                 // TODO: material 側でやった方がよい？
                 if (targetMaterial.uniforms.uWorldMatrix) {

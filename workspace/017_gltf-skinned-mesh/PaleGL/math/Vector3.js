@@ -107,6 +107,10 @@
         return new Vector3(1, 0, 0);
     }
     
+    static fromArray(arr) {
+        return new Vector3(arr[0], arr[1], arr[2]);
+    }
+    
     static addVectors(...vectors) {
         const v = Vector3.zero();
         vectors.forEach(elem => {

@@ -146,7 +146,11 @@ export class SkinnedMesh extends Mesh {
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => {
             return Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix);
         });
+
         this.material.uniforms.uJointMatrices.value = jointMatrices;
+        if(this.depthMaterial) {
+            this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
+        }
         
         // const newPositions = [];
         // for(let i = 0; i < this.positions.length; i++) {

@@ -1,22 +1,23 @@
-
 import {Actor} from "../actors/Actor.js";
 import {Bone} from "../core/Bone.js";
 import {SkinnedMesh} from "../actors/SkinnedMesh.js";
 import {Geometry} from "../geometries/Geometry.js";
 import {Mesh} from "../actors/Mesh.js";
+import {Vector3} from "../math/Vector3.js";
+import {Matrix4} from "../math/Matrix4.js";
 
-export async function loadGLTF({ gpu, path }) {
+export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
     const gltf = await response.json();
 
     const rootActor = new Actor();
-   
+
     // for debug
     console.log(gltf);
-    
+
     // gltf.scene ... default scene index
     // const targetScene = gltf.scenes[gltf.scene];
-    
+
     // accessor の component type は gl の format と値が同じ
     // console.log('gl.BYTE', gl.BYTE); // 5120
     // console.log('gl.UNSIGNED_BYTE', gl.UNSIGNED_BYTE); // 5121
@@ -25,22 +26,22 @@ export async function loadGLTF({ gpu, path }) {
     // console.log('gl.INT', gl.INT); // 5124
     // console.log('gl.UNSIGNED_INT', gl.UNSIGNED_INT); // 5125
     // console.log('gl.FLOAT', gl.FLOAT); // 5126    
-    
+
     const binBufferDataList = await Promise.all(gltf.buffers.map(async (buffer) => {
         // NOTE: buffer = { byteLength, uri }
         const binResponse = await fetch(buffer.uri);
         const binBufferData = await binResponse.arrayBuffer();
-        return { byteLength: buffer.byteLength, binBufferData };
+        return {byteLength: buffer.byteLength, binBufferData};
     }));
-    
+
     const getBufferData = (accessor) => {
         const bufferView = gltf.bufferViews[accessor.bufferView];
         const {binBufferData} = binBufferDataList[bufferView.buffer];
         const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
         return slicedBuffer;
     }
-    
-    const createMesh = ({ meshIndex, skinIndex = null }) => {
+
+    const createMesh = ({meshIndex, skinIndex = null}) => {
         let positions = null;
         let normals = null;
         let uvs = null;
@@ -48,7 +49,7 @@ export async function loadGLTF({ gpu, path }) {
         let joints = null;
         let weights = null;
         let rootBone = null;
-        
+
         console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
 
         const mesh = gltf.meshes[meshIndex];
@@ -105,30 +106,45 @@ export async function loadGLTF({ gpu, path }) {
                 indices = new Uint16Array(bufferData);
             }
         });
-        
-        if(skinIndex !== null) {
+
+        if (skinIndex !== null) {
             console.log("[loadGLTF.createMesh] mesh has skin");
             // gltf.skins
             const skin = gltf.skins[skinIndex];
-            
+
             const createBone = (nodeIndex, parentBone) => {
                 const node = gltf.nodes[nodeIndex];
-                const bone = new Bone({ name: node.name, index: nodeIndex });
-                if(parentBone) {
+                // NOTE:
+                // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
+                // - indexをふり直しても良い
+                const bone = new Bone({name: node.name, index: nodeIndex});
+               
+                const offsetMatrix = Matrix4.multiplyMatrices(
+                    node.translation ? Matrix4.translationMatrix(Vector3.fromArray(node.translation)) : Matrix4.identity(),
+                    Matrix4.identity(),
+                    Matrix4.identity()
+                );
+                bone.offsetMatrix = offsetMatrix;
+                
+                if (parentBone) {
                     parentBone.addChild(bone);
                 }
-                if(node.children) {
+                if (node.children) {
                     node.children.forEach(childNodeIndex => createBone(childNodeIndex, bone));
                 }
                 return bone;
             };
-            
+
             // NOTE: joints の 0番目が常に root bone のはず？
             rootBone = createBone(skin.joints[0]);
+
+            rootBone.calcBoneOffsetMatrix();
+            rootBone.calcJointMatrix();
         }
-        
-        console.log("root bone", rootBone)
-        
+
+        // console.log("root bone", rootBone)
+        // console.log(positions, normals, uvs, joints, weights)
+
         const geometry = new Geometry({
             gpu,
             attributes: {
@@ -142,47 +158,49 @@ export async function loadGLTF({ gpu, path }) {
                 },
                 uv: {
                     data: uvs,
-                    size: 3
+                    size: 2
                 },
-                // bone があるならjointとweightもあるはず
-                ...(rootBone ? {
-                    joint: {
-                        data: joints,
-                        size: 4,
-                    },
-                    weight: {
-                        data: weights,
-                        size: 4,
-                    }
-                } : {}),
+                // // bone があるならjointとweightもあるはず
+                // ...(rootBone ? {
+                //     boneIndices: {
+                //         data: joints,
+                //         size: 4
+                //     },
+                //     boneWeights: {
+                //         data: weights,
+                //         size: 4
+                //     },
+                // } : {}),
             },
             indices,
             drawCount: indices.length
         });
-        
+
+
+        return new Mesh({ geometry })
         // return rootBone
         //     ? new SkinnedMesh({ geometry, bones: rootBone })
         //     : new Mesh({ geometry })
     }
-    
+
     const findNode = (node) => {
         const targetNode = gltf.nodes[node];
 
         // for debug
         // console.log("[loadGLTF.findNode] target node", targetNode);
 
-        if(targetNode.hasOwnProperty("children")) {
+        if (targetNode.hasOwnProperty("children")) {
             targetNode.children.forEach(targetNode => findNode(targetNode));
             return;
         }
         // mesh node
-        if(targetNode.hasOwnProperty("mesh")) {
+        if (targetNode.hasOwnProperty("mesh")) {
             // TODO: fix multi mesh
             const mesh = createMesh({
                 meshIndex: targetNode.mesh,
                 skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
             });
-            // rootActor.addChild(mesh);
+            rootActor.addChild(mesh);
         }
         // // skin node
         // if(targetNode.hasOwnProperty("skin")) {
@@ -194,18 +212,18 @@ export async function loadGLTF({ gpu, path }) {
             findNode(node)
         });
     });
-    
+
     // console.log(rootActor)
-    
+
     return rootActor;
-    
+
     // const data = {
     //     positions: mesh.positions,
     //     normals: mesh.normals,
     //     uvs: mesh.uvs,
     //     indices: mesh.indices
     // }
-   
+
     // // for debug
     // // console.log(data)
     // 
