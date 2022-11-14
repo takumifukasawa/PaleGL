@@ -22,6 +22,8 @@ export class SkinnedMesh extends Mesh {
         const boneIndices = [...this.geometry.attributes.boneIndices.data];
         const boneWeights = [...this.geometry.attributes.boneWeights.data];
         
+        console.log(this.geometry.attributes)
+        
         for(let i = 0; i < positions.length / 3; i++) {
             this.positions.push([
                 positions[i * 3 + 0],

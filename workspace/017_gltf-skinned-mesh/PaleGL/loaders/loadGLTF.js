@@ -74,22 +74,21 @@ export async function loadGLTF({gpu, path}) {
                 // const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
                 // const data = new Float32Array(slicedBuffer);
                 const bufferData = getBufferData(accessor);
-                const data = new Float32Array(bufferData);
                 switch (attributeName) {
                     case "POSITION":
-                        positions = data;
+                        positions = new Float32Array(bufferData);
                         break;
                     case "NORMAL":
-                        normals = data;
+                        normals = new Float32Array(bufferData);
                         break;
                     case "TEXCOORD_0":
-                        uvs = data;
+                        uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = data;
+                        joints = new Uint16Array(bufferData);
                         break;
                     case "WEIGHTS_0":
-                        weights = data;
+                        weights = new Float32Array(bufferData);
                         break;
                     default:
                         throw "[loadGLTF] invalid attribute name";
@@ -160,27 +159,26 @@ export async function loadGLTF({gpu, path}) {
                     data: uvs,
                     size: 2
                 },
-                // // bone があるならjointとweightもあるはず
-                // ...(rootBone ? {
-                //     boneIndices: {
-                //         data: joints,
-                //         size: 4
-                //     },
-                //     boneWeights: {
-                //         data: weights,
-                //         size: 4
-                //     },
-                // } : {}),
+                // bone があるならjointとweightもあるはず
+                ...(rootBone ? {
+                    boneIndices: {
+                        data: joints,
+                        size: 4
+                    },
+                    boneWeights: {
+                        data: weights,
+                        size: 4
+                    },
+                } : {}),
             },
             indices,
             drawCount: indices.length
         });
-
-
-        return new Mesh({ geometry })
-        // return rootBone
-        //     ? new SkinnedMesh({ geometry, bones: rootBone })
-        //     : new Mesh({ geometry })
+        
+        // return new Mesh({ geometry })
+        return rootBone
+            ? new SkinnedMesh({ geometry, bones: rootBone })
+            : new Mesh({ geometry })
     }
 
     const findNode = (node) => {
