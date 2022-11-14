@@ -11,6 +11,7 @@ export class Actor {
     #onStart;
     #onFixedUpdate;
     #onUpdate;
+    animationClips;
     
     set onStart(value) {
         this.#onStart = value;

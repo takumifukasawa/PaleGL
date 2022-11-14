@@ -5,6 +5,7 @@ import {Geometry} from "../geometries/Geometry.js";
 import {Mesh} from "../actors/Mesh.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {AnimationClip} from "../core/AnimationClip.js";
 
 export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
@@ -232,9 +233,6 @@ export async function loadGLTF({gpu, path}) {
     });
     
     const createAnimationClips = () => {
-        if(gltf.animations && gltf.animations.length < 1) {
-            return [];
-        }
         return gltf.animations.map(animation => {
             return animation.channels.map(channel => {
                 const sampler = animation.samplers[channel.sampler];
@@ -244,26 +242,43 @@ export async function loadGLTF({gpu, path}) {
                 const outputAccessor = gltf.accessors[sampler.output];
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
+                let elementsNum;
+                switch(outputAccessor.type) {
+                    case "VEC3":
+                        elementsNum = 3;
+                        break;
+                    case "VEC4":
+                        elementsNum = 4;
+                        break;
+                    default:
+                        throw "invalid accessor type";
+                }
                 const animationClip = new AnimationClip({
                     target: cacheNodes[channel.target.node],
                     key: channel.target.path,
                     interpolation: sampler.interpolation,
-                    type: outputAccessor.type,
+                    // type: outputAccessor.type,
                     data: outputData,
                     start: inputAccessor.min,
                     end: inputAccessor.max,
                     frames: inputData,
-                    frameCount: inputAccessor.count
+                    frameCount: inputAccessor.count,
+                    elementsNum
                 });
                 return animationClip;
             });
-        });
+        }).flat(); // TODO: flatしちゃって問題ない？
     }
 
     console.log("------------")
     console.log("cache nodes", cacheNodes)
-    const animationClips = createAnimationClips();
-    console.log("animation clips", animationClips);
+
+    if(gltf.animations && gltf.animations.length > 0) {
+        const animationClips = createAnimationClips();
+        console.log("animation clips", animationClips);
+        rootActor.animationClips = animationClips;
+    }
+
     console.log("root actor", rootActor);
     console.log("------------")
 
@@ -284,33 +299,3 @@ export async function loadGLTF({gpu, path}) {
     // return data;
 }
 
-class AnimationClip {
-    target;
-    key;
-    interpolation;
-    type;
-    #data;
-    start;
-    end;
-    frames;
-    frameCount;
-    
-    get data() {
-        return this.#data;
-    }
-
-    constructor({ target, key, interpolation, type, data, start, end, frames, frameCount }) {
-        this.target = target;
-        this.key = key;
-        this.interpolation = interpolation;
-        this.type = type;
-        this.#data = data;
-        this.start = start;
-        this.end = end;
-        this.frames = frames;
-        this.frameCount = frameCount;
-    }
-}
-
-class AnimationData {
-}

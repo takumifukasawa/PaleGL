@@ -646,6 +646,22 @@ const createRawSkinnedMesh = async () => {
 
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
+    gltfActor.onStart = ({ actor }) => {
+        if(actor.animationClips) {
+            actor.animationClips.forEach(animationClip => {
+                // TODO: this is dummy time
+                animationClip.play(performance.now() / 1000);
+            });
+        }
+    };
+    gltfActor.onUpdate = ({ actor }) => {
+        if(actor.animationClips) {
+            actor.animationClips.forEach(animationClip => {
+                // TODO: this is dummy time
+                animationClip.update(performance.now() / 1000);
+            });
+        }
+    };
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
     gltfActor.transform.children[0].transform.children[0].material = new Material({
         gpu,
