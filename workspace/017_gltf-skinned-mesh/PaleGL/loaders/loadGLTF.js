@@ -192,27 +192,36 @@ export async function loadGLTF({gpu, path}) {
         
         const hasChildren = targetNode.hasOwnProperty("children");
         const hasMesh = targetNode.hasOwnProperty("mesh");
-
-        // anchor actor (null actor)
-        if (hasChildren && !hasMesh) {
-            const anchorActor = new Actor();
-            parentActor.addChild(anchorActor);
-            cacheNodes[nodeIndex] = anchorActor;
-            targetNode.children.forEach(targetNode => findNode(targetNode, anchorActor));
-            return;
-        }
-
+        
         // mesh actor
         if (hasMesh) {
             // TODO: fix multi mesh
-            const mesh = createMesh({
+            const meshActor = createMesh({
                 nodeIndex,
                 meshIndex: targetNode.mesh,
                 skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
             });
-            cacheNodes[nodeIndex] = mesh;
+            cacheNodes[nodeIndex] = meshActor;
             
-            parentActor.addChild(mesh);
+            parentActor.addChild(meshActor);
+            
+            if (hasChildren) {
+                targetNode.children.forEach(child => findNode(child, meshActor));
+            }
+            
+            return;
+        }
+       
+        // TODO: meshがない時、boneなのかnull_actorなのかの判別がついてない
+        if (hasChildren) {
+            if(!!cacheNodes[nodeIndex]) {
+                targetNode.children.forEach(child => findNode(child, parentActor));
+            } else {
+                const anchorActor = new Actor();
+                parentActor.addChild(anchorActor);
+                cacheNodes[nodeIndex] = anchorActor;
+                targetNode.children.forEach(child => findNode(child, anchorActor));
+            }
         }
     }
 
@@ -236,7 +245,8 @@ export async function loadGLTF({gpu, path}) {
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
                 const animationClip = new AnimationClip({
-                    name: channel.target.path,
+                    target: cacheNodes[channel.target.node],
+                    key: channel.target.path,
                     interpolation: sampler.interpolation,
                     type: outputAccessor.type,
                     data: outputData,
@@ -251,10 +261,10 @@ export async function loadGLTF({gpu, path}) {
     }
 
     console.log("------------")
-    console.log(cacheNodes)
+    console.log("cache nodes", cacheNodes)
     const animationClips = createAnimationClips();
-    console.log(animationClips);
-    console.log(rootActor);
+    console.log("animation clips", animationClips);
+    console.log("root actor", rootActor);
     console.log("------------")
 
     // console.log(rootActor)
@@ -275,7 +285,8 @@ export async function loadGLTF({gpu, path}) {
 }
 
 class AnimationClip {
-    name;
+    target;
+    key;
     interpolation;
     type;
     #data;
@@ -288,8 +299,9 @@ class AnimationClip {
         return this.#data;
     }
 
-    constructor({ name, interpolation, type, data, start, end, frames, frameCount }) {
-        this.name = name;
+    constructor({ target, key, interpolation, type, data, start, end, frames, frameCount }) {
+        this.target = target;
+        this.key = key;
         this.interpolation = interpolation;
         this.type = type;
         this.#data = data;
