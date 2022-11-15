@@ -653,16 +653,16 @@ const createGLTFSkinnedMesh = async () => {
             actor.animator.animationClips.forEach(animationClip => {
                 // animationClip.onUpdate = (frameValue, rawFrameValue) => {
                 animationClip.onUpdate = (animationKeyframes) => {
-                    animationKeyframes.map(({ target, key, value }) => {
+                    animationKeyframes.map(({ target, key, frameValue }) => {
                         // console.log(target, key, value)
                         // console.log(frameValue, rawFrameValue)
                         switch(key) {
                             case "translation":
-                                target.position = new Vector3(value[0], value[1], value[2]);
+                                target.position = frameValue;
                                 break;
                             case "rotation":
                                 // TODO: rotationはquaternionなのでquaternionであるべき
-                                const q = new Quaternion(value[0], value[1], value[2], value[3]);
+                                const q = frameValue;
                                 const euler = q.toEulerDegree();
                                 // console.log(euler)
                                 target.rotation = Rotator.fromRadian(
@@ -677,7 +677,7 @@ const createGLTFSkinnedMesh = async () => {
                                 // );
                                 break;
                             case "scale":
-                                target.scale = new Vector3(value[0], value[1], value[2]);
+                                target.scale = frameValue;
                                 break;
                             default:
                                 throw "invalid animation clip key";

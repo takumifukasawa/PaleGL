@@ -95,7 +95,9 @@ export const RenderTargetTypes = {
     Depth: "Depth"
 }
 
-export const AnimationClipTypes = {
+export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
-    Rotator: "Rotator",
+    Quaternion: "Quaternion"
+    // Rotator: "Rotator",
+    // Scalar: "Scalar"
 }

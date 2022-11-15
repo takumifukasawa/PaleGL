@@ -1,20 +1,22 @@
-﻿import {AnimationClipTypes} from "../constants.js";
+﻿import {AnimationKeyframeTypes} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
-import {Rotator} from "../math/Rotator.js";
+import {Quaternion} from "../math/Quaternion.js";
 
 export class AnimationKeyframes {
     target;
     key;
     interpolation;
     #data;
-    elementSize;
-    frameCount;
+    #elementSize;
+    frameCount
+    
+    
 
     get data() {
         return this.#data;
     }
 
-    constructor({ target, type, key, interpolation, data, start, end, frameCount, elementSize }) {
+    constructor({ target, type, key, interpolation, data, start, end, frameCount }) {
         this.target = target;
         this.key = key;
         this.interpolation = interpolation;
@@ -23,12 +25,29 @@ export class AnimationKeyframes {
         this.start = start;
         this.end = end;
         this.frameCount = frameCount;
-        this.elementSize = elementSize;
+
+        switch(this.type) {
+            case AnimationKeyframeTypes.Vector3:
+                this.#elementSize = 3;
+                break;
+            case AnimationKeyframeTypes.Quaternion:
+                this.#elementSize = 4;
+                break;
+            default:
+                throw "[AnimationKeyframes.getFrameValue] invalid type";
+        }       
     }
-    
+
     getFrameValue(frame) {
-        return (new Array(this.elementSize)).fill(0).map((e, i) => {
-            return this.#data[frame * this.elementSize + i];
-        });
+        const arr = (new Array(this.#elementSize)).fill(0).map((e, i) => this.#data[frame * this.#elementSize + i]);
+
+        switch(this.type) {
+            case AnimationKeyframeTypes.Vector3:
+                return new Vector3(...arr);
+            case AnimationKeyframeTypes.Quaternion:
+                return new Quaternion(...arr);
+            default:
+                throw "[AnimationKeyframes.getFrameValue] invalid type";
+        }
     }
 }

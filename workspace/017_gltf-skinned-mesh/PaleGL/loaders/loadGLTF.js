@@ -6,7 +6,7 @@ import {Mesh} from "../actors/Mesh.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {AnimationClip} from "../core/AnimationClip.js";
-import {AnimationClipTypes} from "../constants.js";
+import {AnimationKeyframeTypes} from "../constants.js";
 import {AnimationKeyframes} from "../core/AnimationKeyframes.js";
 import {Quaternion} from "../math/Quaternion.js";
 
@@ -260,6 +260,20 @@ export async function loadGLTF({gpu, path}) {
                     default:
                         throw "invalid key type";
                 }
+                
+                let animationKeyframeType;
+                switch(channel.target.path) {
+                    case "rotation":
+                        animationKeyframeType = AnimationKeyframeTypes.Quaternion;
+                        break;
+                    case "translation":
+                    case "scale":
+                        animationKeyframeType = AnimationKeyframeTypes.Vector3;
+                        break;
+                    default:
+                        throw "invalid channel taget path";
+                }
+                
                 const animationKeyframes = new AnimationKeyframes({
                     target: cacheNodes[channel.target.node],
                     key: channel.target.path,
@@ -270,8 +284,8 @@ export async function loadGLTF({gpu, path}) {
                     end: inputAccessor.max,
                     frames: inputData,
                     frameCount: inputAccessor.count,
-                    elementSize,
-                    type: channel.target.path === "rotation" ? AnimationClipTypes.Rotator : AnimationClipTypes.Vector3
+                    // elementSize,
+                    type: animationKeyframeType
                 });
                 return animationKeyframes;
                 // animationClip.addAnimationKeyframes(animationKeyframes);

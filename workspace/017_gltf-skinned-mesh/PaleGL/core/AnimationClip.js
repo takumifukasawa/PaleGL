@@ -1,5 +1,4 @@
-﻿import {AnimationClipTypes} from "../constants.js";
-import {Vector3} from "../math/Vector3.js";
+﻿import {Vector3} from "../math/Vector3.js";
 import {Rotator} from "../math/Rotator.js";
 
 export class AnimationClip {
@@ -110,7 +109,7 @@ export class AnimationClip {
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,
-                    value: animationKeyframes.getFrameValue(this.currentFrame)
+                    frameValue: animationKeyframes.getFrameValue(this.currentFrame)
                 }
             });
             this.onUpdate(keyframes);
