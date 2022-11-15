@@ -98,5 +98,4 @@ export const RenderTargetTypes = {
 export const AnimationClipTypes = {
     Vector3: "Vector3",
     Rotator: "Rotator",
-    Scalar: "Scalar"
 }

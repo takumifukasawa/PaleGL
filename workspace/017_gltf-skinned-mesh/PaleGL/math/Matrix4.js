@@ -574,6 +574,17 @@ export class Matrix4 {
         return result;
     }
     
+    static fromTRS(position, rotation, scaling) {
+        const rotationRadians = rotation.getAxesRadians();
+        return Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(position),
+            Matrix4.rotationYMatrix(rotationRadians.y),
+            Matrix4.rotationXMatrix(rotationRadians.x),
+            Matrix4.rotationZMatrix(rotationRadians.z),
+            Matrix4.scalingMatrix(scaling)
+        );
+    }
+    
     log()
     {
         console.log(`--------------------

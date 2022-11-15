@@ -1,5 +1,7 @@
 ﻿import {NodeBase} from "./NodeBase.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {Rotator} from "../math/Rotator.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class Bone extends NodeBase {
     offsetMatrix = Matrix4.identity(); // 初期姿勢のボーンローカル座標
@@ -7,6 +9,10 @@ export class Bone extends NodeBase {
     #boneOffsetMatrix = Matrix4.identity(); // 初期姿勢行列の逆行列
     #jointMatrix = Matrix4.identity();
     index;
+    
+    position = Vector3.zero();
+    rotation = Rotator.zero();
+    scale = Vector3.one();
     
     get boneOffsetMatrix() {
         return this.#boneOffsetMatrix;
@@ -51,6 +57,12 @@ export class Bone extends NodeBase {
     // }
 
     calcJointMatrix(parentBone) {
+        // 1: update offset matrix
+        this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
+        // console.log(this.name, this.position, this.rotation, this.scale)
+        // console.log(this.name, this.offsetMatrix);
+        
+        // 2: update joint matrix
         // console.log("[Bone.calcJointMatrix]", this.name)
         this.#jointMatrix = !!parentBone
             ? Matrix4.multiplyMatrices(parentBone.jointMatrix, this.offsetMatrix)

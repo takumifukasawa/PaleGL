@@ -6,7 +6,7 @@ import {Mesh} from "../actors/Mesh.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {AnimationClip} from "../core/AnimationClip.js";
-import {AnimationClipTypes} from "../constants";
+import {AnimationClipTypes} from "../constants.js";
 
 export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
@@ -52,7 +52,8 @@ export async function loadGLTF({gpu, path}) {
         // - indexをふり直しても良い
         const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
-       
+      
+        // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
             node.translation ? Matrix4.translationMatrix(Vector3.fromArray(node.translation)) : Matrix4.identity(),
             Matrix4.identity(),
@@ -243,17 +244,17 @@ export async function loadGLTF({gpu, path}) {
                 const outputAccessor = gltf.accessors[sampler.output];
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
-                let elementSize;
-                switch(outputAccessor.type) {
-                    case "VEC3":
-                        elementSize = 3;
-                        break;
-                    case "VEC4":
-                        elementSize = 4;
-                        break;
-                    default:
-                        throw "invalid accessor type";
-                }
+                // let elementSize;
+                // switch(outputAccessor.type) {
+                //     case "VEC3":
+                //         elementSize = 3;
+                //         break;
+                //     case "VEC4":
+                //         elementSize = 4;
+                //         break;
+                //     default:
+                //         throw "invalid accessor type";
+                // }
                 const animationClip = new AnimationClip({
                     target: cacheNodes[channel.target.node],
                     key: channel.target.path,
@@ -264,7 +265,7 @@ export async function loadGLTF({gpu, path}) {
                     end: inputAccessor.max,
                     frames: inputData,
                     frameCount: inputAccessor.count,
-                    elementSize,
+                    // elementSize,
                     type: channel.target.path === "rotation" ? AnimationClipTypes.Rotator : AnimationClipTypes.Vector3
                 });
                 return animationClip;

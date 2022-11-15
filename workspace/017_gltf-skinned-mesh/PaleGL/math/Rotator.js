@@ -15,12 +15,19 @@
         return this.elements[1];
     }
     
-   
     getAxes() {
         return {
             x: this.elements[0],
             y: this.elements[1],
             z: this.elements[2],
+        }
+    }
+    
+    getAxesRadians() {
+        return {
+            x: this.elements[0] * Math.PI / 180 ,
+            y: this.elements[1] * Math.PI / 180 ,
+            z: this.elements[2] * Math.PI / 180 ,
         }
     }
 
@@ -31,10 +38,20 @@
     
     set(x, y, z) {
         this.elements = new Float32Array([x, y, z]);
+        return this;
     }
     
     static zero() {
         return new Rotator(0, 0, 0);
+    }
+    
+    static fromRadian(x, y, z) {
+        const rotator = new Rotator().set(
+            x * 180 / Math.PI,
+            y * 180 / Math.PI,
+            z * 180 / Math.PI,
+        );
+        return rotator;
     }
     
     setRotationX(degree) {
