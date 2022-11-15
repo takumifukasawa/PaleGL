@@ -8,6 +8,7 @@ export class AnimationKeyframes {
     interpolation;
     #data;
     elementSize;
+    frameCount;
 
     get data() {
         return this.#data;
@@ -21,7 +22,7 @@ export class AnimationKeyframes {
         this.#data = data;
         this.start = start;
         this.end = end;
-        this.frameCouns = frameCount;
+        this.frameCount = frameCount;
         this.elementSize = elementSize;
     }
     

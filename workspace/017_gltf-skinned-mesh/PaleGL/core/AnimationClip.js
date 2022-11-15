@@ -29,22 +29,30 @@ export class AnimationClip {
     
     #keyframes = [];
     
+    get keyframes() {
+        return this.#keyframes;
+    }
+    
     get data() {
         return this.#data;
     }
 
-    constructor({ name, start, end, frames, frameCount }) {
+    constructor({ name, start, end, frames, frameCount, keyframes }) {
         this.name = name;
         this.start = start;
         this.end = end;
         this.frames = frames;
         this.frameCount = frameCount;
+        this.#keyframes = keyframes;
         // this.elementSize = elementSize;
+       
+        // TODO: add keyframes した時も計算するようにした方が便利そう 
+        this.frameCount = Math.max(...(keyframes.map(({ frameCount }) => frameCount)));
     }
     
-    addAnimationKeyframes(animationKeyframe) {
-        this.#keyframes.push(animationKeyframe);
-    }
+    // addAnimationKeyframes(animationKeyframe) {
+    //     this.#keyframes.push(animationKeyframe);
+    // }
    
     // start at 0 frame
     play() {

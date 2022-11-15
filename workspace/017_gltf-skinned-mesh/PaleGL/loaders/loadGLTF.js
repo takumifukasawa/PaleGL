@@ -145,8 +145,9 @@ export async function loadGLTF({gpu, path}) {
             // NOTE: joints の 0番目が常に root bone のはず？
             rootBone = createBone(skin.joints[0]);
 
-            rootBone.calcBoneOffsetMatrix();
-            rootBone.calcJointMatrix();
+            // TODO: skinning mesh 側でやるべき？
+            // rootBone.calcBoneOffsetMatrix();
+            // rootBone.calcJointMatrix();
         }
         
         // console.log("root bone", rootBone)
@@ -171,7 +172,7 @@ export async function loadGLTF({gpu, path}) {
                 ...(rootBone ? {
                     boneIndices: {
                         data: joints,
-                        size: 4
+                        size: 2
                     },
                     boneWeights: {
                         data: weights,
@@ -237,8 +238,7 @@ export async function loadGLTF({gpu, path}) {
     
     const createAnimationClips = () => {
         return gltf.animations.map(animation => {
-            const animationClip = new AnimationClip({});
-            animation.channels.forEach(channel => {
+            const keyframes = animation.channels.map(channel => {
                 const sampler = animation.samplers[channel.sampler];
                 const inputAccessor = gltf.accessors[sampler.input];
                 const inputBufferData = getBufferData(inputAccessor);
@@ -271,8 +271,10 @@ export async function loadGLTF({gpu, path}) {
                     elementSize,
                     type: channel.target.path === "rotation" ? AnimationClipTypes.Rotator : AnimationClipTypes.Vector3
                 });
-                animationClip.addAnimationKeyframes(animationKeyframes);
+                return animationKeyframes;
+                // animationClip.addAnimationKeyframes(animationKeyframes);
             });
+            const animationClip = new AnimationClip({ keyframes });
             return animationClip;
         });
     }

@@ -37,6 +37,7 @@ export class Bone extends NodeBase {
             ? Matrix4.multiplyMatrices(parentBone.poseMatrix, this.offsetMatrix)
             // ? Matrix4.multiplyMatrices(this.offsetMatrix, parentBone.poseMatrix)
             : this.offsetMatrix;
+        // this.offsetMatrix.log()
         
             // : Matrix4.identity()
         // this.#poseMatrix.log();

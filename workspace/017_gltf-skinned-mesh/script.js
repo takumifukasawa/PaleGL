@@ -40,6 +40,7 @@ import {Actor} from "./PaleGL/actors/Actor.js";
 import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.js";
 import {Bone} from "./PaleGL/core/Bone.js";
 import {Rotator} from "./PaleGL/math/Rotator.js";
+import {Quaternion} from "./PaleGL/math/Quaternion.js";
 
 let debuggerGUI;
 let width, height;
@@ -661,11 +662,19 @@ const createGLTFSkinnedMesh = async () => {
                                 break;
                             case "rotation":
                                 // TODO: rotationはquaternionなのでquaternionであるべき
+                                const q = new Quaternion(value[0], value[1], value[2], value[3]);
+                                const euler = q.toEuler();
+                                // console.log(euler)
                                 target.rotation = Rotator.fromRadian(
-                                    value[0] * value[3],
-                                    value[1] * value[3],
-                                    value[2] * value[3]
+                                    euler.x * Math.PI / 180,
+                                    euler.y * Math.PI / 180,
+                                    euler.z * Math.PI / 180,
                                 );
+                                // target.rotation = Rotator.fromRadian(
+                                //     value[0] * value[3],
+                                //     value[1] * value[3],
+                                //     value[2] * value[3]
+                                // );
                                 break;
                             case "scale":
                                 target.scale = new Vector3(value[0], value[1], value[2]);
@@ -691,6 +700,8 @@ const createGLTFSkinnedMesh = async () => {
     // TODO: remove. it's for debugging
     // gltfActor.animationClips = [gltfActor.animationClips[0]];
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
+    
+    console.log(gltfActor.transform.children[0].transform.children[0])
 
     gltfActor.transform.children[0].transform.children[0].material = new Material({
         gpu,
@@ -699,29 +710,29 @@ const createGLTFSkinnedMesh = async () => {
             layout(location = 0) in vec3 aPosition;
             layout(location = 1) in vec3 aNormal;
             layout(location = 2) in vec2 aUv;
-            // layout(location = 3) in vec4 aBoneIndices;
-            // layout(location = 4) in vec4 aBoneWeights;
+            layout(location = 3) in vec4 aBoneIndices;
+            layout(location = 4) in vec4 aBoneWeights;
 
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
-            // // uniform mat4[5] uBoneOffsetMatrices;
-            // uniform mat4[5] uJointMatrices;
+            // uniform mat4[5] uBoneOffsetMatrices;
+            uniform mat4[5] uJointMatrices;
             
             out vec2 vUv;
             
             void main() {
                 vUv = aUv;
 
-                // mat4 skinMatrix =
-                //      uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                //      uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                //      uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                //      uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                mat4 skinMatrix =
+                     uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                     uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                     uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                     uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
                 
                 // pre calc skinning in cpu
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
             }
             `,
         fragmentShader: `#version 300 es
