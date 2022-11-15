@@ -699,7 +699,7 @@ const createGLTFSkinnedMesh = async () => {
     };
  
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
-    
+
     skinningMesh.castShadow = true;
     
     skinningMesh.material = new Material({
