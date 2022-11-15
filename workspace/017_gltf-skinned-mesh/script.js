@@ -647,48 +647,49 @@ const createRawSkinnedMesh = async () => {
 
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
-    gltfActor.onStart = ({ actor }) => {
-        // return;
-        if(actor.animationClips) {
-            actor.animationClips.forEach(animationClip => {
-                animationClip.onUpdate = (frameValue, rawFrameValue) => {
-                    // console.log(frameValue, rawFrameValue)
-                    switch(animationClip.key) {
-                        case "translation":
-                            animationClip.target.position = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-                            break;
-                        case "rotation":
-                            // TODO: rotationはquaternionなのでquaternionであるべき
-                            animationClip.target.rotation = Rotator.fromRadian(
-                                rawFrameValue[0] * rawFrameValue[3],
-                                rawFrameValue[1] * rawFrameValue[3],
-                                rawFrameValue[2] * rawFrameValue[3]
-                            );
-                            break;
-                        case "scale":
-                            animationClip.target.scale = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-                            break;
-                        default:
-                            throw "invalid animation clip key";
-                    }
-                }
-                animationClip.loop = true;
-                animationClip.play();
-            });
-        }
-    };
-    gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
-        // return;
-        if(actor.animationClips) {
-            actor.animationClips.forEach(animationClip => {
-                // TODO: this is dummy time
-                animationClip.update(fixedDeltaTime);
-            });
-        }
-    };
+    // gltfActor.onStart = ({ actor }) => {
+    //     // return;
+    //     if(actor.animationClips) {
+    //         actor.animationClips.forEach(animationClip => {
+    //             animationClip.onUpdate = (frameValue, rawFrameValue) => {
+    //                 // console.log(frameValue, rawFrameValue)
+    //                 switch(animationClip.key) {
+    //                     case "translation":
+    //                         animationClip.target.position = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
+    //                         break;
+    //                     case "rotation":
+    //                         // TODO: rotationはquaternionなのでquaternionであるべき
+    //                         animationClip.target.rotation = Rotator.fromRadian(
+    //                             rawFrameValue[0] * rawFrameValue[3],
+    //                             rawFrameValue[1] * rawFrameValue[3],
+    //                             rawFrameValue[2] * rawFrameValue[3]
+    //                         );
+    //                         break;
+    //                     case "scale":
+    //                         animationClip.target.scale = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
+    //                         break;
+    //                     default:
+    //                         throw "invalid animation clip key";
+    //                 }
+    //             }
+    //             animationClip.loop = true;
+    //             animationClip.play();
+    //         });
+    //     }
+    // };
+    // gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
+    //     // return;
+    //     if(actor.animationClips) {
+    //         actor.animationClips.forEach(animationClip => {
+    //             // TODO: this is dummy time
+    //             animationClip.update(fixedDeltaTime);
+    //         });
+    //     }
+    // };
     // TODO: remove. it's for debugging
     // gltfActor.animationClips = [gltfActor.animationClips[0]];
     // const bData = await loadGLTF({ gpu, path: "./models/whale.CYCLES.gltf" });
+
     gltfActor.transform.children[0].transform.children[0].material = new Material({
         gpu,
         vertexShader: `#version 300 es

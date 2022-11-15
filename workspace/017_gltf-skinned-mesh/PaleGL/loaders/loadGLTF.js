@@ -236,7 +236,11 @@ export async function loadGLTF({gpu, path}) {
     
     const createAnimationClips = () => {
         return gltf.animations.map(animation => {
-            return animation.channels.map(channel => {
+            const animationClip = new AnimationClip({
+            });
+            return animationClip
+
+                return animation.channels.map(channel => {
                 const sampler = animation.samplers[channel.sampler];
                 const inputAccessor = gltf.accessors[sampler.input];
                 const inputBufferData = getBufferData(inputAccessor);

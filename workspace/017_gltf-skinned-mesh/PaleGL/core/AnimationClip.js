@@ -27,21 +27,23 @@ export class AnimationClip {
     
     onUpdate;
     
+    #animationKeyframesList = [];
+    
     get data() {
         return this.#data;
     }
 
-    constructor({ target, key, interpolation, type, data, start, end, frames, frameCount/*, elementSize*/ }) {
-        this.target = target;
-        this.key = key;
-        this.interpolation = interpolation;
-        this.type = type;
-        this.#data = data;
+    constructor({ name, target, key, interpolation, type, data, start, end, frames, frameCount/*, elementSize*/ }) {
+        this.name = name;
         this.start = start;
         this.end = end;
         this.frames = frames;
         this.frameCount = frameCount;
         // this.elementSize = elementSize;
+    }
+    
+    addAnimationKeyframes(animationKeyframes) {
+        this.#animationKeyframesList.push(animationKeyframes);
     }
    
     // start at 0 frame
@@ -74,51 +76,38 @@ export class AnimationClip {
 
         this.currentFrame = Math.floor(this.#currentTime / spf);
         
-        switch(this.type) {
-            case AnimationClipTypes.Vector3:
-                this.elementSize = 3;
-                break;
-            case AnimationClipTypes.Rotator:
-                this.elementSize = 4;
-                break;
-            default:
-                throw "invalid animation clip type";
-        }
-       
-        // console.log("-------")
-        const rawFrameValue = (new Array(this.elementSize))
-            .fill(0)
-            .map((e, i) => {
-                const value = this.data[this.currentFrame * this.elementSize + i];
-                // console.log(this.currentFrame, this.currentFrame * this.elementSize + i)
-                return value;
-            });
-
-        // build frame value each animation clip type
-        // TODO:
-        // - 関数に切り出してもいいかも
-        // - 必ず生の値を渡すでもいいかもしれない
-        let frameValue;
-        switch(this.type) {
-            case AnimationClipTypes.Vector3:
-                frameValue = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-                break;
-            case AnimationClipTypes.Rotator:
-                // TODO: raw frame value は quaternion ?
-                frameValue = Rotator.fromRadian(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-                break;
-            // TODO: typeごとの処理
-            default:
-                throw "invalid animation clip type";
-        }
+        // // build frame value each animation clip type
+        // // TODO:
+        // // - 関数に切り出してもいいかも
+        // // - 必ず生の値を渡すでもいいかもしれない
+        // let frameValue;
+        // switch(this.type) {
+        //     case AnimationClipTypes.Vector3:
+        //         frameValue = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
+        //         break;
+        //     case AnimationClipTypes.Rotator:
+        //         // TODO: raw frame value は quaternion ?
+        //         frameValue = Rotator.fromRadian(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
+        //         break;
+        //     // TODO: typeごとの処理
+        //     default:
+        //         throw "invalid animation clip type";
+        // }
         
         if(this.onUpdate) {
             // this.onUpdate(frameValue);
             // TODO: rawframevalueだけ送っちゃうのがわかりやすい気もしてきた
-            this.onUpdate(frameValue, rawFrameValue);
-        } else {
-            // TODO: あんまりやりたくないけど、onUpdateがない場合は直接データを入れる?
-            // this.target[this.key] = frameValue;
+            const keyframes = this.#animationKeyframesList.map(animationKeyframes => {
+                return {
+                    target: animationKeyframes.target,
+                    key: animationKeyframes.key,
+                    value: animationKeyframes.getFrameValue(this.currentFrame)
+                }
+            });
+            this.onUpdate(keyframes);
+        // } else {
+        //     // TODO: あんまりやりたくないけど、onUpdateがない場合は直接データを入れる?
+        //     // this.target[this.key] = frameValue;
         }
     }
 }
