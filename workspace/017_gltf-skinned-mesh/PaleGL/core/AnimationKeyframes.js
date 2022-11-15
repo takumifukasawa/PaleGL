@@ -7,23 +7,27 @@ export class AnimationKeyframes {
     key;
     interpolation;
     #data;
-    size;
+    elementSize;
 
     get data() {
         return this.#data;
     }
 
-    constructor({ target, key, interpolation, data }) {
+    constructor({ target, type, key, interpolation, data, start, end, frameCount, elementSize }) {
         this.target = target;
         this.key = key;
         this.interpolation = interpolation;
         this.type = type;
         this.#data = data;
+        this.start = start;
+        this.end = end;
+        this.frameCouns = frameCount;
+        this.elementSize = elementSize;
     }
     
     getFrameValue(frame) {
-        return (new Array(this.size)).fill(0).map((e, i) => {
-            return this.#data[frame * this.size + i];
+        return (new Array(this.elementSize)).fill(0).map((e, i) => {
+            return this.#data[frame * this.elementSize + i];
         });
     }
 }

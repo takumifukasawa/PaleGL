@@ -27,13 +27,13 @@ export class AnimationClip {
     
     onUpdate;
     
-    #animationKeyframesList = [];
+    #keyframes = [];
     
     get data() {
         return this.#data;
     }
 
-    constructor({ name, target, key, interpolation, type, data, start, end, frames, frameCount/*, elementSize*/ }) {
+    constructor({ name, start, end, frames, frameCount }) {
         this.name = name;
         this.start = start;
         this.end = end;
@@ -42,8 +42,8 @@ export class AnimationClip {
         // this.elementSize = elementSize;
     }
     
-    addAnimationKeyframes(animationKeyframes) {
-        this.#animationKeyframesList.push(animationKeyframes);
+    addAnimationKeyframes(animationKeyframe) {
+        this.#keyframes.push(animationKeyframe);
     }
    
     // start at 0 frame
@@ -97,7 +97,8 @@ export class AnimationClip {
         if(this.onUpdate) {
             // this.onUpdate(frameValue);
             // TODO: rawframevalueだけ送っちゃうのがわかりやすい気もしてきた
-            const keyframes = this.#animationKeyframesList.map(animationKeyframes => {
+            const keyframes = this.#keyframes.map(animationKeyframes => {
+                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,

@@ -7,6 +7,7 @@ import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {AnimationClip} from "../core/AnimationClip.js";
 import {AnimationClipTypes} from "../constants.js";
+import {AnimationKeyframes} from "../core/AnimationKeyframes.js";
 
 export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
@@ -236,11 +237,8 @@ export async function loadGLTF({gpu, path}) {
     
     const createAnimationClips = () => {
         return gltf.animations.map(animation => {
-            const animationClip = new AnimationClip({
-            });
-            return animationClip
-
-                return animation.channels.map(channel => {
+            const animationClip = new AnimationClip({});
+            animation.channels.forEach(channel => {
                 const sampler = animation.samplers[channel.sampler];
                 const inputAccessor = gltf.accessors[sampler.input];
                 const inputBufferData = getBufferData(inputAccessor);
@@ -248,18 +246,19 @@ export async function loadGLTF({gpu, path}) {
                 const outputAccessor = gltf.accessors[sampler.output];
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
-                // let elementSize;
-                // switch(outputAccessor.type) {
-                //     case "VEC3":
-                //         elementSize = 3;
-                //         break;
-                //     case "VEC4":
-                //         elementSize = 4;
-                //         break;
-                //     default:
-                //         throw "invalid accessor type";
-                // }
-                const animationClip = new AnimationClip({
+                let elementSize;
+                switch(channel.target.path) {
+                    case "translation":
+                    case "scale":
+                        elementSize = 3;
+                        break;
+                    case "rotation":
+                        elementSize = 4;
+                        break;
+                    default:
+                        throw "invalid key type";
+                }
+                const animationKeyframes = new AnimationKeyframes({
                     target: cacheNodes[channel.target.node],
                     key: channel.target.path,
                     interpolation: sampler.interpolation,
@@ -269,12 +268,13 @@ export async function loadGLTF({gpu, path}) {
                     end: inputAccessor.max,
                     frames: inputData,
                     frameCount: inputAccessor.count,
-                    // elementSize,
+                    elementSize,
                     type: channel.target.path === "rotation" ? AnimationClipTypes.Rotator : AnimationClipTypes.Vector3
                 });
-                return animationClip;
+                animationClip.addAnimationKeyframes(animationKeyframes);
             });
-        }).flat(); // TODO: flatしちゃって問題ない？
+            return animationClip;
+        });
     }
 
     console.log("------------")
