@@ -116,7 +116,8 @@ export async function loadGLTF({gpu, path}) {
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = new Uint16Array(bufferData);
+                        joints = new Uint8Array(bufferData);
+                        // joints = new Float32Array(bufferData);
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);
@@ -172,7 +173,7 @@ export async function loadGLTF({gpu, path}) {
                 ...(rootBone ? {
                     boneIndices: {
                         data: joints,
-                        size: 2
+                        size: 4
                     },
                     boneWeights: {
                         data: weights,
