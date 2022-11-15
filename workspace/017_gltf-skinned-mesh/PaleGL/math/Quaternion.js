@@ -26,7 +26,10 @@ export class Quaternion {
         this.elements = new Float32Array([x, y, z, w]);
         return this;
     }
-    
+
+    // ref:
+    // - https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
+    // - https://github.com/infusion/Quaternion.js/blob/master/quaternion.js
     toEulerRadian() {
         const x = this.x;
         const y = this.y;
@@ -44,8 +47,6 @@ export class Quaternion {
         };
     }
     
-    // ref: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
-    // ref: https://github.com/infusion/Quaternion.js/blob/master/quaternion.js
     // degree
     toEulerDegree() {
         const rad = this.toEulerRadian();

@@ -1,17 +1,18 @@
 ﻿import {Transform} from "../core/Transform.js";
 import {ActorTypes} from "./../constants.js";
 import {uuidv4} from "../utilities/uuid.js";
+import {Animator} from "../core/Animator.js";
 
 export class Actor {
     transform = new Transform();
     type;
     uuid;
     isStarted = false;
+    animator; // NOTE: いよいよcomponentっぽくしたくなってきた
     // lifecycle callback
     #onStart;
     #onFixedUpdate;
     #onUpdate;
-    animationClips;
     
     set onStart(value) {
         this.#onStart = value;
@@ -29,6 +30,7 @@ export class Actor {
         this.transform.actor = this;
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
+        this.animator = new Animator();
     }
     
     addChild(child) {
@@ -63,6 +65,9 @@ export class Actor {
     
     fixedUpdate({ gpu, fixedTime, fixedDeltaTime } = {}) {
         this.#tryStart({ gpu });
+        if(this.animator) {
+            this.animator.update(fixedDeltaTime);
+        }
         if(this.#onFixedUpdate) {
             this.#onFixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
         }

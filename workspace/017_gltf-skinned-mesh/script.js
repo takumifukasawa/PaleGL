@@ -649,8 +649,8 @@ const createRawSkinnedMesh = async () => {
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     gltfActor.onStart = ({ actor }) => {
-        if(actor.animationClips) {
-            actor.animationClips.forEach(animationClip => {
+        if(actor.animator.animationClips) {
+            actor.animator.animationClips.forEach(animationClip => {
                 // animationClip.onUpdate = (frameValue, rawFrameValue) => {
                 animationClip.onUpdate = (animationKeyframes) => {
                     animationKeyframes.map(({ target, key, value }) => {
@@ -689,14 +689,14 @@ const createGLTFSkinnedMesh = async () => {
             });
         }
     };
-    gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
-        if(actor.animationClips) {
-            actor.animationClips.forEach(animationClip => {
-                // TODO: this is dummy time
-                animationClip.update(fixedDeltaTime);
-            });
-        }
-    };
+    // gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
+    //     if(actor.animationClips) {
+    //         actor.animationClips.forEach(animationClip => {
+    //             // TODO: this is dummy time
+    //             animationClip.update(fixedDeltaTime);
+    //         });
+    //     }
+    // };
  
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
 

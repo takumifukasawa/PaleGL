@@ -276,7 +276,10 @@ export async function loadGLTF({gpu, path}) {
                 return animationKeyframes;
                 // animationClip.addAnimationKeyframes(animationKeyframes);
             });
-            const animationClip = new AnimationClip({ keyframes });
+            const animationClip = new AnimationClip({ 
+                name: animation.name,
+                keyframes
+            });
             return animationClip;
         });
     }
@@ -287,7 +290,8 @@ export async function loadGLTF({gpu, path}) {
     if(gltf.animations && gltf.animations.length > 0) {
         const animationClips = createAnimationClips();
         console.log("animation clips", animationClips);
-        rootActor.animationClips = animationClips;
+        rootActor.animator.setAnimationClips(animationClips);
+        // rootActor.animationClips = ;
     }
 
     console.log("root actor", rootActor);
