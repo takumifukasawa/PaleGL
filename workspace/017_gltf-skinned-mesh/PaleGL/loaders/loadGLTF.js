@@ -8,6 +8,7 @@ import {Matrix4} from "../math/Matrix4.js";
 import {AnimationClip} from "../core/AnimationClip.js";
 import {AnimationClipTypes} from "../constants.js";
 import {AnimationKeyframes} from "../core/AnimationKeyframes.js";
+import {Quaternion} from "../math/Quaternion.js";
 
 export async function loadGLTF({gpu, path}) {
     const response = await fetch(path);
@@ -56,9 +57,9 @@ export async function loadGLTF({gpu, path}) {
       
         // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
-            node.translation ? Matrix4.translationMatrix(Vector3.fromArray(node.translation)) : Matrix4.identity(),
-            Matrix4.identity(),
-            Matrix4.identity()
+            node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
+            node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
+            node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
         );
         bone.offsetMatrix = offsetMatrix;
         

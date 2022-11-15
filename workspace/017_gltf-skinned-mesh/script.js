@@ -663,7 +663,7 @@ const createGLTFSkinnedMesh = async () => {
                             case "rotation":
                                 // TODO: rotationはquaternionなのでquaternionであるべき
                                 const q = new Quaternion(value[0], value[1], value[2], value[3]);
-                                const euler = q.toEuler();
+                                const euler = q.toEulerDegree();
                                 // console.log(euler)
                                 target.rotation = Rotator.fromRadian(
                                     euler.x * Math.PI / 180,

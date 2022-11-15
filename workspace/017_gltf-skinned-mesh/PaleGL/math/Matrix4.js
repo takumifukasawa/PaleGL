@@ -585,6 +585,15 @@ export class Matrix4 {
         );
     }
     
+    static fromQuaternion(q) {
+        const euler = q.toEulerRadian();
+        return Matrix4.multiplyMatrices(
+            Matrix4.rotationYMatrix(euler.y),
+            Matrix4.rotationXMatrix(euler.x),
+            Matrix4.rotationZMatrix(euler.z),
+        );
+    }
+
     log()
     {
         console.log(`--------------------
