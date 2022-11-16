@@ -47,6 +47,7 @@ let width, height;
 let objMesh;
 let floorPlaneMesh;
 let cubeMap;
+let gltfActor;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
@@ -650,7 +651,7 @@ const createRawSkinnedMesh = async () => {
 const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
-    const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
@@ -953,25 +954,36 @@ function initDebugger() {
     });
     
     debuggerGUI.addSliderDebugger({
-        label: "obj position x",
+        label: "gltf actor position x",
         minValue: -10,
         maxValue: 10,
         stepValue: 0.01,
-        initialValue: objMesh.transform.position.x,
+        initialValue: gltfActor.transform.position.x,
         onChange: (value) => {
-            const p = objMesh.transform.position;
-            objMesh.transform.setTranslation(new Vector3(value, p.y, p.z))
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
         }
     });
     debuggerGUI.addSliderDebugger({
-        label: "obj position z",
+        label: "gltf actor position y",
         minValue: -10,
         maxValue: 10,
         stepValue: 0.01,
-        initialValue: objMesh.transform.position.z,
+        initialValue: gltfActor.transform.position.y,
         onChange: (value) => {
-            const p = objMesh.transform.position;
-            objMesh.transform.setTranslation(new Vector3(p.x, p.y, value))
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position z",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.z,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
         }
     });
 
