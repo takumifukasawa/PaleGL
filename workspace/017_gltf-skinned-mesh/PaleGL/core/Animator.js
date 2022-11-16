@@ -1,6 +1,7 @@
 
 export class Animator {
     #animationClips;
+    #playingAnimationClip;
     
     get animationClips() {
         return this.#animationClips;
@@ -20,12 +21,14 @@ export class Animator {
             return;
         }
         animationClip.play();
+        this.#playingAnimationClip = animationClip;
     }
    
     // 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
     update(deltaTime) {
-        this.#animationClips.forEach(animationClip => {
-            animationClip.update(deltaTime);
-        });
+        if(!this.#playingAnimationClip) {
+            return;
+        }
+        this.#playingAnimationClip.update(deltaTime);
     }
 }

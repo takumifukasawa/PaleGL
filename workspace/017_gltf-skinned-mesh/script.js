@@ -47,6 +47,7 @@ let width, height;
 let objMesh;
 let floorPlaneMesh;
 let cubeMap;
+let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
 const states = {
@@ -656,8 +657,9 @@ const createGLTFSkinnedMesh = async () => {
                 animationClip.loop = true;
             });
         }
-        actor.animator.play("Twist");
     };
+    
+    skinningMeshAnimator = gltfActor.animator;
  
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
 
@@ -939,6 +941,16 @@ const main = async () => {
 function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
+
+    debuggerGUI.addPullDownDebugger({
+        label: "animations",
+        initialValue: skinningMeshAnimator.animationClips[0].name,
+        options: skinningMeshAnimator.animationClips.map(animationClip => ({ value: animationClip.name })),
+        initialExec: true,
+        onChange: (value) => {
+            skinningMeshAnimator.play(value);
+        }
+    });
     
     debuggerGUI.addSliderDebugger({
         label: "obj position x",

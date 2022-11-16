@@ -2,6 +2,7 @@
 import {Rotator} from "../math/Rotator.js";
 
 export class AnimationClip {
+    name;
     target;
     key;
     interpolation;
