@@ -58,13 +58,11 @@ export class SkinnedMesh extends Mesh {
        
         const { gpu } = options;
        
-        // TODO: load gltf 側でやればよい？
         this.bones.calcBoneOffsetMatrix();
         // this.bones.calcJointMatrix();
         
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
         
-        console.log(this.boneOffsetMatrices)
         // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
         // this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
       

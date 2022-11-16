@@ -24,7 +24,7 @@ export class AnimationClip {
     // TODO: fpsをgltfから引っ張ってこれるかどうか
     fps = 30; // default
     
-    onUpdate;
+    onUpdateProxy;
     
     #keyframes = [];
     
@@ -100,10 +100,9 @@ export class AnimationClip {
         //     default:
         //         throw "invalid animation clip type";
         // }
-        
-        if(this.onUpdate) {
-            // this.onUpdate(frameValue);
-            // TODO: rawframevalueだけ送っちゃうのがわかりやすい気もしてきた
+       
+        // 代理でupdateしたい場合 
+        if(this.onUpdateProxy) {
             const keyframes = this.#keyframes.map(animationKeyframes => {
                 // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
@@ -112,10 +111,32 @@ export class AnimationClip {
                     frameValue: animationKeyframes.getFrameValue(this.currentFrame)
                 }
             });
-            this.onUpdate(keyframes);
-        // } else {
-        //     // TODO: あんまりやりたくないけど、onUpdateがない場合は直接データを入れる?
-        //     // this.target[this.key] = frameValue;
+            this.onUpdateProxy(keyframes);
+        } else {
+            this.#keyframes.forEach(animationKeyframes => {
+                const frameValue = animationKeyframes.getFrameValue(this.currentFrame)
+                switch (animationKeyframes.key) {
+                    case "translation":
+                        animationKeyframes.target.position = frameValue;
+                        break;
+                    case "rotation":
+                        // TODO: rotationはquaternionなのでquaternionであるべき
+                        const q = frameValue;
+                        const euler = q.toEulerDegree();
+                        // console.log(euler)
+                        animationKeyframes.target.rotation = Rotator.fromRadian(
+                            euler.x * Math.PI / 180,
+                            euler.y * Math.PI / 180,
+                            euler.z * Math.PI / 180,
+                        );
+                        break;
+                    case "scale":
+                        animationKeyframes.scale = frameValue;
+                        break;
+                    default:
+                        throw "invalid animation keyframes key";
+                }
+            });
         }
     }
 }

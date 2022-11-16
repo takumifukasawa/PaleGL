@@ -651,52 +651,11 @@ const createGLTFSkinnedMesh = async () => {
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
-                // animationClip.onUpdate = (frameValue, rawFrameValue) => {
-                animationClip.onUpdate = (animationKeyframes) => {
-                    animationKeyframes.map(({ target, key, frameValue }) => {
-                        // console.log(target, key, value)
-                        // console.log(frameValue, rawFrameValue)
-                        switch(key) {
-                            case "translation":
-                                target.position = frameValue;
-                                break;
-                            case "rotation":
-                                // TODO: rotationはquaternionなのでquaternionであるべき
-                                const q = frameValue;
-                                const euler = q.toEulerDegree();
-                                // console.log(euler)
-                                target.rotation = Rotator.fromRadian(
-                                    euler.x * Math.PI / 180,
-                                    euler.y * Math.PI / 180,
-                                    euler.z * Math.PI / 180,
-                                );
-                                // target.rotation = Rotator.fromRadian(
-                                //     value[0] * value[3],
-                                //     value[1] * value[3],
-                                //     value[2] * value[3]
-                                // );
-                                break;
-                            case "scale":
-                                target.scale = frameValue;
-                                break;
-                            default:
-                                throw "invalid animation clip key";
-                        }
-                    })
-                }
                 animationClip.loop = true;
-                animationClip.play();
             });
         }
+        actor.animator.play("ArmatureAction");
     };
-    // gltfActor.onFixedUpdate = ({ actor, fixedDeltaTime }) => {
-    //     if(actor.animationClips) {
-    //         actor.animationClips.forEach(animationClip => {
-    //             // TODO: this is dummy time
-    //             animationClip.update(fixedDeltaTime);
-    //         });
-    //     }
-    // };
  
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
 
