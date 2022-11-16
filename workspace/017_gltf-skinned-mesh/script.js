@@ -648,14 +648,15 @@ const createRawSkinnedMesh = async () => {
 
 const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
-    const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
+    // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
+    const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
                 animationClip.loop = true;
             });
         }
-        actor.animator.play("ArmatureAction");
+        actor.animator.play("Twist");
     };
  
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
