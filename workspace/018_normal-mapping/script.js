@@ -240,6 +240,7 @@ const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
     gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
@@ -250,111 +251,122 @@ const createGLTFSkinnedMesh = async () => {
     
     skinningMeshAnimator = gltfActor.animator;
  
-    const skinningMesh = gltfActor.transform.children[0].transform.children[0];
-
-    skinningMesh.castShadow = true;
+    const skinningMeshes = gltfActor.transform.children[0].transform.children;
     
-    skinningMesh.material = new Material({
-        gpu,
-        vertexShader: `#version 300 es
-            
-            layout(location = 0) in vec3 aPosition;
-            layout(location = 1) in vec3 aNormal;
-            layout(location = 2) in vec2 aUv;
-            layout(location = 3) in vec4 aBoneIndices;
-            layout(location = 4) in vec4 aBoneWeights;
+    skinningMeshes.forEach(skinningMesh => {
 
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            uniform mat4[5] uJointMatrices;
-            
-            out vec2 vUv;
-            
-            void main() {
-                vUv = aUv;
-
-                mat4 skinMatrix =
-                     uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                     uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                     uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                     uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+        skinningMesh.castShadow = true;
+        
+        skinningMesh.material = new Material({
+            gpu,
+            vertexShader: `#version 300 es
                 
-                // pre calc skinning in cpu
-                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-            }
-        `,
-        fragmentShader: `#version 300 es
-            
-            precision mediump float;
-            
-            in vec2 vUv;
-            
-            out vec4 outColor;
+                layout(location = 0) in vec3 aPosition;
+                layout(location = 1) in vec3 aNormal;
+                layout(location = 2) in vec2 aUv;
+                layout(location = 3) in vec4 aBoneIndices;
+                layout(location = 4) in vec4 aBoneWeights;
 
-            void main() {
-                outColor = vec4(vUv, 1., 1.);
-            }
-            `,
-        uniforms: {
-            // uBoneOffsetMatrices: {
-            //     type: UniformTypes.Matrix4Array,
-            //     value: null
-            // },
-            uJointMatrices: {
-                type: UniformTypes.Matrix4Array,
-                value: null
-            },
-        }
-    });
-    skinningMesh.depthMaterial = new Material({
-        gpu,
-        vertexShader: `#version 300 es
-            
-            layout(location = 0) in vec3 aPosition;
-            layout(location = 1) in vec3 aNormal;
-            layout(location = 2) in vec2 aUv;
-            layout(location = 3) in vec4 aBoneIndices;
-            layout(location = 4) in vec4 aBoneWeights;
-
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            uniform mat4[5] uJointMatrices;
-            
-            out vec2 vUv;
-            
-            void main() {
-                vUv = aUv;
-
-                mat4 skinMatrix =
-                     uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                     uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                     uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                     uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                uniform mat4 uWorldMatrix;
+                uniform mat4 uViewMatrix;
+                uniform mat4 uProjectionMatrix;
+                uniform mat4 uNormalMatrix;
+                uniform mat4[5] uJointMatrices;
                 
-                // pre calc skinning in cpu
-                // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-            }
-        `,       
-        fragmentShader: `#version 300 es
-            
-            precision mediump float;
-            
-            out vec4 outColor;
+                out vec2 vUv;
+                out vec3 vNormal;
+                
+                void main() {
+                    vUv = aUv;
 
-            void main() {
-                outColor = vec4(1., 1., 1., 1.);
-            }
+                    mat4 skinMatrix =
+                         uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                         uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                         uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                         uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                    
+                    vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
+                    // vNormal = (mat4(uWorldMatrix * skinMatrix) * vec4(aNormal, 1.)).xyz;
+                    // vNormal = (uWorldMatrix * skinMatrix * vec4(aNormal, 1.)).xyz;
+                    
+                    // pre calc skinning in cpu
+                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                }
             `,
-        uniforms: {
-            uJointMatrices: {
-                type: UniformTypes.Matrix4Array,
-                value: null
-            },
-        }
+            fragmentShader: `#version 300 es
+                
+                precision mediump float;
+                
+                in vec2 vUv;
+                in vec3 vNormal;
+                
+                out vec4 outColor;
+
+                void main() {
+                    outColor = vec4(vNormal, 1.);
+                    // outColor = vec4(vec3(vNormal.x), 1.);
+                }
+                `,
+            uniforms: {
+                // uBoneOffsetMatrices: {
+                //     type: UniformTypes.Matrix4Array,
+                //     value: null
+                // },
+                uJointMatrices: {
+                    type: UniformTypes.Matrix4Array,
+                    value: null
+                },
+            }
+        });
+        skinningMesh.depthMaterial = new Material({
+            gpu,
+            vertexShader: `#version 300 es
+                
+                layout(location = 0) in vec3 aPosition;
+                layout(location = 1) in vec3 aNormal;
+                layout(location = 2) in vec2 aUv;
+                layout(location = 3) in vec4 aBoneIndices;
+                layout(location = 4) in vec4 aBoneWeights;
+
+                uniform mat4 uWorldMatrix;
+                uniform mat4 uViewMatrix;
+                uniform mat4 uProjectionMatrix;
+                uniform mat4[5] uJointMatrices;
+                
+                out vec2 vUv;
+                
+                void main() {
+                    vUv = aUv;
+
+                    mat4 skinMatrix =
+                         uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+                         uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+                         uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+                         uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
+                    
+                    // pre calc skinning in cpu
+                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                }
+            `,       
+            fragmentShader: `#version 300 es
+                
+                precision mediump float;
+                
+                out vec4 outColor;
+
+                void main() {
+                    outColor = vec4(1., 1., 1., 1.);
+                }
+                `,
+            uniforms: {
+                uJointMatrices: {
+                    type: UniformTypes.Matrix4Array,
+                    value: null
+                },
+            }
+        });
     });
     
     return gltfActor;
@@ -567,6 +579,39 @@ function initDebugger() {
         onChange: (value) => {
             const p = gltfActor.transform.position;
             gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation x",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.x,
+        onChange: (value) => {
+            gltfActor.transform.setRotationX(value);
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation y",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.y,
+        onChange: (value) => {
+            gltfActor.transform.setRotationY(value);
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation z",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.z,
+        onChange: (value) => {
+            gltfActor.transform.setRotationZ(value);
         }
     });
 

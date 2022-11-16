@@ -2,15 +2,33 @@
     // x, y, z axes
     // 一旦そのままdegreeが入る想定
     elements; 
-    
+   
+    // degree
+    get x() {
+        return this.elements[0];
+    }
+   
+    // degree
+    get y() {
+        return this.elements[1];
+    }
+   
+    // degree
+    get z() {
+        return this.elements[2];
+    }
+
+    // degree
     get roll() {
         return this.elements[2];
     }
-    
+
+    // degree
     get pitch() {
         return this.elements[0];
     }
-    
+
+    // degree
     get yaw() {
         return this.elements[1];
     }
