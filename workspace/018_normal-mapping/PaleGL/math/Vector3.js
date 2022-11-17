@@ -83,6 +83,15 @@
         return this;
     }
     
+    equals(v) {
+        const eps = 0.0000001;
+        const flag = 
+            (this.x - v.x) < eps &&
+            (this.y - v.y) < eps &&
+            (this.z - v.z) < eps;
+        return flag;
+    }
+    
     static zero() {
         return new Vector3(0, 0, 0);
     }
@@ -95,6 +104,10 @@
         return new Vector3(0, 1, 0);
     }
     
+    static down() {
+        return new Vector3(0, -1, 0);
+    }
+    
     static back() {
         return new Vector3(0, 0, -1);
     }
@@ -105,6 +118,10 @@
     
     static right() {
         return new Vector3(1, 0, 0);
+    }
+
+    static left() {
+        return new Vector3(-1, 0, 0);
     }
     
     static fromArray(arr) {
@@ -128,13 +145,39 @@
             v1.z - v2.z
         );
     }
-    
+   
+    // v1 x v2
     static crossVectors(v1, v2) {
         return new Vector3(
             v1.y * v2.z - v1.z * v2.y,
             v1.z * v2.x - v1.x * v2.z,
             v1.x * v2.y - v1.y * v2.x
         );
+    }
+  
+    // normal is should normalized
+    static getTangent(n) {
+        console.log(n.equals(Vector3.forward()));
+        console.log(n.equals(Vector3.back()));
+        if(n.equals(Vector3.forward())) {
+            return Vector3.right();
+        }
+        if(n.equals(Vector3.back())) {
+            return Vector3.left();
+        }
+        return Vector3.crossVectors(n, Vector3.forward());
+    }
+
+    // normal is should normalized
+    static getBinormal(n) {
+        const t = Vector3.getTangent(n);
+        if(t.equals(Vector3.right())) {
+            return Vector3.up();
+        }
+        if(t.equals(Vector3.left())) {
+            return Vector3.down();
+        }
+        return Vector3.crossVectors(t, n);
     }
     
     static fill(value) {

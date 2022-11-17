@@ -629,3 +629,8 @@ function initDebugger() {
 }
 
 main();
+
+Vector3.getTangent(new Vector3(0, 0, 1)).log();
+Vector3.getTangent(new Vector3(0, 0, -1)).log();
+// Vector3.getBinormal(new Vector3(0, 0, 1)).log();
+// Vector3.getBinormal(new Vector3(0, 0, -1)).log();
