@@ -72,7 +72,7 @@ export class Bone extends NodeBase {
             : this.offsetMatrix;
         // this.#jointMatrix.log()
        
-        // 無理やりpose状態にする時はこれを使う
+        // NOTE: 無理やりpose状態にする時はこれを使う
         // this.#jointMatrix = this.#boneOffsetMatrix.clone().invert();
         
         

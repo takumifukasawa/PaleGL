@@ -614,6 +614,44 @@ function initDebugger() {
             gltfActor.transform.setRotationZ(value);
         }
     });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor scale x",
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.scale.x,
+        onChange: (value) => {
+            const scale = gltfActor.transform.scale;
+            gltfActor.transform.setScaling(new Vector3(value, scale.y, scale.z));
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor scale y",
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.scale.y,
+        onChange: (value) => {
+            const scale = gltfActor.transform.scale;
+            gltfActor.transform.setScaling(new Vector3(scale.x, value, scale.z));
+        }
+    });
+    
+    console.log(gltfActor.transform)
+
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor scale z",
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.scale.z,
+        onChange: (value) => {
+            const scale = gltfActor.transform.scale;
+            gltfActor.transform.setScaling(new Vector3(scale.x, scale.y, value));
+        }
+    });
 
     debuggerGUI.addBorderSpacer();
 
