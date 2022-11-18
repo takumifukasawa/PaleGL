@@ -651,6 +651,7 @@ const main = async () => {
 function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
+    
     debuggerGUI.addSliderDebugger({
         label: "floor rotation x",
         minValue: -180,
@@ -685,6 +686,45 @@ function initDebugger() {
     });
 
     debuggerGUI.addBorderSpacer();
+    
+    debuggerGUI.addSliderDebugger({
+        label: "light position x",
+        minValue: -20,
+        maxValue: 20,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.x,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(value, p.y, p.z));
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "light position y",
+        minValue: 0.01,
+        maxValue: 20,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.y,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(p.x, value, p.z));
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "light position z",
+        minValue: -20,
+        maxValue: 20,
+        stepValue: 0.01,
+        initialValue: directionalLight.transform.position.z,
+        onChange: (value) => {
+            const p = directionalLight.transform.position;
+            directionalLight.transform.setTranslation(new Vector3(p.x, p.y, value));
+        }
+    });
+
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addPullDownDebugger({
         label: "animations",
@@ -693,109 +733,6 @@ function initDebugger() {
         initialExec: true,
         onChange: (value) => {
             skinningMeshAnimator.play(value);
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position x",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.x,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position y",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.y,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position z",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.z,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation x",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.x,
-        onChange: (value) => {
-            gltfActor.transform.setRotationX(value);
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation y",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.y,
-        onChange: (value) => {
-            gltfActor.transform.setRotationY(value);
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation z",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.z,
-        onChange: (value) => {
-            gltfActor.transform.setRotationZ(value);
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor scale x",
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.scale.x,
-        onChange: (value) => {
-            const scale = gltfActor.transform.scale;
-            gltfActor.transform.setScaling(new Vector3(value, scale.y, scale.z));
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor scale y",
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.scale.y,
-        onChange: (value) => {
-            const scale = gltfActor.transform.scale;
-            gltfActor.transform.setScaling(new Vector3(scale.x, value, scale.z));
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor scale z",
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.scale.z,
-        onChange: (value) => {
-            const scale = gltfActor.transform.scale;
-            gltfActor.transform.setScaling(new Vector3(scale.x, scale.y, value));
         }
     });
 
