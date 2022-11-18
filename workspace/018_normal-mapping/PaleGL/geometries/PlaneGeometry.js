@@ -1,8 +1,21 @@
 ﻿
 import {Geometry} from "./Geometry.js";
+import {Vector3} from "../math/Vector3.js";
 
 export class PlaneGeometry extends Geometry {
-    constructor({ gpu }) {
+    constructor({
+        gpu,
+        calculateTangent = false,
+        calculateBinormal = false 
+    }) {
+
+        const normals = [
+            [0, 0, 1],
+            [0, 0, 1],
+            [0, 0, 1],
+            [0, 0, 1],
+        ];
+
         super({
             gpu,
             // -----------------------------
@@ -33,17 +46,29 @@ export class PlaneGeometry extends Geometry {
                     size: 2
                 },
                 normal: {
-                    data: [
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-                    ],
+                    data: [...normals].flat(),
                     size: 3
                 },
+                ...(calculateTangent ?
+                    {
+                        tangent: {
+                            data: normals.map(arr => [...Vector3.getTangent(Vector3.fromArray(arr)).elements]).flat(),
+                            size: 3
+                        },
+                    } : {}
+                ),
+                ...(calculateBinormal ?
+                    {
+                        binormal: {
+                            data: normals.map(arr => [...Vector3.getBinormal(Vector3.fromArray(arr)).elements]).flat(),
+                            size: 3
+                        },
+                    } : {}
+                ),
             },
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
         });
+        console.log(this.attributes)
     }
 }

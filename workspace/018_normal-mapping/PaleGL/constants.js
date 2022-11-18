@@ -35,7 +35,12 @@ export const TextureWrapTypes = {
 };
 
 export const TextureFilterTypes = {
-    Linear: "Linear",
+    Nearest: "Nearest", // min, mag
+    Linear: "Linear", // min, mag
+    NearestMipmapNearest: "NearestMipmapNearest", // only min filter
+    NearestMipmapLinear: "NearestMipmapLinear", // only min filter,
+    LinearMipmapNearest: "LinearMipmapNearest", // only min filter
+    LinearMipmapLinear: "LinearMipmapLinear", // only min filter
 };
 
 export const BlendTypes = {

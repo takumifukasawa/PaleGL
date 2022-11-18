@@ -18,7 +18,7 @@ export class Texture extends GLObject {
         type = TextureTypes.RGBA,
         width, height,
         mipmap = false,
-        minFilter = TextureFilterTypes.Linear, magFilter = TextureFilterTypes.Linear,
+        minFilter = TextureFilterTypes.Nearest, magFilter = TextureFilterTypes.Nearest,
         wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge,
         flipY = false,
     }) {
@@ -46,14 +46,20 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA:
                 // min filter settings
                 switch(minFilter) {
+                    case TextureFilterTypes.Nearest:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                        break;
                     case TextureFilterTypes.Linear:
-                            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                            break;
-                        default:
-                            throw "invalid min filter type"
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                        break;
+                    default:
+                        throw "invalid min filter type"
                 }
                 // mag filter settings
                 switch(magFilter) {
+                    case TextureFilterTypes.Nearest:
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                        break;
                     case TextureFilterTypes.Linear:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                         break;

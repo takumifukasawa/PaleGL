@@ -6,7 +6,8 @@ import {
     PrimitiveTypes,
     UniformTypes,
     RenderTargetTypes,
-    AttributeUsageType
+    AttributeUsageType,
+    TextureWrapTypes, TextureFilterTypes
 } from "./PaleGL/constants.js";
 import {Vector3} from "./PaleGL/math/Vector3.js";
 import {Vector4} from "./PaleGL/math/Vector4.js";
@@ -432,27 +433,51 @@ const main = async () => {
         gpu, cubeMap
     });
     
-    const floorImg = await loadImg("./images/uv-checker.png");
-    const floorTexture = new Texture({ gpu, img: floorImg });
-    
+    // const floorNormalImg = await loadImg("./images/floor_tiles_02_nor_gl_1k.png");
+    const floorNormalImg = await loadImg("./images/blue_floor_tiles_01_nor_gl_1k.png");
+    const floorNormalMap = new Texture({
+        gpu,
+        img: floorNormalImg,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
+
+    const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
-        geometry: new PlaneGeometry({gpu}),
+        geometry: floorGeometry,
         material: new Material({
             gpu,
             vertexShader: `#version 300 es
             
             layout(location = 0) in vec3 aPosition;
             layout(location = 1) in vec2 aUv;
+            layout(location = 2) in vec3 aNormal;
+            layout(location = 3) in vec3 aTangent;
+            layout(location = 4) in vec3 aBinormal;
 
             uniform mat4 uWorldMatrix;
             uniform mat4 uViewMatrix;
             uniform mat4 uProjectionMatrix;
             uniform mat4 uShadowMapProjectionMatrix;
-            
+            uniform mat4 uNormalMatrix;
+           
+            out vec3 vNormal;
+            out vec3 vTangent;
+            out vec3 vBinormal;
             out vec2 vUv;
             out vec4 vShadowMapProjectionUv;
 
             void main() {
+                // 1. そのままピクセルシェーダーに渡してTBN行列にすると、normalmapから読み取ったベクトルはメッシュのローカル座標系にされる
+                // vNormal = aNormal;
+                // vTangent = aTangent;
+                // vBinormal = aBinormal;
+                // 2. 法線をワールド空間に変換してピクセルシェーダーでTBN行列にすると、normalmapから読み取ったベクトルはワールド座標系に変換される
+                vNormal = (uNormalMatrix * vec4(aNormal, 1.)).xyz; // local normal -> world normal
+                vTangent = (uNormalMatrix * vec4(aTangent, 1.)).xyz; // local tangent -> world tangent
+                vBinormal = (uNormalMatrix * vec4(aBinormal, 1.)).xyz; // local binormal -> world binormal
                 vUv = aUv;
                 vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.);
                 vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
@@ -463,47 +488,75 @@ const main = async () => {
             
             precision mediump float;
             
-            uniform sampler2D uBillboardTexture;
+            uniform sampler2D uNormalMap;
             uniform sampler2D uShadowMap;
             uniform float uShadowBias;
            
             in vec4 vShadowMapProjectionUv; 
             in vec2 vUv;
+            in vec3 vNormal;
+            in vec3 vTangent;
+            in vec3 vBinormal;
             
             out vec4 outColor;
             
             void main() {
-                outColor = texture(uBillboardTexture, vUv);
+               
+                // ------------------------------------------------------- 
+                // calc base color
+                // ------------------------------------------------------- 
+               
+                vec4 baseColor = vec4(.1, .1, .1, 1.);
+                baseColor = texture(uNormalMap, vUv);
+                
+                // ------------------------------------------------------- 
+                // calc normal from normal map
+                // ------------------------------------------------------- 
+              
+                vec3 normal = normalize(vNormal);
+                vec3 tangent = normalize(vTangent);
+                vec3 binormal = normalize(vBinormal);
+                mat3 nbt = mat3(tangent, binormal, normal);
+                vec3 nt = texture(uNormalMap, vUv * vec2(2., 2.)).xyz;
+                nt = nt * 2. - 1.;
+                vec3 n = normalize(nbt * nt);
+                baseColor.xyz = nt;
+               
+                // ------------------------------------------------------- 
+                // calc shadow 
+                // ------------------------------------------------------- 
+                
                 vec3 projectionUv = vShadowMapProjectionUv.xyz / vShadowMapProjectionUv.w;
                 vec4 projectionShadowColor = texture(uShadowMap, projectionUv.xy);
                 float sceneDepth = projectionShadowColor.r;
                 float depthFromLight = projectionUv.z;
-           
                 float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - uShadowBias), 0., 1.);
                 float shadowAreaRect =
                     step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
                     step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
                     step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-
                 float shadowRate = shadowOccluded * shadowAreaRect;
-                
-                vec4 baseColor = vec4(.1, .1, .1, 1.);
                 vec4 shadowColor = vec4(0., 0., 0., 1.);
+               
+                // ------------------------------------------------------- 
+                // blend
+                // ------------------------------------------------------- 
+                
                 vec4 resultColor = mix(baseColor, shadowColor, shadowRate);
                 outColor = resultColor;
             }
             `,
             uniforms: {
-                uBillboardTexture: {
+                uNormalMap: {
                     type: UniformTypes.Texture,
-                    value: floorTexture
+                    value: floorNormalMap
                 },
             },
             receiveShadow: true
         })
     });
     floorPlaneMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(20));
+        actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
         actor.transform.setTranslation(new Vector3(0, 0, 0));
     }
@@ -537,6 +590,40 @@ const main = async () => {
 function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
+    debuggerGUI.addSliderDebugger({
+        label: "floor rotation x",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: floorPlaneMesh.transform.rotation.x,
+        onChange: (value) => {
+            floorPlaneMesh.transform.setRotationX(value);
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "floor rotation y",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: floorPlaneMesh.transform.rotation.y,
+        onChange: (value) => {
+            floorPlaneMesh.transform.setRotationY(value);
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "floor rotation z",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: floorPlaneMesh.transform.rotation.z,
+        onChange: (value) => {
+            floorPlaneMesh.transform.setRotationZ(value);
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addPullDownDebugger({
         label: "animations",
@@ -639,8 +726,6 @@ function initDebugger() {
         }
     });
     
-    console.log(gltfActor.transform)
-
     debuggerGUI.addSliderDebugger({
         label: "gltf actor scale z",
         minValue: -5,
@@ -655,6 +740,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
+
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",
         initialValue: captureSceneCamera.postProcess.enabled,
@@ -667,8 +753,3 @@ function initDebugger() {
 }
 
 main();
-
-Vector3.getTangent(new Vector3(0, 0, 1)).log();
-Vector3.getTangent(new Vector3(0, 0, -1)).log();
-// Vector3.getBinormal(new Vector3(0, 0, 1)).log();
-// Vector3.getBinormal(new Vector3(0, 0, -1)).log();

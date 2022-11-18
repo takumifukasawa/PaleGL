@@ -3,14 +3,6 @@ import {VertexArrayObject} from "./../core/VertexArrayObject.js";
 import {IndexBufferObject} from "./../core/IndexBufferObject.js";
 import {Vector3} from "../math/Vector3.js";
 
-const createTangent = (n) => {
-    if(n.equals(Vector3.up())) {
-        return Vector3.right();
-    }
-    if(n.equals(Vector3.down())) {
-        
-    }
-}
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも

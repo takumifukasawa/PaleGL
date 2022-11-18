@@ -86,9 +86,9 @@
     equals(v) {
         const eps = 0.0000001;
         const flag = 
-            (this.x - v.x) < eps &&
-            (this.y - v.y) < eps &&
-            (this.z - v.z) < eps;
+            Math.abs(this.x - v.x) < eps &&
+            Math.abs(this.y - v.y) < eps &&
+            Math.abs(this.z - v.z) < eps;
         return flag;
     }
     
@@ -157,8 +157,6 @@
   
     // normal is should normalized
     static getTangent(n) {
-        console.log(n.equals(Vector3.forward()));
-        console.log(n.equals(Vector3.back()));
         if(n.equals(Vector3.forward())) {
             return Vector3.right();
         }
