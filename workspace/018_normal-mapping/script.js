@@ -436,6 +436,16 @@ const main = async () => {
     });
     
     // const floorNormalImg = await loadImg("./images/floor_tiles_02_nor_gl_1k.png");
+    const floorDiffuseImg = await loadImg("./images/blue_floor_tiles_01_diff_1k.png");
+    const floorDiffuseMap = new Texture({
+        gpu,
+        img: floorDiffuseImg,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
+
     const floorNormalImg = await loadImg("./images/blue_floor_tiles_01_nor_gl_1k.png");
     const floorNormalMap = new Texture({
         gpu,
@@ -494,7 +504,8 @@ const main = async () => {
             fragmentShader: `#version 300 es
             
             precision mediump float;
-            
+           
+            uniform sampler2D uDiffuseMap; 
             uniform sampler2D uNormalMap;
             uniform sampler2D uShadowMap;
             uniform float uShadowBias;
@@ -517,6 +528,8 @@ const main = async () => {
             out vec4 outColor;
             
             void main() {
+            
+                vec2 uv
                
                 // ------------------------------------------------------- 
                 // calc base color
@@ -524,6 +537,8 @@ const main = async () => {
                
                 vec4 baseColor = vec4(.1, .1, .1, 1.);
                 baseColor = texture(uNormalMap, vUv);
+                
+                vec4 diffuseColor = texture(uDiffuseMap, 
                 
                 // ------------------------------------------------------- 
                 // calc normal from normal map
@@ -541,7 +556,7 @@ const main = async () => {
                 // ------------------------------------------------------- 
                 // directional light
                 // ------------------------------------------------------- 
-
+                
                 // vec3 N = normalize(vNormal);
                 vec3 N = worldNormal;
                 vec3 L = normalize(uDirectionalLight.direction);
@@ -588,6 +603,10 @@ const main = async () => {
             }
             `,
             uniforms: {
+                uDiffuseMap: {
+                    type: UniformTypes.Texture,
+                    value: floorDiffuseMap
+                },
                 uNormalMap: {
                     type: UniformTypes.Texture,
                     value: floorNormalMap
