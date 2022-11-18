@@ -529,16 +529,16 @@ const main = async () => {
             
             void main() {
             
-                vec2 uv
+                vec2 uv = vUv * 2.;
                
                 // ------------------------------------------------------- 
                 // calc base color
                 // ------------------------------------------------------- 
                
                 vec4 baseColor = vec4(.1, .1, .1, 1.);
-                baseColor = texture(uNormalMap, vUv);
+                baseColor = texture(uNormalMap, uv);
                 
-                vec4 diffuseColor = texture(uDiffuseMap, 
+                vec4 diffuseMapColor = texture(uDiffuseMap, uv);
                 
                 // ------------------------------------------------------- 
                 // calc normal from normal map
@@ -548,7 +548,7 @@ const main = async () => {
                 vec3 tangent = normalize(vTangent);
                 vec3 binormal = normalize(vBinormal);
                 mat3 tbn = mat3(tangent, binormal, normal);
-                vec3 nt = texture(uNormalMap, vUv * vec2(2., 2.)).xyz;
+                vec3 nt = texture(uNormalMap, uv).xyz;
                 nt = nt * 2. - 1.;
                 vec3 worldNormal = normalize(tbn * nt);
                 // baseColor.xyz = nt;
@@ -562,7 +562,7 @@ const main = async () => {
                 vec3 L = normalize(uDirectionalLight.direction);
                 float diffuseRate = clamp(dot(N, L), 0., 1.);
                 // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-                vec3 diffuseColor = vec3(1.) * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+                vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
 
                 vec3 P = vWorldPosition;
                 vec3 E = uViewPosition;
