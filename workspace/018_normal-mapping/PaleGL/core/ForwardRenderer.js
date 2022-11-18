@@ -303,7 +303,7 @@ export class ForwardRenderer {
 
         // setup depth test
         const depthTest = material.depthTest;
-
+        
         // draw
         this.#gpu.draw(
             geometry.drawCount,

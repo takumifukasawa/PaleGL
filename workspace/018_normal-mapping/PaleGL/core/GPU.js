@@ -201,7 +201,9 @@ export class GPU {
         Object.keys(this.#uniforms).forEach(uniformName => {
             const uniform = this.#uniforms[uniformName];
             if(uniform.type === UniformTypes.Struct) {
-                Object.keys(uniform.value).forEach(key => setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value));
+                Object.keys(uniform.value).forEach(key => {
+                    setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                });
             } else {
                 setUniformValue(uniform.type, uniformName, uniform.value);
             }

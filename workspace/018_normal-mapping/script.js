@@ -174,7 +174,8 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
 }
 
 const directionalLight = new DirectionalLight();
-captureScene.add(directionalLight);
+directionalLight.intensity = 1;
+directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(4, 12, 4));
     actor.transform.lookAt(new Vector3(0, 0, 0));
@@ -185,6 +186,7 @@ directionalLight.onStart = ({ actor }) => {
     actor.shadowCamera.setSize(null, null, -12, 12, -12, 12);
     actor.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
 }
+captureScene.add(directionalLight);
 
 const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
@@ -467,6 +469,7 @@ const main = async () => {
             out vec3 vTangent;
             out vec3 vBinormal;
             out vec2 vUv;
+            out vec3 vWorldPosition;
             out vec4 vShadowMapProjectionUv;
 
             void main() {
@@ -478,8 +481,12 @@ const main = async () => {
                 vNormal = (uNormalMatrix * vec4(aNormal, 1.)).xyz; // local normal -> world normal
                 vTangent = (uNormalMatrix * vec4(aTangent, 1.)).xyz; // local tangent -> world tangent
                 vBinormal = (uNormalMatrix * vec4(aBinormal, 1.)).xyz; // local binormal -> world binormal
+                
                 vUv = aUv;
+                
                 vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.);
+                vWorldPosition = worldPosition.xyz;
+                
                 vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
                 gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
             }
@@ -491,12 +498,21 @@ const main = async () => {
             uniform sampler2D uNormalMap;
             uniform sampler2D uShadowMap;
             uniform float uShadowBias;
-           
+            uniform vec3 uViewPosition;          
+            
+            struct DirectionalLight {
+                vec3 direction;
+                float intensity;
+                vec4 color;
+            };
+            uniform DirectionalLight uDirectionalLight;
+          
             in vec4 vShadowMapProjectionUv; 
             in vec2 vUv;
             in vec3 vNormal;
             in vec3 vTangent;
             in vec3 vBinormal;
+            in vec3 vWorldPosition;
             
             out vec4 outColor;
             
@@ -516,11 +532,36 @@ const main = async () => {
                 vec3 normal = normalize(vNormal);
                 vec3 tangent = normalize(vTangent);
                 vec3 binormal = normalize(vBinormal);
-                mat3 nbt = mat3(tangent, binormal, normal);
+                mat3 tbn = mat3(tangent, binormal, normal);
                 vec3 nt = texture(uNormalMap, vUv * vec2(2., 2.)).xyz;
                 nt = nt * 2. - 1.;
-                vec3 n = normalize(nbt * nt);
-                baseColor.xyz = nt;
+                vec3 worldNormal = normalize(tbn * nt);
+                // baseColor.xyz = nt;
+                
+                // ------------------------------------------------------- 
+                // directional light
+                // ------------------------------------------------------- 
+
+                // vec3 N = normalize(vNormal);
+                vec3 N = worldNormal;
+                vec3 L = normalize(uDirectionalLight.direction);
+                float diffuseRate = clamp(dot(N, L), 0., 1.);
+                // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+                vec3 diffuseColor = vec3(1.) * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+                vec3 P = vWorldPosition;
+                vec3 E = uViewPosition;
+                vec3 PtoL = L; // for directional light
+                vec3 PtoE = normalize(E - P);
+                vec3 H = normalize(PtoL + PtoE);
+                float specularPower = 16.;
+                float specularRate = clamp(dot(H, N), 0., 1.);
+                specularRate = pow(specularRate, specularPower);
+                vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+    
+                vec3 ambientColor = vec3(.1);
+    
+                vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
                
                 // ------------------------------------------------------- 
                 // calc shadow 
@@ -542,7 +583,7 @@ const main = async () => {
                 // blend
                 // ------------------------------------------------------- 
                 
-                vec4 resultColor = mix(baseColor, shadowColor, shadowRate);
+                vec4 resultColor = mix(surfaceColor, shadowColor, shadowRate);
                 outColor = resultColor;
             }
             `,
@@ -551,6 +592,7 @@ const main = async () => {
                     type: UniformTypes.Texture,
                     value: floorNormalMap
                 },
+                uDirectionalLight: {}
             },
             receiveShadow: true
         })
