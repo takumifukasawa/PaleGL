@@ -152,8 +152,14 @@ export async function loadGLTF({gpu, path}) {
             // rootBone.calcJointMatrix();
         }
         
-        // console.log("root bone", rootBone)
-        // console.log(positions, normals, uvs, joints, weights)
+        
+        console.log("======================================")
+        console.log("root bone", rootBone)
+        console.log(positions, normals, uvs, joints, weights)
+        
+        const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
+        console.log(tangents, binormals)
+        console.log("======================================")
 
         const geometry = new Geometry({
             gpu,
@@ -162,13 +168,21 @@ export async function loadGLTF({gpu, path}) {
                     data: positions,
                     size: 3,
                 },
+                uv: {
+                    data: uvs,
+                    size: 2
+                },
                 normal: {
                     data: normals,
                     size: 3
                 },
-                uv: {
-                    data: uvs,
-                    size: 2
+                tangent: {
+                    data: tangents,
+                    size: 3
+                },
+                binormal: {
+                    data: binormals,
+                    size: 3
                 },
                 // bone があるならjointとweightもあるはず
                 ...(rootBone ? {

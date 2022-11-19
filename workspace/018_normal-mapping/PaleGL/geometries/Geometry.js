@@ -66,4 +66,23 @@ export class Geometry {
     updateAttribute(key, data) {
         this.vertexArrayObject.updateAttribute(key, data);
     }
+    
+    static createTangentsAndBinormals(normals) {
+        const tangents = [];
+        const binormals = [];
+        for(let i = 0; i < normals.length / 3; i++) {
+            const x = normals[i * 3 + 0];
+            const y = normals[i * 3 + 1];
+            const z = normals[i * 3 + 2];
+            const n = new Vector3(x, y, z);
+            const t = Vector3.getTangent(n);
+            const b = Vector3.getBinormalFromTangent(t, n);
+            tangents.push(...t.elements);
+            binormals.push(...b.elements);
+        }
+        return {
+            tangents,
+            binormals
+        };
+    }
 }

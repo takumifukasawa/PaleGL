@@ -10,11 +10,13 @@ export class PlaneGeometry extends Geometry {
     }) {
 
         const normals = [
-            [0, 0, 1],
-            [0, 0, 1],
-            [0, 0, 1],
-            [0, 0, 1],
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
         ];
+        
+        const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
 
         super({
             gpu,
@@ -46,13 +48,13 @@ export class PlaneGeometry extends Geometry {
                     size: 2
                 },
                 normal: {
-                    data: [...normals].flat(),
+                    data: normals,
                     size: 3
                 },
                 ...(calculateTangent ?
                     {
                         tangent: {
-                            data: normals.map(arr => [...Vector3.getTangent(Vector3.fromArray(arr)).elements]).flat(),
+                            data: tangents,
                             size: 3
                         },
                     } : {}
@@ -60,7 +62,7 @@ export class PlaneGeometry extends Geometry {
                 ...(calculateBinormal ?
                     {
                         binormal: {
-                            data: normals.map(arr => [...Vector3.getBinormal(Vector3.fromArray(arr)).elements]).flat(),
+                            data: binormals,
                             size: 3
                         },
                     } : {}

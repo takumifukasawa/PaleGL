@@ -154,28 +154,27 @@
             v1.x * v2.y - v1.y * v2.x
         );
     }
-  
-    // normal is should normalized
+ 
+    // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {
-        if(n.equals(Vector3.forward())) {
+        if(n.equals(Vector3.up())) {
             return Vector3.right();
         }
-        if(n.equals(Vector3.back())) {
-            return Vector3.left();
+        if(n.equals(Vector3.down())) {
+            return Vector3.right();
         }
-        return Vector3.crossVectors(n, Vector3.forward());
+        return Vector3.crossVectors(n, Vector3.down());
     }
 
-    // normal is should normalized
-    static getBinormal(n) {
-        const t = Vector3.getTangent(n);
-        if(t.equals(Vector3.right())) {
-            return Vector3.up();
-        }
-        if(t.equals(Vector3.left())) {
-            return Vector3.down();
-        }
-        return Vector3.crossVectors(t, n);
+    static getBinormalFromTangent(t, n) {
+        // if(t.equals(Vector3.right())) {
+        //     return Vector3.forward();
+        // }
+        // if(t.equals(Vector3.left())) {
+        //     return Vector3.back();
+        // }
+        // return Vector3.crossVectors(t, n);
+        return Vector3.crossVectors(t, n.clone().negate());
     }
     
     static fill(value) {

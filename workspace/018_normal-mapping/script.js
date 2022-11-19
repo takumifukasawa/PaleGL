@@ -222,8 +222,8 @@ const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    // targetCameraPosition.y = ny * 10 + 12;
-    targetCameraPosition.y = ny * 20;
+    targetCameraPosition.y = ny * 10 + 12;
+    // targetCameraPosition.y = ny * 20;
 };
 
 const onWindowResize = () => {
@@ -258,17 +258,15 @@ const createGLTFSkinnedMesh = async () => {
     
     skinningMeshes.forEach(skinningMesh => {
 
-        skinningMesh.castShadow = true;
-        
-        skinningMesh.material = new Material({
-            gpu,
-            vertexShader: `#version 300 es
+        const skinningMeshVertexShader = `#version 300 es
                 
                 layout(location = 0) in vec3 aPosition;
-                layout(location = 1) in vec3 aNormal;
-                layout(location = 2) in vec2 aUv;
-                layout(location = 3) in vec4 aBoneIndices;
-                layout(location = 4) in vec4 aBoneWeights;
+                layout(location = 1) in vec2 aUv;
+                layout(location = 2) in vec3 aNormal;
+                layout(location = 3) in vec3 aTangent;
+                layout(location = 4) in vec3 aBinormal;
+                layout(location = 5) in vec4 aBoneIndices;
+                layout(location = 6) in vec4 aBoneWeights;
 
                 uniform mat4 uWorldMatrix;
                 uniform mat4 uViewMatrix;
@@ -278,6 +276,8 @@ const createGLTFSkinnedMesh = async () => {
                 
                 out vec2 vUv;
                 out vec3 vNormal;
+                out vec3 vTangent;
+                out vec3 vBinormal;
                 
                 void main() {
                     vUv = aUv;
@@ -288,26 +288,41 @@ const createGLTFSkinnedMesh = async () => {
                          uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
                          uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
                     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
-                    
+                   
+                    // TODO: なぜworldMatrixをかけてnormalになるかが分かっていない 
+                    // 平行移動成分はいらないのでmat3
                     vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
-                    // vNormal = (mat4(uWorldMatrix * skinMatrix) * vec4(aNormal, 1.)).xyz;
-                    // vNormal = (uWorldMatrix * skinMatrix * vec4(aNormal, 1.)).xyz;
+                    vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
+                    vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
+                    
+                    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+                    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
                     
                     // pre calc skinning in cpu
                     // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                 }
-            `,
+        `;
+        
+        skinningMesh.castShadow = true;
+        
+        skinningMesh.material = new Material({
+            gpu,
+            vertexShader: skinningMeshVertexShader,
             fragmentShader: `#version 300 es
                 
                 precision mediump float;
                 
                 in vec2 vUv;
                 in vec3 vNormal;
+                in vec3 vTangent;
+                in vec3 vBinormal;
                 
                 out vec4 outColor;
 
                 void main() {
                     outColor = vec4(vNormal, 1.);
+                    outColor = vec4(vTangent, 1.);
+                    // outColor = vec4(vBinormal, 1.);
                     // outColor = vec4(vec3(vNormal.x), 1.);
                 }
                 `,
@@ -324,35 +339,7 @@ const createGLTFSkinnedMesh = async () => {
         });
         skinningMesh.depthMaterial = new Material({
             gpu,
-            vertexShader: `#version 300 es
-                
-                layout(location = 0) in vec3 aPosition;
-                layout(location = 1) in vec3 aNormal;
-                layout(location = 2) in vec2 aUv;
-                layout(location = 3) in vec4 aBoneIndices;
-                layout(location = 4) in vec4 aBoneWeights;
-
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
-                uniform mat4[5] uJointMatrices;
-                
-                out vec2 vUv;
-                
-                void main() {
-                    vUv = aUv;
-
-                    mat4 skinMatrix =
-                         uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                         uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                         uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                         uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
-                    
-                    // pre calc skinning in cpu
-                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-                }
-            `,       
+            vertexShader: skinningMeshVertexShader,
             fragmentShader: `#version 300 es
                 
                 precision mediump float;
@@ -612,6 +599,11 @@ const main = async () => {
                     mix(surfaceColor, shadowColor, .7),
                     shadowRate
                 );
+               
+                // check normal 
+                // resultColor.xyz = vec3(N.x);
+                // resultColor.xyz = vec3(N.y);
+                // resultColor.xyz = vec3(N.z);
                 
                 outColor = resultColor;
             }
@@ -754,7 +746,6 @@ function initDebugger() {
         }
     });
 
-
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addPullDownDebugger({
@@ -767,8 +758,72 @@ function initDebugger() {
         }
     });
 
-    debuggerGUI.addBorderSpacer();
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position x",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.x,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position y",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.y,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position z",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.z,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
+        }
+    });
 
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation x",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.x,
+        onChange: (value) => {
+            gltfActor.transform.setRotationX(value);
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation y",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.y,
+        onChange: (value) => {
+            gltfActor.transform.setRotationY(value);
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation z",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.z,
+        onChange: (value) => {
+            gltfActor.transform.setRotationZ(value);
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",
@@ -780,5 +835,24 @@ function initDebugger() {
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
+
+// (Vector3.getTangent(new Vector3(0, 0, 1)).log());
+// (Vector3.getBinormal(new Vector3(0, 0, 1)).log());
+// console.log("--------");
+// (Vector3.getTangent(new Vector3(1, 0, 0)).log());
+// (Vector3.getBinormal(new Vector3(1, 0, 0)).log());
+// Vector3.getTangent(new Vector3(1, 0, 0)).log() // will: 0, 0, -1
+// Vector3.getTangent(new Vector3(0, 1, 0)).log() // will: 1, 0, 0
+// Vector3.getTangent(new Vector3(0, 0, 1)).log() // will: 1, 0, 0
+// Vector3.getTangent(new Vector3(-1, 0, 0)).log() // will: 0, 0, 1
+// Vector3.getTangent(new Vector3(0, -1, 0)).log() // will: 1, 0, 0
+// Vector3.getTangent(new Vector3(0, 0, -1)).log() // will: -1, 0, 0
+// console.log("--------");
+Vector3.getTangent(new Vector3(1, 0, 0)).log() // will: 0, 1, 0
+Vector3.getTangent(new Vector3(0, 1, 0)).log() // will: -1, 0, 0
+Vector3.getTangent(new Vector3(0, 0, 1)).log() // will: 0, 1, 0
+Vector3.getTangent(new Vector3(-1, 0, 0)).log() // will: 0, -1, 0
+Vector3.getTangent(new Vector3(0, -1, 0)).log() // will: 1, 0, 0
+Vector3.getTangent(new Vector3(0, 0, -1)).log() // will: -1, 0, 0
 
 main();
