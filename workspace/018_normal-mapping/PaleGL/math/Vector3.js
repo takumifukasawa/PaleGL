@@ -167,13 +167,6 @@
     }
 
     static getBinormalFromTangent(t, n) {
-        // if(t.equals(Vector3.right())) {
-        //     return Vector3.forward();
-        // }
-        // if(t.equals(Vector3.left())) {
-        //     return Vector3.back();
-        // }
-        // return Vector3.crossVectors(t, n);
         return Vector3.crossVectors(t, n.clone().negate());
     }
     
