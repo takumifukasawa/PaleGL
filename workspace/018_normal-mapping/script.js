@@ -440,6 +440,7 @@ const main = async () => {
     const floorDiffuseMap = new Texture({
         gpu,
         img: floorDiffuseImg,
+        // mipmap: true,
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
         minFilter: TextureFilterTypes.Linear,
@@ -450,6 +451,7 @@ const main = async () => {
     const floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
+        // mipmap: true,
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
         minFilter: TextureFilterTypes.Linear,
@@ -508,6 +510,7 @@ const main = async () => {
             uniform sampler2D uDiffuseMap; 
             uniform sampler2D uNormalMap;
             uniform sampler2D uShadowMap;
+            uniform float uNormalStrength;
             uniform float uShadowBias;
             uniform vec3 uViewPosition;          
             
@@ -551,14 +554,16 @@ const main = async () => {
                 vec3 nt = texture(uNormalMap, uv).xyz;
                 nt = nt * 2. - 1.;
                 vec3 worldNormal = normalize(tbn * nt);
-                // baseColor.xyz = nt;
+                // TODO: fix blend
+                vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
                 
                 // ------------------------------------------------------- 
                 // directional light
                 // ------------------------------------------------------- 
                 
                 // vec3 N = normalize(vNormal);
-                vec3 N = worldNormal;
+                vec3 N = normalize(worldNormal);
+                // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
                 vec3 L = normalize(uDirectionalLight.direction);
                 float diffuseRate = clamp(dot(N, L), 0., 1.);
                 // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
@@ -611,6 +616,10 @@ const main = async () => {
                     type: UniformTypes.Texture,
                     value: floorNormalMap
                 },
+                uNormalStrength: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
                 uDirectionalLight: {}
             },
             receiveShadow: true
@@ -651,7 +660,20 @@ const main = async () => {
 function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
-    
+
+    debuggerGUI.addSliderDebugger({
+        label: "normal strength",
+        minValue: 0,
+        maxValue: 2,
+        stepValue: 0.01,
+        initialValue: floorPlaneMesh.material.uniforms.uNormalStrength.value,
+        onChange: (value) => {
+            floorPlaneMesh.material.uniforms.uNormalStrength.value = value;
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
+
     debuggerGUI.addSliderDebugger({
         label: "floor rotation x",
         minValue: -180,
