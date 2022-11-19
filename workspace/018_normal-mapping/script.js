@@ -553,8 +553,12 @@ const main = async () => {
                 mat3 tbn = mat3(tangent, binormal, normal);
                 vec3 nt = texture(uNormalMap, uv).xyz;
                 nt = nt * 2. - 1.;
-                vec3 worldNormal = normalize(tbn * nt);
-                // TODO: fix blend
+                
+                // 1: mesh world normal
+                // vec3 worldNormal = normal;
+                // 2: world normal from normal map
+                // vec3 worldNormal = normalize(tbn * nt);
+                // blend mesh world normal ~ world normal from normal map
                 vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
                 
                 // ------------------------------------------------------- 
@@ -604,6 +608,7 @@ const main = async () => {
                 // ------------------------------------------------------- 
                 
                 vec4 resultColor = mix(surfaceColor, shadowColor, shadowRate);
+                
                 outColor = resultColor;
             }
             `,
