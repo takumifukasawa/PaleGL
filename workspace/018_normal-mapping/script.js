@@ -607,7 +607,11 @@ const main = async () => {
                 // blend
                 // ------------------------------------------------------- 
                 
-                vec4 resultColor = mix(surfaceColor, shadowColor, shadowRate);
+                vec4 resultColor = mix(
+                    surfaceColor,
+                    mix(surfaceColor, shadowColor, .7),
+                    shadowRate
+                );
                 
                 outColor = resultColor;
             }
