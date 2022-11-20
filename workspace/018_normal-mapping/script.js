@@ -185,8 +185,8 @@ directionalLight.onStart = ({ actor }) => {
     actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
-    actor.shadowCamera.far = 40;
-    actor.shadowCamera.setSize(null, null, -12, 12, -12, 12);
+    actor.shadowCamera.far = 30;
+    actor.shadowCamera.setSize(null, null, -8, 8, -8, 8);
     actor.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
 }
 captureScene.add(directionalLight);
