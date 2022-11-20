@@ -246,7 +246,7 @@ const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-3.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-4.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
