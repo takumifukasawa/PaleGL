@@ -23,7 +23,11 @@ export class CubeMap extends GLObject {
         this.#texture = gl.createTexture();
         
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.#texture);
-        
+       
+        // cubemapの場合は html img でも falseで良い。というのがよくわかってない。そういうもの？
+        // ただ、たしかに反転すると上下が反転して見た目がおかしくなる
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
         Object.keys(images).forEach((key) => {
             let axis = null;
             switch(key) {
@@ -57,7 +61,7 @@ export class CubeMap extends GLObject {
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
+ 
         // TODO: unbindしない方がよい？
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     }

@@ -48,9 +48,12 @@ let width, height;
 let objMesh;
 let floorPlaneMesh;
 let cubeMap;
+let floorDiffuseMap;
+let floorNormalMap;
 let gltfActor;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
+
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -242,7 +245,8 @@ const onWindowResize = () => {
 const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -278,6 +282,7 @@ const createGLTFSkinnedMesh = async () => {
                 out vec3 vNormal;
                 out vec3 vTangent;
                 out vec3 vBinormal;
+                out vec3 vWorldPosition;
                 
                 void main() {
                     vUv = aUv;
@@ -297,9 +302,13 @@ const createGLTFSkinnedMesh = async () => {
                     
                     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
                     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
+                    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
+                   
+                    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.); 
+                    vWorldPosition = worldPosition.xyz;
                     
                     // pre calc skinning in cpu
-                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    // gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
                 }
         `;
         
@@ -316,14 +325,86 @@ const createGLTFSkinnedMesh = async () => {
                 in vec3 vNormal;
                 in vec3 vTangent;
                 in vec3 vBinormal;
+                in vec3 vWorldPosition;
                 
                 out vec4 outColor;
+                
+            uniform sampler2D uDiffuseMap; 
+            uniform sampler2D uNormalMap;
+            uniform sampler2D uShadowMap;
+            uniform vec3 uViewPosition;          
+            
+            struct DirectionalLight {
+                vec3 direction;
+                float intensity;
+                vec4 color;
+            };
+            uniform DirectionalLight uDirectionalLight;
+ 
 
                 void main() {
-                    outColor = vec4(vNormal, 1.);
-                    outColor = vec4(vTangent, 1.);
+                
+                vec2 uv = vUv;
+                
+                    // outColor = vec4(vNormal, 1.);
+                    // // outColor = vec4(vTangent, 1.);
                     // outColor = vec4(vBinormal, 1.);
-                    // outColor = vec4(vec3(vNormal.x), 1.);
+                    // outColor = vec4(vUv, 1., 1.);
+
+                // ------------------------------------------------------- 
+                // calc base color
+                // ------------------------------------------------------- 
+               
+                vec4 baseColor = vec4(.1, .1, .1, 1.);
+                baseColor = texture(uNormalMap, uv);
+                
+                vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+                
+                // ------------------------------------------------------- 
+                // calc normal from normal map
+                // ------------------------------------------------------- 
+              
+                vec3 normal = normalize(vNormal);
+                vec3 tangent = normalize(vTangent);
+                vec3 binormal = normalize(vBinormal);
+                mat3 tbn = mat3(tangent, binormal, normal);
+                vec3 nt = texture(uNormalMap, uv).xyz;
+                nt = nt * 2. - 1.;
+                
+                // 1: mesh world normal
+                // vec3 worldNormal = normal;
+                // 2: world normal from normal map
+                vec3 worldNormal = normalize(tbn * nt);
+                // 3: blend mesh world normal ~ world normal from normal map
+                // vec3 worldNormal = mix(normal, normalize(tbn * nt), 1.);
+                
+                // ------------------------------------------------------- 
+                // directional light
+                // ------------------------------------------------------- 
+                
+                // vec3 N = normalize(vNormal);
+                vec3 N = normalize(worldNormal);
+                // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
+                vec3 L = normalize(uDirectionalLight.direction);
+                float diffuseRate = clamp(dot(N, L), 0., 1.);
+                // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+                vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+                vec3 P = vWorldPosition;
+                vec3 E = uViewPosition;
+                vec3 PtoL = L; // for directional light
+                vec3 PtoE = normalize(E - P);
+                vec3 H = normalize(PtoL + PtoE);
+                float specularPower = 16.;
+                float specularRate = clamp(dot(H, N), 0., 1.);
+                specularRate = pow(specularRate, specularPower);
+                vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+    
+                vec3 ambientColor = vec3(.1);
+    
+                vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+                   
+                   outColor = surfaceColor; 
                 }
                 `,
             uniforms: {
@@ -331,10 +412,19 @@ const createGLTFSkinnedMesh = async () => {
                 //     type: UniformTypes.Matrix4Array,
                 //     value: null
                 // },
+                uDiffuseMap: {
+                    type: UniformTypes.Texture,
+                    value: floorDiffuseMap,
+                },
+                uNormalMap: {
+                    type: UniformTypes.Texture,
+                    value: floorNormalMap
+                },
                 uJointMatrices: {
                     type: UniformTypes.Matrix4Array,
                     value: null
                 },
+                uDirectionalLight: {}
             }
         });
         skinningMesh.depthMaterial = new Material({
@@ -358,13 +448,46 @@ const createGLTFSkinnedMesh = async () => {
             }
         });
     });
-    
-    return gltfActor;
 }
 
 const main = async () => {
-    captureScene.add(await createGLTFSkinnedMesh());
-   
+    // const floorNormalImg = await loadImg("./images/floor_tiles_02_nor_gl_1k.png");
+    const floorDiffuseImg = await loadImg("./images/blue_floor_tiles_01_diff_1k.png");
+    floorDiffuseMap = new Texture({
+        gpu,
+        img: floorDiffuseImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
+
+    const floorNormalImg = await loadImg("./images/blue_floor_tiles_01_nor_gl_1k.png");
+    floorNormalMap = new Texture({
+        gpu,
+        img: floorNormalImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
+
+    const images = {
+        [CubeMapAxis.PositiveX]: "./images/px.png",
+        [CubeMapAxis.NegativeX]: "./images/nx.png",
+        [CubeMapAxis.PositiveY]: "./images/py.png",
+        [CubeMapAxis.NegativeY]: "./images/ny.png",
+        [CubeMapAxis.PositiveZ]: "./images/pz.png",
+        [CubeMapAxis.NegativeZ]: "./images/nz.png",
+    };
+  
+    cubeMap = await loadCubeMap({ gpu, images });
+    
+    await createGLTFSkinnedMesh()
+    captureScene.add(gltfActor);
+    
     const objData = await loadObj("./models/sphere-32-32.obj");
     objMesh = new Mesh({
         geometry: new Geometry({
@@ -407,43 +530,11 @@ const main = async () => {
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
-    const images = {
-        [CubeMapAxis.PositiveX]: "./images/px.png",
-        [CubeMapAxis.NegativeX]: "./images/nx.png",
-        [CubeMapAxis.PositiveY]: "./images/py.png",
-        [CubeMapAxis.NegativeY]: "./images/ny.png",
-        [CubeMapAxis.PositiveZ]: "./images/pz.png",
-        [CubeMapAxis.NegativeZ]: "./images/nz.png",
-    };
-  
-    cubeMap = await loadCubeMap({ gpu, images });
-    
+   
     const skyboxMesh = new Skybox({
         gpu, cubeMap
     });
     
-    // const floorNormalImg = await loadImg("./images/floor_tiles_02_nor_gl_1k.png");
-    const floorDiffuseImg = await loadImg("./images/blue_floor_tiles_01_diff_1k.png");
-    const floorDiffuseMap = new Texture({
-        gpu,
-        img: floorDiffuseImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
-
-    const floorNormalImg = await loadImg("./images/blue_floor_tiles_01_nor_gl_1k.png");
-    const floorNormalMap = new Texture({
-        gpu,
-        img: floorNormalImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
 
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
@@ -835,24 +926,5 @@ function initDebugger() {
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
-
-// (Vector3.getTangent(new Vector3(0, 0, 1)).log());
-// (Vector3.getBinormal(new Vector3(0, 0, 1)).log());
-// console.log("--------");
-// (Vector3.getTangent(new Vector3(1, 0, 0)).log());
-// (Vector3.getBinormal(new Vector3(1, 0, 0)).log());
-// Vector3.getTangent(new Vector3(1, 0, 0)).log() // will: 0, 0, -1
-// Vector3.getTangent(new Vector3(0, 1, 0)).log() // will: 1, 0, 0
-// Vector3.getTangent(new Vector3(0, 0, 1)).log() // will: 1, 0, 0
-// Vector3.getTangent(new Vector3(-1, 0, 0)).log() // will: 0, 0, 1
-// Vector3.getTangent(new Vector3(0, -1, 0)).log() // will: 1, 0, 0
-// Vector3.getTangent(new Vector3(0, 0, -1)).log() // will: -1, 0, 0
-// console.log("--------");
-Vector3.getTangent(new Vector3(1, 0, 0)).log() // will: 0, 1, 0
-Vector3.getTangent(new Vector3(0, 1, 0)).log() // will: -1, 0, 0
-Vector3.getTangent(new Vector3(0, 0, 1)).log() // will: 0, 1, 0
-Vector3.getTangent(new Vector3(-1, 0, 0)).log() // will: 0, -1, 0
-Vector3.getTangent(new Vector3(0, -1, 0)).log() // will: 1, 0, 0
-Vector3.getTangent(new Vector3(0, 0, -1)).log() // will: -1, 0, 0
 
 main();

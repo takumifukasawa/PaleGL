@@ -152,14 +152,7 @@ export async function loadGLTF({gpu, path}) {
             // rootBone.calcJointMatrix();
         }
         
-        
-        console.log("======================================")
-        console.log("root bone", rootBone)
-        console.log(positions, normals, uvs, joints, weights)
-        
         const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
-        console.log(tangents, binormals)
-        console.log("======================================")
 
         const geometry = new Geometry({
             gpu,
