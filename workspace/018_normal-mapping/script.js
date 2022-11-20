@@ -246,7 +246,7 @@ const createGLTFSkinnedMesh = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-single-animation.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-3.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -292,23 +292,25 @@ const createGLTFSkinnedMesh = async () => {
                          uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
                          uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
                          uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * skinMatrix * vec4(aPosition, 1.);
                    
                     // TODO: なぜworldMatrixをかけてnormalになるかが分かっていない 
                     // 平行移動成分はいらないのでmat3
-                    vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
-                    vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
-                    vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
+                    // vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
+                    // vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
+                    // vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
                     
                     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
                     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
                     vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
                    
-                    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1.); 
+                    vec4 worldPosition = uWorldMatrix * skinMatrix * vec4(aPosition, 1.); 
                     vWorldPosition = worldPosition.xyz;
+                   
+                    // with skin position 
+                    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
                     
                     // pre calc skinning in cpu
-                    // gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                 }
         `;
         
@@ -403,8 +405,14 @@ const createGLTFSkinnedMesh = async () => {
                 vec3 ambientColor = vec3(.1);
     
                 vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
-                   
-                   outColor = surfaceColor; 
+                
+                outColor = surfaceColor; 
+                // outColor = vec4(vec3(N.y), 1.);
+                // outColor = vec4(vec3(worldNormal.y), 1.);
+                // outColor = vec4(tangent, 1.);
+                // outColor = vec4(normal, 1.);
+                // outColor = vec4(nt, 1.);
+                // outColor = vec4(vec3(uv.y), 1.);
                 }
                 `,
             uniforms: {

@@ -151,8 +151,20 @@ export async function loadGLTF({gpu, path}) {
             // rootBone.calcBoneOffsetMatrix();
             // rootBone.calcJointMatrix();
         }
+       
+        // GLTF2.0は、UV座標の原点が左上にある。しかし左下を原点とした方が分かりやすい気がしているのでYを反転
+        // - uvは2次元前提で処理している
+        // ref: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#images
+        const uvFlippedY = uvs.map((elem, i) => i % 2 === 0 ? elem : 1. - elem);
         
         const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
+
+        // for debug
+        // console.log("======================================")
+        // console.log("root bone", rootBone)
+        // console.log(positions, uvFlippedY, normals, joints, weights)
+        // console.log(tangents, binormals)
+        // console.log("======================================")
 
         const geometry = new Geometry({
             gpu,
@@ -162,7 +174,7 @@ export async function loadGLTF({gpu, path}) {
                     size: 3,
                 },
                 uv: {
-                    data: uvs,
+                    data: uvFlippedY,
                     size: 2
                 },
                 normal: {
