@@ -301,7 +301,7 @@ const createGLTFSkinnedMesh = async () => {
             vertexShader: generateDepthVertexShader({
                 isSkinning: true,
                 jointNum: skinningMesh.boneCount,
-                useNormalMap: true
+                // useNormalMap: true
             }),
             fragmentShader: `#version 300 es
                 

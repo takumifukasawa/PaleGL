@@ -4,6 +4,7 @@ import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Geometry} from "../geometries/Geometry.js";
 import {Material} from "../materials/Material.js";
+import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
 
 export class SkinnedMesh extends Mesh {
     bones;
@@ -16,9 +17,36 @@ export class SkinnedMesh extends Mesh {
     boneOffsetMatrices;
     
     constructor({bones, ...options}) {
-        super({ ...options, actorType: ActorTypes.SkinnedMesh });
+        super({
+            ...options,
+            actorType: ActorTypes.SkinnedMesh
+        });
+
         this.bones = bones;
-        
+
+        this.bones.traverse(() => {
+            this.boneCount++;
+        });
+
+        // if exists override
+        if(options.depthMaterial) {
+            const depthMaterial = new Material({
+                gpu,
+                vertexShader: generateDepthVertexShader({
+                    isSkinning: true,
+                    jointNum: this.boneCount,
+                }),
+                fragmentShader: `#version 300 es
+                precision mediump float;
+                out vec4 outColor;
+                void main() {
+                    outColor = vec4(1., 1., 1., 1.);
+                }
+                `
+            });
+            this.depthMaterial = depthMaterial;
+        }
+
         // const positions = [...this.geometry.attributes.position.data];
         // const boneIndices = [...this.geometry.attributes.boneIndices.data];
         // const boneWeights = [...this.geometry.attributes.boneWeights.data];
@@ -51,10 +79,6 @@ export class SkinnedMesh extends Mesh {
        
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
-        
-        this.bones.traverse(() => {
-            this.boneCount++;
-        });
     }
     
     start(options) {

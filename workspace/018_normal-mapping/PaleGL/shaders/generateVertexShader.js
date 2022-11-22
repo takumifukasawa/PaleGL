@@ -22,11 +22,11 @@ export const generateVertexShader = ({
         `layout(location = 1) in vec2 aUv;`,
         `layout(location = 2) in vec3 aNormal;`,
     ];
-    if(useNormalMap) {
-        attributes.push(...normalMapVertexAttributes(attributes.length));
-    }
     if(isSkinning) {
         attributes.push(...skinningVertexAttributes(attributes.length));
+    }
+    if(useNormalMap) {
+        attributes.push(...normalMapVertexAttributes(attributes.length));
     }
         
     return `#version 300 es

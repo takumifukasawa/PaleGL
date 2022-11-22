@@ -181,14 +181,6 @@ export async function loadGLTF({gpu, path}) {
                     data: normals,
                     size: 3
                 },
-                tangent: {
-                    data: tangents,
-                    size: 3
-                },
-                binormal: {
-                    data: binormals,
-                    size: 3
-                },
                 // bone があるならjointとweightもあるはず
                 ...(rootBone ? {
                     boneIndices: {
@@ -199,7 +191,15 @@ export async function loadGLTF({gpu, path}) {
                         data: weights,
                         size: 4
                     },
-                } : {}),
+                } : {}),               
+                tangent: {
+                    data: tangents,
+                    size: 3
+                },
+                binormal: {
+                    data: binormals,
+                    size: 3
+                },
             },
             indices,
             drawCount: indices.length

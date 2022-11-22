@@ -2,6 +2,7 @@
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Material} from "../materials/Material.js";
+import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
 
 export class ForwardRenderer {
     #gpu;
