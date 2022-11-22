@@ -44,6 +44,7 @@ import {Rotator} from "./PaleGL/math/Rotator.js";
 import {Quaternion} from "./PaleGL/math/Quaternion.js";
 import {generateDepthVertexShader, generateVertexShader} from "./PaleGL/shaders/generateVertexShader.js";
 import {PhongMaterial} from "./PaleGL/materials/PhongMaterial.js";
+import {Vector2} from "./PaleGL/math/Vector2.js";
 
 let debuggerGUI;
 let width, height;
@@ -375,6 +376,8 @@ const main = async () => {
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
         actor.transform.setTranslation(new Vector3(0, 0, 0));
+        actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
+        actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
     captureScene.add(floorPlaneMesh);

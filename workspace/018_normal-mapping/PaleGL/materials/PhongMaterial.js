@@ -14,12 +14,14 @@ import {
 } from "../shaders/lightingCommon.js";
 import {UniformTypes} from "../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
+import {Vector2} from "../math/Vector2.js";
 
 const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 300 es
 
 precision mediump float;
 
 uniform sampler2D uDiffuseMap; 
+uniform vec2 uDiffuseMapUvScale;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
 uniform vec3 uViewPosition;          
@@ -49,7 +51,7 @@ ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
 
 void main() {
-    vec2 uv = vUv;
+    vec2 uv = vUv * uDiffuseMapUvScale;
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
@@ -96,7 +98,11 @@ void main() {
 export class PhongMaterial extends Material {
     constructor({
         diffuseMap,
+        diffuseMapUvScale, // vec2
+        diffuseMapUvOffset, // vec2
         normalMap,
+        normalMapUvScale, // vec2
+        normalMapUvOffset, // vec2
         jointMatrices,
         ...options
     }) {
@@ -105,9 +111,25 @@ export class PhongMaterial extends Material {
                 type: UniformTypes.Texture,
                 value: diffuseMap,
             },
+            uDiffuseMapUvScale: {
+                type: UniformTypes.Vector2,
+                value: Vector2.one()
+            },
+            uDiffuseMapUvOffset: {
+                type: UniformTypes.Vector2,
+                value: Vector2.one()
+            },
             uNormalMap: {
                 type: UniformTypes.Texture,
                 value: normalMap,
+            },
+            uNormalMapUvScale: {
+                type: UniformTypes.Vector2,
+                value: Vector2.one()
+            },
+            uNormalMapUvOffset: {
+                type: UniformTypes.Vector2,
+                value: Vector2.one()
             },
             ...(jointMatrices ? {
                 uJointMatrices: {

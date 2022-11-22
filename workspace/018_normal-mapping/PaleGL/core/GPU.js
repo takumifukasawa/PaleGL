@@ -153,6 +153,9 @@ export class GPU {
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
                     break;
+                case UniformTypes.Vector2:
+                    gl.uniform2fv(location, value.elements);
+                    break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, value.elements);
                     break;

@@ -175,7 +175,6 @@
     }
     
     log() {
-         // col order to row order
         console.log(`--------------------
 ${this.x}, ${this.y}, ${this.z}
 --------------------`);       
