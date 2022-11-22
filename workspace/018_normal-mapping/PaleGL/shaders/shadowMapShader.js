@@ -9,4 +9,9 @@ export const shadowMapVertex = () => `
 
 export const shadowMapVertexUniforms = () => `
 uniform mat4 uShadowMapProjectionMatrix;
-`
+`;
+
+export const shadowMapFragmentUniforms = () => `
+uniform sampler2D uShadowMap;
+uniform float uShadowBias;
+`;
