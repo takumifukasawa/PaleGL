@@ -16,6 +16,9 @@ export class SkinnedMesh extends Mesh {
     
     boneOffsetMatrices;
     
+    #boneIndicesForLines = [];
+    #boneOrderedIndex = [];
+    
     constructor({bones, gpu, ...options}) {
         super({
             ...options,
@@ -24,9 +27,12 @@ export class SkinnedMesh extends Mesh {
 
         this.bones = bones;
 
-        this.bones.traverse(() => {
+        this.bones.traverse((bone) => {
             this.boneCount++;
+            this.#boneOrderedIndex[bone.index] = bone;
         });
+        
+        console.log("fuga", this.#boneOrderedIndex)
 
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
@@ -69,34 +75,32 @@ export class SkinnedMesh extends Mesh {
         // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
         // this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
         
-        const indices = [];
         const checkChildNum = (bone) => {
             if(bone.hasChild) {
                 bone.children.forEach(childBone => {
-                    indices.push(bone.index, childBone.index);
-                    console.log("hogehoge", bone.index, childBone.index)
+                    this.#boneIndicesForLines.push(bone.index, childBone.index);
                     checkChildNum(childBone);
                 });
             }
         }
         checkChildNum(this.bones);
-        console.log("bones", this.bones)
-        console.log(indices)
-
+        
         this.boneLines = new Mesh({
             gpu,
             geometry: new Geometry({
                 gpu,
                 attributes: {
                     position: {
+                        data: new Array(this.#boneIndicesForLines.length * 3),
                         // data: new Array((indices.length / 2) * 3),
-                        data: new Array((indices.length / 2) * 3),
+                        // data: this.#boneIndicesForLines.length,
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
                 },
-                indices,
-                drawCount: indices.length
+                // indices: this.#boneIndicesForLines,
+                // drawCount: indices.length
+                drawCount: this.#boneIndicesForLines.length
             }),
             material: new Material({
                 gpu,
@@ -142,14 +146,15 @@ export class SkinnedMesh extends Mesh {
         const boneJointMatrices = this.getBoneJointMatrices();
 
         // console.log("--------")
-        const boneLinePositions = [];
-        const getBoneLinePositions = (bone) => {
-            boneLinePositions.push(...bone.jointMatrix.position.elements);
-            bone.children.forEach(childBone => {
-                getBoneLinePositions(childBone);
-            });
-        }
-        getBoneLinePositions(this.bones);
+        const boneLinePositions = this.#boneIndicesForLines.map(boneIndex => [...this.#boneOrderedIndex[boneIndex].jointMatrix.position.elements]);
+        // const getBoneLinePositions = (bone) => {
+        //     boneLinePositions.push(...bone.jointMatrix.position.elements);
+        //     bone.children.forEach(childBone => {
+        //         getBoneLinePositions(childBone);
+        //     });
+        // }
+        // getBoneLinePositions(this.bones);
+        // console.log(boneLinePositions)
         
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
        
