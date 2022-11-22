@@ -61,6 +61,27 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     return resultColor;
 }
 
+vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
+    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
+    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
+    float sceneDepth = projectionShadowColor.r;
+    float depthFromLight = projectionUv.z;
+    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
+    float shadowAreaRect =
+        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
+        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
+        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
+    float shadowRate = shadowOccluded * shadowAreaRect;
+    
+    vec4 resultColor = mix(
+       surfaceColor,
+       mix(surfaceColor, shadowColor, shadowBlendRate),
+       shadowRate
+    );
+    
+    return resultColor;
+} 
+
 void main() {
 
     vec2 uv = vUv * 1.;
@@ -92,10 +113,6 @@ void main() {
     // blend mesh world normal ~ world normal from normal map
     // vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
     
-    // ------------------------------------------------------- 
-    // directional light
-    // ------------------------------------------------------- 
-    
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
@@ -104,62 +121,11 @@ void main() {
     Camera camera;
     camera.worldPosition = uViewPosition;
     
+    // directional light
     vec4 surfaceColor = calcDirectionalLight(surface, uDirectionalLight, camera);
     
-    // // vec3 N = normalize(vNormal);
-    // vec3 N = normalize(worldNormal);
-    // // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
-    // vec3 L = normalize(uDirectionalLight.direction);
-    // float diffuseRate = clamp(dot(N, L), 0., 1.);
-    // // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-    // vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    // vec3 P = vWorldPosition;
-    // vec3 E = uViewPosition;
-    // vec3 PtoL = L; // for directional light
-    // vec3 PtoE = normalize(E - P);
-    // vec3 H = normalize(PtoL + PtoE);
-    // float specularPower = 16.;
-    // float specularRate = clamp(dot(H, N), 0., 1.);
-    // specularRate = pow(specularRate, specularPower);
-    // vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    // vec3 ambientColor = vec3(.1);
-
-    // vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+    vec4 resultColor = applyShadow(surfaceColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);
    
-    // ------------------------------------------------------- 
-    // calc shadow 
-    // ------------------------------------------------------- 
-    
-    vec3 projectionUv = vShadowMapProjectionUv.xyz / vShadowMapProjectionUv.w;
-    vec4 projectionShadowColor = texture(uShadowMap, projectionUv.xy);
-    float sceneDepth = projectionShadowColor.r;
-    float depthFromLight = projectionUv.z;
-    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - uShadowBias), 0., 1.);
-    float shadowAreaRect =
-        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-    float shadowRate = shadowOccluded * shadowAreaRect;
-    vec4 shadowColor = vec4(0., 0., 0., 1.);
-   
-    // ------------------------------------------------------- 
-    // blend
-    // ------------------------------------------------------- 
-    
-    vec4 resultColor = mix(
-        surfaceColor,
-        mix(surfaceColor, shadowColor, .7),
-        shadowRate
-    );
-   
-    // check normal 
-    // resultColor.xyz = vec3(N.x);
-    // resultColor.xyz = vec3(N.y);
-    // resultColor.xyz = vec3(N.z);
-    
-    // outColor = vec4(N, 1.);
     outColor = resultColor;
 }
 `;

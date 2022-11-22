@@ -1,4 +1,9 @@
-import {skinningVertexUniforms, skinningVertex, skinningVertexAttributes} from "./skinningShader.js";
+import {
+    skinningVertexUniforms,
+    // skinningVertex,
+    skinningVertexAttributes,
+    calcSkinningMatrixFunc
+} from "./skinningShader.js";
 import {transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingCommon.js";
@@ -28,6 +33,8 @@ export const generateVertexShader = ({
 
 ${attributes.join("\n")}
 
+${isSkinning ? calcSkinningMatrixFunc() : ""}
+
 ${transformVertexUniforms()}
 
 out vec2 vUv;
@@ -40,7 +47,28 @@ ${useShadowMap ? shadowMapVertexUniforms() : ""}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
-    ${isSkinning ? skinningVertex() : `vec4 localPosition = vec4(aPosition, 1.);`}
+    ${isSkinning ? `
+    mat4 skinMatrix = calcSkinningMatrix(
+        uJointMatrices[int(aBoneIndices[0])],
+        uJointMatrices[int(aBoneIndices[1])],
+        uJointMatrices[int(aBoneIndices[2])],
+        uJointMatrices[int(aBoneIndices[3])],
+        aBoneWeights
+    );
+    ` : ""}
+
+    ${isSkinning
+        ? `
+    vec4 localPosition = skinMatrix * vec4(aPosition, 1.);`
+        : `
+    vec4 localPosition = vec4(aPosition, 1.);`
+    }
+    
+    ${isSkinning ? `
+    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
+    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
+    ` : ""}
 
     ${useShadowMap ? shadowMapVertex() : ""}
   
