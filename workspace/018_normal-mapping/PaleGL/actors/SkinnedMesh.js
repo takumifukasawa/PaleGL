@@ -28,38 +28,6 @@ export class SkinnedMesh extends Mesh {
             this.boneCount++;
         });
 
-        // if not exists override
-
-        // const positions = [...this.geometry.attributes.position.data];
-        // const boneIndices = [...this.geometry.attributes.boneIndices.data];
-        // const boneWeights = [...this.geometry.attributes.boneWeights.data];
-        // 
-        // console.log(this.geometry.attributes)
-        // 
-        // for(let i = 0; i < positions.length / 3; i++) {
-        //     this.positions.push([
-        //         positions[i * 3 + 0],
-        //         positions[i * 3 + 1],
-        //         positions[i * 3 + 2]
-        //     ]);
-        // } 
-        // for(let i = 0; i < boneIndices.length / 4; i++) {
-        //     this.boneIndices.push([
-        //         boneIndices[i * 4 + 0],
-        //         boneIndices[i * 4 + 1],
-        //         boneIndices[i * 4 + 2],
-        //         boneIndices[i * 4 + 3]
-        //     ]);
-        // }
-        // for(let i = 0; i < boneWeights.length / 4; i++) {
-        //     this.boneWeights.push([
-        //         boneWeights[i * 4 + 0],
-        //         boneWeights[i * 4 + 1],
-        //         boneWeights[i * 4 + 2],
-        //         boneWeights[i * 4 + 3]
-        //     ]);
-        // }
-       
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
     }

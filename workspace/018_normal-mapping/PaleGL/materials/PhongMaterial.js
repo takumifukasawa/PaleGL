@@ -97,7 +97,10 @@ void main() {
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
 
-    ${receiveShadow ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);` : ""}
+    ${receiveShadow
+        ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
+        : ""
+    }
 
     outColor = resultColor;
 }
