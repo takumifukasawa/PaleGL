@@ -298,7 +298,11 @@ const createGLTFSkinnedMesh = async () => {
         });
         skinningMesh.depthMaterial = new Material({
             gpu,
-            vertexShader: generateDepthVertexShader({ isSkinning: true, jointNum: 5, useNormalMap: true}),
+            vertexShader: generateDepthVertexShader({
+                isSkinning: true,
+                jointNum: skinningMesh.boneCount,
+                useNormalMap: true
+            }),
             fragmentShader: `#version 300 es
                 
                 precision mediump float;
