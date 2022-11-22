@@ -42,6 +42,7 @@ import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.js";
 import {Bone} from "./PaleGL/core/Bone.js";
 import {Rotator} from "./PaleGL/math/Rotator.js";
 import {Quaternion} from "./PaleGL/math/Quaternion.js";
+import {generateVertexShader} from "./PaleGL/shaders/generateVertexShader.js";
 
 let debuggerGUI;
 let width, height;
@@ -261,62 +262,69 @@ const createGLTFSkinnedMesh = async () => {
     const skinningMeshes = gltfActor.transform.children[0].transform.children;
     
     skinningMeshes.forEach(skinningMesh => {
+        const skinningMeshVertexShader = generateVertexShader({
+            isSkinning: true,
+            jointNum: 5,
+            useShadowMap: true,
+            useNormalMap: true
+        });
+        console.log(skinningMeshVertexShader)
            
-         const skinningMeshVertexShader = `#version 300 es
-                
-                layout(location = 0) in vec3 aPosition;
-                layout(location = 1) in vec2 aUv;
-                layout(location = 2) in vec3 aNormal;
-                layout(location = 3) in vec3 aTangent;
-                layout(location = 4) in vec3 aBinormal;
-                layout(location = 5) in vec4 aBoneIndices;
-                layout(location = 6) in vec4 aBoneWeights;
+        //  const skinningMeshVertexShader = `#version 300 es
+        //         
+        //         layout(location = 0) in vec3 aPosition;
+        //         layout(location = 1) in vec2 aUv;
+        //         layout(location = 2) in vec3 aNormal;
+        //         layout(location = 3) in vec3 aTangent;
+        //         layout(location = 4) in vec3 aBinormal;
+        //         layout(location = 5) in vec4 aBoneIndices;
+        //         layout(location = 6) in vec4 aBoneWeights;
 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
-                uniform mat4 uNormalMatrix;
-                uniform mat4[5] uJointMatrices;
-                uniform mat4 uShadowMapProjectionMatrix;
-                
-                out vec2 vUv;
-                out vec3 vNormal;
-                out vec3 vTangent;
-                out vec3 vBinormal;
-                out vec3 vWorldPosition;
-                out vec4 vShadowMapProjectionUv;
-                
-                void main() {
-                    vUv = aUv;
+        //         uniform mat4 uWorldMatrix;
+        //         uniform mat4 uViewMatrix;
+        //         uniform mat4 uProjectionMatrix;
+        //         uniform mat4 uNormalMatrix;
+        //         uniform mat4[5] uJointMatrices;
+        //         uniform mat4 uShadowMapProjectionMatrix;
+        //         
+        //         out vec2 vUv;
+        //         out vec3 vNormal;
+        //         out vec3 vTangent;
+        //         out vec3 vBinormal;
+        //         out vec3 vWorldPosition;
+        //         out vec4 vShadowMapProjectionUv;
+        //         
+        //         void main() {
+        //             vUv = aUv;
 
-                    mat4 skinMatrix =
-                         uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                         uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                         uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                         uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                   
-                    // TODO: なぜworldMatrixをかけてnormalになるかが分かっていない 
-                    // 平行移動成分はいらないのでmat3
-                    // vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
-                    // vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
-                    // vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
-                    
-                    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-                    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-                    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-                   
-                    vec4 worldPosition = uWorldMatrix * skinMatrix * vec4(aPosition, 1.); 
-                    vWorldPosition = worldPosition.xyz;
-                   
-                    // with skin position 
-                    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-                    
-                    // pre calc skinning in cpu
-                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-                
-                    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
-                }
-        `;
+        //             mat4 skinMatrix =
+        //                  uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
+        //                  uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
+        //                  uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
+        //                  uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
+        //            
+        //             // TODO: なぜworldMatrixをかけてnormalになるかが分かっていない 
+        //             // 平行移動成分はいらないのでmat3
+        //             // vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
+        //             // vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
+        //             // vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
+        //             
+        //             vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+        //             vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
+        //             vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
+        //            
+        //             vec4 worldPosition = uWorldMatrix * skinMatrix * vec4(aPosition, 1.); 
+        //             vWorldPosition = worldPosition.xyz;
+        //            
+        //             // with skin position 
+        //             gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+        //             
+        //             // pre calc skinning in cpu
+        //             // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+        //         
+        //             vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
+        //         }
+        // `;
  
         const skinningMeshDepthVertexShader = `#version 300 es
                 

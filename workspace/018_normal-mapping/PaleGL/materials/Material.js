@@ -14,6 +14,7 @@ export class Material {
     culling;
     faceSide;
     receiveShadow;
+    isSkinning;
 
     static UniformTypes = {
         Float: "Float",
@@ -22,18 +23,19 @@ export class Material {
     };
 
     constructor({
-                    gpu,
-                    vertexShader,
-                    fragmentShader,
-                    primitiveType,
-                    depthTest = null,
-                    depthWrite = null,
-                    faceSide = FaceSide.Front,
-                    receiveShadow = false,
-                    blendType,
-                    renderQueue,
-                    uniforms = {}
-                }) {
+        gpu,
+        vertexShader,
+        fragmentShader,
+        primitiveType,
+        depthTest = null,
+        depthWrite = null,
+        faceSide = FaceSide.Front,
+        receiveShadow = false,
+        blendType,
+        renderQueue,
+        isSkinning,
+        uniforms = {}
+    }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
@@ -60,6 +62,8 @@ export class Material {
         if (!this.renderQueue) {
             throw "invalid render queue";
         }
+        
+        this.isSkinning = isSkinning;
 
         // TODO: シェーダーごとにわける？(postprocessの場合はいらないuniformなどがある
         const commonUniforms = {
