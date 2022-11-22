@@ -64,11 +64,13 @@ void main() {
     vec4 localPosition = vec4(aPosition, 1.);`
     }
     
-    ${isSkinning ? `
+    ${(isSkinning && useNormalMap) ? `
     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-    ` : ""}
+    ` : `
+    vNormal = mat3(uNormalMatrix) * aNormal;
+    `}
 
     ${useShadowMap ? shadowMapVertex() : ""}
   
