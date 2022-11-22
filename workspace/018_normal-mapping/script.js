@@ -274,22 +274,26 @@ const createGLTFSkinnedMesh = async () => {
         
         skinningMesh.material = new PhongMaterial({
             gpu,
-            uniforms: {
-                uDiffuseMap: {
-                    type: UniformTypes.Texture,
-                    value: floorDiffuseMap,
-                },
-                uNormalMap: {
-                    type: UniformTypes.Texture,
-                    value: floorNormalMap
-                },
-                // TODO: 毎回これ入れるのめんどいので共通化したい
-                uJointMatrices: {
-                    type: UniformTypes.Matrix4Array,
-                    value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity())
-                },
-                uDirectionalLight: {}
-            },
+            diffuseMap: floorDiffuseMap,
+            normalMap: floorNormalMap,
+            // TODO: 毎回これ入れるのめんどいので共通化したい
+            jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+            // uniforms: {
+            //     uDiffuseMap: {
+            //         type: UniformTypes.Texture,
+            //         value: floorDiffuseMap,
+            //     },
+            //     uNormalMap: {
+            //         type: UniformTypes.Texture,
+            //         value: floorNormalMap
+            //     },
+            //     // TODO: 毎回これ入れるのめんどいので共通化したい
+            //     uJointMatrices: {
+            //         type: UniformTypes.Matrix4Array,
+            //         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity())
+            //     },
+            //     uDirectionalLight: {}
+            // },
             receiveShadow: true
         });
         skinningMesh.depthMaterial = new Material({

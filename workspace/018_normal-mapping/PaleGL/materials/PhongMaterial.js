@@ -3,6 +3,8 @@ import { Material } from "./Material.js";
 import {shadowMapFragmentFunc} from "../shaders/shadowMapShader.js";
 import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {normalMapFragmentFunc} from "../shaders/lightingCommon.js";
+import {UniformTypes} from "../constants.js";
+import {Matrix4} from "../math/Matrix4.js";
 
 const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 300 es
 
@@ -72,32 +74,10 @@ void main() {
 
     vec2 uv = vUv * 1.;
    
-    // ------------------------------------------------------- 
-    // calc base color
-    // ------------------------------------------------------- 
-   
     vec4 baseColor = vec4(.1, .1, .1, 1.);
     baseColor = texture(uNormalMap, uv);
 
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    
-    // ------------------------------------------------------- 
-    // calc normal from normal map
-    // ------------------------------------------------------- 
-  
-    // vec3 normal = normalize(vNormal);
-    // vec3 tangent = normalize(vTangent);
-    // vec3 binormal = normalize(vBinormal);
-    // mat3 tbn = mat3(tangent, binormal, normal);
-    // vec3 nt = texture(uNormalMap, uv).xyz;
-    // nt = nt * 2. - 1.;
-    // 
-    // // 1: mesh world normal
-    // // vec3 worldNormal = normal;
-    // // 2: world normal from normal map
-    // vec3 worldNormal = normalize(tbn * nt);
-    // // blend mesh world normal ~ world normal from normal map
-    // // vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
     
     ${useNormalMap
         ? "vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);"
@@ -125,12 +105,29 @@ void main() {
 
 export class PhongMaterial extends Material {
     constructor(options) {
-        const isSkinning = !!options.uniforms.uJointMatrices;
-        const useNormalMap = !!options.uniforms.uNormalMap;
-        console.log(options.uniforms)
+        const baseUniforms = {
+            uDiffuseMap: {
+                type: UniformTypes.Texture,
+                value: options.diffuseMap,
+            },
+            uNormalMap: {
+                type: UniformTypes.Texture,
+                value: options.normalMap,
+            },
+            ...(options.jointMatrices ? {
+                uJointMatrices: {
+                    type: UniformTypes.Matrix4Array,
+                    value: options.jointMatrices
+                }
+            } : {}),
+            uDirectionalLight: {}
+        };
+
+        const isSkinning = !!baseUniforms.uJointMatrices;
+        const useNormalMap = !!baseUniforms.uNormalMap;
         const vertexShader = generateVertexShader({
             isSkinning: isSkinning,
-            jointNum: isSkinning ? options.uniforms.uJointMatrices.value.length : null,
+            jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
             receiveShadow: options.receiveShadow,
             useNormalMap
         });
@@ -138,6 +135,9 @@ export class PhongMaterial extends Material {
             receiveShadow: options.receiveShadow,
             useNormalMap,
         });
-        super({ ...options, vertexShader, fragmentShader} );
+        
+        const uniforms = { ...baseUniforms, ...(options.uniforms ?  options.uniforms : {})};
+
+        super({ ...options, vertexShader, fragmentShader, uniforms} );
     }
 }
