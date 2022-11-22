@@ -94,27 +94,32 @@ void main() {
 `;
 
 export class PhongMaterial extends Material {
-    constructor(options) {
+    constructor({
+        diffuseMap,
+        normalMap,
+        jointMatrices,
+        ...options
+    }) {
         const baseUniforms = {
             uDiffuseMap: {
                 type: UniformTypes.Texture,
-                value: options.diffuseMap,
+                value: diffuseMap,
             },
             uNormalMap: {
                 type: UniformTypes.Texture,
-                value: options.normalMap,
+                value: normalMap,
             },
-            ...(options.jointMatrices ? {
+            ...(jointMatrices ? {
                 uJointMatrices: {
                     type: UniformTypes.Matrix4Array,
-                    value: options.jointMatrices
+                    value: jointMatrices
                 }
             } : {}),
             uDirectionalLight: {}
         };
 
-        const isSkinning = !!options.jointMatrices;
-        const useNormalMap = !!options.normalMap;
+        const isSkinning = !!jointMatrices;
+        const useNormalMap = !!normalMap;
         const vertexShader = generateVertexShader({
             isSkinning: isSkinning,
             jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
