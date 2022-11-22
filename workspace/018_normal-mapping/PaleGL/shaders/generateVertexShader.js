@@ -15,8 +15,6 @@ export const generateVertexShader = ({
     useNormalMap,
 }) => {
     
-    let attributeLayoutPointer = 0;
-    
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
@@ -64,13 +62,29 @@ void main() {
     vec4 localPosition = vec4(aPosition, 1.);`
     }
     
-    ${(isSkinning && useNormalMap) ? `
+    ${(() => {
+        if(isSkinning) {
+            return useNormalMap
+                ? `
     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-    ` : `
+`
+                : `
+    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+`;
+        } else {
+            return useNormalMap
+                ? `
     vNormal = mat3(uNormalMatrix) * aNormal;
-    `}
+    vTangent = mat3(uNormalMatrix) * aTangent;
+    vBinormal = mat3(uNormalMatrix) * aBinormal;
+`
+                : `
+    vNormal = mat3(uNormalMatrix) * aNormal;
+`;
+        }
+    })()}
 
     ${receiveShadow ? shadowMapVertex() : ""}
   
@@ -85,18 +99,16 @@ void main() {
 
 export const generateDepthVertexShader = ({ isSkinning, useNormalMap, jointNum }) => {
 
-    let attributeLayoutPointer = 0;
-
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
         `layout(location = 2) in vec3 aNormal;`,
     ];
-    if(useNormalMap) {
-        attributes.push(...normalMapVertexAttributes(attributes.length));
-    }
     if (isSkinning) {
         attributes.push(...skinningVertexAttributes(attributes.length));
+    }
+    if(useNormalMap) {
+        attributes.push(...normalMapVertexAttributes(attributes.length));
     }
 
     return `#version 300 es

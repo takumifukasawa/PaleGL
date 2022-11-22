@@ -75,6 +75,8 @@ void main() {
         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
         : ""
     }
+    
+    // resultColor.xyz = vNormal;
 
     outColor = resultColor;
 }
@@ -111,8 +113,8 @@ export class PhongMaterial extends Material {
             uDirectionalLight: {}
         };
 
-        const isSkinning = !!baseUniforms.uJointMatrices;
-        const useNormalMap = !!baseUniforms.uNormalMap;
+        const isSkinning = !!options.jointMatrices;
+        const useNormalMap = !!options.normalMap;
         const vertexShader = generateVertexShader({
             isSkinning: isSkinning,
             jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
