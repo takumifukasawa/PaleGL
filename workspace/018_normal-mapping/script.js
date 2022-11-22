@@ -296,30 +296,30 @@ const createGLTFSkinnedMesh = async () => {
             // },
             receiveShadow: true
         });
-        skinningMesh.depthMaterial = new Material({
-            gpu,
-            vertexShader: generateDepthVertexShader({
-                isSkinning: true,
-                jointNum: skinningMesh.boneCount,
-                // useNormalMap: true
-            }),
-            fragmentShader: `#version 300 es
-                
-                precision mediump float;
-                
-                out vec4 outColor;
+        // skinningMesh.depthMaterial = new Material({
+        //     gpu,
+        //     vertexShader: generateDepthVertexShader({
+        //         isSkinning: true,
+        //         jointNum: skinningMesh.boneCount,
+        //         // useNormalMap: true
+        //     }),
+        //     fragmentShader: `#version 300 es
+        //         
+        //         precision mediump float;
+        //         
+        //         out vec4 outColor;
 
-                void main() {
-                    outColor = vec4(1., 1., 1., 1.);
-                }
-                `,
-            uniforms: {
-                uJointMatrices: {
-                    type: UniformTypes.Matrix4Array,
-                    value: null
-                },
-            }
-        });
+        //         void main() {
+        //             outColor = vec4(1., 1., 1., 1.);
+        //         }
+        //         `,
+        //     uniforms: {
+        //         uJointMatrices: {
+        //             type: UniformTypes.Matrix4Array,
+        //             value: null
+        //         },
+        //     }
+        // });
     });
 }
 

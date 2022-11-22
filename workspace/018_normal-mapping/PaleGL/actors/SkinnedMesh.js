@@ -1,5 +1,5 @@
 ﻿import {Mesh} from "./Mesh.js";
-import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes} from "../constants.js";
+import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes, UniformTypes} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Geometry} from "../geometries/Geometry.js";
@@ -16,7 +16,7 @@ export class SkinnedMesh extends Mesh {
     
     boneOffsetMatrices;
     
-    constructor({bones, ...options}) {
+    constructor({bones, gpu, ...options}) {
         super({
             ...options,
             actorType: ActorTypes.SkinnedMesh
@@ -28,24 +28,7 @@ export class SkinnedMesh extends Mesh {
             this.boneCount++;
         });
 
-        // if exists override
-        if(options.depthMaterial) {
-            const depthMaterial = new Material({
-                gpu,
-                vertexShader: generateDepthVertexShader({
-                    isSkinning: true,
-                    jointNum: this.boneCount,
-                }),
-                fragmentShader: `#version 300 es
-                precision mediump float;
-                out vec4 outColor;
-                void main() {
-                    outColor = vec4(1., 1., 1., 1.);
-                }
-                `
-            });
-            this.depthMaterial = depthMaterial;
-        }
+        // if not exists override
 
         // const positions = [...this.geometry.attributes.position.data];
         // const boneIndices = [...this.geometry.attributes.boneIndices.data];
@@ -85,7 +68,31 @@ export class SkinnedMesh extends Mesh {
         super.start(options);
        
         const { gpu } = options;
-       
+
+        if(!options.depthMaterial) {
+            const depthMaterial = new Material({
+                gpu,
+                vertexShader: generateDepthVertexShader({
+                    isSkinning: true,
+                    jointNum: this.boneCount,
+                }),
+                fragmentShader: `#version 300 es
+                precision mediump float;
+                out vec4 outColor;
+                void main() {
+                    outColor = vec4(1., 1., 1., 1.);
+                }
+                `,
+                uniforms: {
+                    uJointMatrices: {
+                        type: UniformTypes.Matrix4Array,
+                        value: null
+                    },
+                }
+            });
+            this.depthMaterial = depthMaterial;
+        }
+
         this.bones.calcBoneOffsetMatrix();
         // this.bones.calcJointMatrix();
         
