@@ -3,6 +3,10 @@ export const shadowMapVertexVaryings = () => `
 out vec4 vShadowMapProjectionUv;
 `;
 
+export const shadowMapFragmentVaryings = () => `
+in vec4 vShadowMapProjectionUv;
+`;
+
 export const shadowMapVertex = () => `
     vShadowMapProjectionUv = uShadowMapProjectionMatrix * uWorldMatrix * localPosition;
 `;

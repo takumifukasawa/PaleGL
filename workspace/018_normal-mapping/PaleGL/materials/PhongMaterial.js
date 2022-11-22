@@ -1,8 +1,12 @@
 
 import { Material } from "./Material.js";
-import {shadowMapFragmentFunc} from "../shaders/shadowMapShader.js";
+import {shadowMapFragmentFunc, shadowMapFragmentVaryings} from "../shaders/shadowMapShader.js";
 import {generateVertexShader} from "../shaders/generateVertexShader.js";
-import {normalMapFragmentFunc} from "../shaders/lightingCommon.js";
+import {
+    normalMapFragmentFunc,
+    normalMapFragmentVarying,
+    phongSurfaceDirectionalLightFunc
+} from "../shaders/lightingCommon.js";
 import {UniformTypes} from "../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 
@@ -34,40 +38,16 @@ struct Camera {
     vec3 worldPosition;
 };
 
-in vec4 vShadowMapProjectionUv; 
 in vec2 vUv;
 in vec3 vNormal;
-in vec3 vTangent;
-in vec3 vBinormal;
+${receiveShadow ? shadowMapFragmentVaryings() : ""}
+${normalMapFragmentVarying()}
 in vec3 vWorldPosition;
 
 out vec4 outColor;
 
-vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
-    vec3 N = normalize(surface.worldNormal);
-    vec3 L = normalize(directionalLight.direction);
-    float diffuseRate = clamp(dot(N, L), 0., 1.);
-    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    vec3 P = surface.worldPosition;
-    vec3 E = camera.worldPosition;
-    vec3 PtoL = L; // for directional light
-    vec3 PtoE = normalize(E - P);
-    vec3 H = normalize(PtoL + PtoE);
-    float specularPower = 16.;
-    float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower);
-    vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
-
-    vec3 ambientColor = vec3(.1);
-
-    vec4 resultColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
-    
-    return resultColor;
-}
-
+${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
-
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
 
 void main() {

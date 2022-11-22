@@ -9,6 +9,11 @@ out vec3 vTangent;
 out vec3 vBinormal;
 `;
 
+export const normalMapFragmentVarying = () => `
+in vec3 vTangent;
+in vec3 vBinormal;
+`;
+
 export const normalMapFragmentFunc = () => `
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
     vec3 n = normalize(normal);
@@ -28,8 +33,28 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 }
 `
 
-export const directionalLightFunc = () => `
-vec3 calcDirectionalLight(vec3 worldPosition, vec3 worldNormal, ) {
+export const phongSurfaceDirectionalLightFunc = () => `
+vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
+    vec3 N = normalize(surface.worldNormal);
+    vec3 L = normalize(directionalLight.direction);
+    float diffuseRate = clamp(dot(N, L), 0., 1.);
+    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+    vec3 P = surface.worldPosition;
+    vec3 E = camera.worldPosition;
+    vec3 PtoL = L; // for directional light
+    vec3 PtoE = normalize(E - P);
+    vec3 H = normalize(PtoL + PtoE);
+    float specularPower = 16.;
+    float specularRate = clamp(dot(H, N), 0., 1.);
+    specularRate = pow(specularRate, specularPower);
+    vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
+
+    vec3 ambientColor = vec3(.1);
+
+    vec4 resultColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+    
+    return resultColor;
 }
 `;
 
