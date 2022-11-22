@@ -1,9 +1,14 @@
 
 import { Material } from "./Material.js";
-import {shadowMapFragmentFunc, shadowMapFragmentVaryings} from "../shaders/shadowMapShader.js";
+import {
+    shadowMapFragmentFunc,
+    shadowMapFragmentUniforms,
+    shadowMapFragmentVaryings
+} from "../shaders/shadowMapShader.js";
 import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {
-    normalMapFragmentFunc,
+    directionalLightFragmentUniforms,
+    normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
     phongSurfaceDirectionalLightFunc
 } from "../shaders/lightingCommon.js";
@@ -15,18 +20,11 @@ const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 30
 precision mediump float;
 
 uniform sampler2D uDiffuseMap; 
-uniform sampler2D uNormalMap;
-uniform float uNormalStrength;
-uniform sampler2D uShadowMap;
-uniform float uShadowBias;
+${useNormalMap ? normalMapFragmentUniforms() : ""}
+${receiveShadow ? shadowMapFragmentUniforms() : ""}
 uniform vec3 uViewPosition;          
 
-struct DirectionalLight {
-    vec3 direction;
-    float intensity;
-    vec4 color;
-};
-uniform DirectionalLight uDirectionalLight;
+${directionalLightFragmentUniforms()}
 
 struct Surface {
     vec3 worldNormal;
@@ -51,12 +49,8 @@ ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
 
 void main() {
-
-    vec2 uv = vUv * 1.;
+    vec2 uv = vUv;
    
-    vec4 baseColor = vec4(.1, .1, .1, 1.);
-    baseColor = texture(uNormalMap, uv);
-
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     ${useNormalMap

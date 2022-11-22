@@ -14,6 +14,11 @@ in vec3 vTangent;
 in vec3 vBinormal;
 `;
 
+export const normalMapFragmentUniforms = () => `
+uniform sampler2D uNormalMap;
+uniform float uNormalStrength;
+`;
+
 export const normalMapFragmentFunc = () => `
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
     vec3 n = normalize(normal);
@@ -32,6 +37,15 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
     return resultNormal;
 }
 `
+
+export const directionalLightFragmentUniforms = () => `
+struct DirectionalLight {
+    vec3 direction;
+    float intensity;
+    vec4 color;
+};
+uniform DirectionalLight uDirectionalLight;
+`;
 
 export const phongSurfaceDirectionalLightFunc = () => `
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
