@@ -7,6 +7,7 @@ import {Material} from "../materials/Material.js";
 
 export class SkinnedMesh extends Mesh {
     bones;
+    boneCount = 0;
    
     // positions = [];
     // boneIndices = [];
@@ -51,6 +52,9 @@ export class SkinnedMesh extends Mesh {
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
         
+        this.bones.traverse(() => {
+            this.boneCount++;
+        });
     }
     
     start(options) {
@@ -65,7 +69,7 @@ export class SkinnedMesh extends Mesh {
         
         // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
         // this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
-      
+        
         const indices = [];
         const checkChildNum = (bone) => {
             if(bone.hasChild) {

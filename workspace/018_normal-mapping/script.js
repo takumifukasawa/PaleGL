@@ -42,7 +42,7 @@ import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.js";
 import {Bone} from "./PaleGL/core/Bone.js";
 import {Rotator} from "./PaleGL/math/Rotator.js";
 import {Quaternion} from "./PaleGL/math/Quaternion.js";
-import {generateVertexShader} from "./PaleGL/shaders/generateVertexShader.js";
+import {generateDepthVertexShader, generateVertexShader} from "./PaleGL/shaders/generateVertexShader.js";
 import {PhongMaterial} from "./PaleGL/materials/PhongMaterial.js";
 
 let debuggerGUI;
@@ -266,289 +266,15 @@ const createGLTFSkinnedMesh = async () => {
         const skinningMeshVertexShader = generateVertexShader({
             isSkinning: true,
             jointNum: 5,
-            useShadowMap: true,
+            receiveShadow: true,
             useNormalMap: true
         });
-           
-        const skinningMeshDepthVertexShader = `#version 300 es
-                
-                layout(location = 0) in vec3 aPosition;
-                layout(location = 1) in vec2 aUv;
-                layout(location = 2) in vec3 aNormal;
-                layout(location = 3) in vec3 aTangent;
-                layout(location = 4) in vec3 aBinormal;
-                layout(location = 5) in vec4 aBoneIndices;
-                layout(location = 6) in vec4 aBoneWeights;
-
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
-                uniform mat4 uNormalMatrix;
-                uniform mat4[5] uJointMatrices;
-                
-                out vec2 vUv;
-                out vec3 vNormal;
-                out vec3 vTangent;
-                out vec3 vBinormal;
-                out vec3 vWorldPosition;
-                in vec4 vShadowMapProjectionUv;
-                
-                void main() {
-                    vUv = aUv;
-
-                    mat4 skinMatrix =
-                         uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-                         uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-                         uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-                         uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-                   
-                    // TODO: なぜworldMatrixをかけてnormalになるかが分かっていない 
-                    // 平行移動成分はいらないのでmat3
-                    // vNormal = normalize(mat3(uWorldMatrix * skinMatrix) * aNormal);
-                    // vTangent = normalize(mat3(uWorldMatrix * skinMatrix) * aTangent);
-                    // vBinormal = normalize(mat3(uWorldMatrix * skinMatrix) * aBinormal);
-                    
-                    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-                    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-                    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-                   
-                    vec4 worldPosition = uWorldMatrix * skinMatrix * vec4(aPosition, 1.); 
-                    vWorldPosition = worldPosition.xyz;
-                   
-                    // with skin position 
-                    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-                    
-                    // pre calc skinning in cpu
-                    // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-                }
-        `;
         
         skinningMesh.castShadow = true;
-       
+        
         skinningMesh.material = new PhongMaterial({
             gpu,
-            vertexShader: skinningMeshVertexShader,
-            // fragmentShader: `#version 300 es
-            // 
-            // precision mediump float;
-           
-            // uniform sampler2D uDiffuseMap; 
-            // uniform sampler2D uNormalMap;
-            // uniform sampler2D uShadowMap;
-            // uniform float uNormalStrength;
-            // uniform float uShadowBias;
-            // uniform vec3 uViewPosition;          
-            // 
-            // struct DirectionalLight {
-            //     vec3 direction;
-            //     float intensity;
-            //     vec4 color;
-            // };
-            // uniform DirectionalLight uDirectionalLight;
-          
-            // in vec4 vShadowMapProjectionUv; 
-            // in vec2 vUv;
-            // in vec3 vNormal;
-            // in vec3 vTangent;
-            // in vec3 vBinormal;
-            // in vec3 vWorldPosition;
-            // 
-            // out vec4 outColor;
-            // 
-            // void main() {
-            // 
-            //     vec2 uv = vUv * 1.;
-            //    
-            //     // ------------------------------------------------------- 
-            //     // calc base color
-            //     // ------------------------------------------------------- 
-            //    
-            //     vec4 baseColor = vec4(.1, .1, .1, 1.);
-            //     baseColor = texture(uNormalMap, uv);
-            //     
-            //     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-            //     
-            //     // ------------------------------------------------------- 
-            //     // calc normal from normal map
-            //     // ------------------------------------------------------- 
-            //   
-            //     vec3 normal = normalize(vNormal);
-            //     vec3 tangent = normalize(vTangent);
-            //     vec3 binormal = normalize(vBinormal);
-            //     mat3 tbn = mat3(tangent, binormal, normal);
-            //     vec3 nt = texture(uNormalMap, uv).xyz;
-            //     nt = nt * 2. - 1.;
-            //     
-            //     // 1: mesh world normal
-            //     // vec3 worldNormal = normal;
-            //     // 2: world normal from normal map
-            //     vec3 worldNormal = normalize(tbn * nt);
-            //     // blend mesh world normal ~ world normal from normal map
-            //     // vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
-            //     
-            //     // ------------------------------------------------------- 
-            //     // directional light
-            //     // ------------------------------------------------------- 
-            //     
-            //     // vec3 N = normalize(vNormal);
-            //     vec3 N = normalize(worldNormal);
-            //     // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
-            //     vec3 L = normalize(uDirectionalLight.direction);
-            //     float diffuseRate = clamp(dot(N, L), 0., 1.);
-            //     // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-            //     vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-            //     vec3 P = vWorldPosition;
-            //     vec3 E = uViewPosition;
-            //     vec3 PtoL = L; // for directional light
-            //     vec3 PtoE = normalize(E - P);
-            //     vec3 H = normalize(PtoL + PtoE);
-            //     float specularPower = 16.;
-            //     float specularRate = clamp(dot(H, N), 0., 1.);
-            //     specularRate = pow(specularRate, specularPower);
-            //     vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-    
-            //     vec3 ambientColor = vec3(.1);
-    
-            //     vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
-            //    
-            //     // ------------------------------------------------------- 
-            //     // calc shadow 
-            //     // ------------------------------------------------------- 
-            //     
-            //     vec3 projectionUv = vShadowMapProjectionUv.xyz / vShadowMapProjectionUv.w;
-            //     vec4 projectionShadowColor = texture(uShadowMap, projectionUv.xy);
-            //     float sceneDepth = projectionShadowColor.r;
-            //     float depthFromLight = projectionUv.z;
-            //     float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - uShadowBias), 0., 1.);
-            //     float shadowAreaRect =
-            //         step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-            //         step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-            //         step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-            //     float shadowRate = shadowOccluded * shadowAreaRect;
-            //     vec4 shadowColor = vec4(0., 0., 0., 1.);
-            //    
-            //     // ------------------------------------------------------- 
-            //     // blend
-            //     // ------------------------------------------------------- 
-            //     
-            //     vec4 resultColor = mix(
-            //         surfaceColor,
-            //         mix(surfaceColor, shadowColor, .7),
-            //         shadowRate
-            //     );
-            //    
-            //     // check normal 
-            //     // resultColor.xyz = vec3(N.x);
-            //     // resultColor.xyz = vec3(N.y);
-            //     // resultColor.xyz = vec3(N.z);
-            //     
-            //     // outColor = vec4(N, 1.);
-            //     outColor = resultColor;
-            // }
-            // `,
-            
-            // fragmentShader: `#version 300 es
-            //     
-            //     precision mediump float;
-            //     
-            //     in vec2 vUv;
-            //     in vec3 vNormal;
-            //     in vec3 vTangent;
-            //     in vec3 vBinormal;
-            //     in vec3 vWorldPosition;
-            //     
-            //     out vec4 outColor;
-            //     
-            // uniform sampler2D uDiffuseMap; 
-            // uniform sampler2D uNormalMap;
-            // uniform sampler2D uShadowMap;
-            // uniform vec3 uViewPosition;          
-            // 
-            // struct DirectionalLight {
-            //     vec3 direction;
-            //     float intensity;
-            //     vec4 color;
-            // };
-            // uniform DirectionalLight uDirectionalLight;
- 
-
-            //     void main() {
-            //     
-            //     vec2 uv = vUv;
-            //     
-            //         // outColor = vec4(vNormal, 1.);
-            //         // // outColor = vec4(vTangent, 1.);
-            //         // outColor = vec4(vBinormal, 1.);
-            //         // outColor = vec4(vUv, 1., 1.);
-
-            //     // ------------------------------------------------------- 
-            //     // calc base color
-            //     // ------------------------------------------------------- 
-            //    
-            //     vec4 baseColor = vec4(.1, .1, .1, 1.);
-            //     baseColor = texture(uNormalMap, uv);
-            //     
-            //     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-            //     
-            //     // ------------------------------------------------------- 
-            //     // calc normal from normal map
-            //     // ------------------------------------------------------- 
-            //   
-            //     vec3 normal = normalize(vNormal);
-            //     vec3 tangent = normalize(vTangent);
-            //     vec3 binormal = normalize(vBinormal);
-            //     mat3 tbn = mat3(tangent, binormal, normal);
-            //     vec3 nt = texture(uNormalMap, uv).xyz;
-            //     nt = nt * 2. - 1.;
-            //     
-            //     // 1: mesh world normal
-            //     // vec3 worldNormal = normal;
-            //     // 2: world normal from normal map
-            //     vec3 worldNormal = normalize(tbn * nt);
-            //     // 3: blend mesh world normal ~ world normal from normal map
-            //     // vec3 worldNormal = mix(normal, normalize(tbn * nt), 1.);
-            //     
-            //     // ------------------------------------------------------- 
-            //     // directional light
-            //     // ------------------------------------------------------- 
-            //     
-            //     // vec3 N = normalize(vNormal);
-            //     vec3 N = normalize(worldNormal);
-            //     // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
-            //     vec3 L = normalize(uDirectionalLight.direction);
-            //     float diffuseRate = clamp(dot(N, L), 0., 1.);
-            //     // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-            //     vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-            //     vec3 P = vWorldPosition;
-            //     vec3 E = uViewPosition;
-            //     vec3 PtoL = L; // for directional light
-            //     vec3 PtoE = normalize(E - P);
-            //     vec3 H = normalize(PtoL + PtoE);
-            //     float specularPower = 16.;
-            //     float specularRate = clamp(dot(H, N), 0., 1.);
-            //     specularRate = pow(specularRate, specularPower);
-            //     vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-    
-            //     vec3 ambientColor = vec3(.1);
-    
-            //     vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
-            //     
-            //     outColor = surfaceColor; 
-            //     // outColor = vec4(vec3(N.y), 1.);
-            //     // outColor = vec4(vec3(worldNormal.y), 1.);
-            //     // outColor = vec4(tangent, 1.);
-            //     // outColor = vec4(normal, 1.);
-            //     // outColor = vec4(nt, 1.);
-            //     // outColor = vec4(vec3(uv.y), 1.);
-            //     }
-            //     `,
             uniforms: {
-                // uBoneOffsetMatrices: {
-                //     type: UniformTypes.Matrix4Array,
-                //     value: null
-                // },
                 uDiffuseMap: {
                     type: UniformTypes.Texture,
                     value: floorDiffuseMap,
@@ -557,9 +283,10 @@ const createGLTFSkinnedMesh = async () => {
                     type: UniformTypes.Texture,
                     value: floorNormalMap
                 },
+                // TODO: 毎回これ入れるのめんどいので共通化したい
                 uJointMatrices: {
                     type: UniformTypes.Matrix4Array,
-                    value: null
+                    value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity())
                 },
                 uDirectionalLight: {}
             },
@@ -567,7 +294,7 @@ const createGLTFSkinnedMesh = async () => {
         });
         skinningMesh.depthMaterial = new Material({
             gpu,
-            vertexShader: skinningMeshDepthVertexShader,
+            vertexShader: generateDepthVertexShader({ isSkinning: true, jointNum: 5, useNormalMap: true}),
             fragmentShader: `#version 300 es
                 
                 precision mediump float;

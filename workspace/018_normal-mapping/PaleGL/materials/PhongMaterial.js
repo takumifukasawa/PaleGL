@@ -1,7 +1,10 @@
 
 import { Material } from "./Material.js";
+import {shadowMapFragmentFunc} from "../shaders/shadowMapShader.js";
+import {generateVertexShader} from "../shaders/generateVertexShader.js";
+import {normalMapFragmentFunc} from "../shaders/lightingCommon.js";
 
-const fragmentShader = `#version 300 es
+const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 300 es
 
 precision mediump float;
 
@@ -61,26 +64,9 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     return resultColor;
 }
 
-vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
-    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
-    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
-    float sceneDepth = projectionShadowColor.r;
-    float depthFromLight = projectionUv.z;
-    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
-    float shadowAreaRect =
-        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-    float shadowRate = shadowOccluded * shadowAreaRect;
-    
-    vec4 resultColor = mix(
-       surfaceColor,
-       mix(surfaceColor, shadowColor, shadowBlendRate),
-       shadowRate
-    );
-    
-    return resultColor;
-} 
+${useNormalMap ? normalMapFragmentFunc() : ""}
+
+${receiveShadow ? shadowMapFragmentFunc() : ""}
 
 void main() {
 
@@ -92,27 +78,32 @@ void main() {
    
     vec4 baseColor = vec4(.1, .1, .1, 1.);
     baseColor = texture(uNormalMap, uv);
-    
+
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     // ------------------------------------------------------- 
     // calc normal from normal map
     // ------------------------------------------------------- 
   
-    vec3 normal = normalize(vNormal);
-    vec3 tangent = normalize(vTangent);
-    vec3 binormal = normalize(vBinormal);
-    mat3 tbn = mat3(tangent, binormal, normal);
-    vec3 nt = texture(uNormalMap, uv).xyz;
-    nt = nt * 2. - 1.;
+    // vec3 normal = normalize(vNormal);
+    // vec3 tangent = normalize(vTangent);
+    // vec3 binormal = normalize(vBinormal);
+    // mat3 tbn = mat3(tangent, binormal, normal);
+    // vec3 nt = texture(uNormalMap, uv).xyz;
+    // nt = nt * 2. - 1.;
+    // 
+    // // 1: mesh world normal
+    // // vec3 worldNormal = normal;
+    // // 2: world normal from normal map
+    // vec3 worldNormal = normalize(tbn * nt);
+    // // blend mesh world normal ~ world normal from normal map
+    // // vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
     
-    // 1: mesh world normal
-    // vec3 worldNormal = normal;
-    // 2: world normal from normal map
-    vec3 worldNormal = normalize(tbn * nt);
-    // blend mesh world normal ~ world normal from normal map
-    // vec3 worldNormal = mix(normal, normalize(tbn * nt), uNormalStrength);
-    
+    ${useNormalMap
+        ? "vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);"
+        : "vec3 worldNormal = normalize(vNormal);"
+    }
+
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
@@ -121,18 +112,32 @@ void main() {
     Camera camera;
     camera.worldPosition = uViewPosition;
     
-    // directional light
-    vec4 surfaceColor = calcDirectionalLight(surface, uDirectionalLight, camera);
+    vec4 resultColor = vec4(0, 0, 0, 1);
     
-    vec4 resultColor = applyShadow(surfaceColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);
-   
+    // directional light
+    resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
+
+    ${receiveShadow ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);` : ""}
+
     outColor = resultColor;
 }
 `;
 
 export class PhongMaterial extends Material {
     constructor(options) {
-        options.fragmentShader = fragmentShader;
-        super(options);
+        const isSkinning = !!options.uniforms.uJointMatrices;
+        const useNormalMap = !!options.uniforms.uNormalMap;
+        console.log(options.uniforms)
+        const vertexShader = generateVertexShader({
+            isSkinning: isSkinning,
+            jointNum: isSkinning ? options.uniforms.uJointMatrices.value.length : null,
+            receiveShadow: options.receiveShadow,
+            useNormalMap
+        });
+        const fragmentShader = generateFragmentShader({
+            receiveShadow: options.receiveShadow,
+            useNormalMap,
+        });
+        super({ ...options, vertexShader, fragmentShader} );
     }
 }
