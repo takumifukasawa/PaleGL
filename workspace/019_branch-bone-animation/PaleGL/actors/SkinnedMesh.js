@@ -85,21 +85,21 @@ export class SkinnedMesh extends Mesh {
         }
         checkChildNum(this.bones);
         
+        console.log(this.#boneIndicesForLines)
+        
         this.boneLines = new Mesh({
             gpu,
             geometry: new Geometry({
                 gpu,
                 attributes: {
                     position: {
-                        data: new Array(this.#boneIndicesForLines.length * 3),
-                        // data: new Array((indices.length / 2) * 3),
-                        // data: this.#boneIndicesForLines.length,
+                        // data: new Array(this.#boneIndicesForLines.length * 3),
+                        data: new Array(this.#boneOrderedIndex.length * 3),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
                 },
-                // indices: this.#boneIndicesForLines,
-                // drawCount: indices.length
+                indices: this.#boneIndicesForLines,
                 drawCount: this.#boneIndicesForLines.length
             }),
             material: new Material({
@@ -145,8 +145,9 @@ export class SkinnedMesh extends Mesh {
         const boneOffsetMatrices = this.boneOffsetMatrices;
         const boneJointMatrices = this.getBoneJointMatrices();
 
-        // console.log("--------")
-        const boneLinePositions = this.#boneIndicesForLines.map(boneIndex => [...this.#boneOrderedIndex[boneIndex].jointMatrix.position.elements]);
+        // const boneLinePositions = this.#boneIndicesForLines.map(boneIndex => [...this.#boneOrderedIndex[boneIndex].jointMatrix.position.elements]);
+        const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
+        
         // const getBoneLinePositions = (bone) => {
         //     boneLinePositions.push(...bone.jointMatrix.position.elements);
         //     bone.children.forEach(childBone => {
