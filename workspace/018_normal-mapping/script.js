@@ -263,63 +263,15 @@ const createGLTFSkinnedMesh = async () => {
     const skinningMeshes = gltfActor.transform.children[0].transform.children;
     
     skinningMeshes.forEach(skinningMesh => {
-        const skinningMeshVertexShader = generateVertexShader({
-            isSkinning: true,
-            jointNum: 5,
-            receiveShadow: true,
-            useNormalMap: true
-        });
-        
         skinningMesh.castShadow = true;
-        
         skinningMesh.material = new PhongMaterial({
             gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
             // TODO: 毎回これ入れるのめんどいので共通化したい
             jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-            // uniforms: {
-            //     uDiffuseMap: {
-            //         type: UniformTypes.Texture,
-            //         value: floorDiffuseMap,
-            //     },
-            //     uNormalMap: {
-            //         type: UniformTypes.Texture,
-            //         value: floorNormalMap
-            //     },
-            //     // TODO: 毎回これ入れるのめんどいので共通化したい
-            //     uJointMatrices: {
-            //         type: UniformTypes.Matrix4Array,
-            //         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity())
-            //     },
-            //     uDirectionalLight: {}
-            // },
             receiveShadow: true
         });
-        // skinningMesh.depthMaterial = new Material({
-        //     gpu,
-        //     vertexShader: generateDepthVertexShader({
-        //         isSkinning: true,
-        //         jointNum: skinningMesh.boneCount,
-        //         // useNormalMap: true
-        //     }),
-        //     fragmentShader: `#version 300 es
-        //         
-        //         precision mediump float;
-        //         
-        //         out vec4 outColor;
-
-        //         void main() {
-        //             outColor = vec4(1., 1., 1., 1.);
-        //         }
-        //         `,
-        //     uniforms: {
-        //         uJointMatrices: {
-        //             type: UniformTypes.Matrix4Array,
-        //             value: null
-        //         },
-        //     }
-        // });
     });
 }
 
