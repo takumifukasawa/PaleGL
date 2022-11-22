@@ -410,54 +410,6 @@ function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "normal strength",
-    //     minValue: 0,
-    //     maxValue: 2,
-    //     stepValue: 0.01,
-    //     initialValue: floorPlaneMesh.material.uniforms.uNormalStrength.value,
-    //     onChange: (value) => {
-    //         floorPlaneMesh.material.uniforms.uNormalStrength.value = value;
-    //     }
-    // });
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addSliderDebugger({
-        label: "floor rotation x",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: floorPlaneMesh.transform.rotation.x,
-        onChange: (value) => {
-            floorPlaneMesh.transform.setRotationX(value);
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "floor rotation y",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: floorPlaneMesh.transform.rotation.y,
-        onChange: (value) => {
-            floorPlaneMesh.transform.setRotationY(value);
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "floor rotation z",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: floorPlaneMesh.transform.rotation.z,
-        onChange: (value) => {
-            floorPlaneMesh.transform.setRotationZ(value);
-        }
-    });
-
-    debuggerGUI.addBorderSpacer();
-    
     debuggerGUI.addSliderDebugger({
         label: "light position x",
         minValue: -20,
