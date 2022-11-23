@@ -56,4 +56,8 @@ export class Quaternion {
             z: rad.z * 180 / Math.PI,
         };
     }
+    
+    static identity() {
+        return new Quaternion(0, 0, 0, 1);
+    }
 }

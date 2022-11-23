@@ -32,8 +32,6 @@ export class SkinnedMesh extends Mesh {
             this.#boneOrderedIndex[bone.index] = bone;
         });
         
-        console.log("fuga", this.#boneOrderedIndex)
-
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
     }
@@ -84,8 +82,6 @@ export class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
-        
-        console.log(this.#boneIndicesForLines)
         
         this.boneLines = new Mesh({
             gpu,
@@ -145,69 +141,17 @@ export class SkinnedMesh extends Mesh {
         const boneOffsetMatrices = this.boneOffsetMatrices;
         const boneJointMatrices = this.getBoneJointMatrices();
 
-        // const boneLinePositions = this.#boneIndicesForLines.map(boneIndex => [...this.#boneOrderedIndex[boneIndex].jointMatrix.position.elements]);
         const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-        
-        // const getBoneLinePositions = (bone) => {
-        //     boneLinePositions.push(...bone.jointMatrix.position.elements);
-        //     bone.children.forEach(childBone => {
-        //         getBoneLinePositions(childBone);
-        //     });
-        // }
-        // getBoneLinePositions(this.bones);
-        // console.log(boneLinePositions)
-        
+       
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
        
        // console.log("-------") 
-        const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => {
-            // boneOffsetMatrix.log()
-            return Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix);
-        });
+        const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
 
         this.material.uniforms.uJointMatrices.value = jointMatrices;
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
-        
-        // const newPositions = [];
-        // for(let i = 0; i < this.positions.length; i++) {
-        //     const x = this.positions[i][0];
-        //     const y = this.positions[i][1];
-        //     const z = this.positions[i][2];
-        //     const p = new Vector3(x, y, z);
-        //     const boneWeights = this.boneWeights[i];
-        //     const boneIndices = this.boneIndices[i];
-        //     const np = Vector3.addVectors(
-        //         p.clone()
-        //             .multiplyMatrix4(Matrix4.multiplyMatrices(
-        //                 boneJointMatrices[boneIndices[0]],
-        //                 boneOffsetMatrices[boneIndices[0]],
-        //             ))
-        //             .scale(boneWeights[0]),
-        //         p.clone()
-        //             .multiplyMatrix4(Matrix4.multiplyMatrices(
-        //                 boneJointMatrices[boneIndices[1]],
-        //                 boneOffsetMatrices[boneIndices[1]],
-        //             ))
-        //             .scale(boneWeights[1]),
-        //         p.clone()
-        //             .multiplyMatrix4(Matrix4.multiplyMatrices(
-        //                 boneJointMatrices[boneIndices[2]],
-        //                 boneOffsetMatrices[boneIndices[2]],
-        //             ))
-        //             .scale(boneWeights[2]),
-        //         p.clone()
-        //             .multiplyMatrix4(Matrix4.multiplyMatrices(
-        //                 boneJointMatrices[boneIndices[3]],
-        //                 boneOffsetMatrices[boneIndices[3]],
-        //             ))
-        //             .scale(boneWeights[3]),
-        //     );
-        //     newPositions.push(np);
-        // }
-        // const newData = newPositions.map(p => [...p.elements]).flat();
-        // // this.geometry.updateAttribute("position", newData);
     }
 
     getBoneOffsetMatrices() {
@@ -223,7 +167,6 @@ export class SkinnedMesh extends Mesh {
         const matrices = [];
         this.bones.traverse((bone) => {
             const m = bone.jointMatrix.clone();
-            // const m = bone.boneOffsetMatrix.clone();
             matrices.push(m);
         });
         return matrices;        

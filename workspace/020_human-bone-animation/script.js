@@ -257,6 +257,9 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
+    // gltfActor.transform.setRotationX(90);
+    // gltfActor.transform.setScaling(Vector3.fill(0.01));
+    
     skinningMeshAnimator = gltfActor.animator;
  
     const skinningMeshes = gltfActor.transform.children[0].transform.children;

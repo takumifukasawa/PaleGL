@@ -10,7 +10,12 @@ import {AnimationKeyframeTypes} from "../constants.js";
 import {AnimationKeyframes} from "../core/AnimationKeyframes.js";
 import {Quaternion} from "../math/Quaternion.js";
 
-export async function loadGLTF({gpu, path}) {
+export async function loadGLTF({
+    gpu,
+    path,
+    adjustScale = Vector3.one(),
+    adjustRotation = Quaternion.identity()
+}) {
     const response = await fetch(path);
     const gltf = await response.json();
 
@@ -57,9 +62,14 @@ export async function loadGLTF({gpu, path}) {
       
         // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
-            node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
+            // node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
+            node.translation
+                ? Matrix4.translationMatrix(new Vector3(node.translation[0] / 100, node.translation[1] / 100, node.translation[2] / 100))
+                // ? Matrix4.translationMatrix(new Vector3(node.translation[0], node.translation[1], node.translation[2]))
+                : Matrix4.identity(),
             node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
             node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+            // node.scale ? Matrix4.scalingMatrix(new Vector3(node.scale[0] / 100, node.scale[1] / 100, node.scale[])) : Matrix4.identity()
         );
         bone.offsetMatrix = offsetMatrix;
         

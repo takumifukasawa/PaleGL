@@ -246,9 +246,9 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    // gltfActor = await loadGLTF({ gpu, path: "./models/branching-bone-animation.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/branching-bone-animation.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-4.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
