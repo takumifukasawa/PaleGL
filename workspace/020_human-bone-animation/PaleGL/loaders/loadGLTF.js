@@ -61,21 +61,10 @@ export async function loadGLTF({
         // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
             node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-            // test edit bone translation
-            // node.translation
-            //     ? Matrix4.translationMatrix(new Vector3(node.translation[0] / 100, node.translation[1] / 100, node.translation[2] / 100))
-            //     : Matrix4.identity(),
             node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-            // node.rotation ? Matrix4.fromQuaternion(new Quaternion(node.rotation[3], node.rotation[2], node.rotation[1], node.rotation[0])) : Matrix4.identity(),
             node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
         );
         bone.offsetMatrix = offsetMatrix;
-        console.log("----------------------")
-        console.log(bone.name)
-        console.log("translation", node.translation)
-        console.log("rotation: q", node.rotation)
-        console.log("rotation: euler degree", (new Quaternion(...node.rotation)).toEulerDegree())
-        console.log("scale", node.scale)
         
         if (parentBone) {
             parentBone.addChild(bone);

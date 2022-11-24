@@ -246,10 +246,6 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    // gltfActor = await loadGLTF({ gpu, path: "./models/branching-bone-animation.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-4.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk.gltf" });
     gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
@@ -260,7 +256,6 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
-    // gltfActor.transform.setRotationX(90);
     gltfActor.transform.setScaling(Vector3.fill(4));
     
     skinningMeshAnimator = gltfActor.animator;
@@ -454,7 +449,7 @@ function initDebugger() {
 
     debuggerGUI.addPullDownDebugger({
         label: "animations",
-        initialValue: skinningMeshAnimator.animationClips[0].name,
+        initialValue: skinningMeshAnimator.animationClips[1].name, // index: 0 のアニメーションがなぜか消せないのでとりあえず
         options: skinningMeshAnimator.animationClips.map(animationClip => ({ value: animationClip.name })),
         initialExec: true,
         onChange: (value) => {
