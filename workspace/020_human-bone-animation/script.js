@@ -248,7 +248,13 @@ const onWindowResize = () => {
 const createGLTFSkinnedMesh = async () => {
     // gltfActor = await loadGLTF({ gpu, path: "./models/branching-bone-animation.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-4.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-apply-transform.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-mixamo-control-rig.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-manual-clear-transform.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-manual-nla.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-apply-rotation.gltf" });
+    
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
@@ -258,7 +264,7 @@ const createGLTFSkinnedMesh = async () => {
     };
     
     // gltfActor.transform.setRotationX(90);
-    // gltfActor.transform.setScaling(Vector3.fill(0.01));
+    gltfActor.transform.setScaling(Vector3.fill(0.05));
     
     skinningMeshAnimator = gltfActor.animator;
  
