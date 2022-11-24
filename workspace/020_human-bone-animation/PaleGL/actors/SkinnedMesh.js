@@ -128,8 +128,57 @@ export class SkinnedMesh extends Mesh {
                 depthTest: false
             })
         });
+
+        this.bonePoints = new Mesh({
+            gpu,
+            geometry: new Geometry({
+                gpu,
+                attributes: {
+                    position: {
+                        // data: new Array(this.#boneIndicesForLines.length * 3),
+                        data: new Array(this.#boneOrderedIndex.length * 3),
+                        size: 3,
+                        usage: AttributeUsageType.DynamicDraw
+                    }
+                },
+                // indices: this.#boneIndicesForLines,
+                drawCount: this.#boneIndicesForLines.length               
+            }),
+            material: new Material({
+                gpu,
+                vertexShader: `#version 300 es
+               
+                layout (location = 0) in vec3 aPosition;
+                
+                uniform mat4 uWorldMatrix;
+                uniform mat4 uViewMatrix;
+                uniform mat4 uProjectionMatrix;
+                
+                void main() {
+                    // gl_Point = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_PointSize = 6.;
+                }
+                `,
+                fragmentShader: `#version 300 es
+                
+                precision mediump float;
+                
+                out vec4 outColor;
+                
+                void main() {
+                    outColor = vec4(1, 0., 0, 1.);
+                }
+                `,
+                primitiveType: PrimitiveTypes.Points,
+                blendType: BlendTypes.Transparent,
+                depthWrite: false,
+                depthTest: false
+            })
+        });
         
         this.addChild(this.boneLines);
+        this.addChild(this.bonePoints)
     }
     
     update(options) {
@@ -144,6 +193,7 @@ export class SkinnedMesh extends Mesh {
         const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
        
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
+        this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
        
        // console.log("-------") 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));

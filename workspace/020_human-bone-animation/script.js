@@ -228,8 +228,8 @@ const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = ny * 10 + 12;
-    // targetCameraPosition.y = ny * 20;
+    // targetCameraPosition.y = ny * 10 + 12;
+    targetCameraPosition.y = ny * 20;
 };
 
 const onWindowResize = () => {
@@ -249,11 +249,8 @@ const createGLTFSkinnedMesh = async () => {
     // gltfActor = await loadGLTF({ gpu, path: "./models/branching-bone-animation.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/skin-bone-multi-animation-unwrap-uv-4.gltf" });
     // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-apply-transform.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-mixamo-control-rig.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-manual-clear-transform.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-manual-nla.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/mixamo-idle-apply-rotation.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -264,7 +261,7 @@ const createGLTFSkinnedMesh = async () => {
     };
     
     // gltfActor.transform.setRotationX(90);
-    gltfActor.transform.setScaling(Vector3.fill(0.05));
+    gltfActor.transform.setScaling(Vector3.fill(4));
     
     skinningMeshAnimator = gltfActor.animator;
  

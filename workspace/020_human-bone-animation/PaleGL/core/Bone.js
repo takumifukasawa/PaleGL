@@ -70,10 +70,11 @@ export class Bone extends NodeBase {
             ? Matrix4.multiplyMatrices(parentBone.jointMatrix, this.offsetMatrix)
             // ? Matrix4.multiplyMatrices(this.offsetMatrix, parentBone.jointMatrix)
             : this.offsetMatrix;
+        
         // this.#jointMatrix.log()
        
         // NOTE: 無理やりpose状態にする時はこれを使う
-        this.#jointMatrix = this.#boneOffsetMatrix.clone().invert();
+        // this.#jointMatrix = this.#boneOffsetMatrix.clone().invert();
         
         this.children.forEach(childBone => childBone.calcJointMatrix(this));
     }
