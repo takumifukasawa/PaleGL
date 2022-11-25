@@ -27,7 +27,7 @@ function bundle() {
     // 手動でrootのmjsを末尾にpush
     filePathList.push(rootModulePath);
     
-    const importRegex = /import \{[a-zA-Z0-9\s\n\,]*\} from \"[a-zA-Z0-9\/\.\s\-_]*\.js\";?/g;
+    const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from \"[a-zA-Z0-9\/\.\s\-_]*\.js\";?/g;
     // const exportRegex = /export (class|const|default|function)\s/g;
     const exportRegex = /export\s/g;
     
@@ -36,14 +36,17 @@ function bundle() {
     filePathList.forEach((filePath, i) => {
         const data = fs.readFileSync(filePath, "utf-8");
         
+        let replacedData;
+        
         // 手動でrootのmjsが末尾にいるのでparseしない
         if(i === filePathList.length - 1) {
-            replacedContents.push(data)
-            return;
+            replacedData = data
+                .replaceAll(/ from \".*\.js\"/g, "");
+        } else {
+            replacedData = data
+                .replaceAll(importRegex, "")
+                .replaceAll(exportRegex, "");
         }
-        const replacedData = data
-            .replaceAll(importRegex, "")
-            .replaceAll(exportRegex, "");
         replacedContents.push(replacedData);
     });
     
