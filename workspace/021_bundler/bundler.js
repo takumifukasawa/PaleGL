@@ -5,6 +5,7 @@ const path = require("path");
 // NOTE
 // - 一階層下までをwatch
 // - ファイルのadd,remove,moveがある時は手動で一度killして再度立ち上げる
+// - circular dependency には対応してない
 // ---------------------------------------------------------------------
 
 // ---------------------------------------------------------------------
@@ -53,8 +54,8 @@ function hasItemInImportMaps(path) {
     return false;
 }
 
-function extractImportFilePaths(filePath, data = null, needsPush = true) {
-    const content = data || fs.readFileSync(filePath, "utf-8");
+function extractImportFilePaths(filePath) {
+    const content = fs.readFileSync(filePath, "utf-8");
     
     // for debug
     // console.log("-----------");
@@ -70,8 +71,8 @@ function extractImportFilePaths(filePath, data = null, needsPush = true) {
         }
     });
 
-    // has item のチェックいらないはずだけど一応
-    if (needsPush && !hasItemInImportMaps(filePath)) {
+    // NOTE: has item のチェックいらないはずだけど一応
+    if (!hasItemInImportMaps(filePath)) {
         importMaps.add({
             id: importMaps.size,
             path: filePath,
@@ -84,16 +85,7 @@ function bundle() {
     importMaps.clear();
     watchPaths.splice(0);
     
-        
-    const rootContent = fs.readFileSync(rootModulePath, "utf-8");
-
-    extractImportFilePaths(rootModulePath, rootContent, false);
-
-    importMaps.add({
-        id: importMaps.size,
-        path: rootModulePath,
-        content: rootContent,
-    });
+    extractImportFilePaths(rootModulePath);
 
     const replacedContents = Array.from(importMaps).map((item, i) => {
         const isLast = i === importMaps.size - 1;
