@@ -55,15 +55,7 @@ function hasItemInImportMaps(path) {
 
 function extractImportFilePaths(filePath, data = null, needsPush = true) {
     const content = data || fs.readFileSync(filePath, "utf-8");
-
-    if (needsPush) {
-        importMaps.add({
-            id: importMaps.size,
-            path: filePath,
-            content,
-        });
-    }
-
+    
     // for debug
     // console.log("-----------");
     // console.log(`target file path: ${filePath}`);
@@ -77,9 +69,22 @@ function extractImportFilePaths(filePath, data = null, needsPush = true) {
             extractImportFilePaths(importFilePath);
         }
     });
+
+    // has item のチェックいらないはずだけど一応
+    if (needsPush && !hasItemInImportMaps(filePath)) {
+        importMaps.add({
+            id: importMaps.size,
+            path: filePath,
+            content,
+        });
+    }
 }
 
 function bundle() {
+    importMaps.clear();
+    watchPaths.splice(0);
+    
+        
     const rootContent = fs.readFileSync(rootModulePath, "utf-8");
 
     extractImportFilePaths(rootModulePath, rootContent, false);
