@@ -33,7 +33,7 @@ const watchPaths = [];
 // ---------------------------------------------------------------------
 
 function replaceContents(data, isLast = false) {
-    // 手動でrootのmjsを末尾においているのでparseしない
+    // 手動でrootのmjsを末尾においている
     if (isLast) {
         return data.replaceAll(/ from \".*\.js\"/g, "");
     }
