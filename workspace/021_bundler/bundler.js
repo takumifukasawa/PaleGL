@@ -50,10 +50,10 @@ function getDirectories(searchPath) {
 function replaceContents(data, isLast = false) {
     // 手動でrootのmjsを末尾においているため
     if (isLast) {
-        return data.replaceAll(/ from \".*\.js\"/g, "");
+        return data.replaceAll(/ from (\'|\").*\.js(\'|\")/g, "");
     }
 
-    const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from \"[a-zA-Z0-9\/\.\s\-_]*\.js\";?/g;
+    const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from (\'|\")[a-zA-Z0-9\/\.\s\-_]*\.js(\'|\");?/g;
     const exportRegex = /export\s/g;
     return data
         .replaceAll(importRegex, "")
@@ -75,12 +75,12 @@ function extractImportFilePaths(filePath) {
     // for debug
     // console.log("-----------");
     // console.log(`target file path: ${filePath}`);
-
-    const regex = /\"(.*?\.js)\";/g;
+    
+    const regex = /(\'|\")(.*?\.js)(\'|\");/g;
     const matches = [...content.matchAll(regex)];
     const fileDir = path.dirname(filePath);
     matches.forEach((match) => {
-        const importFilePath = path.normalize(path.join(fileDir, match[1]));
+        const importFilePath = path.normalize(path.join(fileDir, match[2]));
         if (!hasItemInImportMaps(importFilePath)) {
             extractImportFilePaths(importFilePath);
         }
@@ -110,24 +110,22 @@ function bundle() {
         return replaceContents(item.content, isLast);
     });
 
-    const bundledContent = replacedContents
-        .join("\n")
-        .replaceAll(/\/\*.*\*\//g, "");
-
-    const newLines = [];
-
-    bundledContent.split("\n").forEach(line => {
-        let str = line;
-        // str = str.trim()
-        // str = str
-        //     .replace(/\/\/.*/, "");
-        // if(str !== "") {
-        //     newLines.push(str);
-        // }
-        newLines.push(str)
-    });
-   
-    const outputContent = newLines.join("\n");
+    const outputContent = replacedContents.join("\n");
+    
+    // TODO: minify
+    // const bundledContent = replacedContents
+    //     .join("\n")
+    //     .replaceAll(/\/\*.*\*\//g, "");
+    // const newLines = [];
+    // bundledContent.split("\n").forEach(line => {
+    //     let str = line;
+    //     str = str
+    //         .replace(/\/\/.*/, "");
+    //     if(str !== "" || str !== "\n") {
+    //         newLines.push(str);
+    //     }
+    // });
+    // const outputContent = newLines.join("\n");
 
     fs.writeFile(outputFilePath, outputContent, "utf-8", () => {
         console.log("completed bundle file. -> " + outputFilePath);
