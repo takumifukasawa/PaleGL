@@ -786,8 +786,7 @@ ${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
 --------------------`);
     }
 }
-﻿
-const PrimitiveTypes = {
+﻿const PrimitiveTypes = {
     Points: "Points",
     Lines: "Lines",
     LineLoop: "LineLoop",
@@ -816,7 +815,7 @@ const UniformTypes = {
 const TextureTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
-}
+};
 
 const TextureWrapTypes = {
     Repeat: "Repeat",
@@ -882,19 +881,19 @@ const FaceSide = {
 const AttributeUsageType = {
     StaticDraw: "StaticDraw",
     DynamicDraw: "DynamicDraw"
-}
+};
 
 const RenderTargetTypes = {
     RGBA: "RGBA",
     Depth: "Depth"
-}
+};
 
 const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
     // Rotator: "Rotator",
     // Scalar: "Scalar"
-}
+};
 ﻿class Rotator {
     // x, y, z axes
     // 一旦そのままdegreeが入る想定
@@ -1278,7 +1277,7 @@ class Shader extends GLObject {
         // check shader info log
         const vsInfo = gl.getShaderInfoLog(vs);
         if(vsInfo.length > 0) {
-            console.error("[Shader] vertex shader has error")
+            console.error("[Shader] vertex shader has error");
             throw vsInfo;
         }
 
@@ -1293,7 +1292,7 @@ class Shader extends GLObject {
         const fsInfo = gl.getShaderInfoLog(fs);
         // check shader info log
         if(fsInfo.length > 0) {
-            console.error("[Shader] fragment shader has error")
+            console.error("[Shader] fragment shader has error");
             throw fsInfo;
         }
         
@@ -5905,6 +5904,8 @@ export {PostProcessPass};
 // shaders
 
 // utilities
+
+
 
 // others
 export {

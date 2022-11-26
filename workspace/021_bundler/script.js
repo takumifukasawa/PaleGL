@@ -51,7 +51,6 @@ let gltfActor;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
 
-
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");

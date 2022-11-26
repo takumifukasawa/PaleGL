@@ -2,10 +2,13 @@
 const path = require("path");
 
 // ---------------------------------------------------------------------
-// NOTE
+// NOTE:
 // - 一階層下までをwatch
 // - ファイルのadd,remove,moveがある時は手動で一度killして再度立ち上げる
 // - circular dependency には対応してない
+//
+// TODO:
+// - catch error
 // ---------------------------------------------------------------------
 
 // ---------------------------------------------------------------------
@@ -32,8 +35,20 @@ const watchPaths = [];
 // functions
 // ---------------------------------------------------------------------
 
+function getDirectories(searchPath) {
+    const dirents = fs.readdirSync(searchPath, {withFileTypes: true});
+    const directoryPaths = [];
+    for (const dirent of dirents) {
+        if (dirent.isDirectory()) {
+            const dirPath = path.join(searchPath, dirent.name);
+            directoryPaths.push(dirPath);
+        }
+    }
+    return directoryPaths;
+}
+
 function replaceContents(data, isLast = false) {
-    // 手動でrootのmjsを末尾においている
+    // 手動でrootのmjsを末尾においているため
     if (isLast) {
         return data.replaceAll(/ from \".*\.js\"/g, "");
     }
@@ -56,7 +71,7 @@ function hasItemInImportMaps(path) {
 
 function extractImportFilePaths(filePath) {
     const content = fs.readFileSync(filePath, "utf-8");
-    
+
     // for debug
     // console.log("-----------");
     // console.log(`target file path: ${filePath}`);
@@ -81,10 +96,11 @@ function extractImportFilePaths(filePath) {
     }
 }
 
+
 function bundle() {
     importMaps.clear();
     watchPaths.splice(0);
-    
+
     extractImportFilePaths(rootModulePath);
 
     const replacedContents = Array.from(importMaps).map((item, i) => {
@@ -94,7 +110,26 @@ function bundle() {
         return replaceContents(item.content, isLast);
     });
 
-    fs.writeFile(outputFilePath, replacedContents.join("\n"), () => {
+    const bundledContent = replacedContents
+        .join("\n")
+        .replaceAll(/\/\*.*\*\//g, "");
+
+    const newLines = [];
+
+    bundledContent.split("\n").forEach(line => {
+        let str = line;
+        // str = str.trim()
+        // str = str
+        //     .replace(/\/\/.*/, "");
+        // if(str !== "") {
+        //     newLines.push(str);
+        // }
+        newLines.push(str)
+    });
+   
+    const outputContent = newLines.join("\n");
+
+    fs.writeFile(outputFilePath, outputContent, "utf-8", () => {
         console.log("completed bundle file. -> " + outputFilePath);
     });
 }
@@ -102,18 +137,6 @@ function bundle() {
 function watchFileHandler() {
     console.log("start bundle.")
     bundle();
-}
-
-function getDirectories(searchPath) {
-    const dirents = fs.readdirSync(searchPath, {withFileTypes: true});
-    const directoryPaths = [];
-    for (const dirent of dirents) {
-        if (dirent.isDirectory()) {
-            const dirPath = path.join(searchPath, dirent.name);
-            directoryPaths.push(dirPath);
-        }
-    }
-    return directoryPaths;
 }
 
 // cleanups
@@ -124,16 +147,17 @@ function exitHandler(options) {
         fs.unwatchFile(watchPath, watchFileHandler);
     });
     if (options.cleanup) {
-        console.log('cleanup on exit');
+        console.log('cleanup exit.');
     }
     if (options.exit) {
+        console.log("interrupted exit.");
         process.exit();
     }
 }
 
 function main() {
     console.log("start watch...");
-   
+
     // initial exec
     console.log("initial bundle.");
     bundle();
@@ -151,10 +175,10 @@ function main() {
 // execute
 // ---------------------------------------------------------------------
 
-process.on('exit', () => exitHandler({cleanup: true}));
-process.on('SIGINT', () => exitHandler({exit: true}));
-process.on('SIGUSR1', () => exitHandler({exit: true}));
-process.on('SIGUSR2', () => exitHandler.bind({exit: true}));
-process.on('uncaughtException', () => exitHandler.bind({exit: true}));
+// process.on('exit', () => exitHandler({cleanup: true}));
+// process.on('SIGINT', () => exitHandler({exit: true}));
+// process.on('SIGUSR1', () => exitHandler({exit: true}));
+// process.on('SIGUSR2', () => exitHandler.bind({exit: true}));
+// process.on('uncaughtException', () => exitHandler.bind({exit: true}));
 
 main();

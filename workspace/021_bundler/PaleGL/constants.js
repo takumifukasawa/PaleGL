@@ -1,5 +1,4 @@
-﻿
-export const PrimitiveTypes = {
+﻿export const PrimitiveTypes = {
     Points: "Points",
     Lines: "Lines",
     LineLoop: "LineLoop",
@@ -28,7 +27,7 @@ export const UniformTypes = {
 export const TextureTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
-}
+};
 
 export const TextureWrapTypes = {
     Repeat: "Repeat",
@@ -94,16 +93,16 @@ export const FaceSide = {
 export const AttributeUsageType = {
     StaticDraw: "StaticDraw",
     DynamicDraw: "DynamicDraw"
-}
+};
 
 export const RenderTargetTypes = {
     RGBA: "RGBA",
     Depth: "Depth"
-}
+};
 
 export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
     // Rotator: "Rotator",
     // Scalar: "Scalar"
-}
+};

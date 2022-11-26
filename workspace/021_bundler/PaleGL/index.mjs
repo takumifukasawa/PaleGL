@@ -56,6 +56,8 @@ export {PostProcessPass} from "./postprocess/PostProcessPass.js";
 
 // utilities
 
+/* hogehoge */
+
 // others
 export {
     PrimitiveTypes,
