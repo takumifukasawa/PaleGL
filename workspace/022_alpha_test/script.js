@@ -31,7 +31,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    generateVertexShader, RenderQueues,
+    generateVertexShader, RenderQueues, FaceSide,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -44,6 +44,7 @@ let checkerPlaneMesh;
 let cubeMap;
 let floorDiffuseMap;
 let floorNormalMap;
+let floorDiffuseWithCheckerAlphaMap;
 let gltfActor;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
@@ -258,7 +259,6 @@ const createGLTFSkinnedMesh = async () => {
 }
 
 const main = async () => {
-    // const floorNormalImg = await loadImg("./images/floor_tiles_02_nor_gl_1k.png");
     const floorDiffuseImg = await loadImg("./images/blue_floor_tiles_01_diff_1k.png");
     floorDiffuseMap = new Texture({
         gpu,
@@ -274,6 +274,17 @@ const main = async () => {
     floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
+    
+    const floorDiffuseWithCheckerAlphaImg = await loadImg("./images/blue_floor_tiles_01_diff_1k_with_checker_alpha.png");
+    floorDiffuseWithCheckerAlphaMap = new Texture({
+        gpu,
+        img: floorDiffuseWithCheckerAlphaImg,
         // mipmap: true,
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
@@ -369,9 +380,12 @@ const main = async () => {
         }),
         material: new PhongMaterial({
             gpu,
-            diffuseMap: floorDiffuseMap,
+            diffuseMap: floorDiffuseWithCheckerAlphaMap,
             normalMap: floorNormalMap,
-            receiveShadow: true
+            receiveShadow: false,
+            queue: RenderQueues.AlphaTest,
+            alphaTest: 0.5,
+            faceSide: FaceSide.Double
         }),
         // material: new Material({
         //     gpu,
@@ -389,7 +403,7 @@ const main = async () => {
     });
     alphaTestPhongMesh.onStart = ({ actor }) => {
         // actor.material.uniforms.uCubeTexture.value = cubeMap;
-        actor.transform.setTranslation(new Vector3(0, 2, 0));
+        actor.transform.setTranslation(new Vector3(2, 2, 0));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
@@ -454,7 +468,7 @@ const main = async () => {
     captureScene.add(skyboxMesh);
     captureScene.add(alphaTestPhongMesh);
     captureScene.add(reflectSkyboxMesh);
-    captureScene.add(checkerPlaneMesh);
+    // captureScene.add(checkerPlaneMesh);
 
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));

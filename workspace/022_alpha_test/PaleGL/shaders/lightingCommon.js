@@ -1,12 +1,15 @@
 
 export const alphaTestFunc = () => `
-void checkAlphaTest(vec4 color, float threshold) {
-    if(color.a < threshold) {
+void checkAlphaTest(float value, float threshold) {
+    if(value < threshold) {
         discard;
     }
 }
 `;
 
+export const alphaTestFragmentUniforms = () => `
+uniform float uAlphaTestThreshold;
+`;
 
 export const normalMapVertexAttributes = (beginIndex) => [
 `layout(location = ${beginIndex + 0}) in vec3 aTangent;`,
@@ -75,7 +78,10 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
 
     vec3 ambientColor = vec3(.1);
 
-    vec4 resultColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+    vec4 resultColor = vec4(
+        diffuseColor + specularColor + ambientColor,
+        surface.diffuseColor.a
+    );
     
     return resultColor;
 }

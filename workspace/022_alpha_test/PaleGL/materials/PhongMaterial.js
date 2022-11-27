@@ -7,6 +7,7 @@ import {
 } from "../shaders/shadowMapShader.js";
 import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {
+    alphaTestFragmentUniforms,
     alphaTestFunc,
     directionalLightFragmentUniforms,
     normalMapFragmentFunc, normalMapFragmentUniforms,
@@ -25,7 +26,8 @@ uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
-uniform vec3 uViewPosition;          
+uniform vec3 uViewPosition;
+${alphaTest ? alphaTestFragmentUniforms() : ""}
 
 ${directionalLightFragmentUniforms()}
 
@@ -74,13 +76,13 @@ void main() {
     
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-
+    
     ${receiveShadow
         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
         : ""
     }
     ${alphaTest
-        ? `checkAlphaTest(resultColor);`
+        ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
         : ""
     }
 
@@ -158,7 +160,10 @@ export class PhongMaterial extends Material {
             alphaTest: options.alphaTest
         });
         
-        const uniforms = { ...baseUniforms, ...(options.uniforms ?  options.uniforms : {})};
+        const uniforms = {
+            ...baseUniforms,
+            ...(options.uniforms ?  options.uniforms : {})
+        };
 
         super({ ...options, vertexShader, fragmentShader, uniforms} );
     }

@@ -70,7 +70,7 @@ export class Material {
         
         this.isSkinning = isSkinning;
 
-        // TODO: シェーダーごとにわける？(postprocessの場合はいらないuniformなどがある
+        // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,
@@ -105,7 +105,13 @@ export class Material {
             uShadowBias: {
                 type: UniformTypes.Float,
                 value: 0.01
-            }
+            },
+            ...(this.alphaTest ? {
+                uAlphaTestThreshold: {
+                    type: UniformTypes.Float,
+                    value: this.alphaTest
+                }
+            } : {})
         };
         
         this.queue = queue || null;

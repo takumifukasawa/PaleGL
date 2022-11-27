@@ -1387,7 +1387,7 @@ class Material {
         
         this.isSkinning = isSkinning;
 
-        // TODO: シェーダーごとにわける？(postprocessの場合はいらないuniformなどがある
+        // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,
@@ -1422,7 +1422,13 @@ class Material {
             uShadowBias: {
                 type: UniformTypes.Float,
                 value: 0.01
-            }
+            },
+            ...(this.alphaTest ? {
+                uAlphaTestThreshold: {
+                    type: UniformTypes.Float,
+                    value: this.alphaTest
+                }
+            } : {})
         };
         
         this.queue = queue || null;
@@ -3072,13 +3078,16 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
 `;
 
 const alphaTestFunc = () => `
-void checkAlphaTest(vec4 color, float threshold) {
-    if(color.a < threshold) {
+void checkAlphaTest(float value, float threshold) {
+    if(value < threshold) {
         discard;
     }
 }
 `;
 
+const alphaTestFragmentUniforms = () => `
+uniform float uAlphaTestThreshold;
+`;
 
 const normalMapVertexAttributes = (beginIndex) => [
 `layout(location = ${beginIndex + 0}) in vec3 aTangent;`,
@@ -3147,7 +3156,10 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
 
     vec3 ambientColor = vec3(.1);
 
-    vec4 resultColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+    vec4 resultColor = vec4(
+        diffuseColor + specularColor + ambientColor,
+        surface.diffuseColor.a
+    );
     
     return resultColor;
 }
@@ -5520,7 +5532,8 @@ uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
-uniform vec3 uViewPosition;          
+uniform vec3 uViewPosition;
+${alphaTest ? alphaTestFragmentUniforms() : ""}
 
 ${directionalLightFragmentUniforms()}
 
@@ -5569,13 +5582,13 @@ void main() {
     
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-
+    
     ${receiveShadow
         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
         : ""
     }
     ${alphaTest
-        ? `checkAlphaTest(resultColor);`
+        ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
         : ""
     }
 
@@ -5653,7 +5666,10 @@ class PhongMaterial extends Material {
             alphaTest: options.alphaTest
         });
         
-        const uniforms = { ...baseUniforms, ...(options.uniforms ?  options.uniforms : {})};
+        const uniforms = {
+            ...baseUniforms,
+            ...(options.uniforms ?  options.uniforms : {})
+        };
 
         super({ ...options, vertexShader, fragmentShader, uniforms} );
     }
