@@ -33,11 +33,13 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
         step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
     float shadowRate = shadowOccluded * shadowAreaRect;
     
-    vec4 resultColor = mix(
-       surfaceColor,
-       mix(surfaceColor, shadowColor, shadowBlendRate),
+    vec4 resultColor = vec4(1.);
+    resultColor.xyz = mix(
+       surfaceColor.xyz,
+       mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
        shadowRate
     );
+    resultColor.a = surfaceColor.a;
     
     return resultColor;
 } 

@@ -382,7 +382,7 @@ const main = async () => {
             gpu,
             diffuseMap: floorDiffuseWithCheckerAlphaMap,
             normalMap: floorNormalMap,
-            receiveShadow: false,
+            receiveShadow: true,
             queue: RenderQueues.AlphaTest,
             alphaTest: 0.5,
             faceSide: FaceSide.Double
