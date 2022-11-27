@@ -173,10 +173,10 @@ function main() {
 // execute
 // ---------------------------------------------------------------------
 
-// process.on('exit', () => exitHandler({cleanup: true}));
-// process.on('SIGINT', () => exitHandler({exit: true}));
-// process.on('SIGUSR1', () => exitHandler({exit: true}));
-// process.on('SIGUSR2', () => exitHandler.bind({exit: true}));
-// process.on('uncaughtException', () => exitHandler.bind({exit: true}));
+process.on('exit', () => exitHandler({cleanup: true}));
+process.on('SIGINT', () => exitHandler({exit: true}));
+process.on('SIGUSR1', () => exitHandler({exit: true}));
+process.on('SIGUSR2', () => exitHandler.bind({exit: true}));
+process.on('uncaughtException', () => exitHandler.bind({exit: true}));
 
 main();

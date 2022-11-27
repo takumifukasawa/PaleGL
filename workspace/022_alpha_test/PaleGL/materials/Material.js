@@ -15,6 +15,7 @@ export class Material {
     faceSide;
     receiveShadow;
     isSkinning;
+    queue;
 
     static UniformTypes = {
         Float: "Float",
@@ -34,6 +35,7 @@ export class Material {
         blendType,
         renderQueue,
         isSkinning,
+        queue,
         uniforms = {}
     }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
@@ -102,6 +104,8 @@ export class Material {
                 value: 0.01
             }
         };
+        
+        this.queue = queue || null;
 
         this.uniforms = {...commonUniforms, ...uniforms};
     }

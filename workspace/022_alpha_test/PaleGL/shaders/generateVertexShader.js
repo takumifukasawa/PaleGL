@@ -7,12 +7,14 @@ import {transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingCommon.js";
 
+// TODO: out varying を centroid できるようにしたい
+
 export const generateVertexShader = ({
     isSkinning,
     jointNum,
     receiveShadow,
     useNormalMap,
-}) => {
+} = {}) => {
     
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,

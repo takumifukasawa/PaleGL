@@ -1,4 +1,4 @@
-﻿import {ActorTypes, BlendTypes, UniformTypes} from "./../constants.js";
+﻿import {ActorTypes, BlendTypes, RenderQueues, UniformTypes} from "./../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Material} from "../materials/Material.js";
@@ -197,6 +197,7 @@ export class ForwardRenderer {
         const meshActorsEachQueue = {
             skybox: [], // maybe only one
             opaque: [],
+            alphaTest: [],
             transparent: [],
         };
         const lightActors = [];
@@ -206,21 +207,28 @@ export class ForwardRenderer {
                 case ActorTypes.Skybox:
                     meshActorsEachQueue.skybox.push(actor);
                     // actor.transform.parent = camera.transform;
-                    break;
+                    return;
+
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
+                    switch(actor.material.queue) {
+                        case RenderQueues.AlphaTest:
+                            meshActorsEachQueue.alphaTest.push(actor);
+                            return;
+                    }
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:
                             meshActorsEachQueue.opaque.push(actor);
-                            break;
+                            return;
                         case BlendTypes.Transparent:
                         case BlendTypes.Additive:
                             meshActorsEachQueue.transparent.push(actor);
-                            break;
+                            return;
                         default:
                             throw "invalid blend type";
                     }
                     break;
+
                 case ActorTypes.Light:
                     lightActors.push(actor);
                     break;

@@ -840,7 +840,8 @@ const BlendTypes = {
 const RenderQueues = {
     Skybox: 1,
     Opaque: 2,
-    Transparent: 3
+    AlphaTest: 3,
+    Transparent: 4
 };
 
 const RenderbufferTypes = {
@@ -1331,6 +1332,7 @@ class Material {
     faceSide;
     receiveShadow;
     isSkinning;
+    queue;
 
     static UniformTypes = {
         Float: "Float",
@@ -1350,6 +1352,7 @@ class Material {
         blendType,
         renderQueue,
         isSkinning,
+        queue,
         uniforms = {}
     }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
@@ -1418,6 +1421,8 @@ class Material {
                 value: 0.01
             }
         };
+        
+        this.queue = queue || null;
 
         this.uniforms = {...commonUniforms, ...uniforms};
     }
@@ -3168,12 +3173,14 @@ vec4 calcPhongLighting() {
 
 
 
+// TODO: out varying を centroid できるようにしたい
+
 const generateVertexShader = ({
     isSkinning,
     jointNum,
     receiveShadow,
     useNormalMap,
-}) => {
+} = {}) => {
     
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
@@ -3756,7 +3763,6 @@ class PlaneGeometry extends Geometry {
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
         });
-        console.log(this.attributes)
     }
 }
 
@@ -3773,7 +3779,7 @@ class PlaneGeometry extends Geometry {
 
 
 // 法線が内側を向いた単位立方体
-const geometryObjText = `
+const skyboxGeometryObjText = `
 # Blender 3.3.1
 # www.blender.org
 mtllib skybox-cube.mtl
@@ -3886,7 +3892,7 @@ void main() {
 
 class Skybox extends Mesh {
     constructor({gpu, cubeMap}) {
-        const skyboxObjData = parseObj(geometryObjText);
+        const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
             attributes: {
@@ -4300,6 +4306,7 @@ class ForwardRenderer {
         const meshActorsEachQueue = {
             skybox: [], // maybe only one
             opaque: [],
+            alphaTest: [],
             transparent: [],
         };
         const lightActors = [];
@@ -4309,21 +4316,28 @@ class ForwardRenderer {
                 case ActorTypes.Skybox:
                     meshActorsEachQueue.skybox.push(actor);
                     // actor.transform.parent = camera.transform;
-                    break;
+                    return;
+
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
+                    switch(actor.material.queue) {
+                        case RenderQueues.AlphaTest:
+                            meshActorsEachQueue.alphaTest.push(actor);
+                            return;
+                    }
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:
                             meshActorsEachQueue.opaque.push(actor);
-                            break;
+                            return;
                         case BlendTypes.Transparent:
                         case BlendTypes.Additive:
                             meshActorsEachQueue.transparent.push(actor);
-                            break;
+                            return;
                         default:
                             throw "invalid blend type";
                     }
                     break;
+
                 case ActorTypes.Light:
                     lightActors.push(actor);
                     break;
@@ -5902,6 +5916,7 @@ export {PostProcess};
 export {PostProcessPass};
 
 // shaders
+export {generateVertexShader};
 
 // utilities
 

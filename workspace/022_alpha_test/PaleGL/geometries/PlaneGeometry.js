@@ -71,6 +71,5 @@ export class PlaneGeometry extends Geometry {
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
         });
-        console.log(this.attributes)
     }
 }

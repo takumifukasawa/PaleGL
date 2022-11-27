@@ -53,6 +53,7 @@ export {PostProcess} from "./postprocess/PostProcess.js";
 export {PostProcessPass} from "./postprocess/PostProcessPass.js";
 
 // shaders
+export {generateVertexShader} from "./shaders/generateVertexShader.js";
 
 // utilities
 

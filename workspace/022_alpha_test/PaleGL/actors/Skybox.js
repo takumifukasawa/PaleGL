@@ -11,7 +11,7 @@ import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 
 // 法線が内側を向いた単位立方体
-const geometryObjText = `
+const skyboxGeometryObjText = `
 # Blender 3.3.1
 # www.blender.org
 mtllib skybox-cube.mtl
@@ -124,7 +124,7 @@ void main() {
 
 export class Skybox extends Mesh {
     constructor({gpu, cubeMap}) {
-        const skyboxObjData = parseObj(geometryObjText);
+        const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
             attributes: {

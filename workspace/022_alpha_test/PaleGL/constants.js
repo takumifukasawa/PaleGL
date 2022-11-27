@@ -52,7 +52,8 @@ export const BlendTypes = {
 export const RenderQueues = {
     Skybox: 1,
     Opaque: 2,
-    Transparent: 3
+    AlphaTest: 3,
+    Transparent: 4
 };
 
 export const RenderbufferTypes = {

@@ -1,12 +1,9 @@
 ﻿import {
     PrimitiveTypes,
     GPU,
-    BlendTypes,
     CubeMapAxis,
-    FaceSide,
     UniformTypes,
     RenderTargetTypes,
-    AttributeUsageType,
     TextureWrapTypes,
     TextureFilterTypes,
     Vector3,
@@ -19,7 +16,6 @@
     PerspectiveCamera,
     Texture,
     loadImg,
-    BoxGeometry,
     PostProcess,
     FragmentPass,
     PlaneGeometry,
@@ -28,15 +24,14 @@
     loadGLTF,
     Geometry,
     Color,
-    CubeMap,
     loadCubeMap,
     Skybox,
     AxesHelper,
     RenderTarget,
     Engine,
-    Actor,
     PhongMaterial,
-    Vector2
+    Vector2,
+    generateVertexShader, RenderQueues,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -44,6 +39,7 @@ let debuggerGUI;
 let width, height;
 let objMesh;
 let floorPlaneMesh;
+let checkerPlaneMesh;
 let cubeMap;
 let floorDiffuseMap;
 let floorNormalMap;
@@ -135,7 +131,7 @@ void main() {
 }
 `;
 
-const gl = canvasElement.getContext('webgl2');
+const gl = canvasElement.getContext('webgl2', { antialias: false });
 
 const gpu = new GPU({gl});
 
@@ -189,14 +185,6 @@ captureScene.add(directionalLight);
 
 const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
-
-// const testOrtho = new OrthographicCamera(-5, 5, -5, 5, 1, 20);
-// testOrtho.visibleFrustum = true;
-// testOrtho.transform.setTranslation(new Vector3(-5, 5, 0));
-// testOrtho.transform.lookAt(new Vector3(0, 0, 0));
-// testOrtho.setRenderTarget(new DoubleBuffer({ width: 512, height: 512, gpu, useDepthBuffer: true }));
-// testOrtho.setRenderTarget(new RenderTarget({ width: 512, height: 512, gpu, useDepthBuffer: false }));
-// captureScene.add(testOrtho);
 
 const postProcess = new PostProcess({gpu, renderer});
 postProcess.addPass(new FragmentPass({
@@ -348,11 +336,9 @@ const main = async () => {
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
-   
     const skyboxMesh = new Skybox({
         gpu, cubeMap
     });
-    
 
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
@@ -372,9 +358,45 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
+    const checkerGeometry = new PlaneGeometry({gpu});
+    checkerPlaneMesh = new Mesh({
+        geometry: checkerGeometry,
+        material: new Material({
+            gpu,
+            vertexShader: generateVertexShader(),
+            fragmentShader: `#version 300 es
+            
+            precision mediump float;
+            
+            in vec2 vUv;
+            
+            out vec4 outColor;
+            
+            void main() {
+                float size = 4.;
+                float x = step(.5, fract(vUv.x * size / 2.));
+                float y = step(.5, fract(vUv.y * size / 2.));
+                float a = step(.5, x + y) - step(.5, x * y);
+                if(a < .5) discard;
+                // outColor = vec4(vUv, 0., 1);
+                outColor = vec4(vec3(a), 1);
+            }
+            `,
+            queue: RenderQueues.AlphaTest,
+        }),
+    });
+    checkerPlaneMesh.onStart = ({ actor }) => {
+        actor.transform.setScaling(Vector3.fill(5));
+        // actor.transform.setRotationX(-90);
+        actor.transform.setTranslation(new Vector3(0, 5, 0));
+        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
+        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
+    }
+    
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(objMesh);
+    captureScene.add(checkerPlaneMesh);
 
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
