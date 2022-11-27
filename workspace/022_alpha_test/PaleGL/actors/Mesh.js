@@ -38,7 +38,7 @@ export class Mesh extends Actor {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: this.material.vertexShader,
-                fragmentShader: this.material.fragmentShader,
+                fragmentShader: this.material.depthFragmentShader || generateDepthFragmentShader(),
                 uniforms: this.material.depthUniforms,
                 faceSide: this.material.faceSide
             });

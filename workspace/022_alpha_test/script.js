@@ -344,7 +344,7 @@ const main = async () => {
     });
     reflectSkyboxMesh.onStart = ({ actor }) => {
         actor.material.uniforms.uCubeTexture.value = cubeMap;
-        actor.transform.setTranslation(new Vector3(0, 2, -5));
+        actor.transform.setTranslation(new Vector3(-4, 2, 0));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
 
@@ -387,23 +387,10 @@ const main = async () => {
             alphaTest: 0.5,
             faceSide: FaceSide.Double
         }),
-        // material: new Material({
-        //     gpu,
-        //     vertexShader: objModelVertexShader,
-        //     fragmentShader: objModelFragmentShader,
-        //     primitiveType: PrimitiveTypes.Triangles,
-        //     uniforms: {
-        //         uCubeTexture: {
-        //             type: UniformTypes.CubeMap,
-        //             value: null
-        //         },
-        //     }
-        // }),
         castShadow: true
     });
     alphaTestPhongMesh.onStart = ({ actor }) => {
-        // actor.material.uniforms.uCubeTexture.value = cubeMap;
-        actor.transform.setTranslation(new Vector3(2, 2, 0));
+        actor.transform.setTranslation(new Vector3(4, 2, 0));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
