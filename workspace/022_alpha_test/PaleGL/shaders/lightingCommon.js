@@ -1,5 +1,5 @@
 
-export const alphaTestFunc = () => `
+export const alphaTestFragmentFunc = () => `
 void checkAlphaTest(float value, float threshold) {
     if(value < threshold) {
         discard;

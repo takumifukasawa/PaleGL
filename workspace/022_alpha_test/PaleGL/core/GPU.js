@@ -196,7 +196,7 @@ export class GPU {
                     }
                     break;
                 default:
-                    throw "invalid uniform type";
+                    throw `invalid uniform - name: ${uniformName}, type: ${type}`;
             }
         };
  

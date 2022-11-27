@@ -53,7 +53,7 @@ function replaceContents(data, isLast = false) {
         return data.replaceAll(/ from (\'|\").*\.js(\'|\")/g, "");
     }
 
-    const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from (\'|\")[a-zA-Z0-9\/\.\s\-_]*\.js(\'|\");?/g;
+    const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from (\'|\")[a-zA-Z0-9\/\.\s\-_]*(\.js)?(\'|\");?/g;
     const exportRegex = /export\s/g;
     return data
         .replaceAll(importRegex, "")
@@ -132,7 +132,7 @@ function bundle() {
     });
 }
 
-function watchFileHandler() {
+function watchFileHandler(current, prev) {
     console.log("start bundle.")
     bundle();
 }

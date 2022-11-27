@@ -2,6 +2,7 @@
 import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
+import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class Material {
     shader;
@@ -9,6 +10,7 @@ export class Material {
     blendType;
     renderQueue;
     uniforms = {};
+    depthUniforms;
     depthTest;
     depthWrite;
     alphaTest;
@@ -17,6 +19,10 @@ export class Material {
     receiveShadow;
     isSkinning;
     queue;
+    
+    vertexShader;
+    fragmentShader;
+    depthFragmentShader;
 
     static UniformTypes = {
         Float: "Float",
@@ -28,6 +34,7 @@ export class Material {
         gpu,
         vertexShader,
         fragmentShader,
+        depthFragmentShader,
         primitiveType,
         depthTest = null,
         depthWrite = null,
@@ -38,9 +45,14 @@ export class Material {
         renderQueue,
         isSkinning,
         queue,
-        uniforms = {}
+        uniforms = {},
+        depthUniforms = {}
     }) {
         this.shader = new Shader({gpu, vertexShader, fragmentShader});
+        this.vertexShader = vertexShader;
+        this.fragmentShader = fragmentShader;
+        this.depthFragmentShader = depthFragmentShader;
+        
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
 
@@ -93,6 +105,16 @@ export class Material {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero()
             },
+
+            ...(this.alphaTest ? {
+                uAlphaTestThreshold: {
+                    type: UniformTypes.Float,
+                    value: this.alphaTest
+                }
+            } : {})
+        };
+        
+        const shadowUniforms = this.receiveShadow ? {
             uShadowMap: {
                 type: UniformTypes.Texture,
                 value: null,
@@ -105,17 +127,13 @@ export class Material {
             uShadowBias: {
                 type: UniformTypes.Float,
                 value: 0.01
-            },
-            ...(this.alphaTest ? {
-                uAlphaTestThreshold: {
-                    type: UniformTypes.Float,
-                    value: this.alphaTest
-                }
-            } : {})
-        };
+            }
+        } : {};
         
         this.queue = queue || null;
 
-        this.uniforms = {...commonUniforms, ...uniforms};
+        this.uniforms = {...commonUniforms, ...shadowUniforms, ...uniforms};
+        
+        this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
 }

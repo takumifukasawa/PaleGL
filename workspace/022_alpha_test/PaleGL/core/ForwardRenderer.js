@@ -3,6 +3,7 @@ import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Material} from "../materials/Material.js";
 import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
+import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class ForwardRenderer {
     #gpu;
@@ -10,7 +11,9 @@ export class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
+    
     #depthMaterial;
+    // #depthMaterialAlphaTestQueue;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
         this.#gpu = gpu;
@@ -28,14 +31,22 @@ export class ForwardRenderer {
                 gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
             }
             `,
-            fragmentShader: `#version 300 es
-            precision mediump float;
-            out vec4 outColor;
-            void main() {
-                outColor = vec4(1., 1., 1., 1.);
-            }
-            `
-        })
+            fragmentShader: generateDepthFragmentShader({ alphaTest: false })
+        });
+        // this.#depthMaterialAlphaTestQueue = new Material({
+        //     gpu,
+        //     vertexShader: `#version 300 es
+        //     layout (location = 0) in vec3 aPosition;
+        //     uniform mat4 uWorldMatrix;
+        //     uniform mat4 uViewMatrix;
+        //     uniform mat4 uProjectionMatrix;
+        //     void main() {
+        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+        //     }
+        //     `,
+        //     fragmentShader: generateDepthFragmentShader({ alphaTest: true })
+        // });
+        // console.log(generateDepthFragmentShader({ alphaTest: true }))
     }
 
     setSize(width, height) {
@@ -74,8 +85,18 @@ export class ForwardRenderer {
             this.clear(0, 0, 0, 1);
 
             castShadowMeshActors.forEach(meshActor => {
-                // const material = meshActor.material;
-                const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
+                // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
+
+                const targetMaterial = meshActor.depthMaterial;
+                
+                // let targetMaterial = this.#depthMaterial;
+                // if(meshActor.depthMaterial) {
+                //     targetMaterial = meshActor.depthMaterial;
+                // } else {
+                //     if(meshActor.material.alphaTest) {
+                //         targetMaterial = this.#depthMaterialAlphaTestQueue;
+                //     }
+                // }
 
                 // TODO: material 側でやった方がよい？
                 if (targetMaterial.uniforms.uWorldMatrix) {

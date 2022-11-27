@@ -98,7 +98,7 @@ void main() {
 `;
 }
 
-export const generateDepthVertexShader = ({ isSkinning, useNormalMap, jointNum }) => {
+export const generateDepthVertexShader = ({ isSkinning, useNormalMap, jointNum } = {}) => {
 
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
@@ -119,7 +119,6 @@ ${attributes.join("\n")}
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
 ${transformVertexUniforms()}
-
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
