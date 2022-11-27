@@ -37,7 +37,8 @@ import {DebuggerGUI} from "./DebuggerGUI.js";
 
 let debuggerGUI;
 let width, height;
-let objMesh;
+let reflectSkyboxMesh;
+let alphaTestPhongMesh;
 let floorPlaneMesh;
 let checkerPlaneMesh;
 let cubeMap;
@@ -294,26 +295,26 @@ const main = async () => {
     await createGLTFSkinnedMesh()
     captureScene.add(gltfActor);
     
-    const objData = await loadObj("./models/sphere-32-32.obj");
-    objMesh = new Mesh({
+    const sphereGeometryData = await loadObj("./models/sphere-32-32.obj");
+    reflectSkyboxMesh = new Mesh({
         geometry: new Geometry({
             gpu,
             attributes: {
                 position: {
-                    data: objData.positions,
+                    data: sphereGeometryData.positions,
                     size: 3
                 },
                 uv: {
-                    data: objData.uvs,
+                    data: sphereGeometryData.uvs,
                     size: 2,
                 },
                 normal: {
-                    data: objData.normals,
+                    data: sphereGeometryData.normals,
                     size: 3
                 },
             },
-            indices: objData.indices,
-            drawCount: objData.indices.length,
+            indices: sphereGeometryData.indices,
+            drawCount: sphereGeometryData.indices.length,
             castShadow: true,
         }),
         material: new Material({
@@ -330,9 +331,65 @@ const main = async () => {
         }),
         castShadow: true
     });
-    objMesh.onStart = ({ actor }) => {
+    reflectSkyboxMesh.onStart = ({ actor }) => {
         actor.material.uniforms.uCubeTexture.value = cubeMap;
         actor.transform.setTranslation(new Vector3(0, 2, -5));
+        actor.transform.setScaling(new Vector3(2, 2, 2));
+    }
+
+    const sphereTangentAndNormals = Geometry.createTangentsAndBinormals(sphereGeometryData.normals);
+    alphaTestPhongMesh = new Mesh({
+        geometry: new Geometry({
+            gpu,
+            attributes: {
+                position: {
+                    data: sphereGeometryData.positions,
+                    size: 3
+                },
+                uv: {
+                    data: sphereGeometryData.uvs,
+                    size: 2,
+                },
+                normal: {
+                    data: sphereGeometryData.normals,
+                    size: 3
+                },
+                tangent: {
+                    data: sphereTangentAndNormals.tangents,
+                    size: 3
+                },
+                binormal: {
+                    data: sphereTangentAndNormals.binormals,
+                    size: 3
+                },
+            },
+            indices: sphereGeometryData.indices,
+            drawCount: sphereGeometryData.indices.length,
+            castShadow: true,
+        }),
+        material: new PhongMaterial({
+            gpu,
+            diffuseMap: floorDiffuseMap,
+            normalMap: floorNormalMap,
+            receiveShadow: true
+        }),
+        // material: new Material({
+        //     gpu,
+        //     vertexShader: objModelVertexShader,
+        //     fragmentShader: objModelFragmentShader,
+        //     primitiveType: PrimitiveTypes.Triangles,
+        //     uniforms: {
+        //         uCubeTexture: {
+        //             type: UniformTypes.CubeMap,
+        //             value: null
+        //         },
+        //     }
+        // }),
+        castShadow: true
+    });
+    alphaTestPhongMesh.onStart = ({ actor }) => {
+        // actor.material.uniforms.uCubeTexture.value = cubeMap;
+        actor.transform.setTranslation(new Vector3(0, 2, 0));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
     
@@ -395,7 +452,8 @@ const main = async () => {
     
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
-    captureScene.add(objMesh);
+    captureScene.add(alphaTestPhongMesh);
+    captureScene.add(reflectSkyboxMesh);
     captureScene.add(checkerPlaneMesh);
 
     captureSceneCamera.transform.position = targetCameraPosition.clone();

@@ -1328,6 +1328,7 @@ class Material {
     uniforms = {};
     depthTest;
     depthWrite;
+    alphaTest;
     culling;
     faceSide;
     receiveShadow;
@@ -1347,6 +1348,7 @@ class Material {
         primitiveType,
         depthTest = null,
         depthWrite = null,
+        alphaTest = null,
         faceSide = FaceSide.Front,
         receiveShadow = false,
         blendType,
@@ -1361,6 +1363,7 @@ class Material {
 
         this.depthTest = depthTest !== null ? depthTest : true;
         this.depthWrite = depthWrite;
+        this.alphaTest = alphaTest;
 
         this.faceSide = faceSide;
         this.receiveShadow = !!receiveShadow;
@@ -3067,6 +3070,15 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
     return resultColor;
 } 
 `;
+
+const alphaTestFunc = () => `
+void checkAlphaTest(vec4 color, float threshold) {
+    if(color.a < threshold) {
+        discard;
+    }
+}
+`;
+
 
 const normalMapVertexAttributes = (beginIndex) => [
 `layout(location = ${beginIndex + 0}) in vec3 aTangent;`,
@@ -5500,7 +5512,7 @@ ${this.x}, ${this.y}
 
 
 
-const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 300 es
+const generateFragmentShader = ({ receiveShadow, useNormalMap, alphaTest }) => `#version 300 es
 
 precision mediump float;
 
@@ -5533,6 +5545,7 @@ out vec4 outColor;
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
+${alphaTest ? alphaTestFunc() : ""}    
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -5561,8 +5574,10 @@ void main() {
         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
         : ""
     }
-    
-    // resultColor.xyz = vNormal;
+    ${alphaTest
+        ? `checkAlphaTest(resultColor);`
+        : ""
+    }
 
     outColor = resultColor;
 }
@@ -5635,6 +5650,7 @@ class PhongMaterial extends Material {
         const fragmentShader = generateFragmentShader({
             receiveShadow: options.receiveShadow,
             useNormalMap,
+            alphaTest: options.alphaTest
         });
         
         const uniforms = { ...baseUniforms, ...(options.uniforms ?  options.uniforms : {})};

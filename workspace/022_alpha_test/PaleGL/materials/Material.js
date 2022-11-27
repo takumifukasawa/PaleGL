@@ -11,6 +11,7 @@ export class Material {
     uniforms = {};
     depthTest;
     depthWrite;
+    alphaTest;
     culling;
     faceSide;
     receiveShadow;
@@ -30,6 +31,7 @@ export class Material {
         primitiveType,
         depthTest = null,
         depthWrite = null,
+        alphaTest = null,
         faceSide = FaceSide.Front,
         receiveShadow = false,
         blendType,
@@ -44,6 +46,7 @@ export class Material {
 
         this.depthTest = depthTest !== null ? depthTest : true;
         this.depthWrite = depthWrite;
+        this.alphaTest = alphaTest;
 
         this.faceSide = faceSide;
         this.receiveShadow = !!receiveShadow;

@@ -1,4 +1,13 @@
 
+export const alphaTestFunc = () => `
+void checkAlphaTest(vec4 color, float threshold) {
+    if(color.a < threshold) {
+        discard;
+    }
+}
+`;
+
+
 export const normalMapVertexAttributes = (beginIndex) => [
 `layout(location = ${beginIndex + 0}) in vec3 aTangent;`,
 `layout(location = ${beginIndex + 1}) in vec3 aBinormal;`

@@ -7,6 +7,7 @@ import {
 } from "../shaders/shadowMapShader.js";
 import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {
+    alphaTestFunc,
     directionalLightFragmentUniforms,
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
@@ -16,7 +17,7 @@ import {UniformTypes} from "../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector2} from "../math/Vector2.js";
 
-const generateFragmentShader = ({ receiveShadow, useNormalMap }) => `#version 300 es
+const generateFragmentShader = ({ receiveShadow, useNormalMap, alphaTest }) => `#version 300 es
 
 precision mediump float;
 
@@ -49,6 +50,7 @@ out vec4 outColor;
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
+${alphaTest ? alphaTestFunc() : ""}    
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -77,8 +79,10 @@ void main() {
         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
         : ""
     }
-    
-    // resultColor.xyz = vNormal;
+    ${alphaTest
+        ? `checkAlphaTest(resultColor);`
+        : ""
+    }
 
     outColor = resultColor;
 }
@@ -151,6 +155,7 @@ export class PhongMaterial extends Material {
         const fragmentShader = generateFragmentShader({
             receiveShadow: options.receiveShadow,
             useNormalMap,
+            alphaTest: options.alphaTest
         });
         
         const uniforms = { ...baseUniforms, ...(options.uniforms ?  options.uniforms : {})};
