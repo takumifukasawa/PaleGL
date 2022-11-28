@@ -4414,6 +4414,7 @@ class ForwardRenderer {
         };
         const lightActors = [];
 
+        // TODO: 複数material対応
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -4423,10 +4424,14 @@ class ForwardRenderer {
 
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
-                    switch(actor.material.queue) {
-                        case RenderQueues.AlphaTest:
-                            meshActorsEachQueue.alphaTest.push(actor);
-                            return;
+                    // switch(actor.material.queue) {
+                    //     case RenderQueues.AlphaTest:
+                    //         meshActorsEachQueue.alphaTest.push(actor);
+                    //         return;
+                    // }
+                    if(!!actor.material.alphaTest) {
+                        meshActorsEachQueue.alphaTest.push(actor);
+                        return;
                     }
                     switch (actor.material.blendType) {
                         case BlendTypes.Opaque:

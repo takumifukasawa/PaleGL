@@ -229,7 +229,6 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    console.log("hogehoge", await loadGLTF({ gpu, path: "./models/cube-material-3.gltf" }));
     gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
@@ -384,7 +383,7 @@ const main = async () => {
             diffuseMap: floorDiffuseWithCheckerAlphaMap,
             normalMap: floorNormalMap,
             receiveShadow: true,
-            queue: RenderQueues.AlphaTest,
+            // queue: RenderQueues.AlphaTest,
             alphaTest: 0.5,
             faceSide: FaceSide.Double
         }),
@@ -441,7 +440,7 @@ const main = async () => {
                 outColor = vec4(vec3(a), 1);
             }
             `,
-            queue: RenderQueues.AlphaTest,
+            // queue: RenderQueues.AlphaTest,
         }),
     });
     checkerPlaneMesh.onStart = ({ actor }) => {
