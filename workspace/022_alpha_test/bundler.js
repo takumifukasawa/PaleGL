@@ -50,14 +50,15 @@ function getDirectories(searchPath) {
 function replaceContents(data, isLast = false) {
     // 手動でrootのmjsを末尾においているため
     if (isLast) {
-        return data.replaceAll(/ from (\'|\").*\.js(\'|\")/g, "");
+        return data
+            .replace(/ from (\'|\").*\.js(\'|\")/g, "");
     }
 
     const importRegex = /import \{[a-zA-Z0-9\s\,\/]*\} from (\'|\")[a-zA-Z0-9\/\.\s\-_]*(\.js)?(\'|\");?/g;
     const exportRegex = /export\s/g;
     return data
-        .replaceAll(importRegex, "")
-        .replaceAll(exportRegex, "");
+        .replace(importRegex, "")
+        .replace(exportRegex, "");
 }
 
 function hasItemInImportMaps(path) {
