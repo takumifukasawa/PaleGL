@@ -134,14 +134,12 @@ export class SkinnedMesh extends Mesh {
                 gpu,
                 attributes: {
                     position: {
-                        // data: new Array(this.#boneIndicesForLines.length * 3),
                         data: new Array(this.#boneOrderedIndex.length * 3),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
                 },
-                // indices: this.#boneIndicesForLines,
-                drawCount: this.#boneIndicesForLines.length               
+                drawCount: this.#boneOrderedIndex.length
             }),
             material: new Material({
                 gpu,
