@@ -3525,14 +3525,12 @@ class SkinnedMesh extends Mesh {
                 gpu,
                 attributes: {
                     position: {
-                        // data: new Array(this.#boneIndicesForLines.length * 3),
                         data: new Array(this.#boneOrderedIndex.length * 3),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
                 },
-                // indices: this.#boneIndicesForLines,
-                drawCount: this.#boneIndicesForLines.length               
+                drawCount: this.#boneOrderedIndex.length
             }),
             material: new Material({
                 gpu,
@@ -5596,90 +5594,6 @@ ${this.x}, ${this.y}
 
 
 
-
-
-// const generatePhongMaterialFragmentShader = ({ receiveShadow, useNormalMap, alphaTest }) => `#version 300 es
-// 
-// precision mediump float;
-// 
-// uniform sampler2D uDiffuseMap; 
-// uniform vec2 uDiffuseMapUvScale;
-// ${useNormalMap ? normalMapFragmentUniforms() : ""}
-// ${receiveShadow ? shadowMapFragmentUniforms() : ""}
-// uniform vec3 uViewPosition;
-// ${alphaTest ? alphaTestFragmentUniforms() : ""}
-// 
-// ${directionalLightFragmentUniforms()}
-// 
-// struct Surface {
-//     vec3 worldNormal;
-//     vec3 worldPosition;
-//     vec4 diffuseColor;
-// };
-// 
-// struct Camera {
-//     vec3 worldPosition;
-// };
-// 
-// in vec2 vUv;
-// in vec3 vNormal;
-// ${receiveShadow ? shadowMapFragmentVaryings() : ""}
-// ${normalMapFragmentVarying()}
-// in vec3 vWorldPosition;
-// 
-// out vec4 outColor;
-// 
-// ${phongSurfaceDirectionalLightFunc()}
-// ${useNormalMap ? normalMapFragmentFunc() : ""}
-// ${receiveShadow ? shadowMapFragmentFunc() : ""}
-// ${alphaTest ? alphaTestFragmentFunc() : ""}    
-// 
-// void main() {
-//     vec2 uv = vUv * uDiffuseMapUvScale;
-//    
-//     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-//     
-//     ${useNormalMap
-//         ? "vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);"
-//         : "vec3 worldNormal = normalize(vNormal);"
-//     }
-// 
-//     Surface surface;
-//     surface.worldPosition = vWorldPosition;
-//     surface.worldNormal = worldNormal;
-//     surface.diffuseColor = diffuseMapColor;
-//     
-//     Camera camera;
-//     camera.worldPosition = uViewPosition;
-//     
-//     vec4 resultColor = vec4(0, 0, 0, 1);
-//     
-//     // directional light
-//     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-//     
-//     ${receiveShadow
-//         ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
-//         : ""
-//     }
-//     ${alphaTest
-//         ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
-//         : ""
-//     }
-// 
-//     outColor = resultColor;
-// }
-// `;
-
-// const generateDepthFragmentShader = () => `#version 300 es
-//                 
-// precision mediump float;
-// 
-// out vec4 outColor;
-// 
-// void main() {
-//     outColor = vec4(1., 1., 1., 1.);
-// }
-// `;
 
 class PhongMaterial extends Material {
     constructor({
