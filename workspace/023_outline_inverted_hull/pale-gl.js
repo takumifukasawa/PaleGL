@@ -4421,7 +4421,6 @@ class ForwardRenderer {
                     meshActorsEachQueue.skybox.push(actor);
                     // actor.transform.parent = camera.transform;
                     return;
-
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
                     // switch(actor.material.queue) {
