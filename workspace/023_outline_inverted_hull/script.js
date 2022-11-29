@@ -247,14 +247,24 @@ const createGLTFSkinnedMesh = async () => {
     
     skinningMeshes.forEach(skinningMesh => {
         skinningMesh.castShadow = true;
-        skinningMesh.material = new PhongMaterial({
-            gpu,
-            diffuseMap: floorDiffuseMap,
-            normalMap: floorNormalMap,
-            // TODO: 毎回これ入れるのめんどいので共通化したい
-            jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-            receiveShadow: true
-        });
+        skinningMesh.materials = [
+            new PhongMaterial({
+                gpu,
+                diffuseMap: floorDiffuseMap,
+                normalMap: floorNormalMap,
+                // TODO: 毎回これ入れるのめんどいので共通化したい
+                jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                receiveShadow: true
+            }),
+            new PhongMaterial({
+                gpu,
+                diffuseMap: floorDiffuseMap,
+                normalMap: floorNormalMap,
+                // TODO: 毎回これ入れるのめんどいので共通化したい
+                jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                receiveShadow: true
+            }),          
+        ];
     });
 }
 

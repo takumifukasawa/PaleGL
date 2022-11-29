@@ -51,7 +51,8 @@ export class SkinnedMesh extends Mesh {
                     jointNum: this.boneCount,
                 }),
                 fragmentShader: generateDepthFragmentShader({
-                    alphaTest: !!this.material.alphaTest
+                    // alphaTest: !!this.material.alphaTest
+                    alphaTest: !!this.mainMaterial.alphaTest
                 }),
                 uniforms: {
                     uJointMatrices: {
@@ -59,13 +60,13 @@ export class SkinnedMesh extends Mesh {
                         value: null
                     },
                 },
-                alphaTest: this.material.alphaTest
+                alphaTest: this.mainMaterial.alphaTest
             });
         // }
 
         this.bones.calcBoneOffsetMatrix();
         // this.bones.calcJointMatrix();
-        
+
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
         
         // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
@@ -194,7 +195,9 @@ export class SkinnedMesh extends Mesh {
        // console.log("-------") 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
 
-        this.material.uniforms.uJointMatrices.value = jointMatrices;
+        this.materials.forEach(material => {
+            material.uniforms.uJointMatrices.value = jointMatrices;
+        });
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }

@@ -15,11 +15,17 @@ export class Mesh extends Actor {
         if(this.materials.length > 1) {
             console.warn("[Mesh.material getter] materials length > 1. material is head of materials.")
         }
-        return this.materials[0];
+        // return this.materials[0];
+        return this.mainMaterial;
     }
     
     set material(material) {
         this.materials = [material];
+    }
+    
+    get mainMaterial() {
+        // materiamainMaterial.alphaTest
+        return this.materials[0];
     }
     
     constructor({
@@ -34,6 +40,7 @@ export class Mesh extends Actor {
         super(actorType);
         this.geometry = geometry;
         // this.material = material;
+        // TODO: check material is array
         this.materials = material !== null ? [material] : materials;
         this.depthMaterial = depthMaterial;
         this.castShadow = !!castShadow;

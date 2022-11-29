@@ -1468,11 +1468,17 @@ class Mesh extends Actor {
         if(this.materials.length > 1) {
             console.warn("[Mesh.material getter] materials length > 1. material is head of materials.")
         }
-        return this.materials[0];
+        // return this.materials[0];
+        return this.mainMaterial;
     }
     
     set material(material) {
         this.materials = [material];
+    }
+    
+    get mainMaterial() {
+        // materiamainMaterial.alphaTest
+        return this.materials[0];
     }
     
     constructor({
@@ -1487,6 +1493,7 @@ class Mesh extends Actor {
         super(actorType);
         this.geometry = geometry;
         // this.material = material;
+        // TODO: check material is array
         this.materials = material !== null ? [material] : materials;
         this.depthMaterial = depthMaterial;
         this.castShadow = !!castShadow;
@@ -3478,7 +3485,8 @@ class SkinnedMesh extends Mesh {
                     jointNum: this.boneCount,
                 }),
                 fragmentShader: generateDepthFragmentShader({
-                    alphaTest: !!this.material.alphaTest
+                    // alphaTest: !!this.material.alphaTest
+                    alphaTest: !!this.mainMaterial.alphaTest
                 }),
                 uniforms: {
                     uJointMatrices: {
@@ -3486,13 +3494,13 @@ class SkinnedMesh extends Mesh {
                         value: null
                     },
                 },
-                alphaTest: this.material.alphaTest
+                alphaTest: this.mainMaterial.alphaTest
             });
         // }
 
         this.bones.calcBoneOffsetMatrix();
         // this.bones.calcJointMatrix();
-        
+
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
         
         // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
@@ -3621,7 +3629,9 @@ class SkinnedMesh extends Mesh {
        // console.log("-------") 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
 
-        this.material.uniforms.uJointMatrices.value = jointMatrices;
+        this.materials.forEach(material => {
+            material.uniforms.uJointMatrices.value = jointMatrices;
+        });
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
