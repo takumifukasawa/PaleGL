@@ -253,11 +253,11 @@ const createGLTFSkinnedMesh = async () => {
                 diffuseMap: floorDiffuseMap,
                 normalMap: floorNormalMap,
                 // TODO: 毎回これ入れるのめんどいので共通化したい
-                // jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
                 receiveShadow: true,
                 uniforms: {
                     uJointMatrices: {
                         type: UniformTypes.Matrix4Array,
+                        // TODO: 毎回これ入れるのめんどいので共通化したい
                         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
                     }
                 }
@@ -285,6 +285,7 @@ const createGLTFSkinnedMesh = async () => {
                 uniforms: {
                     uJointMatrices: {
                         type: UniformTypes.Matrix4Array,
+                        // TODO: 毎回これ入れるのめんどいので共通化したい
                         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
                     }
                 },
