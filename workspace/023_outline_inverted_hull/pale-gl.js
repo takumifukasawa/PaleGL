@@ -4275,10 +4275,11 @@ class ForwardRenderer {
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
 
-            castShadowMeshActors.forEach(meshActor => {
+            castShadowMeshActors.forEach(({ actor }) => {
                 // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
 
-                const targetMaterial = meshActor.depthMaterial;
+                // const targetMaterial = actor.depthMaterial;
+                const targetMaterial = actor.depthMaterial;
                 
                 // let targetMaterial = this.#depthMaterial;
                 // if(meshActor.depthMaterial) {
@@ -4291,7 +4292,7 @@ class ForwardRenderer {
 
                 // TODO: material 側でやった方がよい？
                 if (targetMaterial.uniforms.uWorldMatrix) {
-                    targetMaterial.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
+                    targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
                 }
                 if (targetMaterial.uniforms.uViewMatrix) {
                     targetMaterial.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
@@ -4300,11 +4301,18 @@ class ForwardRenderer {
                     targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
                 
-                this.renderMesh(meshActor.geometry, targetMaterial);
+                this.renderMesh(actor.geometry, targetMaterial);
             });
         });
     }
     
+   #buildRenderMeshInfo(actor, materialIndex = 0) {
+        return {
+            actor,
+            materialIndex
+        }
+    }
+
     #scenePass(sortedMeshActors, camera, lightActors) {
 
         // TODO: refactor
@@ -4315,15 +4323,15 @@ class ForwardRenderer {
             camera.clearColor.w
         );
 
-        sortedMeshActors.forEach(meshActor => {
-            switch (meshActor.type) {
+        sortedMeshActors.forEach(({ actor, materialIndex }) => {
+            switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
-                    meshActor.updateTransform(camera);
+                    actor.updateTransform(camera);
                     break;
             }
 
-            const targetMaterial = meshActor.material;
+            const targetMaterial = actor.materials[materialIndex];
 
             // reset
             // NOTE: 余計なresetとかしない方がいい気がする
@@ -4333,7 +4341,7 @@ class ForwardRenderer {
 
             // TODO: material 側でやった方がよい？
             if (targetMaterial.uniforms.uWorldMatrix) {
-                targetMaterial.uniforms.uWorldMatrix.value = meshActor.transform.worldMatrix;
+                targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
             }
             if (targetMaterial.uniforms.uViewMatrix) {
                 targetMaterial.uniforms.uViewMatrix.value = camera.viewMatrix;
@@ -4342,7 +4350,7 @@ class ForwardRenderer {
                 targetMaterial.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
             }
             if (targetMaterial.uniforms.uNormalMatrix) {
-                targetMaterial.uniforms.uNormalMatrix.value = meshActor.transform.worldMatrix.clone().invert().transpose();
+                targetMaterial.uniforms.uNormalMatrix.value = actor.transform.worldMatrix.clone().invert().transpose();
             }
             if (targetMaterial.uniforms.uViewPosition) {
                 targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
@@ -4401,48 +4409,51 @@ class ForwardRenderer {
                 }
             });
 
-            this.renderMesh(meshActor.geometry, meshActor.material);
+            this.renderMesh(actor.geometry, targetMaterial);
         });
     }
-
+    
     render(scene, camera) {
-        const meshActorsEachQueue = {
+        const renderMeshInfoEachQueue = {
             skybox: [], // maybe only one
             opaque: [],
             alphaTest: [],
             transparent: [],
         };
         const lightActors = [];
-
+        
+       
         // TODO: 複数material対応
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    meshActorsEachQueue.skybox.push(actor);
+                    // renderMeshInfoEachQueue.skybox.push(actor);
+                    renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
+                    // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
                     return;
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
-                    // switch(actor.material.queue) {
-                    //     case RenderQueues.AlphaTest:
-                    //         meshActorsEachQueue.alphaTest.push(actor);
-                    //         return;
-                    // }
-                    if(!!actor.material.alphaTest) {
-                        meshActorsEachQueue.alphaTest.push(actor);
-                        return;
-                    }
-                    switch (actor.material.blendType) {
-                        case BlendTypes.Opaque:
-                            meshActorsEachQueue.opaque.push(actor);
+                    actor.materials.forEach((material, i) => {
+                        if(!!material.alphaTest) {
+                            // renderMeshInfoEachQueue.alphaTest.push(actor);
+                            renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
                             return;
-                        case BlendTypes.Transparent:
-                        case BlendTypes.Additive:
-                            meshActorsEachQueue.transparent.push(actor);
-                            return;
-                        default:
-                            throw "invalid blend type";
-                    }
+                        }
+                        switch (material.blendType) {
+                            case BlendTypes.Opaque:
+                                // renderMeshInfoEachQueue.opaque.push(actor);
+                                renderMeshInfoEachQueue.opaque.push(this.#buildRenderMeshInfo(actor, i));
+                                return;
+                            case BlendTypes.Transparent:
+                            case BlendTypes.Additive:
+                                // renderMeshInfoEachQueue.transparent.push(actor);
+                                renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
+                                return;
+                            default:
+                                throw "invalid blend type";
+                        }
+                    });
                     break;
 
                 case ActorTypes.Light:
@@ -4454,8 +4465,9 @@ class ForwardRenderer {
         // TODO: depth sort 
 
         // sort by render queue
-        const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
-        const sortedMeshActors = Object.keys(meshActorsEachQueue).map(key => (meshActorsEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        // const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
+        const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
+        const sortedMeshActors = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
         
         // ------------------------------------------------------------------------------
         // 1. shadow pass
@@ -4464,11 +4476,11 @@ class ForwardRenderer {
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
         
         if(castShadowLightActors.length > 0) {
-            const castShadowMeshActors = sortedMeshActors.filter(meshActor => {
-                if(meshActor.type === ActorTypes.Skybox) {
+            const castShadowMeshActors = sortedMeshActors.filter(({ actor }) => {
+                if(actor.type === ActorTypes.Skybox) {
                     return false;
                 }
-                return meshActor.castShadow;
+                return actor.castShadow;
             });
             if(castShadowMeshActors.length > 0) {
                 this.#shadowPass(castShadowLightActors, castShadowMeshActors);
