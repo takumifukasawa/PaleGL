@@ -51,6 +51,7 @@ let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
 let outlineColor = new Color(0, 0, 0, 1);
 let outlineAlpha = 1;
+let outlineOffset = 0.05;
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -271,8 +272,11 @@ const createGLTFSkinnedMesh = async () => {
                     jointNum: skinningMesh.boneCount,
                     receiveShadow: false,
                     isSkinning: true,
+                    insertUniforms: `
+uniform float uOutlineOffset;
+                    `,
                     localPositionProcess: `
-                    localPosition = vec4(aPosition + aNormal * 0.05, 1.);
+    localPosition = vec4(aPosition + aNormal * uOutlineOffset, 1.);
                     `,
                 }),
                 fragmentShader: `#version 300 es
@@ -297,6 +301,10 @@ const createGLTFSkinnedMesh = async () => {
                         type: UniformTypes.Color,
                         value: outlineColor
                     },
+                    uOutlineOffset: {
+                        type: UniformTypes.Float,
+                        value: outlineOffset
+                    }
                 },
                 faceSide: FaceSide.Back,
                 blendType: BlendTypes.Transparent
@@ -653,6 +661,20 @@ function initDebugger() {
             outlineColor.a = outlineAlpha;
             skinningMeshes.forEach(skinningMesh => {
                 skinningMesh.materials[1].uniforms.uOutlineColor.value = outlineColor;
+            });
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "outline offset",
+        initialValue: outlineOffset,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            outlineOffset = value;
+            skinningMeshes.forEach(skinningMesh => {
+                skinningMesh.materials[1].uniforms.uOutlineOffset.value = outlineOffset;
             });
         }
     });

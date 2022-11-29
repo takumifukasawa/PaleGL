@@ -3304,6 +3304,7 @@ const generateVertexShader = ({
     receiveShadow,
     useNormalMap,
     localPositionProcess,
+    insertUniforms,
 } = {}) => {
     
     const attributes = [
@@ -3317,7 +3318,7 @@ const generateVertexShader = ({
     if(useNormalMap) {
         attributes.push(...normalMapVertexAttributes(attributes.length));
     }
-        
+
     return `#version 300 es
 
 ${attributes.join("\n")}
@@ -3334,6 +3335,7 @@ ${receiveShadow ? shadowMapVertexVaryings() : "" }
 
 ${receiveShadow ? shadowMapVertexUniforms() : ""}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
+${insertUniforms || ""}
 
 void main() {
     ${isSkinning ? `
