@@ -1328,9 +1328,11 @@ class Material {
     vertexShader;
     fragmentShader;
     depthFragmentShader;
+   
+    get isCompiledShader() {
+        return !!this.shader;
+    }
     
-    pass = []; // material pass
-
     constructor({
         gpu,
         vertexShader,
@@ -1440,7 +1442,7 @@ class Material {
     
     start(options) {
         const { gpu } = options;
-        if(!this.shader) {
+        if(!this.isCompiledShader) {
             this.shader = new Shader({
                 gpu,
                 vertexShader: this.vertexShader,
