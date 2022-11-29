@@ -1,5 +1,6 @@
 ﻿import {TimeSkipper} from "../utilities/TimeSkipper.js";
 import {TimeAccumulator} from "../utilities/TimeAccumulator.js";
+import {ActorTypes} from "../constants.js";
 
 export class Engine {
     #renderer;
@@ -71,7 +72,18 @@ export class Engine {
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        this.#scene.traverse((actor) => actor.update({ gpu: this.#gpu, time, deltaTime }));
+        this.#scene.traverse((actor) => {
+            actor.update({gpu: this.#gpu, time, deltaTime});
+            switch(actor.type) {
+                case ActorTypes.Skybox:
+                case ActorTypes.Mesh:
+                case ActorTypes.SkinnedMesh:
+                    actor.beforeRender({ gpu: this.#gpu });
+                    break;
+                default:
+                    break;
+            }
+        });
         
         this.render();
     }

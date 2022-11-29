@@ -1351,7 +1351,9 @@ class Material {
         uniforms = {},
         depthUniforms = {}
     }) {
+        // 外側から任意のタイミングでcompileした方が都合が良さそう
         // this.shader = new Shader({gpu, vertexShader, fragmentShader});
+
         this.vertexShader = vertexShader;
         this.fragmentShader = fragmentShader;
         this.depthFragmentShader = depthFragmentShader;
@@ -1440,15 +1442,12 @@ class Material {
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
     
-    start(options) {
-        const { gpu } = options;
-        if(!this.isCompiledShader) {
-            this.shader = new Shader({
-                gpu,
-                vertexShader: this.vertexShader,
-                fragmentShader: this.fragmentShader
-            });
-        }
+    compileShader({ gpu }) {
+        this.shader = new Shader({
+            gpu,
+            vertexShader: this.vertexShader,
+            fragmentShader: this.fragmentShader
+        });
     }
 }
 
@@ -1511,13 +1510,20 @@ class Mesh extends Actor {
                 faceSide: this.material.faceSide
             });
         }
-      
+    }
+
+    // beforeRenderはActorに持たせても良い
+    beforeRender(options) {
+        const { gpu } = options;
+
         this.materials.forEach(material => {
-            material.start(options);
+            if(!material.isCompiledShader) {
+                material.compileShader({ gpu });
+            }
         });
-        if(this.depthMaterial) {
-            this.depthMaterial.start(options)
-        }
+        if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
+            this.depthMaterial.compileShader({ gpu });
+        }       
     }
 }
 ﻿
@@ -3482,8 +3488,6 @@ class SkinnedMesh extends Mesh {
                 },
                 alphaTest: this.material.alphaTest
             });
-            this.depthMaterial.start({ gpu });
-            // this.depthMaterial = depthMaterial;
         // }
 
         this.bones.calcBoneOffsetMatrix();
@@ -4128,6 +4132,7 @@ class TimeAccumulator {
 ﻿
 
 
+
 class Engine {
     #renderer;
     #fixedUpdateFrameTimer;
@@ -4198,7 +4203,18 @@ class Engine {
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        this.#scene.traverse((actor) => actor.update({ gpu: this.#gpu, time, deltaTime }));
+        this.#scene.traverse((actor) => {
+            actor.update({gpu: this.#gpu, time, deltaTime});
+            switch(actor.type) {
+                case ActorTypes.Skybox:
+                case ActorTypes.Mesh:
+                case ActorTypes.SkinnedMesh:
+                    actor.beforeRender({ gpu: this.#gpu });
+                    break;
+                default:
+                    break;
+            }
+        });
         
         this.render();
     }
@@ -4325,7 +4341,7 @@ class ForwardRenderer {
                 if (targetMaterial.uniforms.uProjectionMatrix) {
                     targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
-               
+              
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
@@ -4563,7 +4579,7 @@ class ForwardRenderer {
 
         // setup depth test
         const depthTest = material.depthTest;
-        
+       
         // draw
         this.#gpu.draw(
             geometry.drawCount,

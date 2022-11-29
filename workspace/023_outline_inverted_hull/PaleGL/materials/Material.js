@@ -46,7 +46,9 @@ export class Material {
         uniforms = {},
         depthUniforms = {}
     }) {
+        // 外側から任意のタイミングでcompileした方が都合が良さそう
         // this.shader = new Shader({gpu, vertexShader, fragmentShader});
+
         this.vertexShader = vertexShader;
         this.fragmentShader = fragmentShader;
         this.depthFragmentShader = depthFragmentShader;
@@ -135,14 +137,11 @@ export class Material {
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
     
-    start(options) {
-        const { gpu } = options;
-        if(!this.isCompiledShader) {
-            this.shader = new Shader({
-                gpu,
-                vertexShader: this.vertexShader,
-                fragmentShader: this.fragmentShader
-            });
-        }
+    compileShader({ gpu }) {
+        this.shader = new Shader({
+            gpu,
+            vertexShader: this.vertexShader,
+            fragmentShader: this.fragmentShader
+        });
     }
 }

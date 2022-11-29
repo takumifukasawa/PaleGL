@@ -110,7 +110,7 @@ export class ForwardRenderer {
                 if (targetMaterial.uniforms.uProjectionMatrix) {
                     targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
-               
+              
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
@@ -348,7 +348,7 @@ export class ForwardRenderer {
 
         // setup depth test
         const depthTest = material.depthTest;
-        
+       
         // draw
         this.#gpu.draw(
             geometry.drawCount,

@@ -57,12 +57,19 @@ export class Mesh extends Actor {
                 faceSide: this.material.faceSide
             });
         }
-      
+    }
+
+    // beforeRenderはActorに持たせても良い
+    beforeRender(options) {
+        const { gpu } = options;
+
         this.materials.forEach(material => {
-            material.start(options);
+            if(!material.isCompiledShader) {
+                material.compileShader({ gpu });
+            }
         });
-        if(this.depthMaterial) {
-            this.depthMaterial.start(options)
-        }
+        if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
+            this.depthMaterial.compileShader({ gpu });
+        }       
     }
 }
