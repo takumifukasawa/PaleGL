@@ -267,7 +267,10 @@ const createGLTFSkinnedMesh = async () => {
                 vertexShader: generateVertexShader({
                     jointNum: skinningMesh.boneCount,
                     receiveShadow: false,
-                    isSkinning: true
+                    isSkinning: true,
+                    localPositionProcess: `
+                    localPosition = vec4(aPosition + aNormal * .05, 1.);
+                    `,
                 }),
                 fragmentShader: `#version 300 es
                
@@ -276,7 +279,7 @@ const createGLTFSkinnedMesh = async () => {
                 out vec4 outColor;
                 
                 void main() {
-                    outColor = vec4(1., 0., 0., 1.);
+                    outColor = vec4(0., 1., 0., 1.);
                 }
                 `,
                 uniforms: {
@@ -284,7 +287,8 @@ const createGLTFSkinnedMesh = async () => {
                         type: UniformTypes.Matrix4Array,
                         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
                     }
-                }
+                },
+                faceSide: FaceSide.Back,
             }),          
         ];
         console.log("hogehoge", skinningMesh.materials)

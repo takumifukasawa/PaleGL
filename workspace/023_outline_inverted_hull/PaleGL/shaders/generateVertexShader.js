@@ -14,6 +14,7 @@ export const generateVertexShader = ({
     jointNum,
     receiveShadow,
     useNormalMap,
+    localPositionProcess,
 } = {}) => {
     
     const attributes = [
@@ -55,12 +56,14 @@ void main() {
         aBoneWeights
     );
     ` : ""}
-
+    
+    vec4 localPosition = vec4(aPosition, 1.);;
+    ${localPositionProcess || ""}
+    
     ${isSkinning
         ? `
-    vec4 localPosition = skinMatrix * vec4(aPosition, 1.);`
-        : `
-    vec4 localPosition = vec4(aPosition, 1.);`
+    localPosition = skinMatrix * localPosition;`
+        : ""
     }
     
     ${(() => {
@@ -91,7 +94,9 @@ void main() {
   
     // assign common varyings 
     vUv = aUv; 
-    vWorldPosition = (uWorldMatrix * localPosition).xyz;
+    vec4 worldPosition = uWorldMatrix * localPosition;
+  
+    vWorldPosition = worldPosition.xyz;
    
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }
