@@ -51,6 +51,7 @@ export {CopyPass} from "./postprocess/CopyPass.js";
 export {FragmentPass} from "./postprocess/FragmentPass.js";
 export {PostProcess} from "./postprocess/PostProcess.js";
 export {PostProcessPass} from "./postprocess/PostProcessPass.js";
+export {FXAAPass} from "./postprocess/FXAAPass.js";
 
 // shaders
 export {generateVertexShader} from "./shaders/generateVertexShader.js";

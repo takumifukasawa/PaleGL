@@ -15,7 +15,7 @@ export class ForwardRenderer {
     // #depthMaterial;
     // #depthMaterialAlphaTestQueue;
 
-    constructor({gpu, canvas, pixelRatio = 1}) {
+    constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;

@@ -18,6 +18,7 @@
     loadImg,
     PostProcess,
     FragmentPass,
+    FXAAPass,
     PlaneGeometry,
     DirectionalLight,
     loadObj,
@@ -146,7 +147,7 @@ const captureScene = new Scene();
 const renderer = new ForwardRenderer({
         gpu,
         canvas: canvasElement,
-        pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+        pixelRatio: Math.min(window.devicePixelRatio, 1)
     }
 );
 
@@ -193,21 +194,22 @@ const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({gpu, renderer});
-postProcess.addPass(new FragmentPass({
-    gpu, fragmentShader: `#version 300 es
-precision mediump float;
-in vec2 vUv;
-out vec4 outColor;
-uniform sampler2D uSceneTexture;
-void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
-    float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
-    float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
-    float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
-    outColor = vec4(r, g, b, 1);
-}
-`
-}));
+postProcess.addPass(new FXAAPass({ gpu }));
+// postProcess.addPass(new FragmentPass({
+//     gpu, fragmentShader: `#version 300 es
+// precision mediump float;
+// in vec2 vUv;
+// out vec4 outColor;
+// uniform sampler2D uSceneTexture;
+// void main() {
+//     vec4 textureColor = texture(uSceneTexture, vUv);
+//     float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
+//     float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
+//     float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
+//     outColor = vec4(r, g, b, 1);
+// }
+// `
+// }));
 
 captureSceneCamera.setPostProcess(postProcess);
 

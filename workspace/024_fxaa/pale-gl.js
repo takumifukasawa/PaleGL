@@ -4194,8 +4194,12 @@ class Engine {
     }
     
     setSize(width, height) {
-        this.#scene.traverse((actor) => actor.setSize(width, height));
-        this.#renderer.setSize(width, height);
+        const w = width * this.renderer.pixelRatio;
+        const h = height * this.renderer.pixelRatio;
+        // this.#scene.traverse((actor) => actor.setSize(width, height));
+        // this.#renderer.setSize(width, height);
+        this.#scene.traverse((actor) => actor.setSize(w, h));
+        this.#renderer.setSize(w, h);
     }
 
     fixedUpdate(fixedTime, fixedDeltaTime) {
@@ -4264,7 +4268,7 @@ class ForwardRenderer {
     // #depthMaterial;
     // #depthMaterialAlphaTestQueue;
 
-    constructor({gpu, canvas, pixelRatio = 1}) {
+    constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
@@ -5987,7 +5991,15 @@ void main() {
 
 
 
-const baseVertexShader = `#version 300 es
+
+class PostProcessPass {
+    #geometry;
+    #material;
+    renderTarget;
+    mesh;
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
+        const baseVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -5999,14 +6011,8 @@ void main() {
     gl_Position = vec4(aPosition, 1);
 }
 `;
+        vertexShader = vertexShader || baseVertexShader;
 
-class PostProcessPass {
-    #geometry;
-    #material;
-    renderTarget;
-    mesh;
-    
-    constructor({ gpu, vertexShader = baseVertexShader, fragmentShader, uniforms }) {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
         this.#material = new Material({
@@ -6033,7 +6039,10 @@ class PostProcessPass {
 }
 ﻿
 
-const fragmentShader = `#version 300 es
+
+class CopyPass extends PostProcessPass {
+    constructor({ gpu }) {
+        const fragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -6049,8 +6058,6 @@ void main() {
 }
 `;
 
-class CopyPass extends PostProcessPass {
-    constructor({ gpu }) {
         super({ gpu, fragmentShader });
     }
 }
@@ -6120,6 +6127,34 @@ class PostProcess {
     }
 }
 ﻿
+
+class FXAAPass extends PostProcessPass {
+    constructor({ gpu }) {
+        const fragmentShader = `#version 300 es
+
+precision mediump float;
+
+in vec2 vUv;
+
+out vec4 outColor;
+
+uniform sampler2D uSceneTexture;
+        
+float getLuminance(vec3 rgb) {
+    return dot(rgb, vec3(.2126729, .7151522, .0721750));
+}
+
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    float luminance = getLuminance(textureColor.rgb);
+    outColor = vec4(vec3(luminance), 1.);
+}
+`;
+
+        super({ gpu, fragmentShader });
+    }
+}
+﻿
 // actors
 export {Actor};
 export {ArrowHelper};
@@ -6172,6 +6207,7 @@ export {CopyPass};
 export {FragmentPass};
 export {PostProcess};
 export {PostProcessPass};
+export {FXAAPass};
 
 // shaders
 export {generateVertexShader};

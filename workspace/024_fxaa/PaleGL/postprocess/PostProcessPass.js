@@ -4,7 +4,15 @@ import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../actors/Mesh.js";
 import {PrimitiveTypes, UniformTypes} from "../constants.js";
 
-const baseVertexShader = `#version 300 es
+
+export class PostProcessPass {
+    #geometry;
+    #material;
+    renderTarget;
+    mesh;
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
+        const baseVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aUv;
@@ -16,14 +24,8 @@ void main() {
     gl_Position = vec4(aPosition, 1);
 }
 `;
+        vertexShader = vertexShader || baseVertexShader;
 
-export class PostProcessPass {
-    #geometry;
-    #material;
-    renderTarget;
-    mesh;
-    
-    constructor({ gpu, vertexShader = baseVertexShader, fragmentShader, uniforms }) {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
         this.#material = new Material({
