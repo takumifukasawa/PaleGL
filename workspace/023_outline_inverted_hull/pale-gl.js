@@ -4556,7 +4556,11 @@ class ForwardRenderer {
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
         if (camera.enabledPostProcess) {
-            camera.postProcess.render(this, camera);
+            camera.postProcess.render({
+                gpu: this.#gpu,
+                renderer: this,
+                camera
+            });
         }
 
         // NOTE: ない方がよい？
@@ -6054,6 +6058,7 @@ class FragmentPass extends PostProcessPass {
 
 
 
+// TODO: actorを継承してもいいかもしれない
 class PostProcess {
     passes = [];
     renderTarget;
@@ -6076,7 +6081,7 @@ class PostProcess {
         this.passes.push(pass);
     }
 
-    render(renderer, sceneCamera) {
+    render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
         // TODO
@@ -6084,7 +6089,7 @@ class PostProcess {
         this.passes.forEach((pass, i) => {
             const isLastPass = i === this.passes.length - 1;
             if(isLastPass) {
-                renderer.setRenderTarget(sceneCamera.renderTarget);
+                renderer.setRenderTarget(camera.renderTarget);
             } else {
                 renderer.setRenderTarget(pass.renderTarget);
             }
@@ -6094,8 +6099,14 @@ class PostProcess {
                 this.#camera.clearColor.z,
                 this.#camera.clearColor.w
             );
+            
+            // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
             pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            if(!pass.mesh.material.isCompiledShader) {
+                pass.mesh.material.compileShader({ gpu })
+            }
+
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
             prevRenderTarget = pass.renderTarget;
         });

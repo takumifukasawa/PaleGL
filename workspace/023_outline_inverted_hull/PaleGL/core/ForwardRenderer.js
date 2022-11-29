@@ -310,7 +310,11 @@ export class ForwardRenderer {
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
         if (camera.enabledPostProcess) {
-            camera.postProcess.render(this, camera);
+            camera.postProcess.render({
+                gpu: this.#gpu,
+                renderer: this,
+                camera
+            });
         }
 
         // NOTE: ない方がよい？

@@ -2,6 +2,7 @@
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Vector3} from "../math/Vector3.js";
 
+// TODO: actorを継承してもいいかもしれない
 export class PostProcess {
     passes = [];
     renderTarget;
@@ -24,7 +25,7 @@ export class PostProcess {
         this.passes.push(pass);
     }
 
-    render(renderer, sceneCamera) {
+    render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
         // TODO
@@ -32,7 +33,7 @@ export class PostProcess {
         this.passes.forEach((pass, i) => {
             const isLastPass = i === this.passes.length - 1;
             if(isLastPass) {
-                renderer.setRenderTarget(sceneCamera.renderTarget);
+                renderer.setRenderTarget(camera.renderTarget);
             } else {
                 renderer.setRenderTarget(pass.renderTarget);
             }
@@ -42,8 +43,14 @@ export class PostProcess {
                 this.#camera.clearColor.z,
                 this.#camera.clearColor.w
             );
+            
+            // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
             pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            if(!pass.mesh.material.isCompiledShader) {
+                pass.mesh.material.compileShader({ gpu })
+            }
+
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
             prevRenderTarget = pass.renderTarget;
         });
