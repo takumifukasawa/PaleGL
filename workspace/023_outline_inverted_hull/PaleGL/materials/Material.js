@@ -44,7 +44,7 @@ export class Material {
         uniforms = {},
         depthUniforms = {}
     }) {
-        this.shader = new Shader({gpu, vertexShader, fragmentShader});
+        // this.shader = new Shader({gpu, vertexShader, fragmentShader});
         this.vertexShader = vertexShader;
         this.fragmentShader = fragmentShader;
         this.depthFragmentShader = depthFragmentShader;
@@ -131,5 +131,16 @@ export class Material {
         this.uniforms = {...commonUniforms, ...shadowUniforms, ...uniforms};
         
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
+    }
+    
+    start(options) {
+        const { gpu } = options;
+        if(!this.shader) {
+            this.shader = new Shader({
+                gpu,
+                vertexShader: this.vertexShader,
+                fragmentShader: this.fragmentShader
+            });
+        }
     }
 }

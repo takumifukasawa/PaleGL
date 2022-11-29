@@ -12,7 +12,7 @@ export class ForwardRenderer {
     #realWidth;
     #realHeight;
     
-    #depthMaterial;
+    // #depthMaterial;
     // #depthMaterialAlphaTestQueue;
 
     constructor({gpu, canvas, pixelRatio = 1}) {
@@ -20,19 +20,20 @@ export class ForwardRenderer {
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
 
-        this.#depthMaterial = new Material({
-            gpu,
-            vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            void main() {
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-            }
-            `,
-            fragmentShader: generateDepthFragmentShader({ alphaTest: false })
-        });
+        // this.#depthMaterial = new Material({
+        //     gpu,
+        //     vertexShader: `#version 300 es
+        //     layout (location = 0) in vec3 aPosition;
+        //     uniform mat4 uWorldMatrix;
+        //     uniform mat4 uViewMatrix;
+        //     uniform mat4 uProjectionMatrix;
+        //     void main() {
+        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+        //     }
+        //     `,
+        //     fragmentShader: generateDepthFragmentShader({ alphaTest: false })
+        // });
+        // this.#depthMaterial.start({ gpu })
         // this.#depthMaterialAlphaTestQueue = new Material({
         //     gpu,
         //     vertexShader: `#version 300 es
@@ -109,7 +110,7 @@ export class ForwardRenderer {
                 if (targetMaterial.uniforms.uProjectionMatrix) {
                     targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
                 }
-                
+               
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });

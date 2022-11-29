@@ -61,6 +61,7 @@ export class SkinnedMesh extends Mesh {
                 },
                 alphaTest: this.material.alphaTest
             });
+            this.depthMaterial.start({ gpu });
             // this.depthMaterial = depthMaterial;
         // }
 
