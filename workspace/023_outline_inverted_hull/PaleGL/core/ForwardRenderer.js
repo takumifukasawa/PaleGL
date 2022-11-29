@@ -122,7 +122,7 @@ export class ForwardRenderer {
         }
     }
 
-    #scenePass(sortedMeshActors, camera, lightActors) {
+    #scenePass(sortedRenderMeshInfos, camera, lightActors) {
 
         // TODO: refactor
         this.clear(
@@ -132,7 +132,7 @@ export class ForwardRenderer {
             camera.clearColor.w
         );
 
-        sortedMeshActors.forEach(({ actor, materialIndex }) => {
+        sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
@@ -276,7 +276,7 @@ export class ForwardRenderer {
         // sort by render queue
         // const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-        const sortedMeshActors = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
         
         // ------------------------------------------------------------------------------
         // 1. shadow pass
@@ -285,7 +285,7 @@ export class ForwardRenderer {
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
         
         if(castShadowLightActors.length > 0) {
-            const castShadowMeshActors = sortedMeshActors.filter(({ actor }) => {
+            const castShadowMeshActors = sortedRenderMeshInfos.filter(({ actor }) => {
                 if(actor.type === ActorTypes.Skybox) {
                     return false;
                 }
@@ -306,7 +306,7 @@ export class ForwardRenderer {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }
        
-        this.#scenePass(sortedMeshActors, camera, lightActors);
+        this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
         if (camera.enabledPostProcess) {
             camera.postProcess.render(this, camera);
