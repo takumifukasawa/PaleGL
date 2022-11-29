@@ -46,8 +46,11 @@ let floorDiffuseMap;
 let floorNormalMap;
 let floorDiffuseWithCheckerAlphaMap;
 let gltfActor;
+let skinningMeshes;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
+let outlineColor = new Color(0, 0, 0, 1);
+let outlineAlpha = 1;
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -211,8 +214,8 @@ const onMouseMove = (e) => {
     const nx = (e.clientX / width) * 2 - 1;
     const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    // targetCameraPosition.y = ny * 10 + 12;
-    targetCameraPosition.y = ny * 20;
+    targetCameraPosition.y = ny * 10 + 12;
+    // targetCameraPosition.y = ny * 20;
 };
 
 const onWindowResize = () => {
@@ -243,7 +246,7 @@ const createGLTFSkinnedMesh = async () => {
     
     skinningMeshAnimator = gltfActor.animator;
  
-    const skinningMeshes = gltfActor.transform.children[0].transform.children;
+    skinningMeshes = gltfActor.transform.children[0].transform.children;
     
     skinningMeshes.forEach(skinningMesh => {
         skinningMesh.castShadow = true;
@@ -269,7 +272,7 @@ const createGLTFSkinnedMesh = async () => {
                     receiveShadow: false,
                     isSkinning: true,
                     localPositionProcess: `
-                    localPosition = vec4(aPosition + aNormal * .2, 1.);
+                    localPosition = vec4(aPosition + aNormal * 0.05, 1.);
                     `,
                 }),
                 fragmentShader: `#version 300 es
@@ -278,8 +281,10 @@ const createGLTFSkinnedMesh = async () => {
                 
                 out vec4 outColor;
                 
+                uniform vec4 uOutlineColor;
+                
                 void main() {
-                    outColor = vec4(1., 0., 0., 0.2);
+                    outColor = uOutlineColor;
                 }
                 `,
                 uniforms: {
@@ -287,10 +292,13 @@ const createGLTFSkinnedMesh = async () => {
                         type: UniformTypes.Matrix4Array,
                         // TODO: 毎回これ入れるのめんどいので共通化したい
                         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                    }
+                    },
+                    uOutlineColor: {
+                        type: UniformTypes.Color,
+                        value: outlineColor
+                    },
                 },
                 faceSide: FaceSide.Back,
-                queue: RenderQueues.Transparent,
                 blendType: BlendTypes.Transparent
             }),          
         ];
@@ -632,6 +640,35 @@ function initDebugger() {
         initialValue: gltfActor.transform.rotation.z,
         onChange: (value) => {
             gltfActor.transform.setRotationZ(value);
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addColorDebugger({
+        label: "outline color",
+        initialValue: outlineColor,
+        onChange: (value) => {
+            outlineColor = Color.fromHex(value);
+            outlineColor.a = outlineAlpha;
+            skinningMeshes.forEach(skinningMesh => {
+                skinningMesh.materials[1].uniforms.uOutlineColor.value = outlineColor;
+            });
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "outline alpha",
+        initialValue: outlineAlpha,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.01,
+        onChange: (value) => {
+            outlineAlpha = value;
+            outlineColor.a = outlineAlpha;
+            skinningMeshes.forEach(skinningMesh => {
+                skinningMesh.materials[1].uniforms.uOutlineColor.value = outlineColor;
+            });
         }
     });
 

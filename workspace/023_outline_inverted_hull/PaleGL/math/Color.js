@@ -33,6 +33,10 @@
         return this.elements[3] * 255;
     }
     
+    set a(value) {
+        this.elements[3] = value;
+    }
+    
     constructor(r, g, b, a) {
         this.set(r, g, b, a);
     }

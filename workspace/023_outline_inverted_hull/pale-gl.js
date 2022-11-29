@@ -1376,13 +1376,14 @@ class Material {
                     this.renderQueue = RenderQueues.Opaque;
                     break;
                 case BlendTypes.Transparent:
+                case BlendTypes.Additive:
                     this.renderQueue = RenderQueues.Transparent;
                     break;
             }
         }
 
         if (!this.renderQueue) {
-            throw "invalid render queue";
+            throw "[Material.constructor] invalid render queue";
         }
         
         this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
@@ -5919,6 +5920,10 @@ void main() {
 
     get a255() {
         return this.elements[3] * 255;
+    }
+    
+    set a(value) {
+        this.elements[3] = value;
     }
     
     constructor(r, g, b, a) {

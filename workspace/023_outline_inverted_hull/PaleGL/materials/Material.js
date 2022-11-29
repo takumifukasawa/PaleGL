@@ -71,13 +71,14 @@ export class Material {
                     this.renderQueue = RenderQueues.Opaque;
                     break;
                 case BlendTypes.Transparent:
+                case BlendTypes.Additive:
                     this.renderQueue = RenderQueues.Transparent;
                     break;
             }
         }
 
         if (!this.renderQueue) {
-            throw "invalid render queue";
+            throw "[Material.constructor] invalid render queue";
         }
         
         this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
