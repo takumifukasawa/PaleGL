@@ -31,7 +31,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    generateVertexShader, RenderQueues, FaceSide,
+    generateVertexShader, RenderQueues, FaceSide, BlendTypes,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -269,7 +269,7 @@ const createGLTFSkinnedMesh = async () => {
                     receiveShadow: false,
                     isSkinning: true,
                     localPositionProcess: `
-                    localPosition = vec4(aPosition + aNormal * .05, 1.);
+                    localPosition = vec4(aPosition + aNormal * .2, 1.);
                     `,
                 }),
                 fragmentShader: `#version 300 es
@@ -279,7 +279,7 @@ const createGLTFSkinnedMesh = async () => {
                 out vec4 outColor;
                 
                 void main() {
-                    outColor = vec4(0., 1., 0., 1.);
+                    outColor = vec4(1., 0., 0., 0.2);
                 }
                 `,
                 uniforms: {
@@ -290,9 +290,10 @@ const createGLTFSkinnedMesh = async () => {
                     }
                 },
                 faceSide: FaceSide.Back,
+                queue: RenderQueues.Transparent,
+                blendType: BlendTypes.Transparent
             }),          
         ];
-        console.log("hogehoge", skinningMesh.materials)
     });
 }
 
