@@ -253,18 +253,45 @@ const createGLTFSkinnedMesh = async () => {
                 diffuseMap: floorDiffuseMap,
                 normalMap: floorNormalMap,
                 // TODO: 毎回これ入れるのめんどいので共通化したい
-                jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                receiveShadow: true
+                // jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                receiveShadow: true,
+                uniforms: {
+                    uJointMatrices: {
+                        type: UniformTypes.Matrix4Array,
+                        value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                    }
+                }
             }),
-            new PhongMaterial({
-                gpu,
-                diffuseMap: floorDiffuseMap,
-                normalMap: floorNormalMap,
-                // TODO: 毎回これ入れるのめんどいので共通化したい
-                jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                receiveShadow: true
-            }),          
+            // new Material({
+            //     gpu,
+            //     vertexShader: generateVertexShader({
+            //         jointNum: skinningMesh.boneCount,
+            //         receiveShadow: false,
+            //     }),
+            //     // vertexShader: generateVertexShader({
+            //     //     isSkinning,
+            //     //     jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
+            //     //     receiveShadow: options.receiveShadow,
+            //     //     useNormalMap
+            //     // })
+            //     fragmentShader: `#version 300 es
+            //    
+            //     precision mediump float;
+            //     
+            //     out vec4 outColor;
+            //     
+            //     void main() {
+            //         outColor = vec4(1., 0., 0., 1.);
+            //     }
+            //     `,
+            //     uniforms: {
+            //     }
+            //     // TODO: 毎回これ入れるのめんどいので共通化したい
+            //     jointMatrices: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+            //     // receiveShadow: true
+            // }),          
         ];
+        console.log("hogehoge", skinningMesh.materials)
     });
 }
 

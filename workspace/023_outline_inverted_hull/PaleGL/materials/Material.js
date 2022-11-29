@@ -80,7 +80,7 @@ export class Material {
             throw "invalid render queue";
         }
         
-        this.isSkinning = isSkinning;
+        this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
 
         // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         const commonUniforms = {

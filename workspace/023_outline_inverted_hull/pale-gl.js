@@ -1385,7 +1385,7 @@ class Material {
             throw "invalid render queue";
         }
         
-        this.isSkinning = isSkinning;
+        this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
 
         // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         const commonUniforms = {
@@ -5676,8 +5676,9 @@ class PhongMaterial extends Material {
         diffuseMapUvOffset, // vec2
         normalMap,
         normalMapUvScale, // vec2
-        normalMapUvOffset, // vec2
-        jointMatrices,
+        normalMapUvOffset, // vec2,
+        uniforms = {},
+        // jointMatrices,
         ...options
     }) {
         const baseUniforms = {
@@ -5705,20 +5706,22 @@ class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            ...(jointMatrices ? {
-                uJointMatrices: {
-                    type: UniformTypes.Matrix4Array,
-                    value: jointMatrices
-                }
-            } : {}),
+            // ...(jointMatrices ? {
+            //     uJointMatrices: {
+            //         type: UniformTypes.Matrix4Array,
+            //         value: jointMatrices
+            //     }
+            // } : {}),
             uDirectionalLight: {}
         };
         
-        const isSkinning = !!jointMatrices;
+        const isSkinning = !!uniforms.uJointMatrices;
+        
         const useNormalMap = !!normalMap;
         const vertexShader = generateVertexShader({
             isSkinning,
-            jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
+            // jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
+            jointNum: isSkinning ? uniforms.uJointMatrices.value.length : null,
             receiveShadow: options.receiveShadow,
             useNormalMap
         });
@@ -5728,9 +5731,9 @@ class PhongMaterial extends Material {
             alphaTest: options.alphaTest
         });
         
-        const uniforms = {
+        const mergedUniforms = {
             ...baseUniforms,
-            ...(options.uniforms ?  options.uniforms : {})
+            ...(uniforms ?  uniforms : {})
         };
         
         const depthFragmentShader = PhongMaterial.generateDepthFragmentShader({ alphaTest: options.alphaTest });
@@ -5747,15 +5750,22 @@ class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            ...(jointMatrices ? {
-                uJointMatrices: {
-                    type: UniformTypes.Matrix4Array,
-                    value: jointMatrices
-                }
-            } : {}),
+            // ...(jointMatrices ? {
+            //     uJointMatrices: {
+            //         type: UniformTypes.Matrix4Array,
+            //         value: jointMatrices
+            //     }
+            // } : {}),
         }
 
-        super({ ...options, vertexShader, fragmentShader, uniforms, depthFragmentShader, depthUniforms });
+        super({
+            ...options,
+            vertexShader,
+            fragmentShader,
+            uniforms: mergedUniforms,
+            depthFragmentShader,
+            depthUniforms
+        });
     }
     
     static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest }) {
