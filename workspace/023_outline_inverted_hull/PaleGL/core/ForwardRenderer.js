@@ -79,12 +79,12 @@ export class ForwardRenderer {
         this.#gpu.clear(r, g, b, a);
     }
 
-    #shadowPass(castShadowLightActors, castShadowMeshActors) {
+    #shadowPass(castShadowLightActors, castShadowRenderMeshInfos) {
         castShadowLightActors.forEach(lightActor => {
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
 
-            castShadowMeshActors.forEach(({ actor }) => {
+            castShadowRenderMeshInfos.forEach(({ actor }) => {
                 // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
 
                 // const targetMaterial = actor.depthMaterial;
@@ -285,14 +285,14 @@ export class ForwardRenderer {
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
         
         if(castShadowLightActors.length > 0) {
-            const castShadowMeshActors = sortedRenderMeshInfos.filter(({ actor }) => {
+            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
                 if(actor.type === ActorTypes.Skybox) {
                     return false;
                 }
                 return actor.castShadow;
             });
-            if(castShadowMeshActors.length > 0) {
-                this.#shadowPass(castShadowLightActors, castShadowMeshActors);
+            if(castShadowRenderMeshInfos.length > 0) {
+                this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
             }
         }
 
