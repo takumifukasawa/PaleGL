@@ -516,7 +516,8 @@ const main = async () => {
 
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
-    captureSceneCamera.postProcess.enabled = false;
+    
+    captureSceneCamera.postProcess.enabled = true;
     
     window.addEventListener("mousemove", onMouseMove);
     
