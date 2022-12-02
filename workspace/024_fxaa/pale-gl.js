@@ -6157,6 +6157,10 @@ float rgbToLuma(vec3 rgb) {
     return dot(rgb, vec3(.299, .587, .114));
 }
 
+// vec4 sampleTexture(sampler2D tex, ivec2 coord) {
+//     return texelFetch(tex, coord, 0);
+// }
+
 vec4 sampleTexture(sampler2D tex, ivec2 coord) {
     return texelFetch(tex, coord, 0);
 }
@@ -6166,7 +6170,8 @@ vec4 sampleTextureOffset(sampler2D tex, ivec2 coord, int offsetX, int offsetY) {
 }
 
 void main() {
-    vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
+    // vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
+    ivec2 texelSize = ivec2(1, 1);
    
     // (0, renderer height) ---------- (renderer width, renderer height)
     //          |                                     |
@@ -6179,11 +6184,11 @@ void main() {
     // ------------------------------------------------------------------
    
     // 隣接ピクセルの色を取得
-    vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0, 1).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -1, 0).xyz;
+    vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0, texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0).xyz;
     vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0, 0).xyz;
-    vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, 1, 0).xyz;
-    vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0, -1).xyz;
+    vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, 0).xyz;
+    vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0, -texelSize.y).xyz;
 
     // 隣接ピクセルの輝度を取得
     float lumaTop = rgbToLuma(rgbTop);
@@ -6209,8 +6214,8 @@ void main() {
     }
     
     // 角のピクセルの色を取得
-    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -1, 1).xyz;
-    vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, 1, 1).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, texelSize.y).xyz;
     vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -1, -1).xyz;
     vec3 rgbBottomRight = sampleTextureOffset(uSceneTexture, uv, 1, -1).xyz;
 
@@ -6263,7 +6268,11 @@ void main() {
     // outColor = vec4(vec3(horizontal), 1.);
     // outColor = vec4(vec3(vertical), 1.);
     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-    // outColor = vec4(float(pixelStep) < 0. ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+    
+    // check edge: red ... positive, green ... negative
+    outColor = vec4(float(pixelStep) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    
+    // outColor = vec4(float(pixelStep * int(blendFactor)) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
     
     outColor = sampleTexture(uSceneTexture, uv);
     
