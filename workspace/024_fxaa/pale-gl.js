@@ -6170,14 +6170,20 @@ vec4 sampleTextureOffset(sampler2D tex, ivec2 coord, int offsetX, int offsetY) {
 }
 
 void main() {
+    float fxaaContrastThreshold = .0312;
+    float fxaaRelativeThreshold = .063;
+    float fxaaSubpixelBlending = 1.;
+    
     // vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
     ivec2 texelSize = ivec2(1, 1);
+    vec2 f_texelSize = vec2(1., 1.);
    
     // (0, renderer height) ---------- (renderer width, renderer height)
     //          |                                     |
     //          |                                     |
     //        (0, 0) ----------------------- (renderer width, 0)
     ivec2 uv = ivec2(gl_FragCoord.xy);
+    vec2 fuv = gl_FragCoord.xy;
     
     // ------------------------------------------------------------------
     // local contrast check
@@ -6202,14 +6208,10 @@ void main() {
     float lumaLowest = min(lumaCenter, min(min(lumaTop, lumaLeft), min(lumaBottom, lumaRight)));
     float lumaContrast = lumaHighest - lumaLowest;
     
-    float fxaaContrastThreshold = .0312;
-    
-    float fxaaRelativeThreshold = .063;
-    
     // should skip pixel 
     if(lumaContrast < max(fxaaContrastThreshold, lumaHighest * fxaaRelativeThreshold)) {
-        outColor = vec4(rgbCenter, 1.);
-        // outColor = vec4(0., 0., 0., 1.);
+        // outColor = vec4(rgbCenter, 1.);
+        outColor = vec4(0., 0., 0., 1.);
         return;
     }
     
@@ -6235,7 +6237,7 @@ void main() {
     determineEdgeFilter = abs(determineEdgeFilter - lumaCenter); // to high-pass filter
     determineEdgeFilter = clamp(determineEdgeFilter / lumaContrast, 0., 1.);  // to normalized filter
     float blendFactor = smoothstep(0., 1., determineEdgeFilter); // linear to smoothstep
-    blendFactor = blendFactor * blendFactor; // smoothstep to squared smoothstep
+    blendFactor = blendFactor * blendFactor * fxaaSubpixelBlending; // smoothstep to squared smoothstep
  
     // エッジの方向検出
     float horizontal =
@@ -6248,19 +6250,46 @@ void main() {
         abs(lumaBottomRight + lumaBottomLeft - 2. * lumaBottom);
     bool isHorizontal = horizontal >= vertical;
     
-    float positiveLuminance = isHorizontal ? lumaTop : lumaRight;
-    float negativeLuminance = isHorizontal ? lumaBottom : lumaLeft;
-    float positiveGradient = abs(positiveLuminance - lumaCenter);
-    float negativeGradient = abs(negativeLuminance - lumaCenter);
+    float positiveLuma = isHorizontal ? lumaTop : lumaRight;
+    float negativeLuma = isHorizontal ? lumaBottom : lumaLeft;
+    float positiveGradient = abs(positiveLuma - lumaCenter);
+    float negativeGradient = abs(negativeLuma - lumaCenter);
    
     // texelFetchを使うので隣接ピクセルへのオフセットの絶対値は1
-    int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
+    // int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
+    // int pixelStep = isHorizontal ? 1 : -1;
+    int pixelStep = 1;
+
+    float oppositeLuma;
+    
+    if(positiveGradient < negativeGradient) {
+        pixelStep = -pixelStep;
+    }
+    
+    outColor = vec4(pixelStep < 0 ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+    // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+    return;
     
     if(isHorizontal) {
-        uv.y += pixelStep * int(blendFactor);
+        // uv.y += pixelStep * int(blendFactor);
+        oppositeLuma = negativeLuma;
     } else {
-        uv.x += pixelStep * int(blendFactor);
+        // uv.x += pixelStep * int(blendFactor);
+        oppositeLuma = positiveLuma;
     }
+   
+    vec2 uvEdge = fuv;
+    vec2 edgeStep = vec2(0.);
+   
+    if(isHorizontal) {
+        uvEdge.y += float(pixelStep) * 0.5;
+        edgeStep = vec2(f_texelSize.x, 0.);
+    } else {
+        uvEdge.x += float(pixelStep) * 0.5;
+        edgeStep = vec2(0., f_texelSize.y);
+    }
+    
+    // float edgeLuma = lumaCenter + 
     
     // outColor = vec4(vec3(lumaContrast), 1.);
     // outColor = vec4(vec3(determineEdgeFilter), 1.);
