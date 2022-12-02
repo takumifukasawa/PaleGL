@@ -82,8 +82,8 @@ void main() {
     
     // should skip pixel 
     if(lumaContrast < max(fxaaContrastThreshold, lumaHighest * fxaaRelativeThreshold)) {
-        // outColor = vec4(rgbCenter, 1.);
-        outColor = vec4(0., 0., 0., 1.);
+        outColor = vec4(rgbCenter, 1.);
+        // outColor = vec4(0., 0., 0., 1.);
         return;
     }
     
@@ -146,47 +146,122 @@ void main() {
         oppositeLuma = positiveLuma;
         gradient = positiveGradient;
     }
-    
-    outColor = vec4(vec3(gradient), 1.);
-    return;
-    
-    if(isHorizontal) {
-        uv.y += pixelStep * int(blendFactor);
-    } else {
-        uv.x += pixelStep * int(blendFactor);
-    }
-    
-    outColor = vec4(pixelStep < 0 ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
-    // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
-    outColor = sampleTexture(uSceneTexture, uv);
-    return;
    
     vec2 uvEdge = fuv;
     vec2 edgeStep = vec2(0.);
-   
+
     if(isHorizontal) {
-        uvEdge.y += float(pixelStep) * 0.5;
-        edgeStep = vec2(f_texelSize.x, 0.);
+        uvEdge.y += float(pixelStep) * .5; // offset half pixel
+        edgeStep = vec2(float(texelSize.x), 0.);
+        // uv.y += pixelStep * int(blendFactor);
     } else {
-        uvEdge.x += float(pixelStep) * 0.5;
-        edgeStep = vec2(0., f_texelSize.y);
+        uvEdge.x += float(pixelStep) * .5; // offset half pixel
+        edgeStep = vec2(0., float(texelSize.y));
+        // uv.x += pixelStep * int(blendFactor);
+    }
+
+    float edgeLuma = (lumaCenter + oppositeLuma) * .5;
+    float gradientThreshold = gradient * .25;
+
+    vec2 puv = uvEdge + edgeStep;
+    float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, ivec2(puv)).xyz) - edgeLuma;
+    bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
+    for(int i = 0; i < 9 && !pAtEnd; i++) {
+        puv += edgeStep;
+        pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, ivec2(puv)).xyz) - edgeLuma;
+        pAtEnd = abs(pLumaDelta) >= gradientThreshold;
+    }
+   
+    // check pat end 
+    // outColor = vec4(pAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+
+    vec2 nuv = uvEdge - edgeStep;
+    float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, ivec2(nuv)).xyz) - edgeLuma;
+    bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+    for(int i = 0; i < 9 && !nAtEnd; i++) {
+        nuv += edgeStep;
+        nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, ivec2(nuv)).xyz) - edgeLuma;
+        nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+    }
+   
+    // check nat end 
+    // outColor = vec4(nAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    
+    float pDistance, nDistance;
+    if(isHorizontal) {
+        pDistance = puv.x - fuv.x;
+        nDistance = fuv.x - nuv.x;
+    } else {
+        pDistance = puv.y - fuv.y;
+        nDistance = fuv.y - nuv.y;
     }
     
-    // float edgeLuma = lumaCenter + 
+    float shortestDistance;
+    bool deltaSign;
+    if(pDistance <= nDistance) {
+        shortestDistance = pDistance;
+        deltaSign = pLumaDelta >= 0.;
+    } else {
+        shortestDistance = nDistance;
+        deltaSign = nLumaDelta >= 0.;
+    }
     
-    // outColor = vec4(vec3(lumaContrast), 1.);
-    // outColor = vec4(vec3(determineEdgeFilter), 1.);
-    // outColor = vec4(vec3(blendFactor), 1.);
-    // outColor = vec4(vec3(horizontal), 1.);
-    // outColor = vec4(vec3(vertical), 1.);
-    // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    if(deltaSign == (lumaCenter - edgeLuma >= 0.)) {
+        shortestDistance = 0.;
+        // return;
+    } else {
+        // pDistance = pDistance * 10.;
+        shortestDistance = shortestDistance * 10.;
+    }
     
-    // check edge: red ... positive, green ... negative
-    outColor = vec4(float(pixelStep) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    float edgeBlend = .5 - shortestDistance / (pDistance + nDistance);
     
-    // outColor = vec4(float(pixelStep * int(blendFactor)) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    float finalBlend = max(blendFactor, edgeBlend);
+    
+    if(isHorizontal) {
+        uv.y += pixelStep * int(finalBlend);
+    } else {
+        uv.x += pixelStep * int(finalBlend);
+    }
+
+    // outColor = vec4(vec3(shortestDistance), 1.);
+    // outColor = vec4(vec3(shortestDistance), 1.);
+    // outColor = vec4(vec3(finalBlend), 1.);
     
     outColor = sampleTexture(uSceneTexture, uv);
+    // outColor = vec4(vec3(finalBlend), 1.);
+
+//     return;
+//     
+//     outColor = vec4(pixelStep < 0 ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+//     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+//     outColor = sampleTexture(uSceneTexture, uv);
+//     
+//     return;
+//    
+//     if(isHorizontal) {
+//         uvEdge.y += float(pixelStep) * 0.5;
+//         edgeStep = vec2(f_texelSize.x, 0.);
+//     } else {
+//         uvEdge.x += float(pixelStep) * 0.5;
+//         edgeStep = vec2(0., f_texelSize.y);
+//     }
+//     
+//     // float edgeLuma = lumaCenter + 
+//     
+//     // outColor = vec4(vec3(lumaContrast), 1.);
+//     // outColor = vec4(vec3(determineEdgeFilter), 1.);
+//     // outColor = vec4(vec3(blendFactor), 1.);
+//     // outColor = vec4(vec3(horizontal), 1.);
+//     // outColor = vec4(vec3(vertical), 1.);
+//     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+//     
+//     // check edge: red ... positive, green ... negative
+//     outColor = vec4(float(pixelStep) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+//     
+//     // outColor = vec4(float(pixelStep * int(blendFactor)) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+//     
+//     outColor = sampleTexture(uSceneTexture, uv);
     
     
 //     
