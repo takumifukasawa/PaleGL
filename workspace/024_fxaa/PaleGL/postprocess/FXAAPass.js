@@ -134,6 +134,7 @@ void main() {
     // texelFetchを使うので隣接ピクセルへのオフセットの絶対値は1
     // int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
     // int pixelStep = isHorizontal ? 1 : -1;
+    // TODO: fix texel size for uv float coord
     int pixelStep = 1;
     float oppositeLuma;
     float gradient;
