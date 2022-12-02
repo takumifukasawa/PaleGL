@@ -6139,6 +6139,9 @@ class PostProcess {
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
 class FXAAPass extends PostProcessPass {
+    get gpu() {
+        return this._gpu;
+    }
     constructor({ gpu }) {
         const fragmentShader = `#version 300 es
 
@@ -6254,29 +6257,40 @@ void main() {
     float negativeLuma = isHorizontal ? lumaBottom : lumaLeft;
     float positiveGradient = abs(positiveLuma - lumaCenter);
     float negativeGradient = abs(negativeLuma - lumaCenter);
+  
+    // 
+    // edge luminance 
+    // 
    
     // texelFetchを使うので隣接ピクセルへのオフセットの絶対値は1
     // int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
     // int pixelStep = isHorizontal ? 1 : -1;
     int pixelStep = 1;
-
     float oppositeLuma;
-    
+    float gradient;
+
     if(positiveGradient < negativeGradient) {
         pixelStep = -pixelStep;
+        oppositeLuma = negativeLuma;
+        gradient = negativeGradient;
+    } else {
+        oppositeLuma = positiveLuma;
+        gradient = positiveGradient;
+    }
+    
+    outColor = vec4(vec3(gradient), 1.);
+    return;
+    
+    if(isHorizontal) {
+        uv.y += pixelStep * int(blendFactor);
+    } else {
+        uv.x += pixelStep * int(blendFactor);
     }
     
     outColor = vec4(pixelStep < 0 ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
+    outColor = sampleTexture(uSceneTexture, uv);
     return;
-    
-    if(isHorizontal) {
-        // uv.y += pixelStep * int(blendFactor);
-        oppositeLuma = negativeLuma;
-    } else {
-        // uv.x += pixelStep * int(blendFactor);
-        oppositeLuma = positiveLuma;
-    }
    
     vec2 uvEdge = fuv;
     vec2 edgeStep = vec2(0.);
@@ -6373,6 +6387,7 @@ void main() {
                 }
             }
         });
+        this._gpu = gpu;
     }
     
     setSize(width, height) {
