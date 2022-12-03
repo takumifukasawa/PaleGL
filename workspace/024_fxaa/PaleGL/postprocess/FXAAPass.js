@@ -27,6 +27,10 @@ out vec4 outColor;
 uniform sampler2D uSceneTexture;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
+
+uniform float uContrastThreshold;
+uniform float uRelativeThreshold;
+uniform float uSubpixelBlending;
         
 float rgbToLuma(vec3 rgb) {
     // return dot(rgb, vec3(.2126729, .7151522, .0721750));
@@ -61,11 +65,10 @@ vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY
     // return vec4(1.);
 }
 
-
 void main() {
-    float fxaaContrastThreshold = .0312;
-    float fxaaRelativeThreshold = .063;
-    float fxaaSubpixelBlending = 1.;
+    float fxaaContrastThreshold = uContrastThreshold;
+    float fxaaRelativeThreshold = uRelativeThreshold;
+    float fxaaSubpixelBlending = uSubpixelBlending;
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
     // ivec2 texelSize = ivec2(1, 1);
@@ -172,12 +175,17 @@ void main() {
     if(isHorizontal) {
         uvEdge.y += float(pixelStep) * .5; // offset half pixel
         edgeStep = vec2(float(texelSize.x), 0.);
-        // uv.y += pixelStep * blendFactor;
+        uv.y += pixelStep * blendFactor;
     } else {
         uvEdge.x += float(pixelStep) * .5; // offset half pixel
         edgeStep = vec2(0., float(texelSize.y));
-        // uv.x += pixelStep * blendFactor;
+        uv.x += pixelStep * blendFactor;
     }
+    
+    outColor = vec4(vec3(gradient), 1.);
+    outColor = vec4(pixelStep < 0. ? vec3(1., 0., 0.) : vec3(1.), 1.);
+    outColor = sampleTexture(uSceneTexture, uv);
+    return;
 
     float edgeLuma = (lumaCenter + oppositeLuma) * .5;
     float gradientThreshold = gradient * .25;
@@ -282,6 +290,18 @@ if(!nAtEnd) {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uContrastThreshold: {
+                    type: UniformTypes.Float,
+                    value: 0.0312,
+                },
+                uRelativeThreshold: {
+                    type: UniformTypes.Float,
+                    value: 0.063,
+                },
+                uSubpixelBlending: {
+                    type: UniformTypes.Float,
+                    value: 0.75
                 }
             }
         });
@@ -292,6 +312,7 @@ if(!nAtEnd) {
         super.setSize(width, height);
         this.mesh.material.uniforms.uTargetWidth.value = width;
         this.mesh.material.uniforms.uTargetHeight.value = height;
+        console.log(width, height)
     }
     
 }
