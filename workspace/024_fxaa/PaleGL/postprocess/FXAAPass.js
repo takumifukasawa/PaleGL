@@ -296,192 +296,28 @@ void main() {
     vec2 uv = vUv;
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    
+   
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
-    EdgeData e = determineEdge(l, texelSize);
-   
-    // ------------------------------------------------------------------
-    // local contrast check
-    // ------------------------------------------------------------------
-   
-    // 隣接ピクセルの色を取得
-    vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0., texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0., 0.).xyz;
-    vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0., -texelSize.y).xyz;
 
-    // 隣接ピクセルの輝度を取得
-    float lumaTop = rgbToLuma(rgbTop);
-    float lumaLeft = rgbToLuma(rgbLeft);
-    float lumaCenter = rgbToLuma(rgbCenter);
-    float lumaRight = rgbToLuma(rgbRight);
-    float lumaBottom = rgbToLuma(rgbBottom);
-
-    // 上下左右のピクセルからコントラストを計算
-    float lumaHighest = max(lumaCenter, max(max(lumaTop, lumaLeft), max(lumaBottom, lumaRight)));
-    float lumaLowest = min(lumaCenter, min(min(lumaTop, lumaLeft), min(lumaBottom, lumaRight)));
-    float lumaContrast = lumaHighest - lumaLowest;
-    
-    // should skip pixel 
-    if(lumaContrast < max(uContrastThreshold, lumaHighest * uRelativeThreshold)) {
-        // outColor = vec4(rgbCenter, 1.);
-        outColor = vec4(0., 0., 0., 1.);
+    if(shouldSkipPixel(l)) {
+        // outColor = vec4(vec3(0.), 1.);
+        outColor = sampleTexture(uSceneTexture, uv);
         return;
     }
     
-    // 角のピクセルの色を取得
-    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, -texelSize.y).xyz;
-
-    // 角のピクセルの輝度を取得
-    float lumaTopLeft = rgbToLuma(rgbTopLeft);
-    float lumaTopRight = rgbToLuma(rgbTopRight);
-    float lumaBottomLeft = rgbToLuma(rgbBottomLeft);
-    float lumaBottomRight = rgbToLuma(rgbBottomRight);
+    EdgeData e = determineEdge(l, texelSize);
+    float pixelBlend = determinePixelBlendFactor(l); 
+    float edgeBlend = determineEdgeBlendFactor(l, e, uv, texelSize);
     
-    // エッジ判定用のカーネル
-    // 1 - 2 - 1
-    // 2 - p - 2
-    // 1 - 2 - 1
-    float determineEdgeFilter = 2. * (lumaTop + lumaRight + lumaBottom + lumaLeft);
-    determineEdgeFilter += lumaTopLeft + lumaTopRight + lumaBottomLeft + lumaBottomRight;
-    determineEdgeFilter *= 1. / 12.; // to low-pass filter
-    determineEdgeFilter = abs(determineEdgeFilter - lumaCenter); // to high-pass filter
-    determineEdgeFilter = clamp(determineEdgeFilter / lumaContrast, 0., 1.);  // to normalized filter
-    float pixelBlendFactor = smoothstep(0., 1., determineEdgeFilter); // linear to smoothstep
-    pixelBlendFactor = pixelBlendFactor * pixelBlendFactor * uSubpixelBlending; // smoothstep to squared smoothstep
- 
-    // エッジの方向検出
-    float horizontal =
-        abs(lumaTop + lumaBottom - 2. * lumaCenter) * 2. +
-        abs(lumaTopRight + lumaBottomRight - 2. * lumaRight) + 
-        abs(lumaTopLeft + lumaBottomLeft - 2. * lumaLeft);
-    float vertical = 
-        abs(lumaRight + lumaRight - 2. * lumaCenter) * 2. +
-        abs(lumaTopRight + lumaTopLeft - 2. * lumaTop) +
-        abs(lumaBottomRight + lumaBottomLeft - 2. * lumaBottom);
-    bool isHorizontal = horizontal >= vertical;
+    float finalBlend = max(pixelBlend, edgeBlend);
     
-    float positiveLuma = isHorizontal ? lumaTop : lumaRight;
-    float negativeLuma = isHorizontal ? lumaBottom : lumaLeft;
-    float positiveGradient = abs(positiveLuma - lumaCenter);
-    float negativeGradient = abs(negativeLuma - lumaCenter);
-  
-    // 
-    // edge luminance 
-    // 
-   
-    float pixelStep = isHorizontal ? texelSize.x : texelSize.y;
-    float oppositeLuma;
-    float gradient;
-
-    if(positiveGradient < negativeGradient) {
-        pixelStep = -pixelStep;
-        oppositeLuma = negativeLuma;
-        gradient = negativeGradient;
+    if(e.isHorizontal) {
+        uv.y += e.pixelStep * finalBlend;
     } else {
-        oppositeLuma = positiveLuma;
-        gradient = positiveGradient;
-    }
-   
-    vec2 uvEdge = uv; // copy
-    vec2 edgeStep = vec2(0.);
-
-    if(isHorizontal) {
-        uvEdge.y += pixelStep * .5; // offset half pixel
-        edgeStep = vec2(texelSize.x, 0.);
-    } else {
-        uvEdge.x += pixelStep * .5; // offset half pixel
-        edgeStep = vec2(0., texelSize.y);
+        uv.x += e.pixelStep * finalBlend;
     }
 
-    float edgeLuma = (lumaCenter + oppositeLuma) * .5;
-    float gradientThreshold = gradient * .25;
-
-    vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
-    float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
-    bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
-
-    // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map(i => {
-    return `
-if(!pAtEnd) {
-    puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-    pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
-    pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
-}
-`;
-})).join("\n")}
-    // }
-    if(!pAtEnd) {
-        puv += edgeStep * vec2(${edgeGuess});
-    }
-   
-    vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
-    float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
-    bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
-
-    // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map(i => {
-    return `   
-if(!nAtEnd) {
-    nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-    nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
-    nAtEnd = abs(nLumaDelta) >= gradientThreshold;
-}
-`;
-        })).join("\n")}
-    // }
-    if(!nAtEnd) {
-        nuv -= edgeStep * vec2(${edgeGuess});
-    }
-   
-    // check nat end 
-    // outColor = vec4(nAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-    
-    float pDistance, nDistance;
-    if(isHorizontal) {
-        pDistance = puv.x - uv.x;
-        nDistance = uv.x - nuv.x;
-    } else {
-        pDistance = puv.y - uv.y;
-        nDistance = uv.y - nuv.y;
-    }
-    
-    float shortestDistance;
-    bool deltaSign;
-    if(pDistance <= nDistance) {
-        shortestDistance = pDistance;
-        deltaSign = pLumaDelta >= 0.;
-    } else {
-        shortestDistance = nDistance;
-        deltaSign = nLumaDelta >= 0.;
-    }
-    
-    float edgeBlendFactor;
-    
-    if(deltaSign == (lumaCenter - edgeLuma >= 0.)) {
-        edgeBlendFactor = 0.;
-    } else {
-        edgeBlendFactor = .5 - shortestDistance / (pDistance + nDistance);
-    }
-    
-    float finalBlend = max(pixelBlendFactor, edgeBlendFactor);
-    
-    if(isHorizontal) {
-        uv.y += pixelStep * finalBlend;
-    } else {
-        uv.x += pixelStep * finalBlend;
-    }
-
-    // outColor = vec4(vec3(edgeBlend), 1.);
-    // outColor = vec4(vec3(pixelStep > .0011 ? 1. : 0.), 1.);
-    // outColor = sampleTexture(uSceneTexture, uv);
-    // outColor = vec4(finalBlend > 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-    outColor = vec4(vec3(finalBlend), 1.);
+    outColor = sampleTexture(uSceneTexture, uv);
 }
 `;
 
