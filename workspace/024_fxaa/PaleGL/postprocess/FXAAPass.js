@@ -12,6 +12,10 @@ export class FXAAPass extends PostProcessPass {
         return this._gpu;
     }
     constructor({ gpu }) {
+        const edgeStepsArray = [1., 1.5, 2., 2., 2., 2., 2., 2., 2., 4.];
+        const edgeStepCount = 10;
+        const edgeGuess = 8.;
+
         const fragmentShader = `#version 300 es
 
 precision mediump float;
@@ -100,8 +104,8 @@ void main() {
     
     // should skip pixel 
     if(lumaContrast < max(fxaaContrastThreshold, lumaHighest * fxaaRelativeThreshold)) {
-        // outColor = vec4(rgbCenter, 1.);
-        outColor = vec4(0., 0., 0., 1.);
+        outColor = vec4(rgbCenter, 1.);
+        // outColor = vec4(0., 0., 0., 1.);
         return;
     }
     
@@ -149,10 +153,6 @@ void main() {
     // edge luminance 
     // 
    
-    // texelFetchを使うので隣接ピクセルへのオフセットの絶対値は1
-    // int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
-    // int pixelStep = isHorizontal ? 1 : -1;
-    // TODO: fix texel size for uv float coord
     float pixelStep = isHorizontal ? texelSize.x : texelSize.y;
     float oppositeLuma;
     float gradient;
@@ -182,27 +182,45 @@ void main() {
     float edgeLuma = (lumaCenter + oppositeLuma) * .5;
     float gradientThreshold = gradient * .25;
 
-    vec2 puv = uvEdge + edgeStep;
+    vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
     float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
-    
-    for(int i = 0; i < 9 && !pAtEnd; i++) {
-        puv += edgeStep;
-        pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
-        pAtEnd = abs(pLumaDelta) >= gradientThreshold;
+
+    // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
+${(new Array(edgeStepCount - 1).fill(0).map(i => {
+    return `
+if(!pAtEnd) {
+    puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
+    pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+    pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
+}
+`;
+})).join("\n")}
+    // }
+    if(!pAtEnd) {
+        puv += edgeStep * vec2(${edgeGuess});
     }
    
     // check pat end 
     // outColor = vec4(pAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
 
-    vec2 nuv = uvEdge - edgeStep;
+    vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
     float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
-    
-    for(int i = 0; i < 9 && !nAtEnd; i++) {
-        nuv += edgeStep;
-        nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
-        nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+
+    // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
+${(new Array(edgeStepCount - 1).fill(0).map(i => {
+    return `   
+if(!nAtEnd) {
+    nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
+    nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+    nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+}
+`;
+        })).join("\n")}
+    // }
+    if(!nAtEnd) {
+        nuv -= edgeStep * vec2(${edgeGuess});
     }
    
     // check nat end 
@@ -245,96 +263,11 @@ void main() {
         uv.x += pixelStep * finalBlend;
     }
 
-    // outColor = vec4(vec3(shortestDistance), 1.);
-    // outColor = vec4(vec3(shortestDistance), 1.);
+    // outColor = vec4(vec3(edgeBlend), 1.);
     // outColor = vec4(vec3(finalBlend), 1.);
-    
-    // outColor = sampleTexture(uSceneTexture, uv);
-    outColor = vec4(vec3(finalBlend > 1. ? 1. : 0.), 1.);
-
-//     return;
-//     
-//     outColor = vec4(pixelStep < 0 ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
-//     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(1., 1., 1.), 1.);
-//     outColor = sampleTexture(uSceneTexture, uv);
-//     
-//     return;
-//    
-//     if(isHorizontal) {
-//         uvEdge.y += float(pixelStep) * 0.5;
-//         edgeStep = vec2(f_texelSize.x, 0.);
-//     } else {
-//         uvEdge.x += float(pixelStep) * 0.5;
-//         edgeStep = vec2(0., f_texelSize.y);
-//     }
-//     
-//     // float edgeLuma = lumaCenter + 
-//     
-//     // outColor = vec4(vec3(lumaContrast), 1.);
-//     // outColor = vec4(vec3(determineEdgeFilter), 1.);
-//     // outColor = vec4(vec3(blendFactor), 1.);
-//     // outColor = vec4(vec3(horizontal), 1.);
-//     // outColor = vec4(vec3(vertical), 1.);
-//     // outColor = vec4(isHorizontal ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-//     
-//     // check edge: red ... positive, green ... negative
-//     outColor = vec4(float(pixelStep) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-//     
-//     // outColor = vec4(float(pixelStep * int(blendFactor)) < 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-//     
-//     outColor = sampleTexture(uSceneTexture, uv);
-    
-    
-//     
-//     // ------------------------------------------------------------------
-//     // gradient, edge direction
-//     // ------------------------------------------------------------------
-//    
-//     // float lumaL = (lumaTop + lumaLeft + lumaEast + lumaBottom) * .25;
-//     // float rangeL = abs(lumaL - lumaCenter);
-//     // float blendL = max(0., (rangeL / range) - FXAA_SUBPIX_TRIM) * FXAA_SUBPIX_TRIM_SCALE;
-//     // blendL = min(FXAA_SUBPIX_CAP, blendL);
-//     // 
-//     // float rgbL = rgbTop + rgbLeft + rgbCenter + rgbEast + rgbBottom;
-//     // vec3 rgbTopLeft = texture(uSceneTexture, vUv + vec2(-texelSize.x, texelSize.y)).xyz;
-//     // vec3 rgbTopRight = texture(uSceneTexture, vUv + vec2(texelSize.x, texelSize.y)).xyz;
-//     // vec3 rgbBottomLeft = texture(uSceneTexture, vUv + vec2(-texelSize.x, -texelSize.y)).xyz;
-//     // vec3 rgbBottomRight = texture(uSceneTexture, vUv + vec2(texelSize.x, texelSize.y)).xyz;
-//     // rgbL += (rgbTopLeft + rgbTopRight + rgbBottomLeft + rgbBottomRight);
-//     // rgbL *= (1. / 9.);
-//     
-//     vec3 rgbTopLeft = texture(uSceneTexture, vUv + vec2(-texelSize.x, texelSize.y)).xyz;
-//     vec3 rgbTopRight = texture(uSceneTexture, vUv + vec2(texelSize.x, texelSize.y)).xyz;
-//     vec3 rgbBottomLeft = texture(uSceneTexture, vUv + vec2(-texelSize.x, -texelSize.y)).xyz;
-//     vec3 rgbBottomRight = texture(uSceneTexture, vUv + vec2(texelSize.x, texelSize.y)).xyz;
-//     
-//     float lumaTopLeft = rgbToLuma(rgbTopLeft);
-//     float lumaTopRight = rgbToLuma(rgbTopRight);
-//     float lumaBottomLeft = rgbToLuma(rgbBottomLeft);
-//     float lumaBottomRight = rgbToLuma(rgbBottomRight);
-//     
-//     float lumaBottomTop = lumaBottom + lumaTop;
-//     float lumaLeftRight = lumaLeft + lumaRight;
-//  
-//     float lumaLeftCorners = lumaBottomLeft + lumaTopLeft;
-//     float lumaBottomCorners = lumaBottomLeft + lumaBottomRight;
-//     float lumaRightCorners = lumaBottomRight + lumaTopRight;
-//     float lumaTopCorners = lumaTopRight + lumaTopLeft;
-//     
-//     float edgeHorizontal = abs(-2. * lumaLeft + lumaLeftCorners) + abs(-2. * lumaCenter + lumaBottomTop) * 2.;
-//     float edgeVertical = abs(-2. * lumaTop + lumaTopCorners) + abs(-2. * lumaCenter + lumaLeftRight) * 2.;
-//     
-//     float isHorizontal = (edgeHorizontal >= edgeVertical) ? 1. : 0.;
-//     
-//     outColor = vec4(vec3(isHorizontal), 1.);
-//     // outColor = vec4(vec3(edgeVertical), 1.);
-//     
-//     // ------------------------------------------------------------------
-//     // result
-//     // ------------------------------------------------------------------
-//  
-//     // vec4 textureColor = texture(uSceneTexture, vUv);
-//     // outColor = vec4(vec3(lumaM), 1.);
+    // outColor = vec4(vec3(pixelStep > .0011 ? 1. : 0.), 1.);
+    outColor = sampleTexture(uSceneTexture, uv);
+    // outColor = vec4(vec3(finalBlend > 1. ? 1. : 0.), 1.);
 }
 `;
 
