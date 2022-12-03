@@ -6240,7 +6240,6 @@ vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY
     return sampleTexture(tex, coord + vec2(offsetX, offsetY));
 }
 
-
 LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     // vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
     
@@ -6323,7 +6322,7 @@ EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
         abs(l.topRight + l.bottomRight - 2. * l.right) + 
         abs(l.topLeft + l.bottomLeft - 2. * l.left);
     float vertical = 
-        abs(l.right + l.right - 2. * l.center) * 2. +
+        abs(l.right + l.left - 2. * l.center) * 2. +
         abs(l.topRight + l.topLeft - 2. * l.top) +
         abs(l.bottomRight + l.bottomLeft - 2. * l.bottom);
     e.isHorizontal = horizontal >= vertical;
