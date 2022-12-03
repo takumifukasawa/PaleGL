@@ -82,8 +82,8 @@ void main() {
     
     // should skip pixel 
     if(lumaContrast < max(fxaaContrastThreshold, lumaHighest * fxaaRelativeThreshold)) {
-        outColor = vec4(rgbCenter, 1.);
-        // outColor = vec4(0., 0., 0., 1.);
+        // outColor = vec4(rgbCenter, 1.);
+        outColor = vec4(0., 0., 0., 1.);
         return;
     }
     
@@ -135,7 +135,7 @@ void main() {
     // int pixelStep = positiveGradient >= negativeGradient ? 1 : -1;
     // int pixelStep = isHorizontal ? 1 : -1;
     // TODO: fix texel size for uv float coord
-    int pixelStep = 1;
+    int pixelStep = isHorizontal ? texelSize.x : texelSize.y;
     float oppositeLuma;
     float gradient;
 
@@ -229,8 +229,8 @@ void main() {
     // outColor = vec4(vec3(shortestDistance), 1.);
     // outColor = vec4(vec3(finalBlend), 1.);
     
-    outColor = sampleTexture(uSceneTexture, uv);
-    // outColor = vec4(vec3(finalBlend), 1.);
+    // outColor = sampleTexture(uSceneTexture, uv);
+    outColor = vec4(vec3(finalBlend > 1. ? 1. : 0.), 1.);
 
 //     return;
 //     
