@@ -147,7 +147,7 @@ const captureScene = new Scene();
 const renderer = new ForwardRenderer({
         gpu,
         canvas: canvasElement,
-        pixelRatio: Math.min(window.devicePixelRatio, 1)
+        pixelRatio: Math.min(window.devicePixelRatio, 1.5)
     }
 );
 
@@ -719,7 +719,7 @@ function initDebugger() {
         maxValue: 0.333,
         stepValue: 0.001,
         onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value;
+            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
         }
     });
     

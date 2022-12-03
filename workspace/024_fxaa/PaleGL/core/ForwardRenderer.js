@@ -50,13 +50,15 @@ export class ForwardRenderer {
         // console.log(generateDepthFragmentShader({ alphaTest: true }))
     }
 
-    setSize(width, height) {
-        this.#realWidth = Math.floor(width * this.pixelRatio);
-        this.#realHeight = Math.floor(height * this.pixelRatio);
+    setSize(width, height, realWidth, realHeight) {
+        this.#realWidth = realWidth;
+        this.#realHeight = realHeight;
+        // this.#realWidth = Math.floor(width * this.pixelRatio);
+        // this.#realHeight = Math.floor(height * this.pixelRatio);
         this.canvas.width = this.#realWidth;
         this.canvas.height = this.#realHeight;
-        this.canvas.style.width = `${width}px`;
-        this.canvas.style.height = `${height}px`;
+        // this.canvas.style.width = `${width}px`;
+        // this.canvas.style.height = `${height}px`;
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
 

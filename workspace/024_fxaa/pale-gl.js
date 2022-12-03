@@ -4209,12 +4209,14 @@ class Engine {
     }
     
     setSize(width, height) {
-        const w = width * this.renderer.pixelRatio;
-        const h = height * this.renderer.pixelRatio;
+        const rw = width * this.renderer.pixelRatio;
+        const rh = height * this.renderer.pixelRatio;
+        const w = Math.floor(rw);
+        const h = Math.floor(rh);
         // this.#scene.traverse((actor) => actor.setSize(width, height));
         // this.#renderer.setSize(width, height);
         this.#scene.traverse((actor) => actor.setSize(w, h));
-        this.#renderer.setSize(w, h);
+        this.#renderer.setSize(w, h, rw, rh);
     }
 
     fixedUpdate(fixedTime, fixedDeltaTime) {
@@ -4318,13 +4320,15 @@ class ForwardRenderer {
         // console.log(generateDepthFragmentShader({ alphaTest: true }))
     }
 
-    setSize(width, height) {
-        this.#realWidth = Math.floor(width * this.pixelRatio);
-        this.#realHeight = Math.floor(height * this.pixelRatio);
+    setSize(width, height, realWidth, realHeight) {
+        this.#realWidth = realWidth;
+        this.#realHeight = realHeight;
+        // this.#realWidth = Math.floor(width * this.pixelRatio);
+        // this.#realHeight = Math.floor(height * this.pixelRatio);
         this.canvas.width = this.#realWidth;
         this.canvas.height = this.#realHeight;
-        this.canvas.style.width = `${width}px`;
-        this.canvas.style.height = `${height}px`;
+        // this.canvas.style.width = `${width}px`;
+        // this.canvas.style.height = `${height}px`;
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
 
@@ -6158,9 +6162,14 @@ class FXAAPass extends PostProcessPass {
         return this._gpu;
     }
     constructor({ gpu }) {
+        // # high quality
         const edgeStepsArray = [1., 1.5, 2., 2., 2., 2., 2., 2., 2., 4.];
         const edgeStepCount = 10;
         const edgeGuess = 8.;
+        // # low quality
+        // const edgeStepsArray = [1, 1.5, 2, 4];
+        // const edgeStepCount = 4;
+        // const edgeGuess = 12.;
 
         const fragmentShader = `#version 300 es
 
@@ -6201,14 +6210,10 @@ float rgbToLuma(vec3 rgb) {
 
 vec4 sampleTexture(sampler2D tex, vec2 coord) {
     return texture(tex, coord);
-    // return texture(tex, coord, 0);
-    // return tex2Dlod(tex, coord, 0);
-    // return vec4(1.);
 }
 
 vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY) {
     return sampleTexture(tex, coord + vec2(offsetX, offsetY));
-    // return vec4(1.);
 }
 
 void main() {
@@ -6217,15 +6222,11 @@ void main() {
     float fxaaSubpixelBlending = uSubpixelBlending;
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    // ivec2 texelSize = ivec2(1, 1);
-    // vec2 f_texelSize = vec2(1., 1.);
    
     // (0, renderer height) ---------- (renderer width, renderer height)
     //          |                                     |
     //          |                                     |
     //        (0, 0) ----------------------- (renderer width, 0)
-    // ivec2 uv = ivec2(gl_FragCoord.xy);
-    // vec2 fuv = gl_FragCoord.xy;
     vec2 uv = vUv;
     
     // ------------------------------------------------------------------
@@ -6279,8 +6280,8 @@ void main() {
     determineEdgeFilter *= 1. / 12.; // to low-pass filter
     determineEdgeFilter = abs(determineEdgeFilter - lumaCenter); // to high-pass filter
     determineEdgeFilter = clamp(determineEdgeFilter / lumaContrast, 0., 1.);  // to normalized filter
-    float blendFactor = smoothstep(0., 1., determineEdgeFilter); // linear to smoothstep
-    blendFactor = blendFactor * blendFactor * fxaaSubpixelBlending; // smoothstep to squared smoothstep
+    float pixelBlendFactor = smoothstep(0., 1., determineEdgeFilter); // linear to smoothstep
+    pixelBlendFactor = pixelBlendFactor * pixelBlendFactor * fxaaSubpixelBlending; // smoothstep to squared smoothstep
  
     // エッジの方向検出
     float horizontal =
@@ -6319,19 +6320,12 @@ void main() {
     vec2 edgeStep = vec2(0.);
 
     if(isHorizontal) {
-        uvEdge.y += float(pixelStep) * .5; // offset half pixel
-        edgeStep = vec2(float(texelSize.x), 0.);
-        uv.y += pixelStep * blendFactor;
+        uvEdge.y += pixelStep * .5; // offset half pixel
+        edgeStep = vec2(texelSize.x, 0.);
     } else {
-        uvEdge.x += float(pixelStep) * .5; // offset half pixel
-        edgeStep = vec2(0., float(texelSize.y));
-        uv.x += pixelStep * blendFactor;
+        uvEdge.x += pixelStep * .5; // offset half pixel
+        edgeStep = vec2(0., texelSize.y);
     }
-    
-    outColor = vec4(vec3(gradient), 1.);
-    outColor = vec4(pixelStep < 0. ? vec3(1., 0., 0.) : vec3(1.), 1.);
-    outColor = sampleTexture(uSceneTexture, uv);
-    return;
 
     float edgeLuma = (lumaCenter + oppositeLuma) * .5;
     float gradientThreshold = gradient * .25;
@@ -6355,9 +6349,6 @@ if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeGuess});
     }
    
-    // check pat end 
-    // outColor = vec4(pAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-
     vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
     float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
@@ -6399,17 +6390,15 @@ if(!nAtEnd) {
         deltaSign = nLumaDelta >= 0.;
     }
     
+    float edgeBlendFactor;
+    
     if(deltaSign == (lumaCenter - edgeLuma >= 0.)) {
-        shortestDistance = 0.;
-        // return;
+        edgeBlendFactor = 0.;
     } else {
-        // pDistance = pDistance * 10.;
-        shortestDistance = shortestDistance * 10.;
+        edgeBlendFactor = .5 - shortestDistance / (pDistance + nDistance);
     }
     
-    float edgeBlend = .5 - shortestDistance / (pDistance + nDistance);
-    
-    float finalBlend = max(blendFactor, edgeBlend);
+    float finalBlend = max(pixelBlendFactor, edgeBlendFactor);
     
     if(isHorizontal) {
         uv.y += pixelStep * finalBlend;
@@ -6418,10 +6407,10 @@ if(!nAtEnd) {
     }
 
     // outColor = vec4(vec3(edgeBlend), 1.);
-    // outColor = vec4(vec3(finalBlend), 1.);
     // outColor = vec4(vec3(pixelStep > .0011 ? 1. : 0.), 1.);
     outColor = sampleTexture(uSceneTexture, uv);
-    // outColor = vec4(vec3(finalBlend > 1. ? 1. : 0.), 1.);
+    // outColor = vec4(finalBlend > 0. ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    // outColor = vec4(vec3(finalBlend), 1.);
 }
 `;
 
@@ -6458,7 +6447,6 @@ if(!nAtEnd) {
         super.setSize(width, height);
         this.mesh.material.uniforms.uTargetWidth.value = width;
         this.mesh.material.uniforms.uTargetHeight.value = height;
-        console.log(width, height)
     }
     
 }

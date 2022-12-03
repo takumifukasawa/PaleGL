@@ -45,12 +45,14 @@ export class Engine {
     }
     
     setSize(width, height) {
-        const w = width * this.renderer.pixelRatio;
-        const h = height * this.renderer.pixelRatio;
+        const rw = width * this.renderer.pixelRatio;
+        const rh = height * this.renderer.pixelRatio;
+        const w = Math.floor(rw);
+        const h = Math.floor(rh);
         // this.#scene.traverse((actor) => actor.setSize(width, height));
         // this.#renderer.setSize(width, height);
         this.#scene.traverse((actor) => actor.setSize(w, h));
-        this.#renderer.setSize(w, h);
+        this.#renderer.setSize(w, h, rw, rh);
     }
 
     fixedUpdate(fixedTime, fixedDeltaTime) {
