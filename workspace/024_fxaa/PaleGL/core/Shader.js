@@ -24,8 +24,8 @@ export class Shader extends GLObject {
         // check shader info log
         const vsInfo = gl.getShaderInfoLog(vs);
         if(vsInfo.length > 0) {
-            console.error("[Shader] vertex shader has error");
-            throw vsInfo;
+            const errorInfo = Shader.buildErrorInfo(vsInfo, vertexShader, "[Shader] vertex shader has error");
+            throw errorInfo;
         }
 
         // fragment shader
@@ -39,8 +39,8 @@ export class Shader extends GLObject {
         const fsInfo = gl.getShaderInfoLog(fs);
         // check shader info log
         if(fsInfo.length > 0) {
-            console.error("[Shader] fragment shader has error");
-            throw fsInfo;
+            const errorInfo = Shader.buildErrorInfo(fsInfo, fragmentShader, "[Shader] fragment shader has error");
+            throw errorInfo;
         }
         
         // program object
@@ -59,5 +59,20 @@ export class Shader extends GLObject {
         if(programInfo.length > 0) {
             throw programInfo;
         }
+    }
+    
+    static buildErrorInfo(infoLog, shaderSource, header) {
+        return `[Shader] fragment shader has error
+            
+---
+
+${infoLog}
+
+---
+            
+${shaderSource.split("\n").map((line, i) => {
+    return `${i + 1}: ${line}`;
+}).join("\n")}       
+`;
     }
 }
