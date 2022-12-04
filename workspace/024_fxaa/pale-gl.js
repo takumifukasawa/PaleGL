@@ -6242,8 +6242,6 @@ vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY
 }
 
 LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
-    // vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    
     LuminanceData l;
 
     // 隣接ピクセルの色を取得
@@ -6323,7 +6321,7 @@ float determinePixelBlendFactor(LuminanceData l) {
     // smoothstep to squared smoothstep
     pixelBlendFactor = pixelBlendFactor * pixelBlendFactor;
     
-    // sub-pixel の blend 率を最後にかける
+    // sub-pixel の blend 率をかける
     pixelBlendFactor *= uSubpixelBlending; 
     
     return pixelBlendFactor;
@@ -6410,10 +6408,12 @@ EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
     // 隣接ピクセルの輝度差が大きい方の情報を取得
 
     if(positiveGradient < negativeGradient) {
+        // -方向の方が輝度差が大きい場合
         e.pixelStep = -e.pixelStep;
         e.oppositeLuma = negativeLuma;
         e.gradient = negativeGradient;
     } else {
+        // +方向の方が輝度差が大きい場合
         e.oppositeLuma = positiveLuma;
         e.gradient = positiveGradient;
     }
@@ -6425,6 +6425,8 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     vec2 uvEdge = uv; // copy
     vec2 edgeStep = vec2(0.);
 
+    // uvを半ピクセル分オフセット
+    // 境界に沿った位置で計算していくため
     if(e.isHorizontal) {
         uvEdge.y += e.pixelStep * .5; // offset half pixel
         edgeStep = vec2(texelSize.x, 0.);
@@ -6435,6 +6437,9 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
 
     float edgeLuma = (l.center + e.oppositeLuma) * .5;
     float gradientThreshold = e.gradient * .25;
+    
+    // +方向に一定回数edgeStepずらしながら輝度差,uv値を計算
+    // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
 
     vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
     float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
@@ -6454,6 +6459,9 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeGuess});
     }
+    
+    // -方向に一定回数edgeStepずらしながら輝度差,uv値を計算
+    // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
     vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
     float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
@@ -6473,6 +6481,9 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeGuess});
     }
+    
+    // 探索を打ち切った地点のuv値と自身のピクセルを元に+方向と-方向の距離を計算
+    // 距離なのでabsしてもよいはず
    
     float pDistance, nDistance;
     if(e.isHorizontal) {
@@ -6482,6 +6493,8 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
         pDistance = puv.y - uv.y;
         nDistance = uv.y - nuv.y;
     }
+    
+    // 探索を打ち切った地点までの距離の小さい方を元に輝度差の符号を確認
     
     float shortestDistance;
     bool deltaSign;
@@ -6493,14 +6506,13 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
         deltaSign = nLumaDelta >= 0.;
     }
    
-   // return edgeLuma; 
-    // return edgeLuma > 0. ? 1. : 0.;
-    
     float edgeBlendFactor;
     
     if(deltaSign == (l.center - edgeLuma >= 0.)) {
+        // エッジから遠ざかっている場合ブレンド係数を0にしてスキップすることで、エッジの片側にあるピクセルだけをブレンド
         edgeBlendFactor = 0.;
     } else {
+        // エッジまでの距離に応じてblend率を変える（近いほど高く、遠いほど低く）
         edgeBlendFactor = .5 - shortestDistance / (pDistance + nDistance);
     }
     
@@ -6515,7 +6527,6 @@ void main() {
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
-        // outColor = vec4(vec3(0.), 1.);
         outColor = sampleTexture(uSceneTexture, uv);
         return;
     }
@@ -6532,13 +6543,6 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    // outColor = vec4(e.pixelStep > .01 ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-    // outColor = vec4(vec3(pixelBlend), 1.);
-    // outColor = vec4(vec3(edgeBlend), 1.);
-    // outColor = vec4(vec3(e.gradient), 1.);
-    // outColor = vec4(vec3(e.oppositeLuma), 1.);
-    // outColor = vec4(vec3(finalBlend), 1.);
-    // outColor = vec4(vec3(e.pixelStep), 1.);
     outColor = sampleTexture(uSceneTexture, uv);
 }
 `;
