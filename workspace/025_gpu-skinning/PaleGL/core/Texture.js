@@ -46,8 +46,10 @@ export class Texture extends GLObject {
         }
       
         // filter
+        // filterable ref: https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
         switch(this.type) {
             case TextureTypes.RGBA:
+            case TextureTypes.RGBA16F:
             case TextureTypes.RGBA32F:
                 // min filter settings
                 switch(minFilter) {
@@ -77,6 +79,12 @@ export class Texture extends GLObject {
             case TextureTypes.Depth:
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                break;
+                
+            // 「filterできない」で合っているはず？
+            case TextureTypes.RGBA32F:
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 break;
 
             default:
@@ -136,6 +144,14 @@ export class Texture extends GLObject {
                     }
                     break;
                     
+                case TextureTypes.RGBA16F:
+                    if (width && height) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.#img);
+                    }   
+                    break;
+ 
                 case TextureTypes.RGBA32F:
                     if (width && height) {
                         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
@@ -167,6 +183,10 @@ export class Texture extends GLObject {
             case TextureTypes.Depth:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 break;
+
+            case TextureTypes.RGBA16F:
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                break;
                 
             case TextureTypes.RGBA32F:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
@@ -184,8 +204,14 @@ export class Texture extends GLObject {
     update({ width, height, data }) {
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
-        
+       
+        // TODO: execute all type
         switch(this.type) {
+
+            case TextureTypes.RGBA16F:
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                break;
+            
             case TextureTypes.RGBA32F:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
                 break;
