@@ -1,7 +1,7 @@
 ﻿import {Texture} from "./Texture.js";
 import {Framebuffer} from "./Framebuffer.js";
 import {Renderbuffer} from "./Renderbuffer.js";
-import {RenderbufferTypes, RenderTargetTypes, TextureTypes} from "./../constants.js";
+import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "./../constants.js";
 import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 export class RenderTarget extends AbstractRenderTarget {
@@ -74,7 +74,9 @@ export class RenderTarget extends AbstractRenderTarget {
             width: this.width,
             height: this.height,
             mipmap: false,
-            type: textureType
+            type: textureType,
+            minFilter: TextureFilterTypes.Linear,
+            magFilter: TextureFilterTypes.Linear
         });
 
         // set texture to render buffer

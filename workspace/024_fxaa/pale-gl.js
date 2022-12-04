@@ -2667,7 +2667,9 @@ class RenderTarget extends AbstractRenderTarget {
             width: this.width,
             height: this.height,
             mipmap: false,
-            type: textureType
+            type: textureType,
+            minFilter: TextureFilterTypes.Linear,
+            magFilter: TextureFilterTypes.Linear
         });
 
         // set texture to render buffer
@@ -6152,9 +6154,9 @@ class PostProcess {
 
 
 // ref:
+// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 // http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
 // https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
-// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
 class FXAAPass extends PostProcessPass {
@@ -6228,7 +6230,6 @@ struct LuminanceData {
 // 2: use texture function
 
 float rgbToLuma(vec3 rgb) {
-    // return dot(rgb, vec3(.2126729, .7151522, .0721750));
     return dot(rgb, vec3(.299, .587, .114));
 }
 
@@ -6436,7 +6437,7 @@ void main() {
     vec2 uv = vUv;
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-   
+    
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
