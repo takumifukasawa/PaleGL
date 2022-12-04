@@ -148,40 +148,114 @@ bool shouldSkipPixel(LuminanceData l) {
 }
 
 float determinePixelBlendFactor(LuminanceData l) {
-    // エッジ判定用のカーネル
-    // 1 - 2 - 1
-    // 2 - p - 2
-    // 1 - 2 - 1
+    // sub-pixel blend 用のカーネル
+    // | 1 | 2 | 1 | 
+    // | 2 | 0 | 2 |
+    // | 1 | 2 | 1 |
+ 
     float determineEdgeFilter = 2. * (l.top + l.right + l.bottom + l.left);
     determineEdgeFilter += l.topLeft + l.topRight + l.bottomLeft + l.bottomRight;
-    determineEdgeFilter *= 1. / 12.; // to low-pass filter
-    determineEdgeFilter = abs(determineEdgeFilter - l.center); // to high-pass filter
-    determineEdgeFilter = clamp(determineEdgeFilter / l.contrast, 0., 1.);  // to normalized filter
-    float pixelBlendFactor = smoothstep(0., 1., determineEdgeFilter); // linear to smoothstep
-    pixelBlendFactor = pixelBlendFactor * pixelBlendFactor * uSubpixelBlending; // smoothstep to squared smoothstep
+    
+    // to low-pass filter
+    determineEdgeFilter *= 1. / 12.; 
+    
+    // to high-pass filter
+    determineEdgeFilter = abs(determineEdgeFilter - l.center); 
+    
+    // to normalized filter
+    determineEdgeFilter = clamp(determineEdgeFilter / l.contrast, 0., 1.); 
+    
+    // linear to smoothstep
+    float pixelBlendFactor = smoothstep(0., 1., determineEdgeFilter); 
+    
+    // smoothstep to squared smoothstep
+    pixelBlendFactor = pixelBlendFactor * pixelBlendFactor;
+    
+    // sub-pixel の blend 率を最後にかける
+    pixelBlendFactor *= uSubpixelBlending; 
+    
     return pixelBlendFactor;
 }
 
 EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
     EdgeData e;
     
-    // エッジの方向検出
+    // # エッジの方向検出
+   
+    // ----------------------------------------------------------------------- 
+    // ## 縦の勾配を計算
+    // A, B, C を足す
+    // Aはピクセルの上下なので重みを2倍に
+    //
+    // A:
+    // | 0 |  2 | 0 |
+    // | 0 | -4 | 0 |
+    // | 0 |  2 | 0 |
+    //
+    // B:
+    // | 1  | 0 | 0 |
+    // | -2 | 0 | 0 |
+    // | 1  | 0 | 0 |
+    //
+    // C:
+    // | 0 | 0 | 1  |
+    // | 0 | 0 | -2 |
+    // | 0 | 0 | 1  |
+    // ----------------------------------------------------------------------- 
+    
     float horizontal =
         abs(l.top + l.bottom - 2. * l.center) * 2. +
         abs(l.topRight + l.bottomRight - 2. * l.right) + 
         abs(l.topLeft + l.bottomLeft - 2. * l.left);
+        
+    // ----------------------------------------------------------------------- 
+    // ## 横の勾配を計算
+    // A, B, C を足す
+    // Aはピクセルの左右なので重みを2倍に
+    //
+    // A:
+    // | 0 |  0 | 0 |
+    // | 2 | -4 | 2 |
+    // | 0 |  0 | 0 |
+    //
+    // B:
+    // | 1 | -2 | 1 |
+    // | 0 | 0  | 0 |
+    // | 0 | 0  | 0 |
+    //
+    // C:
+    // | 0 | 0  | 0 |
+    // | 0 | 0  | 0 |
+    // | 1 | -2 | 1 |
+    // ----------------------------------------------------------------------- 
+        
     float vertical = 
         abs(l.right + l.left - 2. * l.center) * 2. +
         abs(l.topRight + l.topLeft - 2. * l.top) +
         abs(l.bottomRight + l.bottomLeft - 2. * l.bottom);
+       
+    // 縦の勾配と横の勾配を比較して水平線と垂直線のどちらになっているかを決める
+    // 勾配が大きい方がより強い境界になっているみなす 
+        
     e.isHorizontal = horizontal >= vertical;
+    
+    // 境界の方向が決まったら + - 方向を決める 
+    // 水平線 ... 上が+,下が-
+    // 垂直線 ... 右が+,左が-
     
     float positiveLuma = e.isHorizontal ? l.top : l.right;
     float negativeLuma = e.isHorizontal ? l.bottom : l.left;
+    
+    // +方向と-方向それぞれと自身のピクセルの輝度差を計算
+
     float positiveGradient = abs(positiveLuma - l.center);
     float negativeGradient = abs(negativeLuma - l.center);
+    
+    // 境界の方向に応じて、隣接ピクセルへのuv差分値を決める
   
     e.pixelStep = e.isHorizontal ? texelSize.y : texelSize.x;
+
+    // 隣接ピクセルの輝度差が大きい方の情報を取得
 
     if(positiveGradient < negativeGradient) {
         e.pixelStep = -e.pixelStep;
