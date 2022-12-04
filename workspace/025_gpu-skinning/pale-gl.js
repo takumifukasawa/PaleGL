@@ -815,6 +815,7 @@ const UniformTypes = {
 const TextureTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
+    RGBA32F: "RGBA32F"
 };
 
 const TextureWrapTypes = {
@@ -2380,6 +2381,10 @@ class Texture extends GLObject {
         const gl = this.#gpu.gl;
 
         this.#img = img || null;
+        
+        if(!this.#img && (!width || !height)) {
+            console.error("[Texture.constructor] invalid width or height")
+        }
 
         this.#texture = gl.createTexture();
 
@@ -2456,29 +2461,32 @@ class Texture extends GLObject {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
         }
 
-        // bind texture data
-        switch(this.type) {
-            case TextureTypes.RGBA:
-                if (width && height) {
-                    // for render target
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                } else {
-                    // set img to texture
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                }
-                break;
-            case TextureTypes.Depth:
-                if (width && height) {
-                    // for render target
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                } else {
-                    // set img to texture
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                }
-                break;
-            default:
-                throw "invalid type";
-        }
+        // TODO: startみたいな関数でtextureにdataをセットしたい
+        // if(this.#img) {
+            // bind texture data
+            switch(this.type) {
+                case TextureTypes.RGBA:
+                    if (width && height) {
+                        // for render target
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                    } else {
+                        // set img to texture
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                    }
+                    break;
+                case TextureTypes.Depth:
+                    if (width && height) {
+                        // for render target
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                    } else {
+                        // set img to texture
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                    }
+                    break;
+                default:
+                    throw "invalid type";
+            }
+        // }
        
         // TODO: あった方がよい？
         // unbind img
@@ -2504,6 +2512,19 @@ class Texture extends GLObject {
         }
         
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+        
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+    
+    update({ width, height, data }) {
+        const gl = this.#gpu.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this.#texture);
+        
+        switch(this.type) {
+            case TextureTypes.RGBA32F:
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
+                break;
+        }
         
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
@@ -2629,6 +2650,8 @@ class RenderTarget extends AbstractRenderTarget {
         width = 1,
         height = 1,
         useDepthBuffer = false,
+        minFilter = TextureFilterTypes.Linear,
+        magFilter = TextureFilterTypes.Linear,
     }) {
         super();
         
@@ -2668,8 +2691,8 @@ class RenderTarget extends AbstractRenderTarget {
             height: this.height,
             mipmap: false,
             type: textureType,
-            minFilter: TextureFilterTypes.Linear,
-            magFilter: TextureFilterTypes.Linear
+            minFilter,
+            magFilter
         });
 
         // set texture to render buffer
@@ -3466,6 +3489,7 @@ void main() {
 
 
 
+
 class SkinnedMesh extends Mesh {
     bones;
     boneCount = 0;
@@ -3478,6 +3502,8 @@ class SkinnedMesh extends Mesh {
     
     #boneIndicesForLines = [];
     #boneOrderedIndex = [];
+    
+    #jointTexture;
     
     constructor({bones, gpu, ...options}) {
         super({
@@ -3501,7 +3527,7 @@ class SkinnedMesh extends Mesh {
         super.start(options);
        
         const { gpu } = options;
-
+        
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
                 gpu,
@@ -3518,6 +3544,10 @@ class SkinnedMesh extends Mesh {
                         type: UniformTypes.Matrix4Array,
                         value: null
                     },
+                    uJointTexture: {
+                        type: UniformTypes.Texture,
+                        value: null
+                    }
                 },
                 alphaTest: this.mainMaterial.alphaTest
             });
@@ -3540,6 +3570,8 @@ class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
+        
+        this.#jointTexture = new Texture({ gpu, width: 1, height: 1 });
         
         this.boneLines = new Mesh({
             gpu,
@@ -3660,6 +3692,14 @@ class SkinnedMesh extends Mesh {
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
+        
+        const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+        
+        this.#jointTexture.update({
+            width: 4,
+            height: this.boneCount,
+            data: jointData
+        });
     }
 
     getBoneOffsetMatrices() {
@@ -4661,7 +4701,10 @@ class GPU {
 
     constructor({gl}) {
         this.gl = gl;
-        this.dummyTexture = new Texture({ gpu: this, img: createWhite1x1() });
+        this.dummyTexture = new Texture({
+            gpu: this,
+            img: createWhite1x1(),
+        });
     }
 
     setShader(shader) {

@@ -21,7 +21,10 @@ export class GPU {
 
     constructor({gl}) {
         this.gl = gl;
-        this.dummyTexture = new Texture({ gpu: this, img: createWhite1x1() });
+        this.dummyTexture = new Texture({
+            gpu: this,
+            img: createWhite1x1(),
+        });
     }
 
     setShader(shader) {

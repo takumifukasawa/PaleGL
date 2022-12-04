@@ -6,6 +6,7 @@ import {Geometry} from "../geometries/Geometry.js";
 import {Material} from "../materials/Material.js";
 import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader";
+import {Texture} from "../core/Texture.js";
 
 export class SkinnedMesh extends Mesh {
     bones;
@@ -19,6 +20,8 @@ export class SkinnedMesh extends Mesh {
     
     #boneIndicesForLines = [];
     #boneOrderedIndex = [];
+    
+    #jointTexture;
     
     constructor({bones, gpu, ...options}) {
         super({
@@ -42,7 +45,7 @@ export class SkinnedMesh extends Mesh {
         super.start(options);
        
         const { gpu } = options;
-
+        
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
                 gpu,
@@ -59,6 +62,10 @@ export class SkinnedMesh extends Mesh {
                         type: UniformTypes.Matrix4Array,
                         value: null
                     },
+                    uJointTexture: {
+                        type: UniformTypes.Texture,
+                        value: null
+                    }
                 },
                 alphaTest: this.mainMaterial.alphaTest
             });
@@ -81,6 +88,8 @@ export class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
+        
+        this.#jointTexture = new Texture({ gpu, width: 1, height: 1 });
         
         this.boneLines = new Mesh({
             gpu,
@@ -201,6 +210,14 @@ export class SkinnedMesh extends Mesh {
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
+        
+        const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+        
+        this.#jointTexture.update({
+            width: 4,
+            height: this.boneCount,
+            data: jointData
+        });
     }
 
     getBoneOffsetMatrices() {

@@ -270,6 +270,10 @@ const createGLTFSkinnedMesh = async () => {
                         type: UniformTypes.Matrix4Array,
                         // TODO: 毎回これ入れるのめんどいので共通化したい
                         value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                    },
+                    uJointTexture: {
+                        type: UniformTypes.Texture,
+                        value: null
                     }
                 }
             }),

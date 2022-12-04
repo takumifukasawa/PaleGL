@@ -27,6 +27,7 @@ export const UniformTypes = {
 export const TextureTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
+    RGBA32F: "RGBA32F"
 };
 
 export const TextureWrapTypes = {
