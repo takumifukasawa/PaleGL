@@ -3651,6 +3651,11 @@ class SkinnedMesh extends Mesh {
         checkChildNum(this.bones);
        
         if(this.#gpuSkinning) {
+            // ボーンごとの joint matrix をテクスチャに詰める
+            // 1ボーンあたり4pixel（4 channel x 4 pixel = 16） 必要
+            // 精度は16bitで十分だが jsのtypedarrayには16bitがないので32bitを使う
+            // bit容量は下記
+            // 32bit (bit per channel) * 16 (4 channel * 4 pixel) * N bones
             this.#jointTexture = new Texture({
                 gpu,
                 width: 1,
