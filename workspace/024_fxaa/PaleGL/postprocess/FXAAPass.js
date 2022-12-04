@@ -97,16 +97,16 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
 
     // 隣接ピクセルの色を取得
     vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0., texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0., 0.).xyz;
     vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, 0.).xyz;
     vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0., 0.).xyz;
 
     // 角のピクセルの色を取得
-    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
     vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
     vec3 rgbBottomRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, -texelSize.y).xyz;
 
     // 隣接ピクセルの輝度を取得
     float lumaTop = rgbToLuma(rgbTop);
@@ -182,11 +182,6 @@ EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
     float positiveGradient = abs(positiveLuma - l.center);
     float negativeGradient = abs(negativeLuma - l.center);
   
-    // 
-    // edge luminance 
-    // 
-   
-    //e.pixelStep = e.isHorizontal ? texelSize.x : texelSize.y;
     e.pixelStep = e.isHorizontal ? texelSize.y : texelSize.x;
 
     if(positiveGradient < negativeGradient) {
@@ -221,13 +216,13 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map(i => {
+${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `
-if(!pAtEnd) {
-    puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-    pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
-    pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
-}
+    if(!pAtEnd) {
+        puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
+        pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+        pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
+    }
 `;
 })).join("\n")}
     // }
@@ -240,13 +235,13 @@ if(!pAtEnd) {
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map(i => {
+${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `   
-if(!nAtEnd) {
-    nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-    nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
-    nAtEnd = abs(nLumaDelta) >= gradientThreshold;
-}
+    if(!nAtEnd) {
+        nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
+        nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+        nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+    }
 `;
         })).join("\n")}
     // }
@@ -254,9 +249,6 @@ if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeGuess});
     }
    
-    // check nat end 
-    // outColor = vec4(nAtEnd ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
-    
     float pDistance, nDistance;
     if(e.isHorizontal) {
         pDistance = puv.x - uv.x;
@@ -275,6 +267,9 @@ if(!nAtEnd) {
         shortestDistance = nDistance;
         deltaSign = nLumaDelta >= 0.;
     }
+   
+   // return edgeLuma; 
+    // return edgeLuma > 0. ? 1. : 0.;
     
     float edgeBlendFactor;
     
@@ -288,10 +283,6 @@ if(!nAtEnd) {
 }
 
 void main() {
-//     float fxaaContrastThreshold = uContrastThreshold;
-//     float fxaaRelativeThreshold = uRelativeThreshold;
-//     float fxaaSubpixelBlending = uSubpixelBlending;
-    
     vec2 uv = vUv;
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
@@ -316,6 +307,13 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
+    // outColor = vec4(e.pixelStep > .01 ? vec3(1., 0., 0.) : vec3(0., 1., 0.), 1.);
+    // outColor = vec4(vec3(pixelBlend), 1.);
+    // outColor = vec4(vec3(edgeBlend), 1.);
+    // outColor = vec4(vec3(e.gradient), 1.);
+    // outColor = vec4(vec3(e.oppositeLuma), 1.);
+    // outColor = vec4(vec3(finalBlend), 1.);
+    // outColor = vec4(vec3(e.pixelStep), 1.);
     outColor = sampleTexture(uSceneTexture, uv);
 }
 `;
