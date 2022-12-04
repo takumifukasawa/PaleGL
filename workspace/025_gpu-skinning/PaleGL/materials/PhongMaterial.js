@@ -25,6 +25,8 @@ export class PhongMaterial extends Material {
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
+        // isSkinning,
+        // gpuSkinning,
         uniforms = {},
         // jointMatrices,
         ...options
@@ -62,14 +64,16 @@ export class PhongMaterial extends Material {
             // } : {}),
             uDirectionalLight: {}
         };
-        
-        const isSkinning = !!uniforms.uJointMatrices;
+       
+        // TODO: uniformsじゃなくてoptionsから判別させたい
+        // const isSkinning = !!uniforms.uJointMatrices;
         
         const useNormalMap = !!normalMap;
         const vertexShader = generateVertexShader({
-            isSkinning,
+            isSkinning: options.isSkinning,
+            gpuSkinning: options.gpuSkinning,
             // jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
-            jointNum: isSkinning ? uniforms.uJointMatrices.value.length : null,
+            jointNum: options.isSkinning ? uniforms.uJointMatrices.value.length : null,
             receiveShadow: options.receiveShadow,
             useNormalMap
         });
@@ -108,6 +112,8 @@ export class PhongMaterial extends Material {
 
         super({
             ...options,
+            // gpuSkinning,
+            // isSkinning
             vertexShader,
             fragmentShader,
             uniforms: mergedUniforms,

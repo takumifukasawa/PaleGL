@@ -23,6 +23,9 @@ export class SkinnedMesh extends Mesh {
     
     #jointTexture;
     
+    #gpuSkinning;
+    
+    // TODO: generate vertex shader in constructor
     constructor({bones, gpu, ...options}) {
         super({
             ...options,
@@ -40,17 +43,20 @@ export class SkinnedMesh extends Mesh {
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
     }
-    
+   
     start(options) {
         super.start(options);
        
         const { gpu } = options;
+
+        this.#gpuSkinning = !!this.mainMaterial.gpuSkinning;
         
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({
                     isSkinning: true,
+                    gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
                 }),
                 fragmentShader: generateDepthFragmentShader({
@@ -62,10 +68,14 @@ export class SkinnedMesh extends Mesh {
                         type: UniformTypes.Matrix4Array,
                         value: null
                     },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    }
+                    ...(this.#gpuSkinning ?
+                        {
+                            uJointTexture: {
+                                type: UniformTypes.Texture,
+                                value: null
+                            }
+                        }
+                    : {}),
                 },
                 alphaTest: this.mainMaterial.alphaTest
             });
@@ -88,13 +98,15 @@ export class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
-        
-        this.#jointTexture = new Texture({
-            gpu,
-            width: 1,
-            height: 1,
-            type: TextureTypes.RGBA32F
-        });
+       
+        if(this.#gpuSkinning) {
+            this.#jointTexture = new Texture({
+                gpu,
+                width: 1,
+                height: 1,
+                type: TextureTypes.RGBA32F
+            });
+        }
         
         this.boneLines = new Mesh({
             gpu,
@@ -206,7 +218,6 @@ export class SkinnedMesh extends Mesh {
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
        
-       // console.log("-------") 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
 
         this.materials.forEach(material => {
@@ -215,17 +226,19 @@ export class SkinnedMesh extends Mesh {
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
-        
-        const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
-        
-        this.#jointTexture.update({
-            width: 4,
-            height: this.boneCount,
-            data: jointData
-        });
 
-        this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
-        this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
+        if(this.#gpuSkinning) {
+            const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+            
+            this.#jointTexture.update({
+                width: 4,
+                height: this.boneCount,
+                data: jointData
+            });
+
+            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+            this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
+        }
     }
 
     getBoneOffsetMatrices() {

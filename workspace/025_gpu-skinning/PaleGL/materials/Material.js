@@ -18,6 +18,7 @@ export class Material {
     faceSide;
     receiveShadow;
     isSkinning;
+    gpuSkinning;
     queue;
     
     vertexShader;
@@ -42,6 +43,7 @@ export class Material {
         blendType,
         renderQueue,
         isSkinning,
+        gpuSkinning,
         queue,
         uniforms = {},
         depthUniforms = {}
@@ -80,10 +82,16 @@ export class Material {
         if (!this.renderQueue) {
             throw "[Material.constructor] invalid render queue";
         }
-        
-        this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
+       
+        // TODO: フラグだけで判別した方が良い気がする
+        // this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
+        // this.gpuSkinning = gpuSkinning || !!uniforms.uJointTexture;
+        this.isSkinning = isSkinning;
+        this.gpuSkinning = gpuSkinning;
 
-        // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
+        // TODO:
+        // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
+        // - skinning回りもここで入れたい？
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,

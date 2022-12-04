@@ -259,12 +259,15 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshes.forEach(skinningMesh => {
         skinningMesh.castShadow = true;
         skinningMesh.materials = [
+            // TODO: materialにgpuskinning option持たせる？
             new PhongMaterial({
                 gpu,
                 diffuseMap: floorDiffuseMap,
                 normalMap: floorNormalMap,
                 // TODO: 毎回これ入れるのめんどいので共通化したい
                 receiveShadow: true,
+                isSkinning: true,
+                gpuSkinning: true,
                 uniforms: {
                     uJointMatrices: {
                         type: UniformTypes.Matrix4Array,
@@ -281,8 +284,9 @@ const createGLTFSkinnedMesh = async () => {
                 gpu,
                 vertexShader: generateVertexShader({
                     jointNum: skinningMesh.boneCount,
-                    receiveShadow: false,
                     isSkinning: true,
+                    gpuSkinning: true,
+                    receiveShadow: false,
                     insertUniforms: `
 uniform float uOutlineOffset;
                     `,

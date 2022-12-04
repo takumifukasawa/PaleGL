@@ -27,23 +27,33 @@ mat4 getJointMatrix(sampler2D jointTexture, int jointIndex) {
 }
 `;
 
-// export const skinningVertex = () => `
-//     mat4 skinMatrix =
-//          uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-//          uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-//          uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-//          uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-//     
-//     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-//     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-//     vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-//     
-//     vec4 localPosition = skinMatrix * vec4(aPosition, 1.);
-// 
-//     // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
-// `;
-
 export const skinningVertexUniforms = (jointNum) => `
 uniform mat4[${jointNum}] uJointMatrices;
 uniform sampler2D uJointTexture;
+`;
+
+export const skinningVertex = (gpuSkinning = false) => `
+    ${!gpuSkinning ? `
+    // cpu skinning
+    mat4 skinMatrix = calcSkinningMatrix(
+        uJointMatrices[int(aBoneIndices[0])],
+        uJointMatrices[int(aBoneIndices[1])],
+        uJointMatrices[int(aBoneIndices[2])],
+        uJointMatrices[int(aBoneIndices[3])],
+        aBoneWeights
+    );
+    ` : `
+    // gpu skinning
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
+    mat4 skinMatrix = calcSkinningMatrix(
+        jointMatrix0,
+        jointMatrix1,
+        jointMatrix2,
+        jointMatrix3,
+        aBoneWeights
+    );
+    `}
 `;

@@ -1,7 +1,7 @@
 import {
     skinningVertexUniforms,
     skinningVertexAttributes,
-    calcSkinningMatrixFunc
+    calcSkinningMatrixFunc, skinningVertex
 } from "./skinningShader.js";
 import {transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
@@ -11,6 +11,7 @@ import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingComm
 
 export const generateVertexShader = ({
     isSkinning,
+    gpuSkinning,
     jointNum,
     receiveShadow,
     useNormalMap,
@@ -49,33 +50,10 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 ${insertUniforms || ""}
 
 void main() {
-    ${isSkinning ? `
-    // cpu skinning
-    // mat4 skinMatrix = calcSkinningMatrix(
-    //     uJointMatrices[int(aBoneIndices[0])],
-    //     uJointMatrices[int(aBoneIndices[1])],
-    //     uJointMatrices[int(aBoneIndices[2])],
-    //     uJointMatrices[int(aBoneIndices[3])],
-    //     aBoneWeights
-    // );
-   
-    // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
-    mat4 skinMatrix = calcSkinningMatrix(
-        jointMatrix0,
-        jointMatrix1,
-        jointMatrix2,
-        jointMatrix3,
-        aBoneWeights
-    );
-    ` : ""}
+    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
     ${localPositionProcess || ""}
-    
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
@@ -119,7 +97,13 @@ void main() {
 `;
 }
 
-export const generateDepthVertexShader = ({ isSkinning, useNormalMap, jointNum } = {}) => {
+export const generateDepthVertexShader = ({
+    isSkinning,
+    gpuSkinning,
+    localPositionProcess ,
+    useNormalMap,
+    jointNum
+} = {}) => {
 
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
@@ -143,36 +127,16 @@ ${transformVertexUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
-    ${isSkinning ? `
-    // cpu skinning
-    // mat4 skinMatrix = calcSkinningMatrix(
-    //     uJointMatrices[int(aBoneIndices[0])],
-    //     uJointMatrices[int(aBoneIndices[1])],
-    //     uJointMatrices[int(aBoneIndices[2])],
-    //     uJointMatrices[int(aBoneIndices[3])],
-    //     aBoneWeights
-    // );
+    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
-    // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
-    mat4 skinMatrix = calcSkinningMatrix(
-        jointMatrix0,
-        jointMatrix1,
-        jointMatrix2,
-        jointMatrix3,
-        aBoneWeights
-    );
-    ` : ""}
-
+    vec4 localPosition = vec4(aPosition, 1.);
+    ${localPositionProcess || ""}
     ${isSkinning
         ? `
-    vec4 localPosition = skinMatrix * vec4(aPosition, 1.);`
-        : `
-    vec4 localPosition = vec4(aPosition, 1.);`
+    localPosition = skinMatrix * localPosition;`
+        : ""
     }
+ 
     
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }

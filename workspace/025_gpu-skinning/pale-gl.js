@@ -1339,6 +1339,7 @@ class Material {
     faceSide;
     receiveShadow;
     isSkinning;
+    gpuSkinning;
     queue;
     
     vertexShader;
@@ -1363,6 +1364,7 @@ class Material {
         blendType,
         renderQueue,
         isSkinning,
+        gpuSkinning,
         queue,
         uniforms = {},
         depthUniforms = {}
@@ -1401,10 +1403,16 @@ class Material {
         if (!this.renderQueue) {
             throw "[Material.constructor] invalid render queue";
         }
-        
-        this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
+       
+        // TODO: フラグだけで判別した方が良い気がする
+        // this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
+        // this.gpuSkinning = gpuSkinning || !!uniforms.uJointTexture;
+        this.isSkinning = isSkinning;
+        this.gpuSkinning = gpuSkinning;
 
-        // TODO: シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
+        // TODO:
+        // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
+        // - skinning回りもここで入れたい？
         const commonUniforms = {
             uWorldMatrix: {
                 type: UniformTypes.Matrix4,
@@ -3171,25 +3179,35 @@ mat4 getJointMatrix(sampler2D jointTexture, int jointIndex) {
 }
 `;
 
-// const skinningVertex = () => `
-//     mat4 skinMatrix =
-//          uJointMatrices[int(aBoneIndices[0])] * aBoneWeights.x +
-//          uJointMatrices[int(aBoneIndices[1])] * aBoneWeights.y +
-//          uJointMatrices[int(aBoneIndices[2])] * aBoneWeights.z +
-//          uJointMatrices[int(aBoneIndices[3])] * aBoneWeights.w;
-//     
-//     vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-//     vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-//     vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-//     
-//     vec4 localPosition = skinMatrix * vec4(aPosition, 1.);
-// 
-//     // gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
-// `;
-
 const skinningVertexUniforms = (jointNum) => `
 uniform mat4[${jointNum}] uJointMatrices;
 uniform sampler2D uJointTexture;
+`;
+
+const skinningVertex = (gpuSkinning = false) => `
+    ${!gpuSkinning ? `
+    // cpu skinning
+    mat4 skinMatrix = calcSkinningMatrix(
+        uJointMatrices[int(aBoneIndices[0])],
+        uJointMatrices[int(aBoneIndices[1])],
+        uJointMatrices[int(aBoneIndices[2])],
+        uJointMatrices[int(aBoneIndices[3])],
+        aBoneWeights
+    );
+    ` : `
+    // gpu skinning
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
+    mat4 skinMatrix = calcSkinningMatrix(
+        jointMatrix0,
+        jointMatrix1,
+        jointMatrix2,
+        jointMatrix3,
+        aBoneWeights
+    );
+    `}
 `;
 
 
@@ -3372,6 +3390,7 @@ vec4 calcPhongLighting() {
 
 const generateVertexShader = ({
     isSkinning,
+    gpuSkinning,
     jointNum,
     receiveShadow,
     useNormalMap,
@@ -3410,33 +3429,10 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 ${insertUniforms || ""}
 
 void main() {
-    ${isSkinning ? `
-    // cpu skinning
-    // mat4 skinMatrix = calcSkinningMatrix(
-    //     uJointMatrices[int(aBoneIndices[0])],
-    //     uJointMatrices[int(aBoneIndices[1])],
-    //     uJointMatrices[int(aBoneIndices[2])],
-    //     uJointMatrices[int(aBoneIndices[3])],
-    //     aBoneWeights
-    // );
-   
-    // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
-    mat4 skinMatrix = calcSkinningMatrix(
-        jointMatrix0,
-        jointMatrix1,
-        jointMatrix2,
-        jointMatrix3,
-        aBoneWeights
-    );
-    ` : ""}
+    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
     ${localPositionProcess || ""}
-    
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
@@ -3480,7 +3476,13 @@ void main() {
 `;
 }
 
-const generateDepthVertexShader = ({ isSkinning, useNormalMap, jointNum } = {}) => {
+const generateDepthVertexShader = ({
+    isSkinning,
+    gpuSkinning,
+    localPositionProcess ,
+    useNormalMap,
+    jointNum
+} = {}) => {
 
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
@@ -3504,36 +3506,16 @@ ${transformVertexUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
-    ${isSkinning ? `
-    // cpu skinning
-    // mat4 skinMatrix = calcSkinningMatrix(
-    //     uJointMatrices[int(aBoneIndices[0])],
-    //     uJointMatrices[int(aBoneIndices[1])],
-    //     uJointMatrices[int(aBoneIndices[2])],
-    //     uJointMatrices[int(aBoneIndices[3])],
-    //     aBoneWeights
-    // );
+    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
-    // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
-    mat4 skinMatrix = calcSkinningMatrix(
-        jointMatrix0,
-        jointMatrix1,
-        jointMatrix2,
-        jointMatrix3,
-        aBoneWeights
-    );
-    ` : ""}
-
+    vec4 localPosition = vec4(aPosition, 1.);
+    ${localPositionProcess || ""}
     ${isSkinning
         ? `
-    vec4 localPosition = skinMatrix * vec4(aPosition, 1.);`
-        : `
-    vec4 localPosition = vec4(aPosition, 1.);`
+    localPosition = skinMatrix * localPosition;`
+        : ""
     }
+ 
     
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }
@@ -3565,6 +3547,9 @@ class SkinnedMesh extends Mesh {
     
     #jointTexture;
     
+    #gpuSkinning;
+    
+    // TODO: generate vertex shader in constructor
     constructor({bones, gpu, ...options}) {
         super({
             ...options,
@@ -3582,17 +3567,20 @@ class SkinnedMesh extends Mesh {
         // for debug
         // console.log(this.positions, this.boneIndices, this.boneWeights)
     }
-    
+   
     start(options) {
         super.start(options);
        
         const { gpu } = options;
+
+        this.#gpuSkinning = !!this.mainMaterial.gpuSkinning;
         
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({
                     isSkinning: true,
+                    gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
                 }),
                 fragmentShader: generateDepthFragmentShader({
@@ -3604,10 +3592,14 @@ class SkinnedMesh extends Mesh {
                         type: UniformTypes.Matrix4Array,
                         value: null
                     },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    }
+                    ...(this.#gpuSkinning ?
+                        {
+                            uJointTexture: {
+                                type: UniformTypes.Texture,
+                                value: null
+                            }
+                        }
+                    : {}),
                 },
                 alphaTest: this.mainMaterial.alphaTest
             });
@@ -3630,13 +3622,15 @@ class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
-        
-        this.#jointTexture = new Texture({
-            gpu,
-            width: 1,
-            height: 1,
-            type: TextureTypes.RGBA32F
-        });
+       
+        if(this.#gpuSkinning) {
+            this.#jointTexture = new Texture({
+                gpu,
+                width: 1,
+                height: 1,
+                type: TextureTypes.RGBA32F
+            });
+        }
         
         this.boneLines = new Mesh({
             gpu,
@@ -3748,7 +3742,6 @@ class SkinnedMesh extends Mesh {
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
        
-       // console.log("-------") 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
 
         this.materials.forEach(material => {
@@ -3757,17 +3750,19 @@ class SkinnedMesh extends Mesh {
         if(this.depthMaterial) {
             this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         }
-        
-        const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
-        
-        this.#jointTexture.update({
-            width: 4,
-            height: this.boneCount,
-            data: jointData
-        });
 
-        this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
-        this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
+        if(this.#gpuSkinning) {
+            const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+            
+            this.#jointTexture.update({
+                width: 4,
+                height: this.boneCount,
+                data: jointData
+            });
+
+            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+            this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
+        }
     }
 
     getBoneOffsetMatrices() {
@@ -5825,6 +5820,8 @@ class PhongMaterial extends Material {
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
+        // isSkinning,
+        // gpuSkinning,
         uniforms = {},
         // jointMatrices,
         ...options
@@ -5862,14 +5859,16 @@ class PhongMaterial extends Material {
             // } : {}),
             uDirectionalLight: {}
         };
-        
-        const isSkinning = !!uniforms.uJointMatrices;
+       
+        // TODO: uniformsじゃなくてoptionsから判別させたい
+        // const isSkinning = !!uniforms.uJointMatrices;
         
         const useNormalMap = !!normalMap;
         const vertexShader = generateVertexShader({
-            isSkinning,
+            isSkinning: options.isSkinning,
+            gpuSkinning: options.gpuSkinning,
             // jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
-            jointNum: isSkinning ? uniforms.uJointMatrices.value.length : null,
+            jointNum: options.isSkinning ? uniforms.uJointMatrices.value.length : null,
             receiveShadow: options.receiveShadow,
             useNormalMap
         });
@@ -5908,6 +5907,8 @@ class PhongMaterial extends Material {
 
         super({
             ...options,
+            // gpuSkinning,
+            // isSkinning
             vertexShader,
             fragmentShader,
             uniforms: mergedUniforms,
