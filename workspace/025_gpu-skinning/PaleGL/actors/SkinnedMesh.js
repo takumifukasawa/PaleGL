@@ -1,5 +1,5 @@
 ﻿import {Mesh} from "./Mesh.js";
-import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes, UniformTypes} from "../constants.js";
+import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes, TextureTypes, UniformTypes} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Geometry} from "../geometries/Geometry.js";
@@ -89,7 +89,12 @@ export class SkinnedMesh extends Mesh {
         }
         checkChildNum(this.bones);
         
-        this.#jointTexture = new Texture({ gpu, width: 1, height: 1 });
+        this.#jointTexture = new Texture({
+            gpu,
+            width: 1,
+            height: 1,
+            type: TextureTypes.RGBA32F
+        });
         
         this.boneLines = new Mesh({
             gpu,
@@ -218,6 +223,9 @@ export class SkinnedMesh extends Mesh {
             height: this.boneCount,
             data: jointData
         });
+
+        this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+        this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
     }
 
     getBoneOffsetMatrices() {

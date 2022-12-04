@@ -50,16 +50,30 @@ ${insertUniforms || ""}
 
 void main() {
     ${isSkinning ? `
+    // cpu skinning
+    // mat4 skinMatrix = calcSkinningMatrix(
+    //     uJointMatrices[int(aBoneIndices[0])],
+    //     uJointMatrices[int(aBoneIndices[1])],
+    //     uJointMatrices[int(aBoneIndices[2])],
+    //     uJointMatrices[int(aBoneIndices[3])],
+    //     aBoneWeights
+    // );
+   
+    // gpu skinning
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
     mat4 skinMatrix = calcSkinningMatrix(
-        uJointMatrices[int(aBoneIndices[0])],
-        uJointMatrices[int(aBoneIndices[1])],
-        uJointMatrices[int(aBoneIndices[2])],
-        uJointMatrices[int(aBoneIndices[3])],
+        jointMatrix0,
+        jointMatrix1,
+        jointMatrix2,
+        jointMatrix3,
         aBoneWeights
     );
     ` : ""}
     
-    vec4 localPosition = vec4(aPosition, 1.);;
+    vec4 localPosition = vec4(aPosition, 1.);
     ${localPositionProcess || ""}
     
     ${isSkinning
@@ -130,11 +144,25 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
     ${isSkinning ? `
+    // cpu skinning
+    // mat4 skinMatrix = calcSkinningMatrix(
+    //     uJointMatrices[int(aBoneIndices[0])],
+    //     uJointMatrices[int(aBoneIndices[1])],
+    //     uJointMatrices[int(aBoneIndices[2])],
+    //     uJointMatrices[int(aBoneIndices[3])],
+    //     aBoneWeights
+    // );
+    
+    // gpu skinning
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
     mat4 skinMatrix = calcSkinningMatrix(
-        uJointMatrices[int(aBoneIndices[0])],
-        uJointMatrices[int(aBoneIndices[1])],
-        uJointMatrices[int(aBoneIndices[2])],
-        uJointMatrices[int(aBoneIndices[3])],
+        jointMatrix0,
+        jointMatrix1,
+        jointMatrix2,
+        jointMatrix3,
         aBoneWeights
     );
     ` : ""}

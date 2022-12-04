@@ -15,6 +15,16 @@ mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 joi
          jointMat3 * aBoneWeights.w;
     return skinMatrix;
 }
+
+mat4 getJointMatrix(sampler2D jointTexture, int jointIndex) {
+    mat4 jointMatrix = mat4(
+        texelFetch(jointTexture, ivec2(0, jointIndex), 0),
+        texelFetch(jointTexture, ivec2(1, jointIndex), 0),
+        texelFetch(jointTexture, ivec2(2, jointIndex), 0),
+        texelFetch(jointTexture, ivec2(3, jointIndex), 0)
+    );
+    return jointMatrix;
+}
 `;
 
 // export const skinningVertex = () => `
@@ -35,4 +45,5 @@ mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 joi
 
 export const skinningVertexUniforms = (jointNum) => `
 uniform mat4[${jointNum}] uJointMatrices;
+uniform sampler2D uJointTexture;
 `;

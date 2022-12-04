@@ -48,6 +48,7 @@ export class Texture extends GLObject {
         // filter
         switch(this.type) {
             case TextureTypes.RGBA:
+            case TextureTypes.RGBA32F:
                 // min filter settings
                 switch(minFilter) {
                     case TextureFilterTypes.Nearest:
@@ -77,6 +78,7 @@ export class Texture extends GLObject {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 break;
+
             default:
                 throw "invalid texture type";
         }
@@ -110,7 +112,7 @@ export class Texture extends GLObject {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
         }
 
-        // TODO: startみたいな関数でtextureにdataをセットしたい
+        // TODO: startみたいな関数でtextureにdataをセットした方が効率よい？
         // if(this.#img) {
             // bind texture data
             switch(this.type) {
@@ -123,6 +125,7 @@ export class Texture extends GLObject {
                         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
                     }
                     break;
+                    
                 case TextureTypes.Depth:
                     if (width && height) {
                         // for render target
@@ -132,8 +135,17 @@ export class Texture extends GLObject {
                         gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                     }
                     break;
+                    
+                case TextureTypes.RGBA32F:
+                    if (width && height) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.#img);
+                    }   
+                    break;
+                    
                 default:
-                    throw "invalid type";
+                    throw "[Texture.constructor] invalid type";
             }
         // }
        
@@ -149,15 +161,19 @@ export class Texture extends GLObject {
         // bind texture data
         switch(this.type) {
             case TextureTypes.RGBA:
-                // for render target
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
                 break;
+                
             case TextureTypes.Depth:
-                // for render target
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 break;
+                
+            case TextureTypes.RGBA32F:
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                break;
+                
             default:
-                throw "invalid type";
+                throw "[Texture.setSize] invalid type";
         }
         
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
@@ -173,6 +189,8 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA32F:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
                 break;
+            default:
+                throw "[Texture.update] invalid type";
         }
         
         gl.bindTexture(gl.TEXTURE_2D, null);
