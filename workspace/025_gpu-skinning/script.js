@@ -240,7 +240,8 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -253,6 +254,7 @@ const createGLTFSkinnedMesh = async () => {
     gltfActor.transform.setScaling(Vector3.fill(4));
     
     skinningMeshAnimator = gltfActor.animator;
+    console.log("hogehoge", gltfActor.animator)
  
     skinningMeshes = gltfActor.transform.children[0].transform.children;
     
