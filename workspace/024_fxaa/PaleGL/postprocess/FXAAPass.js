@@ -407,13 +407,20 @@ void main() {
                     type: UniformTypes.Float,
                     value: 1,
                 },
+                // 1/32 = 0.03125 ... visible limit
+                // 1/16 = 0.0625 ... high quality
+                // 1/12 = 0.0833 ... upper limit
                 uContrastThreshold: {
                     type: UniformTypes.Float,
-                    value: 0.0312,
+                    value: 0.0625,
                 },
+                // 1/3 = 0.333 ... too little
+                // 1/4 = 0.25 ... low quality
+                // 1/8 = 0.125 ... high quality
+                // 1/16 = 0.0625 ... overkill
                 uRelativeThreshold: {
                     type: UniformTypes.Float,
-                    value: 0.063,
+                    value: 0.125,
                 },
                 uSubpixelBlending: {
                     type: UniformTypes.Float,
