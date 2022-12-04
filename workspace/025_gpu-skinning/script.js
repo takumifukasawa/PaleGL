@@ -165,18 +165,18 @@ captureSceneCamera.onStart = ({ actor }) => {
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
     // 1: move position with mouse
-    // const cameraPosition = Vector3.addVectors(
-    //     actor.transform.position,
-    //     new Vector3(
-    //         (targetCameraPosition.x - actor.transform.position.x) * 0.1,
-    //         (targetCameraPosition.y - actor.transform.position.y) * 0.1,
-    //         (targetCameraPosition.z - actor.transform.position.z) * 0.1
-    //     )
-    // );
-    // actor.transform.position = cameraPosition;
+    const cameraPosition = Vector3.addVectors(
+        actor.transform.position,
+        new Vector3(
+            (targetCameraPosition.x - actor.transform.position.x) * 0.1,
+            (targetCameraPosition.y - actor.transform.position.y) * 0.1,
+            (targetCameraPosition.z - actor.transform.position.z) * 0.1
+        )
+    );
+    actor.transform.position = cameraPosition;
     
     // 2: fixed position
-    actor.transform.position = new Vector3(0, 5, 10);
+    // actor.transform.position = new Vector3(0, 5, 10);
 }
 
 const directionalLight = new DirectionalLight();
