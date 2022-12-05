@@ -241,7 +241,8 @@ const onWindowResize = () => {
 
 const createGLTFSkinnedMesh = async () => {
     // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/test-plane-skinning.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -254,7 +255,6 @@ const createGLTFSkinnedMesh = async () => {
     gltfActor.transform.setScaling(Vector3.fill(4));
     
     skinningMeshAnimator = gltfActor.animator;
-    console.log("hogehoge", gltfActor.animator)
  
     skinningMeshes = gltfActor.transform.children[0].transform.children;
     
@@ -600,7 +600,7 @@ function initDebugger() {
 
     debuggerGUI.addPullDownDebugger({
         label: "animations",
-        initialValue: skinningMeshAnimator.animationClips[1].name, // index: 0 のアニメーションがなぜか消せないのでとりあえず
+        initialValue: skinningMeshAnimator.animationClips[0].name, // index: 0 のアニメーションがなぜか消せないのでとりあえず
         options: skinningMeshAnimator.animationClips.map(animationClip => ({ value: animationClip.name })),
         initialExec: true,
         onChange: (value) => {
@@ -608,70 +608,70 @@ function initDebugger() {
         }
     });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position x",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.x,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position y",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.y,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position z",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.z,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
-    //     }
-    // });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position x",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.x,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position y",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.y,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor position z",
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.position.z,
+        onChange: (value) => {
+            const p = gltfActor.transform.position;
+            gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
+        }
+    });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation x",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.x,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationX(value);
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation y",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.y,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationY(value);
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation z",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.z,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationZ(value);
-    //     }
-    // });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation x",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.x,
+        onChange: (value) => {
+            gltfActor.transform.setRotationX(value);
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation y",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.y,
+        onChange: (value) => {
+            gltfActor.transform.setRotationY(value);
+        }
+    });
+    debuggerGUI.addSliderDebugger({
+        label: "gltf actor rotation z",
+        minValue: -180,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: gltfActor.transform.rotation.z,
+        onChange: (value) => {
+            gltfActor.transform.setRotationZ(value);
+        }
+    });
 
     debuggerGUI.addBorderSpacer();
 

@@ -57,8 +57,9 @@ export async function loadGLTF({
         // - indexをふり直しても良い
         const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
+        
+        console.log("hogehoge", node)
       
-        // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
             node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
             node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),

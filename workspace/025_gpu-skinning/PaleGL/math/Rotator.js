@@ -32,7 +32,8 @@
     get yaw() {
         return this.elements[1];
     }
-    
+   
+    // degree
     getAxes() {
         return {
             x: this.elements[0],
@@ -70,6 +71,11 @@
             z * 180 / Math.PI,
         );
         return rotator;
+    }
+    
+    static fromQuaternion(q) {
+        const euler = q.toEulerDegree();
+        return new Rotator(euler.x, euler.y, euler.z);
     }
     
     setRotationX(degree) {

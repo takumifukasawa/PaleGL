@@ -755,7 +755,10 @@ class Matrix4 {
         );
         return result;
     }
-    
+  
+    // position ... vector3
+    // rotation ... rotator
+    // scaling ... vector3
     static fromTRS(position, rotation, scaling) {
         const rotationRadians = rotation.getAxesRadians();
         return Matrix4.multiplyMatrices(
@@ -768,11 +771,11 @@ class Matrix4 {
     }
     
     static fromQuaternion(q) {
-        const euler = q.toEulerRadian();
+        const eulerRadian = q.toEulerRadian();
         return Matrix4.multiplyMatrices(
-            Matrix4.rotationYMatrix(euler.y),
-            Matrix4.rotationXMatrix(euler.x),
-            Matrix4.rotationZMatrix(euler.z),
+            Matrix4.rotationYMatrix(eulerRadian.y),
+            Matrix4.rotationXMatrix(eulerRadian.x),
+            Matrix4.rotationZMatrix(eulerRadian.z),
         );
     }
 
@@ -931,7 +934,8 @@ const AnimationKeyframeTypes = {
     get yaw() {
         return this.elements[1];
     }
-    
+   
+    // degree
     getAxes() {
         return {
             x: this.elements[0],
@@ -969,6 +973,11 @@ const AnimationKeyframeTypes = {
             z * 180 / Math.PI,
         );
         return rotator;
+    }
+    
+    static fromQuaternion(q) {
+        const euler = q.toEulerDegree();
+        return new Rotator(euler.x, euler.y, euler.z);
     }
     
     setRotationX(degree) {
@@ -3764,6 +3773,11 @@ class SkinnedMesh extends Mesh {
         super.update(options);
         
         this.bones.calcJointMatrix();
+        // this.bones.traverse(b => {
+        //    if(b.name === "thigh.L") {
+        //        console.log(b.rotation.getAxes())
+        //    }
+        // })
         
         // NOTE: test update skinning by cpu
         const boneOffsetMatrices = this.boneOffsetMatrices;
@@ -5302,13 +5316,14 @@ class AnimationClip {
                     case "rotation":
                         // TODO: rotationはquaternionなのでquaternionであるべき
                         const q = frameValue;
-                        const euler = q.toEulerDegree();
-                        // console.log(euler)
-                        animationKeyframes.target.rotation = Rotator.fromRadian(
-                            euler.x * Math.PI / 180,
-                            euler.y * Math.PI / 180,
-                            euler.z * Math.PI / 180,
-                        );
+                        // const euler = q.toEulerDegree();
+                        // // console.log(euler)
+                        // animationKeyframes.target.rotation = Rotator.fromRadian(
+                        //     euler.x * Math.PI / 180,
+                        //     euler.y * Math.PI / 180,
+                        //     euler.z * Math.PI / 180,
+                        // );
+                        animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
                         break;
                     case "scale":
                         animationKeyframes.scale = frameValue;
@@ -5497,8 +5512,9 @@ async function loadGLTF({
         // - indexをふり直しても良い
         const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
+        
+        console.log("hogehoge", node)
       
-        // TODO: fix initial pose matrix
         const offsetMatrix = Matrix4.multiplyMatrices(
             node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
             node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),

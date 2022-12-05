@@ -213,6 +213,11 @@ export class SkinnedMesh extends Mesh {
         super.update(options);
         
         this.bones.calcJointMatrix();
+        // this.bones.traverse(b => {
+        //    if(b.name === "thigh.L") {
+        //        console.log(b.rotation.getAxes())
+        //    }
+        // })
         
         // NOTE: test update skinning by cpu
         const boneOffsetMatrices = this.boneOffsetMatrices;

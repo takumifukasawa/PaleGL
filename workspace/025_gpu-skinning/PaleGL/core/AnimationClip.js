@@ -123,13 +123,14 @@ export class AnimationClip {
                     case "rotation":
                         // TODO: rotationはquaternionなのでquaternionであるべき
                         const q = frameValue;
-                        const euler = q.toEulerDegree();
-                        // console.log(euler)
-                        animationKeyframes.target.rotation = Rotator.fromRadian(
-                            euler.x * Math.PI / 180,
-                            euler.y * Math.PI / 180,
-                            euler.z * Math.PI / 180,
-                        );
+                        // const euler = q.toEulerDegree();
+                        // // console.log(euler)
+                        // animationKeyframes.target.rotation = Rotator.fromRadian(
+                        //     euler.x * Math.PI / 180,
+                        //     euler.y * Math.PI / 180,
+                        //     euler.z * Math.PI / 180,
+                        // );
+                        animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
                         break;
                     case "scale":
                         animationKeyframes.scale = frameValue;

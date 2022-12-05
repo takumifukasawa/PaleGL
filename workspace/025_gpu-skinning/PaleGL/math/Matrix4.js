@@ -573,7 +573,10 @@ export class Matrix4 {
         );
         return result;
     }
-    
+  
+    // position ... vector3
+    // rotation ... rotator
+    // scaling ... vector3
     static fromTRS(position, rotation, scaling) {
         const rotationRadians = rotation.getAxesRadians();
         return Matrix4.multiplyMatrices(
@@ -586,11 +589,11 @@ export class Matrix4 {
     }
     
     static fromQuaternion(q) {
-        const euler = q.toEulerRadian();
+        const eulerRadian = q.toEulerRadian();
         return Matrix4.multiplyMatrices(
-            Matrix4.rotationYMatrix(euler.y),
-            Matrix4.rotationXMatrix(euler.x),
-            Matrix4.rotationZMatrix(euler.z),
+            Matrix4.rotationYMatrix(eulerRadian.y),
+            Matrix4.rotationXMatrix(eulerRadian.x),
+            Matrix4.rotationZMatrix(eulerRadian.z),
         );
     }
 
