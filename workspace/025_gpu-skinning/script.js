@@ -241,8 +241,8 @@ const onWindowResize = () => {
 
 const createGLTFSkinnedMesh = async () => {
     // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/test-plane-skinning.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
+    // gltfActor = await loadGLTF({ gpu, path: "./models/test-plane-skinning.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
