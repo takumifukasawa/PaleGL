@@ -79,4 +79,7 @@ export class Actor {
             this.#onUpdate({ actor: this, gpu, time, deltaTime });
         }
     }
+    
+    beforeRender({ gpu }) {
+    }
 }

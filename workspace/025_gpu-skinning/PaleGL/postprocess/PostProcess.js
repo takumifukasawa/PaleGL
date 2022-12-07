@@ -48,7 +48,7 @@ export class PostProcess {
             pass.mesh.updateTransform();
             pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
             if(!pass.mesh.material.isCompiledShader) {
-                pass.mesh.material.compileShader({ gpu })
+                pass.mesh.material.start({ gpu })
             }
 
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);

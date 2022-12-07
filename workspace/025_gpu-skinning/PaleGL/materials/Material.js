@@ -5,6 +5,8 @@ import {Vector3} from "../math/Vector3.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class Material {
+    name;
+  
     shader;
     primitiveType;
     blendType;
@@ -17,23 +19,37 @@ export class Material {
     culling;
     faceSide;
     receiveShadow;
+    queue;
+    
     isSkinning;
     gpuSkinning;
-    queue;
+    jointNum;
     
     vertexShader;
     fragmentShader;
     depthFragmentShader;
-   
+
+    #vertexShaderGenerator;
+    #fragmentShaderGenerator;
+    #depthFragmentShaderGenerator;
+    
     get isCompiledShader() {
         return !!this.shader;
     }
-    
+
     constructor({
         gpu,
+        
+        name,
+        
         vertexShader,
         fragmentShader,
         depthFragmentShader,
+        
+        vertexShaderGenerator,
+        fragmentShaderGenerator,
+        depthFragmentShaderGenerator,
+        
         primitiveType,
         depthTest = null,
         depthWrite = null,
@@ -48,12 +64,52 @@ export class Material {
         uniforms = {},
         depthUniforms = {}
     }) {
+        this.name = name;
+        
         // 外側から任意のタイミングでcompileした方が都合が良さそう
         // this.shader = new Shader({gpu, vertexShader, fragmentShader});
-
-        this.vertexShader = vertexShader;
-        this.fragmentShader = fragmentShader;
-        this.depthFragmentShader = depthFragmentShader;
+        
+        if(vertexShader) {
+            this.vertexShader = vertexShader;
+        }
+        if(fragmentShader) {
+            this.fragmentShader = fragmentShader;
+        }
+        if(depthFragmentShader) {
+            this.depthFragmentShader = depthFragmentShader;
+        }
+        
+        if(vertexShaderGenerator) {
+            this.#vertexShaderGenerator = vertexShaderGenerator;
+        }
+        if(fragmentShaderGenerator) {
+            this.#fragmentShaderGenerator = fragmentShaderGenerator;
+        }
+        if(depthFragmentShaderGenerator) {
+            this.#depthFragmentShaderGenerator = depthFragmentShaderGenerator;
+        }
+        
+        //this.#generateVertexShader = () => {
+        //    if(this.vertexShader) {
+        //        return;
+        //    }
+        //    // this.vertexShader = vertexShader;
+        //    this.vertexShader = vertexShaderGenerator({ isSkinning, jointNum, gpuSkinning });
+        //};
+        //this.#generateFragmentShader = () => {
+        //    if(this.fragmentShader) {
+        //        return;
+        //    }
+        //    // this.fragmentShader = fragmentShader;
+        //    this.fragmentShader = fragmentShaderGenerator();
+        //};
+        //this.#generateDepthFragmentShader = () => {
+        //    if(this.depthFragmentShader) {
+        //        return;
+        //    }
+        //    // this.depthFragmentShader = depthFragmentShader;
+        //    // this.depthFragmentShader = depthFragmentShaderGenerator();
+        //}
         
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
@@ -145,8 +201,22 @@ export class Material {
         
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
-    
-    compileShader({ gpu }) {
+
+    start({ gpu }) {
+        if(!this.vertexShader && this.#vertexShaderGenerator) {
+            this.vertexShader = this.#vertexShaderGenerator({
+                isSkinning: this.isSkinning,
+                jointNum: this.jointNum, 
+                gpuSkinning: this.gpuSkinning
+            });
+        }
+        if(!this.fragmentShader && this.#fragmentShaderGenerator) {
+            this.fragmentShader = this.#fragmentShaderGenerator();
+        }
+        if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
+            this.depthFragmentShader = this.#depthFragmentShaderGenerator();
+        }
+
         this.shader = new Shader({
             gpu,
             vertexShader: this.vertexShader,

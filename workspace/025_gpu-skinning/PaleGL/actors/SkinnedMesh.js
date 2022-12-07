@@ -45,11 +45,26 @@ export class SkinnedMesh extends Mesh {
     }
    
     start(options) {
-        super.start(options);
-       
         const { gpu } = options;
 
         this.#gpuSkinning = !!this.mainMaterial.gpuSkinning;
+
+        this.materials.forEach(material => {
+            material.uniforms.uJointMatrices = {
+                type: UniformTypes.Matrix4Array,
+                // TODO: 毎回これ入れるのめんどいので共通化したい
+                value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
+            };
+            if(this.#gpuSkinning) {
+                material.uniforms.uJointTexture = {
+                    type: UniformTypes.Texture,
+                    value: null
+                };
+            }
+            material.isSkinning = true;
+            material.gpuSkinning = this.#gpuSkinning;
+            material.jointNum = this.boneCount;
+        });
         
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
@@ -66,7 +81,8 @@ export class SkinnedMesh extends Mesh {
                 uniforms: {
                     uJointMatrices: {
                         type: UniformTypes.Matrix4Array,
-                        value: null
+                        value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
+                        // value: null
                     },
                     ...(this.#gpuSkinning ?
                         {
@@ -80,6 +96,8 @@ export class SkinnedMesh extends Mesh {
                 alphaTest: this.mainMaterial.alphaTest
             });
         // }
+
+        super.start(options);
 
         this.bones.calcBoneOffsetMatrix();
         // this.bones.calcJointMatrix();
@@ -269,4 +287,8 @@ export class SkinnedMesh extends Mesh {
         return matrices;        
     }
     
+    beforeRender(options) {
+        super.beforeRender(options);
+    }
+
 }

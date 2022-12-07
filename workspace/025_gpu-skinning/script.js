@@ -271,15 +271,15 @@ const createGLTFSkinnedMesh = async () => {
                 isSkinning: true,
                 gpuSkinning: true,
                 uniforms: {
-                    uJointMatrices: {
-                        type: UniformTypes.Matrix4Array,
-                        // TODO: 毎回これ入れるのめんどいので共通化したい
-                        value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                    },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    }
+                    // uJointMatrices: {
+                    //     type: UniformTypes.Matrix4Array,
+                    //     // TODO: 毎回これ入れるのめんどいので共通化したい
+                    //     value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                    // },
+                    // uJointTexture: {
+                    //     type: UniformTypes.Texture,
+                    //     value: null
+                    // }
                 }
             }),
             new Material({
@@ -309,15 +309,15 @@ uniform float uOutlineOffset;
                 }
                 `,
                 uniforms: {
-                    uJointMatrices: {
-                        type: UniformTypes.Matrix4Array,
-                        // TODO: 毎回これ入れるのめんどいので共通化したい
-                        value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                    },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    },
+                    // uJointMatrices: {
+                    //     type: UniformTypes.Matrix4Array,
+                    //     // TODO: 毎回これ入れるのめんどいので共通化したい
+                    //     value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
+                    // },
+                    // uJointTexture: {
+                    //     type: UniformTypes.Texture,
+                    //     value: null
+                    // },
                     uOutlineColor: {
                         type: UniformTypes.Color,
                         value: outlineColor
@@ -521,16 +521,14 @@ const main = async () => {
     });
     checkerPlaneMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(5));
-        // actor.transform.setRotationX(-90);
         actor.transform.setTranslation(new Vector3(0, 5, 0));
-        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
-        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
     
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(alphaTestPhongMesh);
     captureScene.add(reflectSkyboxMesh);
+    
     // captureScene.add(checkerPlaneMesh);
 
     captureSceneCamera.transform.position = targetCameraPosition.clone();

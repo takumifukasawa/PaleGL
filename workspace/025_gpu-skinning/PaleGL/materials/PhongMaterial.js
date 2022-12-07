@@ -69,15 +69,16 @@ export class PhongMaterial extends Material {
         // const isSkinning = !!uniforms.uJointMatrices;
         
         const useNormalMap = !!normalMap;
-        const vertexShader = generateVertexShader({
-            isSkinning: options.isSkinning,
-            gpuSkinning: options.gpuSkinning,
-            // jointNum: isSkinning ? baseUniforms.uJointMatrices.value.length : null,
-            jointNum: options.isSkinning ? uniforms.uJointMatrices.value.length : null,
+        
+        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning }) => generateVertexShader({
+            isSkinning,
+            gpuSkinning,
+            jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap
         });
-        const fragmentShader = PhongMaterial.generateFragmentShader({
+        
+        const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({
             receiveShadow: options.receiveShadow,
             useNormalMap,
             alphaTest: options.alphaTest
@@ -88,7 +89,8 @@ export class PhongMaterial extends Material {
             ...(uniforms ?  uniforms : {})
         };
         
-        const depthFragmentShader = PhongMaterial.generateDepthFragmentShader({ alphaTest: options.alphaTest });
+        const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({ alphaTest: options.alphaTest });
+        
         const depthUniforms = {
             uDiffuseMap: {
                 type: UniformTypes.Texture,
@@ -112,14 +114,22 @@ export class PhongMaterial extends Material {
 
         super({
             ...options,
+            name: "PhongMaterial",
             // gpuSkinning,
             // isSkinning
-            vertexShader,
-            fragmentShader,
+            // vertexShader,
+            // fragmentShader,
+            // depthFragmentShader,
+            vertexShaderGenerator,
+            fragmentShaderGenerator,
+            depthFragmentShaderGenerator,
             uniforms: mergedUniforms,
-            depthFragmentShader,
             depthUniforms
         });
+    }
+    
+    start(options) {
+        super.start(options);
     }
     
     static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest }) {
