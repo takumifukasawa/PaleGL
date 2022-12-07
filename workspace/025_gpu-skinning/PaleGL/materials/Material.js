@@ -4,6 +4,7 @@ import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
+// TODO: depth fragment は mesh に持たせた方がわかりやすそう
 export class Material {
     name;
   

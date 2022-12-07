@@ -1338,6 +1338,7 @@ void main() {
 
 
 
+// TODO: depth fragment は mesh に持たせた方がわかりやすそう
 class Material {
     name;
   
@@ -1639,11 +1640,6 @@ class Mesh extends Actor {
         if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
             this.depthMaterial.start({ gpu });
         }
-    }
- 
-    beforeRender(options)
-    {
-        super.beforeRender(options);
     }
 }
 ﻿

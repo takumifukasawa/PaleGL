@@ -79,9 +79,4 @@ export class Mesh extends Actor {
             this.depthMaterial.start({ gpu });
         }
     }
- 
-    beforeRender(options)
-    {
-        super.beforeRender(options);
-    }
 }
