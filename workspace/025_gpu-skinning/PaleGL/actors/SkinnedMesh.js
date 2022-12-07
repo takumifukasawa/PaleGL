@@ -47,7 +47,24 @@ export class SkinnedMesh extends Mesh {
     start(options) {
         const { gpu } = options;
 
+        this.bones.calcBoneOffsetMatrix();
+        this.boneOffsetMatrices = this.getBoneOffsetMatrices();
+
         this.#gpuSkinning = !!this.mainMaterial.gpuSkinning;
+
+        if(this.#gpuSkinning) {
+            // ボーンごとの joint matrix をテクスチャに詰める
+            // 1ボーンあたり4pixel（4 channel x 4 pixel = 16） 必要
+            // 精度は16bitで十分だが jsのtypedarrayには16bitがないので32bitを使う
+            // bit容量は下記
+            // 32bit (bit per channel) * 16 (4 channel * 4 pixel) * N bones
+            this.#jointTexture = new Texture({
+                gpu,
+                width: 1,
+                height: 1,
+                type: TextureTypes.RGBA32F
+            });
+        }
 
         this.materials.forEach(material => {
             material.uniforms.uJointMatrices = {
@@ -65,7 +82,8 @@ export class SkinnedMesh extends Mesh {
             material.gpuSkinning = this.#gpuSkinning;
             material.jointNum = this.boneCount;
         });
-        
+
+        // TODO: depthを強制的につくるようにして問題ない？
         // if(!options.depthMaterial) {
             this.depthMaterial = new Material({
                 gpu,
@@ -99,14 +117,72 @@ export class SkinnedMesh extends Mesh {
 
         super.start(options);
 
-        this.bones.calcBoneOffsetMatrix();
-        // this.bones.calcJointMatrix();
+        this.#createSkinDebugger({ gpu });
+    }
+    
+    update(options) {
+        super.update(options);
+        
+        this.bones.calcJointMatrix();
+        
+        // for debug
+        // this.bones.traverse(b => {
+        //    if(b.name === "thigh.L") {
+        //        console.log(b.rotation.getAxes())
+        //    }
+        // })
+        
+        // NOTE: test update skinning by cpu
+        const boneOffsetMatrices = this.boneOffsetMatrices;
+        const boneJointMatrices = this.getBoneJointMatrices();
 
-        this.boneOffsetMatrices = this.getBoneOffsetMatrices();
-        
-        // this.material.uniforms.uBoneOffsetMatrices.value = this.boneOffsetMatrices;
-        // this.material.uniforms.uJointMatrices.value = this.getBoneJointMatrices();
-        
+        const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
+       
+        this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
+        this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
+       
+        const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+
+        this.materials.forEach(material => {
+            material.uniforms.uJointMatrices.value = jointMatrices;
+        });
+        if(this.depthMaterial) {
+            this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
+        }
+
+        if(this.#gpuSkinning) {
+            const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+            
+            this.#jointTexture.update({
+                width: 4,
+                height: this.boneCount,
+                data: jointData
+            });
+
+            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+            this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
+        }
+    }
+
+    getBoneOffsetMatrices() {
+        const matrices = [];
+        this.bones.traverse((bone) => {
+            const m = bone.boneOffsetMatrix.clone();
+            matrices.push(m);
+        });
+        return matrices;
+    }
+    
+    getBoneJointMatrices() {
+        const matrices = [];
+        this.bones.traverse((bone) => {
+            const m = bone.jointMatrix.clone();
+            matrices.push(m);
+        });
+        return matrices;        
+    }
+    
+    #createSkinDebugger({ gpu }) {
         const checkChildNum = (bone) => {
             if(bone.hasChild) {
                 bone.children.forEach(childBone => {
@@ -116,22 +192,8 @@ export class SkinnedMesh extends Mesh {
             }
         }
         checkChildNum(this.bones);
-       
-        if(this.#gpuSkinning) {
-            // ボーンごとの joint matrix をテクスチャに詰める
-            // 1ボーンあたり4pixel（4 channel x 4 pixel = 16） 必要
-            // 精度は16bitで十分だが jsのtypedarrayには16bitがないので32bitを使う
-            // bit容量は下記
-            // 32bit (bit per channel) * 16 (4 channel * 4 pixel) * N bones
-            this.#jointTexture = new Texture({
-                gpu,
-                width: 1,
-                height: 1,
-                type: TextureTypes.RGBA32F
-            });
-        }
         
-        this.boneLines = new Mesh({
+         this.boneLines = new Mesh({
             gpu,
             geometry: new Geometry({
                 gpu,
@@ -224,71 +286,6 @@ export class SkinnedMesh extends Mesh {
         });
         
         this.addChild(this.boneLines);
-        this.addChild(this.bonePoints)
+        this.addChild(this.bonePoints)       
     }
-    
-    update(options) {
-        super.update(options);
-        
-        this.bones.calcJointMatrix();
-        // this.bones.traverse(b => {
-        //    if(b.name === "thigh.L") {
-        //        console.log(b.rotation.getAxes())
-        //    }
-        // })
-        
-        // NOTE: test update skinning by cpu
-        const boneOffsetMatrices = this.boneOffsetMatrices;
-        const boneJointMatrices = this.getBoneJointMatrices();
-
-        const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-       
-        this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
-        this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
-       
-        const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
-
-        this.materials.forEach(material => {
-            material.uniforms.uJointMatrices.value = jointMatrices;
-        });
-        if(this.depthMaterial) {
-            this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
-        }
-
-        if(this.#gpuSkinning) {
-            const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
-            
-            this.#jointTexture.update({
-                width: 4,
-                height: this.boneCount,
-                data: jointData
-            });
-
-            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
-            this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
-        }
-    }
-
-    getBoneOffsetMatrices() {
-        const matrices = [];
-        this.bones.traverse((bone) => {
-            const m = bone.boneOffsetMatrix.clone();
-            matrices.push(m);
-        });
-        return matrices;
-    }
-    
-    getBoneJointMatrices() {
-        const matrices = [];
-        this.bones.traverse((bone) => {
-            const m = bone.jointMatrix.clone();
-            matrices.push(m);
-        });
-        return matrices;        
-    }
-    
-    beforeRender(options) {
-        super.beforeRender(options);
-    }
-
 }
