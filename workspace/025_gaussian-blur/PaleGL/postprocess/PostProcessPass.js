@@ -12,8 +12,8 @@ export class PostProcessPass extends AbstractPostProcessPass {
     renderTarget;
     mesh;
     
-    constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
-        super();
+    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
+        super({ name });
 
         const baseVertexShader = `#version 300 es
 

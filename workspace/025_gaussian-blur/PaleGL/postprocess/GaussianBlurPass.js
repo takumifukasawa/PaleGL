@@ -7,7 +7,7 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
     #passes = [];
 
     constructor({ gpu }) {
-        const horizontalBlueFragmentShader = `#version 300 es
+        const blurShaderGenerator = (isHorizontal) => `#version 300 es
 
 precision mediump float;
 
@@ -50,20 +50,20 @@ void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    // horizontal blue
-    sampleColor += texture(uSceneTexture, vUv + vec2(-2., 0.) * texelSize) * (1. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(-1., 0.) * texelSize) * (4. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
     sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(1., 0.) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(2., 0.) * texelSize) * (1. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
     outColor = sampleColor;
 }
 `;
         super();
        
         const horizontalBlurPass = new FragmentPass({
+            name: "horizontal blur pass",
             gpu,
-            fragmentShader: horizontalBlueFragmentShader,
+            fragmentShader: blurShaderGenerator(true),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -75,9 +75,24 @@ void main() {
                 }
             }           
         });
-        this.#passes.push(horizontalBlurPass);
+        const verticalBlurPass = new FragmentPass({
+            name: "vertical blur pass",
+            gpu,
+            fragmentShader: blurShaderGenerator(false),
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }           
+        });
         
-        // this.#verticalRenderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
+        this.#passes.push(horizontalBlurPass);
+        this.#passes.push(verticalBlurPass);
     }
 
     setSize(width, height) {
@@ -86,14 +101,6 @@ void main() {
             pass.mesh.material.uniforms.uTargetWidth.value = width;
             pass.mesh.material.uniforms.uTargetHeight.value = height;
         });
-    }
-
-    setRenderTarget(renderer, camera, isLastPass) {
-        if(isLastPass) {
-            renderer.setRenderTarget(camera.renderTarget);
-        } else {
-            renderer.setRenderTarget(this.renderTarget);
-        }
     }
 
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
@@ -109,7 +116,7 @@ void main() {
 
             // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
-            pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            pass.mesh.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             if(!pass.mesh.material.isCompiledShader) {
                 pass.mesh.material.start({ gpu })
             }

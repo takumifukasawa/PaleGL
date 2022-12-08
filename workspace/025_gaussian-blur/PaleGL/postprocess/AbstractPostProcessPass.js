@@ -6,9 +6,12 @@ import {PrimitiveTypes, UniformTypes} from "../constants.js";
 
 
 export class AbstractPostProcessPass {
+    name;
     enabled = true;
 
-    constructor() {}
+    constructor({ name = "" } = {}) {
+        this.name = name;
+    }
   
     setSize(width, height) {
         throw "[AbstractPostProcessPass.setSize] should implementation";
