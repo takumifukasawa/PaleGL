@@ -32,7 +32,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    generateVertexShader, RenderQueues, FaceSide, BlendTypes,
+    generateVertexShader, RenderQueues, FaceSide, BlendTypes, BloomPass,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -197,9 +197,12 @@ captureScene.add(directionalLight);
 const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
-const postProcess = new PostProcess({gpu, renderer});
-const fxaaPass = new FXAAPass({ gpu });
-postProcess.addPass(fxaaPass);
+const postProcess = new PostProcess({ gpu, renderer });
+// const fxaaPass = new FXAAPass({ gpu });
+// postProcess.addPass(fxaaPass);
+const bloomPass = new BloomPass({ gpu }) 
+postProcess.addPass(bloomPass);
+
 // postProcess.addPass(new FragmentPass({
 //     gpu, fragmentShader: `#version 300 es
 // precision mediump float;
@@ -716,38 +719,38 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa contrast threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
-        minValue: 0.0312,
-        maxValue: 0.0833,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa contrast threshold",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
+    //     minValue: 0.0312,
+    //     maxValue: 0.0833,
+    //     stepValue: 0.001,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
+    //     }
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa relative threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
-        minValue: 0.063,
-        maxValue: 0.333,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa subpixel blending",
-        initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.01,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa relative threshold",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
+    //     minValue: 0.063,
+    //     maxValue: 0.333,
+    //     stepValue: 0.001,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
+    //     }
+    // });
+    // 
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa subpixel blending",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.01,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
+    //     }
+    // });
     
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",

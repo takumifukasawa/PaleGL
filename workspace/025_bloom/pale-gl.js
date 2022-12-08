@@ -6849,6 +6849,29 @@ void main() {
     
 }
 ﻿
+
+class BloomPass extends PostProcessPass {
+    constructor({ gpu }) {
+        const fragmentShader = `#version 300 es
+
+precision mediump float;
+
+in vec2 vUv;
+
+out vec4 outColor;
+
+uniform sampler2D uSceneTexture;
+
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    outColor = textureColor;
+}
+`;
+
+        super({ gpu, fragmentShader });
+    }
+}
+﻿
 // actors
 export {Actor};
 export {ArrowHelper};
@@ -6902,6 +6925,7 @@ export {FragmentPass};
 export {PostProcess};
 export {PostProcessPass};
 export {FXAAPass};
+export {BloomPass};
 
 // shaders
 export {generateVertexShader};
