@@ -731,6 +731,14 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
+        label: "bloom pass enabled",
+        initialValue: bloomPass.enabled,
+        onChange: (value) => bloomPass.enabled = value,
+    })
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
         label: "fxaa pass enabled",
         initialValue: fxaaPass.enabled,
         onChange: (value) => fxaaPass.enabled = value,
