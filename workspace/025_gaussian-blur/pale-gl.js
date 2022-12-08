@@ -6319,8 +6319,25 @@ void main() {
     setSize(width, height) {
         this.renderTarget.setSize(width, height);
     }
-    
-    render({ gpu, prevRenderTarget }) {
+
+    setRenderTarget(renderer, camera, isLastPass) {
+        if(isLastPass) {
+            renderer.setRenderTarget(camera.renderTarget);
+        } else {
+            renderer.setRenderTarget(this.renderTarget);
+        }
+    }
+
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        this.setRenderTarget(renderer, camera, isLastPass);
+
+        renderer.clear(
+            camera.clearColor.x,
+            camera.clearColor.y,
+            camera.clearColor.z,
+            camera.clearColor.w
+        );
+
         // このあたりの処理をpassに逃してもいいかもしれない
         this.mesh.updateTransform();
         this.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
@@ -6410,33 +6427,28 @@ class PostProcess {
     render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
+
         // TODO
         // - filterでenabledなpassのみ抽出
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
-            if(isLastPass) {
-                renderer.setRenderTarget(camera.renderTarget);
-            } else {
-                renderer.setRenderTarget(pass.renderTarget);
-            }
-            renderer.clear(
-                this.#camera.clearColor.x,
-                this.#camera.clearColor.y,
-                this.#camera.clearColor.z,
-                this.#camera.clearColor.w
-            );
-            
-            // このあたりの処理をpassに逃してもいいかもしれない
-            // pass.mesh.updateTransform();
-            // pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-            // if(!pass.mesh.material.isCompiledShader) {
-            //     pass.mesh.material.start({ gpu })
+            // if(isLastPass) {
+            //     renderer.setRenderTarget(camera.renderTarget);
+            // } else {
+            //     renderer.setRenderTarget(pass.renderTarget);
             // }
-            
-            pass.render({ gpu, prevRenderTarget });
+
+            pass.render({
+                gpu,
+                renderer,
+                camera: this.#camera,
+                prevRenderTarget,
+                isLastPass,
+            });
 
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+
             prevRenderTarget = pass.renderTarget;
         });
     }
@@ -6835,6 +6847,7 @@ void main() {
     }
 
     outColor = sampleTexture(uSceneTexture, uv);
+    // outColor = sampleTexture(uSceneTexture, vUv);
 }
 `;
 
@@ -6883,7 +6896,8 @@ void main() {
 }
 ﻿
 
-class BloomPass extends PostProcessPass {
+
+class GaussianBlurPass extends PostProcessPass {
     constructor({ gpu }) {
         const fragmentShader = `#version 300 es
 
@@ -6895,13 +6909,72 @@ out vec4 outColor;
 
 uniform sampler2D uSceneTexture;
 
+// ------------------------------------------------------
+//
+// # 3x3
+//
+// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
+//
+// --------------------------
+// | 1 | 2 | 1 |
+// | 2 | 4 | 2 | * (1 / 16)
+// | 1 | 2 | 1 |
+// --------------------------
+//
+// # 5x5
+//
+// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
+//
+// -------------------------------------
+// | 1 | 4  | 6  | 4  | 1 |
+// | 4 | 16 | 24 | 16 | 4 |
+// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
+// | 4 | 16 | 24 | 16 | 4 |
+// | 1 | 4  | 6  | 4  | 1 |
+// -------------------------------------
+//
+// ------------------------------------------------------
+
+uniform float uTargetWidth;
+uniform float uTargetHeight;
+
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
-    outColor = textureColor;
+    vec4 sampleColor = vec4(0.);
+    vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
+    // horizontal blue
+    sampleColor += texture(uSceneTexture, vUv + vec2(-2., 0.) * texelSize) * (1. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(-1., 0.) * texelSize) * (4. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(1., 0.) * texelSize) * (4. / 16.);
+    sampleColor += texture(uSceneTexture, vUv + vec2(2., 0.) * texelSize) * (1. / 16.);
+    outColor = sampleColor;
 }
 `;
-
-        super({ gpu, fragmentShader });
+        super({
+            gpu,
+            fragmentShader,
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }
+        });
+    }
+    
+    setSize(width, height) {
+        super.setSize(width, height);
+        this.mesh.material.uniforms.uTargetWidth.value = width;
+        this.mesh.material.uniforms.uTargetHeight.value = height;
+    }
+    
+    render(options) {
+        super.render(options);
     }
 }
 ﻿
@@ -6958,7 +7031,7 @@ export {FragmentPass};
 export {PostProcess};
 export {PostProcessPass};
 export {FXAAPass};
-export {BloomPass};
+export {GaussianBlurPass};
 
 // shaders
 export {generateVertexShader};

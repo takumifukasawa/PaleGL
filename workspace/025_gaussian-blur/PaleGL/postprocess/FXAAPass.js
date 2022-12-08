@@ -392,6 +392,7 @@ void main() {
     }
 
     outColor = sampleTexture(uSceneTexture, uv);
+    // outColor = sampleTexture(uSceneTexture, vUv);
 }
 `;
 

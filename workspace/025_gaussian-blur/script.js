@@ -32,7 +32,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    generateVertexShader, RenderQueues, FaceSide, BlendTypes, BloomPass,
+    generateVertexShader, RenderQueues, FaceSide, BlendTypes, GaussianBlurPass,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -176,7 +176,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     actor.transform.position = cameraPosition;
     
     // 2: fixed position
-    actor.transform.position = new Vector3(0, 5, 10);
+    // actor.transform.position = new Vector3(0, 5, 10);
 }
 
 const directionalLight = new DirectionalLight();
@@ -199,9 +199,6 @@ directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
-const bloomPass = new BloomPass({ gpu }) 
-postProcess.addPass(bloomPass);
-
 const rgbShiftPass = new FragmentPass({
     gpu, fragmentShader: `#version 300 es
 precision mediump float;
@@ -217,11 +214,14 @@ void main() {
 }
 `
 });
-rgbShiftPass.enabled = false;
+// rgbShiftPass.enabled = false;
 postProcess.addPass(rgbShiftPass)
 
 const fxaaPass = new FXAAPass({ gpu });
 postProcess.addPass(fxaaPass);
+
+const gaussianBlurPass = new GaussianBlurPass({ gpu })
+postProcess.addPass(gaussianBlurPass);
 
 captureSceneCamera.setPostProcess(postProcess);
 
@@ -727,15 +727,7 @@ function initDebugger() {
         initialValue: rgbShiftPass.enabled,
         onChange: (value) => rgbShiftPass.enabled = value,
     });
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "bloom pass enabled",
-        initialValue: bloomPass.enabled,
-        onChange: (value) => bloomPass.enabled = value,
-    })
-
+    
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
@@ -775,6 +767,14 @@ function initDebugger() {
         onChange: (value) => {
             fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
         }
+    });
+    
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: "gaussian blur pass enabled",
+        initialValue: gaussianBlurPass.enabled,
+        onChange: (value) => gaussianBlurPass.enabled = value,
     });
 
     debuggerGUI.addBorderSpacer();

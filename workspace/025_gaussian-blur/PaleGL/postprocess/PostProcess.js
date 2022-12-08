@@ -48,33 +48,28 @@ export class PostProcess {
     render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
+
         // TODO
         // - filterでenabledなpassのみ抽出
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
-            if(isLastPass) {
-                renderer.setRenderTarget(camera.renderTarget);
-            } else {
-                renderer.setRenderTarget(pass.renderTarget);
-            }
-            renderer.clear(
-                this.#camera.clearColor.x,
-                this.#camera.clearColor.y,
-                this.#camera.clearColor.z,
-                this.#camera.clearColor.w
-            );
-            
-            // このあたりの処理をpassに逃してもいいかもしれない
-            // pass.mesh.updateTransform();
-            // pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-            // if(!pass.mesh.material.isCompiledShader) {
-            //     pass.mesh.material.start({ gpu })
+            // if(isLastPass) {
+            //     renderer.setRenderTarget(camera.renderTarget);
+            // } else {
+            //     renderer.setRenderTarget(pass.renderTarget);
             // }
-            
-            pass.render({ gpu, prevRenderTarget });
+
+            pass.render({
+                gpu,
+                renderer,
+                camera: this.#camera,
+                prevRenderTarget,
+                isLastPass,
+            });
 
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+
             prevRenderTarget = pass.renderTarget;
         });
     }

@@ -53,8 +53,25 @@ void main() {
     setSize(width, height) {
         this.renderTarget.setSize(width, height);
     }
-    
-    render({ gpu, prevRenderTarget }) {
+
+    setRenderTarget(renderer, camera, isLastPass) {
+        if(isLastPass) {
+            renderer.setRenderTarget(camera.renderTarget);
+        } else {
+            renderer.setRenderTarget(this.renderTarget);
+        }
+    }
+
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        this.setRenderTarget(renderer, camera, isLastPass);
+
+        renderer.clear(
+            camera.clearColor.x,
+            camera.clearColor.y,
+            camera.clearColor.z,
+            camera.clearColor.w
+        );
+
         // このあたりの処理をpassに逃してもいいかもしれない
         this.mesh.updateTransform();
         this.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
