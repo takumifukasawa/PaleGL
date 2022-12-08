@@ -9,6 +9,26 @@ export class PostProcess {
     #camera;
     enabled = true;
     
+    #selfEnabled = true;
+    
+    get enabled() {
+        if(!this.#selfEnabled) {
+            return false;
+        }
+        
+        for(let i = 0; i < this.passes.length; i++) {
+            if(this.passes[i].enabled) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    set enabled(value) {
+        this.#selfEnabled = value;
+    }
+    
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
@@ -30,8 +50,9 @@ export class PostProcess {
         let prevRenderTarget = this.renderTarget;
         // TODO
         // - filterでenabledなpassのみ抽出
-        this.passes.forEach((pass, i) => {
-            const isLastPass = i === this.passes.length - 1;
+        const enabledPasses = this.passes.filter(pass => pass.enabled);
+        enabledPasses.forEach((pass, i) => {
+            const isLastPass = i === enabledPasses.length - 1;
             if(isLastPass) {
                 renderer.setRenderTarget(camera.renderTarget);
             } else {

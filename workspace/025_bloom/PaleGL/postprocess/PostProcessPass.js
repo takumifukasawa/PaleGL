@@ -10,6 +10,7 @@ export class PostProcessPass {
     #material;
     renderTarget;
     mesh;
+    enabled = true;
     
     constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
         const baseVertexShader = `#version 300 es

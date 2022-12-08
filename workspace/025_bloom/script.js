@@ -176,7 +176,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     actor.transform.position = cameraPosition;
     
     // 2: fixed position
-    // actor.transform.position = new Vector3(0, 5, 10);
+    actor.transform.position = new Vector3(0, 5, 10);
 }
 
 const directionalLight = new DirectionalLight();
@@ -198,26 +198,30 @@ const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
 directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
-// const fxaaPass = new FXAAPass({ gpu });
-// postProcess.addPass(fxaaPass);
+
 const bloomPass = new BloomPass({ gpu }) 
 postProcess.addPass(bloomPass);
 
-// postProcess.addPass(new FragmentPass({
-//     gpu, fragmentShader: `#version 300 es
-// precision mediump float;
-// in vec2 vUv;
-// out vec4 outColor;
-// uniform sampler2D uSceneTexture;
-// void main() {
-//     vec4 textureColor = texture(uSceneTexture, vUv);
-//     float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
-//     float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
-//     float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
-//     outColor = vec4(r, g, b, 1);
-// }
-// `
-// }));
+const rgbShiftPass = new FragmentPass({
+    gpu, fragmentShader: `#version 300 es
+precision mediump float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uSceneTexture;
+void main() {
+    vec4 textureColor = texture(uSceneTexture, vUv);
+    float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
+    float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
+    float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
+    outColor = vec4(r, g, b, 1);
+}
+`
+});
+rgbShiftPass.enabled = false;
+postProcess.addPass(rgbShiftPass)
+
+const fxaaPass = new FXAAPass({ gpu });
+postProcess.addPass(fxaaPass);
 
 captureSceneCamera.setPostProcess(postProcess);
 
@@ -609,70 +613,70 @@ function initDebugger() {
         }
     });
 
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position x",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.x,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position y",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.y,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor position z",
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.position.z,
-        onChange: (value) => {
-            const p = gltfActor.transform.position;
-            gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor position x",
+    //     minValue: -10,
+    //     maxValue: 10,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.position.x,
+    //     onChange: (value) => {
+    //         const p = gltfActor.transform.position;
+    //         gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
+    //     }
+    // });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor position y",
+    //     minValue: -10,
+    //     maxValue: 10,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.position.y,
+    //     onChange: (value) => {
+    //         const p = gltfActor.transform.position;
+    //         gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
+    //     }
+    // });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor position z",
+    //     minValue: -10,
+    //     maxValue: 10,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.position.z,
+    //     onChange: (value) => {
+    //         const p = gltfActor.transform.position;
+    //         gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
+    //     }
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation x",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.x,
-        onChange: (value) => {
-            gltfActor.transform.setRotationX(value);
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation y",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.y,
-        onChange: (value) => {
-            gltfActor.transform.setRotationY(value);
-        }
-    });
-    debuggerGUI.addSliderDebugger({
-        label: "gltf actor rotation z",
-        minValue: -180,
-        maxValue: 180,
-        stepValue: 0.01,
-        initialValue: gltfActor.transform.rotation.z,
-        onChange: (value) => {
-            gltfActor.transform.setRotationZ(value);
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor rotation x",
+    //     minValue: -180,
+    //     maxValue: 180,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.rotation.x,
+    //     onChange: (value) => {
+    //         gltfActor.transform.setRotationX(value);
+    //     }
+    // });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor rotation y",
+    //     minValue: -180,
+    //     maxValue: 180,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.rotation.y,
+    //     onChange: (value) => {
+    //         gltfActor.transform.setRotationY(value);
+    //     }
+    // });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "gltf actor rotation z",
+    //     minValue: -180,
+    //     maxValue: 180,
+    //     stepValue: 0.01,
+    //     initialValue: gltfActor.transform.rotation.z,
+    //     onChange: (value) => {
+    //         gltfActor.transform.setRotationZ(value);
+    //     }
+    // });
 
     debuggerGUI.addBorderSpacer();
 
@@ -716,42 +720,57 @@ function initDebugger() {
             });
         }
     });
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: "rgb shift pass enabled",
+        initialValue: rgbShiftPass.enabled,
+        onChange: (value) => rgbShiftPass.enabled = value,
+    });
 
     debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa contrast threshold",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
-    //     minValue: 0.0312,
-    //     maxValue: 0.0833,
-    //     stepValue: 0.001,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
-    //     }
-    // });
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    })
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa relative threshold",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
-    //     minValue: 0.063,
-    //     maxValue: 0.333,
-    //     stepValue: 0.001,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
-    //     }
-    // });
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa subpixel blending",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.01,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
-    //     }
-    // });
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa contrast threshold",
+        initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
+        minValue: 0.0312,
+        maxValue: 0.0833,
+        stepValue: 0.001,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
+        }
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa relative threshold",
+        initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
+        minValue: 0.063,
+        maxValue: 0.333,
+        stepValue: 0.001,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
+        }
+    });
     
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa subpixel blending",
+        initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.01,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
+        }
+    });
+
+    debuggerGUI.addBorderSpacer();
+
     debuggerGUI.addToggleDebugger({
         label: "Enabled Post Process",
         initialValue: captureSceneCamera.postProcess.enabled,
