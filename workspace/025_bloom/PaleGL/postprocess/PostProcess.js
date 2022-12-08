@@ -66,11 +66,13 @@ export class PostProcess {
             );
             
             // このあたりの処理をpassに逃してもいいかもしれない
-            pass.mesh.updateTransform();
-            pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-            if(!pass.mesh.material.isCompiledShader) {
-                pass.mesh.material.start({ gpu })
-            }
+            // pass.mesh.updateTransform();
+            // pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            // if(!pass.mesh.material.isCompiledShader) {
+            //     pass.mesh.material.start({ gpu })
+            // }
+            
+            pass.render({ gpu, prevRenderTarget });
 
             renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
             prevRenderTarget = pass.renderTarget;

@@ -53,4 +53,13 @@ void main() {
     setSize(width, height) {
         this.renderTarget.setSize(width, height);
     }
+    
+    render({ gpu, prevRenderTarget }) {
+        // このあたりの処理をpassに逃してもいいかもしれない
+        this.mesh.updateTransform();
+        this.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        if(!this.mesh.material.isCompiledShader) {
+            this.mesh.material.start({ gpu })
+        }
+    }
 }
