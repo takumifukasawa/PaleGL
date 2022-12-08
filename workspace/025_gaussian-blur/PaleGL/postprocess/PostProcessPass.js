@@ -78,5 +78,7 @@ void main() {
         if(!this.mesh.material.isCompiledShader) {
             this.mesh.material.start({ gpu })
         }
+
+        renderer.renderMesh(this.mesh.geometry, this.mesh.material);
     }
 }

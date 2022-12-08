@@ -27,7 +27,7 @@ export class PostProcess {
     set enabled(value) {
         this.#selfEnabled = value;
     }
-    
+
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
@@ -67,7 +67,7 @@ export class PostProcess {
                 isLastPass,
             });
 
-            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+            // renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
 
             prevRenderTarget = pass.renderTarget;
         });

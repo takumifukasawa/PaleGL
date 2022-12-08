@@ -76,7 +76,7 @@ void main() {
         this.mesh.material.uniforms.uTargetWidth.value = width;
         this.mesh.material.uniforms.uTargetHeight.value = height;
     }
-    
+
     render(options) {
         super.render(options);
     }

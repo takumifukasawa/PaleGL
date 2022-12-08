@@ -6344,6 +6344,8 @@ void main() {
         if(!this.mesh.material.isCompiledShader) {
             this.mesh.material.start({ gpu })
         }
+
+        renderer.renderMesh(this.mesh.geometry, this.mesh.material);
     }
 }
 ﻿
@@ -6406,7 +6408,7 @@ class PostProcess {
     set enabled(value) {
         this.#selfEnabled = value;
     }
-    
+
     constructor({ gpu }) {
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
@@ -6446,7 +6448,7 @@ class PostProcess {
                 isLastPass,
             });
 
-            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+            // renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
 
             prevRenderTarget = pass.renderTarget;
         });
@@ -6971,7 +6973,7 @@ void main() {
         this.mesh.material.uniforms.uTargetWidth.value = width;
         this.mesh.material.uniforms.uTargetHeight.value = height;
     }
-    
+
     render(options) {
         super.render(options);
     }
