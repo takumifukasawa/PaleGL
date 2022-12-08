@@ -1,9 +1,13 @@
 ﻿import {PostProcessPass} from "./PostProcessPass.js";
 import {UniformTypes} from "../constants.js";
+import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
+import {FragmentPass} from "./FragmentPass.js";
 
-export class GaussianBlurPass extends PostProcessPass {
+export class GaussianBlurPass extends AbstractPostProcessPass {
+    #passes = [];
+
     constructor({ gpu }) {
-        const fragmentShader = `#version 300 es
+        const horizontalBlueFragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -55,9 +59,11 @@ void main() {
     outColor = sampleColor;
 }
 `;
-        super({
+        super();
+       
+        const horizontalBlurPass = new FragmentPass({
             gpu,
-            fragmentShader,
+            fragmentShader: horizontalBlueFragmentShader,
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -67,17 +73,48 @@ void main() {
                     type: UniformTypes.Float,
                     value: 1,
                 }
-            }
+            }           
         });
+        this.#passes.push(horizontalBlurPass);
+        
+        // this.#verticalRenderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
     }
 
     setSize(width, height) {
-        super.setSize(width, height);
-        this.mesh.material.uniforms.uTargetWidth.value = width;
-        this.mesh.material.uniforms.uTargetHeight.value = height;
+        this.#passes.forEach(pass => {
+            pass.setSize(width, height);
+            pass.mesh.material.uniforms.uTargetWidth.value = width;
+            pass.mesh.material.uniforms.uTargetHeight.value = height;
+        });
     }
 
-    render(options) {
-        super.render(options);
+    setRenderTarget(renderer, camera, isLastPass) {
+        if(isLastPass) {
+            renderer.setRenderTarget(camera.renderTarget);
+        } else {
+            renderer.setRenderTarget(this.renderTarget);
+        }
     }
+
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        this.#passes.forEach((pass, i) => {
+            pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
+
+            renderer.clear(
+                camera.clearColor.x,
+                camera.clearColor.y,
+                camera.clearColor.z,
+                camera.clearColor.w
+            );
+
+            // このあたりの処理をpassに逃してもいいかもしれない
+            pass.mesh.updateTransform();
+            pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            if(!pass.mesh.material.isCompiledShader) {
+                pass.mesh.material.start({ gpu })
+            }
+
+            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+        });
+    }   
 }

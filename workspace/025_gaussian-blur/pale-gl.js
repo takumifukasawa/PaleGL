@@ -6271,14 +6271,40 @@ void main() {
 
 
 
-class PostProcessPass {
+class AbstractPostProcessPass {
+    enabled = true;
+
+    constructor() {}
+  
+    setSize(width, height) {
+        throw "[AbstractPostProcessPass.setSize] should implementation";
+    }
+
+    setRenderTarget(renderer, camera, isLastPass) {
+        throw "[AbstractPostProcessPass.setRenderTarget] should implementation";
+    }
+    
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass } = {}) {
+        throw "[AbstractPostProcessPass.render] should implementation";
+    }
+}
+﻿
+
+
+
+
+
+
+
+class PostProcessPass extends AbstractPostProcessPass {
     #geometry;
     #material;
     renderTarget;
     mesh;
-    enabled = true;
     
     constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
+        super();
+
         const baseVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
@@ -6375,8 +6401,8 @@ void main() {
 ﻿
 
 class FragmentPass extends PostProcessPass {
-    constructor({ gpu, fragmentShader }) {
-        super({ gpu, fragmentShader });
+    constructor({ gpu, fragmentShader, uniforms }) {
+        super({ gpu, fragmentShader, uniforms });
     }
 }
 ﻿
@@ -6898,9 +6924,13 @@ void main() {
 ﻿
 
 
-class GaussianBlurPass extends PostProcessPass {
+
+
+class GaussianBlurPass extends AbstractPostProcessPass {
+    #passes = [];
+
     constructor({ gpu }) {
-        const fragmentShader = `#version 300 es
+        const horizontalBlueFragmentShader = `#version 300 es
 
 precision mediump float;
 
@@ -6952,9 +6982,11 @@ void main() {
     outColor = sampleColor;
 }
 `;
-        super({
+        super();
+       
+        const horizontalBlurPass = new FragmentPass({
             gpu,
-            fragmentShader,
+            fragmentShader: horizontalBlueFragmentShader,
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -6964,19 +6996,50 @@ void main() {
                     type: UniformTypes.Float,
                     value: 1,
                 }
-            }
+            }           
         });
+        this.#passes.push(horizontalBlurPass);
+        
+        // this.#verticalRenderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
     }
 
     setSize(width, height) {
-        super.setSize(width, height);
-        this.mesh.material.uniforms.uTargetWidth.value = width;
-        this.mesh.material.uniforms.uTargetHeight.value = height;
+        this.#passes.forEach(pass => {
+            pass.setSize(width, height);
+            pass.mesh.material.uniforms.uTargetWidth.value = width;
+            pass.mesh.material.uniforms.uTargetHeight.value = height;
+        });
     }
 
-    render(options) {
-        super.render(options);
+    setRenderTarget(renderer, camera, isLastPass) {
+        if(isLastPass) {
+            renderer.setRenderTarget(camera.renderTarget);
+        } else {
+            renderer.setRenderTarget(this.renderTarget);
+        }
     }
+
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        this.#passes.forEach((pass, i) => {
+            pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
+
+            renderer.clear(
+                camera.clearColor.x,
+                camera.clearColor.y,
+                camera.clearColor.z,
+                camera.clearColor.w
+            );
+
+            // このあたりの処理をpassに逃してもいいかもしれない
+            pass.mesh.updateTransform();
+            pass.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+            if(!pass.mesh.material.isCompiledShader) {
+                pass.mesh.material.start({ gpu })
+            }
+
+            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+        });
+    }   
 }
 ﻿
 // actors

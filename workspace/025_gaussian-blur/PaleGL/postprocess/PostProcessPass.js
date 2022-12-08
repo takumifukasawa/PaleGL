@@ -3,16 +3,18 @@ import {Material} from "../materials/Material.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../actors/Mesh.js";
 import {PrimitiveTypes, UniformTypes} from "../constants.js";
+import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 
 
-export class PostProcessPass {
+export class PostProcessPass extends AbstractPostProcessPass {
     #geometry;
     #material;
     renderTarget;
     mesh;
-    enabled = true;
     
     constructor({ gpu, vertexShader, fragmentShader, uniforms }) {
+        super();
+
         const baseVertexShader = `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
