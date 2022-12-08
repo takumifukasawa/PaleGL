@@ -434,8 +434,8 @@ void main() {
     
     setSize(width, height) {
         super.setSize(width, height);
-        this.mesh.material.uniforms.uTargetWidth.value = width;
-        this.mesh.material.uniforms.uTargetHeight.value = height;
+        this.material.uniforms.uTargetWidth.value = width;
+        this.material.uniforms.uTargetHeight.value = height;
     }
     
 }

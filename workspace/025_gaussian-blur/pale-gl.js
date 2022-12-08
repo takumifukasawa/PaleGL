@@ -6300,8 +6300,8 @@ class AbstractPostProcessPass {
 
 
 class PostProcessPass extends AbstractPostProcessPass {
-    #geometry;
-    #material;
+    geometry;
+    material;
     renderTarget;
     mesh;
     
@@ -6323,8 +6323,8 @@ void main() {
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.#geometry = new PlaneGeometry({ gpu });
-        this.#material = new Material({
+        this.geometry = new PlaneGeometry({ gpu });
+        this.material = new Material({
             gpu,
             vertexShader,
             fragmentShader,
@@ -6338,8 +6338,8 @@ void main() {
             primitiveType: PrimitiveTypes.Triangles
         });
         this.mesh = new Mesh({
-            geometry: this.#geometry,
-            material: this.#material
+            geometry: this.geometry,
+            material: this.material
         }); 
         
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
@@ -6369,12 +6369,12 @@ void main() {
 
         // このあたりの処理をpassに逃してもいいかもしれない
         this.mesh.updateTransform();
-        this.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-        if(!this.mesh.material.isCompiledShader) {
-            this.mesh.material.start({ gpu })
+        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        if(!this.material.isCompiledShader) {
+            this.material.start({ gpu })
         }
 
-        renderer.renderMesh(this.mesh.geometry, this.mesh.material);
+        renderer.renderMesh(this.geometry, this.material);
     }
 }
 ﻿
@@ -6919,8 +6919,8 @@ void main() {
     
     setSize(width, height) {
         super.setSize(width, height);
-        this.mesh.material.uniforms.uTargetWidth.value = width;
-        this.mesh.material.uniforms.uTargetHeight.value = height;
+        this.material.uniforms.uTargetWidth.value = width;
+        this.material.uniforms.uTargetHeight.value = height;
     }
     
 }
@@ -7024,8 +7024,8 @@ void main() {
     setSize(width, height) {
         this.#passes.forEach(pass => {
             pass.setSize(width, height);
-            pass.mesh.material.uniforms.uTargetWidth.value = width;
-            pass.mesh.material.uniforms.uTargetHeight.value = height;
+            pass.material.uniforms.uTargetWidth.value = width;
+            pass.material.uniforms.uTargetHeight.value = height;
         });
     }
 
@@ -7042,12 +7042,12 @@ void main() {
 
             // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
-            pass.mesh.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
-            if(!pass.mesh.material.isCompiledShader) {
-                pass.mesh.material.start({ gpu })
+            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            if(!pass.material.isCompiledShader) {
+                pass.material.start({ gpu })
             }
 
-            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+            renderer.renderMesh(pass.geometry, pass.material);
         });
     }   
 }

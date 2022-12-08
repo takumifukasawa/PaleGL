@@ -7,8 +7,8 @@ import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 
 
 export class PostProcessPass extends AbstractPostProcessPass {
-    #geometry;
-    #material;
+    geometry;
+    material;
     renderTarget;
     mesh;
     
@@ -30,8 +30,8 @@ void main() {
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.#geometry = new PlaneGeometry({ gpu });
-        this.#material = new Material({
+        this.geometry = new PlaneGeometry({ gpu });
+        this.material = new Material({
             gpu,
             vertexShader,
             fragmentShader,
@@ -45,8 +45,8 @@ void main() {
             primitiveType: PrimitiveTypes.Triangles
         });
         this.mesh = new Mesh({
-            geometry: this.#geometry,
-            material: this.#material
+            geometry: this.geometry,
+            material: this.material
         }); 
         
         this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
@@ -76,11 +76,11 @@ void main() {
 
         // このあたりの処理をpassに逃してもいいかもしれない
         this.mesh.updateTransform();
-        this.mesh.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
-        if(!this.mesh.material.isCompiledShader) {
-            this.mesh.material.start({ gpu })
+        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        if(!this.material.isCompiledShader) {
+            this.material.start({ gpu })
         }
 
-        renderer.renderMesh(this.mesh.geometry, this.mesh.material);
+        renderer.renderMesh(this.geometry, this.material);
     }
 }

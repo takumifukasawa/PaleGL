@@ -98,8 +98,8 @@ void main() {
     setSize(width, height) {
         this.#passes.forEach(pass => {
             pass.setSize(width, height);
-            pass.mesh.material.uniforms.uTargetWidth.value = width;
-            pass.mesh.material.uniforms.uTargetHeight.value = height;
+            pass.material.uniforms.uTargetWidth.value = width;
+            pass.material.uniforms.uTargetHeight.value = height;
         });
     }
 
@@ -116,12 +116,12 @@ void main() {
 
             // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
-            pass.mesh.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
-            if(!pass.mesh.material.isCompiledShader) {
-                pass.mesh.material.start({ gpu })
+            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            if(!pass.material.isCompiledShader) {
+                pass.material.start({ gpu })
             }
 
-            renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
+            renderer.renderMesh(pass.geometry, pass.material);
         });
     }   
 }
