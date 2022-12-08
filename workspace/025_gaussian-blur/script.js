@@ -214,10 +214,11 @@ void main() {
 }
 `
 });
-// rgbShiftPass.enabled = false;
+rgbShiftPass.enabled = false;
 postProcess.addPass(rgbShiftPass)
 
 const fxaaPass = new FXAAPass({ gpu });
+fxaaPass.enabled = false;
 postProcess.addPass(fxaaPass);
 
 const gaussianBlurPass = new GaussianBlurPass({ gpu })

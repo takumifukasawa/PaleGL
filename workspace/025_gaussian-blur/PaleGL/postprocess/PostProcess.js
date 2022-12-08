@@ -7,7 +7,6 @@ export class PostProcess {
     passes = [];
     renderTarget;
     #camera;
-    enabled = true;
     
     #selfEnabled = true;
     

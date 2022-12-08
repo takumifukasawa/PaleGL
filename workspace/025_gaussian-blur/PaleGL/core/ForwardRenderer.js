@@ -302,7 +302,7 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-        
+       
         if (camera.enabledPostProcess) {
             this.setRenderTarget(camera.postProcess.renderTarget.write);
         } else {

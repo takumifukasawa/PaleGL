@@ -4813,7 +4813,7 @@ class ForwardRenderer {
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-        
+       
         if (camera.enabledPostProcess) {
             this.setRenderTarget(camera.postProcess.renderTarget.write);
         } else {
@@ -6386,7 +6386,6 @@ class PostProcess {
     passes = [];
     renderTarget;
     #camera;
-    enabled = true;
     
     #selfEnabled = true;
     
@@ -6966,7 +6965,7 @@ void main() {
             }
         });
     }
-    
+
     setSize(width, height) {
         super.setSize(width, height);
         this.mesh.material.uniforms.uTargetWidth.value = width;

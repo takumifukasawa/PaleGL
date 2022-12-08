@@ -70,7 +70,7 @@ void main() {
             }
         });
     }
-    
+
     setSize(width, height) {
         super.setSize(width, height);
         this.mesh.material.uniforms.uTargetWidth.value = width;
