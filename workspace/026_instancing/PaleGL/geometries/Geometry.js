@@ -10,7 +10,7 @@ export class Geometry {
     attributes;
     vertexCount;
     vertexArrayObject;
-    indexBufferObject;
+    // indexBufferObject;
     indices;
     drawCount;
 
@@ -51,10 +51,14 @@ export class Geometry {
     }
     
     #createGeometry({ gpu }) {
-        this.vertexArrayObject = new VertexArrayObject({gpu, attributes: this.attributes})
-        if (this.indices) {
-            this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
-        }
+        this.vertexArrayObject = new VertexArrayObject({
+            gpu,
+            attributes: this.attributes,
+            indices: this.indices
+        });
+        // if (this.indices) {
+        //     this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
+        // }
     }
     
     update() {

@@ -328,7 +328,7 @@ export class ForwardRenderer {
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
-        this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
+        // this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
         // material
         this.#gpu.setShader(material.shader);
         // uniforms

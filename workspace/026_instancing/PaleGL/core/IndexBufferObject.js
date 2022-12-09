@@ -2,6 +2,7 @@
 
 export class IndexBufferObject extends GLObject {
     #ibo;
+    #gpu;
     
     get glObject() {
         return this.#ibo;
@@ -10,11 +11,23 @@ export class IndexBufferObject extends GLObject {
     constructor({ gpu, indices }) {
         super();
         
-        const gl = gpu.gl;
+        this.#gpu = gpu;
+        
+        const gl = this.#gpu.gl;
         
         this.#ibo = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo);
+
+        this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    }
+    
+    bind() {
+        const gl = this.#gpu.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo);
+    }
+    
+    unbind() {
+        const gl = this.#gpu.gl;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 }

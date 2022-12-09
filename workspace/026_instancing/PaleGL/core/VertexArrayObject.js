@@ -1,10 +1,16 @@
 ﻿import {GLObject} from "./GLObject.js";
 import {AttributeUsageType} from "../constants.js";
+import {IndexBufferObject} from "./IndexBufferObject.js";
 
 export class VertexArrayObject extends GLObject {
     #vao;
     #vboList = {};
     #gpu;
+    #ibo;
+    
+    get hasIndices() {
+        return !!this.#ibo;
+    }
 
     get glObject() {
         return this.#vao;
@@ -21,7 +27,7 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({gpu, attributes}) {
+    constructor({gpu, attributes, indices = null}) {
         super();
         
         this.#gpu = gpu;
@@ -48,8 +54,20 @@ export class VertexArrayObject extends GLObject {
             this.#vboList[key] = { vbo, usage };
         });
 
+        if(indices) {
+            this.#ibo = new IndexBufferObject({gpu, indices})
+        }
+
         // unbind vertex array to webgl context
         gl.bindVertexArray(null);
+      
+        // unbind array buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        
+        // unbind index buffer
+        if(this.#ibo) {
+            this.#ibo.unbind();
+        }
     }
     
     updateAttribute(key, data) {

@@ -1240,7 +1240,15 @@ class Actor {
 }
 ﻿class GLObject {
     get glObject() {
-        throw "should implementation glObject getter";
+        throw "[GLObject.glObject] should implementation";
+    }
+    
+    bind() {
+        throw "[GLObject.bind] should implementation";
+    }
+
+    unbind() {
+        throw "[GLObject.unbind] should implementation";
     }
 }
 ﻿
@@ -1795,11 +1803,50 @@ class Attribute {
 }
 ﻿
 
+class IndexBufferObject extends GLObject {
+    #ibo;
+    #gpu;
+    
+    get glObject() {
+        return this.#ibo;
+    }
+    
+    constructor({ gpu, indices }) {
+        super();
+        
+        this.#gpu = gpu;
+        
+        const gl = this.#gpu.gl;
+        
+        this.#ibo = gl.createBuffer();
+
+        this.bind();
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    }
+    
+    bind() {
+        const gl = this.#gpu.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo);
+    }
+    
+    unbind() {
+        const gl = this.#gpu.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    }
+}
+﻿
+
+
 
 class VertexArrayObject extends GLObject {
     #vao;
     #vboList = {};
     #gpu;
+    #ibo;
+    
+    get hasIndices() {
+        return !!this.#ibo;
+    }
 
     get glObject() {
         return this.#vao;
@@ -1816,7 +1863,7 @@ class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({gpu, attributes}) {
+    constructor({gpu, attributes, indices = null}) {
         super();
         
         this.#gpu = gpu;
@@ -1843,8 +1890,20 @@ class VertexArrayObject extends GLObject {
             this.#vboList[key] = { vbo, usage };
         });
 
+        if(indices) {
+            this.#ibo = new IndexBufferObject({gpu, indices})
+        }
+
         // unbind vertex array to webgl context
         gl.bindVertexArray(null);
+      
+        // unbind array buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        
+        // unbind index buffer
+        if(this.#ibo) {
+            this.#ibo.unbind();
+        }
     }
     
     updateAttribute(key, data) {
@@ -1852,26 +1911,6 @@ class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
-}
-﻿
-
-class IndexBufferObject extends GLObject {
-    #ibo;
-    
-    get glObject() {
-        return this.#ibo;
-    }
-    
-    constructor({ gpu, indices }) {
-        super();
-        
-        const gl = gpu.gl;
-        
-        this.#ibo = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 }
 ﻿
@@ -1886,7 +1925,7 @@ class Geometry {
     attributes;
     vertexCount;
     vertexArrayObject;
-    indexBufferObject;
+    // indexBufferObject;
     indices;
     drawCount;
 
@@ -1927,10 +1966,14 @@ class Geometry {
     }
     
     #createGeometry({ gpu }) {
-        this.vertexArrayObject = new VertexArrayObject({gpu, attributes: this.attributes})
-        if (this.indices) {
-            this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
-        }
+        this.vertexArrayObject = new VertexArrayObject({
+            gpu,
+            attributes: this.attributes,
+            indices: this.indices
+        });
+        // if (this.indices) {
+        //     this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
+        // }
     }
     
     update() {
@@ -4839,7 +4882,7 @@ class ForwardRenderer {
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
-        this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
+        // this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
         // material
         this.#gpu.setShader(material.shader);
         // uniforms
@@ -4894,7 +4937,7 @@ class GPU {
     gl;
     #shader;
     #vao;
-    #ibo;
+    // #ibo;
     #uniforms;
     dummyTexture;
 
@@ -4914,9 +4957,9 @@ class GPU {
         this.#vao = vao;
     }
 
-    setIndexBufferObject(ibo) {
-        this.#ibo = ibo;
-    }
+    // setIndexBufferObject(ibo) {
+    //     this.#ibo = ibo;
+    // }
 
     setUniforms(uniforms) {
         this.#uniforms = uniforms;
@@ -5097,10 +5140,11 @@ class GPU {
         // set vertex
         gl.bindVertexArray(this.#vao.glObject);
 
-        if (this.#ibo) {
+        // if (this.#ibo) {
+        if (this.#vao.hasIndices) {
             // draw by indices
             // drawCount ... use indices count
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
+            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
             gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
         } else {
             // draw by array
@@ -7052,133 +7096,6 @@ void main() {
     }   
 }
 ﻿
-
-
-
-
-class BloomPass extends AbstractPostProcessPass {
-    #passes = [];
-
-    constructor({ gpu }) {
-        const blurShaderGenerator = (isHorizontal) => `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-
-out vec4 outColor;
-
-uniform sampler2D uSceneTexture;
-
-// ------------------------------------------------------
-//
-// # 3x3
-//
-// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
-//
-// --------------------------
-// | 1 | 2 | 1 |
-// | 2 | 4 | 2 | * (1 / 16)
-// | 1 | 2 | 1 |
-// --------------------------
-//
-// # 5x5
-//
-// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
-//
-// -------------------------------------
-// | 1 | 4  | 6  | 4  | 1 |
-// | 4 | 16 | 24 | 16 | 4 |
-// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
-// | 4 | 16 | 24 | 16 | 4 |
-// | 1 | 4  | 6  | 4  | 1 |
-// -------------------------------------
-//
-// ------------------------------------------------------
-
-uniform float uTargetWidth;
-uniform float uTargetHeight;
-
-void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
-    vec4 sampleColor = vec4(0.);
-    vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
-    outColor = sampleColor;
-}
-`;
-        super();
-       
-        const horizontalBlurPass = new FragmentPass({
-            name: "horizontal blur pass",
-            gpu,
-            fragmentShader: blurShaderGenerator(true),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }           
-        });
-        const verticalBlurPass = new FragmentPass({
-            name: "vertical blur pass",
-            gpu,
-            fragmentShader: blurShaderGenerator(false),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }           
-        });
-        
-        this.#passes.push(horizontalBlurPass);
-        this.#passes.push(verticalBlurPass);
-    }
-
-    setSize(width, height) {
-        this.#passes.forEach(pass => {
-            pass.setSize(width, height);
-            pass.material.uniforms.uTargetWidth.value = width;
-            pass.material.uniforms.uTargetHeight.value = height;
-        });
-    }
-
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
-        this.#passes.forEach((pass, i) => {
-            pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
-
-            renderer.clear(
-                camera.clearColor.x,
-                camera.clearColor.y,
-                camera.clearColor.z,
-                camera.clearColor.w
-            );
-
-            // このあたりの処理をpassに逃してもいいかもしれない
-            pass.mesh.updateTransform();
-            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
-            if(!pass.material.isCompiledShader) {
-                pass.material.start({ gpu })
-            }
-
-            renderer.renderMesh(pass.geometry, pass.material);
-        });
-    }   
-}
-﻿
 // actors
 export {Actor};
 export {ArrowHelper};
@@ -7233,7 +7150,6 @@ export {PostProcess};
 export {PostProcessPass};
 export {FXAAPass};
 export {GaussianBlurPass};
-import {BloomPass};
 
 // shaders
 export {generateVertexShader};

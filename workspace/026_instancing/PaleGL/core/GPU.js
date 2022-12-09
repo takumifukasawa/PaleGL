@@ -15,7 +15,7 @@ export class GPU {
     gl;
     #shader;
     #vao;
-    #ibo;
+    // #ibo;
     #uniforms;
     dummyTexture;
 
@@ -35,9 +35,9 @@ export class GPU {
         this.#vao = vao;
     }
 
-    setIndexBufferObject(ibo) {
-        this.#ibo = ibo;
-    }
+    // setIndexBufferObject(ibo) {
+    //     this.#ibo = ibo;
+    // }
 
     setUniforms(uniforms) {
         this.#uniforms = uniforms;
@@ -218,10 +218,11 @@ export class GPU {
         // set vertex
         gl.bindVertexArray(this.#vao.glObject);
 
-        if (this.#ibo) {
+        // if (this.#ibo) {
+        if (this.#vao.hasIndices) {
             // draw by indices
             // drawCount ... use indices count
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
+            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
             gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
         } else {
             // draw by array

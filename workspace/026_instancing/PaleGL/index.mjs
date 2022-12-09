@@ -53,7 +53,6 @@ export {PostProcess} from "./postprocess/PostProcess.js";
 export {PostProcessPass} from "./postprocess/PostProcessPass.js";
 export {FXAAPass} from "./postprocess/FXAAPass.js";
 export {GaussianBlurPass} from "./postprocess/GaussianBlurPass.js";
-import {BloomPass} from "./postprocess/BloomPass.js";
 
 // shaders
 export {generateVertexShader} from "./shaders/generateVertexShader.js";

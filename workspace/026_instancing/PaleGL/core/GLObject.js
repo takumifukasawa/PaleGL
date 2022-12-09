@@ -1,5 +1,13 @@
 ﻿export class GLObject {
     get glObject() {
-        throw "should implementation glObject getter";
+        throw "[GLObject.glObject] should implementation";
+    }
+    
+    bind() {
+        throw "[GLObject.bind] should implementation";
+    }
+
+    unbind() {
+        throw "[GLObject.unbind] should implementation";
     }
 }
