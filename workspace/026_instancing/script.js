@@ -528,7 +528,7 @@ out vec3 vColor;
 
 void main() {
     vColor = aColor;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset, 1.);
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset + vec3(0., float(gl_InstanceID) * .5, 0.), 1.);
 }
             `,
             fragmentShader: `#version 300 es
