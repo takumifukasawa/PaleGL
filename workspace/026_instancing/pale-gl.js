@@ -1795,13 +1795,22 @@ class Attribute {
     size; // data per vertex. ex) position: 3, uv: 2
     offset;
     usageType;
+    divisor;
     
-    constructor({ data, location, size, offset = 0, usageType = AttributeUsageType.StaticDraw }) {
+    constructor({
+        data,
+        location,
+        size,
+        offset = 0,
+        usageType = AttributeUsageType.StaticDraw,
+        divisor
+    }) {
         this.data = data;
         this.location = location;
         this.size = size;
         this.offset = offset;
         this.usageType = usageType;
+        this.divisor = divisor;
     }
 }
 ﻿
@@ -1879,7 +1888,7 @@ class VertexArrayObject extends GLObject {
 
         Object.keys(attributes).forEach(key => {
             const attribute = attributes[key];
-            const {data, size, location, usageType} = attribute;
+            const {data, size, location, usageType, divisor} = attribute;
             const vbo = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
             const usage = this.getUsage(gl, usageType);
@@ -1889,6 +1898,10 @@ class VertexArrayObject extends GLObject {
             // stride is always 0 because buffer is not interleaved.
             // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
             gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+            
+            if(divisor) {
+                gl.vertexAttribDivisor(location, divisor);
+            }
             
             this.#vboList[key] = { vbo, usage };
         });
@@ -1932,6 +1945,8 @@ class Geometry {
     indices;
     drawCount;
 
+    instanceCount;
+
     #gpu;
 
     constructor({
@@ -1940,10 +1955,13 @@ class Geometry {
         indices,
         drawCount,
         immediateCreate = true,
-        calculateTangent = false,
-        calculateBinormal = false
+        // calculateTangent = false,
+        calculateBinormal = false,
+        instanceCount = null,
     }) {
         this.#gpu = gpu;
+        
+        this.instanceCount = instanceCount;
 
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
@@ -1954,6 +1972,7 @@ class Geometry {
                 size: attribute.size,
                 offset: attribute.offset,
                 usage: attribute.usage,
+                divisor: attribute.divisor
             });
         });
         
@@ -4920,6 +4939,7 @@ class ForwardRenderer {
             depthWrite,
             material.blendType,
             material.faceSide,
+            geometry.instanceCount
         );
     }
 }
@@ -5007,8 +5027,11 @@ class GPU {
                 throw "invalid primitive type";
         }
     }
-   
-    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, startOffset = 0) {
+  
+    // TODO:
+    // - start offset と instanceCount は逆の方が良い
+    // - なんなら object destructuring の方がよさそう
+    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, instanceCount, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
        
@@ -5148,11 +5171,19 @@ class GPU {
             // draw by indices
             // drawCount ... use indices count
             // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
-            gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
+            if(instanceCount) {
+                gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
+            } else {
+                gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
+            }
         } else {
             // draw by array
             // draw count ... use vertex num
-            gl.drawArrays(glPrimitiveType, startOffset, drawCount);
+            if(instanceCount) {
+                gl.drawArraysInstanced(glPrimitiveType, startOffset, drawCount, instanceCount);
+            } else {
+                gl.drawArrays(glPrimitiveType, startOffset, drawCount);
+            }
         }
        
         // unbind when end render
@@ -6254,11 +6285,15 @@ void main() {
         return this.elements[3] * 255;
     }
     
+    get rgbArray() {
+        return [this.r, this.g, this.b];
+    }
+    
     set a(value) {
         this.elements[3] = value;
     }
     
-    constructor(r, g, b, a) {
+    constructor(r, g, b, a = 1) {
         this.set(r, g, b, a);
     }
     

@@ -14,6 +14,8 @@ export class Geometry {
     indices;
     drawCount;
 
+    instanceCount;
+
     #gpu;
 
     constructor({
@@ -22,10 +24,13 @@ export class Geometry {
         indices,
         drawCount,
         immediateCreate = true,
-        calculateTangent = false,
-        calculateBinormal = false
+        // calculateTangent = false,
+        calculateBinormal = false,
+        instanceCount = null,
     }) {
         this.#gpu = gpu;
+        
+        this.instanceCount = instanceCount;
 
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
@@ -36,6 +41,7 @@ export class Geometry {
                 size: attribute.size,
                 offset: attribute.offset,
                 usage: attribute.usage,
+                divisor: attribute.divisor
             });
         });
         

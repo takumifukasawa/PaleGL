@@ -6,12 +6,21 @@ export class Attribute {
     size; // data per vertex. ex) position: 3, uv: 2
     offset;
     usageType;
+    divisor;
     
-    constructor({ data, location, size, offset = 0, usageType = AttributeUsageType.StaticDraw }) {
+    constructor({
+        data,
+        location,
+        size,
+        offset = 0,
+        usageType = AttributeUsageType.StaticDraw,
+        divisor
+    }) {
         this.data = data;
         this.location = location;
         this.size = size;
         this.offset = offset;
         this.usageType = usageType;
+        this.divisor = divisor;
     }
 }

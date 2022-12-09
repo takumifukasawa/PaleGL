@@ -363,6 +363,7 @@ export class ForwardRenderer {
             depthWrite,
             material.blendType,
             material.faceSide,
+            geometry.instanceCount
         );
     }
 }

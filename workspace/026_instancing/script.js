@@ -460,7 +460,6 @@ const main = async () => {
             },
             indices: sphereGeometryData.indices,
             drawCount: sphereGeometryData.indices.length,
-            castShadow: true,
         }),
         material: new PhongMaterial({
             gpu,
@@ -494,33 +493,54 @@ const main = async () => {
                     data: sphereGeometryData.normals,
                     size: 3
                 },
+                color: {
+                    data: (new Array(sphereGeometryData.positions.length / 3)).fill(0).map(() => {
+                        return new Color(Math.random(), Math.random(), Math.random()).rgbArray;
+                    }).flat(),
+                    size: 3,
+                    divisor: 1
+                },
+                localOffset: {
+                    data: (new Array(sphereGeometryData.positions.length / 3)).fill(0).map((_, i) => {
+                        return [i * 2.5, 0, 0];
+                    }).flat(),
+                    size: 3,
+                    divisor: 1                   
+                }
             },
             indices: sphereGeometryData.indices,
             drawCount: sphereGeometryData.indices.length,
-            castShadow: true,
+            instanceCount: 5,
         }),       
         material: new Material({
             gpu,
             vertexShader: `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
+layout (location = 3) in vec3 aColor;
+layout (location = 4) in vec3 aLocalOffset;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uWorldMatrix;
 
+out vec3 vColor;
+
 void main() {
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+    vColor = aColor;
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset, 1.);
 }
             `,
             fragmentShader: `#version 300 es
           
 precision mediump float;          
+ 
+in vec3 vColor;
            
 out vec4 outColor;
 
 void main() {
-    outColor = vec4(1., 0., 0., 1.);
+    outColor = vec4(vColor, 1.);
 }
             `
         })

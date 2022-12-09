@@ -40,7 +40,7 @@ export class VertexArrayObject extends GLObject {
 
         Object.keys(attributes).forEach(key => {
             const attribute = attributes[key];
-            const {data, size, location, usageType} = attribute;
+            const {data, size, location, usageType, divisor} = attribute;
             const vbo = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
             const usage = this.getUsage(gl, usageType);
@@ -50,6 +50,10 @@ export class VertexArrayObject extends GLObject {
             // stride is always 0 because buffer is not interleaved.
             // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
             gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+            
+            if(divisor) {
+                gl.vertexAttribDivisor(location, divisor);
+            }
             
             this.#vboList[key] = { vbo, usage };
         });

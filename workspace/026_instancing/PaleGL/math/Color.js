@@ -33,11 +33,15 @@
         return this.elements[3] * 255;
     }
     
+    get rgbArray() {
+        return [this.r, this.g, this.b];
+    }
+    
     set a(value) {
         this.elements[3] = value;
     }
     
-    constructor(r, g, b, a) {
+    constructor(r, g, b, a = 1) {
         this.set(r, g, b, a);
     }
     

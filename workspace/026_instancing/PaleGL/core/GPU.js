@@ -82,8 +82,11 @@ export class GPU {
                 throw "invalid primitive type";
         }
     }
-   
-    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, startOffset = 0) {
+  
+    // TODO:
+    // - start offset と instanceCount は逆の方が良い
+    // - なんなら object destructuring の方がよさそう
+    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, instanceCount, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
        
@@ -223,11 +226,19 @@ export class GPU {
             // draw by indices
             // drawCount ... use indices count
             // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
-            gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
+            if(instanceCount) {
+                gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
+            } else {
+                gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
+            }
         } else {
             // draw by array
             // draw count ... use vertex num
-            gl.drawArrays(glPrimitiveType, startOffset, drawCount);
+            if(instanceCount) {
+                gl.drawArraysInstanced(glPrimitiveType, startOffset, drawCount, instanceCount);
+            } else {
+                gl.drawArrays(glPrimitiveType, startOffset, drawCount);
+            }
         }
        
         // unbind when end render
