@@ -477,7 +477,61 @@ const main = async () => {
         actor.transform.setTranslation(new Vector3(4, 2, 0));
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
+
+    const instancedSphereMesh = new Mesh({
+        geometry: new Geometry({
+            gpu,
+            attributes: {
+                position: {
+                    data: sphereGeometryData.positions,
+                    size: 3
+                },
+                uv: {
+                    data: sphereGeometryData.uvs,
+                    size: 2,
+                },
+                normal: {
+                    data: sphereGeometryData.normals,
+                    size: 3
+                },
+            },
+            indices: sphereGeometryData.indices,
+            drawCount: sphereGeometryData.indices.length,
+            castShadow: true,
+        }),       
+        material: new Material({
+            gpu,
+            vertexShader: `#version 300 es
+
+layout (location = 0) in vec3 aPosition;
+
+uniform mat4 uProjectionMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uWorldMatrix;
+
+void main() {
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+}
+            `,
+            fragmentShader: `#version 300 es
+          
+precision mediump float;          
+           
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(1., 0., 0., 1.);
+}
+            `
+        })
+    });
+    instancedSphereMesh.onStart = () => {
+        instancedSphereMesh.transform.position = new Vector3(0, 1, 0);
+    };
     
+    captureScene.add(instancedSphereMesh);
+
+
     const skyboxMesh = new Skybox({
         gpu, cubeMap
     });
