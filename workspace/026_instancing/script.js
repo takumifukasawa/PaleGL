@@ -278,17 +278,6 @@ const createGLTFSkinnedMesh = async () => {
                 receiveShadow: true,
                 isSkinning: true,
                 gpuSkinning: true,
-                uniforms: {
-                    // uJointMatrices: {
-                    //     type: UniformTypes.Matrix4Array,
-                    //     // TODO: 毎回これ入れるのめんどいので共通化したい
-                    //     value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                    // },
-                    // uJointTexture: {
-                    //     type: UniformTypes.Texture,
-                    //     value: null
-                    // }
-                }
             }),
             new Material({
                 gpu,
@@ -317,15 +306,6 @@ uniform float uOutlineOffset;
                 }
                 `,
                 uniforms: {
-                    // uJointMatrices: {
-                    //     type: UniformTypes.Matrix4Array,
-                    //     // TODO: 毎回これ入れるのめんどいので共通化したい
-                    //     value: new Array(skinningMesh.boneCount).fill(0).map(i => Matrix4.identity()),
-                    // },
-                    // uJointTexture: {
-                    //     type: UniformTypes.Texture,
-                    //     value: null
-                    // },
                     uOutlineColor: {
                         type: UniformTypes.Color,
                         value: outlineColor
@@ -477,29 +457,27 @@ const main = async () => {
         actor.transform.setScaling(new Vector3(2, 2, 2));
     }
 
+    const instancedSphereNum = 5;
     const instancedSphereMesh = new Mesh({
         geometry: new Geometry({
             gpu,
             attributes: {
+                // index: 0
                 position: {
                     data: sphereGeometryData.positions,
                     size: 3
                 },
+                // index: 1
                 uv: {
                     data: sphereGeometryData.uvs,
                     size: 2,
                 },
+                // index: 2
                 normal: {
                     data: sphereGeometryData.normals,
                     size: 3
                 },
-                color: {
-                    data: (new Array(sphereGeometryData.positions.length / 3)).fill(0).map(() => {
-                        return new Color(Math.random(), Math.random(), Math.random()).rgbArray;
-                    }).flat(),
-                    size: 3,
-                    divisor: 1
-                },
+                // index: 3
                 localOffset: {
                     data: (new Array(sphereGeometryData.positions.length / 3)).fill(0).map((_, i) => {
                         return [i * 2.5, 0, 0];
@@ -510,25 +488,25 @@ const main = async () => {
             },
             indices: sphereGeometryData.indices,
             drawCount: sphereGeometryData.indices.length,
-            instanceCount: 5,
+            instanceCount: instancedSphereNum,
         }),       
         material: new Material({
             gpu,
             vertexShader: `#version 300 es
 
 layout (location = 0) in vec3 aPosition;
-layout (location = 3) in vec3 aColor;
-layout (location = 4) in vec3 aLocalOffset;
+layout (location = 3) in vec3 aLocalOffset;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uWorldMatrix;
+uniform vec4 uColor[${instancedSphereNum}];
 
 out vec3 vColor;
 
 void main() {
-    vColor = aColor;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset + vec3(0., float(gl_InstanceID) * .5, 0.), 1.);
+    vColor = uColor[gl_InstanceID].xyz;
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset, 1.);
 }
             `,
             fragmentShader: `#version 300 es
@@ -542,7 +520,13 @@ out vec4 outColor;
 void main() {
     outColor = vec4(vColor, 1.);
 }
-            `
+            `,
+            uniforms: {
+                uColor: {
+                    type: UniformTypes.ColorArray,
+                    value: (new Array(instancedSphereNum)).fill(0).map((_, i) => new Color(Math.random(), Math.random(), Math.random(), 1))
+                }
+            }
         })
     });
     instancedSphereMesh.onStart = () => {

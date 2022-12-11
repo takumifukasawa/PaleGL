@@ -813,6 +813,7 @@ const UniformTypes = {
     Struct: "Struct",
     Float: "Float",
     Color: "Color",
+    ColorArray: "ColorArray",
 };
 
 const TextureTypes = {
@@ -5122,6 +5123,12 @@ class GPU {
                     break;
                 case UniformTypes.Color:
                     gl.uniform4fv(location, value.elements);
+                    break;
+                case UniformTypes.ColorArray:
+                    if(value) {
+                        // arg[1] ... use transpose.
+                        gl.uniform4fv(location, value.map(v => [...v.elements]).flat());
+                    }
                     break;
                 case UniformTypes.Texture:
                     if(value) {

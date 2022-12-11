@@ -22,6 +22,7 @@ export const UniformTypes = {
     Struct: "Struct",
     Float: "Float",
     Color: "Color",
+    ColorArray: "ColorArray",
 };
 
 export const TextureTypes = {
