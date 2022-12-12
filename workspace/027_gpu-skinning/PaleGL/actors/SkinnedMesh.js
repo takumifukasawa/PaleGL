@@ -157,18 +157,12 @@ export class SkinnedMesh extends Mesh {
             const rowNum = Math.ceil(this.boneCount / colNum);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
-                ...jointMatrices.map(m => [...m.elements]),
-                ...(
-                    new Array(fillNum)
-                        .fill(0)
-                        .map(() => [
-                            0, 0, 0, 0,
-                            0, 0, 0, 0,
-                            0, 0, 0, 0,
-                            0, 0, 0, 0
-                        ])
-                    )
-            ].flat());
+                    ...jointMatrices,
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                ]
+                .map(m => [...m.elements])
+                .flat()
+            );
            
             const matrixColNum = 4;
             const dataPerPixel = 4;
