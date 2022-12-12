@@ -153,8 +153,8 @@ export class SkinnedMesh extends Mesh {
         }
 
         if(this.#gpuSkinning) {
-            const colNum = 4;
-            const rowNum = Math.ceil(this.boneCount / 4);
+            const colNum = 1;
+            const rowNum = Math.ceil(this.boneCount / colNum);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
                 ...jointMatrices.map(m => [...m.elements]),
@@ -169,12 +169,22 @@ export class SkinnedMesh extends Mesh {
                         ])
                     )
             ].flat());
-            
+           
+            const matrixColNum = 4;
+            const dataPerPixel = 4;
             this.#jointTexture.update({
-                width: colNum * 4,
+                width: colNum * matrixColNum,
                 height: rowNum,
                 data: jointData
             });
+            
+            // for debug
+            // console.log(
+            //     colNum * matrixColNum,
+            //     rowNum,
+            //     colNum * matrixColNum * rowNum * dataPerPixel,
+            //     jointData.length
+            // );
 
             this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;

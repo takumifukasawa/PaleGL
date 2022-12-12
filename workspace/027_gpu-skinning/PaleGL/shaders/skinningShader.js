@@ -26,17 +26,30 @@ mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 joi
 //     return jointMatrix;
 // }
 
-mat4 getJointMatrix(sampler2D jointTexture, int jointNum, int jointIndex, int currentSkinIndex, int colNum, int rowNum, int offset) {
+mat4 getJointMatrix(sampler2D jointTexture, int jointNum, int jointIndex, int currentSkinIndex, int colNum, int rowNum) {
+    // float targetIndex = float(jointNum) * float(currentSkinIndex) / float(colNum);
+    // float targetIndex = float(currentSkinIndex) / float(colNum);
+    float targetIndex = float(jointIndex) / float(colNum);
     // int colIndex = fract(float(jointNum) * float(currentSkinIndex) / float(colNum)); // 横
     // int rowIndex = floor(float(jointNum) * float(currentSkinIndex) / float(colNum)); // 縦
-    int colIndex = int(fract(float(jointNum) * float(currentSkinIndex) / float(colNum))); // 横
-    int rowIndex = int(floor(float(jointNum) * float(currentSkinIndex) / float(colNum))); // 縦
+    int colIndex = int(fract(targetIndex)); // 横
+    int rowIndex = int(floor(targetIndex)); // 縦
     
     mat4 jointMatrix = mat4(
-        texelFetch(jointTexture, ivec2(colIndex + offset, rowIndex), 0),
-        texelFetch(jointTexture, ivec2(colIndex + offset, rowIndex), 0),
-        texelFetch(jointTexture, ivec2(colIndex + offset, rowIndex), 0),
-        texelFetch(jointTexture, ivec2(colIndex + offset, rowIndex), 0)
+        // texelFetch(jointTexture, ivec2(offset, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(offset, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(offset, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(offset, rowIndex), 0)
+        
+        // texelFetch(jointTexture, ivec2(0, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(1, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(2, rowIndex), 0),
+        // texelFetch(jointTexture, ivec2(3, rowIndex), 0)
+        
+        texelFetch(jointTexture, ivec2(colIndex + 0, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex + 1, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex + 2, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex + 3, rowIndex), 0)
     );
     return jointMatrix;
 }
@@ -59,10 +72,10 @@ export const skinningVertex = (gpuSkinning = false) => `
     );
     ` : `
     // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[0]), 0, 1, 31, 0);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[1]), 0, 1, 31, 1);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[2]), 0, 1, 31, 2);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[3]), 0, 1, 31, 3);
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[0]), 0, 1, 61);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[1]), 0, 1, 61);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[2]), 0, 1, 61);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, 61, int(aBoneIndices[3]), 0, 1, 61);
     // mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
     // mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
     // mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
