@@ -267,6 +267,9 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshes = gltfActor.transform.children[0].transform.children;
     
     skinningMeshes.forEach(skinningMesh => {
+        // ルートにanimatorをattachしてるので一旦ここでassign
+        skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
+        
         skinningMesh.castShadow = true;
         skinningMesh.materials = [
             // TODO: materialにgpuskinning option持たせる？

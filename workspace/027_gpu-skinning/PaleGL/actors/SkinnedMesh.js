@@ -25,6 +25,8 @@ export class SkinnedMesh extends Mesh {
     
     #gpuSkinning;
     
+    #animationClips;
+    
     // TODO: generate vertex shader in constructor
     constructor({bones, gpu, ...options}) {
         super({
@@ -151,11 +153,26 @@ export class SkinnedMesh extends Mesh {
         }
 
         if(this.#gpuSkinning) {
-            const jointData = new Float32Array(jointMatrices.map(m => [...m.elements]).flat());
+            const colNum = 4;
+            const rowNum = Math.ceil(this.boneCount / 4);
+            const fillNum = colNum * rowNum - this.boneCount;
+            const jointData = new Float32Array([
+                ...jointMatrices.map(m => [...m.elements]),
+                ...(
+                    new Array(fillNum)
+                        .fill(0)
+                        .map(() => [
+                            0, 0, 0, 0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0
+                        ])
+                    )
+            ].flat());
             
             this.#jointTexture.update({
-                width: 4,
-                height: this.boneCount,
+                width: colNum * 4,
+                height: rowNum,
                 data: jointData
             });
 
@@ -287,5 +304,9 @@ export class SkinnedMesh extends Mesh {
         
         this.addChild(this.boneLines);
         this.addChild(this.bonePoints)       
+    }
+    
+    setAnimationClips(animationClips) {
+        this.#animationClips = animationClips;
     }
 }
