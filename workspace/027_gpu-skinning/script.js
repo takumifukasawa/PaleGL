@@ -265,7 +265,8 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshAnimator = gltfActor.animator;
  
     skinningMeshes = gltfActor.transform.children[0].transform.children;
-    
+   
+    // skinningMeshは一個だけどloopで処理しちゃう
     skinningMeshes.forEach(skinningMesh => {
         // ルートにanimatorをattachしてるので一旦ここでassign
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);

@@ -120,6 +120,28 @@ export class SkinnedMesh extends Mesh {
         super.start(options);
 
         this.#createSkinDebugger({ gpu });
+
+        const animationData = [];
+        this.#animationClips.forEach((animationClip, i) => {
+            const data = {
+                name: animationClip.name,
+                value: []
+            };
+            this.bones.traverse(bone => {
+                data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
+            });
+            animationData.push(data);
+        });
+        console.log(animationData)
+        this.#animationClips.forEach((animationClip, i) => {
+            const dataEachKeyframes = animationClip.getAllKeyframesValue();
+            dataEachKeyframes.forEach((dataKeyframes, frame) => {
+                dataKeyframes.forEach(elem => {
+                    animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
+                });
+            });
+        });
+        console.log(animationData)
     }
     
     update(options) {

@@ -41,11 +41,9 @@ export class AnimationClip {
         this.name = name;
         this.start = start;
         this.end = end;
-        this.frames = frames;
         this.frameCount = frameCount;
         this.#keyframes = keyframes;
-        // this.elementSize = elementSize;
-       
+        
         // TODO: add keyframes した時も計算するようにした方が便利そう 
         this.frameCount = Math.max(...(keyframes.map(({ frameCount }) => frameCount)));
     }
@@ -140,5 +138,19 @@ export class AnimationClip {
                 }
             });
         }
+    }
+    
+    getAllKeyframesValue() {
+        return (new Array(this.frameCount)).fill(0).map((_, i) => {
+            const keyframes = this.#keyframes.map(animationKeyframes => {
+                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
+                return {
+                    target: animationKeyframes.target,
+                    key: animationKeyframes.key,
+                    frameValue: animationKeyframes.getFrameValue(i)
+                }
+            });
+            return keyframes;
+        });
     }
 }

@@ -3834,6 +3834,28 @@ class SkinnedMesh extends Mesh {
         super.start(options);
 
         this.#createSkinDebugger({ gpu });
+
+        const animationData = [];
+        this.#animationClips.forEach((animationClip, i) => {
+            const data = {
+                name: animationClip.name,
+                value: []
+            };
+            this.bones.traverse(bone => {
+                data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
+            });
+            animationData.push(data);
+        });
+        console.log(animationData)
+        this.#animationClips.forEach((animationClip, i) => {
+            const dataEachKeyframes = animationClip.getAllKeyframesValue();
+            dataEachKeyframes.forEach((dataKeyframes, frame) => {
+                dataKeyframes.forEach(elem => {
+                    animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
+                });
+            });
+        });
+        console.log(animationData)
     }
     
     update(options) {
@@ -5450,11 +5472,9 @@ class AnimationClip {
         this.name = name;
         this.start = start;
         this.end = end;
-        this.frames = frames;
         this.frameCount = frameCount;
         this.#keyframes = keyframes;
-        // this.elementSize = elementSize;
-       
+        
         // TODO: add keyframes した時も計算するようにした方が便利そう 
         this.frameCount = Math.max(...(keyframes.map(({ frameCount }) => frameCount)));
     }
@@ -5550,6 +5570,20 @@ class AnimationClip {
             });
         }
     }
+    
+    getAllKeyframesValue() {
+        return (new Array(this.frameCount)).fill(0).map((_, i) => {
+            const keyframes = this.#keyframes.map(animationKeyframes => {
+                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
+                return {
+                    target: animationKeyframes.target,
+                    key: animationKeyframes.key,
+                    frameValue: animationKeyframes.getFrameValue(i)
+                }
+            });
+            return keyframes;
+        });
+    }
 }
 
 
@@ -5626,8 +5660,6 @@ class AnimationKeyframes {
     #data;
     #elementSize;
     frameCount
-    
-    
 
     get data() {
         return this.#data;

@@ -9,8 +9,6 @@ export class AnimationKeyframes {
     #data;
     #elementSize;
     frameCount
-    
-    
 
     get data() {
         return this.#data;
