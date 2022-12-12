@@ -3382,10 +3382,10 @@ const skinningVertex = (gpuSkinning = false) => `
     );
     ` : `
     // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 2, 31);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 2, 31);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 2, 31);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 2, 31);
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 4, 16);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 4, 16);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 4, 16);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 4, 16);
     // mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
     // mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
     // mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
@@ -3867,7 +3867,7 @@ class SkinnedMesh extends Mesh {
         }
 
         if(this.#gpuSkinning) {
-            const colNum = 2;
+            const colNum = 4;
             const rowNum = Math.ceil(this.boneCount / colNum);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
@@ -3879,7 +3879,6 @@ class SkinnedMesh extends Mesh {
             );
            
             const matrixColNum = 4;
-            const dataPerPixel = 4;
             this.#jointTexture.update({
                 width: colNum * matrixColNum,
                 height: rowNum,

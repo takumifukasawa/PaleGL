@@ -153,7 +153,7 @@ export class SkinnedMesh extends Mesh {
         }
 
         if(this.#gpuSkinning) {
-            const colNum = 2;
+            const colNum = 4;
             const rowNum = Math.ceil(this.boneCount / colNum);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
@@ -165,7 +165,6 @@ export class SkinnedMesh extends Mesh {
             );
            
             const matrixColNum = 4;
-            const dataPerPixel = 4;
             this.#jointTexture.update({
                 width: colNum * matrixColNum,
                 height: rowNum,
