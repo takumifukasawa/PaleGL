@@ -7,6 +7,7 @@ import {Material} from "../materials/Material.js";
 import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader";
 import {Texture} from "../core/Texture.js";
+import {Rotator} from "../math/Rotator.js";
 
 export class SkinnedMesh extends Mesh {
     bones;
@@ -132,12 +133,19 @@ export class SkinnedMesh extends Mesh {
             });
             animationData.push(data);
         });
-        console.log(animationData)
         this.#animationClips.forEach((animationClip, i) => {
             const dataEachKeyframes = animationClip.getAllKeyframesValue();
             dataEachKeyframes.forEach((dataKeyframes, frame) => {
                 dataKeyframes.forEach(elem => {
                     animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
+                    const targetObj = animationData[i].value[elem.target.index][frame];
+                    if(targetObj.hasOwnProperty("translation") && targetObj.hasOwnProperty("rotation") && targetObj.hasOwnProperty("scale")) {
+                        animationData[i].value[elem.target.index][frame] = Matrix4.fromTRS(
+                            targetObj["translation"],
+                            Rotator.fromQuaternion(targetObj["rotation"]),
+                            targetObj["scale"]
+                        );
+                    }
                 });
             });
         });
