@@ -65,9 +65,9 @@ export class Actor {
     
     fixedUpdate({ gpu, fixedTime, fixedDeltaTime } = {}) {
         this.#tryStart({ gpu });
-        // if(this.animator) {
-        //     this.animator.update(fixedDeltaTime);
-        // }
+        if(this.animator) {
+            this.animator.update(fixedDeltaTime);
+        }
         if(this.#onFixedUpdate) {
             this.#onFixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
         }
