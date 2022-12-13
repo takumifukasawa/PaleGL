@@ -3369,9 +3369,11 @@ mat4 getJointMatrix(
     int rowNum,
     float time
 ) {
+    float totalFrameCount = 60.;
     // float totalFrameCount = 60. * float(jointNum);
     // float offset = mod(time * float(jointNum), totalFrameCount);
-    int offset = int(time) * jointNum;
+    int offset = int(mod(floor(time), totalFrameCount)) * jointNum;
+    // int offset = int(time) * jointNum;
     int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
     int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
  
