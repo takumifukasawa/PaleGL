@@ -174,6 +174,7 @@ export class SkinnedMesh extends Mesh {
                     if(frameIndex !== 0) {
                         return;
                     }
+                    const clipBoneMatricesData = [];
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
                         const { translation, rotation, scale, bone } = data;
@@ -188,13 +189,26 @@ export class SkinnedMesh extends Mesh {
                     
                     // どちらも bone index order ではない
                     const boneOffsetMatrices = this.boneOffsetMatrices;
-                    const boneJointMatrices = this.getBoneJointMatrices();
+                    // const boneJointMatrices = this.getBoneJointMatrices();
+                    const boneJointMatrices = this.getBoneJointMatricesWithBone();
+
                     // offset行列を踏まえたjoint行列を計算
-                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => {
+                        const mat = Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix)
+                        clipBoneMatricesData[boneJointMatrices[i].bone.index] = {
+                            bone: boneJointMatrices.bone, 
+                            matrix: boneJointMatrices[i].matrix
+                        };
+                        return mat;
+                    });
+                    const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
 
                     // 配列の中は boneIndex order ではないことに注意
                     // traverseした時の順番のまま
-                    jointMatricesAllFrames.push(jointMatrices);
+                    // jointMatricesAllFrames.push(jointMatrices);
+
+                    // 中身は bone index orderされてる
+                    jointMatricesAllFrames.push(clipBoneMatricesData);
                     
                     // jointMatricesAllFrames[
                 });
@@ -269,12 +283,10 @@ matrix elements: ${jointData.length}
         // const boneOffsetMatrices = this.boneOffsetMatrices;
         // const boneJointMatrices = this.getBoneJointMatrices();
 
-        const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-        // const boneLinePositions = this.#boneOrderedIndex.map((bone, boneIndex) => {
-        //     // return [...this.#jointMatricesAllFrames[0][boneIndex].position.elements];
-        //     return [...this.#jointMatricesAllFrames[0][bone.index].position.elements];
-        // });
-       
+        // こっちが正しい
+        // const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
+        const boneLinePositions = this.#jointMatricesAllFrames[0].map(data => [...data.matrix.position.elements]);
+
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
        
@@ -345,6 +357,15 @@ matrix elements: ${jointData.length}
         return matrices;        
     }
     
+    getBoneJointMatricesWithBone() {
+        const data = [];
+        this.bones.traverse((bone) => {
+            const matrix = bone.jointMatrix.clone();
+            data.push({ bone, matrix });
+        });
+        return data;
+    }
+
     #createSkinDebugger({ gpu }) {
         const checkChildNum = (bone) => {
             if(bone.hasChild) {
