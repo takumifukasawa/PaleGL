@@ -163,6 +163,7 @@ export class SkinnedMesh extends Mesh {
             
             this.#animationData.forEach(clips => {
                 clips.forEach((keyframeData, frameIndex) => {
+                    console.log(keyframeData)
                     keyframeData.forEach((data, boneIndex) => {
                         const { translation, rotation, scale } = data;
                         const targetBone = this.bones.findByIndex(boneIndex);
@@ -173,7 +174,7 @@ export class SkinnedMesh extends Mesh {
                     this.bones.calcJointMatrix();
                     const boneOffsetMatrices = this.boneOffsetMatrices;
                     const boneJointMatrices = this.getBoneJointMatrices();
-                    const jointMatrices = this.boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
                     jointMatricesAllFrames.push(jointMatrices);                   
                 });
                 // console.log("hogehoge", clips, animationData, this.bones)
@@ -196,11 +197,11 @@ export class SkinnedMesh extends Mesh {
             
             jointMatricesAllFrames = jointMatricesAllFrames.flat();
 
-            console.log(this.#animationData, jointMatricesAllFrames)
+            console.log("ttt", this.#animationData, jointMatricesAllFrames)
 
             const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
           
-            const colNum = 1;
+            const colNum = 4;
             const boneCount = this.boneCount * framesDuration;
             const rowNum = Math.ceil(boneCount / colNum);
             const fillNum = colNum * rowNum - boneCount;
@@ -230,6 +231,8 @@ total pixels: ${colNum * matrixColNum * rowNum},
 all elements: ${colNum * matrixColNum * rowNum * 4},
 matrix elements: ${jointData.length}
             `);
+            jointMatricesAllFrames[5].log()
+            console.log("--------")
         }
     }
     
@@ -255,6 +258,8 @@ matrix elements: ${jointData.length}
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
        
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+       
+        // console.log(jointMatrices[5].getPrettyLine())
 
         this.materials.forEach(material => {
             material.uniforms.uJointMatrices.value = jointMatrices;
