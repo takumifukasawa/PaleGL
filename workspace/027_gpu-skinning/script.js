@@ -281,14 +281,14 @@ const createGLTFSkinnedMesh = async () => {
                 // TODO: 毎回これ入れるのめんどいので共通化したい
                 receiveShadow: true,
                 isSkinning: true,
-                gpuSkinning: true,
+                // gpuSkinning: true,
             }),
             new Material({
                 gpu,
                 vertexShader: generateVertexShader({
                     jointNum: skinningMesh.boneCount,
                     isSkinning: true,
-                    gpuSkinning: true,
+                    // gpuSkinning: true,
                     receiveShadow: false,
                     insertUniforms: `
 uniform float uOutlineOffset;
