@@ -32,27 +32,27 @@ mat4 getJointMatrix(sampler2D jointTexture, int jointIndex) {
     return jointMatrix;
 }
 
-// mat4 getJointMatrix(
-//     sampler2D jointTexture,
-//     int jointIndex,
-//     int jointNum,
-//     int currentSkinIndex,
-//     int colNum,
-//     int totalFrameCount,
-//     float time
-// ) {
-//     int offset = int(mod(floor(time), float(totalFrameCount))) * jointNum;
-//     int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
-//     int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
-// 
-//     mat4 jointMatrix = mat4(
-//         texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),
-//         texelFetch(jointTexture, ivec2(colIndex * 4 + 1, rowIndex), 0),
-//         texelFetch(jointTexture, ivec2(colIndex * 4 + 2, rowIndex), 0),
-//         texelFetch(jointTexture, ivec2(colIndex * 4 + 3, rowIndex), 0)
-//     );
-//     return jointMatrix;
-// }
+mat4 getJointMatrixGPUSkinning(
+    sampler2D jointTexture,
+    int jointIndex,
+    int jointNum,
+    int currentSkinIndex,
+    int colNum,
+    int totalFrameCount,
+    float time
+) {
+    int offset = int(mod(floor(time), float(totalFrameCount))) * jointNum;
+    int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
+    int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
+
+    mat4 jointMatrix = mat4(
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 1, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 2, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 3, rowIndex), 0)
+    );
+    return jointMatrix;
+}
 `;
 
 export const skinningVertexUniforms = (jointNum) => `
@@ -78,10 +78,10 @@ export const skinningVertex = (gpuSkinning = false) => `
     ${gpuSkinning ? `
     // gpu skinning
     float fps = 30.;
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
     mat4 skinMatrix = calcSkinningMatrix(
         jointMatrix0,
         jointMatrix1,

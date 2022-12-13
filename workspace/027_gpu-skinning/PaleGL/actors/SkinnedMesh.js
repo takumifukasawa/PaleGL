@@ -265,8 +265,9 @@ matrix elements: ${jointData.length}
             jointMatricesAllFrames[5].log()
             console.log("--------")
         }
+        
+        // console.log(this.materials)
     }
-
 
     #jointMatricesAllFrames;
 
