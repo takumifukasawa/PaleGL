@@ -3360,9 +3360,20 @@ mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 joi
 //     return jointMatrix;
 // }
 
-mat4 getJointMatrix(sampler2D jointTexture, int jointIndex, int jointNum, int currentSkinIndex, int colNum, int rowNum) {
-    int colIndex = int(mod(float(jointIndex), float(colNum))); // 横
-    int rowIndex = int(floor(float(jointIndex) / float(colNum))); // 縦
+mat4 getJointMatrix(
+    sampler2D jointTexture,
+    int jointIndex,
+    int jointNum,
+    int currentSkinIndex,
+    int colNum,
+    int rowNum,
+    float time
+) {
+    // float totalFrameCount = 60. * float(jointNum);
+    // float offset = mod(time * float(jointNum), totalFrameCount);
+    int offset = int(time) * jointNum;
+    int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
+    int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
  
     mat4 jointMatrix = mat4(
         texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),
@@ -3391,10 +3402,11 @@ const skinningVertex = (gpuSkinning = false) => `
     );
     ` : `
     // gpu skinning
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 4, 915);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 4, 915);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 4, 915);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 4, 915);
+    float fps = 30.;
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 4, 915, uTime * fps);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 4, 915, uTime * fps);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 4, 915, uTime * fps);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 4, 915, uTime * fps);
     // mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
     // mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
     // mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
@@ -3417,7 +3429,9 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 `;
 
-
+const engineCommonUniforms = () => `
+uniform float uTime;
+`;
 
 const shadowMapVertexVaryings = () => `
 out vec4 vShadowMapProjectionUv;
@@ -3615,13 +3629,14 @@ ${attributes.join("\n")}
 
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
-${transformVertexUniforms()}
-
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
+
+${transformVertexUniforms()}
+${engineCommonUniforms()}
 
 ${receiveShadow ? shadowMapVertexUniforms() : ""}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
@@ -3702,6 +3717,7 @@ ${attributes.join("\n")}
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
 ${transformVertexUniforms()}
+${engineCommonUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {
@@ -3800,13 +3816,16 @@ class SkinnedMesh extends Mesh {
         this.materials.forEach(material => {
             material.uniforms.uJointMatrices = {
                 type: UniformTypes.Matrix4Array,
-                // TODO: 毎回これ入れるのめんどいので共通化したい
                 value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
             };
             if(this.#gpuSkinning) {
                 material.uniforms.uJointTexture = {
                     type: UniformTypes.Texture,
                     value: null
+                };
+                material.uniforms.uTime = {
+                    type: UniformTypes.Float,
+                    value: 0,
                 };
             }
             material.isSkinning = true;
@@ -3989,6 +4008,8 @@ matrix elements: ${jointData.length}
     update(options) {
         super.update(options);
         
+        const { time } = options;
+        
         this.bones.calcJointMatrix();
         
         // for debug
@@ -4054,7 +4075,12 @@ matrix elements: ${jointData.length}
                 // );
             }
 
-            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+            this.materials.forEach(mat => {
+                mat.uniforms.uJointTexture.value = this.#jointTexture;
+                if(this.#gpuSkinning) {
+                    mat.uniforms.uTime.value = time;
+                }
+            });
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
         }
     }

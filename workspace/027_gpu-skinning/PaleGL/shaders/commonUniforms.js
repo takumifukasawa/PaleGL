@@ -6,3 +6,6 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 `;
 
+export const engineCommonUniforms = () => `
+uniform float uTime;
+`;

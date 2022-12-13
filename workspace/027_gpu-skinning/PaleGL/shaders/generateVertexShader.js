@@ -3,7 +3,7 @@ import {
     skinningVertexAttributes,
     calcSkinningMatrixFunc, skinningVertex
 } from "./skinningShader.js";
-import {transformVertexUniforms} from "./commonUniforms.js";
+import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingCommon.js";
 
@@ -37,13 +37,14 @@ ${attributes.join("\n")}
 
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
-${transformVertexUniforms()}
-
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
+
+${transformVertexUniforms()}
+${engineCommonUniforms()}
 
 ${receiveShadow ? shadowMapVertexUniforms() : ""}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
@@ -124,6 +125,7 @@ ${attributes.join("\n")}
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
 ${transformVertexUniforms()}
+${engineCommonUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 void main() {

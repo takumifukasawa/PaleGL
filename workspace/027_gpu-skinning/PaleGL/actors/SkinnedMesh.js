@@ -77,13 +77,16 @@ export class SkinnedMesh extends Mesh {
         this.materials.forEach(material => {
             material.uniforms.uJointMatrices = {
                 type: UniformTypes.Matrix4Array,
-                // TODO: 毎回これ入れるのめんどいので共通化したい
                 value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
             };
             if(this.#gpuSkinning) {
                 material.uniforms.uJointTexture = {
                     type: UniformTypes.Texture,
                     value: null
+                };
+                material.uniforms.uTime = {
+                    type: UniformTypes.Float,
+                    value: 0,
                 };
             }
             material.isSkinning = true;
@@ -266,6 +269,8 @@ matrix elements: ${jointData.length}
     update(options) {
         super.update(options);
         
+        const { time } = options;
+        
         this.bones.calcJointMatrix();
         
         // for debug
@@ -331,7 +336,12 @@ matrix elements: ${jointData.length}
                 // );
             }
 
-            this.materials.forEach(mat => mat.uniforms.uJointTexture.value = this.#jointTexture);
+            this.materials.forEach(mat => {
+                mat.uniforms.uJointTexture.value = this.#jointTexture;
+                if(this.#gpuSkinning) {
+                    mat.uniforms.uTime.value = time;
+                }
+            });
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
         }
     }
