@@ -22,12 +22,20 @@ struct SkinAnimationClipData {
     int frameCount;
 };
 
-mat4 getJointMatrix(sampler2D jointTexture, int jointIndex) {
+mat4 getJointMatrix(sampler2D jointTexture, int jointIndex, int colNum) {
+    int colIndex = int(mod(float(jointIndex), float(colNum))); // 横
+    int rowIndex = int(floor(float(jointIndex) / float(colNum))); // 縦
     mat4 jointMatrix = mat4(
-        texelFetch(jointTexture, ivec2(0, jointIndex), 0),
-        texelFetch(jointTexture, ivec2(1, jointIndex), 0),
-        texelFetch(jointTexture, ivec2(2, jointIndex), 0),
-        texelFetch(jointTexture, ivec2(3, jointIndex), 0)
+        // 1: boneの行列が1個ずつ縦に並んでいる場合
+        // texelFetch(jointTexture, ivec2(0, jointIndex), 0),
+        // texelFetch(jointTexture, ivec2(1, jointIndex), 0),
+        // texelFetch(jointTexture, ivec2(2, jointIndex), 0),
+        // texelFetch(jointTexture, ivec2(3, jointIndex), 0)
+        // 2: 適宜詰めている場合
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 1, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 2, rowIndex), 0),
+        texelFetch(jointTexture, ivec2(colIndex * 4 + 3, rowIndex), 0)
     );
     return jointMatrix;
 }
@@ -90,10 +98,10 @@ export const skinningVertex = (gpuSkinning = false) => `
         aBoneWeights
     );
     ` : `
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]));
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), uJointTextureColNum);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), uJointTextureColNum);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), uJointTextureColNum);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), uJointTextureColNum);
     mat4 skinMatrix = calcSkinningMatrix(
         jointMatrix0,
         jointMatrix1,

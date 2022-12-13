@@ -30,7 +30,9 @@ export class SkinnedMesh extends Mesh {
 
     #animationData;
     
-    #jointTextureColNum = 1;
+    #jointTextureColNum = 4;
+
+    #jointMatricesAllFrames;
     
     // TODO: generate vertex shader in constructor
     constructor({bones, gpu, ...options}) {
@@ -83,6 +85,10 @@ export class SkinnedMesh extends Mesh {
                 type: UniformTypes.Texture,
                 value: null
             };
+            material.uniforms.uJointTextureColNum = {
+                type: UniformTypes.Int,
+                value: this.#jointTextureColNum,
+            };
             if(this.#gpuSkinning) {
                 material.uniforms = {
                     ...material.uniforms,
@@ -94,10 +100,6 @@ export class SkinnedMesh extends Mesh {
                         uBoneCount: {
                             type: UniformTypes.Int,
                             value: this.boneCount
-                        },
-                        uJointTextureColNum: {
-                            type: UniformTypes.Int,
-                            value: this.#jointTextureColNum
                         },
                         uTotalFrameCount: {
                             type: UniformTypes.Int,
@@ -133,7 +135,11 @@ export class SkinnedMesh extends Mesh {
                     uJointTexture: {
                         type: UniformTypes.Texture,
                         value: null
-                    }
+                    },
+                    uJointTextureColNum: {
+                        type: UniformTypes.Int,
+                        value: this.#jointTextureColNum,
+                    },
                 },
                 alphaTest: this.mainMaterial.alphaTest
             });
@@ -265,11 +271,7 @@ matrix elements: ${jointData.length}
             jointMatricesAllFrames[5].log()
             console.log("--------")
         }
-        
-        // console.log(this.materials)
     }
-
-    #jointMatricesAllFrames;
 
     update(options) {
         super.update(options);
@@ -284,20 +286,12 @@ matrix elements: ${jointData.length}
         //        console.log(b.rotation.getAxes())
         //    }
         // })
-        
-        // NOTE: test update skinning by cpu
-        // needs
-        const boneOffsetMatrices = this.boneOffsetMatrices;
-        const boneJointMatrices = this.getBoneJointMatricesWithBone();
 
         // こっちが正しい
         const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-        // const boneLinePositions = this.#jointMatricesAllFrames[1][0].map(data => [...data.matrix.position.elements]);
 
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
-        
-        const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix));
 
         // TODO: よく考えたら bone index order になっていないがそれで大丈夫かどうか確認
         // this.materials.forEach(material => {
@@ -307,37 +301,39 @@ matrix elements: ${jointData.length}
         //     this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
         // }
 
-        // if(this.#gpuSkinning) {
-        //     if(!this.#animationClips) {
-                // 1: for only bones. bone matrix update by cpu
+        if(!this.#gpuSkinning) {
+            // NOTE: test update skinning by cpu
+            // needs
+            const boneOffsetMatrices = this.boneOffsetMatrices;
+            const boneJointMatrices = this.getBoneJointMatricesWithBone();
 
-                const colNum = 1;
-                const rowNum = Math.ceil(this.boneCount / colNum);
-                const fillNum = colNum * rowNum - this.boneCount;
-                // const jointData = new Float32Array([
-                //         ...jointMatrices,
-                //         ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
-                //     ]
-                //     .map(m => [...m.elements])
-                //     .flat()
-                // );
-                const jointData = new Float32Array([
-                        ...jointMatrices,
-                        // ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
-                    ]
-                        .map(m => [...m.elements])
-                        .flat()
-                );
+            const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix));
+            
+            const colNum = this.#jointTextureColNum;
+            const rowNum = Math.ceil(this.boneCount / colNum);
+            const fillNum = colNum * rowNum - this.boneCount;
+            const jointData = new Float32Array([
+                    ...jointMatrices,
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                ]
+                .map(m => [...m.elements])
+                .flat()
+            );
+        // const jointData = new Float32Array([
+        //         ...jointMatrices,
+        //         // ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+        //     ]
+        //         .map(m => [...m.elements])
+        //         .flat()
+        // );
 
-        const matrixColNum = 4;
-                this.#jointTexture.update({
-                    width: colNum * matrixColNum,
-                    height: rowNum,
-                    data: jointData
-                });
-            // }
+            const matrixColNum = 4;
+            this.#jointTexture.update({
+                width: colNum * matrixColNum,
+                height: rowNum,
+                data: jointData
+            });
 
-        // console.log(colNum * matrixColNum, rowNum, jointData)
             this.materials.forEach(mat => {
                 mat.uniforms.uJointTexture.value = this.#jointTexture;
                 if(this.#gpuSkinning) {
@@ -345,7 +341,10 @@ matrix elements: ${jointData.length}
                 }
             });
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
-        // }
+            if(this.#gpuSkinning) {
+                this.depthMaterial.uniforms.uTime.value = time;
+            }
+        }
     }
 
     getBoneOffsetMatrices() {
