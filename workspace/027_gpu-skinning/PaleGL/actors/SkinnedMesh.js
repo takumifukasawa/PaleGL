@@ -128,40 +128,43 @@ export class SkinnedMesh extends Mesh {
             const animationData = [];
             console.log(this.#animationClips)
             this.#animationClips.forEach((animationClip, i) => {
-                const data = {
-                    name: animationClip.name,
-                    value: []
-                };
-                this.bones.traverse(bone => {
-                    data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
-                });
-                animationData.push(data);
+                // const data = {
+                //     name: animationClip.name,
+                //     value: []
+                // };
+                // this.bones.traverse(bone => {
+                //     // data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
+                //     data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
+                // });
+                // animationData.push(data);
             });
             this.#animationClips.forEach((animationClip, i) => {
                 const dataEachKeyframes = animationClip.getAllKeyframesValue();
-                dataEachKeyframes.forEach((dataKeyframes, frame) => {
+                console.log("fugafuga", dataEachKeyframes)
+                animationData[i] = [];
+                dataEachKeyframes.forEach((dataKeyframes, frameIndex) => {
+                    animationData[i][frameIndex] = [];
                     dataKeyframes.forEach(elem => {
-                        animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
-                        const targetObj = animationData[i].value[elem.target.index][frame];
-                        // if(targetObj.hasOwnProperty("translation") && targetObj.hasOwnProperty("rotation") && targetObj.hasOwnProperty("scale")) {
-                        //     animationData[i].value[elem.target.index][frame] = Matrix4.fromTRS(
-                        //         targetObj["translation"],
-                        //         Rotator.fromQuaternion(targetObj["rotation"]),
-                        //         targetObj["scale"]
-                        //     );
-                        // }
+                        // animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
+                        // const targetObj = animationData[i].value[elem.target.index][frame];
+                        const boneIndex = elem.target.index;
+                        if(!animationData[i][frameIndex][boneIndex]) {
+                            animationData[i][frameIndex][boneIndex] = {};
+                        }
+                        animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue;
                     });
                 });
             });
             this.#animationData = animationData;
             
+            console.log("gogo", animationData)
+            
             let jointMatricesAllFrames = [];
             
-            console.log(animationData, this.bones)
-
             this.#animationData.forEach(clips => {
-                clips.value.forEach((boneData, boneIndex) => {
-                    boneData.forEach(({ translation, rotation, scale }, frameIndex) => {
+                clips.forEach((keyframeData, frameIndex) => {
+                    keyframeData.forEach((data, boneIndex) => {
+                        const { translation, rotation, scale } = data;
                         const targetBone = this.bones.findByIndex(boneIndex);
                         targetBone.position = translation;
                         targetBone.rotation = Rotator.fromQuaternion(rotation);
@@ -170,9 +173,23 @@ export class SkinnedMesh extends Mesh {
                     this.bones.calcJointMatrix();
                     const boneOffsetMatrices = this.boneOffsetMatrices;
                     const boneJointMatrices = this.getBoneJointMatrices();
-                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
-                    jointMatricesAllFrames.push(jointMatrices);
+                    const jointMatrices = this.boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+                    jointMatricesAllFrames.push(jointMatrices);                   
                 });
+                // console.log("hogehoge", clips, animationData, this.bones)
+                // clips.value.forEach((boneData, boneIndex) => {
+                //     boneData.forEach(({ translation, rotation, scale }, frameIndex) => {
+                //         const targetBone = this.bones.findByIndex(boneIndex);
+                //         targetBone.position = translation;
+                //         targetBone.rotation = Rotator.fromQuaternion(rotation);
+                //         targetBone.scale = scale;
+                //     });
+                //     this.bones.calcJointMatrix();
+                //     const boneOffsetMatrices = this.boneOffsetMatrices;
+                //     const boneJointMatrices = this.getBoneJointMatrices();
+                //     const jointMatrices = this.boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i], boneOffsetMatrix));
+                //     jointMatricesAllFrames.push(jointMatrices);
+                // });
             });
             
             // console.log(this.#animationData, jointMatricesAllFrames)
@@ -183,7 +200,7 @@ export class SkinnedMesh extends Mesh {
 
             const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
           
-            const colNum = 61;
+            const colNum = 1;
             const boneCount = this.boneCount * framesDuration;
             const rowNum = Math.ceil(boneCount / colNum);
             const fillNum = colNum * rowNum - boneCount;
@@ -205,13 +222,13 @@ export class SkinnedMesh extends Mesh {
  
             // for debug
             console.log(`
-                col num: ${colNum},
-                row num: ${rowNum},
-                col pixels: ${colNum * matrixColNum},
-                row pixels: ${rowNum},
-                total pixels: ${colNum * matrixColNum * rowNum},
-                all elements: ${colNum * matrixColNum * rowNum * 4},
-                matrix elements: ${jointData.length}
+col num: ${colNum},
+row num: ${rowNum},
+col pixels: ${colNum * matrixColNum},
+row pixels: ${rowNum},
+total pixels: ${colNum * matrixColNum * rowNum},
+all elements: ${colNum * matrixColNum * rowNum * 4},
+matrix elements: ${jointData.length}
             `);
         }
     }
