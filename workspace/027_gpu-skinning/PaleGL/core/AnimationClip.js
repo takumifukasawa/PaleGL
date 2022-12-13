@@ -131,7 +131,7 @@ export class AnimationClip {
                         animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
                         break;
                     case "scale":
-                        animationKeyframes.scale = frameValue;
+                        animationKeyframes.target.scale = frameValue;
                         break;
                     default:
                         throw "invalid animation keyframes key";

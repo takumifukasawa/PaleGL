@@ -85,24 +85,4 @@ export class Bone extends NodeBase {
             child.traverse(callback);
         })
     }
-
-    findBy(callback) {
-        if(callback(this)) {
-            return this;
-        }
-        for(let i = 0; i < this.children.length; i++) {
-            return this.children[i].findBy(callback);
-        }
-    }
-    
-    findByIndex(needleIndex) {
-        if(needleIndex === this.index) {
-            return this;
-        }
-        for(let i = 0; i < this.children.length; i++) {
-            if(this.children[i].findByIndex(needleIndex)) {
-                return this.children[i];
-            }
-        }
-    }
 }
