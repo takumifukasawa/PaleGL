@@ -156,6 +156,9 @@ export class GPU {
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
             // TODO: nullなとき,値がおかしいときはセットしない
             switch(type) {
+                case UniformTypes.Int:
+                    gl.uniform1i(location, value);
+                    break;
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
                     break;

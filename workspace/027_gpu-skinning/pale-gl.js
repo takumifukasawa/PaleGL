@@ -821,6 +821,7 @@ const UniformTypes = {
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
+    Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",
 };
@@ -3372,7 +3373,6 @@ mat4 getJointMatrix(
     int jointNum,
     int currentSkinIndex,
     int colNum,
-    int rowNum,
     int totalFrameCount,
     float time
 ) {
@@ -3393,6 +3393,10 @@ mat4 getJointMatrix(
 const skinningVertexUniforms = (jointNum) => `
 uniform mat4[${jointNum}] uJointMatrices;
 uniform sampler2D uJointTexture;
+
+uniform int uBoneCount;
+uniform int uJointTextureColNum;
+uniform int uTotalFrameCount;
 `;
 
 const skinningVertex = (gpuSkinning = false) => `
@@ -3408,10 +3412,10 @@ const skinningVertex = (gpuSkinning = false) => `
     ` : `
     // gpu skinning
     float fps = 30.;
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 4, 915, 60, uTime * fps);
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
     // mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
     // mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
     // mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
@@ -3774,6 +3778,8 @@ class SkinnedMesh extends Mesh {
 
     #animationData;
     
+    #jointTextureColNum = 4;
+    
     // TODO: generate vertex shader in constructor
     constructor({bones, gpu, ...options}) {
         super({
@@ -3832,6 +3838,31 @@ class SkinnedMesh extends Mesh {
                     type: UniformTypes.Float,
                     value: 0,
                 };
+                material.uniforms = {
+                    ...material.uniforms,
+                    ...({
+                        uJointTexture: {
+                            type: UniformTypes.Texture,
+                            value: null
+                        },
+                        uTime: {
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        uBoneCount: {
+                            type: UniformTypes.Int,
+                            value: this.boneCount
+                        },
+                        uJointTextureColNum: {
+                            type: UniformTypes.Int,
+                            value: this.#jointTextureColNum
+                        },
+                        uTotalFrameCount: {
+                            type: UniformTypes.Int,
+                            value: 0,
+                        }
+                    })
+                }
             }
             material.isSkinning = true;
             material.gpuSkinning = this.#gpuSkinning;
@@ -3916,7 +3947,6 @@ class SkinnedMesh extends Mesh {
             this.#animationData.forEach((clips, clipIndex) => {
                 jointMatricesAllFrames[clipIndex] = [];
                 clips.forEach((keyframeData, frameIndex) => {
-                    const clipBoneMatricesData = [];
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
                         const { translation, rotation, scale, bone } = data;
@@ -3935,23 +3965,13 @@ class SkinnedMesh extends Mesh {
                     const boneJointMatrices = this.getBoneJointMatricesWithBone();
 
                     // offset行列を踏まえたjoint行列を計算
-                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => {
-                        const mat = Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix)
-                        // 1: traverse index order
-                        clipBoneMatricesData.push(mat);
-                        // 2: bone index order
-                        // clipBoneMatricesData[boneJointMatrices[i].bone.index] = {
-                        //     bone: boneJointMatrices.bone, 
-                        //     matrix: boneJointMatrices[i].matrix
-                        // };
-                        return mat;
-                    });
+                    const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix));
 
                     // 配列の中は boneIndex order ではないことに注意
                     // traverseした時の順番のまま
                     // jointMatricesAllFrames.push(jointMatrices);
 
-                    jointMatricesAllFrames[clipIndex].push(clipBoneMatricesData);
+                    jointMatricesAllFrames[clipIndex].push(jointMatrices);
                     
                     // jointMatricesAllFrames[
                 });
@@ -3972,7 +3992,7 @@ class SkinnedMesh extends Mesh {
 
             const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
           
-            const colNum = 4;
+            const colNum = this.#jointTextureColNum;
             const boneCount = this.boneCount * framesDuration;
             const rowNum = Math.ceil(boneCount / colNum);
             const fillNum = colNum * rowNum - boneCount;
@@ -3991,6 +4011,8 @@ class SkinnedMesh extends Mesh {
                 height: rowNum,
                 data: jointData
             });
+            
+            this.materials.forEach(material => material.uniforms.uTotalFrameCount.value = framesDuration);
  
             // for debug
             console.log(`
@@ -5344,6 +5366,9 @@ class GPU {
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
             // TODO: nullなとき,値がおかしいときはセットしない
             switch(type) {
+                case UniformTypes.Int:
+                    gl.uniform1i(location, value);
+                    break;
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
                     break;

@@ -38,7 +38,6 @@ mat4 getJointMatrix(
     int jointNum,
     int currentSkinIndex,
     int colNum,
-    int rowNum,
     int totalFrameCount,
     float time
 ) {
@@ -59,6 +58,10 @@ mat4 getJointMatrix(
 export const skinningVertexUniforms = (jointNum) => `
 uniform mat4[${jointNum}] uJointMatrices;
 uniform sampler2D uJointTexture;
+
+uniform int uBoneCount;
+uniform int uJointTextureColNum;
+uniform int uTotalFrameCount;
 `;
 
 export const skinningVertex = (gpuSkinning = false) => `
@@ -74,10 +77,10 @@ export const skinningVertex = (gpuSkinning = false) => `
     ` : `
     // gpu skinning
     float fps = 30.;
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), 61, 0, 4, 915, 60, uTime * fps);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), 61, 0, 4, 915, 60, uTime * fps);
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
     // mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]));
     // mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]));
     // mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]));
