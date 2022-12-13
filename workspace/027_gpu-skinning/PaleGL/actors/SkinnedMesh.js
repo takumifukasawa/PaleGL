@@ -167,13 +167,8 @@ export class SkinnedMesh extends Mesh {
             let jointMatricesAllFrames = [];
             
             this.#animationData.forEach((clips, clipIndex) => {
-                if(clipIndex !== 0) {
-                    return;
-                }
                 clips.forEach((keyframeData, frameIndex) => {
-                    if(frameIndex !== 0) {
-                        return;
-                    }
+                    jointMatricesAllFrames[clipIndex] = [];
                     const clipBoneMatricesData = [];
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
@@ -208,7 +203,7 @@ export class SkinnedMesh extends Mesh {
                     // jointMatricesAllFrames.push(jointMatrices);
 
                     // 中身は bone index orderされてる
-                    jointMatricesAllFrames.push(clipBoneMatricesData);
+                    jointMatricesAllFrames[clipIndex].push(clipBoneMatricesData);
                     
                     // jointMatricesAllFrames[
                 });
@@ -285,7 +280,7 @@ matrix elements: ${jointData.length}
 
         // こっちが正しい
         // const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-        const boneLinePositions = this.#jointMatricesAllFrames[0].map(data => [...data.matrix.position.elements]);
+        const boneLinePositions = this.#jointMatricesAllFrames[0][0].map(data => [...data.matrix.position.elements]);
 
         this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
         this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
