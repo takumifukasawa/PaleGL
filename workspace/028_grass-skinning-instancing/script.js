@@ -39,7 +39,6 @@ import {DebuggerGUI} from "./DebuggerGUI.js";
 let debuggerGUI;
 let width, height;
 let floorPlaneMesh;
-let cubeMap;
 let floorDiffuseMap;
 let floorNormalMap;
 let gltfActor;
@@ -194,15 +193,14 @@ const main = async () => {
         [CubeMapAxis.PositiveZ]: "./images/pz.png",
         [CubeMapAxis.NegativeZ]: "./images/nz.png",
     };
-  
-    cubeMap = await loadCubeMap({ gpu, images });
-    
-    await createGLTFSkinnedMesh()
-    captureScene.add(gltfActor);
-    
+
+    const cubeMap = await loadCubeMap({ gpu, images });
     const skyboxMesh = new Skybox({
         gpu, cubeMap
     });
+
+    await createGLTFSkinnedMesh()
+    captureScene.add(gltfActor);
 
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
