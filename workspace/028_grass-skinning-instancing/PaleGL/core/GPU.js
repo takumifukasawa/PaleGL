@@ -199,11 +199,11 @@ export class GPU {
                     activeTextureIndex++;
                     break;
                 case UniformTypes.CubeMap:
+                    // TODO: valueのguardなくて大丈夫なはず
                     if(value) {
                         gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
                         gl.bindTexture(
                             gl.TEXTURE_CUBE_MAP,
-                            // TODO: needs dummy texture for cubemap ?
                             value ? value.glObject : this.dummyTexture.glObject
                         );
                         gl.uniform1i(location, activeTextureIndex);

@@ -151,7 +151,8 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshes.forEach(skinningMesh => {
         // ルートにanimatorをattachしてるので一旦ここでassign
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
-       
+      
+        skinningMesh.debugBoneView = true;
         skinningMesh.castShadow = true;
         skinningMesh.material = new PhongMaterial({
             gpu,
