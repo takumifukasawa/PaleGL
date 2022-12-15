@@ -3793,14 +3793,14 @@ class SkinnedMesh extends Mesh {
     
     #animationClips;
 
-    #animationData;
-    
     #jointTextureColNum = 1;
 
     #jointMatricesAllFrames;
     
+    debugBoneView;
+    
     // TODO: generate vertex shader in constructor
-    constructor({bones, gpu, ...options}) {
+    constructor({bones, debugBoneView, gpu, ...options}) {
         super({
             ...options,
             actorType: ActorTypes.SkinnedMesh,
@@ -3808,6 +3808,7 @@ class SkinnedMesh extends Mesh {
         });
 
         this.bones = bones;
+        this.debugBoneView = !!debugBoneView;
 
         // bone index order な配列を作っておく
         this.bones.traverse((bone) => {
@@ -3926,22 +3927,15 @@ class SkinnedMesh extends Mesh {
 
         super.start(options);
 
-        this.#createSkinDebugger({ gpu });
+        if(this.debugBoneView) {
+            this.#createSkinDebugger({ gpu });
+        }
 
+        // アニメーションもテクスチャに焼きたいのでanimationClipsが必要
         if(this.#animationClips && this.#gpuSkinning) {
             const animationData = [];
-            console.log(this.#animationClips)
-            this.#animationClips.forEach((animationClip, i) => {
-                // const data = {
-                //     name: animationClip.name,
-                //     value: []
-                // };
-                // this.bones.traverse(bone => {
-                //     // data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
-                //     data.value[bone.index] = (new Array(animationClip.frameCount).fill(0).map(() => ({})));
-                // });
-                // animationData.push(data);
-            });
+            
+            // TODO: refactor
             this.#animationClips.forEach((animationClip, i) => {
                 const dataEachKeyframes = animationClip.getAllKeyframesValue();
                 console.log("fugafuga", dataEachKeyframes)
@@ -3961,13 +3955,11 @@ class SkinnedMesh extends Mesh {
                     });
                 });
             });
-            this.#animationData = animationData;
-            
-            console.log("gogo", animationData)
             
             let jointMatricesAllFrames = [];
-            
-            this.#animationData.forEach((clips, clipIndex) => {
+           
+            // TODO: refactor
+            animationData.forEach((clips, clipIndex) => {
                 jointMatricesAllFrames[clipIndex] = [];
                 clips.forEach((keyframeData, frameIndex) => {
                     // boneにkeyframeごとの計算を割り当て
@@ -3984,19 +3976,12 @@ class SkinnedMesh extends Mesh {
                     
                     // どちらも bone index order ではない
                     const boneOffsetMatrices = this.boneOffsetMatrices;
-                    // const boneJointMatrices = this.getBoneJointMatrices();
                     const boneJointMatrices = this.getBoneJointMatricesWithBone();
 
                     // offset行列を踏まえたjoint行列を計算
                     const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) => Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix));
 
-                    // 配列の中は boneIndex order ではないことに注意
-                    // traverseした時の順番のまま
-                    // jointMatricesAllFrames.push(jointMatrices);
-
                     jointMatricesAllFrames[clipIndex].push(jointMatrices);
-                    
-                    // jointMatricesAllFrames[
                 });
             });
 
@@ -4005,14 +3990,6 @@ class SkinnedMesh extends Mesh {
 
             jointMatricesAllFrames = [...jointMatricesAllFrames].flat(2);
             
-            console.log(jointMatricesAllFrames)
-
-            // console.log("ttt", this.#animationData, jointMatricesAllFrames)
-            // this.#jointMatricesAllFrames = jointMatricesAllFrames;
-           
-            // TODO: fix bake texture
-            // return;
-
             const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
           
             const colNum = this.#jointTextureColNum;
@@ -4059,27 +4036,12 @@ matrix elements: ${jointData.length}
         const { time } = options;
         
         this.bones.calcJointMatrix();
-        
-        // for debug
-        // this.bones.traverse(b => {
-        //    if(b.name === "thigh.L") {
-        //        console.log(b.rotation.getAxes())
-        //    }
-        // })
-
-        // こっちが正しい
-        const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-
-        this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
-        this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
-
-        // TODO: よく考えたら bone index order になっていないがそれで大丈夫かどうか確認
-        // this.materials.forEach(material => {
-        //     material.uniforms.uJointMatrices.value = jointMatrices;
-        // });
-        // if(this.depthMaterial) {
-        //     this.depthMaterial.uniforms.uJointMatrices.value = jointMatrices;
-        // }
+      
+        if(this.debugBoneView) {
+            const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
+            this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
+            this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
+        }
 
         if(this.#gpuSkinning) {
             this.materials.forEach(mat => mat.uniforms.uTime.value = time);
@@ -4163,7 +4125,7 @@ matrix elements: ${jointData.length}
         }
         checkChildNum(this.bones);
         
-         this.boneLines = new Mesh({
+        this.boneLines = new Mesh({
             gpu,
             geometry: new Geometry({
                 gpu,

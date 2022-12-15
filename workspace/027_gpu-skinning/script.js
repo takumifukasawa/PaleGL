@@ -270,7 +270,7 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshes.forEach(skinningMesh => {
         // ルートにanimatorをattachしてるので一旦ここでassign
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
-        
+       
         skinningMesh.castShadow = true;
         skinningMesh.materials = [
             // TODO: materialにgpuskinning option持たせる？
@@ -281,14 +281,14 @@ const createGLTFSkinnedMesh = async () => {
                 // TODO: 毎回これ入れるのめんどいので共通化したい
                 receiveShadow: true,
                 isSkinning: true,
-                // gpuSkinning: true,
+                gpuSkinning: true,
             }),
             new Material({
                 gpu,
                 vertexShader: generateVertexShader({
                     jointNum: skinningMesh.boneCount,
                     isSkinning: true,
-                    // gpuSkinning: true,
+                    gpuSkinning: true,
                     receiveShadow: false,
                     insertUniforms: `
 uniform float uOutlineOffset;
