@@ -76,6 +76,10 @@
         return new Color(0, 0, 0, 1);
     }
     
+    static green() {
+        return new Color(0, 0, 1, 1);
+    }
+    
     static fromRGB(r, g, b, a) {
         return new Color(r / 255, g / 255, b / 255, 1);
     }

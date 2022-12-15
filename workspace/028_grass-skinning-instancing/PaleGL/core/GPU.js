@@ -1,4 +1,4 @@
-﻿import {BlendTypes, FaceSide, PrimitiveTypes, UniformTypes} from "./../constants.js";
+﻿import {BlendTypes, FaceSide, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants.js";
 import {Texture} from "./Texture.js";
 
 const createWhite1x1 = () => {
@@ -24,6 +24,8 @@ export class GPU {
         this.dummyTexture = new Texture({
             gpu: this,
             img: createWhite1x1(),
+            wrapS: TextureWrapTypes.Repeat,
+            wrapT: TextureWrapTypes.Repeat,
         });
     }
 
@@ -188,15 +190,13 @@ export class GPU {
                     }
                     break;
                 case UniformTypes.Texture:
-                    if(value) {
-                        gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                        gl.bindTexture(
-                            gl.TEXTURE_2D,
-                            value ? value.glObject : this.dummyTexture.glObject
-                        );
-                        gl.uniform1i(location, activeTextureIndex);
-                        activeTextureIndex++;
-                    }
+                    gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                    gl.bindTexture(
+                        gl.TEXTURE_2D,
+                        value ? value.glObject : this.dummyTexture.glObject
+                    );
+                    gl.uniform1i(location, activeTextureIndex);
+                    activeTextureIndex++;
                     break;
                 case UniformTypes.CubeMap:
                     if(value) {

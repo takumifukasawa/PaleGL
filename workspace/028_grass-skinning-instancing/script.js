@@ -38,105 +38,18 @@ import {DebuggerGUI} from "./DebuggerGUI.js";
 
 let debuggerGUI;
 let width, height;
-let reflectSkyboxMesh;
-let alphaTestPhongMesh;
 let floorPlaneMesh;
-let checkerPlaneMesh;
 let cubeMap;
 let floorDiffuseMap;
 let floorNormalMap;
-let floorDiffuseWithCheckerAlphaMap;
 let gltfActor;
 let skinningMeshes;
 let skinningMeshAnimator;
 const targetCameraPosition = new Vector3(0, 5, 10);
-let outlineColor = new Color(0, 0, 0, 1);
-let outlineAlpha = 1;
-let outlineOffset = 0.05;
 
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
-
-const objModelVertexShader = `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aNormal;
-
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
-
-out vec2 vUv;
-out vec3 vNormal;
-out vec3 vWorldPosition;
-
-void main() {
-    vUv = aUv;
-    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
-    vWorldPosition = worldPosition.xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-}
-`;
-
-const objModelFragmentShader = `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-in vec3 vNormal;
-in vec3 vWorldPosition;
-
-out vec4 outColor;
-
-uniform vec3 uViewPosition;
-uniform samplerCube uCubeTexture;
-
-mat2 rotate(float r) {
-    float c = cos(r);
-    float s = sin(r);
-    return mat2(c, s, -s, c);
-}
-
-void main() {
-    vec3 N = normalize(vNormal);
-    vec3 P = vWorldPosition;
-    vec3 E = uViewPosition;
-    vec3 PtoE = normalize(E - P);
- 
-    // ----------------------------------------------------------
-    // begin: for cube map sample pattern
-    // ----------------------------------------------------------
-  
-    // pattern_1: raw
-    // vec3 reflectDir = reflect(-PtoE, N);
-    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
-   
-    // pattern_2: reverse x
-    // reflectDir *= vec3(-1., 1., 1.);
-    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
-
-    // pattern_3: reverse x and z
-    // vec3 reflectDir = reflect(-PtoE, N);
-    // reflectDir *= vec3(-1., 1., -1.);
-    // vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
-
-    // pattern_4: reverse x and rotate
-    vec3 reflectDir = reflect(-PtoE, N);
-    reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(3.14);
-    vec3 cubeColor = texture(uCubeTexture, reflectDir).xyz;
-
-    // ----------------------------------------------------------
-    // end: for cube map sample pattern
-    // ----------------------------------------------------------
-   
-    outColor = vec4(cubeColor, 1);
-}
-`;
 
 const gl = canvasElement.getContext('webgl2', { antialias: false });
 
@@ -199,30 +112,9 @@ directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
-const rgbShiftPass = new FragmentPass({
-    gpu, fragmentShader: `#version 300 es
-precision mediump float;
-in vec2 vUv;
-out vec4 outColor;
-uniform sampler2D uSceneTexture;
-void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
-    float r = texture(uSceneTexture, vUv + vec2(0.01, 0)).r;
-    float g = texture(uSceneTexture, vUv + vec2(-0.005, 0)).g;
-    float b = texture(uSceneTexture, vUv + vec2(0, 0.005)).b;
-    outColor = vec4(r, g, b, 1);
-}
-`
-});
-rgbShiftPass.enabled = false;
-postProcess.addPass(rgbShiftPass)
-
 const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = false;
 postProcess.addPass(fxaaPass);
-
-const gaussianBlurPass = new GaussianBlurPass({ gpu })
-postProcess.addPass(gaussianBlurPass);
 
 captureSceneCamera.setPostProcess(postProcess);
 
@@ -231,26 +123,16 @@ const onMouseMove = (e) => {
     const ny = ((e.clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
     targetCameraPosition.y = ny * 10 + 12;
-    // targetCameraPosition.y = ny * 20;
 };
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
-
-    // captureSceneCamera.setSize(width, height);
-    // // testOrtho.setSize(width, height);
-
-    // renderer.setSize(width, height);
-    // postProcess.setSize(width, height);
-    
     engine.setSize(width, height);
 };
 
 const createGLTFSkinnedMesh = async () => {
-    // gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-walk-fix-roll.gltf" });
-    gltfActor = await loadGLTF({ gpu, path: "./models/voxel-human-multi-animation.gltf" });
-    // gltfActor = await loadGLTF({ gpu, path: "./models/test-plane-skinning.gltf" });
+    gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
     
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
@@ -260,7 +142,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
-    gltfActor.transform.setScaling(Vector3.fill(4));
+    gltfActor.transform.setScaling(Vector3.fill(0.5));
     
     skinningMeshAnimator = gltfActor.animator;
  
@@ -272,57 +154,12 @@ const createGLTFSkinnedMesh = async () => {
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
        
         skinningMesh.castShadow = true;
-        skinningMesh.materials = [
-            // TODO: materialにgpuskinning option持たせる？
-            new PhongMaterial({
-                gpu,
-                diffuseMap: floorDiffuseMap,
-                normalMap: floorNormalMap,
-                // TODO: 毎回これ入れるのめんどいので共通化したい
-                receiveShadow: true,
-                isSkinning: true,
-                gpuSkinning: true,
-            }),
-            new Material({
-                gpu,
-                vertexShader: generateVertexShader({
-                    jointNum: skinningMesh.boneCount,
-                    isSkinning: true,
-                    gpuSkinning: true,
-                    receiveShadow: false,
-                    insertUniforms: `
-uniform float uOutlineOffset;
-                    `,
-                    localPositionProcess: `
-    localPosition = vec4(aPosition + aNormal * uOutlineOffset, 1.);
-                    `,
-                }),
-                fragmentShader: `#version 300 es
-               
-                precision mediump float;
-                
-                out vec4 outColor;
-                
-                uniform vec4 uOutlineColor;
-                
-                void main() {
-                    outColor = uOutlineColor;
-                }
-                `,
-                uniforms: {
-                    uOutlineColor: {
-                        type: UniformTypes.Color,
-                        value: outlineColor
-                    },
-                    uOutlineOffset: {
-                        type: UniformTypes.Float,
-                        value: outlineOffset
-                    }
-                },
-                faceSide: FaceSide.Back,
-                blendType: BlendTypes.Transparent
-            }),          
-        ];
+        skinningMesh.material = new PhongMaterial({
+            gpu,
+            diffuseColor: new Color(0, 1, 0, 1),
+            receiveShadow: true,
+            isSkinning: true,
+        });
     });
 }
 
@@ -349,17 +186,6 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
     
-    const floorDiffuseWithCheckerAlphaImg = await loadImg("./images/blue_floor_tiles_01_diff_1k_with_checker_alpha.png");
-    floorDiffuseWithCheckerAlphaMap = new Texture({
-        gpu,
-        img: floorDiffuseWithCheckerAlphaImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
-
     const images = {
         [CubeMapAxis.PositiveX]: "./images/px.png",
         [CubeMapAxis.NegativeX]: "./images/nx.png",
@@ -374,172 +200,6 @@ const main = async () => {
     await createGLTFSkinnedMesh()
     captureScene.add(gltfActor);
     
-    const sphereGeometryData = await loadObj("./models/sphere-32-32.obj");
-    reflectSkyboxMesh = new Mesh({
-        geometry: new Geometry({
-            gpu,
-            attributes: {
-                position: {
-                    data: sphereGeometryData.positions,
-                    size: 3
-                },
-                uv: {
-                    data: sphereGeometryData.uvs,
-                    size: 2,
-                },
-                normal: {
-                    data: sphereGeometryData.normals,
-                    size: 3
-                },
-            },
-            indices: sphereGeometryData.indices,
-            drawCount: sphereGeometryData.indices.length,
-            castShadow: true,
-        }),
-        material: new Material({
-            gpu,
-            vertexShader: objModelVertexShader,
-            fragmentShader: objModelFragmentShader,
-            primitiveType: PrimitiveTypes.Triangles,
-            uniforms: {
-                uCubeTexture: {
-                    type: UniformTypes.CubeMap,
-                    value: null
-                },
-            }
-        }),
-        castShadow: true
-    });
-    reflectSkyboxMesh.onStart = ({ actor }) => {
-        actor.material.uniforms.uCubeTexture.value = cubeMap;
-        actor.transform.setTranslation(new Vector3(-4, 2, 0));
-        actor.transform.setScaling(new Vector3(2, 2, 2));
-    }
-
-    const sphereTangentAndNormals = Geometry.createTangentsAndBinormals(sphereGeometryData.normals);
-    alphaTestPhongMesh = new Mesh({
-        geometry: new Geometry({
-            gpu,
-            attributes: {
-                position: {
-                    data: sphereGeometryData.positions,
-                    size: 3
-                },
-                uv: {
-                    data: sphereGeometryData.uvs,
-                    size: 2,
-                },
-                normal: {
-                    data: sphereGeometryData.normals,
-                    size: 3
-                },
-                tangent: {
-                    data: sphereTangentAndNormals.tangents,
-                    size: 3
-                },
-                binormal: {
-                    data: sphereTangentAndNormals.binormals,
-                    size: 3
-                },
-            },
-            indices: sphereGeometryData.indices,
-            drawCount: sphereGeometryData.indices.length,
-        }),
-        material: new PhongMaterial({
-            gpu,
-            diffuseMap: floorDiffuseWithCheckerAlphaMap,
-            normalMap: floorNormalMap,
-            receiveShadow: true,
-            // queue: RenderQueues.AlphaTest,
-            alphaTest: 0.5,
-            faceSide: FaceSide.Double
-        }),
-        castShadow: true
-    });
-    alphaTestPhongMesh.onStart = ({ actor }) => {
-        actor.transform.setTranslation(new Vector3(4, 2, 0));
-        actor.transform.setScaling(new Vector3(2, 2, 2));
-    }
-
-    const instancedSphereNum = 5;
-    const instancedSphereMesh = new Mesh({
-        geometry: new Geometry({
-            gpu,
-            attributes: {
-                // index: 0
-                position: {
-                    data: sphereGeometryData.positions,
-                    size: 3
-                },
-                // index: 1
-                uv: {
-                    data: sphereGeometryData.uvs,
-                    size: 2,
-                },
-                // index: 2
-                normal: {
-                    data: sphereGeometryData.normals,
-                    size: 3
-                },
-                // index: 3
-                localOffset: {
-                    data: (new Array(sphereGeometryData.positions.length / 3)).fill(0).map((_, i) => {
-                        return [i * 2.5, 0, 0];
-                    }).flat(),
-                    size: 3,
-                    divisor: 1                   
-                }
-            },
-            indices: sphereGeometryData.indices,
-            drawCount: sphereGeometryData.indices.length,
-            instanceCount: instancedSphereNum,
-        }),       
-        material: new Material({
-            gpu,
-            vertexShader: `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 3) in vec3 aLocalOffset;
-
-uniform mat4 uProjectionMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uWorldMatrix;
-uniform vec4 uColor[${instancedSphereNum}];
-
-out vec3 vColor;
-
-void main() {
-    vColor = uColor[gl_InstanceID].xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition + aLocalOffset, 1.);
-}
-            `,
-            fragmentShader: `#version 300 es
-          
-precision mediump float;          
- 
-in vec3 vColor;
-           
-out vec4 outColor;
-
-void main() {
-    outColor = vec4(vColor, 1.);
-}
-            `,
-            uniforms: {
-                uColor: {
-                    type: UniformTypes.ColorArray,
-                    value: (new Array(instancedSphereNum)).fill(0).map((_, i) => new Color(Math.random(), Math.random(), Math.random(), 1))
-                }
-            }
-        })
-    });
-    instancedSphereMesh.onStart = () => {
-        instancedSphereMesh.transform.position = new Vector3(0, 1, 0);
-    };
-    
-    captureScene.add(instancedSphereMesh);
-
-
     const skyboxMesh = new Skybox({
         gpu, cubeMap
     });
@@ -561,50 +221,12 @@ void main() {
         actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
-
-    const checkerGeometry = new PlaneGeometry({gpu});
-    checkerPlaneMesh = new Mesh({
-        geometry: checkerGeometry,
-        material: new Material({
-            gpu,
-            vertexShader: generateVertexShader(),
-            fragmentShader: `#version 300 es
-            
-            precision mediump float;
-            
-            in vec2 vUv;
-            
-            out vec4 outColor;
-            
-            void main() {
-                float size = 4.;
-                float x = step(.5, fract(vUv.x * size / 2.));
-                float y = step(.5, fract(vUv.y * size / 2.));
-                float a = step(.5, x + y) - step(.5, x * y);
-                if(a < .5) discard;
-                // outColor = vec4(vUv, 0., 1);
-                outColor = vec4(vec3(a), 1);
-            }
-            `,
-            // queue: RenderQueues.AlphaTest,
-        }),
-    });
-    checkerPlaneMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(5));
-        actor.transform.setTranslation(new Vector3(0, 5, 0));
-    }
-    
+   
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
-    captureScene.add(alphaTestPhongMesh);
-    captureScene.add(reflectSkyboxMesh);
     
-    // captureScene.add(checkerPlaneMesh);
-
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
-    
-    // captureSceneCamera.postProcess.enabled = true;
     
     window.addEventListener("mousemove", onMouseMove);
 
@@ -628,44 +250,6 @@ function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "light position x",
-    //     minValue: -20,
-    //     maxValue: 20,
-    //     stepValue: 0.01,
-    //     initialValue: directionalLight.transform.position.x,
-    //     onChange: (value) => {
-    //         const p = directionalLight.transform.position;
-    //         directionalLight.transform.setTranslation(new Vector3(value, p.y, p.z));
-    //     }
-    // });
-
-    // debuggerGUI.addSliderDebugger({
-    //     label: "light position y",
-    //     minValue: 0.01,
-    //     maxValue: 20,
-    //     stepValue: 0.01,
-    //     initialValue: directionalLight.transform.position.y,
-    //     onChange: (value) => {
-    //         const p = directionalLight.transform.position;
-    //         directionalLight.transform.setTranslation(new Vector3(p.x, value, p.z));
-    //     }
-    // });
-
-    // debuggerGUI.addSliderDebugger({
-    //     label: "light position z",
-    //     minValue: -20,
-    //     maxValue: 20,
-    //     stepValue: 0.01,
-    //     initialValue: directionalLight.transform.position.z,
-    //     onChange: (value) => {
-    //         const p = directionalLight.transform.position;
-    //         directionalLight.transform.setTranslation(new Vector3(p.x, p.y, value));
-    //     }
-    // });
-
-    // debuggerGUI.addBorderSpacer();
-
     debuggerGUI.addPullDownDebugger({
         label: "animations",
         initialValue: skinningMeshAnimator.animationClips[0].name, // index: 0 のアニメーションがなぜか消せないのでとりあえず
@@ -676,121 +260,6 @@ function initDebugger() {
         }
     });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position x",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.x,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(value, p.y, p.z))
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position y",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.y,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(p.x, value, p.z))
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor position z",
-    //     minValue: -10,
-    //     maxValue: 10,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.position.z,
-    //     onChange: (value) => {
-    //         const p = gltfActor.transform.position;
-    //         gltfActor.transform.setTranslation(new Vector3(p.x, p.y, value))
-    //     }
-    // });
-
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation x",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.x,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationX(value);
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation y",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.y,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationY(value);
-    //     }
-    // });
-    // debuggerGUI.addSliderDebugger({
-    //     label: "gltf actor rotation z",
-    //     minValue: -180,
-    //     maxValue: 180,
-    //     stepValue: 0.01,
-    //     initialValue: gltfActor.transform.rotation.z,
-    //     onChange: (value) => {
-    //         gltfActor.transform.setRotationZ(value);
-    //     }
-    // });
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addColorDebugger({
-        label: "outline color",
-        initialValue: outlineColor,
-        onChange: (value) => {
-            outlineColor = Color.fromHex(value);
-            outlineColor.a = outlineAlpha;
-            skinningMeshes.forEach(skinningMesh => {
-                skinningMesh.materials[1].uniforms.uOutlineColor.value = outlineColor;
-            });
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "outline offset",
-        initialValue: outlineOffset,
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        onChange: (value) => {
-            outlineOffset = value;
-            skinningMeshes.forEach(skinningMesh => {
-                skinningMesh.materials[1].uniforms.uOutlineOffset.value = outlineOffset;
-            });
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "outline alpha",
-        initialValue: outlineAlpha,
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.01,
-        onChange: (value) => {
-            outlineAlpha = value;
-            outlineColor.a = outlineAlpha;
-            skinningMeshes.forEach(skinningMesh => {
-                skinningMesh.materials[1].uniforms.uOutlineColor.value = outlineColor;
-            });
-        }
-    });
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "rgb shift pass enabled",
-        initialValue: rgbShiftPass.enabled,
-        onChange: (value) => rgbShiftPass.enabled = value,
-    });
-    
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
@@ -832,14 +301,6 @@ function initDebugger() {
         }
     });
     
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "gaussian blur pass enabled",
-        initialValue: gaussianBlurPass.enabled,
-        onChange: (value) => gaussianBlurPass.enabled = value,
-    });
-
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({

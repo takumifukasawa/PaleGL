@@ -16,22 +16,28 @@ import {
 } from "../shaders/lightingCommon.js";
 import {UniformTypes} from "../constants.js";
 import {Vector2} from "../math/Vector2.js";
+import {Color} from "../math/Color.js";
 
 export class PhongMaterial extends Material {
+    diffuseColor;
+    
     constructor({
+        diffuseColor,
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
-        // isSkinning,
-        // gpuSkinning,
         uniforms = {},
-        // jointMatrices,
         ...options
     }) {
+
         const baseUniforms = {
+            uDiffuseColor: {
+                type: UniformTypes.Color,
+                value: diffuseColor || Color.white(),
+            },
             uDiffuseMap: {
                 type: UniformTypes.Texture,
                 value: diffuseMap,
@@ -56,18 +62,9 @@ export class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            // ...(jointMatrices ? {
-            //     uJointMatrices: {
-            //         type: UniformTypes.Matrix4Array,
-            //         value: jointMatrices
-            //     }
-            // } : {}),
             uDirectionalLight: {}
         };
        
-        // TODO: uniformsじゃなくてoptionsから判別させたい
-        // const isSkinning = !!uniforms.uJointMatrices;
-        
         const useNormalMap = !!normalMap;
         
         const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning }) => generateVertexShader({
@@ -104,22 +101,11 @@ export class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            // ...(jointMatrices ? {
-            //     uJointMatrices: {
-            //         type: UniformTypes.Matrix4Array,
-            //         value: jointMatrices
-            //     }
-            // } : {}),
         }
 
         super({
             ...options,
             name: "PhongMaterial",
-            // gpuSkinning,
-            // isSkinning
-            // vertexShader,
-            // fragmentShader,
-            // depthFragmentShader,
             vertexShaderGenerator,
             fragmentShaderGenerator,
             depthFragmentShaderGenerator,
@@ -137,6 +123,7 @@ export class PhongMaterial extends Material {
 
 precision mediump float;
 
+uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
@@ -182,7 +169,7 @@ void main() {
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = diffuseMapColor; // TODO: base color をかける
+    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
     
     Camera camera;
     camera.worldPosition = uViewPosition;
@@ -200,7 +187,7 @@ void main() {
         ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
         : ""
     }
-
+    
     outColor = resultColor;
 }
 `;
@@ -211,6 +198,7 @@ void main() {
 
 precision mediump float;
 
+uniform vec4 uColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
 ${alphaTest ? alphaTestFragmentUniforms() : ""}
@@ -226,7 +214,7 @@ void main() {
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
-    vec4 diffuseColor = diffuseMapColor;
+    vec4 diffuseColor = uColor * diffuseMapColor;
     
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
