@@ -73,8 +73,12 @@ export class Geometry {
         }
     }
 
-    updateAttribute(key, data) {
-        this.vertexArrayObject.updateAttribute(key, data);
+    updateAttribute(key, attribute) {
+        this.vertexArrayObject.updateAttribute(key, attribute);
+    }
+    
+    setAttribute(key, attribute) {
+        this.vertexArrayObject.setAttribute(key, attribute);
     }
     
     static createTangentsAndBinormals(normals) {

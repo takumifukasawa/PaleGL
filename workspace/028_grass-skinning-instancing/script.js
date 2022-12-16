@@ -32,7 +32,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    generateVertexShader, RenderQueues, FaceSide, BlendTypes, GaussianBlurPass,
+    generateVertexShader, RenderQueues, FaceSide, BlendTypes, GaussianBlurPass, AttributeUsageType,
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -132,7 +132,7 @@ const onWindowResize = () => {
 
 const createGLTFSkinnedMesh = async () => {
     gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
-    
+   
     gltfActor.onStart = ({ actor }) => {
         if(actor.animator.animationClips) {
             actor.animator.animationClips.forEach(animationClip => {
@@ -154,11 +154,27 @@ const createGLTFSkinnedMesh = async () => {
       
         skinningMesh.debugBoneView = true;
         skinningMesh.castShadow = true;
+        skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
+            data: [
+                [-2, 0, 0],
+                [0, 0, 0],
+                [2, 0, 0],
+            ].flat(),
+            size: 3,
+            usageType: AttributeUsageType.StaticDraw,
+            divisor: 1
+        });
+        skinningMesh.instanceCount = 3;
         skinningMesh.material = new PhongMaterial({
             gpu,
             diffuseColor: new Color(0, 1, 0, 1),
             receiveShadow: true,
             isSkinning: true,
+            vertexShaderModifier: {
+                localPositionPostProcess: `
+    localPosition = localPosition
+`,
+            }
         });
     });
 }

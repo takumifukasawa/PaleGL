@@ -3,9 +3,9 @@ import {AttributeUsageType} from "../constants.js";
 import {IndexBufferObject} from "./IndexBufferObject.js";
 
 export class VertexArrayObject extends GLObject {
+    #gpu;
     #vao;
     #vboList = {};
-    #gpu;
     #ibo;
     
     get hasIndices() {
@@ -40,22 +40,7 @@ export class VertexArrayObject extends GLObject {
 
         Object.keys(attributes).forEach(key => {
             const attribute = attributes[key];
-            const {data, size, location, usageType, divisor} = attribute;
-            const vbo = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-            const usage = this.getUsage(gl, usageType);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
-            gl.enableVertexAttribArray(location);
-            // size ... 頂点ごとに埋める数
-            // stride is always 0 because buffer is not interleaved.
-            // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
-            gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
-            
-            if(divisor) {
-                gl.vertexAttribDivisor(location, divisor);
-            }
-            
-            this.#vboList[key] = { vbo, usage };
+            this.setAttribute(key, attribute);
         });
 
         if(indices) {
@@ -79,5 +64,27 @@ export class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+    
+    setAttribute(key, attribute) {
+        const gl = this.#gpu.gl;
+        
+        const {data, size, location, usageType, divisor} = attribute;
+        const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
+        const vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        const usage = this.getUsage(gl, usageType);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
+        gl.enableVertexAttribArray(newLocation);
+        // size ... 頂点ごとに埋める数
+        // stride is always 0 because buffer is not interleaved.
+        // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+        gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+
+        if(divisor) {
+            gl.vertexAttribDivisor(newLocation, divisor);
+        }
+
+        this.#vboList[key] = { vbo, usage };       
     }
 }

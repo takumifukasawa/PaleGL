@@ -16,9 +16,11 @@ export const generateVertexShader = ({
     receiveShadow,
     useNormalMap,
     localPositionProcess,
+    localPositionPostProcess,
     insertUniforms,
 } = {}) => {
-    
+   
+    // TODO: attributeのデータから吐きたい
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
@@ -60,6 +62,7 @@ void main() {
     localPosition = skinMatrix * localPosition;`
         : ""
     }
+    ${localPositionPostProcess || ""}
     
     ${(() => {
         if(isSkinning) {

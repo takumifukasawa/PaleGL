@@ -29,6 +29,10 @@ export class PhongMaterial extends Material {
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
+        // TODO: 外部化
+        vertexShaderModifier = {
+            localPositionPostProcess: ""
+        },
         uniforms = {},
         ...options
     }) {
@@ -72,7 +76,8 @@ export class PhongMaterial extends Material {
             gpuSkinning,
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
-            useNormalMap
+            useNormalMap,
+            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || ""
         });
         
         const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({

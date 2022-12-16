@@ -1862,9 +1862,9 @@ class IndexBufferObject extends GLObject {
 
 
 class VertexArrayObject extends GLObject {
+    #gpu;
     #vao;
     #vboList = {};
-    #gpu;
     #ibo;
     
     get hasIndices() {
@@ -1899,22 +1899,7 @@ class VertexArrayObject extends GLObject {
 
         Object.keys(attributes).forEach(key => {
             const attribute = attributes[key];
-            const {data, size, location, usageType, divisor} = attribute;
-            const vbo = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-            const usage = this.getUsage(gl, usageType);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
-            gl.enableVertexAttribArray(location);
-            // size ... 頂点ごとに埋める数
-            // stride is always 0 because buffer is not interleaved.
-            // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
-            gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
-            
-            if(divisor) {
-                gl.vertexAttribDivisor(location, divisor);
-            }
-            
-            this.#vboList[key] = { vbo, usage };
+            this.setAttribute(key, attribute);
         });
 
         if(indices) {
@@ -1938,6 +1923,28 @@ class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+    
+    setAttribute(key, attribute) {
+        const gl = this.#gpu.gl;
+        
+        const {data, size, location, usageType, divisor} = attribute;
+        const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
+        const vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        const usage = this.getUsage(gl, usageType);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
+        gl.enableVertexAttribArray(newLocation);
+        // size ... 頂点ごとに埋める数
+        // stride is always 0 because buffer is not interleaved.
+        // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+        gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+
+        if(divisor) {
+            gl.vertexAttribDivisor(newLocation, divisor);
+        }
+
+        this.#vboList[key] = { vbo, usage };       
     }
 }
 ﻿
@@ -2015,8 +2022,12 @@ class Geometry {
         }
     }
 
-    updateAttribute(key, data) {
-        this.vertexArrayObject.updateAttribute(key, data);
+    updateAttribute(key, attribute) {
+        this.vertexArrayObject.updateAttribute(key, attribute);
+    }
+    
+    setAttribute(key, attribute) {
+        this.vertexArrayObject.setAttribute(key, attribute);
     }
     
     static createTangentsAndBinormals(normals) {
@@ -3634,9 +3645,11 @@ const generateVertexShader = ({
     receiveShadow,
     useNormalMap,
     localPositionProcess,
+    localPositionPostProcess,
     insertUniforms,
 } = {}) => {
-    
+   
+    // TODO: attributeのデータから吐きたい
     const attributes = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
@@ -3678,6 +3691,7 @@ void main() {
     localPosition = skinMatrix * localPosition;`
         : ""
     }
+    ${localPositionPostProcess || ""}
     
     ${(() => {
         if(isSkinning) {
@@ -6397,6 +6411,10 @@ class PhongMaterial extends Material {
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
+        // TODO: 外部化
+        vertexShaderModifier = {
+            localPositionPostProcess: ""
+        },
         uniforms = {},
         ...options
     }) {
@@ -6440,7 +6458,8 @@ class PhongMaterial extends Material {
             gpuSkinning,
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
-            useNormalMap
+            useNormalMap,
+            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || ""
         });
         
         const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({
