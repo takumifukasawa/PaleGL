@@ -1,6 +1,6 @@
 import {
     skinningVertexUniforms,
-    skinningVertexAttributes,
+    // skinningVertexAttributes,
     calcSkinningMatrixFunc, skinningVertex
 } from "./skinningShader.js";
 import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.js";

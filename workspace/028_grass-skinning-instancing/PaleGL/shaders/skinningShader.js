@@ -1,10 +1,10 @@
 // import {transformVertexUniforms, shadowMapVertexUniforms} from "./commonUniforms";
 // import {shadowMapVertex} from "./shadowMapShader";
 
-export const skinningVertexAttributes = (beginIndex) => [
-`layout(location = ${beginIndex + 0}) in vec4 aBoneIndices;`,
-`layout(location = ${beginIndex + 1}) in vec4 aBoneWeights;`,
-];
+// export const skinningVertexAttributes = (beginIndex) => [
+// `layout(location = ${beginIndex + 0}) in vec4 aBoneIndices;`,
+// `layout(location = ${beginIndex + 1}) in vec4 aBoneWeights;`,
+// ];
 
 export const calcSkinningMatrixFunc = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
