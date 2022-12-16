@@ -77,7 +77,8 @@ export class PhongMaterial extends Material {
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap,
-            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            vertexShaderModifier,
             ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
         });
         

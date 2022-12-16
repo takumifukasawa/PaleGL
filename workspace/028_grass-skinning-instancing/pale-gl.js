@@ -3760,52 +3760,17 @@ const generateVertexShader = ({
     jointNum,
     receiveShadow,
     useNormalMap,
-    localPositionProcess,
-    localPositionPostProcess,
+    // localPositionProcess,
+    // localPositionPostProcess,
+    vertexShaderModifier = {
+        localPositionProcess: "",
+        localPositionPostProcess: ""
+    },
     insertUniforms,
 } = {}) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
-
-    // // TODO: attributeのデータから吐きたい
-    // const attributesList = [
-    //     `layout(location = 0) in vec3 aPosition;`,
-    //     `layout(location = 1) in vec2 aUv;`,
-    //     `layout(location = 2) in vec3 aNormal;`,
-    // ];
-    // if(isSkinning) {
-    //     attributesList.push(...skinningVertexAttributes(attributesList.length));
-    // }
-    // if(useNormalMap) {
-    //     attributesList.push(...normalMapVertexAttributes(attributesList.length));
-    // }
-    
-    // const sortedAttributeDescriptors = [];
-    // Object.keys(attributeDescriptors).forEach(key => {
-    //     const attributeDescriptor = attributeDescriptors[key];
-    //     sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
-    // });
-
-    // const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
-    //     let type;
-    //     // TODO: fix all type
-    //     switch(size) {
-    //         case 2:
-    //             type = "vec2";
-    //             break;
-    //         case 3:
-    //             type = "vec3";
-    //             break;
-    //         case 4:
-    //             type = "vec4";
-    //             break;
-    //         default:
-    //             throw "invalid type";
-    //     }
-    //     const str = `layout(location = ${location}) in ${type} ${key};`;
-    //     return str;
-    // });
-    
+   
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
 
     return `#version 300 es
@@ -3831,13 +3796,13 @@ void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
-    ${localPositionProcess || ""}
+    ${vertexShaderModifier.localPositionProcess || ""}
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
         : ""
     }
-    ${localPositionPostProcess || ""}
+    ${vertexShaderModifier.localPositionPostProcess || ""}
     
     ${(() => {
         if(isSkinning) {
@@ -3871,7 +3836,7 @@ void main() {
   
     vWorldPosition = worldPosition.xyz;
    
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
 }
@@ -3880,24 +3845,16 @@ const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,
-    localPositionProcess,
-    localPositionPostProcess,
+    // localPositionProcess,
+    // localPositionPostProcess,
+    vertexShaderModifier = {
+        localPositionProcess: "",
+        localPositionPostProcess: ""
+    },
     useNormalMap,
     jointNum
 } = {}) => {
-
-    // const attributes = [
-    //     `layout(location = 0) in vec3 aPosition;`,
-    //     `layout(location = 1) in vec2 aUv;`,
-    //     `layout(location = 2) in vec3 aNormal;`,
-    // ];
-    // if (isSkinning) {
-    //     attributes.push(...skinningVertexAttributes(attributes.length));
-    // }
-    // if(useNormalMap) {
-    //     attributes.push(...normalMapVertexAttributes(attributes.length));
-    // }
-    
+   
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
 
     return `#version 300 es
@@ -3914,13 +3871,13 @@ void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
-    ${localPositionProcess || ""}
+    ${vertexShaderModifier.localPositionProcess || ""}
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
         : ""
     }
-    ${localPositionPostProcess || ""}
+    ${vertexShaderModifier.localPositionPostProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }
@@ -4052,7 +4009,8 @@ class SkinnedMesh extends Mesh {
                     isSkinning: true,
                     gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
-                    localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
+                    vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
+                    // localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
                 }),
                 fragmentShader: generateDepthFragmentShader({
                     // alphaTest: !!this.material.alphaTest
@@ -6602,7 +6560,8 @@ class PhongMaterial extends Material {
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap,
-            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            vertexShaderModifier,
             ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
         });
         

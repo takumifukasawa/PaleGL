@@ -123,7 +123,8 @@ export class SkinnedMesh extends Mesh {
                     isSkinning: true,
                     gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
-                    localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
+                    vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
+                    // localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
                 }),
                 fragmentShader: generateDepthFragmentShader({
                     // alphaTest: !!this.material.alphaTest
