@@ -30,7 +30,7 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({gpu, attributes, indices = null}) {
+    constructor({gpu, attributes = {}, indices = null}) {
         super();
         
         this.#gpu = gpu;

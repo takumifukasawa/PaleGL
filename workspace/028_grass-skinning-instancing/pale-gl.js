@@ -1386,9 +1386,15 @@ class Material {
     #vertexShaderGenerator;
     #fragmentShaderGenerator;
     #depthFragmentShaderGenerator;
+
+    #vertexShaderModifier;
     
     get isCompiledShader() {
         return !!this.shader;
+    }
+    
+    get vertexShaderModifier() {
+        return this.#vertexShaderModifier;
     }
 
     constructor({
@@ -1403,6 +1409,8 @@ class Material {
         vertexShaderGenerator,
         fragmentShaderGenerator,
         depthFragmentShaderGenerator,
+        
+        vertexShaderModifier,
         
         primitiveType,
         depthTest = null,
@@ -1441,6 +1449,10 @@ class Material {
         }
         if(depthFragmentShaderGenerator) {
             this.#depthFragmentShaderGenerator = depthFragmentShaderGenerator;
+        }
+        
+        if(vertexShaderModifier) {
+            this.#vertexShaderModifier = vertexShaderModifier;
         }
         
         //this.#generateVertexShader = () => {
@@ -1642,6 +1654,8 @@ class Mesh extends Actor {
         super.start(options);
         
         const { gpu } = options;
+        
+        this.geometry.start();
         
         // 未コンパイルであればコンパイルする
         this.materials.forEach(material => {
@@ -1906,7 +1920,7 @@ class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({gpu, attributes, indices = null}) {
+    constructor({gpu, attributes = {}, indices = null}) {
         super();
         
         this.#gpu = gpu;
@@ -1992,7 +2006,7 @@ class Geometry {
         attributes,
         indices,
         drawCount,
-        immediateCreate = true,
+        // immediateCreate = true,
         // calculateTangent = false,
         calculateBinormal = false,
         instanceCount = null,
@@ -2000,6 +2014,18 @@ class Geometry {
         this.#gpu = gpu;
         
         this.instanceCount = instanceCount;
+
+        this.drawCount = drawCount;
+        
+        if (indices) {
+            this.indices = indices;
+        }
+        
+        this.vertexArrayObject = new VertexArrayObject({
+            gpu,
+            attributes: this.attributes,
+            indices: this.indices
+        });
 
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
@@ -2015,15 +2041,10 @@ class Geometry {
             // });
         });
         
-        this.drawCount = drawCount;
 
-        if (indices) {
-            this.indices = indices;
-        }
-
-        if(gpu && immediateCreate) {
-            this.#createGeometry({ gpu })
-        }
+        // if(gpu && immediateCreate) {
+        //     this.#createGeometry({ gpu })
+        // }
     }
     
     setAttribute(key, attribute, i = -1) {
@@ -2039,6 +2060,8 @@ class Geometry {
             usage: attribute.usage,
             divisor: attribute.divisor
         });       
+
+        this.vertexArrayObject.setAttribute(key, this.attributes[key]);
     }
    
     // TODO: startでcreategeometryしたい
@@ -2052,6 +2075,12 @@ class Geometry {
         });
         // if (this.indices) {
         //     this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
+        // }
+    }
+    
+    start() {
+        // if(!this.vertexArrayObject) {
+            this.#createGeometry({ gpu: this.#gpu })
         // }
     }
     
@@ -3840,7 +3869,8 @@ const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,
-    localPositionProcess ,
+    localPositionProcess,
+    localPositionPostProcess,
     useNormalMap,
     jointNum
 } = {}) => {
@@ -3879,7 +3909,7 @@ void main() {
     localPosition = skinMatrix * localPosition;`
         : ""
     }
- 
+    ${localPositionPostProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }
@@ -4011,6 +4041,7 @@ class SkinnedMesh extends Mesh {
                     isSkinning: true,
                     gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
+                    localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
                 }),
                 fragmentShader: generateDepthFragmentShader({
                     // alphaTest: !!this.material.alphaTest
@@ -6600,6 +6631,7 @@ class PhongMaterial extends Material {
             vertexShaderGenerator,
             fragmentShaderGenerator,
             depthFragmentShaderGenerator,
+            vertexShaderModifier,
             uniforms: mergedUniforms,
             depthUniforms
         });

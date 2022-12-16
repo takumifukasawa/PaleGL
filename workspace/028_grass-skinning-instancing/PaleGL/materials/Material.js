@@ -33,9 +33,15 @@ export class Material {
     #vertexShaderGenerator;
     #fragmentShaderGenerator;
     #depthFragmentShaderGenerator;
+
+    #vertexShaderModifier;
     
     get isCompiledShader() {
         return !!this.shader;
+    }
+    
+    get vertexShaderModifier() {
+        return this.#vertexShaderModifier;
     }
 
     constructor({
@@ -50,6 +56,8 @@ export class Material {
         vertexShaderGenerator,
         fragmentShaderGenerator,
         depthFragmentShaderGenerator,
+        
+        vertexShaderModifier,
         
         primitiveType,
         depthTest = null,
@@ -88,6 +96,10 @@ export class Material {
         }
         if(depthFragmentShaderGenerator) {
             this.#depthFragmentShaderGenerator = depthFragmentShaderGenerator;
+        }
+        
+        if(vertexShaderModifier) {
+            this.#vertexShaderModifier = vertexShaderModifier;
         }
         
         //this.#generateVertexShader = () => {

@@ -169,7 +169,8 @@ export const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,
-    localPositionProcess ,
+    localPositionProcess,
+    localPositionPostProcess,
     useNormalMap,
     jointNum
 } = {}) => {
@@ -208,7 +209,7 @@ void main() {
     localPosition = skinMatrix * localPosition;`
         : ""
     }
- 
+    ${localPositionPostProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
 }

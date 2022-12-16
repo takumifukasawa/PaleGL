@@ -115,6 +115,7 @@ export class PhongMaterial extends Material {
             vertexShaderGenerator,
             fragmentShaderGenerator,
             depthFragmentShaderGenerator,
+            vertexShaderModifier,
             uniforms: mergedUniforms,
             depthUniforms
         });

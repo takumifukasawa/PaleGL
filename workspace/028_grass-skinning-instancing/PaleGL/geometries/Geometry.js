@@ -23,7 +23,7 @@ export class Geometry {
         attributes,
         indices,
         drawCount,
-        immediateCreate = true,
+        // immediateCreate = true,
         // calculateTangent = false,
         calculateBinormal = false,
         instanceCount = null,
@@ -31,6 +31,18 @@ export class Geometry {
         this.#gpu = gpu;
         
         this.instanceCount = instanceCount;
+
+        this.drawCount = drawCount;
+        
+        if (indices) {
+            this.indices = indices;
+        }
+        
+        this.vertexArrayObject = new VertexArrayObject({
+            gpu,
+            attributes: this.attributes,
+            indices: this.indices
+        });
 
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
@@ -46,15 +58,10 @@ export class Geometry {
             // });
         });
         
-        this.drawCount = drawCount;
 
-        if (indices) {
-            this.indices = indices;
-        }
-
-        if(gpu && immediateCreate) {
-            this.#createGeometry({ gpu })
-        }
+        // if(gpu && immediateCreate) {
+        //     this.#createGeometry({ gpu })
+        // }
     }
     
     setAttribute(key, attribute, i = -1) {
@@ -70,6 +77,8 @@ export class Geometry {
             usage: attribute.usage,
             divisor: attribute.divisor
         });       
+
+        this.vertexArrayObject.setAttribute(key, this.attributes[key]);
     }
    
     // TODO: startでcreategeometryしたい
@@ -83,6 +92,12 @@ export class Geometry {
         });
         // if (this.indices) {
         //     this.indexBufferObject = new IndexBufferObject({gpu, indices: this.indices})
+        // }
+    }
+    
+    start() {
+        // if(!this.vertexArrayObject) {
+            this.#createGeometry({ gpu: this.#gpu })
         // }
     }
     

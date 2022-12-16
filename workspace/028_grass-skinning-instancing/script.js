@@ -152,7 +152,6 @@ const createGLTFSkinnedMesh = async () => {
         // ルートにanimatorをattachしてるので一旦ここでassign
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
       
-        skinningMesh.debugBoneView = true;
         skinningMesh.castShadow = true;
         skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
             data: [
@@ -172,7 +171,13 @@ const createGLTFSkinnedMesh = async () => {
             isSkinning: true,
             vertexShaderModifier: {
                 localPositionPostProcess: `
-    localPosition = localPosition;
+    mat4 instancePositionOffset = mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        aInstancePositionOffset.x, aInstancePositionOffset.y, aInstancePositionOffset.z, 1
+    );
+    localPosition = instancePositionOffset * localPosition;
 `,
             }
         });

@@ -58,6 +58,8 @@ export class Mesh extends Actor {
         
         const { gpu } = options;
         
+        this.geometry.start();
+        
         // 未コンパイルであればコンパイルする
         this.materials.forEach(material => {
             if(!material.isCompiledShader) {
