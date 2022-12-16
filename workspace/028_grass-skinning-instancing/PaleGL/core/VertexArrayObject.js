@@ -52,7 +52,7 @@ export class VertexArrayObject extends GLObject {
 
         // unbind vertex array to webgl context
         gl.bindVertexArray(null);
-      
+
         // unbind array buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         
@@ -69,9 +69,14 @@ export class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
-    setAttribute(key, attribute) {
+    setAttribute(key, attribute, push = false) {
         const gl = this.#gpu.gl;
-        
+
+        if(push) {
+            // bind vertex array to webgl context
+            gl.bindVertexArray(this.#vao);
+        }
+
         const {data, size, location, usageType, divisor} = attribute;
         const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
         const vbo = gl.createBuffer();
@@ -88,6 +93,11 @@ export class VertexArrayObject extends GLObject {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.#vboList[key] = { vbo, usage };       
+        this.#vboList[key] = { vbo, usage };
+        
+        if(push) {
+            gl.bindVertexArray(null);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
     }
 }

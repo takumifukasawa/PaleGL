@@ -78,13 +78,14 @@ export class Geometry {
             divisor: attribute.divisor
         });       
 
-        this.vertexArrayObject.setAttribute(key, this.attributes[key]);
+        this.vertexArrayObject.setAttribute(key, this.attributes[key], true);
     }
    
-    // TODO: startでcreategeometryしたい
+    // TODO: startで create geometry したい
     // start() {}
     
     #createGeometry({ gpu }) {
+        console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
             attributes: this.attributes,
@@ -96,9 +97,9 @@ export class Geometry {
     }
     
     start() {
-        // if(!this.vertexArrayObject) {
+        if(!this.vertexArrayObject) {
             this.#createGeometry({ gpu: this.#gpu })
-        // }
+        }
     }
     
     update() {

@@ -141,7 +141,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
-    gltfActor.transform.setScaling(Vector3.fill(0.5));
+    gltfActor.transform.setScaling(Vector3.fill(1));
     
     skinningMeshAnimator = gltfActor.animator;
  
@@ -153,17 +153,17 @@ const createGLTFSkinnedMesh = async () => {
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
       
         skinningMesh.castShadow = true;
+        skinningMesh.geometry.instanceCount = 3;
         skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
             data: [
-                [-2, 0, 0],
+                [-3, 0, 0],
                 [0, 0, 0],
-                [2, 0, 0],
+                [3, 0, 0],
             ].flat(),
             size: 3,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });
-        skinningMesh.instanceCount = 3;
         skinningMesh.material = new PhongMaterial({
             gpu,
             diffuseColor: new Color(0, 1, 0, 1),

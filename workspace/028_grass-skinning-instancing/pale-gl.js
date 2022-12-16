@@ -1942,7 +1942,7 @@ class VertexArrayObject extends GLObject {
 
         // unbind vertex array to webgl context
         gl.bindVertexArray(null);
-      
+
         // unbind array buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         
@@ -1959,9 +1959,14 @@ class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
-    setAttribute(key, attribute) {
+    setAttribute(key, attribute, push = false) {
         const gl = this.#gpu.gl;
-        
+
+        if(push) {
+            // bind vertex array to webgl context
+            gl.bindVertexArray(this.#vao);
+        }
+
         const {data, size, location, usageType, divisor} = attribute;
         const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
         const vbo = gl.createBuffer();
@@ -1978,7 +1983,12 @@ class VertexArrayObject extends GLObject {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.#vboList[key] = { vbo, usage };       
+        this.#vboList[key] = { vbo, usage };
+        
+        if(push) {
+            gl.bindVertexArray(null);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
     }
 }
 ﻿
@@ -2061,13 +2071,14 @@ class Geometry {
             divisor: attribute.divisor
         });       
 
-        this.vertexArrayObject.setAttribute(key, this.attributes[key]);
+        this.vertexArrayObject.setAttribute(key, this.attributes[key], true);
     }
    
-    // TODO: startでcreategeometryしたい
+    // TODO: startで create geometry したい
     // start() {}
     
     #createGeometry({ gpu }) {
+        console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
             attributes: this.attributes,
@@ -2079,9 +2090,9 @@ class Geometry {
     }
     
     start() {
-        // if(!this.vertexArrayObject) {
+        if(!this.vertexArrayObject) {
             this.#createGeometry({ gpu: this.#gpu })
-        // }
+        }
     }
     
     update() {
