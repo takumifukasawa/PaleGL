@@ -319,8 +319,9 @@ export async function loadGLTF({
         });
     }
 
-    console.log("------------")
-    console.log("cache nodes", cacheNodes)
+    // for debug
+    // console.log("------------")
+    // console.log("cache nodes", cacheNodes)
 
     if(gltf.animations && gltf.animations.length > 0) {
         const animationClips = createAnimationClips();

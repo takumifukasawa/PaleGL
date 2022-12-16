@@ -169,6 +169,7 @@ const createGLTFSkinnedMesh = async () => {
             diffuseColor: new Color(0, 1, 0, 1),
             receiveShadow: true,
             isSkinning: true,
+            gpuSkinning: true,
             vertexShaderModifier: {
                 localPositionPostProcess: `
     mat4 instancePositionOffset = mat4(

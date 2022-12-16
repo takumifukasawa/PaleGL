@@ -175,13 +175,10 @@ export class SkinnedMesh extends Mesh {
             // TODO: refactor
             this.#animationClips.forEach((animationClip, i) => {
                 const dataEachKeyframes = animationClip.getAllKeyframesValue();
-                console.log("fugafuga", dataEachKeyframes)
                 animationData[i] = [];
                 dataEachKeyframes.forEach((dataKeyframes, frameIndex) => {
                     animationData[i][frameIndex] = [];
                     dataKeyframes.forEach(elem => {
-                        // animationData[i].value[elem.target.index][frame][elem.key] = elem.frameValue;
-                        // const targetObj = animationData[i].value[elem.target.index][frame];
                         const boneIndex = elem.target.index;
                         if(!animationData[i][frameIndex][boneIndex]) {
                             animationData[i][frameIndex][boneIndex] = {
