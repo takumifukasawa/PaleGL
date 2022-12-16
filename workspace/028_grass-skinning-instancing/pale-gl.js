@@ -3680,33 +3680,8 @@ vec4 calcPhongLighting() {
 
 // TODO: out varying を centroid できるようにしたい
 
-const generateVertexShader = ({
-    attributeDescriptors,
-    isSkinning,
-    gpuSkinning,
-    jointNum,
-    receiveShadow,
-    useNormalMap,
-    localPositionProcess,
-    localPositionPostProcess,
-    insertUniforms,
-} = {}) => {
-    // for debug
-    console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
-
-    // // TODO: attributeのデータから吐きたい
-    // const attributesList = [
-    //     `layout(location = 0) in vec3 aPosition;`,
-    //     `layout(location = 1) in vec2 aUv;`,
-    //     `layout(location = 2) in vec3 aNormal;`,
-    // ];
-    // if(isSkinning) {
-    //     attributesList.push(...skinningVertexAttributes(attributesList.length));
-    // }
-    // if(useNormalMap) {
-    //     attributesList.push(...normalMapVertexAttributes(attributesList.length));
-    // }
-    
+const buildVertexAttributeLayouts = (attributeDescriptors) => {
+    console.log("hogehoge", attributeDescriptors)
     const sortedAttributeDescriptors = [];
     Object.keys(attributeDescriptors).forEach(key => {
         const attributeDescriptor = attributeDescriptors[key];
@@ -3715,6 +3690,7 @@ const generateVertexShader = ({
 
     const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
         let type;
+        // TODO: fix all type
         switch(size) {
             case 2:
                 type = "vec2";
@@ -3731,10 +3707,68 @@ const generateVertexShader = ({
         const str = `layout(location = ${location}) in ${type} ${key};`;
         return str;
     });
+    
+    return attributesList;
+}
+
+const generateVertexShader = ({
+    attributeDescriptors,
+    isSkinning,
+    gpuSkinning,
+    jointNum,
+    receiveShadow,
+    useNormalMap,
+    localPositionProcess,
+    localPositionPostProcess,
+    insertUniforms,
+} = {}) => {
+    // for debug
+    // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
+
+    // // TODO: attributeのデータから吐きたい
+    // const attributesList = [
+    //     `layout(location = 0) in vec3 aPosition;`,
+    //     `layout(location = 1) in vec2 aUv;`,
+    //     `layout(location = 2) in vec3 aNormal;`,
+    // ];
+    // if(isSkinning) {
+    //     attributesList.push(...skinningVertexAttributes(attributesList.length));
+    // }
+    // if(useNormalMap) {
+    //     attributesList.push(...normalMapVertexAttributes(attributesList.length));
+    // }
+    
+    // const sortedAttributeDescriptors = [];
+    // Object.keys(attributeDescriptors).forEach(key => {
+    //     const attributeDescriptor = attributeDescriptors[key];
+    //     sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
+    // });
+
+    // const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
+    //     let type;
+    //     // TODO: fix all type
+    //     switch(size) {
+    //         case 2:
+    //             type = "vec2";
+    //             break;
+    //         case 3:
+    //             type = "vec3";
+    //             break;
+    //         case 4:
+    //             type = "vec4";
+    //             break;
+    //         default:
+    //             throw "invalid type";
+    //     }
+    //     const str = `layout(location = ${location}) in ${type} ${key};`;
+    //     return str;
+    // });
+    
+    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
 
     return `#version 300 es
 
-${attributesList.join("\n")}
+${attributes.join("\n")}
 
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
@@ -3801,6 +3835,7 @@ void main() {
 }
 
 const generateDepthVertexShader = ({
+    attributeDescriptors,
     isSkinning,
     gpuSkinning,
     localPositionProcess ,
@@ -3808,17 +3843,19 @@ const generateDepthVertexShader = ({
     jointNum
 } = {}) => {
 
-    const attributes = [
-        `layout(location = 0) in vec3 aPosition;`,
-        `layout(location = 1) in vec2 aUv;`,
-        `layout(location = 2) in vec3 aNormal;`,
-    ];
-    if (isSkinning) {
-        attributes.push(...skinningVertexAttributes(attributes.length));
-    }
-    if(useNormalMap) {
-        attributes.push(...normalMapVertexAttributes(attributes.length));
-    }
+    // const attributes = [
+    //     `layout(location = 0) in vec3 aPosition;`,
+    //     `layout(location = 1) in vec2 aUv;`,
+    //     `layout(location = 2) in vec3 aNormal;`,
+    // ];
+    // if (isSkinning) {
+    //     attributes.push(...skinningVertexAttributes(attributes.length));
+    // }
+    // if(useNormalMap) {
+    //     attributes.push(...normalMapVertexAttributes(attributes.length));
+    // }
+    
+    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
 
     return `#version 300 es
 
@@ -3968,6 +4005,7 @@ class SkinnedMesh extends Mesh {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({
+                    attributeDescriptors: this.geometry.getAttributeDescriptors(),
                     isSkinning: true,
                     gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
@@ -4151,13 +4189,6 @@ matrix elements: ${jointData.length}
                 .map(m => [...m.elements])
                 .flat()
             );
-        // const jointData = new Float32Array([
-        //         ...jointMatrices,
-        //         // ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
-        //     ]
-        //         .map(m => [...m.elements])
-        //         .flat()
-        // );
 
             const matrixColNum = 4;
             this.#jointTexture.update({

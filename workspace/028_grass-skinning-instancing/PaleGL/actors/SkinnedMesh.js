@@ -119,6 +119,7 @@ export class SkinnedMesh extends Mesh {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({
+                    attributeDescriptors: this.geometry.getAttributeDescriptors(),
                     isSkinning: true,
                     gpuSkinning: this.#gpuSkinning,
                     jointNum: this.boneCount,
@@ -302,13 +303,6 @@ matrix elements: ${jointData.length}
                 .map(m => [...m.elements])
                 .flat()
             );
-        // const jointData = new Float32Array([
-        //         ...jointMatrices,
-        //         // ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
-        //     ]
-        //         .map(m => [...m.elements])
-        //         .flat()
-        // );
 
             const matrixColNum = 4;
             this.#jointTexture.update({
