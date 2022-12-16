@@ -58,12 +58,13 @@ export class Mesh extends Actor {
         
         const { gpu } = options;
         
-        console.log()
-
         // 未コンパイルであればコンパイルする
         this.materials.forEach(material => {
             if(!material.isCompiledShader) {
-                material.start({ gpu });
+                material.start({
+                    gpu,
+                    attributeDescriptors: this.geometry.getAttributeDescriptors()
+                });
             }
         });
 
@@ -81,7 +82,10 @@ export class Mesh extends Actor {
         }       
         
         if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
-            this.depthMaterial.start({ gpu });
+            this.depthMaterial.start({
+                gpu,
+                attributeDescriptors: this.geometry.getAttributeDescriptors()
+            });
         }
     }
 }

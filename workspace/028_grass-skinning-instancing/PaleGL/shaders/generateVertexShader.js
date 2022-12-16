@@ -10,7 +10,7 @@ import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingComm
 // TODO: out varying を centroid できるようにしたい
 
 export const generateVertexShader = ({
-    attributes,
+    attributeDescriptors,
     isSkinning,
     gpuSkinning,
     jointNum,
@@ -20,35 +20,46 @@ export const generateVertexShader = ({
     localPositionPostProcess,
     insertUniforms,
 } = {}) => {
+    // for debug
+    console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
 
-    // TODO: attributeのデータから吐きたい
-    const attributesList = [
-        `layout(location = 0) in vec3 aPosition;`,
-        `layout(location = 1) in vec2 aUv;`,
-        `layout(location = 2) in vec3 aNormal;`,
-    ];
-    if(isSkinning) {
-        attributesList.push(...skinningVertexAttributes(attributesList.length));
-    }
-    if(useNormalMap) {
-        attributesList.push(...normalMapVertexAttributes(attributesList.length));
-    }
+    // // TODO: attributeのデータから吐きたい
+    // const attributesList = [
+    //     `layout(location = 0) in vec3 aPosition;`,
+    //     `layout(location = 1) in vec2 aUv;`,
+    //     `layout(location = 2) in vec3 aNormal;`,
+    // ];
+    // if(isSkinning) {
+    //     attributesList.push(...skinningVertexAttributes(attributesList.length));
+    // }
+    // if(useNormalMap) {
+    //     attributesList.push(...normalMapVertexAttributes(attributesList.length));
+    // }
     
-    // const attributesList = attributes.map(attr => {
-    //     let type;
-    //     switch(attr.size) {
-    //         case 2:
-    //             type = "vec2";
-    //             break;
-    //         case 3:
-    //             type = "vec3";
-    //             break;
-    //         default:
-    //             throw "invalid type";
-    //     }
-    //     const str = `layout(location = ${attr.location}) in ${type} ${attr.name};`;
-    //     return str;
-    // });
+    const sortedAttributeDescriptors = [];
+    Object.keys(attributeDescriptors).forEach(key => {
+        const attributeDescriptor = attributeDescriptors[key];
+        sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
+    });
+
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
+        let type;
+        switch(size) {
+            case 2:
+                type = "vec2";
+                break;
+            case 3:
+                type = "vec3";
+                break;
+            case 4:
+                type = "vec4";
+                break;
+            default:
+                throw "invalid type";
+        }
+        const str = `layout(location = ${location}) in ${type} ${key};`;
+        return str;
+    });
 
     return `#version 300 es
 

@@ -23,4 +23,11 @@ export class Attribute {
         this.usageType = usageType;
         this.divisor = divisor;
     }
+    
+    getDescriptor() {
+        return {
+            location: this.location,
+            size: this.size,
+        }
+    }
 }

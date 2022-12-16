@@ -203,9 +203,13 @@ export class Material {
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
 
-    start({ gpu }) {
+    start({ gpu, attributeDescriptors }) {
+        // for debug
+        // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
+
         if(!this.vertexShader && this.#vertexShaderGenerator) {
             this.vertexShader = this.#vertexShaderGenerator({
+                attributeDescriptors,
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
                 gpuSkinning: this.gpuSkinning

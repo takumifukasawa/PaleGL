@@ -1556,9 +1556,13 @@ class Material {
         this.depthUniforms = {...commonUniforms, ...depthUniforms };
     }
 
-    start({ gpu }) {
+    start({ gpu, attributeDescriptors }) {
+        // for debug
+        // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
+
         if(!this.vertexShader && this.#vertexShaderGenerator) {
             this.vertexShader = this.#vertexShaderGenerator({
+                attributeDescriptors,
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
                 gpuSkinning: this.gpuSkinning
@@ -1639,12 +1643,13 @@ class Mesh extends Actor {
         
         const { gpu } = options;
         
-        console.log()
-
         // 未コンパイルであればコンパイルする
         this.materials.forEach(material => {
             if(!material.isCompiledShader) {
-                material.start({ gpu });
+                material.start({
+                    gpu,
+                    attributeDescriptors: this.geometry.getAttributeDescriptors()
+                });
             }
         });
 
@@ -1662,7 +1667,10 @@ class Mesh extends Actor {
         }       
         
         if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
-            this.depthMaterial.start({ gpu });
+            this.depthMaterial.start({
+                gpu,
+                attributeDescriptors: this.geometry.getAttributeDescriptors()
+            });
         }
     }
 }
@@ -1824,6 +1832,13 @@ class Attribute {
         this.offset = offset;
         this.usageType = usageType;
         this.divisor = divisor;
+    }
+    
+    getDescriptor() {
+        return {
+            location: this.location,
+            size: this.size,
+        }
     }
 }
 ﻿
@@ -1989,7 +2004,7 @@ class Geometry {
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
             const attribute = attributes[key];
-            this.#buildAndSetAttribute(key, attribute, i);
+            this.setAttribute(key, attribute, i);
             // this.attributes[key] = new Attribute({
             //     data: attribute.data,
             //     location: attribute.location || i,
@@ -2011,7 +2026,7 @@ class Geometry {
         }
     }
     
-    #buildAndSetAttribute(key, attribute, i = -1) {
+    setAttribute(key, attribute, i = -1) {
         const location = attribute.location ?
             attribute.location :
             i > -1 ? i : Object.keys(this.attributes).length;
@@ -2051,10 +2066,12 @@ class Geometry {
         this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
     }
 
-    setAttribute(key, attribute) {
-        this.vertexArrayObject.setAttribute(key, attribute);
+    getAttributeDescriptors() {
+        const attributes = {};
+        Object.keys(this.attributes).forEach(key => attributes[key] = this.attributes[key].getDescriptor());
+        return attributes;
     }
-    
+
     static createTangentsAndBinormals(normals) {
         const tangents = [];
         const binormals = [];
@@ -3664,7 +3681,7 @@ vec4 calcPhongLighting() {
 // TODO: out varying を centroid できるようにしたい
 
 const generateVertexShader = ({
-    attributes,
+    attributeDescriptors,
     isSkinning,
     gpuSkinning,
     jointNum,
@@ -3674,35 +3691,46 @@ const generateVertexShader = ({
     localPositionPostProcess,
     insertUniforms,
 } = {}) => {
+    // for debug
+    console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
 
-    // TODO: attributeのデータから吐きたい
-    const attributesList = [
-        `layout(location = 0) in vec3 aPosition;`,
-        `layout(location = 1) in vec2 aUv;`,
-        `layout(location = 2) in vec3 aNormal;`,
-    ];
-    if(isSkinning) {
-        attributesList.push(...skinningVertexAttributes(attributesList.length));
-    }
-    if(useNormalMap) {
-        attributesList.push(...normalMapVertexAttributes(attributesList.length));
-    }
+    // // TODO: attributeのデータから吐きたい
+    // const attributesList = [
+    //     `layout(location = 0) in vec3 aPosition;`,
+    //     `layout(location = 1) in vec2 aUv;`,
+    //     `layout(location = 2) in vec3 aNormal;`,
+    // ];
+    // if(isSkinning) {
+    //     attributesList.push(...skinningVertexAttributes(attributesList.length));
+    // }
+    // if(useNormalMap) {
+    //     attributesList.push(...normalMapVertexAttributes(attributesList.length));
+    // }
     
-    // const attributesList = attributes.map(attr => {
-    //     let type;
-    //     switch(attr.size) {
-    //         case 2:
-    //             type = "vec2";
-    //             break;
-    //         case 3:
-    //             type = "vec3";
-    //             break;
-    //         default:
-    //             throw "invalid type";
-    //     }
-    //     const str = `layout(location = ${attr.location}) in ${type} ${attr.name};`;
-    //     return str;
-    // });
+    const sortedAttributeDescriptors = [];
+    Object.keys(attributeDescriptors).forEach(key => {
+        const attributeDescriptor = attributeDescriptors[key];
+        sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
+    });
+
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
+        let type;
+        switch(size) {
+            case 2:
+                type = "vec2";
+                break;
+            case 3:
+                type = "vec3";
+                break;
+            case 4:
+                type = "vec4";
+                break;
+            default:
+                throw "invalid type";
+        }
+        const str = `layout(location = ${location}) in ${type} ${key};`;
+        return str;
+    });
 
     return `#version 300 es
 
@@ -4395,7 +4423,7 @@ class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                position: {
+                aPosition: {
                     data: [
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -4412,7 +4440,7 @@ class BoxGeometry extends Geometry {
                     ],
                     size: 3,
                 },
-                uv: {
+                aUv: {
                     data: (new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -4421,7 +4449,7 @@ class BoxGeometry extends Geometry {
                     ])).flat(),
                     size: 2
                 },
-                normal: {
+                aNormal: {
                     data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
                     size: 3
                 }
@@ -4466,7 +4494,7 @@ class PlaneGeometry extends Geometry {
             // 1 ---- 3
             // -----------------------------
             attributes: {
-                position: {
+                aPosition: {
                     data: [
                         -1, 1, 0,
                         -1, -1, 0,
@@ -4475,7 +4503,7 @@ class PlaneGeometry extends Geometry {
                     ],
                     size: 3
                 },
-                uv: {
+                aUv: {
                     data: [
                         0, 1,
                         0, 0,
@@ -4484,13 +4512,13 @@ class PlaneGeometry extends Geometry {
                     ],
                     size: 2
                 },
-                normal: {
+                aNormal: {
                     data: normals,
                     size: 3
                 },
                 ...(calculateTangent ?
                     {
-                        tangent: {
+                        aTangent: {
                             data: tangents,
                             size: 3
                         },
@@ -4498,7 +4526,7 @@ class PlaneGeometry extends Geometry {
                 ),
                 ...(calculateBinormal ?
                     {
-                        binormal: {
+                        aBinormal: {
                             data: binormals,
                             size: 3
                         },
@@ -6109,34 +6137,34 @@ async function loadGLTF({
         const geometry = new Geometry({
             gpu,
             attributes: {
-                position: {
+                aPosition: {
                     data: positions,
                     size: 3,
                 },
-                uv: {
+                aUv: {
                     data: uvFlippedY,
                     size: 2
                 },
-                normal: {
+                aNormal: {
                     data: normals,
                     size: 3
                 },
                 // bone があるならjointとweightもあるはず
                 ...(rootBone ? {
-                    boneIndices: {
+                    aBoneIndices: {
                         data: joints,
                         size: 4
                     },
-                    boneWeights: {
+                    aBoneWeights: {
                         data: weights,
                         size: 4
                     },
                 } : {}),               
-                tangent: {
+                aTangent: {
                     data: tangents,
                     size: 3
                 },
-                binormal: {
+                aBinormal: {
                     data: binormals,
                     size: 3
                 },
@@ -6495,13 +6523,14 @@ class PhongMaterial extends Material {
        
         const useNormalMap = !!normalMap;
         
-        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning }) => generateVertexShader({
+        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
             isSkinning,
             gpuSkinning,
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap,
-            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || ""
+            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
         });
         
         const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({

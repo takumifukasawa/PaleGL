@@ -171,34 +171,34 @@ export async function loadGLTF({
         const geometry = new Geometry({
             gpu,
             attributes: {
-                position: {
+                aPosition: {
                     data: positions,
                     size: 3,
                 },
-                uv: {
+                aUv: {
                     data: uvFlippedY,
                     size: 2
                 },
-                normal: {
+                aNormal: {
                     data: normals,
                     size: 3
                 },
                 // bone があるならjointとweightもあるはず
                 ...(rootBone ? {
-                    boneIndices: {
+                    aBoneIndices: {
                         data: joints,
                         size: 4
                     },
-                    boneWeights: {
+                    aBoneWeights: {
                         data: weights,
                         size: 4
                     },
                 } : {}),               
-                tangent: {
+                aTangent: {
                     data: tangents,
                     size: 3
                 },
-                binormal: {
+                aBinormal: {
                     data: binormals,
                     size: 3
                 },

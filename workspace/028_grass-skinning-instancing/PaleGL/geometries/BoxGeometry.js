@@ -33,7 +33,7 @@ export class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                position: {
+                aPosition: {
                     data: [
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -50,7 +50,7 @@ export class BoxGeometry extends Geometry {
                     ],
                     size: 3,
                 },
-                uv: {
+                aUv: {
                     data: (new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -59,7 +59,7 @@ export class BoxGeometry extends Geometry {
                     ])).flat(),
                     size: 2
                 },
-                normal: {
+                aNormal: {
                     data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
                     size: 3
                 }

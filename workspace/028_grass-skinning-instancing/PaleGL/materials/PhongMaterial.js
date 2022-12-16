@@ -71,13 +71,14 @@ export class PhongMaterial extends Material {
        
         const useNormalMap = !!normalMap;
         
-        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning }) => generateVertexShader({
+        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
             isSkinning,
             gpuSkinning,
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap,
-            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || ""
+            localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
         });
         
         const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({

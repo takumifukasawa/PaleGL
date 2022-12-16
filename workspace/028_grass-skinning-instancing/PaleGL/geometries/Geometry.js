@@ -35,7 +35,7 @@ export class Geometry {
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
             const attribute = attributes[key];
-            this.#buildAndSetAttribute(key, attribute, i);
+            this.setAttribute(key, attribute, i);
             // this.attributes[key] = new Attribute({
             //     data: attribute.data,
             //     location: attribute.location || i,
@@ -57,7 +57,7 @@ export class Geometry {
         }
     }
     
-    #buildAndSetAttribute(key, attribute, i = -1) {
+    setAttribute(key, attribute, i = -1) {
         const location = attribute.location ?
             attribute.location :
             i > -1 ? i : Object.keys(this.attributes).length;
@@ -97,10 +97,12 @@ export class Geometry {
         this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
     }
 
-    setAttribute(key, attribute) {
-        this.vertexArrayObject.setAttribute(key, attribute);
+    getAttributeDescriptors() {
+        const attributes = {};
+        Object.keys(this.attributes).forEach(key => attributes[key] = this.attributes[key].getDescriptor());
+        return attributes;
     }
-    
+
     static createTangentsAndBinormals(normals) {
         const tangents = [];
         const binormals = [];
