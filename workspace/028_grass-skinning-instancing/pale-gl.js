@@ -3678,10 +3678,12 @@ vec4 calcPhongLighting() {
 
 
 
-// TODO: out varying を centroid できるようにしたい
+// -----------------------------------------------
+// TODO:
+// - out varying を centroid できるようにしたい
+// -----------------------------------------------
 
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
-    console.log("hogehoge", attributeDescriptors)
     const sortedAttributeDescriptors = [];
     Object.keys(attributeDescriptors).forEach(key => {
         const attributeDescriptor = attributeDescriptors[key];
