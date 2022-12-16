@@ -1638,6 +1638,8 @@ class Mesh extends Actor {
         super.start(options);
         
         const { gpu } = options;
+        
+        console.log()
 
         // 未コンパイルであればコンパイルする
         this.materials.forEach(material => {
@@ -1875,6 +1877,9 @@ class VertexArrayObject extends GLObject {
         return this.#vao;
     }
     
+    get vboList() {
+    }
+    
     getUsage(gl, usageType) {
         switch(usageType) {
             case AttributeUsageType.StaticDraw:
@@ -1984,14 +1989,15 @@ class Geometry {
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
             const attribute = attributes[key];
-            this.attributes[key] = new Attribute({
-                data: attribute.data,
-                location: attribute.location || i,
-                size: attribute.size,
-                offset: attribute.offset,
-                usage: attribute.usage,
-                divisor: attribute.divisor
-            });
+            this.#buildAndSetAttribute(key, attribute, i);
+            // this.attributes[key] = new Attribute({
+            //     data: attribute.data,
+            //     location: attribute.location || i,
+            //     size: attribute.size,
+            //     offset: attribute.offset,
+            //     usage: attribute.usage,
+            //     divisor: attribute.divisor
+            // });
         });
         
         this.drawCount = drawCount;
@@ -2004,6 +2010,24 @@ class Geometry {
             this.#createGeometry({ gpu })
         }
     }
+    
+    #buildAndSetAttribute(key, attribute, i = -1) {
+        const location = attribute.location ?
+            attribute.location :
+            i > -1 ? i : Object.keys(this.attributes).length;
+        this.attributes[key] = new Attribute({
+            data: attribute.data,
+            // location: i > -1 ? attribute.location || i,
+            location,
+            size: attribute.size,
+            offset: attribute.offset,
+            usage: attribute.usage,
+            divisor: attribute.divisor
+        });       
+    }
+   
+    // TODO: startでcreategeometryしたい
+    // start() {}
     
     #createGeometry({ gpu }) {
         this.vertexArrayObject = new VertexArrayObject({
@@ -2022,10 +2046,11 @@ class Geometry {
         }
     }
 
-    updateAttribute(key, attribute) {
-        this.vertexArrayObject.updateAttribute(key, attribute);
+    updateAttribute(key, data) {
+        this.attributes[key].data = data;
+        this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
     }
-    
+
     setAttribute(key, attribute) {
         this.vertexArrayObject.setAttribute(key, attribute);
     }
@@ -3639,6 +3664,7 @@ vec4 calcPhongLighting() {
 // TODO: out varying を centroid できるようにしたい
 
 const generateVertexShader = ({
+    attributes,
     isSkinning,
     gpuSkinning,
     jointNum,
@@ -3648,23 +3674,39 @@ const generateVertexShader = ({
     localPositionPostProcess,
     insertUniforms,
 } = {}) => {
-   
+
     // TODO: attributeのデータから吐きたい
-    const attributes = [
+    const attributesList = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
         `layout(location = 2) in vec3 aNormal;`,
     ];
     if(isSkinning) {
-        attributes.push(...skinningVertexAttributes(attributes.length));
+        attributesList.push(...skinningVertexAttributes(attributesList.length));
     }
     if(useNormalMap) {
-        attributes.push(...normalMapVertexAttributes(attributes.length));
+        attributesList.push(...normalMapVertexAttributes(attributesList.length));
     }
+    
+    // const attributesList = attributes.map(attr => {
+    //     let type;
+    //     switch(attr.size) {
+    //         case 2:
+    //             type = "vec2";
+    //             break;
+    //         case 3:
+    //             type = "vec3";
+    //             break;
+    //         default:
+    //             throw "invalid type";
+    //     }
+    //     const str = `layout(location = ${attr.location}) in ${type} ${attr.name};`;
+    //     return str;
+    // });
 
     return `#version 300 es
 
-${attributes.join("\n")}
+${attributesList.join("\n")}
 
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 

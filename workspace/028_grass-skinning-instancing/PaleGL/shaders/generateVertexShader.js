@@ -10,6 +10,7 @@ import {normalMapVertexAttributes, normalMapVertexVaryings} from "./lightingComm
 // TODO: out varying を centroid できるようにしたい
 
 export const generateVertexShader = ({
+    attributes,
     isSkinning,
     gpuSkinning,
     jointNum,
@@ -19,23 +20,39 @@ export const generateVertexShader = ({
     localPositionPostProcess,
     insertUniforms,
 } = {}) => {
-   
+
     // TODO: attributeのデータから吐きたい
-    const attributes = [
+    const attributesList = [
         `layout(location = 0) in vec3 aPosition;`,
         `layout(location = 1) in vec2 aUv;`,
         `layout(location = 2) in vec3 aNormal;`,
     ];
     if(isSkinning) {
-        attributes.push(...skinningVertexAttributes(attributes.length));
+        attributesList.push(...skinningVertexAttributes(attributesList.length));
     }
     if(useNormalMap) {
-        attributes.push(...normalMapVertexAttributes(attributes.length));
+        attributesList.push(...normalMapVertexAttributes(attributesList.length));
     }
+    
+    // const attributesList = attributes.map(attr => {
+    //     let type;
+    //     switch(attr.size) {
+    //         case 2:
+    //             type = "vec2";
+    //             break;
+    //         case 3:
+    //             type = "vec3";
+    //             break;
+    //         default:
+    //             throw "invalid type";
+    //     }
+    //     const str = `layout(location = ${attr.location}) in ${type} ${attr.name};`;
+    //     return str;
+    // });
 
     return `#version 300 es
 
-${attributes.join("\n")}
+${attributesList.join("\n")}
 
 ${isSkinning ? calcSkinningMatrixFunc() : ""}
 

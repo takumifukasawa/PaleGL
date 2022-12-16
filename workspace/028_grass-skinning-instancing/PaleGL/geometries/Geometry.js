@@ -35,14 +35,15 @@ export class Geometry {
         this.attributes = {};
         Object.keys(attributes).forEach((key, i) => {
             const attribute = attributes[key];
-            this.attributes[key] = new Attribute({
-                data: attribute.data,
-                location: attribute.location || i,
-                size: attribute.size,
-                offset: attribute.offset,
-                usage: attribute.usage,
-                divisor: attribute.divisor
-            });
+            this.#buildAndSetAttribute(key, attribute, i);
+            // this.attributes[key] = new Attribute({
+            //     data: attribute.data,
+            //     location: attribute.location || i,
+            //     size: attribute.size,
+            //     offset: attribute.offset,
+            //     usage: attribute.usage,
+            //     divisor: attribute.divisor
+            // });
         });
         
         this.drawCount = drawCount;
@@ -55,6 +56,24 @@ export class Geometry {
             this.#createGeometry({ gpu })
         }
     }
+    
+    #buildAndSetAttribute(key, attribute, i = -1) {
+        const location = attribute.location ?
+            attribute.location :
+            i > -1 ? i : Object.keys(this.attributes).length;
+        this.attributes[key] = new Attribute({
+            data: attribute.data,
+            // location: i > -1 ? attribute.location || i,
+            location,
+            size: attribute.size,
+            offset: attribute.offset,
+            usage: attribute.usage,
+            divisor: attribute.divisor
+        });       
+    }
+   
+    // TODO: startでcreategeometryしたい
+    // start() {}
     
     #createGeometry({ gpu }) {
         this.vertexArrayObject = new VertexArrayObject({
@@ -73,10 +92,11 @@ export class Geometry {
         }
     }
 
-    updateAttribute(key, attribute) {
-        this.vertexArrayObject.updateAttribute(key, attribute);
+    updateAttribute(key, data) {
+        this.attributes[key].data = data;
+        this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
     }
-    
+
     setAttribute(key, attribute) {
         this.vertexArrayObject.setAttribute(key, attribute);
     }

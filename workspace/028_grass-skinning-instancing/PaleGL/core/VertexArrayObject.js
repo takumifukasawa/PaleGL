@@ -16,6 +16,9 @@ export class VertexArrayObject extends GLObject {
         return this.#vao;
     }
     
+    get vboList() {
+    }
+    
     getUsage(gl, usageType) {
         switch(usageType) {
             case AttributeUsageType.StaticDraw:

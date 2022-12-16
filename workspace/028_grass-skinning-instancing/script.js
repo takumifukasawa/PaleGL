@@ -172,7 +172,7 @@ const createGLTFSkinnedMesh = async () => {
             isSkinning: true,
             vertexShaderModifier: {
                 localPositionPostProcess: `
-    localPosition = localPosition
+    localPosition = localPosition;
 `,
             }
         });
