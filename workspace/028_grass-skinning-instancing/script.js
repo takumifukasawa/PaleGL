@@ -320,7 +320,7 @@ const main = async () => {
     captureScene.add(skyboxMesh);
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
+    captureSceneCamera.transform.lookAt(new Vector3(0, -2, 0));
     
     window.addEventListener("mousemove", onMouseMove);
 
