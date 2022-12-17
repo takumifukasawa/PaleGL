@@ -3914,6 +3914,7 @@ class SkinnedMesh extends Mesh {
     
     #animationClips;
 
+    // TODO: editable
     #jointTextureColNum = 1;
 
     #jointMatricesAllFrames;
@@ -4124,7 +4125,7 @@ class SkinnedMesh extends Mesh {
                 .map(m => [...m.elements])
                 .flat()
             );
-           
+          
             const matrixColNum = 4;
             const dataPerPixel = 4;
             this.#jointTexture.update({
@@ -4138,16 +4139,14 @@ class SkinnedMesh extends Mesh {
  
             // for debug
             console.log(`
+# bake skin animation to texture
 col num: ${colNum},
 row num: ${rowNum},
 col pixels: ${colNum * matrixColNum},
 row pixels: ${rowNum},
 total pixels: ${colNum * matrixColNum * rowNum},
 all elements: ${colNum * matrixColNum * rowNum * 4},
-matrix elements: ${jointData.length}
-            `);
-            jointMatricesAllFrames[5].log()
-            console.log("--------")
+matrix elements: ${jointData.length}`);
         }
     }
 
