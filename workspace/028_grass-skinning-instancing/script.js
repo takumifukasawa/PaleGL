@@ -144,7 +144,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
 
-    const scale = 0.2;
+    const scale = 1;
     const baseOffset = 0.5;
     const randomOffset = 0.25;
 
@@ -171,7 +171,7 @@ const createGLTFSkinnedMesh = async () => {
         skinningMesh.castShadow = true;
         skinningMesh.geometry.instanceCount = instanceNum;
         // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-        skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
+        skinningMesh.geometry.setAttribute("aInstancePosition", {
             data: new Array(instanceNum).fill(0).map((_, i) => {
                 const { x, z } = getInstanceIndexInfo(i);
                 return [
@@ -184,11 +184,22 @@ const createGLTFSkinnedMesh = async () => {
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });
+        // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
+        skinningMesh.geometry.setAttribute("aInstanceScale", {
+            data: new Array(instanceNum).fill(0).map((_, i) => {
+                // const { x, z } = getInstanceIndexInfo(i);
+                const s = Math.random() * 0.15 + 0.05;
+                return [s, s, s];
+            }).flat(),
+            size: 3,
+            usageType: AttributeUsageType.StaticDraw,
+            divisor: 1
+        });       
         // aInstanceAnimationOffsetは予約語
         skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
             data: new Array(instanceNum).fill(0).map((_, i) => {
                 const { x, z } = getInstanceIndexInfo(i);
-                return x * z * -0.05;
+                return (x + z) * -0.5;
             }),
             size: 1,
             usageType: AttributeUsageType.StaticDraw,
@@ -202,13 +213,14 @@ const createGLTFSkinnedMesh = async () => {
             gpuSkinning: true,
             vertexShaderModifier: {
                 worldPositionPostProcess: `
-    mat4 instancePositionOffset = mat4(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        aInstancePositionOffset.x, aInstancePositionOffset.y, aInstancePositionOffset.z, 1
+    mat4 instanceTransform = mat4(
+        aInstanceScale.x,       0,                      0,                      0,
+        0,                      aInstanceScale.y,       0,                      0,
+        0,                      0,                      aInstanceScale.z,       0,
+        aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
     );
-    worldPosition = instancePositionOffset * worldPosition;
+    // 本当はworldMatrixをかける前の方がよい
+    worldPosition = instanceTransform * worldPosition;
 `,
             }
         });
@@ -263,7 +275,8 @@ const main = async () => {
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
             receiveShadow: true
-        })
+        }),
+        castShadow: false
     });
     floorPlaneMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(10));
