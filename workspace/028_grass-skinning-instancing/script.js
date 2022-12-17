@@ -158,21 +158,39 @@ const createGLTFSkinnedMesh = async () => {
     skinningMeshes.forEach(skinningMesh => {
         // ルートにanimatorをattachしてるので一旦ここでassign
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
-      
+
+        const sideNum = Math.sqrt(instanceNum);
+        const getInstanceIndexInfo = (i) => {
+            // const x = i % sideNum - (sideNum - 1) * 0.5;
+            // const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
+            const x = i % sideNum;
+            const z = Math.floor(i / sideNum);
+            return { x, z }
+        }
+        
         skinningMesh.castShadow = true;
         skinningMesh.geometry.instanceCount = instanceNum;
+        // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
         skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
             data: new Array(instanceNum).fill(0).map((_, i) => {
-                const sideNum = Math.sqrt(instanceNum);
-                const x = i % sideNum - (sideNum - 1) * 0.5;
-                const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
+                const { x, z } = getInstanceIndexInfo(i);
                 return [
-                    baseOffset * x + Math.random() * randomOffset - randomOffset * 0.5,
+                    baseOffset * x - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5,
                     0,
-                    -baseOffset * z + Math.random() * randomOffset - randomOffset * 0.5
+                    baseOffset * z - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5
                 ];
             }).flat(),
             size: 3,
+            usageType: AttributeUsageType.StaticDraw,
+            divisor: 1
+        });
+        // aInstanceAnimationOffsetは予約語
+        skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
+            data: new Array(instanceNum).fill(0).map((_, i) => {
+                const { x, z } = getInstanceIndexInfo(i);
+                return x * z * 0.1;
+            }),
+            size: 1,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });

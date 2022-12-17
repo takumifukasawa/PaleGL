@@ -22,6 +22,9 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
         let type;
         // TODO: fix all type
         switch(size) {
+            case 1:
+                type = "float";
+                break;
             case 2:
                 type = "vec2";
                 break;
@@ -32,7 +35,7 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
                 type = "vec4";
                 break;
             default:
-                throw "invalid type";
+                throw "[buildVertexAttributeLayouts] invalid attribute layout size";
         }
         const str = `layout(location = ${location}) in ${type} ${key};`;
         return str;

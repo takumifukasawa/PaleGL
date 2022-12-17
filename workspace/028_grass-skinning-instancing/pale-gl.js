@@ -3475,9 +3475,10 @@ mat4 getJointMatrixGPUSkinning(
     int currentSkinIndex,
     int colNum,
     int totalFrameCount,
-    float time
+    float time,
+    float timeOffset
 ) {
-    int offset = int(mod(floor(time), float(totalFrameCount))) * jointNum;
+    int offset = int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum;
     int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
     int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
 
@@ -3514,10 +3515,10 @@ const skinningVertex = (gpuSkinning = false) => `
     ${gpuSkinning ? `
     // gpu skinning
     float fps = 30.;
-    mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
-    mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps);
+    mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
     mat4 skinMatrix = calcSkinningMatrix(
         jointMatrix0,
         jointMatrix1,
@@ -3734,6 +3735,9 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
         let type;
         // TODO: fix all type
         switch(size) {
+            case 1:
+                type = "float";
+                break;
             case 2:
                 type = "vec2";
                 break;
@@ -3744,7 +3748,7 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
                 type = "vec4";
                 break;
             default:
-                throw "invalid type";
+                throw "[buildVertexAttributeLayouts] invalid attribute layout size";
         }
         const str = `layout(location = ${location}) in ${type} ${key};`;
         return str;
