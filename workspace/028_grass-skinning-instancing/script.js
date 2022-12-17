@@ -141,7 +141,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
-    gltfActor.transform.setScaling(Vector3.fill(0.2));
+    gltfActor.transform.setScaling(Vector3.fill(1));
     
     skinningMeshAnimator = gltfActor.animator;
  

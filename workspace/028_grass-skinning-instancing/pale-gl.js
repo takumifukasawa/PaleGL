@@ -3761,7 +3761,6 @@ const generateVertexShader = ({
     receiveShadow,
     useNormalMap,
     vertexShaderModifier = {
-        localPositionProcess: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
     },
@@ -3795,7 +3794,6 @@ void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
-    ${vertexShaderModifier.localPositionProcess || ""}
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
@@ -3846,7 +3844,6 @@ const generateDepthVertexShader = ({
     isSkinning,
     gpuSkinning,
     vertexShaderModifier = {
-        localPositionProcess: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: ""
     },
@@ -3870,7 +3867,6 @@ void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
-    ${vertexShaderModifier.localPositionProcess || ""}
     ${isSkinning
         ? `
     localPosition = skinMatrix * localPosition;`
