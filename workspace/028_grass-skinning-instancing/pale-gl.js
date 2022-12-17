@@ -6321,30 +6321,19 @@ async function loadGLTF({
     // console.log("cache nodes", cacheNodes)
 
     if(gltf.animations && gltf.animations.length > 0) {
+        console.log("[loadGLTF] has animations");
         const animationClips = createAnimationClips();
-        console.log("animation clips", animationClips);
+        // for debug
+        // console.log("animation clips", animationClips);
         rootActor.animator.setAnimationClips(animationClips);
         // rootActor.animationClips = ;
     }
 
-    console.log("root actor", rootActor);
-    console.log("------------")
-
-    // console.log(rootActor)
+    // for debug
+    // console.log("root actor", rootActor);
+    // console.log("------------")
 
     return rootActor;
-
-    // const data = {
-    //     positions: mesh.positions,
-    //     normals: mesh.normals,
-    //     uvs: mesh.uvs,
-    //     indices: mesh.indices
-    // }
-
-    // // for debug
-    // // console.log(data)
-    // 
-    // return data;
 }
 
 

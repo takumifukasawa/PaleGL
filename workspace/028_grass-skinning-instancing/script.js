@@ -36,7 +36,10 @@
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
-const instanceNum = Math.pow(Number.parseInt(location.search.split("=")[1], 10) || 5, 2);
+const searchParams = new URLSearchParams(location.search);
+const instanceNum = searchParams.has("instance-num")
+    ? Number.parseInt(searchParams.get("instance-num"), 10)
+    : 10;
 console.log(`instance num: ${instanceNum}`);
 
 let debuggerGUI;
@@ -70,7 +73,7 @@ const engine = new Engine({ gpu, renderer });
 
 engine.setScene(captureScene);
 
-const captureSceneCamera = new PerspectiveCamera(90, 1, 0.1, 100);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 captureScene.mainCamera = captureSceneCamera;
 
@@ -104,7 +107,7 @@ directionalLight.onStart = ({ actor }) => {
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
-    actor.shadowCamera.setSize(null, null, -8, 8, -8, 8);
+    actor.shadowCamera.setSize(null, null, -12, 12, -12, 12);
     actor.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
 }
 captureScene.add(directionalLight);
@@ -144,11 +147,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
 
-    const scale = 1;
-    const baseOffset = 0.5;
-    const randomOffset = 0.25;
-
-    gltfActor.transform.setScaling(Vector3.fill(scale));
+    // gltfActor.transform.setScaling(Vector3.fill(scale));
     
     skinningMeshAnimator = gltfActor.animator;
  
@@ -168,39 +167,49 @@ const createGLTFSkinnedMesh = async () => {
             return { x, z }
         }
         
+        const posRangeX = 7.2;
+        const posRangeZ = 7.2;
+        const baseScale = 0.05;
+        const randomScaleRange = 0.15;
+        const animationOffsetAdjust = 2;
+        
+        const instanceInfo = {
+            position: [],
+            scale: []
+        };
+        new Array(instanceNum).fill(0).forEach((_, i) => {
+            const px = (Math.random() * 2 - 1) * posRangeX;
+            const pz = (Math.random() * 2 - 1) * posRangeZ;
+            const p = [px, 0, pz];
+            instanceInfo.position.push(p);
+           
+            const s = Math.random() * randomScaleRange + baseScale;
+            instanceInfo.scale.push([s, s, s]);
+        });
+        const animationOffsetInfo = instanceInfo.position.map(([x, _, z]) => {
+            return (-x + z) * animationOffsetAdjust;
+        })
+        
         skinningMesh.castShadow = true;
         skinningMesh.geometry.instanceCount = instanceNum;
+  
         // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
         skinningMesh.geometry.setAttribute("aInstancePosition", {
-            data: new Array(instanceNum).fill(0).map((_, i) => {
-                const { x, z } = getInstanceIndexInfo(i);
-                return [
-                    baseOffset * x - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5,
-                    0,
-                    - (baseOffset * z - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5)
-                ];
-            }).flat(),
+            data: instanceInfo.position.flat(),
             size: 3,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });
         // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
         skinningMesh.geometry.setAttribute("aInstanceScale", {
-            data: new Array(instanceNum).fill(0).map((_, i) => {
-                // const { x, z } = getInstanceIndexInfo(i);
-                const s = Math.random() * 0.15 + 0.05;
-                return [s, s, s];
-            }).flat(),
+            data: instanceInfo.scale.flat(),
             size: 3,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });       
         // aInstanceAnimationOffsetは予約語
         skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
-            data: new Array(instanceNum).fill(0).map((_, i) => {
-                const { x, z } = getInstanceIndexInfo(i);
-                return (x + z) * -0.5;
-            }),
+            data: animationOffsetInfo,
             size: 1,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
@@ -279,9 +288,8 @@ const main = async () => {
         castShadow: false
     });
     floorPlaneMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(10));
+        actor.transform.setScaling(Vector3.fill(7.5));
         actor.transform.setRotationX(-90);
-        actor.transform.setTranslation(new Vector3(0, 0, 0));
         actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
@@ -290,7 +298,7 @@ const main = async () => {
     captureScene.add(skyboxMesh);
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, 5, 0));
+    captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
     
     window.addEventListener("mousemove", onMouseMove);
 
