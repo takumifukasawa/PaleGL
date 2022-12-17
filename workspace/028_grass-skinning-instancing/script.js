@@ -36,6 +36,9 @@
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
+const instanceNum = Math.pow(Number.parseInt(location.search.split("=")[1], 10) || 5, 2);
+console.log(`instance num: ${instanceNum}`);
+
 let debuggerGUI;
 let width, height;
 let floorPlaneMesh;
@@ -140,8 +143,12 @@ const createGLTFSkinnedMesh = async () => {
             });
         }
     };
-    
-    gltfActor.transform.setScaling(Vector3.fill(1));
+
+    const scale = 0.2;
+    const baseOffset = 0.5;
+    const randomOffset = 0.25;
+
+    gltfActor.transform.setScaling(Vector3.fill(scale));
     
     skinningMeshAnimator = gltfActor.animator;
  
@@ -153,13 +160,18 @@ const createGLTFSkinnedMesh = async () => {
         skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
       
         skinningMesh.castShadow = true;
-        skinningMesh.geometry.instanceCount = 3;
+        skinningMesh.geometry.instanceCount = instanceNum;
         skinningMesh.geometry.setAttribute("aInstancePositionOffset", {
-            data: [
-                [-3, 0, 0],
-                [0, 0, 0],
-                [3, 0, 0],
-            ].flat(),
+            data: new Array(instanceNum).fill(0).map((_, i) => {
+                const sideNum = Math.sqrt(instanceNum);
+                const x = i % sideNum - (sideNum - 1) * 0.5;
+                const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
+                return [
+                    baseOffset * x + Math.random() * randomOffset - randomOffset * 0.5,
+                    0,
+                    -baseOffset * z + Math.random() * randomOffset - randomOffset * 0.5
+                ];
+            }).flat(),
             size: 3,
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
