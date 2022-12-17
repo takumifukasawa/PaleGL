@@ -63,7 +63,12 @@ export const phongSurfaceDirectionalLightFunc = () => `
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
     vec3 L = normalize(directionalLight.direction);
+    // lambert
     float diffuseRate = clamp(dot(N, L), 0., 1.);
+    // half lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
+    // original lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .7 + .3;
     vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
 
     vec3 P = surface.worldPosition;
@@ -71,11 +76,15 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     vec3 PtoL = L; // for directional light
     vec3 PtoE = normalize(E - P);
     vec3 H = normalize(PtoL + PtoE);
-    float specularPower = 16.;
+    // TODO: surfaceに持たせる
+    float specularPower = 32.;
     float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower);
+    // TODO: 外から渡せるようにする
+    float specularAmount = 1.;
+    specularRate = pow(specularRate, specularPower) * specularAmount;
     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
 
+    // TODO: 外から渡せるようにする
     vec3 ambientColor = vec3(.1);
 
     vec4 resultColor = vec4(

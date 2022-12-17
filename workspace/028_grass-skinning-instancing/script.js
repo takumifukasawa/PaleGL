@@ -36,11 +36,17 @@
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
+const debuggerStates = {
+    instanceNum: 0
+}
+
 const searchParams = new URLSearchParams(location.search);
 const instanceNum = searchParams.has("instance-num")
     ? Number.parseInt(searchParams.get("instance-num"), 10)
     : 10;
 console.log(`instance num: ${instanceNum}`);
+
+debuggerStates.instanceNum = instanceNum;
 
 let debuggerGUI;
 let width, height;
@@ -101,7 +107,7 @@ const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(4, 12, 4));
+    actor.transform.setTranslation(new Vector3(-4, 12, 4));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
@@ -167,28 +173,35 @@ const createGLTFSkinnedMesh = async () => {
             return { x, z }
         }
         
-        const posRangeX = 7.2;
-        const posRangeZ = 7.2;
-        const baseScale = 0.05;
-        const randomScaleRange = 0.15;
-        const animationOffsetAdjust = 2;
-        
         const instanceInfo = {
             position: [],
-            scale: []
+            scale: [],
+            color: []
         };
         new Array(instanceNum).fill(0).forEach((_, i) => {
+            const posRangeX = 7.2;
+            const posRangeZ = 7.2;
             const px = (Math.random() * 2 - 1) * posRangeX;
             const pz = (Math.random() * 2 - 1) * posRangeZ;
             const p = [px, 0, pz];
             instanceInfo.position.push(p);
-           
+
+            const baseScale = 0.03;
+            const randomScaleRange = 0.05;
             const s = Math.random() * randomScaleRange + baseScale;
-            instanceInfo.scale.push([s, s, s]);
+            instanceInfo.scale.push([s, s * 2, s]);
+            
+            const c = Color.fromRGB(
+                Math.floor(Math.random() * 240 + 15),
+                Math.floor(Math.random() * 10 + 245),
+                Math.floor(Math.random() * 245 + 10)
+            );
+            instanceInfo.color.push([...c.elements]);
         });
         const animationOffsetInfo = instanceInfo.position.map(([x, _, z]) => {
+            const animationOffsetAdjust = (Math.random() * 0.9 - 0.45) + 2;
             return (-x + z) * animationOffsetAdjust;
-        })
+        });
         
         skinningMesh.castShadow = true;
         skinningMesh.geometry.instanceCount = instanceNum;
@@ -214,9 +227,15 @@ const createGLTFSkinnedMesh = async () => {
             usageType: AttributeUsageType.StaticDraw,
             divisor: 1
         });
+        skinningMesh.geometry.setAttribute("aInstanceVertexColor", {
+            data: instanceInfo.color.flat(),
+            size: 4,
+            usageType: AttributeUsageType.StaticDraw,
+            divisor: 1
+        });
         skinningMesh.material = new PhongMaterial({
             gpu,
-            diffuseColor: new Color(0, 1, 0, 1),
+            diffuseColor: new Color(1, 1, 1, 1),
             receiveShadow: true,
             isSkinning: true,
             gpuSkinning: true,
@@ -231,6 +250,9 @@ const createGLTFSkinnedMesh = async () => {
     // 本当はworldMatrixをかける前の方がよい
     worldPosition = instanceTransform * worldPosition;
 `,
+                outClipPositionPreProcess: `
+    vVertexColor = aInstanceVertexColor;
+`
             }
         });
     });
@@ -318,27 +340,36 @@ const main = async () => {
     requestAnimationFrame(tick);
 }
 
+
 function initDebugger() {
 
     debuggerGUI = new DebuggerGUI();
 
-    debuggerGUI.addPullDownDebugger({
-        label: "animations",
-        initialValue: skinningMeshAnimator.animationClips[0].name, // index: 0 のアニメーションがなぜか消せないのでとりあえず
-        options: skinningMeshAnimator.animationClips.map(animationClip => ({ value: animationClip.name })),
-        initialExec: true,
+    debuggerGUI.addSliderDebugger({
+        label: "instance num",
+        minValue: 1,
+        maxValue: 20000,
+        initialValue: debuggerStates.instanceNum,
         onChange: (value) => {
-            skinningMeshAnimator.play(value);
+            debuggerStates.instanceNum = value;
         }
     });
-
+    
+    debuggerGUI.addButtonDebugger({
+        buttonLabel: "reload",
+        onClick: () => {
+            const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
+            location.replace(url);
+        }
+    })
+    
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "fxaa pass enabled",
         initialValue: fxaaPass.enabled,
         onChange: (value) => fxaaPass.enabled = value,
-    })
+    });
 
     debuggerGUI.addSliderDebugger({
         label: "fxaa contrast threshold",

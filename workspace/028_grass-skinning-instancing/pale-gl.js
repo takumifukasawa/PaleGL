@@ -3663,7 +3663,12 @@ const phongSurfaceDirectionalLightFunc = () => `
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
     vec3 L = normalize(directionalLight.direction);
+    // lambert
     float diffuseRate = clamp(dot(N, L), 0., 1.);
+    // half lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
+    // original lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .7 + .3;
     vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
 
     vec3 P = surface.worldPosition;
@@ -3671,11 +3676,15 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     vec3 PtoL = L; // for directional light
     vec3 PtoE = normalize(E - P);
     vec3 H = normalize(PtoL + PtoE);
-    float specularPower = 16.;
+    // TODO: surfaceに持たせる
+    float specularPower = 32.;
     float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower);
+    // TODO: 外から渡せるようにする
+    float specularAmount = 1.;
+    specularRate = pow(specularRate, specularPower) * specularAmount;
     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
 
+    // TODO: 外から渡せるようにする
     vec3 ambientColor = vec3(.1);
 
     vec4 resultColor = vec4(
@@ -3767,6 +3776,7 @@ const generateVertexShader = ({
     vertexShaderModifier = {
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        outClipPositionPreProcess: "",
     },
     insertUniforms,
 } = {}) => {
@@ -3786,6 +3796,8 @@ out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
+// TODO: フラグで必要に応じて出し分け
+out vec4 vVertexColor;
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -3831,13 +3843,18 @@ void main() {
   
     // assign common varyings 
     vUv = aUv; 
+    // TODO: 頂点カラーが必要かどうかはフラグで出し分けたい
+    vVertexColor = vec4(1., 1., 1., 1.);
+
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
   
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
-   
+ 
+    ${vertexShaderModifier.outClipPositionPreProcess || ""}
+ 
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
@@ -3849,7 +3866,8 @@ const generateDepthVertexShader = ({
     gpuSkinning,
     vertexShaderModifier = {
         localPositionPostProcess: "",
-        worldPositionPostProcess: ""
+        worldPositionPostProcess: "",
+        outClipPositionPreProcess: "",
     },
     useNormalMap,
     jointNum
@@ -3867,6 +3885,9 @@ ${transformVertexUniforms()}
 ${engineCommonUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
+// TODO: depthでは必要ないのでなくしたい
+out vec4 vVertexColor;
+
 void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
@@ -3880,6 +3901,8 @@ void main() {
     
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
+ 
+    ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
@@ -6629,13 +6652,15 @@ in vec3 vNormal;
 ${receiveShadow ? shadowMapFragmentVaryings() : ""}
 ${normalMapFragmentVarying()}
 in vec3 vWorldPosition;
+// TODO: フラグで必要に応じて出し分け
+in vec4 vVertexColor;
 
 out vec4 outColor;
 
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
-${alphaTest ? alphaTestFragmentFunc() : ""}    
+${alphaTest ? alphaTestFragmentFunc() : ""}
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -6650,7 +6675,7 @@ void main() {
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
+    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
     
     Camera camera;
     camera.worldPosition = uViewPosition;
@@ -6685,6 +6710,7 @@ uniform vec2 uDiffuseMapUvScale;
 ${alphaTest ? alphaTestFragmentUniforms() : ""}
 
 in vec2 vUv;
+in vec4 vVertexColor;
 
 out vec4 outColor;
 
@@ -6695,7 +6721,7 @@ void main() {
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
-    vec4 diffuseColor = uColor * diffuseMapColor;
+    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
     
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     

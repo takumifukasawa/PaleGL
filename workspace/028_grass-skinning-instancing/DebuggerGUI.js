@@ -29,15 +29,17 @@ export class DebuggerGUI {
             padding-top: 8px;
         `;
 
-        const labelWrapperElement = document.createElement("div");
-        const labelTextElement = document.createElement("p");
-        labelTextElement.style.cssText = `
-            margin-right: 1em;
-        `;
-        labelTextElement.textContent = label;
+        if(label) {
+            const labelWrapperElement = document.createElement("div");
+            const labelTextElement = document.createElement("p");
+            labelTextElement.style.cssText = `
+                margin-right: 1em;
+            `;
+            labelTextElement.textContent = label;
 
-        labelWrapperElement.appendChild(labelTextElement);
-        debuggerContentElement.appendChild(labelWrapperElement);
+            labelWrapperElement.appendChild(labelTextElement);
+            debuggerContentElement.appendChild(labelWrapperElement);
+        }
 
         const debuggerInputElement = document.createElement("div");
         debuggerContentElement.appendChild(debuggerInputElement);
@@ -191,6 +193,29 @@ export class DebuggerGUI {
         contentElement.appendChild(sliderValueView);
         contentElement.appendChild(sliderInput);
         this.#domElement.appendChild(wrapperElement);
+    }
+    
+    addButtonDebugger({
+        buttonLabel,
+        onClick,
+        onInput = null,
+    }) {
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement("");
+        
+        const buttonInput = document.createElement("input");
+        buttonInput.type = "button";
+        buttonInput.value = buttonLabel;
+        
+        buttonInput.style.cssText = `
+        font-size: 9px;
+        font-weight: bold;
+        padding: 1px 2px;
+`;
+        
+        buttonInput.addEventListener("click", () => onClick());
+
+        contentElement.appendChild(buttonInput);
+        this.#domElement.appendChild(wrapperElement);       
     }
 
     addBorderSpacer() {

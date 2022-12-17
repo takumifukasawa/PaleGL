@@ -156,13 +156,15 @@ in vec3 vNormal;
 ${receiveShadow ? shadowMapFragmentVaryings() : ""}
 ${normalMapFragmentVarying()}
 in vec3 vWorldPosition;
+// TODO: フラグで必要に応じて出し分け
+in vec4 vVertexColor;
 
 out vec4 outColor;
 
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
-${alphaTest ? alphaTestFragmentFunc() : ""}    
+${alphaTest ? alphaTestFragmentFunc() : ""}
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -177,7 +179,7 @@ void main() {
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
+    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
     
     Camera camera;
     camera.worldPosition = uViewPosition;
@@ -212,6 +214,7 @@ uniform vec2 uDiffuseMapUvScale;
 ${alphaTest ? alphaTestFragmentUniforms() : ""}
 
 in vec2 vUv;
+in vec4 vVertexColor;
 
 out vec4 outColor;
 
@@ -222,7 +225,7 @@ void main() {
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
-    vec4 diffuseColor = uColor * diffuseMapColor;
+    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
     
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     

@@ -54,6 +54,7 @@ export const generateVertexShader = ({
     vertexShaderModifier = {
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        outClipPositionPreProcess: "",
     },
     insertUniforms,
 } = {}) => {
@@ -73,6 +74,8 @@ out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
+// TODO: フラグで必要に応じて出し分け
+out vec4 vVertexColor;
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -118,13 +121,18 @@ void main() {
   
     // assign common varyings 
     vUv = aUv; 
+    // TODO: 頂点カラーが必要かどうかはフラグで出し分けたい
+    vVertexColor = vec4(1., 1., 1., 1.);
+
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
   
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
-   
+ 
+    ${vertexShaderModifier.outClipPositionPreProcess || ""}
+ 
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
@@ -136,7 +144,8 @@ export const generateDepthVertexShader = ({
     gpuSkinning,
     vertexShaderModifier = {
         localPositionPostProcess: "",
-        worldPositionPostProcess: ""
+        worldPositionPostProcess: "",
+        outClipPositionPreProcess: "",
     },
     useNormalMap,
     jointNum
@@ -154,6 +163,9 @@ ${transformVertexUniforms()}
 ${engineCommonUniforms()}
 ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
+// TODO: depthでは必要ないのでなくしたい
+out vec4 vVertexColor;
+
 void main() {
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
@@ -167,6 +179,8 @@ void main() {
     
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
+ 
+    ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
