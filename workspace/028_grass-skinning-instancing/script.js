@@ -177,7 +177,7 @@ const createGLTFSkinnedMesh = async () => {
                 return [
                     baseOffset * x - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5,
                     0,
-                    baseOffset * z - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5
+                    - (baseOffset * z - (baseOffset * sideNum * 0.5) + Math.random() * randomOffset - randomOffset * 0.5)
                 ];
             }).flat(),
             size: 3,
@@ -188,7 +188,7 @@ const createGLTFSkinnedMesh = async () => {
         skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
             data: new Array(instanceNum).fill(0).map((_, i) => {
                 const { x, z } = getInstanceIndexInfo(i);
-                return x * z * 0.1;
+                return x * z * -0.05;
             }),
             size: 1,
             usageType: AttributeUsageType.StaticDraw,
