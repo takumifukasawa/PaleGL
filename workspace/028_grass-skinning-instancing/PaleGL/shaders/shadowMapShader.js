@@ -8,7 +8,7 @@ in vec4 vShadowMapProjectionUv;
 `;
 
 export const shadowMapVertex = () => `
-    vShadowMapProjectionUv = uShadowMapProjectionMatrix * uWorldMatrix * localPosition;
+    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
 `;
 
 export const shadowMapVertexUniforms = () => `
@@ -40,7 +40,7 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
        shadowRate
     );
     resultColor.a = surfaceColor.a;
-    
+
     return resultColor;
 } 
 `;

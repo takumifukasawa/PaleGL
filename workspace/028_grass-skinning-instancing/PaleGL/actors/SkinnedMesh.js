@@ -117,7 +117,6 @@ export class SkinnedMesh extends Mesh {
 
         // TODO: depthを強制的につくるようにして問題ない？
         // if(!options.depthMaterial) {
-        console.log("hogehoge", this.mainMaterial.vertexShaderModifier)
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({

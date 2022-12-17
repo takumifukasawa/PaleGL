@@ -3562,7 +3562,7 @@ in vec4 vShadowMapProjectionUv;
 `;
 
 const shadowMapVertex = () => `
-    vShadowMapProjectionUv = uShadowMapProjectionMatrix * uWorldMatrix * localPosition;
+    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
 `;
 
 const shadowMapVertexUniforms = () => `
@@ -3594,7 +3594,7 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
        shadowRate
     );
     resultColor.a = surfaceColor.a;
-    
+
     return resultColor;
 } 
 `;
@@ -3828,8 +3828,6 @@ void main() {
 `;
         }
     })()}
-
-    ${receiveShadow ? shadowMapVertex() : ""}
   
     // assign common varyings 
     vUv = aUv; 
@@ -3837,6 +3835,8 @@ void main() {
     ${vertexShaderModifier.worldPositionPostProcess || ""}
   
     vWorldPosition = worldPosition.xyz;
+
+    ${receiveShadow ? shadowMapVertex() : ""}
    
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
@@ -4005,7 +4005,6 @@ class SkinnedMesh extends Mesh {
 
         // TODO: depthを強制的につくるようにして問題ない？
         // if(!options.depthMaterial) {
-        console.log("hogehoge", this.mainMaterial.vertexShaderModifier)
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: generateDepthVertexShader({

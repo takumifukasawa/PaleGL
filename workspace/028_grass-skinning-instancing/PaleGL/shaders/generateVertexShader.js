@@ -115,8 +115,6 @@ void main() {
 `;
         }
     })()}
-
-    ${receiveShadow ? shadowMapVertex() : ""}
   
     // assign common varyings 
     vUv = aUv; 
@@ -124,6 +122,8 @@ void main() {
     ${vertexShaderModifier.worldPositionPostProcess || ""}
   
     vWorldPosition = worldPosition.xyz;
+
+    ${receiveShadow ? shadowMapVertex() : ""}
    
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
