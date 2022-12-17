@@ -3760,11 +3760,10 @@ const generateVertexShader = ({
     jointNum,
     receiveShadow,
     useNormalMap,
-    // localPositionProcess,
-    // localPositionPostProcess,
     vertexShaderModifier = {
         localPositionProcess: "",
-        localPositionPostProcess: ""
+        localPositionPostProcess: "",
+        worldPositionPostProcess: "",
     },
     insertUniforms,
 } = {}) => {
@@ -3833,6 +3832,7 @@ void main() {
     // assign common varyings 
     vUv = aUv; 
     vec4 worldPosition = uWorldMatrix * localPosition;
+    ${vertexShaderModifier.worldPositionPostProcess || ""}
   
     vWorldPosition = worldPosition.xyz;
    
@@ -3845,11 +3845,10 @@ const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,
-    // localPositionProcess,
-    // localPositionPostProcess,
     vertexShaderModifier = {
         localPositionProcess: "",
-        localPositionPostProcess: ""
+        localPositionPostProcess: "",
+        worldPositionPostProcess: ""
     },
     useNormalMap,
     jointNum
@@ -3879,7 +3878,10 @@ void main() {
     }
     ${vertexShaderModifier.localPositionPostProcess || ""}
     
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
+    vec4 worldPosition = uWorldMatrix * localPosition;
+    ${vertexShaderModifier.worldPositionPostProcess || ""}
+    
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
 }
 `;
 }

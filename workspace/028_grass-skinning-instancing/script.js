@@ -141,7 +141,7 @@ const createGLTFSkinnedMesh = async () => {
         }
     };
     
-    gltfActor.transform.setScaling(Vector3.fill(1));
+    gltfActor.transform.setScaling(Vector3.fill(0.2));
     
     skinningMeshAnimator = gltfActor.animator;
  
@@ -171,14 +171,14 @@ const createGLTFSkinnedMesh = async () => {
             isSkinning: true,
             gpuSkinning: true,
             vertexShaderModifier: {
-                localPositionPostProcess: `
+                worldPositionPostProcess: `
     mat4 instancePositionOffset = mat4(
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         aInstancePositionOffset.x, aInstancePositionOffset.y, aInstancePositionOffset.z, 1
     );
-    localPosition = instancePositionOffset * localPosition;
+    worldPosition = instancePositionOffset * worldPosition;
 `,
             }
         });
