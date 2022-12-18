@@ -37,7 +37,8 @@
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
 const debuggerStates = {
-    instanceNum: 0
+    instanceNum: 0,
+    castShadow: true
 }
 
 const searchParams = new URLSearchParams(location.search);
@@ -53,9 +54,8 @@ let width, height;
 let floorPlaneMesh;
 let floorDiffuseMap;
 let floorNormalMap;
-let gltfActor;
-let skinningMeshes;
-let skinningMeshAnimator;
+// let gltfActor;
+let skinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPhone|Android)/i);
 
@@ -155,104 +155,102 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
+    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
    
-    gltfActor.onStart = ({ actor }) => {
-        if(actor.animator.animationClips) {
-            actor.animator.animationClips.forEach(animationClip => {
-                animationClip.loop = true;
-            });
-        }
-    };
+    // gltfActor.onStart = ({ actor }) => {
+    //     if(actor.animator.animationClips) {
+    //         actor.animator.animationClips.forEach(animationClip => {
+    //             animationClip.loop = true;
+    //         });
+    //     }
+    // };
 
     // gltfActor.transform.setScaling(Vector3.fill(scale));
     
-    skinningMeshAnimator = gltfActor.animator;
+    // skinningMeshAnimator = gltfActor.animator;
  
-    skinningMeshes = gltfActor.transform.children[0].transform.children;
+    const skinningMesh = gltfActor.transform.children[0].transform.children[0];
    
-    // skinningMeshは一個だけどloopで処理しちゃう
-    skinningMeshes.forEach(skinningMesh => {
-        // ルートにanimatorをattachしてるので一旦ここでassign
-        skinningMesh.setAnimationClips(skinningMeshAnimator.animationClips);
+    // ルートにanimatorをattachしてるので一旦ここでassign
+    skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
 
-        const sideNum = Math.sqrt(instanceNum);
-        const getInstanceIndexInfo = (i) => {
-            // const x = i % sideNum - (sideNum - 1) * 0.5;
-            // const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
-            const x = i % sideNum;
-            const z = Math.floor(i / sideNum);
-            return { x, z }
-        }
-        
-        const instanceInfo = {
-            position: [],
-            scale: [],
-            color: []
-        };
-        new Array(instanceNum).fill(0).forEach((_, i) => {
-            const posRangeX = 7.2;
-            const posRangeZ = 7.2;
-            const px = (Math.random() * 2 - 1) * posRangeX;
-            const pz = (Math.random() * 2 - 1) * posRangeZ;
-            const p = [px, 0, pz];
-            instanceInfo.position.push(p);
+    const sideNum = Math.sqrt(instanceNum);
+    const getInstanceIndexInfo = (i) => {
+        // const x = i % sideNum - (sideNum - 1) * 0.5;
+        // const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
+        const x = i % sideNum;
+        const z = Math.floor(i / sideNum);
+        return { x, z }
+    }
+    
+    const instanceInfo = {
+        position: [],
+        scale: [],
+        color: []
+    };
+    new Array(instanceNum).fill(0).forEach((_, i) => {
+        const posRangeX = 7.2;
+        const posRangeZ = 7.2;
+        const px = (Math.random() * 2 - 1) * posRangeX;
+        const pz = (Math.random() * 2 - 1) * posRangeZ;
+        const p = [px, 0, pz];
+        instanceInfo.position.push(p);
 
-            const baseScale = 0.03;
-            const randomScaleRange = 0.05;
-            const s = Math.random() * randomScaleRange + baseScale;
-            instanceInfo.scale.push([s, s * 2, s]);
-            
-            const c = Color.fromRGB(
-                Math.floor(Math.random() * 240 + 15),
-                Math.floor(Math.random() * 10 + 245),
-                Math.floor(Math.random() * 245 + 10)
-            );
-            instanceInfo.color.push([...c.elements]);
-        });
-        const animationOffsetInfo = instanceInfo.position.map(([x, _, z]) => {
-            const animationOffsetAdjust = (Math.random() * 0.9 - 0.45) + 2;
-            return (-x + z) * animationOffsetAdjust;
-        });
+        const baseScale = 0.03;
+        const randomScaleRange = 0.05;
+        const s = Math.random() * randomScaleRange + baseScale;
+        instanceInfo.scale.push([s, s * 2, s]);
         
-        skinningMesh.castShadow = true;
-        skinningMesh.geometry.instanceCount = instanceNum;
-  
-        // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-        skinningMesh.geometry.setAttribute("aInstancePosition", {
-            data: instanceInfo.position.flat(),
-            size: 3,
-            usageType: AttributeUsageType.StaticDraw,
-            divisor: 1
-        });
-        // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-        skinningMesh.geometry.setAttribute("aInstanceScale", {
-            data: instanceInfo.scale.flat(),
-            size: 3,
-            usageType: AttributeUsageType.StaticDraw,
-            divisor: 1
-        });       
-        // aInstanceAnimationOffsetは予約語
-        skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
-            data: animationOffsetInfo,
-            size: 1,
-            usageType: AttributeUsageType.StaticDraw,
-            divisor: 1
-        });
-        skinningMesh.geometry.setAttribute("aInstanceVertexColor", {
-            data: instanceInfo.color.flat(),
-            size: 4,
-            usageType: AttributeUsageType.StaticDraw,
-            divisor: 1
-        });
-        skinningMesh.material = new PhongMaterial({
-            gpu,
-            diffuseColor: new Color(1, 1, 1, 1),
-            receiveShadow: true,
-            isSkinning: true,
-            gpuSkinning: true,
-            vertexShaderModifier: {
-                worldPositionPostProcess: `
+        const c = Color.fromRGB(
+            Math.floor(Math.random() * 240 + 15),
+            Math.floor(Math.random() * 10 + 245),
+            Math.floor(Math.random() * 245 + 10)
+        );
+        instanceInfo.color.push([...c.elements]);
+    });
+    const animationOffsetInfo = instanceInfo.position.map(([x, _, z]) => {
+        const animationOffsetAdjust = (Math.random() * 0.9 - 0.45) + 2;
+        return (-x + z) * animationOffsetAdjust;
+    });
+    
+    skinningMesh.castShadow = debuggerStates.castShadow;
+    skinningMesh.geometry.instanceCount = instanceNum;
+
+    // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
+    skinningMesh.geometry.setAttribute("aInstancePosition", {
+        data: instanceInfo.position.flat(),
+        size: 3,
+        usageType: AttributeUsageType.StaticDraw,
+        divisor: 1
+    });
+    // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
+    skinningMesh.geometry.setAttribute("aInstanceScale", {
+        data: instanceInfo.scale.flat(),
+        size: 3,
+        usageType: AttributeUsageType.StaticDraw,
+        divisor: 1
+    });       
+    // aInstanceAnimationOffsetは予約語
+    skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
+        data: animationOffsetInfo,
+        size: 1,
+        usageType: AttributeUsageType.StaticDraw,
+        divisor: 1
+    });
+    skinningMesh.geometry.setAttribute("aInstanceVertexColor", {
+        data: instanceInfo.color.flat(),
+        size: 4,
+        usageType: AttributeUsageType.StaticDraw,
+        divisor: 1
+    });
+    skinningMesh.material = new PhongMaterial({
+        gpu,
+        diffuseColor: new Color(1, 1, 1, 1),
+        receiveShadow: true,
+        isSkinning: true,
+        gpuSkinning: true,
+        vertexShaderModifier: {
+            worldPositionPostProcess: `
     mat4 instanceTransform = mat4(
         aInstanceScale.x,       0,                      0,                      0,
         0,                      aInstanceScale.y,       0,                      0,
@@ -265,9 +263,10 @@ const createGLTFSkinnedMesh = async () => {
                 outClipPositionPreProcess: `
     vVertexColor = aInstanceVertexColor;
 `
-            }
-        });
+        }
     });
+    
+    return skinningMesh;
 }
 
 const main = async () => {
@@ -307,8 +306,8 @@ const main = async () => {
         gpu, cubeMap
     });
 
-    await createGLTFSkinnedMesh();
-    captureScene.add(gltfActor);
+    skinnedMesh = await createGLTFSkinnedMesh();
+    captureScene.add(skinnedMesh);
 
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
@@ -380,6 +379,16 @@ function initDebugger() {
         }
     })
     
+    debuggerGUI.addBorderSpacer();
+    
+    debuggerGUI.addToggleDebugger({
+        label: "cast shadow",
+        initialValue: debuggerStates.castShadow,
+        onChange: (value) => {
+            skinnedMesh.castShadow = value;
+        }
+    });
+
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({

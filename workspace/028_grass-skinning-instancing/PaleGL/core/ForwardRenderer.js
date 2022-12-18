@@ -87,6 +87,10 @@ export class ForwardRenderer {
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
 
+            if(castShadowRenderMeshInfos.length < 1) {
+                return;
+            }
+
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
 
@@ -294,9 +298,10 @@ export class ForwardRenderer {
                 }
                 return actor.castShadow;
             });
-            if(castShadowRenderMeshInfos.length > 0) {
-                this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
-            }
+            // if(castShadowRenderMeshInfos.length > 0) {
+            //     this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+            // }
+            this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
         }
 
         // ------------------------------------------------------------------------------
