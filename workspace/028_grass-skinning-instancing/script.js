@@ -127,9 +127,10 @@ directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 const postProcess = new PostProcess({ gpu, renderer });
 
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = false;
+fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
+postProcess.enabled = false;
 captureSceneCamera.setPostProcess(postProcess);
 
 const updateCamera = (clientX, clientY) => {
