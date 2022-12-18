@@ -3663,12 +3663,14 @@ const phongSurfaceDirectionalLightFunc = () => `
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
     vec3 L = normalize(directionalLight.direction);
+    
     // lambert
     float diffuseRate = clamp(dot(N, L), 0., 1.);
     // half lambert
     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
     // original lambert
     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .7 + .3;
+    
     vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
 
     vec3 P = surface.worldPosition;
@@ -6689,9 +6691,9 @@ void main() {
     
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-    
+   
     ${receiveShadow
-        ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.7);`
+        ? `resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);`
         : ""
     }
     ${alphaTest

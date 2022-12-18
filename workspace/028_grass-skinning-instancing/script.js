@@ -54,7 +54,6 @@ let width, height;
 let floorPlaneMesh;
 let floorDiffuseMap;
 let floorNormalMap;
-// let gltfActor;
 let skinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|Android)/i);
@@ -124,7 +123,7 @@ const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-4, 12, 4));
+    actor.transform.setTranslation(new Vector3(-8, 6, 8));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
@@ -172,18 +171,6 @@ const onWindowResize = () => {
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
    
-    // gltfActor.onStart = ({ actor }) => {
-    //     if(actor.animator.animationClips) {
-    //         actor.animator.animationClips.forEach(animationClip => {
-    //             animationClip.loop = true;
-    //         });
-    //     }
-    // };
-
-    // gltfActor.transform.setScaling(Vector3.fill(scale));
-    
-    // skinningMeshAnimator = gltfActor.animator;
- 
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
    
     // ルートにanimatorをattachしてるので一旦ここでassign
@@ -191,8 +178,6 @@ const createGLTFSkinnedMesh = async () => {
 
     const sideNum = Math.sqrt(instanceNum);
     const getInstanceIndexInfo = (i) => {
-        // const x = i % sideNum - (sideNum - 1) * 0.5;
-        // const z = Math.floor(i / sideNum) - (sideNum - 1) * 0.5;
         const x = i % sideNum;
         const z = Math.floor(i / sideNum);
         return { x, z }
@@ -204,15 +189,15 @@ const createGLTFSkinnedMesh = async () => {
         color: []
     };
     new Array(instanceNum).fill(0).forEach((_, i) => {
-        const posRangeX = 7.2;
-        const posRangeZ = 7.2;
+        const posRangeX = 7.4;
+        const posRangeZ = 7.4;
         const px = (Math.random() * 2 - 1) * posRangeX;
         const pz = (Math.random() * 2 - 1) * posRangeZ;
         const p = [px, 0, pz];
         instanceInfo.position.push(p);
 
-        const baseScale = 0.03;
-        const randomScaleRange = 0.05;
+        const baseScale = 0.04;
+        const randomScaleRange = 0.08;
         const s = Math.random() * randomScaleRange + baseScale;
         instanceInfo.scale.push([s, s * 2, s]);
         
