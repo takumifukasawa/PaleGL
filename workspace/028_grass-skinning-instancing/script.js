@@ -69,6 +69,20 @@ const gl = canvasElement.getContext('webgl2', { antialias: false });
 
 const gpu = new GPU({gl});
 
+const instanceNumView = document.createElement("p");
+instanceNumView.textContent = `instance num: ${instanceNum}`;
+instanceNumView.style.cssText = `
+position: absolute;
+top: 0;
+left: 0;
+padding: 0.2em 0.5em;
+font-size: 9px;
+color: white;
+font-weight: bold;
+text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+`;
+wrapperElement.appendChild(instanceNumView);
+
 const captureScene = new Scene();
 
 const renderer = new ForwardRenderer({
