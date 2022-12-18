@@ -4694,6 +4694,7 @@ in vec3 vWorldPosition;
 uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
 uniform mat4 uViewDirectionProjectionInverse;
+uniform float uRotationOffset;
 
 out vec4 outColor;
 
@@ -4713,14 +4714,14 @@ void main() {
     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
 
     reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(3.14);
+    reflectDir.xz *= rotate(3.14 + uRotationOffset);
     vec4 textureColor = texture(uCubeTexture, reflectDir);
     outColor = textureColor;
 }
 `;
 
 class Skybox extends Mesh {
-    constructor({gpu, cubeMap}) {
+    constructor({gpu, cubeMap, rotationOffset = 0}) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
@@ -4741,8 +4742,7 @@ class Skybox extends Mesh {
             indices: skyboxObjData.indices,
             drawCount: skyboxObjData.indices.length
         });
-        // const geometry = new PlaneGeometry({ gpu });
-        
+
         const material = new Material({
             gpu,
             vertexShader: skyboxVertexShader,
@@ -4758,6 +4758,10 @@ class Skybox extends Mesh {
                 uViewDirectionProjectionInverse: {
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity(),
+                },
+                uRotationOffset: {
+                    type: UniformTypes.Float,
+                    value: rotationOffset
                 },
             }
         });

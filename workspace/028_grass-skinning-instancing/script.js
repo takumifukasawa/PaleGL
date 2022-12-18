@@ -123,13 +123,13 @@ const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-8, 6, 8));
+    actor.transform.setTranslation(new Vector3(-8, 8, 2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
-    actor.shadowCamera.setSize(null, null, -12, 12, -12, 12);
+    actor.shadowCamera.setSize(null, null, -10, 10, -10, 10);
     actor.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
 }
 captureScene.add(directionalLight);
@@ -170,6 +170,7 @@ const onWindowResize = () => {
 
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
+    // const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
    
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
    
@@ -270,7 +271,7 @@ const createGLTFSkinnedMesh = async () => {
 }
 
 const main = async () => {
-    const floorDiffuseImg = await loadImg("./images/blue_floor_tiles_01_diff_1k.png");
+    const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
         gpu,
         img: floorDiffuseImg,
@@ -281,7 +282,7 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
-    const floorNormalImg = await loadImg("./images/blue_floor_tiles_01_nor_gl_1k.png");
+    const floorNormalImg = await loadImg("./images/brown_mud_leaves_01_nor_gl_1k.jpg");
     floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
@@ -293,17 +294,18 @@ const main = async () => {
     });
     
     const images = {
-        [CubeMapAxis.PositiveX]: "./images/px.png",
-        [CubeMapAxis.NegativeX]: "./images/nx.png",
-        [CubeMapAxis.PositiveY]: "./images/py.png",
-        [CubeMapAxis.NegativeY]: "./images/ny.png",
-        [CubeMapAxis.PositiveZ]: "./images/pz.png",
-        [CubeMapAxis.NegativeZ]: "./images/nz.png",
+        [CubeMapAxis.PositiveX]: "./images/px.jpg",
+        [CubeMapAxis.NegativeX]: "./images/nx.jpg",
+        [CubeMapAxis.PositiveY]: "./images/py.jpg",
+        [CubeMapAxis.NegativeY]: "./images/ny.jpg",
+        [CubeMapAxis.PositiveZ]: "./images/pz.jpg",
+        [CubeMapAxis.NegativeZ]: "./images/nz.jpg",
     };
 
     const cubeMap = await loadCubeMap({ gpu, images });
     const skyboxMesh = new Skybox({
-        gpu, cubeMap
+        gpu, cubeMap,
+        rotationOffset: 1.4
     });
 
     skinnedMesh = await createGLTFSkinnedMesh();
@@ -321,7 +323,7 @@ const main = async () => {
         castShadow: false
     });
     floorPlaneMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(7.5));
+        actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
         actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
@@ -331,7 +333,7 @@ const main = async () => {
     captureScene.add(skyboxMesh);
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, -2, 0));
+    captureSceneCamera.transform.lookAt(new Vector3(0, -3, 0));
    
     if(isSP) {
         window.addEventListener("touchstart", onTouch);
