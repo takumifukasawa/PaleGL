@@ -57,7 +57,7 @@ let floorNormalMap;
 // let gltfActor;
 let skinnedMesh;
 
-const isSP = !!window.navigator.userAgent.match(/(iPhone|iPhone|Android)/i);
+const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|Android)/i);
 
 const targetCameraPosition = new Vector3(0, 5, 10);
 
