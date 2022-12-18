@@ -43,7 +43,7 @@ const debuggerStates = {
 const searchParams = new URLSearchParams(location.search);
 const instanceNum = searchParams.has("instance-num")
     ? Number.parseInt(searchParams.get("instance-num"), 10)
-    : 10;
+    : 500;
 console.log(`instance num: ${instanceNum}`);
 
 debuggerStates.instanceNum = instanceNum;
@@ -56,6 +56,9 @@ let floorNormalMap;
 let gltfActor;
 let skinningMeshes;
 let skinningMeshAnimator;
+
+const isSP = !!window.navigator.userAgent.match(/(iPhone|iPhone|Android)/i);
+
 const targetCameraPosition = new Vector3(0, 5, 10);
 
 const wrapperElement = document.getElementById("wrapper");
@@ -129,12 +132,21 @@ postProcess.addPass(fxaaPass);
 
 captureSceneCamera.setPostProcess(postProcess);
 
-const onMouseMove = (e) => {
-    const nx = (e.clientX / width) * 2 - 1;
-    const ny = ((e.clientY / height) * 2 - 1) * -1;
+const updateCamera = (clientX, clientY) => {
+    const nx = (clientX / width) * 2 - 1;
+    const ny = ((clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
     targetCameraPosition.y = ny * 10 + 12;
+}
+
+const onMouseMove = (e) => {
+    updateCamera(e.clientX, e.clientY);
 };
+
+const onTouch = (e) => {
+    const touch = e.touches[0];
+    updateCamera(touch.clientX, touch.clientY);
+}
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -295,7 +307,7 @@ const main = async () => {
         gpu, cubeMap
     });
 
-    await createGLTFSkinnedMesh()
+    await createGLTFSkinnedMesh();
     captureScene.add(gltfActor);
 
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
@@ -321,8 +333,13 @@ const main = async () => {
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, -2, 0));
-    
-    window.addEventListener("mousemove", onMouseMove);
+   
+    if(isSP) {
+        window.addEventListener("touchstart", onTouch);
+        window.addEventListener("touchmove", onTouch);
+    } else {
+        window.addEventListener("mousemove", onMouseMove);
+    }
 
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
