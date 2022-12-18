@@ -137,4 +137,23 @@ export class Geometry {
             binormals
         };
     }
+    
+    static createBinormals(normals, tangents) {
+        const binormals = [];
+        for(let i = 0; i < normals.length / 3; i++) {
+            const n = new Vector3(
+                normals[i * 3 + 0],
+                normals[i * 3 + 1],
+                normals[i * 3 + 2]
+            );
+            const t = new Vector3(
+                tangents[i * 3 + 0],
+                tangents[i * 3 + 1],
+                tangents[i * 3 + 2]
+            );
+            const b = Vector3.getBinormalFromTangent(t, n);
+            binormals.push(...b.elements);
+        }
+        return binormals;
+    }
 }

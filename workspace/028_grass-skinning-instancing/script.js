@@ -169,7 +169,7 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind.gltf" });
+    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-with-tangents.gltf" });
     // const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
    
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];

@@ -2130,6 +2130,25 @@ class Geometry {
             binormals
         };
     }
+    
+    static createBinormals(normals, tangents) {
+        const binormals = [];
+        for(let i = 0; i < normals.length / 3; i++) {
+            const n = new Vector3(
+                normals[i * 3 + 0],
+                normals[i * 3 + 1],
+                normals[i * 3 + 2]
+            );
+            const t = new Vector3(
+                tangents[i * 3 + 0],
+                tangents[i * 3 + 1],
+                tangents[i * 3 + 2]
+            );
+            const b = Vector3.getBinormalFromTangent(t, n);
+            binormals.push(...b.elements);
+        }
+        return binormals;
+    }
 }
 
 
@@ -6109,6 +6128,8 @@ async function loadGLTF({
     const createMesh = ({nodeIndex, meshIndex, skinIndex = null}) => {
         let positions = null;
         let normals = null;
+        let tangents = null;
+        let binormals = null;
         let uvs = null;
         let indices = null;
         let joints = null;
@@ -6131,13 +6152,9 @@ async function loadGLTF({
             if (primitive.indices) {
                 meshAccessors.indices = {accessor: gltf.accessors[primitive.indices]};
             }
+            console.log("hogehoge", meshAccessors)
             meshAccessors.attributes.forEach(attributeAccessor => {
                 const {attributeName, accessor} = attributeAccessor;
-                // NOTE: accessor = {buffer, byteLength, byteOffset, target }
-                // const bufferView = gltf.bufferViews[accessor.bufferView];
-                // const {binBufferData} = binBufferDataList[bufferView.buffer];
-                // const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
-                // const data = new Float32Array(slicedBuffer);
                 const bufferData = getBufferData(accessor);
                 switch (attributeName) {
                     case "POSITION":
@@ -6145,6 +6162,9 @@ async function loadGLTF({
                         break;
                     case "NORMAL":
                         normals = new Float32Array(bufferData);
+                        break;
+                    case "TANGENT":
+                        tangents = new Float32Array(bufferData);
                         break;
                     case "TEXCOORD_0":
                         uvs = new Float32Array(bufferData);
@@ -6157,16 +6177,11 @@ async function loadGLTF({
                         weights = new Float32Array(bufferData);
                         break;
                     default:
-                        throw "[loadGLTF] invalid attribute name";
+                        throw "[loadGLTF.createMesh] invalid attribute name";
                 }
             });
             if (meshAccessors.indices) {
                 const {attributeName, accessor} = meshAccessors.indices;
-                // NOTE: accessor = {buffer, byteLength, byteOffset, target }
-                // const bufferView = gltf.bufferViews[accessor.bufferView];
-                // const {binBufferData} = binBufferDataList[bufferView.buffer];
-                // const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
-                // indices = new Uint16Array(slicedBuffer);
                 const bufferData = getBufferData(accessor);
                 indices = new Uint16Array(bufferData);
             }
@@ -6179,18 +6194,20 @@ async function loadGLTF({
 
             // NOTE: joints の 0番目が常に root bone のはず？
             rootBone = createBone(skin.joints[0]);
-
-            // TODO: skinning mesh 側でやるべき？
-            // rootBone.calcBoneOffsetMatrix();
-            // rootBone.calcJointMatrix();
         }
        
         // GLTF2.0は、UV座標の原点が左上にある。しかし左下を原点とした方が分かりやすい気がしているのでYを反転
         // - uvは2次元前提で処理している
         // ref: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#images
         const uvFlippedY = uvs.map((elem, i) => i % 2 === 0 ? elem : 1. - elem);
-        
-        const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
+       
+        if(tangents) {
+            binormals = Geometry.createBinormals(normals, tangents);
+        } else {
+            const d = Geometry.createTangentsAndBinormals(normals);
+            tangents = d.tangents;
+            binormals = d.binormals;
+        }
 
         // for debug
         // console.log("======================================")
@@ -6360,7 +6377,6 @@ async function loadGLTF({
         // for debug
         // console.log("animation clips", animationClips);
         rootActor.animator.setAnimationClips(animationClips);
-        // rootActor.animationClips = ;
     }
 
     // for debug
