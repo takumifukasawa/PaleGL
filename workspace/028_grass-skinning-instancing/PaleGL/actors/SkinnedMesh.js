@@ -201,7 +201,6 @@ export class SkinnedMesh extends Mesh {
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
                         const { translation, rotation, scale, bone } = data;
-                        // const targetBone = this.bones.findByIndex(bone.index);
                         const targetBone = this.#boneOrderedIndex[bone.index];
                         targetBone.position = translation;
                         targetBone.rotation = Rotator.fromQuaternion(rotation);
@@ -422,7 +421,6 @@ matrix elements: ${jointData.length}`);
                 uniform mat4 uProjectionMatrix;
                 
                 void main() {
-                    // gl_Point = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                     gl_PointSize = 6.;
                 }

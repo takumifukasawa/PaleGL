@@ -226,7 +226,8 @@ const createGLTFSkinnedMesh = async () => {
         const animationOffsetAdjust = (Math.random() * 0.9 - 0.45) + 2;
         return (-x + z) * animationOffsetAdjust;
     });
-    
+   
+    // skinningMesh.debugBoneView = true;
     skinningMesh.castShadow = debuggerStates.castShadow;
     skinningMesh.geometry.instanceCount = instanceNum;
 

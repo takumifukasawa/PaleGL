@@ -9,6 +9,7 @@ import {AnimationClip} from "../core/AnimationClip.js";
 import {AnimationKeyframeTypes} from "../constants.js";
 import {AnimationKeyframes} from "../core/AnimationKeyframes.js";
 import {Quaternion} from "../math/Quaternion.js";
+import {Rotator} from "../math/Rotator.js";
 
 export async function loadGLTF({
     gpu,
@@ -54,14 +55,20 @@ export async function loadGLTF({
         const node = gltf.nodes[nodeIndex];
         // NOTE:
         // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
-        // - indexをふり直しても良い
         const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
-        
-        const offsetMatrix = Matrix4.multiplyMatrices(
-            node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-            node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-            node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+       
+        // use basic mul
+        // const offsetMatrix = Matrix4.multiplyMatrices(
+        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
+        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
+        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+        // );
+        // use trs
+        const offsetMatrix = Matrix4.fromTRS(
+            node.translation ? new Vector3(...node.translation) : Vector3.zero(),
+            node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
+            node.scale ? new Vector3(...node.scale) : Vector3.one()
         );
         bone.offsetMatrix = offsetMatrix;
         
@@ -164,6 +171,8 @@ export async function loadGLTF({
         // console.log(positions, uvFlippedY, normals, joints, weights)
         // console.log(tangents, binormals)
         // console.log("======================================")
+        console.log("hogehoge", rootBone)
+        console.log("hogehoge", joints)
 
         const geometry = new Geometry({
             gpu,

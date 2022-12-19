@@ -4133,7 +4133,6 @@ class SkinnedMesh extends Mesh {
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
                         const { translation, rotation, scale, bone } = data;
-                        // const targetBone = this.bones.findByIndex(bone.index);
                         const targetBone = this.#boneOrderedIndex[bone.index];
                         targetBone.position = translation;
                         targetBone.rotation = Rotator.fromQuaternion(rotation);
@@ -4354,7 +4353,6 @@ matrix elements: ${jointData.length}`);
                 uniform mat4 uProjectionMatrix;
                 
                 void main() {
-                    // gl_Point = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                     gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
                     gl_PointSize = 6.;
                 }
@@ -6060,6 +6058,7 @@ class AnimationKeyframes {
 
 
 
+
 async function loadGLTF({
     gpu,
     path,
@@ -6104,14 +6103,20 @@ async function loadGLTF({
         const node = gltf.nodes[nodeIndex];
         // NOTE:
         // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
-        // - indexをふり直しても良い
         const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
-        
-        const offsetMatrix = Matrix4.multiplyMatrices(
-            node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-            node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-            node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+       
+        // use basic mul
+        // const offsetMatrix = Matrix4.multiplyMatrices(
+        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
+        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
+        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+        // );
+        // use trs
+        const offsetMatrix = Matrix4.fromTRS(
+            node.translation ? new Vector3(...node.translation) : Vector3.zero(),
+            node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
+            node.scale ? new Vector3(...node.scale) : Vector3.one()
         );
         bone.offsetMatrix = offsetMatrix;
         
@@ -6214,6 +6219,8 @@ async function loadGLTF({
         // console.log(positions, uvFlippedY, normals, joints, weights)
         // console.log(tangents, binormals)
         // console.log("======================================")
+        console.log("hogehoge", rootBone)
+        console.log("hogehoge", joints)
 
         const geometry = new Geometry({
             gpu,
