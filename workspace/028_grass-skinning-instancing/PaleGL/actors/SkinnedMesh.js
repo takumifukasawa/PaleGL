@@ -252,8 +252,8 @@ export class SkinnedMesh extends Mesh {
             this.depthMaterial.uniforms.uTotalFrameCount.value = framesDuration;
  
             // for debug
-            console.log(`
-# bake skin animation to texture
+            console.log(`# bake skin animation to texture
+frames duration: ${framesDuration}
 col num: ${colNum},
 row num: ${rowNum},
 col pixels: ${colNum * matrixColNum},

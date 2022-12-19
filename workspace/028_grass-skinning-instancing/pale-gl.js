@@ -4184,8 +4184,8 @@ class SkinnedMesh extends Mesh {
             this.depthMaterial.uniforms.uTotalFrameCount.value = framesDuration;
  
             // for debug
-            console.log(`
-# bake skin animation to texture
+            console.log(`# bake skin animation to texture
+frames duration: ${framesDuration}
 col num: ${colNum},
 row num: ${rowNum},
 col pixels: ${colNum * matrixColNum},
@@ -6171,7 +6171,6 @@ async function loadGLTF({
                         break;
                     case "JOINTS_0":
                         joints = new Uint8Array(bufferData);
-                        // joints = new Float32Array(bufferData);
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);
@@ -6181,7 +6180,7 @@ async function loadGLTF({
                 }
             });
             if (meshAccessors.indices) {
-                const {attributeName, accessor} = meshAccessors.indices;
+                const { accessor } = meshAccessors.indices;
                 const bufferData = getBufferData(accessor);
                 indices = new Uint16Array(bufferData);
             }
@@ -6189,7 +6188,7 @@ async function loadGLTF({
 
         if (skinIndex !== null) {
             console.log("[loadGLTF.createMesh] mesh has skin");
-            // gltf.skins
+
             const skin = gltf.skins[skinIndex];
 
             // NOTE: joints の 0番目が常に root bone のはず？
@@ -6242,6 +6241,7 @@ async function loadGLTF({
                         size: 4
                     },
                 } : {}),               
+                // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
                 aTangent: {
                     data: tangents,
                     size: 3
