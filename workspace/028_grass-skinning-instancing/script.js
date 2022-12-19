@@ -121,7 +121,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
 
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
-directionalLight.color = Color.fromRGB(255, 255, 255);
+directionalLight.color = Color.fromRGB(255, 190, 180);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, 2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
@@ -169,21 +169,34 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-with-tangents.gltf" });
-    // const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
-   
+    // const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-with-tangents.gltf" });
+    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
+    
+    // const diffuseImg = await loadImg("./images/thatch_roof_angled_diff_256.jpg");
+    // const diffuseMap = new Texture({
+    //     gpu,
+    //     img: diffuseImg,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
+    // 
+    // const normalImg = await loadImg("./images/thatch_roof_angled_nor_gl_256.jpg");
+    // const normalMap = new Texture({
+    //     gpu,
+    //     img: normalImg,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
+
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
    
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
 
-    const sideNum = Math.sqrt(instanceNum);
-    const getInstanceIndexInfo = (i) => {
-        const x = i % sideNum;
-        const z = Math.floor(i / sideNum);
-        return { x, z }
-    }
-    
     const instanceInfo = {
         position: [],
         scale: [],
@@ -247,6 +260,8 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.material = new PhongMaterial({
         gpu,
         diffuseColor: new Color(1, 1, 1, 1),
+        // diffuseMap,
+        // normalMap,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -264,7 +279,17 @@ const createGLTFSkinnedMesh = async () => {
                 outClipPositionPreProcess: `
     vVertexColor = aInstanceVertexColor;
 `
-        }
+        },
+        // uniforms: {
+        //     uDiffuseMapUvScale: {
+        //         type: UniformTypes.Vector2,
+        //         value: new Vector2(0.1, 0.5),
+        //     },
+        //     uNormalMapUvScale: {
+        //         type: UniformTypes.Vector2,
+        //         value: new Vector2(0.1, 0.5),
+        //     },
+        // }
     });
     
     return skinningMesh;

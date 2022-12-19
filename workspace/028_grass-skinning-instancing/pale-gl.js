@@ -6152,7 +6152,7 @@ async function loadGLTF({
             if (primitive.indices) {
                 meshAccessors.indices = {accessor: gltf.accessors[primitive.indices]};
             }
-            console.log("hogehoge", meshAccessors)
+
             meshAccessors.attributes.forEach(attributeAccessor => {
                 const {attributeName, accessor} = attributeAccessor;
                 const bufferData = getBufferData(accessor);
