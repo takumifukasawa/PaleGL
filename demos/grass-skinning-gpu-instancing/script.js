@@ -392,7 +392,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: "instance num",
         minValue: 1,
-        maxValue: 20000,
+        maxValue: 40000,
         initialValue: debuggerStates.instanceNum,
         onChange: (value) => {
             debuggerStates.instanceNum = value;
