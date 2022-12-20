@@ -171,8 +171,6 @@ export async function loadGLTF({
         // console.log(positions, uvFlippedY, normals, joints, weights)
         // console.log(tangents, binormals)
         // console.log("======================================")
-        console.log("hogehoge", rootBone)
-        console.log("hogehoge", joints)
 
         const geometry = new Geometry({
             gpu,
