@@ -12,13 +12,14 @@ import {normalMapVertexVaryings} from "./lightingCommon.js";
 // -----------------------------------------------
 
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
-    const sortedAttributeDescriptors = [];
-    Object.keys(attributeDescriptors).forEach(key => {
-        const attributeDescriptor = attributeDescriptors[key];
-        sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
-    });
+    // const sortedAttributeDescriptors = [];
+    // Object.keys(attributeDescriptors).forEach(key => {
+    //     const attributeDescriptor = attributeDescriptors[key];
+    //     sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
+    // });
+    const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
-    const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, name }) => {
         let type;
         // TODO: fix all type
         switch(size) {
@@ -37,10 +38,10 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
             default:
                 throw "[buildVertexAttributeLayouts] invalid attribute layout size";
         }
-        const str = `layout(location = ${location}) in ${type} ${key};`;
+        const str = `layout(location = ${location}) in ${type} ${name};`;
         return str;
     });
-    
+
     return attributesList;
 }
 

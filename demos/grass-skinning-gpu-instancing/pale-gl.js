@@ -1825,6 +1825,7 @@ function parseObj(content) {
 ﻿
 
 class Attribute {
+    name;
     data; // data
     location; // layout location index
     size; // data per vertex. ex) position: 3, uv: 2
@@ -1833,6 +1834,7 @@ class Attribute {
     divisor;
     
     constructor({
+        name,
         data,
         location,
         size,
@@ -1840,6 +1842,7 @@ class Attribute {
         usageType = AttributeUsageType.StaticDraw,
         divisor
     }) {
+        this.name = name;
         this.data = data;
         this.location = location;
         this.size = size;
@@ -1850,6 +1853,7 @@ class Attribute {
     
     getDescriptor() {
         return {
+            name: this.name,
             location: this.location,
             size: this.size,
         }
@@ -1895,7 +1899,7 @@ class IndexBufferObject extends GLObject {
 class VertexArrayObject extends GLObject {
     #gpu;
     #vao;
-    #vboList = {};
+    #vboList = [];
     #ibo;
     
     get hasIndices() {
@@ -1916,11 +1920,11 @@ class VertexArrayObject extends GLObject {
             case AttributeUsageType.DynamicDraw:
                 return gl.DYNAMIC_DRAW;
             default:
-                throw "invalid usage";
+                throw "[VertexArrayObject.getUsage] invalid usage";
         }
     }
 
-    constructor({gpu, attributes = {}, indices = null}) {
+    constructor({gpu, attributes = [], indices = null}) {
         super();
         
         this.#gpu = gpu;
@@ -1931,9 +1935,12 @@ class VertexArrayObject extends GLObject {
         // bind vertex array to webgl context
         gl.bindVertexArray(this.#vao);
 
-        Object.keys(attributes).forEach(key => {
-            const attribute = attributes[key];
-            this.setAttribute(key, attribute);
+        // Object.keys(attributes).forEach(key => {
+        //     const attribute = attributes[key];
+        //     this.setAttribute(key, attribute);
+        // });
+        attributes.forEach(attribute => {
+            this.setAttribute(attribute);
         });
 
         if(indices) {
@@ -1953,13 +1960,19 @@ class VertexArrayObject extends GLObject {
     }
     
     updateAttribute(key, data) {
+        // const gl = this.#gpu.gl;
+        // gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, null);
         const gl = this.#gpu.gl;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
+        const targetVBO = this.#vboList.find(({ name }) => key === name);
+        gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
+        // TODO: uint16対応
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO), targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
-    setAttribute(key, attribute, push = false) {
+    setAttribute(attribute, push = false) {
         const gl = this.#gpu.gl;
 
         if(push) {
@@ -1967,11 +1980,12 @@ class VertexArrayObject extends GLObject {
             gl.bindVertexArray(this.#vao);
         }
 
-        const {data, size, location, usageType, divisor} = attribute;
+        const {name, data, size, location, usageType, divisor} = attribute;
         const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
         const vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         const usage = this.getUsage(gl, usageType);
+        // TODO: uint16対応
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
         gl.enableVertexAttribArray(newLocation);
         // size ... 頂点ごとに埋める数
@@ -1983,7 +1997,7 @@ class VertexArrayObject extends GLObject {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.#vboList[key] = { vbo, usage };
+        this.#vboList.push({ name, vbo, usage });
         
         if(push) {
             gl.bindVertexArray(null);
@@ -1997,10 +2011,11 @@ class VertexArrayObject extends GLObject {
 
 
 
+
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 class Geometry {
-    attributes;
+    attributes = [];
     vertexCount;
     vertexArrayObject;
     // indexBufferObject;
@@ -2026,30 +2041,40 @@ class Geometry {
         this.instanceCount = instanceCount;
 
         this.drawCount = drawCount;
-        
+       
+        // this.attributes = attributes;
         if (indices) {
             this.indices = indices;
         }
         
+        // console.log("fff", this.attributes)
+       
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
-            attributes: this.attributes,
+            // attributes: this.attributes,
+            // attributes: this.attributes,
+            attributes: [],
             indices: this.indices
         });
-
-        this.attributes = {};
-        Object.keys(attributes).forEach((key, i) => {
-            const attribute = attributes[key];
-            this.setAttribute(key, attribute, i);
-            // this.attributes[key] = new Attribute({
-            //     data: attribute.data,
-            //     location: attribute.location || i,
-            //     size: attribute.size,
-            //     offset: attribute.offset,
-            //     usage: attribute.usage,
-            //     divisor: attribute.divisor
-            // });
+        
+        // this.attributes = attributes;
+        (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
+            this.setAttribute(attribute);
         });
+        // this.attributes = {};
+        // this.attributes = [];
+        // Object.keys(attributes).forEach((key, i) => {
+        //     const attribute = attributes[key];
+        //     this.setAttribute(key, attribute, i);
+        //     // this.attributes[key] = new Attribute({
+        //     //     data: attribute.data,
+        //     //     location: attribute.location || i,
+        //     //     size: attribute.size,
+        //     //     offset: attribute.offset,
+        //     //     usage: attribute.usage,
+        //     //     divisor: attribute.divisor
+        //     // });
+        // });
         
 
         // if(gpu && immediateCreate) {
@@ -2057,21 +2082,30 @@ class Geometry {
         // }
     }
     
-    setAttribute(key, attribute, i = -1) {
-        const location = attribute.location ?
-            attribute.location :
-            i > -1 ? i : Object.keys(this.attributes).length;
-        this.attributes[key] = new Attribute({
+    // setAttribute(key, attribute, i = -1) {
+    // TODO: attribute class を渡す、で良い気がする
+    setAttribute(attribute) {
+        const location = attribute.location
+            ? attribute.location
+            : this.attributes.length;
+        // const location = attribute.location ?
+        //     attribute.location :
+        //     i > -1 ? i : Object.keys(this.attributes).length;
+        // this.attributes[key] = new Attribute({
+        
+        const attr = new Attribute({
+            name: attribute.name,
             data: attribute.data,
             // location: i > -1 ? attribute.location || i,
             location,
             size: attribute.size,
             offset: attribute.offset,
-            usage: attribute.usage,
+            usage: attribute.usage || AttributeUsageType.StaticDraw,
             divisor: attribute.divisor
-        });       
+        });
+        this.attributes.push(attr);
 
-        this.vertexArrayObject.setAttribute(key, this.attributes[key], true);
+        this.vertexArrayObject.setAttribute(attr, true);
     }
    
     // TODO: startで create geometry したい
@@ -2102,14 +2136,20 @@ class Geometry {
     }
 
     updateAttribute(key, data) {
-        this.attributes[key].data = data;
-        this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
+        // this.attributes[key].data = data;
+        // this.vertexArrayObject.updateAttribute(key, this.attributes[key].data);
+        const attribute = this.attributes.find(({ name }) => name === key);
+        // console.log(key, data, this.attributes, attribute)
+        attribute.data = data;
+        // this.vertexArrayObject.updateAttribute(key, attribute[key].data);
+        this.vertexArrayObject.updateAttribute(key, attribute.data);
     }
 
     getAttributeDescriptors() {
-        const attributes = {};
-        Object.keys(this.attributes).forEach(key => attributes[key] = this.attributes[key].getDescriptor());
-        return attributes;
+        // const attributes = {};
+        // Object.keys(this.attributes).forEach(key => attributes[key] = this.attributes[key].getDescriptor());
+        // return attributes;
+        return this.attributes.map(attribute => attribute.getDescriptor());
     }
 
     static createTangentsAndBinormals(normals) {
@@ -2317,16 +2357,17 @@ class ArrowHelper extends Mesh {
         const objData = parseObj(arrowHelperGeometryData);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: objData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: objData.uvs,
                     size: 2
                 }
-            },
+            ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });
@@ -2538,19 +2579,21 @@ class AxesHelper extends Mesh {
         const objData = parseObj(axesHelperGeometryData);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: objData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: objData.uvs,
                     size: 2
                 }
-            },
+            ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });
+        console.log("geom", geometry)
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
@@ -3156,13 +3199,14 @@ class Camera extends Actor {
             this.#visibleFrustumMesh = new Mesh({
                 geometry: new Geometry({
                     gpu,
-                    attributes: {
-                        position: {
+                    attributes: [
+                        {
+                            name: "position",
                             data: new Array(3 * 8),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
-                        }
-                    },
+                        },
+                    ],
                     drawCount: 2 * 12,
                     indices: [
                         // near clip
@@ -3755,13 +3799,14 @@ vec4 calcPhongLighting() {
 // -----------------------------------------------
 
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
-    const sortedAttributeDescriptors = [];
-    Object.keys(attributeDescriptors).forEach(key => {
-        const attributeDescriptor = attributeDescriptors[key];
-        sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
-    });
+    // const sortedAttributeDescriptors = [];
+    // Object.keys(attributeDescriptors).forEach(key => {
+    //     const attributeDescriptor = attributeDescriptors[key];
+    //     sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
+    // });
+    const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
-    const attributesList = sortedAttributeDescriptors.map(({ location, size, key }) => {
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, name }) => {
         let type;
         // TODO: fix all type
         switch(size) {
@@ -3780,10 +3825,10 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
             default:
                 throw "[buildVertexAttributeLayouts] invalid attribute layout size";
         }
-        const str = `layout(location = ${location}) in ${type} ${key};`;
+        const str = `layout(location = ${location}) in ${type} ${name};`;
         return str;
     });
-    
+
     return attributesList;
 }
 
@@ -4486,7 +4531,7 @@ class BoxGeometry extends Geometry {
         
         super({
             gpu,
-            attributes: {
+            attributes: [
                 // -----------------------------
                 //    
                 //   6 ---- 4
@@ -4496,7 +4541,8 @@ class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                aPosition: {
+                {
+                    name: "aPosition",
                     data: [
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -4512,8 +4558,8 @@ class BoxGeometry extends Geometry {
                         ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
                     ],
                     size: 3,
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: (new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -4521,12 +4567,12 @@ class BoxGeometry extends Geometry {
                         1, 0,
                     ])).flat(),
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
                     size: 3
-                }
-            },
+                },
+            ],
             indices: Array.from(Array(6).keys()).map(i => ([
                 i * 4 + 0, i * 4 + 1, i * 4 + 2,
                 i * 4 + 2, i * 4 + 1, i * 4 + 3,
@@ -4566,8 +4612,9 @@ class PlaneGeometry extends Geometry {
             // | /    |
             // 1 ---- 3
             // -----------------------------
-            attributes: {
-                aPosition: {
+            attributes: [
+                {
+                    name: "aPosition",
                     data: [
                         -1, 1, 0,
                         -1, -1, 0,
@@ -4575,8 +4622,8 @@ class PlaneGeometry extends Geometry {
                         1, -1, 0,
                     ],
                     size: 3
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: [
                         0, 1,
                         0, 0,
@@ -4584,28 +4631,26 @@ class PlaneGeometry extends Geometry {
                         1, 0,
                     ],
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals,
                     size: 3
                 },
-                ...(calculateTangent ?
+                (calculateTangent ?
                     {
-                        aTangent: {
-                            data: tangents,
-                            size: 3
-                        },
+                        name: "aTangent",
+                        data: tangents,
+                        size: 3
                     } : {}
                 ),
-                ...(calculateBinormal ?
+                (calculateBinormal ?
                     {
-                        aBinormal: {
-                            data: binormals,
-                            size: 3
-                        },
+                        name: "aBinormal",
+                        data: binormals,
+                        size: 3
                     } : {}
                 ),
-            },
+            ],
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
         });
@@ -4742,20 +4787,21 @@ class Skybox extends Mesh {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: skyboxObjData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: skyboxObjData.uvs,
                     size: 2,
-                },
-                normal: {
+                }, {
+                    name: "normal",
                     data: skyboxObjData.normals,
                     size: 3
                 },
-            },
+            ],
             indices: skyboxObjData.indices,
             drawCount: skyboxObjData.indices.length
         });
@@ -6222,40 +6268,43 @@ async function loadGLTF({
 
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                aPosition: {
+            attributes: [
+                {
+                    name: "aPosition",
                     data: positions,
                     size: 3,
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: uvFlippedY,
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals,
                     size: 3
                 },
                 // bone があるならjointとweightもあるはず
-                ...(rootBone ? {
-                    aBoneIndices: {
+                ...(rootBone ? [
+                    {
+                        name: "aBoneIndices",
                         data: joints,
                         size: 4
-                    },
-                    aBoneWeights: {
+                    }, {
+                        name: "aBoneWeights",
                         data: weights,
                         size: 4
                     },
-                } : {}),               
+                ] : []),               
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
-                aTangent: {
+                {
+                    name: "aTangent",
                     data: tangents,
                     size: 3
-                },
-                aBinormal: {
+                }, {
+                    name: "aBinormal",
                     data: binormals,
                     size: 3
                 },
-            },
+            ],
             indices,
             drawCount: indices.length
         });

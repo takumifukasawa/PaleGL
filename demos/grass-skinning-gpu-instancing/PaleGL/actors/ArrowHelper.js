@@ -165,16 +165,17 @@ export class ArrowHelper extends Mesh {
         const objData = parseObj(arrowHelperGeometryData);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: objData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: objData.uvs,
                     size: 2
                 }
-            },
+            ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });

@@ -28,8 +28,9 @@ export class PlaneGeometry extends Geometry {
             // | /    |
             // 1 ---- 3
             // -----------------------------
-            attributes: {
-                aPosition: {
+            attributes: [
+                {
+                    name: "aPosition",
                     data: [
                         -1, 1, 0,
                         -1, -1, 0,
@@ -37,8 +38,8 @@ export class PlaneGeometry extends Geometry {
                         1, -1, 0,
                     ],
                     size: 3
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: [
                         0, 1,
                         0, 0,
@@ -46,28 +47,26 @@ export class PlaneGeometry extends Geometry {
                         1, 0,
                     ],
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals,
                     size: 3
                 },
-                ...(calculateTangent ?
+                (calculateTangent ?
                     {
-                        aTangent: {
-                            data: tangents,
-                            size: 3
-                        },
+                        name: "aTangent",
+                        data: tangents,
+                        size: 3
                     } : {}
                 ),
-                ...(calculateBinormal ?
+                (calculateBinormal ?
                     {
-                        aBinormal: {
-                            data: binormals,
-                            size: 3
-                        },
+                        name: "aBinormal",
+                        data: binormals,
+                        size: 3
                     } : {}
                 ),
-            },
+            ],
             indices: [0, 1, 2, 2, 1, 3],
             drawCount: 6
         });

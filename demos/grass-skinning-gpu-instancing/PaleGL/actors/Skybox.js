@@ -128,20 +128,21 @@ export class Skybox extends Mesh {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: skyboxObjData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: skyboxObjData.uvs,
                     size: 2,
-                },
-                normal: {
+                }, {
+                    name: "normal",
                     data: skyboxObjData.normals,
                     size: 3
                 },
-            },
+            ],
             indices: skyboxObjData.indices,
             drawCount: skyboxObjData.indices.length
         });

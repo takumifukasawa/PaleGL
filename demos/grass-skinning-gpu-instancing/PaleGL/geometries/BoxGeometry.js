@@ -23,7 +23,7 @@ export class BoxGeometry extends Geometry {
         
         super({
             gpu,
-            attributes: {
+            attributes: [
                 // -----------------------------
                 //    
                 //   6 ---- 4
@@ -33,7 +33,8 @@ export class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                aPosition: {
+                {
+                    name: "aPosition",
                     data: [
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -49,8 +50,8 @@ export class BoxGeometry extends Geometry {
                         ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
                     ],
                     size: 3,
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: (new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -58,12 +59,12 @@ export class BoxGeometry extends Geometry {
                         1, 0,
                     ])).flat(),
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
                     size: 3
-                }
-            },
+                },
+            ],
             indices: Array.from(Array(6).keys()).map(i => ([
                 i * 4 + 0, i * 4 + 1, i * 4 + 2,
                 i * 4 + 2, i * 4 + 1, i * 4 + 3,

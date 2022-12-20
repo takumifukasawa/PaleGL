@@ -92,13 +92,14 @@ export class Camera extends Actor {
             this.#visibleFrustumMesh = new Mesh({
                 geometry: new Geometry({
                     gpu,
-                    attributes: {
-                        position: {
+                    attributes: [
+                        {
+                            name: "position",
                             data: new Array(3 * 8),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
-                        }
-                    },
+                        },
+                    ],
                     drawCount: 2 * 12,
                     indices: [
                         // near clip

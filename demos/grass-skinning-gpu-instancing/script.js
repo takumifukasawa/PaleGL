@@ -85,11 +85,10 @@ wrapperElement.appendChild(instanceNumView);
 const captureScene = new Scene();
 
 const renderer = new ForwardRenderer({
-        gpu,
-        canvas: canvasElement,
-        pixelRatio: Math.min(window.devicePixelRatio, 1.5)
-    }
-);
+    gpu,
+    canvas: canvasElement,
+    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+});
 
 const engine = new Engine({ gpu, renderer });
 
@@ -232,27 +231,31 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.geometry.instanceCount = instanceNum;
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    skinningMesh.geometry.setAttribute("aInstancePosition", {
+    skinningMesh.geometry.setAttribute({
+        name: "aInstancePosition",
         data: instanceInfo.position.flat(),
         size: 3,
         usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    skinningMesh.geometry.setAttribute("aInstanceScale", {
+    skinningMesh.geometry.setAttribute({
+        name: "aInstanceScale",
         data: instanceInfo.scale.flat(),
         size: 3,
         usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });       
     // aInstanceAnimationOffsetは予約語
-    skinningMesh.geometry.setAttribute("aInstanceAnimationOffset", {
+    skinningMesh.geometry.setAttribute({
+        name: "aInstanceAnimationOffset",
         data: animationOffsetInfo,
         size: 1,
         usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
-    skinningMesh.geometry.setAttribute("aInstanceVertexColor", {
+    skinningMesh.geometry.setAttribute({
+        name: "aInstanceVertexColor",
         data: instanceInfo.color.flat(),
         size: 4,
         usageType: AttributeUsageType.StaticDraw,
@@ -333,7 +336,7 @@ const main = async () => {
         gpu, cubeMap,
         rotationOffset: 1.4
     });
-
+    
     skinnedMesh = await createGLTFSkinnedMesh();
     captureScene.add(skinnedMesh);
 

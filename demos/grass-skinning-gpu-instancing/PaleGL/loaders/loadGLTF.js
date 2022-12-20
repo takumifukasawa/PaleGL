@@ -174,40 +174,43 @@ export async function loadGLTF({
 
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                aPosition: {
+            attributes: [
+                {
+                    name: "aPosition",
                     data: positions,
                     size: 3,
-                },
-                aUv: {
+                }, {
+                    name: "aUv",
                     data: uvFlippedY,
                     size: 2
-                },
-                aNormal: {
+                }, {
+                    name: "aNormal",
                     data: normals,
                     size: 3
                 },
                 // bone があるならjointとweightもあるはず
-                ...(rootBone ? {
-                    aBoneIndices: {
+                ...(rootBone ? [
+                    {
+                        name: "aBoneIndices",
                         data: joints,
                         size: 4
-                    },
-                    aBoneWeights: {
+                    }, {
+                        name: "aBoneWeights",
                         data: weights,
                         size: 4
                     },
-                } : {}),               
+                ] : []),               
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
-                aTangent: {
+                {
+                    name: "aTangent",
                     data: tangents,
                     size: 3
-                },
-                aBinormal: {
+                }, {
+                    name: "aBinormal",
                     data: binormals,
                     size: 3
                 },
-            },
+            ],
             indices,
             drawCount: indices.length
         });

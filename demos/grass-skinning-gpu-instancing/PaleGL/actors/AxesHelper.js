@@ -164,19 +164,21 @@ export class AxesHelper extends Mesh {
         const objData = parseObj(axesHelperGeometryData);
         const geometry = new Geometry({
             gpu,
-            attributes: {
-                position: {
+            attributes: [
+                {
+                    name: "position",
                     data: objData.positions,
                     size: 3
-                },
-                uv: {
+                }, {
+                    name: "uv",
                     data: objData.uvs,
                     size: 2
                 }
-            },
+            ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });
+        console.log("geom", geometry)
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
