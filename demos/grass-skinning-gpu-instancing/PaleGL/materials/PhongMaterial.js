@@ -191,6 +191,7 @@ void main() {
    
     ${receiveShadow
         ? `
+// TODO: apply shadow の中に入れても良さそう
 if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
     resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
 }
