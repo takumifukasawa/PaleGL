@@ -152,7 +152,7 @@ export class Skybox extends Mesh {
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
-            depthTest: false,
+            depthTest: true,
             depthWrite: false,
             uniforms: {
                 uCubeTexture: {

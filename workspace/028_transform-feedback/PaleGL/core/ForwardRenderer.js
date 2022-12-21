@@ -92,20 +92,8 @@ export class ForwardRenderer {
             }
 
             castShadowRenderMeshInfos.forEach(({ actor }) => {
-                // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
-
-                // const targetMaterial = actor.depthMaterial;
                 const targetMaterial = actor.depthMaterial;
                 
-                // let targetMaterial = this.#depthMaterial;
-                // if(meshActor.depthMaterial) {
-                //     targetMaterial = meshActor.depthMaterial;
-                // } else {
-                //     if(meshActor.material.alphaTest) {
-                //         targetMaterial = this.#depthMaterialAlphaTestQueue;
-                //     }
-                // }
-
                 // TODO: material 側でやった方がよい？
                 if (targetMaterial.uniforms.uWorldMatrix) {
                     targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
@@ -231,8 +219,8 @@ export class ForwardRenderer {
     
     render(scene, camera) {
         const renderMeshInfoEachQueue = {
-            skybox: [], // maybe only one
             opaque: [],
+            skybox: [], // maybe only one
             alphaTest: [],
             transparent: [],
         };
@@ -281,7 +269,6 @@ export class ForwardRenderer {
         // TODO: depth sort 
 
         // sort by render queue
-        // const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
         const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
         
