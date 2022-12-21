@@ -355,14 +355,14 @@ matrix elements: ${jointData.length}`);
             gpu,
             geometry: new Geometry({
                 gpu,
-                attributes: {
-                    position: {
-                        // data: new Array(this.#boneIndicesForLines.length * 3),
-                        data: new Array(this.#boneOrderedIndex.length * 3),
+                attributes: [
+                    {
+                        name: "position",
+                        data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
-                },
+                ],
                 indices: this.#boneIndicesForLines,
                 drawCount: this.#boneIndicesForLines.length
             }),
@@ -401,13 +401,14 @@ matrix elements: ${jointData.length}`);
             gpu,
             geometry: new Geometry({
                 gpu,
-                attributes: {
-                    position: {
-                        data: new Array(this.#boneOrderedIndex.length * 3),
+                attributes: [
+                    {
+                        name: "position",
+                        data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
-                },
+                ],
                 drawCount: this.#boneOrderedIndex.length
             }),
             material: new Material({

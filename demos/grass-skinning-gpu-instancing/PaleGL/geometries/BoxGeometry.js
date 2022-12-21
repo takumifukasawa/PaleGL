@@ -35,7 +35,7 @@ export class BoxGeometry extends Geometry {
                 // -----------------------------
                 {
                     name: "aPosition",
-                    data: [
+                    data: new Float32Array([
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
                         // right
@@ -48,20 +48,20 @@ export class BoxGeometry extends Geometry {
                         ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
                         // bottom
                         ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
-                    ],
+                    ]),
                     size: 3,
                 }, {
                     name: "aUv",
-                    data: (new Array(6)).fill(0).map(() => ([
+                    data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
                         1, 1,
                         1, 0,
-                    ])).flat(),
+                    ])).flat()),
                     size: 2
                 }, {
                     name: "aNormal",
-                    data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
+                    data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
                 },
             ],

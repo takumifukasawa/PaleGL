@@ -127,7 +127,7 @@ export async function loadGLTF({
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = new Uint8Array(bufferData);
+                        joints = new Float32Array(new Uint8Array(bufferData));
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);
@@ -203,11 +203,11 @@ export async function loadGLTF({
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
                 {
                     name: "aTangent",
-                    data: tangents,
+                    data: new Float32Array(tangents),
                     size: 3
                 }, {
                     name: "aBinormal",
-                    data: binormals,
+                    data: new Float32Array(binormals),
                     size: 3
                 },
             ],

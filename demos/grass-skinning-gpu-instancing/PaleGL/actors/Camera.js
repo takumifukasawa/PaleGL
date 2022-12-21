@@ -95,7 +95,7 @@ export class Camera extends Actor {
                     attributes: [
                         {
                             name: "position",
-                            data: new Array(3 * 8),
+                            data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
                         },

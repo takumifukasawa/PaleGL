@@ -212,7 +212,7 @@ const createGLTFSkinnedMesh = async () => {
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
         name: "aInstancePosition",
-        data: instanceInfo.position.flat(),
+        data: new Float32Array(instanceInfo.position.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
@@ -220,7 +220,7 @@ const createGLTFSkinnedMesh = async () => {
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
         name: "aInstanceScale",
-        data: instanceInfo.scale.flat(),
+        data: new Float32Array(instanceInfo.scale.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
@@ -228,14 +228,14 @@ const createGLTFSkinnedMesh = async () => {
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute({
         name: "aInstanceAnimationOffset",
-        data: animationOffsetInfo,
+        data: new Float32Array(animationOffsetInfo),
         size: 1,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     skinningMesh.geometry.setAttribute({
         name: "aInstanceVertexColor",
-        data: instanceInfo.color.flat(),
+        data: new Float32Array(instanceInfo.color.flat()),
         size: 4,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1

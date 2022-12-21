@@ -167,18 +167,17 @@ export class AxesHelper extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: objData.positions,
+                    data: new Float32Array(objData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: objData.uvs,
+                    data: new Float32Array(objData.uvs),
                     size: 2
                 }
             ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });
-        console.log("geom", geometry)
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es

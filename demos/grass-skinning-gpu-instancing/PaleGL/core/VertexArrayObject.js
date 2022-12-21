@@ -64,17 +64,13 @@ export class VertexArrayObject extends GLObject {
             this.#ibo.unbind();
         }
     }
-    
+
     updateAttribute(key, data) {
-        // const gl = this.#gpu.gl;
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
-        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
-        // gl.bindBuffer(gl.ARRAY_BUFFER, null);
         const gl = this.#gpu.gl;
         const targetVBO = this.#vboList.find(({ name }) => key === name);
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
         // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO), targetVBO.usage);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO.data), targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
@@ -91,13 +87,24 @@ export class VertexArrayObject extends GLObject {
         const vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         const usage = this.getUsage(gl, usageType);
-        // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
+        gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
-        // size ... 頂点ごとに埋める数
-        // stride is always 0 because buffer is not interleaved.
-        // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
-        gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+
+        console.log(name, data)
+        // TODO: uint16対応
+        switch(data.constructor) {
+            case Float32Array:
+                // size ... 頂点ごとに埋める数
+                // stride is always 0 because buffer is not interleaved.
+                // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+                gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+                break;
+            case Uint16Array:
+                gl.vertexAttribIPointer(newLocation, size, gl.FLOAT, 0, 0);
+                break;
+            default:
+                throw "[VertexArrayObject.setAttribute] invalid data type";
+        }
 
         if(divisor) {
             gl.vertexAttribDivisor(newLocation, divisor);

@@ -1958,17 +1958,13 @@ class VertexArrayObject extends GLObject {
             this.#ibo.unbind();
         }
     }
-    
+
     updateAttribute(key, data) {
-        // const gl = this.#gpu.gl;
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.#vboList[key].vbo);
-        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), this.#vboList[key].usage);
-        // gl.bindBuffer(gl.ARRAY_BUFFER, null);
         const gl = this.#gpu.gl;
         const targetVBO = this.#vboList.find(({ name }) => key === name);
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
         // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO), targetVBO.usage);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO.data), targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
@@ -1985,13 +1981,24 @@ class VertexArrayObject extends GLObject {
         const vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         const usage = this.getUsage(gl, usageType);
-        // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), usage);
+        gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
-        // size ... 頂点ごとに埋める数
-        // stride is always 0 because buffer is not interleaved.
-        // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
-        gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+
+        console.log(name, data)
+        // TODO: uint16対応
+        switch(data.constructor) {
+            case Float32Array:
+                // size ... 頂点ごとに埋める数
+                // stride is always 0 because buffer is not interleaved.
+                // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+                gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
+                break;
+            case Uint16Array:
+                gl.vertexAttribIPointer(newLocation, size, gl.FLOAT, 0, 0);
+                break;
+            default:
+                throw "[VertexArrayObject.setAttribute] invalid data type";
+        }
 
         if(divisor) {
             gl.vertexAttribDivisor(newLocation, divisor);
@@ -2319,11 +2326,11 @@ class ArrowHelper extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: objData.positions,
+                    data: new Float32Array(objData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: objData.uvs,
+                    data: new Float32Array(objData.uvs),
                     size: 2
                 }
             ],
@@ -2541,18 +2548,17 @@ class AxesHelper extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: objData.positions,
+                    data: new Float32Array(objData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: objData.uvs,
+                    data: new Float32Array(objData.uvs),
                     size: 2
                 }
             ],
             indices: objData.indices,
             drawCount: objData.indices.length
         });
-        console.log("geom", geometry)
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
@@ -3161,7 +3167,7 @@ class Camera extends Actor {
                     attributes: [
                         {
                             name: "position",
-                            data: new Array(3 * 8),
+                            data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
                         },
@@ -4286,14 +4292,14 @@ matrix elements: ${jointData.length}`);
             gpu,
             geometry: new Geometry({
                 gpu,
-                attributes: {
-                    position: {
-                        // data: new Array(this.#boneIndicesForLines.length * 3),
-                        data: new Array(this.#boneOrderedIndex.length * 3),
+                attributes: [
+                    {
+                        name: "position",
+                        data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
-                },
+                ],
                 indices: this.#boneIndicesForLines,
                 drawCount: this.#boneIndicesForLines.length
             }),
@@ -4332,13 +4338,14 @@ matrix elements: ${jointData.length}`);
             gpu,
             geometry: new Geometry({
                 gpu,
-                attributes: {
-                    position: {
-                        data: new Array(this.#boneOrderedIndex.length * 3),
+                attributes: [
+                    {
+                        name: "position",
+                        data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
                     }
-                },
+                ],
                 drawCount: this.#boneOrderedIndex.length
             }),
             material: new Material({
@@ -4497,7 +4504,7 @@ class BoxGeometry extends Geometry {
                 // -----------------------------
                 {
                     name: "aPosition",
-                    data: [
+                    data: new Float32Array([
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
                         // right
@@ -4510,20 +4517,20 @@ class BoxGeometry extends Geometry {
                         ...boxPosition_6, ...boxPosition_0, ...boxPosition_4, ...boxPosition_2,
                         // bottom
                         ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
-                    ],
+                    ]),
                     size: 3,
                 }, {
                     name: "aUv",
-                    data: (new Array(6)).fill(0).map(() => ([
+                    data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
                         1, 1,
                         1, 0,
-                    ])).flat(),
+                    ])).flat()),
                     size: 2
                 }, {
                     name: "aNormal",
-                    data: normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2),
+                    data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
                 },
             ],
@@ -4569,38 +4576,38 @@ class PlaneGeometry extends Geometry {
             attributes: [
                 {
                     name: "aPosition",
-                    data: [
+                    data: new Float32Array([
                         -1, 1, 0,
                         -1, -1, 0,
                         1, 1, 0,
                         1, -1, 0,
-                    ],
+                    ]),
                     size: 3
                 }, {
                     name: "aUv",
-                    data: [
+                    data: new Float32Array([
                         0, 1,
                         0, 0,
                         1, 1,
                         1, 0,
-                    ],
+                    ]),
                     size: 2
                 }, {
                     name: "aNormal",
-                    data: normals,
+                    data: new Float32Array(normals),
                     size: 3
                 },
                 (calculateTangent ?
                     {
                         name: "aTangent",
-                        data: tangents,
+                        data: new Float32Array(tangents),
                         size: 3
                     } : {}
                 ),
                 (calculateBinormal ?
                     {
                         name: "aBinormal",
-                        data: binormals,
+                        data: new Float32Array(binormals),
                         size: 3
                     } : {}
                 ),
@@ -4744,15 +4751,15 @@ class Skybox extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: skyboxObjData.positions,
+                    data: new Float32Array(skyboxObjData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: skyboxObjData.uvs,
+                    data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }, {
                     name: "normal",
-                    data: skyboxObjData.normals,
+                    data: new Float32Array(skyboxObjData.normals),
                     size: 3
                 },
             ],
@@ -6175,7 +6182,7 @@ async function loadGLTF({
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = new Uint8Array(bufferData);
+                        joints = new Float32Array(new Uint8Array(bufferData));
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);
@@ -6251,11 +6258,11 @@ async function loadGLTF({
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
                 {
                     name: "aTangent",
-                    data: tangents,
+                    data: new Float32Array(tangents),
                     size: 3
                 }, {
                     name: "aBinormal",
-                    data: binormals,
+                    data: new Float32Array(binormals),
                     size: 3
                 },
             ],

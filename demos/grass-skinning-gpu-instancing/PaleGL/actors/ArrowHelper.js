@@ -168,11 +168,11 @@ export class ArrowHelper extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: objData.positions,
+                    data: new Float32Array(objData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: objData.uvs,
+                    data: new Float32Array(objData.uvs),
                     size: 2
                 }
             ],

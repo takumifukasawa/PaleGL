@@ -131,15 +131,15 @@ export class Skybox extends Mesh {
             attributes: [
                 {
                     name: "position",
-                    data: skyboxObjData.positions,
+                    data: new Float32Array(skyboxObjData.positions),
                     size: 3
                 }, {
                     name: "uv",
-                    data: skyboxObjData.uvs,
+                    data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }, {
                     name: "normal",
-                    data: skyboxObjData.normals,
+                    data: new Float32Array(skyboxObjData.normals),
                     size: 3
                 },
             ],
