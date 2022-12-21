@@ -58,7 +58,7 @@ let skinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|Android)/i);
 
-const targetCameraPosition = new Vector3(0, 5, 10);
+const targetCameraPosition = new Vector3(0, 5, 12);
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -115,16 +115,16 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     actor.transform.position = cameraPosition;
     
     // 2: fixed position
-    // actor.transform.position = new Vector3(0, 5, 10);
+    // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 }
 
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 190, 180);
 directionalLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-8, 8, 2));
+    actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    actor.shadowCamera.visibleFrustum = true;
+    actor.shadowCamera.visibleFrustum = false;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
@@ -133,8 +133,8 @@ directionalLight.onStart = ({ actor }) => {
 }
 captureScene.add(directionalLight);
 
-const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
-directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
+// const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
+// directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
@@ -222,7 +222,7 @@ const createGLTFSkinnedMesh = async () => {
         instanceInfo.color.push([...c.elements]);
     });
     const animationOffsetInfo = instanceInfo.position.map(([x, _, z]) => {
-        const animationOffsetAdjust = (Math.random() * 0.9 - 0.45) + 2;
+        const animationOffsetAdjust = (Math.random() * 0.6 - 0.3) + 2;
         return (-x + z) * animationOffsetAdjust;
     });
    
@@ -334,7 +334,7 @@ const main = async () => {
     const cubeMap = await loadCubeMap({ gpu, images });
     const skyboxMesh = new Skybox({
         gpu, cubeMap,
-        rotationOffset: 1.4
+        rotationOffset: 0.8
     });
     
     skinnedMesh = await createGLTFSkinnedMesh();
@@ -419,57 +419,57 @@ function initDebugger() {
             skinnedMesh.castShadow = value;
         }
     });
+   
+    // debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addToggleDebugger({
+    //     label: "fxaa pass enabled",
+    //     initialValue: fxaaPass.enabled,
+    //     onChange: (value) => fxaaPass.enabled = value,
+    // });
 
-    debuggerGUI.addToggleDebugger({
-        label: "fxaa pass enabled",
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => fxaaPass.enabled = value,
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa contrast threshold",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
+    //     minValue: 0.0312,
+    //     maxValue: 0.0833,
+    //     stepValue: 0.001,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
+    //     }
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa contrast threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
-        minValue: 0.0312,
-        maxValue: 0.0833,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
-        }
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa relative threshold",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
+    //     minValue: 0.063,
+    //     maxValue: 0.333,
+    //     stepValue: 0.001,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
+    //     }
+    // });
+    // 
+    // debuggerGUI.addSliderDebugger({
+    //     label: "fxaa subpixel blending",
+    //     initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.01,
+    //     onChange: (value) => {
+    //         fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
+    //     }
+    // });
+    // 
+    // debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa relative threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
-        minValue: 0.063,
-        maxValue: 0.333,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa subpixel blending",
-        initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.01,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
-        }
-    });
-    
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "Enabled Post Process",
-        initialValue: captureSceneCamera.postProcess.enabled,
-        onChange: (value) => {
-            captureSceneCamera.postProcess.enabled = value;
-        }
-    });
+    // debuggerGUI.addToggleDebugger({
+    //     label: "Enabled Post Process",
+    //     initialValue: captureSceneCamera.postProcess.enabled,
+    //     onChange: (value) => {
+    //         captureSceneCamera.postProcess.enabled = value;
+    //     }
+    // });
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
