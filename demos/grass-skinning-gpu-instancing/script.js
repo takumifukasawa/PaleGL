@@ -168,29 +168,8 @@ const onWindowResize = () => {
 };
 
 const createGLTFSkinnedMesh = async () => {
-    // const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-with-tangents.gltf" });
     const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
     
-    // const diffuseImg = await loadImg("./images/thatch_roof_angled_diff_256.jpg");
-    // const diffuseMap = new Texture({
-    //     gpu,
-    //     img: diffuseImg,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-    // 
-    // const normalImg = await loadImg("./images/thatch_roof_angled_nor_gl_256.jpg");
-    // const normalMap = new Texture({
-    //     gpu,
-    //     img: normalImg,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
    
     // ルートにanimatorをattachしてるので一旦ここでassign
@@ -235,7 +214,7 @@ const createGLTFSkinnedMesh = async () => {
         name: "aInstancePosition",
         data: instanceInfo.position.flat(),
         size: 3,
-        usageType: AttributeUsageType.StaticDraw,
+        // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
@@ -243,7 +222,7 @@ const createGLTFSkinnedMesh = async () => {
         name: "aInstanceScale",
         data: instanceInfo.scale.flat(),
         size: 3,
-        usageType: AttributeUsageType.StaticDraw,
+        // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });       
     // aInstanceAnimationOffsetは予約語
@@ -251,14 +230,14 @@ const createGLTFSkinnedMesh = async () => {
         name: "aInstanceAnimationOffset",
         data: animationOffsetInfo,
         size: 1,
-        usageType: AttributeUsageType.StaticDraw,
+        // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     skinningMesh.geometry.setAttribute({
         name: "aInstanceVertexColor",
         data: instanceInfo.color.flat(),
         size: 4,
-        usageType: AttributeUsageType.StaticDraw,
+        // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     skinningMesh.material = new PhongMaterial({
@@ -420,56 +399,56 @@ function initDebugger() {
         }
     });
    
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "fxaa pass enabled",
-    //     initialValue: fxaaPass.enabled,
-    //     onChange: (value) => fxaaPass.enabled = value,
-    // });
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa contrast threshold",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
-    //     minValue: 0.0312,
-    //     maxValue: 0.0833,
-    //     stepValue: 0.001,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
-    //     }
-    // });
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa contrast threshold",
+        initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
+        minValue: 0.0312,
+        maxValue: 0.0833,
+        stepValue: 0.001,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
+        }
+    });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa relative threshold",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
-    //     minValue: 0.063,
-    //     maxValue: 0.333,
-    //     stepValue: 0.001,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
-    //     }
-    // });
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "fxaa subpixel blending",
-    //     initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.01,
-    //     onChange: (value) => {
-    //         fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
-    //     }
-    // });
-    // 
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa relative threshold",
+        initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
+        minValue: 0.063,
+        maxValue: 0.333,
+        stepValue: 0.001,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
+        }
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "fxaa subpixel blending",
+        initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.01,
+        onChange: (value) => {
+            fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
+        }
+    });
+    
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "Enabled Post Process",
-    //     initialValue: captureSceneCamera.postProcess.enabled,
-    //     onChange: (value) => {
-    //         captureSceneCamera.postProcess.enabled = value;
-    //     }
-    // });
+    debuggerGUI.addToggleDebugger({
+        label: "Enabled Post Process",
+        initialValue: captureSceneCamera.postProcess.enabled,
+        onChange: (value) => {
+            captureSceneCamera.postProcess.enabled = value;
+        }
+    });
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
