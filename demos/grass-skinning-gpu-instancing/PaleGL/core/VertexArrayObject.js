@@ -90,7 +90,6 @@ export class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        console.log(name, data)
         // TODO: uint16対応
         switch(data.constructor) {
             case Float32Array:
@@ -100,7 +99,7 @@ export class VertexArrayObject extends GLObject {
                 gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
                 break;
             case Uint16Array:
-                gl.vertexAttribIPointer(newLocation, size, gl.FLOAT, 0, 0);
+                gl.vertexAttribIPointer(newLocation, size, gl.UNSIGNED_SHORT, 0, 0);
                 break;
             default:
                 throw "[VertexArrayObject.setAttribute] invalid data type";

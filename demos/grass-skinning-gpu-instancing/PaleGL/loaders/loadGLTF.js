@@ -127,7 +127,7 @@ export async function loadGLTF({
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = new Float32Array(new Uint8Array(bufferData));
+                        joints = new Uint16Array(new Uint8Array(bufferData));
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);

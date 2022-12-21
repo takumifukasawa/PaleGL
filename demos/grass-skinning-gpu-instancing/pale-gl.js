@@ -1856,6 +1856,7 @@ class Attribute {
             name: this.name,
             location: this.location,
             size: this.size,
+            dataType: this.data.constructor
         }
     }
 }
@@ -1984,7 +1985,6 @@ class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        console.log(name, data)
         // TODO: uint16対応
         switch(data.constructor) {
             case Float32Array:
@@ -1994,7 +1994,7 @@ class VertexArrayObject extends GLObject {
                 gl.vertexAttribPointer(newLocation, size, gl.FLOAT, false, 0, 0);
                 break;
             case Uint16Array:
-                gl.vertexAttribIPointer(newLocation, size, gl.FLOAT, 0, 0);
+                gl.vertexAttribIPointer(newLocation, size, gl.UNSIGNED_SHORT, 0, 0);
                 break;
             default:
                 throw "[VertexArrayObject.setAttribute] invalid data type";
@@ -3454,14 +3454,6 @@ class DirectionalLight extends Light {
         this.addChild(this.shadowCamera);
     }
 }
-// 
-// 
-
-// const skinningVertexAttributes = (beginIndex) => [
-// `layout(location = ${beginIndex + 0}) in vec4 aBoneIndices;`,
-// `layout(location = ${beginIndex + 1}) in vec4 aBoneWeights;`,
-// ];
-
 const calcSkinningMatrixFunc = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
@@ -3478,7 +3470,7 @@ struct SkinAnimationClipData {
     int frameCount;
 };
 
-mat4 getJointMatrix(sampler2D jointTexture, int jointIndex, int colNum) {
+mat4 getJointMatrix(sampler2D jointTexture, uint jointIndex, int colNum) {
     int colIndex = int(mod(float(jointIndex), float(colNum))); // 横
     int rowIndex = int(floor(float(jointIndex) / float(colNum))); // 縦
     mat4 jointMatrix = mat4(
@@ -3498,7 +3490,7 @@ mat4 getJointMatrix(sampler2D jointTexture, int jointIndex, int colNum) {
 
 mat4 getJointMatrixGPUSkinning(
     sampler2D jointTexture,
-    int jointIndex,
+    uint jointIndex,
     int jointNum,
     int currentSkinIndex,
     int colNum,
@@ -3506,9 +3498,9 @@ mat4 getJointMatrixGPUSkinning(
     float time,
     float timeOffset
 ) {
-    int offset = int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum;
-    int colIndex = int(mod(float(jointIndex + offset), float(colNum))); // 横
-    int rowIndex = int(floor(float(jointIndex + offset) / float(colNum))); // 縦
+    float offset = float(int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum);
+    int colIndex = int(mod(float(jointIndex) + offset, float(colNum))); // 横
+    int rowIndex = int(floor(float(jointIndex) + offset / float(colNum))); // 縦
 
     mat4 jointMatrix = mat4(
         texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),
@@ -3543,10 +3535,10 @@ const skinningVertex = (gpuSkinning = false) => `
     ${gpuSkinning ? `
     // gpu skinning
     float fps = 30.;
-    mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[0]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-    mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[1]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-    mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[2]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-    mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, int(aBoneIndices[3]), uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[0], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[1], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[2], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+    mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[3], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
     mat4 skinMatrix = calcSkinningMatrix(
         jointMatrix0,
         jointMatrix1,
@@ -3555,10 +3547,10 @@ const skinningVertex = (gpuSkinning = false) => `
         aBoneWeights
     );
     ` : `
-    mat4 jointMatrix0 = getJointMatrix(uJointTexture, int(aBoneIndices[0]), uJointTextureColNum);
-    mat4 jointMatrix1 = getJointMatrix(uJointTexture, int(aBoneIndices[1]), uJointTextureColNum);
-    mat4 jointMatrix2 = getJointMatrix(uJointTexture, int(aBoneIndices[2]), uJointTextureColNum);
-    mat4 jointMatrix3 = getJointMatrix(uJointTexture, int(aBoneIndices[3]), uJointTextureColNum);
+    mat4 jointMatrix0 = getJointMatrix(uJointTexture, aBoneIndices[0], uJointTextureColNum);
+    mat4 jointMatrix1 = getJointMatrix(uJointTexture, aBoneIndices[1], uJointTextureColNum);
+    mat4 jointMatrix2 = getJointMatrix(uJointTexture, aBoneIndices[2], uJointTextureColNum);
+    mat4 jointMatrix3 = getJointMatrix(uJointTexture, aBoneIndices[3], uJointTextureColNum);
     mat4 skinMatrix = calcSkinningMatrix(
         jointMatrix0,
         jointMatrix1,
@@ -3766,24 +3758,48 @@ vec4 calcPhongLighting() {
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
-    const attributesList = sortedAttributeDescriptors.map(({ location, size, name }) => {
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, name, dataType }) => {
         let type;
         // TODO: fix all type
-        switch(size) {
-            case 1:
-                type = "float";
+        switch(dataType) {
+            case Float32Array:
+                switch(size) {
+                    case 1:
+                        type = "float";
+                        break;
+                    case 2:
+                        type = "vec2";
+                        break;
+                    case 3:
+                        type = "vec3";
+                        break;
+                    case 4:
+                        type = "vec4";
+                        break;
+                    default:
+                        throw "[buildVertexAttributeLayouts] invalid attribute float";
+                }
                 break;
-            case 2:
-                type = "vec2";
-                break;
-            case 3:
-                type = "vec3";
-                break;
-            case 4:
-                type = "vec4";
+            case Uint16Array:
+                switch(size) {
+                    case 1:
+                        type = "int";
+                        break;
+                    case 2:
+                        type = "uvec2";
+                        break;
+                    case 3:
+                        type = "uvec3";
+                        break;
+                    case 4:
+                        type = "uvec4";
+                        break;
+                    default:
+                        throw "[buildVertexAttributeLayouts] invalid attribute int";
+                }               
                 break;
             default:
-                throw "[buildVertexAttributeLayouts] invalid attribute layout size";
+                throw "[buildVertexAttributeLayouts] invalid attribute data type";
         }
         const str = `layout(location = ${location}) in ${type} ${name};`;
         return str;
@@ -6182,7 +6198,7 @@ async function loadGLTF({
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
-                        joints = new Float32Array(new Uint8Array(bufferData));
+                        joints = new Uint16Array(new Uint8Array(bufferData));
                         break;
                     case "WEIGHTS_0":
                         weights = new Float32Array(bufferData);

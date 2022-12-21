@@ -32,6 +32,7 @@ export class Attribute {
             name: this.name,
             location: this.location,
             size: this.size,
+            dataType: this.data.constructor
         }
     }
 }

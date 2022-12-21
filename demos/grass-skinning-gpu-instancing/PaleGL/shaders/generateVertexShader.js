@@ -14,24 +14,48 @@ import {normalMapVertexVaryings} from "./lightingCommon.js";
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
-    const attributesList = sortedAttributeDescriptors.map(({ location, size, name }) => {
+    const attributesList = sortedAttributeDescriptors.map(({ location, size, name, dataType }) => {
         let type;
         // TODO: fix all type
-        switch(size) {
-            case 1:
-                type = "float";
+        switch(dataType) {
+            case Float32Array:
+                switch(size) {
+                    case 1:
+                        type = "float";
+                        break;
+                    case 2:
+                        type = "vec2";
+                        break;
+                    case 3:
+                        type = "vec3";
+                        break;
+                    case 4:
+                        type = "vec4";
+                        break;
+                    default:
+                        throw "[buildVertexAttributeLayouts] invalid attribute float";
+                }
                 break;
-            case 2:
-                type = "vec2";
-                break;
-            case 3:
-                type = "vec3";
-                break;
-            case 4:
-                type = "vec4";
+            case Uint16Array:
+                switch(size) {
+                    case 1:
+                        type = "int";
+                        break;
+                    case 2:
+                        type = "uvec2";
+                        break;
+                    case 3:
+                        type = "uvec3";
+                        break;
+                    case 4:
+                        type = "uvec4";
+                        break;
+                    default:
+                        throw "[buildVertexAttributeLayouts] invalid attribute int";
+                }               
                 break;
             default:
-                throw "[buildVertexAttributeLayouts] invalid attribute layout size";
+                throw "[buildVertexAttributeLayouts] invalid attribute data type";
         }
         const str = `layout(location = ${location}) in ${type} ${name};`;
         return str;
