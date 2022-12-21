@@ -99,7 +99,7 @@ captureScene.add(captureSceneCamera);
 captureScene.mainCamera = captureSceneCamera;
 
 captureSceneCamera.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(0, 0, 5));
+    actor.transform.setTranslation(targetCameraPosition);
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
@@ -399,57 +399,6 @@ function initDebugger() {
         }
     });
    
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "fxaa pass enabled",
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => fxaaPass.enabled = value,
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa contrast threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uContrastThreshold.value,
-        minValue: 0.0312,
-        maxValue: 0.0833,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uContrastThreshold.value = value;
-        }
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa relative threshold",
-        initialValue: fxaaPass.mesh.material.uniforms.uRelativeThreshold.value,
-        minValue: 0.063,
-        maxValue: 0.333,
-        stepValue: 0.001,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uRelativeThreshold.value = value;
-        }
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: "fxaa subpixel blending",
-        initialValue: fxaaPass.mesh.material.uniforms.uSubpixelBlending.value,
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.01,
-        onChange: (value) => {
-            fxaaPass.mesh.material.uniforms.uSubpixelBlending.value = value;
-        }
-    });
-    
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "Enabled Post Process",
-        initialValue: captureSceneCamera.postProcess.enabled,
-        onChange: (value) => {
-            captureSceneCamera.postProcess.enabled = value;
-        }
-    });
-
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
 
