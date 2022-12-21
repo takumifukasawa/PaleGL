@@ -12,11 +12,6 @@ import {normalMapVertexVaryings} from "./lightingCommon.js";
 // -----------------------------------------------
 
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
-    // const sortedAttributeDescriptors = [];
-    // Object.keys(attributeDescriptors).forEach(key => {
-    //     const attributeDescriptor = attributeDescriptors[key];
-    //     sortedAttributeDescriptors[attributeDescriptor.location] = { ...attributeDescriptor, key };
-    // });
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
     const attributesList = sortedAttributeDescriptors.map(({ location, size, name }) => {
