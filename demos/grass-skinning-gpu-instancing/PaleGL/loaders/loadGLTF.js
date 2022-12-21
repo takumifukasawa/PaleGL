@@ -127,6 +127,7 @@ export async function loadGLTF({
                         uvs = new Float32Array(bufferData);
                         break;
                     case "JOINTS_0":
+                        // データはuint8だけど、頂点にはuint16で送る
                         joints = new Uint16Array(new Uint8Array(bufferData));
                         break;
                     case "WEIGHTS_0":
