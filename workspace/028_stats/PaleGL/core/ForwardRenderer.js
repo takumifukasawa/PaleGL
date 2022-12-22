@@ -278,6 +278,7 @@ export class ForwardRenderer {
         
         if(this.#stats) {
             this.#stats.addDrawVertexCount(geometry);
+            this.#stats.incrementDrawCall();
         }
 
         // vertex
