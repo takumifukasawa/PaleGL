@@ -24,6 +24,7 @@
     Engine,
     PhongMaterial,
     Vector2,
+    AxesHelper
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -115,7 +116,7 @@ directionalLight.color = Color.fromRGB(255, 190, 180);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    actor.shadowCamera.visibleFrustum = false;
+    actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
@@ -124,8 +125,8 @@ directionalLight.onStart = ({ actor }) => {
 }
 captureScene.add(directionalLight);
 
-// const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
-// directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
+const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
+directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
@@ -389,6 +390,15 @@ function initDebugger() {
             skinnedMesh.castShadow = value;
         }
     });
+    
+    debuggerGUI.addSliderDebugger({
+        label: "hoge",
+        initialValue: directionalLight.shadowCamera.far,
+        onChange: (value) => {
+            directionalLight.shadowCamera.far = value
+        }
+    })
+    
    
     wrapperElement.appendChild(debuggerGUI.domElement);
 }

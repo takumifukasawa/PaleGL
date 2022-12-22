@@ -65,8 +65,7 @@ export class VertexArrayObject extends GLObject {
         const gl = this.#gpu.gl;
         const targetVBO = this.#vboList.find(({ name }) => key === name);
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
-        // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO.data), targetVBO.usage);
+        gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
@@ -86,7 +85,6 @@ export class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        // TODO: uint16対応
         switch(data.constructor) {
             case Float32Array:
                 // size ... 頂点ごとに埋める数

@@ -1877,8 +1877,7 @@ class VertexArrayObject extends GLObject {
         const gl = this.#gpu.gl;
         const targetVBO = this.#vboList.find(({ name }) => key === name);
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
-        // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO.data), targetVBO.usage);
+        gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
@@ -1898,7 +1897,6 @@ class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        // TODO: uint16対応
         switch(data.constructor) {
             case Float32Array:
                 // size ... 頂点ごとに埋める数
@@ -3072,7 +3070,7 @@ class Camera extends Actor {
                     gpu,
                     attributes: [
                         {
-                            name: "position",
+                            name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
@@ -3131,7 +3129,7 @@ class Camera extends Actor {
         
         if(this.#visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
-            this.#visibleFrustumMesh.geometry.updateAttribute("position", [
+            this.#visibleFrustumMesh.geometry.updateAttribute(AttributeNames.Position, new Float32Array([
                 // near clip
                 ...frustumPositions.nearLeftTop.elements,
                 ...frustumPositions.nearLeftBottom.elements,
@@ -3142,7 +3140,7 @@ class Camera extends Actor {
                 ...frustumPositions.farLeftBottom.elements,
                 ...frustumPositions.farRightTop.elements,
                 ...frustumPositions.farRightBottom.elements,
-            ]);
+            ]));
         }
     }
 

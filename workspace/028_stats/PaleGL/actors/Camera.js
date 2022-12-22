@@ -101,7 +101,7 @@ export class Camera extends Actor {
                     gpu,
                     attributes: [
                         {
-                            name: "position",
+                            name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
@@ -160,7 +160,7 @@ export class Camera extends Actor {
         
         if(this.#visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
-            this.#visibleFrustumMesh.geometry.updateAttribute("position", [
+            this.#visibleFrustumMesh.geometry.updateAttribute(AttributeNames.Position, new Float32Array([
                 // near clip
                 ...frustumPositions.nearLeftTop.elements,
                 ...frustumPositions.nearLeftBottom.elements,
@@ -171,7 +171,7 @@ export class Camera extends Actor {
                 ...frustumPositions.farLeftBottom.elements,
                 ...frustumPositions.farRightTop.elements,
                 ...frustumPositions.farRightBottom.elements,
-            ]);
+            ]));
         }
     }
 
