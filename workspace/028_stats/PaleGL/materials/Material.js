@@ -1,5 +1,5 @@
 ﻿import {Shader} from "./../core/Shader.js";
-import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide} from "./../constants.js";
+import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide, UniformNames} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
@@ -136,19 +136,19 @@ export class Material {
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         // - skinning回りもここで入れたい？
         const commonUniforms = {
-            uWorldMatrix: {
+            [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uViewMatrix: {
+            [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uProjectionMatrix: {
+            [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uNormalMatrix: {
+            [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },

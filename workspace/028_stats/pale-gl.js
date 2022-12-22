@@ -1428,19 +1428,19 @@ class Material {
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         // - skinning回りもここで入れたい？
         const commonUniforms = {
-            uWorldMatrix: {
+            [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uViewMatrix: {
+            [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uProjectionMatrix: {
+            [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
-            uNormalMatrix: {
+            [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
@@ -4994,14 +4994,14 @@ class ForwardRenderer {
                 const targetMaterial = actor.depthMaterial;
                 
                 // TODO: material 側でやった方がよい？
-                if (targetMaterial.uniforms.uWorldMatrix) {
-                    targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
+                if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+                    targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
                 }
-                if (targetMaterial.uniforms.uViewMatrix) {
-                    targetMaterial.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
+                if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+                    targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
                 }
-                if (targetMaterial.uniforms.uProjectionMatrix) {
-                    targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
+                if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+                    targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
                 }
               
                 this.renderMesh(actor.geometry, targetMaterial);
@@ -5043,17 +5043,17 @@ class ForwardRenderer {
             // }
 
             // TODO: material 側でやった方がよい？
-            if (targetMaterial.uniforms.uWorldMatrix) {
-                targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
+            if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+                targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
             }
-            if (targetMaterial.uniforms.uViewMatrix) {
-                targetMaterial.uniforms.uViewMatrix.value = camera.viewMatrix;
+            if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+                targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
             }
-            if (targetMaterial.uniforms.uProjectionMatrix) {
-                targetMaterial.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
+            if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+                targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
             }
-            if (targetMaterial.uniforms.uNormalMatrix) {
-                targetMaterial.uniforms.uNormalMatrix.value = actor.transform.worldMatrix.clone().invert().transpose();
+            if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
+                targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
             }
             if (targetMaterial.uniforms.uViewPosition) {
                 targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
