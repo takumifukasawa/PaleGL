@@ -1,16 +1,17 @@
+import {AttributeNames} from "../constants";
 
 export class Stats {
     domElement;
-    vertexCountView;
+    drawVertexCountView;
     drawCallCountView;
-    vertexCount = 0;
+    drawVertexCount = 0;
     drawCallCount = 0;
     
     constructor({ wrapperElement } = {}) {
         this.domElement = document.createElement("div");
         this.domElement.style.cssText = `
 position: absolute;
-bottom: 0;
+top: 0;
 left: 0;
 padding: 0.2em 0.5em;
 font-size: 9px;
@@ -19,8 +20,8 @@ font-weight: bold;
 text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 `;
 
-        this.vertexCountView = document.createElement("p");
-        this.domElement.appendChild(this.vertexCountView);
+        this.drawVertexCountView = document.createElement("p");
+        this.domElement.appendChild(this.drawVertexCountView);
         
         this.drawCallCountView = document.createElement("p");
         this.domElement.appendChild(this.drawCallCountView);
@@ -29,20 +30,21 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
     }
 
     clear() {
-        this.vertexCount = 0;
+        this.drawVertexCount = 0;
         this.drawCallCount = 0;
     }
 
-    addVertexCount(vertexCount) {
-        this.vertexCount = vertexCount;
+    addDrawVertexCount(geometry) {
+        const positionAttribute = geometry.getAttribute(AttributeNames.Position);
+        this.drawVertexCount += positionAttribute.data.length / 3;
     }
     
     incrementDrawCall() {
         this.drawCallCount++;
     }
     
-    update() {
-        this.vertexCountView.textContent = `vertex count: ${this.vertexCount}`;
+    updateView() {
+        this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
     }
 }

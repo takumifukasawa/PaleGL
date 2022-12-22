@@ -93,7 +93,9 @@ export class Engine {
     }
     
     render() {
+        this.#stats.clear();
         this.#renderer.render(this.#scene, this.#scene.mainCamera);
+        this.#stats.updateView();
     }
    
     // time [sec]

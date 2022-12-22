@@ -258,7 +258,7 @@ export class ForwardRenderer {
         } else {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }
-       
+
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
         if (camera.enabledPostProcess) {
@@ -275,6 +275,10 @@ export class ForwardRenderer {
 
     renderMesh(geometry, material) {
         geometry.update();
+        
+        if(this.#stats) {
+            this.#stats.addDrawVertexCount(geometry);
+        }
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);

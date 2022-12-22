@@ -64,7 +64,7 @@ const instanceNumView = document.createElement("p");
 instanceNumView.textContent = `instance num: ${instanceNum}`;
 instanceNumView.style.cssText = `
 position: absolute;
-top: 0;
+bottom: 0;
 left: 0;
 padding: 0.2em 0.5em;
 font-size: 9px;
@@ -391,15 +391,6 @@ function initDebugger() {
         }
     });
     
-    debuggerGUI.addSliderDebugger({
-        label: "hoge",
-        initialValue: directionalLight.shadowCamera.far,
-        onChange: (value) => {
-            directionalLight.shadowCamera.far = value
-        }
-    })
-    
-   
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
 

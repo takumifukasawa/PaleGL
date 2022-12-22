@@ -95,6 +95,10 @@ export class Geometry {
         attribute.data = data;
         this.vertexArrayObject.updateAttribute(key, attribute.data);
     }
+    
+    getAttribute(key) {
+        return this.attributes.find(({ name }) => name === key);
+    }
 
     getAttributeDescriptors() {
         return this.attributes.map(attribute => attribute.getDescriptor());
