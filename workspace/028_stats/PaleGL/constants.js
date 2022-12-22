@@ -120,5 +120,9 @@ export const UniformNames = {
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
     JointMatrices: "uJointMatrices",
-    NormalMatrix: "uNormalMatrix"
+    JointTexture: "uJointTexture",
+    NormalMatrix: "uNormalMatrix",
+    ShadowMap: "uShadowMap",
+    ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
+    ShadowBias: "uShadowBias",
 };

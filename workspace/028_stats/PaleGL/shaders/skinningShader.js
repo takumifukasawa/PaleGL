@@ -1,3 +1,5 @@
+import {UniformNames} from "../constants";
+
 export const calcSkinningMatrixFunc = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
@@ -59,7 +61,7 @@ mat4 getJointMatrixGPUSkinning(
 export const skinningVertexUniforms = (jointNum) => `
 // tmp for cpu skinning
 // uniform mat4[${jointNum}] uJointMatrices;
-uniform sampler2D uJointTexture;
+uniform sampler2D ${UniformNames.JointTexture};
 
 uniform int uBoneCount;
 uniform int uJointTextureColNum;

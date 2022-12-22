@@ -1,3 +1,4 @@
+import {UniformNames} from "../constants";
 
 export const shadowMapVertexVaryings = () => `
 out vec4 vShadowMapProjectionUv;
@@ -12,12 +13,12 @@ export const shadowMapVertex = () => `
 `;
 
 export const shadowMapVertexUniforms = () => `
-uniform mat4 uShadowMapProjectionMatrix;
+uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
 `;
 
 export const shadowMapFragmentUniforms = () => `
-uniform sampler2D uShadowMap;
-uniform float uShadowBias;
+uniform sampler2D ${UniformNames.ShadowMap};
+uniform float ${UniformNames.ShadowBias};
 `;
 
 export const shadowMapFragmentFunc = () => `

@@ -167,16 +167,16 @@ export class Material {
         };
         
         const shadowUniforms = this.receiveShadow ? {
-            uShadowMap: {
+            [UniformNames.ShadowMap]: {
                 type: UniformTypes.Texture,
                 value: null,
             },
-            uShadowMapProjectionMatrix: {
+            [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
-            uShadowBias: {
+            [UniformNames.ShadowBias]: {
                 type: UniformTypes.Float,
                 value: 0.01
             }

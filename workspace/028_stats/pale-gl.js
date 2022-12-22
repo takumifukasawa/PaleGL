@@ -861,7 +861,11 @@ const UniformNames = {
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
     JointMatrices: "uJointMatrices",
-    NormalMatrix: "uNormalMatrix"
+    JointTexture: "uJointTexture",
+    NormalMatrix: "uNormalMatrix",
+    ShadowMap: "uShadowMap",
+    ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
+    ShadowBias: "uShadowBias",
 };
 ﻿class Rotator {
     // x, y, z axes
@@ -1459,16 +1463,16 @@ class Material {
         };
         
         const shadowUniforms = this.receiveShadow ? {
-            uShadowMap: {
+            [UniformNames.ShadowMap]: {
                 type: UniformTypes.Texture,
                 value: null,
             },
-            uShadowMapProjectionMatrix: {
+            [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity()
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
-            uShadowBias: {
+            [UniformNames.ShadowBias]: {
                 type: UniformTypes.Float,
                 value: 0.01
             }
@@ -3356,6 +3360,8 @@ class DirectionalLight extends Light {
         this.addChild(this.shadowCamera);
     }
 }
+
+
 const calcSkinningMatrixFunc = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
@@ -3417,7 +3423,7 @@ mat4 getJointMatrixGPUSkinning(
 const skinningVertexUniforms = (jointNum) => `
 // tmp for cpu skinning
 // uniform mat4[${jointNum}] uJointMatrices;
-uniform sampler2D uJointTexture;
+uniform sampler2D ${UniformNames.JointTexture};
 
 uniform int uBoneCount;
 uniform int uJointTextureColNum;
@@ -3475,6 +3481,7 @@ const engineCommonUniforms = () => `
 uniform float uTime;
 `;
 
+
 const shadowMapVertexVaryings = () => `
 out vec4 vShadowMapProjectionUv;
 `;
@@ -3488,12 +3495,12 @@ const shadowMapVertex = () => `
 `;
 
 const shadowMapVertexUniforms = () => `
-uniform mat4 uShadowMapProjectionMatrix;
+uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
 `;
 
 const shadowMapFragmentUniforms = () => `
-uniform sampler2D uShadowMap;
-uniform float uShadowBias;
+uniform sampler2D ${UniformNames.ShadowMap};
+uniform float ${UniformNames.ShadowBias};
 `;
 
 const shadowMapFragmentFunc = () => `
@@ -5084,7 +5091,7 @@ class ForwardRenderer {
                 }
 
                 if (
-                    targetMaterial.uniforms.uShadowMapProjectionMatrix &&
+                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
                     light.castShadow
                 ) {
@@ -5103,11 +5110,11 @@ class ForwardRenderer {
 
                     // TODO:
                     // - directional light の構造体に持たせた方がいいかもしれない
-                    if(targetMaterial.uniforms.uShadowMap) {
-                        targetMaterial.uniforms.uShadowMap.value = light.shadowMap.read.texture;
+                    if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
+                        targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
                     }
-                    if(targetMaterial.uniforms.uShadowMapProjectionMatrix) {
-                        targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
+                    if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
+                        targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
                     }
                 }
             });

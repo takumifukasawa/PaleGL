@@ -152,7 +152,7 @@ export class ForwardRenderer {
                 }
 
                 if (
-                    targetMaterial.uniforms.uShadowMapProjectionMatrix &&
+                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
                     light.castShadow
                 ) {
@@ -171,11 +171,11 @@ export class ForwardRenderer {
 
                     // TODO:
                     // - directional light の構造体に持たせた方がいいかもしれない
-                    if(targetMaterial.uniforms.uShadowMap) {
-                        targetMaterial.uniforms.uShadowMap.value = light.shadowMap.read.texture;
+                    if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
+                        targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
                     }
-                    if(targetMaterial.uniforms.uShadowMapProjectionMatrix) {
-                        targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
+                    if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
+                        targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
                     }
                 }
             });
