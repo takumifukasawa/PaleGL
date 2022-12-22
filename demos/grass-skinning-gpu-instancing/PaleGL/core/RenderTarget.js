@@ -5,7 +5,6 @@ import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} 
 import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 export class RenderTarget extends AbstractRenderTarget {
-    // #texture;
     name;
     #framebuffer;
     #depthRenderbuffer;

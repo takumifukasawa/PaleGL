@@ -33,10 +33,6 @@ export class TimeAccumulator {
 
             const loopNum = Math.min(this.maxChaseCount, n);
             for(let i = 0; i < loopNum; i++) {
-                // いらないはず
-                // if((time - interval) < this.#lastTime) {
-                //     break;
-                // }
                 this.#lastTime += interval;
                 this.#callback(this.#lastTime, interval);
             }

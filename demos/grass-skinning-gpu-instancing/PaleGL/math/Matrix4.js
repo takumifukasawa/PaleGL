@@ -378,65 +378,6 @@ export class Matrix4 {
         return this;
     }
    
-    // ref: http://www.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/tech0023.html
-    // invert() {
-    //     const m11 = this.m00;
-    //     const m12 = this.m01;
-    //     const m13 = this.m02;
-    //     const m14 = this.m03;
-    //     const m21 = this.m10;
-    //     const m22 = this.m11;
-    //     const m23 = this.m12;
-    //     const m24 = this.m13;
-    //     const m31 = this.m20;
-    //     const m32 = this.m21;
-    //     const m33 = this.m22;
-    //     const m34 = this.m23;
-    //     const m41 = this.m30;
-    //     const m42 = this.m31;
-    //     const m43 = this.m32;
-    //     const m44 = this.m33;
-    //     
-    //     const det = 
-    //               m11 * m22 * m33 * m44 + m11 * m23 * m34 * m42 + m11 * m24 * m32 * m43
-    //             + m12 * m21 * m34 * m43 + m12 * m23 * m31 * m44 + m12 * m24 * m33 * m41
-    //             + m13 * m21 * m32 * m44 + m13 * m22 * m34 * m41 + m13 * m24 * m31 * m42
-    //             + m14 * m21 * m33 * m42 - m14 * m22 * m31 * m43 + m14 * m23 * m32 * m41
-    //             - m11 * m22 * m34 * m43 - m11 * m23 * m32 * m44 - m11 * m24 * m33 * m42
-    //             - m12 * m21 * m33 * m44 - m12 * m23 * m34 * m41 - m12 * m24 * m31 * m43
-    //             - m13 * m21 * m34 * m42 - m13 * m22 * m31 * m44 - m13 * m24 * m32 * m41
-    //             - m14 * m21 * m32 * m43 - m14 * m22 * m33 * m41 - m14 * m23 * m31 * m42;
-    //     
-    //     const invD = 1 / det;
-    //    
-    //     const n11 = (m22 * m33 * m44 + m23 * m34 * m42 + m24 * m32 * m43 - m22 * m34 * m43 - m23 * m32 * m44 - m24 * m33 * m42) * invD;
-    //     const n12 = (m12 * m34 * m43 + m13 * m32 * m44 + m14 * m33 * m42 - m12 * m33 * m44 - m13 * m34 * m42 - m14 * m32 * m43) * invD;
-    //     const n13 = (m12 * m23 * m44 + m13 * m24 * m42 + m14 * m22 * m43 - m12 * m24 * m43 - m13 * m22 * m44 - m14 * m23 * m42) * invD;
-    //     const n14 = (m12 * m24 * m33 + m13 * m22 * m34 + m14 * m23 * m32 - m12 * m23 * m34 - m13 * m24 * m32 - m14 * m22 * m33) * invD;
-    //     
-    //     const n21 = (m21 * m34 * m43 + m23 * m31 * m44 + m24 * m33 * m41 - m21 * m33 * m44 - m23 * m34 * m41 - m24 * m31 * m43) * invD;
-    //     const n22 = (m11 * m33 * m44 + m13 + m34 * m41 + m14 * m31 * m43 - m11 * m34 * m43 - m13 * m31 * m44 - m14 * m33 * m41) * invD;
-    //     const n23 = (m11 * m24 * m43 + m13 * m21 * m44 + m14 * m23 * m41 - m11 * m23 * m44 - m13 * m24 * m41 - m14 * m21 * m43) * invD;
-    //     const n24 = (m11 * m23 * m34 + m13 * m24 * m31 + m14 * m21 * m33 - m11 * m24 * m33 - m13 * m21 * m34 - m14 * m23 * m31) * invD;
-    //     
-    //     const n31 = (m21 * m32 * m44 + m22 * m34 * m41 + m24 * m31 * m42 - m21 * m34 * m41 - m22 * m31 * m44 - m24 * m32 * m41) * invD;
-    //     const n32 = (m11 * m34 * m42 + m12 * m31 * m44 + m14 * m32 * m41 - m11 * m32 * m44 - m12 * m34 * m41 - m14 * m31 * m42) * invD;
-    //     const n33 = (m11 * m22 * m44 + m12 * m24 * m41 + m14 * m21 * m42 - m11 * m24 * m42 - m12 * m21 * m44 - m14 * m22 * m41) * invD;
-    //     const n34 = (m11 * m24 * m32 + m12 * m21 * m34 + m14 * m22 * m31 - m11 * m22 * m34 - m12 * m24 * m31 - m14 * m21 * m32) * invD;
-    //     
-    //     const n41 = (m21 * m33 * m41 + m22 * m31 * m42 + m23 * m32 * m41 - m21 * m32 * m43 - m22 * m33 * m41 - m23 * m32 * m42) * invD;
-    //     const n42 = (m11 * m32 * m43 + m12 * m33 * m41 + m13 * m31 * m42 - m11 * m33 * m42 - m12 * m31 * m43 - m13 * m32 * m41) * invD;
-    //     const n43 = (m11 * m23 * m42 + m12 * m21 * m43 + m13 + m22 * m41 - m11 * m22 * m43 - m12 * m23 * m41 - m13 * m21 * m42) * invD;
-    //     const n44 = (m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 - m11 * m23 * m32 - m12 * m21 * m33 - m13 * m22 * m31) * invD;
-    //     
-    //     return new Matrix4(
-    //         n11, n12, n13, n14,
-    //         n21, n22, n23, n24,
-    //         n31, n32, n33, n34,
-    //         n41, n42, n43, n44
-    //     );
-    // }
-    
     // ref: https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
     invert() {
 

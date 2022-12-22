@@ -82,12 +82,6 @@ export const CubeMapAxis = {
     NegativeZ: "NegativeZ",
 };
 
-// export const CameraClearType = {
-//     Skybox: "Skybox",
-//     Color: "Color",
-//     // TODO: type for NONE
-// };
-
 export const FaceSide = {
     Front: "Front",
     Back: "Back",
@@ -108,6 +102,4 @@ export const RenderTargetTypes = {
 export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
-    // Rotator: "Rotator",
-    // Scalar: "Scalar"
 };

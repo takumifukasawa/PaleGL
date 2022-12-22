@@ -11,60 +11,22 @@ export class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
-    
-    // #depthMaterial;
-    // #depthMaterialAlphaTestQueue;
 
     constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
-
-        // this.#depthMaterial = new Material({
-        //     gpu,
-        //     vertexShader: `#version 300 es
-        //     layout (location = 0) in vec3 aPosition;
-        //     uniform mat4 uWorldMatrix;
-        //     uniform mat4 uViewMatrix;
-        //     uniform mat4 uProjectionMatrix;
-        //     void main() {
-        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-        //     }
-        //     `,
-        //     fragmentShader: generateDepthFragmentShader({ alphaTest: false })
-        // });
-        // this.#depthMaterial.start({ gpu })
-        // this.#depthMaterialAlphaTestQueue = new Material({
-        //     gpu,
-        //     vertexShader: `#version 300 es
-        //     layout (location = 0) in vec3 aPosition;
-        //     uniform mat4 uWorldMatrix;
-        //     uniform mat4 uViewMatrix;
-        //     uniform mat4 uProjectionMatrix;
-        //     void main() {
-        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-        //     }
-        //     `,
-        //     fragmentShader: generateDepthFragmentShader({ alphaTest: true })
-        // });
-        // console.log(generateDepthFragmentShader({ alphaTest: true }))
     }
 
     setSize(width, height, realWidth, realHeight) {
         this.#realWidth = realWidth;
         this.#realHeight = realHeight;
-        // this.#realWidth = Math.floor(width * this.pixelRatio);
-        // this.#realHeight = Math.floor(height * this.pixelRatio);
         this.canvas.width = this.#realWidth;
         this.canvas.height = this.#realHeight;
-        // this.canvas.style.width = `${width}px`;
-        // this.canvas.style.height = `${height}px`;
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
 
     setRenderTarget(renderTarget) {
-        const gl = this.#gpu.gl;
-
         if (renderTarget) {
             this.#gpu.setFramebuffer(renderTarget.framebuffer)
             this.#gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
@@ -240,18 +202,15 @@ export class ForwardRenderer {
                 case ActorTypes.SkinnedMesh:
                     actor.materials.forEach((material, i) => {
                         if(!!material.alphaTest) {
-                            // renderMeshInfoEachQueue.alphaTest.push(actor);
                             renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
                             return;
                         }
                         switch (material.blendType) {
                             case BlendTypes.Opaque:
-                                // renderMeshInfoEachQueue.opaque.push(actor);
                                 renderMeshInfoEachQueue.opaque.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             case BlendTypes.Transparent:
                             case BlendTypes.Additive:
-                                // renderMeshInfoEachQueue.transparent.push(actor);
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
@@ -285,9 +244,6 @@ export class ForwardRenderer {
                 }
                 return actor.castShadow;
             });
-            // if(castShadowRenderMeshInfos.length > 0) {
-            //     this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
-            // }
             this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
         }
 
@@ -320,7 +276,6 @@ export class ForwardRenderer {
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
-        // this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
         // material
         this.#gpu.setShader(material.shader);
         // uniforms
