@@ -15,7 +15,6 @@ export class GPU {
     gl;
     #shader;
     #vao;
-    // #ibo;
     #uniforms;
     dummyTexture;
 
@@ -36,10 +35,6 @@ export class GPU {
     setVertexArrayObject(vao) {
         this.#vao = vao;
     }
-
-    // setIndexBufferObject(ibo) {
-    //     this.#ibo = ibo;
-    // }
 
     setUniforms(uniforms) {
         this.#uniforms = uniforms;
@@ -234,7 +229,6 @@ export class GPU {
         if (this.#vao.hasIndices) {
             // draw by indices
             // drawCount ... use indices count
-            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
             if(instanceCount) {
                 gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
             } else {

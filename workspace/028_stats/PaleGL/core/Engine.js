@@ -1,16 +1,17 @@
 ﻿import {TimeSkipper} from "../utilities/TimeSkipper.js";
 import {TimeAccumulator} from "../utilities/TimeAccumulator.js";
 import {ActorTypes} from "../constants.js";
+import {Stats} from "../utilities/Stats.js";
 
 export class Engine {
     #renderer;
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
-    // #renderFrameTimer;
     #onBeforeFixedUpdate;
     #onBeforeUpdate;
     #scene;
     #gpu;
+    #stats;
     
     get renderer() {
         return this.#renderer;
@@ -23,11 +24,13 @@ export class Engine {
     constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
+        
+        this.#stats = new Stats();
+        this.#renderer.setStats(this.#stats);
 
         // TODO: 外からfps変えられるようにしたい
         this.#fixedUpdateFrameTimer = new TimeAccumulator(60, this.fixedUpdate.bind(this));
         this.#updateFrameTimer = new TimeSkipper(60, this.update.bind(this));
-        // this.#renderFrameTimer = new TimeSkipper(60, this.render.bind(this));
 
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
         this.#onBeforeUpdate = onBeforeUpdate;
@@ -41,7 +44,6 @@ export class Engine {
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
-        // this.#renderFrameTimer.start(t);
     }
     
     setSize(width, height) {
@@ -49,8 +51,6 @@ export class Engine {
         const rh = height * this.renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        // this.#scene.traverse((actor) => actor.setSize(width, height));
-        // this.#renderer.setSize(width, height);
         this.#scene.traverse((actor) => actor.setSize(w, h));
         this.#renderer.setSize(w, h, rw, rh);
     }
@@ -68,8 +68,6 @@ export class Engine {
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
         this.#scene.traverse((actor) => actor.updateTransform());
-
-        // this.#scene.traverse((actor) => actor.afterUpdatedTransform());
     }
 
     update(time, deltaTime) {

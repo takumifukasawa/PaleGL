@@ -41,10 +41,6 @@ export class VertexArrayObject extends GLObject {
         // bind vertex array to webgl context
         gl.bindVertexArray(this.#vao);
 
-        // Object.keys(attributes).forEach(key => {
-        //     const attribute = attributes[key];
-        //     this.setAttribute(key, attribute);
-        // });
         attributes.forEach(attribute => {
             this.setAttribute(attribute);
         });

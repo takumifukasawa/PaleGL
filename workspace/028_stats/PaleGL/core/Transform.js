@@ -33,10 +33,6 @@ export class Transform {
         return this.#localMatrix;
     }
 
-    // get localPosition() {
-    //     return this.position.clone();
-    // }
-
     get worldPosition() {
         return this.#worldMatrix.position;
     }
@@ -89,17 +85,14 @@ export class Transform {
     }
 
     setRotationX(degree) {
-        // this.rotation.x = degree;
         this.rotation.setRotationX(degree);
     }
 
     setRotationY(degree) {
-        // this.rotation.y = degree;
         this.rotation.setRotationY(degree);
     }
 
     setRotationZ(degree) {
-        // this.rotation.z = degree;
         this.rotation.setRotationZ(degree);
     }
 
@@ -110,10 +103,4 @@ export class Transform {
     lookAt(lookAtTarget) {
         this.lookAtTarget = lookAtTarget;
     }
-
-    // lookAt(center, up = new Vector3(0, 1, 0)) {
-    //     console.log(this.#localMatrix.clone())
-    //     this.#localMatrix.lookAt(center, up);
-    //     console.log(this.#localMatrix.clone())
-    // }
 }

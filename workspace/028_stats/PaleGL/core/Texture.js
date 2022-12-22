@@ -121,49 +121,47 @@ export class Texture extends GLObject {
         }
 
         // TODO: startみたいな関数でtextureにdataをセットした方が効率よい？
-        // if(this.#img) {
-            // bind texture data
-            switch(this.type) {
-                case TextureTypes.RGBA:
-                    if (width && height) {
-                        // for render target
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                    } else {
-                        // set img to texture
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                    }
-                    break;
-                    
-                case TextureTypes.Depth:
-                    if (width && height) {
-                        // for render target
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    } else {
-                        // set img to texture
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    }
-                    break;
-                    
-                case TextureTypes.RGBA16F:
-                    if (width && height) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
-                    } else {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.#img);
-                    }   
-                    break;
+        // bind texture data
+        switch(this.type) {
+            case TextureTypes.RGBA:
+                if (width && height) {
+                    // for render target
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                } else {
+                    // set img to texture
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                }
+                break;
+                
+            case TextureTypes.Depth:
+                if (width && height) {
+                    // for render target
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                } else {
+                    // set img to texture
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                }
+                break;
+                
+            case TextureTypes.RGBA16F:
+                if (width && height) {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                } else {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.#img);
+                }   
+                break;
  
-                case TextureTypes.RGBA32F:
-                    if (width && height) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
-                    } else {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.#img);
-                    }   
-                    break;
-                    
-                default:
-                    throw "[Texture.constructor] invalid type";
-            }
-        // }
+            case TextureTypes.RGBA32F:
+                if (width && height) {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                } else {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.#img);
+                }   
+                break;
+                
+            default:
+                throw "[Texture.constructor] invalid type";
+        }
        
         // TODO: あった方がよい？
         // unbind img
@@ -195,8 +193,6 @@ export class Texture extends GLObject {
             default:
                 throw "[Texture.setSize] invalid type";
         }
-        
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
     }

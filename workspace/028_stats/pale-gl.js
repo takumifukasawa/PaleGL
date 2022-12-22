@@ -560,65 +560,6 @@ class Matrix4 {
         return this;
     }
    
-    // ref: http://www.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/tech0023.html
-    // invert() {
-    //     const m11 = this.m00;
-    //     const m12 = this.m01;
-    //     const m13 = this.m02;
-    //     const m14 = this.m03;
-    //     const m21 = this.m10;
-    //     const m22 = this.m11;
-    //     const m23 = this.m12;
-    //     const m24 = this.m13;
-    //     const m31 = this.m20;
-    //     const m32 = this.m21;
-    //     const m33 = this.m22;
-    //     const m34 = this.m23;
-    //     const m41 = this.m30;
-    //     const m42 = this.m31;
-    //     const m43 = this.m32;
-    //     const m44 = this.m33;
-    //     
-    //     const det = 
-    //               m11 * m22 * m33 * m44 + m11 * m23 * m34 * m42 + m11 * m24 * m32 * m43
-    //             + m12 * m21 * m34 * m43 + m12 * m23 * m31 * m44 + m12 * m24 * m33 * m41
-    //             + m13 * m21 * m32 * m44 + m13 * m22 * m34 * m41 + m13 * m24 * m31 * m42
-    //             + m14 * m21 * m33 * m42 - m14 * m22 * m31 * m43 + m14 * m23 * m32 * m41
-    //             - m11 * m22 * m34 * m43 - m11 * m23 * m32 * m44 - m11 * m24 * m33 * m42
-    //             - m12 * m21 * m33 * m44 - m12 * m23 * m34 * m41 - m12 * m24 * m31 * m43
-    //             - m13 * m21 * m34 * m42 - m13 * m22 * m31 * m44 - m13 * m24 * m32 * m41
-    //             - m14 * m21 * m32 * m43 - m14 * m22 * m33 * m41 - m14 * m23 * m31 * m42;
-    //     
-    //     const invD = 1 / det;
-    //    
-    //     const n11 = (m22 * m33 * m44 + m23 * m34 * m42 + m24 * m32 * m43 - m22 * m34 * m43 - m23 * m32 * m44 - m24 * m33 * m42) * invD;
-    //     const n12 = (m12 * m34 * m43 + m13 * m32 * m44 + m14 * m33 * m42 - m12 * m33 * m44 - m13 * m34 * m42 - m14 * m32 * m43) * invD;
-    //     const n13 = (m12 * m23 * m44 + m13 * m24 * m42 + m14 * m22 * m43 - m12 * m24 * m43 - m13 * m22 * m44 - m14 * m23 * m42) * invD;
-    //     const n14 = (m12 * m24 * m33 + m13 * m22 * m34 + m14 * m23 * m32 - m12 * m23 * m34 - m13 * m24 * m32 - m14 * m22 * m33) * invD;
-    //     
-    //     const n21 = (m21 * m34 * m43 + m23 * m31 * m44 + m24 * m33 * m41 - m21 * m33 * m44 - m23 * m34 * m41 - m24 * m31 * m43) * invD;
-    //     const n22 = (m11 * m33 * m44 + m13 + m34 * m41 + m14 * m31 * m43 - m11 * m34 * m43 - m13 * m31 * m44 - m14 * m33 * m41) * invD;
-    //     const n23 = (m11 * m24 * m43 + m13 * m21 * m44 + m14 * m23 * m41 - m11 * m23 * m44 - m13 * m24 * m41 - m14 * m21 * m43) * invD;
-    //     const n24 = (m11 * m23 * m34 + m13 * m24 * m31 + m14 * m21 * m33 - m11 * m24 * m33 - m13 * m21 * m34 - m14 * m23 * m31) * invD;
-    //     
-    //     const n31 = (m21 * m32 * m44 + m22 * m34 * m41 + m24 * m31 * m42 - m21 * m34 * m41 - m22 * m31 * m44 - m24 * m32 * m41) * invD;
-    //     const n32 = (m11 * m34 * m42 + m12 * m31 * m44 + m14 * m32 * m41 - m11 * m32 * m44 - m12 * m34 * m41 - m14 * m31 * m42) * invD;
-    //     const n33 = (m11 * m22 * m44 + m12 * m24 * m41 + m14 * m21 * m42 - m11 * m24 * m42 - m12 * m21 * m44 - m14 * m22 * m41) * invD;
-    //     const n34 = (m11 * m24 * m32 + m12 * m21 * m34 + m14 * m22 * m31 - m11 * m22 * m34 - m12 * m24 * m31 - m14 * m21 * m32) * invD;
-    //     
-    //     const n41 = (m21 * m33 * m41 + m22 * m31 * m42 + m23 * m32 * m41 - m21 * m32 * m43 - m22 * m33 * m41 - m23 * m32 * m42) * invD;
-    //     const n42 = (m11 * m32 * m43 + m12 * m33 * m41 + m13 * m31 * m42 - m11 * m33 * m42 - m12 * m31 * m43 - m13 * m32 * m41) * invD;
-    //     const n43 = (m11 * m23 * m42 + m12 * m21 * m43 + m13 + m22 * m41 - m11 * m22 * m43 - m12 * m23 * m41 - m13 * m21 * m42) * invD;
-    //     const n44 = (m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 - m11 * m23 * m32 - m12 * m21 * m33 - m13 * m22 * m31) * invD;
-    //     
-    //     return new Matrix4(
-    //         n11, n12, n13, n14,
-    //         n21, n22, n23, n24,
-    //         n31, n32, n33, n34,
-    //         n41, n42, n43, n44
-    //     );
-    // }
-    
     // ref: https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
     invert() {
 
@@ -882,12 +823,6 @@ const CubeMapAxis = {
     NegativeZ: "NegativeZ",
 };
 
-// const CameraClearType = {
-//     Skybox: "Skybox",
-//     Color: "Color",
-//     // TODO: type for NONE
-// };
-
 const FaceSide = {
     Front: "Front",
     Back: "Back",
@@ -908,8 +843,25 @@ const RenderTargetTypes = {
 const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
-    // Rotator: "Rotator",
-    // Scalar: "Scalar"
+};
+
+const AttributeNames = {
+    Position: "aPosition",
+    Uv: "aUv",
+    Normal: "aNormal",
+    Tangent: "aTangent",
+    Binormal: "aBinormal",
+    BoneIndices: "aBoneIndices",
+    BoneWeights: "aBoneWeighs",
+    Color: "aColor",
+};
+
+const UniformNames = {
+    WorldMatrix: "uWorldMatrix",
+    ViewMatrix: "uViewMatrix",
+    ProjectionMatrix: "uProjectionMatrix",
+    JointMatrices: "uJointMatrices",
+    NormalMatrix: "uNormalMatrix"
 };
 ﻿class Rotator {
     // x, y, z axes
@@ -1039,10 +991,6 @@ class Transform {
         return this.#localMatrix;
     }
 
-    // get localPosition() {
-    //     return this.position.clone();
-    // }
-
     get worldPosition() {
         return this.#worldMatrix.position;
     }
@@ -1095,17 +1043,14 @@ class Transform {
     }
 
     setRotationX(degree) {
-        // this.rotation.x = degree;
         this.rotation.setRotationX(degree);
     }
 
     setRotationY(degree) {
-        // this.rotation.y = degree;
         this.rotation.setRotationY(degree);
     }
 
     setRotationZ(degree) {
-        // this.rotation.z = degree;
         this.rotation.setRotationZ(degree);
     }
 
@@ -1116,12 +1061,6 @@ class Transform {
     lookAt(lookAtTarget) {
         this.lookAtTarget = lookAtTarget;
     }
-
-    // lookAt(center, up = new Vector3(0, 1, 0)) {
-    //     console.log(this.#localMatrix.clone())
-    //     this.#localMatrix.lookAt(center, up);
-    //     console.log(this.#localMatrix.clone())
-    // }
 }
 
 // ref: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
@@ -1357,7 +1296,6 @@ void main() {
 
 
 
-// TODO: depth fragment は mesh に持たせた方がわかりやすそう
 class Material {
     name;
   
@@ -1455,28 +1393,6 @@ class Material {
             this.#vertexShaderModifier = vertexShaderModifier;
         }
         
-        //this.#generateVertexShader = () => {
-        //    if(this.vertexShader) {
-        //        return;
-        //    }
-        //    // this.vertexShader = vertexShader;
-        //    this.vertexShader = vertexShaderGenerator({ isSkinning, jointNum, gpuSkinning });
-        //};
-        //this.#generateFragmentShader = () => {
-        //    if(this.fragmentShader) {
-        //        return;
-        //    }
-        //    // this.fragmentShader = fragmentShader;
-        //    this.fragmentShader = fragmentShaderGenerator();
-        //};
-        //this.#generateDepthFragmentShader = () => {
-        //    if(this.depthFragmentShader) {
-        //        return;
-        //    }
-        //    // this.depthFragmentShader = depthFragmentShader;
-        //    // this.depthFragmentShader = depthFragmentShaderGenerator();
-        //}
-        
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
 
@@ -1505,9 +1421,6 @@ class Material {
             throw "[Material.constructor] invalid render queue";
         }
        
-        // TODO: フラグだけで判別した方が良い気がする
-        // this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
-        // this.gpuSkinning = gpuSkinning || !!uniforms.uJointTexture;
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
 
@@ -1936,10 +1849,6 @@ class VertexArrayObject extends GLObject {
         // bind vertex array to webgl context
         gl.bindVertexArray(this.#vao);
 
-        // Object.keys(attributes).forEach(key => {
-        //     const attribute = attributes[key];
-        //     this.setAttribute(key, attribute);
-        // });
         attributes.forEach(attribute => {
             this.setAttribute(attribute);
         });
@@ -2025,7 +1934,6 @@ class Geometry {
     attributes = [];
     vertexCount;
     vertexArrayObject;
-    // indexBufferObject;
     indices;
     drawCount;
 
@@ -2038,8 +1946,6 @@ class Geometry {
         attributes,
         indices,
         drawCount,
-        // immediateCreate = true,
-        // calculateTangent = false,
         calculateBinormal = false,
         instanceCount = null,
     }) {
@@ -2072,7 +1978,6 @@ class Geometry {
         const attr = new Attribute({
             name: attribute.name,
             data: attribute.data,
-            // location: i > -1 ? attribute.location || i,
             location,
             size: attribute.size,
             offset: attribute.offset,
@@ -2156,6 +2061,7 @@ class Geometry {
         return binormals;
     }
 }
+
 
 
 
@@ -2341,15 +2247,15 @@ class ArrowHelper extends Mesh {
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            layout (location = 1) in vec2 aUv;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
+            layout (location = 0) in vec3 ${AttributeNames.Position};
+            layout (location = 1) in vec2 ${AttributeNames.Uv};
+            uniform mat4 ${UniformNames.WorldMatrix};
+            uniform mat4 ${UniformNames.ViewMatrix};
+            uniform mat4 ${UniformNames.ProjectionMatrix};
             out vec2 vUv;
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -2380,6 +2286,7 @@ class ArrowHelper extends Mesh {
 
 }
 ﻿
+
 
 
 
@@ -2547,11 +2454,11 @@ class AxesHelper extends Mesh {
             gpu,
             attributes: [
                 {
-                    name: "position",
+                    name: AttributeNames.Position,
                     data: new Float32Array(objData.positions),
                     size: 3
                 }, {
-                    name: "uv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array(objData.uvs),
                     size: 2
                 }
@@ -2562,15 +2469,15 @@ class AxesHelper extends Mesh {
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            layout (location = 1) in vec2 aUv;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
+            layout (location = 0) in vec3 ${AttributeNames.Position};
+            layout (location = 1) in vec2 ${AttributeNames.Uv};
+            uniform mat4 ${UniformNames.WorldMatrix};
+            uniform mat4 ${UniformNames.ViewMatrix};
+            uniform mat4 ${UniformNames.ProjectionMatrix};
             out vec2 vUv;
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -2760,49 +2667,47 @@ class Texture extends GLObject {
         }
 
         // TODO: startみたいな関数でtextureにdataをセットした方が効率よい？
-        // if(this.#img) {
-            // bind texture data
-            switch(this.type) {
-                case TextureTypes.RGBA:
-                    if (width && height) {
-                        // for render target
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                    } else {
-                        // set img to texture
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
-                    }
-                    break;
-                    
-                case TextureTypes.Depth:
-                    if (width && height) {
-                        // for render target
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    } else {
-                        // set img to texture
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    }
-                    break;
-                    
-                case TextureTypes.RGBA16F:
-                    if (width && height) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
-                    } else {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.#img);
-                    }   
-                    break;
+        // bind texture data
+        switch(this.type) {
+            case TextureTypes.RGBA:
+                if (width && height) {
+                    // for render target
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                } else {
+                    // set img to texture
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
+                }
+                break;
+                
+            case TextureTypes.Depth:
+                if (width && height) {
+                    // for render target
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                } else {
+                    // set img to texture
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                }
+                break;
+                
+            case TextureTypes.RGBA16F:
+                if (width && height) {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                } else {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.#img);
+                }   
+                break;
  
-                case TextureTypes.RGBA32F:
-                    if (width && height) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
-                    } else {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.#img);
-                    }   
-                    break;
-                    
-                default:
-                    throw "[Texture.constructor] invalid type";
-            }
-        // }
+            case TextureTypes.RGBA32F:
+                if (width && height) {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.#img);
+                } else {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.#img);
+                }   
+                break;
+                
+            default:
+                throw "[Texture.constructor] invalid type";
+        }
        
         // TODO: あった方がよい？
         // unbind img
@@ -2834,8 +2739,6 @@ class Texture extends GLObject {
             default:
                 throw "[Texture.setSize] invalid type";
         }
-        
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.#img);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
@@ -2951,7 +2854,6 @@ class AbstractRenderTarget {
 
 
 class RenderTarget extends AbstractRenderTarget {
-    // #texture;
     name;
     #framebuffer;
     #depthRenderbuffer;
@@ -3195,14 +3097,14 @@ class Camera extends Actor {
                     gpu,
                     vertexShader: `#version 300 es
                     
-                    layout (location = 0) in vec3 aPosition;
+                    layout (location = 0) in vec3 ${AttributeNames.Position};
                    
-                    uniform mat4 uWorldMatrix;
-                    uniform mat4 uViewMatrix;
-                    uniform mat4 uProjectionMatrix;
+                    uniform mat4 ${UniformNames.WorldMatrix};
+                    uniform mat4 ${UniformNames.ViewMatrix};
+                    uniform mat4 ${UniformNames.ProjectionMatrix};
                     
                     void main() {
-                        gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                        gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     }
                     `,
                     fragmentShader: `#version 300 es
@@ -3630,11 +3532,6 @@ void checkAlphaTest(float value, float threshold) {
 const alphaTestFragmentUniforms = () => `
 uniform float uAlphaTestThreshold;
 `;
-
-// const normalMapVertexAttributes = (beginIndex) => [
-// `layout(location = ${beginIndex + 0}) in vec3 aTangent;`,
-// `layout(location = ${beginIndex + 1}) in vec3 aBinormal;`
-// ];
 
 const normalMapVertexVaryings = () => `
 out vec3 vTangent;
@@ -4069,53 +3966,44 @@ class SkinnedMesh extends Mesh {
         });
 
         // TODO: depthを強制的につくるようにして問題ない？
-        // if(!options.depthMaterial) {
-            this.depthMaterial = new Material({
-                gpu,
-                vertexShader: generateDepthVertexShader({
-                    attributeDescriptors: this.geometry.getAttributeDescriptors(),
-                    isSkinning: true,
-                    gpuSkinning: this.#gpuSkinning,
-                    jointNum: this.boneCount,
-                    vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
-                    // localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
-                }),
-                fragmentShader: generateDepthFragmentShader({
-                    // alphaTest: !!this.material.alphaTest
-                    alphaTest: !!this.mainMaterial.alphaTest
-                }),
-                uniforms: {
-                    // uJointMatrices: {
-                    //     type: UniformTypes.Matrix4Array,
-                    //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
-                    //     // value: null
-                    // },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    },
-                    uJointTextureColNum: {
-                        type: UniformTypes.Int,
-                        value: this.#jointTextureColNum,
-                    },
-                    ...(this.#gpuSkinning ? {
-                        uTime: {
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        uBoneCount: {
-                            type: UniformTypes.Int,
-                            value: this.boneCount
-                        },
-                        uTotalFrameCount: {
-                            type: UniformTypes.Int,
-                            value: 0,
-                        }
-                    } : {})
+        this.depthMaterial = new Material({
+            gpu,
+            vertexShader: generateDepthVertexShader({
+                attributeDescriptors: this.geometry.getAttributeDescriptors(),
+                isSkinning: true,
+                gpuSkinning: this.#gpuSkinning,
+                jointNum: this.boneCount,
+                vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
+            }),
+            fragmentShader: generateDepthFragmentShader({
+                alphaTest: !!this.mainMaterial.alphaTest
+            }),
+            uniforms: {
+                uJointTexture: {
+                    type: UniformTypes.Texture,
+                    value: null
                 },
-                alphaTest: this.mainMaterial.alphaTest
-            });
-        // }
+                uJointTextureColNum: {
+                    type: UniformTypes.Int,
+                    value: this.#jointTextureColNum,
+                },
+                ...(this.#gpuSkinning ? {
+                    uTime: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    uBoneCount: {
+                        type: UniformTypes.Int,
+                        value: this.boneCount
+                    },
+                    uTotalFrameCount: {
+                        type: UniformTypes.Int,
+                        value: 0,
+                    }
+                } : {})
+            },
+            alphaTest: this.mainMaterial.alphaTest
+        });
 
         super.start(options);
 
@@ -4225,8 +4113,8 @@ matrix elements: ${jointData.length}`);
       
         if(this.debugBoneView) {
             const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-            this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
-            this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
+            this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
+            this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         }
 
         if(this.#gpuSkinning) {
@@ -4310,7 +4198,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -4323,14 +4211,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                 
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                 }
                 `,
                 fragmentShader: `#version 300 es
@@ -4356,7 +4244,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -4368,14 +4256,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     gl_PointSize = 6.;
                 }
                 `,
@@ -4486,6 +4374,7 @@ class CubeMap extends GLObject {
 ﻿
 
 
+
 class BoxGeometry extends Geometry {
     constructor({ gpu }) {
         const boxPosition_0 = [-0.5, 0.5, 0.5];
@@ -4519,7 +4408,7 @@ class BoxGeometry extends Geometry {
                 // 1 ---- 3
                 // -----------------------------
                 {
-                    name: "aPosition",
+                    name: AttributeNames.Position,
                     data: new Float32Array([
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -4536,7 +4425,7 @@ class BoxGeometry extends Geometry {
                     ]),
                     size: 3,
                 }, {
-                    name: "aUv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -4545,7 +4434,7 @@ class BoxGeometry extends Geometry {
                     ])).flat()),
                     size: 2
                 }, {
-                    name: "aNormal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
                 },
@@ -4560,6 +4449,7 @@ class BoxGeometry extends Geometry {
 }
 
 ﻿
+
 
 
 
@@ -4591,7 +4481,7 @@ class PlaneGeometry extends Geometry {
             // -----------------------------
             attributes: [
                 {
-                    name: "aPosition",
+                    name: AttributeNames.Position,
                     data: new Float32Array([
                         -1, 1, 0,
                         -1, -1, 0,
@@ -4600,7 +4490,7 @@ class PlaneGeometry extends Geometry {
                     ]),
                     size: 3
                 }, {
-                    name: "aUv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array([
                         0, 1,
                         0, 0,
@@ -4609,20 +4499,20 @@ class PlaneGeometry extends Geometry {
                     ]),
                     size: 2
                 }, {
-                    name: "aNormal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(normals),
                     size: 3
                 },
                 (calculateTangent ?
                     {
-                        name: "aTangent",
+                        name: AttributeNames.Tangent,
                         data: new Float32Array(tangents),
                         size: 3
                     } : {}
                 ),
                 (calculateBinormal ?
                     {
-                        name: "aBinormal",
+                        name: AttributeNames.Binormal,
                         data: new Float32Array(binormals),
                         size: 3
                     } : {}
@@ -4700,14 +4590,14 @@ const skyboxVertexShader = `#version 300 es
 
 precision mediump float;
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aNormal;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
+layout (location = 2) in vec3 ${AttributeNames.Normal};
 
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
+uniform mat4 ${UniformNames.WorldMatrix};
+uniform mat4 ${UniformNames.ViewMatrix};
+uniform mat4 ${UniformNames.ProjectionMatrix};
+uniform mat4 ${UniformNames.NormalMatrix};
 
 out vec2 vUv;
 out vec3 vNormal;
@@ -4715,10 +4605,10 @@ out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
-    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
+    vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;
+    vec4 worldPosition = ${UniformNames.WorldMatrix} * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * worldPosition;
 }
 `;
 
@@ -4766,15 +4656,15 @@ class Skybox extends Mesh {
             gpu,
             attributes: [
                 {
-                    name: "position",
+                    name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
                     size: 3
                 }, {
-                    name: "uv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }, {
-                    name: "normal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
                     size: 3
                 },
@@ -4788,7 +4678,7 @@ class Skybox extends Mesh {
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
-            depthTest: false,
+            depthTest: true,
             depthWrite: false,
             uniforms: {
                 uCubeTexture: {
@@ -4882,17 +4772,62 @@ class TimeAccumulator {
 
             const loopNum = Math.min(this.maxChaseCount, n);
             for(let i = 0; i < loopNum; i++) {
-                // いらないはず
-                // if((time - interval) < this.#lastTime) {
-                //     break;
-                // }
                 this.#lastTime += interval;
                 this.#callback(this.#lastTime, interval);
             }
         }
     }   
 }
+
+class Stats {
+    domElement;
+    vertexCountView;
+    drawCallCountView;
+    vertexCount = 0;
+    drawCallCount = 0;
+    
+    constructor({ wrapperElement } = {}) {
+        this.domElement = document.createElement("div");
+        this.domElement.style.cssText = `
+position: absolute;
+bottom: 0;
+left: 0;
+padding: 0.2em 0.5em;
+font-size: 9px;
+color: white;
+font-weight: bold;
+text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+`;
+
+        this.vertexCountView = document.createElement("p");
+        this.domElement.appendChild(this.vertexCountView);
+        
+        this.drawCallCountView = document.createElement("p");
+        this.domElement.appendChild(this.drawCallCountView);
+        
+        (wrapperElement || document.body).appendChild(this.domElement);
+    }
+
+    clear() {
+        this.vertexCount = 0;
+        this.drawCallCount = 0;
+    }
+
+    addVertexCount(vertexCount) {
+        this.vertexCount = vertexCount;
+    }
+    
+    incrementDrawCall() {
+        this.drawCallCount++;
+    }
+    
+    update() {
+        this.vertexCountView.textContent = `vertex count: ${this.vertexCount}`;
+        this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
+    }
+}
 ﻿
+
 
 
 
@@ -4900,11 +4835,11 @@ class Engine {
     #renderer;
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
-    // #renderFrameTimer;
     #onBeforeFixedUpdate;
     #onBeforeUpdate;
     #scene;
     #gpu;
+    #stats;
     
     get renderer() {
         return this.#renderer;
@@ -4917,11 +4852,13 @@ class Engine {
     constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
+        
+        this.#stats = new Stats();
+        this.#renderer.setStats(this.#stats);
 
         // TODO: 外からfps変えられるようにしたい
         this.#fixedUpdateFrameTimer = new TimeAccumulator(60, this.fixedUpdate.bind(this));
         this.#updateFrameTimer = new TimeSkipper(60, this.update.bind(this));
-        // this.#renderFrameTimer = new TimeSkipper(60, this.render.bind(this));
 
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
         this.#onBeforeUpdate = onBeforeUpdate;
@@ -4935,7 +4872,6 @@ class Engine {
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
-        // this.#renderFrameTimer.start(t);
     }
     
     setSize(width, height) {
@@ -4943,8 +4879,6 @@ class Engine {
         const rh = height * this.renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        // this.#scene.traverse((actor) => actor.setSize(width, height));
-        // this.#renderer.setSize(width, height);
         this.#scene.traverse((actor) => actor.setSize(w, h));
         this.#renderer.setSize(w, h, rw, rh);
     }
@@ -4962,8 +4896,6 @@ class Engine {
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
         this.#scene.traverse((actor) => actor.updateTransform());
-
-        // this.#scene.traverse((actor) => actor.afterUpdatedTransform());
     }
 
     update(time, deltaTime) {
@@ -5011,60 +4943,27 @@ class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
-    
-    // #depthMaterial;
-    // #depthMaterialAlphaTestQueue;
+    #stats;
 
     constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
-
-        // this.#depthMaterial = new Material({
-        //     gpu,
-        //     vertexShader: `#version 300 es
-        //     layout (location = 0) in vec3 aPosition;
-        //     uniform mat4 uWorldMatrix;
-        //     uniform mat4 uViewMatrix;
-        //     uniform mat4 uProjectionMatrix;
-        //     void main() {
-        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-        //     }
-        //     `,
-        //     fragmentShader: generateDepthFragmentShader({ alphaTest: false })
-        // });
-        // this.#depthMaterial.start({ gpu })
-        // this.#depthMaterialAlphaTestQueue = new Material({
-        //     gpu,
-        //     vertexShader: `#version 300 es
-        //     layout (location = 0) in vec3 aPosition;
-        //     uniform mat4 uWorldMatrix;
-        //     uniform mat4 uViewMatrix;
-        //     uniform mat4 uProjectionMatrix;
-        //     void main() {
-        //         gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
-        //     }
-        //     `,
-        //     fragmentShader: generateDepthFragmentShader({ alphaTest: true })
-        // });
-        // console.log(generateDepthFragmentShader({ alphaTest: true }))
+    }
+    
+    setStats(stats) {
+        this.#stats = stats;
     }
 
     setSize(width, height, realWidth, realHeight) {
         this.#realWidth = realWidth;
         this.#realHeight = realHeight;
-        // this.#realWidth = Math.floor(width * this.pixelRatio);
-        // this.#realHeight = Math.floor(height * this.pixelRatio);
         this.canvas.width = this.#realWidth;
         this.canvas.height = this.#realHeight;
-        // this.canvas.style.width = `${width}px`;
-        // this.canvas.style.height = `${height}px`;
         this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
     }
 
     setRenderTarget(renderTarget) {
-        const gl = this.#gpu.gl;
-
         if (renderTarget) {
             this.#gpu.setFramebuffer(renderTarget.framebuffer)
             this.#gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
@@ -5092,20 +4991,8 @@ class ForwardRenderer {
             }
 
             castShadowRenderMeshInfos.forEach(({ actor }) => {
-                // const targetMaterial = meshActor.depthMaterial || this.#depthMaterial;
-
-                // const targetMaterial = actor.depthMaterial;
                 const targetMaterial = actor.depthMaterial;
                 
-                // let targetMaterial = this.#depthMaterial;
-                // if(meshActor.depthMaterial) {
-                //     targetMaterial = meshActor.depthMaterial;
-                // } else {
-                //     if(meshActor.material.alphaTest) {
-                //         targetMaterial = this.#depthMaterialAlphaTestQueue;
-                //     }
-                // }
-
                 // TODO: material 側でやった方がよい？
                 if (targetMaterial.uniforms.uWorldMatrix) {
                     targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
@@ -5231,19 +5118,16 @@ class ForwardRenderer {
     
     render(scene, camera) {
         const renderMeshInfoEachQueue = {
-            skybox: [], // maybe only one
             opaque: [],
+            skybox: [], // maybe only one
             alphaTest: [],
             transparent: [],
         };
         const lightActors = [];
-        
-       
-        // TODO: 複数material対応
+
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    // renderMeshInfoEachQueue.skybox.push(actor);
                     renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
                     // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
@@ -5252,18 +5136,15 @@ class ForwardRenderer {
                 case ActorTypes.SkinnedMesh:
                     actor.materials.forEach((material, i) => {
                         if(!!material.alphaTest) {
-                            // renderMeshInfoEachQueue.alphaTest.push(actor);
                             renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
                             return;
                         }
                         switch (material.blendType) {
                             case BlendTypes.Opaque:
-                                // renderMeshInfoEachQueue.opaque.push(actor);
                                 renderMeshInfoEachQueue.opaque.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             case BlendTypes.Transparent:
                             case BlendTypes.Additive:
-                                // renderMeshInfoEachQueue.transparent.push(actor);
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
@@ -5281,7 +5162,6 @@ class ForwardRenderer {
         // TODO: depth sort 
 
         // sort by render queue
-        // const sortRenderQueueCompareFunc = (a, b) => a.material.renderQueue - b.material.renderQueue;
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
         const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
         
@@ -5298,9 +5178,6 @@ class ForwardRenderer {
                 }
                 return actor.castShadow;
             });
-            // if(castShadowRenderMeshInfos.length > 0) {
-            //     this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
-            // }
             this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
         }
 
@@ -5333,7 +5210,6 @@ class ForwardRenderer {
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
-        // this.#gpu.setIndexBufferObject(geometry.indexBufferObject);
         // material
         this.#gpu.setShader(material.shader);
         // uniforms
@@ -5389,7 +5265,6 @@ class GPU {
     gl;
     #shader;
     #vao;
-    // #ibo;
     #uniforms;
     dummyTexture;
 
@@ -5410,10 +5285,6 @@ class GPU {
     setVertexArrayObject(vao) {
         this.#vao = vao;
     }
-
-    // setIndexBufferObject(ibo) {
-    //     this.#ibo = ibo;
-    // }
 
     setUniforms(uniforms) {
         this.#uniforms = uniforms;
@@ -5608,7 +5479,6 @@ class GPU {
         if (this.#vao.hasIndices) {
             // draw by indices
             // drawCount ... use indices count
-            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo.glObject);
             if(instanceCount) {
                 gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
             } else {
@@ -5743,47 +5613,23 @@ class Bone extends NodeBase {
     }
 
     calcBoneOffsetMatrix(parentBone) {
-        // console.log("[Bone.calcBoneOffsetMatrix]", this.name)
         this.#poseMatrix = !!parentBone
             ? Matrix4.multiplyMatrices(parentBone.poseMatrix, this.offsetMatrix)
-            // ? Matrix4.multiplyMatrices(this.offsetMatrix, parentBone.poseMatrix)
             : this.offsetMatrix;
-        // this.offsetMatrix.log()
         
-            // : Matrix4.identity()
-        // this.#poseMatrix.log();
         this.#boneOffsetMatrix = this.#poseMatrix.clone().invert();
-        // this.#boneOffsetMatrix.log()
-        // Matrix4.multiplyMatrices(this.#boneOffsetMatrix.clone(), this.#poseMatrix.clone()).log()
         this.children.forEach(childBone => childBone.calcBoneOffsetMatrix(this));
     }
     
-    // calcJointMatrix(childBone) {
-    //     console.log(this, childBone)
-    //     this.#jointMatrix = !!childBone
-    //         ? Matrix4.multiplyMatrices(this.offsetMatrix, childBone.jointMatrix)
-    //         : this.offsetMatrix;
-    //     this.#jointMatrix.log()
-    //     if (this.parent) {
-    //         this.parent.calcJointMatrix(this);
-    //     }
-    // }
-
     calcJointMatrix(parentBone) {
         // 1: update offset matrix
         this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
-        // console.log(this.name, this.position, this.rotation, this.scale)
-        // console.log(this.name, this.offsetMatrix);
         
         // 2: update joint matrix
-        // console.log("[Bone.calcJointMatrix]", this.name)
         this.#jointMatrix = !!parentBone
             ? Matrix4.multiplyMatrices(parentBone.jointMatrix, this.offsetMatrix)
-            // ? Matrix4.multiplyMatrices(this.offsetMatrix, parentBone.jointMatrix)
             : this.offsetMatrix;
         
-        // this.#jointMatrix.log()
-       
         // NOTE: 無理やりpose状態にする時はこれを使う
         // this.#jointMatrix = this.#boneOffsetMatrix.clone().invert();
         
@@ -5881,24 +5727,6 @@ class AnimationClip {
 
         this.currentFrame = Math.floor(this.#currentTime / spf);
         
-        // // build frame value each animation clip type
-        // // TODO:
-        // // - 関数に切り出してもいいかも
-        // // - 必ず生の値を渡すでもいいかもしれない
-        // let frameValue;
-        // switch(this.type) {
-        //     case AnimationClipTypes.Vector3:
-        //         frameValue = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-        //         break;
-        //     case AnimationClipTypes.Rotator:
-        //         // TODO: raw frame value は quaternion ?
-        //         frameValue = Rotator.fromRadian(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-        //         break;
-        //     // TODO: typeごとの処理
-        //     default:
-        //         throw "invalid animation clip type";
-        // }
-       
         // 代理でupdateしたい場合 
         if(this.onUpdateProxy) {
             const keyframes = this.#keyframes.map(animationKeyframes => {
@@ -5920,13 +5748,6 @@ class AnimationClip {
                     case "rotation":
                         // TODO: rotationはquaternionなのでquaternionであるべき
                         const q = frameValue;
-                        // const euler = q.toEulerDegree();
-                        // // console.log(euler)
-                        // animationKeyframes.target.rotation = Rotator.fromRadian(
-                        //     euler.x * Math.PI / 180,
-                        //     euler.y * Math.PI / 180,
-                        //     euler.z * Math.PI / 180,
-                        // );
                         animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
                         break;
                     case "scale":
@@ -5942,7 +5763,6 @@ class AnimationClip {
     getAllKeyframesValue() {
         return (new Array(this.frameCount)).fill(0).map((_, i) => {
             const keyframes = this.#keyframes.map(animationKeyframes => {
-                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,
@@ -6846,8 +6666,8 @@ class PostProcessPass extends AbstractPostProcessPass {
 
         const baseVertexShader = `#version 300 es
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
 
 out vec2 vUv;
 
@@ -6994,16 +6814,9 @@ class PostProcess {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
 
-        // TODO
-        // - filterでenabledなpassのみ抽出
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
-            // if(isLastPass) {
-            //     renderer.setRenderTarget(camera.renderTarget);
-            // } else {
-            //     renderer.setRenderTarget(pass.renderTarget);
-            // }
 
             pass.render({
                 gpu,
@@ -7012,8 +6825,6 @@ class PostProcess {
                 prevRenderTarget,
                 isLastPass,
             });
-
-            // renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
 
             prevRenderTarget = pass.renderTarget;
         });

@@ -82,24 +82,6 @@ export class AnimationClip {
 
         this.currentFrame = Math.floor(this.#currentTime / spf);
         
-        // // build frame value each animation clip type
-        // // TODO:
-        // // - 関数に切り出してもいいかも
-        // // - 必ず生の値を渡すでもいいかもしれない
-        // let frameValue;
-        // switch(this.type) {
-        //     case AnimationClipTypes.Vector3:
-        //         frameValue = new Vector3(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-        //         break;
-        //     case AnimationClipTypes.Rotator:
-        //         // TODO: raw frame value は quaternion ?
-        //         frameValue = Rotator.fromRadian(rawFrameValue[0], rawFrameValue[1], rawFrameValue[2]);
-        //         break;
-        //     // TODO: typeごとの処理
-        //     default:
-        //         throw "invalid animation clip type";
-        // }
-       
         // 代理でupdateしたい場合 
         if(this.onUpdateProxy) {
             const keyframes = this.#keyframes.map(animationKeyframes => {
@@ -121,13 +103,6 @@ export class AnimationClip {
                     case "rotation":
                         // TODO: rotationはquaternionなのでquaternionであるべき
                         const q = frameValue;
-                        // const euler = q.toEulerDegree();
-                        // // console.log(euler)
-                        // animationKeyframes.target.rotation = Rotator.fromRadian(
-                        //     euler.x * Math.PI / 180,
-                        //     euler.y * Math.PI / 180,
-                        //     euler.z * Math.PI / 180,
-                        // );
                         animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
                         break;
                     case "scale":
@@ -143,7 +118,6 @@ export class AnimationClip {
     getAllKeyframesValue() {
         return (new Array(this.frameCount)).fill(0).map((_, i) => {
             const keyframes = this.#keyframes.map(animationKeyframes => {
-                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,

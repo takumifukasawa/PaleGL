@@ -1,5 +1,5 @@
 import {Mesh} from "./Mesh.js";
-import {UniformTypes, PrimitiveTypes, ActorTypes, FaceSide} from "./../constants.js";
+import {UniformTypes, PrimitiveTypes, ActorTypes, FaceSide, AttributeNames, UniformNames} from "./../constants.js";
 import {Material} from "./../materials/Material.js";
 import {loadImg} from "./../loaders/loadImg.js";
 import {loadObj, parseObj} from "./../loaders/loadObj.js";
@@ -64,14 +64,14 @@ const skyboxVertexShader = `#version 300 es
 
 precision mediump float;
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aNormal;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
+layout (location = 2) in vec3 ${AttributeNames.Normal};
 
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
+uniform mat4 ${UniformNames.WorldMatrix};
+uniform mat4 ${UniformNames.ViewMatrix};
+uniform mat4 ${UniformNames.ProjectionMatrix};
+uniform mat4 ${UniformNames.NormalMatrix};
 
 out vec2 vUv;
 out vec3 vNormal;
@@ -79,10 +79,10 @@ out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
-    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
+    vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;
+    vec4 worldPosition = ${UniformNames.WorldMatrix} * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * worldPosition;
 }
 `;
 
@@ -130,15 +130,15 @@ export class Skybox extends Mesh {
             gpu,
             attributes: [
                 {
-                    name: "position",
+                    name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
                     size: 3
                 }, {
-                    name: "uv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }, {
-                    name: "normal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
                     size: 3
                 },

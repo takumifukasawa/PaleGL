@@ -4,7 +4,6 @@ import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
-// TODO: depth fragment は mesh に持たせた方がわかりやすそう
 export class Material {
     name;
   
@@ -102,28 +101,6 @@ export class Material {
             this.#vertexShaderModifier = vertexShaderModifier;
         }
         
-        //this.#generateVertexShader = () => {
-        //    if(this.vertexShader) {
-        //        return;
-        //    }
-        //    // this.vertexShader = vertexShader;
-        //    this.vertexShader = vertexShaderGenerator({ isSkinning, jointNum, gpuSkinning });
-        //};
-        //this.#generateFragmentShader = () => {
-        //    if(this.fragmentShader) {
-        //        return;
-        //    }
-        //    // this.fragmentShader = fragmentShader;
-        //    this.fragmentShader = fragmentShaderGenerator();
-        //};
-        //this.#generateDepthFragmentShader = () => {
-        //    if(this.depthFragmentShader) {
-        //        return;
-        //    }
-        //    // this.depthFragmentShader = depthFragmentShader;
-        //    // this.depthFragmentShader = depthFragmentShaderGenerator();
-        //}
-        
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
 
@@ -152,9 +129,6 @@ export class Material {
             throw "[Material.constructor] invalid render queue";
         }
        
-        // TODO: フラグだけで判別した方が良い気がする
-        // this.isSkinning = isSkinning || !!uniforms.uJointMatrices;
-        // this.gpuSkinning = gpuSkinning || !!uniforms.uJointTexture;
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
 

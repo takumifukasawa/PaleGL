@@ -48,16 +48,9 @@ export class PostProcess {
         this.#camera.updateTransform();
         let prevRenderTarget = this.renderTarget;
 
-        // TODO
-        // - filterでenabledなpassのみ抽出
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
-            // if(isLastPass) {
-            //     renderer.setRenderTarget(camera.renderTarget);
-            // } else {
-            //     renderer.setRenderTarget(pass.renderTarget);
-            // }
 
             pass.render({
                 gpu,
@@ -66,8 +59,6 @@ export class PostProcess {
                 prevRenderTarget,
                 isLastPass,
             });
-
-            // renderer.renderMesh(pass.mesh.geometry, pass.mesh.material);
 
             prevRenderTarget = pass.renderTarget;
         });

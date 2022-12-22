@@ -1,6 +1,7 @@
 ﻿
 import {Geometry} from "./Geometry.js";
 import {Vector3} from "../math/Vector3.js";
+import {AttributeNames} from "../constants.js";
 
 export class PlaneGeometry extends Geometry {
     constructor({
@@ -30,7 +31,7 @@ export class PlaneGeometry extends Geometry {
             // -----------------------------
             attributes: [
                 {
-                    name: "aPosition",
+                    name: AttributeNames.Position,
                     data: new Float32Array([
                         -1, 1, 0,
                         -1, -1, 0,
@@ -39,7 +40,7 @@ export class PlaneGeometry extends Geometry {
                     ]),
                     size: 3
                 }, {
-                    name: "aUv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array([
                         0, 1,
                         0, 0,
@@ -48,20 +49,20 @@ export class PlaneGeometry extends Geometry {
                     ]),
                     size: 2
                 }, {
-                    name: "aNormal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(normals),
                     size: 3
                 },
                 (calculateTangent ?
                     {
-                        name: "aTangent",
+                        name: AttributeNames.Tangent,
                         data: new Float32Array(tangents),
                         size: 3
                     } : {}
                 ),
                 (calculateBinormal ?
                     {
-                        name: "aBinormal",
+                        name: AttributeNames.Binormal,
                         data: new Float32Array(binormals),
                         size: 3
                     } : {}

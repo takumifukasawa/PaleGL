@@ -1,5 +1,13 @@
 ﻿import {Mesh} from "./Mesh.js";
-import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes, TextureTypes, UniformTypes} from "../constants.js";
+import {
+    ActorTypes,
+    AttributeNames,
+    AttributeUsageType,
+    BlendTypes,
+    PrimitiveTypes,
+    TextureTypes, UniformNames,
+    UniformTypes
+} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Geometry} from "../geometries/Geometry.js";
@@ -116,53 +124,44 @@ export class SkinnedMesh extends Mesh {
         });
 
         // TODO: depthを強制的につくるようにして問題ない？
-        // if(!options.depthMaterial) {
-            this.depthMaterial = new Material({
-                gpu,
-                vertexShader: generateDepthVertexShader({
-                    attributeDescriptors: this.geometry.getAttributeDescriptors(),
-                    isSkinning: true,
-                    gpuSkinning: this.#gpuSkinning,
-                    jointNum: this.boneCount,
-                    vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
-                    // localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
-                }),
-                fragmentShader: generateDepthFragmentShader({
-                    // alphaTest: !!this.material.alphaTest
-                    alphaTest: !!this.mainMaterial.alphaTest
-                }),
-                uniforms: {
-                    // uJointMatrices: {
-                    //     type: UniformTypes.Matrix4Array,
-                    //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
-                    //     // value: null
-                    // },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    },
-                    uJointTextureColNum: {
-                        type: UniformTypes.Int,
-                        value: this.#jointTextureColNum,
-                    },
-                    ...(this.#gpuSkinning ? {
-                        uTime: {
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        uBoneCount: {
-                            type: UniformTypes.Int,
-                            value: this.boneCount
-                        },
-                        uTotalFrameCount: {
-                            type: UniformTypes.Int,
-                            value: 0,
-                        }
-                    } : {})
+        this.depthMaterial = new Material({
+            gpu,
+            vertexShader: generateDepthVertexShader({
+                attributeDescriptors: this.geometry.getAttributeDescriptors(),
+                isSkinning: true,
+                gpuSkinning: this.#gpuSkinning,
+                jointNum: this.boneCount,
+                vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
+            }),
+            fragmentShader: generateDepthFragmentShader({
+                alphaTest: !!this.mainMaterial.alphaTest
+            }),
+            uniforms: {
+                uJointTexture: {
+                    type: UniformTypes.Texture,
+                    value: null
                 },
-                alphaTest: this.mainMaterial.alphaTest
-            });
-        // }
+                uJointTextureColNum: {
+                    type: UniformTypes.Int,
+                    value: this.#jointTextureColNum,
+                },
+                ...(this.#gpuSkinning ? {
+                    uTime: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    uBoneCount: {
+                        type: UniformTypes.Int,
+                        value: this.boneCount
+                    },
+                    uTotalFrameCount: {
+                        type: UniformTypes.Int,
+                        value: 0,
+                    }
+                } : {})
+            },
+            alphaTest: this.mainMaterial.alphaTest
+        });
 
         super.start(options);
 
@@ -272,8 +271,8 @@ matrix elements: ${jointData.length}`);
       
         if(this.debugBoneView) {
             const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-            this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
-            this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
+            this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
+            this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         }
 
         if(this.#gpuSkinning) {
@@ -357,7 +356,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -370,14 +369,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                 
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                 }
                 `,
                 fragmentShader: `#version 300 es
@@ -403,7 +402,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -415,14 +414,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     gl_PointSize = 6.;
                 }
                 `,

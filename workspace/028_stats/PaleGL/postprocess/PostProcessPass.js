@@ -2,7 +2,7 @@
 import {Material} from "../materials/Material.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../actors/Mesh.js";
-import {PrimitiveTypes, UniformTypes} from "../constants.js";
+import {AttributeNames, PrimitiveTypes, UniformTypes} from "../constants.js";
 import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 
 
@@ -17,8 +17,8 @@ export class PostProcessPass extends AbstractPostProcessPass {
 
         const baseVertexShader = `#version 300 es
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
 
 out vec2 vUv;
 

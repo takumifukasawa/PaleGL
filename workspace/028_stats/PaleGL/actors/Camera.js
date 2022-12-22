@@ -2,7 +2,14 @@
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector4} from "../math/Vector4.js";
 import {RenderTarget} from "./../core/RenderTarget.js";
-import {ActorTypes, AttributeUsageType, BlendTypes, PrimitiveTypes} from "../constants.js";
+import {
+    ActorTypes,
+    AttributeNames,
+    AttributeUsageType,
+    BlendTypes,
+    PrimitiveTypes,
+    UniformNames
+} from "../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Material} from "../materials/Material.js";
 import {Geometry} from "../geometries/Geometry.js";
@@ -123,14 +130,14 @@ export class Camera extends Actor {
                     gpu,
                     vertexShader: `#version 300 es
                     
-                    layout (location = 0) in vec3 aPosition;
+                    layout (location = 0) in vec3 ${AttributeNames.Position};
                    
-                    uniform mat4 uWorldMatrix;
-                    uniform mat4 uViewMatrix;
-                    uniform mat4 uProjectionMatrix;
+                    uniform mat4 ${UniformNames.WorldMatrix};
+                    uniform mat4 ${UniformNames.ViewMatrix};
+                    uniform mat4 ${UniformNames.ProjectionMatrix};
                     
                     void main() {
-                        gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                        gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     }
                     `,
                     fragmentShader: `#version 300 es

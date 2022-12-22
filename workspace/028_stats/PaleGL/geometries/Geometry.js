@@ -11,7 +11,6 @@ export class Geometry {
     attributes = [];
     vertexCount;
     vertexArrayObject;
-    // indexBufferObject;
     indices;
     drawCount;
 
@@ -24,8 +23,6 @@ export class Geometry {
         attributes,
         indices,
         drawCount,
-        // immediateCreate = true,
-        // calculateTangent = false,
         calculateBinormal = false,
         instanceCount = null,
     }) {
@@ -58,7 +55,6 @@ export class Geometry {
         const attr = new Attribute({
             name: attribute.name,
             data: attribute.data,
-            // location: i > -1 ? attribute.location || i,
             location,
             size: attribute.size,
             offset: attribute.offset,

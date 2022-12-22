@@ -82,12 +82,6 @@ export const CubeMapAxis = {
     NegativeZ: "NegativeZ",
 };
 
-// export const CameraClearType = {
-//     Skybox: "Skybox",
-//     Color: "Color",
-//     // TODO: type for NONE
-// };
-
 export const FaceSide = {
     Front: "Front",
     Back: "Back",
@@ -108,6 +102,23 @@ export const RenderTargetTypes = {
 export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
-    // Rotator: "Rotator",
-    // Scalar: "Scalar"
+};
+
+export const AttributeNames = {
+    Position: "aPosition",
+    Uv: "aUv",
+    Normal: "aNormal",
+    Tangent: "aTangent",
+    Binormal: "aBinormal",
+    BoneIndices: "aBoneIndices",
+    BoneWeights: "aBoneWeighs",
+    Color: "aColor",
+};
+
+export const UniformNames = {
+    WorldMatrix: "uWorldMatrix",
+    ViewMatrix: "uViewMatrix",
+    ProjectionMatrix: "uProjectionMatrix",
+    JointMatrices: "uJointMatrices",
+    NormalMatrix: "uNormalMatrix"
 };
