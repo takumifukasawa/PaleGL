@@ -6658,15 +6658,15 @@ class AbstractPostProcessPass {
     }
   
     setSize(width, height) {
-        throw "[AbstractPostProcessPass.setSize] should implementation";
+        throw "[AbstractPostProcessPass.setSize()] should implementation";
     }
 
     setRenderTarget(renderer, camera, isLastPass) {
-        throw "[AbstractPostProcessPass.setRenderTarget] should implementation";
+        throw "[AbstractPostProcessPass.setRenderTarget()] should implementation";
     }
     
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass } = {}) {
-        throw "[AbstractPostProcessPass.render] should implementation";
+        throw "[AbstractPostProcessPass.render()] should implementation";
     }
 }
 ﻿
@@ -7292,20 +7292,8 @@ void main() {
     }
     
 }
-﻿
 
-
-
-
-class GaussianBlurPass extends AbstractPostProcessPass {
-    #passes = [];
-
-    get renderTarget() {
-        return this.#passes[this.#passes.length - 1].renderTarget;
-    }
-
-    constructor({ gpu }) {
-        const blurShaderGenerator = (isHorizontal) => `#version 300 es
+const gaussianBlurFragmentShader = ({ pixelNum, isHorizontal, srcTextureUniformName }) => `#version 300 es
 
 precision mediump float;
 
@@ -7313,7 +7301,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uSceneTexture;
+uniform sampler2D srcTextureUniformName;
 
 // ------------------------------------------------------
 //
@@ -7350,11 +7338,11 @@ uniform float uTargetWidth;
 uniform float uTargetHeight;
 
 void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
+    vec4 textureColor = texture(srcTextureUniformName, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
 
-    const int pixelNum = 7;
+    const int pixelNum = ${pixelNum};
     float sum = 0.;
     float[pixelNum] weights;
     float width = floor(float(pixelNum) / 2.);
@@ -7366,18 +7354,33 @@ void main() {
     for(int i = 0; i < pixelNum; i++) {
         float weight = weights[i] /= sum;
         float index = float(i) - width;
-        sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+        sampleColor += texture(srcTextureUniformName, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
     }
     
     outColor = sampleColor;
-}
-`;
+}`;
+﻿
+
+
+
+
+
+class GaussianBlurPass extends AbstractPostProcessPass {
+    #passes = [];
+
+    get renderTarget() {
+        return this.#passes[this.#passes.length - 1].renderTarget;
+    }
+
+    constructor({ gpu }) {
         super();
         
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
             gpu,
-            fragmentShader: blurShaderGenerator(true),
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+            }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -7392,7 +7395,9 @@ void main() {
         const verticalBlurPass = new FragmentPass({
             name: "vertical blur pass",
             gpu,
-            fragmentShader: blurShaderGenerator(false),
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: false, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+            }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,

@@ -18,14 +18,14 @@ export class AbstractPostProcessPass {
     }
   
     setSize(width, height) {
-        throw "[AbstractPostProcessPass.setSize] should implementation";
+        throw "[AbstractPostProcessPass.setSize()] should implementation";
     }
 
     setRenderTarget(renderer, camera, isLastPass) {
-        throw "[AbstractPostProcessPass.setRenderTarget] should implementation";
+        throw "[AbstractPostProcessPass.setRenderTarget()] should implementation";
     }
     
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass } = {}) {
-        throw "[AbstractPostProcessPass.render] should implementation";
+        throw "[AbstractPostProcessPass.render()] should implementation";
     }
 }
