@@ -59,18 +59,21 @@ void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
+
+    // old
     // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
     // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
     // sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
     // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
     // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
 
-    const int pixelNum = 10;
+    const int pixelNum = 7;
     float sum = 0.;
     float[pixelNum] weights;
-    float width = float(pixelNum) - floor(float(pixelNum) / 2.);
+    float width = floor(float(pixelNum) / 2.);
+    float sigma = width;
     for(int i = 0; i < pixelNum; i++) {
-        weights[i] = gauss(1., float(i) - width);
+        weights[i] = gauss(sigma, float(i) - width);
         sum += weights[i];
     }
     for(int i = 0; i < pixelNum; i++) {
