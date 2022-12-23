@@ -60,13 +60,6 @@ void main() {
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
 
-    // old
-    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
-    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
-    // sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
-    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
-    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
-
     const int pixelNum = 7;
     float sum = 0.;
     float[pixelNum] weights;
@@ -141,7 +134,6 @@ void main() {
                 camera.clearColor.w
             );
 
-            // このあたりの処理をpassに逃してもいいかもしれない
             pass.mesh.updateTransform();
             pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             if(!pass.material.isCompiledShader) {

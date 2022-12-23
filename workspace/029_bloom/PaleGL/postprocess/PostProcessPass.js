@@ -74,7 +74,6 @@ void main() {
             camera.clearColor.w
         );
 
-        // このあたりの処理をpassに逃してもいいかもしれない
         this.mesh.updateTransform();
         this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
         if(!this.material.isCompiledShader) {
