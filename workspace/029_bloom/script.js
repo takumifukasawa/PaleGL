@@ -130,17 +130,17 @@ directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
-const gaussianBlurPass = new GaussianBlurPass({ gpu });
-gaussianBlurPass.enabled = false;
-postProcess.addPass(gaussianBlurPass);
+// const gaussianBlurPass = new GaussianBlurPass({ gpu });
+// gaussianBlurPass.enabled = false;
+// postProcess.addPass(gaussianBlurPass);
 
 const bloomPass = new BloomPass({ gpu });
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
-const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = false;
-postProcess.addPass(fxaaPass);
+// const fxaaPass = new FXAAPass({ gpu });
+// fxaaPass.enabled = false;
+// postProcess.addPass(fxaaPass);
 
 postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
@@ -390,11 +390,11 @@ function initDebugger() {
     
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: "gaussian blur pass enabled",
-        initialValue: gaussianBlurPass.enabled,
-        onChange: (value) => gaussianBlurPass.enabled = value,
-    })
+    // debuggerGUI.addToggleDebugger({
+    //     label: "gaussian blur pass enabled",
+    //     initialValue: gaussianBlurPass.enabled,
+    //     onChange: (value) => gaussianBlurPass.enabled = value,
+    // })
 
     debuggerGUI.addToggleDebugger({
         label: "bloom pass enabled",
@@ -402,11 +402,11 @@ function initDebugger() {
         onChange: (value) => bloomPass.enabled = value,
     })
 
-    debuggerGUI.addToggleDebugger({
-        label: "fxaa pass enabled",
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => fxaaPass.enabled = value,
-    })
+    // debuggerGUI.addToggleDebugger({
+    //     label: "fxaa pass enabled",
+    //     initialValue: fxaaPass.enabled,
+    //     onChange: (value) => fxaaPass.enabled = value,
+    // })
 
     debuggerGUI.addToggleDebugger({
         label: "postprocess enabled",

@@ -6687,6 +6687,8 @@ class PostProcessPass extends AbstractPostProcessPass {
     material;
     renderTarget;
     mesh;
+    width;
+    height;
     
     constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
         super({ name });
@@ -6729,6 +6731,8 @@ void main() {
     }
   
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
@@ -6781,6 +6785,7 @@ void main() {
 `;
 
         super({ gpu, fragmentShader });
+        
     }
 }
 ﻿
@@ -7454,67 +7459,40 @@ class GaussianBlurPass extends AbstractPostProcessPass {
 
 
 
+
 class BloomPass extends AbstractPostProcessPass {
     #passes = [];
-
+    
     get renderTarget() {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
     constructor({ gpu }) {
         super();
-        
-        const horizontalBlurPass = new FragmentPass({
-            name: "horizontal blur pass",
-            gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
-            }),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }           
-        });
-        const verticalBlurPass = new FragmentPass({
-            name: "vertical blur pass",
-            gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
-            }),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }           
-        });
-        
-        this.#passes.push(horizontalBlurPass);
-        this.#passes.push(verticalBlurPass);
+
+        this.#passes.push(new CopyPass({ gpu }));
+        this.#passes.push(new CopyPass({ gpu }));
     }
 
     setSize(width, height) {
-        this.#passes.forEach(pass => {
-            pass.setSize(width, height);
-            pass.material.uniforms.uTargetWidth.value = width;
-            pass.material.uniforms.uTargetHeight.value = height;
+        this.#passes.forEach((pass, i) => {
+            const w = width / (i === 0 ? 4 : 1);
+            const h = height / (i === 0 ? 4 : 1)
+            pass.setSize(w, h);
+            if(pass.material.uniforms.uTargetWidth) {
+                pass.material.uniforms.uTargetWidth.value = width;
+            }
+            if(pass.material.uniforms.uTargetHeight) {
+                pass.material.uniforms.uTargetHeight.value = height;
+            }
         });
     }
 
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        console.log("------------")
         this.#passes.forEach((pass, i) => {
             pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
-
+            
             renderer.clear(
                 camera.clearColor.x,
                 camera.clearColor.y,
@@ -7523,7 +7501,10 @@ class BloomPass extends AbstractPostProcessPass {
             );
 
             pass.mesh.updateTransform();
-            pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            pass.material.uniforms[UniformNames.SceneTexture].value =
+                i === 0
+                    ? prevRenderTarget.texture
+                    : this.#passes[i - 1].renderTarget.texture;
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }

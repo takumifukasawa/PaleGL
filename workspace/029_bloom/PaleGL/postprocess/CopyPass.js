@@ -20,5 +20,6 @@ void main() {
 `;
 
         super({ gpu, fragmentShader });
+        
     }
 }

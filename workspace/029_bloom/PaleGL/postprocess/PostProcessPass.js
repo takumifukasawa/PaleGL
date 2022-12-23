@@ -11,6 +11,8 @@ export class PostProcessPass extends AbstractPostProcessPass {
     material;
     renderTarget;
     mesh;
+    width;
+    height;
     
     constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
         super({ name });
@@ -53,6 +55,8 @@ void main() {
     }
   
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
