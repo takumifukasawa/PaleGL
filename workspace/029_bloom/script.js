@@ -24,7 +24,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    AxesHelper, GaussianBlurPass, CopyPass
+    AxesHelper, GaussianBlurPass, CopyPass, BloomPass
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -131,12 +131,12 @@ directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
 const postProcess = new PostProcess({ gpu, renderer });
 
 const gaussianBlurPass = new GaussianBlurPass({ gpu });
-gaussianBlurPass.enabled = true;
+gaussianBlurPass.enabled = false;
 postProcess.addPass(gaussianBlurPass);
 
-const copyPass = new CopyPass({ gpu });
-copyPass.enabled = true;
-postProcess.addPass(copyPass);
+const bloomPass = new BloomPass({ gpu });
+bloomPass.enabled = true;
+postProcess.addPass(bloomPass);
 
 const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = false;
@@ -394,6 +394,12 @@ function initDebugger() {
         label: "gaussian blur pass enabled",
         initialValue: gaussianBlurPass.enabled,
         onChange: (value) => gaussianBlurPass.enabled = value,
+    })
+
+    debuggerGUI.addToggleDebugger({
+        label: "bloom pass enabled",
+        initialValue: bloomPass.enabled,
+        onChange: (value) => bloomPass.enabled = value,
     })
 
     debuggerGUI.addToggleDebugger({
