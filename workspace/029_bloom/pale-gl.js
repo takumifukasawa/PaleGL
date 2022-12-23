@@ -7342,6 +7342,11 @@ uniform sampler2D uSceneTexture;
 //
 // ------------------------------------------------------
 
+float gauss(float sigma, float x) {
+    float sigma2 = sigma * sigma;
+    return exp(-(x * x) / (2. * sigma));
+}
+
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -7349,11 +7354,26 @@ void main() {
     vec4 textureColor = texture(uSceneTexture, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
+    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
+    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
+    // sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
+    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
+    // sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
+
+    const int pixelNum = 10;
+    float sum = 0.;
+    float[pixelNum] weights;
+    float width = float(pixelNum) - floor(float(pixelNum) / 2.);
+    for(int i = 0; i < pixelNum; i++) {
+        weights[i] = gauss(1., float(i) - width);
+        sum += weights[i];
+    }
+    for(int i = 0; i < pixelNum; i++) {
+        float weight = weights[i] /= sum;
+        float index = float(i) - width;
+        sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+    }
+    
     outColor = sampleColor;
 }
 `;

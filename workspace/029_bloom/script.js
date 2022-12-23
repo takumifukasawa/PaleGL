@@ -79,6 +79,7 @@ const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
     pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    // pixelRatio: 1
 });
 
 const engine = new Engine({ gpu, renderer });
@@ -138,7 +139,7 @@ copyPass.enabled = true;
 postProcess.addPass(copyPass);
 
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = true;
+fxaaPass.enabled = false;
 postProcess.addPass(fxaaPass);
 
 postProcess.enabled = true;
