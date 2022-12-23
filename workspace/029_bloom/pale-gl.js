@@ -857,15 +857,20 @@ const AttributeNames = {
 };
 
 const UniformNames = {
+    // base
     WorldMatrix: "uWorldMatrix",
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
+    NormalMatrix: "uNormalMatrix",
+    // skinning
     JointMatrices: "uJointMatrices",
     JointTexture: "uJointTexture",
-    NormalMatrix: "uNormalMatrix",
+    // shadow map
     ShadowMap: "uShadowMap",
     ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
     ShadowBias: "uShadowBias",
+    // post process
+    SceneTexture: "uSceneTexture"
 };
 ﻿class Rotator {
     // x, y, z axes
@@ -6708,7 +6713,7 @@ void main() {
             fragmentShader,
             uniforms: {
                 ...uniforms, 
-                uSceneTexture: {
+                [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
                     value: null
                 }
@@ -6746,7 +6751,7 @@ void main() {
         );
 
         this.mesh.updateTransform();
-        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }
@@ -6882,7 +6887,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uSceneTexture;
+uniform sampler2D ${UniformNames.SceneTexture};
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -6946,17 +6951,17 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     LuminanceData l;
 
     // 隣接ピクセルの色を取得
-    vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0., texelSize.y).xyz;
-    vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0., -texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0., 0.).xyz;
+    vec3 rgbTop = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., texelSize.y).xyz;
+    vec3 rgbRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, 0.).xyz;
+    vec3 rgbBottom = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., 0.).xyz;
 
     // 角のピクセルの色を取得
-    vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, -texelSize.y).xyz;
 
     // 隣接ピクセルの輝度を取得
     float lumaTop = rgbToLuma(rgbTop);
@@ -7143,7 +7148,7 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
 
     vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
-    float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+    float pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
@@ -7151,7 +7156,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-        pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+        pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
         pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
     }
 `;
@@ -7165,7 +7170,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
     vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
-    float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+    float nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
@@ -7173,7 +7178,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `   
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-        nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+        nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
         nAtEnd = abs(nLumaDelta) >= gradientThreshold;
     }
 `;
@@ -7228,7 +7233,7 @@ void main() {
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
-        outColor = sampleTexture(uSceneTexture, uv);
+        outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
         return;
     }
     
@@ -7244,8 +7249,8 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    outColor = sampleTexture(uSceneTexture, uv);
-    // outColor = sampleTexture(uSceneTexture, vUv);
+    outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
+    // outColor = sampleTexture(${UniformNames.SceneTexture}, vUv);
 }
 `;
 
@@ -7379,7 +7384,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
             name: "horizontal blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+                isHorizontal: true, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -7396,7 +7401,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
             name: "vertical blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+                isHorizontal: false, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -7434,7 +7439,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
             );
 
             pass.mesh.updateTransform();
-            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }

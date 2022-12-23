@@ -2,7 +2,7 @@
 import {Material} from "../materials/Material.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../actors/Mesh.js";
-import {AttributeNames, PrimitiveTypes, UniformTypes} from "../constants.js";
+import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.js";
 import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 
 
@@ -37,7 +37,7 @@ void main() {
             fragmentShader,
             uniforms: {
                 ...uniforms, 
-                uSceneTexture: {
+                [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
                     value: null
                 }
@@ -75,7 +75,7 @@ void main() {
         );
 
         this.mesh.updateTransform();
-        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }

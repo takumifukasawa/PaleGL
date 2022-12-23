@@ -116,13 +116,18 @@ export const AttributeNames = {
 };
 
 export const UniformNames = {
+    // base
     WorldMatrix: "uWorldMatrix",
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
+    NormalMatrix: "uNormalMatrix",
+    // skinning
     JointMatrices: "uJointMatrices",
     JointTexture: "uJointTexture",
-    NormalMatrix: "uNormalMatrix",
+    // shadow map
     ShadowMap: "uShadowMap",
     ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
     ShadowBias: "uShadowBias",
+    // post process
+    SceneTexture: "uSceneTexture"
 };

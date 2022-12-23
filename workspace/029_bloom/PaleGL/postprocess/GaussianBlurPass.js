@@ -1,5 +1,5 @@
 ﻿import {PostProcessPass} from "./PostProcessPass.js";
-import {UniformTypes} from "../constants.js";
+import {UniformNames, UniformTypes} from "../constants.js";
 import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 import {FragmentPass} from "./FragmentPass.js";
 import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader.js";
@@ -18,7 +18,7 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
             name: "horizontal blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+                isHorizontal: true, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -35,7 +35,7 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
             name: "vertical blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: 7, srcTextureUniformName: "uSceneTexture",
+                isHorizontal: false, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -73,7 +73,7 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
             );
 
             pass.mesh.updateTransform();
-            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }
