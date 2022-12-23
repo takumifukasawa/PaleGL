@@ -6,6 +6,10 @@ import {FragmentPass} from "./FragmentPass.js";
 export class GaussianBlurPass extends AbstractPostProcessPass {
     #passes = [];
 
+    get renderTarget() {
+        return this.#passes[this.#passes.length - 1].renderTarget;
+    }
+
     constructor({ gpu }) {
         const blurShaderGenerator = (isHorizontal) => `#version 300 es
 
@@ -59,7 +63,7 @@ void main() {
 }
 `;
         super();
-       
+        
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
             gpu,

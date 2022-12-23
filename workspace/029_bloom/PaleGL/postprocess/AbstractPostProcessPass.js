@@ -8,6 +8,10 @@ import {PrimitiveTypes, UniformTypes} from "../constants.js";
 export class AbstractPostProcessPass {
     name;
     enabled = true;
+    
+    get renderTarget() {
+        throw "[AbstractPostProcessPass.renderTarget] should implementation";
+    }
 
     constructor({ name = "" } = {}) {
         this.name = name;
