@@ -50,6 +50,8 @@ void main() {
             },
             primitiveType: PrimitiveTypes.Triangles
         });
+        
+        // TODO: mesh生成しなくていい気がする
         this.mesh = new Mesh({
             geometry: this.geometry,
             material: this.material
@@ -72,9 +74,11 @@ void main() {
         }
     }
 
+    // TODO: rename "prevRenderTarget"
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
+        // TODO: ppごとに変えられるのが正しい
         renderer.clear(
             camera.clearColor.x,
             camera.clearColor.y,
@@ -82,8 +86,14 @@ void main() {
             camera.clearColor.w
         );
 
+        // ppの場合はいらない気がする
         this.mesh.updateTransform();
-        this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+        
+        // 渡してない場合はなにもしないことにする
+        if(prevRenderTarget) {
+            this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+        }
+
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }
