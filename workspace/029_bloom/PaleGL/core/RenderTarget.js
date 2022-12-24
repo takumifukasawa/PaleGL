@@ -37,6 +37,7 @@ export class RenderTarget extends AbstractRenderTarget {
         useDepthBuffer = false,
         minFilter = TextureFilterTypes.Linear,
         magFilter = TextureFilterTypes.Linear,
+        mipmap = false,
     }) {
         super();
         
@@ -74,7 +75,7 @@ export class RenderTarget extends AbstractRenderTarget {
             gpu,
             width: this.width,
             height: this.height,
-            mipmap: false,
+            mipmap,
             type: textureType,
             minFilter,
             magFilter
