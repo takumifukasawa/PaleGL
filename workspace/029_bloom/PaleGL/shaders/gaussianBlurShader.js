@@ -66,5 +66,5 @@ void main() {
     outColor = sampleColor;
     
     // for debug
-    // outColor = textureColor;
+    outColor = textureColor;
 }`;

@@ -7371,7 +7371,7 @@ void main() {
     outColor = sampleColor;
     
     // for debug
-    // outColor = textureColor;
+    outColor = textureColor;
 }`;
 ﻿
 
@@ -7580,27 +7580,30 @@ void main() {
         
         this.#renderTargetMip4.setSize(this.#width / 4, this.#height / 4);
         
-        // this.#horizontalBlurPass.renderTarget = this.#renderTargetMip4;
-        this.#horizontalBlurPass.material.uniforms.uTargetWidth.value = this.#width / 4;
-        this.#horizontalBlurPass.material.uniforms.uTargetHeight.value = this.#height / 4;
-        this.#horizontalBlurPass.setSize(this.#width / 4, this.#height / 4);
-        this.#horizontalBlurPass.render({
-            gpu,
-            camera,
-            renderer,
-            prevRenderTarget: this.#extractBrightnessPass.renderTarget,
-        });
+        for(let i = 0; i < 2; i++) {
+            const s = i === 0 ? 2 : 4;
+            // this.#horizontalBlurPass.renderTarget = this.#renderTargetMip4;
+            this.#horizontalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
+            this.#horizontalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
+            this.#horizontalBlurPass.setSize(this.#width / s, this.#height / s);
+            this.#horizontalBlurPass.render({
+                gpu,
+                camera,
+                renderer,
+                prevRenderTarget: i === 0 ? this.#extractBrightnessPass.renderTarget : this.#verticalBlurPass.renderTarget,
+            });
 
-        // this.#verticalBlurPass.renderTarget = this.#renderTargetMip4;
-        this.#verticalBlurPass.material.uniforms.uTargetWidth.value = this.#width / 4;
-        this.#verticalBlurPass.material.uniforms.uTargetHeight.value = this.#height / 4;
-        this.#verticalBlurPass.setSize(this.#width / 4, this.#height / 4);
-        this.#verticalBlurPass.render({
-            gpu,
-            camera,
-            renderer,
-            prevRenderTarget: this.#horizontalBlurPass.renderTarget,
-        });
+            // this.#verticalBlurPass.renderTarget = this.#renderTargetMip4;
+            this.#verticalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
+            this.#verticalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
+            this.#verticalBlurPass.setSize(this.#width / s, this.#height / s);
+            this.#verticalBlurPass.render({
+                gpu,
+                camera,
+                renderer,
+                prevRenderTarget: this.#horizontalBlurPass.renderTarget,
+            });
+        }
 
         this.#lastPass.render({
             gpu,
