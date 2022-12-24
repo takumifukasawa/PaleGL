@@ -7311,7 +7311,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D srcTextureUniformName;
+uniform sampler2D ${srcTextureUniformName};
 
 // ------------------------------------------------------
 //
@@ -7348,7 +7348,7 @@ uniform float uTargetWidth;
 uniform float uTargetHeight;
 
 void main() {
-    vec4 textureColor = texture(srcTextureUniformName, vUv);
+    vec4 textureColor = texture(${srcTextureUniformName}, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
 
@@ -7364,7 +7364,7 @@ void main() {
     for(int i = 0; i < pixelNum; i++) {
         float weight = weights[i] /= sum;
         float index = float(i) - width;
-        sampleColor += texture(srcTextureUniformName, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+        sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
     }
     
     outColor = sampleColor;
@@ -7382,14 +7382,14 @@ class GaussianBlurPass extends AbstractPostProcessPass {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
-    constructor({ gpu }) {
+    constructor({ gpu, blurPixelNum = 7 }) {
         super();
         
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -7406,7 +7406,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
             name: "vertical blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -7463,36 +7463,82 @@ class GaussianBlurPass extends AbstractPostProcessPass {
 class BloomPass extends AbstractPostProcessPass {
     #passes = [];
     
+    #renderTargetMip2;
+    #renderTargetMip4;
+    #renderTargetMip8;
+    #renderTargetMip16;
+    #horizontalBlurPass;
+    #verticalBlurPass;
+
     get renderTarget() {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
     constructor({ gpu }) {
         super();
-
-        this.#passes.push(new CopyPass({ gpu }));
-        this.#passes.push(new CopyPass({ gpu }));
-    }
-
-    setSize(width, height) {
-        this.#passes.forEach((pass, i) => {
-            const w = width / (i === 0 ? 4 : 1);
-            const h = height / (i === 0 ? 4 : 1)
-            pass.setSize(w, h);
-            if(pass.material.uniforms.uTargetWidth) {
-                pass.material.uniforms.uTargetWidth.value = width;
+        
+        this.#renderTargetMip2 = new RenderTarget({ gpu })
+        this.#renderTargetMip4 = new RenderTarget({ gpu })
+        this.#renderTargetMip8 = new RenderTarget({ gpu })
+        this.#renderTargetMip16 = new RenderTarget({ gpu })
+        
+        const blurPixelNum = 7;
+        
+        this.#horizontalBlurPass = new FragmentPass({
+            name: "horizontal blur pass",
+            gpu,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
             }
-            if(pass.material.uniforms.uTargetHeight) {
-                pass.material.uniforms.uTargetHeight.value = height;
+        });
+        this.#verticalBlurPass = new FragmentPass({
+            name: "vertical blur pass",
+            gpu,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
             }
         });
     }
 
+    setSize(width, height) {
+        // this.#passes.forEach((pass, i) => {
+        //     pass.setSize(w, h);
+        //     //pass.material.uniforms.uTargetWidth.value = w;
+        //     //pass.material.uniforms.uTargetHeight.value = h;
+        // });
+        (new Array(4)).fill(0).forEach((_, i) => {
+            const mipRate = 2 ^ (i + 1);
+            const w = width / mipRate;
+            const h = height / mipRate;
+            this.#horizontalBlurPass.setSize(width, height);
+            this.#verticalBlurPass.setSize(width, height);
+        });
+    }
+
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
-        console.log("------------")
         this.#passes.forEach((pass, i) => {
             pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
-            
+
             renderer.clear(
                 camera.clearColor.x,
                 camera.clearColor.y,
@@ -7505,13 +7551,14 @@ class BloomPass extends AbstractPostProcessPass {
                 i === 0
                     ? prevRenderTarget.texture
                     : this.#passes[i - 1].renderTarget.texture;
+
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }
 
             renderer.renderMesh(pass.geometry, pass.material);
         });
-    }   
+    }
 }
 ﻿
 // actors

@@ -7,7 +7,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D srcTextureUniformName;
+uniform sampler2D ${srcTextureUniformName};
 
 // ------------------------------------------------------
 //
@@ -44,7 +44,7 @@ uniform float uTargetWidth;
 uniform float uTargetHeight;
 
 void main() {
-    vec4 textureColor = texture(srcTextureUniformName, vUv);
+    vec4 textureColor = texture(${srcTextureUniformName}, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
 
@@ -60,7 +60,7 @@ void main() {
     for(int i = 0; i < pixelNum; i++) {
         float weight = weights[i] /= sum;
         float index = float(i) - width;
-        sampleColor += texture(srcTextureUniformName, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+        sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
     }
     
     outColor = sampleColor;

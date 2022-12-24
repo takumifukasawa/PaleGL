@@ -11,14 +11,14 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
-    constructor({ gpu }) {
+    constructor({ gpu, blurPixelNum = 7 }) {
         super();
         
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -35,7 +35,7 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
             name: "vertical blur pass",
             gpu,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: 7, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 uTargetWidth: {
