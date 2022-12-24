@@ -7678,7 +7678,7 @@ void main() {
     vec4 sceneColor = texture(${UniformNames.SceneTexture}, vUv);
 
     // vec4 blurColor = blur4Color + blur8Color + blur16Color + blur32Color;
-    // vec4 blurColor = blur4Color * .1 + blur8Color * .2 + blur16Color * .3 + blur32Color * .4;
+    // TODO: 一旦weightを合計1にしている
     vec4 blurColor = blur4Color * .25 + blur8Color * .25 + blur16Color * .25 + blur32Color * .25;
     
     outColor = sceneColor + blurColor;
