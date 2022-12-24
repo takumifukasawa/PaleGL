@@ -77,12 +77,13 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     float specularPower = 32.;
     float specularRate = clamp(dot(H, N), 0., 1.);
     // TODO: 外から渡せるようにする
-    float specularAmount = .5;
+    float specularAmount = 1.;
     specularRate = pow(specularRate, specularPower) * specularAmount;
     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
 
     // TODO: 外から渡せるようにする
-    vec3 ambientColor = vec3(.12, .11, .1);
+    // vec3 ambientColor = vec3(.12, .11, .1);
+    vec3 ambientColor = vec3(.1);
 
     vec4 resultColor = vec4(
         diffuseColor + specularColor + ambientColor,

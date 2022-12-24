@@ -1,4 +1,5 @@
 
+// TODO: gaussの重みはuniformで送るべき
 export const gaussianBlurFragmentShader = ({ pixelNum, isHorizontal, srcTextureUniformName }) => `#version 300 es
 
 precision mediump float;
