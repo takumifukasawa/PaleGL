@@ -7,30 +7,36 @@ import {RenderTarget} from "../core/RenderTarget.js";
 import {CopyPass} from "./CopyPass.js";
 
 export class BloomPass extends AbstractPostProcessPass {
-    #passes = [];
-   
     #extractBrightnessPass;
-    #copyPass;
+
     #renderTargetExtractBrightness;
-    #renderTargetMip2;
     #renderTargetMip4;
     #renderTargetMip8;
     #renderTargetMip16;
+    #renderTargetMip32;
+    
     #horizontalBlurPass;
     #verticalBlurPass;
+    
+    #lastPass;
+    
+    #blurMipPass4;
+    #blurMipPass8;
+    #blurMipPass16;
+    #blurMipPass32;
 
     get renderTarget() {
-        return this.#passes[this.#passes.length - 1].renderTarget;
+        return this.#lastPass.renderTarget;
     }
 
     constructor({ gpu }) {
         super();
        
         this.#renderTargetExtractBrightness = new RenderTarget({ gpu });
-        this.#renderTargetMip2 = new RenderTarget({ gpu })
         this.#renderTargetMip4 = new RenderTarget({ gpu })
         this.#renderTargetMip8 = new RenderTarget({ gpu })
         this.#renderTargetMip16 = new RenderTarget({ gpu })
+        this.#renderTargetMip32 = new RenderTarget({ gpu })
         
         // const copyPass = new CopyPass({ gpu });
         // this.#passes.push(copyPass);
@@ -53,13 +59,10 @@ void main() {
     vec4 color = texture(${UniformNames.SceneTexture}, vUv);
     vec4 b = (color - k) / (1. - k);
     outColor = b;
+    outColor = color;
 }
             `,
         });
-        this.#passes.push(this.#extractBrightnessPass);
-        
-        this.#copyPass = new CopyPass({ gpu });
-        this.#passes.push(this.#copyPass);
         
         const blurPixelNum = 7;
         
@@ -97,33 +100,57 @@ void main() {
                 }
             }
         });
+
+        this.#lastPass = new CopyPass({ gpu });
+        // this.#passes.push(this.#lastPass);
     }
+    
+    #width = 1;
+    #height = 1;
 
     setSize(width, height) {
-        this.#passes.forEach((pass, i) => {
-            pass.setSize(width, height);
-            //pass.material.uniforms.uTargetWidth.value = w;
-            //pass.material.uniforms.uTargetHeight.value = h;
-        });
-        (new Array(4)).fill(0).forEach((_, i) => {
-            const mipRate = 2 ^ (i + 1);
-            const w = width / mipRate;
-            const h = height / mipRate;
-            this.#horizontalBlurPass.setSize(width, height);
-            this.#verticalBlurPass.setSize(width, height);
-        });
+        this.#width = width;
+        this.#height = height;
+        
+        this.#extractBrightnessPass.setSize(width, height);
+        this.#lastPass.setSize(width, height);
     }
 
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
-        this.#copyPass.render({
+        
+        this.#renderTargetMip4.setSize(this.#width / 4, this.#height / 4);
+        
+        // this.#horizontalBlurPass.renderTarget = this.#renderTargetMip4;
+        this.#horizontalBlurPass.material.uniforms.uTargetWidth.value = this.#width / 4;
+        this.#horizontalBlurPass.material.uniforms.uTargetHeight.value = this.#height / 4;
+        this.#horizontalBlurPass.setSize(this.#width / 4, this.#height / 4);
+        this.#horizontalBlurPass.render({
             gpu,
             camera,
             renderer,
             prevRenderTarget: this.#extractBrightnessPass.renderTarget,
+        });
+
+        // this.#verticalBlurPass.renderTarget = this.#renderTargetMip4;
+        this.#verticalBlurPass.material.uniforms.uTargetWidth.value = this.#width / 4;
+        this.#verticalBlurPass.material.uniforms.uTargetHeight.value = this.#height / 4;
+        this.#verticalBlurPass.setSize(this.#width / 4, this.#height / 4);
+        this.#verticalBlurPass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: this.#horizontalBlurPass.renderTarget,
+        });
+
+        this.#lastPass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: this.#verticalBlurPass.renderTarget,
             isLastPass
         });
-        
+
         // this.#passes.forEach((pass, i) => {
         //     pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
 
