@@ -1996,9 +1996,6 @@ class Geometry {
         this.vertexArrayObject.setAttribute(attr, true);
     }
    
-    // TODO: startで create geometry する？
-    // start() {}
-    
     #createGeometry({ gpu }) {
         console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
@@ -6691,10 +6688,8 @@ class PostProcessPass extends AbstractPostProcessPass {
     width;
     height;
     
-    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
-        super({ name });
-
-        const baseVertexShader = `#version 300 es
+    static get baseVertexShader() {
+        return `#version 300 es
 
 layout (location = 0) in vec3 ${AttributeNames.Position};
 layout (location = 1) in vec2 ${AttributeNames.Uv};
@@ -6705,7 +6700,13 @@ void main() {
     vUv = aUv;
     gl_Position = vec4(aPosition, 1);
 }
-`;
+`;   
+    }
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
+        super({ name });
+
+        const baseVertexShader = PostProcessPass.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
@@ -7465,19 +7466,24 @@ class GaussianBlurPass extends AbstractPostProcessPass {
 
 
 
+
 class BloomPass extends AbstractPostProcessPass {
     #extractBrightnessPass;
 
     #renderTargetExtractBrightness;
-    #renderTargetMip4;
-    #renderTargetMip8;
-    #renderTargetMip16;
-    #renderTargetMip32;
+    #renderTargetBlurMip4;
+    #renderTargetBlurMip8;
+    #renderTargetBlurMip16;
+    #renderTargetBlurMip32;
     
     #horizontalBlurPass;
     #verticalBlurPass;
     
     #lastPass;
+    
+    #geometry;
+    #horizontalBlurMaterial;
+    #verticalBlurMaterial;
     
     #blurMipPass4;
     #blurMipPass8;
@@ -7490,12 +7496,15 @@ class BloomPass extends AbstractPostProcessPass {
 
     constructor({ gpu }) {
         super();
-       
+        
+        // NOTE: geometryは親から渡して使いまわしてもよい
+        this.#geometry = new PlaneGeometry({ gpu });
+
         this.#renderTargetExtractBrightness = new RenderTarget({ gpu });
-        this.#renderTargetMip4 = new RenderTarget({ gpu })
-        this.#renderTargetMip8 = new RenderTarget({ gpu })
-        this.#renderTargetMip16 = new RenderTarget({ gpu })
-        this.#renderTargetMip32 = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip4 = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip8 = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip16 = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip32 = new RenderTarget({ gpu })
         
         // const copyPass = new CopyPass({ gpu });
         // this.#passes.push(copyPass);
@@ -7522,8 +7531,49 @@ void main() {
 }
             `,
         });
-        
+
         const blurPixelNum = 7;
+        
+        this.#horizontalBlurMaterial = new Material({
+            vertexShader: PostProcessPass.baseVertexShader,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                [UniformNames.SceneTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }           
+        });
+        this.#verticalBlurMaterial = new Material({
+            vertexShader: PostProcessPass.baseVertexShader,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                [UniformNames.SceneTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }           
+        });
         
         this.#horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
@@ -7573,45 +7623,71 @@ void main() {
         
         this.#extractBrightnessPass.setSize(width, height);
         this.#lastPass.setSize(width, height);
+
+        this.#renderTargetBlurMip4.setSize(this.#width / 4, this.#height / 4);
+        
+        this.#horizontalBlurMaterial.uniforms.uTargetWidth.value = this.#width / 4;
+        this.#horizontalBlurMaterial.uniforms.uTargetHeight.value = this.height / 4;
     }
 
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
-        this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
-        
-        this.#renderTargetMip4.setSize(this.#width / 4, this.#height / 4);
-        
-        for(let i = 0; i < 2; i++) {
-            const s = i === 0 ? 2 : 4;
-            // this.#horizontalBlurPass.renderTarget = this.#renderTargetMip4;
-            this.#horizontalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
-            this.#horizontalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
-            this.#horizontalBlurPass.setSize(this.#width / s, this.#height / s);
-            this.#horizontalBlurPass.render({
-                gpu,
-                camera,
-                renderer,
-                prevRenderTarget: i === 0 ? this.#extractBrightnessPass.renderTarget : this.#verticalBlurPass.renderTarget,
-            });
-
-            // this.#verticalBlurPass.renderTarget = this.#renderTargetMip4;
-            this.#verticalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
-            this.#verticalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
-            this.#verticalBlurPass.setSize(this.#width / s, this.#height / s);
-            this.#verticalBlurPass.render({
-                gpu,
-                camera,
-                renderer,
-                prevRenderTarget: this.#horizontalBlurPass.renderTarget,
-            });
+        // 一回だけ呼びたい
+        this.#geometry.start();
+        if(!this.#horizontalBlurMaterial.isCompiledShader) {
+            this.#horizontalBlurMaterial.start({ gpu, attributeDescriptors: this.#geometry.getAttributeDescriptors() });
         }
+        if(!this.#verticalBlurMaterial.isCompiledShader) {
+            this.#verticalBlurMaterial.start({ gpu, attributeDescriptors: this.#geometry.getAttributeDescriptors() });
+        }
+        
+        this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
+
+        renderer.setRenderTarget(this.#renderTargetBlurMip4);
+        this.#horizontalBlurMaterial.uniforms[UniformNames.SceneTexture].value = this.#extractBrightnessPass.renderTarget.texture;
+        renderer.renderMesh(this.#geometry, this.#horizontalBlurMaterial);
 
         this.#lastPass.render({
             gpu,
             camera,
             renderer,
-            prevRenderTarget: this.#verticalBlurPass.renderTarget,
+            prevRenderTarget: this.#renderTargetBlurMip4,
             isLastPass
         });
+        
+        // this.#renderTargetBlurMip4.setSize(this.#width / 4, this.#height / 4);
+        // 
+        // for(let i = 0; i < 2; i++) {
+        //     const s = i === 0 ? 2 : 4;
+        //     // this.#horizontalBlurPass.renderTarget = this.#renderTargetBlurMip4;
+        //     this.#horizontalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
+        //     this.#horizontalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
+        //     this.#horizontalBlurPass.setSize(this.#width / s, this.#height / s);
+        //     this.#horizontalBlurPass.render({
+        //         gpu,
+        //         camera,
+        //         renderer,
+        //         prevRenderTarget: i === 0 ? this.#extractBrightnessPass.renderTarget : this.#verticalBlurPass.renderTarget,
+        //     });
+
+        //     // this.#verticalBlurPass.renderTarget = this.#renderTargetBlurMip4;
+        //     this.#verticalBlurPass.material.uniforms.uTargetWidth.value = this.#width / s;
+        //     this.#verticalBlurPass.material.uniforms.uTargetHeight.value = this.#height / s;
+        //     this.#verticalBlurPass.setSize(this.#width / s, this.#height / s);
+        //     this.#verticalBlurPass.render({
+        //         gpu,
+        //         camera,
+        //         renderer,
+        //         prevRenderTarget: this.#horizontalBlurPass.renderTarget,
+        //     });
+        // }
+
+        // this.#lastPass.render({
+        //     gpu,
+        //     camera,
+        //     renderer,
+        //     prevRenderTarget: this.#verticalBlurPass.renderTarget,
+        //     isLastPass
+        // });
 
         // this.#passes.forEach((pass, i) => {
         //     pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);

@@ -14,10 +14,8 @@ export class PostProcessPass extends AbstractPostProcessPass {
     width;
     height;
     
-    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
-        super({ name });
-
-        const baseVertexShader = `#version 300 es
+    static get baseVertexShader() {
+        return `#version 300 es
 
 layout (location = 0) in vec3 ${AttributeNames.Position};
 layout (location = 1) in vec2 ${AttributeNames.Uv};
@@ -28,7 +26,13 @@ void main() {
     vUv = aUv;
     gl_Position = vec4(aPosition, 1);
 }
-`;
+`;   
+    }
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
+        super({ name });
+
+        const baseVertexShader = PostProcessPass.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
