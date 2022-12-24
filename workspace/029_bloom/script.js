@@ -401,6 +401,17 @@ function initDebugger() {
         initialValue: bloomPass.enabled,
         onChange: (value) => bloomPass.enabled = value,
     })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom threshold",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.threshold,
+        onChange: (value) => {
+            bloomPass.threshold = value;
+        }
+    })
 
     // debuggerGUI.addToggleDebugger({
     //     label: "fxaa pass enabled",

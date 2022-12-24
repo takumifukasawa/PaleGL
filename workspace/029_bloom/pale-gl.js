@@ -7504,13 +7504,17 @@ class BloomPass extends AbstractPostProcessPass {
     #blurMipPass8;
     #blurMipPass16;
     #blurMipPass32;
-
+   
+    threshold = 0.8;
+   
     get renderTarget() {
         return this.#compositePass.renderTarget;
     }
 
-    constructor({ gpu }) {
+    constructor({ gpu, threshold = 0.8 }) {
         super();
+        
+        this.threshold = threshold;
         
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
@@ -7539,17 +7543,23 @@ out vec4 outColor;
 in vec2 vUv;
 
 uniform sampler2D ${UniformNames.SceneTexture};
-
-float k = .999999;
+uniform float uThreshold;
 
 void main() {
     vec4 color = texture(${UniformNames.SceneTexture}, vUv);
+    float k = uThreshold;
     vec4 b = (color - vec4(k)) / (1. - k);
     outColor = b;
     // for debug
     // outColor = color;
 }
             `,
+            uniforms: {
+                uThreshold: {
+                    type: UniformTypes.Float,
+                    value: this.threshold
+                }
+            }
         });
 
         const blurPixelNum = 7;
@@ -7726,7 +7736,12 @@ void main() {
             this.#verticalBlurMaterial.start({ gpu, attributeDescriptors: this.#geometry.getAttributeDescriptors() });
         }
         
+        this.#extractBrightnessPass.material.uniforms.uThreshold.value = this.threshold;
+        
+        // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
+        
+        // return;
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
             
