@@ -7540,6 +7540,8 @@ function getGaussianBlurWeights(pixelNum, sigma) {
 
 
 
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+// TODO: mipmap使う方法に変えてみる
 class BloomPass extends AbstractPostProcessPass {
     #extractBrightnessPass;
 

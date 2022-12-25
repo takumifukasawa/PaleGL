@@ -8,6 +8,8 @@ import {CopyPass} from "./CopyPass.js";
 import {Material} from "../materials/Material.js";
 import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities.js";
 
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+// TODO: mipmap使う方法に変えてみる
 export class BloomPass extends AbstractPostProcessPass {
     #extractBrightnessPass;
 
