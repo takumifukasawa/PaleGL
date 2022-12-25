@@ -107,6 +107,7 @@ void main() {
             }
         });
 
+        // 可変でもよい
         const blurPixelNum = 7;
         
         const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));

@@ -7390,6 +7390,7 @@ void main() {
 
 
 
+
 class GaussianBlurPass extends AbstractPostProcessPass {
     #passes = [];
 
@@ -7399,6 +7400,8 @@ class GaussianBlurPass extends AbstractPostProcessPass {
 
     constructor({ gpu, blurPixelNum = 7 }) {
         super();
+        
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
         
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
@@ -7414,6 +7417,10 @@ class GaussianBlurPass extends AbstractPostProcessPass {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });
@@ -7431,6 +7438,10 @@ class GaussianBlurPass extends AbstractPostProcessPass {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });
@@ -7625,6 +7636,7 @@ void main() {
             }
         });
 
+        // 可変でもよい
         const blurPixelNum = 7;
         
         const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));

@@ -3,6 +3,7 @@ import {UniformNames, UniformTypes} from "../constants.js";
 import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 import {FragmentPass} from "./FragmentPass.js";
 import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader.js";
+import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities";
 
 export class GaussianBlurPass extends AbstractPostProcessPass {
     #passes = [];
@@ -13,6 +14,8 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
 
     constructor({ gpu, blurPixelNum = 7 }) {
         super();
+        
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
         
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
@@ -28,6 +31,10 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });
@@ -45,6 +52,10 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });

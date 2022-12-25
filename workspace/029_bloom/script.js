@@ -130,12 +130,12 @@ captureScene.add(directionalLight);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
-// const gaussianBlurPass = new GaussianBlurPass({ gpu });
-// gaussianBlurPass.enabled = false;
-// postProcess.addPass(gaussianBlurPass);
+const gaussianBlurPass = new GaussianBlurPass({ gpu });
+gaussianBlurPass.enabled = true;
+postProcess.addPass(gaussianBlurPass);
 
 const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
-bloomPass.enabled = true;
+bloomPass.enabled = false;
 postProcess.addPass(bloomPass);
 
 // const fxaaPass = new FXAAPass({ gpu });
