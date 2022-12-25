@@ -130,17 +130,17 @@ captureScene.add(directionalLight);
 
 const postProcess = new PostProcess({ gpu, renderer });
 
-const gaussianBlurPass = new GaussianBlurPass({ gpu });
-gaussianBlurPass.enabled = true;
-postProcess.addPass(gaussianBlurPass);
+// const gaussianBlurPass = new GaussianBlurPass({ gpu });
+// gaussianBlurPass.enabled = true;
+// postProcess.addPass(gaussianBlurPass);
 
 const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
-bloomPass.enabled = false;
+bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
-// const fxaaPass = new FXAAPass({ gpu });
-// fxaaPass.enabled = false;
-// postProcess.addPass(fxaaPass);
+const fxaaPass = new FXAAPass({ gpu });
+fxaaPass.enabled = false;
+postProcess.addPass(fxaaPass);
 
 postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
@@ -404,7 +404,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: "bloom amount",
         minValue: 0,
-        maxValue: 1,
+        maxValue: 4,
         stepValue: 0.001,
         initialValue: bloomPass.bloomAmount,
         onChange: (value) => {
@@ -434,11 +434,15 @@ function initDebugger() {
         }
     })
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "fxaa pass enabled",
-    //     initialValue: fxaaPass.enabled,
-    //     onChange: (value) => fxaaPass.enabled = value,
-    // })
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    })
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "postprocess enabled",
