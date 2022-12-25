@@ -7462,6 +7462,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
         this.#passes.forEach((pass, i) => {
             pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
 
+            // TODO: pass内で好きに設定してよさそう
             renderer.clear(
                 camera.clearColor.x,
                 camera.clearColor.y,
@@ -7469,6 +7470,7 @@ class GaussianBlurPass extends AbstractPostProcessPass {
                 camera.clearColor.w
             );
 
+            // TODO: mesh経由する必要たぶんない
             pass.mesh.updateTransform();
             pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             if(!pass.material.isCompiledShader) {
