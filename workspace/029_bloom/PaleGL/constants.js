@@ -21,6 +21,7 @@ export const UniformTypes = {
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
+    FloatArray: "FloatArray",
     Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",

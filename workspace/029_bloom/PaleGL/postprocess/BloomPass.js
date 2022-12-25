@@ -6,6 +6,7 @@ import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {CopyPass} from "./CopyPass.js";
 import {Material} from "../materials/Material.js";
+import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities.js";
 
 export class BloomPass extends AbstractPostProcessPass {
     #extractBrightnessPass;
@@ -108,6 +109,8 @@ void main() {
 
         const blurPixelNum = 7;
         
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        
         this.#horizontalBlurMaterial = new Material({
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
@@ -125,7 +128,11 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
-                }
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
             }           
         });
         this.#verticalBlurMaterial = new Material({
@@ -145,7 +152,11 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
-                }
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
             }           
         });
         
@@ -215,7 +226,7 @@ void main() {
     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
 
     outColor = sceneColor + blurColor;
-    
+
     // for debug
     // outColor = blur4Color;
     // outColor = blur8Color;
@@ -299,7 +310,6 @@ void main() {
         // for debug
         // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
-        
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
             const w = this.#width / downSize;

@@ -762,6 +762,7 @@ const UniformTypes = {
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
+    FloatArray: "FloatArray",
     Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",
@@ -5446,6 +5447,9 @@ class GPU {
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
                     break;
+                case UniformTypes.FloatArray:
+                    gl.uniform1fv(location, value);
+                    break;
                 case UniformTypes.Vector2:
                     gl.uniform2fv(location, value.elements);
                     break;
@@ -7358,40 +7362,9 @@ in vec2 vUv;
 out vec4 outColor;
 
 uniform sampler2D ${srcTextureUniformName};
-
-// ------------------------------------------------------
-//
-// # 3x3
-//
-// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
-//
-// --------------------------
-// | 1 | 2 | 1 |
-// | 2 | 4 | 2 | * (1 / 16)
-// | 1 | 2 | 1 |
-// --------------------------
-//
-// # 5x5
-//
-// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
-//
-// -------------------------------------
-// | 1 | 4  | 6  | 4  | 1 |
-// | 4 | 16 | 24 | 16 | 4 |
-// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
-// | 4 | 16 | 24 | 16 | 4 |
-// | 1 | 4  | 6  | 4  | 1 |
-// -------------------------------------
-//
-// ------------------------------------------------------
-
-float gauss(float sigma, float x) {
-    float sigma2 = sigma * sigma;
-    return exp(-(x * x) / (2. * sigma));
-}
-
 uniform float uTargetWidth;
 uniform float uTargetHeight;
+uniform float[${pixelNum}] uBlurWeights;
 
 void main() {
     vec4 textureColor = texture(${srcTextureUniformName}, vUv);
@@ -7399,17 +7372,10 @@ void main() {
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
 
     const int pixelNum = ${pixelNum};
-    float sum = 0.;
-    float[pixelNum] weights;
     float width = floor(float(pixelNum) / 2.);
-    float sigma = width;
     for(int i = 0; i < pixelNum; i++) {
-        weights[i] = gauss(sigma, float(i) - width);
-        sum += weights[i];
-    }
-    for(int i = 0; i < pixelNum; i++) {
-        float weight = weights[i] /= sum;
         float index = float(i) - width;
+        float weight = uBlurWeights[i];
         sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
     }
     
@@ -7503,6 +7469,55 @@ class GaussianBlurPass extends AbstractPostProcessPass {
     }   
 }
 ﻿
+// ------------------------------------------------------
+//
+// # 3x3
+// もしガウシアンブラーなら、
+// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
+//
+// --------------------------
+// | 1 | 2 | 1 |
+// | 2 | 4 | 2 | * (1 / 16)
+// | 1 | 2 | 1 |
+// --------------------------
+//
+// # 5x5
+// もしガウシアンブラーなら、
+// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
+//
+// -------------------------------------
+// | 1 | 4  | 6  | 4  | 1 |
+// | 4 | 16 | 24 | 16 | 4 |
+// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
+// | 4 | 16 | 24 | 16 | 4 |
+// | 1 | 4  | 6  | 4  | 1 |
+// -------------------------------------
+//
+// ------------------------------------------------------
+
+function gaussCoefficient(sigma, x) {
+    const sigma2 = sigma * sigma;
+    return Math.exp(-(x * x) / (2. * sigma));
+}
+﻿
+
+
+// pixelNumは奇数であるべき
+function getGaussianBlurWeights(pixelNum, sigma) {
+    const halfWidth = Math.floor(pixelNum / 2);
+
+    let sum = 0;
+    const rawWeights = new Array(pixelNum).fill(0).map((_, i) => {
+        const index = i - halfWidth;
+        const weight = gaussCoefficient(sigma, index);
+        sum += weight;
+        return weight;
+    });
+
+    return rawWeights.map(w => w / sum);
+}
+﻿
+
 
 
 
@@ -7612,6 +7627,8 @@ void main() {
 
         const blurPixelNum = 7;
         
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        
         this.#horizontalBlurMaterial = new Material({
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
@@ -7629,7 +7646,11 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
-                }
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
             }           
         });
         this.#verticalBlurMaterial = new Material({
@@ -7649,7 +7670,11 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
-                }
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
             }           
         });
         
@@ -7719,7 +7744,7 @@ void main() {
     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
 
     outColor = sceneColor + blurColor;
-    
+
     // for debug
     // outColor = blur4Color;
     // outColor = blur8Color;
@@ -7803,7 +7828,6 @@ void main() {
         // for debug
         // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
-        
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
             const w = this.#width / downSize;
