@@ -7508,9 +7508,10 @@ class GaussianBlurPass extends AbstractPostProcessPass {
 //
 // ------------------------------------------------------
 
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 function gaussCoefficient(sigma, x) {
     const sigma2 = sigma * sigma;
-    return Math.exp(-(x * x) / (2. * sigma));
+    return Math.exp(-(x * x) / (2. * sigma2));
 }
 ﻿
 
