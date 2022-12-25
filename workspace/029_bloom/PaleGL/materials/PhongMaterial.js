@@ -19,13 +19,16 @@ import {Vector2} from "../math/Vector2.js";
 import {Color} from "../math/Color.js";
 
 export class PhongMaterial extends Material {
-    diffuseColor;
+    // // params
+    // diffuseColor;
+    // specularAmount;
     
     constructor({
         diffuseColor,
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
+        specularAmount,
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
@@ -36,6 +39,7 @@ export class PhongMaterial extends Material {
         uniforms = {},
         ...options
     }) {
+        // this.specularAmount = 
 
         const baseUniforms = {
             uDiffuseColor: {
@@ -53,6 +57,10 @@ export class PhongMaterial extends Material {
             uDiffuseMapUvOffset: {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
+            },
+            uSpecularAmount: {
+                type: UniformTypes.Float,
+                value: specularAmount || 1,
             },
             uNormalMap: {
                 type: UniformTypes.Texture,
@@ -125,6 +133,12 @@ export class PhongMaterial extends Material {
     start(options) {
         super.start(options);
     }
+
+    // updateUniforms(options) {
+    //     super.updateUniforms(options);
+    //     this.uniforms.uDiffuseColor.value = this.diffuseColor;
+    //     this.uniforms.uSpecularAmount.value = this.specularAmount;
+    // }
     
     static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest }) {
         return `#version 300 es
@@ -134,6 +148,7 @@ precision mediump float;
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
+uniform float uSpecularAmount;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
 uniform vec3 uViewPosition;
@@ -145,6 +160,7 @@ struct Surface {
     vec3 worldNormal;
     vec3 worldPosition;
     vec4 diffuseColor;
+    float specularAmount;
 };
 
 struct Camera {
@@ -180,6 +196,7 @@ void main() {
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
     surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
+    surface.specularAmount = uSpecularAmount;
     
     Camera camera;
     camera.worldPosition = uViewPosition;

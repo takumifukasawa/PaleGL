@@ -79,7 +79,6 @@ const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
     pixelRatio: Math.min(window.devicePixelRatio, 1.5)
-    // pixelRatio: 1
 });
 
 const engine = new Engine({ gpu, renderer });
@@ -112,7 +111,8 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
 
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
-directionalLight.color = Color.fromRGB(255, 190, 180);
+directionalLight.color = Color.fromRGB(255, 210, 200);
+// directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
@@ -134,7 +134,7 @@ const postProcess = new PostProcess({ gpu, renderer });
 // gaussianBlurPass.enabled = false;
 // postProcess.addPass(gaussianBlurPass);
 
-const bloomPass = new BloomPass({ gpu, threshold: 0.9 });
+const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.2 });
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
@@ -241,9 +241,7 @@ const createGLTFSkinnedMesh = async () => {
     });
     skinningMesh.material = new PhongMaterial({
         gpu,
-        diffuseColor: new Color(1, 1, 1, 1),
-        // diffuseMap,
-        // normalMap,
+        specularAmount: 0.5,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -325,7 +323,8 @@ const main = async () => {
             gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
-            receiveShadow: true
+            receiveShadow: true,
+            specularAmount: 0.4
         }),
         castShadow: false
     });
@@ -401,6 +400,17 @@ function initDebugger() {
         initialValue: bloomPass.enabled,
         onChange: (value) => bloomPass.enabled = value,
     })
+
+    debuggerGUI.addSliderDebugger({
+        label: "bloom amount",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.bloomAmount,
+        onChange: (value) => {
+            bloomPass.bloomAmount = value;
+        }
+    })
     
     debuggerGUI.addSliderDebugger({
         label: "bloom threshold",
@@ -410,6 +420,17 @@ function initDebugger() {
         initialValue: bloomPass.threshold,
         onChange: (value) => {
             bloomPass.threshold = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom tone",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.tone,
+        onChange: (value) => {
+            bloomPass.tone = value;
         }
     })
 

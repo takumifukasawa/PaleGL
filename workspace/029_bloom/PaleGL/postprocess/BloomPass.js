@@ -29,22 +29,26 @@ export class BloomPass extends AbstractPostProcessPass {
     #geometry;
     #horizontalBlurMaterial;
     #verticalBlurMaterial;
-    
-    #blurMipPass4;
-    #blurMipPass8;
-    #blurMipPass16;
-    #blurMipPass32;
    
     threshold = 0.8;
+    tone = 1;
+    bloomAmount = 1;
    
     get renderTarget() {
         return this.#compositePass.renderTarget;
     }
 
-    constructor({ gpu, threshold = 0.8 }) {
+    constructor({
+        gpu,
+        threshold = 0.8,
+        tone = 1,
+        bloomAmount = 1
+    }) {
         super();
         
         this.threshold = threshold;
+        this.tone = tone;
+        this.bloomAmount = bloomAmount;
         
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.#geometry = new PlaneGeometry({ gpu });
@@ -89,15 +93,16 @@ void main() {
     // vec4 b = color - k;
     
     outColor = clamp(b, 0., 1.);
+
     // for debug
-    // outColor = color;
+    // outColor = b;
 }
             `,
             uniforms: {
                 uThreshold: {
                     type: UniformTypes.Float,
                     value: this.threshold
-                }
+                },
             }
         });
 
@@ -197,26 +202,26 @@ uniform sampler2D uBlur4Texture;
 uniform sampler2D uBlur8Texture;
 uniform sampler2D uBlur16Texture;
 uniform sampler2D uBlur32Texture;
+uniform float uTone;
+uniform float uBloomAmount;
 
 void main() {
     vec4 blur4Color = texture(uBlur4Texture, vUv);
     vec4 blur8Color = texture(uBlur8Texture, vUv);
     vec4 blur16Color = texture(uBlur16Texture, vUv);
     vec4 blur32Color = texture(uBlur32Texture, vUv);
-    vec4 sceneColor = texture(${UniformNames.SceneTexture}, vUv);
+    vec4 sceneColor = texture(${UniformNames.SceneTexture}, vUv) * uTone;
 
-    // vec4 blurColor = blur4Color + blur8Color + blur16Color + blur32Color;
-    // TODO: 一旦weightを合計1にしている
-    vec4 blurColor = blur4Color * .25 + blur8Color * .25 + blur16Color * .25 + blur32Color * .25;
-    
+    vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
+
     outColor = sceneColor + blurColor;
-    // outColor = blurColor;
     
     // for debug
     // outColor = blur4Color;
     // outColor = blur8Color;
     // outColor = blur16Color;
     // outColor = blur32Color;
+    // outColor = blurColor;
     // outColor = sceneColor;
 }           
             `,
@@ -225,21 +230,29 @@ void main() {
                     type: UniformTypes.Texture,
                     value: null
                 },
-                "uBlur4Texture": {
+                uBlur4Texture: {
                     type: UniformTypes.Texture,
                     value: null
                 },
-                "uBlur8Texture": {
+                uBlur8Texture: {
                     type: UniformTypes.Texture,
                     value: null
                 },
-                "uBlur16Texture": {
+                uBlur16Texture: {
                     type: UniformTypes.Texture,
                     value: null
                 },
-                "uBlur32Texture": {
+                uBlur32Texture: {
                     type: UniformTypes.Texture,
                     value: null
+                },
+                uTone: {
+                    type: UniformTypes.Float,
+                    value: this.tone,
+                },
+                uBloomAmount: {
+                    type: UniformTypes.Float,
+                    value: this.bloomAmount
                 }
             }
         }); 
@@ -260,8 +273,8 @@ void main() {
         this.#renderTargetBlurMip8_Vertical.setSize(this.#width / 8, this.#height / 8);
         this.#renderTargetBlurMip16_Horizontal.setSize(this.#width / 16, this.#height / 16);
         this.#renderTargetBlurMip16_Vertical.setSize(this.#width / 16, this.#height / 16);
-        this.#renderTargetBlurMip32_Horizontal.setSize(this.#width / 64, this.#height / 64);
-        this.#renderTargetBlurMip32_Vertical.setSize(this.#width / 64, this.#height / 64);
+        this.#renderTargetBlurMip32_Horizontal.setSize(this.#width / 32, this.#height / 32);
+        this.#renderTargetBlurMip32_Vertical.setSize(this.#width / 32, this.#height / 32);
         
         this.#compositePass.setSize(width, height);
     }
@@ -312,13 +325,15 @@ void main() {
         // 1 / 16
         renderBlur(this.#renderTargetBlurMip16_Horizontal, this.#renderTargetBlurMip16_Vertical, 16);
         // 1 / 32
-        renderBlur(this.#renderTargetBlurMip32_Horizontal, this.#renderTargetBlurMip32_Vertical, 64);
+        renderBlur(this.#renderTargetBlurMip32_Horizontal, this.#renderTargetBlurMip32_Vertical, 32);
         
         this.#compositePass.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
         this.#compositePass.material.uniforms.uBlur4Texture.value = this.#renderTargetBlurMip4_Vertical.texture;
         this.#compositePass.material.uniforms.uBlur8Texture.value = this.#renderTargetBlurMip8_Vertical.texture;
         this.#compositePass.material.uniforms.uBlur16Texture.value = this.#renderTargetBlurMip16_Vertical.texture;
         this.#compositePass.material.uniforms.uBlur32Texture.value = this.#renderTargetBlurMip32_Vertical.texture;
+        this.#compositePass.material.uniforms.uTone.value = this.tone;
+        this.#compositePass.material.uniforms.uBloomAmount.value = this.bloomAmount;
 
         this.#compositePass.render({
             gpu,

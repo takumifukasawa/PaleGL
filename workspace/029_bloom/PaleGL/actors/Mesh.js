@@ -90,4 +90,10 @@ export class Mesh extends Actor {
             });
         }
     }
+    
+    beforeRender({gpu}) {
+        super.beforeRender({gpu});
+        // this.materials.forEach(material => material.updateUniforms({ gpu }));
+        // this.depthMaterial.updateUniforms({ gpu });
+    }
 }

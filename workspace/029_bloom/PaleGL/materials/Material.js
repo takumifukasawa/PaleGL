@@ -214,4 +214,10 @@ export class Material {
             fragmentShader: this.fragmentShader
         });
     }
+   
+    // // NOTE: renderer側でmaterial側のuniformをアップデートする用
+    // updateUniforms({ gpu } = {}) {}
+    
+    // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
+    // updateEngineUniforms() {} 
 }
