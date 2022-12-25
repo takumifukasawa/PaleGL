@@ -7,6 +7,8 @@ export class Texture extends GLObject {
     #img;
     #gpu;
     type;
+    minFilter;
+    magFilter;
 
     get glObject() {
         return this.#texture;
@@ -25,6 +27,9 @@ export class Texture extends GLObject {
         super();
         
         this.type = type;
+        
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
 
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
@@ -52,7 +57,7 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA16F:
             case TextureTypes.RGBA32F:
                 // min filter settings
-                switch(minFilter) {
+                switch(this.minFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                         break;
@@ -63,7 +68,7 @@ export class Texture extends GLObject {
                         throw "invalid min filter type"
                 }
                 // mag filter settings
-                switch(magFilter) {
+                switch(this.magFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                         break;

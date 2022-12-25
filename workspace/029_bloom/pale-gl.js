@@ -2573,6 +2573,8 @@ class Texture extends GLObject {
     #img;
     #gpu;
     type;
+    minFilter;
+    magFilter;
 
     get glObject() {
         return this.#texture;
@@ -2591,6 +2593,9 @@ class Texture extends GLObject {
         super();
         
         this.type = type;
+        
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
 
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
@@ -2618,7 +2623,7 @@ class Texture extends GLObject {
             case TextureTypes.RGBA16F:
             case TextureTypes.RGBA32F:
                 // min filter settings
-                switch(minFilter) {
+                switch(this.minFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                         break;
@@ -2629,7 +2634,7 @@ class Texture extends GLObject {
                         throw "invalid min filter type"
                 }
                 // mag filter settings
-                switch(magFilter) {
+                switch(this.magFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                         break;
@@ -7411,7 +7416,7 @@ void main() {
     outColor = sampleColor;
     
     // for debug
-    outColor = textureColor;
+    // outColor = textureColor;
 }`;
 ﻿
 
@@ -7630,7 +7635,7 @@ void main() {
         this.#verticalBlurMaterial = new Material({
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 [UniformNames.SceneTexture]: {
@@ -7794,9 +7799,11 @@ void main() {
         this.#extractBrightnessPass.material.uniforms.uThreshold.value = this.threshold;
         
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
+        
         // for debug
         // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
+        
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
             const w = this.#width / downSize;
@@ -7816,6 +7823,10 @@ void main() {
             this.#verticalBlurMaterial.uniforms.uTargetHeight.value = h;
             renderer.renderMesh(this.#geometry, this.#verticalBlurMaterial);
         }
+        
+        // // for debug
+        // renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);
+        // return;
 
         // 1 / 4
         renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);

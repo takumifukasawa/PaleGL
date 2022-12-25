@@ -85,7 +85,7 @@ const engine = new Engine({ gpu, renderer });
 
 engine.setScene(captureScene);
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 60);
 captureScene.add(captureSceneCamera);
 captureScene.mainCamera = captureSceneCamera;
 
@@ -134,7 +134,7 @@ const postProcess = new PostProcess({ gpu, renderer });
 // gaussianBlurPass.enabled = false;
 // postProcess.addPass(gaussianBlurPass);
 
-const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.2 });
+const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 

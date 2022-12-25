@@ -131,7 +131,7 @@ void main() {
         this.#verticalBlurMaterial = new Material({
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 [UniformNames.SceneTexture]: {
@@ -295,9 +295,11 @@ void main() {
         this.#extractBrightnessPass.material.uniforms.uThreshold.value = this.threshold;
         
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
+        
         // for debug
         // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
+        
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
             const w = this.#width / downSize;
@@ -317,6 +319,10 @@ void main() {
             this.#verticalBlurMaterial.uniforms.uTargetHeight.value = h;
             renderer.renderMesh(this.#geometry, this.#verticalBlurMaterial);
         }
+        
+        // // for debug
+        // renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);
+        // return;
 
         // 1 / 4
         renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);
