@@ -357,16 +357,8 @@ const main = async () => {
         attributes: [
             {
                 name: AttributeNames.Position,
-                data: new Float32Array([
-                    0, 0, 0,
-                    0, 0, 0,
-                    0, 0, 0,
-                    0, 0, 0
-                    // -1, 1, 0,
-                    // -1, -1, 0,
-                    // 1, 1, 0,
-                    // 1, -1, 0,
-                ]),
+                // dummy data
+                data: new Float32Array(new Array(4).fill(0).map(() => [0, 3, 0]).flat()),
                 size: 3
             }, {
                 name: AttributeNames.Uv,
@@ -399,7 +391,7 @@ const main = async () => {
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
                 // viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * viewPosition.xy * 3., viewPosition.zw);`
-                viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * vec2(2.), viewPosition.zw);`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[int(aBillboardVertexIndex)] * vec2(2.);`
             },
             insertUniforms: `uniform vec2[4] uBillboardPositionConverters;`,
         }),
