@@ -371,13 +371,17 @@ const main = async () => {
                 size: 2
             }, {
                 name: "aBillboardVertexIndex",
-                // data: new Uint16Array([
-                data: new Float32Array([
+                data: new Uint16Array([
+                // data: new Float32Array([
                     0,
                     1,
                     2,
                     3,
                 ]),
+                size: 1
+            }, {
+                name: "aBillboardSize",
+                data: new Float32Array(new Array(4).fill(0).map(() => 1)),
                 size: 1
             }
         ],
@@ -391,7 +395,7 @@ const main = async () => {
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
                 // viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * viewPosition.xy * 3., viewPosition.zw);`
-                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[int(aBillboardVertexIndex)] * vec2(2.);`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
             },
             insertUniforms: `uniform vec2[4] uBillboardPositionConverters;`,
         }),
@@ -423,7 +427,7 @@ void main() {
                     new Vector2(1, 1),
                     new Vector2(1, -1),
                 ],
-            }
+            },
         },
         blendType: BlendTypes.Transparent
     });

@@ -37,10 +37,11 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
                         throw "[buildVertexAttributeLayouts] invalid attribute float";
                 }
                 break;
+            // TODO: signedなパターンが欲しい    
             case Uint16Array:
                 switch(size) {
                     case 1:
-                        type = "int";
+                        type = "uint";
                         break;
                     case 2:
                         type = "uvec2";
