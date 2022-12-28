@@ -22,7 +22,7 @@ export class PlaneGeometry extends Geometry {
     static createPlaneGeometryData({
         calculateTangent = false,
         calculateBinormal = false 
-    }) {
+    } = {}) {
         // -----------------------------
         // 0 ---- 2
         // |    / |

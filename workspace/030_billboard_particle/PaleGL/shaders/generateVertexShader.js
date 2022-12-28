@@ -65,7 +65,9 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
 }
 
 export const generateVertexShader = ({
+    // required
     attributeDescriptors,
+    // optional
     isSkinning,
     gpuSkinning,
     jointNum,

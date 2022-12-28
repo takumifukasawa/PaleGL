@@ -24,7 +24,7 @@
     Engine,
     PhongMaterial,
     Vector2,
-    AxesHelper, GaussianBlurPass, CopyPass, BloomPass
+    AxesHelper, GaussianBlurPass, CopyPass, BloomPass, Geometry, Material, generateVertexShader
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -335,8 +335,34 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
    
+    const particleGeometryData = PlaneGeometry.createPlaneGeometryData({ gpu });
+    const particleGeometry = new Geometry({
+        gpu,
+        ...particleGeometryData,
+    });
+    const particleMesh = new Mesh({
+        geometry: particleGeometry,
+        material: new Material({
+            gpu,
+            vertexShader: generateVertexShader({
+                attributeDescriptors: particleGeometry.getAttributeDescriptors(),
+            }),
+            fragmentShader: `#version 300 es
+            
+precision mediump float;
+
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(1., 0., 0., 1.);
+}
+            `
+        }),
+    });
+   
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
+    captureScene.add(particleMesh);
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
     captureSceneCamera.transform.lookAt(new Vector3(0, -3, 0));

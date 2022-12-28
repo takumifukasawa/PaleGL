@@ -3735,7 +3735,9 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
 }
 
 const generateVertexShader = ({
+    // required
     attributeDescriptors,
+    // optional
     isSkinning,
     gpuSkinning,
     jointNum,
@@ -3876,7 +3878,6 @@ void main() {
 }
 `;
 }
-
 ﻿
 
 
@@ -4501,7 +4502,7 @@ class PlaneGeometry extends Geometry {
     static createPlaneGeometryData({
         calculateTangent = false,
         calculateBinormal = false 
-    }) {
+    } = {}) {
         // -----------------------------
         // 0 ---- 2
         // |    / |
