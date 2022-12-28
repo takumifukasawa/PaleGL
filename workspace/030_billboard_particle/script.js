@@ -386,7 +386,6 @@ const main = async () => {
             }
         ],
         indices: [0, 1, 2, 2, 1, 3],
-        // indices: particleGeometryData.indices,
         drawCount: particleGeometryData.drawCount
     });
     const particleMaterial = new Material({
@@ -394,10 +393,12 @@ const main = async () => {
         vertexShader: generateVertexShader({
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
-                // viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * viewPosition.xy * 3., viewPosition.zw);`
+                localPositionPostProcess: `localPosition.y += sin(uTime * 4.);`,
                 viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
             },
-            insertUniforms: `uniform vec2[4] uBillboardPositionConverters;`,
+            insertUniforms: `
+uniform vec2[4] uBillboardPositionConverters;
+`,
         }),
         fragmentShader: `#version 300 es
             
@@ -411,7 +412,7 @@ void main() {
     vec4 baseColor = texture(uParticleMap, vUv);
     float alpha = baseColor.x;
     outColor = vec4(baseColor.xyz, alpha);
-    outColor = vec4(1, 0, 0, 1);
+    // outColor = vec4(1, 0, 0, 1);
 }
         `,
         uniforms: {
@@ -428,14 +429,20 @@ void main() {
                     new Vector2(1, -1),
                 ],
             },
+            uTime: {
+                type: UniformTypes.Float,
+                value: 0,
+            }
         },
         blendType: BlendTypes.Transparent
     });
-    console.log("hogehoge", particleMaterial.vertexShader, particleMaterial.fragmentShader)
     const particleMesh = new Mesh({
         geometry: particleGeometry,
         material: particleMaterial,
     });
+    particleMesh.onFixedUpdate = ({ fixedTime }) => {
+        particleMaterial.uniforms.uTime.value = fixedTime;
+    };
    
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);

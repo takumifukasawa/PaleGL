@@ -81,7 +81,7 @@ export const generateVertexShader = ({
         viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
     },
-    insertUniforms,
+    insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
 } = {}) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
@@ -120,7 +120,7 @@ void main() {
         : ""
     }
     ${vertexShaderModifier.localPositionPostProcess || ""}
-    
+
     ${(() => {
         if(isSkinning) {
             return useNormalMap
