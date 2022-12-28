@@ -24,7 +24,15 @@
     Engine,
     PhongMaterial,
     Vector2,
-    AxesHelper, GaussianBlurPass, CopyPass, BloomPass, Geometry, Material, generateVertexShader
+    AxesHelper,
+    GaussianBlurPass,
+    CopyPass,
+    BloomPass,
+    Geometry,
+    Material,
+    generateVertexShader,
+    UniformTypes,
+    BlendTypes
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -276,6 +284,12 @@ const createGLTFSkinnedMesh = async () => {
 }
 
 const main = async () => {
+    const particleImg = await loadImg("./images/particle-default.png");
+    const particleMap = new Texture({
+        gpu,
+        img: particleImg,
+    });
+    
     const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
         gpu,
@@ -315,7 +329,7 @@ const main = async () => {
     
     skinnedMesh = await createGLTFSkinnedMesh();
     captureScene.add(skinnedMesh);
-
+    
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
@@ -351,12 +365,23 @@ const main = async () => {
             
 precision mediump float;
 
+in vec2 vUv;
 out vec4 outColor;
+uniform sampler2D uParticleMap;
 
 void main() {
-    outColor = vec4(1., 0., 0., 1.);
+    vec4 baseColor = texture(uParticleMap, vUv);
+    float alpha = baseColor.x;
+    outColor = vec4(baseColor.xyz, alpha);
 }
-            `
+            `,
+            uniforms: {
+                uParticleMap: {
+                    type: UniformTypes.Texture,
+                    value: particleMap,
+                }
+            },
+            blendType: BlendTypes.Transparent
         }),
     });
    
