@@ -5,6 +5,7 @@ import {
 import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexVaryings} from "./lightingCommon.js";
+import {AttributeNames} from "../constants.js";
 
 // -----------------------------------------------
 // TODO:
@@ -76,6 +77,7 @@ export const generateVertexShader = ({
     vertexShaderModifier = {
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
     },
     insertUniforms,
@@ -84,6 +86,7 @@ export const generateVertexShader = ({
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+    const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
 
     return `#version 300 es
 
@@ -135,9 +138,9 @@ void main() {
     vTangent = mat3(uNormalMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * aBinormal;
 `
-                : `
+                : hasNormal ? `
     vNormal = mat3(uNormalMatrix) * aNormal;
-`;
+` : "";
         }
     })()}
   
@@ -152,10 +155,13 @@ void main() {
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
+    
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    ${vertexShaderModifier.viewPositionPostProcess || ""}
  
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
- 
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    
+    gl_Position = uProjectionMatrix * viewPosition;
 }
 `;
 }

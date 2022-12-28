@@ -32,7 +32,8 @@
     Material,
     generateVertexShader,
     UniformTypes,
-    BlendTypes
+    BlendTypes,
+    AttributeNames
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -157,7 +158,8 @@ const updateCamera = (clientX, clientY) => {
     const nx = (clientX / width) * 2 - 1;
     const ny = ((clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = ny * 10 + 12;
+    // targetCameraPosition.y = ny * 10 + 12;
+    targetCameraPosition.y = ny * 10
 }
 
 const onMouseMove = (e) => {
@@ -348,20 +350,60 @@ const main = async () => {
         actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
-   
+
     const particleGeometryData = PlaneGeometry.createPlaneGeometryData({ gpu });
     const particleGeometry = new Geometry({
         gpu,
-        ...particleGeometryData,
+        attributes: [
+            {
+                name: AttributeNames.Position,
+                data: new Float32Array([
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0
+                    // -1, 1, 0,
+                    // -1, -1, 0,
+                    // 1, 1, 0,
+                    // 1, -1, 0,
+                ]),
+                size: 3
+            }, {
+                name: AttributeNames.Uv,
+                data: new Float32Array([
+                    0, 1,
+                    0, 0,
+                    1, 1,
+                    1, 0,
+                ]),
+                size: 2
+            }, {
+                name: "aBillboardVertexIndex",
+                // data: new Uint16Array([
+                data: new Float32Array([
+                    0,
+                    1,
+                    2,
+                    3,
+                ]),
+                size: 1
+            }
+        ],
+        indices: [0, 1, 2, 2, 1, 3],
+        // indices: particleGeometryData.indices,
+        drawCount: particleGeometryData.drawCount
     });
-    const particleMesh = new Mesh({
-        geometry: particleGeometry,
-        material: new Material({
-            gpu,
-            vertexShader: generateVertexShader({
-                attributeDescriptors: particleGeometry.getAttributeDescriptors(),
-            }),
-            fragmentShader: `#version 300 es
+    const particleMaterial = new Material({
+        gpu,
+        vertexShader: generateVertexShader({
+            attributeDescriptors: particleGeometry.getAttributeDescriptors(),
+            vertexShaderModifier: {
+                // viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * viewPosition.xy * 3., viewPosition.zw);`
+                viewPositionPostProcess: `viewPosition = vec4(uBillboardPositionConverters[int(aBillboardVertexIndex)] * vec2(2.), viewPosition.zw);`
+            },
+            insertUniforms: `uniform vec2[4] uBillboardPositionConverters;`,
+        }),
+        fragmentShader: `#version 300 es
             
 precision mediump float;
 
@@ -373,16 +415,30 @@ void main() {
     vec4 baseColor = texture(uParticleMap, vUv);
     float alpha = baseColor.x;
     outColor = vec4(baseColor.xyz, alpha);
+    outColor = vec4(1, 0, 0, 1);
 }
-            `,
-            uniforms: {
-                uParticleMap: {
-                    type: UniformTypes.Texture,
-                    value: particleMap,
-                }
+        `,
+        uniforms: {
+            uParticleMap: {
+                type: UniformTypes.Texture,
+                value: particleMap,
             },
-            blendType: BlendTypes.Transparent
-        }),
+            uBillboardPositionConverters: {
+                type: UniformTypes.Vector2Array,
+                value: [
+                    new Vector2(-1, 1),
+                    new Vector2(-1, -1),
+                    new Vector2(1, 1),
+                    new Vector2(1, -1),
+                ],
+            }
+        },
+        blendType: BlendTypes.Transparent
+    });
+    console.log("hogehoge", particleMaterial.vertexShader, particleMaterial.fragmentShader)
+    const particleMesh = new Mesh({
+        geometry: particleGeometry,
+        material: particleMaterial,
     });
    
     captureScene.add(floorPlaneMesh);
@@ -390,7 +446,7 @@ void main() {
     captureScene.add(particleMesh);
     
     captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, -3, 0));
+    captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
    
     if(isSP) {
         window.addEventListener("touchstart", onTouch);

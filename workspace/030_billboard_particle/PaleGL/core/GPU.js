@@ -151,7 +151,8 @@ export class GPU {
         const setUniformValue = (type, uniformName, value) => {
             const gl = this.gl;
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
-            // TODO: nullなとき,値がおかしいときはセットしない
+            // TODO:
+            // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
             switch(type) {
                 case UniformTypes.Int:
                     gl.uniform1i(location, value);
@@ -164,6 +165,9 @@ export class GPU {
                     break;
                 case UniformTypes.Vector2:
                     gl.uniform2fv(location, value.elements);
+                    break;
+                case UniformTypes.Vector2Array:
+                    gl.uniform2fv(location, value.map(v => [...v.elements]).flat());
                     break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, value.elements);

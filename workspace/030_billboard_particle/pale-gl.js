@@ -759,6 +759,7 @@ const UniformTypes = {
     Texture: "Texture",
     CubeMap: "CubeMap",
     Vector2: "Vector2",
+    Vector2Array: "Vector2Array",
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
@@ -3676,6 +3677,7 @@ vec4 calcPhongLighting() {
 
 
 
+
 // -----------------------------------------------
 // TODO:
 // - out varying を centroid できるようにしたい
@@ -3746,6 +3748,7 @@ const generateVertexShader = ({
     vertexShaderModifier = {
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
     },
     insertUniforms,
@@ -3754,6 +3757,7 @@ const generateVertexShader = ({
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+    const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
 
     return `#version 300 es
 
@@ -3805,9 +3809,9 @@ void main() {
     vTangent = mat3(uNormalMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * aBinormal;
 `
-                : `
+                : hasNormal ? `
     vNormal = mat3(uNormalMatrix) * aNormal;
-`;
+` : "";
         }
     })()}
   
@@ -3822,10 +3826,13 @@ void main() {
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
+    
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    ${vertexShaderModifier.viewPositionPostProcess || ""}
  
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
- 
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    
+    gl_Position = uProjectionMatrix * viewPosition;
 }
 `;
 }
@@ -5457,7 +5464,8 @@ class GPU {
         const setUniformValue = (type, uniformName, value) => {
             const gl = this.gl;
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
-            // TODO: nullなとき,値がおかしいときはセットしない
+            // TODO:
+            // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
             switch(type) {
                 case UniformTypes.Int:
                     gl.uniform1i(location, value);
@@ -5470,6 +5478,9 @@ class GPU {
                     break;
                 case UniformTypes.Vector2:
                     gl.uniform2fv(location, value.elements);
+                    break;
+                case UniformTypes.Vector2Array:
+                    gl.uniform2fv(location, value.map(v => [...v.elements]).flat());
                     break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, value.elements);
@@ -7991,5 +8002,6 @@ export {
     FaceSide,
     AttributeUsageType,
     RenderTargetTypes,
-    AnimationKeyframeTypes
+    AnimationKeyframeTypes,
+    AttributeNames
 };

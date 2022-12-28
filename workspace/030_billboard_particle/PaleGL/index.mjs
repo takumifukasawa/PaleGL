@@ -76,5 +76,6 @@ export {
     FaceSide,
     AttributeUsageType,
     RenderTargetTypes,
-    AnimationKeyframeTypes
+    AnimationKeyframeTypes,
+    AttributeNames
 } from "./constants.js";

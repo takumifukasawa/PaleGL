@@ -18,6 +18,7 @@ export const UniformTypes = {
     Texture: "Texture",
     CubeMap: "CubeMap",
     Vector2: "Vector2",
+    Vector2Array: "Vector2Array",
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
