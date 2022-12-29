@@ -8,10 +8,6 @@
     TriangleFan: "TriangleFan",
 };
 
-export const AttributeTypes = {
-    Position: "Position",
-};
-
 export const UniformTypes = {
     Matrix4: "Matrix4",
     Matrix4Array: "Matrix4Array",
@@ -108,13 +104,19 @@ export const AnimationKeyframeTypes = {
 
 export const AttributeNames = {
     Position: "aPosition",
+    Color: "aColor",
     Uv: "aUv",
     Normal: "aNormal",
     Tangent: "aTangent",
     Binormal: "aBinormal",
+    // skinning
     BoneIndices: "aBoneIndices",
     BoneWeights: "aBoneWeighs",
-    Color: "aColor",
+    // instancing
+    InstancePosition: "aInstancePosition",
+    InstanceScale: "aInstanceScale",
+    InstanceAnimationOffset: "aInstanceAnimationOffset",
+    InstanceVertexColor: "aInstanceVertexColor"
 };
 
 export const UniformNames = {

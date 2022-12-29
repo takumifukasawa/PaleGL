@@ -207,7 +207,10 @@ export class Material {
         if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
-
+       
+        // for debug
+        // console.log(this.uniforms, this.depthUniforms)
+        
         this.shader = new Shader({
             gpu,
             vertexShader: this.vertexShader,

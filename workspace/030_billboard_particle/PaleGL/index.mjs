@@ -63,7 +63,6 @@ export {generateVertexShader} from "./shaders/generateVertexShader.js";
 // others
 export {
     PrimitiveTypes,
-    AttributeTypes,
     UniformTypes,
     TextureTypes,
     TextureWrapTypes,

@@ -88,6 +88,7 @@ export const generateVertexShader = ({
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
     const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
+    const hasColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
 
     return `#version 300 es
 

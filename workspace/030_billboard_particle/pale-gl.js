@@ -749,10 +749,6 @@ ${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
     TriangleFan: "TriangleFan",
 };
 
-const AttributeTypes = {
-    Position: "Position",
-};
-
 const UniformTypes = {
     Matrix4: "Matrix4",
     Matrix4Array: "Matrix4Array",
@@ -849,13 +845,19 @@ const AnimationKeyframeTypes = {
 
 const AttributeNames = {
     Position: "aPosition",
+    Color: "aColor",
     Uv: "aUv",
     Normal: "aNormal",
     Tangent: "aTangent",
     Binormal: "aBinormal",
+    // skinning
     BoneIndices: "aBoneIndices",
     BoneWeights: "aBoneWeighs",
-    Color: "aColor",
+    // instancing
+    InstancePosition: "aInstancePosition",
+    InstanceScale: "aInstanceScale",
+    InstanceAnimationOffset: "aInstanceAnimationOffset",
+    InstanceVertexColor: "aInstanceVertexColor"
 };
 
 const UniformNames = {
@@ -1290,7 +1292,7 @@ ${shaderSource.split("\n").map((line, i) => {
 `;
     }
 }
-﻿const generateDepthFragmentShader = () => `#version 300 es
+﻿const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
 
 precision mediump float;
 
@@ -1510,7 +1512,10 @@ class Material {
         if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
-
+       
+        // for debug
+        // console.log(this.uniforms, this.depthUniforms)
+        
         this.shader = new Shader({
             gpu,
             vertexShader: this.vertexShader,
@@ -3759,6 +3764,7 @@ const generateVertexShader = ({
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
     const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
+    const hasColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
 
     return `#version 300 es
 
@@ -7990,7 +7996,6 @@ export {generateVertexShader};
 // others
 export {
     PrimitiveTypes,
-    AttributeTypes,
     UniformTypes,
     TextureTypes,
     TextureWrapTypes,

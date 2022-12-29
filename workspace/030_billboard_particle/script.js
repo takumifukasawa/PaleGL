@@ -220,7 +220,7 @@ const createGLTFSkinnedMesh = async () => {
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
-        name: "aInstancePosition",
+        name: AttributeNames.InstancePosition,
         data: new Float32Array(instanceInfo.position.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
@@ -228,7 +228,7 @@ const createGLTFSkinnedMesh = async () => {
     });
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceScale",
+        name: AttributeNames.InstanceScale,
         data: new Float32Array(instanceInfo.scale.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
@@ -236,14 +236,14 @@ const createGLTFSkinnedMesh = async () => {
     });       
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceAnimationOffset",
+        name: AttributeNames.InstanceAnimationOffset,
         data: new Float32Array(animationOffsetInfo),
         size: 1,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceVertexColor",
+        name: AttributeNames.InstanceVertexColor,
         data: new Float32Array(instanceInfo.color.flat()),
         size: 4,
         // usageType: AttributeUsageType.StaticDraw,
@@ -413,7 +413,9 @@ const main = async () => {
         vertexShader: generateVertexShader({
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
-                localPositionPostProcess: `localPosition.y += sin(uTime * 4.);`,
+                localPositionPostProcess: `
+localPosition.y += sin(uTime * 4.);
+`,
                 viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
             },
             insertUniforms: `
