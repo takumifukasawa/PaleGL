@@ -351,42 +351,62 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
-    const particleGeometryData = PlaneGeometry.createPlaneGeometryData({ gpu });
+    const particleNum = 100;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
             {
                 name: AttributeNames.Position,
                 // dummy data
-                data: new Float32Array(new Array(4).fill(0).map(() => [0, 3, 0]).flat()),
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const x = Math.random() * 18 - 9;
+                    const y = Math.random() * 6;
+                    const z = Math.random() * 18 - 9;
+                    return [
+                        x, y, z,
+                        x, y, z,
+                        x, y, z,
+                        x, y, z,
+                    ];
+                }).flat()),
                 size: 3
             }, {
                 name: AttributeNames.Uv,
-                data: new Float32Array([
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => [
                     0, 1,
                     0, 0,
                     1, 1,
                     1, 0,
-                ]),
+                ]).flat()),
                 size: 2
             }, {
                 name: "aBillboardVertexIndex",
-                data: new Uint16Array([
+                data: new Uint16Array(new Array(particleNum).fill(0).map(() => [
                 // data: new Float32Array([
                     0,
                     1,
                     2,
                     3,
-                ]),
+                ]).flat()),
                 size: 1
             }, {
                 name: "aBillboardSize",
-                data: new Float32Array(new Array(4).fill(0).map(() => 1)),
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const s = Math.random() * .8 + .2;
+                    return [s, s, s, s];
+                }).flat()),
                 size: 1
             }
         ],
-        indices: [0, 1, 2, 2, 1, 3],
-        drawCount: particleGeometryData.drawCount
+        indices: new Array(particleNum).fill(0).map((_, i) => {
+            const offset = i * 4;
+            const index = [
+                0 + offset, 1 + offset, 2 + offset,
+                2 + offset, 1 + offset, 3 + offset
+            ];
+            return index;
+        }).flat(),
+        drawCount: particleNum * 6
     });
     const particleMaterial = new Material({
         gpu,
@@ -434,7 +454,7 @@ void main() {
                 value: 0,
             }
         },
-        blendType: BlendTypes.Transparent
+        blendType: BlendTypes.Additive
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,
