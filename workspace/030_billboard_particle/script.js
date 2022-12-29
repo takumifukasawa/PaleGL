@@ -353,7 +353,7 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
-    const particleNum = 100;
+    const particleNum = 1000;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -382,6 +382,22 @@ const main = async () => {
                 ]).flat()),
                 size: 2
             }, {
+                name: AttributeNames.Color,
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const c = Color.fromRGB(
+                        Math.random() * 50 + 200,
+                        Math.random() * 50 + 170,
+                        Math.random() * 50 + 150
+                    );
+                    return [
+                        ...c.elements,
+                        ...c.elements,
+                        ...c.elements,
+                        ...c.elements
+                    ];
+                }).flat()),
+                size: 4
+            }, {
                 name: "aBillboardVertexIndex",
                 data: new Uint16Array(new Array(particleNum).fill(0).map(() => [
                 // data: new Float32Array([
@@ -394,7 +410,7 @@ const main = async () => {
             }, {
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const s = Math.random() * .8 + .2;
+                    const s = Math.random() * .08 + .02;
                     return [s, s, s, s];
                 }).flat()),
                 size: 1
@@ -413,6 +429,7 @@ const main = async () => {
     const particleMaterial = new Material({
         gpu,
         vertexShader: generateVertexShader({
+            useVertexColor: true,
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
                 localPositionPostProcess: `
@@ -429,14 +446,16 @@ uniform vec2[4] uBillboardPositionConverters;
 precision mediump float;
 
 in vec2 vUv;
+in vec4 vVertexColor;
+
 out vec4 outColor;
 uniform sampler2D uParticleMap;
 
 void main() {
-    vec4 baseColor = texture(uParticleMap, vUv);
-    float alpha = baseColor.x;
-    outColor = vec4(baseColor.xyz, alpha);
-    // outColor = vec4(1, 0, 0, 1);
+    vec4 texColor = texture(uParticleMap, vUv);
+    vec3 baseColor = vVertexColor.xyz;
+    float alpha = texColor.x * vVertexColor.a;
+    outColor = vec4(baseColor, alpha);
 }
         `,
         uniforms: {

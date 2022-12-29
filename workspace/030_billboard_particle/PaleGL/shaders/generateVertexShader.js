@@ -160,7 +160,7 @@ void main() {
         }
         return isInstancing
             ? "vVertexColor = aInstanceVertexColor;"
-            : "vVertexColor = aVertexColor;";
+            : "vVertexColor = aColor;";
     })()}
 
     vec4 worldPosition = uWorldMatrix * localPosition;
