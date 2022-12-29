@@ -255,6 +255,8 @@ const createGLTFSkinnedMesh = async () => {
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
+        isInstancing: true,
+        useVertexColor: true,
         vertexShaderModifier: {
             worldPositionPostProcess: `
     mat4 instanceTransform = mat4(

@@ -20,11 +20,18 @@ export class Material {
     faceSide;
     receiveShadow;
     queue;
-    
+   
+    // skinning
     isSkinning;
     gpuSkinning;
     jointNum;
     
+    // instancing
+    isInstancing;
+    
+    // vertex color
+    useVertexColor;
+
     vertexShader;
     fragmentShader;
     depthFragmentShader;
@@ -66,8 +73,17 @@ export class Material {
         receiveShadow = false,
         blendType,
         renderQueue,
+        
+        // skinning
         isSkinning,
         gpuSkinning,
+        
+        // instancing
+        isInstancing = false,
+       
+        // vertex color 
+        useVertexColor = false,
+        
         queue,
         uniforms = {},
         depthUniforms = {}
@@ -128,9 +144,13 @@ export class Material {
         if (!this.renderQueue) {
             throw "[Material.constructor] invalid render queue";
         }
-       
+      
+        // skinning
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
+        
+        this.isInstancing = isInstancing;
+        this.useVertexColor = useVertexColor;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
@@ -198,11 +218,14 @@ export class Material {
                 attributeDescriptors,
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
-                gpuSkinning: this.gpuSkinning
+                gpuSkinning: this.gpuSkinning,
+                isInstancign: this.isInstancing
             });
         }
         if(!this.fragmentShader && this.#fragmentShaderGenerator) {
-            this.fragmentShader = this.#fragmentShaderGenerator();
+            this.fragmentShader = this.#fragmentShaderGenerator({
+                attributeDescriptors,
+            });
         }
         if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();

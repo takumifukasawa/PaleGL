@@ -70,9 +70,6 @@ export const generateVertexShader = ({
     // required
     attributeDescriptors,
     // optional
-    isSkinning,
-    gpuSkinning,
-    jointNum,
     receiveShadow,
     useNormalMap,
     vertexShaderModifier = {
@@ -82,13 +79,23 @@ export const generateVertexShader = ({
         outClipPositionPreProcess: "",
     },
     insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
+    // skinning
+    isSkinning,
+    gpuSkinning,
+    jointNum,
+    // instancing
+    isInstancing,
+    // vertex color
+    useVertexColor,
 } = {}) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
     const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
-    const hasColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
+    // const hasVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
+    // const hasInstanceVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.InstanceVertexColor);
+    // const hasColor = hasVertexColor || hasInstanceVertexColor;
 
     return `#version 300 es
 
@@ -101,8 +108,7 @@ out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
-// TODO: フラグで必要に応じて出し分け
-out vec4 vVertexColor;
+${useVertexColor ? "out vec4 vVertexColor;" : ""}
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -148,8 +154,14 @@ void main() {
   
     // assign common varyings 
     vUv = aUv; 
-    // TODO: 頂点カラーが必要かどうかはフラグで出し分けたい
-    vVertexColor = vec4(1., 1., 1., 1.);
+    ${(() => {
+        if(!useVertexColor) {
+            return "";
+        }
+        return isInstancing
+            ? "vVertexColor = aInstanceVertexColor;"
+            : "vVertexColor = aVertexColor;";
+    })()}
 
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
