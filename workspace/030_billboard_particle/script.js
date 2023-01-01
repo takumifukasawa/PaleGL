@@ -432,11 +432,13 @@ const main = async () => {
             useVertexColor: true,
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
+                beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
+`,
                 localPositionPostProcess: `
 localPosition.y += sin(uTime * 4.);
 `,
                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
-                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[int(mod(float(gl_VertexID), 4.))] * aBillboardSize;`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`
             },
             insertUniforms: `
 uniform vec2[4] uBillboardPositionConverters;
