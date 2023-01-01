@@ -397,16 +397,16 @@ const main = async () => {
                     ];
                 }).flat()),
                 size: 4
-            }, {
-                name: "aBillboardVertexIndex",
-                data: new Uint16Array(new Array(particleNum).fill(0).map(() => [
-                // data: new Float32Array([
-                    0,
-                    1,
-                    2,
-                    3,
-                ]).flat()),
-                size: 1
+            // }, {
+            //     name: "aBillboardVertexIndex",
+            //     data: new Uint16Array(new Array(particleNum).fill(0).map(() => [
+            //     // data: new Float32Array([
+            //         0,
+            //         1,
+            //         2,
+            //         3,
+            //     ]).flat()),
+            //     size: 1
             }, {
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
@@ -424,7 +424,7 @@ const main = async () => {
             ];
             return index;
         }).flat(),
-        drawCount: particleNum * 6
+        drawCount: particleNum * 6,
     });
     const particleMaterial = new Material({
         gpu,
@@ -435,7 +435,8 @@ const main = async () => {
                 localPositionPostProcess: `
 localPosition.y += sin(uTime * 4.);
 `,
-                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
+                // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[int(mod(float(gl_VertexID), 4.))] * aBillboardSize;`
             },
             insertUniforms: `
 uniform vec2[4] uBillboardPositionConverters;
