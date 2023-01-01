@@ -166,10 +166,21 @@ out vec4 outColor;
 uniform sampler2D uSceneTexture;
 uniform sampler2D uDepthTexture;
 
+// ref threejs
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+  return ( viewZ + near ) / ( near - far );
+}
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( far - near ) * invClipZ - far );
+}
+
 void main() {
     vec4 textureColor = texture(uSceneTexture, vUv * 2.);
     vec4 depthColor = texture(uDepthTexture, vUv);
-    float depth = depthColor.x;
+    float rawDepth = depthColor.x;
+    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 60.);
+    float depth = viewZToOrthographicDepth(z, 0.1, 60.);
+    depth = 1. - depth;
     outColor = textureColor;
     outColor = vec4(vUv, 1., 1.);
     outColor = vec4(vec3(depth), 1.);
