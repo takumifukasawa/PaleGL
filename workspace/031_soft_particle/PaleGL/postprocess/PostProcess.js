@@ -1,6 +1,7 @@
 ﻿import {OrthographicCamera} from "./../actors/OrthographicCamera.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Vector3} from "../math/Vector3.js";
+import {RenderTargetTypes} from "../constants.js";
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
@@ -29,7 +30,11 @@ export class PostProcess {
     }
 
     constructor({ gpu }) {
-        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
+        // this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
+        
+        // this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: false, type: RenderTargetTypes.Depth });
+        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true, type: RenderTargetTypes.Depth, name: "PostProcess RenderTarget" });
+
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
     }

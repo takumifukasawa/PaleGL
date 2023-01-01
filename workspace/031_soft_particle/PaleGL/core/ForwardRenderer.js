@@ -103,6 +103,7 @@ export class ForwardRenderer {
             }
 
             const targetMaterial = actor.materials[materialIndex];
+            // const targetMaterial = actor.depthMaterial;
 
             // reset
             // NOTE: 余計なresetとかしない方がいい気がする
@@ -258,6 +259,7 @@ export class ForwardRenderer {
         } else {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }
+        // this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
 
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 

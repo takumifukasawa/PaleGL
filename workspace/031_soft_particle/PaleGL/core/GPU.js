@@ -226,6 +226,8 @@ export class GPU {
                 });
             } else {
                 setUniformValue(uniform.type, uniformName, uniform.value);
+                // console.log(uniformName === "uDepthTexture");
+                // console.log(uniform.type, uniformName, uniform.value);
             }
         });
         

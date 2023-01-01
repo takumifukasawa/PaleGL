@@ -1,12 +1,4 @@
-﻿import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
-import {Material} from "../materials/Material.js";
-import {RenderTarget} from "../core/RenderTarget.js";
-import {Mesh} from "../actors/Mesh.js";
-import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.js";
-import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
-
-
-export class PostProcessPass extends AbstractPostProcessPass {
+﻿export class DepthPass extends AbstractPostProcessPass {
     geometry;
     material;
     renderTarget;
@@ -76,28 +68,38 @@ void main() {
 
     // TODO: rename "prevRenderTarget"
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
-        this.setRenderTarget(renderer, camera, isLastPass);
-        
-        // TODO: ppごとに変えられるのが正しい
-        renderer.clear(
-            camera.clearColor.x,
-            camera.clearColor.y,
-            camera.clearColor.z,
-            camera.clearColor.w
-        );
-
-        // ppの場合はいらない気がする
+        renderer.setRenderTarget(null);
         this.mesh.updateTransform();
-        
-        // 渡してない場合はなにもしないことにする
-        if(prevRenderTarget) {
-            this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
-        }
-
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }
-
+        if(prevRenderTarget) {
+            this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+        }
         renderer.renderMesh(this.geometry, this.material);
+        
+        // this.setRenderTarget(renderer, camera, isLastPass);
+        // 
+        // // TODO: ppごとに変えられるのが正しい
+        // renderer.clear(
+        //     camera.clearColor.x,
+        //     camera.clearColor.y,
+        //     camera.clearColor.z,
+        //     camera.clearColor.w
+        // );
+
+        // // ppの場合はいらない気がする
+        // this.mesh.updateTransform();
+        // 
+        // // 渡してない場合はなにもしないことにする
+        // if(prevRenderTarget) {
+        //     this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+        // }
+
+        // if(!this.material.isCompiledShader) {
+        //     this.material.start({ gpu })
+        // }
+
+        // renderer.renderMesh(this.geometry, this.material);
     }
 }

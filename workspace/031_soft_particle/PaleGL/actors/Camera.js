@@ -73,12 +73,18 @@ export class Camera extends Actor {
     }
 
     setSize(width, height) {
-        if (!this.#postProcess) {
-            return;
-        }
+        // if (!this.#postProcess) {
+        //     return;
+        // }
+        // if (this.#renderTarget) {
+        //     this.#postProcess.setSize(this.#renderTarget.width, this.#renderTarget.height);
+        // } else {
+        //     this.#postProcess.setSize(width, height);
+        // }
         if (this.#renderTarget) {
-            this.#postProcess.setSize(this.#renderTarget.width, this.#renderTarget.height);
-        } else {
+            this.#renderTarget.setSize(width, height);
+        }
+        if (this.#postProcess) {
             this.#postProcess.setSize(width, height);
         }
     }
