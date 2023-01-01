@@ -353,7 +353,7 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
-    const particleNum = 1000;
+    const particleNum = 2000;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -361,9 +361,9 @@ const main = async () => {
                 name: AttributeNames.Position,
                 // dummy data
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const x = Math.random() * 18 - 9;
+                    const x = Math.random() * 20 - 10;
                     const y = Math.random() * 6;
-                    const z = Math.random() * 18 - 9;
+                    const z = Math.random() * 20 - 10;
                     return [
                         x, y, z,
                         x, y, z,
@@ -397,23 +397,20 @@ const main = async () => {
                     ];
                 }).flat()),
                 size: 4
-            // }, {
-            //     name: "aBillboardVertexIndex",
-            //     data: new Uint16Array(new Array(particleNum).fill(0).map(() => [
-            //     // data: new Float32Array([
-            //         0,
-            //         1,
-            //         2,
-            //         3,
-            //     ]).flat()),
-            //     size: 1
             }, {
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const s = Math.random() * .08 + .02;
+                    const s = Math.random() * .035 + .015;
                     return [s, s, s, s];
                 }).flat()),
                 size: 1
+            }, {
+                name: "aBillboardRateOffset",
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const r = Math.random();
+                    return [r, r, r, r];
+                }).flat()),
+                size: 1,
             }
         ],
         indices: new Array(particleNum).fill(0).map((_, i) => {
@@ -433,12 +430,17 @@ const main = async () => {
             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
             vertexShaderModifier: {
                 beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
+float t = 3.;
+float r = mod((uTime / t) + aBillboardRateOffset, 1.);
 `,
                 localPositionPostProcess: `
-localPosition.y += sin(uTime * 4.);
+localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
+localPosition.z += mix(0., 4., r) * mix(-.4, .4, aBillboardRateOffset);
 `,
                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
-                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
+                lastMain: "vVertexColor.a *= (smoothstep(0., .1, r) * (1. - smoothstep(.9, 1., r)));"
             },
             insertUniforms: `
 uniform vec2[4] uBillboardPositionConverters;
@@ -455,6 +457,8 @@ out vec4 outColor;
 uniform sampler2D uParticleMap;
 
 void main() {
+    // int particleId = int(mod(float(gl_VertexID), 4.));
+
     vec4 texColor = texture(uParticleMap, vUv);
     vec3 baseColor = vVertexColor.xyz;
     float alpha = texColor.x * vVertexColor.a;

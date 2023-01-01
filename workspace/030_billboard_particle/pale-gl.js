@@ -3777,7 +3777,9 @@ const generateVertexShader = ({
         worldPositionPostProcess: "",
         viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: "",
     },
+    insertVaryings,
     insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
     // skinning
     isSkinning,
@@ -3809,6 +3811,7 @@ out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
 ${useVertexColor ? "out vec4 vVertexColor;" : ""}
+${insertVaryings ? insertVaryings : ""}
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -3878,6 +3881,8 @@ void main() {
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * viewPosition;
+    
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }
@@ -3891,7 +3896,9 @@ const generateDepthVertexShader = ({
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: ""
     },
+    insertVaryings,
     useNormalMap,
     jointNum
 } = {}) => {
@@ -3910,6 +3917,7 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 // TODO: depthでは必要ないのでなくしたい
 out vec4 vVertexColor;
+${insertVaryings ? insertVaryings : ""}
 
 void main() {
     ${vertexShaderModifier.beginMain || ""}
@@ -3930,6 +3938,8 @@ void main() {
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }
