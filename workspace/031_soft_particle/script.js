@@ -343,12 +343,12 @@ const createGLTFSkinnedMesh = async () => {
 }
 
 const main = async () => {
-    const particleImg = await loadImg("./images/particle-default.png");
+    const particleImg = await loadImg("./images/particle-smoke.png");
     const particleMap = new Texture({
         gpu,
         img: particleImg,
     });
-    
+
     const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
         gpu,
@@ -408,7 +408,7 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
-    const particleNum = 2000;
+    const particleNum = 100;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -416,9 +416,9 @@ const main = async () => {
                 name: AttributeNames.Position,
                 // dummy data
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const x = Math.random() * 20 - 10;
-                    const y = Math.random() * 6;
-                    const z = Math.random() * 20 - 10;
+                    const x = Math.random() * 18 - 9;
+                    const y = Math.random() * 0.5;
+                    const z = Math.random() * 18 - 9;
                     return [
                         x, y, z,
                         x, y, z,
@@ -455,7 +455,7 @@ const main = async () => {
             }, {
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const s = Math.random() * .035 + .015;
+                    const s = Math.random() * 1.5 + 0.5;
                     return [s, s, s, s];
                 }).flat()),
                 size: 1
@@ -490,7 +490,7 @@ float r = mod((uTime / t) + aBillboardRateOffset, 1.);
 `,
                 localPositionPostProcess: `
 localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
+// localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
 localPosition.z += mix(0., 4., r) * mix(-.4, .4, aBillboardRateOffset);
 `,
                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
@@ -510,6 +510,15 @@ in vec4 vVertexColor;
 
 out vec4 outColor;
 uniform sampler2D uParticleMap;
+uniform sampler2D uDepthTexture;
+
+// ref threejs
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+  return ( viewZ + near ) / ( near - far );
+}
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( far - near ) * invClipZ - far );
+}
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));
@@ -518,6 +527,9 @@ void main() {
     vec3 baseColor = vVertexColor.xyz;
     float alpha = texColor.x * vVertexColor.a;
     outColor = vec4(baseColor, alpha);
+    // outColor = vec4(baseColor, 1.);
+    // float d = texelFetch(uDepthTexture, ivec2(0, 0), 0).x;
+    // outColor = vec4(vec3(d), 1.);
 }
         `,
         uniforms: {
@@ -537,9 +549,14 @@ void main() {
             uTime: {
                 type: UniformTypes.Float,
                 value: 0,
-            }
+            },
+            uDepthTexture: {
+                type: UniformTypes.Texture,
+                value: postProcess.renderTarget.read.depthTexture,
+            }        
         },
-        blendType: BlendTypes.Additive
+        // blendType: BlendTypes.Additive
+        blendType: BlendTypes.Transparent,
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,
