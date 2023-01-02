@@ -77,7 +77,7 @@ export class ForwardRenderer {
         });
     }
     
-   #buildRenderMeshInfo(actor, materialIndex = 0) {
+    #buildRenderMeshInfo(actor, materialIndex = 0) {
         return {
             actor,
             materialIndex
@@ -255,7 +255,7 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
        
         if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget.write);
+            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
         } else {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }

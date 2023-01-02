@@ -5169,7 +5169,7 @@ class ForwardRenderer {
         });
     }
     
-   #buildRenderMeshInfo(actor, materialIndex = 0) {
+    #buildRenderMeshInfo(actor, materialIndex = 0) {
         return {
             actor,
             materialIndex
@@ -5347,7 +5347,7 @@ class ForwardRenderer {
         // ------------------------------------------------------------------------------
        
         if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget.write);
+            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
         } else {
             this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
         }
@@ -7183,6 +7183,7 @@ class PostProcess {
     }
 
     constructor({ gpu }) {
+        // TODO: renderTargetがいらない時もあるので出し分けたい
         this.renderTarget = new RenderTarget({
             gpu,
             name: "PostProcess RenderTarget",
@@ -7207,7 +7208,8 @@ class PostProcess {
 
     render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
-        let prevRenderTarget = this.renderTarget;
+        // TODO: render target を外から渡したほうが分かりやすいかも
+        let prevRenderTarget = camera.renderTarget || this.renderTarget;
 
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {

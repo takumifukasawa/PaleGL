@@ -101,7 +101,8 @@ captureScene.mainCamera = captureSceneCamera;
 const captureSceneRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
-    writeDepthTexture: true
+    writeDepthTexture: true,
+    name: "capture scene render target"
 });
 captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
 
@@ -191,7 +192,8 @@ void main() {
     uniforms: {
         uDepthTexture: {
             type: UniformTypes.Texture,
-            value: postProcess.renderTarget.read.depthTexture,
+            // value: postProcess.renderTarget.read.depthTexture,
+            value: captureSceneRenderTarget.read.depthTexture,
         }
     }
 });
@@ -552,7 +554,8 @@ void main() {
             },
             uDepthTexture: {
                 type: UniformTypes.Texture,
-                value: postProcess.renderTarget.read.depthTexture,
+                // value: postProcess.renderTarget.read.depthTexture,
+                value: captureSceneRenderTarget.read.depthTexture,
             }        
         },
         // blendType: BlendTypes.Additive

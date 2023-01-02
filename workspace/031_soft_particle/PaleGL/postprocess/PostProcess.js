@@ -30,6 +30,7 @@ export class PostProcess {
     }
 
     constructor({ gpu }) {
+        // TODO: renderTargetがいらない時もあるので出し分けたい
         this.renderTarget = new RenderTarget({
             gpu,
             name: "PostProcess RenderTarget",
@@ -54,7 +55,8 @@ export class PostProcess {
 
     render({ gpu, renderer, camera }) {
         this.#camera.updateTransform();
-        let prevRenderTarget = this.renderTarget;
+        // TODO: render target を外から渡したほうが分かりやすいかも
+        let prevRenderTarget = camera.renderTarget || this.renderTarget;
 
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
