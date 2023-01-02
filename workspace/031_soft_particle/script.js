@@ -109,7 +109,7 @@ const captureSceneDepthRenderTarget = new RenderTarget({
     // writeDepthTexture: true,
     name: "capture scene depth render target"
 });
-// TODO: render時だけsetRenderTaregtするようにしたい
+// TODO: render時だけsetRenderTargetするようにしたい
 // captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
 const captureSceneColorRenderTarget = new RenderTarget({
     gpu,
