@@ -1131,6 +1131,11 @@ class Actor {
     #onStart;
     #onFixedUpdate;
     #onUpdate;
+    #enabled = true;
+    
+    get enabled() {
+        return this.#enabled;
+    }
     
     set onStart(value) {
         this.#onStart = value;
@@ -1149,6 +1154,10 @@ class Actor {
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
         this.animator = new Animator();
+    }
+    
+    setEnabled(enabled) {
+        this.#enabled = enabled;
     }
     
     addChild(child) {
@@ -5397,13 +5406,14 @@ class ForwardRenderer {
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
+        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({ actor }) => actor.enabled);
         
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
       
-        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
+        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
         
         if(castShadowLightActors.length > 0) {
             const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {

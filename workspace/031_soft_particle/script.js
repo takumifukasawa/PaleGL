@@ -106,8 +106,7 @@ const captureSceneRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
     type: RenderTargetTypes.Depth,
-    writeDepthTexture: true,
-    // writeDepthTexture: false,
+    // writeDepthTexture: true,
     name: "capture scene render target"
 });
 // TODO: render時だけsetRenderTaregtするようにしたい
