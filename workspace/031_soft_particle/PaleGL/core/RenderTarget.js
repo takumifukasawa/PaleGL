@@ -9,7 +9,7 @@ import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 export class RenderTarget extends AbstractRenderTarget {
     name;
     #framebuffer;
-    // #depthRenderbuffer;
+    #depthRenderbuffer;
     width;
     height;
     #texture;
@@ -41,7 +41,7 @@ export class RenderTarget extends AbstractRenderTarget {
         type = RenderTargetTypes.RGBA,
         width = 1,
         height = 1,
-        // useDepthBuffer = false,
+        useDepthBuffer = false,
         writeDepthTexture = false,
         minFilter = TextureFilterTypes.Linear,
         magFilter = TextureFilterTypes.Linear,
@@ -59,14 +59,14 @@ export class RenderTarget extends AbstractRenderTarget {
 
         this.#framebuffer = new Framebuffer({gpu});
 
-        // if (useDepthBuffer) {
-        //     this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
-        // }
+        if (useDepthBuffer) {
+            this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
+        }
 
-        // // depth as render buffer
-        // if (this.#depthRenderbuffer) {
-        //     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
-        // }
+        // depth as render buffer
+        if (this.#depthRenderbuffer) {
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
+        }
 
         // let textureType;
         // switch (this.type) {
@@ -178,12 +178,16 @@ export class RenderTarget extends AbstractRenderTarget {
                 0
             );                      
         }
+        
+        if(this.#depthTexture && this.#depthRenderbuffer) {
+            throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
+        }
        
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
-        // if (this.#depthRenderbuffer) {
-        //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        // }
+        if (this.#depthRenderbuffer) {
+            gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
@@ -196,8 +200,8 @@ export class RenderTarget extends AbstractRenderTarget {
         if(this.#depthTexture) {
             this.#depthTexture.setSize(this.width, this.height);
         }
-        // if (this.#depthRenderbuffer) {
-        //     this.#depthRenderbuffer.setSize(width, height);
-        // }
+        if (this.#depthRenderbuffer) {
+            this.#depthRenderbuffer.setSize(width, height);
+        }
     }
 }

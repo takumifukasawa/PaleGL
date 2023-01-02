@@ -106,7 +106,7 @@ const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
     type: RenderTargetTypes.Depth,
-    // writeDepthTexture: true,
+    writeDepthTexture: true,
     name: "capture scene depth render target"
 });
 // TODO: render時だけsetRenderTargetするようにしたい
@@ -115,7 +115,8 @@ const captureSceneColorRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
     type: RenderTargetTypes.RGBA,
-    writeDepthTexture: true,
+    useDepthBuffer: true,
+    // writeDepthTexture: true,
     name: "capture scene color render target"
 });
 
