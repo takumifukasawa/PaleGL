@@ -102,15 +102,22 @@ const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 60);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 
-const captureSceneRenderTarget = new RenderTarget({
+const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
     type: RenderTargetTypes.Depth,
     // writeDepthTexture: true,
-    name: "capture scene render target"
+    name: "capture scene depth render target"
 });
 // TODO: render時だけsetRenderTaregtするようにしたい
-captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
+// captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+const captureSceneColorRenderTarget = new RenderTarget({
+    gpu,
+    width: 1, height: 1,
+    type: RenderTargetTypes.RGBA,
+    writeDepthTexture: true,
+    name: "capture scene color render target"
+});
 
 captureSceneCamera.onStart = ({ actor }) => {
     actor.transform.setTranslation(targetCameraPosition);
@@ -192,15 +199,15 @@ void main() {
     depth = 1. - depth;
     outColor = textureColor;
     // outColor = vec4(vUv, 1., 1.);
-    outColor = vec4(vec3(depth), 1.);
+    // outColor = vec4(vec3(depth), 1.);
 }
 `,
     uniforms: {
         uDepthTexture: {
             type: UniformTypes.Texture,
             // value: postProcess.renderTarget.read.depthTexture,
-            // value: captureSceneRenderTarget.read.depthTexture,
-            value: captureSceneRenderTarget.read.depthTexture,
+            // value: captureSceneDepthRenderTarget.read.depthTexture,
+            value: captureSceneDepthRenderTarget.read.depthTexture,
         }
     }
 });
@@ -562,8 +569,8 @@ void main() {
             uDepthTexture: {
                 type: UniformTypes.Texture,
                 // value: postProcess.renderTarget.read.depthTexture,
-                // value: captureSceneRenderTarget.read.depthTexture,
-                value: captureSceneRenderTarget.read.depthTexture,
+                // value: captureSceneDepthRenderTarget.read.depthTexture,
+                value: captureSceneDepthRenderTarget.read.depthTexture,
             }        
         },
         // blendType: BlendTypes.Additive
@@ -599,8 +606,17 @@ void main() {
     };
     
     engine.onRender = (time, deltaTime) => {
-        captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
+        captureSceneDepthRenderTarget.setSize(width, height);
+        captureSceneColorRenderTarget.setSize(width, height);
+        
+        captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+        particleMesh.setEnabled(false);
         renderer.render(captureScene, captureSceneCamera);
+
+        captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
+        particleMesh.setEnabled(true);
+        renderer.render(captureScene, captureSceneCamera);
+  
         // renderer.render(compositeScene, captureSceneCamera);
         postProcess.render({
             gpu,

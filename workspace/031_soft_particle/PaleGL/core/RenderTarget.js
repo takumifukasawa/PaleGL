@@ -156,7 +156,6 @@ export class RenderTarget extends AbstractRenderTarget {
                 this.#texture.glObject,
                 0
             );
-           
         }
 
         if(this.type === RenderTargetTypes.Depth || writeDepthTexture) {
