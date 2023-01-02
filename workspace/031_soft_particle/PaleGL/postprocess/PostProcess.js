@@ -30,10 +30,13 @@ export class PostProcess {
     }
 
     constructor({ gpu }) {
-        // this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
-        
-        // this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: false, type: RenderTargetTypes.Depth });
-        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true, type: RenderTargetTypes.Depth, name: "PostProcess RenderTarget" });
+        this.renderTarget = new RenderTarget({
+            gpu,
+            name: "PostProcess RenderTarget",
+            type: RenderTargetTypes.RGBA,
+            writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
+            width: 1, height: 1,
+        });
 
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));

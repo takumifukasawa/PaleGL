@@ -98,11 +98,12 @@ const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 60);
 captureScene.add(captureSceneCamera);
 captureScene.mainCamera = captureSceneCamera;
 
-// const depthRenderTarget = new RenderTarget({ gpu, useDepthBuffer: true });
-// const depthRenderTarget = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth, useDepthBuffer: true });
-const depthRenderTarget = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.Depth });
-// const depthRenderTarget = new RenderTarget({ gpu, width: 1, height: 1, type: RenderTargetTypes.RGBA });
-captureSceneCamera.setRenderTarget(depthRenderTarget)
+const captureSceneRenderTarget = new RenderTarget({
+    gpu,
+    width: 1, height: 1,
+    writeDepthTexture: true
+});
+captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
 
 captureSceneCamera.onStart = ({ actor }) => {
     actor.transform.setTranslation(targetCameraPosition);
@@ -175,22 +176,22 @@ float perspectiveDepthToViewZ( const in float invClipZ, const in float near, con
 }
 
 void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv * 2.);
+    vec4 textureColor = texture(uSceneTexture, vUv);
     vec4 depthColor = texture(uDepthTexture, vUv);
     float rawDepth = depthColor.x;
+    // TODO: near, far を外から渡す
     float z = perspectiveDepthToViewZ(rawDepth, 0.1, 60.);
     float depth = viewZToOrthographicDepth(z, 0.1, 60.);
     depth = 1. - depth;
     outColor = textureColor;
-    outColor = vec4(vUv, 1., 1.);
-    outColor = vec4(vec3(depth), 1.);
+    // outColor = vec4(vUv, 1., 1.);
+    // outColor = vec4(vec3(depth), 1.);
 }
 `,
     uniforms: {
         uDepthTexture: {
             type: UniformTypes.Texture,
-            // value: depthRenderTarget.texture
-            value: postProcess.renderTarget.read.texture,
+            value: postProcess.renderTarget.read.depthTexture,
         }
     }
 });
@@ -228,7 +229,6 @@ const onTouch = (e) => {
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
-    depthRenderTarget.setSize(width, height);
     engine.setSize(width, height);
 };
 
