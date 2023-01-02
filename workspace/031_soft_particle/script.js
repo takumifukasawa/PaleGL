@@ -169,59 +169,59 @@ const postProcess = new PostProcess({ gpu, renderer });
 // copyPass.enabled = true;
 // postProcess.addPass(copyPass);
 
-const showDepthPass = new DepthPass({
-    gpu,
-    fragmentShader: `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-
-out vec4 outColor;
-
-uniform sampler2D uSceneTexture;
-uniform sampler2D uDepthTexture;
-
-// ref threejs
-float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-  return ( viewZ + near ) / ( near - far );
-}
-float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return ( near * far ) / ( ( far - near ) * invClipZ - far );
-}
-
-void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
-    vec4 depthColor = texture(uDepthTexture, vUv);
-    float rawDepth = depthColor.x;
-    // TODO: near, far を外から渡す
-    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
-    float depth = viewZToOrthographicDepth(z, 0.1, 70.);
-    depth = 1. - depth;
-    outColor = textureColor;
-    // outColor = vec4(vUv, 1., 1.);
-    // outColor = vec4(vec3(depth), 1.);
-}
-`,
-    uniforms: {
-        uDepthTexture: {
-            type: UniformTypes.Texture,
-            // value: postProcess.renderTarget.read.depthTexture,
-            // value: captureSceneDepthRenderTarget.read.depthTexture,
-            value: captureSceneDepthRenderTarget.read.depthTexture,
-        }
-    }
-});
-showDepthPass.enabled = true;
-postProcess.addPass(showDepthPass);
-
-// const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
-// bloomPass.enabled = false;
-// postProcess.addPass(bloomPass);
+// const showDepthPass = new DepthPass({
+//     gpu,
+//     fragmentShader: `#version 300 es
 // 
-// const fxaaPass = new FXAAPass({ gpu });
-// fxaaPass.enabled = false;
-// postProcess.addPass(fxaaPass);
+// precision mediump float;
+// 
+// in vec2 vUv;
+// 
+// out vec4 outColor;
+// 
+// uniform sampler2D uSceneTexture;
+// uniform sampler2D uDepthTexture;
+// 
+// // ref threejs
+// float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+//   return ( viewZ + near ) / ( near - far );
+// }
+// float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+//   return ( near * far ) / ( ( far - near ) * invClipZ - far );
+// }
+// 
+// void main() {
+//     vec4 textureColor = texture(uSceneTexture, vUv);
+//     vec4 depthColor = texture(uDepthTexture, vUv);
+//     float rawDepth = depthColor.x;
+//     // TODO: near, far を外から渡す
+//     float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
+//     float depth = viewZToOrthographicDepth(z, 0.1, 70.);
+//     depth = 1. - depth;
+//     outColor = textureColor;
+//     // outColor = vec4(vUv, 1., 1.);
+//     // outColor = vec4(vec3(depth), 1.);
+// }
+// `,
+//     uniforms: {
+//         uDepthTexture: {
+//             type: UniformTypes.Texture,
+//             // value: postProcess.renderTarget.read.depthTexture,
+//             // value: captureSceneDepthRenderTarget.read.depthTexture,
+//             value: captureSceneDepthRenderTarget.read.depthTexture,
+//         }
+//     }
+// });
+// showDepthPass.enabled = true;
+// postProcess.addPass(showDepthPass);
+
+const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
+bloomPass.enabled = true;
+postProcess.addPass(bloomPass);
+
+const fxaaPass = new FXAAPass({ gpu });
+fxaaPass.enabled = true;
+postProcess.addPass(fxaaPass);
 
 postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
@@ -607,7 +607,6 @@ void main() {
         },
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
-        // depthWrite: true
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,
@@ -645,17 +644,23 @@ void main() {
         captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
         particleMesh.setEnabled(false);
         renderer.render(captureScene, captureSceneCamera);
-
-        captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
+        
         particleMesh.setEnabled(true);
-        renderer.render(captureScene, captureSceneCamera);
+        
+        if(postProcess.enabled) {
+            captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
+            renderer.render(captureScene, captureSceneCamera);
   
-        // renderer.render(compositeScene, captureSceneCamera);
-        postProcess.render({
-            gpu,
-            renderer,
-            camera: captureSceneCamera
-        });
+            // renderer.render(compositeScene, captureSceneCamera);
+            postProcess.render({
+                gpu,
+                renderer,
+                camera: captureSceneCamera
+            });
+        } else {
+            captureSceneCamera.setRenderTarget(null)
+            renderer.render(captureScene, captureSceneCamera);
+        }
     };
 
     const tick = (time) => {
@@ -698,54 +703,54 @@ function initDebugger() {
     //     onChange: (value) => gaussianBlurPass.enabled = value,
     // })
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "bloom pass enabled",
-    //     initialValue: bloomPass.enabled,
-    //     onChange: (value) => bloomPass.enabled = value,
-    // })
+    debuggerGUI.addToggleDebugger({
+        label: "bloom pass enabled",
+        initialValue: bloomPass.enabled,
+        onChange: (value) => bloomPass.enabled = value,
+    })
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom amount",
-    //     minValue: 0,
-    //     maxValue: 4,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.bloomAmount,
-    //     onChange: (value) => {
-    //         bloomPass.bloomAmount = value;
-    //     }
-    // })
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom threshold",
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.threshold,
-    //     onChange: (value) => {
-    //         bloomPass.threshold = value;
-    //     }
-    // })
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom tone",
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.tone,
-    //     onChange: (value) => {
-    //         bloomPass.tone = value;
-    //     }
-    // })
+    debuggerGUI.addSliderDebugger({
+        label: "bloom amount",
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: bloomPass.bloomAmount,
+        onChange: (value) => {
+            bloomPass.bloomAmount = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom threshold",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.threshold,
+        onChange: (value) => {
+            bloomPass.threshold = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom tone",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.tone,
+        onChange: (value) => {
+            bloomPass.tone = value;
+        }
+    })
 
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "fxaa pass enabled",
-    //     initialValue: fxaaPass.enabled,
-    //     onChange: (value) => fxaaPass.enabled = value,
-    // })
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    })
 
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: "postprocess enabled",
