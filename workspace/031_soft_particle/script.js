@@ -201,7 +201,7 @@ void main() {
             type: UniformTypes.Texture,
             // value: postProcess.renderTarget.read.depthTexture,
             // value: captureSceneRenderTarget.read.depthTexture,
-            value: captureSceneRenderTarget.read.texture,
+            value: captureSceneRenderTarget.read.depthTexture,
         }
     }
 });
@@ -564,7 +564,7 @@ void main() {
                 type: UniformTypes.Texture,
                 // value: postProcess.renderTarget.read.depthTexture,
                 // value: captureSceneRenderTarget.read.depthTexture,
-                value: captureSceneRenderTarget.read.texture,
+                value: captureSceneRenderTarget.read.depthTexture,
             }        
         },
         // blendType: BlendTypes.Additive

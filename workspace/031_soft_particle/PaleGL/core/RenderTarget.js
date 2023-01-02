@@ -68,38 +68,78 @@ export class RenderTarget extends AbstractRenderTarget {
         //     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
         // }
 
-        let textureType;
-        switch (this.type) {
-            case RenderTargetTypes.RGBA:
-                textureType = TextureTypes.RGBA;
-                break;
-            case RenderTargetTypes.Depth:
-                textureType = TextureTypes.Depth;
-                break;
-            default:
-                throw "[RenderTarget.constructor] invalid texture type";
-        }
+        // let textureType;
+        // switch (this.type) {
+        //     case RenderTargetTypes.RGBA:
+        //         textureType = TextureTypes.RGBA;
+        //         break;
+        //     case RenderTargetTypes.Depth:
+        //         textureType = TextureTypes.Depth;
+        //         break;
+        //     default:
+        //         throw "[RenderTarget.constructor] invalid texture type";
+        // }
+        
+        // if(this.type === RenderTargetTypes.Depth) {
+        //     this.#depthTexture = new Texture({
+        //         gpu,
+        //         width: this.width,
+        //         height: this.height,
+        //         mipmap: false,
+        //         type: TextureTypes.Depth,
+        //         // 一旦linear固定
+        //         minFilter: TextureFilterTypes.Nearest,
+        //         magFilter: TextureFilterTypes.Nearest
+        //     })
+        //     // depth as texture
+        //     gl.framebufferTexture2D(
+        //         gl.FRAMEBUFFER,
+        //         gl.DEPTH_ATTACHMENT,
+        //         gl.TEXTURE_2D,
+        //         this.#depthTexture.glObject,
+        //         0
+        //     );           
+        // } else {
+        //     this.#texture = new Texture({
+        //         gpu,
+        //         width: this.width,
+        //         height: this.height,
+        //         mipmap,
+        //         type: TextureTypes.RGBA,
+        //         minFilter,
+        //         magFilter
+        //     });
+        //     gl.framebufferTexture2D(
+        //         gl.FRAMEBUFFER,
+        //         gl.COLOR_ATTACHMENT0,
+        //         gl.TEXTURE_2D,
+        //         this.#texture.glObject,
+        //         0
+        //     );
 
-        if(this.type === RenderTargetTypes.Depth) {
-            this.#texture = new Texture({
-                gpu,
-                width: this.width,
-                height: this.height,
-                mipmap: false,
-                type: TextureTypes.Depth,
-                // 一旦linear固定
-                minFilter: TextureFilterTypes.Nearest,
-                magFilter: TextureFilterTypes.Nearest
-            })
-            // depth as texture
-            gl.framebufferTexture2D(
-                gl.FRAMEBUFFER,
-                gl.DEPTH_ATTACHMENT,
-                gl.TEXTURE_2D,
-                this.#texture.glObject,
-                0
-            );           
-        } else {
+        //     if(writeDepthTexture) {
+        //         this.#depthTexture = new Texture({
+        //             gpu,
+        //             width: this.width,
+        //             height: this.height,
+        //             mipmap: false,
+        //             type: TextureTypes.Depth,
+        //             // 一旦linear固定
+        //             minFilter: TextureFilterTypes.Linear,
+        //             magFilter: TextureFilterTypes.Linear
+        //         })
+        //         // depth as texture
+        //         gl.framebufferTexture2D(
+        //             gl.FRAMEBUFFER,
+        //             gl.DEPTH_ATTACHMENT,
+        //             gl.TEXTURE_2D,
+        //             this.#depthTexture.glObject,
+        //             0
+        //         );
+        //     }
+        // }
+        
+        if(this.type === RenderTargetTypes.RGBA) {
             this.#texture = new Texture({
                 gpu,
                 width: this.width,
@@ -116,29 +156,30 @@ export class RenderTarget extends AbstractRenderTarget {
                 this.#texture.glObject,
                 0
             );
-
-            if(writeDepthTexture) {
-                this.#depthTexture = new Texture({
-                    gpu,
-                    width: this.width,
-                    height: this.height,
-                    mipmap: false,
-                    type: TextureTypes.Depth,
-                    // 一旦linear固定
-                    minFilter: TextureFilterTypes.Linear,
-                    magFilter: TextureFilterTypes.Linear
-                })
-                // depth as texture
-                gl.framebufferTexture2D(
-                    gl.FRAMEBUFFER,
-                    gl.DEPTH_ATTACHMENT,
-                    gl.TEXTURE_2D,
-                    this.#depthTexture.glObject,
-                    0
-                );
-            }
+           
         }
- 
+
+        if(this.type === RenderTargetTypes.Depth || writeDepthTexture) {
+            this.#depthTexture = new Texture({
+                gpu,
+                width: this.width,
+                height: this.height,
+                mipmap: false,
+                type: TextureTypes.Depth,
+                // 一旦linear固定
+                minFilter: TextureFilterTypes.Linear,
+                magFilter: TextureFilterTypes.Linear
+            })
+            // depth as texture
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,
+                gl.DEPTH_ATTACHMENT,
+                gl.TEXTURE_2D,
+                this.#depthTexture.glObject,
+                0
+            );                      
+        }
+       
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
         // if (this.#depthRenderbuffer) {
@@ -150,7 +191,9 @@ export class RenderTarget extends AbstractRenderTarget {
     setSize(width, height) {
         this.width = width;
         this.height = height;
-        this.#texture.setSize(this.width, this.height);
+        if(this.#texture) {
+            this.#texture.setSize(this.width, this.height);
+        }
         if(this.#depthTexture) {
             this.#depthTexture.setSize(this.width, this.height);
         }
