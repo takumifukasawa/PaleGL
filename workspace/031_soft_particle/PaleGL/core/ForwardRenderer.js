@@ -253,26 +253,24 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-       
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
-        } else {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
-        }
-        // this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+      
+        // postprocessはrendererから外した方がよさそう  
+        // if (camera.enabledPostProcess) {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
+        // } else {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+        // }
+        this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
 
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
-        if (camera.enabledPostProcess) {
-            camera.postProcess.render({
-                gpu: this.#gpu,
-                renderer: this,
-                camera
-            });
-        }
-
-        // NOTE: ない方がよい？
-        // this.setRenderTarget(null);
+        // if (camera.enabledPostProcess) {
+        //     camera.postProcess.render({
+        //         gpu: this.#gpu,
+        //         renderer: this,
+        //         camera
+        //     });
+        // }
     }
 
     renderMesh(geometry, material) {

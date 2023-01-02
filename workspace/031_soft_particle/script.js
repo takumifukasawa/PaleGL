@@ -83,7 +83,7 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 wrapperElement.appendChild(instanceNumView);
 
 const captureScene = new Scene();
-// const compositeScene = new Scene();
+const compositeScene = new Scene();
 
 const renderer = new ForwardRenderer({
     gpu,
@@ -93,18 +93,24 @@ const renderer = new ForwardRenderer({
 
 const engine = new Engine({ gpu, renderer });
 
-engine.setScene(captureScene);
+engine.setScenes([
+    captureScene,
+    compositeScene
+]);
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 60);
 captureScene.add(captureSceneCamera);
-captureScene.mainCamera = captureSceneCamera;
+// captureScene.mainCamera = captureSceneCamera;
 
 const captureSceneRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
+    type: RenderTargetTypes.Depth,
     writeDepthTexture: true,
+    // writeDepthTexture: false,
     name: "capture scene render target"
 });
+// TODO: render時だけsetRenderTaregtするようにしたい
 captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
 
 captureSceneCamera.onStart = ({ actor }) => {
@@ -187,14 +193,15 @@ void main() {
     depth = 1. - depth;
     outColor = textureColor;
     // outColor = vec4(vUv, 1., 1.);
-    // outColor = vec4(vec3(depth), 1.);
+    outColor = vec4(vec3(depth), 1.);
 }
 `,
     uniforms: {
         uDepthTexture: {
             type: UniformTypes.Texture,
             // value: postProcess.renderTarget.read.depthTexture,
-            value: captureSceneRenderTarget.read.depthTexture,
+            // value: captureSceneRenderTarget.read.depthTexture,
+            value: captureSceneRenderTarget.read.texture,
         }
     }
 });
@@ -556,7 +563,8 @@ void main() {
             uDepthTexture: {
                 type: UniformTypes.Texture,
                 // value: postProcess.renderTarget.read.depthTexture,
-                value: captureSceneRenderTarget.read.depthTexture,
+                // value: captureSceneRenderTarget.read.depthTexture,
+                value: captureSceneRenderTarget.read.texture,
             }        
         },
         // blendType: BlendTypes.Additive
@@ -592,9 +600,16 @@ void main() {
     };
     
     engine.onRender = (time, deltaTime) => {
+        captureSceneCamera.setRenderTarget(captureSceneRenderTarget)
         renderer.render(captureScene, captureSceneCamera);
+        // renderer.render(compositeScene, captureSceneCamera);
+        postProcess.render({
+            gpu,
+            renderer,
+            camera: captureSceneCamera
+        });
     };
-    
+
     const tick = (time) => {
         engine.run(time);
         requestAnimationFrame(tick);

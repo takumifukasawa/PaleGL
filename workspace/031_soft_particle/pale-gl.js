@@ -5375,26 +5375,24 @@ class ForwardRenderer {
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-       
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
-        } else {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
-        }
-        // this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+      
+        // postprocessはrendererから外した方がよさそう  
+        // if (camera.enabledPostProcess) {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
+        // } else {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+        // }
+        this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
 
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
-        if (camera.enabledPostProcess) {
-            camera.postProcess.render({
-                gpu: this.#gpu,
-                renderer: this,
-                camera
-            });
-        }
-
-        // NOTE: ない方がよい？
-        // this.setRenderTarget(null);
+        // if (camera.enabledPostProcess) {
+        //     camera.postProcess.render({
+        //         gpu: this.#gpu,
+        //         renderer: this,
+        //         camera
+        //     });
+        // }
     }
 
     renderMesh(geometry, material) {
@@ -5866,7 +5864,7 @@ class MultipleRenderTarget extends AbstractRenderTarget {
 ﻿
 class Scene {
     children = []; // transform hierarchy
-    mainCamera;
+    // mainCamera;
     
     add(actor) {
         this.children.push(actor.transform);
@@ -5874,15 +5872,15 @@ class Scene {
     
     traverse(execFunc) {
         for(let i = 0; i < this.children.length; i++) {
-            this.recursiveTraverseActor(this.children[i].actor, execFunc);
+            this.#recursiveTraverseActor(this.children[i].actor, execFunc);
         }
     }
     
-    recursiveTraverseActor(actor, execFunc) {
+    #recursiveTraverseActor(actor, execFunc) {
         execFunc(actor);
         if(actor.transform.hasChild) {
             for(let i = 0; i < actor.transform.children.length; i++) {
-                this.recursiveTraverseActor(actor.transform.children[i], execFunc)
+                this.#recursiveTraverseActor(actor.transform.children[i], execFunc)
             }
         }
     }
