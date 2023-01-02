@@ -83,6 +83,7 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 wrapperElement.appendChild(instanceNumView);
 
 const captureScene = new Scene();
+// const compositeScene = new Scene();
 
 const renderer = new ForwardRenderer({
     gpu,
@@ -588,6 +589,10 @@ void main() {
   
     engine.onBeforeUpdate = () => {
         if(!debuggerGUI) initDebugger();
+    };
+    
+    engine.onRender = (time, deltaTime) => {
+        renderer.render(captureScene, captureSceneCamera);
     };
     
     const tick = (time) => {

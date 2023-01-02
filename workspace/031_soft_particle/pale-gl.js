@@ -4990,25 +4990,31 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 
 
 class Engine {
-    #renderer;
-    #fixedUpdateFrameTimer;
-    #updateFrameTimer;
-    #onBeforeFixedUpdate;
-    #onBeforeUpdate;
-    // #scene;
     #gpu;
     #stats;
+    #renderer;
     #scenes = [];
+    // timers
+    #fixedUpdateFrameTimer;
+    #updateFrameTimer;
+    // callbacks
+    #onBeforeFixedUpdate;
+    #onBeforeUpdate;
+    #onRender;
     
     get renderer() {
         return this.#renderer;
     }
     
-    set onBeforeUpdate(value) {
-        this.#onBeforeUpdate = value;
+    set onBeforeUpdate(cb) {
+        this.#onBeforeUpdate = cb;
     }
     
-    constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate }) {
+    set onRender(cb) {
+        this.#onRender = cb;
+    }
+    
+    constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate, onRender }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
         
@@ -5021,6 +5027,7 @@ class Engine {
 
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
         this.#onBeforeUpdate = onBeforeUpdate;
+        this.#onRender = onRender;
     }
     
     setScene(scene) {
@@ -5092,15 +5099,18 @@ class Engine {
             });
         });
         
-        this.render();
+        this.render(time, deltaTime);
     }
     
-    render() {
+    render(time, deltaTime) {
         this.#stats.clear();
         // this.#renderer.render(this.#scene, this.#scene.mainCamera);
-        this.#scenes.forEach(scene => {
-            this.#renderer.render(scene, scene.mainCamera);
-        });
+        // this.#scenes.forEach(scene => {
+        //     this.#renderer.render(scene, scene.mainCamera);
+        // });
+        if(this.#onRender) {
+            this.#onRender(time, deltaTime);
+        }
         this.#stats.updateView();
     }
    
