@@ -9,9 +9,10 @@ export class Engine {
     #updateFrameTimer;
     #onBeforeFixedUpdate;
     #onBeforeUpdate;
-    #scene;
+    // #scene;
     #gpu;
     #stats;
+    #scenes = [];
     
     get renderer() {
         return this.#renderer;
@@ -37,7 +38,12 @@ export class Engine {
     }
     
     setScene(scene) {
-        this.#scene = scene;
+        // this.#scene = scene;
+        this.#scenes.push(scene);
+    }
+    
+    setScenes(scenes) {
+        this.#scenes = scenes;
     }
     
     start() {
@@ -51,7 +57,10 @@ export class Engine {
         const rh = height * this.renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        this.#scene.traverse((actor) => actor.setSize(w, h));
+        // this.#scene.traverse((actor) => actor.setSize(w, h));
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.setSize(w, h));
+        });
         this.#renderer.setSize(w, h, rw, rh);
     }
 
@@ -60,14 +69,20 @@ export class Engine {
             this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
         
-        this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+        // this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.fixedUpdate({gpu: this.#gpu, fixedTime, fixedDeltaTime}));
+        });
 
         // update all actors matrix
         // TODO
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
-        this.#scene.traverse((actor) => actor.updateTransform());
+        // this.#scene.traverse((actor) => actor.updateTransform());
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.updateTransform());
+        });
     }
 
     update(time, deltaTime) {
@@ -76,17 +91,19 @@ export class Engine {
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        this.#scene.traverse((actor) => {
-            actor.update({gpu: this.#gpu, time, deltaTime});
-            switch(actor.type) {
-                case ActorTypes.Skybox:
-                case ActorTypes.Mesh:
-                case ActorTypes.SkinnedMesh:
-                    actor.beforeRender({ gpu: this.#gpu });
-                    break;
-                default:
-                    break;
-            }
+        this.#scenes.forEach((scene) => {
+            scene.traverse((actor) => {
+                actor.update({gpu: this.#gpu, time, deltaTime});
+                switch (actor.type) {
+                    case ActorTypes.Skybox:
+                    case ActorTypes.Mesh:
+                    case ActorTypes.SkinnedMesh:
+                        actor.beforeRender({gpu: this.#gpu});
+                        break;
+                    default:
+                        break;
+                }
+            });
         });
         
         this.render();
@@ -94,7 +111,10 @@ export class Engine {
     
     render() {
         this.#stats.clear();
-        this.#renderer.render(this.#scene, this.#scene.mainCamera);
+        // this.#renderer.render(this.#scene, this.#scene.mainCamera);
+        this.#scenes.forEach(scene => {
+            this.#renderer.render(scene, scene.mainCamera);
+        });
         this.#stats.updateView();
     }
    
