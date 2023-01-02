@@ -98,7 +98,7 @@ engine.setScenes([
     compositeScene
 ]);
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 60);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 
@@ -195,8 +195,8 @@ void main() {
     vec4 depthColor = texture(uDepthTexture, vUv);
     float rawDepth = depthColor.x;
     // TODO: near, far を外から渡す
-    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 60.);
-    float depth = viewZToOrthographicDepth(z, 0.1, 60.);
+    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
+    float depth = viewZToOrthographicDepth(z, 0.1, 70.);
     depth = 1. - depth;
     outColor = textureColor;
     // outColor = vec4(vUv, 1., 1.);
@@ -425,7 +425,7 @@ const main = async () => {
         actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
     }
 
-    const particleNum = 100;
+    const particleNum = 50;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -433,9 +433,10 @@ const main = async () => {
                 name: AttributeNames.Position,
                 // dummy data
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const x = Math.random() * 18 - 9;
+                    const x = Math.random() * 18 - 10;
                     const y = Math.random() * 0.5;
-                    const z = Math.random() * 18 - 9;
+                    // const y = 3.;
+                    const z = Math.random() * 18 - 8;
                     return [
                         x, y, z,
                         x, y, z,
@@ -458,8 +459,9 @@ const main = async () => {
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
                     const c = Color.fromRGB(
                         Math.random() * 50 + 200,
-                        Math.random() * 50 + 170,
-                        Math.random() * 50 + 150
+                        Math.random() * 50 + 190,
+                        Math.random() * 50 + 180,
+                        Math.random() * 150 + 50,
                     );
                     return [
                         ...c.elements,
@@ -472,7 +474,7 @@ const main = async () => {
             }, {
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
-                    const s = Math.random() * 1.5 + 0.5;
+                    const s = Math.random() * 3.5 + 0.5;
                     return [s, s, s, s];
                 }).flat()),
                 size: 1
@@ -508,14 +510,20 @@ float r = mod((uTime / t) + aBillboardRateOffset, 1.);
                 localPositionPostProcess: `
 localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
 // localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
-localPosition.z += mix(0., 4., r) * mix(-.4, .4, aBillboardRateOffset);
+localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
 `,
                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
                 viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
-                lastMain: "vVertexColor.a *= (smoothstep(0., .1, r) * (1. - smoothstep(.9, 1., r)));"
+                lastMain: `
+vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+vViewPosition = viewPosition;
+`,
             },
             insertUniforms: `
 uniform vec2[4] uBillboardPositionConverters;
+`,
+            insertVaryings: `
+out vec4 vViewPosition;
 `,
         }),
         fragmentShader: `#version 300 es
@@ -524,6 +532,7 @@ precision mediump float;
 
 in vec2 vUv;
 in vec4 vVertexColor;
+in vec4 vViewPosition;
 
 out vec4 outColor;
 uniform sampler2D uParticleMap;
@@ -543,10 +552,32 @@ void main() {
     vec4 texColor = texture(uParticleMap, vUv);
     vec3 baseColor = vVertexColor.xyz;
     float alpha = texColor.x * vVertexColor.a;
-    outColor = vec4(baseColor, alpha);
-    // outColor = vec4(baseColor, 1.);
-    // float d = texelFetch(uDepthTexture, ivec2(0, 0), 0).x;
-    // outColor = vec4(vec3(d), 1.);
+    
+    // calc soft fade
+    
+    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
+    float sceneDepth = viewZToOrthographicDepth(z, 0.1, 70.);
+    // for debug
+    outColor = vec4(vec3(sceneDepth), 1.);
+    
+    float currentDepth = viewZToOrthographicDepth(vViewPosition.z, 0.1, 70.);
+    // for debug
+    // outColor = vec4(vec3(currentDepth), 1.);
+    
+    float diffDepth = abs(sceneDepth) - abs(currentDepth);
+    float softFade = smoothstep(0., .01, diffDepth);
+    // for debug
+    // outColor = vec4(vec3(softFade), 1.);
+    
+    // result
+   
+    float fadedAlpha = alpha * softFade;
+    if(fadedAlpha < .01) {
+        discard;
+    }
+
+    outColor = vec4(baseColor, fadedAlpha);
 }
         `,
         uniforms: {
@@ -576,6 +607,7 @@ void main() {
         },
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
+        // depthWrite: true
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,
