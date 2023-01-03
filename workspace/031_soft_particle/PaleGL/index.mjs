@@ -18,7 +18,6 @@ export {Engine} from "./core/Engine.js";
 export {ForwardRenderer} from "./core/ForwardRenderer.js";
 export {GPU} from "./core/GPU.js";
 export {RenderTarget} from "./core/RenderTarget.js";
-export {MultipleRenderTarget} from "./core/MultipleRenderTarget.js";
 export {Scene} from "./core/Scene.js";
 export {Texture} from "./core/Texture.js";
 
@@ -55,7 +54,6 @@ export {PostProcessPass} from "./postprocess/PostProcessPass.js";
 export {FXAAPass} from "./postprocess/FXAAPass.js";
 export {GaussianBlurPass} from "./postprocess/GaussianBlurPass.js";
 export {BloomPass} from "./postprocess/BloomPass.js";
-export {DepthPass} from "./postprocess/DepthPass.js";
 
 // shaders
 export {generateVertexShader} from "./shaders/generateVertexShader.js";
