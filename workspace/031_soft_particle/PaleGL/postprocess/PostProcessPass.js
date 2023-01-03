@@ -91,7 +91,8 @@ void main() {
         
         // 渡してない場合はなにもしないことにする
         if(prevRenderTarget) {
-            this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+            // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+            this.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
         }
 
         if(!this.material.isCompiledShader) {

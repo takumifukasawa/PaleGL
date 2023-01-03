@@ -67,8 +67,10 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
     setSize(width, height) {
         this.#passes.forEach(pass => {
             pass.setSize(width, height);
-            pass.material.uniforms.uTargetWidth.value = width;
-            pass.material.uniforms.uTargetHeight.value = height;
+            // pass.material.uniforms.uTargetWidth.value = width;
+            // pass.material.uniforms.uTargetHeight.value = height;
+            this.material.updateUniform("uTargetWidth", width);
+            this.material.updateUniform("uTargetHeight", height);
         });
     }
 
@@ -86,7 +88,8 @@ export class GaussianBlurPass extends AbstractPostProcessPass {
 
             // TODO: mesh経由する必要たぶんない
             pass.mesh.updateTransform();
-            pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            pass.material.updateUniform(UniformNames.SceneTexture, i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture);
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }
