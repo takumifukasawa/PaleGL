@@ -230,8 +230,8 @@ const updateCamera = (clientX, clientY) => {
     const nx = (clientX / width) * 2 - 1;
     const ny = ((clientY / height) * 2 - 1) * -1;
     targetCameraPosition.x = nx * 20;
-    // targetCameraPosition.y = ny * 10 + 12;
-    targetCameraPosition.y = ny * 10
+    targetCameraPosition.y = ny * 10 + 12;
+    // targetCameraPosition.y = ny * 10
 }
 
 const onMouseMove = (e) => {
