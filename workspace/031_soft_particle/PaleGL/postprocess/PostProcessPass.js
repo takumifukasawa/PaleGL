@@ -77,7 +77,7 @@ void main() {
     // TODO: rename "prevRenderTarget"
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
         this.setRenderTarget(renderer, camera, isLastPass);
-        
+ 
         // TODO: ppごとに変えられるのが正しい
         renderer.clear(
             camera.clearColor.x,
