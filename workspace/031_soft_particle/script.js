@@ -33,7 +33,7 @@
     generateVertexShader,
     UniformTypes,
     BlendTypes,
-    AttributeNames, FragmentPass, DepthPass
+    AttributeNames
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -653,11 +653,10 @@ void main() {
             captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
             renderer.render(captureScene, captureSceneCamera);
   
-            // renderer.render(compositeScene, captureSceneCamera);
             postProcess.render({
                 gpu,
                 renderer,
-                camera: captureSceneCamera
+                sceneRenderTarget: captureSceneColorRenderTarget
             });
         } else {
             captureSceneCamera.setRenderTarget(null)

@@ -2691,11 +2691,11 @@ class Texture extends GLObject {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 break;
                 
-            // 「filterできない」で合っているはず？
-            case TextureTypes.RGBA32F:
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                break;
+            // // 「filterできない」で合っているはず？
+            // case TextureTypes.RGBA32F:
+            //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            //     break;
 
             default:
                 throw "invalid texture type";
@@ -5394,7 +5394,7 @@ class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "invalid blend type";
+                                throw "[ForwardRenderer.render] invalid blend type";
                         }
                     });
                     break;
@@ -5757,164 +5757,6 @@ class GPU {
         // unbind when end render
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-    }
-}
-﻿
-
-
-
-
-
-// TODO: めちゃくちゃ途中
-class MultipleRenderTarget extends AbstractRenderTarget {
-    name;
-    #framebuffer;
-    #depthRenderbuffer;
-    width;
-    height;
-    #textures = [];
-    #texture;
-
-    get texture() {
-        return this.#texture;
-    }
-    
-    get framebuffer() {
-        return this.#framebuffer;
-    }
-    
-    get read() {
-        return this;
-    }
-    
-    get write() {
-        return this;
-    }
-    
-    constructor({
-        gpu,
-        name,
-        width = 1,
-        height = 1,
-    }) {
-        super();
-        
-        this.name = name;
-        
-        this.width = width;
-        this.height = height;
-
-        const gl = gpu.gl;
-
-        this.#framebuffer = new Framebuffer({gpu});
-        
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.#framebuffer);
-
-        // 1: color texture
-        const colorTexture = new Texture({
-            gpu,
-            width: this.width,
-            height: this.height,
-            type: TextureTypes.RGBA
-        });
-        gl.framebufferTexture2D(
-            gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0 + 0,
-            gl.TEXTURE_2D,
-            colorTexture,
-            0
-        );
-        // gl.bindTexture(gl.TEXTURE_2D, null);
-
-        // 2: depth texture
-        const depthTexture = new Texture({
-            gpu,
-            width: this.width,
-            height: this.height,
-            type: TextureTypes.Depth
-        });
-        gl.framebufferTexture2D(
-            gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0 + 1,
-            gl.TEXTURE_2D,
-            depthTexture,
-            0
-        );
-        // gl.bindTexture(gl.TEXTURE_2D, null);
-
-        this.#depthRenderbuffer = new Renderbuffer({
-            gpu,
-            type: RenderbufferTypes.Depth,
-            width,
-            height
-        });
-        gl.framebufferRenderbuffer(
-            gl.FRAMEBUFFER,
-            gl.DEPTH_ATTACHMENT,
-            gl.RENDERBUFFER,
-            this.#depthRenderbuffer.glObject
-        );
-
-        let textureType;
-        switch (type) {
-            case RenderTargetTypes.RGBA:
-                textureType = TextureTypes.RGBA;
-                break;
-            case RenderTargetTypes.Depth:
-                textureType = TextureTypes.Depth;
-                break;
-            default:
-                throw "invalid texture type";
-        }
-
-        //this.#texture = new Texture({
-        //    gpu,
-        //    width: this.width,
-        //    height: this.height,
-        //    type: textureType,
-        //});
-
-        //// set texture to render buffer
-        //switch (type) {
-        //    case RenderTargetTypes.RGBA:
-        //        // color as texture
-        //        gl.framebufferTexture2D(
-        //            gl.FRAMEBUFFER,
-        //            gl.COLOR_ATTACHMENT0,
-        //            gl.TEXTURE_2D,
-        //            this.#texture.glObject,
-        //            0
-        //        );
-        //        break;
-        //    case RenderTargetTypes.Depth:
-        //        // depth as texture
-        //        gl.framebufferTexture2D(
-        //            gl.FRAMEBUFFER,
-        //            gl.DEPTH_ATTACHMENT,
-        //            gl.TEXTURE_2D,
-        //            this.#texture.glObject,
-        //            0
-        //        );
-        //        break;
-        //    default:
-        //        throw "invalid type";
-        //}
-
-        // unbind
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        if (this.#depthRenderbuffer) {
-            gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    }
-
-    setSize(width, height) {
-        this.width = width;
-        this.height = height;
-        this.#texture.setSize(this.width, this.height);
-        if (this.#depthRenderbuffer) {
-            this.#depthRenderbuffer.setSize(width, height);
-        }
     }
 }
 ﻿
@@ -7243,7 +7085,7 @@ class FragmentPass extends PostProcessPass {
 // TODO: actorを継承してもいいかもしれない
 class PostProcess {
     passes = [];
-    renderTarget;
+    // renderTarget;
     #camera;
     
     #selfEnabled = true;
@@ -7267,14 +7109,14 @@ class PostProcess {
     }
 
     constructor({ gpu }) {
-        // TODO: renderTargetがいらない時もあるので出し分けたい
-        this.renderTarget = new RenderTarget({
-            gpu,
-            name: "PostProcess RenderTarget",
-            type: RenderTargetTypes.RGBA,
-            writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
-            width: 1, height: 1,
-        });
+        // // TODO: renderTargetがいらない時もあるので出し分けたい
+        // this.renderTarget = new RenderTarget({
+        //     gpu,
+        //     name: "PostProcess RenderTarget",
+        //     type: RenderTargetTypes.RGBA,
+        //     writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
+        //     width: 1, height: 1,
+        // });
 
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
@@ -7282,7 +7124,7 @@ class PostProcess {
  
     setSize(width, height) {
         this.#camera.setSize(width, height);
-        this.renderTarget.setSize(width, height);
+        // this.renderTarget.setSize(width, height);
         this.passes.forEach(pass => pass.setSize(width, height));
     }
    
@@ -7290,10 +7132,14 @@ class PostProcess {
         this.passes.push(pass);
     }
 
-    render({ gpu, renderer, camera }) {
+    render({ gpu, renderer, sceneRenderTarget }) {
+        if(!sceneRenderTarget) {
+            throw "[PostProcess.render] scene render target is empty."
+        }
+        
         this.#camera.updateTransform();
         // TODO: render target を外から渡したほうが分かりやすいかも
-        let prevRenderTarget = camera.renderTarget || this.renderTarget;
+        let prevRenderTarget = sceneRenderTarget || this.renderTarget;
 
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
@@ -8296,111 +8142,6 @@ void main() {
         });
     }
 }
-﻿class DepthPass extends AbstractPostProcessPass {
-    geometry;
-    material;
-    renderTarget;
-    mesh;
-    width;
-    height;
-    
-    static get baseVertexShader() {
-        return `#version 300 es
-
-layout (location = 0) in vec3 ${AttributeNames.Position};
-layout (location = 1) in vec2 ${AttributeNames.Uv};
-
-out vec2 vUv;
-
-void main() {
-    vUv = aUv;
-    gl_Position = vec4(aPosition, 1);
-}
-`;   
-    }
-    
-    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
-        super({ name });
-
-        const baseVertexShader = PostProcessPass.baseVertexShader;
-        vertexShader = vertexShader || baseVertexShader;
-
-        // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({ gpu });
-        this.material = new Material({
-            gpu,
-            vertexShader,
-            fragmentShader,
-            uniforms: {
-                ...uniforms, 
-                [UniformNames.SceneTexture]: {
-                    type: UniformTypes.Texture,
-                    value: null
-                }
-            },
-            primitiveType: PrimitiveTypes.Triangles
-        });
-        
-        // TODO: mesh生成しなくていい気がする
-        this.mesh = new Mesh({
-            geometry: this.geometry,
-            material: this.material
-        }); 
-        
-        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1 });
-    }
-  
-    setSize(width, height) {
-        this.width = width;
-        this.height = height;
-        this.renderTarget.setSize(width, height);
-    }
-
-    setRenderTarget(renderer, camera, isLastPass) {
-        if(isLastPass) {
-            renderer.setRenderTarget(camera.renderTarget);
-        } else {
-            renderer.setRenderTarget(this.renderTarget);
-        }
-    }
-
-    // TODO: rename "prevRenderTarget"
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
-        renderer.setRenderTarget(null);
-        this.mesh.updateTransform();
-        if(!this.material.isCompiledShader) {
-            this.material.start({ gpu })
-        }
-        if(prevRenderTarget) {
-            this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
-        }
-        renderer.renderMesh(this.geometry, this.material);
-        
-        // this.setRenderTarget(renderer, camera, isLastPass);
-        // 
-        // // TODO: ppごとに変えられるのが正しい
-        // renderer.clear(
-        //     camera.clearColor.x,
-        //     camera.clearColor.y,
-        //     camera.clearColor.z,
-        //     camera.clearColor.w
-        // );
-
-        // // ppの場合はいらない気がする
-        // this.mesh.updateTransform();
-        // 
-        // // 渡してない場合はなにもしないことにする
-        // if(prevRenderTarget) {
-        //     this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
-        // }
-
-        // if(!this.material.isCompiledShader) {
-        //     this.material.start({ gpu })
-        // }
-
-        // renderer.renderMesh(this.geometry, this.material);
-    }
-}
 ﻿
 // actors
 export {Actor};
@@ -8421,7 +8162,6 @@ export {Engine};
 export {ForwardRenderer};
 export {GPU};
 export {RenderTarget};
-export {MultipleRenderTarget};
 export {Scene};
 export {Texture};
 
@@ -8458,7 +8198,6 @@ export {PostProcessPass};
 export {FXAAPass};
 export {GaussianBlurPass};
 export {BloomPass};
-export {DepthPass};
 
 // shaders
 export {generateVertexShader};
