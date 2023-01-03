@@ -538,12 +538,14 @@ out vec4 outColor;
 uniform sampler2D uParticleMap;
 uniform sampler2D uDepthTexture;
 
-// ref threejs
+// ref:
+// https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
+// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
 float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-  return ( viewZ + near ) / ( near - far );
+  return (viewZ + near) / (near - far);
 }
 float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return ( near * far ) / ( ( far - near ) * invClipZ - far );
+  return (near * far) / ((far - near) * invClipZ - far);
 }
 
 void main() {
