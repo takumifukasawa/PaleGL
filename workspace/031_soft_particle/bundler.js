@@ -129,7 +129,7 @@ function bundle() {
     // const outputContent = newLines.join("\n");
 
     fs.writeFile(outputFilePath, outputContent, "utf-8", () => {
-        console.log("completed bundle file. -> " + outputFilePath);
+        console.log(`[${new Date()}] completed bundle file. -> ${outputFilePath}`);
     });
 }
 
