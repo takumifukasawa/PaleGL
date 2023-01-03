@@ -355,8 +355,10 @@ const main = async () => {
     floorPlaneMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
-        actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
-        actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
+        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
+        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
+        actor.material.updateUniform("uDiffuseMapUvScale", new Vector2(3, 3));
+        actor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
     }
 
     const particleNum = 50;
@@ -557,7 +559,8 @@ void main() {
         material: particleMaterial,
     });
     particleMesh.onFixedUpdate = ({ fixedTime }) => {
-        particleMaterial.uniforms.uTime.value = fixedTime;
+        // particleMaterial.uniforms.uTime.value = fixedTime;
+        particleMaterial.updateUniform("uTime", fixedTime);
     };
    
     captureScene.add(floorPlaneMesh);

@@ -241,9 +241,10 @@ export class Material {
         });
     }
 
+    // TODO: 深い階層もupdateができるようにしたい
     updateUniform(name, value) {
         if(!this.uniforms[name]) {
-            throw "[Material.updateUniform] invalid name.";
+            throw `[Material.updateUniform] invalid name ${name}`;
         }
         this.uniforms[name].value = value;
     }
