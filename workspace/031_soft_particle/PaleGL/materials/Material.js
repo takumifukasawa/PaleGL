@@ -240,6 +240,13 @@ export class Material {
             fragmentShader: this.fragmentShader
         });
     }
+
+    updateUniform(name, value) {
+        if(!this.uniforms[name]) {
+            throw "[Material.updateUniform] invalid name.";
+        }
+        this.uniforms[name].value = value;
+    }
    
     // // NOTE: renderer側でmaterial側のuniformをアップデートする用
     // updateUniforms({ gpu } = {}) {}

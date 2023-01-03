@@ -24,9 +24,6 @@
     Engine,
     PhongMaterial,
     Vector2,
-    AxesHelper,
-    GaussianBlurPass,
-    CopyPass,
     BloomPass,
     Geometry,
     Material,
@@ -100,7 +97,6 @@ engine.setScenes([
 
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 captureScene.add(captureSceneCamera);
-// captureScene.mainCamera = captureSceneCamera;
 
 const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
@@ -109,14 +105,11 @@ const captureSceneDepthRenderTarget = new RenderTarget({
     writeDepthTexture: true,
     name: "capture scene depth render target"
 });
-// TODO: render時だけsetRenderTargetするようにしたい
-// captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
 const captureSceneColorRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
     type: RenderTargetTypes.RGBA,
     useDepthBuffer: true,
-    // writeDepthTexture: true,
     name: "capture scene color render target"
 });
 
@@ -143,11 +136,9 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 210, 200);
-// directionalLight.color = Color.fromRGB(255, 255, 255);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    // actor.shadowCamera.visibleFrustum = true;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
@@ -156,64 +147,7 @@ directionalLight.onStart = ({ actor }) => {
 }
 captureScene.add(directionalLight);
 
-// const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
-// directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
-
 const postProcess = new PostProcess({ gpu, renderer });
-
-// const gaussianBlurPass = new GaussianBlurPass({ gpu });
-// gaussianBlurPass.enabled = true;
-// postProcess.addPass(gaussianBlurPass);
-
-// const copyPass = new CopyPass({ gpu });
-// copyPass.enabled = true;
-// postProcess.addPass(copyPass);
-
-// const showDepthPass = new DepthPass({
-//     gpu,
-//     fragmentShader: `#version 300 es
-// 
-// precision mediump float;
-// 
-// in vec2 vUv;
-// 
-// out vec4 outColor;
-// 
-// uniform sampler2D uSceneTexture;
-// uniform sampler2D uDepthTexture;
-// 
-// // ref threejs
-// float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-//   return ( viewZ + near ) / ( near - far );
-// }
-// float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
-//   return ( near * far ) / ( ( far - near ) * invClipZ - far );
-// }
-// 
-// void main() {
-//     vec4 textureColor = texture(uSceneTexture, vUv);
-//     vec4 depthColor = texture(uDepthTexture, vUv);
-//     float rawDepth = depthColor.x;
-//     // TODO: near, far を外から渡す
-//     float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
-//     float depth = viewZToOrthographicDepth(z, 0.1, 70.);
-//     depth = 1. - depth;
-//     outColor = textureColor;
-//     // outColor = vec4(vUv, 1., 1.);
-//     // outColor = vec4(vec3(depth), 1.);
-// }
-// `,
-//     uniforms: {
-//         uDepthTexture: {
-//             type: UniformTypes.Texture,
-//             // value: postProcess.renderTarget.read.depthTexture,
-//             // value: captureSceneDepthRenderTarget.read.depthTexture,
-//             value: captureSceneDepthRenderTarget.read.depthTexture,
-//         }
-//     }
-// });
-// showDepthPass.enabled = true;
-// postProcess.addPass(showDepthPass);
 
 const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
 bloomPass.enabled = true;
@@ -537,6 +471,8 @@ in vec4 vViewPosition;
 out vec4 outColor;
 uniform sampler2D uParticleMap;
 uniform sampler2D uDepthTexture;
+uniform float uNearClip;
+uniform float uFarClip;
 
 // ref:
 // https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
@@ -558,12 +494,12 @@ void main() {
     // calc soft fade
     
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float z = perspectiveDepthToViewZ(rawDepth, 0.1, 70.);
-    float sceneDepth = viewZToOrthographicDepth(z, 0.1, 70.);
+    float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
     // for debug
     outColor = vec4(vec3(sceneDepth), 1.);
     
-    float currentDepth = viewZToOrthographicDepth(vViewPosition.z, 0.1, 70.);
+    float currentDepth = viewZToOrthographicDepth(vViewPosition.z, uNearClip, uFarClip);
     // for debug
     // outColor = vec4(vec3(currentDepth), 1.);
     
@@ -602,10 +538,16 @@ void main() {
             },
             uDepthTexture: {
                 type: UniformTypes.Texture,
-                // value: postProcess.renderTarget.read.depthTexture,
-                // value: captureSceneDepthRenderTarget.read.depthTexture,
                 value: captureSceneDepthRenderTarget.read.depthTexture,
-            }        
+            },
+            uNearClip: {
+                type: UniformTypes.Float,
+                value: captureSceneCamera.near
+            },
+            uFarClip: {
+                type: UniformTypes.Float,
+                value: captureSceneCamera.far
+            }
         },
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
@@ -697,12 +639,6 @@ function initDebugger() {
     })
     
     debuggerGUI.addBorderSpacer();
-
-    // debuggerGUI.addToggleDebugger({
-    //     label: "gaussian blur pass enabled",
-    //     initialValue: gaussianBlurPass.enabled,
-    //     onChange: (value) => gaussianBlurPass.enabled = value,
-    // })
 
     debuggerGUI.addToggleDebugger({
         label: "bloom pass enabled",
