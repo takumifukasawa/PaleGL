@@ -5420,7 +5420,7 @@ class ForwardRenderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-
+                    
                     // // TODO:
                     // // - directional light の構造体に持たせた方がいいかもしれない
                     // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
@@ -5429,7 +5429,7 @@ class ForwardRenderer {
                     // if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
                     //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
                     // }
-                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.texture);
+                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
                     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
                 }
             });
