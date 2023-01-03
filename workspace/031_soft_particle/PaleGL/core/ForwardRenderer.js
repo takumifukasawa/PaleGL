@@ -217,7 +217,7 @@ export class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "invalid blend type";
+                                throw "[ForwardRenderer.render] invalid blend type";
                         }
                     });
                     break;
