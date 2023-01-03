@@ -154,6 +154,45 @@
             v1.x * v2.y - v1.y * v2.x
         );
     }
+
+    static rotateVectorX(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x;
+        const ry = y * c + z * -s;
+        const rz = y * s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorY(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + z * s;
+        const ry = y;
+        const rz = y * -s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorZ(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + y * -s;
+        const ry = x * s + y * s;
+        const rz = z;
+        return new Vector3(rx, ry, rz);
+    }
  
     // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {

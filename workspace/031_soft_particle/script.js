@@ -55,8 +55,6 @@ let skinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 
-const targetCameraPosition = new Vector3(0, 5, 12);
-
 const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
@@ -119,17 +117,21 @@ captureSceneCamera.onStart = ({ actor }) => {
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
     // 1: move position with mouse
-    const cameraPosition = Vector3.addVectors(
-        actor.transform.position,
-        new Vector3(
-            (targetCameraPosition.x - actor.transform.position.x) * 0.1,
-            (targetCameraPosition.y - actor.transform.position.y) * 0.1,
-            (targetCameraPosition.z - actor.transform.position.z) * 0.1
-        )
-    );
-    actor.transform.position = cameraPosition;
+    // const cameraPosition = Vector3.addVectors(
+    //     actor.transform.position,
+    //     new Vector3(
+    //         (targetCameraPosition.x - actor.transform.position.x) * 0.1,
+    //         (targetCameraPosition.y - actor.transform.position.y) * 0.1,
+    //         (targetCameraPosition.z - actor.transform.position.z) * 0.1
+    //     )
+    // );
+    // actor.transform.position = cameraPosition;
     
     // 2: fixed position
+    // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+    
+    // 3: rotation
+    actor.transform.position = targetCameraPosition;
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 }
 
@@ -160,16 +162,77 @@ postProcess.addPass(fxaaPass);
 postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
 
-const updateCamera = (clientX, clientY) => {
-    const nx = (clientX / width) * 2 - 1;
-    const ny = ((clientY / height) * 2 - 1) * -1;
-    targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = ny * 10 + 12;
-    // targetCameraPosition.y = ny * 10
+let isPointerDown = false;
+const beforePointerPosition = { x: 0, y: 0 }
+const pointerPosition = { x: 0, y: 0 };
+const deltaPointerPosition = { x: 0, y: 0 }
+const defaultCameraPosition = new Vector3(0, 6, 18);
+const cameraAngle = {
+    altitude: 0,
+    azimuth: 0, // 方位角
+};
+let targetCameraPosition = defaultCameraPosition.clone();
+
+const updateCamera = () => {
+    const v = Vector3.rotateVectorY(defaultCameraPosition, cameraAngle.azimuth);
+    targetCameraPosition = Vector3.rotateVectorY(defaultCameraPosition, cameraAngle.azimuth);
+    // targetCameraPosition = Vector3.rotateVectorX(defaultCameraPosition, cameraAngle.altitude);
+    // targetCameraPosition = Vector3.rotateVectorX(v, cameraAngle.altitude);
+    
+    // // const nx = (clientX / width) * 2 - 1;
+    // // const ny = ((clientY / height) * 2 - 1) * -1;
+    // targetCameraPosition.x = nx * 20;
+    // targetCameraPosition.y = ny * 10 + 12;
+    // // targetCameraPosition.y = ny * 10
 }
 
-const onMouseMove = (e) => {
-    updateCamera(e.clientX, e.clientY);
+// const onMouseMove = (e) => {
+//     updateCamera(e.clientX, e.clientY);
+// };
+
+const setPointerPosition = (clientX, clientY) => {
+    const nx = (clientX / width) * 2 - 1;
+    const ny = ((clientY / height) * 2 - 1) * -1;
+    pointerPosition.x = nx;
+    pointerPosition.y = ny;
+}
+
+const setDeltaPointerPosition = (x, y) => {
+    deltaPointerPosition.x = 0;
+    deltaPointerPosition.y = 0;
+};
+
+const setBeforePointerPosition = (x, y) => {
+    beforePointerPosition.x = x;
+    beforePointerPosition.y = y;
+};
+
+const onPointerDown = (x, y) => {
+    isPointerDown = true;
+    setBeforePointerPosition(x, y);
+    setPointerPosition(x, y);
+    setDeltaPointerPosition(0, 0);
+};
+
+const onPointerMove = (x, y) => {
+    if(!isPointerDown) {
+        return;
+    }
+    setBeforePointerPosition(pointerPosition.x, pointerPosition.y);
+    setPointerPosition(x, y);
+    const deltaX = pointerPosition.x - beforePointerPosition.x;
+    const deltaY = pointerPosition.y - beforePointerPosition.y;
+    setDeltaPointerPosition(deltaX, deltaY);
+    cameraAngle.azimuth += deltaX * 100;
+    cameraAngle.altitude += deltaY * 100;
+    updateCamera();
+};
+
+const onPointerUp = () => {
+    isPointerDown = false;
+    setBeforePointerPosition(0, 0);
+    setPointerPosition(0, 0);
+    setDeltaPointerPosition(0, 0);
 };
 
 const onTouch = (e) => {
@@ -573,8 +636,14 @@ void main() {
     if(isSP) {
         window.addEventListener("touchstart", onTouch);
         window.addEventListener("touchmove", onTouch);
+        window.addEventListener("touchend", onTouch);
     } else {
-        window.addEventListener("mousemove", onMouseMove);
+        // window.addEventListener("mousemove", onMouseMove);
+        // window.addEventListener("mousedown", (e) => console.log(e))
+        // window.addEventListener("mouseup", (e) => console.log(e))
+        window.addEventListener("mousedown", e => onPointerDown(e.clientX, e.clientY));
+        window.addEventListener("mousemove", e => onPointerMove(e.clientX, e.clientY));
+        window.addEventListener("mouseup", () => onPointerUp());
     }
 
     onWindowResize();
