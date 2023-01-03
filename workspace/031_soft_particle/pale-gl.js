@@ -866,6 +866,7 @@ const UniformNames = {
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
     NormalMatrix: "uNormalMatrix",
+    ViewPosition: "uViewPosition",
     // skinning
     JointMatrices: "uJointMatrices",
     JointTexture: "uJointTexture",
@@ -1487,7 +1488,7 @@ class Material {
                 value: Matrix4.identity()
             },
             // TODO: viewmatrixから引っ張ってきてもよい
-            uViewPosition: {
+            [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero()
             },
@@ -1533,7 +1534,7 @@ class Material {
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
                 gpuSkinning: this.gpuSkinning,
-                isInstancign: this.isInstancing
+                isInstancing: this.isInstancing
             });
         }
         if(!this.fragmentShader && this.#fragmentShaderGenerator) {
@@ -5245,16 +5246,21 @@ class ForwardRenderer {
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
                 
+                // // TODO: material 側でやった方がよい？
+                // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
+                // }
+
                 // TODO: material 側でやった方がよい？
-                if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
-                    targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
-                }
-                if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
-                    targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
-                }
-                if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
-                    targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
-                }
+                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera.viewMatrix);
+                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera.projectionMatrix);
               
                 this.renderMesh(actor.geometry, targetMaterial);
             });
@@ -5295,45 +5301,66 @@ class ForwardRenderer {
             //     targetMaterial.uniforms.uShadowMap.value = null;
             // }
 
+            // // TODO: material 側でやった方がよい？
+            // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewPosition]) {
+            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = camera.transform.worldMatrix.position;
+            // }
+
             // TODO: material 側でやった方がよい？
-            if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
-                targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
-            }
-            if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
-                targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
-            }
-            if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
-                targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
-            }
-            if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
-                targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
-            }
-            if (targetMaterial.uniforms.uViewPosition) {
-                targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
-            }
+            targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
+            targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            targetMaterial.updateUniform(UniformNames.NormalMatrix, actor.transform.worldMatrix.clone().invert().transpose());
+            targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意 
             lightActors.forEach(light => {
                 if (targetMaterial.uniforms.uDirectionalLight) {
-                    targetMaterial.uniforms.uDirectionalLight = {
-                        type: UniformTypes.Struct,
-                        value: {
-                            direction: {
-                                type: UniformTypes.Vector3,
-                                value: light.transform.position,
-                            },
-                            intensity: {
-                                type: UniformTypes.Float,
-                                value: light.intensity,
-                            },
-                            color: {
-                                type: UniformTypes.Color,
-                                value: light.color
-                            }
+                    // targetMaterial.uniforms.uDirectionalLight = {
+                    //     type: UniformTypes.Struct,
+                    //     value: {
+                    //         direction: {
+                    //             type: UniformTypes.Vector3,
+                    //             value: light.transform.position,
+                    //         },
+                    //         intensity: {
+                    //             type: UniformTypes.Float,
+                    //             value: light.intensity,
+                    //         },
+                    //         color: {
+                    //             type: UniformTypes.Color,
+                    //             value: light.color
+                    //         }
+                    //     }
+                    // }
+                    targetMaterial.updateUniform("uDirectionalLight", {
+                        direction: {
+                            type: UniformTypes.Vector3,
+                            value: light.transform.position,
+                        },
+                        intensity: {
+                            type: UniformTypes.Float,
+                            value: light.intensity,
+                        },
+                        color: {
+                            type: UniformTypes.Color,
+                            value: light.color
                         }
-                    }
+                    });
                 }
 
                 if (
@@ -5354,14 +5381,16 @@ class ForwardRenderer {
                         light.shadowCamera.viewMatrix.clone()
                     );
 
-                    // TODO:
-                    // - directional light の構造体に持たせた方がいいかもしれない
-                    if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
-                        targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
-                    }
-                    if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
-                        targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
-                    }
+                    // // TODO:
+                    // // - directional light の構造体に持たせた方がいいかもしれない
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
+                    // }
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
+                    // }
+                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.texture);
+                    targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
                 }
             });
 
@@ -6716,7 +6745,10 @@ class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            uDirectionalLight: {}
+            uDirectionalLight: {
+                type: UniformTypes.Struct,
+                value: {}
+            }
         };
        
         const useNormalMap = !!normalMap;

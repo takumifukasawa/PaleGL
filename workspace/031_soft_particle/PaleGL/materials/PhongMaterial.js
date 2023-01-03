@@ -74,7 +74,10 @@ export class PhongMaterial extends Material {
                 type: UniformTypes.Vector2,
                 value: Vector2.one()
             },
-            uDirectionalLight: {}
+            uDirectionalLight: {
+                type: UniformTypes.Struct,
+                value: {}
+            }
         };
        
         const useNormalMap = !!normalMap;

@@ -173,7 +173,7 @@ export class Material {
                 value: Matrix4.identity()
             },
             // TODO: viewmatrixから引っ張ってきてもよい
-            uViewPosition: {
+            [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero()
             },
@@ -219,7 +219,7 @@ export class Material {
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
                 gpuSkinning: this.gpuSkinning,
-                isInstancign: this.isInstancing
+                isInstancing: this.isInstancing
             });
         }
         if(!this.fragmentShader && this.#fragmentShaderGenerator) {

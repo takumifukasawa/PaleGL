@@ -125,6 +125,7 @@ export const UniformNames = {
     ViewMatrix: "uViewMatrix",
     ProjectionMatrix: "uProjectionMatrix",
     NormalMatrix: "uNormalMatrix",
+    ViewPosition: "uViewPosition",
     // skinning
     JointMatrices: "uJointMatrices",
     JointTexture: "uJointTexture",
