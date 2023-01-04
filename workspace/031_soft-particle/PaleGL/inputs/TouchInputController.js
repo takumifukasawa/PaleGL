@@ -3,19 +3,18 @@ import {Vector2} from "../math/Vector2.js";
 
 export class TouchInputController extends AbstractInputController {
     #tmpIsDown = false;
-    #tmpIsUp = false;
     #tmpInputPosition = Vector2.zero;
-    
+
     constructor() {
         super();
     }
-    
+
     start() {
-        window.addEventListener('mousedown', this.#onMouseDown.bind(this));
-        window.addEventListener('mousemove', this.#onMouseMove.bind(this));
-        window.addEventListener('mouseup', this.#onMouseUp.bind(this));
+        window.addEventListener('touchstart', this.#onTouchStart.bind(this));
+        window.addEventListener('touchmove', this.#onTouchMove.bind(this));
+        window.addEventListener('touchend', this.#onTouchEnd.bind(this));
     }
-    
+
     fixedUpdate() {
         this.updateInternal({
             inputPosition: this.#tmpInputPosition,
@@ -23,18 +22,19 @@ export class TouchInputController extends AbstractInputController {
         });
     }
 
-    #onMouseDown(e) {
+    #onTouchStart(e) {
         this.#tmpIsDown = true;
-        this.setInputPosition(e.clientX, e.clientY);
+        const t = e.touches[0];
+        this.setInputPosition(t.clientX, t.clientY);
     }
 
-    #onMouseMove(e) {
-        this.#tmpIsDown = true;
-        this.setInputPosition(e.clientX, e.clientY);
+    #onTouchMove(e) {
+        const t = e.touches[0];
+        this.setInputPosition(t.clientX, t.clientY);
     }
 
-    #onMouseUp() {
-        this.#tmpIsUp = false;
+    #onTouchEnd() {
+        this.#tmpIsDown = false;
         this.setInputPosition(-Infinity, -Infinity);
     }
 
@@ -43,8 +43,8 @@ export class TouchInputController extends AbstractInputController {
     }
 
     dispose() {
-        window.removeEventListener('mousedown', this.#onMouseDown.bind(this));
-        window.removeEventListener('mousemove', this.#onMouseMove.bind(this));
-        window.removeEventListener('mouseup', this.#onMouseUp.bind(this));
+        window.removeEventListener('touchstart', this.#onTouchStart.bind(this));
+        window.removeEventListener('touchmove', this.#onTouchMove.bind(this));
+        window.removeEventListener('touchend', this.#onTouchEnd.bind(this));
     }
 }

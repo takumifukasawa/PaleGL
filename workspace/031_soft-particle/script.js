@@ -32,7 +32,7 @@
     BlendTypes,
     AttributeNames,
     clamp,
-    OrbitCameraController
+    OrbitCameraController, TouchInputController
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 import {MouseInputController} from "./PaleGL/index.mjs";
@@ -57,7 +57,7 @@ let floorNormalMap;
 let skinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
-const inputController = new MouseInputController();
+const inputController = isSP ? new TouchInputController() : new MouseInputController();
 inputController.start();
 
 const wrapperElement = document.getElementById("wrapper");
