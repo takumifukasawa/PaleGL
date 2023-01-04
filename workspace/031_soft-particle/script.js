@@ -159,66 +159,6 @@ postProcess.enabled = true;
 // TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(postProcess);
 
-// let isPointerDown = false;
-// const beforePointerPosition = { x: 0, y: 0 }
-// const pointerPosition = { x: 0, y: 0 };
-// const deltaPointerPosition = { x: 0, y: 0 }
-// 
-// const setPointerPosition = (clientX, clientY) => {
-//     const nx = (clientX / width) * 2 - 1;
-//     const ny = ((clientY / height) * 2 - 1) * -1;
-//     pointerPosition.x = nx;
-//     pointerPosition.y = ny;
-// }
-// 
-// const setDeltaPointerPosition = (x, y) => {
-//     deltaPointerPosition.x = x;
-//     deltaPointerPosition.y = y;
-// };
-// 
-// const setBeforePointerPosition = (x, y) => {
-//     beforePointerPosition.x = x;
-//     beforePointerPosition.y = y;
-// };
-// 
-// const onPointerDown = (x, y) => {
-//     isPointerDown = true;
-//     setBeforePointerPosition(x, y);
-//     setPointerPosition(x, y);
-//     setDeltaPointerPosition(0, 0);
-// };
-// 
-// const onPointerMove = (x, y) => {
-//     if(!isPointerDown) {
-//         return;
-//     }
-//     setBeforePointerPosition(pointerPosition.x, pointerPosition.y);
-//     setPointerPosition(x, y);
-//     const deltaX = pointerPosition.x - beforePointerPosition.x;
-//     const deltaY = pointerPosition.y - beforePointerPosition.y;
-//     setDeltaPointerPosition(deltaX, deltaY);
-//     
-//     // cameraAngle.azimuth += deltaX * 100;
-//     // cameraAngle.altitude += deltaY * 100;
-//     // cameraAngle.azimuth = cameraAngle.azimuth % 360;
-//     // cameraAngle.altitude = clamp(cameraAngle.altitude, -80, 80);
-//     
-//     // updateCamera();
-//     orbitCameraController.setDelta(deltaPointerPosition.x, -deltaPointerPosition.y);
-// };
-// 
-// const onPointerUp = () => {
-//     isPointerDown = false;
-//     setBeforePointerPosition(0, 0);
-//     setPointerPosition(0, 0);
-//     setDeltaPointerPosition(0, 0);
-// };
-
-// const onTouch = (e) => {
-//     const touch = e.touches[0];
-//     updateCamera(touch.clientX, touch.clientY);
-// }
-
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
@@ -321,16 +261,6 @@ const createGLTFSkinnedMesh = async () => {
     vVertexColor = aInstanceVertexColor;
 `
         },
-        // uniforms: {
-        //     uDiffuseMapUvScale: {
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(0.1, 0.5),
-        //     },
-        //     uNormalMapUvScale: {
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(0.1, 0.5),
-        //     },
-        // }
     });
     
     return skinningMesh;
@@ -610,17 +540,6 @@ void main() {
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
    
-    if(isSP) {
-        // TODO: スマホ対応
-        // window.addEventListener("touchstart", onTouch);
-        // window.addEventListener("touchmove", onTouch);
-        // window.addEventListener("touchend", onTouch);
-    } else {
-        // window.addEventListener("mousedown", e => onPointerDown(e.clientX, e.clientY));
-        // window.addEventListener("mousemove", e => onPointerMove(e.clientX, e.clientY));
-        // window.addEventListener("mouseup", () => onPointerUp());
-    }
- 
     engine.onBeforeStart = () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
