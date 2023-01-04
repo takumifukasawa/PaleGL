@@ -166,29 +166,23 @@ let isPointerDown = false;
 const beforePointerPosition = { x: 0, y: 0 }
 const pointerPosition = { x: 0, y: 0 };
 const deltaPointerPosition = { x: 0, y: 0 }
-const defaultCameraPosition = new Vector3(0, 6, 18);
+// const defaultCameraPosition = new Vector3(0, 6, 18);
+const defaultCameraPosition = new Vector3(0, 0, 18);
 const cameraAngle = {
     altitude: 0,
     azimuth: 0, // 方位角
 };
 let targetCameraPosition = defaultCameraPosition.clone();
 
-const updateCamera = () => {
-    const v = Vector3.rotateVectorY(defaultCameraPosition, cameraAngle.azimuth);
-    targetCameraPosition = Vector3.rotateVectorY(defaultCameraPosition, cameraAngle.azimuth);
-    // targetCameraPosition = Vector3.rotateVectorX(defaultCameraPosition, cameraAngle.altitude);
-    // targetCameraPosition = Vector3.rotateVectorX(v, cameraAngle.altitude);
-    
-    // // const nx = (clientX / width) * 2 - 1;
-    // // const ny = ((clientY / height) * 2 - 1) * -1;
-    // targetCameraPosition.x = nx * 20;
-    // targetCameraPosition.y = ny * 10 + 12;
-    // // targetCameraPosition.y = ny * 10
+const clamp = (x, min, max) => {
+    return Math.min(max, Math.max(x, min));
 }
 
-// const onMouseMove = (e) => {
-//     updateCamera(e.clientX, e.clientY);
-// };
+const updateCamera = () => {
+    const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), cameraAngle.altitude);
+    const v2 = Vector3.rotateVectorY(v1, cameraAngle.azimuth);
+    targetCameraPosition = v2.scale(10).clone();
+}
 
 const setPointerPosition = (clientX, clientY) => {
     const nx = (clientX / width) * 2 - 1;
@@ -225,6 +219,10 @@ const onPointerMove = (x, y) => {
     setDeltaPointerPosition(deltaX, deltaY);
     cameraAngle.azimuth += deltaX * 100;
     cameraAngle.altitude += deltaY * 100;
+
+    cameraAngle.azimuth = cameraAngle.azimuth % 360;
+    cameraAngle.altitude = clamp(cameraAngle.altitude, -80, 80);
+    
     updateCamera();
 };
 
