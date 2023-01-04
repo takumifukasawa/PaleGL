@@ -547,6 +547,8 @@ void main() {
         orbitCameraController.distance = 15;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
+        orbitCameraController.azimuthSpeed = 150;
+        orbitCameraController.altitudeSpeed = 150;
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
         orbitCameraController.start(20, -30);
     }
