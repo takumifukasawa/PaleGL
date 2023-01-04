@@ -101,13 +101,6 @@ const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
-orbitCameraController.distance = 15;
-orbitCameraController.attenuation = 0.01;
-orbitCameraController.dampingFactor = 0.2;
-orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
-orbitCameraController.start(20, -30);
-// orbitCameraController.setDelta(0, 0);
-// orbitCameraController.fixedUpdate();
 
 const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
@@ -627,10 +620,18 @@ void main() {
         // window.addEventListener("mousemove", e => onPointerMove(e.clientX, e.clientY));
         // window.addEventListener("mouseup", () => onPointerUp());
     }
+ 
+    engine.onBeforeStart = () => {
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize);
 
-    onWindowResize();
-    window.addEventListener('resize', onWindowResize);
-  
+        orbitCameraController.distance = 15;
+        orbitCameraController.attenuation = 0.01;
+        orbitCameraController.dampingFactor = 0.2;
+        orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
+        orbitCameraController.start(20, -30);
+    }
+    
     engine.onBeforeUpdate = () => {
         if(!debuggerGUI) initDebugger();
     };

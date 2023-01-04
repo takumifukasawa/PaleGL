@@ -1,36 +1,36 @@
 import {Vector2} from "../math/Vector2.js";
 
 export class AbstractInputController {
-    #_beforeInputPosition = Vector2.zero;
-    #_currentInputPosition = Vector2.zero;
-    #_deltaInputPosition = Vector2.zero;
-    #_deltaNormalizedInputPosition = Vector2.zero;
+    #beforeInputPosition = Vector2.zero;
+    #currentInputPosition = Vector2.zero;
+    #deltaInputPosition = Vector2.zero;
+    #deltaNormalizedInputPosition = Vector2.zero;
     
-    #_isPressed = false;
-    #_isDown = false;
-    #_isReleased = false;
+    #isPressed = false;
+    #isDown = false;
+    #isReleased = false;
     
     #width;
     #height;
     
     get isUp() {
-        return !this.#_isDown;
+        return !this.#isDown;
     }
     
     get isPressed() {
-        return this.#_isPressed;
+        return this.#isPressed;
     }
 
     get isDown() {
-        return this.#_isDown;
+        return this.#isDown;
     }
     
     get isReleased() {
-        return this.#_isReleased;
+        return this.#isReleased;
     }
     
     get deltaNormalizedInputPosition() {
-        return this.#_deltaNormalizedInputPosition;
+        return this.#deltaNormalizedInputPosition;
     }
 
     constructor() {
@@ -55,29 +55,29 @@ export class AbstractInputController {
    
     #updateState(isDown) {
         const isBeforeDown = this.isDown;
-        this.#_isDown = isDown;
+        this.#isDown = isDown;
 
         // pressed
         if(!isBeforeDown && this.isDown) {
-            this.#_isPressed = true;
-            this.#_isReleased = false;
+            this.#isPressed = true;
+            this.#isReleased = false;
             return;
         }
         // down
         if(!isBeforeDown && this.isDown) {
-            this.#_isPressed = false;
-            this.#_isReleased = false;
+            this.#isPressed = false;
+            this.#isReleased = false;
             return;
         }
         // released
         if(isBeforeDown && !this.isDown) {
-            this.#_isPressed = false;
-            this.#_isReleased = true;
+            this.#isPressed = false;
+            this.#isReleased = true;
             return;
         }
         // up 
-        this.#_isPressed = false;
-        this.#_isReleased = false;
+        this.#isPressed = false;
+        this.#isReleased = false;
     }
 
     #updateInputPositions(inputPosition) {
@@ -88,28 +88,28 @@ export class AbstractInputController {
         }
         // pressed
         if(this.isPressed) {
-            this.#_currentInputPosition.copy(inputPosition);
-            this.#_beforeInputPosition.copy(this.#_currentInputPosition);
-            this.#_deltaInputPosition.set(0, 0);
-            this.#_deltaNormalizedInputPosition.set(0, 0);
+            this.#currentInputPosition.copy(inputPosition);
+            this.#beforeInputPosition.copy(this.#currentInputPosition);
+            this.#deltaInputPosition.set(0, 0);
+            this.#deltaNormalizedInputPosition.set(0, 0);
             return;
         }
         // move
-        this.#_beforeInputPosition.copy(this.#_currentInputPosition);
-        this.#_currentInputPosition.copy(inputPosition);
-        const diff = Vector2.subVectors(this.#_currentInputPosition, this.#_beforeInputPosition);
-        this.#_deltaInputPosition.copy(diff);
-        this.#_deltaNormalizedInputPosition.set(
-            this.#_deltaInputPosition.x / this.#width,
-            this.#_deltaInputPosition.y / this.#height
+        this.#beforeInputPosition.copy(this.#currentInputPosition);
+        this.#currentInputPosition.copy(inputPosition);
+        const diff = Vector2.subVectors(this.#currentInputPosition, this.#beforeInputPosition);
+        this.#deltaInputPosition.copy(diff);
+        this.#deltaNormalizedInputPosition.set(
+            this.#deltaInputPosition.x / this.#width,
+            this.#deltaInputPosition.y / this.#height
         );
     }
   
     clearInputPositions() {
-        this.#_beforeInputPosition.set(-Infinity, -Infinity);
-        this.#_currentInputPosition.set(-Infinity, -Infinity);
-        this.#_deltaInputPosition.set(-Infinity, -Infinity);
-        this.#_deltaNormalizedInputPosition.set(-Infinity, -Infinity);
+        this.#beforeInputPosition.set(-Infinity, -Infinity);
+        this.#currentInputPosition.set(-Infinity, -Infinity);
+        this.#deltaInputPosition.set(-Infinity, -Infinity);
+        this.#deltaNormalizedInputPosition.set(-Infinity, -Infinity);
     }
 
     dispose() {}

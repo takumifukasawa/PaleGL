@@ -12,12 +12,17 @@ export class Engine {
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
     // callbacks
+    #onBeforeStart;
     #onBeforeFixedUpdate;
     #onBeforeUpdate;
     #onRender;
     
     get renderer() {
         return this.#renderer;
+    }
+    
+    set onBeforeStart(cb) {
+        this.#onBeforeStart = cb;
     }
     
     set onBeforeUpdate(cb) {
@@ -56,8 +61,11 @@ export class Engine {
     setScenes(scenes) {
         this.#scenes = scenes;
     }
-    
+
     start() {
+        if(this.#onBeforeStart) {
+            this.#onBeforeStart();
+        }
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
