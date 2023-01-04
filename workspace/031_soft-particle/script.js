@@ -32,10 +32,9 @@
     BlendTypes,
     AttributeNames,
     clamp,
-    OrbitCameraController, TouchInputController
+    OrbitCameraController, TouchInputController, MouseInputController
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
-import {MouseInputController} from "./PaleGL/index.mjs";
 
 const debuggerStates = {
     instanceNum: 0,
@@ -88,7 +87,7 @@ const compositeScene = new Scene();
 const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
-    pixelRatio: Math.min(window.devicePixelRatio, 2)
+    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
 });
 
 const engine = new Engine({ gpu, renderer });
