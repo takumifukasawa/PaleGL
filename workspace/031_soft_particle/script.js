@@ -112,7 +112,6 @@ const captureSceneColorRenderTarget = new RenderTarget({
 });
 
 captureSceneCamera.onStart = ({ actor }) => {
-    actor.transform.setTranslation(targetCameraPosition);
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
@@ -132,6 +131,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     
     // 3: rotation
     actor.transform.position = targetCameraPosition;
+    actor.transform.lookAt(new Vector3(0, 0, 0));
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 }
 
@@ -629,9 +629,6 @@ void main() {
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
-    
-    captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, 0, 0));
    
     if(isSP) {
         window.addEventListener("touchstart", onTouch);

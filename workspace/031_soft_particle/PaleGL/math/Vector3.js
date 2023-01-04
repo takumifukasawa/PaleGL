@@ -24,7 +24,12 @@
     set z(value) {
         this.elements[2] = value;
     }
-    
+
+    get magnitude() {
+        const eps = 0.0001;
+        return Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+    }
+
     constructor(x, y, z) {
         this.set(x, y, z);
     }
@@ -35,11 +40,12 @@
     }
     
     normalize() {
-        const eps = 0.0001;
-        const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
-        this.x = this.x / length;
-        this.y = this.y / length;
-        this.z = this.z / length;
+        // const eps = 0.0001;
+        // const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+        const mag = this.magnitude;
+        this.x = this.x / mag;
+        this.y = this.y / mag;
+        this.z = this.z / mag;
         return this;
     }
     
@@ -177,7 +183,7 @@
         const s = Math.sin(rad);
         const rx = x * c + z * s;
         const ry = y;
-        const rz = y * -s + z * c;
+        const rz = x * -s + z * c;
         return new Vector3(rx, ry, rz);
     }
     
