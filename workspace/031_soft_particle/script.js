@@ -30,7 +30,9 @@
     generateVertexShader,
     UniformTypes,
     BlendTypes,
-    AttributeNames
+    AttributeNames,
+    clamp,
+    OrbitCameraController
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -96,6 +98,10 @@ engine.setScenes([
 const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 captureScene.add(captureSceneCamera);
 
+const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+orbitCameraController.distance = 15;
+orbitCameraController.update(0, 0);
+
 const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
     width: 1, height: 1,
@@ -115,24 +121,11 @@ captureSceneCamera.onStart = ({ actor }) => {
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
-    // 1: move position with mouse
-    // const cameraPosition = Vector3.addVectors(
-    //     actor.transform.position,
-    //     new Vector3(
-    //         (targetCameraPosition.x - actor.transform.position.x) * 0.1,
-    //         (targetCameraPosition.y - actor.transform.position.y) * 0.1,
-    //         (targetCameraPosition.z - actor.transform.position.z) * 0.1
-    //     )
-    // );
-    // actor.transform.position = cameraPosition;
-    
-    // 2: fixed position
+    // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
     
-    // 3: rotation
-    actor.transform.position = targetCameraPosition;
-    actor.transform.lookAt(new Vector3(0, 0, 0));
-    // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+    // 2: orbit controls
+    // TODO: orbit controlsはここでupdate(dampのだめ
 }
 
 const directionalLight = new DirectionalLight();
@@ -160,29 +153,13 @@ fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
 postProcess.enabled = true;
+// TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(postProcess);
 
 let isPointerDown = false;
 const beforePointerPosition = { x: 0, y: 0 }
 const pointerPosition = { x: 0, y: 0 };
 const deltaPointerPosition = { x: 0, y: 0 }
-// const defaultCameraPosition = new Vector3(0, 6, 18);
-const defaultCameraPosition = new Vector3(0, 0, 18);
-const cameraAngle = {
-    altitude: 0,
-    azimuth: 0, // 方位角
-};
-let targetCameraPosition = defaultCameraPosition.clone();
-
-const clamp = (x, min, max) => {
-    return Math.min(max, Math.max(x, min));
-}
-
-const updateCamera = () => {
-    const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), cameraAngle.altitude);
-    const v2 = Vector3.rotateVectorY(v1, cameraAngle.azimuth);
-    targetCameraPosition = v2.scale(10).clone();
-}
 
 const setPointerPosition = (clientX, clientY) => {
     const nx = (clientX / width) * 2 - 1;
@@ -217,13 +194,15 @@ const onPointerMove = (x, y) => {
     const deltaX = pointerPosition.x - beforePointerPosition.x;
     const deltaY = pointerPosition.y - beforePointerPosition.y;
     setDeltaPointerPosition(deltaX, deltaY);
-    cameraAngle.azimuth += deltaX * 100;
-    cameraAngle.altitude += deltaY * 100;
-
-    cameraAngle.azimuth = cameraAngle.azimuth % 360;
-    cameraAngle.altitude = clamp(cameraAngle.altitude, -80, 80);
     
-    updateCamera();
+    // cameraAngle.azimuth += deltaX * 100;
+    // cameraAngle.altitude += deltaY * 100;
+    // cameraAngle.azimuth = cameraAngle.azimuth % 360;
+    // cameraAngle.altitude = clamp(cameraAngle.altitude, -80, 80);
+    
+    // updateCamera();
+    
+    orbitCameraController.update(deltaX, deltaY);
 };
 
 const onPointerUp = () => {
@@ -233,10 +212,10 @@ const onPointerUp = () => {
     setDeltaPointerPosition(0, 0);
 };
 
-const onTouch = (e) => {
-    const touch = e.touches[0];
-    updateCamera(touch.clientX, touch.clientY);
-}
+// const onTouch = (e) => {
+//     const touch = e.touches[0];
+//     updateCamera(touch.clientX, touch.clientY);
+// }
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
@@ -629,13 +608,11 @@ void main() {
     captureScene.add(particleMesh);
    
     if(isSP) {
-        window.addEventListener("touchstart", onTouch);
-        window.addEventListener("touchmove", onTouch);
-        window.addEventListener("touchend", onTouch);
+        // TODO: スマホ対応
+        // window.addEventListener("touchstart", onTouch);
+        // window.addEventListener("touchmove", onTouch);
+        // window.addEventListener("touchend", onTouch);
     } else {
-        // window.addEventListener("mousemove", onMouseMove);
-        // window.addEventListener("mousedown", (e) => console.log(e))
-        // window.addEventListener("mouseup", (e) => console.log(e))
         window.addEventListener("mousedown", e => onPointerDown(e.clientX, e.clientY));
         window.addEventListener("mousemove", e => onPointerMove(e.clientX, e.clientY));
         window.addEventListener("mouseup", () => onPointerUp());

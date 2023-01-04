@@ -5866,6 +5866,79 @@ class Scene {
     }
 }
 ﻿
+// ------------------------------------------------------
+//
+// # 3x3
+// もしガウシアンブラーなら、
+// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
+//
+// --------------------------
+// | 1 | 2 | 1 |
+// | 2 | 4 | 2 | * (1 / 16)
+// | 1 | 2 | 1 |
+// --------------------------
+//
+// # 5x5
+// もしガウシアンブラーなら、
+// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
+//
+// -------------------------------------
+// | 1 | 4  | 6  | 4  | 1 |
+// | 4 | 16 | 24 | 16 | 4 |
+// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
+// | 4 | 16 | 24 | 16 | 4 |
+// | 1 | 4  | 6  | 4  | 1 |
+// -------------------------------------
+//
+// ------------------------------------------------------
+
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+function gaussCoefficient(sigma, x) {
+    const sigma2 = sigma * sigma;
+    return Math.exp(-(x * x) / (2. * sigma2));
+}
+
+function clamp(x, min, max) {
+    return Math.min(max, Math.max(x, min));
+}
+
+
+
+
+class OrbitCameraController {
+    #camera;
+    dumpingFactor = 0.01;
+    minAzimuth;
+    maxAzimuth;
+    minAltitude = -45;
+    maxAltitude = 45;
+    azimuthSpeed = 100;
+    altitudeSpeed = 100;
+    #cameraAngle = { azimuth: 0, altitude: 0};
+    #lookAtTarget = Vector3.zero();
+    distance = 10;
+    
+    constructor(camera) {
+        this.#camera = camera;
+    }
+
+    update(deltaX, deltaY) {
+        this.#cameraAngle.azimuth += deltaX * this.azimuthSpeed;
+        this.#cameraAngle.altitude += deltaY * this.altitudeSpeed;
+
+        // TODO: limit azimuth
+        this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
+        this.#cameraAngle.altitude = clamp(this.#cameraAngle.altitude, this.minAltitude, this.maxAltitude);
+
+        const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), this.#cameraAngle.altitude);
+        const v2 = Vector3.rotateVectorY(v1, this.#cameraAngle.azimuth);
+        const targetCameraPosition = v2.scale(this.distance).clone();
+
+        this.#camera.transform.position = targetCameraPosition;
+        this.#camera.transform.lookAt(this.#lookAtTarget);
+    }
+}
+﻿
 
 
 // example
@@ -7820,38 +7893,6 @@ class GaussianBlurPass extends AbstractPostProcessPass {
     }   
 }
 ﻿
-// ------------------------------------------------------
-//
-// # 3x3
-// もしガウシアンブラーなら、
-// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
-//
-// --------------------------
-// | 1 | 2 | 1 |
-// | 2 | 4 | 2 | * (1 / 16)
-// | 1 | 2 | 1 |
-// --------------------------
-//
-// # 5x5
-// もしガウシアンブラーなら、
-// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
-//
-// -------------------------------------
-// | 1 | 4  | 6  | 4  | 1 |
-// | 4 | 16 | 24 | 16 | 4 |
-// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
-// | 4 | 16 | 24 | 16 | 4 |
-// | 1 | 4  | 6  | 4  | 1 |
-// -------------------------------------
-//
-// ------------------------------------------------------
-
-// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
-function gaussCoefficient(sigma, x) {
-    const sigma2 = sigma * sigma;
-    return Math.exp(-(x * x) / (2. * sigma2));
-}
-﻿
 
 
 // pixelNumは奇数であるべき
@@ -8269,6 +8310,7 @@ export {GPU};
 export {RenderTarget};
 export {Scene};
 export {Texture};
+export {OrbitCameraController};
 
 // geometries
 export {BoxGeometry};
@@ -8308,6 +8350,7 @@ export {BloomPass};
 export {generateVertexShader};
 
 // utilities
+export {clamp};
 
 // others
 export {

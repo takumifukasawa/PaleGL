@@ -30,3 +30,7 @@ export function gaussCoefficient(sigma, x) {
     const sigma2 = sigma * sigma;
     return Math.exp(-(x * x) / (2. * sigma2));
 }
+
+export function clamp(x, min, max) {
+    return Math.min(max, Math.max(x, min));
+}

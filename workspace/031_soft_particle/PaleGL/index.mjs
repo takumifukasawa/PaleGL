@@ -20,6 +20,7 @@ export {GPU} from "./core/GPU.js";
 export {RenderTarget} from "./core/RenderTarget.js";
 export {Scene} from "./core/Scene.js";
 export {Texture} from "./core/Texture.js";
+export {OrbitCameraController} from "./core/OrbitCameraController.js";
 
 // geometries
 export {BoxGeometry} from "./geometries/BoxGeometry.js";
@@ -59,6 +60,7 @@ export {BloomPass} from "./postprocess/BloomPass.js";
 export {generateVertexShader} from "./shaders/generateVertexShader.js";
 
 // utilities
+export {clamp} from "./utilities/mathUtilities.js";
 
 // others
 export {
