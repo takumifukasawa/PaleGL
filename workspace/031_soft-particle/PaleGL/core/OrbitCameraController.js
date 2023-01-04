@@ -11,14 +11,14 @@ export class OrbitCameraController {
     azimuthSpeed = 100;
     altitudeSpeed = 100;
     #cameraAngle = { azimuth: 0, altitude: 0};
-    #lookAtTarget = Vector3.zero();
+    #lookAtTarget = Vector3.zero;
     distance = 10;
     attenuation = 0.001;
     #targetX;
     #targetY;
     
-    #targetCameraPosition = Vector3.zero();
-    #currentCameraPosition = Vector3.zero();
+    #targetCameraPosition = Vector3.zero;
+    #currentCameraPosition = Vector3.zero;
     
     set lookAtTarget(v) {
         this.#lookAtTarget = v;

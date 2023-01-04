@@ -161,7 +161,7 @@ export class Skybox extends Mesh {
                 },
                 uViewDirectionProjectionInverse: {
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity(),
+                    value: Matrix4.identity,
                 },
                 uRotationOffset: {
                     type: UniformTypes.Float,

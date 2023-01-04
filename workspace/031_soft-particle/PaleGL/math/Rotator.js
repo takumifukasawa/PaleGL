@@ -44,9 +44,9 @@
     
     getAxesRadians() {
         return {
-            x: this.elements[0] * Math.PI / 180 ,
-            y: this.elements[1] * Math.PI / 180 ,
-            z: this.elements[2] * Math.PI / 180 ,
+            x: this.elements[0] * Math.PI / 180,
+            y: this.elements[1] * Math.PI / 180,
+            z: this.elements[2] * Math.PI / 180,
         }
     }
 
@@ -60,7 +60,7 @@
         return this;
     }
     
-    static zero() {
+    static get zero() {
         return new Rotator(0, 0, 0);
     }
     

@@ -16,8 +16,8 @@ import {Geometry} from "../geometries/Geometry.js";
 import {Mesh} from "./Mesh.js";
 
 export class Camera extends Actor {
-    viewMatrix = Matrix4.identity();
-    projectionMatrix = Matrix4.identity();
+    viewMatrix = Matrix4.identity;
+    projectionMatrix = Matrix4.identity;
     #renderTarget;
     clearColor; // TODO: color class
     #postProcess;

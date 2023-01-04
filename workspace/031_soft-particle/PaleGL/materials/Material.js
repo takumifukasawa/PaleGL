@@ -158,24 +158,24 @@ export class Material {
         const commonUniforms = {
             [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: viewmatrixから引っ張ってきてもよい
             [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero()
+                value: Vector3.zero
             },
 
             ...(this.alphaTest ? {
@@ -193,7 +193,7 @@ export class Material {
             },
             [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
             [UniformNames.ShadowBias]: {

@@ -98,35 +98,35 @@
         return flag;
     }
     
-    static zero() {
+    static get zero() {
         return new Vector3(0, 0, 0);
     }
 
-    static one() {
+    static get one() {
         return new Vector3(1, 1, 1);
     }
     
-    static up() {
+    static get up() {
         return new Vector3(0, 1, 0);
     }
     
-    static down() {
+    static get down() {
         return new Vector3(0, -1, 0);
     }
     
-    static back() {
+    static get back() {
         return new Vector3(0, 0, -1);
     }
     
-    static forward() {
+    static get forward() {
         return new Vector3(0, 0, 1);
     }
     
-    static right() {
+    static get right() {
         return new Vector3(1, 0, 0);
     }
 
-    static left() {
+    static get left() {
         return new Vector3(-1, 0, 0);
     }
     
@@ -135,7 +135,7 @@
     }
     
     static addVectors(...vectors) {
-        const v = Vector3.zero();
+        const v = Vector3.zero;
         vectors.forEach(elem => {
             v.x += elem.x;
             v.y += elem.y;
@@ -202,13 +202,13 @@
  
     // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {
-        if(n.equals(Vector3.up())) {
-            return Vector3.right();
+        if(n.equals(Vector3.up)) {
+            return Vector3.right;
         }
-        if(n.equals(Vector3.down())) {
-            return Vector3.right();
+        if(n.equals(Vector3.down)) {
+            return Vector3.right;
         }
-        return Vector3.crossVectors(n, Vector3.down());
+        return Vector3.crossVectors(n, Vector3.down);
     }
 
     static getBinormalFromTangent(t, n) {

@@ -10,11 +10,11 @@ export class Transform {
     parent;
     actor;
     children = [];
-    #worldMatrix = Matrix4.identity();
-    #localMatrix = Matrix4.identity();
-    position = Vector3.zero();
-    rotation = Rotator.zero(); // degree vector
-    scale = Vector3.one();
+    #worldMatrix = Matrix4.identity;
+    #localMatrix = Matrix4.identity;
+    position = Vector3.zero;
+    rotation = Rotator.zero; // degree vector
+    scale = Vector3.one;
     lookAtTarget = null; // world v
 
     get childCount() {
@@ -60,7 +60,7 @@ export class Transform {
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix = this.actor.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up(), true)
+                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up, true)
                 : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);

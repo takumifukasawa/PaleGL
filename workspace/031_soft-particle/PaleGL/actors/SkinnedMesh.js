@@ -89,7 +89,7 @@ export class SkinnedMesh extends Mesh {
         this.materials.forEach(material => {
             // material.uniforms.uJointMatrices = {
             //     type: UniformTypes.Matrix4Array,
-            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
+            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
             // };
             material.uniforms = {
                 ...material.uniforms,
@@ -232,7 +232,7 @@ export class SkinnedMesh extends Mesh {
             const fillNum = colNum * rowNum - boneCount;
             const jointData = new Float32Array([
                     ...jointMatricesAllFrames,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()
@@ -294,7 +294,7 @@ matrix elements: ${jointData.length}`);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
                     ...jointMatrices,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()

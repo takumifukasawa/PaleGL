@@ -98,35 +98,35 @@
         return flag;
     }
     
-    static zero() {
+    static get zero() {
         return new Vector3(0, 0, 0);
     }
 
-    static one() {
+    static get one() {
         return new Vector3(1, 1, 1);
     }
     
-    static up() {
+    static get up() {
         return new Vector3(0, 1, 0);
     }
     
-    static down() {
+    static get down() {
         return new Vector3(0, -1, 0);
     }
     
-    static back() {
+    static get back() {
         return new Vector3(0, 0, -1);
     }
     
-    static forward() {
+    static get forward() {
         return new Vector3(0, 0, 1);
     }
     
-    static right() {
+    static get right() {
         return new Vector3(1, 0, 0);
     }
 
-    static left() {
+    static get left() {
         return new Vector3(-1, 0, 0);
     }
     
@@ -135,7 +135,7 @@
     }
     
     static addVectors(...vectors) {
-        const v = Vector3.zero();
+        const v = Vector3.zero;
         vectors.forEach(elem => {
             v.x += elem.x;
             v.y += elem.y;
@@ -202,13 +202,13 @@
  
     // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {
-        if(n.equals(Vector3.up())) {
-            return Vector3.right();
+        if(n.equals(Vector3.up)) {
+            return Vector3.right;
         }
-        if(n.equals(Vector3.down())) {
-            return Vector3.right();
+        if(n.equals(Vector3.down)) {
+            return Vector3.right;
         }
-        return Vector3.crossVectors(n, Vector3.down());
+        return Vector3.crossVectors(n, Vector3.down);
     }
 
     static getBinormalFromTangent(t, n) {
@@ -412,7 +412,7 @@ class Matrix4 {
         return this;
     }
 
-    static identity() {
+    static get identity() {
         return new Matrix4(
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -481,7 +481,7 @@ class Matrix4 {
     }
     
     static multiplyMatrices(...matrices) {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         matrices.forEach(matrix => m.multiply(matrix));
         return m;
     }
@@ -559,7 +559,7 @@ class Matrix4 {
     }
     
     clone() {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         m.m00 = this.m00;
         m.m01 = this.m01;
         m.m02 = this.m02;
@@ -976,9 +976,9 @@ const UniformNames = {
     
     getAxesRadians() {
         return {
-            x: this.elements[0] * Math.PI / 180 ,
-            y: this.elements[1] * Math.PI / 180 ,
-            z: this.elements[2] * Math.PI / 180 ,
+            x: this.elements[0] * Math.PI / 180,
+            y: this.elements[1] * Math.PI / 180,
+            z: this.elements[2] * Math.PI / 180,
         }
     }
 
@@ -992,7 +992,7 @@ const UniformNames = {
         return this;
     }
     
-    static zero() {
+    static get zero() {
         return new Rotator(0, 0, 0);
     }
     
@@ -1035,11 +1035,11 @@ class Transform {
     parent;
     actor;
     children = [];
-    #worldMatrix = Matrix4.identity();
-    #localMatrix = Matrix4.identity();
-    position = Vector3.zero();
-    rotation = Rotator.zero(); // degree vector
-    scale = Vector3.one();
+    #worldMatrix = Matrix4.identity;
+    #localMatrix = Matrix4.identity;
+    position = Vector3.zero;
+    rotation = Rotator.zero; // degree vector
+    scale = Vector3.one;
     lookAtTarget = null; // world v
 
     get childCount() {
@@ -1085,7 +1085,7 @@ class Transform {
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix = this.actor.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up(), true)
+                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up, true)
                 : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
@@ -1526,24 +1526,24 @@ class Material {
         const commonUniforms = {
             [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: viewmatrixから引っ張ってきてもよい
             [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero()
+                value: Vector3.zero
             },
 
             ...(this.alphaTest ? {
@@ -1561,7 +1561,7 @@ class Material {
             },
             [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
             [UniformNames.ShadowBias]: {
@@ -3194,8 +3194,8 @@ class RenderTarget extends AbstractRenderTarget {
 
 
 class Camera extends Actor {
-    viewMatrix = Matrix4.identity();
-    projectionMatrix = Matrix4.identity();
+    viewMatrix = Matrix4.identity;
+    projectionMatrix = Matrix4.identity;
     #renderTarget;
     clearColor; // TODO: color class
     #postProcess;
@@ -3413,9 +3413,9 @@ class OrthographicCamera extends Camera {
     }
    
     getFrustumLocalPositions() {
-        const localForward = Vector3.back();
-        const localRight = Vector3.right();
-        const localUp = Vector3.up();
+        const localForward = Vector3.back;
+        const localRight = Vector3.right;
+        const localUp = Vector3.up;
 
         const halfWidth = (Math.abs(this.left) + Math.abs(this.right)) / 2;
         const halfHeight = (Math.abs(this.top) + Math.abs(this.right)) / 2;
@@ -4187,7 +4187,7 @@ class SkinnedMesh extends Mesh {
         this.materials.forEach(material => {
             // material.uniforms.uJointMatrices = {
             //     type: UniformTypes.Matrix4Array,
-            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
+            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
             // };
             material.uniforms = {
                 ...material.uniforms,
@@ -4330,7 +4330,7 @@ class SkinnedMesh extends Mesh {
             const fillNum = colNum * rowNum - boneCount;
             const jointData = new Float32Array([
                     ...jointMatricesAllFrames,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()
@@ -4392,7 +4392,7 @@ matrix elements: ${jointData.length}`);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
                     ...jointMatrices,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()
@@ -4960,7 +4960,7 @@ class Skybox extends Mesh {
                 },
                 uViewDirectionProjectionInverse: {
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity(),
+                    value: Matrix4.identity,
                 },
                 uRotationOffset: {
                     type: UniformTypes.Float,
@@ -5927,14 +5927,14 @@ class OrbitCameraController {
     azimuthSpeed = 100;
     altitudeSpeed = 100;
     #cameraAngle = { azimuth: 0, altitude: 0};
-    #lookAtTarget = Vector3.zero();
+    #lookAtTarget = Vector3.zero;
     distance = 10;
     attenuation = 0.001;
     #targetX;
     #targetY;
     
-    #targetCameraPosition = Vector3.zero();
-    #currentCameraPosition = Vector3.zero();
+    #targetCameraPosition = Vector3.zero;
+    #currentCameraPosition = Vector3.zero;
     
     set lookAtTarget(v) {
         this.#lookAtTarget = v;
@@ -6050,15 +6050,15 @@ class NodeBase {
 
 
 class Bone extends NodeBase {
-    offsetMatrix = Matrix4.identity(); // 初期姿勢のボーンローカル座標
-    #poseMatrix = Matrix4.identity(); // 初期姿勢行列
-    #boneOffsetMatrix = Matrix4.identity(); // 初期姿勢行列の逆行列
-    #jointMatrix = Matrix4.identity();
+    offsetMatrix = Matrix4.identity; // 初期姿勢のボーンローカル座標
+    #poseMatrix = Matrix4.identity; // 初期姿勢行列
+    #boneOffsetMatrix = Matrix4.identity; // 初期姿勢行列の逆行列
+    #jointMatrix = Matrix4.identity;
     index;
     
-    position = Vector3.zero();
-    rotation = Rotator.zero();
-    scale = Vector3.one();
+    position = Vector3.zero;
+    rotation = Rotator.zero;
+    scale = Vector3.one;
     
     get boneOffsetMatrix() {
         return this.#boneOffsetMatrix;
@@ -6416,15 +6416,15 @@ async function loadGLTF({
        
         // use basic mul
         // const offsetMatrix = Matrix4.multiplyMatrices(
-        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity,
+        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity,
+        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity
         // );
         // use trs
         const offsetMatrix = Matrix4.fromTRS(
-            node.translation ? new Vector3(...node.translation) : Vector3.zero(),
+            node.translation ? new Vector3(...node.translation) : Vector3.zero,
             node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
-            node.scale ? new Vector3(...node.scale) : Vector3.one()
+            node.scale ? new Vector3(...node.scale) : Vector3.one
         );
         bone.offsetMatrix = offsetMatrix;
         
