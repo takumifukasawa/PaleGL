@@ -88,7 +88,7 @@ const compositeScene = new Scene();
 const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
-    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    pixelRatio: Math.min(window.devicePixelRatio, 2)
 });
 
 const engine = new Engine({ gpu, renderer });
@@ -134,7 +134,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     
     // 2: orbit controls
     if(inputController.isDown) {
-        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition.x, -inputController.deltaNormalizedInputPosition.y);
+        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition.x, inputController.deltaNormalizedInputPosition.y);
     }
     orbitCameraController.fixedUpdate();
 }

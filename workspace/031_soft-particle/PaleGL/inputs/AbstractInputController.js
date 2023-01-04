@@ -10,8 +10,8 @@ export class AbstractInputController {
     #_isDown = false;
     #_isReleased = false;
     
-    #_width;
-    #_height;
+    #width;
+    #height;
     
     get isUp() {
         return !this.#_isDown;
@@ -42,8 +42,8 @@ export class AbstractInputController {
     }
     
     setSize(width, height) {
-        this.#_width = width;
-        this.#_height = height;
+        this.#width = width;
+        this.#height = height;
     }
 
     // inputPosition ... v2
@@ -100,8 +100,8 @@ export class AbstractInputController {
         const diff = Vector2.subVectors(this.#_currentInputPosition, this.#_beforeInputPosition);
         this.#_deltaInputPosition.copy(diff);
         this.#_deltaNormalizedInputPosition.set(
-            this.#_deltaInputPosition.x / this.#_width,
-            this.#_deltaInputPosition.y / this.#_height
+            this.#_deltaInputPosition.x / this.#width,
+            this.#_deltaInputPosition.y / this.#height
         );
     }
   
