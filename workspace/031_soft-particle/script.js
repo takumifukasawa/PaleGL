@@ -107,8 +107,8 @@ orbitCameraController.attenuation = 0.01;
 orbitCameraController.dampingFactor = 0.2;
 orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
 orbitCameraController.start(20, -30);
-orbitCameraController.setDelta(0, 0);
-orbitCameraController.fixedUpdate();
+// orbitCameraController.setDelta(0, 0);
+// orbitCameraController.fixedUpdate();
 
 const captureSceneDepthRenderTarget = new RenderTarget({
     gpu,
@@ -134,7 +134,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
     
     // 2: orbit controls
     if(inputController.isDown) {
-        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition.x, inputController.deltaNormalizedInputPosition.y);
+        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
 }

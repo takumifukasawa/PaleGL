@@ -5930,8 +5930,8 @@ class OrbitCameraController {
     #lookAtTarget = Vector3.zero;
     distance = 10;
     attenuation = 0.001;
-    #targetX;
-    #targetY;
+    #targetX = 0;
+    #targetY = 0;
     
     #targetCameraPosition = Vector3.zero;
     #currentCameraPosition = Vector3.zero;
@@ -5952,9 +5952,9 @@ class OrbitCameraController {
         // this.#currentCameraPosition = this.#targetCameraPosition.clone();
     }
     
-    setDelta(deltaX, deltaY) {
-        this.#targetX = deltaX;
-        this.#targetY = deltaY;
+    setDelta(delta) {
+        this.#targetX = delta.x;
+        this.#targetY = delta.y;
     }
 
     fixedUpdate() {
