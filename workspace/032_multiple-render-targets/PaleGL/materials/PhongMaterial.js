@@ -238,10 +238,11 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
 
     // correct
     outBaseColor = resultColor;
-    
+    outNormalColor = vec4(worldNormal, 1.); 
+
     // this is dummy
     // outBaseColor = vec4(1., 0., 0., 1.);
-    outNormalColor = vec4(0., 1., 0., 1.); 
+    // outNormalColor = vec4(0., 1., 0., 1.); 
 }
 `;
     }

@@ -90,7 +90,6 @@ export class ForwardRenderer {
     }
 
     #scenePass(sortedRenderMeshInfos, camera, lightActors) {
-
         // TODO: refactor
         this.clear(
             camera.clearColor.x,

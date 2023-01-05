@@ -6,10 +6,6 @@ export class AbstractRenderTarget {
         this.isSwappable = isSwappable;
     }
     
-    get isMultipleRenderTarget() {
-        throw "[AbstractRenderTarget] should implementation 'isMultipleRenderTarget' getter";
-    }
-
     get read() {
         throw "[AbstractRenderTarget] should implementation 'read' getter";
     }

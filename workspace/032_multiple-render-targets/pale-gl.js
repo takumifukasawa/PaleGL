@@ -2692,16 +2692,20 @@ class Texture extends GLObject {
         flipY = false,
     }) {
         super();
-        
-        this.type = type;
-        
-        this.minFilter = minFilter;
-        this.magFilter = magFilter;
 
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
 
         this.#img = img || null;
+        this.type = type;
+        this.mipmap = mipmap;
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
+        this.wrapS = wrapS;
+        this.wrapT = wrapT;
+        this.flipY = flipY;
+        this.width = width;
+        this.height = height;
         
         if(!this.#img && (!width || !height)) {
             console.error("[Texture.constructor] invalid width or height")
@@ -2843,6 +2847,9 @@ class Texture extends GLObject {
     }
     
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
+        
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
 
@@ -2873,6 +2880,9 @@ class Texture extends GLObject {
     }
     
     update({ width, height, data }) {
+        this.width = width;
+        this.height = height;
+        
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
        
@@ -2897,9 +2907,22 @@ class Texture extends GLObject {
 
 class Framebuffer extends GLObject {
     #framebuffer;
+    #drawBuffersList = [];
+    
+    get drawBufferList() {
+        return this.#drawBuffersList;
+    }
     
     get glObject() {
         return this.#framebuffer;
+    }
+    
+    get hasMultipleDrawBuffers() {
+        return this.#drawBuffersList.length >= 2;
+    }
+   
+    registerDrawBuffer(drawBufferName) {
+        this.#drawBuffersList.push(drawBufferName);
     }
     
     constructor({ gpu }) {
@@ -2968,12 +2991,12 @@ class AbstractRenderTarget {
     constructor({ isSwappable = false } = {}) {
         this.isSwappable = isSwappable;
     }
-
+    
     get read() {
-        throw "should implementation";
+        throw "[AbstractRenderTarget] should implementation 'read' getter";
     }
     get write() {
-        throw "should implementation";
+        throw "[AbstractRenderTarget] should implementation 'write' getter";
     }
 }
 ﻿
@@ -3004,7 +3027,7 @@ class RenderTarget extends AbstractRenderTarget {
     get framebuffer() {
         return this.#framebuffer;
     }
-    
+
     get read() {
         return this;
     }
@@ -3046,77 +3069,6 @@ class RenderTarget extends AbstractRenderTarget {
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
         }
 
-        // let textureType;
-        // switch (this.type) {
-        //     case RenderTargetTypes.RGBA:
-        //         textureType = TextureTypes.RGBA;
-        //         break;
-        //     case RenderTargetTypes.Depth:
-        //         textureType = TextureTypes.Depth;
-        //         break;
-        //     default:
-        //         throw "[RenderTarget.constructor] invalid texture type";
-        // }
-        
-        // if(this.type === RenderTargetTypes.Depth) {
-        //     this.#depthTexture = new Texture({
-        //         gpu,
-        //         width: this.width,
-        //         height: this.height,
-        //         mipmap: false,
-        //         type: TextureTypes.Depth,
-        //         // 一旦linear固定
-        //         minFilter: TextureFilterTypes.Nearest,
-        //         magFilter: TextureFilterTypes.Nearest
-        //     })
-        //     // depth as texture
-        //     gl.framebufferTexture2D(
-        //         gl.FRAMEBUFFER,
-        //         gl.DEPTH_ATTACHMENT,
-        //         gl.TEXTURE_2D,
-        //         this.#depthTexture.glObject,
-        //         0
-        //     );           
-        // } else {
-        //     this.#texture = new Texture({
-        //         gpu,
-        //         width: this.width,
-        //         height: this.height,
-        //         mipmap,
-        //         type: TextureTypes.RGBA,
-        //         minFilter,
-        //         magFilter
-        //     });
-        //     gl.framebufferTexture2D(
-        //         gl.FRAMEBUFFER,
-        //         gl.COLOR_ATTACHMENT0,
-        //         gl.TEXTURE_2D,
-        //         this.#texture.glObject,
-        //         0
-        //     );
-
-        //     if(writeDepthTexture) {
-        //         this.#depthTexture = new Texture({
-        //             gpu,
-        //             width: this.width,
-        //             height: this.height,
-        //             mipmap: false,
-        //             type: TextureTypes.Depth,
-        //             // 一旦linear固定
-        //             minFilter: TextureFilterTypes.Linear,
-        //             magFilter: TextureFilterTypes.Linear
-        //         })
-        //         // depth as texture
-        //         gl.framebufferTexture2D(
-        //             gl.FRAMEBUFFER,
-        //             gl.DEPTH_ATTACHMENT,
-        //             gl.TEXTURE_2D,
-        //             this.#depthTexture.glObject,
-        //             0
-        //         );
-        //     }
-        // }
-        
         if(this.type === RenderTargetTypes.RGBA) {
             this.#texture = new Texture({
                 gpu,
@@ -3134,6 +3086,8 @@ class RenderTarget extends AbstractRenderTarget {
                 this.#texture.glObject,
                 0
             );
+
+            this.framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0);
         }
 
         if(this.type === RenderTargetTypes.Depth || writeDepthTexture) {
@@ -4898,7 +4852,9 @@ uniform vec3 uViewPosition;
 uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 
-out vec4 outColor;
+// out vec4 outColor;
+layout (location = 0) out vec4 outBaseColor;
+layout (location = 1) out vec4 outNormalColor;
 
 mat2 rotate(float r) {
     float c = cos(r);
@@ -4918,7 +4874,10 @@ void main() {
     reflectDir.x *= -1.;
     reflectDir.xz *= rotate(3.14 + uRotationOffset);
     vec4 textureColor = texture(uCubeTexture, reflectDir);
-    outColor = textureColor;
+    
+    // outColor = textureColor;
+    outBaseColor = textureColor;
+    outNormalColor = vec4(-reflectDir, 1.);
 }
 `;
 
@@ -5341,7 +5300,6 @@ class ForwardRenderer {
     }
 
     #scenePass(sortedRenderMeshInfos, camera, lightActors) {
-
         // TODO: refactor
         this.clear(
             camera.clearColor.x,
@@ -5649,9 +5607,19 @@ class GPU {
     
     setFramebuffer(framebuffer) {
         const gl = this.gl;
-        !!framebuffer
-            ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
-            : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        if(!framebuffer) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            return;
+        }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject);
+        if(framebuffer.hasMultipleDrawBuffers) {
+            gl.drawBuffers(framebuffer.drawBufferList);
+        }
+        
+        // tmp
+        // !!framebuffer
+        //     ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
+        //     : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
     flush() {
@@ -5667,6 +5635,9 @@ class GPU {
         gl.enable(gl.DEPTH_TEST);
         gl.clearColor(r, g, b, a);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // gl.depthMask(true);
+        // gl.colorMask(true, true, true, true);
+        // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     #getGLPrimitive(primitiveType) {
@@ -5859,6 +5830,173 @@ class GPU {
         // unbind when end render
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+    }
+}
+﻿
+
+
+
+
+
+// NOTE:
+// renderer用
+class GBufferRenderTargets extends AbstractRenderTarget {
+    name;
+    #framebuffer;
+    // #depthRenderbuffer;
+    width;
+    height;
+    #textures = [];
+    #baseColorTexture;
+    #normalTexture;
+    #depthTexture;
+    type;
+    
+    get textures() {
+        return this.#textures;
+    }
+
+    get baseColorTexture() {
+        return this.#baseColorTexture;
+    }
+    
+    get normalTexture() {
+        return this.#normalTexture;
+    }
+
+    get depthTexture() {
+        return this.#depthTexture;
+    }
+
+    get framebuffer() {
+        return this.#framebuffer;
+    }
+
+    get read() {
+        return this;
+    }
+ 
+    get write() {
+        return this;
+    }
+
+    constructor({
+        gpu,
+        name,
+        // type = RenderTargetTypes.RGBA,
+        width = 1,
+        height = 1,
+        // useDepthBuffer = false,
+        // writeDepthTexture = false,
+        // mipmap = false,
+    }) {
+        super();
+        
+        const minFilter = TextureFilterTypes.Linear;
+        const magFilter = TextureFilterTypes.Linear;
+        
+        const gl = gpu.gl;
+
+        this.name = name;
+        // this.type = type;
+        
+        this.width = width;
+        this.height = height;
+
+        this.#framebuffer = new Framebuffer({gpu});
+
+        // if (useDepthBuffer) {
+        //     this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
+        // }
+
+        // depth as render buffer
+        // if (this.#depthRenderbuffer) {
+        //     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
+        // }
+
+        // 1: base scene
+        this.#baseColorTexture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: TextureTypes.RGBA,
+            minFilter,
+            magFilter
+        });
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.COLOR_ATTACHMENT0 + 0,
+            gl.TEXTURE_2D,
+            this.#baseColorTexture.glObject,
+            0
+        );
+        this.#textures.push(this.#baseColorTexture);
+        this.framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0 + 0);
+
+        // 2: normal
+        this.#normalTexture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: TextureTypes.RGBA,
+            minFilter,
+            magFilter
+        });
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.COLOR_ATTACHMENT0 + 1,
+            gl.TEXTURE_2D,
+            this.#normalTexture.glObject,
+            0
+        );
+        this.framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0 + 1);
+
+        this.#textures.push(this.#normalTexture);
+
+        // 3: depth
+        this.#depthTexture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: TextureTypes.Depth,
+            // 一旦linear固定
+            minFilter,
+            magFilter
+        })
+        // depth as texture
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.DEPTH_ATTACHMENT,
+            gl.TEXTURE_2D,
+            this.#depthTexture.glObject,
+            0
+        );                      
+    
+        // if(this.#depthTexture && this.#depthRenderbuffer) {
+        //     throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
+        // }
+       
+        // unbind
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        // if (this.#depthRenderbuffer) {
+        //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        // }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+
+    setSize(width, height) {
+        this.width = width;
+        this.height = height;
+        this.#textures.forEach(texture => texture.setSize(this.width, this.height));
+        if(this.#depthTexture) {
+            this.#depthTexture.setSize(this.width, this.height);
+        }
+        // if (this.#depthRenderbuffer) {
+        //     this.#depthRenderbuffer.setSize(width, height);
+        // }
     }
 }
 ﻿
@@ -7054,7 +7192,9 @@ in vec3 vWorldPosition;
 // TODO: フラグで必要に応じて出し分け
 ${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
-out vec4 outColor;
+// out vec4 outColor;
+layout (location = 0) out vec4 outBaseColor;
+layout (location = 1) out vec4 outNormalColor;
 
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
@@ -7101,8 +7241,14 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
         ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
         : ""
     }
-    
-    outColor = resultColor;
+
+    // correct
+    outBaseColor = resultColor;
+    outNormalColor = vec4(worldNormal, 1.); 
+
+    // this is dummy
+    // outBaseColor = vec4(1., 0., 0., 1.);
+    // outNormalColor = vec4(0., 1., 0., 1.); 
 }
 `;
     }
@@ -8600,6 +8746,7 @@ export {Engine};
 export {ForwardRenderer};
 export {GPU};
 export {RenderTarget};
+export {GBufferRenderTargets};
 export {Scene};
 export {Texture};
 export {OrbitCameraController};

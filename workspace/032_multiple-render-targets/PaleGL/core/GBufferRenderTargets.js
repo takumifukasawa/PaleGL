@@ -6,7 +6,7 @@ import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 // NOTE:
 // renderer用
-export class MultipleRenderTargets extends AbstractRenderTarget {
+export class GBufferRenderTargets extends AbstractRenderTarget {
     name;
     #framebuffer;
     // #depthRenderbuffer;
@@ -38,10 +38,6 @@ export class MultipleRenderTargets extends AbstractRenderTarget {
         return this.#framebuffer;
     }
 
-    get isMultipleRenderTarget() {
-        return false;
-    }
-    
     get read() {
         return this;
     }

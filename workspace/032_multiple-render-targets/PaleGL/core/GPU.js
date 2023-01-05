@@ -74,6 +74,9 @@ export class GPU {
         gl.enable(gl.DEPTH_TEST);
         gl.clearColor(r, g, b, a);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // gl.depthMask(true);
+        // gl.colorMask(true, true, true, true);
+        // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     #getGLPrimitive(primitiveType) {

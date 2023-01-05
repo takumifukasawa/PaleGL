@@ -27,10 +27,6 @@ export class RenderTarget extends AbstractRenderTarget {
         return this.#framebuffer;
     }
 
-    get isMultipleRenderTarget() {
-        return false;
-    }
-
     get read() {
         return this;
     }

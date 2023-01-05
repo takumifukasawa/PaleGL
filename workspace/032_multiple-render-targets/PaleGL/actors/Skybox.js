@@ -99,7 +99,9 @@ uniform vec3 uViewPosition;
 uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 
-out vec4 outColor;
+// out vec4 outColor;
+layout (location = 0) out vec4 outBaseColor;
+layout (location = 1) out vec4 outNormalColor;
 
 mat2 rotate(float r) {
     float c = cos(r);
@@ -119,7 +121,10 @@ void main() {
     reflectDir.x *= -1.;
     reflectDir.xz *= rotate(3.14 + uRotationOffset);
     vec4 textureColor = texture(uCubeTexture, reflectDir);
-    outColor = textureColor;
+    
+    // outColor = textureColor;
+    outBaseColor = textureColor;
+    outNormalColor = vec4(-reflectDir, 1.);
 }
 `;
 

@@ -25,16 +25,20 @@ export class Texture extends GLObject {
         flipY = false,
     }) {
         super();
-        
-        this.type = type;
-        
-        this.minFilter = minFilter;
-        this.magFilter = magFilter;
 
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
 
         this.#img = img || null;
+        this.type = type;
+        this.mipmap = mipmap;
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
+        this.wrapS = wrapS;
+        this.wrapT = wrapT;
+        this.flipY = flipY;
+        this.width = width;
+        this.height = height;
         
         if(!this.#img && (!width || !height)) {
             console.error("[Texture.constructor] invalid width or height")
@@ -176,6 +180,9 @@ export class Texture extends GLObject {
     }
     
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
+        
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
 
@@ -206,6 +213,9 @@ export class Texture extends GLObject {
     }
     
     update({ width, height, data }) {
+        this.width = width;
+        this.height = height;
+        
         const gl = this.#gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.#texture);
        

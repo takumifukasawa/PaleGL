@@ -21,6 +21,7 @@
     loadCubeMap,
     Skybox,
     RenderTarget,
+    GBufferRenderTargets,
     Engine,
     PhongMaterial,
     Vector2,
@@ -32,7 +33,7 @@
     BlendTypes,
     AttributeNames,
     clamp,
-    OrbitCameraController, TouchInputController, MouseInputController
+    OrbitCameraController, TouchInputController, MouseInputController, FragmentPass
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -84,10 +85,12 @@ wrapperElement.appendChild(instanceNumView);
 const captureScene = new Scene();
 const compositeScene = new Scene();
 
+const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+
 const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
-    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    pixelRatio
 });
 
 const engine = new Engine({ gpu, renderer });
@@ -115,6 +118,11 @@ const captureSceneColorRenderTarget = new RenderTarget({
     type: RenderTargetTypes.RGBA,
     useDepthBuffer: true,
     name: "capture scene color render target"
+});
+const gBufferRenderTarget = new GBufferRenderTargets({
+    gpu,
+    width: 1, height: 1,
+    name: "g-buffer render target"
 });
 
 captureSceneCamera.onStart = ({ actor }) => {
@@ -148,12 +156,80 @@ captureScene.add(directionalLight);
 const postProcess = new PostProcess({ gpu, renderer });
 
 const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
-bloomPass.enabled = true;
+bloomPass.enabled = false;
 postProcess.addPass(bloomPass);
 
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = true;
+fxaaPass.enabled = false;
 postProcess.addPass(fxaaPass);
+
+const gBufferPass = new FragmentPass({
+    gpu,
+    fragmentShader: `#version 300 es
+ 
+precision mediump float;
+
+in vec2 vUv;
+
+out vec4 outColor;
+
+uniform sampler2D uBaseColorTexture;
+uniform sampler2D uNormalTexture;
+uniform sampler2D uDepthTexture;
+uniform float uNearClip;
+uniform float uFarClip;
+
+// ref:
+// https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
+// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+  return (viewZ + near) / (near - far);
+}
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return (near * far) / ((far - near) * invClipZ - far);
+}
+
+float isArea(vec2 uv) {
+    return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
+}
+
+void main() {
+    vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
+    vec2 normalUV = vUv * 2. + vec2(-1., -1.);
+    vec2 depthUV = vUv * 2.;
+    vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
+    vec4 normalColor = texture(uNormalTexture, normalUV) * isArea(normalUV);
+    float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
+    float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);   
+
+    outColor = baseColor + normalColor + sceneDepth;
+}
+`,
+    uniforms: {
+        uBaseColorTexture: {
+            type: UniformTypes.Texture,
+            value: gBufferRenderTarget.baseColorTexture
+        },
+        uNormalTexture: {
+            type: UniformTypes.Texture,
+            value: gBufferRenderTarget.normalTexture
+        },
+        uDepthTexture: {
+            type: UniformTypes.Texture,
+            value: gBufferRenderTarget.depthTexture
+        },
+        uNearClip: {
+            type: UniformTypes.Float,
+            value: captureSceneCamera.near,
+        },
+        uFarClip: {
+            type: UniformTypes.Float,
+            value: captureSceneCamera.far,
+        }
+    }
+});
+postProcess.addPass(gBufferPass);
 
 postProcess.enabled = true;
 // TODO: set post process いらないかも
@@ -443,7 +519,10 @@ in vec2 vUv;
 in vec4 vVertexColor;
 in vec4 vViewPosition;
 
-out vec4 outColor;
+// out vec4 outColor;
+layout (location = 0) out vec4 outBaseColor;
+layout (location = 1) out vec4 outNormalColor;
+
 uniform sampler2D uParticleMap;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;
@@ -472,7 +551,7 @@ void main() {
     float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
     float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
     // for debug
-    outColor = vec4(vec3(sceneDepth), 1.);
+    // outColor = vec4(vec3(sceneDepth), 1.);
     
     float currentDepth = viewZToOrthographicDepth(vViewPosition.z, uNearClip, uFarClip);
     // for debug
@@ -482,15 +561,16 @@ void main() {
     float softFade = smoothstep(0., .01, diffDepth);
     // for debug
     // outColor = vec4(vec3(softFade), 1.);
-    
+
     // result
-   
+
     float fadedAlpha = alpha * softFade;
     if(fadedAlpha < .01) {
         discard;
     }
 
-    outColor = vec4(baseColor, fadedAlpha);
+    outBaseColor = vec4(baseColor, fadedAlpha);
+    outNormalColor = vec4(0., 0., 1., 1.); // dummy
 }
         `,
         uniforms: {
@@ -538,8 +618,8 @@ void main() {
    
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
-    captureScene.add(particleMesh);
-   
+    // captureScene.add(particleMesh);
+
     engine.onBeforeStart = () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
@@ -560,30 +640,45 @@ void main() {
     engine.onBeforeFixedUpdate = () => {
         inputController.fixedUpdate();
     }
-    
+
     engine.onRender = (time, deltaTime) => {
-        captureSceneDepthRenderTarget.setSize(width, height);
-        captureSceneColorRenderTarget.setSize(width, height);
-        
-        captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
-        particleMesh.setEnabled(false);
+        gBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        captureSceneCamera.setRenderTarget(gBufferRenderTarget)
         renderer.render(captureScene, captureSceneCamera);
+
+        postProcess.render({
+            gpu,
+            renderer,
+            sceneRenderTarget: gBufferRenderTarget
+        });
+
+        return;
         
-        particleMesh.setEnabled(true);
-        
-        if(postProcess.enabled) {
-            captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
-            renderer.render(captureScene, captureSceneCamera);
+        // // tmp
+
+        // captureSceneDepthRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        // captureSceneColorRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+
+        // skyboxMesh.setEnabled(false);
+        // particleMesh.setEnabled(false);
+        // captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+        // renderer.render(captureScene, captureSceneCamera);
+        // 
+        // particleMesh.setEnabled(true);
+        // 
+        // if(postProcess.enabled) {
+        //     captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
+        //     renderer.render(captureScene, captureSceneCamera);
   
-            postProcess.render({
-                gpu,
-                renderer,
-                sceneRenderTarget: captureSceneColorRenderTarget
-            });
-        } else {
-            captureSceneCamera.setRenderTarget(null)
-            renderer.render(captureScene, captureSceneCamera);
-        }
+        //     postProcess.render({
+        //         gpu,
+        //         renderer,
+        //         sceneRenderTarget: captureSceneColorRenderTarget
+        //     });
+        // } else {
+        //     captureSceneCamera.setRenderTarget(null)
+        //     renderer.render(captureScene, captureSceneCamera);
+        // }
     };
 
     const tick = (time) => {
@@ -618,62 +713,62 @@ function initDebugger() {
         }
     })
     
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: "bloom pass enabled",
-        initialValue: bloomPass.enabled,
-        onChange: (value) => bloomPass.enabled = value,
-    })
+    // debuggerGUI.addToggleDebugger({
+    //     label: "bloom pass enabled",
+    //     initialValue: bloomPass.enabled,
+    //     onChange: (value) => bloomPass.enabled = value,
+    // })
 
-    debuggerGUI.addSliderDebugger({
-        label: "bloom amount",
-        minValue: 0,
-        maxValue: 4,
-        stepValue: 0.001,
-        initialValue: bloomPass.bloomAmount,
-        onChange: (value) => {
-            bloomPass.bloomAmount = value;
-        }
-    })
-    
-    debuggerGUI.addSliderDebugger({
-        label: "bloom threshold",
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: bloomPass.threshold,
-        onChange: (value) => {
-            bloomPass.threshold = value;
-        }
-    })
-    
-    debuggerGUI.addSliderDebugger({
-        label: "bloom tone",
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: bloomPass.tone,
-        onChange: (value) => {
-            bloomPass.tone = value;
-        }
-    })
+    // debuggerGUI.addSliderDebugger({
+    //     label: "bloom amount",
+    //     minValue: 0,
+    //     maxValue: 4,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.bloomAmount,
+    //     onChange: (value) => {
+    //         bloomPass.bloomAmount = value;
+    //     }
+    // })
+    // 
+    // debuggerGUI.addSliderDebugger({
+    //     label: "bloom threshold",
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.threshold,
+    //     onChange: (value) => {
+    //         bloomPass.threshold = value;
+    //     }
+    // })
+    // 
+    // debuggerGUI.addSliderDebugger({
+    //     label: "bloom tone",
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.tone,
+    //     onChange: (value) => {
+    //         bloomPass.tone = value;
+    //     }
+    // })
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: "fxaa pass enabled",
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => fxaaPass.enabled = value,
-    })
+    // debuggerGUI.addToggleDebugger({
+    //     label: "fxaa pass enabled",
+    //     initialValue: fxaaPass.enabled,
+    //     onChange: (value) => fxaaPass.enabled = value,
+    // })
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: "postprocess enabled",
-        initialValue: postProcess.enabled,
-        onChange: (value) => postProcess.enabled = value,
-    })
+    // debuggerGUI.addToggleDebugger({
+    //     label: "postprocess enabled",
+    //     initialValue: postProcess.enabled,
+    //     onChange: (value) => postProcess.enabled = value,
+    // })
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
