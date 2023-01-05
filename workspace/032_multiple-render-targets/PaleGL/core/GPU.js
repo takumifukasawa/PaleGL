@@ -46,9 +46,19 @@ export class GPU {
     
     setFramebuffer(framebuffer) {
         const gl = this.gl;
-        !!framebuffer
-            ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
-            : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        if(!framebuffer) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            return;
+        }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject);
+        if(framebuffer.hasMultipleDrawBuffers) {
+            gl.drawBuffers(framebuffer.drawBufferList);
+        }
+        
+        // tmp
+        // !!framebuffer
+        //     ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
+        //     : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
     flush() {

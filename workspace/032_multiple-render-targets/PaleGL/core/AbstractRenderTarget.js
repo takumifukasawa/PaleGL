@@ -5,11 +5,15 @@ export class AbstractRenderTarget {
     constructor({ isSwappable = false } = {}) {
         this.isSwappable = isSwappable;
     }
+    
+    get isMultipleRenderTarget() {
+        throw "[AbstractRenderTarget] should implementation 'isMultipleRenderTarget' getter";
+    }
 
     get read() {
-        throw "should implementation";
+        throw "[AbstractRenderTarget] should implementation 'read' getter";
     }
     get write() {
-        throw "should implementation";
+        throw "[AbstractRenderTarget] should implementation 'write' getter";
     }
 }

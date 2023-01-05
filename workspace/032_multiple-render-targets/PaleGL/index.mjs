@@ -18,6 +18,7 @@ export {Engine} from "./core/Engine.js";
 export {ForwardRenderer} from "./core/ForwardRenderer.js";
 export {GPU} from "./core/GPU.js";
 export {RenderTarget} from "./core/RenderTarget.js";
+export {MultipleRenderTargets} from "./core/MultipleRenderTargets.js";
 export {Scene} from "./core/Scene.js";
 export {Texture} from "./core/Texture.js";
 export {OrbitCameraController} from "./core/OrbitCameraController.js";

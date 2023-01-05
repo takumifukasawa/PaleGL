@@ -186,7 +186,9 @@ in vec3 vWorldPosition;
 // TODO: フラグで必要に応じて出し分け
 ${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
-out vec4 outColor;
+// out vec4 outColor;
+layout (location = 0) out vec4 outBaseColor;
+layout (location = 1) out vec4 outNormalColor;
 
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
@@ -233,8 +235,13 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
         ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
         : ""
     }
+
+    // correct
+    outBaseColor = resultColor;
     
-    outColor = resultColor;
+    // this is dummy
+    // outBaseColor = vec4(1., 0., 0., 1.);
+    outNormalColor = vec4(0., 1., 0., 1.); 
 }
 `;
     }
