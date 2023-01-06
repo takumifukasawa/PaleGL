@@ -213,7 +213,7 @@ export class ForwardRenderer {
         });
     }
     
-    render(scene, camera) {
+    render(scene, camera, { enabledShadowPass = true } = {}) {
         const renderMeshInfoEachQueue = {
             opaque: [],
             skybox: [], // maybe only one
@@ -268,15 +268,17 @@ export class ForwardRenderer {
         // ------------------------------------------------------------------------------
       
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
-        
-        if(castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
-                if(actor.type === ActorTypes.Skybox) {
-                    return false;
-                }
-                return actor.castShadow;
-            });
-            this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+       
+        if(enabledShadowPass) {
+            if(castShadowLightActors.length > 0) {
+                const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
+                    if(actor.type === ActorTypes.Skybox) {
+                        return false;
+                    }
+                    return actor.castShadow;
+                });
+                this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+            }
         }
 
         // ------------------------------------------------------------------------------

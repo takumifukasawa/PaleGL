@@ -38,6 +38,7 @@ import {DebuggerGUI} from "./DebuggerGUI.js";
 
 const debuggerStates = {
     instanceNum: 0,
+    enabledParticle: true,
 }
 
 const searchParams = new URLSearchParams(location.search);
@@ -54,6 +55,7 @@ let floorPlaneMesh;
 let floorDiffuseMap;
 let floorNormalMap;
 let skinnedMesh;
+let particleMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -336,7 +338,7 @@ const main = async () => {
         actor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
     }
 
-    const particleNum = 200;
+    const particleNum = 100;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -529,7 +531,7 @@ void main() {
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
     });
-    const particleMesh = new Mesh({
+    particleMesh = new Mesh({
         geometry: particleGeometry,
         material: particleMaterial,
     });
@@ -546,7 +548,7 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = 15;
+        orbitCameraController.distance = isSP ? 25 : 17;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
@@ -564,16 +566,21 @@ void main() {
     engine.onRender = (time, deltaTime) => {
         captureSceneDepthRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         captureSceneColorRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        
-        captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
-        particleMesh.setEnabled(false);
-        renderer.render(captureScene, captureSceneCamera);
-        
-        particleMesh.setEnabled(true);
+       
+        if(debuggerStates.enabledParticle) {
+            captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+            particleMesh.setEnabled(false);
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: false });
+            particleMesh.setEnabled(true);
+        } else {
+            captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+            particleMesh.setEnabled(false);
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: true });
+        }
         
         if(postProcess.enabled) {
             captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
-            renderer.render(captureScene, captureSceneCamera);
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: debuggerStates.enabledParticle });
   
             postProcess.render({
                 gpu,
@@ -616,8 +623,16 @@ function initDebugger() {
             const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
             location.replace(url);
         }
-    })
+    });
+
+    debuggerGUI.addBorderSpacer();
     
+    debuggerGUI.addToggleDebugger({
+        label: "particle fog enabled",
+        initialValue: debuggerStates.enabledParticle,
+        onChange: (value) => debuggerStates.enabledParticle = value
+    })
+
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
@@ -668,7 +683,7 @@ function initDebugger() {
     })
 
     debuggerGUI.addBorderSpacer();
-
+    
     debuggerGUI.addToggleDebugger({
         label: "postprocess enabled",
         initialValue: postProcess.enabled,
