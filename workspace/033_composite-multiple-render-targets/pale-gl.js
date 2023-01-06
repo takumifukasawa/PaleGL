@@ -3180,6 +3180,26 @@ class RenderTarget extends AbstractRenderTarget {
         );
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
+    
+    static blitDepth({ gpu, sourceRenderTarget, destRenderTarget, width, height }) {
+        const gl = gpu.gl;
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, sourceRenderTarget.framebuffer.glObject);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, destRenderTarget.framebuffer.glObject);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        if(gl.checkFramebufferStatus(gl.READ_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+            console.error("invalid state");
+            return;
+        }
+        gl.blitFramebuffer(
+            0, 0,
+            width, height,
+            0, 0,
+            width, height,
+            gl.DEPTH_BUFFER_BIT,
+            gl.NEAREST
+        );
+    }
 }
 ﻿
 

@@ -131,6 +131,20 @@ const afterGBufferRenderTarget = new RenderTarget({
     name: "after g-buffer render target"
 });
 
+const copyDepthSourceRenderTarget = new RenderTarget({
+    gpu,
+    type: RenderTargetTypes.Depth,
+    width: 1, height: 1,
+    name: "copy depth source render target"
+});
+
+const copyDepthDestRenderTarget = new RenderTarget({
+    gpu,
+    type: RenderTargetTypes.Depth,
+    width: 1, height: 1,
+    name: "copy depth dest render target"
+});
+
 captureSceneCamera.onStart = ({ actor }) => {
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
@@ -151,8 +165,8 @@ directionalLight.color = Color.fromRGB(255, 210, 200);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    // actor.castShadow = true;
-    actor.castShadow = false;
+    actor.castShadow = true;
+    // actor.castShadow = false;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
     actor.shadowCamera.setSize(null, null, -10, 10, -10, 10);
@@ -163,7 +177,7 @@ captureScene.add(directionalLight);
 const postProcess = new PostProcess({ gpu, renderer });
 
 const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
-bloomPass.enabled = false;
+bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
 const fxaaPass = new FXAAPass({ gpu });
@@ -236,6 +250,7 @@ void main() {
         }
     }
 });
+gBufferPass.enabled = false;
 postProcess.addPass(gBufferPass);
 
 postProcess.enabled = true;
@@ -565,14 +580,14 @@ void main() {
     // result
     
     // outBaseColor = vec4(1., 0., 0., 1.);
-    outColor = vec4(1., 0., 0., 1.);
+    // outColor = vec4(1., 0., 0., 1.);
 
-    // float fadedAlpha = alpha * softFade;
-    // if(fadedAlpha < .01) {
-    //     discard;
-    // }
+    float fadedAlpha = alpha * softFade;
+    if(fadedAlpha < .01) {
+        discard;
+    }
 
-    // outColor = vec4(baseColor, fadedAlpha);
+    outColor = vec4(baseColor, fadedAlpha);
     // outBaseColor = vec4(baseColor, fadedAlpha);
     // outNormalColor = vec4(0., 0., 1., 1.); // dummy
 }
@@ -598,7 +613,8 @@ void main() {
             uDepthTexture: {
                 type: UniformTypes.Texture,
                 // value: captureSceneDepthRenderTarget.read.depthTexture,
-                value: gBufferRenderTarget.read.depthTexture,
+                // value: gBufferRenderTarget.read.depthTexture,
+                value: null,
             },
             uNearClip: {
                 type: UniformTypes.Float,
@@ -633,11 +649,10 @@ void main() {
         inputController.setSize(width, height);
         engine.setSize(width, height);
 
-        afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
-        afterGBufferRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
         gBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         afterGBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        console.log(gBufferRenderTarget, afterGBufferRenderTarget)
+        copyDepthSourceRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        copyDepthDestRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         // console.log(afterGBufferRenderTarget)
     };
 
@@ -670,7 +685,18 @@ void main() {
         particleMesh.setEnabled(false);
         renderer.render(captureScene, captureSceneCamera, {});
 
+        afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
+        afterGBufferRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
+
         // TODO: copy depth texture
+        copyDepthSourceRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
+        RenderTarget.blitDepth({
+            gpu,
+            sourceRenderTarget: copyDepthSourceRenderTarget,
+            destRenderTarget: copyDepthDestRenderTarget,
+            width: width * pixelRatio, height: height * pixelRatio
+        });
+        particleMesh.material.updateUniform("uDepthTexture", copyDepthDestRenderTarget.depthTexture);
 
         // captureSceneCamera.setRenderTarget(gBufferRenderTarget)
         captureSceneCamera.setRenderTarget(afterGBufferRenderTarget)
@@ -680,18 +706,18 @@ void main() {
         particleMesh.setEnabled(true);
         renderer.render(captureScene, captureSceneCamera, { useShadowPass: false, clearScene: false });
 
-        // gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
-        // gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
-        // gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
-        gBufferPass.material.uniforms.uBaseColorTexture.value = afterGBufferRenderTarget.read.texture;
-        gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.read.normalTexture;
-        gBufferPass.material.uniforms.uDepthTexture.value = afterGBufferRenderTarget.read.depthTexture;
+        gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
+        gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
+        gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
+        // gBufferPass.material.uniforms.uBaseColorTexture.value = afterGBufferRenderTarget.read.texture;
+        // gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.read.normalTexture;
+        // gBufferPass.material.uniforms.uDepthTexture.value = afterGBufferRenderTarget.read.depthTexture;
 
         postProcess.render({
             gpu,
             renderer,
-            sceneRenderTarget: gBufferRenderTarget
-            //sceneRenderTarget: afterGBufferRenderTarget
+            // sceneRenderTarget: gBufferRenderTarget
+            sceneRenderTarget: afterGBufferRenderTarget
         });
 
         return;
@@ -755,62 +781,62 @@ function initDebugger() {
         }
     })
     
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "bloom pass enabled",
-    //     initialValue: bloomPass.enabled,
-    //     onChange: (value) => bloomPass.enabled = value,
-    // })
+    debuggerGUI.addToggleDebugger({
+        label: "bloom pass enabled",
+        initialValue: bloomPass.enabled,
+        onChange: (value) => bloomPass.enabled = value,
+    })
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom amount",
-    //     minValue: 0,
-    //     maxValue: 4,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.bloomAmount,
-    //     onChange: (value) => {
-    //         bloomPass.bloomAmount = value;
-    //     }
-    // })
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom threshold",
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.threshold,
-    //     onChange: (value) => {
-    //         bloomPass.threshold = value;
-    //     }
-    // })
-    // 
-    // debuggerGUI.addSliderDebugger({
-    //     label: "bloom tone",
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: bloomPass.tone,
-    //     onChange: (value) => {
-    //         bloomPass.tone = value;
-    //     }
-    // })
+    debuggerGUI.addSliderDebugger({
+        label: "bloom amount",
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: bloomPass.bloomAmount,
+        onChange: (value) => {
+            bloomPass.bloomAmount = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom threshold",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.threshold,
+        onChange: (value) => {
+            bloomPass.threshold = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom tone",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.tone,
+        onChange: (value) => {
+            bloomPass.tone = value;
+        }
+    })
 
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "fxaa pass enabled",
-    //     initialValue: fxaaPass.enabled,
-    //     onChange: (value) => fxaaPass.enabled = value,
-    // })
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    })
 
-    // debuggerGUI.addBorderSpacer();
+    debuggerGUI.addBorderSpacer();
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: "postprocess enabled",
-    //     initialValue: postProcess.enabled,
-    //     onChange: (value) => postProcess.enabled = value,
-    // })
+    debuggerGUI.addToggleDebugger({
+        label: "postprocess enabled",
+        initialValue: postProcess.enabled,
+        onChange: (value) => postProcess.enabled = value,
+    })
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
