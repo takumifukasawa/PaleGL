@@ -191,5 +191,7 @@ export class RenderTarget extends AbstractRenderTarget {
             gl.DEPTH_BUFFER_BIT,
             gl.NEAREST
         );
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
     }
 }
