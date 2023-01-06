@@ -184,7 +184,7 @@ const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = false;
 postProcess.addPass(fxaaPass);
 
-const gBufferPass = new FragmentPass({
+const showBuffersPass = new FragmentPass({
     gpu,
     fragmentShader: `#version 300 es
  
@@ -253,8 +253,8 @@ void main() {
         },
     }
 });
-gBufferPass.enabled = true;
-postProcess.addPass(gBufferPass);
+showBuffersPass.enabled = true;
+postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
 // TODO: set post process いらないかも
@@ -708,9 +708,9 @@ void main() {
         particleMesh.enabled = true;
         renderer.render(captureScene, captureSceneCamera, { useShadowPass: false, clearScene: false });
 
-        gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
-        gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
-        gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
+        showBuffersPass.material.updateUniform("uBaseColorTexture", gBufferRenderTarget.baseColorTexture);
+        showBuffersPass.material.updateUniform("uNormalTexture", gBufferRenderTarget.normalTexture);
+        showBuffersPass.material.updateUniform("uDepthTexture", gBufferRenderTarget.depthTexture);
         postProcess.render({
             gpu,
             renderer,
@@ -753,9 +753,9 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
     
     debuggerGUI.addToggleDebugger({
-        label: "show g-buffer",
-        initialValue: gBufferPass.enabled,
-        onChange: (value) => gBufferPass.enabled = value,
+        label: "show buffers",
+        initialValue: showBuffersPass.enabled,
+        onChange: (value) => showBuffersPass.enabled = value,
     });
 
     debuggerGUI.addBorderSpacer();
