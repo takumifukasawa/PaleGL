@@ -84,10 +84,12 @@ wrapperElement.appendChild(instanceNumView);
 const captureScene = new Scene();
 const compositeScene = new Scene();
 
+const pixelRatio = Math.min(window.devicePixelRatio, 1.5)
+
 const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
-    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    pixelRatio
 });
 
 const engine = new Engine({ gpu, renderer });
@@ -560,8 +562,8 @@ void main() {
     }
     
     engine.onRender = (time, deltaTime) => {
-        captureSceneDepthRenderTarget.setSize(width, height);
-        captureSceneColorRenderTarget.setSize(width, height);
+        captureSceneDepthRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        captureSceneColorRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         
         captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
         particleMesh.setEnabled(false);

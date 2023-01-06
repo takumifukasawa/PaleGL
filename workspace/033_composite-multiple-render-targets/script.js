@@ -133,7 +133,7 @@ const afterGBufferRenderTarget = new RenderTarget({
 
 const copyDepthSourceRenderTarget = new RenderTarget({
     gpu,
-    type: RenderTargetTypes.Depth,
+    type: RenderTargetTypes.Empty,
     width: 1, height: 1,
     name: "copy depth source render target"
 });
