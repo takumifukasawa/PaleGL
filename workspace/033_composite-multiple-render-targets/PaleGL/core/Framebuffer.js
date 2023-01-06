@@ -28,7 +28,6 @@ export class Framebuffer extends GLObject {
         const gl = this.#gpu.gl;
         
         this.#framebuffer = gl.createFramebuffer();
-        // this.bind();
     }
     
     bind() {

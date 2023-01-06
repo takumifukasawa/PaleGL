@@ -124,7 +124,7 @@ void main() {
     
     // outColor = textureColor;
     outBaseColor = textureColor;
-    outNormalColor = vec4(-reflectDir, 1.);
+    outNormalColor = vec4(0., 0., 0., 1.);
 }
 `;
 

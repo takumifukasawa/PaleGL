@@ -15,6 +15,10 @@ export class Actor {
     #onUpdate;
     #enabled = true;
     
+    set enabled(value) {
+        this.#enabled = value;
+    }
+    
     get enabled() {
         return this.#enabled;
     }
@@ -36,10 +40,6 @@ export class Actor {
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
         this.animator = new Animator();
-    }
-    
-    setEnabled(enabled) {
-        this.#enabled = enabled;
     }
     
     addChild(child) {

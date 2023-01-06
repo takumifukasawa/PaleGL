@@ -682,10 +682,10 @@ void main() {
 
     engine.onRender = (time, deltaTime) => {
         captureSceneCamera.setRenderTarget(gBufferRenderTarget)
-        skyboxMesh.setEnabled(true);
-        floorPlaneMesh.setEnabled(true);
-        skinnedMesh.setEnabled(true);
-        particleMesh.setEnabled(false);
+        skyboxMesh.enabled = true;
+        floorPlaneMesh.enabled = true;
+        skinnedMesh.enabled = true;
+        particleMesh.enabled = false;
         renderer.render(captureScene, captureSceneCamera, {});
 
         afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
@@ -702,10 +702,10 @@ void main() {
         particleMesh.material.updateUniform("uDepthTexture", copyDepthDestRenderTarget.depthTexture);
 
         captureSceneCamera.setRenderTarget(afterGBufferRenderTarget)
-        skyboxMesh.setEnabled(false);
-        floorPlaneMesh.setEnabled(false);
-        skinnedMesh.setEnabled(false);
-        particleMesh.setEnabled(true);
+        skyboxMesh.enabled = false;
+        floorPlaneMesh.enabled = false;
+        skinnedMesh.enabled = false;
+        particleMesh.enabled = true;
         renderer.render(captureScene, captureSceneCamera, { useShadowPass: false, clearScene: false });
 
         gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
@@ -716,34 +716,6 @@ void main() {
             renderer,
             sceneRenderTarget: afterGBufferRenderTarget
         });
-
-        return;
-        
-        // // tmp
-
-        // captureSceneDepthRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        // captureSceneColorRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-
-        // skyboxMesh.setEnabled(false);
-        // particleMesh.setEnabled(false);
-        // captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
-        // renderer.render(captureScene, captureSceneCamera);
-        // 
-        // particleMesh.setEnabled(true);
-        // 
-        // if(postProcess.enabled) {
-        //     captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
-        //     renderer.render(captureScene, captureSceneCamera);
-  
-        //     postProcess.render({
-        //         gpu,
-        //         renderer,
-        //         sceneRenderTarget: captureSceneColorRenderTarget
-        //     });
-        // } else {
-        //     captureSceneCamera.setRenderTarget(null)
-        //     renderer.render(captureScene, captureSceneCamera);
-        // }
     };
 
     const tick = (time) => {

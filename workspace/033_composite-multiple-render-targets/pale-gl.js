@@ -1188,6 +1188,10 @@ class Actor {
     #onUpdate;
     #enabled = true;
     
+    set enabled(value) {
+        this.#enabled = value;
+    }
+    
     get enabled() {
         return this.#enabled;
     }
@@ -1209,10 +1213,6 @@ class Actor {
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
         this.animator = new Animator();
-    }
-    
-    setEnabled(enabled) {
-        this.#enabled = enabled;
     }
     
     addChild(child) {
@@ -2946,7 +2946,6 @@ class Framebuffer extends GLObject {
         const gl = this.#gpu.gl;
         
         this.#framebuffer = gl.createFramebuffer();
-        // this.bind();
     }
     
     bind() {
@@ -4961,7 +4960,7 @@ void main() {
     
     // outColor = textureColor;
     outBaseColor = textureColor;
-    outNormalColor = vec4(-reflectDir, 1.);
+    outNormalColor = vec4(0., 0., 0., 1.);
 }
 `;
 
