@@ -3,6 +3,7 @@
 export class Framebuffer extends GLObject {
     #framebuffer;
     #drawBuffersList = [];
+    #gpu;
     
     get drawBufferList() {
         return this.#drawBuffersList;
@@ -22,10 +23,21 @@ export class Framebuffer extends GLObject {
     
     constructor({ gpu }) {
         super();
-        
-        const gl = gpu.gl;
+       
+        this.#gpu = gpu;
+        const gl = this.#gpu.gl;
         
         this.#framebuffer = gl.createFramebuffer();
+        // this.bind();
+    }
+    
+    bind() {
+        const gl = this.#gpu.gl;
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.#framebuffer);
+    }
+
+    unbind() {
+        const gl = this.#gpu.gl;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }

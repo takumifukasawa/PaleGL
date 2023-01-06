@@ -2921,6 +2921,7 @@ class Texture extends GLObject {
 class Framebuffer extends GLObject {
     #framebuffer;
     #drawBuffersList = [];
+    #gpu;
     
     get drawBufferList() {
         return this.#drawBuffersList;
@@ -2940,11 +2941,22 @@ class Framebuffer extends GLObject {
     
     constructor({ gpu }) {
         super();
-        
-        const gl = gpu.gl;
+       
+        this.#gpu = gpu;
+        const gl = this.#gpu.gl;
         
         this.#framebuffer = gl.createFramebuffer();
+        // this.bind();
+    }
+    
+    bind() {
+        const gl = this.#gpu.gl;
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.#framebuffer);
+    }
+
+    unbind() {
+        const gl = this.#gpu.gl;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }
 ﻿
@@ -3074,6 +3086,7 @@ class RenderTarget extends AbstractRenderTarget {
         this.height = height;
 
         this.#framebuffer = new Framebuffer({gpu});
+        this.#framebuffer.bind();
 
         if (useDepthBuffer) {
             this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
@@ -3129,13 +3142,15 @@ class RenderTarget extends AbstractRenderTarget {
         if(this.#depthTexture && this.#depthRenderbuffer) {
             throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
         }
-       
+
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
         if (this.#depthRenderbuffer) {
             gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        this.framebuffer.unbind();
+        // Framebuffer.unbind();
     }
 
     setSize(width, height) {
@@ -3169,7 +3184,8 @@ class RenderTarget extends AbstractRenderTarget {
     setDepthTexture(depthTexture) {
         const gl = this.#gpu.gl;
         this.#depthTexture = depthTexture;
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer.glObject);
+        this.framebuffer.bind();
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer.glObject);
         // depth as texture
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER,
@@ -3178,7 +3194,9 @@ class RenderTarget extends AbstractRenderTarget {
             this.#depthTexture.glObject,
             0
         );
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // Framebuffer.unbind();
+        this.framebuffer.unbind();
+        // // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
     
     static blitDepth({ gpu, sourceRenderTarget, destRenderTarget, width, height }) {
@@ -5972,6 +5990,7 @@ class GBufferRenderTargets extends AbstractRenderTarget {
         this.height = height;
 
         this.#framebuffer = new Framebuffer({gpu});
+        this.#framebuffer.bind();
 
         // if (useDepthBuffer) {
         //     this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
@@ -6052,7 +6071,9 @@ class GBufferRenderTargets extends AbstractRenderTarget {
         // if (this.#depthRenderbuffer) {
         //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         // }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        this.framebuffer.unbind();
+        // Framebuffer.unbind();
     }
 
     setSize(width, height) {

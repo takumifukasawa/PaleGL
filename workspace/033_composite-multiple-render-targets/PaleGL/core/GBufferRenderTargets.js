@@ -70,6 +70,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         this.height = height;
 
         this.#framebuffer = new Framebuffer({gpu});
+        this.#framebuffer.bind();
 
         // if (useDepthBuffer) {
         //     this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
@@ -150,7 +151,9 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         // if (this.#depthRenderbuffer) {
         //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         // }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        this.framebuffer.unbind();
+        // Framebuffer.unbind();
     }
 
     setSize(width, height) {
