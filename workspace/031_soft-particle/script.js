@@ -336,7 +336,7 @@ const main = async () => {
         actor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
     }
 
-    const particleNum = 50;
+    const particleNum = 200;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
