@@ -199,6 +199,7 @@ uniform sampler2D uNormalTexture;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
+uniform float uShowGBuffer;
 
 // ref:
 // https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
@@ -218,11 +219,13 @@ void main() {
     vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
     vec2 normalUV = vUv * 2. + vec2(-1., -1.);
     vec2 depthUV = vUv * 2.;
+    
     vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
     vec4 normalColor = texture(uNormalTexture, normalUV) * isArea(normalUV);
+    
     float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
     float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
-    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);   
+    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
 
     outColor = baseColor + normalColor + sceneDepth;
 }
@@ -247,10 +250,10 @@ void main() {
         uFarClip: {
             type: UniformTypes.Float,
             value: captureSceneCamera.far,
-        }
+        },
     }
 });
-gBufferPass.enabled = false;
+gBufferPass.enabled = true;
 postProcess.addPass(gBufferPass);
 
 postProcess.enabled = true;
@@ -698,7 +701,6 @@ void main() {
         });
         particleMesh.material.updateUniform("uDepthTexture", copyDepthDestRenderTarget.depthTexture);
 
-        // captureSceneCamera.setRenderTarget(gBufferRenderTarget)
         captureSceneCamera.setRenderTarget(afterGBufferRenderTarget)
         skyboxMesh.setEnabled(false);
         floorPlaneMesh.setEnabled(false);
@@ -709,14 +711,9 @@ void main() {
         gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
         gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
         gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
-        // gBufferPass.material.uniforms.uBaseColorTexture.value = afterGBufferRenderTarget.read.texture;
-        // gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.read.normalTexture;
-        // gBufferPass.material.uniforms.uDepthTexture.value = afterGBufferRenderTarget.read.depthTexture;
-
         postProcess.render({
             gpu,
             renderer,
-            // sceneRenderTarget: gBufferRenderTarget
             sceneRenderTarget: afterGBufferRenderTarget
         });
 
@@ -779,8 +776,16 @@ function initDebugger() {
             const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
             location.replace(url);
         }
-    })
+    });
     
+    debuggerGUI.addBorderSpacer();
+    
+    debuggerGUI.addToggleDebugger({
+        label: "show g-buffer",
+        initialValue: gBufferPass.enabled,
+        onChange: (value) => gBufferPass.enabled = value,
+    });
+
     debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
@@ -828,14 +833,6 @@ function initDebugger() {
         label: "fxaa pass enabled",
         initialValue: fxaaPass.enabled,
         onChange: (value) => fxaaPass.enabled = value,
-    })
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addToggleDebugger({
-        label: "postprocess enabled",
-        initialValue: postProcess.enabled,
-        onChange: (value) => postProcess.enabled = value,
     })
 
     wrapperElement.appendChild(debuggerGUI.domElement);
