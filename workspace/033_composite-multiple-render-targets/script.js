@@ -519,9 +519,9 @@ in vec2 vUv;
 in vec4 vVertexColor;
 in vec4 vViewPosition;
 
-// out vec4 outColor;
-layout (location = 0) out vec4 outBaseColor;
-layout (location = 1) out vec4 outNormalColor;
+out vec4 outColor;
+// layout (location = 0) out vec4 outBaseColor;
+// layout (location = 1) out vec4 outNormalColor;
 
 uniform sampler2D uParticleMap;
 uniform sampler2D uDepthTexture;
@@ -564,7 +564,8 @@ void main() {
     
     // result
     
-    outBaseColor = vec4(1., 0., 0., 1.);
+    // outBaseColor = vec4(1., 0., 0., 1.);
+    outColor = vec4(1., 0., 0., 1.);
 
     // float fadedAlpha = alpha * softFade;
     // if(fadedAlpha < .01) {
@@ -573,7 +574,7 @@ void main() {
 
     // outColor = vec4(baseColor, fadedAlpha);
     // outBaseColor = vec4(baseColor, fadedAlpha);
-    outNormalColor = vec4(0., 0., 1., 1.); // dummy
+    // outNormalColor = vec4(0., 0., 1., 1.); // dummy
 }
         `,
         uniforms: {
@@ -596,7 +597,8 @@ void main() {
             },
             uDepthTexture: {
                 type: UniformTypes.Texture,
-                value: captureSceneDepthRenderTarget.read.depthTexture,
+                // value: captureSceneDepthRenderTarget.read.depthTexture,
+                value: gBufferRenderTarget.read.depthTexture,
             },
             uNearClip: {
                 type: UniformTypes.Float,
@@ -624,17 +626,18 @@ void main() {
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
 
+    // TODO: engine側に移譲したい
     const onWindowResize = () => {
         width = wrapperElement.offsetWidth;
         height = wrapperElement.offsetHeight;
         inputController.setSize(width, height);
         engine.setSize(width, height);
 
-        // afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
-        // afterGBufferRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
+        afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
+        afterGBufferRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
         gBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        console.log(gBufferRenderTarget)
-        // afterGBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        afterGBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        console.log(gBufferRenderTarget, afterGBufferRenderTarget)
         // console.log(afterGBufferRenderTarget)
     };
 
@@ -667,20 +670,22 @@ void main() {
         particleMesh.setEnabled(false);
         renderer.render(captureScene, captureSceneCamera, {});
 
-        captureSceneCamera.setRenderTarget(gBufferRenderTarget)
-        // captureSceneCamera.setRenderTarget(afterGBufferRenderTarget)
+        // TODO: copy depth texture
+
+        // captureSceneCamera.setRenderTarget(gBufferRenderTarget)
+        captureSceneCamera.setRenderTarget(afterGBufferRenderTarget)
         skyboxMesh.setEnabled(false);
         floorPlaneMesh.setEnabled(false);
         skinnedMesh.setEnabled(false);
         particleMesh.setEnabled(true);
         renderer.render(captureScene, captureSceneCamera, { useShadowPass: false, clearScene: false });
 
-        gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
-        gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
-        gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
-        // gBufferPass.material.uniforms.uBaseColorTexture.value = afterGBufferRenderTarget.texture;
+        // gBufferPass.material.uniforms.uBaseColorTexture.value = gBufferRenderTarget.baseColorTexture;
         // gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.normalTexture;
-        // gBufferPass.material.uniforms.uDepthTexture.value = afterGBufferRenderTarget.depthTexture;
+        // gBufferPass.material.uniforms.uDepthTexture.value = gBufferRenderTarget.depthTexture;
+        gBufferPass.material.uniforms.uBaseColorTexture.value = afterGBufferRenderTarget.read.texture;
+        gBufferPass.material.uniforms.uNormalTexture.value = gBufferRenderTarget.read.normalTexture;
+        gBufferPass.material.uniforms.uDepthTexture.value = afterGBufferRenderTarget.read.depthTexture;
 
         postProcess.render({
             gpu,
