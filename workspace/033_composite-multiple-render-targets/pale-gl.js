@@ -2813,12 +2813,16 @@ class Texture extends GLObject {
             case TextureTypes.Depth:
                 if (width && height) {
                     // for render target
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                    // 1: use 16bit
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                    // 2: use 32bit
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 } else {
                     // set img to texture
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                    // 1: use 16bit
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                    // 2: use 32bit
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 }
                 break;
                 
@@ -2861,8 +2865,10 @@ class Texture extends GLObject {
                 break;
                 
             case TextureTypes.Depth:
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
-                // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                // 1: use 16bit
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
+                // 2: use 32bit
+                // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
                 break;
 
             case TextureTypes.RGBA16F:
@@ -3125,8 +3131,10 @@ class RenderTarget extends AbstractRenderTarget {
                 mipmap: false,
                 type: TextureTypes.Depth,
                 // 一旦linear固定
-                minFilter: TextureFilterTypes.Linear,
-                magFilter: TextureFilterTypes.Linear
+                // minFilter: TextureFilterTypes.Linear,
+                // magFilter: TextureFilterTypes.Linear
+                minFilter,
+                magFilter
             })
             // depth as texture
             gl.framebufferTexture2D(
@@ -6053,6 +6061,8 @@ class GBufferRenderTargets extends AbstractRenderTarget {
             // 一旦linear固定
             minFilter,
             magFilter
+            // minFilter: TextureFilterTypes.Nearest,
+            // magFilter: TextureFilterTypes.Nearest
         })
         // depth as texture
         gl.framebufferTexture2D(

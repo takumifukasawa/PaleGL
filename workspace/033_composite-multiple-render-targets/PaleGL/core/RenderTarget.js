@@ -100,8 +100,10 @@ export class RenderTarget extends AbstractRenderTarget {
                 mipmap: false,
                 type: TextureTypes.Depth,
                 // 一旦linear固定
-                minFilter: TextureFilterTypes.Linear,
-                magFilter: TextureFilterTypes.Linear
+                // minFilter: TextureFilterTypes.Linear,
+                // magFilter: TextureFilterTypes.Linear
+                minFilter,
+                magFilter
             })
             // depth as texture
             gl.framebufferTexture2D(

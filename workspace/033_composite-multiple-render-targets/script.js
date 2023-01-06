@@ -86,6 +86,8 @@ const captureScene = new Scene();
 const compositeScene = new Scene();
 
 const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+// const pixelRatio = Math.min(window.devicePixelRatio, 1);
+// const pixelRatio = ;
 
 const renderer = new ForwardRenderer({
     gpu,
@@ -100,7 +102,8 @@ engine.setScenes([
     compositeScene
 ]);
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
+// const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
+const captureSceneCamera = new PerspectiveCamera(70, 1, 1, 50);
 captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
@@ -181,7 +184,7 @@ bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = false;
+fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
 const showBuffersPass = new FragmentPass({
@@ -219,6 +222,7 @@ void main() {
     vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
     vec2 normalUV = vUv * 2. + vec2(-1., -1.);
     vec2 depthUV = vUv * 2.;
+    // vec2 depthUV = vUv;
     
     vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
     vec4 normalColor = texture(uNormalTexture, normalUV) * isArea(normalUV);
@@ -228,6 +232,7 @@ void main() {
     float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
 
     outColor = baseColor + normalColor + sceneDepth;
+    // outColor = vec4(vec3(sceneDepth), 1.);
 }
 `,
     uniforms: {
@@ -253,7 +258,7 @@ void main() {
         },
     }
 });
-showBuffersPass.enabled = true;
+showBuffersPass.enabled = false;
 postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
@@ -663,7 +668,7 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = 15;
+        orbitCameraController.distance = isSP ? 20 : 15;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
         orbitCameraController.azimuthSpeed = 200;

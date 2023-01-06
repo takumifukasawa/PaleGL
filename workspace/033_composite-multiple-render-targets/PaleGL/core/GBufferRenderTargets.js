@@ -132,6 +132,8 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             // 一旦linear固定
             minFilter,
             magFilter
+            // minFilter: TextureFilterTypes.Nearest,
+            // magFilter: TextureFilterTypes.Nearest
         })
         // depth as texture
         gl.framebufferTexture2D(
