@@ -20,6 +20,7 @@ export {GPU} from "./core/GPU.js";
 export {RenderTarget} from "./core/RenderTarget.js";
 export {Scene} from "./core/Scene.js";
 export {Texture} from "./core/Texture.js";
+export {OrbitCameraController} from "./core/OrbitCameraController.js";
 
 // geometries
 export {BoxGeometry} from "./geometries/BoxGeometry.js";
@@ -53,16 +54,21 @@ export {PostProcess} from "./postprocess/PostProcess.js";
 export {PostProcessPass} from "./postprocess/PostProcessPass.js";
 export {FXAAPass} from "./postprocess/FXAAPass.js";
 export {GaussianBlurPass} from "./postprocess/GaussianBlurPass.js";
+export {BloomPass} from "./postprocess/BloomPass.js";
 
 // shaders
 export {generateVertexShader} from "./shaders/generateVertexShader.js";
 
 // utilities
+export {clamp} from "./utilities/mathUtilities.js";
+
+// inputs
+export {TouchInputController} from "./inputs/TouchInputController.js";
+export {MouseInputController} from "./inputs/MouseInputController.js";
 
 // others
 export {
     PrimitiveTypes,
-    AttributeTypes,
     UniformTypes,
     TextureTypes,
     TextureWrapTypes,
@@ -75,5 +81,6 @@ export {
     FaceSide,
     AttributeUsageType,
     RenderTargetTypes,
-    AnimationKeyframeTypes
+    AnimationKeyframeTypes,
+    AttributeNames
 } from "./constants.js";

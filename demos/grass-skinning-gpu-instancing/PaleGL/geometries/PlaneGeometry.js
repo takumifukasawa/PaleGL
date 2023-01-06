@@ -1,6 +1,7 @@
 ﻿
 import {Geometry} from "./Geometry.js";
 import {Vector3} from "../math/Vector3.js";
+import {AttributeNames} from "../constants.js";
 
 export class PlaneGeometry extends Geometry {
     constructor({
@@ -8,6 +9,28 @@ export class PlaneGeometry extends Geometry {
         calculateTangent = false,
         calculateBinormal = false 
     }) {
+        const { attributes, indices, drawCount } = PlaneGeometry.createPlaneGeometryData({ calculateTangent, calculateBinormal });
+
+        super({
+            gpu,
+            attributes,
+            indices,
+            drawCount,
+        });
+    }
+    
+    static createPlaneGeometryData({
+        calculateTangent = false,
+        calculateBinormal = false 
+    } = {}) {
+        // -----------------------------
+        // 0 ---- 2
+        // |    / |
+        // |   /  |
+        // |  /   |
+        // | /    |
+        // 1 ---- 3
+        // -----------------------------
 
         const normals = [
             0, 0, 1,
@@ -17,58 +40,53 @@ export class PlaneGeometry extends Geometry {
         ];
         
         const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
-
-        super({
-            gpu,
-            // -----------------------------
-            // 0 ---- 2
-            // |    / |
-            // |   /  |
-            // |  /   |
-            // | /    |
-            // 1 ---- 3
-            // -----------------------------
-            attributes: [
-                {
-                    name: "aPosition",
-                    data: new Float32Array([
-                        -1, 1, 0,
-                        -1, -1, 0,
-                        1, 1, 0,
-                        1, -1, 0,
-                    ]),
-                    size: 3
-                }, {
-                    name: "aUv",
-                    data: new Float32Array([
-                        0, 1,
-                        0, 0,
-                        1, 1,
-                        1, 0,
-                    ]),
-                    size: 2
-                }, {
-                    name: "aNormal",
-                    data: new Float32Array(normals),
-                    size: 3
-                },
-                (calculateTangent ?
-                    {
-                        name: "aTangent",
-                        data: new Float32Array(tangents),
-                        size: 3
-                    } : {}
-                ),
-                (calculateBinormal ?
-                    {
-                        name: "aBinormal",
-                        data: new Float32Array(binormals),
-                        size: 3
-                    } : {}
-                ),
-            ],
+      
+        // TODO: uniqでfilter
+        const attributes = [
+            {
+                name: AttributeNames.Position,
+                data: new Float32Array([
+                    -1, 1, 0,
+                    -1, -1, 0,
+                    1, 1, 0,
+                    1, -1, 0,
+                ]),
+                size: 3
+            }, {
+                name: AttributeNames.Uv,
+                data: new Float32Array([
+                    0, 1,
+                    0, 0,
+                    1, 1,
+                    1, 0,
+                ]),
+                size: 2
+            }, {
+                name: AttributeNames.Normal,
+                data: new Float32Array(normals),
+                size: 3
+            },
+        ];
+        
+        if(calculateTangent) {
+            attributes.push({
+                name: AttributeNames.Tangent,
+                data: new Float32Array(tangents),
+                size: 3
+            });
+        }
+        if(calculateBinormal) {
+            attributes.push({
+                name: AttributeNames.Binormal,
+                data: new Float32Array(binormals),
+                size: 3
+            });
+        }
+        
+        return {
+            attributes,
             indices: [0, 1, 2, 2, 1, 3],
-            drawCount: 6
-        });
+            drawCount: 6,
+        };
     }
 }

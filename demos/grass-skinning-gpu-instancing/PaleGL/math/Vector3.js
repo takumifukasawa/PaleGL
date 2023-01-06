@@ -24,7 +24,12 @@
     set z(value) {
         this.elements[2] = value;
     }
-    
+
+    get magnitude() {
+        const eps = 0.0001;
+        return Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+    }
+
     constructor(x, y, z) {
         this.set(x, y, z);
     }
@@ -35,11 +40,12 @@
     }
     
     normalize() {
-        const eps = 0.0001;
-        const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
-        this.x = this.x / length;
-        this.y = this.y / length;
-        this.z = this.z / length;
+        // const eps = 0.0001;
+        // const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+        const mag = this.magnitude;
+        this.x = this.x / mag;
+        this.y = this.y / mag;
+        this.z = this.z / mag;
         return this;
     }
     
@@ -92,35 +98,35 @@
         return flag;
     }
     
-    static zero() {
+    static get zero() {
         return new Vector3(0, 0, 0);
     }
 
-    static one() {
+    static get one() {
         return new Vector3(1, 1, 1);
     }
     
-    static up() {
+    static get up() {
         return new Vector3(0, 1, 0);
     }
     
-    static down() {
+    static get down() {
         return new Vector3(0, -1, 0);
     }
     
-    static back() {
+    static get back() {
         return new Vector3(0, 0, -1);
     }
     
-    static forward() {
+    static get forward() {
         return new Vector3(0, 0, 1);
     }
     
-    static right() {
+    static get right() {
         return new Vector3(1, 0, 0);
     }
 
-    static left() {
+    static get left() {
         return new Vector3(-1, 0, 0);
     }
     
@@ -129,7 +135,7 @@
     }
     
     static addVectors(...vectors) {
-        const v = Vector3.zero();
+        const v = Vector3.zero;
         vectors.forEach(elem => {
             v.x += elem.x;
             v.y += elem.y;
@@ -154,16 +160,55 @@
             v1.x * v2.y - v1.y * v2.x
         );
     }
+
+    static rotateVectorX(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x;
+        const ry = y * c + z * -s;
+        const rz = y * s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorY(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + z * s;
+        const ry = y;
+        const rz = x * -s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorZ(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + y * -s;
+        const ry = x * s + y * s;
+        const rz = z;
+        return new Vector3(rx, ry, rz);
+    }
  
     // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {
-        if(n.equals(Vector3.up())) {
-            return Vector3.right();
+        if(n.equals(Vector3.up)) {
+            return Vector3.right;
         }
-        if(n.equals(Vector3.down())) {
-            return Vector3.right();
+        if(n.equals(Vector3.down)) {
+            return Vector3.right;
         }
-        return Vector3.crossVectors(n, Vector3.down());
+        return Vector3.crossVectors(n, Vector3.down);
     }
 
     static getBinormalFromTangent(t, n) {
@@ -172,6 +217,14 @@
     
     static fill(value) {
         return new Vector3(value, value, value);
+    }
+    
+    static lerpVectors(v1, v2, r) {
+        return new Vector3(
+            v1.x + (v2.x - v1.x) * r,
+            v1.y + (v2.y - v1.y) * r,
+            v1.z + (v2.z - v1.z) * r
+        );
     }
     
     log() {

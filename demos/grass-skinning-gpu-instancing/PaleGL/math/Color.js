@@ -80,8 +80,8 @@
         return new Color(0, 0, 1, 1);
     }
     
-    static fromRGB(r, g, b, a) {
-        return new Color(r / 255, g / 255, b / 255, 1);
+    static fromRGB(r, g, b, a = 255) {
+        return new Color(r / 255, g / 255, b / 255, a / 255);
     }
     
     // hex ... #rrggbb or rrggbb

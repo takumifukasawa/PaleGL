@@ -8,20 +8,24 @@ import {PrimitiveTypes, UniformTypes} from "../constants.js";
 export class AbstractPostProcessPass {
     name;
     enabled = true;
+    
+    get renderTarget() {
+        throw "[AbstractPostProcessPass.renderTarget] should implementation";
+    }
 
     constructor({ name = "" } = {}) {
         this.name = name;
     }
   
     setSize(width, height) {
-        throw "[AbstractPostProcessPass.setSize] should implementation";
+        throw "[AbstractPostProcessPass.setSize()] should implementation";
     }
 
     setRenderTarget(renderer, camera, isLastPass) {
-        throw "[AbstractPostProcessPass.setRenderTarget] should implementation";
+        throw "[AbstractPostProcessPass.setRenderTarget()] should implementation";
     }
     
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass } = {}) {
-        throw "[AbstractPostProcessPass.render] should implementation";
+        throw "[AbstractPostProcessPass.render()] should implementation";
     }
 }

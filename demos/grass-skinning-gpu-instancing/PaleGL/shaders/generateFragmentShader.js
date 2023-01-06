@@ -1,4 +1,4 @@
-﻿export const generateDepthFragmentShader = () => `#version 300 es
+﻿export const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
 
 precision mediump float;
 

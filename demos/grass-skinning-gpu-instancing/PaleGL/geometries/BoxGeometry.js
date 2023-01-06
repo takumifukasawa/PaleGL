@@ -1,5 +1,6 @@
 ﻿
 import {Geometry} from "./Geometry.js";
+import {AttributeNames} from "../constants.js";
 
 export class BoxGeometry extends Geometry {
     constructor({ gpu }) {
@@ -34,7 +35,7 @@ export class BoxGeometry extends Geometry {
                 // 1 ---- 3
                 // -----------------------------
                 {
-                    name: "aPosition",
+                    name: AttributeNames.Position,
                     data: new Float32Array([
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -51,7 +52,7 @@ export class BoxGeometry extends Geometry {
                     ]),
                     size: 3,
                 }, {
-                    name: "aUv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -60,7 +61,7 @@ export class BoxGeometry extends Geometry {
                     ])).flat()),
                     size: 2
                 }, {
-                    name: "aNormal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
                 },

@@ -31,9 +31,9 @@ export class OrthographicCamera extends Camera {
     }
    
     getFrustumLocalPositions() {
-        const localForward = Vector3.back();
-        const localRight = Vector3.right();
-        const localUp = Vector3.up();
+        const localForward = Vector3.back;
+        const localRight = Vector3.right;
+        const localUp = Vector3.up;
 
         const halfWidth = (Math.abs(this.left) + Math.abs(this.right)) / 2;
         const halfHeight = (Math.abs(this.top) + Math.abs(this.right)) / 2;

@@ -66,9 +66,6 @@ export class Geometry {
         this.vertexArrayObject.setAttribute(attr, true);
     }
    
-    // TODO: startで create geometry する？
-    // start() {}
-    
     #createGeometry({ gpu }) {
         console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
@@ -94,6 +91,10 @@ export class Geometry {
         const attribute = this.attributes.find(({ name }) => name === key);
         attribute.data = data;
         this.vertexArrayObject.updateAttribute(key, attribute.data);
+    }
+    
+    getAttribute(key) {
+        return this.attributes.find(({ name }) => name === key);
     }
 
     getAttributeDescriptors() {

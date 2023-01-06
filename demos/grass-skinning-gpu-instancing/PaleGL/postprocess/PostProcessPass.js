@@ -2,7 +2,7 @@
 import {Material} from "../materials/Material.js";
 import {RenderTarget} from "../core/RenderTarget.js";
 import {Mesh} from "../actors/Mesh.js";
-import {PrimitiveTypes, UniformTypes} from "../constants.js";
+import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.js";
 import {AbstractPostProcessPass} from "./AbstractPostProcessPass.js";
 
 
@@ -11,14 +11,14 @@ export class PostProcessPass extends AbstractPostProcessPass {
     material;
     renderTarget;
     mesh;
+    width;
+    height;
     
-    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
-        super({ name });
+    static get baseVertexShader() {
+        return `#version 300 es
 
-        const baseVertexShader = `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
 
 out vec2 vUv;
 
@@ -26,7 +26,13 @@ void main() {
     vUv = aUv;
     gl_Position = vec4(aPosition, 1);
 }
-`;
+`;   
+    }
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
+        super({ name });
+
+        const baseVertexShader = PostProcessPass.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
@@ -37,13 +43,15 @@ void main() {
             fragmentShader,
             uniforms: {
                 ...uniforms, 
-                uSceneTexture: {
+                [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
                     value: null
                 }
             },
             primitiveType: PrimitiveTypes.Triangles
         });
+        
+        // TODO: mesh生成しなくていい気がする
         this.mesh = new Mesh({
             geometry: this.geometry,
             material: this.material
@@ -53,6 +61,8 @@ void main() {
     }
   
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
@@ -64,9 +74,11 @@ void main() {
         }
     }
 
+    // TODO: rename "prevRenderTarget"
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
         this.setRenderTarget(renderer, camera, isLastPass);
-
+ 
+        // TODO: ppごとに変えられるのが正しい
         renderer.clear(
             camera.clearColor.x,
             camera.clearColor.y,
@@ -74,9 +86,15 @@ void main() {
             camera.clearColor.w
         );
 
-        // このあたりの処理をpassに逃してもいいかもしれない
+        // ppの場合はいらない気がする
         this.mesh.updateTransform();
-        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        
+        // 渡してない場合はなにもしないことにする
+        if(prevRenderTarget) {
+            // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+            this.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
+        }
+
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }

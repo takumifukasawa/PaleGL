@@ -1,4 +1,4 @@
-﻿import {ActorTypes, BlendTypes, RenderQueues, UniformTypes} from "./../constants.js";
+﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.js";
 import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Material} from "../materials/Material.js";
@@ -11,11 +11,16 @@ export class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
+    #stats;
 
     constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
+    }
+    
+    setStats(stats) {
+        this.#stats = stats;
     }
 
     setSize(width, height, realWidth, realHeight) {
@@ -56,23 +61,28 @@ export class ForwardRenderer {
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
                 
+                // // TODO: material 側でやった方がよい？
+                // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
+                // }
+
                 // TODO: material 側でやった方がよい？
-                if (targetMaterial.uniforms.uWorldMatrix) {
-                    targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
-                }
-                if (targetMaterial.uniforms.uViewMatrix) {
-                    targetMaterial.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
-                }
-                if (targetMaterial.uniforms.uProjectionMatrix) {
-                    targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
-                }
+                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera.viewMatrix);
+                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera.projectionMatrix);
               
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
     }
     
-   #buildRenderMeshInfo(actor, materialIndex = 0) {
+    #buildRenderMeshInfo(actor, materialIndex = 0) {
         return {
             actor,
             materialIndex
@@ -98,6 +108,7 @@ export class ForwardRenderer {
             }
 
             const targetMaterial = actor.materials[materialIndex];
+            // const targetMaterial = actor.depthMaterial;
 
             // reset
             // NOTE: 余計なresetとかしない方がいい気がする
@@ -105,49 +116,70 @@ export class ForwardRenderer {
             //     targetMaterial.uniforms.uShadowMap.value = null;
             // }
 
+            // // TODO: material 側でやった方がよい？
+            // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewPosition]) {
+            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = camera.transform.worldMatrix.position;
+            // }
+
             // TODO: material 側でやった方がよい？
-            if (targetMaterial.uniforms.uWorldMatrix) {
-                targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
-            }
-            if (targetMaterial.uniforms.uViewMatrix) {
-                targetMaterial.uniforms.uViewMatrix.value = camera.viewMatrix;
-            }
-            if (targetMaterial.uniforms.uProjectionMatrix) {
-                targetMaterial.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
-            }
-            if (targetMaterial.uniforms.uNormalMatrix) {
-                targetMaterial.uniforms.uNormalMatrix.value = actor.transform.worldMatrix.clone().invert().transpose();
-            }
-            if (targetMaterial.uniforms.uViewPosition) {
-                targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
-            }
+            targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
+            targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            targetMaterial.updateUniform(UniformNames.NormalMatrix, actor.transform.worldMatrix.clone().invert().transpose());
+            targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意 
             lightActors.forEach(light => {
                 if (targetMaterial.uniforms.uDirectionalLight) {
-                    targetMaterial.uniforms.uDirectionalLight = {
-                        type: UniformTypes.Struct,
-                        value: {
-                            direction: {
-                                type: UniformTypes.Vector3,
-                                value: light.transform.position,
-                            },
-                            intensity: {
-                                type: UniformTypes.Float,
-                                value: light.intensity,
-                            },
-                            color: {
-                                type: UniformTypes.Color,
-                                value: light.color
-                            }
+                    // targetMaterial.uniforms.uDirectionalLight = {
+                    //     type: UniformTypes.Struct,
+                    //     value: {
+                    //         direction: {
+                    //             type: UniformTypes.Vector3,
+                    //             value: light.transform.position,
+                    //         },
+                    //         intensity: {
+                    //             type: UniformTypes.Float,
+                    //             value: light.intensity,
+                    //         },
+                    //         color: {
+                    //             type: UniformTypes.Color,
+                    //             value: light.color
+                    //         }
+                    //     }
+                    // }
+                    targetMaterial.updateUniform("uDirectionalLight", {
+                        direction: {
+                            type: UniformTypes.Vector3,
+                            value: light.transform.position,
+                        },
+                        intensity: {
+                            type: UniformTypes.Float,
+                            value: light.intensity,
+                        },
+                        color: {
+                            type: UniformTypes.Color,
+                            value: light.color
                         }
-                    }
+                    });
                 }
 
                 if (
-                    targetMaterial.uniforms.uShadowMapProjectionMatrix &&
+                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
                     light.castShadow
                 ) {
@@ -163,15 +195,17 @@ export class ForwardRenderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-
-                    // TODO:
-                    // - directional light の構造体に持たせた方がいいかもしれない
-                    if(targetMaterial.uniforms.uShadowMap) {
-                        targetMaterial.uniforms.uShadowMap.value = light.shadowMap.read.texture;
-                    }
-                    if(targetMaterial.uniforms.uShadowMapProjectionMatrix) {
-                        targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
-                    }
+                    
+                    // // TODO:
+                    // // - directional light の構造体に持たせた方がいいかもしれない
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
+                    // }
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
+                    // }
+                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+                    targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
                 }
             });
 
@@ -179,7 +213,7 @@ export class ForwardRenderer {
         });
     }
     
-    render(scene, camera) {
+    render(scene, camera, { enabledShadowPass = true } = {}) {
         const renderMeshInfoEachQueue = {
             opaque: [],
             skybox: [], // maybe only one
@@ -187,13 +221,10 @@ export class ForwardRenderer {
             transparent: [],
         };
         const lightActors = [];
-        
-       
-        // TODO: 複数material対応
+
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    // renderMeshInfoEachQueue.skybox.push(actor);
                     renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
                     // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
@@ -214,7 +245,7 @@ export class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "invalid blend type";
+                                throw "[ForwardRenderer.render] invalid blend type";
                         }
                     });
                     break;
@@ -229,50 +260,57 @@ export class ForwardRenderer {
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
+        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({ actor }) => actor.enabled);
         
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
       
-        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
-        
-        if(castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
-                if(actor.type === ActorTypes.Skybox) {
-                    return false;
-                }
-                return actor.castShadow;
-            });
-            this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
+       
+        if(enabledShadowPass) {
+            if(castShadowLightActors.length > 0) {
+                const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
+                    if(actor.type === ActorTypes.Skybox) {
+                        return false;
+                    }
+                    return actor.castShadow;
+                });
+                this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+            }
         }
 
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-       
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget.write);
-        } else {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
-        }
-       
+      
+        // postprocessはrendererから外した方がよさそう  
+        // if (camera.enabledPostProcess) {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
+        // } else {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+        // }
+        this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
-        if (camera.enabledPostProcess) {
-            camera.postProcess.render({
-                gpu: this.#gpu,
-                renderer: this,
-                camera
-            });
-        }
-
-        // NOTE: ない方がよい？
-        // this.setRenderTarget(null);
+        // if (camera.enabledPostProcess) {
+        //     camera.postProcess.render({
+        //         gpu: this.#gpu,
+        //         renderer: this,
+        //         camera
+        //     });
+        // }
     }
 
     renderMesh(geometry, material) {
         geometry.update();
+        
+        if(this.#stats) {
+            this.#stats.addDrawVertexCount(geometry);
+            this.#stats.incrementDrawCall();
+        }
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);

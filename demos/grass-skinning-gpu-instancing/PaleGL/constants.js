@@ -8,19 +8,17 @@
     TriangleFan: "TriangleFan",
 };
 
-export const AttributeTypes = {
-    Position: "Position",
-};
-
 export const UniformTypes = {
     Matrix4: "Matrix4",
     Matrix4Array: "Matrix4Array",
     Texture: "Texture",
     CubeMap: "CubeMap",
     Vector2: "Vector2",
+    Vector2Array: "Vector2Array",
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
+    FloatArray: "FloatArray",
     Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",
@@ -102,4 +100,39 @@ export const RenderTargetTypes = {
 export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
+};
+
+export const AttributeNames = {
+    Position: "aPosition",
+    Color: "aColor",
+    Uv: "aUv",
+    Normal: "aNormal",
+    Tangent: "aTangent",
+    Binormal: "aBinormal",
+    // skinning
+    BoneIndices: "aBoneIndices",
+    BoneWeights: "aBoneWeighs",
+    // instancing
+    InstancePosition: "aInstancePosition",
+    InstanceScale: "aInstanceScale",
+    InstanceAnimationOffset: "aInstanceAnimationOffset",
+    InstanceVertexColor: "aInstanceVertexColor"
+};
+
+export const UniformNames = {
+    // base
+    WorldMatrix: "uWorldMatrix",
+    ViewMatrix: "uViewMatrix",
+    ProjectionMatrix: "uProjectionMatrix",
+    NormalMatrix: "uNormalMatrix",
+    ViewPosition: "uViewPosition",
+    // skinning
+    JointMatrices: "uJointMatrices",
+    JointTexture: "uJointTexture",
+    // shadow map
+    ShadowMap: "uShadowMap",
+    ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
+    ShadowBias: "uShadowBias",
+    // post process
+    SceneTexture: "uSceneTexture"
 };

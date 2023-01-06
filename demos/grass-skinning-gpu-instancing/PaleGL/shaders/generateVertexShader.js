@@ -5,6 +5,7 @@ import {
 import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.js";
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexVaryings} from "./lightingCommon.js";
+import {AttributeNames} from "../constants.js";
 
 // -----------------------------------------------
 // TODO:
@@ -36,10 +37,11 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
                         throw "[buildVertexAttributeLayouts] invalid attribute float";
                 }
                 break;
+            // TODO: signedなパターンが欲しい    
             case Uint16Array:
                 switch(size) {
                     case 1:
-                        type = "int";
+                        type = "uint";
                         break;
                     case 2:
                         type = "uvec2";
@@ -65,23 +67,38 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
 }
 
 export const generateVertexShader = ({
+    // required
     attributeDescriptors,
-    isSkinning,
-    gpuSkinning,
-    jointNum,
+    // optional
     receiveShadow,
     useNormalMap,
     vertexShaderModifier = {
+        beginMain: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: "",
     },
-    insertUniforms,
+    insertVaryings,
+    insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
+    // skinning
+    isSkinning,
+    gpuSkinning,
+    jointNum,
+    // instancing
+    isInstancing,
+    // vertex color
+    useVertexColor,
 } = {}) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+    const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
+    // const hasVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
+    // const hasInstanceVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.InstanceVertexColor);
+    // const hasColor = hasVertexColor || hasInstanceVertexColor;
 
     return `#version 300 es
 
@@ -94,8 +111,8 @@ out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
-// TODO: フラグで必要に応じて出し分け
-out vec4 vVertexColor;
+${useVertexColor ? "out vec4 vVertexColor;" : ""}
+${insertVaryings ? insertVaryings : ""}
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -105,6 +122,8 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 ${insertUniforms || ""}
 
 void main() {
+    ${vertexShaderModifier.beginMain || ""}
+
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
@@ -114,7 +133,7 @@ void main() {
         : ""
     }
     ${vertexShaderModifier.localPositionPostProcess || ""}
-    
+
     ${(() => {
         if(isSkinning) {
             return useNormalMap
@@ -133,16 +152,22 @@ void main() {
     vTangent = mat3(uNormalMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * aBinormal;
 `
-                : `
+                : hasNormal ? `
     vNormal = mat3(uNormalMatrix) * aNormal;
-`;
+` : "";
         }
     })()}
   
     // assign common varyings 
     vUv = aUv; 
-    // TODO: 頂点カラーが必要かどうかはフラグで出し分けたい
-    vVertexColor = vec4(1., 1., 1., 1.);
+    ${(() => {
+        if(!useVertexColor) {
+            return "";
+        }
+        return isInstancing
+            ? "vVertexColor = aInstanceVertexColor;"
+            : "vVertexColor = aColor;";
+    })()}
 
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
@@ -150,10 +175,15 @@ void main() {
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
+    
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    ${vertexShaderModifier.viewPositionPostProcess || ""}
  
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
- 
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    
+    gl_Position = uProjectionMatrix * viewPosition;
+    
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }
@@ -163,10 +193,13 @@ export const generateDepthVertexShader = ({
     isSkinning,
     gpuSkinning,
     vertexShaderModifier = {
+        beginMain: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: ""
     },
+    insertVaryings,
     useNormalMap,
     jointNum
 } = {}) => {
@@ -185,8 +218,11 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 // TODO: depthでは必要ないのでなくしたい
 out vec4 vVertexColor;
+${insertVaryings ? insertVaryings : ""}
 
 void main() {
+    ${vertexShaderModifier.beginMain || ""}
+
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
@@ -203,6 +239,8 @@ void main() {
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }

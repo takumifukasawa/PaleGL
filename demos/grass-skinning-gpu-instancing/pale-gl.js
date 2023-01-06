@@ -24,7 +24,12 @@
     set z(value) {
         this.elements[2] = value;
     }
-    
+
+    get magnitude() {
+        const eps = 0.0001;
+        return Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+    }
+
     constructor(x, y, z) {
         this.set(x, y, z);
     }
@@ -35,11 +40,12 @@
     }
     
     normalize() {
-        const eps = 0.0001;
-        const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
-        this.x = this.x / length;
-        this.y = this.y / length;
-        this.z = this.z / length;
+        // const eps = 0.0001;
+        // const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+        const mag = this.magnitude;
+        this.x = this.x / mag;
+        this.y = this.y / mag;
+        this.z = this.z / mag;
         return this;
     }
     
@@ -92,35 +98,35 @@
         return flag;
     }
     
-    static zero() {
+    static get zero() {
         return new Vector3(0, 0, 0);
     }
 
-    static one() {
+    static get one() {
         return new Vector3(1, 1, 1);
     }
     
-    static up() {
+    static get up() {
         return new Vector3(0, 1, 0);
     }
     
-    static down() {
+    static get down() {
         return new Vector3(0, -1, 0);
     }
     
-    static back() {
+    static get back() {
         return new Vector3(0, 0, -1);
     }
     
-    static forward() {
+    static get forward() {
         return new Vector3(0, 0, 1);
     }
     
-    static right() {
+    static get right() {
         return new Vector3(1, 0, 0);
     }
 
-    static left() {
+    static get left() {
         return new Vector3(-1, 0, 0);
     }
     
@@ -129,7 +135,7 @@
     }
     
     static addVectors(...vectors) {
-        const v = Vector3.zero();
+        const v = Vector3.zero;
         vectors.forEach(elem => {
             v.x += elem.x;
             v.y += elem.y;
@@ -154,16 +160,55 @@
             v1.x * v2.y - v1.y * v2.x
         );
     }
+
+    static rotateVectorX(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x;
+        const ry = y * c + z * -s;
+        const rz = y * s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorY(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + z * s;
+        const ry = y;
+        const rz = x * -s + z * c;
+        return new Vector3(rx, ry, rz);
+    }
+    
+    static rotateVectorZ(v, degree) {
+        const x = v.x;
+        const y = v.y;
+        const z = v.z;
+        const rad = degree / 180 * Math.PI;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * c + y * -s;
+        const ry = x * s + y * s;
+        const rz = z;
+        return new Vector3(rx, ry, rz);
+    }
  
     // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
     static getTangent(n) {
-        if(n.equals(Vector3.up())) {
-            return Vector3.right();
+        if(n.equals(Vector3.up)) {
+            return Vector3.right;
         }
-        if(n.equals(Vector3.down())) {
-            return Vector3.right();
+        if(n.equals(Vector3.down)) {
+            return Vector3.right;
         }
-        return Vector3.crossVectors(n, Vector3.down());
+        return Vector3.crossVectors(n, Vector3.down);
     }
 
     static getBinormalFromTangent(t, n) {
@@ -172,6 +217,14 @@
     
     static fill(value) {
         return new Vector3(value, value, value);
+    }
+    
+    static lerpVectors(v1, v2, r) {
+        return new Vector3(
+            v1.x + (v2.x - v1.x) * r,
+            v1.y + (v2.y - v1.y) * r,
+            v1.z + (v2.z - v1.z) * r
+        );
     }
     
     log() {
@@ -359,7 +412,7 @@ class Matrix4 {
         return this;
     }
 
-    static identity() {
+    static get identity() {
         return new Matrix4(
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -428,7 +481,7 @@ class Matrix4 {
     }
     
     static multiplyMatrices(...matrices) {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         matrices.forEach(matrix => m.multiply(matrix));
         return m;
     }
@@ -506,7 +559,7 @@ class Matrix4 {
     }
     
     clone() {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         m.m00 = this.m00;
         m.m01 = this.m01;
         m.m02 = this.m02;
@@ -749,19 +802,17 @@ ${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
     TriangleFan: "TriangleFan",
 };
 
-const AttributeTypes = {
-    Position: "Position",
-};
-
 const UniformTypes = {
     Matrix4: "Matrix4",
     Matrix4Array: "Matrix4Array",
     Texture: "Texture",
     CubeMap: "CubeMap",
     Vector2: "Vector2",
+    Vector2Array: "Vector2Array",
     Vector3: "Vector3",
     Struct: "Struct",
     Float: "Float",
+    FloatArray: "FloatArray",
     Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",
@@ -844,6 +895,41 @@ const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
 };
+
+const AttributeNames = {
+    Position: "aPosition",
+    Color: "aColor",
+    Uv: "aUv",
+    Normal: "aNormal",
+    Tangent: "aTangent",
+    Binormal: "aBinormal",
+    // skinning
+    BoneIndices: "aBoneIndices",
+    BoneWeights: "aBoneWeighs",
+    // instancing
+    InstancePosition: "aInstancePosition",
+    InstanceScale: "aInstanceScale",
+    InstanceAnimationOffset: "aInstanceAnimationOffset",
+    InstanceVertexColor: "aInstanceVertexColor"
+};
+
+const UniformNames = {
+    // base
+    WorldMatrix: "uWorldMatrix",
+    ViewMatrix: "uViewMatrix",
+    ProjectionMatrix: "uProjectionMatrix",
+    NormalMatrix: "uNormalMatrix",
+    ViewPosition: "uViewPosition",
+    // skinning
+    JointMatrices: "uJointMatrices",
+    JointTexture: "uJointTexture",
+    // shadow map
+    ShadowMap: "uShadowMap",
+    ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
+    ShadowBias: "uShadowBias",
+    // post process
+    SceneTexture: "uSceneTexture"
+};
 ﻿class Rotator {
     // x, y, z axes
     // 一旦そのままdegreeが入る想定
@@ -890,9 +976,9 @@ const AnimationKeyframeTypes = {
     
     getAxesRadians() {
         return {
-            x: this.elements[0] * Math.PI / 180 ,
-            y: this.elements[1] * Math.PI / 180 ,
-            z: this.elements[2] * Math.PI / 180 ,
+            x: this.elements[0] * Math.PI / 180,
+            y: this.elements[1] * Math.PI / 180,
+            z: this.elements[2] * Math.PI / 180,
         }
     }
 
@@ -906,7 +992,7 @@ const AnimationKeyframeTypes = {
         return this;
     }
     
-    static zero() {
+    static get zero() {
         return new Rotator(0, 0, 0);
     }
     
@@ -949,11 +1035,11 @@ class Transform {
     parent;
     actor;
     children = [];
-    #worldMatrix = Matrix4.identity();
-    #localMatrix = Matrix4.identity();
-    position = Vector3.zero();
-    rotation = Rotator.zero(); // degree vector
-    scale = Vector3.one();
+    #worldMatrix = Matrix4.identity;
+    #localMatrix = Matrix4.identity;
+    position = Vector3.zero;
+    rotation = Rotator.zero; // degree vector
+    scale = Vector3.one;
     lookAtTarget = null; // world v
 
     get childCount() {
@@ -999,7 +1085,7 @@ class Transform {
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix = this.actor.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up(), true)
+                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up, true)
                 : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
@@ -1099,6 +1185,11 @@ class Actor {
     #onStart;
     #onFixedUpdate;
     #onUpdate;
+    #enabled = true;
+    
+    get enabled() {
+        return this.#enabled;
+    }
     
     set onStart(value) {
         this.#onStart = value;
@@ -1117,6 +1208,10 @@ class Actor {
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
         this.animator = new Animator();
+    }
+    
+    setEnabled(enabled) {
+        this.#enabled = enabled;
     }
     
     addChild(child) {
@@ -1260,7 +1355,7 @@ ${shaderSource.split("\n").map((line, i) => {
 `;
     }
 }
-﻿const generateDepthFragmentShader = () => `#version 300 es
+﻿const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
 
 precision mediump float;
 
@@ -1293,11 +1388,18 @@ class Material {
     faceSide;
     receiveShadow;
     queue;
-    
+   
+    // skinning
     isSkinning;
     gpuSkinning;
     jointNum;
     
+    // instancing
+    isInstancing;
+    
+    // vertex color
+    useVertexColor;
+
     vertexShader;
     fragmentShader;
     depthFragmentShader;
@@ -1339,8 +1441,17 @@ class Material {
         receiveShadow = false,
         blendType,
         renderQueue,
+        
+        // skinning
         isSkinning,
         gpuSkinning,
+        
+        // instancing
+        isInstancing = false,
+       
+        // vertex color 
+        useVertexColor = false,
+        
         queue,
         uniforms = {},
         depthUniforms = {}
@@ -1401,34 +1512,38 @@ class Material {
         if (!this.renderQueue) {
             throw "[Material.constructor] invalid render queue";
         }
-       
+      
+        // skinning
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
+        
+        this.isInstancing = isInstancing;
+        this.useVertexColor = useVertexColor;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         // - skinning回りもここで入れたい？
         const commonUniforms = {
-            uWorldMatrix: {
+            [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uViewMatrix: {
+            [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uProjectionMatrix: {
+            [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uNormalMatrix: {
+            [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: viewmatrixから引っ張ってきてもよい
-            uViewPosition: {
+            [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero()
+                value: Vector3.zero
             },
 
             ...(this.alphaTest ? {
@@ -1440,16 +1555,16 @@ class Material {
         };
         
         const shadowUniforms = this.receiveShadow ? {
-            uShadowMap: {
+            [UniformNames.ShadowMap]: {
                 type: UniformTypes.Texture,
                 value: null,
             },
-            uShadowMapProjectionMatrix: {
+            [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
-            uShadowBias: {
+            [UniformNames.ShadowBias]: {
                 type: UniformTypes.Float,
                 value: 0.01
             }
@@ -1471,22 +1586,42 @@ class Material {
                 attributeDescriptors,
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
-                gpuSkinning: this.gpuSkinning
+                gpuSkinning: this.gpuSkinning,
+                isInstancing: this.isInstancing
             });
         }
         if(!this.fragmentShader && this.#fragmentShaderGenerator) {
-            this.fragmentShader = this.#fragmentShaderGenerator();
+            this.fragmentShader = this.#fragmentShaderGenerator({
+                attributeDescriptors,
+            });
         }
         if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
-
+       
+        // for debug
+        // console.log(this.uniforms, this.depthUniforms)
+        
         this.shader = new Shader({
             gpu,
             vertexShader: this.vertexShader,
             fragmentShader: this.fragmentShader
         });
     }
+
+    // TODO: 深い階層もupdateができるようにしたい
+    updateUniform(name, value) {
+        if(!this.uniforms[name]) {
+            throw `[Material.updateUniform] invalid name ${name}`;
+        }
+        this.uniforms[name].value = value;
+    }
+   
+    // // NOTE: renderer側でmaterial側のuniformをアップデートする用
+    // updateUniforms({ gpu } = {}) {}
+    
+    // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
+    // updateEngineUniforms() {} 
 }
 
 ﻿
@@ -1580,6 +1715,12 @@ class Mesh extends Actor {
                 attributeDescriptors: this.geometry.getAttributeDescriptors()
             });
         }
+    }
+    
+    beforeRender({gpu}) {
+        super.beforeRender({gpu});
+        // this.materials.forEach(material => material.updateUniforms({ gpu }));
+        // this.depthMaterial.updateUniforms({ gpu });
     }
 }
 ﻿
@@ -1854,8 +1995,7 @@ class VertexArrayObject extends GLObject {
         const gl = this.#gpu.gl;
         const targetVBO = this.#vboList.find(({ name }) => key === name);
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
-        // TODO: uint16対応
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(targetVBO.data), targetVBO.usage);
+        gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
@@ -1875,7 +2015,6 @@ class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        // TODO: uint16対応
         switch(data.constructor) {
             case Float32Array:
                 // size ... 頂点ごとに埋める数
@@ -1970,9 +2109,6 @@ class Geometry {
         this.vertexArrayObject.setAttribute(attr, true);
     }
    
-    // TODO: startで create geometry する？
-    // start() {}
-    
     #createGeometry({ gpu }) {
         console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
@@ -1998,6 +2134,10 @@ class Geometry {
         const attribute = this.attributes.find(({ name }) => name === key);
         attribute.data = data;
         this.vertexArrayObject.updateAttribute(key, attribute.data);
+    }
+    
+    getAttribute(key) {
+        return this.attributes.find(({ name }) => name === key);
     }
 
     getAttributeDescriptors() {
@@ -2042,6 +2182,7 @@ class Geometry {
         return binormals;
     }
 }
+
 
 
 
@@ -2227,15 +2368,15 @@ class ArrowHelper extends Mesh {
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            layout (location = 1) in vec2 aUv;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
+            layout (location = 0) in vec3 ${AttributeNames.Position};
+            layout (location = 1) in vec2 ${AttributeNames.Uv};
+            uniform mat4 ${UniformNames.WorldMatrix};
+            uniform mat4 ${UniformNames.ViewMatrix};
+            uniform mat4 ${UniformNames.ProjectionMatrix};
             out vec2 vUv;
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -2266,6 +2407,7 @@ class ArrowHelper extends Mesh {
 
 }
 ﻿
+
 
 
 
@@ -2433,11 +2575,11 @@ class AxesHelper extends Mesh {
             gpu,
             attributes: [
                 {
-                    name: "position",
+                    name: AttributeNames.Position,
                     data: new Float32Array(objData.positions),
                     size: 3
                 }, {
-                    name: "uv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array(objData.uvs),
                     size: 2
                 }
@@ -2448,15 +2590,15 @@ class AxesHelper extends Mesh {
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            layout (location = 1) in vec2 aUv;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
+            layout (location = 0) in vec3 ${AttributeNames.Position};
+            layout (location = 1) in vec2 ${AttributeNames.Uv};
+            uniform mat4 ${UniformNames.WorldMatrix};
+            uniform mat4 ${UniformNames.ViewMatrix};
+            uniform mat4 ${UniformNames.ProjectionMatrix};
             out vec2 vUv;
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
             fragmentShader: `#version 300 es
@@ -2532,6 +2674,8 @@ class Texture extends GLObject {
     #img;
     #gpu;
     type;
+    minFilter;
+    magFilter;
 
     get glObject() {
         return this.#texture;
@@ -2550,6 +2694,9 @@ class Texture extends GLObject {
         super();
         
         this.type = type;
+        
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
 
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
@@ -2577,7 +2724,7 @@ class Texture extends GLObject {
             case TextureTypes.RGBA16F:
             case TextureTypes.RGBA32F:
                 // min filter settings
-                switch(minFilter) {
+                switch(this.minFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                         break;
@@ -2588,7 +2735,7 @@ class Texture extends GLObject {
                         throw "invalid min filter type"
                 }
                 // mag filter settings
-                switch(magFilter) {
+                switch(this.magFilter) {
                     case TextureFilterTypes.Nearest:
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                         break;
@@ -2606,11 +2753,11 @@ class Texture extends GLObject {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 break;
                 
-            // 「filterできない」で合っているはず？
-            case TextureTypes.RGBA32F:
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                break;
+            // // 「filterできない」で合っているはず？
+            // case TextureTypes.RGBA32F:
+            //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            //     break;
 
             default:
                 throw "invalid texture type";
@@ -2662,9 +2809,11 @@ class Texture extends GLObject {
                 if (width && height) {
                     // for render target
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
                 } else {
                     // set img to texture
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
                 }
                 break;
                 
@@ -2705,6 +2854,7 @@ class Texture extends GLObject {
                 
             case TextureTypes.Depth:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.#img);
+                // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.#img);
                 break;
 
             case TextureTypes.RGBA16F:
@@ -2790,7 +2940,7 @@ class Renderbuffer extends GLObject {
                 gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
                 break;
             default:
-                throw "invalid render buffer type.";
+                throw "[Renderbuffer.constructor] invalid render buffer type.";
         }
         
         // TODO: あったほうがよい？
@@ -2832,6 +2982,8 @@ class AbstractRenderTarget {
 
 
 
+// TODO:
+// depth texture を外から渡す形でもいいかも
 class RenderTarget extends AbstractRenderTarget {
     name;
     #framebuffer;
@@ -2839,9 +2991,14 @@ class RenderTarget extends AbstractRenderTarget {
     width;
     height;
     #texture;
+    #depthTexture;
 
     get texture() {
         return this.#texture;
+    }
+    
+    get depthTexture() {
+        return this.#depthTexture;
     }
 
     get framebuffer() {
@@ -2863,17 +3020,20 @@ class RenderTarget extends AbstractRenderTarget {
         width = 1,
         height = 1,
         useDepthBuffer = false,
+        writeDepthTexture = false,
         minFilter = TextureFilterTypes.Linear,
         magFilter = TextureFilterTypes.Linear,
+        mipmap = false,
     }) {
         super();
-        
+
+        const gl = gpu.gl;
+
         this.name = name;
+        this.type = type;
         
         this.width = width;
         this.height = height;
-
-        const gl = gpu.gl;
 
         this.#framebuffer = new Framebuffer({gpu});
 
@@ -2886,54 +3046,121 @@ class RenderTarget extends AbstractRenderTarget {
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
         }
 
-        let textureType;
-        switch (type) {
-            case RenderTargetTypes.RGBA:
-                textureType = TextureTypes.RGBA;
-                break;
-            case RenderTargetTypes.Depth:
-                textureType = TextureTypes.Depth;
-                break;
-            default:
-                throw "invalid texture type";
+        // let textureType;
+        // switch (this.type) {
+        //     case RenderTargetTypes.RGBA:
+        //         textureType = TextureTypes.RGBA;
+        //         break;
+        //     case RenderTargetTypes.Depth:
+        //         textureType = TextureTypes.Depth;
+        //         break;
+        //     default:
+        //         throw "[RenderTarget.constructor] invalid texture type";
+        // }
+        
+        // if(this.type === RenderTargetTypes.Depth) {
+        //     this.#depthTexture = new Texture({
+        //         gpu,
+        //         width: this.width,
+        //         height: this.height,
+        //         mipmap: false,
+        //         type: TextureTypes.Depth,
+        //         // 一旦linear固定
+        //         minFilter: TextureFilterTypes.Nearest,
+        //         magFilter: TextureFilterTypes.Nearest
+        //     })
+        //     // depth as texture
+        //     gl.framebufferTexture2D(
+        //         gl.FRAMEBUFFER,
+        //         gl.DEPTH_ATTACHMENT,
+        //         gl.TEXTURE_2D,
+        //         this.#depthTexture.glObject,
+        //         0
+        //     );           
+        // } else {
+        //     this.#texture = new Texture({
+        //         gpu,
+        //         width: this.width,
+        //         height: this.height,
+        //         mipmap,
+        //         type: TextureTypes.RGBA,
+        //         minFilter,
+        //         magFilter
+        //     });
+        //     gl.framebufferTexture2D(
+        //         gl.FRAMEBUFFER,
+        //         gl.COLOR_ATTACHMENT0,
+        //         gl.TEXTURE_2D,
+        //         this.#texture.glObject,
+        //         0
+        //     );
+
+        //     if(writeDepthTexture) {
+        //         this.#depthTexture = new Texture({
+        //             gpu,
+        //             width: this.width,
+        //             height: this.height,
+        //             mipmap: false,
+        //             type: TextureTypes.Depth,
+        //             // 一旦linear固定
+        //             minFilter: TextureFilterTypes.Linear,
+        //             magFilter: TextureFilterTypes.Linear
+        //         })
+        //         // depth as texture
+        //         gl.framebufferTexture2D(
+        //             gl.FRAMEBUFFER,
+        //             gl.DEPTH_ATTACHMENT,
+        //             gl.TEXTURE_2D,
+        //             this.#depthTexture.glObject,
+        //             0
+        //         );
+        //     }
+        // }
+        
+        if(this.type === RenderTargetTypes.RGBA) {
+            this.#texture = new Texture({
+                gpu,
+                width: this.width,
+                height: this.height,
+                mipmap,
+                type: TextureTypes.RGBA,
+                minFilter,
+                magFilter
+            });
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,
+                gl.COLOR_ATTACHMENT0,
+                gl.TEXTURE_2D,
+                this.#texture.glObject,
+                0
+            );
         }
 
-        this.#texture = new Texture({
-            gpu,
-            width: this.width,
-            height: this.height,
-            mipmap: false,
-            type: textureType,
-            minFilter,
-            magFilter
-        });
-
-        // set texture to render buffer
-        switch (type) {
-            case RenderTargetTypes.RGBA:
-                // color as texture
-                gl.framebufferTexture2D(
-                    gl.FRAMEBUFFER,
-                    gl.COLOR_ATTACHMENT0,
-                    gl.TEXTURE_2D,
-                    this.#texture.glObject,
-                    0
-                );
-                break;
-            case RenderTargetTypes.Depth:
-                // depth as texture
-                gl.framebufferTexture2D(
-                    gl.FRAMEBUFFER,
-                    gl.DEPTH_ATTACHMENT,
-                    gl.TEXTURE_2D,
-                    this.#texture.glObject,
-                    0
-                );
-                break;
-            default:
-                throw "invalid type";
+        if(this.type === RenderTargetTypes.Depth || writeDepthTexture) {
+            this.#depthTexture = new Texture({
+                gpu,
+                width: this.width,
+                height: this.height,
+                mipmap: false,
+                type: TextureTypes.Depth,
+                // 一旦linear固定
+                minFilter: TextureFilterTypes.Linear,
+                magFilter: TextureFilterTypes.Linear
+            })
+            // depth as texture
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,
+                gl.DEPTH_ATTACHMENT,
+                gl.TEXTURE_2D,
+                this.#depthTexture.glObject,
+                0
+            );                      
         }
-
+        
+        if(this.#depthTexture && this.#depthRenderbuffer) {
+            throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
+        }
+       
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
         if (this.#depthRenderbuffer) {
@@ -2945,7 +3172,12 @@ class RenderTarget extends AbstractRenderTarget {
     setSize(width, height) {
         this.width = width;
         this.height = height;
-        this.#texture.setSize(this.width, this.height);
+        if(this.#texture) {
+            this.#texture.setSize(this.width, this.height);
+        }
+        if(this.#depthTexture) {
+            this.#depthTexture.setSize(this.width, this.height);
+        }
         if (this.#depthRenderbuffer) {
             this.#depthRenderbuffer.setSize(width, height);
         }
@@ -2962,8 +3194,8 @@ class RenderTarget extends AbstractRenderTarget {
 
 
 class Camera extends Actor {
-    viewMatrix = Matrix4.identity();
-    projectionMatrix = Matrix4.identity();
+    viewMatrix = Matrix4.identity;
+    projectionMatrix = Matrix4.identity;
     #renderTarget;
     clearColor; // TODO: color class
     #postProcess;
@@ -3019,12 +3251,18 @@ class Camera extends Actor {
     }
 
     setSize(width, height) {
-        if (!this.#postProcess) {
-            return;
-        }
+        // if (!this.#postProcess) {
+        //     return;
+        // }
+        // if (this.#renderTarget) {
+        //     this.#postProcess.setSize(this.#renderTarget.width, this.#renderTarget.height);
+        // } else {
+        //     this.#postProcess.setSize(width, height);
+        // }
         if (this.#renderTarget) {
-            this.#postProcess.setSize(this.#renderTarget.width, this.#renderTarget.height);
-        } else {
+            this.#renderTarget.setSize(width, height);
+        }
+        if (this.#postProcess) {
             this.#postProcess.setSize(width, height);
         }
     }
@@ -3047,7 +3285,7 @@ class Camera extends Actor {
                     gpu,
                     attributes: [
                         {
-                            name: "position",
+                            name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
@@ -3076,14 +3314,14 @@ class Camera extends Actor {
                     gpu,
                     vertexShader: `#version 300 es
                     
-                    layout (location = 0) in vec3 aPosition;
+                    layout (location = 0) in vec3 ${AttributeNames.Position};
                    
-                    uniform mat4 uWorldMatrix;
-                    uniform mat4 uViewMatrix;
-                    uniform mat4 uProjectionMatrix;
+                    uniform mat4 ${UniformNames.WorldMatrix};
+                    uniform mat4 ${UniformNames.ViewMatrix};
+                    uniform mat4 ${UniformNames.ProjectionMatrix};
                     
                     void main() {
-                        gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                        gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     }
                     `,
                     fragmentShader: `#version 300 es
@@ -3106,7 +3344,7 @@ class Camera extends Actor {
         
         if(this.#visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
-            this.#visibleFrustumMesh.geometry.updateAttribute("position", [
+            this.#visibleFrustumMesh.geometry.updateAttribute(AttributeNames.Position, new Float32Array([
                 // near clip
                 ...frustumPositions.nearLeftTop.elements,
                 ...frustumPositions.nearLeftBottom.elements,
@@ -3117,7 +3355,7 @@ class Camera extends Actor {
                 ...frustumPositions.farLeftBottom.elements,
                 ...frustumPositions.farRightTop.elements,
                 ...frustumPositions.farRightBottom.elements,
-            ]);
+            ]));
         }
     }
 
@@ -3175,9 +3413,9 @@ class OrthographicCamera extends Camera {
     }
    
     getFrustumLocalPositions() {
-        const localForward = Vector3.back();
-        const localRight = Vector3.right();
-        const localUp = Vector3.up();
+        const localForward = Vector3.back;
+        const localRight = Vector3.right;
+        const localUp = Vector3.up;
 
         const halfWidth = (Math.abs(this.left) + Math.abs(this.right)) / 2;
         const halfHeight = (Math.abs(this.top) + Math.abs(this.right)) / 2;
@@ -3335,6 +3573,8 @@ class DirectionalLight extends Light {
         this.addChild(this.shadowCamera);
     }
 }
+
+
 const calcSkinningMatrixFunc = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
@@ -3396,7 +3636,7 @@ mat4 getJointMatrixGPUSkinning(
 const skinningVertexUniforms = (jointNum) => `
 // tmp for cpu skinning
 // uniform mat4[${jointNum}] uJointMatrices;
-uniform sampler2D uJointTexture;
+uniform sampler2D ${UniformNames.JointTexture};
 
 uniform int uBoneCount;
 uniform int uJointTextureColNum;
@@ -3454,6 +3694,7 @@ const engineCommonUniforms = () => `
 uniform float uTime;
 `;
 
+
 const shadowMapVertexVaryings = () => `
 out vec4 vShadowMapProjectionUv;
 `;
@@ -3467,12 +3708,12 @@ const shadowMapVertex = () => `
 `;
 
 const shadowMapVertexUniforms = () => `
-uniform mat4 uShadowMapProjectionMatrix;
+uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
 `;
 
 const shadowMapFragmentUniforms = () => `
-uniform sampler2D uShadowMap;
-uniform float uShadowBias;
+uniform sampler2D ${UniformNames.ShadowMap};
+uniform float ${UniformNames.ShadowBias};
 `;
 
 const shadowMapFragmentFunc = () => `
@@ -3577,13 +3818,12 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     // TODO: surfaceに持たせる
     float specularPower = 32.;
     float specularRate = clamp(dot(H, N), 0., 1.);
-    // TODO: 外から渡せるようにする
-    float specularAmount = .5;
-    specularRate = pow(specularRate, specularPower) * specularAmount;
+    specularRate = pow(specularRate, specularPower) * surface.specularAmount;
     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
 
     // TODO: 外から渡せるようにする
-    vec3 ambientColor = vec3(.12, .11, .1);
+    // vec3 ambientColor = vec3(.12, .11, .1);
+    vec3 ambientColor = vec3(.1);
 
     vec4 resultColor = vec4(
         diffuseColor + specularColor + ambientColor,
@@ -3626,6 +3866,7 @@ vec4 calcPhongLighting() {
 
 
 
+
 // -----------------------------------------------
 // TODO:
 // - out varying を centroid できるようにしたい
@@ -3656,10 +3897,11 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
                         throw "[buildVertexAttributeLayouts] invalid attribute float";
                 }
                 break;
+            // TODO: signedなパターンが欲しい    
             case Uint16Array:
                 switch(size) {
                     case 1:
-                        type = "int";
+                        type = "uint";
                         break;
                     case 2:
                         type = "uvec2";
@@ -3685,23 +3927,38 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
 }
 
 const generateVertexShader = ({
+    // required
     attributeDescriptors,
-    isSkinning,
-    gpuSkinning,
-    jointNum,
+    // optional
     receiveShadow,
     useNormalMap,
     vertexShaderModifier = {
+        beginMain: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
+        viewPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: "",
     },
-    insertUniforms,
+    insertVaryings,
+    insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
+    // skinning
+    isSkinning,
+    gpuSkinning,
+    jointNum,
+    // instancing
+    isInstancing,
+    // vertex color
+    useVertexColor,
 } = {}) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+    const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
+    // const hasVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
+    // const hasInstanceVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.InstanceVertexColor);
+    // const hasColor = hasVertexColor || hasInstanceVertexColor;
 
     return `#version 300 es
 
@@ -3714,8 +3971,8 @@ out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? normalMapVertexVaryings() : ""}
 ${receiveShadow ? shadowMapVertexVaryings() : "" }
-// TODO: フラグで必要に応じて出し分け
-out vec4 vVertexColor;
+${useVertexColor ? "out vec4 vVertexColor;" : ""}
+${insertVaryings ? insertVaryings : ""}
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
@@ -3725,6 +3982,8 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 ${insertUniforms || ""}
 
 void main() {
+    ${vertexShaderModifier.beginMain || ""}
+
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
@@ -3734,7 +3993,7 @@ void main() {
         : ""
     }
     ${vertexShaderModifier.localPositionPostProcess || ""}
-    
+
     ${(() => {
         if(isSkinning) {
             return useNormalMap
@@ -3753,16 +4012,22 @@ void main() {
     vTangent = mat3(uNormalMatrix) * aTangent;
     vBinormal = mat3(uNormalMatrix) * aBinormal;
 `
-                : `
+                : hasNormal ? `
     vNormal = mat3(uNormalMatrix) * aNormal;
-`;
+` : "";
         }
     })()}
   
     // assign common varyings 
     vUv = aUv; 
-    // TODO: 頂点カラーが必要かどうかはフラグで出し分けたい
-    vVertexColor = vec4(1., 1., 1., 1.);
+    ${(() => {
+        if(!useVertexColor) {
+            return "";
+        }
+        return isInstancing
+            ? "vVertexColor = aInstanceVertexColor;"
+            : "vVertexColor = aColor;";
+    })()}
 
     vec4 worldPosition = uWorldMatrix * localPosition;
     ${vertexShaderModifier.worldPositionPostProcess || ""}
@@ -3770,10 +4035,15 @@ void main() {
     vWorldPosition = worldPosition.xyz;
 
     ${receiveShadow ? shadowMapVertex() : ""}
+    
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    ${vertexShaderModifier.viewPositionPostProcess || ""}
  
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
- 
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    
+    gl_Position = uProjectionMatrix * viewPosition;
+    
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }
@@ -3783,10 +4053,13 @@ const generateDepthVertexShader = ({
     isSkinning,
     gpuSkinning,
     vertexShaderModifier = {
+        beginMain: "",
         localPositionPostProcess: "",
         worldPositionPostProcess: "",
         outClipPositionPreProcess: "",
+        lastMain: ""
     },
+    insertVaryings,
     useNormalMap,
     jointNum
 } = {}) => {
@@ -3805,8 +4078,11 @@ ${isSkinning ? skinningVertexUniforms(jointNum) : ""}
 
 // TODO: depthでは必要ないのでなくしたい
 out vec4 vVertexColor;
+${insertVaryings ? insertVaryings : ""}
 
 void main() {
+    ${vertexShaderModifier.beginMain || ""}
+
     ${isSkinning ? skinningVertex(gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
@@ -3823,10 +4099,11 @@ void main() {
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
     
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+
+    ${vertexShaderModifier.lastMain || ""}
 }
 `;
 }
-
 ﻿
 
 
@@ -3910,7 +4187,7 @@ class SkinnedMesh extends Mesh {
         this.materials.forEach(material => {
             // material.uniforms.uJointMatrices = {
             //     type: UniformTypes.Matrix4Array,
-            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
+            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
             // };
             material.uniforms = {
                 ...material.uniforms,
@@ -3945,53 +4222,44 @@ class SkinnedMesh extends Mesh {
         });
 
         // TODO: depthを強制的につくるようにして問題ない？
-        // if(!options.depthMaterial) {
-            this.depthMaterial = new Material({
-                gpu,
-                vertexShader: generateDepthVertexShader({
-                    attributeDescriptors: this.geometry.getAttributeDescriptors(),
-                    isSkinning: true,
-                    gpuSkinning: this.#gpuSkinning,
-                    jointNum: this.boneCount,
-                    vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
-                    // localPositionPostProcess: this.mainMaterial.vertexShaderModifier.localPositionPostProcess
-                }),
-                fragmentShader: generateDepthFragmentShader({
-                    // alphaTest: !!this.material.alphaTest
-                    alphaTest: !!this.mainMaterial.alphaTest
-                }),
-                uniforms: {
-                    // uJointMatrices: {
-                    //     type: UniformTypes.Matrix4Array,
-                    //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity()),
-                    //     // value: null
-                    // },
-                    uJointTexture: {
-                        type: UniformTypes.Texture,
-                        value: null
-                    },
-                    uJointTextureColNum: {
-                        type: UniformTypes.Int,
-                        value: this.#jointTextureColNum,
-                    },
-                    ...(this.#gpuSkinning ? {
-                        uTime: {
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        uBoneCount: {
-                            type: UniformTypes.Int,
-                            value: this.boneCount
-                        },
-                        uTotalFrameCount: {
-                            type: UniformTypes.Int,
-                            value: 0,
-                        }
-                    } : {})
+        this.depthMaterial = new Material({
+            gpu,
+            vertexShader: generateDepthVertexShader({
+                attributeDescriptors: this.geometry.getAttributeDescriptors(),
+                isSkinning: true,
+                gpuSkinning: this.#gpuSkinning,
+                jointNum: this.boneCount,
+                vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
+            }),
+            fragmentShader: generateDepthFragmentShader({
+                alphaTest: !!this.mainMaterial.alphaTest
+            }),
+            uniforms: {
+                uJointTexture: {
+                    type: UniformTypes.Texture,
+                    value: null
                 },
-                alphaTest: this.mainMaterial.alphaTest
-            });
-        // }
+                uJointTextureColNum: {
+                    type: UniformTypes.Int,
+                    value: this.#jointTextureColNum,
+                },
+                ...(this.#gpuSkinning ? {
+                    uTime: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    uBoneCount: {
+                        type: UniformTypes.Int,
+                        value: this.boneCount
+                    },
+                    uTotalFrameCount: {
+                        type: UniformTypes.Int,
+                        value: 0,
+                    }
+                } : {})
+            },
+            alphaTest: this.mainMaterial.alphaTest
+        });
 
         super.start(options);
 
@@ -4062,7 +4330,7 @@ class SkinnedMesh extends Mesh {
             const fillNum = colNum * rowNum - boneCount;
             const jointData = new Float32Array([
                     ...jointMatricesAllFrames,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()
@@ -4101,8 +4369,8 @@ matrix elements: ${jointData.length}`);
       
         if(this.debugBoneView) {
             const boneLinePositions = this.#boneOrderedIndex.map(bone => [...bone.jointMatrix.position.elements]);
-            this.boneLines.geometry.updateAttribute("position", boneLinePositions.flat())
-            this.bonePoints.geometry.updateAttribute("position", boneLinePositions.flat())
+            this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
+            this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         }
 
         if(this.#gpuSkinning) {
@@ -4124,7 +4392,7 @@ matrix elements: ${jointData.length}`);
             const fillNum = colNum * rowNum - this.boneCount;
             const jointData = new Float32Array([
                     ...jointMatrices,
-                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity())
+                    ...(new Array(fillNum)).fill(0).map(() => Matrix4.identity)
                 ]
                 .map(m => [...m.elements])
                 .flat()
@@ -4186,7 +4454,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -4199,14 +4467,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                 
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                 }
                 `,
                 fragmentShader: `#version 300 es
@@ -4232,7 +4500,7 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 attributes: [
                     {
-                        name: "position",
+                        name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
                         usage: AttributeUsageType.DynamicDraw
@@ -4244,14 +4512,14 @@ matrix elements: ${jointData.length}`);
                 gpu,
                 vertexShader: `#version 300 es
                
-                layout (location = 0) in vec3 aPosition;
+                layout (location = 0) in vec3 ${AttributeNames.Position};
                 
-                uniform mat4 uWorldMatrix;
-                uniform mat4 uViewMatrix;
-                uniform mat4 uProjectionMatrix;
+                uniform mat4 ${UniformNames.WorldMatrix};
+                uniform mat4 ${UniformNames.ViewMatrix};
+                uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     gl_PointSize = 6.;
                 }
                 `,
@@ -4362,6 +4630,7 @@ class CubeMap extends GLObject {
 ﻿
 
 
+
 class BoxGeometry extends Geometry {
     constructor({ gpu }) {
         const boxPosition_0 = [-0.5, 0.5, 0.5];
@@ -4395,7 +4664,7 @@ class BoxGeometry extends Geometry {
                 // 1 ---- 3
                 // -----------------------------
                 {
-                    name: "aPosition",
+                    name: AttributeNames.Position,
                     data: new Float32Array([
                         // front
                         ...boxPosition_0, ...boxPosition_1, ...boxPosition_2, ...boxPosition_3,
@@ -4412,7 +4681,7 @@ class BoxGeometry extends Geometry {
                     ]),
                     size: 3,
                 }, {
-                    name: "aUv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
                         0, 0,
@@ -4421,7 +4690,7 @@ class BoxGeometry extends Geometry {
                     ])).flat()),
                     size: 2
                 }, {
-                    name: "aNormal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
                 },
@@ -4439,12 +4708,35 @@ class BoxGeometry extends Geometry {
 
 
 
+
 class PlaneGeometry extends Geometry {
     constructor({
         gpu,
         calculateTangent = false,
         calculateBinormal = false 
     }) {
+        const { attributes, indices, drawCount } = PlaneGeometry.createPlaneGeometryData({ calculateTangent, calculateBinormal });
+
+        super({
+            gpu,
+            attributes,
+            indices,
+            drawCount,
+        });
+    }
+    
+    static createPlaneGeometryData({
+        calculateTangent = false,
+        calculateBinormal = false 
+    } = {}) {
+        // -----------------------------
+        // 0 ---- 2
+        // |    / |
+        // |   /  |
+        // |  /   |
+        // | /    |
+        // 1 ---- 3
+        // -----------------------------
 
         const normals = [
             0, 0, 1,
@@ -4454,59 +4746,54 @@ class PlaneGeometry extends Geometry {
         ];
         
         const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
-
-        super({
-            gpu,
-            // -----------------------------
-            // 0 ---- 2
-            // |    / |
-            // |   /  |
-            // |  /   |
-            // | /    |
-            // 1 ---- 3
-            // -----------------------------
-            attributes: [
-                {
-                    name: "aPosition",
-                    data: new Float32Array([
-                        -1, 1, 0,
-                        -1, -1, 0,
-                        1, 1, 0,
-                        1, -1, 0,
-                    ]),
-                    size: 3
-                }, {
-                    name: "aUv",
-                    data: new Float32Array([
-                        0, 1,
-                        0, 0,
-                        1, 1,
-                        1, 0,
-                    ]),
-                    size: 2
-                }, {
-                    name: "aNormal",
-                    data: new Float32Array(normals),
-                    size: 3
-                },
-                (calculateTangent ?
-                    {
-                        name: "aTangent",
-                        data: new Float32Array(tangents),
-                        size: 3
-                    } : {}
-                ),
-                (calculateBinormal ?
-                    {
-                        name: "aBinormal",
-                        data: new Float32Array(binormals),
-                        size: 3
-                    } : {}
-                ),
-            ],
+      
+        // TODO: uniqでfilter
+        const attributes = [
+            {
+                name: AttributeNames.Position,
+                data: new Float32Array([
+                    -1, 1, 0,
+                    -1, -1, 0,
+                    1, 1, 0,
+                    1, -1, 0,
+                ]),
+                size: 3
+            }, {
+                name: AttributeNames.Uv,
+                data: new Float32Array([
+                    0, 1,
+                    0, 0,
+                    1, 1,
+                    1, 0,
+                ]),
+                size: 2
+            }, {
+                name: AttributeNames.Normal,
+                data: new Float32Array(normals),
+                size: 3
+            },
+        ];
+        
+        if(calculateTangent) {
+            attributes.push({
+                name: AttributeNames.Tangent,
+                data: new Float32Array(tangents),
+                size: 3
+            });
+        }
+        if(calculateBinormal) {
+            attributes.push({
+                name: AttributeNames.Binormal,
+                data: new Float32Array(binormals),
+                size: 3
+            });
+        }
+        
+        return {
+            attributes,
             indices: [0, 1, 2, 2, 1, 3],
-            drawCount: 6
-        });
+            drawCount: 6,
+        };
     }
 }
 
@@ -4576,14 +4863,14 @@ const skyboxVertexShader = `#version 300 es
 
 precision mediump float;
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
-layout (location = 2) in vec3 aNormal;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
+layout (location = 2) in vec3 ${AttributeNames.Normal};
 
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
+uniform mat4 ${UniformNames.WorldMatrix};
+uniform mat4 ${UniformNames.ViewMatrix};
+uniform mat4 ${UniformNames.ProjectionMatrix};
+uniform mat4 ${UniformNames.NormalMatrix};
 
 out vec2 vUv;
 out vec3 vNormal;
@@ -4591,10 +4878,10 @@ out vec3 vWorldPosition;
 
 void main() {
     vUv = aUv;
-    vNormal = (uNormalMatrix * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = uWorldMatrix * vec4(aPosition, 1);
+    vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;
+    vec4 worldPosition = ${UniformNames.WorldMatrix} * vec4(aPosition, 1);
     vWorldPosition = worldPosition.xyz;
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * worldPosition;
 }
 `;
 
@@ -4642,15 +4929,15 @@ class Skybox extends Mesh {
             gpu,
             attributes: [
                 {
-                    name: "position",
+                    name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
                     size: 3
                 }, {
-                    name: "uv",
+                    name: AttributeNames.Uv,
                     data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }, {
-                    name: "normal",
+                    name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
                     size: 3
                 },
@@ -4673,7 +4960,7 @@ class Skybox extends Mesh {
                 },
                 uViewDirectionProjectionInverse: {
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity(),
+                    value: Matrix4.identity,
                 },
                 uRotationOffset: {
                     type: UniformTypes.Float,
@@ -4764,30 +5051,101 @@ class TimeAccumulator {
         }
     }   
 }
+
+
+class Stats {
+    domElement;
+    drawVertexCountView;
+    drawCallCountView;
+    drawVertexCount = 0;
+    drawCallCount = 0;
+    
+    constructor({ wrapperElement } = {}) {
+        this.domElement = document.createElement("div");
+        this.domElement.style.cssText = `
+position: absolute;
+top: 0;
+left: 0;
+padding: 0.2em 0.5em;
+font-size: 9px;
+color: white;
+font-weight: bold;
+text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+`;
+
+        this.drawVertexCountView = document.createElement("p");
+        this.domElement.appendChild(this.drawVertexCountView);
+        
+        this.drawCallCountView = document.createElement("p");
+        this.domElement.appendChild(this.drawCallCountView);
+        
+        (wrapperElement || document.body).appendChild(this.domElement);
+    }
+
+    clear() {
+        this.drawVertexCount = 0;
+        this.drawCallCount = 0;
+    }
+
+    addDrawVertexCount(geometry) {
+        const positionAttribute = geometry.getAttribute(AttributeNames.Position);
+        this.drawVertexCount += positionAttribute.data.length / 3;
+    }
+    
+    incrementDrawCall() {
+        this.drawCallCount++;
+    }
+    
+    updateView() {
+        this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
+        this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
+    }
+}
 ﻿
 
 
 
+
 class Engine {
+    #gpu;
+    #stats;
     #renderer;
+    #scenes = [];
+    // timers
     #fixedUpdateFrameTimer;
     #updateFrameTimer;
+    // callbacks
+    #onBeforeStart;
     #onBeforeFixedUpdate;
     #onBeforeUpdate;
-    #scene;
-    #gpu;
+    #onRender;
     
     get renderer() {
         return this.#renderer;
     }
     
-    set onBeforeUpdate(value) {
-        this.#onBeforeUpdate = value;
+    set onBeforeStart(cb) {
+        this.#onBeforeStart = cb;
     }
     
-    constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate }) {
+    set onBeforeUpdate(cb) {
+        this.#onBeforeUpdate = cb;
+    }
+    
+    set onBeforeFixedUpdate(cb) {
+        this.#onBeforeFixedUpdate = cb;
+    }
+    
+    set onRender(cb) {
+        this.#onRender = cb;
+    }
+    
+    constructor({ gpu, renderer, onBeforeFixedUpdate, onBeforeUpdate, onRender }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
+        
+        this.#stats = new Stats();
+        this.#renderer.setStats(this.#stats);
 
         // TODO: 外からfps変えられるようにしたい
         this.#fixedUpdateFrameTimer = new TimeAccumulator(60, this.fixedUpdate.bind(this));
@@ -4795,13 +5153,22 @@ class Engine {
 
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
         this.#onBeforeUpdate = onBeforeUpdate;
+        this.#onRender = onRender;
     }
     
     setScene(scene) {
-        this.#scene = scene;
+        // this.#scene = scene;
+        this.#scenes.push(scene);
     }
     
+    setScenes(scenes) {
+        this.#scenes = scenes;
+    }
+
     start() {
+        if(this.#onBeforeStart) {
+            this.#onBeforeStart();
+        }
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
@@ -4812,7 +5179,10 @@ class Engine {
         const rh = height * this.renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        this.#scene.traverse((actor) => actor.setSize(w, h));
+        // this.#scene.traverse((actor) => actor.setSize(w, h));
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.setSize(w, h));
+        });
         this.#renderer.setSize(w, h, rw, rh);
     }
 
@@ -4821,14 +5191,20 @@ class Engine {
             this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
         
-        this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+        // this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.fixedUpdate({gpu: this.#gpu, fixedTime, fixedDeltaTime}));
+        });
 
         // update all actors matrix
         // TODO
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
-        this.#scene.traverse((actor) => actor.updateTransform());
+        // this.#scene.traverse((actor) => actor.updateTransform());
+        this.#scenes.forEach(scene => {
+            scene.traverse((actor) => actor.updateTransform());
+        });
     }
 
     update(time, deltaTime) {
@@ -4837,24 +5213,34 @@ class Engine {
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        this.#scene.traverse((actor) => {
-            actor.update({gpu: this.#gpu, time, deltaTime});
-            switch(actor.type) {
-                case ActorTypes.Skybox:
-                case ActorTypes.Mesh:
-                case ActorTypes.SkinnedMesh:
-                    actor.beforeRender({ gpu: this.#gpu });
-                    break;
-                default:
-                    break;
-            }
+        this.#scenes.forEach((scene) => {
+            scene.traverse((actor) => {
+                actor.update({gpu: this.#gpu, time, deltaTime});
+                switch (actor.type) {
+                    case ActorTypes.Skybox:
+                    case ActorTypes.Mesh:
+                    case ActorTypes.SkinnedMesh:
+                        actor.beforeRender({gpu: this.#gpu});
+                        break;
+                    default:
+                        break;
+                }
+            });
         });
         
-        this.render();
+        this.render(time, deltaTime);
     }
     
-    render() {
-        this.#renderer.render(this.#scene, this.#scene.mainCamera);
+    render(time, deltaTime) {
+        this.#stats.clear();
+        // this.#renderer.render(this.#scene, this.#scene.mainCamera);
+        // this.#scenes.forEach(scene => {
+        //     this.#renderer.render(scene, scene.mainCamera);
+        // });
+        if(this.#onRender) {
+            this.#onRender(time, deltaTime);
+        }
+        this.#stats.updateView();
     }
    
     // time [sec]
@@ -4876,11 +5262,16 @@ class ForwardRenderer {
     pixelRatio;
     #realWidth;
     #realHeight;
+    #stats;
 
     constructor({gpu, canvas, pixelRatio = 1.5}) {
         this.#gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
+    }
+    
+    setStats(stats) {
+        this.#stats = stats;
     }
 
     setSize(width, height, realWidth, realHeight) {
@@ -4921,23 +5312,28 @@ class ForwardRenderer {
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
                 
+                // // TODO: material 側でやった方がよい？
+                // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
+                // }
+                // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+                //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
+                // }
+
                 // TODO: material 側でやった方がよい？
-                if (targetMaterial.uniforms.uWorldMatrix) {
-                    targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
-                }
-                if (targetMaterial.uniforms.uViewMatrix) {
-                    targetMaterial.uniforms.uViewMatrix.value = lightActor.shadowCamera.viewMatrix;
-                }
-                if (targetMaterial.uniforms.uProjectionMatrix) {
-                    targetMaterial.uniforms.uProjectionMatrix.value = lightActor.shadowCamera.projectionMatrix;
-                }
+                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera.viewMatrix);
+                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera.projectionMatrix);
               
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
     }
     
-   #buildRenderMeshInfo(actor, materialIndex = 0) {
+    #buildRenderMeshInfo(actor, materialIndex = 0) {
         return {
             actor,
             materialIndex
@@ -4963,6 +5359,7 @@ class ForwardRenderer {
             }
 
             const targetMaterial = actor.materials[materialIndex];
+            // const targetMaterial = actor.depthMaterial;
 
             // reset
             // NOTE: 余計なresetとかしない方がいい気がする
@@ -4970,49 +5367,70 @@ class ForwardRenderer {
             //     targetMaterial.uniforms.uShadowMap.value = null;
             // }
 
+            // // TODO: material 側でやった方がよい？
+            // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
+            // }
+            // if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
+            //     targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
+            // }
+            // if (targetMaterial.uniforms[UniformNames.ViewPosition]) {
+            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = camera.transform.worldMatrix.position;
+            // }
+
             // TODO: material 側でやった方がよい？
-            if (targetMaterial.uniforms.uWorldMatrix) {
-                targetMaterial.uniforms.uWorldMatrix.value = actor.transform.worldMatrix;
-            }
-            if (targetMaterial.uniforms.uViewMatrix) {
-                targetMaterial.uniforms.uViewMatrix.value = camera.viewMatrix;
-            }
-            if (targetMaterial.uniforms.uProjectionMatrix) {
-                targetMaterial.uniforms.uProjectionMatrix.value = camera.projectionMatrix;
-            }
-            if (targetMaterial.uniforms.uNormalMatrix) {
-                targetMaterial.uniforms.uNormalMatrix.value = actor.transform.worldMatrix.clone().invert().transpose();
-            }
-            if (targetMaterial.uniforms.uViewPosition) {
-                targetMaterial.uniforms.uViewPosition.value = camera.transform.worldMatrix.position;
-            }
+            targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
+            targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            targetMaterial.updateUniform(UniformNames.NormalMatrix, actor.transform.worldMatrix.clone().invert().transpose());
+            targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意 
             lightActors.forEach(light => {
                 if (targetMaterial.uniforms.uDirectionalLight) {
-                    targetMaterial.uniforms.uDirectionalLight = {
-                        type: UniformTypes.Struct,
-                        value: {
-                            direction: {
-                                type: UniformTypes.Vector3,
-                                value: light.transform.position,
-                            },
-                            intensity: {
-                                type: UniformTypes.Float,
-                                value: light.intensity,
-                            },
-                            color: {
-                                type: UniformTypes.Color,
-                                value: light.color
-                            }
+                    // targetMaterial.uniforms.uDirectionalLight = {
+                    //     type: UniformTypes.Struct,
+                    //     value: {
+                    //         direction: {
+                    //             type: UniformTypes.Vector3,
+                    //             value: light.transform.position,
+                    //         },
+                    //         intensity: {
+                    //             type: UniformTypes.Float,
+                    //             value: light.intensity,
+                    //         },
+                    //         color: {
+                    //             type: UniformTypes.Color,
+                    //             value: light.color
+                    //         }
+                    //     }
+                    // }
+                    targetMaterial.updateUniform("uDirectionalLight", {
+                        direction: {
+                            type: UniformTypes.Vector3,
+                            value: light.transform.position,
+                        },
+                        intensity: {
+                            type: UniformTypes.Float,
+                            value: light.intensity,
+                        },
+                        color: {
+                            type: UniformTypes.Color,
+                            value: light.color
                         }
-                    }
+                    });
                 }
 
                 if (
-                    targetMaterial.uniforms.uShadowMapProjectionMatrix &&
+                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
                     light.castShadow
                 ) {
@@ -5028,15 +5446,17 @@ class ForwardRenderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-
-                    // TODO:
-                    // - directional light の構造体に持たせた方がいいかもしれない
-                    if(targetMaterial.uniforms.uShadowMap) {
-                        targetMaterial.uniforms.uShadowMap.value = light.shadowMap.read.texture;
-                    }
-                    if(targetMaterial.uniforms.uShadowMapProjectionMatrix) {
-                        targetMaterial.uniforms.uShadowMapProjectionMatrix.value = textureProjectionMatrix;
-                    }
+                    
+                    // // TODO:
+                    // // - directional light の構造体に持たせた方がいいかもしれない
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
+                    // }
+                    // if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
+                    //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
+                    // }
+                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+                    targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
                 }
             });
 
@@ -5044,7 +5464,7 @@ class ForwardRenderer {
         });
     }
     
-    render(scene, camera) {
+    render(scene, camera, { enabledShadowPass = true } = {}) {
         const renderMeshInfoEachQueue = {
             opaque: [],
             skybox: [], // maybe only one
@@ -5052,13 +5472,10 @@ class ForwardRenderer {
             transparent: [],
         };
         const lightActors = [];
-        
-       
-        // TODO: 複数material対応
+
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    // renderMeshInfoEachQueue.skybox.push(actor);
                     renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
                     // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
@@ -5079,7 +5496,7 @@ class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "invalid blend type";
+                                throw "[ForwardRenderer.render] invalid blend type";
                         }
                     });
                     break;
@@ -5094,50 +5511,57 @@ class ForwardRenderer {
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat();
+        // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
+        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({ actor }) => actor.enabled);
         
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
       
-        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow);
-        
-        if(castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
-                if(actor.type === ActorTypes.Skybox) {
-                    return false;
-                }
-                return actor.castShadow;
-            });
-            this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
+       
+        if(enabledShadowPass) {
+            if(castShadowLightActors.length > 0) {
+                const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
+                    if(actor.type === ActorTypes.Skybox) {
+                        return false;
+                    }
+                    return actor.castShadow;
+                });
+                this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
+            }
         }
 
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-       
-        if (camera.enabledPostProcess) {
-            this.setRenderTarget(camera.postProcess.renderTarget.write);
-        } else {
-            this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
-        }
-       
+      
+        // postprocessはrendererから外した方がよさそう  
+        // if (camera.enabledPostProcess) {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
+        // } else {
+        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+        // }
+        this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
-        if (camera.enabledPostProcess) {
-            camera.postProcess.render({
-                gpu: this.#gpu,
-                renderer: this,
-                camera
-            });
-        }
-
-        // NOTE: ない方がよい？
-        // this.setRenderTarget(null);
+        // if (camera.enabledPostProcess) {
+        //     camera.postProcess.render({
+        //         gpu: this.#gpu,
+        //         renderer: this,
+        //         camera
+        //     });
+        // }
     }
 
     renderMesh(geometry, material) {
         geometry.update();
+        
+        if(this.#stats) {
+            this.#stats.addDrawVertexCount(geometry);
+            this.#stats.incrementDrawCall();
+        }
 
         // vertex
         this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
@@ -5332,7 +5756,8 @@ class GPU {
         const setUniformValue = (type, uniformName, value) => {
             const gl = this.gl;
             const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
-            // TODO: nullなとき,値がおかしいときはセットしない
+            // TODO:
+            // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
             switch(type) {
                 case UniformTypes.Int:
                     gl.uniform1i(location, value);
@@ -5340,8 +5765,14 @@ class GPU {
                 case UniformTypes.Float:
                     gl.uniform1f(location, value);
                     break;
+                case UniformTypes.FloatArray:
+                    gl.uniform1fv(location, value);
+                    break;
                 case UniformTypes.Vector2:
                     gl.uniform2fv(location, value.elements);
+                    break;
+                case UniformTypes.Vector2Array:
+                    gl.uniform2fv(location, value.map(v => [...v.elements]).flat());
                     break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, value.elements);
@@ -5400,6 +5831,8 @@ class GPU {
                 });
             } else {
                 setUniformValue(uniform.type, uniformName, uniform.value);
+                // console.log(uniformName === "uDepthTexture");
+                // console.log(uniform.type, uniformName, uniform.value);
             }
         });
         
@@ -5433,7 +5866,7 @@ class GPU {
 ﻿
 class Scene {
     children = []; // transform hierarchy
-    mainCamera;
+    // mainCamera;
     
     add(actor) {
         this.children.push(actor.transform);
@@ -5441,17 +5874,128 @@ class Scene {
     
     traverse(execFunc) {
         for(let i = 0; i < this.children.length; i++) {
-            this.recursiveTraverseActor(this.children[i].actor, execFunc);
+            this.#recursiveTraverseActor(this.children[i].actor, execFunc);
         }
     }
     
-    recursiveTraverseActor(actor, execFunc) {
+    #recursiveTraverseActor(actor, execFunc) {
         execFunc(actor);
         if(actor.transform.hasChild) {
             for(let i = 0; i < actor.transform.children.length; i++) {
-                this.recursiveTraverseActor(actor.transform.children[i], execFunc)
+                this.#recursiveTraverseActor(actor.transform.children[i], execFunc)
             }
         }
+    }
+}
+﻿
+// ------------------------------------------------------
+//
+// # 3x3
+// もしガウシアンブラーなら、
+// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
+//
+// --------------------------
+// | 1 | 2 | 1 |
+// | 2 | 4 | 2 | * (1 / 16)
+// | 1 | 2 | 1 |
+// --------------------------
+//
+// # 5x5
+// もしガウシアンブラーなら、
+// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
+//
+// -------------------------------------
+// | 1 | 4  | 6  | 4  | 1 |
+// | 4 | 16 | 24 | 16 | 4 |
+// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
+// | 4 | 16 | 24 | 16 | 4 |
+// | 1 | 4  | 6  | 4  | 1 |
+// -------------------------------------
+//
+// ------------------------------------------------------
+
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+function gaussCoefficient(sigma, x) {
+    const sigma2 = sigma * sigma;
+    return Math.exp(-(x * x) / (2. * sigma2));
+}
+
+function clamp(x, min, max) {
+    return Math.min(max, Math.max(x, min));
+}
+
+
+
+
+class OrbitCameraController {
+    #camera;
+    dampingFactor = 0.01;
+    minAzimuth;
+    maxAzimuth;
+    minAltitude = -45;
+    maxAltitude = 45;
+    azimuthSpeed = 100;
+    altitudeSpeed = 100;
+    #cameraAngle = { azimuth: 0, altitude: 0};
+    #lookAtTarget = Vector3.zero;
+    distance = 10;
+    attenuation = 0.001;
+    #targetX = 0;
+    #targetY = 0;
+    
+    #targetCameraPosition = Vector3.zero;
+    #currentCameraPosition = Vector3.zero;
+    
+    set lookAtTarget(v) {
+        this.#lookAtTarget = v;
+    }
+    
+    constructor(camera) {
+        this.#camera = camera;
+    }
+    
+    start(defaultAzimuth = 0, defaultAltitude = 0) {
+        this.#cameraAngle.azimuth = defaultAzimuth;
+        this.#cameraAngle.altitude = defaultAltitude;
+        this.#updateCameraPosition(true);
+        // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
+        // this.#currentCameraPosition = this.#targetCameraPosition.clone();
+    }
+    
+    setDelta(delta) {
+        this.#targetX = delta.x;
+        this.#targetY = delta.y;
+    }
+
+    fixedUpdate() {
+        this.#targetX = Math.sign(this.#targetX) * Math.max(0, Math.abs(this.#targetX) - this.attenuation);
+        this.#targetY = Math.sign(this.#targetY) * Math.max(0, Math.abs(this.#targetY) - this.attenuation);
+        
+        this.#cameraAngle.azimuth += this.#targetX * this.azimuthSpeed;
+        this.#cameraAngle.altitude += this.#targetY * this.altitudeSpeed;
+        
+        this.#updateCameraPosition();
+    }
+
+    #updateCameraPosition(isJump = false) {
+        // TODO: limit azimuth
+        this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
+        this.#cameraAngle.altitude = clamp(this.#cameraAngle.altitude, this.minAltitude, this.maxAltitude);
+
+        const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), this.#cameraAngle.altitude);
+        const v2 = Vector3.rotateVectorY(v1, this.#cameraAngle.azimuth);
+        this.#targetCameraPosition = Vector3.addVectors(
+            this.#lookAtTarget,
+            v2.scale(this.distance)
+        );
+        this.#currentCameraPosition = Vector3.lerpVectors(
+            this.#currentCameraPosition,
+            this.#targetCameraPosition,
+            isJump ? 1 : this.dampingFactor
+        );
+
+        this.#camera.transform.position = this.#currentCameraPosition;
+        this.#camera.transform.lookAt(this.#lookAtTarget);
     }
 }
 ﻿
@@ -5516,15 +6060,15 @@ class NodeBase {
 
 
 class Bone extends NodeBase {
-    offsetMatrix = Matrix4.identity(); // 初期姿勢のボーンローカル座標
-    #poseMatrix = Matrix4.identity(); // 初期姿勢行列
-    #boneOffsetMatrix = Matrix4.identity(); // 初期姿勢行列の逆行列
-    #jointMatrix = Matrix4.identity();
+    offsetMatrix = Matrix4.identity; // 初期姿勢のボーンローカル座標
+    #poseMatrix = Matrix4.identity; // 初期姿勢行列
+    #boneOffsetMatrix = Matrix4.identity; // 初期姿勢行列の逆行列
+    #jointMatrix = Matrix4.identity;
     index;
     
-    position = Vector3.zero();
-    rotation = Rotator.zero();
-    scale = Vector3.one();
+    position = Vector3.zero;
+    rotation = Rotator.zero;
+    scale = Vector3.one;
     
     get boneOffsetMatrix() {
         return this.#boneOffsetMatrix;
@@ -5882,15 +6426,15 @@ async function loadGLTF({
        
         // use basic mul
         // const offsetMatrix = Matrix4.multiplyMatrices(
-        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity,
+        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity,
+        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity
         // );
         // use trs
         const offsetMatrix = Matrix4.fromTRS(
-            node.translation ? new Vector3(...node.translation) : Vector3.zero(),
+            node.translation ? new Vector3(...node.translation) : Vector3.zero,
             node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
-            node.scale ? new Vector3(...node.scale) : Vector3.one()
+            node.scale ? new Vector3(...node.scale) : Vector3.one
         );
         bone.offsetMatrix = offsetMatrix;
         
@@ -6195,18 +6739,38 @@ async function loadTexture(src) {
     constructor(x, y) {
         this.set(x, y);
     }
-    
+
     set(x, y) {
         this.elements = new Float32Array([x, y]);
         return this;
     }
-    
-    static identity() {
+
+    static get identity() {
         return new Vector2(0, 0);
     }
 
-    static one() {
+    static get one() {
         return new Vector2(1, 1);
+    }
+
+    static get zero() {
+        return new Vector2(0, 0);
+    }
+    
+    static subVectors(v1, v2) {
+        return new Vector2(v1.x - v2.x, v1.y - v2.y);
+    }
+    
+    copy(v) {
+        this.x = v.x;
+        this.y = v.y;
+        return this;
+    }
+    
+    div(v) {
+        this.x /= v.x;
+        this.y /= v.y;
+        return this;
     }
 
     log() {
@@ -6297,8 +6861,8 @@ ${this.x}, ${this.y}
         return new Color(0, 0, 1, 1);
     }
     
-    static fromRGB(r, g, b, a) {
-        return new Color(r / 255, g / 255, b / 255, 1);
+    static fromRGB(r, g, b, a = 255) {
+        return new Color(r / 255, g / 255, b / 255, a / 255);
     }
     
     // hex ... #rrggbb or rrggbb
@@ -6325,13 +6889,16 @@ ${this.x}, ${this.y}
 
 
 class PhongMaterial extends Material {
-    diffuseColor;
+    // // params
+    // diffuseColor;
+    // specularAmount;
     
     constructor({
         diffuseColor,
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
+        specularAmount,
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
@@ -6342,6 +6909,7 @@ class PhongMaterial extends Material {
         uniforms = {},
         ...options
     }) {
+        // this.specularAmount = 
 
         const baseUniforms = {
             uDiffuseColor: {
@@ -6354,11 +6922,15 @@ class PhongMaterial extends Material {
             },
             uDiffuseMapUvScale: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
             },
             uDiffuseMapUvOffset: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
+            },
+            uSpecularAmount: {
+                type: UniformTypes.Float,
+                value: specularAmount || 1,
             },
             uNormalMap: {
                 type: UniformTypes.Texture,
@@ -6366,23 +6938,29 @@ class PhongMaterial extends Material {
             },
             uNormalMapUvScale: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
             },
             uNormalMapUvOffset: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
             },
-            uDirectionalLight: {}
+            uDirectionalLight: {
+                type: UniformTypes.Struct,
+                value: {}
+            }
         };
        
         const useNormalMap = !!normalMap;
-        
+       
+        // TODO: 今渡してる引数系はmaterialのparamsで良い気もする
         const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
             isSkinning,
             gpuSkinning,
             jointNum: isSkinning ? jointNum : null,
             receiveShadow: options.receiveShadow,
             useNormalMap,
+            isInstancing: this.isInstancing,
+            useVertexColor: this.useVertexColor,
             // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
             vertexShaderModifier,
             ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
@@ -6391,15 +6969,19 @@ class PhongMaterial extends Material {
         const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({
             receiveShadow: options.receiveShadow,
             useNormalMap,
-            alphaTest: options.alphaTest
+            alphaTest: options.alphaTest,
+            useVertexColor: options.useVertexColor
         });
-        
+
         const mergedUniforms = {
             ...baseUniforms,
             ...(uniforms ?  uniforms : {})
         };
         
-        const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({ alphaTest: options.alphaTest });
+        const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({
+            alphaTest: options.alphaTest,
+            useVertexColor: options.useVertexColor
+        });
         
         const depthUniforms = {
             uDiffuseMap: {
@@ -6408,14 +6990,15 @@ class PhongMaterial extends Material {
             },
             uDiffuseMapUvScale: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
             },
             uDiffuseMapUvOffset: {
                 type: UniformTypes.Vector2,
-                value: Vector2.one()
+                value: Vector2.one
             },
         }
 
+        // TODO: できるだけconstructorの直後に持っていきたい
         super({
             ...options,
             name: "PhongMaterial",
@@ -6431,8 +7014,14 @@ class PhongMaterial extends Material {
     start(options) {
         super.start(options);
     }
+
+    // updateUniforms(options) {
+    //     super.updateUniforms(options);
+    //     this.uniforms.uDiffuseColor.value = this.diffuseColor;
+    //     this.uniforms.uSpecularAmount.value = this.specularAmount;
+    // }
     
-    static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest }) {
+    static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }) {
         return `#version 300 es
 
 precision mediump float;
@@ -6440,6 +7029,7 @@ precision mediump float;
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
+uniform float uSpecularAmount;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
 uniform vec3 uViewPosition;
@@ -6451,6 +7041,7 @@ struct Surface {
     vec3 worldNormal;
     vec3 worldPosition;
     vec4 diffuseColor;
+    float specularAmount;
 };
 
 struct Camera {
@@ -6463,7 +7054,7 @@ ${receiveShadow ? shadowMapFragmentVaryings() : ""}
 ${normalMapFragmentVarying()}
 in vec3 vWorldPosition;
 // TODO: フラグで必要に応じて出し分け
-in vec4 vVertexColor;
+${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
 out vec4 outColor;
 
@@ -6485,8 +7076,12 @@ void main() {
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
-    
+    ${useVertexColor
+        ? "surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;"
+        : "surface.diffuseColor = uDiffuseColor * diffuseMapColor;"
+    }
+    surface.specularAmount = uSpecularAmount;
+
     Camera camera;
     camera.worldPosition = uViewPosition;
     
@@ -6514,7 +7109,7 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
 `;
     }
 
-    static generateDepthFragmentShader({ alphaTest }) {
+    static generateDepthFragmentShader({ alphaTest, useVertexColor }) {
         return `#version 300 es
 
 precision mediump float;
@@ -6525,7 +7120,7 @@ uniform vec2 uDiffuseMapUvScale;
 ${alphaTest ? alphaTestFragmentUniforms() : ""}
 
 in vec2 vUv;
-in vec4 vVertexColor;
+${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
 out vec4 outColor;
 
@@ -6535,9 +7130,12 @@ void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    
-    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
-    
+   
+    ${useVertexColor
+        ? "vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;"
+        : "vec4 diffuseColor = uColor * diffuseMapColor;"
+    }
+
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
     ${alphaTest
@@ -6561,21 +7159,25 @@ void main() {
 class AbstractPostProcessPass {
     name;
     enabled = true;
+    
+    get renderTarget() {
+        throw "[AbstractPostProcessPass.renderTarget] should implementation";
+    }
 
     constructor({ name = "" } = {}) {
         this.name = name;
     }
   
     setSize(width, height) {
-        throw "[AbstractPostProcessPass.setSize] should implementation";
+        throw "[AbstractPostProcessPass.setSize()] should implementation";
     }
 
     setRenderTarget(renderer, camera, isLastPass) {
-        throw "[AbstractPostProcessPass.setRenderTarget] should implementation";
+        throw "[AbstractPostProcessPass.setRenderTarget()] should implementation";
     }
     
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass } = {}) {
-        throw "[AbstractPostProcessPass.render] should implementation";
+        throw "[AbstractPostProcessPass.render()] should implementation";
     }
 }
 ﻿
@@ -6591,14 +7193,14 @@ class PostProcessPass extends AbstractPostProcessPass {
     material;
     renderTarget;
     mesh;
+    width;
+    height;
     
-    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
-        super({ name });
+    static get baseVertexShader() {
+        return `#version 300 es
 
-        const baseVertexShader = `#version 300 es
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aUv;
+layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 1) in vec2 ${AttributeNames.Uv};
 
 out vec2 vUv;
 
@@ -6606,7 +7208,13 @@ void main() {
     vUv = aUv;
     gl_Position = vec4(aPosition, 1);
 }
-`;
+`;   
+    }
+    
+    constructor({ gpu, vertexShader, fragmentShader, uniforms, name }) {
+        super({ name });
+
+        const baseVertexShader = PostProcessPass.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
@@ -6617,13 +7225,15 @@ void main() {
             fragmentShader,
             uniforms: {
                 ...uniforms, 
-                uSceneTexture: {
+                [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
                     value: null
                 }
             },
             primitiveType: PrimitiveTypes.Triangles
         });
+        
+        // TODO: mesh生成しなくていい気がする
         this.mesh = new Mesh({
             geometry: this.geometry,
             material: this.material
@@ -6633,6 +7243,8 @@ void main() {
     }
   
     setSize(width, height) {
+        this.width = width;
+        this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
@@ -6644,9 +7256,11 @@ void main() {
         }
     }
 
+    // TODO: rename "prevRenderTarget"
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
         this.setRenderTarget(renderer, camera, isLastPass);
-
+ 
+        // TODO: ppごとに変えられるのが正しい
         renderer.clear(
             camera.clearColor.x,
             camera.clearColor.y,
@@ -6654,9 +7268,15 @@ void main() {
             camera.clearColor.w
         );
 
-        // このあたりの処理をpassに逃してもいいかもしれない
+        // ppの場合はいらない気がする
         this.mesh.updateTransform();
-        this.material.uniforms.uSceneTexture.value = prevRenderTarget.texture;
+        
+        // 渡してない場合はなにもしないことにする
+        if(prevRenderTarget) {
+            // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+            this.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
+        }
+
         if(!this.material.isCompiledShader) {
             this.material.start({ gpu })
         }
@@ -6686,6 +7306,7 @@ void main() {
 `;
 
         super({ gpu, fragmentShader });
+        
     }
 }
 ﻿
@@ -6699,10 +7320,11 @@ class FragmentPass extends PostProcessPass {
 
 
 
+
 // TODO: actorを継承してもいいかもしれない
 class PostProcess {
     passes = [];
-    renderTarget;
+    // renderTarget;
     #camera;
     
     #selfEnabled = true;
@@ -6726,14 +7348,22 @@ class PostProcess {
     }
 
     constructor({ gpu }) {
-        this.renderTarget = new RenderTarget({ gpu, width: 1, height: 1, useDepthBuffer: true });
+        // // TODO: renderTargetがいらない時もあるので出し分けたい
+        // this.renderTarget = new RenderTarget({
+        //     gpu,
+        //     name: "PostProcess RenderTarget",
+        //     type: RenderTargetTypes.RGBA,
+        //     writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
+        //     width: 1, height: 1,
+        // });
+
         this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
     }
  
     setSize(width, height) {
         this.#camera.setSize(width, height);
-        this.renderTarget.setSize(width, height);
+        // this.renderTarget.setSize(width, height);
         this.passes.forEach(pass => pass.setSize(width, height));
     }
    
@@ -6741,9 +7371,14 @@ class PostProcess {
         this.passes.push(pass);
     }
 
-    render({ gpu, renderer, camera }) {
+    render({ gpu, renderer, sceneRenderTarget }) {
+        if(!sceneRenderTarget) {
+            throw "[PostProcess.render] scene render target is empty."
+        }
+        
         this.#camera.updateTransform();
-        let prevRenderTarget = this.renderTarget;
+        // TODO: render target を外から渡したほうが分かりやすいかも
+        let prevRenderTarget = sceneRenderTarget || this.renderTarget;
 
         const enabledPasses = this.passes.filter(pass => pass.enabled);
         enabledPasses.forEach((pass, i) => {
@@ -6792,7 +7427,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uSceneTexture;
+uniform sampler2D ${UniformNames.SceneTexture};
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -6856,17 +7491,17 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     LuminanceData l;
 
     // 隣接ピクセルの色を取得
-    vec3 rgbTop = sampleTextureOffset(uSceneTexture, uv, 0., texelSize.y).xyz;
-    vec3 rgbRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(uSceneTexture, uv, 0., -texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(uSceneTexture, uv, 0., 0.).xyz;
+    vec3 rgbTop = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., texelSize.y).xyz;
+    vec3 rgbRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, 0.).xyz;
+    vec3 rgbBottom = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., 0.).xyz;
 
     // 角のピクセルの色を取得
-    vec3 rgbTopRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(uSceneTexture, uv, texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(uSceneTexture, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, -texelSize.y).xyz;
 
     // 隣接ピクセルの輝度を取得
     float lumaTop = rgbToLuma(rgbTop);
@@ -7053,7 +7688,7 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
 
     vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
-    float pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+    float pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
@@ -7061,7 +7696,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-        pLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, puv).xyz) - edgeLuma;
+        pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
         pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
     }
 `;
@@ -7075,7 +7710,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
     vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
-    float nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+    float nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
@@ -7083,7 +7718,7 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     return `   
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-        nLumaDelta = rgbToLuma(sampleTexture(uSceneTexture, nuv).xyz) - edgeLuma;
+        nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
         nAtEnd = abs(nLumaDelta) >= gradientThreshold;
     }
 `;
@@ -7138,7 +7773,7 @@ void main() {
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
-        outColor = sampleTexture(uSceneTexture, uv);
+        outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
         return;
     }
     
@@ -7154,8 +7789,8 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    outColor = sampleTexture(uSceneTexture, uv);
-    // outColor = sampleTexture(uSceneTexture, vUv);
+    outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
+    // outColor = sampleTexture(${UniformNames.SceneTexture}, vUv);
 }
 `;
 
@@ -7197,21 +7832,16 @@ void main() {
     
     setSize(width, height) {
         super.setSize(width, height);
-        this.material.uniforms.uTargetWidth.value = width;
-        this.material.uniforms.uTargetHeight.value = height;
+        // this.material.uniforms.uTargetWidth.value = width;
+        // this.material.uniforms.uTargetHeight.value = height;
+        this.material.updateUniform("uTargetWidth", width);
+        this.material.updateUniform("uTargetHeight", height);
     }
     
 }
-﻿
 
-
-
-
-class GaussianBlurPass extends AbstractPostProcessPass {
-    #passes = [];
-
-    constructor({ gpu }) {
-        const blurShaderGenerator = (isHorizontal) => `#version 300 es
+// TODO: gaussの重みはuniformで送るべき
+const gaussianBlurFragmentShader = ({ pixelNum, isHorizontal, srcTextureUniformName }) => `#version 300 es
 
 precision mediump float;
 
@@ -7219,55 +7849,71 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uSceneTexture;
-
-// ------------------------------------------------------
-//
-// # 3x3
-//
-// 1/4, 2/4, 1/4 を縦横 => 3 + 3 => 6回 fetch
-//
-// --------------------------
-// | 1 | 2 | 1 |
-// | 2 | 4 | 2 | * (1 / 16)
-// | 1 | 2 | 1 |
-// --------------------------
-//
-// # 5x5
-//
-// 1/16, 4/16, 6/16, 4/16, 1/16 を縦横 => 5 + 5 => 10回 fetch
-//
-// -------------------------------------
-// | 1 | 4  | 6  | 4  | 1 |
-// | 4 | 16 | 24 | 16 | 4 |
-// | 6 | 24 | 36 | 24 | 6 | * (1/ 256)
-// | 4 | 16 | 24 | 16 | 4 |
-// | 1 | 4  | 6  | 4  | 1 |
-// -------------------------------------
-//
-// ------------------------------------------------------
-
+uniform sampler2D ${srcTextureUniformName};
 uniform float uTargetWidth;
 uniform float uTargetHeight;
+uniform float[${pixelNum}] uBlurWeights;
 
 void main() {
-    vec4 textureColor = texture(uSceneTexture, vUv);
+    vec4 textureColor = texture(${srcTextureUniformName}, vUv);
     vec4 sampleColor = vec4(0.);
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-2." : "0."}, ${isHorizontal ? "0." : "2."}) * texelSize) * (1. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "-1." : "0."}, ${isHorizontal ? "0." : "1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(0., 0.) * texelSize) * (6. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "1." : 0.}, ${isHorizontal ? "0." : "-1."}) * texelSize) * (4. / 16.);
-    sampleColor += texture(uSceneTexture, vUv + vec2(${isHorizontal ? "2." : "0."}, ${isHorizontal ? "0." : "-2."}) * texelSize) * (1. / 16.);
+
+    const int pixelNum = ${pixelNum};
+    float width = floor(float(pixelNum) / 2.);
+    for(int i = 0; i < pixelNum; i++) {
+        float index = float(i) - width;
+        float weight = uBlurWeights[i];
+        sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+    }
+    
     outColor = sampleColor;
+    
+    // for debug
+    // outColor = textureColor;
+}`;
+﻿
+
+
+// pixelNumは奇数であるべき
+function getGaussianBlurWeights(pixelNum, sigma) {
+    const halfWidth = Math.floor(pixelNum / 2);
+
+    let sum = 0;
+    const rawWeights = new Array(pixelNum).fill(0).map((_, i) => {
+        const index = i - halfWidth;
+        const weight = gaussCoefficient(sigma, index);
+        sum += weight;
+        return weight;
+    });
+
+    return rawWeights.map(w => w / sum);
 }
-`;
+﻿
+
+
+
+
+
+
+class GaussianBlurPass extends AbstractPostProcessPass {
+    #passes = [];
+
+    get renderTarget() {
+        return this.#passes[this.#passes.length - 1].renderTarget;
+    }
+
+    constructor({ gpu, blurPixelNum = 7 }) {
         super();
-       
+        
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        
         const horizontalBlurPass = new FragmentPass({
             name: "horizontal blur pass",
             gpu,
-            fragmentShader: blurShaderGenerator(true),
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -7276,13 +7922,19 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });
         const verticalBlurPass = new FragmentPass({
             name: "vertical blur pass",
             gpu,
-            fragmentShader: blurShaderGenerator(false),
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -7291,6 +7943,10 @@ void main() {
                 uTargetHeight: {
                     type: UniformTypes.Float,
                     value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
                 }
             }           
         });
@@ -7302,8 +7958,10 @@ void main() {
     setSize(width, height) {
         this.#passes.forEach(pass => {
             pass.setSize(width, height);
-            pass.material.uniforms.uTargetWidth.value = width;
-            pass.material.uniforms.uTargetHeight.value = height;
+            // pass.material.uniforms.uTargetWidth.value = width;
+            // pass.material.uniforms.uTargetHeight.value = height;
+            this.material.updateUniform("uTargetWidth", width);
+            this.material.updateUniform("uTargetHeight", height);
         });
     }
 
@@ -7311,6 +7969,7 @@ void main() {
         this.#passes.forEach((pass, i) => {
             pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
 
+            // TODO: pass内で好きに設定してよさそう
             renderer.clear(
                 camera.clearColor.x,
                 camera.clearColor.y,
@@ -7318,9 +7977,10 @@ void main() {
                 camera.clearColor.w
             );
 
-            // このあたりの処理をpassに逃してもいいかもしれない
+            // TODO: mesh経由する必要たぶんない
             pass.mesh.updateTransform();
-            pass.material.uniforms.uSceneTexture.value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+            pass.material.updateUniform(UniformNames.SceneTexture, i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture);
             if(!pass.material.isCompiledShader) {
                 pass.material.start({ gpu })
             }
@@ -7328,6 +7988,599 @@ void main() {
             renderer.renderMesh(pass.geometry, pass.material);
         });
     }   
+}
+﻿
+
+
+
+
+
+
+
+
+
+// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+// TODO: mipmap使う方法に変えてみる
+class BloomPass extends AbstractPostProcessPass {
+    #extractBrightnessPass;
+
+    #renderTargetExtractBrightness;
+    #renderTargetBlurMip4_Horizontal;
+    #renderTargetBlurMip4_Vertical;
+    #renderTargetBlurMip8_Horizontal;
+    #renderTargetBlurMip8_Vertical;
+    #renderTargetBlurMip16_Horizontal;
+    #renderTargetBlurMip16_Vertical;
+    #renderTargetBlurMip32_Horizontal;
+    #renderTargetBlurMip32_Vertical;
+    
+    #horizontalBlurPass;
+    #verticalBlurPass;
+    
+    // #lastPass;
+    #compositePass;
+    
+    #geometry;
+    #horizontalBlurMaterial;
+    #verticalBlurMaterial;
+   
+    threshold = 0.8;
+    tone = 1;
+    bloomAmount = 1;
+   
+    get renderTarget() {
+        return this.#compositePass.renderTarget;
+    }
+
+    constructor({
+        gpu,
+        threshold = 0.8,
+        tone = 1,
+        bloomAmount = 1
+    }) {
+        super();
+        
+        this.threshold = threshold;
+        this.tone = tone;
+        this.bloomAmount = bloomAmount;
+        
+        // NOTE: geometryは親から渡して使いまわしてもよい
+        this.#geometry = new PlaneGeometry({ gpu });
+
+        this.#renderTargetExtractBrightness = new RenderTarget({ gpu });
+        this.#renderTargetBlurMip4_Horizontal = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip4_Vertical = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip8_Horizontal = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip8_Vertical = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip16_Horizontal = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip16_Vertical = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip32_Horizontal = new RenderTarget({ gpu })
+        this.#renderTargetBlurMip32_Vertical = new RenderTarget({ gpu })
+        
+        // const copyPass = new CopyPass({ gpu });
+        // this.#passes.push(copyPass);
+        
+        this.#extractBrightnessPass = new FragmentPass({
+            gpu,
+            fragmentShader: `#version 300 es
+            
+precision mediump float;
+
+out vec4 outColor;
+
+in vec2 vUv;
+
+uniform sampler2D ${UniformNames.SceneTexture};
+uniform float uThreshold;
+
+void main() {
+    vec4 color = texture(${UniformNames.SceneTexture}, vUv);
+    float k = uThreshold;
+    
+    // pattern_1
+    // ex
+    // k: 0.9, c: 1 => b = 1 
+    // k: 0.8, c: 1 => b = 0.25
+    vec4 b = (color - vec4(k)) / (1. - k);
+    
+    // pattern_2
+    // vec4 b = color - k;
+    
+    outColor = clamp(b, 0., 1.);
+
+    // for debug
+    // outColor = b;
+}
+            `,
+            uniforms: {
+                uThreshold: {
+                    type: UniformTypes.Float,
+                    value: this.threshold
+                },
+            }
+        });
+
+        // 可変でもよい
+        const blurPixelNum = 7;
+        
+        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        
+        this.#horizontalBlurMaterial = new Material({
+            vertexShader: PostProcessPass.baseVertexShader,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                [UniformNames.SceneTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
+            }           
+        });
+        this.#verticalBlurMaterial = new Material({
+            vertexShader: PostProcessPass.baseVertexShader,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                [UniformNames.SceneTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uBlurWeights: {
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(blurWeights)
+                },
+            }           
+        });
+        
+        this.#horizontalBlurPass = new FragmentPass({
+            name: "horizontal blur pass",
+            gpu,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }
+        });
+        this.#verticalBlurPass = new FragmentPass({
+            name: "vertical blur pass",
+            gpu,
+            fragmentShader: gaussianBlurFragmentShader({
+                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+            }),
+            uniforms: {
+                uTargetWidth: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                uTargetHeight: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
+            }
+        });
+
+        // this.#lastPass = new CopyPass({ gpu });
+        // this.#passes.push(this.#lastPass);
+       
+        this.#compositePass = new FragmentPass({
+            gpu,
+            fragmentShader: `#version 300 es
+            
+precision mediump float;
+
+in vec2 vUv;
+
+out vec4 outColor;
+
+uniform sampler2D ${UniformNames.SceneTexture};
+uniform sampler2D uBlur4Texture;
+uniform sampler2D uBlur8Texture;
+uniform sampler2D uBlur16Texture;
+uniform sampler2D uBlur32Texture;
+uniform float uTone;
+uniform float uBloomAmount;
+
+void main() {
+    vec4 blur4Color = texture(uBlur4Texture, vUv);
+    vec4 blur8Color = texture(uBlur8Texture, vUv);
+    vec4 blur16Color = texture(uBlur16Texture, vUv);
+    vec4 blur32Color = texture(uBlur32Texture, vUv);
+    vec4 sceneColor = texture(${UniformNames.SceneTexture}, vUv) * uTone;
+
+    vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
+
+    outColor = sceneColor + blurColor;
+
+    // for debug
+    // outColor = blur4Color;
+    // outColor = blur8Color;
+    // outColor = blur16Color;
+    // outColor = blur32Color;
+    // outColor = blurColor;
+    // outColor = sceneColor;
+}           
+            `,
+            uniforms: {
+                [UniformNames.SceneTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uBlur4Texture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uBlur8Texture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uBlur16Texture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uBlur32Texture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                uTone: {
+                    type: UniformTypes.Float,
+                    value: this.tone,
+                },
+                uBloomAmount: {
+                    type: UniformTypes.Float,
+                    value: this.bloomAmount
+                }
+            }
+        }); 
+    }
+    
+    #width = 1;
+    #height = 1;
+
+    setSize(width, height) {
+        this.#width = width;
+        this.#height = height;
+        
+        this.#extractBrightnessPass.setSize(width, height);
+
+        this.#renderTargetBlurMip4_Horizontal.setSize(this.#width / 4, this.#height / 4);
+        this.#renderTargetBlurMip4_Vertical.setSize(this.#width / 4, this.#height / 4);
+        this.#renderTargetBlurMip8_Horizontal.setSize(this.#width / 8, this.#height / 8);
+        this.#renderTargetBlurMip8_Vertical.setSize(this.#width / 8, this.#height / 8);
+        this.#renderTargetBlurMip16_Horizontal.setSize(this.#width / 16, this.#height / 16);
+        this.#renderTargetBlurMip16_Vertical.setSize(this.#width / 16, this.#height / 16);
+        this.#renderTargetBlurMip32_Horizontal.setSize(this.#width / 32, this.#height / 32);
+        this.#renderTargetBlurMip32_Vertical.setSize(this.#width / 32, this.#height / 32);
+        
+        this.#compositePass.setSize(width, height);
+    }
+
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }) {
+        // 一回だけ呼びたい
+        this.#geometry.start();
+        // ppの場合はいらない気がする
+        // this.mesh.updateTransform();
+
+        if(!this.#horizontalBlurMaterial.isCompiledShader) {
+            this.#horizontalBlurMaterial.start({ gpu, attributeDescriptors: this.#geometry.getAttributeDescriptors() });
+        }
+        if(!this.#verticalBlurMaterial.isCompiledShader) {
+            this.#verticalBlurMaterial.start({ gpu, attributeDescriptors: this.#geometry.getAttributeDescriptors() });
+        }
+        
+        // this.#extractBrightnessPass.material.uniforms.uThreshold.value = this.threshold;
+        this.#extractBrightnessPass.material.updateUniform("uThreshold", this.threshold);
+        
+        this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
+        
+        // for debug
+        // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
+        // return;
+        
+        const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
+            const w = this.#width / downSize;
+            const h = this.#height / downSize;
+            
+            renderer.setRenderTarget(horizontalRenderTarget);
+            renderer.clear(0, 0, 0, 1)
+            // this.#horizontalBlurMaterial.uniforms[UniformNames.SceneTexture].value = this.#extractBrightnessPass.renderTarget.texture;
+            // this.#horizontalBlurMaterial.uniforms.uTargetWidth.value = w;
+            // this.#horizontalBlurMaterial.uniforms.uTargetHeight.value = h;
+            this.#horizontalBlurMaterial.updateUniform(UniformNames.SceneTexture, this.#extractBrightnessPass.renderTarget.texture);
+            this.#horizontalBlurMaterial.updateUniform("uTargetWidth", w);
+            this.#horizontalBlurMaterial.updateUniform("uTargetHeight", w);
+            renderer.renderMesh(this.#geometry, this.#horizontalBlurMaterial);
+            
+            renderer.setRenderTarget(verticalRenderTarget);
+            renderer.clear(0, 0, 0, 1)
+            // this.#verticalBlurMaterial.uniforms[UniformNames.SceneTexture].value = horizontalRenderTarget.texture; 
+            // this.#verticalBlurMaterial.uniforms.uTargetWidth.value = w;
+            // this.#verticalBlurMaterial.uniforms.uTargetHeight.value = h;
+            this.#verticalBlurMaterial.updateUniform(UniformNames.SceneTexture, horizontalRenderTarget.texture);
+            this.#verticalBlurMaterial.updateUniform("uTargetWidth", w);
+            this.#verticalBlurMaterial.updateUniform("uTargetHeight", h);
+            renderer.renderMesh(this.#geometry, this.#verticalBlurMaterial);
+        }
+        
+        // // for debug
+        // renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);
+        // return;
+
+        // 1 / 4
+        renderBlur(this.#renderTargetBlurMip4_Horizontal, this.#renderTargetBlurMip4_Vertical, 4);
+        // 1 / 8
+        renderBlur(this.#renderTargetBlurMip8_Horizontal, this.#renderTargetBlurMip8_Vertical, 8);
+        // 1 / 16
+        renderBlur(this.#renderTargetBlurMip16_Horizontal, this.#renderTargetBlurMip16_Vertical, 16);
+        // 1 / 32
+        renderBlur(this.#renderTargetBlurMip32_Horizontal, this.#renderTargetBlurMip32_Vertical, 32);
+        
+        // this.#compositePass.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
+        // this.#compositePass.material.uniforms.uBlur4Texture.value = this.#renderTargetBlurMip4_Vertical.texture;
+        // this.#compositePass.material.uniforms.uBlur8Texture.value = this.#renderTargetBlurMip8_Vertical.texture;
+        // this.#compositePass.material.uniforms.uBlur16Texture.value = this.#renderTargetBlurMip16_Vertical.texture;
+        // this.#compositePass.material.uniforms.uBlur32Texture.value = this.#renderTargetBlurMip32_Vertical.texture;
+        // this.#compositePass.material.uniforms.uTone.value = this.tone;
+        // this.#compositePass.material.uniforms.uBloomAmount.value = this.bloomAmount;
+        this.#compositePass.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
+        this.#compositePass.material.updateUniform("uBlur4Texture", this.#renderTargetBlurMip4_Vertical.texture);
+        this.#compositePass.material.updateUniform("uBlur8Texture", this.#renderTargetBlurMip8_Vertical.texture);
+        this.#compositePass.material.updateUniform("uBlur16Texture", this.#renderTargetBlurMip16_Vertical.texture);
+        this.#compositePass.material.updateUniform("uBlur32Texture", this.#renderTargetBlurMip32_Vertical.texture);
+        this.#compositePass.material.updateUniform("uTone", this.tone);
+        this.#compositePass.material.updateUniform("uBloomAmount", this.bloomAmount);
+       
+        this.#compositePass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: null,
+            isLastPass
+        });
+    }
+}
+
+
+class AbstractInputController {
+    #beforeInputPosition = Vector2.zero;
+    #currentInputPosition = Vector2.zero;
+    #deltaInputPosition = Vector2.zero;
+    #deltaNormalizedInputPosition = Vector2.zero;
+    
+    #isPressed = false;
+    #isDown = false;
+    #isReleased = false;
+    
+    #width;
+    #height;
+    
+    get isUp() {
+        return !this.#isDown;
+    }
+    
+    get isPressed() {
+        return this.#isPressed;
+    }
+
+    get isDown() {
+        return this.#isDown;
+    }
+    
+    get isReleased() {
+        return this.#isReleased;
+    }
+    
+    get deltaNormalizedInputPosition() {
+        return this.#deltaNormalizedInputPosition;
+    }
+
+    constructor() {
+        this.clearInputPositions();
+    }
+
+    start() {
+        throw "[AbstractInputController] should implementation 'start' method.";
+    }
+    
+    setSize(width, height) {
+        this.#width = width;
+        this.#height = height;
+    }
+
+    // inputPosition ... v2
+    // isDown ... bool
+    updateInternal({ inputPosition, isDown }) {
+        this.#updateState(isDown);
+        this.#updateInputPositions(inputPosition);
+    }
+   
+    #updateState(isDown) {
+        const isBeforeDown = this.isDown;
+        this.#isDown = isDown;
+
+        // pressed
+        if(!isBeforeDown && this.isDown) {
+            this.#isPressed = true;
+            this.#isReleased = false;
+            return;
+        }
+        // down
+        if(!isBeforeDown && this.isDown) {
+            this.#isPressed = false;
+            this.#isReleased = false;
+            return;
+        }
+        // released
+        if(isBeforeDown && !this.isDown) {
+            this.#isPressed = false;
+            this.#isReleased = true;
+            return;
+        }
+        // up 
+        this.#isPressed = false;
+        this.#isReleased = false;
+    }
+
+    #updateInputPositions(inputPosition) {
+        // up
+        if(this.isUp) {
+            this.clearInputPositions();
+            return;
+        }
+        // pressed
+        if(this.isPressed) {
+            this.#currentInputPosition.copy(inputPosition);
+            this.#beforeInputPosition.copy(this.#currentInputPosition);
+            this.#deltaInputPosition.set(0, 0);
+            this.#deltaNormalizedInputPosition.set(0, 0);
+            return;
+        }
+        // move
+        this.#beforeInputPosition.copy(this.#currentInputPosition);
+        this.#currentInputPosition.copy(inputPosition);
+        const diff = Vector2.subVectors(this.#currentInputPosition, this.#beforeInputPosition);
+        this.#deltaInputPosition.copy(diff);
+        this.#deltaNormalizedInputPosition.set(
+            this.#deltaInputPosition.x / this.#width,
+            this.#deltaInputPosition.y / this.#height
+        );
+    }
+  
+    clearInputPositions() {
+        this.#beforeInputPosition.set(-Infinity, -Infinity);
+        this.#currentInputPosition.set(-Infinity, -Infinity);
+        this.#deltaInputPosition.set(-Infinity, -Infinity);
+        this.#deltaNormalizedInputPosition.set(-Infinity, -Infinity);
+    }
+
+    dispose() {}
+}
+
+
+
+class TouchInputController extends AbstractInputController {
+    #tmpIsDown = false;
+    #tmpInputPosition = Vector2.zero;
+
+    constructor() {
+        super();
+    }
+
+    start() {
+        window.addEventListener('touchstart', this.#onTouchStart.bind(this));
+        window.addEventListener('touchmove', this.#onTouchMove.bind(this));
+        window.addEventListener('touchend', this.#onTouchEnd.bind(this));
+    }
+
+    fixedUpdate() {
+        this.updateInternal({
+            inputPosition: this.#tmpInputPosition,
+            isDown: this.#tmpIsDown
+        });
+    }
+
+    #onTouchStart(e) {
+        this.#tmpIsDown = true;
+        const t = e.touches[0];
+        this.setInputPosition(t.clientX, t.clientY);
+    }
+
+    #onTouchMove(e) {
+        const t = e.touches[0];
+        this.setInputPosition(t.clientX, t.clientY);
+    }
+
+    #onTouchEnd() {
+        this.#tmpIsDown = false;
+        this.setInputPosition(-Infinity, -Infinity);
+    }
+
+    setInputPosition(x, y) {
+        this.#tmpInputPosition.set(x, y);
+    }
+
+    dispose() {
+        window.removeEventListener('touchstart', this.#onTouchStart.bind(this));
+        window.removeEventListener('touchmove', this.#onTouchMove.bind(this));
+        window.removeEventListener('touchend', this.#onTouchEnd.bind(this));
+    }
+}
+
+
+
+class MouseInputController extends AbstractInputController {
+    #tmpIsDown = false;
+    #tmpInputPosition = Vector2.zero;
+    
+    constructor() {
+        super();
+    }
+    
+    start() {
+        window.addEventListener('mousedown', this.#onMouseDown.bind(this));
+        window.addEventListener('mousemove', this.#onMouseMove.bind(this));
+        window.addEventListener('mouseup', this.#onMouseUp.bind(this));
+    }
+    
+    fixedUpdate() {
+        this.updateInternal({
+            inputPosition: this.#tmpInputPosition,
+            isDown: this.#tmpIsDown
+        });
+    }
+
+    #onMouseDown(e) {
+        this.#tmpIsDown = true;
+        this.setInputPosition(e.clientX, e.clientY);
+    }
+
+    #onMouseMove(e) {
+        this.setInputPosition(e.clientX, e.clientY);
+    }
+
+    #onMouseUp() {
+        this.#tmpIsDown = false;
+        this.setInputPosition(-Infinity, -Infinity);
+    }
+
+    setInputPosition(x, y) {
+        this.#tmpInputPosition.set(x, y);
+    }
+
+    dispose() {
+        window.removeEventListener('mousedown', this.#onMouseDown.bind(this));
+        window.removeEventListener('mousemove', this.#onMouseMove.bind(this));
+        window.removeEventListener('mouseup', this.#onMouseUp.bind(this));
+    }
 }
 ﻿
 // actors
@@ -7351,6 +8604,7 @@ export {GPU};
 export {RenderTarget};
 export {Scene};
 export {Texture};
+export {OrbitCameraController};
 
 // geometries
 export {BoxGeometry};
@@ -7384,16 +8638,21 @@ export {PostProcess};
 export {PostProcessPass};
 export {FXAAPass};
 export {GaussianBlurPass};
+export {BloomPass};
 
 // shaders
 export {generateVertexShader};
 
 // utilities
+export {clamp};
+
+// inputs
+export {TouchInputController};
+export {MouseInputController};
 
 // others
 export {
     PrimitiveTypes,
-    AttributeTypes,
     UniformTypes,
     TextureTypes,
     TextureWrapTypes,
@@ -7406,5 +8665,6 @@ export {
     FaceSide,
     AttributeUsageType,
     RenderTargetTypes,
-    AnimationKeyframeTypes
+    AnimationKeyframeTypes,
+    AttributeNames
 };

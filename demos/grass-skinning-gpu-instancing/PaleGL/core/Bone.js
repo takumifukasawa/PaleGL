@@ -4,15 +4,15 @@ import {Rotator} from "../math/Rotator.js";
 import {Vector3} from "../math/Vector3.js";
 
 export class Bone extends NodeBase {
-    offsetMatrix = Matrix4.identity(); // 初期姿勢のボーンローカル座標
-    #poseMatrix = Matrix4.identity(); // 初期姿勢行列
-    #boneOffsetMatrix = Matrix4.identity(); // 初期姿勢行列の逆行列
-    #jointMatrix = Matrix4.identity();
+    offsetMatrix = Matrix4.identity; // 初期姿勢のボーンローカル座標
+    #poseMatrix = Matrix4.identity; // 初期姿勢行列
+    #boneOffsetMatrix = Matrix4.identity; // 初期姿勢行列の逆行列
+    #jointMatrix = Matrix4.identity;
     index;
     
-    position = Vector3.zero();
-    rotation = Rotator.zero();
-    scale = Vector3.one();
+    position = Vector3.zero;
+    rotation = Rotator.zero;
+    scale = Vector3.one;
     
     get boneOffsetMatrix() {
         return this.#boneOffsetMatrix;

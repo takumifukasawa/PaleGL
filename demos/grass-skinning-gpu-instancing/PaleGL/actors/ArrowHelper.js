@@ -2,6 +2,7 @@ import {Mesh} from "./Mesh.js";
 import {Material} from "../materials/Material.js";
 import {parseObj} from "../loaders/loadObj.js";
 import {Geometry} from "../geometries/Geometry.js";
+import {AttributeNames, UniformNames} from "../constants.js";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -183,15 +184,15 @@ export class ArrowHelper extends Mesh {
         const material = new Material({
             gpu,
             vertexShader: `#version 300 es
-            layout (location = 0) in vec3 aPosition;
-            layout (location = 1) in vec2 aUv;
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
+            layout (location = 0) in vec3 ${AttributeNames.Position};
+            layout (location = 1) in vec2 ${AttributeNames.Uv};
+            uniform mat4 ${UniformNames.WorldMatrix};
+            uniform mat4 ${UniformNames.ViewMatrix};
+            uniform mat4 ${UniformNames.ProjectionMatrix};
             out vec2 vUv;
             void main() {
                 vUv = aUv;
-                gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(aPosition, 1.);
+                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
             fragmentShader: `#version 300 es

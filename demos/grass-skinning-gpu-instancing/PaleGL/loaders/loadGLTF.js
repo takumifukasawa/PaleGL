@@ -60,15 +60,15 @@ export async function loadGLTF({
        
         // use basic mul
         // const offsetMatrix = Matrix4.multiplyMatrices(
-        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity(),
-        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity(),
-        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity()
+        //     node.translation ? Matrix4.translationMatrix(new Vector3(...node.translation)) : Matrix4.identity,
+        //     node.rotation ? Matrix4.fromQuaternion(new Quaternion(...node.rotation)) : Matrix4.identity,
+        //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity
         // );
         // use trs
         const offsetMatrix = Matrix4.fromTRS(
-            node.translation ? new Vector3(...node.translation) : Vector3.zero(),
+            node.translation ? new Vector3(...node.translation) : Vector3.zero,
             node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
-            node.scale ? new Vector3(...node.scale) : Vector3.one()
+            node.scale ? new Vector3(...node.scale) : Vector3.one
         );
         bone.offsetMatrix = offsetMatrix;
         

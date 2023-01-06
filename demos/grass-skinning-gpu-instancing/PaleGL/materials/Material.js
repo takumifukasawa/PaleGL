@@ -1,5 +1,5 @@
 ﻿import {Shader} from "./../core/Shader.js";
-import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide} from "./../constants.js";
+import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide, UniformNames} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
@@ -20,11 +20,18 @@ export class Material {
     faceSide;
     receiveShadow;
     queue;
-    
+   
+    // skinning
     isSkinning;
     gpuSkinning;
     jointNum;
     
+    // instancing
+    isInstancing;
+    
+    // vertex color
+    useVertexColor;
+
     vertexShader;
     fragmentShader;
     depthFragmentShader;
@@ -66,8 +73,17 @@ export class Material {
         receiveShadow = false,
         blendType,
         renderQueue,
+        
+        // skinning
         isSkinning,
         gpuSkinning,
+        
+        // instancing
+        isInstancing = false,
+       
+        // vertex color 
+        useVertexColor = false,
+        
         queue,
         uniforms = {},
         depthUniforms = {}
@@ -128,34 +144,38 @@ export class Material {
         if (!this.renderQueue) {
             throw "[Material.constructor] invalid render queue";
         }
-       
+      
+        // skinning
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
+        
+        this.isInstancing = isInstancing;
+        this.useVertexColor = useVertexColor;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         // - skinning回りもここで入れたい？
         const commonUniforms = {
-            uWorldMatrix: {
+            [UniformNames.WorldMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uViewMatrix: {
+            [UniformNames.ViewMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uProjectionMatrix: {
+            [UniformNames.ProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
-            uNormalMatrix: {
+            [UniformNames.NormalMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: viewmatrixから引っ張ってきてもよい
-            uViewPosition: {
+            [UniformNames.ViewPosition]: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero()
+                value: Vector3.zero
             },
 
             ...(this.alphaTest ? {
@@ -167,16 +187,16 @@ export class Material {
         };
         
         const shadowUniforms = this.receiveShadow ? {
-            uShadowMap: {
+            [UniformNames.ShadowMap]: {
                 type: UniformTypes.Texture,
                 value: null,
             },
-            uShadowMapProjectionMatrix: {
+            [UniformNames.ShadowMapProjectionMatrix]: {
                 type: UniformTypes.Matrix4,
-                value: Matrix4.identity()
+                value: Matrix4.identity
             },
             // TODO: shadow map class を作って bias 持たせた方がよい
-            uShadowBias: {
+            [UniformNames.ShadowBias]: {
                 type: UniformTypes.Float,
                 value: 0.01
             }
@@ -198,20 +218,40 @@ export class Material {
                 attributeDescriptors,
                 isSkinning: this.isSkinning,
                 jointNum: this.jointNum, 
-                gpuSkinning: this.gpuSkinning
+                gpuSkinning: this.gpuSkinning,
+                isInstancing: this.isInstancing
             });
         }
         if(!this.fragmentShader && this.#fragmentShaderGenerator) {
-            this.fragmentShader = this.#fragmentShaderGenerator();
+            this.fragmentShader = this.#fragmentShaderGenerator({
+                attributeDescriptors,
+            });
         }
         if(!this.depthFragmentShader && this.#depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
-
+       
+        // for debug
+        // console.log(this.uniforms, this.depthUniforms)
+        
         this.shader = new Shader({
             gpu,
             vertexShader: this.vertexShader,
             fragmentShader: this.fragmentShader
         });
     }
+
+    // TODO: 深い階層もupdateができるようにしたい
+    updateUniform(name, value) {
+        if(!this.uniforms[name]) {
+            throw `[Material.updateUniform] invalid name ${name}`;
+        }
+        this.uniforms[name].value = value;
+    }
+   
+    // // NOTE: renderer側でmaterial側のuniformをアップデートする用
+    // updateUniforms({ gpu } = {}) {}
+    
+    // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
+    // updateEngineUniforms() {} 
 }

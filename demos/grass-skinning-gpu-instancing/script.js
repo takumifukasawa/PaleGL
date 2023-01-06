@@ -24,12 +24,21 @@
     Engine,
     PhongMaterial,
     Vector2,
+    BloomPass,
+    Geometry,
+    Material,
+    generateVertexShader,
+    UniformTypes,
+    BlendTypes,
+    AttributeNames,
+    clamp,
+    OrbitCameraController, TouchInputController, MouseInputController
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
 const debuggerStates = {
     instanceNum: 0,
-    castShadow: true
+    enabledParticle: true,
 }
 
 const searchParams = new URLSearchParams(location.search);
@@ -46,10 +55,11 @@ let floorPlaneMesh;
 let floorDiffuseMap;
 let floorNormalMap;
 let skinnedMesh;
+let particleMesh;
 
-const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|Android)/i);
-
-const targetCameraPosition = new Vector3(0, 5, 12);
+const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
+const inputController = isSP ? new TouchInputController() : new MouseInputController();
+inputController.start();
 
 const wrapperElement = document.getElementById("wrapper");
 
@@ -63,7 +73,7 @@ const instanceNumView = document.createElement("p");
 instanceNumView.textContent = `instance num: ${instanceNum}`;
 instanceNumView.style.cssText = `
 position: absolute;
-top: 0;
+bottom: 0;
 left: 0;
 padding: 0.2em 0.5em;
 font-size: 9px;
@@ -74,48 +84,63 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 wrapperElement.appendChild(instanceNumView);
 
 const captureScene = new Scene();
+const compositeScene = new Scene();
+
+const pixelRatio = Math.min(window.devicePixelRatio, 1.5)
 
 const renderer = new ForwardRenderer({
     gpu,
     canvas: canvasElement,
-    pixelRatio: Math.min(window.devicePixelRatio, 1.5)
+    pixelRatio
 });
 
 const engine = new Engine({ gpu, renderer });
 
-engine.setScene(captureScene);
+engine.setScenes([
+    captureScene,
+    compositeScene
+]);
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 captureScene.add(captureSceneCamera);
-captureScene.mainCamera = captureSceneCamera;
+
+const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+
+const captureSceneDepthRenderTarget = new RenderTarget({
+    gpu,
+    width: 1, height: 1,
+    type: RenderTargetTypes.Depth,
+    writeDepthTexture: true,
+    name: "capture scene depth render target"
+});
+const captureSceneColorRenderTarget = new RenderTarget({
+    gpu,
+    width: 1, height: 1,
+    type: RenderTargetTypes.RGBA,
+    useDepthBuffer: true,
+    name: "capture scene color render target"
+});
 
 captureSceneCamera.onStart = ({ actor }) => {
-    actor.transform.setTranslation(targetCameraPosition);
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
-    // 1: move position with mouse
-    const cameraPosition = Vector3.addVectors(
-        actor.transform.position,
-        new Vector3(
-            (targetCameraPosition.x - actor.transform.position.x) * 0.1,
-            (targetCameraPosition.y - actor.transform.position.y) * 0.1,
-            (targetCameraPosition.z - actor.transform.position.z) * 0.1
-        )
-    );
-    actor.transform.position = cameraPosition;
-    
-    // 2: fixed position
+    // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+    
+    // 2: orbit controls
+    if(inputController.isDown) {
+        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+    }
+    orbitCameraController.fixedUpdate();
 }
 
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
-directionalLight.color = Color.fromRGB(255, 190, 180);
+directionalLight.color = Color.fromRGB(255, 210, 200);
 directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    actor.shadowCamera.visibleFrustum = false;
     actor.castShadow = true;
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
@@ -124,37 +149,24 @@ directionalLight.onStart = ({ actor }) => {
 }
 captureScene.add(directionalLight);
 
-// const directionalLightShadowCameraAxesHelper = new AxesHelper({ gpu });
-// directionalLight.shadowCamera.addChild(directionalLightShadowCameraAxesHelper);
-
 const postProcess = new PostProcess({ gpu, renderer });
+
+const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
+bloomPass.enabled = true;
+postProcess.addPass(bloomPass);
 
 const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
-postProcess.enabled = false;
+postProcess.enabled = true;
+// TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(postProcess);
-
-const updateCamera = (clientX, clientY) => {
-    const nx = (clientX / width) * 2 - 1;
-    const ny = ((clientY / height) * 2 - 1) * -1;
-    targetCameraPosition.x = nx * 20;
-    targetCameraPosition.y = ny * 10 + 12;
-}
-
-const onMouseMove = (e) => {
-    updateCamera(e.clientX, e.clientY);
-};
-
-const onTouch = (e) => {
-    const touch = e.touches[0];
-    updateCamera(touch.clientX, touch.clientY);
-}
 
 const onWindowResize = () => {
     width = wrapperElement.offsetWidth;
     height = wrapperElement.offsetHeight;
+    inputController.setSize(width, height);
     engine.setSize(width, height);
 };
 
@@ -196,13 +208,12 @@ const createGLTFSkinnedMesh = async () => {
         return (-x + z) * animationOffsetAdjust;
     });
    
-    // skinningMesh.debugBoneView = true;
-    skinningMesh.castShadow = debuggerStates.castShadow;
+    skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
-        name: "aInstancePosition",
+        name: AttributeNames.InstancePosition,
         data: new Float32Array(instanceInfo.position.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
@@ -210,7 +221,7 @@ const createGLTFSkinnedMesh = async () => {
     });
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceScale",
+        name: AttributeNames.InstanceScale,
         data: new Float32Array(instanceInfo.scale.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
@@ -218,14 +229,14 @@ const createGLTFSkinnedMesh = async () => {
     });       
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceAnimationOffset",
+        name: AttributeNames.InstanceAnimationOffset,
         data: new Float32Array(animationOffsetInfo),
         size: 1,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
     });
     skinningMesh.geometry.setAttribute({
-        name: "aInstanceVertexColor",
+        name: AttributeNames.InstanceVertexColor,
         data: new Float32Array(instanceInfo.color.flat()),
         size: 4,
         // usageType: AttributeUsageType.StaticDraw,
@@ -233,12 +244,12 @@ const createGLTFSkinnedMesh = async () => {
     });
     skinningMesh.material = new PhongMaterial({
         gpu,
-        diffuseColor: new Color(1, 1, 1, 1),
-        // diffuseMap,
-        // normalMap,
+        specularAmount: 0.5,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
+        isInstancing: true,
+        useVertexColor: true,
         vertexShaderModifier: {
             worldPositionPostProcess: `
     mat4 instanceTransform = mat4(
@@ -254,22 +265,18 @@ const createGLTFSkinnedMesh = async () => {
     vVertexColor = aInstanceVertexColor;
 `
         },
-        // uniforms: {
-        //     uDiffuseMapUvScale: {
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(0.1, 0.5),
-        //     },
-        //     uNormalMapUvScale: {
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(0.1, 0.5),
-        //     },
-        // }
     });
     
     return skinningMesh;
 }
 
 const main = async () => {
+    const particleImg = await loadImg("./images/particle-smoke.png");
+    const particleMap = new Texture({
+        gpu,
+        img: particleImg,
+    });
+
     const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
         gpu,
@@ -309,7 +316,7 @@ const main = async () => {
     
     skinnedMesh = await createGLTFSkinnedMesh();
     captureScene.add(skinnedMesh);
-
+    
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
@@ -317,37 +324,275 @@ const main = async () => {
             gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
-            receiveShadow: true
+            receiveShadow: true,
+            specularAmount: 0.4
         }),
         castShadow: false
     });
     floorPlaneMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
-        actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
-        actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
+        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
+        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
+        actor.material.updateUniform("uDiffuseMapUvScale", new Vector2(3, 3));
+        actor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
     }
+
+    const particleNum = 100;
+    const particleGeometry = new Geometry({
+        gpu,
+        attributes: [
+            {
+                name: AttributeNames.Position,
+                // dummy data
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const x = Math.random() * 18 - 10;
+                    const y = Math.random() * 0.5;
+                    // const y = 3.;
+                    const z = Math.random() * 18 - 8;
+                    return [
+                        x, y, z,
+                        x, y, z,
+                        x, y, z,
+                        x, y, z,
+                    ];
+                }).flat()),
+                size: 3
+            }, {
+                name: AttributeNames.Uv,
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => [
+                    0, 1,
+                    0, 0,
+                    1, 1,
+                    1, 0,
+                ]).flat()),
+                size: 2
+            }, {
+                name: AttributeNames.Color,
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const c = Color.fromRGB(
+                        Math.random() * 50 + 200,
+                        Math.random() * 50 + 190,
+                        Math.random() * 50 + 180,
+                        Math.random() * 150 + 50,
+                    );
+                    return [
+                        ...c.elements,
+                        ...c.elements,
+                        ...c.elements,
+                        ...c.elements
+                    ];
+                }).flat()),
+                size: 4
+            }, {
+                name: "aBillboardSize",
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const s = Math.random() * 3.5 + 0.5;
+                    return [s, s, s, s];
+                }).flat()),
+                size: 1
+            }, {
+                name: "aBillboardRateOffset",
+                data: new Float32Array(new Array(particleNum).fill(0).map(() => {
+                    const r = Math.random();
+                    return [r, r, r, r];
+                }).flat()),
+                size: 1,
+            }
+        ],
+        indices: new Array(particleNum).fill(0).map((_, i) => {
+            const offset = i * 4;
+            const index = [
+                0 + offset, 1 + offset, 2 + offset,
+                2 + offset, 1 + offset, 3 + offset
+            ];
+            return index;
+        }).flat(),
+        drawCount: particleNum * 6,
+    });
+    const particleMaterial = new Material({
+        gpu,
+        vertexShader: generateVertexShader({
+            useVertexColor: true,
+            attributeDescriptors: particleGeometry.getAttributeDescriptors(),
+            vertexShaderModifier: {
+                beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
+float t = 3.;
+float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+`,
+                localPositionPostProcess: `
+localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+// localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
+localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+`,
+                // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
+                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
+                lastMain: `
+vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+vViewPosition = viewPosition;
+`,
+            },
+            insertUniforms: `
+uniform vec2[4] uBillboardPositionConverters;
+`,
+            insertVaryings: `
+out vec4 vViewPosition;
+`,
+        }),
+        fragmentShader: `#version 300 es
+            
+precision mediump float;
+
+in vec2 vUv;
+in vec4 vVertexColor;
+in vec4 vViewPosition;
+
+out vec4 outColor;
+uniform sampler2D uParticleMap;
+uniform sampler2D uDepthTexture;
+uniform float uNearClip;
+uniform float uFarClip;
+
+// ref:
+// https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
+// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+  return (viewZ + near) / (near - far);
+}
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return (near * far) / ((far - near) * invClipZ - far);
+}
+
+void main() {
+    // int particleId = int(mod(float(gl_VertexID), 4.));
+
+    vec4 texColor = texture(uParticleMap, vUv);
+    vec3 baseColor = vVertexColor.xyz;
+    float alpha = texColor.x * vVertexColor.a;
+    
+    // calc soft fade
+    
+    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
+    // for debug
+    outColor = vec4(vec3(sceneDepth), 1.);
+    
+    float currentDepth = viewZToOrthographicDepth(vViewPosition.z, uNearClip, uFarClip);
+    // for debug
+    // outColor = vec4(vec3(currentDepth), 1.);
+    
+    float diffDepth = abs(sceneDepth) - abs(currentDepth);
+    float softFade = smoothstep(0., .01, diffDepth);
+    // for debug
+    // outColor = vec4(vec3(softFade), 1.);
+    
+    // result
+   
+    float fadedAlpha = alpha * softFade;
+    if(fadedAlpha < .01) {
+        discard;
+    }
+
+    outColor = vec4(baseColor, fadedAlpha);
+}
+        `,
+        uniforms: {
+            uParticleMap: {
+                type: UniformTypes.Texture,
+                value: particleMap,
+            },
+            uBillboardPositionConverters: {
+                type: UniformTypes.Vector2Array,
+                value: [
+                    new Vector2(-1, 1),
+                    new Vector2(-1, -1),
+                    new Vector2(1, 1),
+                    new Vector2(1, -1),
+                ],
+            },
+            uTime: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uDepthTexture: {
+                type: UniformTypes.Texture,
+                value: captureSceneDepthRenderTarget.read.depthTexture,
+            },
+            uNearClip: {
+                type: UniformTypes.Float,
+                value: captureSceneCamera.near
+            },
+            uFarClip: {
+                type: UniformTypes.Float,
+                value: captureSceneCamera.far
+            }
+        },
+        // blendType: BlendTypes.Additive
+        blendType: BlendTypes.Transparent,
+    });
+    particleMesh = new Mesh({
+        geometry: particleGeometry,
+        material: particleMaterial,
+    });
+    particleMesh.onFixedUpdate = ({ fixedTime }) => {
+        // particleMaterial.uniforms.uTime.value = fixedTime;
+        particleMaterial.updateUniform("uTime", fixedTime);
+    };
    
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
-    
-    captureSceneCamera.transform.position = targetCameraPosition.clone();
-    captureSceneCamera.transform.lookAt(new Vector3(0, -3, 0));
+    captureScene.add(particleMesh);
    
-    if(isSP) {
-        window.addEventListener("touchstart", onTouch);
-        window.addEventListener("touchmove", onTouch);
-    } else {
-        window.addEventListener("mousemove", onMouseMove);
-    }
+    engine.onBeforeStart = () => {
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize);
 
-    onWindowResize();
-    window.addEventListener('resize', onWindowResize);
-  
+        orbitCameraController.distance = isSP ? 25 : 17;
+        orbitCameraController.attenuation = 0.01;
+        orbitCameraController.dampingFactor = 0.2;
+        orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
+        orbitCameraController.start(20, -30);
+    }
+    
     engine.onBeforeUpdate = () => {
         if(!debuggerGUI) initDebugger();
     };
     
+    engine.onBeforeFixedUpdate = () => {
+        inputController.fixedUpdate();
+    }
+    
+    engine.onRender = (time, deltaTime) => {
+        captureSceneDepthRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+        captureSceneColorRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
+       
+        if(debuggerStates.enabledParticle) {
+            captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+            particleMesh.setEnabled(false);
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: false });
+            particleMesh.setEnabled(true);
+        } else {
+            captureSceneCamera.setRenderTarget(captureSceneDepthRenderTarget)
+            particleMesh.setEnabled(false);
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: true });
+        }
+        
+        if(postProcess.enabled) {
+            captureSceneCamera.setRenderTarget(captureSceneColorRenderTarget)
+            renderer.render(captureScene, captureSceneCamera, { enabledShadowPass: debuggerStates.enabledParticle });
+  
+            postProcess.render({
+                gpu,
+                renderer,
+                sceneRenderTarget: captureSceneColorRenderTarget
+            });
+        } else {
+            captureSceneCamera.setRenderTarget(null)
+            renderer.render(captureScene, captureSceneCamera);
+        }
+    };
+
     const tick = (time) => {
         engine.run(time);
         requestAnimationFrame(tick);
@@ -378,18 +623,73 @@ function initDebugger() {
             const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
             location.replace(url);
         }
-    })
-    
+    });
+
     debuggerGUI.addBorderSpacer();
     
     debuggerGUI.addToggleDebugger({
-        label: "cast shadow",
-        initialValue: debuggerStates.castShadow,
+        label: "particle fog enabled",
+        initialValue: debuggerStates.enabledParticle,
+        onChange: (value) => debuggerStates.enabledParticle = value
+    })
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: "bloom pass enabled",
+        initialValue: bloomPass.enabled,
+        onChange: (value) => bloomPass.enabled = value,
+    })
+
+    debuggerGUI.addSliderDebugger({
+        label: "bloom amount",
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: bloomPass.bloomAmount,
         onChange: (value) => {
-            skinnedMesh.castShadow = value;
+            bloomPass.bloomAmount = value;
         }
-    });
-   
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom threshold",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.threshold,
+        onChange: (value) => {
+            bloomPass.threshold = value;
+        }
+    })
+    
+    debuggerGUI.addSliderDebugger({
+        label: "bloom tone",
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: bloomPass.tone,
+        onChange: (value) => {
+            bloomPass.tone = value;
+        }
+    })
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: "fxaa pass enabled",
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => fxaaPass.enabled = value,
+    })
+
+    debuggerGUI.addBorderSpacer();
+    
+    debuggerGUI.addToggleDebugger({
+        label: "postprocess enabled",
+        initialValue: postProcess.enabled,
+        onChange: (value) => postProcess.enabled = value,
+    })
+
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
 

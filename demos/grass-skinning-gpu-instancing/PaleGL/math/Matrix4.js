@@ -177,7 +177,7 @@ export class Matrix4 {
         return this;
     }
 
-    static identity() {
+    static get identity() {
         return new Matrix4(
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -246,7 +246,7 @@ export class Matrix4 {
     }
     
     static multiplyMatrices(...matrices) {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         matrices.forEach(matrix => m.multiply(matrix));
         return m;
     }
@@ -324,7 +324,7 @@ export class Matrix4 {
     }
     
     clone() {
-        const m = Matrix4.identity();
+        const m = Matrix4.identity;
         m.m00 = this.m00;
         m.m01 = this.m01;
         m.m02 = this.m02;
