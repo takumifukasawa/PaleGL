@@ -103,7 +103,7 @@ engine.setScenes([
 ]);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(70, 1, 1, 40);
+const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
@@ -191,7 +191,7 @@ const showBuffersPass = new FragmentPass({
     gpu,
     fragmentShader: `#version 300 es
  
-precision mediump float;
+precision highp float;
 
 in vec2 vUv;
 
@@ -232,7 +232,6 @@ void main() {
     float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
 
     outColor = baseColor + normalColor + sceneDepth;
-    // outColor = vec4(vec3(sceneDepth), 1.);
 }
 `,
     uniforms: {
@@ -536,7 +535,7 @@ out vec4 vViewPosition;
         }),
         fragmentShader: `#version 300 es
             
-precision mediump float;
+precision highp float;
 
 in vec2 vUv;
 in vec4 vVertexColor;
