@@ -101,7 +101,7 @@ engine.setScenes([
     compositeScene
 ]);
 
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
+const captureSceneCamera = new PerspectiveCamera(70, 1, 1, 40);
 captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
@@ -548,7 +548,7 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = isSP ? 25 : 17;
+        orbitCameraController.distance = isSP ? 20 : 15;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);

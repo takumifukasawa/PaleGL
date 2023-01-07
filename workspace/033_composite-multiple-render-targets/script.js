@@ -103,7 +103,7 @@ engine.setScenes([
 ]);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(70, 1, 1, 50);
+const captureSceneCamera = new PerspectiveCamera(70, 1, 1, 40);
 captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
