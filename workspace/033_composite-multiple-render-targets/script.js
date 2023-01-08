@@ -256,7 +256,7 @@ void main() {
         },
     }
 });
-showBuffersPass.enabled = false;
+showBuffersPass.enabled = true;
 postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
@@ -355,7 +355,7 @@ const createGLTFSkinnedMesh = async () => {
     // 本当はworldMatrixをかける前の方がよい
     worldPosition = instanceTransform * worldPosition;
 `,
-                outClipPositionPreProcess: `
+            outClipPositionPreProcess: `
     vVertexColor = aInstanceVertexColor;
 `
         },
@@ -543,7 +543,7 @@ out vec3 vNormal;
 out vec4 vVertexColor;
 out vec4 vViewPosition;
 
-#pragma uniform_vertex_matrices
+#pragma uniform_transform_vertex
 
 #pragma uniform_time
 

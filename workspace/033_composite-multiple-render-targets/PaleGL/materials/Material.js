@@ -21,6 +21,8 @@ export class Material {
     faceSide;
     receiveShadow;
     queue;
+    
+    useNormalMap;
    
     // skinning
     isSkinning;
@@ -36,6 +38,10 @@ export class Material {
     vertexShader;
     fragmentShader;
     depthFragmentShader;
+    
+    rawVertexShader;
+    rawFragmentShader;
+    rawDepthFragmentShader;
 
     #vertexShaderGenerator;
     #fragmentShaderGenerator;
@@ -75,9 +81,12 @@ export class Material {
         blendType,
         renderQueue,
         
+        useNormalMap,
+        
         // skinning
         isSkinning,
         gpuSkinning,
+        jointNum,
         
         // instancing
         isInstancing = false,
@@ -149,9 +158,12 @@ export class Material {
         // skinning
         this.isSkinning = isSkinning;
         this.gpuSkinning = gpuSkinning;
+        this.jointNum = jointNum;
         
         this.isInstancing = isInstancing;
         this.useVertexColor = useVertexColor;
+
+        this.useNormalMap = useNormalMap;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
@@ -234,13 +246,20 @@ export class Material {
        
         // for debug
         // console.log(this.uniforms, this.depthUniforms)
-      
+    
+        const rawVertexShader = buildVertexShader(this.vertexShader, attributeDescriptors);
+        const rawFragmentShader = buildFragmentShader(this.fragmentShader);
+        // const rawDepthFragmentShader
+
+        this.rawVertexShader = rawVertexShader;
+        this.rawFragmentShader = rawFragmentShader;
+
         this.shader = new Shader({
             gpu,
             // vertexShader: this.vertexShader,
-            vertexShader: buildVertexShader(this.vertexShader, attributeDescriptors),
+            vertexShader: rawVertexShader,
             // fragmentShader: this.fragmentShader
-            fragmentShader: buildFragmentShader(this.fragmentShader),
+            fragmentShader: rawFragmentShader,
         });
     }
 

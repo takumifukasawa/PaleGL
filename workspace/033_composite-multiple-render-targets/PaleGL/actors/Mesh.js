@@ -82,12 +82,15 @@ export class Mesh extends Actor {
                 faceSide: this.mainMaterial.faceSide
             });
         }       
-        
+
         if(this.depthMaterial && !this.depthMaterial.isCompiledShader) {
             this.depthMaterial.start({
                 gpu,
                 attributeDescriptors: this.geometry.getAttributeDescriptors()
             });
+            console.log("main", this.mainMaterial.rawVertexShader)
+            console.log("frag", this.mainMaterial.rawFragmentShader)
+            console.log("depth", this.depthMaterial.rawVertexShader)
         }
     }
     

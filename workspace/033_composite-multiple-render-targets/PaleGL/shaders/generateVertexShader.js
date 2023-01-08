@@ -123,7 +123,7 @@ void main() {
     ${vertexShaderModifier.viewPositionPostProcess || ""}
  
     ${vertexShaderModifier.outClipPositionPreProcess || ""}
-    
+
     gl_Position = uProjectionMatrix * viewPosition;
     
     ${vertexShaderModifier.lastMain || ""}

@@ -5,18 +5,19 @@ import {
     shadowMapFragmentUniforms,
     shadowMapFragmentVaryings
 } from "../shaders/shadowMapShader.js";
-import {generateVertexShader} from "../shaders/generateVertexShader.js";
+// import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {
     alphaTestFragmentUniforms,
     alphaTestFragmentFunc,
     directionalLightFragmentUniforms,
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
-    phongSurfaceDirectionalLightFunc
+    phongSurfaceDirectionalLightFunc, normalMapVertexVaryings
 } from "../shaders/lightingCommon.js";
 import {UniformTypes} from "../constants.js";
 import {Vector2} from "../math/Vector2.js";
 import {Color} from "../math/Color.js";
+import {buildVertexShader} from "../shaders/buildShader.js";
 
 export class PhongMaterial extends Material {
     // // params
@@ -33,9 +34,7 @@ export class PhongMaterial extends Material {
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
         // TODO: 外部化
-        vertexShaderModifier = {
-            localPositionPostProcess: ""
-        },
+        vertexShaderModifier = {},
         uniforms = {},
         ...options
     }) {
@@ -80,38 +79,38 @@ export class PhongMaterial extends Material {
             }
         };
        
-        const useNormalMap = !!normalMap;
-       
-        // TODO: 今渡してる引数系はmaterialのparamsで良い気もする
-        const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
-            isSkinning,
-            gpuSkinning,
-            jointNum: isSkinning ? jointNum : null,
-            receiveShadow: options.receiveShadow,
-            useNormalMap,
-            isInstancing: this.isInstancing,
-            useVertexColor: this.useVertexColor,
-            // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
-            vertexShaderModifier,
-            ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
-        });
-        
-        const fragmentShaderGenerator = () => PhongMaterial.generateFragmentShader({
-            receiveShadow: options.receiveShadow,
-            useNormalMap,
-            alphaTest: options.alphaTest,
-            useVertexColor: options.useVertexColor
-        });
+        // const useNormalMap = !!normalMap;
+        // // TODO: 今渡してる引数系はmaterialのparamsで良い気もする
+        // const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
+        //     isSkinning,
+        //     gpuSkinning,
+        //     jointNum: isSkinning ? jointNum : null,
+        //     receiveShadow: options.receiveShadow,
+        //     useNormalMap,
+        //     isInstancing: this.isInstancing,
+        //     useVertexColor: this.useVertexColor,
+        //     // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+        //     vertexShaderModifier,
+        //     ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
+        // });
+
+
+        // const fragmentShaderGenerator = () => this.generateFragmentShader({
+        //     receiveShadow: options.receiveShadow,
+        //     useNormalMap: options.useNormalMap,
+        //     alphaTest: options.alphaTest,
+        //     useVertexColor: options.useVertexColor
+        // });
 
         const mergedUniforms = {
             ...baseUniforms,
             ...(uniforms ?  uniforms : {})
         };
         
-        const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({
-            alphaTest: options.alphaTest,
-            useVertexColor: options.useVertexColor
-        });
+        // const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({
+        //     alphaTest: options.alphaTest,
+        //     useVertexColor: options.useVertexColor
+        // });
         
         const depthUniforms = {
             uDiffuseMap: {
@@ -128,30 +127,131 @@ export class PhongMaterial extends Material {
             },
         }
 
+
         // TODO: できるだけconstructorの直後に持っていきたい
         super({
             ...options,
             name: "PhongMaterial",
-            vertexShaderGenerator,
-            fragmentShaderGenerator,
-            depthFragmentShaderGenerator,
+            // vertexShaderGenerator,
+            // vertexShader,
+            // fragmentShaderGenerator,
+            // depthFragmentShaderGenerator,
             vertexShaderModifier,
             uniforms: mergedUniforms,
-            depthUniforms
+            depthUniforms,
+            useNormalMap: !!normalMap
         });
     }
     
     start(options) {
+        this.vertexShader = this.generateVertexShader({
+            isSkinning: this.isSkinning,
+            gpuSkinning: this.gpuSkinning,
+            jointNum: this.isSkinning ? this.jointNum : null,
+            receiveShadow: this.receiveShadow,
+            useNormalMap: this.useNormalMap,
+            isInstancing: this.isInstancing,
+            useVertexColor: this.useVertexColor,
+            // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
+            vertexShaderModifier: this.vertexShaderModifier,
+            attributeDescriptors: options.attributeDescriptors
+        });
+
+        this.fragmentShader = this.generateFragmentShader({
+            receiveShadow: this.receiveShadow,
+            useNormalMap: this.useNormalMap,
+            alphaTest: this.alphaTest,
+            useVertexColor: this.useVertexColor
+        });
+
+        this.depthFragmentShader = this.generateDepthFragmentShader({
+            alphaTest: this.alphaTest,
+            useVertexColor: this.useVertexColor
+        });
+        
         super.start(options);
     }
 
-    // updateUniforms(options) {
-    //     super.updateUniforms(options);
-    //     this.uniforms.uDiffuseColor.value = this.diffuseColor;
-    //     this.uniforms.uSpecularAmount.value = this.specularAmount;
-    // }
+    generateVertexShader({
+        isSkinning,
+        gpuSkinning,
+        jointNum,
+        receiveShadow,
+        useNormalMap,
+        isInstancing,
+        useVertexColor,
+        vertexShaderModifier,
+        attributeDescriptors,
+        insertUniforms,
+    }) {
+        const shader = `#version 300 es
+
+#pragma attributes
+
+// varings
+out vec2 vUv;
+out vec3 vWorldPosition;
+out vec3 vNormal;
+${useNormalMap ? "#pragma varying_normal_map" : ""}
+${receiveShadow ? "#pragma varying_receive_shadow" : "" }
+${useVertexColor ? "#pragma varying_vertex_color" : ""}
+
+// uniforms
+#pragma uniform_transform_vertex
+#pragma uniform_engine
+${receiveShadow ? "#pragma uniform_receive_shadow" : "" }
+
+${isSkinning ? "#pragma function_skinning" : ""}
+
+${isSkinning ? `#pragma uniform_skinning ${jointNum}` : ""}
+${insertUniforms || ""}
+
+void main() {
+    ${vertexShaderModifier.beginMain || ""}
+
+    ${isSkinning ? "#pragma vertex_skinning gpu" : "" }
+
+    vec4 localPosition = vec4(aPosition, 1.);
+     ${isSkinning
+            ? `
+    localPosition = skinMatrix * localPosition;`
+            : ""
+        }
+    ${vertexShaderModifier.localPositionPostProcess || ""}
+
+    ${useNormalMap
+            ? isSkinning
+                ? "#pragma vertex_normal_map skinning"
+                : "#pragma vertex_normal_map"
+            : isSkinning
+                ? "vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;"
+                : "vNormal = mat3(uNormalMatrix) * aNormal;"
+        }
+
+    // assign common varyings 
+    vUv = aUv;
+
+    vec4 worldPosition = uWorldMatrix * localPosition;
+    ${vertexShaderModifier.worldPositionPostProcess || ""}
+ 
+    vWorldPosition = worldPosition.xyz;
+
+    ${receiveShadow ? "#pragma vertex_receive_shadow" : ""}
+
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    ${vertexShaderModifier.viewPositionPostProcess || ""}
+ 
+    ${vertexShaderModifier.outClipPositionPreProcess || ""}
+ 
+    gl_Position = uProjectionMatrix * viewPosition;
+
+    ${vertexShaderModifier.lastMain || ""} 
+}`;
+
+        return shader;
+    }
     
-    static generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }) {
+    generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }) {
         return `#version 300 es
 
 precision mediump float;
@@ -239,6 +339,9 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
     // correct
     outBaseColor = resultColor;
     outNormalColor = vec4(worldNormal, 1.); 
+    // outBaseColor = vec4(vec3(texture(uShadowMap, uv).x), 1.);
+    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
+    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
 
     // this is dummy
     // outBaseColor = vec4(1., 0., 0., 1.);
@@ -247,7 +350,7 @@ if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
 `;
     }
 
-    static generateDepthFragmentShader({ alphaTest, useVertexColor }) {
+    generateDepthFragmentShader({ alphaTest, useVertexColor }) {
         return `#version 300 es
 
 precision mediump float;
