@@ -28,7 +28,6 @@
     BloomPass,
     Geometry,
     Material,
-    generateVertexShader,
     UniformTypes,
     BlendTypes,
     AttributeNames,
@@ -506,33 +505,75 @@ const main = async () => {
     });
     const particleMaterial = new Material({
         gpu,
-        vertexShader: generateVertexShader({
-            useVertexColor: true,
-            attributeDescriptors: particleGeometry.getAttributeDescriptors(),
-            vertexShaderModifier: {
-                beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
-float t = 3.;
-float r = mod((uTime / t) + aBillboardRateOffset, 1.);
-`,
-                localPositionPostProcess: `
-localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-// localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
-localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
-`,
-                // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
-                viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
-                lastMain: `
-vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-vViewPosition = viewPosition;
-`,
-            },
-            insertUniforms: `
-uniform vec2[4] uBillboardPositionConverters;
-`,
-            insertVaryings: `
+//         vertexShader: generateVertexShader({
+//             useVertexColor: true,
+//             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
+//             vertexShaderModifier: {
+//                 beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
+// float t = 3.;
+// float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+// `,
+//                 localPositionPostProcess: `
+// localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+// // localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
+// localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+// `,
+//                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
+//                 viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
+//                 lastMain: `
+// vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+// vViewPosition = viewPosition;
+// `,
+//             },
+//             insertUniforms: `
+// uniform vec2[4] uBillboardPositionConverters;
+// `,
+//             insertVaryings: `
+// out vec4 vViewPosition;
+// `,
+//         }),
+        vertexShader: `#version 300 es
+
+#pragma attributes
+
+out vec2 vUv;
+out vec3 vWorldPosition;
+out vec3 vNormal;
+
+out vec4 vVertexColor;
 out vec4 vViewPosition;
-`,
-        }),
+
+#pragma uniform_vertex_matrices
+
+#pragma uniform_time
+
+uniform vec2[4] uBillboardPositionConverters;
+
+void main() {
+    int particleId = int(mod(float(gl_VertexID), 4.));
+    float t = 3.;
+    float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+
+    vec4 localPosition = vec4(aPosition, 1.);
+
+    localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+    localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+
+    // assign common varyings 
+    vUv = aUv; 
+    vVertexColor = aColor;
+    vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+
+    vec4 worldPosition = uWorldMatrix * localPosition;
+  
+    vWorldPosition = worldPosition.xyz;
+    
+    vec4 viewPosition = uViewMatrix * worldPosition;
+    viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
+    vViewPosition = viewPosition;
+ 
+    gl_Position = uProjectionMatrix * viewPosition;
+}`,
         fragmentShader: `#version 300 es
             
 precision highp float;
@@ -660,7 +701,6 @@ void main() {
         afterGBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         copyDepthSourceRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
         copyDepthDestRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        // console.log(afterGBufferRenderTarget)
     };
 
     engine.onBeforeStart = () => {
@@ -815,3 +855,4 @@ function initDebugger() {
 }
 
 main();
+

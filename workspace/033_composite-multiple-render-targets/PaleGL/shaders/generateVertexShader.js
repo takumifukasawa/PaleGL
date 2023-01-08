@@ -6,65 +6,8 @@ import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.js
 import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.js";
 import {normalMapVertexVaryings} from "./lightingCommon.js";
 import {AttributeNames} from "../constants.js";
+import {buildVertexAttributeLayouts} from "./buildShader.js";
 
-// -----------------------------------------------
-// TODO:
-// - out varying を centroid できるようにしたい
-// -----------------------------------------------
-
-const buildVertexAttributeLayouts = (attributeDescriptors) => {
-    const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
-
-    const attributesList = sortedAttributeDescriptors.map(({ location, size, name, dataType }) => {
-        let type;
-        // TODO: fix all type
-        switch(dataType) {
-            case Float32Array:
-                switch(size) {
-                    case 1:
-                        type = "float";
-                        break;
-                    case 2:
-                        type = "vec2";
-                        break;
-                    case 3:
-                        type = "vec3";
-                        break;
-                    case 4:
-                        type = "vec4";
-                        break;
-                    default:
-                        throw "[buildVertexAttributeLayouts] invalid attribute float";
-                }
-                break;
-            // TODO: signedなパターンが欲しい    
-            case Uint16Array:
-                switch(size) {
-                    case 1:
-                        type = "uint";
-                        break;
-                    case 2:
-                        type = "uvec2";
-                        break;
-                    case 3:
-                        type = "uvec3";
-                        break;
-                    case 4:
-                        type = "uvec4";
-                        break;
-                    default:
-                        throw "[buildVertexAttributeLayouts] invalid attribute int";
-                }               
-                break;
-            default:
-                throw "[buildVertexAttributeLayouts] invalid attribute data type";
-        }
-        const str = `layout(location = ${location}) in ${type} ${name};`;
-        return str;
-    });
-
-    return attributesList;
-}
 
 export const generateVertexShader = ({
     // required
@@ -244,3 +187,4 @@ void main() {
 }
 `;
 }
+

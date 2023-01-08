@@ -2,7 +2,8 @@
 import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide, UniformNames} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
-import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
+import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.js";
+// import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class Material {
     name;
@@ -233,11 +234,13 @@ export class Material {
        
         // for debug
         // console.log(this.uniforms, this.depthUniforms)
-        
+      
         this.shader = new Shader({
             gpu,
-            vertexShader: this.vertexShader,
-            fragmentShader: this.fragmentShader
+            // vertexShader: this.vertexShader,
+            vertexShader: buildVertexShader(this.vertexShader, attributeDescriptors),
+            // fragmentShader: this.fragmentShader
+            fragmentShader: buildFragmentShader(this.fragmentShader),
         });
     }
 
