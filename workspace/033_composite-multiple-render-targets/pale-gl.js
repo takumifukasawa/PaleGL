@@ -1473,7 +1473,9 @@ const skinningVertex = (gpuSkinning = false) => `
 // - out varying を centroid できるようにしたい
 // -----------------------------------------------
 
+// .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
 
+const pragmaRegex = /^#pragma(.*)/;
 
 
 
@@ -1531,12 +1533,19 @@ const buildVertexAttributeLayouts = (attributeDescriptors) => {
     return attributesList;
 }
 
+const joinShaderLines = (shaderLines) => {
+    return shaderLines
+        .map(line => line.replace(/^\s*$/, ""))
+        .join("\n")
+        .replaceAll(/\n{3,}/g, "\n");
+};
+
 const buildVertexShader = (shader, attributeDescriptors) => {
     const shaderLines =  shader.split("\n");
     const resultShaderLines = [];
 
     shaderLines.forEach(shaderLine => {
-        const pragma = (shaderLine.trim()).match(/^#pragma(.*)/);
+        const pragma = (shaderLine.trim()).match(pragmaRegex);
 
         if(!pragma) {
             resultShaderLines.push(shaderLine);
@@ -1555,10 +1564,6 @@ const buildVertexShader = (shader, attributeDescriptors) => {
                 newLines.push(...attributes);
                 break;
                 
-            case "uniform_time":
-                newLines.push("uniform float uTime;");
-                break;
-                
             case "uniform_transform_vertex":
                 newLines.push(`
 uniform mat4 uWorldMatrix;
@@ -1569,11 +1574,15 @@ uniform mat4 uNormalMatrix;
                 break;
                 
             case "varying_receive_shadow":
-                newLines.push("out vec4 vShadowMapProjectionUv;");
+                newLines.push(`
+out vec4 vShadowMapProjectionUv;
+`);
                 break;
                 
             case "uniform_receive_shadow":
-                newLines.push("uniform mat4 uShadowMapProjectionMatrix;");
+                newLines.push(`
+uniform mat4 uShadowMapProjectionMatrix;
+`);
                 break;
                 
             case "uniform_engine":
@@ -1615,18 +1624,22 @@ vBinormal = mat3(uNormalMatrix) * aBinormal;
                 break;
                 
             case "vertex_receive_shadow":
-                newLines.push("vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;");
+                newLines.push(`    
+vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
+`);
                 break;
 
             case "varying_vertex_color":
-                newLines.push("out vec4 vVertexColor;");
+                newLines.push(`
+out vec4 vVertexColor;
+`);
                 break;
             default:
-                throw "[buildVertexShader] invalid pragma";
+                throw `[buildVertexShader] invalid pragma: ${pragmaName}`;
         }
         resultShaderLines.push(newLines.join("\n"));
     });
-    return resultShaderLines.join("\n");
+    return joinShaderLines(resultShaderLines);
 }
 
 const buildFragmentShader = (shader) => {
@@ -1634,7 +1647,7 @@ const buildFragmentShader = (shader) => {
     const resultShaderLines = [];
 
     shaderLines.forEach(shaderLine => {
-        const pragma = (shaderLine.trim()).match(/^#pragma\s([a-zA-Z0-9_\s]*)$/);
+        const pragma = (shaderLine.trim()).match(pragmaRegex);
 
         if(!pragma) {
             resultShaderLines.push(shaderLine);
@@ -1644,21 +1657,29 @@ const buildFragmentShader = (shader) => {
         const pragmaContent = pragma[1];
         let newLines = [];
         switch(pragmaContent) {
-            case "uniform_time":
-                newLines.push("uniform float uTime;");
-                break;
             case "uniform_vertex_matrices":
                 newLines.push(`uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;`);
                 break;
             default:
-                throw "[buildFragmentShader] invalid pragma";
+                throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
         }
         resultShaderLines.push(newLines.join("\n"));
     });
-    return resultShaderLines.join("\n");
+    return joinShaderLines(resultShaderLines);
 }
+
+const defaultDepthFragmentShader = () => `#version 300 es
+
+precision mediump float;
+
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(1., 1., 1., 1.);
+}
+`;
 ﻿
 
 
@@ -1907,12 +1928,8 @@ class Material {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
        
-        // for debug
-        // console.log(this.uniforms, this.depthUniforms)
-    
         const rawVertexShader = buildVertexShader(this.vertexShader, attributeDescriptors);
         const rawFragmentShader = buildFragmentShader(this.fragmentShader);
-        // const rawDepthFragmentShader
 
         this.rawVertexShader = rawVertexShader;
         this.rawFragmentShader = rawFragmentShader;
@@ -1941,16 +1958,6 @@ class Material {
     // updateEngineUniforms() {} 
 }
 
-﻿const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
-
-precision mediump float;
-
-out vec4 outColor;
-
-void main() {
-    outColor = vec4(1., 1., 1., 1.);
-}
-`;
 ﻿
 
 
@@ -2030,7 +2037,7 @@ class Mesh extends Actor {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: this.mainMaterial.vertexShader,
-                fragmentShader: this.mainMaterial.depthFragmentShader || generateDepthFragmentShader(),
+                fragmentShader: this.mainMaterial.depthFragmentShader || defaultDepthFragmentShader(),
                 uniforms: this.mainMaterial.depthUniforms,
                 faceSide: this.mainMaterial.faceSide
             });
@@ -2044,9 +2051,9 @@ class Mesh extends Actor {
         }
         
         // for debug
-        // console.log("main", this.mainMaterial.rawVertexShader)
-        // console.log("frag", this.mainMaterial.rawFragmentShader)
-        // console.log("depth", this.depthMaterial.rawVertexShader)
+        // console.log("main raw vertex", this.mainMaterial.rawVertexShader)
+        // console.log("main raw fragment", this.mainMaterial.rawFragmentShader)
+        // console.log("depth raw vertex", this.depthMaterial.rawVertexShader)
     }
 
     beforeRender({gpu}) {
@@ -7191,7 +7198,7 @@ class PhongMaterial extends Material {
 
 #pragma attributes
 
-// varings
+// varyings
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
@@ -7212,23 +7219,35 @@ ${insertUniforms || ""}
 void main() {
     ${vertexShaderModifier.beginMain || ""}
 
-    ${isSkinning ? "#pragma vertex_skinning gpu" : "" }
+    ${isSkinning
+        ? `
+    #pragma vertex_skinning gpu
+`       : ""
+    }
 
     vec4 localPosition = vec4(aPosition, 1.);
-     ${isSkinning
-            ? `
+    ${isSkinning
+        ? `
     localPosition = skinMatrix * localPosition;`
-            : ""
-        }
+        : ""
+    }
     ${vertexShaderModifier.localPositionPostProcess || ""}
 
     ${useNormalMap
             ? isSkinning
-                ? "#pragma vertex_normal_map skinning"
-                : "#pragma vertex_normal_map"
+                ? `
+    #pragma vertex_normal_map skinning
+`
+                : `
+    #pragma vertex_normal_map
+`
             : isSkinning
-                ? "vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;"
-                : "vNormal = mat3(uNormalMatrix) * aNormal;"
+                ? `
+    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+`
+                : `
+    vNormal = mat3(uNormalMatrix) * aNormal;
+`
         }
 
     // assign common varyings 
@@ -7304,16 +7323,24 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     ${useNormalMap
-        ? "vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);"
-        : "vec3 worldNormal = normalize(vNormal);"
+        ? `
+    vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
+`
+        : `
+    vec3 worldNormal = normalize(vNormal);
+`
     }
 
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
     ${useVertexColor
-        ? "surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;"
-        : "surface.diffuseColor = uDiffuseColor * diffuseMapColor;"
+        ? `
+    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
+`
+        : `
+    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
+`
     }
     surface.specularAmount = uSpecularAmount;
 
@@ -7327,24 +7354,23 @@ void main() {
    
     ${receiveShadow
         ? `
-// TODO: apply shadow の中に入れても良さそう
-if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-    resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
-}
+    // TODO: apply shadow の中に入れても良さそう
+    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+        resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
+    }
 `
         : ""
     }
     ${alphaTest
-        ? `checkAlphaTest(resultColor.a, uAlphaTestThreshold);`
+        ? `
+    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+`
         : ""
     }
 
     // correct
     outBaseColor = resultColor;
     outNormalColor = vec4(worldNormal, 1.); 
-    // outBaseColor = vec4(vec3(texture(uShadowMap, uv).x), 1.);
-    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
-    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
 
     // this is dummy
     // outBaseColor = vec4(1., 0., 0., 1.);
@@ -7376,14 +7402,20 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
    
     ${useVertexColor
-        ? "vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;"
-        : "vec4 diffuseColor = uColor * diffuseMapColor;"
+        ? `
+    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
+`
+        : `
+    vec4 diffuseColor = uColor * diffuseMapColor;
+`
     }
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
     ${alphaTest
-        ? `checkAlphaTest(alpha, uAlphaTestThreshold);`
+        ? `
+    checkAlphaTest(alpha, uAlphaTestThreshold);
+`
         : ""
     }
 

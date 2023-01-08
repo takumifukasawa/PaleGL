@@ -158,7 +158,7 @@ export class PhongMaterial extends Material {
 
 #pragma attributes
 
-// varings
+// varyings
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
@@ -179,23 +179,35 @@ ${insertUniforms || ""}
 void main() {
     ${vertexShaderModifier.beginMain || ""}
 
-    ${isSkinning ? "#pragma vertex_skinning gpu" : "" }
+    ${isSkinning
+        ? `
+    #pragma vertex_skinning gpu
+`       : ""
+    }
 
     vec4 localPosition = vec4(aPosition, 1.);
-     ${isSkinning
-            ? `
+    ${isSkinning
+        ? `
     localPosition = skinMatrix * localPosition;`
-            : ""
-        }
+        : ""
+    }
     ${vertexShaderModifier.localPositionPostProcess || ""}
 
     ${useNormalMap
             ? isSkinning
-                ? "#pragma vertex_normal_map skinning"
-                : "#pragma vertex_normal_map"
+                ? `
+    #pragma vertex_normal_map skinning
+`
+                : `
+    #pragma vertex_normal_map
+`
             : isSkinning
-                ? "vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;"
-                : "vNormal = mat3(uNormalMatrix) * aNormal;"
+                ? `
+    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+`
+                : `
+    vNormal = mat3(uNormalMatrix) * aNormal;
+`
         }
 
     // assign common varyings 
@@ -271,16 +283,24 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     ${useNormalMap
-        ? "vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);"
-        : "vec3 worldNormal = normalize(vNormal);"
+        ? `
+    vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
+`
+        : `
+    vec3 worldNormal = normalize(vNormal);
+`
     }
 
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
     ${useVertexColor
-        ? "surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;"
-        : "surface.diffuseColor = uDiffuseColor * diffuseMapColor;"
+        ? `
+    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
+`
+        : `
+    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
+`
     }
     surface.specularAmount = uSpecularAmount;
 
@@ -311,9 +331,6 @@ void main() {
     // correct
     outBaseColor = resultColor;
     outNormalColor = vec4(worldNormal, 1.); 
-    // outBaseColor = vec4(vec3(texture(uShadowMap, uv).x), 1.);
-    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
-    // outBaseColor = vec4(vec3(vShadowMapProjectionUv.xyz), 1.);
 
     // this is dummy
     // outBaseColor = vec4(1., 0., 0., 1.);
@@ -345,14 +362,20 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
    
     ${useVertexColor
-        ? "vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;"
-        : "vec4 diffuseColor = uColor * diffuseMapColor;"
+        ? `
+    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
+`
+        : `
+    vec4 diffuseColor = uColor * diffuseMapColor;
+`
     }
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
     ${alphaTest
-        ? `checkAlphaTest(alpha, uAlphaTestThreshold);`
+        ? `
+    checkAlphaTest(alpha, uAlphaTestThreshold);
+`
         : ""
     }
 

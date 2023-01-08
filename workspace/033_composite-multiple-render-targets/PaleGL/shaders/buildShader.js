@@ -105,11 +105,15 @@ uniform mat4 uNormalMatrix;
                 break;
                 
             case "varying_receive_shadow":
-                newLines.push("out vec4 vShadowMapProjectionUv;");
+                newLines.push(`
+out vec4 vShadowMapProjectionUv;
+`);
                 break;
                 
             case "uniform_receive_shadow":
-                newLines.push("uniform mat4 uShadowMapProjectionMatrix;");
+                newLines.push(`
+uniform mat4 uShadowMapProjectionMatrix;
+`);
                 break;
                 
             case "uniform_engine":
@@ -136,13 +140,13 @@ out vec3 vBinormal;
             case "vertex_normal_map":
                 const isSkinningNormalMap = pragmas[1] && pragmas[1] === "skinning";
                 newLines.push(isSkinningNormalMap ? `
-    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
+vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
+vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
                 ` : `
-    vNormal = mat3(uNormalMatrix) * aNormal;
-    vTangent = mat3(uNormalMatrix) * aTangent;
-    vBinormal = mat3(uNormalMatrix) * aBinormal;
+vNormal = mat3(uNormalMatrix) * aNormal;
+vTangent = mat3(uNormalMatrix) * aTangent;
+vBinormal = mat3(uNormalMatrix) * aBinormal;
 `);
                 break;
                 
@@ -152,12 +156,14 @@ out vec3 vBinormal;
                 
             case "vertex_receive_shadow":
                 newLines.push(`    
-    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
+vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
 `);
                 break;
 
             case "varying_vertex_color":
-                newLines.push("out vec4 vVertexColor;");
+                newLines.push(`
+out vec4 vVertexColor;
+`);
                 break;
             default:
                 throw `[buildVertexShader] invalid pragma: ${pragmaName}`;

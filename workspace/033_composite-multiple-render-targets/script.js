@@ -517,8 +517,7 @@ out vec4 vVertexColor;
 out vec4 vViewPosition;
 
 #pragma uniform_transform_vertex
-
-#pragma uniform_time
+#pragma uniform_engine
 
 uniform vec2[4] uBillboardPositionConverters;
 
