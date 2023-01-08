@@ -57,9 +57,6 @@ export {FXAAPass} from "./postprocess/FXAAPass.js";
 export {GaussianBlurPass} from "./postprocess/GaussianBlurPass.js";
 export {BloomPass} from "./postprocess/BloomPass.js";
 
-// shaders
-export {generateVertexShader, buildVertexShader} from "./shaders/generateVertexShader.js";
-
 // utilities
 export {clamp} from "./utilities/mathUtilities.js";
 

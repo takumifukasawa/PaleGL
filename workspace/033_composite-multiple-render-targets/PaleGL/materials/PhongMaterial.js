@@ -5,7 +5,6 @@ import {
     shadowMapFragmentUniforms,
     shadowMapFragmentVaryings
 } from "../shaders/shadowMapShader.js";
-// import {generateVertexShader} from "../shaders/generateVertexShader.js";
 import {
     alphaTestFragmentUniforms,
     alphaTestFragmentFunc,
@@ -79,39 +78,11 @@ export class PhongMaterial extends Material {
             }
         };
        
-        // const useNormalMap = !!normalMap;
-        // // TODO: 今渡してる引数系はmaterialのparamsで良い気もする
-        // const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
-        //     isSkinning,
-        //     gpuSkinning,
-        //     jointNum: isSkinning ? jointNum : null,
-        //     receiveShadow: options.receiveShadow,
-        //     useNormalMap,
-        //     isInstancing: this.isInstancing,
-        //     useVertexColor: this.useVertexColor,
-        //     // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
-        //     vertexShaderModifier,
-        //     ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
-        // });
-
-
-        // const fragmentShaderGenerator = () => this.generateFragmentShader({
-        //     receiveShadow: options.receiveShadow,
-        //     useNormalMap: options.useNormalMap,
-        //     alphaTest: options.alphaTest,
-        //     useVertexColor: options.useVertexColor
-        // });
-
         const mergedUniforms = {
             ...baseUniforms,
             ...(uniforms ?  uniforms : {})
         };
-        
-        // const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({
-        //     alphaTest: options.alphaTest,
-        //     useVertexColor: options.useVertexColor
-        // });
-        
+
         const depthUniforms = {
             uDiffuseMap: {
                 type: UniformTypes.Texture,
@@ -126,7 +97,6 @@ export class PhongMaterial extends Material {
                 value: Vector2.one
             },
         }
-
 
         // TODO: できるだけconstructorの直後に持っていきたい
         super({

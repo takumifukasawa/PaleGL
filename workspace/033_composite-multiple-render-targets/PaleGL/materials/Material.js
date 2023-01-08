@@ -3,7 +3,6 @@ import {BlendTypes, UniformTypes, PrimitiveTypes, RenderQueues, FaceSide, Unifor
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.js";
-// import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class Material {
     name;

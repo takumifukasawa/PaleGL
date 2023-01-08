@@ -1,9 +1,5 @@
 ﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.js";
-import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
-import {Material} from "../materials/Material.js";
-import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
-import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 
 export class ForwardRenderer {
     #gpu;
