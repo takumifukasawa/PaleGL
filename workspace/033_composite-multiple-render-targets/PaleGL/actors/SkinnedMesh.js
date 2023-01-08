@@ -93,30 +93,7 @@ export class SkinnedMesh extends Mesh {
             // };
             material.uniforms = {
                 ...material.uniforms,
-                
-                uJointTexture: {
-                    type: UniformTypes.Texture,
-                    value: null
-                },
-                uJointTextureColNum: {
-                    type: UniformTypes.Int,
-                    value: this.#jointTextureColNum,
-                },
-                
-                ...(this.#gpuSkinning ? {
-                    uTime: {
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    uBoneCount: {
-                        type: UniformTypes.Int,
-                        value: this.boneCount
-                    },
-                    uTotalFrameCount: {
-                        type: UniformTypes.Int,
-                        value: 0,
-                    }
-                } : {})
+                ...this.generateSkinningUniforms()
             }
             material.isSkinning = true;
             material.gpuSkinning = this.#gpuSkinning;
@@ -165,36 +142,7 @@ export class SkinnedMesh extends Mesh {
        
         this.mainMaterial.depthUniforms = {
             ...this.mainMaterial.depthUniforms,
-            ...({
-                uTime: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-               
-                uJointTexture: {
-                    type: UniformTypes.Texture,
-                    value: null
-                },
-                uJointTextureColNum: {
-                    type: UniformTypes.Int,
-                    value: this.#jointTextureColNum,
-                },
-
-                ...(this.#gpuSkinning ? {
-                    uTime: {
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    uBoneCount: {
-                        type: UniformTypes.Int,
-                        value: this.boneCount
-                    },
-                    uTotalFrameCount: {
-                        type: UniformTypes.Int,
-                        value: 0,
-                    }
-                } : {})               
-            })
+            ...this.generateSkinningUniforms()
         } 
 
         super.start(options);
@@ -345,6 +293,33 @@ matrix elements: ${jointData.length}`);
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
         }
     }
+
+    generateSkinningUniforms() {
+        return {
+            uJointTexture: {
+                type: UniformTypes.Texture,
+                    value: null
+            },
+            uJointTextureColNum: {
+                type: UniformTypes.Int,
+                    value: this.#jointTextureColNum,
+            },
+            ...(this.#gpuSkinning ? {
+                uTime: {
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                uBoneCount: {
+                    type: UniformTypes.Int,
+                    value: this.boneCount
+                },
+                uTotalFrameCount: {
+                    type: UniformTypes.Int,
+                    value: 0,
+                }
+            } : {})
+        }
+    }    
 
     getBoneOffsetMatrices() {
         const matrices = [];
