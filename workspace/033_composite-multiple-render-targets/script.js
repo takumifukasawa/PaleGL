@@ -360,7 +360,7 @@ const createGLTFSkinnedMesh = async () => {
 `
         },
     });
-    
+
     return skinningMesh;
 }
 
