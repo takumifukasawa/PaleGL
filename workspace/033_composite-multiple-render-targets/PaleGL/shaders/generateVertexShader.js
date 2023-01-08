@@ -1,3 +1,5 @@
+// NOTE: deprecated
+
 import {
     skinningVertexUniforms,
     calcSkinningMatrixFunc, skinningVertex
@@ -8,8 +10,7 @@ import {normalMapVertexVaryings} from "./lightingCommon.js";
 import {AttributeNames} from "../constants.js";
 import {buildVertexAttributeLayouts} from "./buildShader.js";
 
-
-export const generateVertexShader = ({
+const generateVertexShader = ({
     // required
     attributeDescriptors,
     // optional
@@ -131,7 +132,7 @@ void main() {
 `;
 }
 
-export const generateDepthVertexShader = ({
+const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,

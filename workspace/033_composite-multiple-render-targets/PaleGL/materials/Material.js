@@ -246,12 +246,8 @@ export class Material {
             this.depthFragmentShader = this.#depthFragmentShaderGenerator();
         }
        
-        // for debug
-        // console.log(this.uniforms, this.depthUniforms)
-    
         const rawVertexShader = buildVertexShader(this.vertexShader, attributeDescriptors);
         const rawFragmentShader = buildFragmentShader(this.fragmentShader);
-        // const rawDepthFragmentShader
 
         this.rawVertexShader = rawVertexShader;
         this.rawFragmentShader = rawFragmentShader;

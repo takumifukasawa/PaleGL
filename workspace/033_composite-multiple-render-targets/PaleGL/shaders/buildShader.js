@@ -4,9 +4,11 @@
 // - out varying を centroid できるようにしたい
 // -----------------------------------------------
 
-import {UniformNames} from "../constants.js";
+// .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
+
+const pragmaRegex = /^#pragma(.*)/;
+
 import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader.js";
-import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms";
 
 export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
@@ -62,12 +64,19 @@ export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     return attributesList;
 }
 
+const joinShaderLines = (shaderLines) => {
+    return shaderLines
+        .map(line => line.replace(/^\s*$/, ""))
+        .join("\n")
+        .replaceAll(/\n{3,}/g, "\n");
+};
+
 export const buildVertexShader = (shader, attributeDescriptors) => {
     const shaderLines =  shader.split("\n");
     const resultShaderLines = [];
 
     shaderLines.forEach(shaderLine => {
-        const pragma = (shaderLine.trim()).match(/^#pragma(.*)/);
+        const pragma = (shaderLine.trim()).match(pragmaRegex);
 
         if(!pragma) {
             resultShaderLines.push(shaderLine);
@@ -84,10 +93,6 @@ export const buildVertexShader = (shader, attributeDescriptors) => {
             case "attributes":
                 const attributes = buildVertexAttributeLayouts(attributeDescriptors);
                 newLines.push(...attributes);
-                break;
-                
-            case "uniform_time":
-                newLines.push("uniform float uTime;");
                 break;
                 
             case "uniform_transform_vertex":
@@ -131,13 +136,13 @@ out vec3 vBinormal;
             case "vertex_normal_map":
                 const isSkinningNormalMap = pragmas[1] && pragmas[1] === "skinning";
                 newLines.push(isSkinningNormalMap ? `
-vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
+    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
+    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
+    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
                 ` : `
-vNormal = mat3(uNormalMatrix) * aNormal;
-vTangent = mat3(uNormalMatrix) * aTangent;
-vBinormal = mat3(uNormalMatrix) * aBinormal;
+    vNormal = mat3(uNormalMatrix) * aNormal;
+    vTangent = mat3(uNormalMatrix) * aTangent;
+    vBinormal = mat3(uNormalMatrix) * aBinormal;
 `);
                 break;
                 
@@ -146,18 +151,20 @@ vBinormal = mat3(uNormalMatrix) * aBinormal;
                 break;
                 
             case "vertex_receive_shadow":
-                newLines.push("vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;");
+                newLines.push(`    
+    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
+`);
                 break;
 
             case "varying_vertex_color":
                 newLines.push("out vec4 vVertexColor;");
                 break;
             default:
-                throw "[buildVertexShader] invalid pragma";
+                throw `[buildVertexShader] invalid pragma: ${pragmaName}`;
         }
         resultShaderLines.push(newLines.join("\n"));
     });
-    return resultShaderLines.join("\n");
+    return joinShaderLines(resultShaderLines);
 }
 
 export const buildFragmentShader = (shader) => {
@@ -165,7 +172,7 @@ export const buildFragmentShader = (shader) => {
     const resultShaderLines = [];
 
     shaderLines.forEach(shaderLine => {
-        const pragma = (shaderLine.trim()).match(/^#pragma\s([a-zA-Z0-9_\s]*)$/);
+        const pragma = (shaderLine.trim()).match(pragmaRegex);
 
         if(!pragma) {
             resultShaderLines.push(shaderLine);
@@ -175,18 +182,26 @@ export const buildFragmentShader = (shader) => {
         const pragmaContent = pragma[1];
         let newLines = [];
         switch(pragmaContent) {
-            case "uniform_time":
-                newLines.push("uniform float uTime;");
-                break;
             case "uniform_vertex_matrices":
                 newLines.push(`uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;`);
                 break;
             default:
-                throw "[buildFragmentShader] invalid pragma";
+                throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
         }
         resultShaderLines.push(newLines.join("\n"));
     });
-    return resultShaderLines.join("\n");
+    return joinShaderLines(resultShaderLines);
 }
+
+export const defaultDepthFragmentShader = () => `#version 300 es
+
+precision mediump float;
+
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(1., 1., 1., 1.);
+}
+`;

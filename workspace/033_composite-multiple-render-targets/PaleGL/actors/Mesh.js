@@ -1,7 +1,7 @@
 ﻿import {Actor} from "./Actor.js";
 import {ActorTypes, UniformTypes} from "./../constants.js";
 import {Material} from "../materials/Material.js";
-import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
+import {defaultDepthFragmentShader} from "../shaders/buildShader.js";
 
 export class Mesh extends Actor {
     geometry;
@@ -77,7 +77,7 @@ export class Mesh extends Actor {
             this.depthMaterial = new Material({
                 gpu,
                 vertexShader: this.mainMaterial.vertexShader,
-                fragmentShader: this.mainMaterial.depthFragmentShader || generateDepthFragmentShader(),
+                fragmentShader: this.mainMaterial.depthFragmentShader || defaultDepthFragmentShader(),
                 uniforms: this.mainMaterial.depthUniforms,
                 faceSide: this.mainMaterial.faceSide
             });
@@ -91,9 +91,9 @@ export class Mesh extends Actor {
         }
         
         // for debug
-        // console.log("main", this.mainMaterial.rawVertexShader)
-        // console.log("frag", this.mainMaterial.rawFragmentShader)
-        // console.log("depth", this.depthMaterial.rawVertexShader)
+        // console.log("main raw vertex", this.mainMaterial.rawVertexShader)
+        // console.log("main raw fragment", this.mainMaterial.rawFragmentShader)
+        // console.log("depth raw vertex", this.depthMaterial.rawVertexShader)
     }
 
     beforeRender({gpu}) {
