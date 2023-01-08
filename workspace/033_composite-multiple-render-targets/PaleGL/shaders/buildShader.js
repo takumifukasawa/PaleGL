@@ -6,6 +6,7 @@
 
 import {UniformNames} from "../constants.js";
 import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader.js";
+import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms";
 
 export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);

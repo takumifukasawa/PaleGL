@@ -135,5 +135,7 @@ export const UniformNames = {
     ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
     ShadowBias: "uShadowBias",
     // post process
-    SceneTexture: "uSceneTexture"
+    SceneTexture: "uSceneTexture",
+    // time
+    Time: "uTime"
 };

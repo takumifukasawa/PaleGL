@@ -256,7 +256,7 @@ void main() {
         },
     }
 });
-showBuffersPass.enabled = true;
+showBuffersPass.enabled = false;
 postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
@@ -505,33 +505,6 @@ const main = async () => {
     });
     const particleMaterial = new Material({
         gpu,
-//         vertexShader: generateVertexShader({
-//             useVertexColor: true,
-//             attributeDescriptors: particleGeometry.getAttributeDescriptors(),
-//             vertexShaderModifier: {
-//                 beginMain: `int particleId = int(mod(float(gl_VertexID), 4.));
-// float t = 3.;
-// float r = mod((uTime / t) + aBillboardRateOffset, 1.);
-// `,
-//                 localPositionPostProcess: `
-// localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-// // localPosition.y += mix(0., 2., r) * mix(.6, 1., aBillboardRateOffset);
-// localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
-// `,
-//                 // viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[aBillboardVertexIndex] * aBillboardSize;`
-//                 viewPositionPostProcess: `viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;`,
-//                 lastMain: `
-// vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-// vViewPosition = viewPosition;
-// `,
-//             },
-//             insertUniforms: `
-// uniform vec2[4] uBillboardPositionConverters;
-// `,
-//             insertVaryings: `
-// out vec4 vViewPosition;
-// `,
-//         }),
         vertexShader: `#version 300 es
 
 #pragma attributes

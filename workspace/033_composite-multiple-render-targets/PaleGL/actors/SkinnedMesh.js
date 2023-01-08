@@ -8,12 +8,9 @@ import {
     TextureTypes, UniformNames,
     UniformTypes
 } from "../constants.js";
-import {Vector3} from "../math/Vector3.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Geometry} from "../geometries/Geometry.js";
 import {Material} from "../materials/Material.js";
-import {generateDepthVertexShader} from "../shaders/generateVertexShader.js";
-import {generateDepthFragmentShader} from "../shaders/generateFragmentShader.js";
 import {Texture} from "../core/Texture.js";
 import {Rotator} from "../math/Rotator.js";
 
@@ -87,10 +84,6 @@ export class SkinnedMesh extends Mesh {
         });
 
         this.materials.forEach(material => {
-            // material.uniforms.uJointMatrices = {
-            //     type: UniformTypes.Matrix4Array,
-            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
-            // };
             material.uniforms = {
                 ...material.uniforms,
                 ...this.generateSkinningUniforms()
@@ -100,46 +93,6 @@ export class SkinnedMesh extends Mesh {
             material.jointNum = this.boneCount;
         });
 
-        // // TODO: depthを強制的につくるようにして問題ない？
-        // this.depthMaterial = new Material({
-        //     gpu,
-        //     vertexShader: generateDepthVertexShader({
-        //         attributeDescriptors: this.geometry.getAttributeDescriptors(),
-        //         isSkinning: true,
-        //         gpuSkinning: this.#gpuSkinning,
-        //         jointNum: this.boneCount,
-        //         vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
-        //     }),
-        //     fragmentShader: generateDepthFragmentShader({
-        //         alphaTest: !!this.mainMaterial.alphaTest
-        //     }),
-        //     uniforms: {
-        //         uJointTexture: {
-        //             type: UniformTypes.Texture,
-        //             value: null
-        //         },
-        //         uJointTextureColNum: {
-        //             type: UniformTypes.Int,
-        //             value: this.#jointTextureColNum,
-        //         },
-        //         ...(this.#gpuSkinning ? {
-        //             uTime: {
-        //                 type: UniformTypes.Float,
-        //                 value: 0,
-        //             },
-        //             uBoneCount: {
-        //                 type: UniformTypes.Int,
-        //                 value: this.boneCount
-        //             },
-        //             uTotalFrameCount: {
-        //                 type: UniformTypes.Int,
-        //                 value: 0,
-        //             }
-        //         } : {})
-        //     },
-        //     alphaTest: this.mainMaterial.alphaTest
-        // });
-       
         this.mainMaterial.depthUniforms = {
             ...this.mainMaterial.depthUniforms,
             ...this.generateSkinningUniforms()
@@ -296,6 +249,11 @@ matrix elements: ${jointData.length}`);
 
     generateSkinningUniforms() {
         return {
+            // TODO: for cpu
+            // material.uniforms.uJointMatrices = {
+            //     type: UniformTypes.Matrix4Array,
+            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
+            // };
             uJointTexture: {
                 type: UniformTypes.Texture,
                     value: null
@@ -305,10 +263,6 @@ matrix elements: ${jointData.length}`);
                     value: this.#jointTextureColNum,
             },
             ...(this.#gpuSkinning ? {
-                uTime: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
                 uBoneCount: {
                     type: UniformTypes.Int,
                     value: this.boneCount

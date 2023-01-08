@@ -929,7 +929,9 @@ const UniformNames = {
     ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
     ShadowBias: "uShadowBias",
     // post process
-    SceneTexture: "uSceneTexture"
+    SceneTexture: "uSceneTexture",
+    // time
+    Time: "uTime"
 };
 ﻿class Rotator {
     // x, y, z axes
@@ -1474,6 +1476,7 @@ const skinningVertex = (gpuSkinning = false) => `
 
 
 
+
 const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
@@ -1656,22 +1659,11 @@ uniform mat4 uProjectionMatrix;`);
     });
     return resultShaderLines.join("\n");
 }
-﻿const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
-
-precision mediump float;
-
-out vec4 outColor;
-
-void main() {
-    outColor = vec4(1., 1., 1., 1.);
-}
-`;
 ﻿
 
 
 
 
-// 
 
 class Material {
     name;
@@ -1858,7 +1850,10 @@ class Material {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero
             },
-
+            [UniformNames.Time]: {
+                type: UniformTypes.Float,
+                value: 0
+            },
             ...(this.alphaTest ? {
                 uAlphaTestThreshold: {
                     type: UniformTypes.Float,
@@ -1946,6 +1941,16 @@ class Material {
     // updateEngineUniforms() {} 
 }
 
+﻿const generateDepthFragmentShader = ({ uniformDescriptors } = {}) => `#version 300 es
+
+precision mediump float;
+
+out vec4 outColor;
+
+void main() {
+    outColor = vec4(1., 1., 1., 1.);
+}
+`;
 ﻿
 
 
@@ -2036,12 +2041,14 @@ class Mesh extends Actor {
                 gpu,
                 attributeDescriptors: this.geometry.getAttributeDescriptors()
             });
-            console.log("main", this.mainMaterial.rawVertexShader)
-            console.log("frag", this.mainMaterial.rawFragmentShader)
-            console.log("depth", this.depthMaterial.rawVertexShader)
         }
+        
+        // for debug
+        // console.log("main", this.mainMaterial.rawVertexShader)
+        // console.log("frag", this.mainMaterial.rawFragmentShader)
+        // console.log("depth", this.depthMaterial.rawVertexShader)
     }
-    
+
     beforeRender({gpu}) {
         super.beforeRender({gpu});
         // this.materials.forEach(material => material.updateUniforms({ gpu }));
@@ -3942,377 +3949,7 @@ class DirectionalLight extends Light {
         this.addChild(this.shadowCamera);
     }
 }
-
-const transformVertexUniforms = () => `
-uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
-`;
-
-const engineCommonUniforms = () => `
-uniform float uTime;
-`;
-
-
-const shadowMapVertexVaryings = () => `
-out vec4 vShadowMapProjectionUv;
-`;
-
-const shadowMapFragmentVaryings = () => `
-in vec4 vShadowMapProjectionUv;
-`;
-
-const shadowMapVertex = () => `
-    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
-`;
-
-const shadowMapVertexUniforms = () => `
-uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
-`;
-
-const shadowMapFragmentUniforms = () => `
-uniform sampler2D ${UniformNames.ShadowMap};
-uniform float ${UniformNames.ShadowBias};
-`;
-
-const shadowMapFragmentFunc = () => `
-vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
-    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
-    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
-    float sceneDepth = projectionShadowColor.r;
-    float depthFromLight = projectionUv.z;
-    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
-    float shadowAreaRect =
-        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-    float shadowRate = shadowOccluded * shadowAreaRect;
-    
-    vec4 resultColor = vec4(1.);
-    resultColor.xyz = mix(
-       surfaceColor.xyz,
-       mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
-       shadowRate
-    );
-    resultColor.a = surfaceColor.a;
-
-    return resultColor;
-} 
-`;
-
-const alphaTestFragmentFunc = () => `
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-`;
-
-const alphaTestFragmentUniforms = () => `
-uniform float uAlphaTestThreshold;
-`;
-
-const normalMapVertexVaryings = () => `
-out vec3 vTangent;
-out vec3 vBinormal;
-`;
-
-const normalMapFragmentVarying = () => `
-in vec3 vTangent;
-in vec3 vBinormal;
-`;
-
-const normalMapFragmentUniforms = () => `
-uniform sampler2D uNormalMap;
-uniform float uNormalStrength;
-`;
-
-const normalMapFragmentFunc = () => `
-vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
-    vec3 n = normalize(normal);
-    vec3 t = normalize(tangent);
-    vec3 b = normalize(binormal);
-    mat3 tbn = mat3(t, b, n);
-    vec3 nt = texture(normalMap, uv).xyz;
-    nt = nt * 2. - 1.;
-
-    // 2: normal from normal map
-    vec3 resultNormal = normalize(tbn * nt);
-    // blend mesh normal ~ normal map
-    // vec3 normal = mix(normal, normalize(tbn * nt));
-    // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
-
-    return resultNormal;
-}
-`
-
-const directionalLightFragmentUniforms = () => `
-struct DirectionalLight {
-    vec3 direction;
-    float intensity;
-    vec4 color;
-};
-uniform DirectionalLight uDirectionalLight;
-`;
-
-const phongSurfaceDirectionalLightFunc = () => `
-vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
-    vec3 N = normalize(surface.worldNormal);
-    vec3 L = normalize(directionalLight.direction);
-    
-    // lambert
-    float diffuseRate = clamp(dot(N, L), 0., 1.);
-    // half lambert
-    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
-    // original lambert
-    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
-    
-    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    vec3 P = surface.worldPosition;
-    vec3 E = camera.worldPosition;
-    vec3 PtoL = L; // for directional light
-    vec3 PtoE = normalize(E - P);
-    vec3 H = normalize(PtoL + PtoE);
-    // TODO: surfaceに持たせる
-    float specularPower = 32.;
-    float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower) * surface.specularAmount;
-    vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
-
-    // TODO: 外から渡せるようにする
-    // vec3 ambientColor = vec3(.12, .11, .1);
-    vec3 ambientColor = vec3(.1);
-
-    vec4 resultColor = vec4(
-        diffuseColor + specularColor + ambientColor,
-        surface.diffuseColor.a
-    );
-    
-    return resultColor;
-}
-`;
-
-const phongLightingFunc = () => `
-vec4 calcPhongLighting() {
-    // vec3 N = normalize(vNormal);
-    vec3 N = normalize(worldNormal);
-    // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
-    vec3 L = normalize(uDirectionalLight.direction);
-    float diffuseRate = clamp(dot(N, L), 0., 1.);
-    // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-    vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    vec3 P = vWorldPosition;
-    vec3 E = uViewPosition;
-    vec3 PtoL = L; // for directional light
-    vec3 PtoE = normalize(E - P);
-    vec3 H = normalize(PtoL + PtoE);
-    float specularPower = 16.;
-    float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower);
-    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
-
-    vec3 ambientColor = vec3(.1);
-
-    vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
-    
-    return surfaceColor;
-}
-`;
-
-
-
-
-
-
-
-
-const generateVertexShader = ({
-    // required
-    attributeDescriptors,
-    // optional
-    receiveShadow,
-    useNormalMap,
-    vertexShaderModifier = {
-        beginMain: "",
-        localPositionPostProcess: "",
-        worldPositionPostProcess: "",
-        viewPositionPostProcess: "",
-        outClipPositionPreProcess: "",
-        lastMain: "",
-    },
-    insertVaryings,
-    insertUniforms, // TODO: 使ってるuniformsから自動的に生成したいかも
-    // skinning
-    isSkinning,
-    gpuSkinning,
-    jointNum,
-    // instancing
-    isInstancing,
-    // vertex color
-    useVertexColor,
-} = {}) => {
-    // for debug
-    // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
-   
-    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
-    const hasNormal = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Normal);
-    // const hasVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.Color);
-    // const hasInstanceVertexColor = !!attributeDescriptors.find(({ name }) => name === AttributeNames.InstanceVertexColor);
-    // const hasColor = hasVertexColor || hasInstanceVertexColor;
-
-    return `#version 300 es
-
-${attributes.join("\n")}
-
-${isSkinning ? calcSkinningMatrixFunc() : ""}
-
-out vec2 vUv;
-out vec3 vWorldPosition;
-out vec3 vNormal;
-${useNormalMap ? normalMapVertexVaryings() : ""}
-${receiveShadow ? shadowMapVertexVaryings() : "" }
-${useVertexColor ? "out vec4 vVertexColor;" : ""}
-${insertVaryings ? insertVaryings : ""}
-
-${transformVertexUniforms()}
-${engineCommonUniforms()}
-
-${receiveShadow ? shadowMapVertexUniforms() : ""}
-${isSkinning ? skinningVertexUniforms(jointNum) : ""}
-${insertUniforms || ""}
-
-void main() {
-    ${vertexShaderModifier.beginMain || ""}
-
-    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
-    
-    vec4 localPosition = vec4(aPosition, 1.);
-    ${isSkinning
-        ? `
-    localPosition = skinMatrix * localPosition;`
-        : ""
-    }
-    ${vertexShaderModifier.localPositionPostProcess || ""}
-
-    ${(() => {
-        if(isSkinning) {
-            return useNormalMap
-                ? `
-    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-    vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-    vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-`
-                : `
-    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-`;
-        } else {
-            return useNormalMap
-                ? `
-    vNormal = mat3(uNormalMatrix) * aNormal;
-    vTangent = mat3(uNormalMatrix) * aTangent;
-    vBinormal = mat3(uNormalMatrix) * aBinormal;
-`
-                : hasNormal ? `
-    vNormal = mat3(uNormalMatrix) * aNormal;
-` : "";
-        }
-    })()}
-  
-    // assign common varyings 
-    vUv = aUv; 
-    ${(() => {
-        if(!useVertexColor) {
-            return "";
-        }
-        return isInstancing
-            ? "vVertexColor = aInstanceVertexColor;"
-            : "vVertexColor = aColor;";
-    })()}
-
-    vec4 worldPosition = uWorldMatrix * localPosition;
-    ${vertexShaderModifier.worldPositionPostProcess || ""}
-  
-    vWorldPosition = worldPosition.xyz;
-
-    ${receiveShadow ? shadowMapVertex() : ""}
-    
-    vec4 viewPosition = uViewMatrix * worldPosition;
-    ${vertexShaderModifier.viewPositionPostProcess || ""}
- 
-    ${vertexShaderModifier.outClipPositionPreProcess || ""}
-
-    gl_Position = uProjectionMatrix * viewPosition;
-    
-    ${vertexShaderModifier.lastMain || ""}
-}
-`;
-}
-
-const generateDepthVertexShader = ({
-    attributeDescriptors,
-    isSkinning,
-    gpuSkinning,
-    vertexShaderModifier = {
-        beginMain: "",
-        localPositionPostProcess: "",
-        worldPositionPostProcess: "",
-        outClipPositionPreProcess: "",
-        lastMain: ""
-    },
-    insertVaryings,
-    useNormalMap,
-    jointNum
-} = {}) => {
-   
-    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
-
-    return `#version 300 es
-
-${attributes.join("\n")}
-
-${isSkinning ? calcSkinningMatrixFunc() : ""}
-
-${transformVertexUniforms()}
-${engineCommonUniforms()}
-${isSkinning ? skinningVertexUniforms(jointNum) : ""}
-
-// TODO: depthでは必要ないのでなくしたい
-out vec4 vVertexColor;
-${insertVaryings ? insertVaryings : ""}
-
-void main() {
-    ${vertexShaderModifier.beginMain || ""}
-
-    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
-    
-    vec4 localPosition = vec4(aPosition, 1.);
-    ${isSkinning
-        ? `
-    localPosition = skinMatrix * localPosition;`
-        : ""
-    }
-    ${vertexShaderModifier.localPositionPostProcess || ""}
-    
-    vec4 worldPosition = uWorldMatrix * localPosition;
-    ${vertexShaderModifier.worldPositionPostProcess || ""}
- 
-    ${vertexShaderModifier.outClipPositionPreProcess || ""}
-    
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
-
-    ${vertexShaderModifier.lastMain || ""}
-}
-`;
-}
-
-
 ﻿
-
-
-
 
 
 
@@ -4351,7 +3988,7 @@ class SkinnedMesh extends Mesh {
         super({
             ...options,
             actorType: ActorTypes.SkinnedMesh,
-            autoGenerateDepthMaterial: false,
+            autoGenerateDepthMaterial: true,
         });
 
         this.bones = bones;
@@ -4390,81 +4027,19 @@ class SkinnedMesh extends Mesh {
         });
 
         this.materials.forEach(material => {
-            // material.uniforms.uJointMatrices = {
-            //     type: UniformTypes.Matrix4Array,
-            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
-            // };
             material.uniforms = {
                 ...material.uniforms,
-                
-                uJointTexture: {
-                    type: UniformTypes.Texture,
-                    value: null
-                },
-                uJointTextureColNum: {
-                    type: UniformTypes.Int,
-                    value: this.#jointTextureColNum,
-                },
-                
-                ...(this.#gpuSkinning ? {
-                    uTime: {
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    uBoneCount: {
-                        type: UniformTypes.Int,
-                        value: this.boneCount
-                    },
-                    uTotalFrameCount: {
-                        type: UniformTypes.Int,
-                        value: 0,
-                    }
-                } : {})
+                ...this.generateSkinningUniforms()
             }
             material.isSkinning = true;
             material.gpuSkinning = this.#gpuSkinning;
             material.jointNum = this.boneCount;
         });
 
-        // TODO: depthを強制的につくるようにして問題ない？
-        this.depthMaterial = new Material({
-            gpu,
-            vertexShader: generateDepthVertexShader({
-                attributeDescriptors: this.geometry.getAttributeDescriptors(),
-                isSkinning: true,
-                gpuSkinning: this.#gpuSkinning,
-                jointNum: this.boneCount,
-                vertexShaderModifier: this.mainMaterial.vertexShaderModifier,
-            }),
-            fragmentShader: generateDepthFragmentShader({
-                alphaTest: !!this.mainMaterial.alphaTest
-            }),
-            uniforms: {
-                uJointTexture: {
-                    type: UniformTypes.Texture,
-                    value: null
-                },
-                uJointTextureColNum: {
-                    type: UniformTypes.Int,
-                    value: this.#jointTextureColNum,
-                },
-                ...(this.#gpuSkinning ? {
-                    uTime: {
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    uBoneCount: {
-                        type: UniformTypes.Int,
-                        value: this.boneCount
-                    },
-                    uTotalFrameCount: {
-                        type: UniformTypes.Int,
-                        value: 0,
-                    }
-                } : {})
-            },
-            alphaTest: this.mainMaterial.alphaTest
-        });
+        this.mainMaterial.depthUniforms = {
+            ...this.mainMaterial.depthUniforms,
+            ...this.generateSkinningUniforms()
+        } 
 
         super.start(options);
 
@@ -4614,6 +4189,34 @@ matrix elements: ${jointData.length}`);
             this.depthMaterial.uniforms.uJointTexture.value = this.#jointTexture;
         }
     }
+
+    generateSkinningUniforms() {
+        return {
+            // TODO: for cpu
+            // material.uniforms.uJointMatrices = {
+            //     type: UniformTypes.Matrix4Array,
+            //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
+            // };
+            uJointTexture: {
+                type: UniformTypes.Texture,
+                    value: null
+            },
+            uJointTextureColNum: {
+                type: UniformTypes.Int,
+                    value: this.#jointTextureColNum,
+            },
+            ...(this.#gpuSkinning ? {
+                uBoneCount: {
+                    type: UniformTypes.Int,
+                    value: this.boneCount
+                },
+                uTotalFrameCount: {
+                    type: UniformTypes.Int,
+                    value: 0,
+                }
+            } : {})
+        }
+    }    
 
     getBoneOffsetMatrices() {
         const matrices = [];
@@ -5460,10 +5063,6 @@ class Engine {
     }
 }
 ﻿
-
-
-
-
 
 
 class ForwardRenderer {
@@ -7113,6 +6712,174 @@ async function loadGLTF({
 ﻿
 async function loadTexture(src) {
 }
+
+
+const shadowMapVertexVaryings = () => `
+out vec4 vShadowMapProjectionUv;
+`;
+
+const shadowMapFragmentVaryings = () => `
+in vec4 vShadowMapProjectionUv;
+`;
+
+const shadowMapVertex = () => `
+    vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
+`;
+
+const shadowMapVertexUniforms = () => `
+uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
+`;
+
+const shadowMapFragmentUniforms = () => `
+uniform sampler2D ${UniformNames.ShadowMap};
+uniform float ${UniformNames.ShadowBias};
+`;
+
+const shadowMapFragmentFunc = () => `
+vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
+    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
+    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
+    float sceneDepth = projectionShadowColor.r;
+    float depthFromLight = projectionUv.z;
+    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
+    float shadowAreaRect =
+        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
+        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
+        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
+    float shadowRate = shadowOccluded * shadowAreaRect;
+    
+    vec4 resultColor = vec4(1.);
+    resultColor.xyz = mix(
+       surfaceColor.xyz,
+       mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
+       shadowRate
+    );
+    resultColor.a = surfaceColor.a;
+
+    return resultColor;
+} 
+`;
+
+const alphaTestFragmentFunc = () => `
+void checkAlphaTest(float value, float threshold) {
+    if(value < threshold) {
+        discard;
+    }
+}
+`;
+
+const alphaTestFragmentUniforms = () => `
+uniform float uAlphaTestThreshold;
+`;
+
+const normalMapVertexVaryings = () => `
+out vec3 vTangent;
+out vec3 vBinormal;
+`;
+
+const normalMapFragmentVarying = () => `
+in vec3 vTangent;
+in vec3 vBinormal;
+`;
+
+const normalMapFragmentUniforms = () => `
+uniform sampler2D uNormalMap;
+uniform float uNormalStrength;
+`;
+
+const normalMapFragmentFunc = () => `
+vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
+    vec3 n = normalize(normal);
+    vec3 t = normalize(tangent);
+    vec3 b = normalize(binormal);
+    mat3 tbn = mat3(t, b, n);
+    vec3 nt = texture(normalMap, uv).xyz;
+    nt = nt * 2. - 1.;
+
+    // 2: normal from normal map
+    vec3 resultNormal = normalize(tbn * nt);
+    // blend mesh normal ~ normal map
+    // vec3 normal = mix(normal, normalize(tbn * nt));
+    // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
+
+    return resultNormal;
+}
+`
+
+const directionalLightFragmentUniforms = () => `
+struct DirectionalLight {
+    vec3 direction;
+    float intensity;
+    vec4 color;
+};
+uniform DirectionalLight uDirectionalLight;
+`;
+
+const phongSurfaceDirectionalLightFunc = () => `
+vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
+    vec3 N = normalize(surface.worldNormal);
+    vec3 L = normalize(directionalLight.direction);
+    
+    // lambert
+    float diffuseRate = clamp(dot(N, L), 0., 1.);
+    // half lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
+    // original lambert
+    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
+    
+    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+    vec3 P = surface.worldPosition;
+    vec3 E = camera.worldPosition;
+    vec3 PtoL = L; // for directional light
+    vec3 PtoE = normalize(E - P);
+    vec3 H = normalize(PtoL + PtoE);
+    // TODO: surfaceに持たせる
+    float specularPower = 32.;
+    float specularRate = clamp(dot(H, N), 0., 1.);
+    specularRate = pow(specularRate, specularPower) * surface.specularAmount;
+    vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
+
+    // TODO: 外から渡せるようにする
+    // vec3 ambientColor = vec3(.12, .11, .1);
+    vec3 ambientColor = vec3(.1);
+
+    vec4 resultColor = vec4(
+        diffuseColor + specularColor + ambientColor,
+        surface.diffuseColor.a
+    );
+    
+    return resultColor;
+}
+`;
+
+const phongLightingFunc = () => `
+vec4 calcPhongLighting() {
+    // vec3 N = normalize(vNormal);
+    vec3 N = normalize(worldNormal);
+    // vec3 N = mix(vNormal, worldNormal * uNormalStrength, uNormalStrength);
+    vec3 L = normalize(uDirectionalLight.direction);
+    float diffuseRate = clamp(dot(N, L), 0., 1.);
+    // vec3 diffuseColor = textureColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+    vec3 diffuseColor = diffuseMapColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+    vec3 P = vWorldPosition;
+    vec3 E = uViewPosition;
+    vec3 PtoL = L; // for directional light
+    vec3 PtoE = normalize(E - P);
+    vec3 H = normalize(PtoL + PtoE);
+    float specularPower = 16.;
+    float specularRate = clamp(dot(H, N), 0., 1.);
+    specularRate = pow(specularRate, specularPower);
+    vec3 specularColor = specularRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+
+    vec3 ambientColor = vec3(.1);
+
+    vec4 surfaceColor = vec4(diffuseColor + specularColor + ambientColor, 1.);
+    
+    return surfaceColor;
+}
+`;
 ﻿class Vector2 {
     elements;
     
@@ -7278,7 +7045,6 @@ ${this.x}, ${this.y}
 
 
 
-// 
 
 
 
@@ -7345,39 +7111,11 @@ class PhongMaterial extends Material {
             }
         };
        
-        // const useNormalMap = !!normalMap;
-        // // TODO: 今渡してる引数系はmaterialのparamsで良い気もする
-        // const vertexShaderGenerator = ({ isSkinning, jointNum, gpuSkinning, ...opts }) => generateVertexShader({
-        //     isSkinning,
-        //     gpuSkinning,
-        //     jointNum: isSkinning ? jointNum : null,
-        //     receiveShadow: options.receiveShadow,
-        //     useNormalMap,
-        //     isInstancing: this.isInstancing,
-        //     useVertexColor: this.useVertexColor,
-        //     // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
-        //     vertexShaderModifier,
-        //     ...opts, // TODO: 本当はあんまりこういう渡し方はしたくない
-        // });
-
-
-        // const fragmentShaderGenerator = () => this.generateFragmentShader({
-        //     receiveShadow: options.receiveShadow,
-        //     useNormalMap: options.useNormalMap,
-        //     alphaTest: options.alphaTest,
-        //     useVertexColor: options.useVertexColor
-        // });
-
         const mergedUniforms = {
             ...baseUniforms,
             ...(uniforms ?  uniforms : {})
         };
-        
-        // const depthFragmentShaderGenerator = () => PhongMaterial.generateDepthFragmentShader({
-        //     alphaTest: options.alphaTest,
-        //     useVertexColor: options.useVertexColor
-        // });
-        
+
         const depthUniforms = {
             uDiffuseMap: {
                 type: UniformTypes.Texture,
@@ -7392,7 +7130,6 @@ class PhongMaterial extends Material {
                 value: Vector2.one
             },
         }
-
 
         // TODO: できるだけconstructorの直後に持っていきたい
         super({
@@ -9147,9 +8884,6 @@ export {PostProcessPass};
 export {FXAAPass};
 export {GaussianBlurPass};
 export {BloomPass};
-
-// shaders
-export {generateVertexShader, buildVertexShader};
 
 // utilities
 export {clamp};

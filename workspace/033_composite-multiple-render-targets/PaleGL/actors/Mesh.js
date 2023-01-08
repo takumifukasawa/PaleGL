@@ -88,12 +88,14 @@ export class Mesh extends Actor {
                 gpu,
                 attributeDescriptors: this.geometry.getAttributeDescriptors()
             });
-            console.log("main", this.mainMaterial.rawVertexShader)
-            console.log("frag", this.mainMaterial.rawFragmentShader)
-            console.log("depth", this.depthMaterial.rawVertexShader)
         }
+        
+        // for debug
+        // console.log("main", this.mainMaterial.rawVertexShader)
+        // console.log("frag", this.mainMaterial.rawFragmentShader)
+        // console.log("depth", this.depthMaterial.rawVertexShader)
     }
-    
+
     beforeRender({gpu}) {
         super.beforeRender({gpu});
         // this.materials.forEach(material => material.updateUniforms({ gpu }));

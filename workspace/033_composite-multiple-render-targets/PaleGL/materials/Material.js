@@ -189,7 +189,10 @@ export class Material {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero
             },
-
+            [UniformNames.Time]: {
+                type: UniformTypes.Float,
+                value: 0
+            },
             ...(this.alphaTest ? {
                 uAlphaTestThreshold: {
                     type: UniformTypes.Float,
