@@ -153,7 +153,7 @@ captureSceneCamera.onStart = ({ actor }) => {
 captureSceneCamera.onFixedUpdate = ({ actor }) => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
-    
+
     // 2: orbit controls
     if(inputController.isDown) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
@@ -204,13 +204,13 @@ uniform float uFarClip;
 uniform float uShowGBuffer;
 
 // ref:
-// https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
 // https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-  return (viewZ + near) / (near - far);
+float viewZToLinearDepth(float z, float near, float far) {
+    return (z + near) / (near - far);
 }
-float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return (near * far) / ((far - near) * invClipZ - far);
+float perspectiveDepthToLinearDepth(float depth, float near, float far) {
+    float nz = near * depth;
+    return -nz / (far * (depth - 1.) - nz);
 }
 
 float isArea(vec2 uv) {
@@ -227,8 +227,8 @@ void main() {
     vec4 normalColor = texture(uNormalTexture, normalUV) * isArea(normalUV);
     
     float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
-    float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
-    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
+    // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
+    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip) * isArea(depthUV);
 
     outColor = baseColor + normalColor + sceneDepth;
 }
@@ -515,6 +515,7 @@ out vec3 vNormal;
 
 out vec4 vVertexColor;
 out vec4 vViewPosition;
+out vec4 vClipPosition;
 
 #pragma uniform_transform_vertex
 #pragma uniform_engine
@@ -543,8 +544,12 @@ void main() {
     vec4 viewPosition = uViewMatrix * worldPosition;
     viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
     vViewPosition = viewPosition;
+    
+    vec4 clipPosition = uProjectionMatrix * viewPosition;
  
-    gl_Position = uProjectionMatrix * viewPosition;
+    gl_Position = clipPosition;
+    
+    vClipPosition = clipPosition;
 }`,
         fragmentShader: `#version 300 es
             
@@ -553,6 +558,7 @@ precision highp float;
 in vec2 vUv;
 in vec4 vVertexColor;
 in vec4 vViewPosition;
+in vec4 vClipPosition;
 
 out vec4 outColor;
 // layout (location = 0) out vec4 outBaseColor;
@@ -564,13 +570,13 @@ uniform float uNearClip;
 uniform float uFarClip;
 
 // ref:
-// https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/ShaderChunk/packing.glsl.js
 // https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-  return (viewZ + near) / (near - far);
+float viewZToLinearDepth(float z, float near, float far) {
+    return (z + near) / (near - far);
 }
-float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return (near * far) / ((far - near) * invClipZ - far);
+float perspectiveDepthToLinearDepth(float depth, float near, float far) {
+    float nz = near * depth;
+    return -nz / (far * (depth - 1.) - nz);
 }
 
 void main() {
@@ -583,12 +589,11 @@ void main() {
     // calc soft fade
     
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float z = perspectiveDepthToViewZ(rawDepth, uNearClip, uFarClip);
-    float sceneDepth = viewZToOrthographicDepth(z, uNearClip, uFarClip);
+    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     // for debug
     // outColor = vec4(vec3(sceneDepth), 1.);
-    
-    float currentDepth = viewZToOrthographicDepth(vViewPosition.z, uNearClip, uFarClip);
+
+    float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
     // for debug
     // outColor = vec4(vec3(currentDepth), 1.);
     
@@ -682,8 +687,10 @@ void main() {
         orbitCameraController.distance = isSP ? 20 : 15;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
-        orbitCameraController.azimuthSpeed = 200;
-        orbitCameraController.altitudeSpeed = 200;
+        orbitCameraController.azimuthSpeed = 100;
+        orbitCameraController.altitudeSpeed = 100;
+        orbitCameraController.deltaAzimuthPower = 2;
+        orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
         orbitCameraController.start(20, -30);
     }

@@ -16,6 +16,8 @@ export class OrbitCameraController {
     attenuation = 0.001;
     #targetX = 0;
     #targetY = 0;
+    deltaAzimuthPower = 1;
+    deltaAltitudePower = 1;
     
     #targetCameraPosition = Vector3.zero;
     #currentCameraPosition = Vector3.zero;
@@ -37,8 +39,8 @@ export class OrbitCameraController {
     }
     
     setDelta(delta) {
-        this.#targetX = delta.x;
-        this.#targetY = delta.y;
+        this.#targetX = delta.x * this.deltaAzimuthPower;
+        this.#targetY = delta.y * this.deltaAltitudePower;
     }
 
     fixedUpdate() {
