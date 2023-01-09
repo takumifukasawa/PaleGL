@@ -203,15 +203,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
 
-// ref:
-// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-float viewZToLinearDepth(float z, float near, float far) {
-    return (z + near) / (near - far);
-}
-float perspectiveDepthToLinearDepth(float depth, float near, float far) {
-    float nz = near * depth;
-    return -nz / (far * (depth - 1.) - nz);
-}
+#pragma function_depth
 
 float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
@@ -569,15 +561,7 @@ uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 
-// ref:
-// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-float viewZToLinearDepth(float z, float near, float far) {
-    return (z + near) / (near - far);
-}
-float perspectiveDepthToLinearDepth(float depth, float near, float far) {
-    float nz = near * depth;
-    return -nz / (far * (depth - 1.) - nz);
-}
+#pragma function_depth
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));
