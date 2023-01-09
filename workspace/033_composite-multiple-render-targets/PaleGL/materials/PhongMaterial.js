@@ -330,7 +330,7 @@ void main() {
 
     // correct
     outBaseColor = resultColor;
-    outNormalColor = vec4(worldNormal, 1.); 
+    outNormalColor = vec4(worldNormal * .5 + .5, 1.); 
 
     // this is dummy
     // outBaseColor = vec4(1., 0., 0., 1.);

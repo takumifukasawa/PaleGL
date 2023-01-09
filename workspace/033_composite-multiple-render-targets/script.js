@@ -216,7 +216,7 @@ void main() {
     // vec2 depthUV = vUv;
     
     vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
-    vec4 normalColor = texture(uNormalTexture, normalUV) * isArea(normalUV);
+    vec4 normalColor = (texture(uNormalTexture, normalUV) * 2. - 1.) * isArea(normalUV);
     
     float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
     // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
