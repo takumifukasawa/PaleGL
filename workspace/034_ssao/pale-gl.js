@@ -1702,6 +1702,12 @@ void main() {
 
 
 
+// -------------------------------------------------------------------
+// TODO:
+// - rawVertex, rawFragment を渡せるように？
+// - vertexShaderGenerator, fragmentShaderGenerator を剥がす
+// -------------------------------------------------------------------
+
 class Material {
     name;
   

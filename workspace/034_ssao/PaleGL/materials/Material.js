@@ -4,6 +4,12 @@ import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
 import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.js";
 
+// -------------------------------------------------------------------
+// TODO:
+// - rawVertex, rawFragment を渡せるように？
+// - vertexShaderGenerator, fragmentShaderGenerator を剥がす
+// -------------------------------------------------------------------
+
 export class Material {
     name;
   
