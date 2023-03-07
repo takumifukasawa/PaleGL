@@ -59,6 +59,7 @@ export {BloomPass} from "./postprocess/BloomPass.js";
 
 // utilities
 export {clamp} from "./utilities/mathUtilities.js";
+export {maton} from "./utilities/maton.js";
 
 // inputs
 export {TouchInputController} from "./inputs/TouchInputController.js";

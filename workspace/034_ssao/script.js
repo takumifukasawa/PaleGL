@@ -32,7 +32,7 @@
     BlendTypes,
     AttributeNames,
     clamp,
-    OrbitCameraController, TouchInputController, MouseInputController, FragmentPass
+    OrbitCameraController, TouchInputController, MouseInputController, FragmentPass, maton
 } from "./pale-gl.js";
 import {DebuggerGUI} from "./DebuggerGUI.js";
 
@@ -63,7 +63,7 @@ const wrapperElement = document.getElementById("wrapper");
 
 const canvasElement = document.getElementById("js-canvas");
 
-const gl = canvasElement.getContext('webgl2', { antialias: false });
+const gl = canvasElement.getContext('webgl2', {antialias: false});
 
 const gpu = new GPU({gl});
 
@@ -94,7 +94,7 @@ const renderer = new ForwardRenderer({
     pixelRatio
 });
 
-const engine = new Engine({ gpu, renderer });
+const engine = new Engine({gpu, renderer});
 
 engine.setScenes([
     captureScene,
@@ -147,15 +147,15 @@ const copyDepthDestRenderTarget = new RenderTarget({
     name: "copy depth dest render target"
 });
 
-captureSceneCamera.onStart = ({ actor }) => {
+captureSceneCamera.onStart = ({actor}) => {
     actor.setClearColor(new Vector4(0, 0, 0, 1));
 }
-captureSceneCamera.onFixedUpdate = ({ actor }) => {
+captureSceneCamera.onFixedUpdate = ({actor}) => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
     // 2: orbit controls
-    if(inputController.isDown) {
+    if (inputController.isDown) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
@@ -164,7 +164,7 @@ captureSceneCamera.onFixedUpdate = ({ actor }) => {
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 210, 200);
-directionalLight.onStart = ({ actor }) => {
+directionalLight.onStart = ({actor}) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     actor.castShadow = true;
@@ -172,17 +172,17 @@ directionalLight.onStart = ({ actor }) => {
     actor.shadowCamera.near = 1;
     actor.shadowCamera.far = 30;
     actor.shadowCamera.setSize(null, null, -10, 10, -10, 10);
-    actor.shadowMap = new RenderTarget({ gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth });
+    actor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
 }
 captureScene.add(directionalLight);
 
-const postProcess = new PostProcess({ gpu, renderer });
+const postProcess = new PostProcess({gpu, renderer});
 
-const bloomPass = new BloomPass({ gpu, threshold: 0.9, bloomAmount: 0.8 });
+const bloomPass = new BloomPass({gpu, threshold: 0.9, bloomAmount: 0.8});
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
-const fxaaPass = new FXAAPass({ gpu });
+const fxaaPass = new FXAAPass({gpu});
 fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
@@ -257,10 +257,10 @@ captureSceneCamera.setPostProcess(postProcess);
 
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: "./models/glass-wind-poly.gltf" });
-    
+    const gltfActor = await loadGLTF({gpu, path: "./models/glass-wind-poly.gltf"});
+
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
-   
+
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
 
@@ -281,7 +281,7 @@ const createGLTFSkinnedMesh = async () => {
         const randomScaleRange = 0.08;
         const s = Math.random() * randomScaleRange + baseScale;
         instanceInfo.scale.push([s, s * 2, s]);
-        
+
         const c = Color.fromRGB(
             Math.floor(Math.random() * 240 + 15),
             Math.floor(Math.random() * 10 + 245),
@@ -293,7 +293,7 @@ const createGLTFSkinnedMesh = async () => {
         const animationOffsetAdjust = (Math.random() * 0.6 - 0.3) + 2;
         return (-x + z) * animationOffsetAdjust;
     });
-   
+
     skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
 
@@ -312,7 +312,7 @@ const createGLTFSkinnedMesh = async () => {
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
-    });       
+    });
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute({
         name: AttributeNames.InstanceAnimationOffset,
@@ -384,7 +384,7 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
-    
+
     const images = {
         [CubeMapAxis.PositiveX]: "./images/px.jpg",
         [CubeMapAxis.NegativeX]: "./images/nx.jpg",
@@ -394,14 +394,14 @@ const main = async () => {
         [CubeMapAxis.NegativeZ]: "./images/nz.jpg",
     };
 
-    const cubeMap = await loadCubeMap({ gpu, images });
+    const cubeMap = await loadCubeMap({gpu, images});
     const skyboxMesh = new Skybox({
         gpu, cubeMap,
         rotationOffset: 0.8
     });
-    
+
     skinnedMesh = await createGLTFSkinnedMesh();
-    
+
     const floorGeometry = new PlaneGeometry({gpu, calculateTangent: true, calculateBinormal: true});
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
@@ -414,7 +414,7 @@ const main = async () => {
         }),
         castShadow: false
     });
-    floorPlaneMesh.onStart = ({ actor }) => {
+    floorPlaneMesh.onStart = ({actor}) => {
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
         // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
@@ -641,7 +641,7 @@ void main() {
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    particleMesh.onFixedUpdate = ({ fixedTime }) => {
+    particleMesh.onFixedUpdate = ({fixedTime}) => {
         // particleMaterial.uniforms.uTime.value = fixedTime;
         particleMaterial.updateUniform("uTime", fixedTime);
     };
@@ -678,11 +678,11 @@ void main() {
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
         orbitCameraController.start(20, -30);
     }
-    
+
     engine.onBeforeUpdate = () => {
-        if(!debuggerGUI) initDebugger();
+        if (!debuggerGUI) initDebugger();
     };
-    
+
     engine.onBeforeFixedUpdate = () => {
         inputController.fixedUpdate();
     }
@@ -713,7 +713,7 @@ void main() {
         floorPlaneMesh.enabled = false;
         skinnedMesh.enabled = false;
         particleMesh.enabled = true;
-        renderer.render(captureScene, captureSceneCamera, { useShadowPass: false, clearScene: false });
+        renderer.render(captureScene, captureSceneCamera, {useShadowPass: false, clearScene: false});
 
         showBuffersPass.material.updateUniform("uBaseColorTexture", gBufferRenderTarget.baseColorTexture);
         showBuffersPass.material.updateUniform("uNormalTexture", gBufferRenderTarget.normalTexture);
@@ -729,7 +729,7 @@ void main() {
         engine.run(time);
         requestAnimationFrame(tick);
     }
-    
+
     engine.start();
     requestAnimationFrame(tick);
 }
@@ -748,7 +748,7 @@ function initDebugger() {
             debuggerStates.instanceNum = value;
         }
     });
-    
+
     debuggerGUI.addButtonDebugger({
         buttonLabel: "reload",
         onClick: () => {
@@ -756,9 +756,9 @@ function initDebugger() {
             location.replace(url);
         }
     });
-    
+
     debuggerGUI.addBorderSpacer();
-    
+
     debuggerGUI.addToggleDebugger({
         label: "show buffers",
         initialValue: showBuffersPass.enabled,
@@ -783,7 +783,7 @@ function initDebugger() {
             bloomPass.bloomAmount = value;
         }
     })
-    
+
     debuggerGUI.addSliderDebugger({
         label: "bloom threshold",
         minValue: 0,
@@ -794,7 +794,7 @@ function initDebugger() {
             bloomPass.threshold = value;
         }
     })
-    
+
     debuggerGUI.addSliderDebugger({
         label: "bloom tone",
         minValue: 0,
@@ -818,4 +818,3 @@ function initDebugger() {
 }
 
 main();
-
