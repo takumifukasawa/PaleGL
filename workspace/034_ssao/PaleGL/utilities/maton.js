@@ -1,16 +1,16 @@
 function fillFunc(arr, value) {
     // 非破壊
-    // const newArr = [...arr];
-    // for (let i = 0; i < arr.length; i++) {
-    //     newArr[i] = value;
-    // }
-    // return newArr;
+    const newArr = [...arr];
+    for (let i = 0; i < arr.length; i++) {
+        newArr[i] = value;
+    }
+    return newArr;
 
     // 破壊的 
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = value;
-    }
-    return arr;
+    // for (let i = 0; i < arr.length; i++) {
+    //     arr[i] = value;
+    // }
+    // return arr;
 }
 
 function matonWrapper(obj) {
