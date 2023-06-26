@@ -7,7 +7,7 @@
     Vector3,
     Vector4,
     Scene,
-    ForwardRenderer,
+    Renderer,
     Mesh,
     PerspectiveCamera,
     Texture,
@@ -88,7 +88,7 @@ const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
 // const pixelRatio = Math.min(window.devicePixelRatio, 1);
 // const pixelRatio = ;
 
-const renderer = new ForwardRenderer({
+const renderer = new Renderer({
     gpu,
     canvas: canvasElement,
     pixelRatio

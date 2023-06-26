@@ -15,7 +15,7 @@ export {Skybox} from "./actors/Skybox.js";
 export {CubeMap} from "./core/CubeMap.js";
 export {DoubleBuffer} from "./core/DoubleBuffer.js";
 export {Engine} from "./core/Engine.js";
-export {ForwardRenderer} from "./core/ForwardRenderer.js";
+export {Renderer} from "./core/Renderer.js";
 export {GPU} from "./core/GPU.js";
 export {RenderTarget} from "./core/RenderTarget.js";
 export {GBufferRenderTargets} from "./core/GBufferRenderTargets.js";

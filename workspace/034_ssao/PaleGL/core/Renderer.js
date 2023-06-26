@@ -1,7 +1,7 @@
 ﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.js";
 import {Matrix4} from "../math/Matrix4.js";
 
-export class ForwardRenderer {
+export class Renderer {
     #gpu;
     canvas;
     pixelRatio;
@@ -242,7 +242,7 @@ export class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "[ForwardRenderer.render] invalid blend type";
+                                throw "[Renderer.render] invalid blend type";
                         }
                     });
                     break;

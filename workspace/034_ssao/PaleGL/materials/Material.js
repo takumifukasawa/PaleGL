@@ -269,7 +269,7 @@ export class Material {
 
     // TODO:
     // - structみたいな深い階層もupdateができるようにしたい
-    // - 'updateUniformValue'の方が良い
+    // - 'updateUniformValue'の方が良い??
     updateUniform(name, value) {
         if(!this.uniforms[name]) {
             throw `[Material.updateUniform] invalid uniform key: ${name}`;
@@ -283,9 +283,9 @@ export class Material {
     // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
     // updateEngineUniforms() {} 
 
-    getUniformValue(name) {
+    getUniform(name) {
         if(!this.uniforms[name]) {
-            throw `[Material.getUniformValue] invalid uniform key: ${name}`;
+            throw `[Material.getUniform] invalid uniform key: ${name}`;
         }
         return this.uniforms[name].value;
     }

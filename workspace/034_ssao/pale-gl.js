@@ -1967,7 +1967,7 @@ class Material {
 
     // TODO:
     // - structみたいな深い階層もupdateができるようにしたい
-    // - 'updateUniformValue'の方が良い
+    // - 'updateUniformValue'の方が良い??
     updateUniform(name, value) {
         if(!this.uniforms[name]) {
             throw `[Material.updateUniform] invalid uniform key: ${name}`;
@@ -1981,9 +1981,9 @@ class Material {
     // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
     // updateEngineUniforms() {} 
 
-    getUniformValue(name) {
+    getUniform(name) {
         if(!this.uniforms[name]) {
-            throw `[Material.getUniformValue] invalid uniform key: ${name}`;
+            throw `[Material.getUniform] invalid uniform key: ${name}`;
         }
         return this.uniforms[name].value;
     }
@@ -5103,7 +5103,7 @@ class Engine {
 ﻿
 
 
-class ForwardRenderer {
+class Renderer {
     #gpu;
     canvas;
     pixelRatio;
@@ -5344,7 +5344,7 @@ class ForwardRenderer {
                                 renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
                                 return;
                             default:
-                                throw "[ForwardRenderer.render] invalid blend type";
+                                throw "[Renderer.render] invalid blend type";
                         }
                     });
                     break;
@@ -8679,17 +8679,17 @@ void main() {
 }
 function fillFunc(arr, value) {
     // 非破壊
-    // const newArr = [...arr];
-    // for (let i = 0; i < arr.length; i++) {
-    //     newArr[i] = value;
-    // }
-    // return newArr;
+    const newArr = [...arr];
+    for (let i = 0; i < arr.length; i++) {
+        newArr[i] = value;
+    }
+    return newArr;
 
     // 破壊的 
-    for (let i = 0; i < arr.length; i++) {
-        arr[i] = value;
-    }
-    return arr;
+    // for (let i = 0; i < arr.length; i++) {
+    //     arr[i] = value;
+    // }
+    // return arr;
 }
 
 function matonWrapper(obj) {
@@ -8956,7 +8956,7 @@ export {Skybox};
 export {CubeMap};
 export {DoubleBuffer};
 export {Engine};
-export {ForwardRenderer};
+export {Renderer};
 export {GPU};
 export {RenderTarget};
 export {GBufferRenderTargets};
