@@ -1,39 +1,90 @@
-import {
-    GPU,
-    CubeMapAxis,
-    RenderTargetTypes,
+import "./style.css";
+
+// actors
+export {Actor} from "./PaleGL/actors/Actor.ts";
+export {ArrowHelper} from "./PaleGL/actors/ArrowHelper.ts";
+export {AxesHelper} from "./PaleGL/actors/AxesHelper.ts";
+export {DirectionalLight} from "./PaleGL/actors/DirectionalLight.ts";
+export {Light} from "./PaleGL/actors/Light.ts";
+export {Mesh} from "./PaleGL/actors/Mesh.ts";
+export {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.ts";
+export {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera.ts";
+export {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.ts";
+export {Skybox} from "./PaleGL/actors/Skybox.ts";
+
+// core
+export {CubeMap} from "./PaleGL/core/CubeMap.ts";
+export {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.ts";
+export {Engine} from "./PaleGL/core/Engine.ts";
+export {Renderer} from "./PaleGL/core/Renderer.ts";
+export {GPU} from "./PaleGL/core/GPU.ts";
+export {RenderTarget} from "./PaleGL/core/RenderTarget.ts";
+export {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets.ts";
+export {Scene} from "./PaleGL/core/Scene.ts";
+export {Texture} from "./PaleGL/core/Texture.ts";
+export {OrbitCameraController} from "./PaleGL/core/OrbitCameraController.ts";
+
+// geometries
+export {BoxGeometry} from "./PaleGL/geometries/BoxGeometry.ts";
+export {Geometry} from "./PaleGL/geometries/Geometry.ts";
+export {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.ts";
+
+// loaders
+export {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.ts";
+export {loadGLTF} from "./PaleGL/loaders/loadGLTF.ts";
+export {loadImg} from "./PaleGL/loaders/loadImg.ts";
+export {loadObj} from "./PaleGL/loaders/loadObj.ts";
+export {loadTexture} from "./PaleGL/loaders/loadTexture.ts";
+
+// materials
+export {Material} from "./PaleGL/materials/Material.ts";
+export {PhongMaterial} from "./PaleGL/materials/PhongMaterial.ts";
+
+// math
+export {Color} from "./PaleGL/math/Color.ts";
+export {Matrix4} from "./PaleGL/math/Matrix4.ts";
+export {Quaternion} from "./PaleGL/math/Quaternion.ts";
+export {Rotator} from "./PaleGL/math/Rotator.ts";
+export {Vector2} from "./PaleGL/math/Vector2.ts";
+export {Vector3} from "./PaleGL/math/Vector3.ts";
+export {Vector4} from "./PaleGL/math/Vector4.ts";
+
+// postprocess
+export {CopyPass} from "./PaleGL/postprocess/CopyPass.ts";
+export {FragmentPass} from "./PaleGL/postprocess/FragmentPass.ts";
+export {PostProcess} from "./PaleGL/postprocess/PostProcess.ts";
+export {PostProcessPass} from "./PaleGL/postprocess/PostProcessPass.ts";
+export {FXAAPass} from "./PaleGL/postprocess/FXAAPass.ts";
+export {GaussianBlurPass} from "./PaleGL/postprocess/GaussianBlurPass.ts";
+export {BloomPass} from "./PaleGL/postprocess/BloomPass.ts";
+
+// utilities
+export {clamp} from "./PaleGL/utilities/mathUtilities.ts";
+export {maton} from "./PaleGL/utilities/maton.ts";
+
+// inputs
+export {TouchInputController} from "./PaleGL/inputs/TouchInputController.ts";
+export {MouseInputController} from "./PaleGL/inputs/MouseInputController.ts";
+
+// others
+export {
+    PrimitiveTypes,
+    UniformTypes,
+    TextureTypes,
     TextureWrapTypes,
     TextureFilterTypes,
-    Vector3,
-    Vector4,
-    Scene,
-    Renderer,
-    Mesh,
-    PerspectiveCamera,
-    Texture,
-    loadImg,
-    PostProcess,
-    FXAAPass,
-    PlaneGeometry,
-    DirectionalLight,
-    loadGLTF,
-    Color,
-    loadCubeMap,
-    Skybox,
-    RenderTarget,
-    GBufferRenderTargets,
-    Engine,
-    PhongMaterial,
-    Vector2,
-    BloomPass,
-    Geometry,
-    Material,
-    UniformTypes,
     BlendTypes,
-    AttributeNames,
-    clamp,
-    OrbitCameraController, TouchInputController, MouseInputController, FragmentPass, maton
-} from "./pale-gl.js";
+    RenderQueues,
+    RenderbufferTypes,
+    ActorTypes,
+    CubeMapAxis,
+    FaceSide,
+    AttributeUsageType,
+    RenderTargetTypes,
+    AnimationKeyframeTypes,
+    AttributeNames
+} from "./PaleGL/constants.ts";
+
 import {DebuggerGUI} from "./DebuggerGUI.ts";
 
 const debuggerStates = {
