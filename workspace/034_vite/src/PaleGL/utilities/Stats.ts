@@ -1,4 +1,5 @@
-import {AttributeNames} from "../constants.js";
+import {AttributeNames} from "../constants.ts";
+import {Geometry} from "../geometries/Geometry.ts";
 
 export class Stats {
     domElement;
@@ -7,7 +8,8 @@ export class Stats {
     drawVertexCount = 0;
     drawCallCount = 0;
     
-    constructor({ wrapperElement } = {}) {
+    constructor(args: { wrapperElement: HTMLElement}) {
+        const { wrapperElement } = args;
         this.domElement = document.createElement("div");
         this.domElement.style.cssText = `
 position: absolute;
@@ -34,7 +36,7 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
         this.drawCallCount = 0;
     }
 
-    addDrawVertexCount(geometry) {
+    addDrawVertexCount(geometry: Geometry) {
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
         this.drawVertexCount += positionAttribute.data.length / 3;
     }

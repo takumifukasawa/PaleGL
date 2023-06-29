@@ -3,6 +3,7 @@ import {Material} from "../materials/Material.js";
 import {parseObj} from "../loaders/loadObj.js";
 import {Geometry} from "../geometries/Geometry.js";
 import {AttributeNames, UniformNames} from "../constants.js";
+import {GPU} from "../core/GPU.ts";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -162,7 +163,7 @@ f 23/56/18 22/55/18 20/53/18
 `
 
 export class ArrowHelper extends Mesh {
-    constructor({ gpu }) {
+    constructor({ gpu }: {gpu: GPU}) {
         const objData = parseObj(arrowHelperGeometryData);
         const geometry = new Geometry({
             gpu,

@@ -1,4 +1,4 @@
-function fillFunc(arr, value) {
+function fillFunc<T>(arr: T[], value: T): T[] {
     // 非破壊
     const newArr = [...arr];
     for (let i = 0; i < arr.length; i++) {
@@ -13,12 +13,12 @@ function fillFunc(arr, value) {
     // return arr;
 }
 
-function matonWrapper(obj) {
-    let tmp;
+function matonWrapper<T>(obj: T[]): T {
+    let tmp: T[];
 
     tmp = obj;
 
-    function fill(...args) {
+    function fill(...args: T[]): T[] {
         if (Array.isArray(args[0])) {
             return fillFunc(...args);
         }

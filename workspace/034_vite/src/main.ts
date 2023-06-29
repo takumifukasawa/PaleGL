@@ -1,87 +1,59 @@
 import "./style.css";
 
 // actors
-export {Actor} from "./PaleGL/actors/Actor.ts";
-export {ArrowHelper} from "./PaleGL/actors/ArrowHelper.ts";
-export {AxesHelper} from "./PaleGL/actors/AxesHelper.ts";
-export {DirectionalLight} from "./PaleGL/actors/DirectionalLight.ts";
-export {Light} from "./PaleGL/actors/Light.ts";
-export {Mesh} from "./PaleGL/actors/Mesh.ts";
-export {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera.ts";
-export {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera.ts";
-export {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.ts";
-export {Skybox} from "./PaleGL/actors/Skybox.ts";
+import {DirectionalLight} from "./PaleGL/actors/DirectionalLight.ts";
+import {Mesh} from "./PaleGL/actors/Mesh.ts";
+import {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera.ts";
+import {Skybox} from "./PaleGL/actors/Skybox.ts";
+import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.ts";
 
 // core
-export {CubeMap} from "./PaleGL/core/CubeMap.ts";
-export {DoubleBuffer} from "./PaleGL/core/DoubleBuffer.ts";
-export {Engine} from "./PaleGL/core/Engine.ts";
-export {Renderer} from "./PaleGL/core/Renderer.ts";
-export {GPU} from "./PaleGL/core/GPU.ts";
-export {RenderTarget} from "./PaleGL/core/RenderTarget.ts";
-export {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets.ts";
-export {Scene} from "./PaleGL/core/Scene.ts";
-export {Texture} from "./PaleGL/core/Texture.ts";
-export {OrbitCameraController} from "./PaleGL/core/OrbitCameraController.ts";
+import {Engine} from "./PaleGL/core/Engine.ts";
+import {Renderer} from "./PaleGL/core/Renderer.ts";
+import {GPU} from "./PaleGL/core/GPU.ts";
+import {RenderTarget} from "./PaleGL/core/RenderTarget.ts";
+import {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets.ts";
+import {Scene} from "./PaleGL/core/Scene.ts";
+import {Texture} from "./PaleGL/core/Texture.ts";
+import {OrbitCameraController} from "./PaleGL/core/OrbitCameraController.ts";
 
 // geometries
-export {BoxGeometry} from "./PaleGL/geometries/BoxGeometry.ts";
-export {Geometry} from "./PaleGL/geometries/Geometry.ts";
-export {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.ts";
+import {Geometry} from "./PaleGL/geometries/Geometry.ts";
+import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.ts";
 
 // loaders
-export {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.ts";
-export {loadGLTF} from "./PaleGL/loaders/loadGLTF.ts";
-export {loadImg} from "./PaleGL/loaders/loadImg.ts";
-export {loadObj} from "./PaleGL/loaders/loadObj.ts";
-export {loadTexture} from "./PaleGL/loaders/loadTexture.ts";
+import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.ts";
+import {loadGLTF} from "./PaleGL/loaders/loadGLTF.ts";
+import {loadImg} from "./PaleGL/loaders/loadImg.ts";
 
 // materials
-export {Material} from "./PaleGL/materials/Material.ts";
-export {PhongMaterial} from "./PaleGL/materials/PhongMaterial.ts";
+import {Material} from "./PaleGL/materials/Material.ts";
+import {PhongMaterial} from "./PaleGL/materials/PhongMaterial.ts";
 
 // math
-export {Color} from "./PaleGL/math/Color.ts";
-export {Matrix4} from "./PaleGL/math/Matrix4.ts";
-export {Quaternion} from "./PaleGL/math/Quaternion.ts";
-export {Rotator} from "./PaleGL/math/Rotator.ts";
-export {Vector2} from "./PaleGL/math/Vector2.ts";
-export {Vector3} from "./PaleGL/math/Vector3.ts";
-export {Vector4} from "./PaleGL/math/Vector4.ts";
+import {Color} from "./PaleGL/math/Color.ts";
+import {Vector2} from "./PaleGL/math/Vector2.ts";
+import {Vector3} from "./PaleGL/math/Vector3.ts";
+import {Vector4} from "./PaleGL/math/Vector4.ts";
 
 // postprocess
-export {CopyPass} from "./PaleGL/postprocess/CopyPass.ts";
-export {FragmentPass} from "./PaleGL/postprocess/FragmentPass.ts";
-export {PostProcess} from "./PaleGL/postprocess/PostProcess.ts";
-export {PostProcessPass} from "./PaleGL/postprocess/PostProcessPass.ts";
-export {FXAAPass} from "./PaleGL/postprocess/FXAAPass.ts";
-export {GaussianBlurPass} from "./PaleGL/postprocess/GaussianBlurPass.ts";
-export {BloomPass} from "./PaleGL/postprocess/BloomPass.ts";
-
-// utilities
-export {clamp} from "./PaleGL/utilities/mathUtilities.ts";
-export {maton} from "./PaleGL/utilities/maton.ts";
+import {FragmentPass} from "./PaleGL/postprocess/FragmentPass.ts";
+import {PostProcess} from "./PaleGL/postprocess/PostProcess.ts";
+import {FXAAPass} from "./PaleGL/postprocess/FXAAPass.ts";
+import {BloomPass} from "./PaleGL/postprocess/BloomPass.ts";
 
 // inputs
-export {TouchInputController} from "./PaleGL/inputs/TouchInputController.ts";
-export {MouseInputController} from "./PaleGL/inputs/MouseInputController.ts";
+import {TouchInputController} from "./PaleGL/inputs/TouchInputController.ts";
+import {MouseInputController} from "./PaleGL/inputs/MouseInputController.ts";
 
 // others
-export {
-    PrimitiveTypes,
+import {
     UniformTypes,
-    TextureTypes,
     TextureWrapTypes,
     TextureFilterTypes,
     BlendTypes,
-    RenderQueues,
-    RenderbufferTypes,
-    ActorTypes,
     CubeMapAxis,
-    FaceSide,
-    AttributeUsageType,
     RenderTargetTypes,
-    AnimationKeyframeTypes,
     AttributeNames
 } from "./PaleGL/constants.ts";
 
@@ -92,19 +64,21 @@ const debuggerStates = {
 }
 
 const searchParams = new URLSearchParams(location.search);
-const instanceNum = searchParams.has("instance-num")
-    ? Number.parseInt(searchParams.get("instance-num"), 10)
+const instanceNumStr = searchParams.get("instance-num");
+const instanceNum = instanceNumStr
+    ? Number.parseInt(instanceNumStr, 10)
     : 500;
 console.log(`instance num: ${instanceNum}`);
 
 debuggerStates.instanceNum = instanceNum;
 
-let debuggerGUI;
-let width, height;
-let floorPlaneMesh;
-let floorDiffuseMap;
-let floorNormalMap;
-let skinnedMesh;
+let debuggerGUI: DebuggerGUI;
+let width: number, height: number;
+let floorPlaneMesh: Mesh;
+let floorDiffuseMap: Texture;
+let floorNormalMap: Texture;
+let skinnedMesh: SkinnedMesh;
+
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -112,7 +86,7 @@ inputController.start();
 
 const wrapperElement = document.getElementById("wrapper");
 
-const canvasElement = document.getElementById("js-canvas");
+const canvasElement = document.getElementById("js-canvas") as HTMLCanvasElement;
 
 const gl = canvasElement.getContext('webgl2', {antialias: false});
 
@@ -130,7 +104,7 @@ color: white;
 font-weight: bold;
 text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 `;
-wrapperElement.appendChild(instanceNumView);
+wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = new Scene();
 const compositeScene = new Scene();
@@ -795,6 +769,7 @@ function initDebugger() {
         minValue: 1,
         maxValue: 40000,
         initialValue: debuggerStates.instanceNum,
+        stepValue: 1,
         onChange: (value) => {
             debuggerStates.instanceNum = value;
         }

@@ -6,7 +6,9 @@
     Triangles: "Triangles",
     TriangleStrip: "TriangleStrip",
     TriangleFan: "TriangleFan",
-};
+} as const;
+
+export type PrimitiveType = typeof PrimitiveTypes[keyof typeof PrimitiveTypes];
 
 export const UniformTypes = {
     Matrix4: "Matrix4",
@@ -22,19 +24,25 @@ export const UniformTypes = {
     Int: "Int",
     Color: "Color",
     ColorArray: "ColorArray",
-};
+} as const;
+
+export type UniformType = typeof UniformTypes[keyof typeof UniformTypes];
 
 export const TextureTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
     RGBA16F: "RGBA16F",
     RGBA32F: "RGBA32F"
-};
+} as const;
+
+export type TextureType = typeof TextureTypes[keyof typeof TextureTypes];
 
 export const TextureWrapTypes = {
     Repeat: "Repeat",
     ClampToEdge: "ClampToEdge",
-};
+} as const;
+
+export type TextureWrapType = typeof TextureWrapTypes[keyof typeof TextureWrapTypes];
 
 export const TextureFilterTypes = {
     Nearest: "Nearest", // min, mag
@@ -43,24 +51,32 @@ export const TextureFilterTypes = {
     NearestMipmapLinear: "NearestMipmapLinear", // only min filter,
     LinearMipmapNearest: "LinearMipmapNearest", // only min filter
     LinearMipmapLinear: "LinearMipmapLinear", // only min filter
-};
+} as const;
+
+export type TextureFilterType = typeof TextureFilterTypes[keyof typeof TextureFilterTypes];
 
 export const BlendTypes = {
     Opaque: "Opaque",
     Transparent: "Transparent",
     Additive: "Additive",
-};
+} as const;
+
+export type BlendType = typeof BlendTypes[keyof typeof BlendTypes];
 
 export const RenderQueues = {
     Skybox: 1,
     Opaque: 2,
     AlphaTest: 3,
     Transparent: 4
-};
+} as const;
+
+export type RenderQueue = typeof RenderQueues[keyof typeof RenderQueues];
 
 export const RenderbufferTypes = {
     Depth: "Depth",
-};
+} as const;
+
+export type RenderbufferType = typeof RenderbufferTypes[keyof typeof RenderbufferTypes];
 
 export const ActorTypes = {
     Null: "Null",
@@ -69,7 +85,9 @@ export const ActorTypes = {
     Light: "Light",
     Skybox: "Skybox",
     Camera: "Camera",
-};
+} as const;
+
+export type ActorType = typeof ActorTypes[keyof typeof ActorTypes];
 
 export const CubeMapAxis = {
     PositiveX: "PositiveX",
@@ -78,30 +96,46 @@ export const CubeMapAxis = {
     NegativeY: "NegativeY",
     PositiveZ: "PositiveZ",
     NegativeZ: "NegativeZ",
-};
+} as const;
+
+export type CubeMapAxis = typeof CubeMapAxis[keyof typeof CubeMapAxis];
 
 export const FaceSide = {
     Front: "Front",
     Back: "Back",
     Double: "Double"
-};
+} as const;
+
+export type FaceSide = typeof FaceSide[keyof typeof FaceSide];
 
 // TODO: rename Type"s"
 export const AttributeUsageType = {
     StaticDraw: "StaticDraw",
     DynamicDraw: "DynamicDraw"
-};
+} as const;
+
+export type AttributeUsageType = typeof AttributeUsageType[keyof typeof AttributeUsageType];
+
+// export type AttributeUsageType =
+// {
+//     StaticDraw: "StaticDraw",
+//     DynamicDraw: "DynamicDraw"
+// }
 
 export const RenderTargetTypes = {
     RGBA: "RGBA",
     Depth: "Depth",
     Empty: "Empty",
-};
+} as const;
+
+export type RenderTargetType = typeof RenderTargetTypes[keyof typeof RenderTargetTypes];
 
 export const AnimationKeyframeTypes = {
     Vector3: "Vector3",
     Quaternion: "Quaternion"
-};
+} as const;
+
+export type AnimationKeyframeType = typeof AnimationKeyframeTypes[keyof typeof AnimationKeyframeTypes];
 
 export const AttributeNames = {
     Position: "aPosition",
@@ -118,7 +152,9 @@ export const AttributeNames = {
     InstanceScale: "aInstanceScale",
     InstanceAnimationOffset: "aInstanceAnimationOffset",
     InstanceVertexColor: "aInstanceVertexColor"
-};
+} as const;
+
+export type AttributeName = typeof AttributeNames[keyof typeof AttributeNames];
 
 export const UniformNames = {
     // base
@@ -138,4 +174,6 @@ export const UniformNames = {
     SceneTexture: "uSceneTexture",
     // time
     Time: "uTime"
-};
+} as const;
+
+export type UniformName = typeof UniformNames[keyof typeof UniformNames];

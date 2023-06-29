@@ -1,72 +1,78 @@
-﻿import {Attribute} from "./../core/Attribute.js";
-import {VertexArrayObject} from "./../core/VertexArrayObject.js";
-import {IndexBufferObject} from "./../core/IndexBufferObject.js";
-import {Vector3} from "../math/Vector3.js";
-import {AttributeUsageType} from "../constants.js";
-
+﻿import {Attribute} from "./../core/Attribute.ts";
+import {VertexArrayObject} from "./../core/VertexArrayObject.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {AttributeUsageType} from "../constants.ts";
+import {GPU} from "../core/GPU.ts";
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 export class Geometry {
-    attributes = [];
-    vertexCount;
-    vertexArrayObject;
-    indices;
-    drawCount;
+    attributes: Attribute[];
+    vertexCount: number = 0;
+    vertexArrayObject: VertexArrayObject;
+    indices: number[] | null = null;
+    drawCount: number;
 
-    instanceCount;
+    instanceCount: number | null;
 
-    #gpu;
+    private gpu: GPU;
 
     constructor({
-        gpu,
-        attributes,
-        indices,
-        drawCount,
-        calculateBinormal = false,
-        instanceCount = null,
+                    gpu,
+                    attributes,
+                    indices,
+                    drawCount,
+                    // calculateBinormal = false,
+                    instanceCount = null,
+                }: {
+        gpu: GPU,
+        attributes: Attribute[],
+        indices: number[],
+        drawCount: number,
+        // calculateBinormal: boolean,
+        instanceCount?: number,
     }) {
-        this.#gpu = gpu;
-        
+        this.gpu = gpu;
+
         this.instanceCount = instanceCount;
         this.drawCount = drawCount;
 
         if (indices) {
             this.indices = indices;
         }
-        
+
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
             attributes: [],
             indices: this.indices
         });
-        
+
         (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
             this.setAttribute(attribute);
         });
     }
-    
+
     // TODO: attribute class を渡す、で良い気がする
-    setAttribute(attribute) {
+    setAttribute(attribute: Attribute) {
         const location = attribute.location
             ? attribute.location
             : this.attributes.length;
-        
+
         const attr = new Attribute({
             name: attribute.name,
             data: attribute.data,
             location,
             size: attribute.size,
             offset: attribute.offset,
-            usage: attribute.usage || AttributeUsageType.StaticDraw,
+            usageType: attribute.usageType || AttributeUsageType.StaticDraw,
             divisor: attribute.divisor
         });
         this.attributes.push(attr);
 
         this.vertexArrayObject.setAttribute(attr, true);
     }
-   
-    #createGeometry({ gpu }) {
+
+    #createGeometry({gpu}: { gpu: GPU }) {
         console.log("[Geometry.createGeometry]", this.attributes)
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
@@ -74,37 +80,40 @@ export class Geometry {
             indices: this.indices
         });
     }
-    
+
     start() {
-        if(!this.vertexArrayObject) {
-            this.#createGeometry({ gpu: this.#gpu })
-        }
-    }
-    
-    update() {
-        if(!this.vertexArrayObject) {
-            this.#createGeometry({ gpu: this.#gpu })
+        if (!this.vertexArrayObject) {
+            this.#createGeometry({gpu: this.gpu})
         }
     }
 
-    updateAttribute(key, data) {
-        const attribute = this.attributes.find(({ name }) => name === key);
+    update() {
+        if (!this.vertexArrayObject) {
+            this.#createGeometry({gpu: this.gpu})
+        }
+    }
+
+    updateAttribute(key: string, data: Float32Array) {
+        const attribute = this.attributes.find(({name}) => name === key);
+        if(!attribute) {
+            throw "invalid attribute";
+        }
         attribute.data = data;
         this.vertexArrayObject.updateAttribute(key, attribute.data);
     }
-    
-    getAttribute(key) {
-        return this.attributes.find(({ name }) => name === key);
+
+    getAttribute(key: string) {
+        return this.attributes.find(({name}) => name === key);
     }
 
     getAttributeDescriptors() {
         return this.attributes.map(attribute => attribute.getDescriptor());
     }
 
-    static createTangentsAndBinormals(normals) {
-        const tangents = [];
-        const binormals = [];
-        for(let i = 0; i < normals.length / 3; i++) {
+    static createTangentsAndBinormals(normals: number[]) {
+        const tangents: number[] = [];
+        const binormals: number[] = [];
+        for (let i = 0; i < normals.length / 3; i++) {
             const x = normals[i * 3 + 0];
             const y = normals[i * 3 + 1];
             const z = normals[i * 3 + 2];
@@ -119,10 +128,10 @@ export class Geometry {
             binormals
         };
     }
-    
-    static createBinormals(normals, tangents) {
+
+    static createBinormals(normals: number[], tangents: number[]) {
         const binormals = [];
-        for(let i = 0; i < normals.length / 3; i++) {
+        for (let i = 0; i < normals.length / 3; i++) {
             const n = new Vector3(
                 normals[i * 3 + 0],
                 normals[i * 3 + 1],

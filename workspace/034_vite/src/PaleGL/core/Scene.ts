@@ -1,19 +1,23 @@
-﻿
+﻿import {Actor} from "../actors/Actor.ts";
+import {Transform} from "./Transform.ts";
+
+type TraverseFunc = (actor: Actor) => void;
+
 export class Scene {
-    children = []; // transform hierarchy
+    children: Transform[] = []; // transform hierarchy
     // mainCamera;
     
-    add(actor) {
+    add(actor: Actor) {
         this.children.push(actor.transform);
     }
     
-    traverse(execFunc) {
+    traverse(execFunc: TraverseFunc) {
         for(let i = 0; i < this.children.length; i++) {
             this.#recursiveTraverseActor(this.children[i].actor, execFunc);
         }
     }
     
-    #recursiveTraverseActor(actor, execFunc) {
+    #recursiveTraverseActor(actor: Actor, execFunc: TraverseFunc) {
         execFunc(actor);
         if(actor.transform.hasChild) {
             for(let i = 0; i < actor.transform.children.length; i++) {

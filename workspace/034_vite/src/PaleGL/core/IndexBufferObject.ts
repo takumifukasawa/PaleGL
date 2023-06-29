@@ -1,33 +1,34 @@
 ﻿import {GLObject} from "./GLObject.js";
+import {GPU} from "./GPU.ts";
 
 export class IndexBufferObject extends GLObject {
-    #ibo;
-    #gpu;
-    
+    private ibo;
+    private gpu;
+
     get glObject() {
-        return this.#ibo;
+        return this.ibo;
     }
-    
-    constructor({ gpu, indices }) {
+
+    constructor({gpu, indices}: { gpu: GPU, indices: number[] }) {
         super();
-        
-        this.#gpu = gpu;
-        
-        const gl = this.#gpu.gl;
-        
-        this.#ibo = gl.createBuffer();
+
+        this.gpu = gpu;
+
+        const gl = this.gpu.gl;
+
+        this.ibo = gl.createBuffer();
 
         this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
     }
-    
+
     bind() {
-        const gl = this.#gpu.gl;
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.#ibo);
+        const gl = this.gpu.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
     }
-    
+
     unbind() {
-        const gl = this.#gpu.gl;
+        const gl = this.gpu.gl;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 }

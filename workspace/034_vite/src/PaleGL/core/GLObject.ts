@@ -1,13 +1,13 @@
 ﻿export class GLObject {
-    get glObject() {
+    get glObject(): WebGLProgram {
         throw "[GLObject.glObject] should implementation";
     }
     
-    bind() {
+    bind(): void {
         throw "[GLObject.bind] should implementation";
     }
 
-    unbind() {
+    unbind(): void {
         throw "[GLObject.unbind] should implementation";
     }
 }

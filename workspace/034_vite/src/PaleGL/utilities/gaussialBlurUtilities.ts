@@ -1,8 +1,8 @@
 ﻿
-import { gaussCoefficient } from "./mathUtilities.js";
+import { gaussCoefficient } from "./mathUtilities.ts";
 
 // pixelNumは奇数であるべき
-export function getGaussianBlurWeights(pixelNum, sigma) {
+export function getGaussianBlurWeights(pixelNum: number, sigma: number) {
     const halfWidth = Math.floor(pixelNum / 2);
 
     let sum = 0;

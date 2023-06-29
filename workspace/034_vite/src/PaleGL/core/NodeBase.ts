@@ -1,14 +1,9 @@
-﻿import {Vector3} from "../math/Vector3.js";
-import {Matrix4} from "../math/Matrix4.js";
-import {ActorTypes} from "../constants.js";
-import {Rotator} from "../math/Rotator.js";
+﻿export class NodeBase {
+    name: string;
+    parent: NodeBase | null = null;
+    children: NodeBase[] = [];
 
-export class NodeBase {
-    name;
-    parent = null;
-    children = [];
-    
-    constructor({ name }) {
+    constructor({name}: { name: string }) {
         this.name = name;
     }
 
@@ -20,7 +15,7 @@ export class NodeBase {
         return this.childCount > 0;
     }
 
-    addChild(child) {
+    addChild(child: NodeBase) {
         this.children.push(child);
         child.parent = this;
     }

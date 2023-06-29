@@ -1,9 +1,15 @@
-﻿import {BlendTypes, FaceSide, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants.js";
-import {Texture} from "./Texture.js";
+﻿import {BlendTypes, FaceSide, PrimitiveType, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants.ts";
+import {Texture} from "./Texture.ts";
+import {Shader} from "./Shader.ts";
+import {VertexArrayObject} from "./VertexArrayObject.ts";
+import {Framebuffer} from "./Framebuffer.ts";
 
 const createWhite1x1 = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
+    if (!ctx) {
+        throw "invalid context";
+    }
     canvas.width = 1;
     canvas.height = 1;
     ctx.fillStyle = "white";
@@ -12,13 +18,13 @@ const createWhite1x1 = () => {
 };
 
 export class GPU {
-    gl;
-    #shader;
-    #vao;
-    #uniforms;
-    dummyTexture;
+    gl: WebGL2RenderingContext;
+    private shader: Shader | null = null;
+    private vao: VertexArrayObject | null = null;
+    private uniforms;
+    dummyTexture: Texture;
 
-    constructor({gl}) {
+    constructor({gl}: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
         this.dummyTexture = new Texture({
             gpu: this,
@@ -28,33 +34,33 @@ export class GPU {
         });
     }
 
-    setShader(shader) {
-        this.#shader = shader;
+    setShader(shader: Shader) {
+        this.shader = shader;
     }
 
-    setVertexArrayObject(vao) {
-        this.#vao = vao;
+    setVertexArrayObject(vao: VertexArrayObject) {
+        this.vao = vao;
     }
 
     setUniforms(uniforms) {
-        this.#uniforms = uniforms;
+        this.uniforms = uniforms;
     }
 
-    setSize(x, y, width, height) {
+    setSize(x: number, y: number, width: number, height: number) {
         this.gl.viewport(x, y, width, height);
     }
-    
-    setFramebuffer(framebuffer) {
+
+    setFramebuffer(framebuffer: Framebuffer) {
         const gl = this.gl;
-        if(!framebuffer) {
+        if (!framebuffer) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             return;
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject);
-        if(framebuffer.hasMultipleDrawBuffers) {
+        if (framebuffer.hasMultipleDrawBuffers) {
             gl.drawBuffers(framebuffer.drawBufferList);
         }
-        
+
         // tmp
         // !!framebuffer
         //     ? gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.glObject)
@@ -65,7 +71,7 @@ export class GPU {
         this.gl.flush();
     }
 
-    clear(r, g, b, a) {
+    clear(r: number, g: number, b: number, a: number) {
         const gl = this.gl;
         // TODO: mask設定は外側からやった方がよい気がする
         gl.depthMask(true);
@@ -79,7 +85,7 @@ export class GPU {
         // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
-    #getGLPrimitive(primitiveType) {
+    #getGLPrimitive(primitiveType: PrimitiveType) {
         const gl = this.gl;
         switch (primitiveType) {
             case PrimitiveTypes.Points:
@@ -92,16 +98,16 @@ export class GPU {
                 throw "invalid primitive type";
         }
     }
-  
+
     // TODO:
     // - start offset と instanceCount は逆の方が良い
     // - なんなら object destructuring の方がよさそう
     draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, instanceCount, startOffset = 0) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
-       
+
         // culling
-        switch(faceSide) {
+        switch (faceSide) {
             case FaceSide.Front:
                 gl.enable(gl.CULL_FACE);
                 gl.cullFace(gl.BACK);
@@ -126,19 +132,19 @@ export class GPU {
         // console.log(gl.getParameter(gl.DEPTH_WRITEMASK));
 
         // depth test
-        if(depthTest) {
+        if (depthTest) {
             gl.enable(gl.DEPTH_TEST);
             gl.depthFunc(gl.LEQUAL); // TODO: set by arg
         } else {
             gl.disable(gl.DEPTH_TEST);
         }
-     
+
         // TODO: renderer側でやるべき？
         // blend
         // gl.blendFunc(src, dest)
         // - src: current draw
         // - dest: drawn 
-        switch(blendType) {
+        switch (blendType) {
             case BlendTypes.Opaque:
                 gl.disable(gl.BLEND);
                 // pattern_2: for enabled blend
@@ -157,16 +163,16 @@ export class GPU {
                 throw "invalid blend type";
         }
 
-        gl.useProgram(this.#shader.glObject);
-        
+        gl.useProgram(this.shader.glObject);
+
         let activeTextureIndex = 0;
-    
+
         const setUniformValue = (type, uniformName, value) => {
             const gl = this.gl;
-            const location = gl.getUniformLocation(this.#shader.glObject, uniformName);
+            const location = gl.getUniformLocation(this.shader.glObject, uniformName);
             // TODO:
             // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
-            switch(type) {
+            switch (type) {
                 case UniformTypes.Int:
                     gl.uniform1i(location, value);
                     break;
@@ -190,7 +196,7 @@ export class GPU {
                     gl.uniformMatrix4fv(location, false, value.elements);
                     break;
                 case UniformTypes.Matrix4Array:
-                    if(value) {
+                    if (value) {
                         // arg[1] ... use transpose.
                         gl.uniformMatrix4fv(location, false, value.map(v => [...v.elements]).flat());
                     }
@@ -199,7 +205,7 @@ export class GPU {
                     gl.uniform4fv(location, value.elements);
                     break;
                 case UniformTypes.ColorArray:
-                    if(value) {
+                    if (value) {
                         // arg[1] ... use transpose.
                         gl.uniform4fv(location, value.map(v => [...v.elements]).flat());
                     }
@@ -215,7 +221,7 @@ export class GPU {
                     break;
                 case UniformTypes.CubeMap:
                     // TODO: valueのguardなくて大丈夫なはず
-                    if(value) {
+                    if (value) {
                         gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
                         gl.bindTexture(
                             gl.TEXTURE_CUBE_MAP,
@@ -229,11 +235,11 @@ export class GPU {
                     throw `invalid uniform - name: ${uniformName}, type: ${type}`;
             }
         };
- 
+
         // uniforms
-        Object.keys(this.#uniforms).forEach(uniformName => {
-            const uniform = this.#uniforms[uniformName];
-            if(uniform.type === UniformTypes.Struct) {
+        Object.keys(this.uniforms).forEach(uniformName => {
+            const uniform = this.uniforms[uniformName];
+            if (uniform.type === UniformTypes.Struct) {
                 Object.keys(uniform.value).forEach(key => {
                     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
                 });
@@ -243,15 +249,15 @@ export class GPU {
                 // console.log(uniform.type, uniformName, uniform.value);
             }
         });
-        
+
         // set vertex
-        gl.bindVertexArray(this.#vao.glObject);
+        gl.bindVertexArray(this.vao.glObject);
 
         // if (this.#ibo) {
-        if (this.#vao.hasIndices) {
+        if (this.vao.hasIndices) {
             // draw by indices
             // drawCount ... use indices count
-            if(instanceCount) {
+            if (instanceCount) {
                 gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
             } else {
                 gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
@@ -259,13 +265,13 @@ export class GPU {
         } else {
             // draw by array
             // draw count ... use vertex num
-            if(instanceCount) {
+            if (instanceCount) {
                 gl.drawArraysInstanced(glPrimitiveType, startOffset, drawCount, instanceCount);
             } else {
                 gl.drawArrays(glPrimitiveType, startOffset, drawCount);
             }
         }
-       
+
         // unbind when end render
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);

@@ -1,28 +1,37 @@
 ﻿
+type Callback = (lastTime: number, deltaTime: number) => void;
+
 export class TimeSkipper {
-    targetFPS;
-    #callback;
-    #lastTime;
+    targetFPS: number;
+
+    private callback: Callback;
+    private lastTime: number = -Infinity;
  
-    constructor(targetFPS, callback) {
+    constructor(targetFPS: number, callback: Callback) {
         this.targetFPS = targetFPS;
-        this.#callback = callback;
+        this.callback = callback;
     }
 
-    // time [sec]
-    start(time) {
-        this.#lastTime = time;
+    /**
+     * 
+     * @param time [sec]
+     */
+    start(time: number) {
+        this.lastTime = time;
     }
    
-    // time [sec]
-    exec(time) {
+    /**
+     * 
+     * @param time [sec]
+     */
+    exec(time: number) {
         const interval = 1 / this.targetFPS;
-        if((time - interval) >= this.#lastTime) {
-            const elapsedTime = time - this.#lastTime;
+        if((time - interval) >= this.lastTime) {
+            const elapsedTime = time - this.lastTime;
             const n = Math.floor(elapsedTime / interval);
             const deltaTime = interval * n;
-            this.#lastTime += deltaTime;
-            this.#callback(this.#lastTime, deltaTime);
+            this.lastTime += deltaTime;
+            this.callback(this.lastTime, deltaTime);
         }
     }
 }

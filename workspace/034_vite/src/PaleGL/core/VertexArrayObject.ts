@@ -1,26 +1,34 @@
 ﻿import {GLObject} from "./GLObject.js";
 import {AttributeUsageType} from "../constants.js";
 import {IndexBufferObject} from "./IndexBufferObject.js";
+import {GPU} from "./GPU.ts";
+import {Attribute} from "./Attribute.ts";
+
+type VertexBufferObject = {
+    name: string,
+    vbo: WebGLBuffer,
+    usage: number
+}
 
 export class VertexArrayObject extends GLObject {
-    #gpu;
-    #vao;
-    #vboList = [];
-    #ibo;
-    
+    private gpu: GPU;
+    private vao: WebGLVertexArrayObject;
+    private vboList: VertexBufferObject[] = [];
+    private ibo: IndexBufferObject | null = null;
+
     get hasIndices() {
-        return !!this.#ibo;
+        return !!this.ibo;
     }
 
     get glObject() {
-        return this.#vao;
+        return this.vao;
     }
-    
-    get vboList() {
-    }
-    
-    getUsage(gl, usageType) {
-        switch(usageType) {
+
+    // get vboList() {
+    // }
+
+    getUsage(gl: WebGL2RenderingContext, usageType: AttributeUsageType) {
+        switch (usageType) {
             case AttributeUsageType.StaticDraw:
                 return gl.STATIC_DRAW;
             case AttributeUsageType.DynamicDraw:
@@ -30,23 +38,31 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({gpu, attributes = [], indices = null}) {
+    constructor({gpu, attributes = [], indices = null}: {
+        gpu: GPU,
+        attributes: Attribute[],
+        indices: number[] | null
+    }) {
         super();
-        
-        this.#gpu = gpu;
 
-        const gl = this.#gpu.gl;
-        this.#vao = gl.createVertexArray();
+        this.gpu = gpu;
+
+        const gl = this.gpu.gl;
+        const vao = gl.createVertexArray();
+        if (!vao) {
+            throw "invalid vao";
+        }
+        this.vao = vao;
 
         // bind vertex array to webgl context
-        gl.bindVertexArray(this.#vao);
+        gl.bindVertexArray(this.vao);
 
         attributes.forEach(attribute => {
             this.setAttribute(attribute);
         });
 
-        if(indices) {
-            this.#ibo = new IndexBufferObject({gpu, indices})
+        if (indices) {
+            this.ibo = new IndexBufferObject({gpu, indices})
         }
 
         // unbind vertex array to webgl context
@@ -54,38 +70,44 @@ export class VertexArrayObject extends GLObject {
 
         // unbind array buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        
+
         // unbind index buffer
-        if(this.#ibo) {
-            this.#ibo.unbind();
+        if (this.ibo) {
+            this.ibo.unbind();
         }
     }
 
-    updateAttribute(key, data) {
-        const gl = this.#gpu.gl;
-        const targetVBO = this.#vboList.find(({ name }) => key === name);
+    updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
+        const gl = this.gpu.gl;
+        const targetVBO = this.vboList.find(({name}) => key === name);
+        if (!targetVBO) {
+            throw "invalid target vbo";
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
-    
-    setAttribute(attribute, push = false) {
-        const gl = this.#gpu.gl;
 
-        if(push) {
+    setAttribute(attribute: Attribute, push = false) {
+        const gl = this.gpu.gl;
+
+        if (push) {
             // bind vertex array to webgl context
-            gl.bindVertexArray(this.#vao);
+            gl.bindVertexArray(this.vao);
         }
 
         const {name, data, size, location, usageType, divisor} = attribute;
-        const newLocation = (location !== null && location !== undefined) ? location : this.#vboList.length;
+        const newLocation = (location !== null && location !== undefined) ? location : this.vboList.length;
         const vbo = gl.createBuffer();
+        if (!vbo) {
+            throw "invalid vbo";
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         const usage = this.getUsage(gl, usageType);
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
         gl.enableVertexAttribArray(newLocation);
 
-        switch(data.constructor) {
+        switch (data.constructor) {
             case Float32Array:
                 // size ... 頂点ごとに埋める数
                 // stride is always 0 because buffer is not interleaved.
@@ -99,13 +121,13 @@ export class VertexArrayObject extends GLObject {
                 throw "[VertexArrayObject.setAttribute] invalid data type";
         }
 
-        if(divisor) {
+        if (divisor) {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.#vboList.push({ name, vbo, usage });
-        
-        if(push) {
+        this.vboList.push({name, vbo, usage});
+
+        if (push) {
             gl.bindVertexArray(null);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }

@@ -1,22 +1,30 @@
-﻿import {AttributeUsageType} from "../constants.js";
+﻿import {AttributeUsageType} from "../constants.ts";
 
 export class Attribute {
-    name;
-    data; // data
-    location; // layout location index
-    size; // data per vertex. ex) position: 3, uv: 2
-    offset;
-    usageType;
-    divisor;
-    
+    name: string;
+    data: Float32Array; // data
+    location: number; // layout location index
+    size: number; // data per vertex. ex) position: 3, uv: 2
+    offset: number;
+    usageType: AttributeUsageType;
+    divisor: number;
+
     constructor({
-        name,
-        data,
-        location,
-        size,
-        offset = 0,
-        usageType = AttributeUsageType.StaticDraw,
-        divisor
+                    name,
+                    data,
+                    location = -1, // TODO
+                    size,
+                    offset = 0,
+                    usageType = AttributeUsageType.StaticDraw,
+                    divisor = -1 // TODO
+                }: {
+        name: string,
+        data: Float32Array,
+        location?: number,
+        size: number,
+        offset?: number,
+        usageType?: AttributeUsageType,
+        divisor?: number
     }) {
         this.name = name;
         this.data = data;
@@ -26,7 +34,7 @@ export class Attribute {
         this.usageType = usageType;
         this.divisor = divisor;
     }
-    
+
     getDescriptor() {
         return {
             name: this.name,
