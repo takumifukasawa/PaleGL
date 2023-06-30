@@ -1,48 +1,49 @@
-﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.js";
-import {Matrix4} from "../math/Matrix4.js";
+﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.ts";
+import {Matrix4} from "../math/Matrix4.ts";
+import {GPU} from "./GPU";
 
 export class Renderer {
-    #gpu;
+    private gpu;
     canvas;
     pixelRatio;
-    #realWidth;
-    #realHeight;
+    private realWidth;
+    private realHeight;
     #stats;
 
-    constructor({gpu, canvas, pixelRatio = 1.5}) {
-        this.#gpu = gpu;
+    constructor({gpu, canvas, pixelRatio = 1.5}: { gpu: GPU, canvas: HTMLCanvasElement, pixelRatio: number }) {
+        this.gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
     }
-    
+
     setStats(stats) {
         this.#stats = stats;
     }
 
     setSize(width, height, realWidth, realHeight) {
-        this.#realWidth = realWidth;
-        this.#realHeight = realHeight;
-        this.canvas.width = this.#realWidth;
-        this.canvas.height = this.#realHeight;
-        this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
+        this.realWidth = realWidth;
+        this.realHeight = realHeight;
+        this.canvas.width = this.realWidth;
+        this.canvas.height = this.realHeight;
+        this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
     }
 
     setRenderTarget(renderTarget) {
         if (renderTarget) {
-            this.#gpu.setFramebuffer(renderTarget.framebuffer)
-            this.#gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
+            this.gpu.setFramebuffer(renderTarget.framebuffer)
+            this.gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
         } else {
-            this.#gpu.setFramebuffer(null)
-            this.#gpu.setSize(0, 0, this.#realWidth, this.#realHeight);
+            this.gpu.setFramebuffer(null)
+            this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
         }
     }
 
     flush() {
-        this.#gpu.flush();
+        this.gpu.flush();
     }
 
     clear(r, g, b, a) {
-        this.#gpu.clear(r, g, b, a);
+        this.gpu.clear(r, g, b, a);
     }
 
     #shadowPass(castShadowLightActors, castShadowRenderMeshInfos) {
@@ -50,13 +51,13 @@ export class Renderer {
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
 
-            if(castShadowRenderMeshInfos.length < 1) {
+            if (castShadowRenderMeshInfos.length < 1) {
                 return;
             }
 
-            castShadowRenderMeshInfos.forEach(({ actor }) => {
+            castShadowRenderMeshInfos.forEach(({actor}) => {
                 const targetMaterial = actor.depthMaterial;
-                
+
                 // // TODO: material 側でやった方がよい？
                 // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
                 //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
@@ -72,12 +73,12 @@ export class Renderer {
                 targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
                 targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera.viewMatrix);
                 targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera.projectionMatrix);
-              
+
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
     }
-    
+
     #buildRenderMeshInfo(actor, materialIndex = 0) {
         return {
             actor,
@@ -87,7 +88,7 @@ export class Renderer {
 
     #scenePass(sortedRenderMeshInfos, camera, lightActors, clear = true) {
         // TODO: refactor
-        if(clear) {
+        if (clear) {
             this.clear(
                 camera.clearColor.x,
                 camera.clearColor.y,
@@ -96,7 +97,7 @@ export class Renderer {
             );
         }
 
-        sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+        sortedRenderMeshInfos.forEach(({actor, materialIndex}) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
@@ -192,7 +193,7 @@ export class Renderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-                    
+
                     // // TODO:
                     // // - directional light の構造体に持たせた方がいいかもしれない
                     // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
@@ -209,8 +210,8 @@ export class Renderer {
             this.renderMesh(actor.geometry, targetMaterial);
         });
     }
-    
-    render(scene, camera, { useShadowPass = true, clearScene = true }) {
+
+    render(scene, camera, {useShadowPass = true, clearScene = true}) {
         const renderMeshInfoEachQueue = {
             opaque: [],
             skybox: [], // maybe only one
@@ -229,7 +230,7 @@ export class Renderer {
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
                     actor.materials.forEach((material, i) => {
-                        if(!!material.alphaTest) {
+                        if (!!material.alphaTest) {
                             renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
                             return;
                         }
@@ -258,22 +259,22 @@ export class Renderer {
         // sort by render queue
         const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
         // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
-        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({ actor }) => actor.enabled);
-        
+        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({actor}) => actor.enabled);
+
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
-      
+
         const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
-        
-        if(castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
-                if(actor.type === ActorTypes.Skybox) {
+
+        if (castShadowLightActors.length > 0) {
+            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({actor}) => {
+                if (actor.type === ActorTypes.Skybox) {
                     return false;
                 }
                 return actor.castShadow;
             });
-            if(useShadowPass) {
+            if (useShadowPass) {
                 this.#shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
             }
         }
@@ -281,7 +282,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
         // 2. scene pass
         // ------------------------------------------------------------------------------
-      
+
         // postprocessはrendererから外した方がよさそう  
         // if (camera.enabledPostProcess) {
         //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
@@ -294,7 +295,7 @@ export class Renderer {
 
         // if (camera.enabledPostProcess) {
         //     camera.postProcess.render({
-        //         gpu: this.#gpu,
+        //         gpu: this.gpu,
         //         renderer: this,
         //         camera
         //     });
@@ -303,18 +304,18 @@ export class Renderer {
 
     renderMesh(geometry, material) {
         geometry.update();
-        
-        if(this.#stats) {
+
+        if (this.#stats) {
             this.#stats.addDrawVertexCount(geometry);
             this.#stats.incrementDrawCall();
         }
 
         // vertex
-        this.#gpu.setVertexArrayObject(geometry.vertexArrayObject);
+        this.gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
-        this.#gpu.setShader(material.shader);
+        this.gpu.setShader(material.shader);
         // uniforms
-        this.#gpu.setUniforms(material.uniforms);
+        this.gpu.setUniforms(material.uniforms);
 
         // setup depth write (depth mask)
         let depthWrite;
@@ -336,9 +337,9 @@ export class Renderer {
 
         // setup depth test
         const depthTest = material.depthTest;
-       
+
         // draw
-        this.#gpu.draw(
+        this.gpu.draw(
             geometry.drawCount,
             material.primitiveType,
             depthTest,

@@ -1,9 +1,10 @@
 import {Mesh} from "./Mesh.js";
-import {Material} from "../materials/Material.js";
-import {parseObj} from "../loaders/loadObj.js";
-import {Geometry} from "../geometries/Geometry.js";
-import {AttributeNames, UniformNames} from "../constants.js";
+import {Material} from "../materials/Material.ts";
+import {parseObj} from "../loaders/loadObj.ts";
+import {Geometry} from "../geometries/Geometry.ts";
+import {AttributeNames, UniformNames} from "../constants.ts";
 import {GPU} from "../core/GPU.ts";
+import {Attribute} from "../core/Attribute.ts";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -163,20 +164,21 @@ f 23/56/18 22/55/18 20/53/18
 `
 
 export class ArrowHelper extends Mesh {
-    constructor({ gpu }: {gpu: GPU}) {
+    constructor({gpu}: { gpu: GPU }) {
         const objData = parseObj(arrowHelperGeometryData);
         const geometry = new Geometry({
             gpu,
             attributes: [
-                {
+                new Attribute({
                     name: "position",
                     data: new Float32Array(objData.positions),
                     size: 3
-                }, {
+                }),
+                new Attribute({
                     name: "uv",
                     data: new Float32Array(objData.uvs),
                     size: 2
-                }
+                })
             ],
             indices: objData.indices,
             drawCount: objData.indices.length
@@ -211,9 +213,9 @@ export class ArrowHelper extends Mesh {
             }
             `
         });
-        super({ geometry, material });
+        super({geometry, material});
     }
-    
+
     // setPosition(p) {
     //     this.transform.setTranslation(p);
     // }

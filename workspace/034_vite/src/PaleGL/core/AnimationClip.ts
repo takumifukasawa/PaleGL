@@ -1,90 +1,98 @@
-﻿import {Vector3} from "../math/Vector3.js";
-import {Rotator} from "../math/Rotator.js";
+﻿import {Vector3} from "../math/Vector3.ts";
+import {Rotator} from "../math/Rotator.ts";
+import {AnimationKeyframes} from "./AnimationKeyframes";
 
 export class AnimationClip {
-    name;
+    name: string;
     target;
     key;
     interpolation;
     type; // animation clip type
-    #data;
-    start;
-    end;
-    frames;
-    frameCount;
+    private data;
+    start: number;
+    end: number;
+    frames: number;
+    frameCount: number;
     // elementSize; // TODO: typeを元に振り分けても良い気がする
-    
-    #currentTime;
-    currentFrame;
-    
-    loop;
-    isPlaying;
 
-    speed = 1;
-    
+    private currentTime: number;
+    currentFrame: number;
+
+    loop: boolean;
+    isPlaying: boolean;
+
+    speed: number = 1;
+
     // TODO: fpsをgltfから引っ張ってこれるかどうか
-    fps = 30; // default
-    
-    onUpdateProxy;
-    
-    #keyframes = [];
-    
+    fps: number = 30; // default
+
+    onUpdateProxy: (n: number) => void;
+
+    private keyframes = [];
+
     get keyframes() {
-        return this.#keyframes;
-    }
-    
-    get data() {
-        return this.#data;
+        return this.keyframes;
     }
 
-    constructor({ name, start, end, frames, frameCount, keyframes }) {
+    get data() {
+        return this.data;
+    }
+
+    constructor({name, start, end, frames, frameCount, keyframes}: {
+        name: string,
+        start?: number,
+        end?: number,
+        // frames: number,
+        frameCount?: number,
+        keyframes: AnimationKeyframes[]
+    }) {
         this.name = name;
         this.start = start;
         this.end = end;
         this.frameCount = frameCount;
-        this.#keyframes = keyframes;
-        
+        this.keyframes = keyframes;
+
         // TODO: add keyframes した時も計算するようにした方が便利そう 
-        this.frameCount = Math.max(...(keyframes.map(({ frameCount }) => frameCount)));
+        this.frameCount = Math.max(...(keyframes.map(({frameCount}) => frameCount)));
     }
-    
+
     // addAnimationKeyframes(animationKeyframe) {
-    //     this.#keyframes.push(animationKeyframe);
+    //     this.keyframes.push(animationKeyframe);
     // }
-   
+
     // start at 0 frame
     play() {
-        this.#currentTime = 0;
+        this.currentTime = 0;
         this.isPlaying = true;
     }
 
     update(deltaTime) {
-        if(!this.isPlaying) {
+        if (!this.isPlaying) {
             return;
         }
-        
+
         // spf ... [s / frame]
         const spf = 1 / this.fps;
 
-        this.#currentTime += deltaTime * this.speed;
-       
+        this.currentTime += deltaTime * this.speed;
+
         // TODO: durationはendと常にイコールならendを参照する形でもよい
         const duration = spf * this.frameCount;
-        
-        if(this.#currentTime > duration) {
-            if(!this.loop) {
+
+        if (this.currentTime > duration) {
+            if (!this.loop) {
                 this.currentFrame = this.frameCount;
-                this.#currentTime = duration; 
+                this.currentTime = duration;
                 return;
             }
-            this.#currentTime %= duration;
+            this.currentTime %= duration;
         }
 
-        this.currentFrame = Math.floor(this.#currentTime / spf);
-        
+        this.currentFrame = Math.floor(this.currentTime / spf);
+
         // 代理でupdateしたい場合 
-        if(this.onUpdateProxy) {
-            const keyframes = this.#keyframes.map(animationKeyframes => {
+        if (this.onUpdateProxy) {
+            const keyframes = this.keyframes.map(animationKeyframes => {
                 // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
                     target: animationKeyframes.target,
@@ -94,7 +102,7 @@ export class AnimationClip {
             });
             this.onUpdateProxy(keyframes);
         } else {
-            this.#keyframes.forEach(animationKeyframes => {
+            this.keyframes.forEach(animationKeyframes => {
                 const frameValue = animationKeyframes.getFrameValue(this.currentFrame)
                 switch (animationKeyframes.key) {
                     case "translation":
@@ -114,10 +122,10 @@ export class AnimationClip {
             });
         }
     }
-    
+
     getAllKeyframesValue() {
         return (new Array(this.frameCount)).fill(0).map((_, i) => {
-            const keyframes = this.#keyframes.map(animationKeyframes => {
+            const keyframes = this.keyframes.map(animationKeyframes => {
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,

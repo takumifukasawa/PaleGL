@@ -1,5 +1,5 @@
-﻿import {Attribute} from "./../core/Attribute.ts";
-import {VertexArrayObject} from "./../core/VertexArrayObject.ts";
+﻿import {Attribute} from "../core/Attribute";
+import {VertexArrayObject} from "../core/VertexArrayObject";
 import {Vector3} from "../math/Vector3.ts";
 import {AttributeUsageType} from "../constants.ts";
 import {GPU} from "../core/GPU.ts";
@@ -95,7 +95,7 @@ export class Geometry {
 
     updateAttribute(key: string, data: Float32Array) {
         const attribute = this.attributes.find(({name}) => name === key);
-        if(!attribute) {
+        if (!attribute) {
             throw "invalid attribute";
         }
         attribute.data = data;

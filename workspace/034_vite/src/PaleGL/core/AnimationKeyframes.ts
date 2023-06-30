@@ -1,17 +1,20 @@
-﻿import {AnimationKeyframeTypes} from "../constants.js";
-import {Vector3} from "../math/Vector3.js";
-import {Quaternion} from "../math/Quaternion.js";
+﻿import {AnimationKeyframeType, AnimationKeyframeTypes} from "../constants.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {Quaternion} from "../math/Quaternion.ts";
 
 export class AnimationKeyframes {
     target;
     key;
     interpolation;
-    #data;
-    #elementSize;
-    frameCount
+    private data;
+    private elementSize: number;
+    frameCount: number
+    type: AnimationKeyframeType;
+    start: number;
+    end: number;
 
     get data() {
-        return this.#data;
+        return this.data;
     }
 
     constructor({ target, type, key, interpolation, data, start, end, frameCount }) {
@@ -19,17 +22,17 @@ export class AnimationKeyframes {
         this.key = key;
         this.interpolation = interpolation;
         this.type = type;
-        this.#data = data;
+        this.data = data;
         this.start = start;
         this.end = end;
         this.frameCount = frameCount;
 
         switch(this.type) {
             case AnimationKeyframeTypes.Vector3:
-                this.#elementSize = 3;
+                this.elementSize = 3;
                 break;
             case AnimationKeyframeTypes.Quaternion:
-                this.#elementSize = 4;
+                this.elementSize = 4;
                 break;
             default:
                 throw "[AnimationKeyframes.getFrameValue] invalid type";
@@ -37,7 +40,7 @@ export class AnimationKeyframes {
     }
 
     getFrameValue(frame) {
-        const arr = (new Array(this.#elementSize)).fill(0).map((e, i) => this.#data[frame * this.#elementSize + i]);
+        const arr = (new Array(this.elementSize)).fill(0).map((e, i) => this.data[frame * this.elementSize + i]);
 
         switch(this.type) {
             case AnimationKeyframeTypes.Vector3:

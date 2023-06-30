@@ -1,7 +1,8 @@
 ﻿
-import {Geometry} from "./Geometry.js";
-import {Vector3} from "../math/Vector3.js";
-import {AttributeNames} from "../constants.js";
+import {Geometry} from "./Geometry.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {AttributeNames} from "../constants.ts";
+import {Attribute} from "../core/Attribute.ts";
 
 export class PlaneGeometry extends Geometry {
     constructor({
@@ -43,7 +44,7 @@ export class PlaneGeometry extends Geometry {
       
         // TODO: uniqでfilter
         const attributes = [
-            {
+            new Attribute({
                 name: AttributeNames.Position,
                 data: new Float32Array([
                     -1, 1, 0,
@@ -52,7 +53,8 @@ export class PlaneGeometry extends Geometry {
                     1, -1, 0,
                 ]),
                 size: 3
-            }, {
+            }),
+            new Attribute({
                 name: AttributeNames.Uv,
                 data: new Float32Array([
                     0, 1,
@@ -61,26 +63,27 @@ export class PlaneGeometry extends Geometry {
                     1, 0,
                 ]),
                 size: 2
-            }, {
+            }),
+            new Attribute({
                 name: AttributeNames.Normal,
                 data: new Float32Array(normals),
                 size: 3
-            },
+            }),
         ];
         
         if(calculateTangent) {
-            attributes.push({
+            attributes.push(new Attribute({
                 name: AttributeNames.Tangent,
                 data: new Float32Array(tangents),
                 size: 3
-            });
+            }));
         }
         if(calculateBinormal) {
-            attributes.push({
+            attributes.push(new Attribute({
                 name: AttributeNames.Binormal,
                 data: new Float32Array(binormals),
                 size: 3
-            });
+            }));
         }
         
         return {

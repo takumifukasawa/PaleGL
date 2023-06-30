@@ -12,7 +12,7 @@ import {GPU} from "./GPU.ts";
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
     private texture: WebGLTexture
-    private img: TexImageSource;
+    private img: TexImageSource | null;
     private gpu;
     type;
 
@@ -39,8 +39,10 @@ export class Texture extends GLObject {
                     wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge,
                     flipY = false,
                 }: {
+        // require
         gpu: GPU
-        img: TexImageSource,
+        // optional
+        img?: TexImageSource | null,
         type?: TextureType,
         width?: number,
         height?: number,

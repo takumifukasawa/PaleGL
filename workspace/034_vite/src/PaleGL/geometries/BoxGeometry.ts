@@ -1,6 +1,7 @@
 ﻿
-import {Geometry} from "./Geometry.js";
-import {AttributeNames} from "../constants.js";
+import {Geometry} from "./Geometry.ts";
+import {AttributeNames} from "../constants.ts";
+import {Attribute} from "../core/Attribute.ts";
 
 export class BoxGeometry extends Geometry {
     constructor({ gpu }) {
@@ -34,7 +35,7 @@ export class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                {
+                new Attribute({
                     name: AttributeNames.Position,
                     data: new Float32Array([
                         // front
@@ -51,7 +52,8 @@ export class BoxGeometry extends Geometry {
                         ...boxPosition_1, ...boxPosition_7, ...boxPosition_3, ...boxPosition_5,
                     ]),
                     size: 3,
-                }, {
+                }),
+                new Attribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array((new Array(6)).fill(0).map(() => ([
                         0, 1,
@@ -60,11 +62,12 @@ export class BoxGeometry extends Geometry {
                         1, 0,
                     ])).flat()),
                     size: 2
-                }, {
+                }),
+                new Attribute({
                     name: AttributeNames.Normal,
                     data: new Float32Array(normals.map((normal) => (new Array(4).fill(0).map(() => normal))).flat(2)),
                     size: 3
-                },
+                }),
             ],
             indices: Array.from(Array(6).keys()).map(i => ([
                 i * 4 + 0, i * 4 + 1, i * 4 + 2,

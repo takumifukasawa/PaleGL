@@ -1,15 +1,15 @@
-
 export class AbstractRenderTarget {
-    isSwappable; // bool
-    
-    constructor({ isSwappable = false } = {}) {
+    isSwappable: boolean; // bool
+
+    constructor({isSwappable = false}: { isSwappable: boolean } = {}) {
         this.isSwappable = isSwappable;
     }
-    
-    get read() {
+
+    get read(): AbstractRenderTarget {
         throw "[AbstractRenderTarget] should implementation 'read' getter";
     }
-    get write() {
+
+    get write(): AbstractRenderTarget {
         throw "[AbstractRenderTarget] should implementation 'write' getter";
     }
 }

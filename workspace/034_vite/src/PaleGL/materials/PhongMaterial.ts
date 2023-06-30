@@ -1,10 +1,10 @@
 
-import { Material } from "./Material.js";
+import { Material } from "./Material.ts";
 import {
     shadowMapFragmentFunc,
     shadowMapFragmentUniforms,
     shadowMapFragmentVaryings
-} from "../shaders/shadowMapShader.js";
+} from "../shaders/shadowMapShader.ts";
 import {
     alphaTestFragmentUniforms,
     alphaTestFragmentFunc,
@@ -12,10 +12,10 @@ import {
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
     phongSurfaceDirectionalLightFunc, normalMapVertexVaryings
-} from "../shaders/lightingCommon.js";
-import {UniformTypes} from "../constants.js";
-import {Vector2} from "../math/Vector2.js";
-import {Color} from "../math/Color.js";
+} from "../shaders/lightingCommon.ts";
+import {UniformTypes} from "../constants.ts";
+import {Vector2} from "../math/Vector2.ts";
+import {Color} from "../math/Color.ts";
 import {buildVertexShader} from "../shaders/buildShader.js";
 
 export class PhongMaterial extends Material {
@@ -153,7 +153,7 @@ export class PhongMaterial extends Material {
         vertexShaderModifier,
         attributeDescriptors,
         insertUniforms,
-    }) {
+    }): string {
         const shader = `#version 300 es
 
 #pragma attributes
@@ -233,7 +233,7 @@ void main() {
         return shader;
     }
     
-    generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }) {
+    generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }): string {
         return `#version 300 es
 
 precision mediump float;

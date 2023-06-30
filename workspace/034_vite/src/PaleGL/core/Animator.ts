@@ -1,34 +1,35 @@
+import {AnimationClip} from "./AnimationClip";
 
 export class Animator {
-    #animationClips;
-    #playingAnimationClip;
+    private _animationClips;
+    private playingAnimationClip;
     
     get animationClips() {
-        return this.#animationClips;
+        return this._animationClips;
     }
     
-    constructor(animationClips) {
-        this.#animationClips = animationClips || [];
+    constructor(animationClips: AnimationClip[] = []) {
+        this._animationClips = animationClips;
     }
     
     setAnimationClips(animationClips) {
-        this.#animationClips = animationClips;
+        this._animationClips = animationClips;
     }
     
     play(name) {
-        const animationClip = this.#animationClips.find(animationClip => name === animationClip.name);
+        const animationClip = this._animationClips.find(animationClip => name === animationClip.name);
         if(!animationClip) {
             return;
         }
         animationClip.play();
-        this.#playingAnimationClip = animationClip;
+        this.playingAnimationClip = animationClip;
     }
    
     // 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
     update(deltaTime) {
-        if(!this.#playingAnimationClip) {
+        if(!this.playingAnimationClip) {
             return;
         }
-        this.#playingAnimationClip.update(deltaTime);
+        this.playingAnimationClip.update(deltaTime);
     }
 }
