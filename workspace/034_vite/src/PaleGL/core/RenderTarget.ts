@@ -18,10 +18,10 @@ export class RenderTarget extends AbstractRenderTarget {
     width;
     height;
     type: RenderTargetType;
-    private framebuffer;
-    private depthRenderbuffer;
-    private texture;
-    private depthTexture;
+    private framebuffer: Framebuffer;
+    private depthRenderbuffer: Renderbuffer;
+    private texture: Texture | null = null;
+    private depthTexture: Texture | null = null;
     private gpu;
 
     get texture() {

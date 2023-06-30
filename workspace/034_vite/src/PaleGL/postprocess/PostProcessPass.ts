@@ -1,18 +1,23 @@
 ﻿import {PlaneGeometry} from "../geometries/PlaneGeometry.ts";
-import {Material} from "../materials/Material.ts";
+import {Material, Uniforms} from "../materials/Material.ts";
 import {RenderTarget} from "../core/RenderTarget.ts";
 import {Mesh} from "../actors/Mesh.ts";
 import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.ts";
-import {AbstractPostProcessPass} from "./AbstractPostProcessPass.ts";
+import {AbstractPostProcessPass, IPostProcessPass} from "./AbstractPostProcessPass.ts";
+import {Renderer} from "../core/Renderer.ts";
+import {GPU} from "../core/GPU.ts";
+import {Camera} from "../actors/Camera.ts";
 
 
-export class PostProcessPass extends AbstractPostProcessPass {
-    geometry;
-    material;
-    renderTarget;
-    mesh;
-    width;
-    height;
+// export class PostProcessPass extends AbstractPostProcessPass {
+export class PostProcessPass implements IPostProcessPass {
+    name: string;
+    geometry: PlaneGeometry;
+    material: Material;
+    renderTarget: RenderTarget
+    mesh: Mesh;
+    width: number = 1;
+    height: number = 1;
 
     static get baseVertexShader() {
         return `#version 300 es
@@ -29,8 +34,15 @@ void main() {
 `;
     }
 
-    constructor({gpu, vertexShader, fragmentShader, uniforms, name}) {
-        super({name});
+    constructor({gpu, vertexShader, fragmentShader, uniforms, name}: {
+        gpu: GPU,
+        vertexShader: string,
+        fragmentShader: string,
+        uniforms: Uniforms,
+        name: string
+    }) {
+        // super({name});
+        this.name = name;
 
         const baseVertexShader = PostProcessPass.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
@@ -64,13 +76,13 @@ void main() {
         });
     }
 
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
-    setRenderTarget(renderer, camera, isLastPass) {
+    setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
         if (isLastPass) {
             renderer.setRenderTarget(camera.renderTarget);
         } else {
@@ -79,7 +91,13 @@ void main() {
     }
 
     // TODO: rename "prevRenderTarget"
-    render({gpu, camera, renderer, prevRenderTarget, isLastPass}) {
+    render({gpu, camera, renderer, prevRenderTarget, isLastPass}: {
+        gpu: GPU,
+        camera: Camera,
+        renderer: Renderer,
+        prevRenderTarget: RenderTarget,
+        isLastPass: boolean
+    }) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
         // TODO: ppごとに変えられるのが正しい

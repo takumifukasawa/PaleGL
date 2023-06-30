@@ -1,22 +1,22 @@
 ﻿export class Color {
-    elements; // each 0~1
-    
+    elements: Float32Array = new Float32Array(4); // each 0~1
+
     get r() {
         return this.elements[0];
     }
-    
+
     get g() {
         return this.elements[1];
     }
-    
+
     get b() {
         return this.elements[2];
     }
-    
+
     get a() {
         return this.elements[3];
     }
-    
+
     get r255() {
         return this.elements[0] * 255;
     }
@@ -32,23 +32,23 @@
     get a255() {
         return this.elements[3] * 255;
     }
-    
+
     get rgbArray() {
         return [this.r, this.g, this.b];
     }
-    
+
     set a(value) {
         this.elements[3] = value;
     }
-    
-    constructor(r, g, b, a = 1) {
+
+    constructor(r: number, g: number, b: number, a: number = 1) {
         this.set(r, g, b, a);
     }
-    
-    set(r, g, b, a) {
+
+    set(r: number, g: number, b: number, a: number) {
         this.elements = new Float32Array([r, g, b, a]);
     }
-    
+
     getRGB() {
         return {
             r: this.r255,
@@ -56,7 +56,7 @@
             b: this.a255,
         }
     }
-    
+
     getHexCoord(withHash = true) {
         const rgb = this.getRGB();
         const r = rgb.r.toString(16);
@@ -67,25 +67,25 @@
         // console.log(rgb, str, this.r, this.g, this.b)
         return str;
     }
-    
+
     static white() {
         return new Color(1, 1, 1, 1);
     }
-    
+
     static black() {
         return new Color(0, 0, 0, 1);
     }
-    
+
     static green() {
         return new Color(0, 0, 1, 1);
     }
-    
-    static fromRGB(r, g, b, a = 255) {
+
+    static fromRGB(r: number, g: number, b: number, a: number = 255) {
         return new Color(r / 255, g / 255, b / 255, a / 255);
     }
-    
+
     // hex ... #rrggbb or rrggbb
-    static fromHex(hex) {
+    static fromHex(hex: string) {
         const coord = hex.slice(0, 1) === "#" ? hex.slice(1) : hex;
         const r = coord.slice(0, 2);
         const g = coord.slice(2, 4);

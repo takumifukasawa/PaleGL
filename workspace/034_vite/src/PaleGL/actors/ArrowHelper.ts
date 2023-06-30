@@ -5,6 +5,7 @@ import {Geometry} from "../geometries/Geometry.ts";
 import {AttributeNames, UniformNames} from "../constants.ts";
 import {GPU} from "../core/GPU.ts";
 import {Attribute} from "../core/Attribute.ts";
+import {Vector3} from "../math/Vector3.ts";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -220,7 +221,7 @@ export class ArrowHelper extends Mesh {
     //     this.transform.setTranslation(p);
     // }
 
-    setDirection(p) {
+    setDirection(p: Vector3) {
         this.transform.lookAt(p);
     }
 

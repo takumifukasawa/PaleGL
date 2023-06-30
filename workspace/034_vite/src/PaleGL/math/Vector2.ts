@@ -1,6 +1,8 @@
-﻿export class Vector2 {
-    elements;
-    
+﻿import {Vector3} from "./Vector3.ts";
+
+export class Vector2 {
+    elements: Float32Array = new Float32Array(2);
+
     get x() {
         return this.elements[0];
     }
@@ -17,11 +19,11 @@
         this.elements[1] = value;
     }
 
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         this.set(x, y);
     }
 
-    set(x, y) {
+    set(x: number, y: number) {
         this.elements = new Float32Array([x, y]);
         return this;
     }
@@ -37,18 +39,18 @@
     static get zero() {
         return new Vector2(0, 0);
     }
-    
-    static subVectors(v1, v2) {
+
+    static subVectors(v1: Vector3, v2: Vector3) {
         return new Vector2(v1.x - v2.x, v1.y - v2.y);
     }
-    
-    copy(v) {
+
+    copy(v: Vector3) {
         this.x = v.x;
         this.y = v.y;
         return this;
     }
-    
-    div(v) {
+
+    div(v: Vector3) {
         this.x /= v.x;
         this.y /= v.y;
         return this;
@@ -57,6 +59,6 @@
     log() {
         console.log(`--------------------
 ${this.x}, ${this.y}
---------------------`);       
+--------------------`);
     }
 }

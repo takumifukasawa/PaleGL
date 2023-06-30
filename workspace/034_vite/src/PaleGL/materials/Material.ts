@@ -12,11 +12,12 @@ import {Matrix4} from "../math/Matrix4.ts";
 import {Vector3} from "../math/Vector3.ts";
 import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.ts";
 import {GPU} from "../core/GPU.ts";
+import {Texture} from "../core/Texture.ts";
 
 // TODO: fix type
-type UniformValue = number | number[] | Vector3 | Vector3[] | Matrix4 | Matrix4[] | null;
+export type UniformValue = number | number[] | Vector3 | Vector3[] | Matrix4 | Matrix4[] | Texture | null;
 
-type VertexShaderModifier = {
+export type VertexShaderModifier = {
     "beginMain"?: string,
     "localPositionPostProcess"?: string,
     "worldPositionPostProcess"?: string,
@@ -25,13 +26,13 @@ type VertexShaderModifier = {
     "lastMain"?: string,
 }
 
-type VertexShaderGenerator = ({
-                                  attributeDescriptors,
-                                  isSkinning,
-                                  jointNum,
-                                  gpuSkinning,
-                                  isInstancing
-                              }: {
+export type VertexShaderGenerator = ({
+                                         attributeDescriptors,
+                                         isSkinning,
+                                         jointNum,
+                                         gpuSkinning,
+                                         isInstancing
+                                     }: {
     attributeDescriptors,
     isSkinning: boolean,
     jointNum: number | null,
@@ -40,11 +41,11 @@ type VertexShaderGenerator = ({
 
 }) => string;
 
-type FragmentShaderGenerator = ({attributeDescriptors}: { attributeDescriptors }) => string;
+export type FragmentShaderGenerator = ({attributeDescriptors}: { attributeDescriptors }) => string;
 
-type DepthFragmentShaderGenerator = () => string;
+export type DepthFragmentShaderGenerator = () => string;
 
-interface Uniforms {
+export interface Uniforms {
     [name: string]: {
         type: UniformType,
         value: UniformValue
@@ -150,13 +151,14 @@ export class Material {
                     depthUniforms = {}
                 }: {
                     // required
-       
+
                     gpu: GPU,
                     vertexShader: string,
                     fragmentShader: string,
-                    uniforms: Uniforms,
 
                     // optional
+
+                    uniforms?: Uniforms,
 
                     name?: string,
 
@@ -365,13 +367,7 @@ export class Material {
 // TODO:
 // - structみたいな深い階層もupdateができるようにしたい
 // - 'updateUniformValue'の方が良い??
-    updateUniform(name
-                      :
-                      string, value
-                      :
-                      UniformValue
-    ):
-        void {
+    updateUniform(name: string, value: UniformValue): void {
         if (!
             this.uniforms[name]
         ) {

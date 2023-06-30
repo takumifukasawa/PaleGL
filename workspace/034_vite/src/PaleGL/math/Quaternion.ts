@@ -1,6 +1,6 @@
 
 export class Quaternion {
-    elements;
+    elements: Float32Array = new Float32Array(4);
     
     get x () {
         return this.elements[0];
@@ -18,11 +18,11 @@ export class Quaternion {
         return this.elements[3];
     }
 
-    constructor(x, y, z, w) {
+    constructor(x: number, y: number, z: number, w: number) {
         this.set(x, y, z, w);
     }
     
-    set(x, y, z, w) {
+    set(x: number, y: number, z: number, w: number) {
         this.elements = new Float32Array([x, y, z, w]);
         return this;
     }

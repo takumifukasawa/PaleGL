@@ -1,7 +1,9 @@
-﻿export class Rotator {
+﻿import {Quaternion} from "./Quaternion.ts";
+
+export class Rotator {
     // x, y, z axes
     // 一旦そのままdegreeが入る想定
-    elements; 
+    elements: Float32Array = new Float32Array(3); 
    
     // degree
     get x() {
@@ -51,11 +53,11 @@
     }
 
     // degrees
-    constructor(x, y, z) {
+    constructor(x: number, y: number, z: number) {
         this.set(x, y, z);
     }
     
-    set(x, y, z) {
+    set(x: number, y: number, z: number) {
         this.elements = new Float32Array([x, y, z]);
         return this;
     }
@@ -64,8 +66,8 @@
         return new Rotator(0, 0, 0);
     }
     
-    static fromRadian(x, y, z) {
-        const rotator = new Rotator().set(
+    static fromRadian(x: number, y: number, z: number) {
+        const rotator = Rotator.zero.set(
             x * 180 / Math.PI,
             y * 180 / Math.PI,
             z * 180 / Math.PI,
@@ -73,20 +75,20 @@
         return rotator;
     }
     
-    static fromQuaternion(q) {
+    static fromQuaternion(q: Quaternion) {
         const euler = q.toEulerDegree();
         return new Rotator(euler.x, euler.y, euler.z);
     }
     
-    setRotationX(degree) {
+    setRotationX(degree: number) {
         this.elements[0] = degree;
     }
     
-    setRotationY(degree) {
+    setRotationY(degree: number) {
         this.elements[1] = degree;
     }
     
-    setRotationZ(degree) {
+    setRotationZ(degree: number) {
         this.elements[2] = degree;
     }
 }
