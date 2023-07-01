@@ -8,7 +8,7 @@ export class Stats {
     drawVertexCount = 0;
     drawCallCount = 0;
     
-    constructor(args: { wrapperElement: HTMLElement}) {
+    constructor(args: { wrapperElement?: HTMLElement} = {}) {
         const { wrapperElement } = args;
         this.domElement = document.createElement("div");
         this.domElement.style.cssText = `
@@ -38,6 +38,9 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 
     addDrawVertexCount(geometry: Geometry) {
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
+        if(!positionAttribute) {
+            return;
+        }
         this.drawVertexCount += positionAttribute.data.length / 3;
     }
     

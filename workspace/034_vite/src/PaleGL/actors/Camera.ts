@@ -1,31 +1,53 @@
 ﻿import {Actor} from "./Actor.ts";
 import {Matrix4} from "../math/Matrix4.ts";
 import {Vector4} from "../math/Vector4.ts";
-import {RenderTarget} from "./../core/RenderTarget.ts";
+// import {RenderTarget} from "./../core/RenderTarget.ts";
 import {
     ActorTypes,
     AttributeNames,
     AttributeUsageType,
-    BlendTypes,
+    BlendTypes, CameraType,
     PrimitiveTypes,
     UniformNames
 } from "../constants.ts";
-import {Vector3} from "../math/Vector3.ts";
+// import {Vector3} from "../math/Vector3.ts";
 import {Material} from "../materials/Material.ts";
 import {Geometry} from "../geometries/Geometry.ts";
 import {Mesh} from "./Mesh.ts";
 import {Attribute} from "../core/Attribute";
+import {RenderTarget} from "../core/RenderTarget.ts";
+// import {Color} from "../math/Color.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {PostProcess} from "../postprocess/PostProcess.ts";
+import {GPU} from "../core/GPU.ts";
+
+export const FrustumDirection = {
+    nearLeftTop: "nearLeftTop",
+    nearRightTop: "nearRightTop",
+    nearLeftBottom: "nearLeftBottom",
+    nearRightBottom: "nearRightBottom",
+    farLeftTop: "farLeftTop",
+    farRightTop: "farRightTop",
+    farLeftBottom: "farLeftBottom",
+    farRightBottom: "farRightBottom",
+} as const;
+export type FrustumDirectionType = typeof FrustumDirection[keyof typeof FrustumDirection];
+
+export type FrustumVectors = {
+    [key in FrustumDirectionType]: Vector3;
+};
 
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
     projectionMatrix = Matrix4.identity;
-    #renderTarget;
-    clearColor; // TODO: color class
-    #postProcess;
-    near;
-    far;
-    visibleFrustum = false;
-    #visibleFrustumMesh;
+    #renderTarget: RenderTarget | null = null;
+    clearColor: Vector4; // TODO: color class
+    #postProcess: PostProcess | null;
+    near: number = 1;
+    far: number = 10;
+    visibleFrustum: boolean = false;
+    #visibleFrustumMesh: Mesh | null = null;
+    cameraType: CameraType;
 
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
@@ -62,18 +84,24 @@ export class Camera extends Actor {
     get writeRenderTarget() {
         if (this.#renderTarget) {
             // for double buffer
-            return this.#renderTarget.isSwappable ? this.#renderTarget.write() : this.#renderTarget;
+            return this.#renderTarget.isSwappable ? this.#renderTarget.write : this.#renderTarget;
         }
         return null;
     }
 
-    constructor({clearColor, postProcess} = {}) {
+    // constructor({clearColor, postProcess}: { clearColor: Vector4, postProcess: PostProcess } = {}) {
+    constructor({cameraType, clearColor, postProcess}: {
+        cameraType: CameraType,
+        clearColor?: Vector4,
+        postProcess?: PostProcess
+    }) {
         super(ActorTypes.Camera);
+        this.cameraType = cameraType;
         this.clearColor = clearColor || new Vector4(0, 0, 0, 1);
-        this.#postProcess = postProcess;
+        this.#postProcess = postProcess || null;
     }
 
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         // if (!this.#postProcess) {
         //     return;
         // }
@@ -90,19 +118,19 @@ export class Camera extends Actor {
         }
     }
 
-    setPostProcess(postProcess) {
+    setPostProcess(postProcess: PostProcess) {
         this.#postProcess = postProcess;
     }
 
-    setClearColor(clearColor) {
+    setClearColor(clearColor: Vector4) {
         this.clearColor = clearColor;
     }
-    
-    update({ gpu }) {
-        
-        super.update({ gpu });
-        
-        if(this.visibleFrustum && !this.#visibleFrustumMesh) {
+
+    update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number }) {
+
+        super.update({gpu, time, deltaTime});
+
+        if (this.visibleFrustum && !this.#visibleFrustumMesh) {
             this.#visibleFrustumMesh = new Mesh({
                 geometry: new Geometry({
                     gpu,
@@ -164,8 +192,8 @@ export class Camera extends Actor {
             });
             this.addChild(this.#visibleFrustumMesh);
         }
-        
-        if(this.#visibleFrustumMesh) {
+
+        if (this.#visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
             this.#visibleFrustumMesh.geometry.updateAttribute(AttributeNames.Position, new Float32Array([
                 // near clip
@@ -187,15 +215,16 @@ export class Camera extends Actor {
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
     }
 
-    setRenderTarget(renderTarget) {
+    setRenderTarget(renderTarget: RenderTarget | null) {
         this.#renderTarget = renderTarget;
     }
 
+    // @ts-ignore
     #updateProjectionMatrix() {
         throw "should implementation";
     }
-    
-    getFrustumLocalPositions() {
+
+    getFrustumLocalPositions(): FrustumVectors {
         throw "should implementation";
     }
 

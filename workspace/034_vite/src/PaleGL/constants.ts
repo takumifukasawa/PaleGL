@@ -177,3 +177,21 @@ export const UniformNames = {
 } as const;
 
 export type UniformName = typeof UniformNames[keyof typeof UniformNames];
+
+export const CameraTypes = {
+    Perspective: "Perspective",
+    Orthographic: "Orthographic"
+} as const;
+
+export type CameraType = typeof CameraTypes[keyof typeof CameraTypes];
+
+export type GLColorAttachment =
+    36064 // gl.COLOR_ATTACHMENT0 + 0 
+    | 36065 // gl.COLOR_ATTACHMENT0 + 1
+    | 36066 // gl.COLOR_ATTACHMENT0 + 2
+    | 36067 // gl.COLOR_ATTACHMENT0 + 3
+    | 36068 // gl.COLOR_ATTACHMENT0 + 4
+    | 36069 // gl.COLOR_ATTACHMENT0 + 5
+    | 36070 // gl.COLOR_ATTACHMENT0 + 6
+    | 36071 // gl.COLOR_ATTACHMENT0 + 7
+ 

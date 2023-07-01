@@ -1,35 +1,41 @@
-﻿import {GLObject} from "./GLObject.js";
+﻿import {GLObject} from "./GLObject.ts";
+import {GLColorAttachment} from "../constants.ts";
+import {GPU} from "./GPU.ts";
 
 export class Framebuffer extends GLObject {
-    #framebuffer;
-    #drawBuffersList = [];
+    #framebuffer: WebGLFramebuffer;
+    #drawBuffersList: GLColorAttachment[] = [];
     #gpu;
-    
+
     get drawBufferList() {
         return this.#drawBuffersList;
     }
-    
+
     get glObject() {
         return this.#framebuffer;
     }
-    
+
     get hasMultipleDrawBuffers() {
         return this.#drawBuffersList.length >= 2;
     }
-   
-    registerDrawBuffer(drawBufferName) {
+
+    registerDrawBuffer(drawBufferName: GLColorAttachment) {
         this.#drawBuffersList.push(drawBufferName);
     }
-    
-    constructor({ gpu }) {
+
+    constructor({gpu}: { gpu: GPU }) {
         super();
-       
+
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
-        
-        this.#framebuffer = gl.createFramebuffer();
+
+        const fb = gl.createFramebuffer();
+        if (!fb) {
+            throw "invalid framebuffer";
+        }
+        this.#framebuffer = fb;
     }
-    
+
     bind() {
         const gl = this.#gpu.gl;
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.#framebuffer);

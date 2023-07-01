@@ -1,23 +1,22 @@
 
-import {RenderTarget} from "./RenderTarget.js";
-import {RenderTargetTypes} from "../constants.js";
+import {RenderTarget, RenderTargetOptions} from "./RenderTarget.ts";
+// import {RenderTargetTypes} from "../constants.ts";
 import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 export class DoubleBuffer extends AbstractRenderTarget {
-    #renderTargets = [];
+    #renderTargets: RenderTarget[] = [];
     
     currentReadIndex = 0;
     
-    constructor(renderTargetOptions) {
+    constructor(renderTargetOptions: RenderTargetOptions) {
         super({ isSwappable: true });
         for(let i = 0; i < 2; i++) {
-            this.#renderTargets.push(new RenderTarget(
-                { ...renderTargetOptions, ...({ name: `double-buffer_${i}` }) }
-            ));
+            const options: RenderTargetOptions = { ...renderTargetOptions, ...({ name: `double-buffer_${i}` }) };
+            this.#renderTargets.push(new RenderTarget(options));
         }
     }
     
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         this.#renderTargets.forEach(renderTarget => renderTarget.setSize(width, height));
     }
 

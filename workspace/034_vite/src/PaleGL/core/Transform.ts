@@ -2,20 +2,21 @@
 import {Matrix4} from "../math/Matrix4.js";
 import {ActorTypes} from "../constants.js";
 import {Rotator} from "../math/Rotator.js";
+import {Actor} from "../actors/Actor.ts";
 
 // TODO: 
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
 // - NodeBaseを継承
 export class Transform {
-    parent;
-    actor;
-    children = [];
-    #worldMatrix = Matrix4.identity;
-    #localMatrix = Matrix4.identity;
-    position = Vector3.zero;
-    rotation = Rotator.zero; // degree vector
-    scale = Vector3.one;
-    lookAtTarget = null; // world v
+    parent: Transform | null = null;
+    actor: Actor;
+    children: Transform[] = [];
+    #worldMatrix: Matrix4 = Matrix4.identity;
+    #localMatrix: Matrix4 = Matrix4.identity;
+    position: Vector3 = Vector3.zero;
+    rotation: Rotator = Rotator.zero; // degree vector
+    scale: Vector3 = Vector3.one;
+    lookAtTarget: Vector3 | null = null; // world v
 
     get childCount() {
         return this.children.length;
@@ -36,7 +37,7 @@ export class Transform {
     get worldPosition() {
         return this.#worldMatrix.position;
     }
-    
+
     get worldRight() {
         return new Vector3(this.#worldMatrix.m00, this.#worldMatrix.m10, this.#worldMatrix.m20).normalize();
     }
@@ -48,8 +49,12 @@ export class Transform {
     get worldForward() {
         return new Vector3(this.#worldMatrix.m02, this.#worldMatrix.m12, this.#worldMatrix.m22).normalize();
     }
+    
+    constructor(actor: Actor) {
+        this.actor = actor;
+    }
 
-    addChild(child) {
+    addChild(child: Transform) {
         this.children.push(child);
     }
 
@@ -80,27 +85,27 @@ export class Transform {
             : this.#localMatrix;
     }
 
-    setScaling(s) {
+    setScaling(s: Vector3) {
         this.scale = s;
     }
 
-    setRotationX(degree) {
+    setRotationX(degree: number) {
         this.rotation.setRotationX(degree);
     }
 
-    setRotationY(degree) {
+    setRotationY(degree: number) {
         this.rotation.setRotationY(degree);
     }
 
-    setRotationZ(degree) {
+    setRotationZ(degree: number) {
         this.rotation.setRotationZ(degree);
     }
 
-    setTranslation(v) {
+    setTranslation(v: Vector3) {
         this.position = v;
     }
 
-    lookAt(lookAtTarget) {
+    lookAt(lookAtTarget: Vector3) {
         this.lookAtTarget = lookAtTarget;
     }
 }

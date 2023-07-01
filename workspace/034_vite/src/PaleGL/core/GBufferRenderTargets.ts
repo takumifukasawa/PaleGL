@@ -1,23 +1,26 @@
-﻿import {Texture} from "./Texture.js";
-import {Framebuffer} from "./Framebuffer.js";
-import {Renderbuffer} from "./Renderbuffer.js";
-import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "./../constants.js";
-import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
+﻿import {Texture} from "./Texture.ts";
+import {Framebuffer} from "./Framebuffer.ts";
+// import {Renderbuffer} from "./Renderbuffer.ts";
+// import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "./../constants.ts";
+import {GLColorAttachment, TextureFilterTypes, TextureTypes} from "./../constants.ts";
+import {AbstractRenderTarget} from "./AbstractRenderTarget.ts";
+import {GPU} from "./GPU.ts";
 
 // NOTE:
 // renderer用
 export class GBufferRenderTargets extends AbstractRenderTarget {
-    name;
-    #framebuffer;
+    name: string;
+    #framebuffer: Framebuffer;
     // #depthRenderbuffer;
-    width;
-    height;
-    #textures = [];
-    #baseColorTexture;
-    #normalTexture;
-    #depthTexture;
-    type;
-    
+    width: number;
+    height: number;
+    #textures: Texture[] = [];
+    #baseColorTexture: Texture;
+    #normalTexture: Texture;
+    #depthTexture: Texture;
+
+    // type;
+
     get textures() {
         return this.#textures;
     }
@@ -25,7 +28,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     get baseColorTexture() {
         return this.#baseColorTexture;
     }
-    
+
     get normalTexture() {
         return this.#normalTexture;
     }
@@ -41,31 +44,31 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     get read() {
         return this;
     }
- 
+
     get write() {
         return this;
     }
 
     constructor({
-        gpu,
-        name,
-        // type = RenderTargetTypes.RGBA,
-        width = 1,
-        height = 1,
-        // useDepthBuffer = false,
-        // writeDepthTexture = false,
-        // mipmap = false,
-    }) {
+                    gpu,
+                    name,
+                    // type = RenderTargetTypes.RGBA,
+                    width = 1,
+                    height = 1,
+                    // useDepthBuffer = false,
+                    // writeDepthTexture = false,
+                    // mipmap = false,
+                }: { gpu: GPU, name: string, width: number, height: number }) {
         super();
-        
+
         const minFilter = TextureFilterTypes.Linear;
         const magFilter = TextureFilterTypes.Linear;
-        
+
         const gl = gpu.gl;
 
         this.name = name;
         // this.type = type;
-        
+
         this.width = width;
         this.height = height;
 
@@ -99,7 +102,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             0
         );
         this.#textures.push(this.#baseColorTexture);
-        this.framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0 + 0);
+        this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 0) as GLColorAttachment);
 
         // 2: normal
         this.#normalTexture = new Texture({
@@ -118,7 +121,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             this.#normalTexture.glObject,
             0
         );
-        this.framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0 + 1);
+        this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 1) as GLColorAttachment);
 
         this.#textures.push(this.#normalTexture);
 
@@ -142,12 +145,12 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             gl.TEXTURE_2D,
             this.#depthTexture.glObject,
             0
-        );                      
-    
+        );
+
         // if(this.#depthTexture && this.#depthRenderbuffer) {
         //     throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
         // }
-       
+
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
         // if (this.#depthRenderbuffer) {
@@ -158,11 +161,11 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         // Framebuffer.unbind();
     }
 
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
         this.#textures.forEach(texture => texture.setSize(this.width, this.height));
-        if(this.#depthTexture) {
+        if (this.#depthTexture) {
             this.#depthTexture.setSize(this.width, this.height);
         }
         // if (this.#depthRenderbuffer) {
