@@ -1,7 +1,7 @@
-﻿import {Actor} from "./Actor.js";
-import {Matrix4} from "../math/Matrix4.js";
-import {Vector4} from "../math/Vector4.js";
-import {RenderTarget} from "./../core/RenderTarget.js";
+﻿import {Actor} from "./Actor.ts";
+import {Matrix4} from "../math/Matrix4.ts";
+import {Vector4} from "../math/Vector4.ts";
+import {RenderTarget} from "./../core/RenderTarget.ts";
 import {
     ActorTypes,
     AttributeNames,
@@ -9,11 +9,12 @@ import {
     BlendTypes,
     PrimitiveTypes,
     UniformNames
-} from "../constants.js";
-import {Vector3} from "../math/Vector3.js";
-import {Material} from "../materials/Material.js";
-import {Geometry} from "../geometries/Geometry.js";
-import {Mesh} from "./Mesh.js";
+} from "../constants.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {Material} from "../materials/Material.ts";
+import {Geometry} from "../geometries/Geometry.ts";
+import {Mesh} from "./Mesh.ts";
+import {Attribute} from "../core/Attribute";
 
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
@@ -106,12 +107,12 @@ export class Camera extends Actor {
                 geometry: new Geometry({
                     gpu,
                     attributes: [
-                        {
+                        new Attribute({
                             name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
                             usageType: AttributeUsageType.DynamicDraw
-                        },
+                        }),
                     ],
                     drawCount: 2 * 12,
                     indices: [

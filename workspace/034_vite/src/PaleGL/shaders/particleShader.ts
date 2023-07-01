@@ -1,5 +1,5 @@
 ﻿
-export const billboardVertexShader = () => `#version 300 es
+export const billboardVertexShader: () => string = () => `#version 300 es
 
 uniform float uSize;
 

@@ -1,4 +1,4 @@
-import {Vector2} from "../math/Vector2.js";
+import {Vector2} from "../math/Vector2.ts";
 
 export class AbstractInputController {
     #beforeInputPosition = Vector2.zero;
@@ -10,8 +10,8 @@ export class AbstractInputController {
     #isDown = false;
     #isReleased = false;
     
-    #width;
-    #height;
+    #width: number;
+    #height: number;
     
     get isUp() {
         return !this.#isDown;

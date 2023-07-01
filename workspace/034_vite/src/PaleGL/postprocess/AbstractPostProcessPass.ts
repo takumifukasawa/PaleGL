@@ -3,21 +3,24 @@ import {Camera} from "../actors/Camera.ts";
 import {GPU} from "../core/GPU.ts";
 import {RenderTarget} from "../core/RenderTarget.ts";
 
+export type PostProcessRenderArgs = {
+    gpu: GPU,
+    camera: Camera,
+    renderer: Renderer,
+    prevRenderTarget: RenderTarget,
+    isLastPass: boolean
+}
+
 export interface IPostProcessPass {
     gpu: GPU;
     name: string;
     enabled: boolean;
     width: number;
     height: number;
+
     setSize: (width: number, height: number) => void;
     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
-    render: ({gpu, camera, renderer, prevRenderTarget, isLastPass}: {
-        gpu: GPU,
-        camera: Camera,
-        renderer: Renderer,
-        prevRenderTarget: RenderTarget,
-        isLastPass: boolean
-    }) => void;
+    render: ({gpu, camera, renderer, prevRenderTarget, isLastPass}: PostProcessRenderArgs) => void;
 }
 
 // export abstract class AbstractPostProcessPass implements IPostProcessPass {

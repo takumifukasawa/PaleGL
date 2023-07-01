@@ -13,9 +13,10 @@ import {Vector3} from "../math/Vector3.ts";
 import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.ts";
 import {GPU} from "../core/GPU.ts";
 import {Texture} from "../core/Texture.ts";
+import {AttributeDescriptor} from "../core/Attribute";
 
 // TODO: fix type
-export type UniformValue = number | number[] | Vector3 | Vector3[] | Matrix4 | Matrix4[] | Texture | null;
+export type UniformValue = number | number[] | Vector3 | Vector3[] | Matrix4 | Matrix4[] | Texture | Float32Array | null;
 
 export type VertexShaderModifier = {
     "beginMain"?: string,
@@ -323,7 +324,7 @@ export class Material {
         this.depthUniforms = {...commonUniforms, ...depthUniforms};
     }
 
-    start({gpu, attributeDescriptors})
+    start({gpu, attributeDescriptors}: {gpu: GPU, attributeDescriptors?: AttributeDescriptor[] })
         :
         void {
         // for debug

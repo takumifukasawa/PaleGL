@@ -1,5 +1,13 @@
 ﻿import {AttributeUsageType} from "../constants.ts";
 
+export type AttributeDescriptor = {
+    location: number,
+    size: number,
+    name: string,
+    // dataType: Float32Array | Uint16Array
+    dataType: Function
+}
+
 export class Attribute {
     name: string;
     data: Float32Array; // data
@@ -35,7 +43,7 @@ export class Attribute {
         this.divisor = divisor;
     }
 
-    getDescriptor() {
+    getDescriptor(): AttributeDescriptor {
         return {
             name: this.name,
             location: this.location,

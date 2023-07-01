@@ -8,7 +8,9 @@
 
 const pragmaRegex = /^#pragma(.*)/;
 
-import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader.js";
+
+
+import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader.ts";
 
 export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
@@ -134,7 +136,7 @@ out vec3 vBinormal;
                 
             case "uniform_skinning":
                 const jointNum = pragmas[1];
-                newLines.push(skinningVertexUniforms());
+                newLines.push(skinningVertexUniforms(jointNum));
                 break;
                 
             case "vertex_normal_map":

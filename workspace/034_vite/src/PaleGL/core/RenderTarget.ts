@@ -58,9 +58,9 @@ export class RenderTarget extends AbstractRenderTarget {
     }: {
         // require
         gpu: GPU,
-        width: number,
-        height: number,
         // optional
+        width?: number,
+        height?: number,
         name?: string,
         type?: RenderTargetType,
         useDepthBuffer?: boolean,

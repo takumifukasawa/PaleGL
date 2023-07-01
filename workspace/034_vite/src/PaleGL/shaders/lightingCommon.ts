@@ -1,5 +1,5 @@
 
-export const alphaTestFragmentFunc = () => `
+export const alphaTestFragmentFunc: () => string = () => `
 void checkAlphaTest(float value, float threshold) {
     if(value < threshold) {
         discard;
@@ -7,26 +7,26 @@ void checkAlphaTest(float value, float threshold) {
 }
 `;
 
-export const alphaTestFragmentUniforms = () => `
+export const alphaTestFragmentUniforms: () => string = () => `
 uniform float uAlphaTestThreshold;
 `;
 
-export const normalMapVertexVaryings = () => `
+export const normalMapVertexVaryings: () => string = () => `
 out vec3 vTangent;
 out vec3 vBinormal;
 `;
 
-export const normalMapFragmentVarying = () => `
+export const normalMapFragmentVarying: () => string = () => `
 in vec3 vTangent;
 in vec3 vBinormal;
 `;
 
-export const normalMapFragmentUniforms = () => `
+export const normalMapFragmentUniforms: () => string = () => `
 uniform sampler2D uNormalMap;
 uniform float uNormalStrength;
 `;
 
-export const normalMapFragmentFunc = () => `
+export const normalMapFragmentFunc: () => string = () => `
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
     vec3 n = normalize(normal);
     vec3 t = normalize(tangent);
@@ -45,7 +45,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 }
 `
 
-export const directionalLightFragmentUniforms = () => `
+export const directionalLightFragmentUniforms: () => string = () => `
 struct DirectionalLight {
     vec3 direction;
     float intensity;
@@ -54,7 +54,7 @@ struct DirectionalLight {
 uniform DirectionalLight uDirectionalLight;
 `;
 
-export const phongSurfaceDirectionalLightFunc = () => `
+export const phongSurfaceDirectionalLightFunc: () => string = () => `
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
     vec3 L = normalize(directionalLight.direction);
@@ -92,7 +92,7 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
 }
 `;
 
-export const phongLightingFunc = () => `
+export const phongLightingFunc: () => string = () => `
 vec4 calcPhongLighting() {
     // vec3 N = normalize(vNormal);
     vec3 N = normalize(worldNormal);

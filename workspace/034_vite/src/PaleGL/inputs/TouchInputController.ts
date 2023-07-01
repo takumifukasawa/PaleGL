@@ -1,5 +1,5 @@
-import {AbstractInputController} from "./AbstractInputController.js";
-import {Vector2} from "../math/Vector2.js";
+import {AbstractInputController} from "./AbstractInputController.ts";
+import {Vector2} from "../math/Vector2.ts";
 
 export class TouchInputController extends AbstractInputController {
     #tmpIsDown = false;

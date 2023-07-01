@@ -13,7 +13,7 @@ function fillFunc<T>(arr: T[], value: T): T[] {
     // return arr;
 }
 
-function matonWrapper<T>(obj: T[]): T {
+function matonWrapper<T>(obj: T[]): {value: () => T, fill: () => T[]} {
     let tmp: T[];
 
     tmp = obj;

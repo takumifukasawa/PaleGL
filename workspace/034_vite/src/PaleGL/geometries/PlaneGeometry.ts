@@ -3,12 +3,17 @@ import {Geometry} from "./Geometry.ts";
 import {Vector3} from "../math/Vector3.ts";
 import {AttributeNames} from "../constants.ts";
 import {Attribute} from "../core/Attribute.ts";
+import {GPU} from "../core/GPU";
 
 export class PlaneGeometry extends Geometry {
     constructor({
         gpu,
         calculateTangent = false,
         calculateBinormal = false 
+    }: {
+        gpu: GPU,
+        calculateTangent?: boolean,
+        calculateBinormal?: boolean
     }) {
         const { attributes, indices, drawCount } = PlaneGeometry.createPlaneGeometryData({ calculateTangent, calculateBinormal });
 

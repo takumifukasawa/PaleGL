@@ -1,5 +1,4 @@
-
-import { Material } from "./Material.ts";
+import {Material, VertexShaderModifier} from "./Material.ts";
 import {
     shadowMapFragmentFunc,
     shadowMapFragmentUniforms,
@@ -17,26 +16,28 @@ import {UniformTypes} from "../constants.ts";
 import {Vector2} from "../math/Vector2.ts";
 import {Color} from "../math/Color.ts";
 import {buildVertexShader} from "../shaders/buildShader.js";
+import {AttributeDescriptor} from "../core/Attribute";
+import {GPU} from "../core/GPU";
 
 export class PhongMaterial extends Material {
     // // params
     // diffuseColor;
     // specularAmount;
-    
+
     constructor({
-        diffuseColor,
-        diffuseMap,
-        diffuseMapUvScale, // vec2
-        diffuseMapUvOffset, // vec2
-        specularAmount,
-        normalMap,
-        normalMapUvScale, // vec2
-        normalMapUvOffset, // vec2,
-        // TODO: 外部化
-        vertexShaderModifier = {},
-        uniforms = {},
-        ...options
-    }) {
+                    diffuseColor,
+                    diffuseMap,
+                    diffuseMapUvScale, // vec2
+                    diffuseMapUvOffset, // vec2
+                    specularAmount,
+                    normalMap,
+                    normalMapUvScale, // vec2
+                    normalMapUvOffset, // vec2,
+                    // TODO: 外部化
+                    vertexShaderModifier = {},
+                    uniforms = {},
+                    ...options
+                }) {
         // this.specularAmount = 
 
         const baseUniforms = {
@@ -77,10 +78,10 @@ export class PhongMaterial extends Material {
                 value: {}
             }
         };
-       
+
         const mergedUniforms = {
             ...baseUniforms,
-            ...(uniforms ?  uniforms : {})
+            ...(uniforms ? uniforms : {})
         };
 
         const depthUniforms = {
@@ -112,8 +113,8 @@ export class PhongMaterial extends Material {
             useNormalMap: !!normalMap
         });
     }
-    
-    start(options) {
+
+    start({gpu, attributeDescriptors}: { gpu: GPU, attributeDescriptors?: AttributeDescriptor[] }) {
         this.vertexShader = this.generateVertexShader({
             isSkinning: this.isSkinning,
             gpuSkinning: this.gpuSkinning,
@@ -124,7 +125,7 @@ export class PhongMaterial extends Material {
             useVertexColor: this.useVertexColor,
             // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
             vertexShaderModifier: this.vertexShaderModifier,
-            attributeDescriptors: options.attributeDescriptors
+            attributeDescriptors: attributeDescriptors
         });
 
         this.fragmentShader = this.generateFragmentShader({
@@ -138,21 +139,32 @@ export class PhongMaterial extends Material {
             alphaTest: this.alphaTest,
             useVertexColor: this.useVertexColor
         });
-        
-        super.start(options);
+
+        super.start({gpu, attributeDescriptors});
     }
 
     generateVertexShader({
-        isSkinning,
-        gpuSkinning,
-        jointNum,
-        receiveShadow,
-        useNormalMap,
-        isInstancing,
-        useVertexColor,
-        vertexShaderModifier,
-        attributeDescriptors,
-        insertUniforms,
+                             isSkinning,
+                             gpuSkinning,
+                             jointNum,
+                             receiveShadow,
+                             useNormalMap,
+                             isInstancing,
+                             useVertexColor,
+                             vertexShaderModifier,
+                             attributeDescriptors,
+                             insertUniforms,
+                         }: {
+        isSkinning: boolean,
+        gpuSkinning: boolean,
+        jointNum: number | null,
+        receiveShadow: boolean,
+        useNormalMap: boolean,
+        isInstancing: boolean,
+        useVertexColor: boolean,
+        vertexShaderModifier: VertexShaderModifier,
+        attributeDescriptors: AttributeDescriptor[],
+        insertUniforms?: string,
     }): string {
         const shader = `#version 300 es
 
@@ -163,13 +175,13 @@ out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
 ${useNormalMap ? "#pragma varying_normal_map" : ""}
-${receiveShadow ? "#pragma varying_receive_shadow" : "" }
+${receiveShadow ? "#pragma varying_receive_shadow" : ""}
 ${useVertexColor ? "#pragma varying_vertex_color" : ""}
 
 // uniforms
 #pragma uniform_transform_vertex
 #pragma uniform_engine
-${receiveShadow ? "#pragma uniform_receive_shadow" : "" }
+${receiveShadow ? "#pragma uniform_receive_shadow" : ""}
 
 ${isSkinning ? "#pragma function_skinning" : ""}
 
@@ -180,17 +192,17 @@ void main() {
     ${vertexShaderModifier.beginMain || ""}
 
     ${isSkinning
-        ? `
+            ? `
     #pragma vertex_skinning gpu
-`       : ""
-    }
+` : ""
+        }
 
     vec4 localPosition = vec4(aPosition, 1.);
     ${isSkinning
-        ? `
+            ? `
     localPosition = skinMatrix * localPosition;`
-        : ""
-    }
+            : ""
+        }
     ${vertexShaderModifier.localPositionPostProcess || ""}
 
     ${useNormalMap
@@ -232,8 +244,8 @@ void main() {
 
         return shader;
     }
-    
-    generateFragmentShader({ receiveShadow, useNormalMap, alphaTest, useVertexColor }): string {
+
+    generateFragmentShader({receiveShadow, useNormalMap, alphaTest, useVertexColor}): string {
         return `#version 300 es
 
 precision mediump float;
@@ -283,25 +295,25 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     ${useNormalMap
-        ? `
+            ? `
     vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
 `
-        : `
+            : `
     vec3 worldNormal = normalize(vNormal);
 `
-    }
+        }
 
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
     ${useVertexColor
-        ? `
+            ? `
     surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
 `
-        : `
+            : `
     surface.diffuseColor = uDiffuseColor * diffuseMapColor;
 `
-    }
+        }
     surface.specularAmount = uSpecularAmount;
 
     Camera camera;
@@ -313,20 +325,20 @@ void main() {
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
    
     ${receiveShadow
-        ? `
+            ? `
     // TODO: apply shadow の中に入れても良さそう
     if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
         resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
     }
 `
-        : ""
-    }
+            : ""
+        }
     ${alphaTest
-        ? `
+            ? `
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 `
-        : ""
-    }
+            : ""
+        }
 
     // correct
     outBaseColor = resultColor;
@@ -339,7 +351,7 @@ void main() {
 `;
     }
 
-    generateDepthFragmentShader({ alphaTest, useVertexColor }) {
+    generateDepthFragmentShader({alphaTest, useVertexColor}) {
         return `#version 300 es
 
 precision mediump float;
@@ -362,26 +374,26 @@ void main() {
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
    
     ${useVertexColor
-        ? `
+            ? `
     vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
 `
-        : `
+            : `
     vec4 diffuseColor = uColor * diffuseMapColor;
 `
-    }
+        }
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
     ${alphaTest
-        ? `
+            ? `
     checkAlphaTest(alpha, uAlphaTestThreshold);
 `
-        : ""
-    }
+            : ""
+        }
 
     outColor = vec4(1., 1., 1., 1.);
 }
 `;
     }
-    
+
 }

@@ -3,7 +3,7 @@ import {Material, Uniforms} from "../materials/Material.ts";
 import {RenderTarget} from "../core/RenderTarget.ts";
 import {Mesh} from "../actors/Mesh.ts";
 import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.ts";
-import {AbstractPostProcessPass, IPostProcessPass} from "./AbstractPostProcessPass.ts";
+import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
 import {Renderer} from "../core/Renderer.ts";
 import {GPU} from "../core/GPU.ts";
 import {Camera} from "../actors/Camera.ts";
@@ -11,13 +11,16 @@ import {Camera} from "../actors/Camera.ts";
 
 // export class PostProcessPass extends AbstractPostProcessPass {
 export class PostProcessPass implements IPostProcessPass {
+    protected gpu: GPU;
     name: string;
+    enabled: boolean;
+    width: number = 1;
+    height: number = 1;
+
+    mesh: Mesh;
     geometry: PlaneGeometry;
     material: Material;
     renderTarget: RenderTarget
-    mesh: Mesh;
-    width: number = 1;
-    height: number = 1;
 
     static get baseVertexShader() {
         return `#version 300 es
@@ -36,10 +39,10 @@ void main() {
 
     constructor({gpu, vertexShader, fragmentShader, uniforms, name}: {
         gpu: GPU,
-        vertexShader: string,
+        vertexShader?: string,
         fragmentShader: string,
-        uniforms: Uniforms,
-        name: string
+        uniforms?: Uniforms,
+        name?: string
     }) {
         // super({name});
         this.name = name;

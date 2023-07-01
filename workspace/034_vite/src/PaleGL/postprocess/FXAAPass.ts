@@ -1,5 +1,7 @@
-﻿import {PostProcessPass} from "./PostProcessPass.js";
-import {UniformTypes,UniformNames} from "../constants.js";
+﻿import {PostProcessPass} from "./PostProcessPass.ts";
+import {UniformTypes,UniformNames} from "../constants.ts";
+import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
+import {GPU} from "../core/GPU";
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
@@ -8,8 +10,10 @@ import {UniformTypes,UniformNames} from "../constants.js";
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
 export class FXAAPass extends PostProcessPass {
+// export class FXAAPass implements IPostProcessPass {
+   
     get gpu() {
-        return this._gpu;
+        return this.gpu;
     }
     constructor({ gpu }) {
         // # high quality
@@ -429,7 +433,7 @@ void main() {
                 }
             }
         });
-        this._gpu = gpu;
+        this.gpu = gpu;
     }
     
     setSize(width, height) {

@@ -1,8 +1,9 @@
-﻿import {Mesh} from "./Mesh.js";
-import {Material} from "../materials/Material.js";
-import {parseObj} from "../loaders/loadObj.js";
-import {Geometry} from "../geometries/Geometry.js";
-import {AttributeNames, UniformNames} from "../constants.js";
+﻿import {Mesh} from "./Mesh.ts";
+import {Material} from "../materials/Material.ts";
+import {parseObj} from "../loaders/loadObj.ts";
+import {Geometry} from "../geometries/Geometry.ts";
+import {AttributeNames, UniformNames} from "../constants.ts";
+import {Attribute} from "../core/Attribute";
 
 const axesHelperGeometryData = `
 # Blender 3.3.1
@@ -166,15 +167,16 @@ export class AxesHelper extends Mesh {
         const geometry = new Geometry({
             gpu,
             attributes: [
-                {
+                new Attribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(objData.positions),
                     size: 3
-                }, {
+                }),
+                new Attribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(objData.uvs),
                     size: 2
-                }
+                })
             ],
             indices: objData.indices,
             drawCount: objData.indices.length

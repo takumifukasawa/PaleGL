@@ -1,6 +1,6 @@
-import {UniformNames} from "../constants.js";
+import {UniformNames} from "../constants.ts";
 
-export const calcSkinningMatrixFunc = () => `
+export const calcSkinningMatrixFunc: () => string = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
          jointMat0 * aBoneWeights.x +
@@ -58,7 +58,7 @@ mat4 getJointMatrixGPUSkinning(
 }
 `;
 
-export const skinningVertexUniforms = (jointNum) => `
+export const skinningVertexUniforms: (jointNum: string) => string = (jointNum) => `
 // tmp for cpu skinning
 // uniform mat4[${jointNum}] uJointMatrices;
 uniform sampler2D ${UniformNames.JointTexture};
@@ -68,7 +68,7 @@ uniform int uJointTextureColNum;
 uniform int uTotalFrameCount;
 `;
 
-export const skinningVertex = (gpuSkinning = false) => `
+export const skinningVertex: (gpuSkinning: boolean) => string = (gpuSkinning = false) => `
     // tmp: for cpu skinning
     // mat4 skinMatrix = calcSkinningMatrix(
     //     uJointMatrices[int(aBoneIndices[0])],

@@ -1,27 +1,27 @@
-import {UniformNames} from "../constants.js";
+import {UniformNames} from "../constants.ts";
 
-export const shadowMapVertexVaryings = () => `
+export const shadowMapVertexVaryings: () => string = () => `
 out vec4 vShadowMapProjectionUv;
 `;
 
-export const shadowMapFragmentVaryings = () => `
+export const shadowMapFragmentVaryings: () => string = () => `
 in vec4 vShadowMapProjectionUv;
 `;
 
-export const shadowMapVertex = () => `
+export const shadowMapVertex: () => string = () => `
     vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
 `;
 
-export const shadowMapVertexUniforms = () => `
+export const shadowMapVertexUniforms: () => string = () => `
 uniform mat4 ${UniformNames.ShadowMapProjectionMatrix};
 `;
 
-export const shadowMapFragmentUniforms = () => `
+export const shadowMapFragmentUniforms: () => string = () => `
 uniform sampler2D ${UniformNames.ShadowMap};
 uniform float ${UniformNames.ShadowBias};
 `;
 
-export const shadowMapFragmentFunc = () => `
+export const shadowMapFragmentFunc: () => string = () => `
 vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
     vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
     vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
