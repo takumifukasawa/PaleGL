@@ -162,7 +162,7 @@ export class Camera extends Actor {
                     ]
                 }),
                 material: new Material({
-                    gpu,
+                    // gpu,
                     vertexShader: `#version 300 es
                     
                     layout (location = 0) in vec3 ${AttributeNames.Position};
@@ -190,7 +190,7 @@ export class Camera extends Actor {
                     depthWrite: false
                 })
             });
-            this.addChild(this.#visibleFrustumMesh);
+            this.addChild(this.#visibleFrustumMesh as Actor);
         }
 
         if (this.#visibleFrustumMesh) {
