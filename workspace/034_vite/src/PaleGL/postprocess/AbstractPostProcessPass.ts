@@ -1,7 +1,7 @@
-﻿import {Renderer} from "../core/Renderer.ts";
-import {Camera} from "../actors/Camera.ts";
-import {GPU} from "../core/GPU.ts";
-import {RenderTarget} from "../core/RenderTarget.ts";
+﻿import {Renderer} from "../core/Renderer";
+import {Camera} from "../actors/Camera";
+import {GPU} from "../core/GPU";
+import {RenderTarget} from "../core/RenderTarget";
 
 export type PostProcessRenderArgs = {
     gpu: GPU,

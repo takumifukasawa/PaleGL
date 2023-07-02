@@ -1,5 +1,5 @@
 ﻿import {GLObject} from "./GLObject.js";
-import {GPU} from "./GPU.ts";
+import {GPU} from "./GPU";
 
 export class IndexBufferObject extends GLObject {
     private ibo;

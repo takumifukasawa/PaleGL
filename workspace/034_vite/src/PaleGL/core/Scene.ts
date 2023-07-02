@@ -1,5 +1,5 @@
-﻿import {Actor} from "../actors/Actor.ts";
-import {Transform} from "./Transform.ts";
+﻿import {Actor} from "../actors/Actor";
+import {Transform} from "./Transform";
 
 type TraverseFunc = (actor: Actor) => void;
 

@@ -1,9 +1,9 @@
 ﻿import {PostProcessPass} from "./PostProcessPass.js";
-import {UniformNames, UniformTypes} from "../constants.ts";
-import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass.ts";
-import {FragmentPass} from "./FragmentPass.ts";
-import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader.ts";
-import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities.ts";
+import {UniformNames, UniformTypes} from "../constants";
+import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass";
+import {FragmentPass} from "./FragmentPass";
+import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader";
+import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities";
 import {GPU} from "../core/GPU";
 import {Renderer} from "../core/Renderer";
 import {Camera} from "../actors/Camera";

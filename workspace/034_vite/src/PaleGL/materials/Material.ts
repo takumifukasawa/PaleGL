@@ -1,4 +1,4 @@
-﻿import {Shader} from "./../core/Shader.ts";
+﻿import {Shader} from "./../core/Shader";
 import {
     BlendTypes,
     UniformTypes,
@@ -7,17 +7,65 @@ import {
     FaceSide,
     UniformNames,
     PrimitiveType, BlendType, RenderQueue, UniformType
-} from "./../constants.ts";
-import {Matrix4} from "../math/Matrix4.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader.ts";
-import {GPU} from "../core/GPU.ts";
-import {Texture} from "../core/Texture.ts";
-import {AttributeDescriptor} from "../core/Attribute.ts";
-import {CubeMap} from "../core/CubeMap.ts";
-import {Vector2} from "../math/Vector2.ts";
-import {Color} from "../math/Color.ts";
-import {DirectionalLightStruct} from "../shaders/lightingCommon.ts";
+} from "./../constants";
+import {Matrix4} from "../math/Matrix4";
+import {Vector3} from "../math/Vector3";
+import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader";
+import {GPU} from "../core/GPU";
+import {Texture} from "../core/Texture";
+import {AttributeDescriptor} from "../core/Attribute";
+import {CubeMap} from "../core/CubeMap";
+import {Vector2} from "../math/Vector2";
+import {Color} from "../math/Color";
+import {DirectionalLightStruct} from "../shaders/lightingCommon";
+
+export type MaterialArgs = {
+    // required
+
+    // gpu: GPU,
+    // TODO: required じゃなくて大丈夫??
+    vertexShader?: string,
+    fragmentShader?: string,
+
+    // optional
+
+    uniforms?: Uniforms,
+
+    name?: string,
+
+    depthFragmentShader?: string,
+
+    vertexShaderGenerator?: VertexShaderGenerator,
+    fragmentShaderGenerator?: FragmentShaderGenerator,
+    depthFragmentShaderGenerator?: DepthFragmentShaderGenerator,
+
+    vertexShaderModifier?: VertexShaderModifier,
+
+    primitiveType?: PrimitiveType,
+    depthTest?: boolean | null,
+    depthWrite?: boolean | null,
+    alphaTest?: number | null,
+    faceSide?: FaceSide,
+    receiveShadow?: boolean,
+    blendType?: BlendType,
+    renderQueue?: RenderQueue,
+
+    useNormalMap?: boolean | null,
+
+    // skinning
+    isSkinning?: boolean | null,
+    gpuSkinning?: boolean | null,
+    jointNum?: number | null,
+
+    // instancing
+    isInstancing?: boolean,
+
+    // vertex color 
+    useVertexColor?: boolean,
+
+    queue?: RenderQueue,
+    depthUniforms?: Uniforms
+};
 
 // TODO: fix type
 export type UniformValue =
@@ -47,7 +95,7 @@ export type VertexShaderModifier = {
 }
 
 export type VertexShaderGenerator = ({
-                                         attributeDescriptors = [],
+                                         attributeDescriptors,
                                          isSkinning,
                                          jointNum,
                                          gpuSkinning,
@@ -61,7 +109,7 @@ export type VertexShaderGenerator = ({
 
 }) => string;
 
-export type FragmentShaderGenerator = ({attributeDescriptors = []}: {
+export type FragmentShaderGenerator = ({attributeDescriptors}: {
     attributeDescriptors?: AttributeDescriptor[]
 }) => string;
 
@@ -175,64 +223,18 @@ export class Material {
                     queue,
                     uniforms = {},
                     depthUniforms = {}
-                }: {
-                    // required
-
-                    // gpu: GPU,
-                    // TODO: required じゃなくて大丈夫??
-                    vertexShader?: string,
-                    fragmentShader?: string,
-
-                    // optional
-
-                    uniforms?: Uniforms,
-
-                    name?: string,
-
-                    depthFragmentShader?: string,
-
-                    vertexShaderGenerator?: VertexShaderGenerator,
-                    fragmentShaderGenerator?: FragmentShaderGenerator,
-                    depthFragmentShaderGenerator?: DepthFragmentShaderGenerator,
-
-                    vertexShaderModifier?: VertexShaderModifier,
-
-                    primitiveType?: PrimitiveType,
-                    depthTest?: boolean | null,
-                    depthWrite?: boolean | null,
-                    alphaTest?: number | null,
-                    faceSide?: FaceSide,
-                    receiveShadow?: boolean,
-                    blendType?: BlendType,
-                    renderQueue?: RenderQueue,
-
-                    useNormalMap?: boolean | null,
-
-                    // skinning
-                    isSkinning?: boolean | null,
-                    gpuSkinning?: boolean | null,
-                    jointNum?: number | null,
-
-                    // instancing
-                    isInstancing?: boolean,
-
-                    // vertex color 
-                    useVertexColor?: boolean,
-
-                    queue?: RenderQueue,
-                    depthUniforms?: Uniforms
-                }
+                }: MaterialArgs
     ) {
-        this.name = name;
+        this.name = name || "";
 
         // 外側から任意のタイミングでcompileした方が都合が良さそう
         // this.shader = new Shader({gpu, vertexShader, fragmentShader});
 
         // if (vertexShader) {
-        this.vertexShader = vertexShader;
+        this.vertexShader = vertexShader || "";
         // }
         // if (fragmentShader) {
-        this.fragmentShader = fragmentShader;
+        this.fragmentShader = fragmentShader || "";
         // }
         if (depthFragmentShader) {
             this.depthFragmentShader = depthFragmentShader;
@@ -255,11 +257,11 @@ export class Material {
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
 
-        this.depthTest = depthTest !== null ? depthTest : true;
-        this.depthWrite = depthWrite;
-        this.alphaTest = alphaTest;
+        this.depthTest = !!depthTest ? !!depthTest : true;
+        this.depthWrite = !!depthWrite;
+        this.alphaTest = typeof (alphaTest) === "number" ? alphaTest : null
 
-        this.faceSide = faceSide;
+        this.faceSide = faceSide || FaceSide.Front;
         this.receiveShadow = !!receiveShadow;
 
         if (!!renderQueue) {
@@ -281,14 +283,14 @@ export class Material {
         }
 
         // skinning
-        this.isSkinning = isSkinning;
-        this.gpuSkinning = gpuSkinning;
-        this.jointNum = jointNum;
+        this.isSkinning = !!isSkinning;
+        this.gpuSkinning = !!gpuSkinning;
+        this.jointNum = typeof (jointNum) == "number" ? jointNum : null;
 
-        this.isInstancing = isInstancing;
-        this.useVertexColor = useVertexColor;
+        this.isInstancing = !!isInstancing;
+        this.useVertexColor = !!useVertexColor;
 
-        this.useNormalMap = useNormalMap;
+        this.useNormalMap = !!useNormalMap;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある

@@ -1,4 +1,4 @@
-﻿import {AttributeUsageType} from "../constants.ts";
+﻿import {AttributeUsageType} from "../constants";
 
 export type AttributeDescriptor = {
     location: number,
@@ -8,9 +8,19 @@ export type AttributeDescriptor = {
     dataType: Function
 }
 
+export type AttributeArgs = {
+    name: string,
+    data: Float32Array | Uint16Array,
+    location?: number,
+    size: number,
+    offset?: number,
+    usageType?: AttributeUsageType,
+    divisor?: number
+};
+
 export class Attribute {
     name: string;
-    data: Float32Array; // data
+    data: Float32Array | Uint16Array; // data
     location: number; // layout location index
     size: number; // data per vertex. ex) position: 3, uv: 2
     offset: number;
@@ -20,27 +30,19 @@ export class Attribute {
     constructor({
                     name,
                     data,
-                    location = -1, // TODO
+                    location, // TODO
                     size,
                     offset = 0,
                     usageType = AttributeUsageType.StaticDraw,
                     divisor = -1 // TODO
-                }: {
-        name: string,
-        data: Float32Array,
-        location?: number,
-        size: number,
-        offset?: number,
-        usageType?: AttributeUsageType,
-        divisor?: number
-    }) {
+                }: AttributeArgs) {
         this.name = name;
         this.data = data;
-        this.location = location;
+        this.location = location || -1;
         this.size = size;
-        this.offset = offset;
-        this.usageType = usageType;
-        this.divisor = divisor;
+        this.offset = offset || 0;
+        this.usageType = usageType || AttributeUsageType.StaticDraw;
+        this.divisor = divisor || 0;
     }
 
     getDescriptor(): AttributeDescriptor {

@@ -1,11 +1,11 @@
-﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.ts";
-import {Matrix4} from "../math/Matrix4.ts";
+﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants";
+import {Matrix4} from "../math/Matrix4";
 import {GPU} from "./GPU";
-import {Stats} from "../utilities/Stats.ts";
-import {Light} from "../actors/Light.ts";
-import {Mesh} from "../actors/Mesh.ts";
-import {Scene} from "./Scene.ts";
-import {Camera} from "../actors/Camera.ts";
+import {Stats} from "../utilities/Stats";
+import {Light} from "../actors/Light";
+import {Mesh} from "../actors/Mesh";
+import {Scene} from "./Scene";
+import {Camera} from "../actors/Camera";
 
 export class Renderer {
     private gpu;

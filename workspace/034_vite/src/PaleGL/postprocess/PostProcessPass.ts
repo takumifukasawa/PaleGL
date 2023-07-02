@@ -1,12 +1,12 @@
-﻿import {PlaneGeometry} from "../geometries/PlaneGeometry.ts";
-import {Material, Uniforms} from "../materials/Material.ts";
-import {RenderTarget} from "../core/RenderTarget.ts";
-import {Mesh} from "../actors/Mesh.ts";
-import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants.ts";
-import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
-import {Renderer} from "../core/Renderer.ts";
-import {GPU} from "../core/GPU.ts";
-import {Camera} from "../actors/Camera.ts";
+﻿import {PlaneGeometry} from "../geometries/PlaneGeometry";
+import {Material, Uniforms} from "../materials/Material";
+import {RenderTarget} from "../core/RenderTarget";
+import {Mesh} from "../actors/Mesh";
+import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants";
+import {IPostProcessPass} from "./AbstractPostProcessPass";
+import {Renderer} from "../core/Renderer";
+import {GPU} from "../core/GPU";
+import {Camera} from "../actors/Camera";
 
 
 // export class PostProcessPass extends AbstractPostProcessPass {

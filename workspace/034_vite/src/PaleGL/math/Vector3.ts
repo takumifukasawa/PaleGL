@@ -1,4 +1,4 @@
-﻿import {Matrix4} from "./Matrix4.ts";
+﻿import {Matrix4} from "./Matrix4";
 
 export class Vector3 {
     elements: Float32Array = new Float32Array(3);

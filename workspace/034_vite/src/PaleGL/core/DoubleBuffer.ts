@@ -1,6 +1,6 @@
 
-import {RenderTarget, RenderTargetOptions} from "./RenderTarget.ts";
-// import {RenderTargetTypes} from "../constants.ts";
+import {RenderTarget, RenderTargetOptions} from "./RenderTarget";
+// import {RenderTargetTypes} from "../constants";
 import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
 
 export class DoubleBuffer extends AbstractRenderTarget {

@@ -1,63 +1,77 @@
-﻿import {Vector3} from "../math/Vector3.ts";
-import {Rotator} from "../math/Rotator.ts";
+﻿import {Rotator} from "../math/Rotator";
 import {AnimationKeyframes} from "./AnimationKeyframes";
+import {Vector3} from "../math/Vector3";
+import {Quaternion} from "../math/Quaternion";
+import {GLTFAnimationChannelTargetPath, GLTFNodeActorKind} from "../loaders/loadGLTF";
+import {Bone} from "./Bone";
+import {Actor} from "../actors/Actor";
+
+// import {GLTFAnimationSamplerInterpolation} from "../loaders/loadGLTF";
+
+
+type UpdateProxyKeyframe = {
+    target: GLTFNodeActorKind,
+    key: GLTFAnimationChannelTargetPath,
+    frameValue: Vector3 | Quaternion,
+};
 
 export class AnimationClip {
     name: string;
-    target;
-    key;
-    interpolation;
-    type; // animation clip type
-    private data;
-    start: number;
-    end: number;
-    frames: number;
+    // target;
+    // key;
+    // interpolation: GLTFAnimationSamplerInterpolation;
+    // type; // animation clip type
+    // private data;
+    // start: number;
+    // end: number;
+    // frames: number;
     frameCount: number;
     // elementSize; // TODO: typeを元に振り分けても良い気がする
 
-    private currentTime: number;
-    currentFrame: number;
+    private currentTime: number = 0;
+    currentFrame: number = 0;
 
-    loop: boolean;
-    isPlaying: boolean;
+    loop: boolean = false;
+    isPlaying: boolean = false;
 
     speed: number = 1;
 
     // TODO: fpsをgltfから引っ張ってこれるかどうか
     fps: number = 30; // default
 
-    onUpdateProxy: (n: number) => void;
+    onUpdateProxy: ((keyframe: UpdateProxyKeyframe[]) => void) | null = null
 
-    private keyframes = [];
+    private _keyframes: AnimationKeyframes[] = [];
 
     get keyframes() {
-        return this.keyframes;
+        return this._keyframes;
     }
 
-    get data() {
-        return this.data;
-    }
+    // get data() {
+    //     return this.data;
+    // }
 
-    constructor({name, start, end, frames, frameCount, keyframes}: {
+    // constructor({name, start, end, frames, frameCount, keyframes}: {
+    constructor({name, keyframes}: {
         name: string,
-        start?: number,
-        end?: number,
+        // start?: number,
+        // end?: number,
         // frames: number,
-        frameCount?: number,
+        // frameCount?: number,
         keyframes: AnimationKeyframes[]
     }) {
         this.name = name;
-        this.start = start;
-        this.end = end;
-        this.frameCount = frameCount;
-        this.keyframes = keyframes;
+        // this.start = start;
+        // this.end = end;
+        // this.frameCount = frameCount;
+        this._keyframes = keyframes;
 
         // TODO: add keyframes した時も計算するようにした方が便利そう 
         this.frameCount = Math.max(...(keyframes.map(({frameCount}) => frameCount)));
     }
 
     // addAnimationKeyframes(animationKeyframe) {
-    //     this.keyframes.push(animationKeyframe);
+    //     this._keyframes.push(animationKeyframe);
     // }
 
     // start at 0 frame
@@ -66,7 +80,7 @@ export class AnimationClip {
         this.isPlaying = true;
     }
 
-    update(deltaTime) {
+    update(deltaTime: number) {
         if (!this.isPlaying) {
             return;
         }
@@ -92,7 +106,7 @@ export class AnimationClip {
 
         // 代理でupdateしたい場合 
         if (this.onUpdateProxy) {
-            const keyframes = this.keyframes.map(animationKeyframes => {
+            const keyframes = this._keyframes.map(animationKeyframes => {
                 // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
                 return {
                     target: animationKeyframes.target,
@@ -102,19 +116,35 @@ export class AnimationClip {
             });
             this.onUpdateProxy(keyframes);
         } else {
-            this.keyframes.forEach(animationKeyframes => {
+            this._keyframes.forEach(animationKeyframes => {
                 const frameValue = animationKeyframes.getFrameValue(this.currentFrame)
                 switch (animationKeyframes.key) {
                     case "translation":
-                        animationKeyframes.target.position = frameValue;
+                        const p = frameValue as Vector3;
+                        // TODO: actor position
+                        if((animationKeyframes.target as Actor).transform) {
+                            (animationKeyframes.target as Actor).transform.position = p;
+                        } else {
+                            (animationKeyframes.target as Bone).position = p;
+                        }
                         break;
                     case "rotation":
                         // TODO: rotationはquaternionなのでquaternionであるべき
-                        const q = frameValue;
-                        animationKeyframes.target.rotation = Rotator.fromQuaternion(q);
+                        const q = frameValue as Quaternion;
+                        const r = Rotator.fromQuaternion(q);
+                        if((animationKeyframes.target as Actor).transform) {
+                            (animationKeyframes.target as Actor).transform.rotation = r;
+                        } else {
+                            (animationKeyframes.target as Bone).rotation = r;
+                        }
                         break;
                     case "scale":
-                        animationKeyframes.target.scale = frameValue;
+                        const s = frameValue as Vector3;
+                        if((animationKeyframes.target as Actor).transform) {
+                            (animationKeyframes.target as Actor).transform.scale = s;
+                        } else {
+                            (animationKeyframes.target as Bone).scale = s;
+                        }
                         break;
                     default:
                         throw "invalid animation keyframes key";
@@ -125,7 +155,7 @@ export class AnimationClip {
 
     getAllKeyframesValue() {
         return (new Array(this.frameCount)).fill(0).map((_, i) => {
-            const keyframes = this.keyframes.map(animationKeyframes => {
+            const keyframes = this._keyframes.map(animationKeyframes => {
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,

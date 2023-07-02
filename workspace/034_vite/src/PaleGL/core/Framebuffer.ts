@@ -1,6 +1,6 @@
-﻿import {GLObject} from "./GLObject.ts";
-import {GLColorAttachment} from "../constants.ts";
-import {GPU} from "./GPU.ts";
+﻿import {GLObject} from "./GLObject";
+import {GLColorAttachment} from "../constants";
+import {GPU} from "./GPU";
 
 export class Framebuffer extends GLObject {
     #framebuffer: WebGLFramebuffer;

@@ -1,5 +1,5 @@
-﻿import {GLObject} from "./GLObject.ts";
-import {GPU} from "./GPU.ts";
+﻿import {GLObject} from "./GLObject";
+import {GPU} from "./GPU";
 
 export class Shader extends GLObject {
     private program: WebGLProgram;

@@ -1,5 +1,5 @@
-﻿import {loadImg} from "./../loaders/loadImg.ts";
-import {CubeMap} from "./../core/CubeMap.ts";
+﻿import {loadImg} from "./../loaders/loadImg";
+import {CubeMap} from "./../core/CubeMap";
 
 // example
 // images: {

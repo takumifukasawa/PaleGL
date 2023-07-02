@@ -1,6 +1,6 @@
 ﻿import {Vector3} from "./Vector3.js";
-import {Rotator} from "./Rotator.ts";
-import {Quaternion} from "./Quaternion.ts";
+import {Rotator} from "./Rotator";
+import {Quaternion} from "./Quaternion";
 
 // memory layout is column order.
 // setter and getter are row order.

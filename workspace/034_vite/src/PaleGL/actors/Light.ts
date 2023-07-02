@@ -1,10 +1,10 @@
-﻿import {Actor} from "./Actor.ts";
-import {ActorTypes} from "../constants.ts";
-import {Color} from "../math/Color.ts";
-// import {Camera} from "./Camera.ts";
-import {RenderTarget} from "../core/RenderTarget.ts";
-import {OrthographicCamera} from "./OrthographicCamera.ts";
-import {PerspectiveCamera} from "./PerspectiveCamera.ts";
+﻿import {Actor} from "./Actor";
+import {ActorTypes} from "../constants";
+import {Color} from "../math/Color";
+// import {Camera} from "./Camera";
+import {RenderTarget} from "../core/RenderTarget";
+import {OrthographicCamera} from "./OrthographicCamera";
+import {PerspectiveCamera} from "./PerspectiveCamera";
 
 // TODO: interfaceでいいかも
 export class Light extends Actor {
@@ -14,10 +14,14 @@ export class Light extends Actor {
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
 
+    hasShadowCamera() {
+        return !!this.shadowCamera;
+    }
+    
     constructor() {
         super(ActorTypes.Light);
     }
-
+    
     setShadowSize() {
         throw "should implementation";
     }

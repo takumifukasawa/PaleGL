@@ -185,6 +185,17 @@ export const CameraTypes = {
 
 export type CameraType = typeof CameraTypes[keyof typeof CameraTypes];
 
+export const GLColorAttachment = {
+    COLOR_ATTACHMENT0: 36064, // gl.COLOR_ATTACHMENT0 + 0 
+    COLOR_ATTACHMENT1: 36065, // gl.COLOR_ATTACHMENT0 + 1 
+    COLOR_ATTACHMENT2: 36066, // gl.COLOR_ATTACHMENT0 + 2 
+    COLOR_ATTACHMENT3: 36067, // gl.COLOR_ATTACHMENT0 + 3 
+    COLOR_ATTACHMENT4: 36068, // gl.COLOR_ATTACHMENT0 + 4 
+    COLOR_ATTACHMENT5: 36069, // gl.COLOR_ATTACHMENT0 + 5 
+    COLOR_ATTACHMENT6: 36070, // gl.COLOR_ATTACHMENT0 + 6 
+    COLOR_ATTACHMENT7: 36071, // gl.COLOR_ATTACHMENT0 + 7 
+} as const;
+
 export type GLColorAttachment =
     36064 // gl.COLOR_ATTACHMENT0 + 0 
     | 36065 // gl.COLOR_ATTACHMENT0 + 1

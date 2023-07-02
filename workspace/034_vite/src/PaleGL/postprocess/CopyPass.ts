@@ -1,4 +1,4 @@
-﻿import {PostProcessPass} from "./PostProcessPass.ts";
+﻿import {PostProcessPass} from "./PostProcessPass";
 
 
 export class CopyPass extends PostProcessPass {

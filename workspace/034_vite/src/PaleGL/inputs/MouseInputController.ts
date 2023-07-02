@@ -1,5 +1,5 @@
-import {AbstractInputController} from "./AbstractInputController.ts";
-import {Vector2} from "../math/Vector2.ts";
+import {AbstractInputController} from "./AbstractInputController";
+import {Vector2} from "../math/Vector2";
 
 export class MouseInputController extends AbstractInputController {
     #tmpIsDown = false;

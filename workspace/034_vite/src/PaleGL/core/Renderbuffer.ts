@@ -1,6 +1,6 @@
-﻿import {GLObject} from "./GLObject.ts";
-import {RenderbufferType, RenderbufferTypes} from "./../constants.ts";
-import {GPU} from "./GPU.ts";
+﻿import {GLObject} from "./GLObject";
+import {RenderbufferType, RenderbufferTypes} from "./../constants";
+import {GPU} from "./GPU";
 
 export class Renderbuffer extends GLObject {
     #gpu: GPU

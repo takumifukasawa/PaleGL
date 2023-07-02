@@ -1,4 +1,4 @@
-﻿import {Vector3} from "./Vector3.ts";
+﻿import {Vector3} from "./Vector3";
 
 export class Vector2 {
     elements: Float32Array = new Float32Array(2);

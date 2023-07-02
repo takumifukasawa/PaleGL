@@ -1,6 +1,6 @@
-﻿export async function loadImg(src): Promise<Image> {
+﻿export async function loadImg(src): Promise<HTMLImageElement> {
     // TODO: reject pattern
-    return new Promise((resolve, reject) => {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
             resolve(img);

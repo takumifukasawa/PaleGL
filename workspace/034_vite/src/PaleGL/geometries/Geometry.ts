@@ -1,13 +1,24 @@
 ﻿import {Attribute} from "../core/Attribute";
 import {VertexArrayObject} from "../core/VertexArrayObject";
-import {Vector3} from "../math/Vector3.ts";
-import {AttributeUsageType} from "../constants.ts";
-import {GPU} from "../core/GPU.ts";
+import {Vector3} from "../math/Vector3";
+import {AttributeUsageType} from "../constants";
+import {GPU} from "../core/GPU";
+
+export type GeometryArgs = {
+    // required
+    gpu: GPU,
+    attributes: Attribute[],
+    drawCount: number,
+    // optional
+    indices?: number[], // TODO: Uint16Array
+    // calculateBinormal: boolean,
+    instanceCount?: number | null,
+};
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 export class Geometry {
-    attributes: Attribute[];
+    attributes: Attribute[] = [];
     vertexCount: number = 0;
     vertexArrayObject: VertexArrayObject;
     indices: number[] | null = null;
@@ -24,17 +35,10 @@ export class Geometry {
                     drawCount,
                     // calculateBinormal = false,
                     instanceCount = null,
-                }: {
-        gpu: GPU,
-        attributes: Attribute[],
-        indices: number[],
-        drawCount: number,
-        // calculateBinormal: boolean,
-        instanceCount?: number,
-    }) {
+                }: GeometryArgs) {
         this.gpu = gpu;
 
-        this.instanceCount = instanceCount;
+        this.instanceCount = typeof (instanceCount) == "number" ? instanceCount : null;
         this.drawCount = drawCount;
 
         if (indices) {

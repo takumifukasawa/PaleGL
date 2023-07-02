@@ -1,7 +1,7 @@
 ﻿
-import {Geometry} from "./Geometry.ts";
-import {AttributeNames} from "../constants.ts";
-import {Attribute} from "../core/Attribute.ts";
+import {Geometry} from "./Geometry";
+import {AttributeNames} from "../constants";
+import {Attribute} from "../core/Attribute";
 
 export class BoxGeometry extends Geometry {
     constructor({ gpu }) {

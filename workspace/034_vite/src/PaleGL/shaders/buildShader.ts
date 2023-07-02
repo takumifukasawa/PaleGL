@@ -10,7 +10,7 @@ const pragmaRegex = /^#pragma(.*)/;
 
 
 
-import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader.ts";
+import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader";
 
 export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);

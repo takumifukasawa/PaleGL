@@ -1,5 +1,5 @@
 ﻿
-import { gaussCoefficient } from "./mathUtilities.ts";
+import { gaussCoefficient } from "./mathUtilities";
 
 // pixelNumは奇数であるべき
 export function getGaussianBlurWeights(pixelNum: number, sigma: number) {

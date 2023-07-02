@@ -1,8 +1,8 @@
-﻿import {BlendTypes, FaceSide, PrimitiveType, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants.ts";
-import {Texture} from "./Texture.ts";
-import {Shader} from "./Shader.ts";
-import {VertexArrayObject} from "./VertexArrayObject.ts";
-import {Framebuffer} from "./Framebuffer.ts";
+﻿import {BlendTypes, FaceSide, PrimitiveType, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants";
+import {Texture} from "./Texture";
+import {Shader} from "./Shader";
+import {VertexArrayObject} from "./VertexArrayObject";
+import {Framebuffer} from "./Framebuffer";
 
 const createWhite1x1 = () => {
     const canvas = document.createElement("canvas");

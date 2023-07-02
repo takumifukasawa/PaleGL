@@ -1,7 +1,7 @@
-﻿import {NodeBase} from "./NodeBase.ts";
-import {Matrix4} from "../math/Matrix4.ts";
-import {Rotator} from "../math/Rotator.ts";
-import {Vector3} from "../math/Vector3.ts";
+﻿import {NodeBase} from "./NodeBase";
+import {Matrix4} from "../math/Matrix4";
+import {Rotator} from "../math/Rotator";
+import {Vector3} from "../math/Vector3";
 
 export class Bone extends NodeBase {
     offsetMatrix: Matrix4 = Matrix4.identity; // 初期姿勢のボーンローカル座標
@@ -31,7 +31,7 @@ export class Bone extends NodeBase {
         this.index = index;
     }
 
-    calcBoneOffsetMatrix(parentBone: Bone) {
+    calcBoneOffsetMatrix(parentBone?: Bone) {
         this.#poseMatrix = !!parentBone
             ? Matrix4.multiplyMatrices(parentBone.poseMatrix, this.offsetMatrix)
             : this.offsetMatrix;
@@ -40,7 +40,7 @@ export class Bone extends NodeBase {
         this.children.forEach(childBone => (childBone as Bone).calcBoneOffsetMatrix(this));
     }
 
-    calcJointMatrix(parentBone: Bone) {
+    calcJointMatrix(parentBone?: Bone) {
         // 1: update offset matrix
         this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
 

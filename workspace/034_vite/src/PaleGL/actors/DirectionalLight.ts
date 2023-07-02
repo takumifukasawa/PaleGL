@@ -1,11 +1,11 @@
-﻿import {Light} from "./Light.ts";
-import {OrthographicCamera} from "./OrthographicCamera.ts";
-import {Actor} from "./Actor.ts";
-// import {PerspectiveCamera} from "./PerspectiveCamera.ts";
-// import {Vector3} from "../math/Vector3.ts";
-// import {RenderTarget} from "../core/RenderTarget.ts";
-// import {DoubleBuffer} from "../core/DoubleBuffer.ts";
-// import {RenderTargetTypes} from "../constants.ts";
+﻿import {Light} from "./Light";
+import {OrthographicCamera} from "./OrthographicCamera";
+import {Actor} from "./Actor";
+// import {PerspectiveCamera} from "./PerspectiveCamera";
+// import {Vector3} from "../math/Vector3";
+// import {RenderTarget} from "../core/RenderTarget";
+// import {DoubleBuffer} from "../core/DoubleBuffer";
+// import {RenderTargetTypes} from "../constants";
 
 export class DirectionalLight extends Light {
     constructor() {

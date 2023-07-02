@@ -1,50 +1,55 @@
 import "./style.css";
 
+console.log("hogehoge");
+
+/*
+import "./style.css";
+
 // actors
-import {DirectionalLight} from "./PaleGL/actors/DirectionalLight.ts";
-import {Mesh} from "./PaleGL/actors/Mesh.ts";
-import {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera.ts";
-import {Skybox} from "./PaleGL/actors/Skybox.ts";
-import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh.ts";
+import {DirectionalLight} from "./PaleGL/actors/DirectionalLight";
+import {Mesh} from "./PaleGL/actors/Mesh";
+import {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera";
+import {Skybox} from "./PaleGL/actors/Skybox";
+import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh";
 
 // core
-import {Engine} from "./PaleGL/core/Engine.ts";
-import {Renderer} from "./PaleGL/core/Renderer.ts";
-import {GPU} from "./PaleGL/core/GPU.ts";
-import {RenderTarget} from "./PaleGL/core/RenderTarget.ts";
-import {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets.ts";
-import {Scene} from "./PaleGL/core/Scene.ts";
-import {Texture} from "./PaleGL/core/Texture.ts";
-import {OrbitCameraController} from "./PaleGL/core/OrbitCameraController.ts";
+import {Engine} from "./PaleGL/core/Engine";
+import {Renderer} from "./PaleGL/core/Renderer";
+import {GPU} from "./PaleGL/core/GPU";
+import {RenderTarget} from "./PaleGL/core/RenderTarget";
+import {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets";
+import {Scene} from "./PaleGL/core/Scene";
+import {Texture} from "./PaleGL/core/Texture";
+import {OrbitCameraController} from "./PaleGL/core/OrbitCameraController";
 
 // geometries
-import {Geometry} from "./PaleGL/geometries/Geometry.ts";
-import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry.ts";
+import {Geometry} from "./PaleGL/geometries/Geometry";
+import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry";
 
 // loaders
-import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap.ts";
-import {loadGLTF} from "./PaleGL/loaders/loadGLTF.ts";
-import {loadImg} from "./PaleGL/loaders/loadImg.ts";
+import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap";
+import {loadGLTF} from "./PaleGL/loaders/loadGLTF";
+import {loadImg} from "./PaleGL/loaders/loadImg";
 
 // materials
-import {Material} from "./PaleGL/materials/Material.ts";
-import {PhongMaterial} from "./PaleGL/materials/PhongMaterial.ts";
+import {Material} from "./PaleGL/materials/Material";
+import {PhongMaterial} from "./PaleGL/materials/PhongMaterial";
 
 // math
-import {Color} from "./PaleGL/math/Color.ts";
-import {Vector2} from "./PaleGL/math/Vector2.ts";
-import {Vector3} from "./PaleGL/math/Vector3.ts";
-import {Vector4} from "./PaleGL/math/Vector4.ts";
+import {Color} from "./PaleGL/math/Color";
+import {Vector2} from "./PaleGL/math/Vector2";
+import {Vector3} from "./PaleGL/math/Vector3";
+import {Vector4} from "./PaleGL/math/Vector4";
 
 // postprocess
-import {FragmentPass} from "./PaleGL/postprocess/FragmentPass.ts";
-import {PostProcess} from "./PaleGL/postprocess/PostProcess.ts";
-import {FXAAPass} from "./PaleGL/postprocess/FXAAPass.ts";
-import {BloomPass} from "./PaleGL/postprocess/BloomPass.ts";
+import {FragmentPass} from "./PaleGL/postprocess/FragmentPass";
+import {PostProcess} from "./PaleGL/postprocess/PostProcess";
+import {FXAAPass} from "./PaleGL/postprocess/FXAAPass";
+import {BloomPass} from "./PaleGL/postprocess/BloomPass";
 
 // inputs
-import {TouchInputController} from "./PaleGL/inputs/TouchInputController.ts";
-import {MouseInputController} from "./PaleGL/inputs/MouseInputController.ts";
+import {TouchInputController} from "./PaleGL/inputs/TouchInputController";
+import {MouseInputController} from "./PaleGL/inputs/MouseInputController";
 
 // others
 import {
@@ -55,9 +60,13 @@ import {
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames
-} from "./PaleGL/constants.ts";
+} from "./PaleGL/constants";
 
-import {DebuggerGUI} from "./DebuggerGUI.ts";
+import {DebuggerGUI} from "./DebuggerGUI";
+import {Camera} from "./PaleGL/actors/Camera";
+import {Light} from "./PaleGL/actors/Light";
+import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera";
+import {Attribute} from "./PaleGL/core/Attribute";
 
 const debuggerStates = {
     instanceNum: 0,
@@ -84,9 +93,9 @@ const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
 inputController.start();
 
-const wrapperElement = document.getElementById("wrapper");
+const wrapperElement = document.getElementById("wrapper")!;
 
-const canvasElement = document.getElementById("js-canvas") as HTMLCanvasElement;
+const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 
 const gl = canvasElement.getContext('webgl2', {antialias: false});
 
@@ -173,7 +182,7 @@ const copyDepthDestRenderTarget = new RenderTarget({
 });
 
 captureSceneCamera.onStart = ({actor}) => {
-    actor.setClearColor(new Vector4(0, 0, 0, 1));
+    (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 }
 captureSceneCamera.onFixedUpdate = ({actor}) => {
     // 1: fixed position
@@ -192,16 +201,20 @@ directionalLight.color = Color.fromRGB(255, 210, 200);
 directionalLight.onStart = ({actor}) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    actor.castShadow = true;
+    // actor.castShadow = true;
     // actor.castShadow = false;
-    actor.shadowCamera.near = 1;
-    actor.shadowCamera.far = 30;
-    actor.shadowCamera.setSize(null, null, -10, 10, -10, 10);
-    actor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+    const lightActor = actor as DirectionalLight;
+    if (lightActor.shadowCamera) {
+        lightActor.shadowCamera.near = 1;
+        lightActor.shadowCamera.far = 30;
+        (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+        lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+    }
 }
 captureScene.add(directionalLight);
 
-const postProcess = new PostProcess({gpu, renderer});
+// const postProcess = new PostProcess({gpu, renderer});
+const postProcess = new PostProcess({gpu});
 
 const bloomPass = new BloomPass({gpu, threshold: 0.9, bloomAmount: 0.8});
 bloomPass.enabled = true;
@@ -284,6 +297,8 @@ captureSceneCamera.setPostProcess(postProcess);
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({gpu, path: "./models/glass-wind-poly.gltf"});
 
+    // あるはずなのでignore
+    // @ts-ignore
     const skinningMesh = gltfActor.transform.children[0].transform.children[0];
 
     // ルートにanimatorをattachしてるので一旦ここでassign
@@ -354,7 +369,7 @@ const createGLTFSkinnedMesh = async () => {
         divisor: 1
     });
     skinningMesh.material = new PhongMaterial({
-        gpu,
+        // gpu,
         specularAmount: 0.5,
         receiveShadow: true,
         isSkinning: true,
@@ -431,7 +446,7 @@ const main = async () => {
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
         material: new PhongMaterial({
-            gpu,
+            // gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
             receiveShadow: true,
@@ -440,20 +455,21 @@ const main = async () => {
         castShadow: false
     });
     floorPlaneMesh.onStart = ({actor}) => {
+        const meshActor = actor as Mesh;
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
         // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
         // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
-        actor.material.updateUniform("uDiffuseMapUvScale", new Vector2(3, 3));
-        actor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
+        meshActor.material.updateUniform("uDiffuseMapUvScale", new Vector2(3, 3));
+        meshActor.material.updateUniform("uNormalMapUvScale", new Vector2(3, 3));
     }
 
     const particleNum = 50;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
-            {
-                name: AttributeNames.Position,
+            new Attribute({
+                name: AttributeNames.Position.toString(),
                 // dummy data
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
                     const x = Math.random() * 18 - 10;
@@ -468,8 +484,9 @@ const main = async () => {
                     ];
                 }).flat()),
                 size: 3
-            }, {
-                name: AttributeNames.Uv,
+            }),
+            new Attribute({
+                name: AttributeNames.Uv.toString(),
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => [
                     0, 1,
                     0, 0,
@@ -477,8 +494,9 @@ const main = async () => {
                     1, 0,
                 ]).flat()),
                 size: 2
-            }, {
-                name: AttributeNames.Color,
+            }),
+            new Attribute({
+                name: AttributeNames.Color.toString(),
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
                     const c = Color.fromRGB(
                         Math.random() * 50 + 200,
@@ -494,21 +512,23 @@ const main = async () => {
                     ];
                 }).flat()),
                 size: 4
-            }, {
+            }),
+            new Attribute({
                 name: "aBillboardSize",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
                     const s = Math.random() * 3.5 + 0.5;
                     return [s, s, s, s];
                 }).flat()),
                 size: 1
-            }, {
+            }),
+            new Attribute({
                 name: "aBillboardRateOffset",
                 data: new Float32Array(new Array(particleNum).fill(0).map(() => {
                     const r = Math.random();
                     return [r, r, r, r];
                 }).flat()),
                 size: 1,
-            }
+            })
         ],
         indices: new Array(particleNum).fill(0).map((_, i) => {
             const offset = i * 4;
@@ -521,7 +541,7 @@ const main = async () => {
         drawCount: particleNum * 6,
     });
     const particleMaterial = new Material({
-        gpu,
+        // gpu,
         vertexShader: `#version 300 es
 
 #pragma attributes
@@ -844,3 +864,4 @@ function initDebugger() {
 }
 
 main();
+*/

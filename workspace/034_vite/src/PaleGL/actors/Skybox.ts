@@ -1,18 +1,18 @@
-import {Mesh} from "./Mesh.ts";
-import {UniformTypes, PrimitiveTypes, ActorTypes, FaceSide, AttributeNames, UniformNames} from "./../constants.ts";
-import {Material} from "./../materials/Material.ts";
-// import {loadImg} from "./../loaders/loadImg.ts";
-import {/*loadObj,*/ parseObj} from "./../loaders/loadObj.ts";
-import {Geometry} from "./../geometries/Geometry.ts";
-// import {CubeMap} from "./../core/CubeMap.ts";
-// import {BoxGeometry} from "../geometries/BoxGeometry.ts";
-// import {PlaneGeometry} from "../geometries/PlaneGeometry.ts";
-import {Matrix4} from "../math/Matrix4.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {CubeMap} from "../core/CubeMap.ts";
-import {Attribute} from "../core/Attribute.ts";
-import {GPU} from "../core/GPU.ts";
-import {Camera} from "./Camera.ts";
+import {Mesh} from "./Mesh";
+import {UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames} from "./../constants";
+import {Material} from "./../materials/Material";
+// import {loadImg} from "./../loaders/loadImg";
+import {/*loadObj,*/ parseObj} from "./../loaders/loadObj";
+import {Geometry} from "./../geometries/Geometry";
+// import {CubeMap} from "./../core/CubeMap";
+// import {BoxGeometry} from "../geometries/BoxGeometry";
+// import {PlaneGeometry} from "../geometries/PlaneGeometry";
+import {Matrix4} from "../math/Matrix4";
+import {Vector3} from "../math/Vector3";
+import {CubeMap} from "../core/CubeMap";
+import {Attribute} from "../core/Attribute";
+import {GPU} from "../core/GPU";
+import {Camera} from "./Camera";
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -163,7 +163,7 @@ export class Skybox extends Mesh {
         });
 
         const material = new Material({
-            gpu,
+            // gpu,
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,

@@ -1,8 +1,8 @@
-﻿import {PostProcessPass} from "./PostProcessPass.ts";
-import {UniformTypes,UniformNames} from "../constants.ts";
-import {GPU} from "../core/GPU.ts";
-// import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
-// import {GPU} from "../core/GPU.ts";
+﻿import {PostProcessPass} from "./PostProcessPass";
+import {UniformTypes,UniformNames} from "../constants";
+import {GPU} from "../core/GPU";
+// import {IPostProcessPass} from "./AbstractPostProcessPass";
+// import {GPU} from "../core/GPU";
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/

@@ -1,10 +1,10 @@
-﻿import {Texture} from "./Texture.ts";
-import {Framebuffer} from "./Framebuffer.ts";
-// import {Renderbuffer} from "./Renderbuffer.ts";
-// import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "./../constants.ts";
-import {GLColorAttachment, TextureFilterTypes, TextureTypes} from "./../constants.ts";
-import {AbstractRenderTarget} from "./AbstractRenderTarget.ts";
-import {GPU} from "./GPU.ts";
+﻿import {Texture} from "./Texture";
+import {Framebuffer} from "./Framebuffer";
+// import {Renderbuffer} from "./Renderbuffer";
+// import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "./../constants";
+import {GLColorAttachment, TextureFilterTypes, TextureTypes} from "./../constants";
+import {AbstractRenderTarget} from "./AbstractRenderTarget";
+import {GPU} from "./GPU";
 
 // NOTE:
 // renderer用
@@ -152,6 +152,8 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         // }
 
         // unbind
+        // TODO: fix-type
+        // @ts-ignore
         gl.bindTexture(gl.TEXTURE_2D, null);
         // if (this.#depthRenderbuffer) {
         //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);

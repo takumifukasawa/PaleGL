@@ -3,12 +3,12 @@
 import {
     skinningVertexUniforms,
     calcSkinningMatrixFunc, skinningVertex
-} from "./skinningShader.ts";
-import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms.ts";
-import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader.ts";
-import {normalMapVertexVaryings} from "./lightingCommon.ts";
-import {AttributeNames} from "../constants.ts";
-import {buildVertexAttributeLayouts} from "./buildShader.ts";
+} from "./skinningShader";
+import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms";
+import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader";
+import {normalMapVertexVaryings} from "./lightingCommon";
+import {AttributeNames} from "../constants";
+import {buildVertexAttributeLayouts} from "./buildShader";
 
 const generateVertexShader = ({
     // required

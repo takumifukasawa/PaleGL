@@ -13,16 +13,25 @@ function fillFunc<T>(arr: T[], value: T): T[] {
     // return arr;
 }
 
-function matonWrapper<T>(obj: T[]): {value: () => T, fill: () => T[]} {
+type MatonWrapper<T> = {
+    value: () => T[],
+    // fill: () => T[]
+    fill: () => MatonWrapper<T>
+};
+
+function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
     let tmp: T[];
 
     tmp = obj;
 
-    function fill(...args: T[]): T[] {
-        if (Array.isArray(args[0])) {
-            return fillFunc(...args);
-        }
+    function fill(...args: T[]): MatonWrapper<T> {
+        // if (Array.isArray(args[0])) {
+        //     // return fillFunc(...args);
+        //     return fillFunc(args[0], args[1]);
+        // }
         fillFunc(tmp, args[0]);
+        // return this as MatonWrapper<T>;
+        // @ts-ignore
         return this;
     }
 
@@ -37,7 +46,7 @@ function matonWrapper<T>(obj: T[]): {value: () => T, fill: () => T[]} {
 }
 
 // wrapper
-const maton = (obj) => {
+const maton = <T>(obj: T[]) => {
     return matonWrapper(obj);
 }
 

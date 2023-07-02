@@ -1,5 +1,5 @@
-type OnChangeCallback = (value: string | boolean | void) => void;
-type OnInputCallback = (value: string | void) => void;
+// type OnChangeCallback = ((value: string | boolean) => void);
+// type OnInputCallback = ((value: string) => void);
 
 export class DebuggerGUI {
 
@@ -65,7 +65,7 @@ export class DebuggerGUI {
                             options = [],
                         }: {
         label: string,
-        onChange: OnChangeCallback,
+        onChange: ((value: string) => void),
         initialValue: string | null,
         initialExec: boolean,
         options: { label: string | null, value: string, isDefault?: boolean } []
@@ -108,8 +108,8 @@ export class DebuggerGUI {
                          initialExec = true,
                      }: {
         label: string,
-        onChange: OnChangeCallback,
-        onInput: OnInputCallback | null,
+        onChange: (value: string) => void,
+        onInput: ((value: string) => void) | null,
         initialValue: string | null,
         initialExec: boolean
     }) {
@@ -143,10 +143,10 @@ export class DebuggerGUI {
                           initialExec = true,
                       }: {
         label: string,
-        onChange: OnChangeCallback,
+        onChange: (value: boolean) => void,
         // onInput: OnInputCallback | null,
-        initialValue: string | null,
-        initialExec: boolean
+        initialValue: boolean | null,
+        initialExec?: boolean
     }) {
         const {wrapperElement, contentElement} = this.#createDebuggerContentElement(label);
 
@@ -176,8 +176,8 @@ export class DebuggerGUI {
                           stepValue
                       }: {
         label: string,
-        onChange: OnChangeCallback,
-        onInput?: OnInputCallback,
+        onChange: (value: number) => void,
+        onInput?: ((value: number) => void) | null,
         initialValue: number,
         initialExec?: boolean,
         minValue: number,
@@ -193,9 +193,9 @@ export class DebuggerGUI {
             sliderValueView.textContent = `value: ${sliderInput.value}`;
         }
 
-        const onUpdateSlider: OnInputCallback = () => {
+        const onUpdateSlider = () => {
             updateCurrentValueView();
-            return Number(sliderInput.value)
+            return Number.parseInt(sliderInput.value, 10);
         };
 
         sliderInput.type = "range";

@@ -1,4 +1,4 @@
-﻿import {PostProcessPass} from "./PostProcessPass.ts";
+﻿import {PostProcessPass} from "./PostProcessPass";
 import {GPU} from "../core/GPU";
 
 export class FragmentPass extends PostProcessPass {

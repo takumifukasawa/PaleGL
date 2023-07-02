@@ -1,9 +1,10 @@
-﻿import {Mesh} from "./Mesh.ts";
-import {Material} from "../materials/Material.ts";
-import {parseObj} from "../loaders/loadObj.ts";
-import {Geometry} from "../geometries/Geometry.ts";
-import {AttributeNames, UniformNames} from "../constants.ts";
+﻿import {Mesh} from "./Mesh";
+import {Material} from "../materials/Material";
+import {parseObj} from "../loaders/loadObj";
+import {Geometry} from "../geometries/Geometry";
+import {AttributeNames, UniformNames} from "../constants";
 import {Attribute} from "../core/Attribute";
+import {GPU} from "../core/GPU";
 
 const axesHelperGeometryData = `
 # Blender 3.3.1
@@ -162,7 +163,7 @@ f 23/56/18 22/55/18 20/53/18
 `;
 
 export class AxesHelper extends Mesh {
-    constructor({ gpu }) {
+    constructor({gpu}: { gpu: GPU }) {
         const objData = parseObj(axesHelperGeometryData);
         const geometry = new Geometry({
             gpu,
@@ -182,7 +183,7 @@ export class AxesHelper extends Mesh {
             drawCount: objData.indices.length
         });
         const material = new Material({
-            gpu,
+            // gpu,
             vertexShader: `#version 300 es
             layout (location = 0) in vec3 ${AttributeNames.Position};
             layout (location = 1) in vec2 ${AttributeNames.Uv};
@@ -210,6 +211,6 @@ export class AxesHelper extends Mesh {
             }
             `,
         });
-        super({ geometry, material });
+        super({geometry, material});
     }
 }

@@ -1,11 +1,11 @@
 import {Mesh} from "./Mesh.js";
-import {Material} from "../materials/Material.ts";
-import {parseObj} from "../loaders/loadObj.ts";
-import {Geometry} from "../geometries/Geometry.ts";
-import {AttributeNames, UniformNames} from "../constants.ts";
-import {GPU} from "../core/GPU.ts";
-import {Attribute} from "../core/Attribute.ts";
-import {Vector3} from "../math/Vector3.ts";
+import {Material} from "../materials/Material";
+import {parseObj} from "../loaders/loadObj";
+import {Geometry} from "../geometries/Geometry";
+import {AttributeNames, UniformNames} from "../constants";
+import {GPU} from "../core/GPU";
+import {Attribute} from "../core/Attribute";
+import {Vector3} from "../math/Vector3";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -186,7 +186,7 @@ export class ArrowHelper extends Mesh {
         });
         // const geometry = new ArrowGeometry({ gpu });
         const material = new Material({
-            gpu,
+            // gpu,
             vertexShader: `#version 300 es
             layout (location = 0) in vec3 ${AttributeNames.Position};
             layout (location = 1) in vec2 ${AttributeNames.Uv};

@@ -1,7 +1,7 @@
-﻿import {Actor} from "./Actor.ts";
-import {Matrix4} from "../math/Matrix4.ts";
-import {Vector4} from "../math/Vector4.ts";
-// import {RenderTarget} from "./../core/RenderTarget.ts";
+﻿import {Actor} from "./Actor";
+import {Matrix4} from "../math/Matrix4";
+import {Vector4} from "../math/Vector4";
+// import {RenderTarget} from "./../core/RenderTarget";
 import {
     ActorTypes,
     AttributeNames,
@@ -9,17 +9,19 @@ import {
     BlendTypes, CameraType,
     PrimitiveTypes,
     UniformNames
-} from "../constants.ts";
-// import {Vector3} from "../math/Vector3.ts";
-import {Material} from "../materials/Material.ts";
-import {Geometry} from "../geometries/Geometry.ts";
-import {Mesh} from "./Mesh.ts";
+} from "../constants";
+// import {Vector3} from "../math/Vector3";
+import {Material} from "../materials/Material";
+import {Geometry} from "../geometries/Geometry";
+import {Mesh} from "./Mesh";
 import {Attribute} from "../core/Attribute";
-import {RenderTarget} from "../core/RenderTarget.ts";
-// import {Color} from "../math/Color.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {PostProcess} from "../postprocess/PostProcess.ts";
-import {GPU} from "../core/GPU.ts";
+import {RenderTarget} from "../core/RenderTarget";
+// import {Color} from "../math/Color";
+import {Vector3} from "../math/Vector3";
+import {PostProcess} from "../postprocess/PostProcess";
+import {GPU} from "../core/GPU";
+// import {AbstractRenderTarget} from "../core/AbstractRenderTarget";
+import {GBufferRenderTargets} from "../core/GBufferRenderTargets";
 
 export const FrustumDirection = {
     nearLeftTop: "nearLeftTop",
@@ -40,7 +42,7 @@ export type FrustumVectors = {
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
     projectionMatrix = Matrix4.identity;
-    #renderTarget: RenderTarget | null = null;
+    #renderTarget: RenderTarget | GBufferRenderTargets | null = null;
     clearColor: Vector4; // TODO: color class
     #postProcess: PostProcess | null;
     near: number = 1;
@@ -48,7 +50,7 @@ export class Camera extends Actor {
     visibleFrustum: boolean = false;
     #visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
-
+   
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
         // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
@@ -215,7 +217,7 @@ export class Camera extends Actor {
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
     }
 
-    setRenderTarget(renderTarget: RenderTarget | null) {
+    setRenderTarget(renderTarget: RenderTarget | GBufferRenderTargets | null) {
         this.#renderTarget = renderTarget;
     }
 

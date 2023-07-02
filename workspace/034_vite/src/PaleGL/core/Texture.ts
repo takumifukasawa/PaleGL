@@ -1,4 +1,4 @@
-﻿import {GLObject} from "./GLObject.ts";
+﻿import {GLObject} from "./GLObject";
 import {
     TextureFilterType,
     TextureFilterTypes,
@@ -6,8 +6,25 @@ import {
     TextureTypes,
     TextureWrapType,
     TextureWrapTypes
-} from "./../constants.ts";
-import {GPU} from "./GPU.ts";
+} from "./../constants";
+import {GPU} from "./GPU";
+
+export type TextureArgs = {
+    // require
+    gpu: GPU
+    // optional
+    img?: TexImageSource | null,
+    type?: TextureType,
+    width?: number,
+    height?: number,
+    mipmap?: boolean,
+    minFilter?: TextureFilterType,
+    magFilter?: TextureFilterType,
+    wrapS?: TextureWrapType,
+    wrapT?: TextureWrapType,
+    flipY?: boolean,
+};
+
 
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
@@ -38,21 +55,7 @@ export class Texture extends GLObject {
                     minFilter = TextureFilterTypes.Nearest, magFilter = TextureFilterTypes.Nearest,
                     wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge,
                     flipY = false,
-                }: {
-        // require
-        gpu: GPU
-        // optional
-        img?: TexImageSource | null,
-        type?: TextureType,
-        width?: number,
-        height?: number,
-        mipmap?: boolean,
-        minFilter?: TextureFilterType,
-        magFilter?: TextureFilterType,
-        wrapS?: TextureWrapType,
-        wrapT?: TextureWrapType,
-        flipY?: boolean,
-    }) {
+                }: TextureArgs) {
         super();
 
         this.gpu = gpu;

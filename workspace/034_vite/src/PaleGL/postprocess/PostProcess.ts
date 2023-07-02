@@ -1,7 +1,7 @@
-﻿import {OrthographicCamera} from "./../actors/OrthographicCamera.ts";
-import {RenderTarget} from "../core/RenderTarget.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {RenderTargetTypes} from "../constants.ts";
+﻿import {OrthographicCamera} from "./../actors/OrthographicCamera";
+import {RenderTarget} from "../core/RenderTarget";
+import {Vector3} from "../math/Vector3";
+import {RenderTargetTypes} from "../constants";
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {

@@ -1,33 +1,114 @@
-import {Actor} from "../actors/Actor.ts";
-import {Bone} from "../core/Bone.ts";
-import {SkinnedMesh} from "../actors/SkinnedMesh.ts";
-import {Geometry} from "../geometries/Geometry.ts";
-import {Mesh} from "../actors/Mesh.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {Matrix4} from "../math/Matrix4.ts";
-import {AnimationClip} from "../core/AnimationClip.ts";
-import {AnimationKeyframeTypes} from "../constants.ts";
-import {AnimationKeyframes} from "../core/AnimationKeyframes.ts";
-import {Quaternion} from "../math/Quaternion.ts";
-import {Rotator} from "../math/Rotator.ts";
+import {Actor} from "../actors/Actor";
+import {Bone} from "../core/Bone";
+import {SkinnedMesh} from "../actors/SkinnedMesh";
+import {Geometry} from "../geometries/Geometry";
+import {Mesh} from "../actors/Mesh";
+import {Vector3} from "../math/Vector3";
+import {Matrix4} from "../math/Matrix4";
+import {AnimationClip} from "../core/AnimationClip";
+import {AnimationKeyframeTypes} from "../constants";
+import {AnimationKeyframes} from "../core/AnimationKeyframes";
+import {Quaternion} from "../math/Quaternion";
+import {Rotator} from "../math/Rotator";
 import {Attribute} from "../core/Attribute";
+import {GPU} from "../core/GPU";
 
-type MeshAccessor = {
-    attributes: MeshAccessorAttribute[],
+type GLTFScene = {
+    nodes: number[]
+}
+
+type GLTFMeshAccessor = {
+    attributes: GLTFMeshAccessorAttribute[],
     indices: {
-        accessor: number
+        // accessor: number
+        accessor: GLTFAccessor
     } | null
 }
 
-type MeshAccessorAttribute = {
-    attributeName: string,
-    accessor: number
+type GLTFMeshPrimitives = {
+    mode: number,
+    indices: 0,
+    attributes: {
+        [key: string]: number
+        // POSITION: number,
+        // NORMAL: number,
+    },
+    material: number
 }
+
+type GLTFMeshAccessorAttribute = {
+    attributeName: string,
+    // accessor: number
+    accessor: GLTFAccessor
+}
+
+type GLTFBuffer = {
+    byteLength: number,
+    uri: string
+}
+
+type GLTFAccessor = {
+    bufferView: number,
+    byteOffset: number,
+    componentType: number, // 5126 gl.float
+    type: string, // VEC2 | VEC3 ??
+    count: number,
+    min: number[],
+    max: number[],
+}
+
+type GLTFNode = {
+    name: string,
+    children: number[],
+    matrix: number[],
+    translation?: number[],
+    rotation?: number[],
+    scale?: number[],
+    mesh?: number,
+    skin?: number,
+    camera?: number,
+}
+
+type GLTFAnimationChannel = {
+    target: {
+        node: number,
+        path: string, // translation, rotation, scaling ??
+    }
+    sampler: number,
+}
+
+export type GLTFAnimationSamplerInterpolation = "LINEAR" | "STEP" | "CATMULLROMSPLINE" | "CUBICSPLINE";
+
+
+type GLTFAnimationSampler = {
+    input: number,
+    interpolation: GLTFAnimationSamplerInterpolation,
+    output: number
+}
+
+type GLTFAnimation = {
+    name: string // TODO: ないはず？
+    channels: GLTFAnimationChannel[],
+    samplers: GLTFAnimationSampler[]
+}
+
+export const GLTFAnimationChannelTargetPath = {
+    translation: "translation",
+    rotation: "rotation",
+    scale: "scale",
+    // weights: "weights";
+} as const;
+
+export type GLTFAnimationChannelTargetPath = typeof GLTFAnimationChannelTargetPath[keyof typeof GLTFAnimationChannelTargetPath];
+
+// export type GLTFAnimationKeyframeType = "Vector3" | "Quaternion";
+
+export type GLTFNodeActorKind = Bone | Actor;
 
 export async function loadGLTF({
                                    gpu,
                                    path,
-                               }) {
+                               }: { gpu: GPU, path: string }) {
     const response = await fetch(path);
     const gltf = await response.json();
 
@@ -36,7 +117,7 @@ export async function loadGLTF({
     // for debug
     console.log("[loadGLTF]", gltf);
 
-    const cacheNodes = [];
+    const cacheNodes: GLTFNodeActorKind[] = [];
 
     // gltf.scene ... default scene index
     // const targetScene = gltf.scenes[gltf.scene];
@@ -50,14 +131,14 @@ export async function loadGLTF({
     // console.log('gl.UNSIGNED_INT', gl.UNSIGNED_INT); // 5125
     // console.log('gl.FLOAT', gl.FLOAT); // 5126    
 
-    const binBufferDataList = await Promise.all(gltf.buffers.map(async (buffer) => {
+    const binBufferDataList = await Promise.all(gltf.buffers.map(async (buffer: GLTFBuffer) => {
         // NOTE: buffer = { byteLength, uri }
         const binResponse = await fetch(buffer.uri);
         const binBufferData = await binResponse.arrayBuffer();
         return {byteLength: buffer.byteLength, binBufferData};
     }));
 
-    const getBufferData = (accessor) => {
+    const getBufferData = (accessor: GLTFAccessor) => {
         const bufferView = gltf.bufferViews[accessor.bufferView];
         const {binBufferData} = binBufferDataList[bufferView.buffer];
         const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
@@ -65,7 +146,7 @@ export async function loadGLTF({
     }
 
     const createBone = (nodeIndex: number, parentBone: Bone | null = null) => {
-        const node = gltf.nodes[nodeIndex];
+        const node: GLTFNode = gltf.nodes[nodeIndex];
         // NOTE:
         // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
         const bone = new Bone({name: node.name, index: nodeIndex});
@@ -79,9 +160,18 @@ export async function loadGLTF({
         // );
         // use trs
         const offsetMatrix = Matrix4.fromTRS(
-            node.translation ? new Vector3(...node.translation) : Vector3.zero,
-            node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
-            node.scale ? new Vector3(...node.scale) : Vector3.one
+            // node.translation ? new Vector3(...node.translation) : Vector3.zero,
+            // node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
+            // node.scale ? new Vector3(...node.scale) : Vector3.one
+            node.translation
+                ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
+                : Vector3.zero,
+            node.rotation
+                ? Rotator.fromQuaternion(new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[2]))
+                : new Rotator(0, 0, 0),
+            node.scale
+                ? new Vector3(node.scale[0], node.scale[1], node.scale[2])
+                : Vector3.one
         );
         bone.offsetMatrix = offsetMatrix;
 
@@ -95,23 +185,27 @@ export async function loadGLTF({
         return bone;
     };
 
-    const createMesh = ({nodeIndex, meshIndex, skinIndex = null}) => {
-        let positions = null;
-        let normals = null;
-        let tangents = null;
-        let binormals = null;
-        let uvs = null;
-        let indices = null;
-        let joints = null;
-        let weights = null;
-        let rootBone = null;
+    const createMesh = ({
+                            // nodeIndex,
+                            meshIndex,
+                            skinIndex = null
+                        }: { /*nodeIndex: number, */ meshIndex: number, skinIndex: number | null }) => {
+        let positions: Float32Array = new Float32Array();
+        let normals: Float32Array = new Float32Array();
+        let tangents: Float32Array = new Float32Array();
+        let binormals: Float32Array = new Float32Array();
+        let uvs: Float32Array = new Float32Array();
+        let indices: Uint16Array = new Uint16Array();
+        let joints: Uint16Array = new Uint16Array();
+        let weights: Float32Array = new Float32Array();
+        let rootBone: Bone | null = null;
 
         console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
 
         const mesh = gltf.meshes[meshIndex];
 
-        mesh.primitives.forEach(primitive => {
-            const meshAccessors: MeshAccessor = {
+        mesh.primitives.forEach((primitive: GLTFMeshPrimitives) => {
+            const meshAccessors: GLTFMeshAccessor = {
                 attributes: [],
                 indices: null
             }
@@ -172,11 +266,15 @@ export async function loadGLTF({
         const uvFlippedY = uvs.map((elem, i) => i % 2 === 0 ? elem : 1. - elem);
 
         if (tangents) {
-            binormals = Geometry.createBinormals(normals, tangents);
+            // binormals = Geometry.createBinormals(normals, tangents);
+            binormals = new Float32Array(Geometry.createBinormals(Array.from(normals), Array.from(tangents)));
         } else {
-            const d = Geometry.createTangentsAndBinormals(normals);
-            tangents = d.tangents;
-            binormals = d.binormals;
+            // const d = Geometry.createTangentsAndBinormals(normals);
+            // tangents = d.tangents;
+            // binormals = d.binormals;
+            const d = Geometry.createTangentsAndBinormals(Array.from(normals));
+            tangents = new Float32Array(d.tangents);
+            binormals = new Float32Array(d.binormals);
         }
 
         // for debug
@@ -229,7 +327,8 @@ export async function loadGLTF({
                     size: 3
                 }),
             ],
-            indices,
+            // indices,
+            indices: Array.from(indices),
             drawCount: indices.length
         });
 
@@ -238,8 +337,8 @@ export async function loadGLTF({
             : new Mesh({geometry})
     }
 
-    const findNode = (nodeIndex, parentActor) => {
-        const targetNode = gltf.nodes[nodeIndex];
+    const findNode = (nodeIndex: number, parentActor: Actor) => {
+        const targetNode: GLTFNode = gltf.nodes[nodeIndex];
 
         // for debug
         // console.log("[loadGLTF.findNode] target node", targetNode);
@@ -251,9 +350,9 @@ export async function loadGLTF({
         if (hasMesh) {
             // TODO: fix multi mesh
             const meshActor = createMesh({
-                nodeIndex,
-                meshIndex: targetNode.mesh,
-                skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin : null
+                // nodeIndex,
+                meshIndex: targetNode.mesh!, // has mesh なのであるはず
+                skinIndex: targetNode.hasOwnProperty("skin") ? targetNode.skin! : null //
             });
             cacheNodes[nodeIndex] = meshActor;
 
@@ -279,14 +378,14 @@ export async function loadGLTF({
         }
     }
 
-    gltf.scenes.forEach(scene => {
+    gltf.scenes.forEach((scene: GLTFScene) => {
         scene.nodes.forEach(node => {
             findNode(node, rootActor)
         });
     });
 
     const createAnimationClips = () => {
-        return gltf.animations.map(animation => {
+        return gltf.animations.map((animation: GLTFAnimation) => {
             const keyframes = animation.channels.map(channel => {
                 const sampler = animation.samplers[channel.sampler];
                 const inputAccessor = gltf.accessors[sampler.input];
@@ -295,13 +394,17 @@ export async function loadGLTF({
                 const outputAccessor = gltf.accessors[sampler.output];
                 const outputBufferData = getBufferData(outputAccessor);
                 const outputData = new Float32Array(outputBufferData);
-                let elementSize;
+                // @ts-ignore
+                let elementSize: number;
                 switch (channel.target.path) {
-                    case "translation":
-                    case "scale":
+                    // case "translation":
+                    // case "scale":
+                    case GLTFAnimationChannelTargetPath.translation:
+                    case GLTFAnimationChannelTargetPath.scale:
                         elementSize = 3;
                         break;
-                    case "rotation":
+                    // case "rotation":
+                    case GLTFAnimationChannelTargetPath.rotation:
                         elementSize = 4;
                         break;
                     default:
@@ -310,11 +413,14 @@ export async function loadGLTF({
 
                 let animationKeyframeType;
                 switch (channel.target.path) {
-                    case "rotation":
+                    // case "rotation":
+                    case GLTFAnimationChannelTargetPath.rotation:
                         animationKeyframeType = AnimationKeyframeTypes.Quaternion;
                         break;
-                    case "translation":
-                    case "scale":
+                    // case "translation":
+                    // case "scale":
+                    case GLTFAnimationChannelTargetPath.translation:
+                    case GLTFAnimationChannelTargetPath.scale:
                         animationKeyframeType = AnimationKeyframeTypes.Vector3;
                         break;
                     default:

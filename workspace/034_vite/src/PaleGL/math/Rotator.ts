@@ -1,4 +1,4 @@
-﻿import {Quaternion} from "./Quaternion.ts";
+﻿import {Quaternion} from "./Quaternion";
 
 export class Rotator {
     // x, y, z axes

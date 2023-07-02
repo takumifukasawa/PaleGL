@@ -1,8 +1,8 @@
 ﻿import {GLObject} from "./GLObject.js";
 import {AttributeUsageType} from "../constants.js";
 import {IndexBufferObject} from "./IndexBufferObject.js";
-import {GPU} from "./GPU.ts";
-import {Attribute} from "./Attribute.ts";
+import {GPU} from "./GPU";
+import {Attribute} from "./Attribute";
 
 type VertexBufferObject = {
     name: string,

@@ -1,12 +1,12 @@
-﻿import {TimeSkipper} from "../utilities/TimeSkipper.ts";
-import {TimeAccumulator} from "../utilities/TimeAccumulator.ts";
-import {ActorTypes} from "../constants.ts";
-import {Stats} from "../utilities/Stats.ts";
-import {GPU} from "./GPU.ts";
-import {Scene} from "./Scene.ts";
-import {Renderer} from "./Renderer.ts";
+﻿import {TimeSkipper} from "../utilities/TimeSkipper";
+import {TimeAccumulator} from "../utilities/TimeAccumulator";
+import {ActorTypes} from "../constants";
+import {Stats} from "../utilities/Stats";
+import {GPU} from "./GPU";
+import {Scene} from "./Scene";
+import {Renderer} from "./Renderer";
 
-type EngineOnBeforeStartCallbackArgs = void;
+// type EngineOnBeforeStartCallbackArgs = void;
 
 type EngineOnStartCallbackArgs = void;
 
@@ -25,7 +25,7 @@ type EngineOnBeforeUpdateCallbackArgs = {
 //     deltaTime: number
 // };
 
-export type EngineOnBeforeStartCallback = (args: EngineOnBeforeStartCallbackArgs) => void;
+export type EngineOnBeforeStartCallback = () => void;
 export type EngineOnStartCallback = (args: EngineOnStartCallbackArgs) => void;
 export type EngineOnBeforeFixedUpdateCallback = (args: EngineOnBeforeFixedUpdateCallbackArgs) => void;
 export type EngineOnBeforeUpdateCallback = (args: EngineOnBeforeUpdateCallbackArgs) => void;
@@ -76,9 +76,9 @@ export class Engine {
                 }: {
         gpu: GPU,
         renderer: Renderer,
-        onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback,
-        onBeforeUpdate: EngineOnBeforeUpdateCallback,
-        onRender: EngineOnRenderCallback
+        onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback,
+        onBeforeUpdate?: EngineOnBeforeUpdateCallback,
+        onRender?: EngineOnRenderCallback
     }) {
         this.#gpu = gpu;
         this.#renderer = renderer;

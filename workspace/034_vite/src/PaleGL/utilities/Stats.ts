@@ -1,5 +1,5 @@
-import {AttributeNames} from "../constants.ts";
-import {Geometry} from "../geometries/Geometry.ts";
+import {AttributeNames} from "../constants";
+import {Geometry} from "../geometries/Geometry";
 
 export class Stats {
     domElement;

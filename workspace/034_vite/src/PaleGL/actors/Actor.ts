@@ -1,12 +1,17 @@
-﻿import {Transform} from "../core/Transform.ts";
-import {ActorType, ActorTypes} from "./../constants.ts";
-import {uuidv4} from "../utilities/uuid.ts";
-import {Animator} from "../core/Animator.ts";
-import {GPU} from "../core/GPU.ts";
+﻿import {Transform} from "../core/Transform";
+import {ActorType, ActorTypes} from "./../constants";
+import {uuidv4} from "../utilities/uuid";
+import {Animator} from "../core/Animator";
+import {GPU} from "../core/GPU";
+import {Camera} from "./Camera";
 
-type OnStartCallback = (args: {actor: Actor, gpu: GPU}) => void;
-type OnFixedUpdateCallback = (args: {actor: Actor, gpu: GPU, fixedTime: number, fixedDeltaTime: number}) => void;
-type OnUpdateCallback = (args: {actor: Actor, gpu: GPU, time: number, deltaTime: number}) => void;
+type OnStartCallback = (args: { actor: Actor, gpu: GPU }) => void;
+type OnFixedUpdateCallback = (args: { actor: Actor, gpu: GPU, fixedTime: number, fixedDeltaTime: number }) => void;
+type OnUpdateCallback = (args: { actor: Actor, gpu: GPU, time: number, deltaTime: number }) => void;
+
+export type ActorStartArgs = { gpu: GPU };
+export type ActorFixedUpdateArgs = { gpu: GPU, fixedTime: number, fixedDeltaTime: number };
+export type ActorUpdateArgs = { gpu: GPU, time: number, deltaTime: number };
 
 export class Actor {
     transform: Transform;
@@ -57,7 +62,7 @@ export class Actor {
     setSize(width: number, height: number) {
     }
 
-    #tryStart({gpu}: {gpu: GPU}) {
+    #tryStart({gpu}: { gpu: GPU }) {
         if (this.isStarted) {
             return;
         }
@@ -65,7 +70,8 @@ export class Actor {
         this.start({gpu});
     }
 
-    updateTransform() {
+    // @ts-ignore
+    updateTransform(camera?: Camera) {
         this.transform.updateMatrix();
     }
 
@@ -74,14 +80,14 @@ export class Actor {
     // -----------------------------------------------------------------
 
     // start({gpu}: { gpu: GPU } = {}) {
-    start({gpu}: { gpu: GPU }) {
+    start({gpu}: ActorStartArgs) {
         if (this._onStart) {
             this._onStart({actor: this, gpu});
         }
     }
 
     // fixedUpdate({gpu, fixedTime, fixedDeltaTime}: { gpu: GPU, fixedTime: number, fixedDeltaTime: number } = {}) {
-    fixedUpdate({gpu, fixedTime, fixedDeltaTime}: { gpu: GPU, fixedTime: number, fixedDeltaTime: number }) {
+    fixedUpdate({gpu, fixedTime, fixedDeltaTime}: ActorFixedUpdateArgs) {
         this.#tryStart({gpu});
         if (this.animator) {
             this.animator.update(fixedDeltaTime);
@@ -92,7 +98,7 @@ export class Actor {
     }
 
     // update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number } = {}) {
-    update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number }) {
+    update({gpu, time, deltaTime}: ActorUpdateArgs) {
         this.#tryStart({gpu});
         if (this._onUpdate) {
             this._onUpdate({actor: this, gpu, time, deltaTime});

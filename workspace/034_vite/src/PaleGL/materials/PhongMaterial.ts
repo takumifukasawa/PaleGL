@@ -1,9 +1,9 @@
-import {Material, Uniforms, VertexShaderModifier} from "./Material.ts";
+import {MaterialArgs, Material, Uniforms, VertexShaderModifier} from "./Material";
 import {
     shadowMapFragmentFunc,
     shadowMapFragmentUniforms,
     shadowMapFragmentVaryings
-} from "../shaders/shadowMapShader.ts";
+} from "../shaders/shadowMapShader";
 import {
     alphaTestFragmentUniforms,
     alphaTestFragmentFunc,
@@ -11,16 +11,29 @@ import {
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
     phongSurfaceDirectionalLightFunc
-} from "../shaders/lightingCommon.ts";
-import {UniformTypes} from "../constants.ts";
-import {Vector2} from "../math/Vector2.ts";
-import {Color} from "../math/Color.ts";
+} from "../shaders/lightingCommon";
+import {UniformTypes} from "../constants";
+import {Vector2} from "../math/Vector2";
+import {Color} from "../math/Color";
 // import {buildVertexShader} from "../shaders/buildShader.js";
-import {AttributeDescriptor} from "../core/Attribute.ts";
-import {GPU} from "../core/GPU.ts";
-import {Texture} from "../core/Texture.ts";
-import {Vector3} from "../math/Vector3.ts";
-import {Vector4} from "../math/Vector4.ts";
+import {AttributeDescriptor} from "../core/Attribute";
+import {GPU} from "../core/GPU";
+import {Texture} from "../core/Texture";
+import {Vector3} from "../math/Vector3";
+import {Vector4} from "../math/Vector4";
+
+export type PhongMaterialArgs = {
+    diffuseColor?: Color,
+    diffuseMap?: Texture
+    diffuseMapUvScale?: Vector2,
+    diffuseMapUvOffset?: Vector2,
+    specularAmount?: number,
+    normalMap?: Texture,
+    normalMapUvScale?: Vector2,
+    normalMapUvOffset?: Vector2,
+    vertexShaderModifier?: VertexShaderModifier,
+    uniforms?: Uniforms,
+} & MaterialArgs;
 
 export class PhongMaterial extends Material {
     // // params
@@ -40,18 +53,7 @@ export class PhongMaterial extends Material {
                     vertexShaderModifier = {},
                     uniforms = {},
                     ...options
-                }: {
-        diffuseColor?: Color,
-        diffuseMap?: Texture
-        diffuseMapUvScale?: Vector2,
-        diffuseMapUvOffset?: Vector2,
-        specularAmount?: number,
-        normalMap?: Texture,
-        normalMapUvScale?: Vector2,
-        normalMapUvOffset?: Vector2,
-        vertexShaderModifier?: VertexShaderModifier,
-        uniforms?: Uniforms,
-    }) {
+                }: PhongMaterialArgs) {
         // this.specularAmount = 
 
         const baseUniforms: Uniforms = {
@@ -263,7 +265,12 @@ void main() {
         return shader;
     }
 
-    generateFragmentShader({receiveShadow, useNormalMap, useAlphaTest, useVertexColor}: {receiveShadow: boolean, useNormalMap: boolean, useAlphaTest: boolean, useVertexColor: boolean }): string {
+    generateFragmentShader({
+                               receiveShadow,
+                               useNormalMap,
+                               useAlphaTest,
+                               useVertexColor
+                           }: { receiveShadow: boolean, useNormalMap: boolean, useAlphaTest: boolean, useVertexColor: boolean }): string {
         return `#version 300 es
 
 precision mediump float;
@@ -369,7 +376,7 @@ void main() {
 `;
     }
 
-    generateDepthFragmentShader({useAlphaTest, useVertexColor}: {useAlphaTest: boolean, useVertexColor: boolean}) {
+    generateDepthFragmentShader({useAlphaTest, useVertexColor}: { useAlphaTest: boolean, useVertexColor: boolean }) {
         return `#version 300 es
 
 precision mediump float;

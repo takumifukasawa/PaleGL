@@ -1,4 +1,4 @@
-import {UniformNames} from "../constants.ts";
+import {UniformNames} from "../constants";
 
 export const shadowMapVertexVaryings: () => string = () => `
 out vec4 vShadowMapProjectionUv;

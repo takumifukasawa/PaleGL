@@ -1,7 +1,7 @@
 ﻿import {Camera, FrustumDirection, FrustumDirectionType, FrustumVectors} from "./Camera.js";
 import {Matrix4} from "../math/Matrix4.js";
 import {Vector3} from "../math/Vector3.js";
-import {CameraTypes} from "../constants.ts";
+import {CameraTypes} from "../constants";
 
 export class OrthographicCamera extends Camera {
     left: number = 0;
@@ -23,14 +23,16 @@ export class OrthographicCamera extends Camera {
         this.setOrthoSize(1, 1, left, right, bottom, top);
     }
 
-    setOrthoSize(width: number, height: number, left: number, right: number, bottom: number, top: number) {
+    setOrthoSize(width: number | null, height: number | null, left: number, right: number, bottom: number, top: number) {
         if (left && right && top && bottom) {
             this.left = left;
             this.right = right;
             this.bottom = bottom;
             this.top = top;
         }
-        this.setSize(width, height);
+        if (width !== null && height !== null) {
+            this.setSize(width, height);
+        }
     }
 
     setSize(width: number, height: number) {

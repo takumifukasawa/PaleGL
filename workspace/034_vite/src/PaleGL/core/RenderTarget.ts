@@ -1,14 +1,15 @@
-﻿import {Texture} from "./Texture.ts";
-import {Framebuffer} from "./Framebuffer.ts";
-import {Renderbuffer} from "./Renderbuffer.ts";
+﻿import {Texture} from "./Texture";
+import {Framebuffer} from "./Framebuffer";
+import {Renderbuffer} from "./Renderbuffer";
 import {
     RenderbufferTypes,
     RenderTargetType,
     RenderTargetTypes, TextureFilterType,
     TextureFilterTypes,
-    TextureTypes
-} from "./../constants.ts";
-import {AbstractRenderTarget} from "./AbstractRenderTarget.ts";
+    TextureTypes,
+    GLColorAttachment,
+} from "./../constants";
+import {AbstractRenderTarget} from "./AbstractRenderTarget";
 import {GPU} from "./GPU";
 
 export type RenderTargetOptions = {
@@ -112,7 +113,8 @@ export class RenderTarget extends AbstractRenderTarget {
                 0
             );
 
-            this._framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0);
+            // this._framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0);
+            this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
         }
 
         if (this.type === RenderTargetTypes.Depth || writeDepthTexture) {
