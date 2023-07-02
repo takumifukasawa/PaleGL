@@ -1,3 +1,11 @@
+import {Vector3} from "../math/Vector3.ts";
+import {Vector4} from "../math/Vector4.ts";
+
+export type DirectionalLightStruct = {
+    direction: Vector3;
+    intensity: number;
+    color: Vector4;
+}
 
 export const alphaTestFragmentFunc: () => string = () => `
 void checkAlphaTest(float value, float threshold) {
@@ -44,6 +52,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
     return resultNormal;
 }
 `
+
 
 export const directionalLightFragmentUniforms: () => string = () => `
 struct DirectionalLight {

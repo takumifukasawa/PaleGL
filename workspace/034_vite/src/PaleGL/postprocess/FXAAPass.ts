@@ -1,7 +1,8 @@
 ﻿import {PostProcessPass} from "./PostProcessPass.ts";
 import {UniformTypes,UniformNames} from "../constants.ts";
-import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
-import {GPU} from "../core/GPU";
+import {GPU} from "../core/GPU.ts";
+// import {IPostProcessPass} from "./AbstractPostProcessPass.ts";
+// import {GPU} from "../core/GPU.ts";
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
@@ -12,10 +13,10 @@ import {GPU} from "../core/GPU";
 export class FXAAPass extends PostProcessPass {
 // export class FXAAPass implements IPostProcessPass {
    
-    get gpu() {
-        return this.gpu;
-    }
-    constructor({ gpu }) {
+    // get gpu() {
+    //     return this.gpu;
+    // }
+    constructor({ gpu }: {gpu: GPU}) {
         // # high quality
         const edgeStepsArray = [1., 1.5, 2., 2., 2., 2., 2., 2., 2., 4.];
         const edgeStepCount = 10;
@@ -433,10 +434,10 @@ void main() {
                 }
             }
         });
-        this.gpu = gpu;
+        // this.gpu = gpu;
     }
     
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         super.setSize(width, height);
         // this.material.uniforms.uTargetWidth.value = width;
         // this.material.uniforms.uTargetHeight.value = height;

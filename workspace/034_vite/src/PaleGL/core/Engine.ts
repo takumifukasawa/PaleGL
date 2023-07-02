@@ -122,7 +122,8 @@ export class Engine {
         this.#scenes.forEach(scene => {
             scene.traverse((actor) => actor.setSize(w, h));
         });
-        this.#renderer.setSize(w, h, rw, rh);
+        // this.#renderer.setSize(w, h, rw, rh);
+        this.#renderer.setSize(rw, rh);
     }
 
     fixedUpdate(fixedTime: number, fixedDeltaTime: number) {

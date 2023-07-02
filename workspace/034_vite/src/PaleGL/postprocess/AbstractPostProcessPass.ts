@@ -12,7 +12,7 @@ export type PostProcessRenderArgs = {
 }
 
 export interface IPostProcessPass {
-    gpu: GPU;
+    // gpu: GPU;
     name: string;
     enabled: boolean;
     width: number;

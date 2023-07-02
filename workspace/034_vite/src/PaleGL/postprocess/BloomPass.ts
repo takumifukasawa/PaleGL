@@ -4,7 +4,7 @@ import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass
 import {FragmentPass} from "./FragmentPass.ts";
 import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader.ts";
 import {RenderTarget} from "../core/RenderTarget.ts";
-import {CopyPass} from "./CopyPass.ts";
+// import {CopyPass} from "./CopyPass.ts";
 import {Material} from "../materials/Material.ts";
 import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities.ts";
 import {PlaneGeometry} from "../geometries/PlaneGeometry";
@@ -16,37 +16,39 @@ import {Renderer} from "../core/Renderer";
 // TODO: mipmap使う方法に変えてみる
 // export class BloomPass extends AbstractPostProcessPass {
 export class BloomPass implements IPostProcessPass {
-    gpu: GPU;
+    // gpu: GPU;
     name: string = "BloomPass";
-    enabled: boolean
-    width: 1;
-    height: 1;
+    enabled: boolean = false;
+    width: number = 1;
+    height: number = 1;
 
     private extractBrightnessPass;
 
-    private renderTargetExtractBrightness;
-    private renderTargetBlurMip4_Horizontal;
-    private renderTargetBlurMip4_Vertical;
-    private renderTargetBlurMip8_Horizontal;
-    private renderTargetBlurMip8_Vertical;
-    private renderTargetBlurMip16_Horizontal;
-    private renderTargetBlurMip16_Vertical;
-    private renderTargetBlurMip32_Horizontal;
-    private renderTargetBlurMip32_Vertical;
+    // tmp
+    // private renderTargetExtractBrightness: RenderTarget;
+    private renderTargetBlurMip4_Horizontal: RenderTarget;
+    private renderTargetBlurMip4_Vertical: RenderTarget;
+    private renderTargetBlurMip8_Horizontal: RenderTarget;
+    private renderTargetBlurMip8_Vertical: RenderTarget;
+    private renderTargetBlurMip16_Horizontal: RenderTarget;
+    private renderTargetBlurMip16_Vertical: RenderTarget;
+    private renderTargetBlurMip32_Horizontal: RenderTarget;
+    private renderTargetBlurMip32_Vertical: RenderTarget;
 
-    private horizontalBlurPass;
-    private verticalBlurPass;
+    // tmp
+    // private horizontalBlurPass: FragmentPass;
+    // private verticalBlurPass: FragmentPass;
 
     // #lastPass;
-    private compositePass;
+    private compositePass: FragmentPass;
 
-    private geometry;
-    horizontalBlurMaterial;
-    verticalBlurMaterial;
+    private geometry: PlaneGeometry;
+    horizontalBlurMaterial: Material;
+    verticalBlurMaterial: Material;
 
-    threshold = 0.8;
-    tone = 1;
-    bloomAmount = 1;
+    threshold: number = 0.8;
+    tone: number = 1;
+    bloomAmount: number = 1;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
@@ -60,7 +62,7 @@ export class BloomPass implements IPostProcessPass {
                 }: { gpu: GPU, threshold?: number, tone?: number, bloomAmount?: number }) {
         // super();
 
-        this.gpu = gpu;
+        // this.gpu = gpu;
 
         this.threshold = threshold;
         this.tone = tone;
@@ -69,7 +71,8 @@ export class BloomPass implements IPostProcessPass {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({gpu});
 
-        this.renderTargetExtractBrightness = new RenderTarget({gpu});
+        // tmp
+        // this.renderTargetExtractBrightness = new RenderTarget({gpu});
         this.renderTargetBlurMip4_Horizontal = new RenderTarget({gpu})
         this.renderTargetBlurMip4_Vertical = new RenderTarget({gpu})
         this.renderTargetBlurMip8_Horizontal = new RenderTarget({gpu})
@@ -128,7 +131,7 @@ void main() {
         const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
 
         this.horizontalBlurMaterial = new Material({
-            gpu,
+            // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
@@ -153,7 +156,7 @@ void main() {
             }
         });
         this.verticalBlurMaterial = new Material({
-            gpu,
+            // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
@@ -178,40 +181,41 @@ void main() {
             }
         });
 
-        this.horizontalBlurPass = new FragmentPass({
-            name: "horizontal blur pass",
-            gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
-            }),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }
-        });
-        this.verticalBlurPass = new FragmentPass({
-            name: "vertical blur pass",
-            gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
-            }),
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                }
-            }
-        });
+        // tmp
+        // this.horizontalBlurPass = new FragmentPass({
+        //     name: "horizontal blur pass",
+        //     gpu,
+        //     fragmentShader: gaussianBlurFragmentShader({
+        //         isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+        //     }),
+        //     uniforms: {
+        //         uTargetWidth: {
+        //             type: UniformTypes.Float,
+        //             value: 1,
+        //         },
+        //         uTargetHeight: {
+        //             type: UniformTypes.Float,
+        //             value: 1,
+        //         }
+        //     }
+        // });
+        // this.verticalBlurPass = new FragmentPass({
+        //     name: "vertical blur pass",
+        //     gpu,
+        //     fragmentShader: gaussianBlurFragmentShader({
+        //         isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+        //     }),
+        //     uniforms: {
+        //         uTargetWidth: {
+        //             type: UniformTypes.Float,
+        //             value: 1,
+        //         },
+        //         uTargetHeight: {
+        //             type: UniformTypes.Float,
+        //             value: 1,
+        //         }
+        //     }
+        // });
 
         // this.#lastPass = new CopyPass({ gpu });
         // this.#passes.push(this.#lastPass);
@@ -309,6 +313,7 @@ void main() {
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
+    // @ts-ignore
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
     }
 
@@ -325,16 +330,14 @@ void main() {
             this.verticalBlurMaterial.start({gpu, attributeDescriptors: this.geometry.getAttributeDescriptors()});
         }
 
-        // this.extractBrightnessPass.material.uniforms.uThreshold.value = this.threshold;
         this.extractBrightnessPass.material.updateUniform("uThreshold", this.threshold);
-
-        this.extractBrightnessPass.render({gpu, camera, renderer, prevRenderTarget});
+        this.extractBrightnessPass.render({gpu, camera, renderer, prevRenderTarget, isLastPass: false});
 
         // for debug
         // this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
 
-        const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {
+        const renderBlur = (horizontalRenderTarget: RenderTarget, verticalRenderTarget: RenderTarget, downSize: number) => {
             const w = this.#width / downSize;
             const h = this.#height / downSize;
 

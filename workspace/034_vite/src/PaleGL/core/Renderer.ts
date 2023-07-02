@@ -1,14 +1,19 @@
 ﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants.ts";
 import {Matrix4} from "../math/Matrix4.ts";
 import {GPU} from "./GPU";
+import {Stats} from "../utilities/Stats.ts";
+import {Light} from "../actors/Light.ts";
+import {Mesh} from "../actors/Mesh.ts";
+import {Scene} from "./Scene.ts";
+import {Camera} from "../actors/Camera.ts";
 
 export class Renderer {
     private gpu;
     canvas;
     pixelRatio;
-    private realWidth;
-    private realHeight;
-    #stats;
+    private realWidth: number = 1;
+    private realHeight: number = 1;
+    #stats: Stats | null = null;
 
     constructor({gpu, canvas, pixelRatio = 1.5}: { gpu: GPU, canvas: HTMLCanvasElement, pixelRatio: number }) {
         this.gpu = gpu;
@@ -16,11 +21,12 @@ export class Renderer {
         this.pixelRatio = pixelRatio;
     }
 
-    setStats(stats) {
+    setStats(stats: Stats) {
         this.#stats = stats;
     }
 
-    setSize(width, height, realWidth, realHeight) {
+    setSize(realWidth: number, realHeight: number) {
+    // setSize(width: number, height: number, realWidth: number, realHeight: number) {
         this.realWidth = realWidth;
         this.realHeight = realHeight;
         this.canvas.width = this.realWidth;
@@ -42,12 +48,16 @@ export class Renderer {
         this.gpu.flush();
     }
 
-    clear(r, g, b, a) {
+    // TODO: pass Color
+    clear(r: number, g: number, b: number, a: number) {
         this.gpu.clear(r, g, b, a);
     }
 
-    #shadowPass(castShadowLightActors, castShadowRenderMeshInfos) {
+    #shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: Mesh[]) {
         castShadowLightActors.forEach(lightActor => {
+            if(!lightActor.shadowMap) {
+                return;
+            }
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
 
@@ -79,7 +89,7 @@ export class Renderer {
         });
     }
 
-    #buildRenderMeshInfo(actor, materialIndex = 0) {
+    #buildRenderMeshInfo(actor: Mesh, materialIndex: number = 0): {actor: Mesh, materialIndex: number} {
         return {
             actor,
             materialIndex
@@ -211,14 +221,14 @@ export class Renderer {
         });
     }
 
-    render(scene, camera, {useShadowPass = true, clearScene = true}) {
+    render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
         const renderMeshInfoEachQueue = {
             opaque: [],
             skybox: [], // maybe only one
             alphaTest: [],
             transparent: [],
         };
-        const lightActors = [];
+        const lightActors: Light[] = [];
 
         scene.traverse((actor) => {
             switch (actor.type) {
@@ -229,7 +239,7 @@ export class Renderer {
                     return;
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
-                    actor.materials.forEach((material, i) => {
+                    (actor as Mesh).materials.forEach((material, i) => {
                         if (!!material.alphaTest) {
                             renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
                             return;

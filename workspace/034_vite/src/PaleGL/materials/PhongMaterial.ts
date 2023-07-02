@@ -1,4 +1,4 @@
-import {Material, VertexShaderModifier} from "./Material.ts";
+import {Material, Uniforms, VertexShaderModifier} from "./Material.ts";
 import {
     shadowMapFragmentFunc,
     shadowMapFragmentUniforms,
@@ -10,14 +10,17 @@ import {
     directionalLightFragmentUniforms,
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
-    phongSurfaceDirectionalLightFunc, normalMapVertexVaryings
+    phongSurfaceDirectionalLightFunc
 } from "../shaders/lightingCommon.ts";
 import {UniformTypes} from "../constants.ts";
 import {Vector2} from "../math/Vector2.ts";
 import {Color} from "../math/Color.ts";
-import {buildVertexShader} from "../shaders/buildShader.js";
-import {AttributeDescriptor} from "../core/Attribute";
-import {GPU} from "../core/GPU";
+// import {buildVertexShader} from "../shaders/buildShader.js";
+import {AttributeDescriptor} from "../core/Attribute.ts";
+import {GPU} from "../core/GPU.ts";
+import {Texture} from "../core/Texture.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {Vector4} from "../math/Vector4.ts";
 
 export class PhongMaterial extends Material {
     // // params
@@ -37,17 +40,28 @@ export class PhongMaterial extends Material {
                     vertexShaderModifier = {},
                     uniforms = {},
                     ...options
-                }) {
+                }: {
+        diffuseColor?: Color,
+        diffuseMap?: Texture
+        diffuseMapUvScale?: Vector2,
+        diffuseMapUvOffset?: Vector2,
+        specularAmount?: number,
+        normalMap?: Texture,
+        normalMapUvScale?: Vector2,
+        normalMapUvOffset?: Vector2,
+        vertexShaderModifier?: VertexShaderModifier,
+        uniforms?: Uniforms,
+    }) {
         // this.specularAmount = 
 
-        const baseUniforms = {
+        const baseUniforms: Uniforms = {
             uDiffuseColor: {
                 type: UniformTypes.Color,
                 value: diffuseColor || Color.white(),
             },
             uDiffuseMap: {
                 type: UniformTypes.Texture,
-                value: diffuseMap,
+                value: diffuseMap || null,
             },
             uDiffuseMapUvScale: {
                 type: UniformTypes.Vector2,
@@ -63,7 +77,7 @@ export class PhongMaterial extends Material {
             },
             uNormalMap: {
                 type: UniformTypes.Texture,
-                value: normalMap,
+                value: normalMap || null,
             },
             uNormalMapUvScale: {
                 type: UniformTypes.Vector2,
@@ -75,19 +89,23 @@ export class PhongMaterial extends Material {
             },
             uDirectionalLight: {
                 type: UniformTypes.Struct,
-                value: {}
+                value: {
+                    direction: Vector3.zero,
+                    intensity: 0,
+                    color: new Vector4(0, 0, 0, 0),
+                }
             }
         };
 
-        const mergedUniforms = {
+        const mergedUniforms: Uniforms = {
             ...baseUniforms,
             ...(uniforms ? uniforms : {})
         };
 
-        const depthUniforms = {
+        const depthUniforms: Uniforms = {
             uDiffuseMap: {
                 type: UniformTypes.Texture,
-                value: diffuseMap,
+                value: diffuseMap || null,
             },
             uDiffuseMapUvScale: {
                 type: UniformTypes.Vector2,
@@ -114,29 +132,29 @@ export class PhongMaterial extends Material {
         });
     }
 
-    start({gpu, attributeDescriptors}: { gpu: GPU, attributeDescriptors?: AttributeDescriptor[] }) {
+    start({gpu, attributeDescriptors = []}: { gpu: GPU, attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = this.generateVertexShader({
-            isSkinning: this.isSkinning,
-            gpuSkinning: this.gpuSkinning,
+            isSkinning: !!this.isSkinning,
+            gpuSkinning: !!this.gpuSkinning,
             jointNum: this.isSkinning ? this.jointNum : null,
             receiveShadow: this.receiveShadow,
-            useNormalMap: this.useNormalMap,
+            useNormalMap: !!this.useNormalMap,
             isInstancing: this.isInstancing,
             useVertexColor: this.useVertexColor,
             // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
             vertexShaderModifier: this.vertexShaderModifier,
-            attributeDescriptors: attributeDescriptors
+            // attributeDescriptors: attributeDescriptors
         });
 
         this.fragmentShader = this.generateFragmentShader({
             receiveShadow: this.receiveShadow,
-            useNormalMap: this.useNormalMap,
-            alphaTest: this.alphaTest,
+            useNormalMap: !!this.useNormalMap,
+            useAlphaTest: this.useAlphaTest,
             useVertexColor: this.useVertexColor
         });
 
         this.depthFragmentShader = this.generateDepthFragmentShader({
-            alphaTest: this.alphaTest,
+            useAlphaTest: this.useAlphaTest,
             useVertexColor: this.useVertexColor
         });
 
@@ -145,14 +163,14 @@ export class PhongMaterial extends Material {
 
     generateVertexShader({
                              isSkinning,
-                             gpuSkinning,
+                             // gpuSkinning,
                              jointNum,
                              receiveShadow,
                              useNormalMap,
-                             isInstancing,
+                             // isInstancing,
                              useVertexColor,
-                             vertexShaderModifier,
-                             attributeDescriptors,
+                             vertexShaderModifier = {},
+                             // attributeDescriptors,
                              insertUniforms,
                          }: {
         isSkinning: boolean,
@@ -163,7 +181,7 @@ export class PhongMaterial extends Material {
         isInstancing: boolean,
         useVertexColor: boolean,
         vertexShaderModifier: VertexShaderModifier,
-        attributeDescriptors: AttributeDescriptor[],
+        // attributeDescriptors: AttributeDescriptor[],
         insertUniforms?: string,
     }): string {
         const shader = `#version 300 es
@@ -245,7 +263,7 @@ void main() {
         return shader;
     }
 
-    generateFragmentShader({receiveShadow, useNormalMap, alphaTest, useVertexColor}): string {
+    generateFragmentShader({receiveShadow, useNormalMap, useAlphaTest, useVertexColor}: {receiveShadow: boolean, useNormalMap: boolean, useAlphaTest: boolean, useVertexColor: boolean }): string {
         return `#version 300 es
 
 precision mediump float;
@@ -257,7 +275,7 @@ uniform float uSpecularAmount;
 ${useNormalMap ? normalMapFragmentUniforms() : ""}
 ${receiveShadow ? shadowMapFragmentUniforms() : ""}
 uniform vec3 uViewPosition;
-${alphaTest ? alphaTestFragmentUniforms() : ""}
+${useAlphaTest ? alphaTestFragmentUniforms() : ""}
 
 ${directionalLightFragmentUniforms()}
 
@@ -287,7 +305,7 @@ layout (location = 1) out vec4 outNormalColor;
 ${phongSurfaceDirectionalLightFunc()}
 ${useNormalMap ? normalMapFragmentFunc() : ""}
 ${receiveShadow ? shadowMapFragmentFunc() : ""}
-${alphaTest ? alphaTestFragmentFunc() : ""}
+${useAlphaTest ? alphaTestFragmentFunc() : ""}
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -333,7 +351,7 @@ void main() {
 `
             : ""
         }
-    ${alphaTest
+    ${useAlphaTest
             ? `
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 `
@@ -351,7 +369,7 @@ void main() {
 `;
     }
 
-    generateDepthFragmentShader({alphaTest, useVertexColor}) {
+    generateDepthFragmentShader({useAlphaTest, useVertexColor}: {useAlphaTest: boolean, useVertexColor: boolean}) {
         return `#version 300 es
 
 precision mediump float;
@@ -359,14 +377,14 @@ precision mediump float;
 uniform vec4 uColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
-${alphaTest ? alphaTestFragmentUniforms() : ""}
+${useAlphaTest ? alphaTestFragmentUniforms() : ""}
 
 in vec2 vUv;
 ${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
 out vec4 outColor;
 
-${alphaTest ? alphaTestFragmentFunc() : ""}    
+${useAlphaTest ? alphaTestFragmentFunc() : ""}    
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -384,7 +402,7 @@ void main() {
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
     
-    ${alphaTest
+    ${useAlphaTest
             ? `
     checkAlphaTest(alpha, uAlphaTestThreshold);
 `

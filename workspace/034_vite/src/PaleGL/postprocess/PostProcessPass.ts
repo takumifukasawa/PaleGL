@@ -11,9 +11,9 @@ import {Camera} from "../actors/Camera.ts";
 
 // export class PostProcessPass extends AbstractPostProcessPass {
 export class PostProcessPass implements IPostProcessPass {
-    protected gpu: GPU;
+    // protected gpu: GPU;
     name: string;
-    enabled: boolean;
+    enabled: boolean = false;
     width: number = 1;
     height: number = 1;
 
@@ -37,7 +37,7 @@ void main() {
 `;
     }
 
-    constructor({gpu, vertexShader, fragmentShader, uniforms, name}: {
+    constructor({gpu, vertexShader, fragmentShader, uniforms, name = ""}: {
         gpu: GPU,
         vertexShader?: string,
         fragmentShader: string,
@@ -53,7 +53,7 @@ void main() {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({gpu});
         this.material = new Material({
-            gpu,
+            // gpu,
             vertexShader,
             fragmentShader,
             uniforms: {
@@ -98,7 +98,7 @@ void main() {
         gpu: GPU,
         camera: Camera,
         renderer: Renderer,
-        prevRenderTarget: RenderTarget,
+        prevRenderTarget: RenderTarget | null,
         isLastPass: boolean
     }) {
         this.setRenderTarget(renderer, camera, isLastPass);
@@ -121,7 +121,7 @@ void main() {
         }
 
         if (!this.material.isCompiledShader) {
-            this.material.start({gpu})
+            this.material.start({gpu, attributeDescriptors: []})
         }
 
         renderer.renderMesh(this.geometry, this.material);

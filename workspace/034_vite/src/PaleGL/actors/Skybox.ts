@@ -1,17 +1,21 @@
-import {Mesh} from "./Mesh.js";
-import {UniformTypes, PrimitiveTypes, ActorTypes, FaceSide, AttributeNames, UniformNames} from "./../constants.js";
-import {Material} from "./../materials/Material.js";
-import {loadImg} from "./../loaders/loadImg.js";
-import {loadObj, parseObj} from "./../loaders/loadObj.js";
-import {Geometry} from "./../geometries/Geometry.js";
-import {CubeMap} from "./../core/CubeMap.js";
-import {BoxGeometry} from "../geometries/BoxGeometry.js";
-import {PlaneGeometry} from "../geometries/PlaneGeometry.js";
-import {Matrix4} from "../math/Matrix4.js";
-import {Vector3} from "../math/Vector3.js";
+import {Mesh} from "./Mesh.ts";
+import {UniformTypes, PrimitiveTypes, ActorTypes, FaceSide, AttributeNames, UniformNames} from "./../constants.ts";
+import {Material} from "./../materials/Material.ts";
+// import {loadImg} from "./../loaders/loadImg.ts";
+import {/*loadObj,*/ parseObj} from "./../loaders/loadObj.ts";
+import {Geometry} from "./../geometries/Geometry.ts";
+// import {CubeMap} from "./../core/CubeMap.ts";
+// import {BoxGeometry} from "../geometries/BoxGeometry.ts";
+// import {PlaneGeometry} from "../geometries/PlaneGeometry.ts";
+import {Matrix4} from "../math/Matrix4.ts";
+import {Vector3} from "../math/Vector3.ts";
+import {CubeMap} from "../core/CubeMap.ts";
+import {Attribute} from "../core/Attribute.ts";
+import {GPU} from "../core/GPU.ts";
+import {Camera} from "./Camera.ts";
 
 // 法線が内側を向いた単位立方体
-const skyboxGeometryObjText = `
+const skyboxGeometryObjText: string = `
 # Blender 3.3.1
 # www.blender.org
 mtllib skybox-cube.mtl
@@ -60,7 +64,7 @@ f 1/3/3 5/11/6 7/13/4
 f 6/12/8 2/6/2 4/10/5
 `;
 
-const skyboxVertexShader = `#version 300 es
+const skyboxVertexShader: string = `#version 300 es
 
 precision mediump float;
 
@@ -129,24 +133,30 @@ void main() {
 `;
 
 export class Skybox extends Mesh {
-    constructor({gpu, cubeMap, rotationOffset = 0}) {
+    constructor({gpu, cubeMap, rotationOffset = 0}: {
+        gpu: GPU,
+        cubeMap: CubeMap,
+        rotationOffset: number
+    }) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
             attributes: [
-                {
+                new Attribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
                     size: 3
-                }, {
+                }),
+                new Attribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
-                }, {
+                }),
+                new Attribute({
                     name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
                     size: 3
-                },
+                }),
             ],
             indices: skyboxObjData.indices,
             drawCount: skyboxObjData.indices.length
@@ -174,13 +184,13 @@ export class Skybox extends Mesh {
                 },
             }
         });
-        
-        super({ geometry, material, actorType: ActorTypes.Skybox });
+
+        super({geometry, material, actorType: ActorTypes.Skybox});
     }
-   
+
     // TODO: renderer側で2回走らないようにする
-    updateTransform(camera) {
-        if(camera) {
+    updateTransform(camera: Camera) {
+        if (camera) {
             this.transform.setTranslation(camera.transform.position);
             // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
             this.transform.setScaling(Vector3.fill(camera.far / 1.733));
