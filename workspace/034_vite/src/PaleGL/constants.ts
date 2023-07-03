@@ -63,11 +63,20 @@ export const BlendTypes = {
 
 export type BlendType = typeof BlendTypes[keyof typeof BlendTypes];
 
+export const RenderQueueType = {
+    Skybox: "Skybox",
+    Opaque: "Opaque",
+    AlphaTest: "AlphaTest",
+    Transparent: "Transparent",
+} as const;
+
+export type RenderQueueType = typeof RenderQueueType[keyof typeof RenderQueueType];
+
 export const RenderQueues = {
-    Skybox: 1,
-    Opaque: 2,
-    AlphaTest: 3,
-    Transparent: 4
+    [RenderQueueType.Skybox]: 1,
+    [RenderQueueType.Opaque]: 2,
+    [RenderQueueType.AlphaTest]: 3,
+    [RenderQueueType.Transparent]: 4
 } as const;
 
 export type RenderQueue = typeof RenderQueues[keyof typeof RenderQueues];
@@ -205,4 +214,3 @@ export type GLColorAttachment =
     | 36069 // gl.COLOR_ATTACHMENT0 + 5
     | 36070 // gl.COLOR_ATTACHMENT0 + 6
     | 36071 // gl.COLOR_ATTACHMENT0 + 7
- 

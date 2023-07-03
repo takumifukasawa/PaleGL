@@ -22,13 +22,13 @@ export class TouchInputController extends AbstractInputController {
         });
     }
 
-    #onTouchStart(e) {
+    #onTouchStart(e: TouchEvent) {
         this.#tmpIsDown = true;
         const t = e.touches[0];
         this.setInputPosition(t.clientX, t.clientY);
     }
 
-    #onTouchMove(e) {
+    #onTouchMove(e: TouchEvent) {
         const t = e.touches[0];
         this.setInputPosition(t.clientX, t.clientY);
     }
@@ -38,7 +38,7 @@ export class TouchInputController extends AbstractInputController {
         this.setInputPosition(-Infinity, -Infinity);
     }
 
-    setInputPosition(x, y) {
+    setInputPosition(x: number, y: number) {
         this.#tmpInputPosition.set(x, y);
     }
 

@@ -39,10 +39,12 @@ export type FrustumVectors = {
     [key in FrustumDirectionType]: Vector3;
 };
 
+export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | null;
+
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
     projectionMatrix = Matrix4.identity;
-    #renderTarget: RenderTarget | GBufferRenderTargets | null = null;
+    #renderTarget: CameraRenderTargetType = null;
     clearColor: Vector4; // TODO: color class
     #postProcess: PostProcess | null;
     near: number = 1;

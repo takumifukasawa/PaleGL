@@ -1,8 +1,8 @@
 import {AnimationClip} from "./AnimationClip";
 
 export class Animator {
-    private _animationClips;
-    private playingAnimationClip;
+    private _animationClips: AnimationClip[];
+    private playingAnimationClip: AnimationClip | null = null;
     
     get animationClips() {
         return this._animationClips;
@@ -12,11 +12,11 @@ export class Animator {
         this._animationClips = animationClips;
     }
     
-    setAnimationClips(animationClips) {
+    setAnimationClips(animationClips: AnimationClip[]) {
         this._animationClips = animationClips;
     }
     
-    play(name) {
+    play(name: string) {
         const animationClip = this._animationClips.find(animationClip => name === animationClip.name);
         if(!animationClip) {
             return;
@@ -26,7 +26,7 @@ export class Animator {
     }
    
     // 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
-    update(deltaTime) {
+    update(deltaTime: number) {
         if(!this.playingAnimationClip) {
             return;
         }

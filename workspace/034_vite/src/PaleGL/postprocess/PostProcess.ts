@@ -1,13 +1,16 @@
 ﻿import {OrthographicCamera} from "./../actors/OrthographicCamera";
-import {RenderTarget} from "../core/RenderTarget";
 import {Vector3} from "../math/Vector3";
-import {RenderTargetTypes} from "../constants";
+import {Camera} from "../actors/Camera";
+import {IPostProcessPass} from "./AbstractPostProcessPass";
+import {GPU} from "../core/GPU";
+import {Renderer} from "../core/Renderer";
+import {RenderTarget} from "../core/RenderTarget";
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
-    passes = [];
+    passes: IPostProcessPass[] = [];
     // renderTarget;
-    #camera;
+    #camera: Camera;
 
     #selfEnabled = true;
 
@@ -29,7 +32,8 @@ export class PostProcess {
         this.#selfEnabled = value;
     }
 
-    constructor({gpu}) {
+    // constructor({gpu}: {gpu: GPU}) {
+    constructor() {
         // // TODO: renderTargetがいらない時もあるので出し分けたい
         // this.renderTarget = new RenderTarget({
         //     gpu,
@@ -43,17 +47,17 @@ export class PostProcess {
         this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
     }
 
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         this.#camera.setSize(width, height);
         // this.renderTarget.setSize(width, height);
         this.passes.forEach(pass => pass.setSize(width, height));
     }
 
-    addPass(pass) {
+    addPass(pass: IPostProcessPass) {
         this.passes.push(pass);
     }
 
-    render({gpu, renderer, sceneRenderTarget}) {
+    render({gpu, renderer, sceneRenderTarget}: {gpu: GPU, renderer: Renderer, sceneRenderTarget: RenderTarget | null}) {
         if (!sceneRenderTarget) {
             throw "[PostProcess.render] scene render target is empty."
         }

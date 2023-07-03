@@ -8,6 +8,8 @@ import {
     GLTFNodeActorKind
 } from "../loaders/loadGLTF";
 
+export type AnimationKeyframeValue = Vector3 | Quaternion;
+
 export class AnimationKeyframes {
     target: GLTFNodeActorKind;
     key;
@@ -67,7 +69,7 @@ export class AnimationKeyframes {
         }       
     }
 
-    getFrameValue(frame: number) {
+    getFrameValue(frame: number): AnimationKeyframeValue {
         const arr = (new Array(this.elementSize)).fill(0).map((_, i) => this._data[frame * this.elementSize + i]);
 
         switch(this.type) {

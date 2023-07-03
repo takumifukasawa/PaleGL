@@ -13,7 +13,7 @@ export type TextureArgs = {
     // require
     gpu: GPU
     // optional
-    img?: TexImageSource | null,
+    img?: HTMLImageElement | HTMLCanvasElement | null,
     type?: TextureType,
     width?: number,
     height?: number,
@@ -29,8 +29,8 @@ export type TextureArgs = {
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
     private texture: WebGLTexture
-    private img: TexImageSource | null;
-    private gpu;
+    private img: HTMLImageElement | HTMLCanvasElement | null = null;
+    private gpu: GPU;
     type;
 
     minFilter;
@@ -71,6 +71,10 @@ export class Texture extends GLObject {
         this.flipY = flipY;
         this.width = width;
         this.height = height;
+
+        if (this.img === null) {
+            throw "invalid img";
+        }
 
         if (!this.img && (!width || !height)) {
             console.error("[Texture.constructor] invalid width or height")
@@ -223,6 +227,10 @@ export class Texture extends GLObject {
         this.width = width;
         this.height = height;
 
+        if (this.img === null) {
+            throw "invalid img";
+        }
+
         const gl = this.gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
@@ -257,6 +265,10 @@ export class Texture extends GLObject {
     update({width, height, data}: { width: number, height: number, data: ArrayBufferView }) {
         this.width = width;
         this.height = height;
+
+        if (this.img === null) {
+            throw "invalid img";
+        }
 
         const gl = this.gpu.gl;
         gl.bindTexture(gl.TEXTURE_2D, this.texture);

@@ -2,8 +2,8 @@
 import {GPU} from "./GPU";
 
 export class IndexBufferObject extends GLObject {
-    private ibo;
-    private gpu;
+    private ibo: WebGLBuffer;
+    private gpu: GPU;
 
     get glObject() {
         return this.ibo;
@@ -16,7 +16,7 @@ export class IndexBufferObject extends GLObject {
 
         const gl = this.gpu.gl;
 
-        this.ibo = gl.createBuffer();
+        this.ibo = gl.createBuffer()!;
 
         this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);

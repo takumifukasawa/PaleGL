@@ -1,11 +1,25 @@
-﻿import {ActorTypes, BlendTypes, RenderQueues, UniformNames, UniformTypes} from "./../constants";
+﻿import {
+    ActorTypes,
+    BlendTypes,
+    RenderQueueType,
+    UniformNames,
+    UniformTypes
+} from "./../constants";
 import {Matrix4} from "../math/Matrix4";
 import {GPU} from "./GPU";
 import {Stats} from "../utilities/Stats";
 import {Light} from "../actors/Light";
 import {Mesh} from "../actors/Mesh";
 import {Scene} from "./Scene";
-import {Camera} from "../actors/Camera";
+import {Camera, CameraRenderTargetType} from "../actors/Camera";
+import {Material} from "../materials/Material";
+import {Geometry} from "../geometries/Geometry";
+
+type RenderMeshInfo = { actor: Mesh, materialIndex: number };
+
+type RenderMeshInfoEachQueue = {
+    [key in RenderQueueType]: RenderMeshInfo[]
+};
 
 export class Renderer {
     private gpu;
@@ -26,7 +40,7 @@ export class Renderer {
     }
 
     setSize(realWidth: number, realHeight: number) {
-    // setSize(width: number, height: number, realWidth: number, realHeight: number) {
+        // setSize(width: number, height: number, realWidth: number, realHeight: number) {
         this.realWidth = realWidth;
         this.realHeight = realHeight;
         this.canvas.width = this.realWidth;
@@ -34,7 +48,7 @@ export class Renderer {
         this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
     }
 
-    setRenderTarget(renderTarget) {
+    setRenderTarget(renderTarget: CameraRenderTargetType) {
         if (renderTarget) {
             this.gpu.setFramebuffer(renderTarget.framebuffer)
             this.gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
@@ -53,9 +67,12 @@ export class Renderer {
         this.gpu.clear(r, g, b, a);
     }
 
-    #shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: Mesh[]) {
+    #shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
         castShadowLightActors.forEach(lightActor => {
-            if(!lightActor.shadowMap) {
+            if (!lightActor.shadowMap) {
+                return;
+            }
+            if (!lightActor.shadowCamera) {
                 return;
             }
             this.setRenderTarget(lightActor.shadowMap.write);
@@ -80,23 +97,32 @@ export class Renderer {
                 // }
 
                 // TODO: material 側でやった方がよい？
-                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera.viewMatrix);
-                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera.projectionMatrix);
+                if (!targetMaterial) {
+                    throw "invalid target material";
+                }
 
+                // 先頭でガードしてるので shadow camera はあるはず。
+                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
+                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
                 this.renderMesh(actor.geometry, targetMaterial);
             });
         });
     }
 
-    #buildRenderMeshInfo(actor: Mesh, materialIndex: number = 0): {actor: Mesh, materialIndex: number} {
+    #buildRenderMeshInfo(actor: Mesh, materialIndex: number = 0): RenderMeshInfo {
         return {
             actor,
             materialIndex
         }
     }
 
-    #scenePass(sortedRenderMeshInfos, camera, lightActors, clear = true) {
+    #scenePass(
+        sortedRenderMeshInfos: RenderMeshInfo[],
+        camera: Camera,
+        lightActors: Light[],
+        clear: boolean = true
+    ) {
         // TODO: refactor
         if (clear) {
             this.clear(
@@ -189,7 +215,9 @@ export class Renderer {
                 if (
                     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
-                    light.castShadow
+                    light.castShadow &&
+                    light.shadowCamera &&
+                    light.shadowMap
                 ) {
                     // clip coord (-1 ~ 1) to uv (0 ~ 1)
                     const textureMatrix = new Matrix4(
@@ -222,18 +250,18 @@ export class Renderer {
     }
 
     render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
-        const renderMeshInfoEachQueue = {
-            opaque: [],
-            skybox: [], // maybe only one
-            alphaTest: [],
-            transparent: [],
+        const renderMeshInfoEachQueue: RenderMeshInfoEachQueue = {
+            [RenderQueueType.Skybox]: [],
+            [RenderQueueType.Opaque]: [],
+            [RenderQueueType.AlphaTest]: [],
+            [RenderQueueType.Transparent]: [],
         };
         const lightActors: Light[] = [];
 
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
+                    renderMeshInfoEachQueue[RenderQueueType.Skybox].push(this.#buildRenderMeshInfo(actor as Mesh));
                     // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
                     return;
@@ -241,16 +269,16 @@ export class Renderer {
                 case ActorTypes.SkinnedMesh:
                     (actor as Mesh).materials.forEach((material, i) => {
                         if (!!material.alphaTest) {
-                            renderMeshInfoEachQueue.alphaTest.push(this.#buildRenderMeshInfo(actor, i));
+                            renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(this.#buildRenderMeshInfo(actor as Mesh, i));
                             return;
                         }
                         switch (material.blendType) {
                             case BlendTypes.Opaque:
-                                renderMeshInfoEachQueue.opaque.push(this.#buildRenderMeshInfo(actor, i));
+                                renderMeshInfoEachQueue[RenderQueueType.Opaque].push(this.#buildRenderMeshInfo(actor as Mesh, i));
                                 return;
                             case BlendTypes.Transparent:
                             case BlendTypes.Additive:
-                                renderMeshInfoEachQueue.transparent.push(this.#buildRenderMeshInfo(actor, i));
+                                renderMeshInfoEachQueue[RenderQueueType.Transparent].push(this.#buildRenderMeshInfo(actor as Mesh, i));
                                 return;
                             default:
                                 throw "[Renderer.render] invalid blend type";
@@ -259,7 +287,7 @@ export class Renderer {
                     break;
 
                 case ActorTypes.Light:
-                    lightActors.push(actor);
+                    lightActors.push(actor as Light);
                     break;
             }
         });
@@ -267,9 +295,20 @@ export class Renderer {
         // TODO: depth sort 
 
         // sort by render queue
-        const sortRenderQueueCompareFunc = (a, b) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
+        const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
+        // default
         // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
-        const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(({actor}) => actor.enabled);
+
+        // ts
+        const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
+            // .map(key => renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc)) // default
+            .map(key => {
+                const renderQueueType = key as RenderQueueType;
+                const info = renderMeshInfoEachQueue[renderQueueType];
+                return info.sort(sortRenderQueueCompareFunc);
+            })
+            .flat()
+            .filter(({actor}) => actor.enabled);
 
         // ------------------------------------------------------------------------------
         // 1. shadow pass
@@ -312,7 +351,7 @@ export class Renderer {
         // }
     }
 
-    renderMesh(geometry, material) {
+    renderMesh(geometry: Geometry, material: Material) {
         geometry.update();
 
         if (this.#stats) {
@@ -323,6 +362,10 @@ export class Renderer {
         // vertex
         this.gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
+        if(!material.shader)
+        {
+            throw "invalid material shader";
+        }
         this.gpu.setShader(material.shader);
         // uniforms
         this.gpu.setUniforms(material.uniforms);
@@ -346,7 +389,7 @@ export class Renderer {
         }
 
         // setup depth test
-        const depthTest = material.depthTest;
+        const depthTest = !!material.depthTest;
 
         // draw
         this.gpu.draw(

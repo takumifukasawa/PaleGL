@@ -10,8 +10,8 @@ export class AbstractInputController {
     #isDown = false;
     #isReleased = false;
     
-    #width: number;
-    #height: number;
+    #width: number = 0;
+    #height: number = 0;
     
     get isUp() {
         return !this.#isDown;
@@ -41,19 +41,19 @@ export class AbstractInputController {
         throw "[AbstractInputController] should implementation 'start' method.";
     }
     
-    setSize(width, height) {
+    setSize(width: number, height: number) {
         this.#width = width;
         this.#height = height;
     }
 
     // inputPosition ... v2
     // isDown ... bool
-    updateInternal({ inputPosition, isDown }) {
+    updateInternal({ inputPosition, isDown }: {inputPosition: Vector2, isDown: boolean}) {
         this.#updateState(isDown);
         this.#updateInputPositions(inputPosition);
     }
    
-    #updateState(isDown) {
+    #updateState(isDown: boolean) {
         const isBeforeDown = this.isDown;
         this.#isDown = isDown;
 
@@ -80,7 +80,7 @@ export class AbstractInputController {
         this.#isReleased = false;
     }
 
-    #updateInputPositions(inputPosition) {
+    #updateInputPositions(inputPosition: Vector2) {
         // up
         if(this.isUp) {
             this.clearInputPositions();

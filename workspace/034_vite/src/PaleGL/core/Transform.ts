@@ -8,8 +8,8 @@ import {Actor} from "../actors/Actor";
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
 // - NodeBaseを継承
 export class Transform {
-    parent: Transform | null = null;
     actor: Actor;
+    parent: Transform | null = null;
     children: Transform[] = [];
     #worldMatrix: Matrix4 = Matrix4.identity;
     #localMatrix: Matrix4 = Matrix4.identity;

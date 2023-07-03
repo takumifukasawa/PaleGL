@@ -1,6 +1,5 @@
 ﻿
 import {Geometry} from "./Geometry";
-import {Vector3} from "../math/Vector3";
 import {AttributeNames} from "../constants";
 import {Attribute} from "../core/Attribute";
 import {GPU} from "../core/GPU";

@@ -1,10 +1,24 @@
-﻿import {BlendTypes, FaceSide, PrimitiveType, PrimitiveTypes, TextureWrapTypes, UniformTypes} from "./../constants";
+﻿import {
+    BlendType,
+    BlendTypes,
+    FaceSide,
+    PrimitiveType,
+    PrimitiveTypes,
+    TextureWrapTypes, UniformType,
+    UniformTypes
+} from "./../constants";
 import {Texture} from "./Texture";
 import {Shader} from "./Shader";
 import {VertexArrayObject} from "./VertexArrayObject";
 import {Framebuffer} from "./Framebuffer";
+import {Uniforms, UniformStructValue, UniformValue} from "../materials/Material";
+import {Vector2} from "../math/Vector2";
+import {Vector3} from "../math/Vector3";
+import {Matrix4} from "../math/Matrix4";
+import {Color} from "../math/Color";
+import {CubeMap} from "./CubeMap";
 
-const createWhite1x1 = () => {
+const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) {
@@ -21,7 +35,7 @@ export class GPU {
     gl: WebGL2RenderingContext;
     private shader: Shader | null = null;
     private vao: VertexArrayObject | null = null;
-    private uniforms;
+    private uniforms: Uniforms = {};
     dummyTexture: Texture;
 
     constructor({gl}: { gl: WebGL2RenderingContext }) {
@@ -42,7 +56,7 @@ export class GPU {
         this.vao = vao;
     }
 
-    setUniforms(uniforms) {
+    setUniforms(uniforms: Uniforms) {
         this.uniforms = uniforms;
     }
 
@@ -50,7 +64,7 @@ export class GPU {
         this.gl.viewport(x, y, width, height);
     }
 
-    setFramebuffer(framebuffer: Framebuffer) {
+    setFramebuffer(framebuffer: Framebuffer | null) {
         const gl = this.gl;
         if (!framebuffer) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -102,7 +116,16 @@ export class GPU {
     // TODO:
     // - start offset と instanceCount は逆の方が良い
     // - なんなら object destructuring の方がよさそう
-    draw(drawCount, primitiveType, depthTest, depthWrite, blendType, faceSide, instanceCount, startOffset = 0) {
+    draw(
+        drawCount: number,
+        primitiveType: PrimitiveType,
+        depthTest: boolean,
+        depthWrite: boolean,
+        blendType: BlendType,
+        faceSide: FaceSide,
+        instanceCount: number | null,
+        startOffset = 0
+    ) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
 
@@ -163,58 +186,65 @@ export class GPU {
                 throw "invalid blend type";
         }
 
+        if(!this.shader) {
+            throw "shader is not set";
+        }
+        if(!this.vao) {
+            throw "vao is not set";
+        }
+
         gl.useProgram(this.shader.glObject);
 
         let activeTextureIndex = 0;
 
-        const setUniformValue = (type, uniformName, value) => {
+        const setUniformValue = (type: UniformType, uniformName: string, value: UniformValue) => {
             const gl = this.gl;
-            const location = gl.getUniformLocation(this.shader.glObject, uniformName);
+            const location = gl.getUniformLocation(this.shader!.glObject, uniformName);
             // TODO:
             // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
             switch (type) {
                 case UniformTypes.Int:
-                    gl.uniform1i(location, value);
+                    gl.uniform1i(location, value as number);
                     break;
                 case UniformTypes.Float:
-                    gl.uniform1f(location, value);
+                    gl.uniform1f(location, value as number);
                     break;
                 case UniformTypes.FloatArray:
-                    gl.uniform1fv(location, value);
+                    gl.uniform1fv(location, value as Float32Array);
                     break;
                 case UniformTypes.Vector2:
-                    gl.uniform2fv(location, value.elements);
+                    gl.uniform2fv(location, (value as Vector2).elements);
                     break;
                 case UniformTypes.Vector2Array:
-                    gl.uniform2fv(location, value.map(v => [...v.elements]).flat());
+                    gl.uniform2fv(location, (value as Vector2[]).map(v => [...v.elements]).flat());
                     break;
                 case UniformTypes.Vector3:
-                    gl.uniform3fv(location, value.elements);
+                    gl.uniform3fv(location, (value as Vector3).elements);
                     break;
                 case UniformTypes.Matrix4:
                     // arg[1] ... use transpose.
-                    gl.uniformMatrix4fv(location, false, value.elements);
+                    gl.uniformMatrix4fv(location, false, (value as Matrix4).elements);
                     break;
                 case UniformTypes.Matrix4Array:
                     if (value) {
                         // arg[1] ... use transpose.
-                        gl.uniformMatrix4fv(location, false, value.map(v => [...v.elements]).flat());
+                        gl.uniformMatrix4fv(location, false, (value as Matrix4[]).map(v => [...v.elements]).flat());
                     }
                     break;
                 case UniformTypes.Color:
-                    gl.uniform4fv(location, value.elements);
+                    gl.uniform4fv(location, (value as Color).elements);
                     break;
                 case UniformTypes.ColorArray:
                     if (value) {
                         // arg[1] ... use transpose.
-                        gl.uniform4fv(location, value.map(v => [...v.elements]).flat());
+                        gl.uniform4fv(location, (value as Color[]).map(v => [...v.elements]).flat());
                     }
                     break;
                 case UniformTypes.Texture:
                     gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
                     gl.bindTexture(
                         gl.TEXTURE_2D,
-                        value ? value.glObject : this.dummyTexture.glObject
+                        value ? (value as Texture).glObject : this.dummyTexture.glObject
                     );
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
@@ -225,7 +255,7 @@ export class GPU {
                         gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
                         gl.bindTexture(
                             gl.TEXTURE_CUBE_MAP,
-                            value ? value.glObject : this.dummyTexture.glObject
+                            value ? (value as CubeMap).glObject : this.dummyTexture.glObject
                         );
                         gl.uniform1i(location, activeTextureIndex);
                         activeTextureIndex++;
@@ -240,8 +270,14 @@ export class GPU {
         Object.keys(this.uniforms).forEach(uniformName => {
             const uniform = this.uniforms[uniformName];
             if (uniform.type === UniformTypes.Struct) {
-                Object.keys(uniform.value).forEach(key => {
-                    setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                // default
+                // Object.keys(uniform.value).forEach(key => {
+                //     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                // });
+                const uniformStructValue = uniform.value as UniformStructValue;
+                Object.keys(uniformStructValue).forEach(key => {
+                    // setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                    setUniformValue(uniformStructValue[key].type, `${uniformName}.${key}`, uniformStructValue[key].value);
                 });
             } else {
                 setUniformValue(uniform.type, uniformName, uniform.value);

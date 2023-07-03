@@ -1,8 +1,9 @@
 ﻿import {PostProcessPass} from "./PostProcessPass";
+import {GPU} from "../core/GPU";
 
 
 export class CopyPass extends PostProcessPass {
-    constructor({ gpu }) {
+    constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = `#version 300 es
 
 precision mediump float;

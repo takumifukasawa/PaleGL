@@ -90,9 +90,9 @@ export class Engine {
         this.#fixedUpdateFrameTimer = new TimeAccumulator(60, this.fixedUpdate.bind(this));
         this.#updateFrameTimer = new TimeSkipper(60, this.update.bind(this));
 
-        this.#onBeforeFixedUpdate = onBeforeFixedUpdate;
-        this.#onBeforeUpdate = onBeforeUpdate;
-        this.#onRender = onRender;
+        this.#onBeforeFixedUpdate = onBeforeFixedUpdate || null;
+        this.#onBeforeUpdate = onBeforeUpdate || null;
+        this.#onRender = onRender || null;
     }
 
     setScene(scene: Scene) {

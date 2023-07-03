@@ -1,5 +1,7 @@
 ﻿import {loadImg} from "./../loaders/loadImg";
 import {CubeMap} from "./../core/CubeMap";
+import {CubeMapAxis} from "../constants";
+import {GPU} from "../core/GPU";
 
 // example
 // images: {
@@ -10,15 +12,63 @@ import {CubeMap} from "./../core/CubeMap";
 //     [CubeMapAxis.PositiveZ]: "xxx.png",
 //     [CubeMapAxis.NegativeZ]: "xxx.png",
 // };
+
+type CubeMapDirectionImagePaths = {
+    [key in CubeMapAxis]: string;
+}
+
+type CubeMapDirectionImages = {
+    [key in CubeMapAxis]: HTMLImageElement;
+}
  
-export async function loadCubeMap({ gpu, images }) {
+export async function loadCubeMap({ gpu, images }: {gpu: GPU, images: CubeMapDirectionImagePaths}) {
     return await Promise.all(Object.keys(images).map(async(key) => {
-            const img = await loadImg(images[key]);
-            return { key, img };
+            const axis = key as CubeMapAxis;
+            const img = await loadImg(images[axis]);
+            return { axis, img };
         }))
-        .then(result => {
-            const data = {};
-            result.forEach(({ key, img }) => data[key] = img);
+        .then<CubeMap>((result) => {
+            // default
+            // const data: {};
+            // result.forEach(({ key, img }) => {
+            //     const axis = key as CubeMapAxis;
+            //     data[axis] = img
+            // });
+            // return new CubeMap({ gpu, images: data });
+
+            // @ts-ignore
+            const data: CubeMapDirectionImages = {};
+            result.forEach(({ axis, img }) => {
+                data[axis] = img
+            });
             return new CubeMap({ gpu, images: data });
+           
+            
+            //const d = Object.keys(CubeMapAxis).reduce((acc, cv) => {
+            //    const axis = cv as CubeMapAxis;
+            //    acc[axis] = axis;
+            //    return {[axis]: img};
+            //}, {})
+          
+            //const data = result.map(({ axis, img }) => {
+            //})
+            //    
+            //const data = {
+            //    [CubeMapAxis.PositiveX]: result[CubeMapAxis.PositiveX].img
+            //}
+            //result.reduce()
+            //const keys = Object.keys(CubeMapAxis).reduce((acc, cv) => {
+            //    const axis = cv as CubeMapAxis;
+            //    acc[axis] = axis;
+            //    return {[axis]: img};
+            //}, {})
+            //const data = result.map(({ key, img }) => {
+            //    const axis = key as CubeMapAxis;
+            //    return {
+            //        axis
+            //    }
+            //    data[axis] = img
+            //});
+            //return new CubeMap({ gpu, images: data });
         });
 }

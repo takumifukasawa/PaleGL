@@ -17,6 +17,7 @@ export interface IPostProcessPass {
     enabled: boolean;
     width: number;
     height: number;
+    renderTarget: RenderTarget;
 
     setSize: (width: number, height: number) => void;
     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;

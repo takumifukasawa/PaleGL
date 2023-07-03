@@ -20,19 +20,26 @@ import {ActorUpdateArgs} from "./Actor";
 import {GPU} from "../core/GPU";
 import {Vector3} from "../math/Vector3";
 import {Quaternion} from "../math/Quaternion";
+import {GLTFAnimationChannelTargetPath} from "../loaders/loadGLTF";
+// import {AnimationKeyframeValue} from "../core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone, debugBoneView?: boolean } & MeshArgs;
 
-interface FrameValue {
-    [key: string]: number
-}
+// type FrameValue = {
+//     [key in GLTFAnimationChannelTargetPath]?: AnimationKeyframeValue
+// }
 
 type FrameData = {
-    translation?: Vector3,
-    rotation?: Quaternion,
-    scale?: Vector3,
+    // translation?: Vector3,
+    // rotation?: Quaternion,
+    // scale?: Vector3,
     bone: Bone,
-} & FrameValue
+    [GLTFAnimationChannelTargetPath.translation]?: Vector3,
+    [GLTFAnimationChannelTargetPath.rotation]?: Quaternion,
+    [GLTFAnimationChannelTargetPath.scale]?: Vector3,
+    // [key in GLTFAnimationChannelTargetPath]?: AnimationKeyframeValue
+}
+// } & FrameValue
 
 // type AnimationData =number[][]{ [key: string]: FrameValue};
 
@@ -141,13 +148,29 @@ export class SkinnedMesh extends Mesh {
                 dataEachKeyframes.forEach((dataKeyframes, frameIndex) => {
                     animationData[i][frameIndex] = [];
                     dataKeyframes.forEach(elem => {
-                        const boneIndex = elem.target.index;
+                        // TODO: bone animation じゃない場合の対応
+                        const boneIndex = (elem.target as Bone).index;
                         if (!animationData[i][frameIndex][boneIndex]) {
                             animationData[i][frameIndex][boneIndex] = {
-                                bone: elem.target
+                                bone: (elem.target as Bone),
+                                // [elem.key]: elem.frameValue
                             };
                         }
-                        animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue;
+                        // animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue;
+                        // TODO: 上手くまとめる方法ない？
+                        switch(elem.key) {
+                            case GLTFAnimationChannelTargetPath.translation:
+                                animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue as Vector3;
+                                break;
+                            case GLTFAnimationChannelTargetPath.rotation:
+                                animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue as Quaternion;
+                                break;
+                            case GLTFAnimationChannelTargetPath.scale:
+                                animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue as Vector3;
+                                break;
+                            default:
+                                throw "invalid target path";
+                        }
                     });
                 });
             });

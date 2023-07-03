@@ -5,7 +5,7 @@ type Args = {
 };
 
 // TODO: gaussの重みはuniformで送るべき
-export const gaussianBlurFragmentShader: (Args) => string = ({pixelNum, isHorizontal, srcTextureUniformName}: Args) => `#version 300 es
+export const gaussianBlurFragmentShader: (args: Args) => string = ({pixelNum, isHorizontal, srcTextureUniformName}: Args) => `#version 300 es
 
 precision mediump float;
 

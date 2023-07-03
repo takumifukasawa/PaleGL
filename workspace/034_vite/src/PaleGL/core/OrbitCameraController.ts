@@ -1,35 +1,38 @@
 import {Vector3} from "../math/Vector3.js";
 import {clamp} from "../utilities/mathUtilities.js";
+import {Camera} from "../actors/Camera";
 
 export class OrbitCameraController {
-    #camera;
+    #camera: Camera;
     dampingFactor = 0.01;
-    minAzimuth;
-    maxAzimuth;
-    minAltitude = -45;
-    maxAltitude = 45;
-    azimuthSpeed = 100;
-    altitudeSpeed = 100;
-    #cameraAngle = { azimuth: 0, altitude: 0};
-    #lookAtTarget = Vector3.zero;
-    distance = 10;
-    attenuation = 0.001;
-    #targetX = 0;
-    #targetY = 0;
-    deltaAzimuthPower = 1;
-    deltaAltitudePower = 1;
-    
+    // minAzimuth: number;
+    // maxAzimuth: number;
+    minAzimuth: number = -45;
+    maxAzimuth: number = 45;
+    minAltitude: number = -45;
+    maxAltitude: number = 45;
+    azimuthSpeed: number = 100;
+    altitudeSpeed: number = 100;
+    #cameraAngle: { azimuth: number, altitude: number } = {azimuth: 0, altitude: 0};
+    #lookAtTarget: Vector3 = Vector3.zero;
+    distance: number = 10;
+    attenuation: number = 0.001;
+    #targetX: number = 0;
+    #targetY: number = 0;
+    deltaAzimuthPower: number = 1;
+    deltaAltitudePower: number = 1;
+
     #targetCameraPosition = Vector3.zero;
     #currentCameraPosition = Vector3.zero;
-    
-    set lookAtTarget(v) {
+
+    set lookAtTarget(v: Vector3) {
         this.#lookAtTarget = v;
     }
-    
-    constructor(camera) {
+
+    constructor(camera: Camera) {
         this.#camera = camera;
     }
-    
+
     start(defaultAzimuth = 0, defaultAltitude = 0) {
         this.#cameraAngle.azimuth = defaultAzimuth;
         this.#cameraAngle.altitude = defaultAltitude;
@@ -37,8 +40,8 @@ export class OrbitCameraController {
         // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
         // this.#currentCameraPosition = this.#targetCameraPosition.clone();
     }
-    
-    setDelta(delta) {
+
+    setDelta(delta: { x: number, y: number }) {
         this.#targetX = delta.x * this.deltaAzimuthPower;
         this.#targetY = delta.y * this.deltaAltitudePower;
     }
@@ -46,10 +49,10 @@ export class OrbitCameraController {
     fixedUpdate() {
         this.#targetX = Math.sign(this.#targetX) * Math.max(0, Math.abs(this.#targetX) - this.attenuation);
         this.#targetY = Math.sign(this.#targetY) * Math.max(0, Math.abs(this.#targetY) - this.attenuation);
-        
+
         this.#cameraAngle.azimuth += this.#targetX * this.azimuthSpeed;
         this.#cameraAngle.altitude += this.#targetY * this.altitudeSpeed;
-        
+
         this.#updateCameraPosition();
     }
 

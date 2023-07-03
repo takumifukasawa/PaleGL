@@ -67,6 +67,10 @@ export type MaterialArgs = {
     depthUniforms?: Uniforms
 };
 
+export type UniformStructValue = {
+    [key: string]: UniformTypeValuePair
+};
+
 // TODO: fix type
 export type UniformValue =
     number
@@ -80,8 +84,10 @@ export type UniformValue =
     | Texture
     | CubeMap
     | Color
+    | Color[]
     | Float32Array
     | DirectionalLightStruct
+    | UniformStructValue
     | null;
 
 // TODO: key to type
@@ -115,11 +121,13 @@ export type FragmentShaderGenerator = ({attributeDescriptors}: {
 
 export type DepthFragmentShaderGenerator = () => string;
 
-export interface Uniforms {
-    [name: string]: {
+type UniformTypeValuePair = {
         type: UniformType,
         value: UniformValue
-    }
+};
+
+export interface Uniforms {
+    [name: string]: UniformTypeValuePair
 }
 
 // -------------------------------------------------------------------

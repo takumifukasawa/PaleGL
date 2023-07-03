@@ -9,8 +9,36 @@ import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from 
 import {normalMapVertexVaryings} from "./lightingCommon";
 import {AttributeNames} from "../constants";
 import {buildVertexAttributeLayouts} from "./buildShader";
+import {AttributeDescriptor} from "../core/Attribute";
 
-const generateVertexShader = ({
+type GenerateVertexShaderArgs = {
+    // required
+    attributeDescriptors: AttributeDescriptor[],
+    // optional
+    receiveShadow?: boolean,
+    useNormalMap?: boolean,
+    vertexShaderModifier?: {
+        beginMain: string,
+        localPositionPostProcess:string,
+        worldPositionPostProcess: string,
+        viewPositionPostProcess: string,
+        outClipPositionPreProcess: string,
+        lastMain: string,
+    },
+    insertVaryings?: string,
+    insertUniforms?: string, // TODO: 使ってるuniformsから自動的に生成したいかも
+    // skinning
+    isSkinning?: boolean,
+    gpuSkinning?: boolean,
+    jointNum?: string,
+    // instancing
+    isInstancing?: boolean,
+    // vertex color
+    useVertexColor?: boolean,
+    
+};
+
+export const generateVertexShader = ({
     // required
     attributeDescriptors,
     // optional
@@ -34,7 +62,7 @@ const generateVertexShader = ({
     isInstancing,
     // vertex color
     useVertexColor,
-} = {}) => {
+}: GenerateVertexShaderArgs) => {
     // for debug
     // console.log("[generateVertexShader] attributeDescriptors", attributeDescriptors)
    
@@ -62,13 +90,13 @@ ${transformVertexUniforms()}
 ${engineCommonUniforms()}
 
 ${receiveShadow ? shadowMapVertexUniforms() : ""}
-${isSkinning ? skinningVertexUniforms(jointNum) : ""}
+${isSkinning ? skinningVertexUniforms(jointNum || "") : ""}
 ${insertUniforms || ""}
 
 void main() {
     ${vertexShaderModifier.beginMain || ""}
 
-    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
+    ${isSkinning ? skinningVertex(!!gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
     ${isSkinning
@@ -132,7 +160,23 @@ void main() {
 `;
 }
 
-const generateDepthVertexShader = ({
+type GenerateDepthVertexShaderArgs = {
+    attributeDescriptors: AttributeDescriptor[],
+    isSkinning?: boolean,
+    gpuSkinning?: boolean,
+    vertexShaderModifier: {
+        beginMain: string,
+        localPositionPostProcess: string,
+        worldPositionPostProcess: string,
+        outClipPositionPreProcess: string,
+        lastMain: string
+    },
+    insertVaryings?: string
+    useNormalMap?: boolean,
+    jointNum?: string
+}
+
+export const generateDepthVertexShader = ({
     attributeDescriptors,
     isSkinning,
     gpuSkinning,
@@ -144,9 +188,9 @@ const generateDepthVertexShader = ({
         lastMain: ""
     },
     insertVaryings,
-    useNormalMap,
+    // useNormalMap,
     jointNum
-} = {}) => {
+}: GenerateDepthVertexShaderArgs) => {
    
     const attributes = buildVertexAttributeLayouts(attributeDescriptors);
 
@@ -158,7 +202,7 @@ ${isSkinning ? calcSkinningMatrixFunc() : ""}
 
 ${transformVertexUniforms()}
 ${engineCommonUniforms()}
-${isSkinning ? skinningVertexUniforms(jointNum) : ""}
+${isSkinning ? skinningVertexUniforms(jointNum || "") : ""}
 
 // TODO: depthでは必要ないのでなくしたい
 out vec4 vVertexColor;
@@ -167,7 +211,7 @@ ${insertVaryings ? insertVaryings : ""}
 void main() {
     ${vertexShaderModifier.beginMain || ""}
 
-    ${isSkinning ? skinningVertex(gpuSkinning) : ""}
+    ${isSkinning ? skinningVertex(!!gpuSkinning) : ""}
     
     vec4 localPosition = vec4(aPosition, 1.);
     ${isSkinning

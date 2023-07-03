@@ -6,13 +6,15 @@
 
 // .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
 
+import {AttributeDescriptor} from "../core/Attribute";
+
 const pragmaRegex = /^#pragma(.*)/;
 
 
 
 import {calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms} from "./skinningShader";
 
-export const buildVertexAttributeLayouts = (attributeDescriptors) => {
+export const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescriptor[]) => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
     const attributesList = sortedAttributeDescriptors.map(({ location, size, name, dataType }) => {
@@ -66,16 +68,16 @@ export const buildVertexAttributeLayouts = (attributeDescriptors) => {
     return attributesList;
 }
 
-const joinShaderLines = (shaderLines) => {
+const joinShaderLines = (shaderLines: string[]) => {
     return shaderLines
         .map(line => line.replace(/^\s*$/, ""))
         .join("\n")
         .replaceAll(/\n{3,}/g, "\n");
 };
 
-export const buildVertexShader = (shader, attributeDescriptors) => {
+export const buildVertexShader = (shader: string, attributeDescriptors: AttributeDescriptor[]) => {
     const shaderLines =  shader.split("\n");
-    const resultShaderLines = [];
+    const resultShaderLines: string[] = [];
 
     shaderLines.forEach(shaderLine => {
         const pragma = (shaderLine.trim()).match(pragmaRegex);
@@ -175,9 +177,9 @@ out vec4 vVertexColor;
     return joinShaderLines(resultShaderLines);
 }
 
-export const buildFragmentShader = (shader) => {
+export const buildFragmentShader = (shader: string) => {
     const shaderLines =  shader.split("\n");
-    const resultShaderLines = [];
+    const resultShaderLines: string[] = [];
 
     shaderLines.forEach(shaderLine => {
         const pragma = (shaderLine.trim()).match(pragmaRegex);

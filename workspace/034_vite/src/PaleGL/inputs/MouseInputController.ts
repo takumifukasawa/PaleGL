@@ -22,12 +22,12 @@ export class MouseInputController extends AbstractInputController {
         });
     }
 
-    #onMouseDown(e) {
+    #onMouseDown(e: MouseEvent) {
         this.#tmpIsDown = true;
         this.setInputPosition(e.clientX, e.clientY);
     }
 
-    #onMouseMove(e) {
+    #onMouseMove(e: MouseEvent) {
         this.setInputPosition(e.clientX, e.clientY);
     }
 
@@ -36,7 +36,7 @@ export class MouseInputController extends AbstractInputController {
         this.setInputPosition(-Infinity, -Infinity);
     }
 
-    setInputPosition(x, y) {
+    setInputPosition(x: number, y: number) {
         this.#tmpInputPosition.set(x, y);
     }
 

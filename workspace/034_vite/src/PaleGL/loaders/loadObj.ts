@@ -1,4 +1,4 @@
-﻿export async function loadObj(path) {
+﻿export async function loadObj(path: string) {
     const response = await fetch(path);
     const content = await response.text();
     return parseObj(content);
@@ -11,11 +11,11 @@ type ObjModelData = {
     indices: number[]
 }
 
-export function parseObj(content): ObjModelData {
-    const rawPositions = [];
-    const rawNormals = [];
-    const rawUvs = [];
-    const rawFaces = [];
+export function parseObj(content: string): ObjModelData {
+    const rawPositions: number[][] = [];
+    const rawNormals: number[][] = [];
+    const rawUvs: number[][] = [];
+    const rawFaces: string[][] = [];
 
     // for debug
     // console.log(content);
@@ -79,10 +79,10 @@ export function parseObj(content): ObjModelData {
         }
     });
 
-    const positions = [];
-    const uvs = [];
-    const normals = [];
-    const indices = [];
+    const positions: number[][] = [];
+    const uvs: number[][] = [];
+    const normals: number[][] = [];
+    const indices: number[] = [];
 
     // TODO: uv, normal がない時の対処
     rawFaces.forEach((face, i) => {

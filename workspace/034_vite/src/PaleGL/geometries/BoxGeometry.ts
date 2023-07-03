@@ -2,9 +2,10 @@
 import {Geometry} from "./Geometry";
 import {AttributeNames} from "../constants";
 import {Attribute} from "../core/Attribute";
+import {GPU} from "../core/GPU";
 
 export class BoxGeometry extends Geometry {
-    constructor({ gpu }) {
+    constructor({ gpu }: {gpu: GPU}) {
         const boxPosition_0 = [-0.5, 0.5, 0.5];
         const boxPosition_1 = [-0.5, -0.5, 0.5];
         const boxPosition_2 = [0.5, 0.5, 0.5];

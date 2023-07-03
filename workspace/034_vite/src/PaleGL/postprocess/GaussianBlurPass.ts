@@ -1,28 +1,28 @@
-﻿import {PostProcessPass} from "./PostProcessPass.js";
-import {UniformNames, UniformTypes} from "../constants";
+﻿import {UniformNames, UniformTypes} from "../constants";
 import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass";
 import {FragmentPass} from "./FragmentPass";
 import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader";
 import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities";
-import {GPU} from "../core/GPU";
 import {Renderer} from "../core/Renderer";
 import {Camera} from "../actors/Camera";
+import {PostProcessPass} from "./PostProcessPass";
+import {GPU} from "../core/GPU";
 
 // export class GaussianBlurPass extends AbstractPostProcessPass {
 export class GaussianBlurPass implements IPostProcessPass {
-    gpu: GPU;
-    name: string = "BloomPass";
-    enabled: boolean
-    width: 1;
-    height: 1;
+    // gpu: GPU;
+    name: string = "GaussianBlurPass";
+    enabled: boolean = false
+    width: number = 1;
+    height: number = 1;
 
-    #passes = [];
+    #passes: PostProcessPass[] = [];
 
     get renderTarget() {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
-    constructor({gpu, blurPixelNum = 7}) {
+    constructor({gpu, blurPixelNum = 7}: {gpu: GPU, blurPixelNum: number}) {
         // super();
 
         const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
@@ -87,6 +87,7 @@ export class GaussianBlurPass implements IPostProcessPass {
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
+    // @ts-ignore
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
     }
 
@@ -107,7 +108,7 @@ export class GaussianBlurPass implements IPostProcessPass {
             // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             pass.material.updateUniform(UniformNames.SceneTexture, i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture);
             if (!pass.material.isCompiledShader) {
-                pass.material.start({gpu})
+                pass.material.start({gpu, attributeDescriptors: []})
             }
 
             renderer.renderMesh(pass.geometry, pass.material);
