@@ -1,9 +1,6 @@
 import "./style.css";
 
-console.log("hoehog");
-
-/*
-import "./style.css";
+console.log(`hogehoge: ${new Date() + ""}`);
 
 // actors
 import {DirectionalLight} from "./PaleGL/actors/DirectionalLight";
@@ -64,9 +61,10 @@ import {
 
 import {DebuggerGUI} from "./DebuggerGUI";
 import {Camera} from "./PaleGL/actors/Camera";
-import {Light} from "./PaleGL/actors/Light";
+// import {Light} from "./PaleGL/actors/Light";
 import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera";
 import {Attribute} from "./PaleGL/core/Attribute";
+// import {Actor} from "./PaleGL/actors/Actor.ts";
 
 const debuggerStates = {
     instanceNum: 0,
@@ -98,6 +96,10 @@ const wrapperElement = document.getElementById("wrapper")!;
 const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 
 const gl = canvasElement.getContext('webgl2', {antialias: false});
+
+if (!gl) {
+    throw "invalid gl";
+}
 
 const gpu = new GPU({gl});
 
@@ -141,20 +143,20 @@ captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
-const captureSceneDepthRenderTarget = new RenderTarget({
-    gpu,
-    width: 1, height: 1,
-    type: RenderTargetTypes.Depth,
-    writeDepthTexture: true,
-    name: "capture scene depth render target"
-});
-const captureSceneColorRenderTarget = new RenderTarget({
-    gpu,
-    width: 1, height: 1,
-    type: RenderTargetTypes.RGBA,
-    useDepthBuffer: true,
-    name: "capture scene color render target"
-});
+// const captureSceneDepthRenderTarget = new RenderTarget({
+//     gpu,
+//     width: 1, height: 1,
+//     type: RenderTargetTypes.Depth,
+//     writeDepthTexture: true,
+//     name: "capture scene depth render target"
+// });
+// const captureSceneColorRenderTarget = new RenderTarget({
+//     gpu,
+//     width: 1, height: 1,
+//     type: RenderTargetTypes.RGBA,
+//     useDepthBuffer: true,
+//     name: "capture scene color render target"
+// });
 const gBufferRenderTarget = new GBufferRenderTargets({
     gpu,
     width: 1, height: 1,
@@ -184,7 +186,8 @@ const copyDepthDestRenderTarget = new RenderTarget({
 captureSceneCamera.onStart = ({actor}) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 }
-captureSceneCamera.onFixedUpdate = ({actor}) => {
+// captureSceneCamera.onFixedUpdate = ({ actor}: {actor: Actor}) => {
+captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -214,7 +217,8 @@ directionalLight.onStart = ({actor}) => {
 captureScene.add(directionalLight);
 
 // const postProcess = new PostProcess({gpu, renderer});
-const postProcess = new PostProcess({gpu});
+// const postProcess = new PostProcess({gpu});
+const postProcess = new PostProcess();
 
 const bloomPass = new BloomPass({gpu, threshold: 0.9, bloomAmount: 0.8});
 bloomPass.enabled = true;
@@ -304,12 +308,17 @@ const createGLTFSkinnedMesh = async () => {
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
 
-    const instanceInfo = {
+    const instanceInfo: {
+        position: number[][],
+        scale: number[][],
+        color: number[][]
+    } = {
         position: [],
         scale: [],
         color: []
     };
-    new Array(instanceNum).fill(0).forEach((_, i) => {
+    // new Array(instanceNum).fill(0).forEach((_, i) => {
+    new Array(instanceNum).fill(0).forEach((_) => {
         const posRangeX = 7.4;
         const posRangeZ = 7.4;
         const px = (Math.random() * 2 - 1) * posRangeX;
@@ -732,7 +741,8 @@ void main() {
         inputController.fixedUpdate();
     }
 
-    engine.onRender = (time, deltaTime) => {
+    // engine.onRender = (time: number, deltaTime: number) => {
+    engine.onRender = () => {
         captureSceneCamera.setRenderTarget(gBufferRenderTarget)
         skyboxMesh.enabled = true;
         floorPlaneMesh.enabled = true;
@@ -770,7 +780,7 @@ void main() {
         });
     };
 
-    const tick = (time) => {
+    const tick = (time: number) => {
         engine.run(time);
         requestAnimationFrame(tick);
     }
@@ -864,4 +874,3 @@ function initDebugger() {
 }
 
 main();
-*/
