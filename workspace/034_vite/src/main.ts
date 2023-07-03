@@ -1,6 +1,6 @@
 import "./style.css";
 
-console.log("hogehoge");
+console.log("hoehog");
 
 /*
 import "./style.css";
