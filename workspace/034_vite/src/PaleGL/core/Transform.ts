@@ -10,7 +10,7 @@ import {Actor} from "../actors/Actor";
 export class Transform {
     actor: Actor;
     parent: Transform | null = null;
-    children: Transform[] = [];
+    children: Actor[] = [];
     #worldMatrix: Matrix4 = Matrix4.identity;
     #localMatrix: Matrix4 = Matrix4.identity;
     position: Vector3 = Vector3.zero;
@@ -54,7 +54,10 @@ export class Transform {
         this.actor = actor;
     }
 
-    addChild(child: Transform) {
+    // addChild(child: Transform) {
+    //     this.children.push(child);
+    // }
+    addChild(child: Actor) {
         this.children.push(child);
     }
 

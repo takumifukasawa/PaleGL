@@ -4,6 +4,8 @@ import {Vector3} from "../math/Vector3";
 import {AttributeUsageType} from "../constants";
 import {GPU} from "../core/GPU";
 
+// TODO: location, divisorをいい感じに指定したい
+
 export type GeometryArgs = {
     // required
     gpu: GPU,

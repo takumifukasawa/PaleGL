@@ -21,8 +21,8 @@ export class Scene {
         execFunc(actor);
         if(actor.transform.hasChild) {
             for(let i = 0; i < actor.transform.children.length; i++) {
-                // this.#recursiveTraverseActor(actor.transform.children[i], execFunc)
-                this.#recursiveTraverseActor(actor.transform.children[i].actor, execFunc)
+                this.#recursiveTraverseActor(actor.transform.children[i], execFunc)
+                // this.#recursiveTraverseActor(actor.transform.children[i].actor, execFunc)
             }
         }
     }

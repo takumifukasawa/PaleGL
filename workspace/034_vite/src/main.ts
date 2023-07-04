@@ -303,9 +303,16 @@ captureSceneCamera.setPostProcess(postProcess);
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({gpu, path: "./models/glass-wind-poly.gltf"});
 
+    console.log(gltfActor)
+    console.log(gltfActor.transform)
+    console.log(gltfActor.transform.children)
+    console.log(gltfActor.transform.children[0])
+    console.log(gltfActor.transform.children[0].transform)
+    console.log(gltfActor.transform.children[0].transform.children)
     // あるはずなのでignore
     // @ts-ignore
-    const skinningMesh = gltfActor.transform.children[0].transform.children[0];
+    // const skinningMesh = gltfActor.transform.children[0].transform.children[0];
+    const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0];
 
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
@@ -349,36 +356,36 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.geometry.instanceCount = instanceNum;
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    skinningMesh.geometry.setAttribute({
+    skinningMesh.geometry.setAttribute(new Attribute({
         name: AttributeNames.InstancePosition,
         data: new Float32Array(instanceInfo.position.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
-    });
+    }));
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    skinningMesh.geometry.setAttribute({
+    skinningMesh.geometry.setAttribute(new Attribute({
         name: AttributeNames.InstanceScale,
         data: new Float32Array(instanceInfo.scale.flat()),
         size: 3,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
-    });
+    }));
     // aInstanceAnimationOffsetは予約語
-    skinningMesh.geometry.setAttribute({
+    skinningMesh.geometry.setAttribute(new Attribute({
         name: AttributeNames.InstanceAnimationOffset,
         data: new Float32Array(animationOffsetInfo),
         size: 1,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
-    });
-    skinningMesh.geometry.setAttribute({
+    }));
+    skinningMesh.geometry.setAttribute(new Attribute({
         name: AttributeNames.InstanceVertexColor,
         data: new Float32Array(instanceInfo.color.flat()),
         size: 4,
         // usageType: AttributeUsageType.StaticDraw,
         divisor: 1
-    });
+    }));
     skinningMesh.material = new PhongMaterial({
         // gpu,
         specularAmount: 0.5,
@@ -877,4 +884,4 @@ function initDebugger() {
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
 
-// main();
+main();

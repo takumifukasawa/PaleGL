@@ -337,7 +337,7 @@ export async function loadGLTF({
             : new Mesh({geometry})
     }
 
-    const findNode = (nodeIndex: number, parentActor: Actor) => {
+    const findNode = (nodeIndex: number, parentActor: Actor): void => {
         const targetNode: GLTFNode = gltf.nodes[nodeIndex];
 
         // for debug

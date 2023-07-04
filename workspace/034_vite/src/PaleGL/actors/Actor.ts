@@ -53,8 +53,8 @@ export class Actor {
     }
 
     addChild(child: Actor) {
-        // this.transform.addChild(child);
-        this.transform.addChild(child.transform); // NOTE: こっちが正しいはず？
+        this.transform.addChild(child);
+        // this.transform.addChild(child.transform); // NOTE: こっちが正しいはず？
         child.transform.parent = this.transform;
     }
 
