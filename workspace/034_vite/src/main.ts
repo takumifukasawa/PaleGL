@@ -1,6 +1,25 @@
 import "@/style.css";
 
-console.log(`hogge: ${new Date() + ""}`);
+// import smokeImgUrl from "../images/particle-smoke.png";
+// import leaveDiffuseImgUrl from "../images/brown_mud_leaves_01_diff_1k.jpg";
+// import leaveNormalImgUrl from "../images/brown_mud_leaves_01_nor_gl_1k.jpg"
+// import CubeMapPositiveXImgUrl from "../images/px.jpg";
+// import CubeMapNegativeXImgUrl from "../images/nx.jpg";
+// import CubeMapPositiveYImgUrl from "../images/py.jpg";
+// import CubeMapNegativeYImgUrl from "../images/ny.jpg";
+// import CubeMapPositiveZImgUrl from "../images/pz.jpg";
+// import CubeMapNegativeZImgUrl from "../images/nz.jpg";
+// import gltfModelUrl from "../models/glass-wind-poly.gltf";
+import smokeImgUrl from "../images/particle-smoke.png?url";
+import leaveDiffuseImgUrl from "../images/brown_mud_leaves_01_diff_1k.jpg?url";
+import leaveNormalImgUrl from "../images/brown_mud_leaves_01_nor_gl_1k.jpg?url"
+import CubeMapPositiveXImgUrl from "../images/px.jpg?url";
+import CubeMapNegativeXImgUrl from "../images/nx.jpg?url";
+import CubeMapPositiveYImgUrl from "../images/py.jpg?url";
+import CubeMapNegativeYImgUrl from "../images/ny.jpg?url";
+import CubeMapPositiveZImgUrl from "../images/pz.jpg?url";
+import CubeMapNegativeZImgUrl from "../images/nz.jpg?url";
+import gltfModelUrl from "../models/glass-wind-poly.gltf?url";
 
 // actors
 import {DirectionalLight} from "@/PaleGL/actors/DirectionalLight";
@@ -301,7 +320,7 @@ captureSceneCamera.setPostProcess(postProcess);
 
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({gpu, path: "/models/glass-wind-poly.gltf"});
+    const gltfActor = await loadGLTF({gpu, path: gltfModelUrl});
 
     console.log(gltfActor)
     console.log(gltfActor.transform)
@@ -410,7 +429,7 @@ const createGLTFSkinnedMesh = async () => {
 `
         },
     });
-    
+
     console.log(skinningMesh)
 
     return skinningMesh;
@@ -419,15 +438,15 @@ const createGLTFSkinnedMesh = async () => {
 // @ts-ignore
 const main = async () => {
     console.log("main")
-    const particleImg = await loadImg("/images/particle-smoke.png");
+    const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
         gpu,
         img: particleImg,
     });
-    
+
     console.log(particleImg)
 
-    const floorDiffuseImg = await loadImg("/images/brown_mud_leaves_01_diff_1k.jpg");
+    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
     floorDiffuseMap = new Texture({
         gpu,
         img: floorDiffuseImg,
@@ -440,7 +459,7 @@ const main = async () => {
 
     console.log(floorDiffuseImg)
 
-    const floorNormalImg = await loadImg("/images/brown_mud_leaves_01_nor_gl_1k.jpg");
+    const floorNormalImg = await loadImg(leaveNormalImgUrl);
     floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
@@ -450,24 +469,24 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
-    
+
     console.log(floorNormalImg)
 
     const images = {
-        [CubeMapAxis.PositiveX]: "/images/px.jpg",
-        [CubeMapAxis.NegativeX]: "/images/nx.jpg",
-        [CubeMapAxis.PositiveY]: "/images/py.jpg",
-        [CubeMapAxis.NegativeY]: "/images/ny.jpg",
-        [CubeMapAxis.PositiveZ]: "/images/pz.jpg",
-        [CubeMapAxis.NegativeZ]: "/images/nz.jpg",
+        [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
+        [CubeMapAxis.NegativeX]: CubeMapNegativeXImgUrl,
+        [CubeMapAxis.PositiveY]: CubeMapPositiveYImgUrl,
+        [CubeMapAxis.NegativeY]: CubeMapNegativeYImgUrl,
+        [CubeMapAxis.PositiveZ]: CubeMapPositiveZImgUrl,
+        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl,
     };
-    
+
     console.log(images)
 
     const cubeMap = await loadCubeMap({gpu, images});
 
     console.log(cubeMap)
-    
+
     const skyboxMesh = new Skybox({
         gpu, cubeMap,
         rotationOffset: 0.8
