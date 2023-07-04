@@ -64,7 +64,7 @@ export class CubeMap extends GLObject {
                     throw "invalid axis"
             }
             if (images[key] === null) {
-                throw `invalid img: ${key}`;
+                throw `[CubeMap] invalid img: ${key}`;
             }
             // TODO: なんで non null assertion 必要？？
             gl.texImage2D(axis, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[key]!);

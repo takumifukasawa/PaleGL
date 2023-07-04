@@ -410,6 +410,8 @@ const createGLTFSkinnedMesh = async () => {
 `
         },
     });
+    
+    console.log(skinningMesh)
 
     return skinningMesh;
 }
@@ -422,6 +424,8 @@ const main = async () => {
         gpu,
         img: particleImg,
     });
+    
+    console.log(particleImg)
 
     const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
@@ -434,6 +438,8 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
+    console.log(floorDiffuseImg)
+
     const floorNormalImg = await loadImg("./images/brown_mud_leaves_01_nor_gl_1k.jpg");
     floorNormalMap = new Texture({
         gpu,
@@ -444,6 +450,8 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
+    
+    console.log(floorNormalImg)
 
     const images = {
         [CubeMapAxis.PositiveX]: "./images/px.jpg",
@@ -453,8 +461,13 @@ const main = async () => {
         [CubeMapAxis.PositiveZ]: "./images/pz.jpg",
         [CubeMapAxis.NegativeZ]: "./images/nz.jpg",
     };
+    
+    console.log(images)
 
     const cubeMap = await loadCubeMap({gpu, images});
+
+    console.log(cubeMap)
+    
     const skyboxMesh = new Skybox({
         gpu, cubeMap,
         rotationOffset: 0.8
