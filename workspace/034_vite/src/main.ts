@@ -714,6 +714,7 @@ void main() {
         },
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
+        depthWrite: false,
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,

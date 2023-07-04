@@ -207,8 +207,8 @@ export class Material {
                     vertexShaderModifier,
 
                     primitiveType,
-                    depthTest = null,
-                    depthWrite = null,
+                    depthTest = true,
+                    depthWrite = true,
                     alphaTest = null,
                     faceSide = FaceSide.Front,
                     receiveShadow = false,

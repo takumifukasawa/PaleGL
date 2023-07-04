@@ -195,7 +195,7 @@ export class DebuggerGUI {
 
         const onUpdateSlider = () => {
             updateCurrentValueView();
-            return Number.parseInt(sliderInput.value, 10);
+            return Number.parseFloat(sliderInput.value);
         };
 
         sliderInput.type = "range";
