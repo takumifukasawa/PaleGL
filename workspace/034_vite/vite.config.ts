@@ -20,7 +20,7 @@ export default defineConfig({
         assetsInlineLimit: 100000000,
         rollupOptions: {
             input: {
-                main: resolve(__dirname, "main.ts"),
+                main: resolve(__dirname, "index.html"),
             },
         },
     },

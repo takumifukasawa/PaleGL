@@ -1,6 +1,6 @@
 import "./style.css";
 
-console.log(`hogehoge: ${new Date() + ""}`);
+console.log(`hogge: ${new Date() + ""}`);
 
 // actors
 import {DirectionalLight} from "./PaleGL/actors/DirectionalLight";
