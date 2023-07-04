@@ -1,52 +1,52 @@
-import "./style.css";
+import "@/style.css";
 
 console.log(`hogge: ${new Date() + ""}`);
 
 // actors
-import {DirectionalLight} from "./PaleGL/actors/DirectionalLight";
-import {Mesh} from "./PaleGL/actors/Mesh";
-import {PerspectiveCamera} from "./PaleGL/actors/PerspectiveCamera";
-import {Skybox} from "./PaleGL/actors/Skybox";
-import {SkinnedMesh} from "./PaleGL/actors/SkinnedMesh";
+import {DirectionalLight} from "@/PaleGL/actors/DirectionalLight";
+import {Mesh} from "@/PaleGL/actors/Mesh";
+import {PerspectiveCamera} from "@/PaleGL/actors/PerspectiveCamera";
+import {Skybox} from "@/PaleGL/actors/Skybox";
+import {SkinnedMesh} from "@/PaleGL/actors/SkinnedMesh";
 
 // core
-import {Engine} from "./PaleGL/core/Engine";
-import {Renderer} from "./PaleGL/core/Renderer";
-import {GPU} from "./PaleGL/core/GPU";
-import {RenderTarget} from "./PaleGL/core/RenderTarget";
-import {GBufferRenderTargets} from "./PaleGL/core/GBufferRenderTargets";
-import {Scene} from "./PaleGL/core/Scene";
-import {Texture} from "./PaleGL/core/Texture";
-import {OrbitCameraController} from "./PaleGL/core/OrbitCameraController";
+import {Engine} from "@/PaleGL/core/Engine";
+import {Renderer} from "@/PaleGL/core/Renderer";
+import {GPU} from "@/PaleGL/core/GPU";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets";
+import {Scene} from "@/PaleGL/core/Scene";
+import {Texture} from "@/PaleGL/core/Texture";
+import {OrbitCameraController} from "@/PaleGL/core/OrbitCameraController";
 
 // geometries
-import {Geometry} from "./PaleGL/geometries/Geometry";
-import {PlaneGeometry} from "./PaleGL/geometries/PlaneGeometry";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
 
 // loaders
-import {loadCubeMap} from "./PaleGL/loaders/loadCubeMap";
-import {loadGLTF} from "./PaleGL/loaders/loadGLTF";
-import {loadImg} from "./PaleGL/loaders/loadImg";
+import {loadCubeMap} from "@/PaleGL/loaders/loadCubeMap";
+import {loadGLTF} from "@/PaleGL/loaders/loadGLTF";
+import {loadImg} from "@/PaleGL/loaders/loadImg";
 
 // materials
-import {Material} from "./PaleGL/materials/Material";
-import {PhongMaterial} from "./PaleGL/materials/PhongMaterial";
+import {Material} from "@/PaleGL/materials/Material";
+import {PhongMaterial} from "@/PaleGL/materials/PhongMaterial";
 
 // math
-import {Color} from "./PaleGL/math/Color";
-import {Vector2} from "./PaleGL/math/Vector2";
-import {Vector3} from "./PaleGL/math/Vector3";
-import {Vector4} from "./PaleGL/math/Vector4";
+import {Color} from "@/PaleGL/math/Color";
+import {Vector2} from "@/PaleGL/math/Vector2";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Vector4} from "@/PaleGL/math/Vector4";
 
 // postprocess
-import {FragmentPass} from "./PaleGL/postprocess/FragmentPass";
-import {PostProcess} from "./PaleGL/postprocess/PostProcess";
-import {FXAAPass} from "./PaleGL/postprocess/FXAAPass";
-import {BloomPass} from "./PaleGL/postprocess/BloomPass";
+import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass";
+import {PostProcess} from "@/PaleGL/postprocess/PostProcess";
+import {FXAAPass} from "@/PaleGL/postprocess/FXAAPass";
+import {BloomPass} from "@/PaleGL/postprocess/BloomPass";
 
 // inputs
-import {TouchInputController} from "./PaleGL/inputs/TouchInputController";
-import {MouseInputController} from "./PaleGL/inputs/MouseInputController";
+import {TouchInputController} from "@/PaleGL/inputs/TouchInputController";
+import {MouseInputController} from "@/PaleGL/inputs/MouseInputController";
 
 // others
 import {
@@ -57,14 +57,14 @@ import {
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames
-} from "./PaleGL/constants";
+} from "@/PaleGL/constants";
 
-import {DebuggerGUI} from "./DebuggerGUI";
-import {Camera} from "./PaleGL/actors/Camera";
-// import {Light} from "./PaleGL/actors/Light";
-import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera";
-import {Attribute} from "./PaleGL/core/Attribute";
-// import {Actor} from "./PaleGL/actors/Actor.ts";
+import {DebuggerGUI} from "@/DebuggerGUI";
+import {Camera} from "@/PaleGL/actors/Camera";
+// import {Light} from "@/PaleGL/actors/Light";
+import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
+import {Attribute} from "@/PaleGL/core/Attribute";
+// import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 const debuggerStates: {
     instanceNum: number
@@ -301,7 +301,7 @@ captureSceneCamera.setPostProcess(postProcess);
 
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({gpu, path: "./models/glass-wind-poly.gltf"});
+    const gltfActor = await loadGLTF({gpu, path: "/models/glass-wind-poly.gltf"});
 
     console.log(gltfActor)
     console.log(gltfActor.transform)
@@ -419,7 +419,7 @@ const createGLTFSkinnedMesh = async () => {
 // @ts-ignore
 const main = async () => {
     console.log("main")
-    const particleImg = await loadImg("./images/particle-smoke.png");
+    const particleImg = await loadImg("/images/particle-smoke.png");
     const particleMap = new Texture({
         gpu,
         img: particleImg,
@@ -427,7 +427,7 @@ const main = async () => {
     
     console.log(particleImg)
 
-    const floorDiffuseImg = await loadImg("./images/brown_mud_leaves_01_diff_1k.jpg");
+    const floorDiffuseImg = await loadImg("/images/brown_mud_leaves_01_diff_1k.jpg");
     floorDiffuseMap = new Texture({
         gpu,
         img: floorDiffuseImg,
@@ -440,7 +440,7 @@ const main = async () => {
 
     console.log(floorDiffuseImg)
 
-    const floorNormalImg = await loadImg("./images/brown_mud_leaves_01_nor_gl_1k.jpg");
+    const floorNormalImg = await loadImg("/images/brown_mud_leaves_01_nor_gl_1k.jpg");
     floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
@@ -454,12 +454,12 @@ const main = async () => {
     console.log(floorNormalImg)
 
     const images = {
-        [CubeMapAxis.PositiveX]: "./images/px.jpg",
-        [CubeMapAxis.NegativeX]: "./images/nx.jpg",
-        [CubeMapAxis.PositiveY]: "./images/py.jpg",
-        [CubeMapAxis.NegativeY]: "./images/ny.jpg",
-        [CubeMapAxis.PositiveZ]: "./images/pz.jpg",
-        [CubeMapAxis.NegativeZ]: "./images/nz.jpg",
+        [CubeMapAxis.PositiveX]: "/images/px.jpg",
+        [CubeMapAxis.NegativeX]: "/images/nx.jpg",
+        [CubeMapAxis.PositiveY]: "/images/py.jpg",
+        [CubeMapAxis.NegativeY]: "/images/ny.jpg",
+        [CubeMapAxis.PositiveZ]: "/images/pz.jpg",
+        [CubeMapAxis.NegativeZ]: "/images/nz.jpg",
     };
     
     console.log(images)

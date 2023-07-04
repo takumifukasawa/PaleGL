@@ -1,8 +1,8 @@
-﻿import {GLObject} from "./GLObject.js";
-import {AttributeUsageType} from "../constants.js";
-import {IndexBufferObject} from "./IndexBufferObject.js";
-import {GPU} from "./GPU";
-import {Attribute} from "./Attribute";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
+import {AttributeUsageType} from "@/PaleGL/constants.js";
+import {IndexBufferObject} from "@/PaleGL/core/IndexBufferObject";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Attribute} from "@/PaleGL/core/Attribute";
 
 type VertexBufferObject = {
     name: string,

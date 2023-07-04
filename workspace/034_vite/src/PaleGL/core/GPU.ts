@@ -6,17 +6,17 @@
     PrimitiveTypes,
     TextureWrapTypes, UniformType,
     UniformTypes
-} from "./../constants";
-import {Texture} from "./Texture";
-import {Shader} from "./Shader";
-import {VertexArrayObject} from "./VertexArrayObject";
-import {Framebuffer} from "./Framebuffer";
-import {Uniforms, UniformStructValue, UniformValue} from "../materials/Material";
-import {Vector2} from "../math/Vector2";
-import {Vector3} from "../math/Vector3";
-import {Matrix4} from "../math/Matrix4";
-import {Color} from "../math/Color";
-import {CubeMap} from "./CubeMap";
+} from "@/PaleGL/constants";
+import {Texture} from "@/PaleGL/core/Texture";
+import {Shader} from "@/PaleGL/core/Shader";
+import {VertexArrayObject} from "@/PaleGL/core/VertexArrayObject";
+import {Framebuffer} from "@/PaleGL/core/Framebuffer";
+import {Uniforms, UniformStructValue, UniformValue} from "@/PaleGL/materials/Material";
+import {Vector2} from "@/PaleGL/math/Vector2";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Color} from "@/PaleGL/math/Color";
+import {CubeMap} from "@/PaleGL/core/CubeMap";
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement("canvas");

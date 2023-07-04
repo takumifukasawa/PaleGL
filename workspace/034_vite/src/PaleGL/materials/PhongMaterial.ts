@@ -1,9 +1,9 @@
-import {MaterialArgs, Material, Uniforms, VertexShaderModifier} from "./Material";
+import {MaterialArgs, Material, Uniforms, VertexShaderModifier} from "@/PaleGL/materials/Material";
 import {
     shadowMapFragmentFunc,
     shadowMapFragmentUniforms,
     shadowMapFragmentVaryings
-} from "../shaders/shadowMapShader";
+} from "@/PaleGL/shaders/shadowMapShader";
 import {
     alphaTestFragmentUniforms,
     alphaTestFragmentFunc,
@@ -11,16 +11,16 @@ import {
     normalMapFragmentFunc, normalMapFragmentUniforms,
     normalMapFragmentVarying,
     phongSurfaceDirectionalLightFunc
-} from "../shaders/lightingCommon";
-import {UniformTypes} from "../constants";
-import {Vector2} from "../math/Vector2";
-import {Color} from "../math/Color";
-// import {buildVertexShader} from "../shaders/buildShader.js";
-import {AttributeDescriptor} from "../core/Attribute";
-import {GPU} from "../core/GPU";
-import {Texture} from "../core/Texture";
-import {Vector3} from "../math/Vector3";
-import {Vector4} from "../math/Vector4";
+} from "@/PaleGL/shaders/lightingCommon";
+import {UniformTypes} from "@/PaleGL/constants";
+import {Vector2} from "@/PaleGL/math/Vector2";
+import {Color} from "@/PaleGL/math/Color";
+// import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
+import {AttributeDescriptor} from "@/PaleGL/core/Attribute";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Texture} from "@/PaleGL/core/Texture";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Vector4} from "@/PaleGL/math/Vector4";
 
 export type PhongMaterialArgs = {
     diffuseColor?: Color,

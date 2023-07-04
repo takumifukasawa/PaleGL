@@ -3,13 +3,13 @@
 import {
     skinningVertexUniforms,
     calcSkinningMatrixFunc, skinningVertex
-} from "./skinningShader";
-import {engineCommonUniforms, transformVertexUniforms} from "./commonUniforms";
-import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "./shadowMapShader";
-import {normalMapVertexVaryings} from "./lightingCommon";
-import {AttributeNames} from "../constants";
-import {buildVertexAttributeLayouts} from "./buildShader";
-import {AttributeDescriptor} from "../core/Attribute";
+} from "@/PaleGL/shaders/skinningShader";
+import {engineCommonUniforms, transformVertexUniforms} from "@/PaleGL/shaders/commonUniforms";
+import {shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings} from "@/PaleGL/shaders/shadowMapShader";
+import {normalMapVertexVaryings} from "@/PaleGL/shaders/lightingCommon";
+import {AttributeNames} from "@/PaleGL/constants";
+import {buildVertexAttributeLayouts} from "@/PaleGL/shaders/buildShader";
+import {AttributeDescriptor} from "@/PaleGL/core/Attribute";
 
 type GenerateVertexShaderArgs = {
     // required

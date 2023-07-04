@@ -1,6 +1,6 @@
-﻿import {Vector3} from "./Vector3.js";
-import {Rotator} from "./Rotator";
-import {Quaternion} from "./Quaternion";
+﻿import {Vector3} from "@/PaleGL/math/Vector3";
+import {Rotator} from "@/PaleGL/math/Rotator";
+import {Quaternion} from "@/PaleGL/math/Quaternion";
 
 // memory layout is column order.
 // setter and getter are row order.

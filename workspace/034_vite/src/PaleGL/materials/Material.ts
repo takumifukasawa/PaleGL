@@ -1,4 +1,4 @@
-﻿import {Shader} from "./../core/Shader";
+﻿import {Shader} from "@/PaleGL/core/Shader";
 import {
     BlendTypes,
     UniformTypes,
@@ -7,17 +7,17 @@ import {
     FaceSide,
     UniformNames,
     PrimitiveType, BlendType, RenderQueue, UniformType
-} from "./../constants";
-import {Matrix4} from "../math/Matrix4";
-import {Vector3} from "../math/Vector3";
-import {buildVertexShader, buildFragmentShader} from "../shaders/buildShader";
-import {GPU} from "../core/GPU";
-import {Texture} from "../core/Texture";
-import {AttributeDescriptor} from "../core/Attribute";
-import {CubeMap} from "../core/CubeMap";
-import {Vector2} from "../math/Vector2";
-import {Color} from "../math/Color";
-import {DirectionalLightStruct} from "../shaders/lightingCommon";
+} from "@/PaleGL/constants";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {buildVertexShader, buildFragmentShader} from "@/PaleGL/shaders/buildShader";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Texture} from "@/PaleGL/core/Texture";
+import {AttributeDescriptor} from "@/PaleGL/core/Attribute";
+import {CubeMap} from "@/PaleGL/core/CubeMap";
+import {Vector2} from "@/PaleGL/math/Vector2";
+import {Color} from "@/PaleGL/math/Color";
+import {DirectionalLightStruct} from "@/PaleGL/shaders/lightingCommon";
 
 export type MaterialArgs = {
     // required

@@ -3,6 +3,7 @@ import {defineConfig} from "vite";
 import {viteSingleFile} from "vite-plugin-singlefile";
 import {createHtmlPlugin} from "vite-plugin-html";
 import checker from 'vite-plugin-checker';
+import tsconfigPaths from "vite-tsconfig-paths";
 
 console.log(resolve(__dirname, "index.html"));
 
@@ -11,6 +12,7 @@ console.log(resolve(__dirname, "index.html"));
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
     plugins: [
+        tsconfigPaths(),
         checker({typescript: true}),
         viteSingleFile(),
         createHtmlPlugin(),

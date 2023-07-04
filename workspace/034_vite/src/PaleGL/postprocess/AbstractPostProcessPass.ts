@@ -1,7 +1,7 @@
-﻿import {Renderer} from "../core/Renderer";
-import {Camera} from "../actors/Camera";
-import {GPU} from "../core/GPU";
-import {RenderTarget} from "../core/RenderTarget";
+﻿import {Renderer} from "@/PaleGL/core/Renderer";
+import {Camera} from "@/PaleGL/actors/Camera";
+import {GPU} from "@/PaleGL/core/GPU";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 
 export type PostProcessRenderArgs = {
     gpu: GPU,

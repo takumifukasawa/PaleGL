@@ -1,5 +1,5 @@
-import {AbstractInputController} from "./AbstractInputController";
-import {Vector2} from "../math/Vector2";
+import {AbstractInputController} from "@/PaleGL/inputs/AbstractInputController";
+import {Vector2} from "@/PaleGL/math/Vector2";
 
 export class TouchInputController extends AbstractInputController {
     #tmpIsDown = false;

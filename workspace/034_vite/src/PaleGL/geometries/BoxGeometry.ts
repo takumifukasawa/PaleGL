@@ -1,8 +1,8 @@
 ﻿
-import {Geometry} from "./Geometry";
-import {AttributeNames} from "../constants";
-import {Attribute} from "../core/Attribute";
-import {GPU} from "../core/GPU";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {AttributeNames} from "@/PaleGL/constants";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export class BoxGeometry extends Geometry {
     constructor({ gpu }: {gpu: GPU}) {

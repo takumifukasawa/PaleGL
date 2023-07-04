@@ -1,4 +1,4 @@
-﻿import {GLObject} from "./GLObject";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
 import {
     TextureFilterType,
     TextureFilterTypes,
@@ -6,7 +6,7 @@ import {
     TextureTypes,
     TextureWrapType,
     TextureWrapTypes
-} from "./../constants";
+} from "@/PaleGL/constants";
 // @ts-ignore
 import {createWhite1x1, GPU} from "./GPU";
 

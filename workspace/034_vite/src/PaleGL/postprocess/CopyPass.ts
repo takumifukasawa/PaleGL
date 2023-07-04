@@ -1,5 +1,5 @@
-﻿import {PostProcessPass} from "./PostProcessPass";
-import {GPU} from "../core/GPU";
+﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
+import {GPU} from "@/PaleGL/core/GPU";
 
 
 export class CopyPass extends PostProcessPass {

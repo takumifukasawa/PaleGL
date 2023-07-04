@@ -1,12 +1,12 @@
-﻿import {UniformNames, UniformTypes} from "../constants";
-import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass";
-import {FragmentPass} from "./FragmentPass";
-import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader";
-import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities";
-import {Renderer} from "../core/Renderer";
-import {Camera} from "../actors/Camera";
-import {PostProcessPass} from "./PostProcessPass";
-import {GPU} from "../core/GPU";
+﻿import {UniformNames, UniformTypes} from "@/PaleGL/constants";
+import {IPostProcessPass, PostProcessRenderArgs} from "@/PaleGL/postprocess/AbstractPostProcessPass";
+import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass";
+import {gaussianBlurFragmentShader} from "@/PaleGL/shaders/gaussianBlurShader";
+import {getGaussianBlurWeights} from "@/PaleGL/utilities/gaussialBlurUtilities";
+import {Renderer} from "@/PaleGL/core/Renderer";
+import {Camera} from "@/PaleGL/actors/Camera";
+import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
+import {GPU} from "@/PaleGL/core/GPU";
 
 // export class GaussianBlurPass extends AbstractPostProcessPass {
 export class GaussianBlurPass implements IPostProcessPass {

@@ -1,9 +1,9 @@
-﻿import {Transform} from "../core/Transform";
-import {ActorType, ActorTypes} from "./../constants";
-import {uuidv4} from "../utilities/uuid";
-import {Animator} from "../core/Animator";
-import {GPU} from "../core/GPU";
-import {Camera} from "./Camera";
+﻿import {Transform} from "@/PaleGL/core/Transform";
+import {ActorType, ActorTypes} from "@/PaleGL/constants";
+import {uuidv4} from "@/PaleGL/utilities/uuid";
+import {Animator} from "@/PaleGL/core/Animator";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Camera} from "@/PaleGL/actors/Camera";
 
 type OnStartCallback = (args: { actor: Actor, gpu: GPU }) => void;
 type OnFixedUpdateCallback = (args: { actor: Actor, gpu: GPU, fixedTime: number, fixedDeltaTime: number }) => void;

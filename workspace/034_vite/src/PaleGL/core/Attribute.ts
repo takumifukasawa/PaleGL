@@ -1,4 +1,4 @@
-﻿import {AttributeUsageType} from "../constants";
+﻿import {AttributeUsageType} from "@/PaleGL/constants";
 
 export type AttributeDescriptor = {
     location: number,

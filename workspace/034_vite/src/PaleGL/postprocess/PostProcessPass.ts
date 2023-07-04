@@ -1,12 +1,12 @@
-﻿import {PlaneGeometry} from "../geometries/PlaneGeometry";
-import {Material, Uniforms} from "../materials/Material";
-import {RenderTarget} from "../core/RenderTarget";
-import {Mesh} from "../actors/Mesh";
-import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "../constants";
-import {IPostProcessPass} from "./AbstractPostProcessPass";
-import {Renderer} from "../core/Renderer";
-import {GPU} from "../core/GPU";
-import {Camera} from "../actors/Camera";
+﻿import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
+import {Material, Uniforms} from "@/PaleGL/materials/Material";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+import {Mesh} from "@/PaleGL/actors/Mesh";
+import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "@/PaleGL/constants";
+import {IPostProcessPass} from "@/PaleGL/postprocess/AbstractPostProcessPass";
+import {Renderer} from "@/PaleGL/core/Renderer";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Camera} from "@/PaleGL/actors/Camera";
 
 
 // export class PostProcessPass extends AbstractPostProcessPass {

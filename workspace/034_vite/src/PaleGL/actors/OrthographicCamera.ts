@@ -1,7 +1,7 @@
-﻿import {Camera, FrustumDirection, FrustumDirectionType, FrustumVectors} from "./Camera.js";
-import {Matrix4} from "../math/Matrix4.js";
-import {Vector3} from "../math/Vector3.js";
-import {CameraTypes} from "../constants";
+﻿import {Camera, FrustumDirection, FrustumDirectionType, FrustumVectors} from "@/PaleGL/actors/Camera";
+import {Matrix4} from "@/PaleGL/math/Matrix4.js";
+import {Vector3} from "@/PaleGL/math/Vector3.js";
+import {CameraTypes} from "@/PaleGL/constants";
 
 export class OrthographicCamera extends Camera {
     left: number = 0;

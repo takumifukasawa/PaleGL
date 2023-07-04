@@ -1,5 +1,5 @@
-import {AttributeNames} from "../constants";
-import {Geometry} from "../geometries/Geometry";
+import {AttributeNames} from "@/PaleGL/constants";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
 
 export class Stats {
     domElement;

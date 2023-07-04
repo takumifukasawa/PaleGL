@@ -1,10 +1,10 @@
-﻿import {TimeSkipper} from "../utilities/TimeSkipper";
-import {TimeAccumulator} from "../utilities/TimeAccumulator";
-import {ActorTypes} from "../constants";
-import {Stats} from "../utilities/Stats";
-import {GPU} from "./GPU";
-import {Scene} from "./Scene";
-import {Renderer} from "./Renderer";
+﻿import {TimeSkipper} from "@/PaleGL/utilities/TimeSkipper";
+import {TimeAccumulator} from "@/PaleGL/utilities/TimeAccumulator";
+import {ActorTypes} from "@/PaleGL/constants";
+import {Stats} from "@/PaleGL/utilities/Stats";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Scene} from "@/PaleGL/core/Scene";
+import {Renderer} from "@/PaleGL/core/Renderer";
 
 // type EngineOnBeforeStartCallbackArgs = void;
 

@@ -1,8 +1,8 @@
-﻿import {Actor} from "./Actor";
-import {ActorTypes} from "../constants";
-import {Color} from "../math/Color";
+﻿import {Actor} from "@/PaleGL/actors/Actor";
+import {ActorTypes} from "@/PaleGL/constants";
+import {Color} from "@/PaleGL/math/Color";
 // import {Camera} from "./Camera";
-import {RenderTarget} from "../core/RenderTarget";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {OrthographicCamera} from "./OrthographicCamera";
 import {PerspectiveCamera} from "./PerspectiveCamera";
 

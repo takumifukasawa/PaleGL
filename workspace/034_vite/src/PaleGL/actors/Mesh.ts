@@ -1,9 +1,9 @@
-﻿import {Actor} from "./Actor";
-import {ActorType, ActorTypes} from "./../constants";
-import {Material} from "../materials/Material";
-import {defaultDepthFragmentShader} from "../shaders/buildShader";
-import {Geometry} from "../geometries/Geometry";
-import {GPU} from "../core/GPU";
+﻿import {Actor} from "@/PaleGL/actors/Actor";
+import {ActorType, ActorTypes} from "@/PaleGL/constants";
+import {Material} from "@/PaleGL/materials/Material";
+import {defaultDepthFragmentShader} from "@/PaleGL/shaders/buildShader";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export type MeshArgs = {
     // required

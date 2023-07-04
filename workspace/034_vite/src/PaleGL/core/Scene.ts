@@ -1,5 +1,5 @@
-﻿import {Actor} from "../actors/Actor";
-import {Transform} from "./Transform";
+﻿import {Actor} from "@/PaleGL/actors/Actor";
+import {Transform} from "@/PaleGL/core/Transform";
 
 type TraverseFunc = (actor: Actor) => void;
 

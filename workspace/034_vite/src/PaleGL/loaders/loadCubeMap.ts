@@ -1,7 +1,7 @@
-﻿import {loadImg} from "./../loaders/loadImg";
-import {CubeMap} from "./../core/CubeMap";
-import {CubeMapAxis} from "../constants";
-import {GPU} from "../core/GPU";
+﻿import {loadImg} from "@/PaleGL/loaders/loadImg";
+import {CubeMap} from "@/PaleGL/core/CubeMap";
+import {CubeMapAxis} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
 
 // example
 // images: {

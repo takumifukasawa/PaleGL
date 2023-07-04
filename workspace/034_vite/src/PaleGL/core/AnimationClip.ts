@@ -1,12 +1,12 @@
-﻿import {Rotator} from "../math/Rotator";
-import {AnimationKeyframes} from "./AnimationKeyframes";
-import {Vector3} from "../math/Vector3";
-import {Quaternion} from "../math/Quaternion";
-import {GLTFAnimationChannelTargetPath, GLTFNodeActorKind} from "../loaders/loadGLTF";
-import {Bone} from "./Bone";
-import {Actor} from "../actors/Actor";
+﻿import {Rotator} from "@/PaleGL/math/Rotator";
+import {AnimationKeyframes} from "@/PaleGL/core/AnimationKeyframes";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Quaternion} from "@/PaleGL/math/Quaternion";
+import {GLTFAnimationChannelTargetPath, GLTFNodeActorKind} from "@/PaleGL/loaders/loadGLTF";
+import {Bone} from "@/PaleGL/core/Bone";
+import {Actor} from "@/PaleGL/actors/Actor";
 
-// import {GLTFAnimationSamplerInterpolation} from "../loaders/loadGLTF";
+// import {GLTFAnimationSamplerInterpolation} from "@/PaleGL/loaders/loadGLTF";
 
 
 type UpdateProxyKeyframe = {

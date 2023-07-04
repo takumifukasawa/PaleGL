@@ -1,8 +1,8 @@
-﻿import {Vector3} from "../math/Vector3.js";
-import {Matrix4} from "../math/Matrix4.js";
-import {ActorTypes} from "../constants.js";
-import {Rotator} from "../math/Rotator.js";
-import {Actor} from "../actors/Actor";
+﻿import {Vector3} from "@/PaleGL/math/Vector3.js";
+import {Matrix4} from "@/PaleGL/math/Matrix4.js";
+import {ActorTypes} from "@/PaleGL/constants.js";
+import {Rotator} from "@/PaleGL/math/Rotator.js";
+import {Actor} from "@/PaleGL/actors/Actor";
 
 // TODO: 
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？

@@ -1,6 +1,6 @@
-﻿import {GLObject} from "./GLObject.js";
-import {CubeMapAxis} from "../constants.js";
-import {GPU} from "./GPU";
+﻿import {GLObject} from "@/PaleGL/core/GLObject.js";
+import {CubeMapAxis} from "@/PaleGL/constants.js";
+import {GPU} from "@/PaleGL/core/GPU";
 
 type CubeMapArgs =
     {

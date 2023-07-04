@@ -1,10 +1,10 @@
-﻿import {OrthographicCamera} from "./../actors/OrthographicCamera";
-import {Vector3} from "../math/Vector3";
-import {Camera} from "../actors/Camera";
-import {IPostProcessPass} from "./AbstractPostProcessPass";
-import {GPU} from "../core/GPU";
-import {Renderer} from "../core/Renderer";
-import {RenderTarget} from "../core/RenderTarget";
+﻿import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Camera} from "@/PaleGL/actors/Camera";
+import {IPostProcessPass} from "@/PaleGL/postprocess/AbstractPostProcessPass";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Renderer} from "@/PaleGL/core/Renderer";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {

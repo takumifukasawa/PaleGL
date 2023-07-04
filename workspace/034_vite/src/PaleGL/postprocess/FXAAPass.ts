@@ -1,8 +1,8 @@
-﻿import {PostProcessPass} from "./PostProcessPass";
-import {UniformTypes,UniformNames} from "../constants";
-import {GPU} from "../core/GPU";
+﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
+import {UniformTypes,UniformNames} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
 // import {IPostProcessPass} from "./AbstractPostProcessPass";
-// import {GPU} from "../core/GPU";
+// import {GPU} from "@/PaleGL/core/GPU";
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/

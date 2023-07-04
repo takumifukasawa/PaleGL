@@ -1,5 +1,5 @@
-import {Vector3} from "../math/Vector3";
-import {Vector4} from "../math/Vector4";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Vector4} from "@/PaleGL/math/Vector4";
 
 export type DirectionalLightStruct = {
     direction: Vector3;

@@ -1,4 +1,4 @@
-﻿import {Mesh, MeshArgs} from "./Mesh";
+﻿import {Mesh, MeshArgs} from "@/PaleGL/actors/Mesh";
 import {
     ActorTypes,
     AttributeNames,
@@ -7,21 +7,21 @@ import {
     PrimitiveTypes,
     TextureTypes, UniformNames,
     UniformTypes
-} from "../constants";
-import {Matrix4} from "../math/Matrix4";
-import {Geometry} from "../geometries/Geometry";
-import {Material} from "../materials/Material";
-import {Texture} from "../core/Texture";
-import {Rotator} from "../math/Rotator";
-import {Bone} from "../core/Bone";
-import {Attribute} from "../core/Attribute";
-import {AnimationClip} from "../core/AnimationClip";
+} from "@/PaleGL/constants";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {Material} from "@/PaleGL/materials/Material";
+import {Texture} from "@/PaleGL/core/Texture";
+import {Rotator} from "@/PaleGL/math/Rotator";
+import {Bone} from "@/PaleGL/core/Bone";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {AnimationClip} from "@/PaleGL/core/AnimationClip";
 import {ActorUpdateArgs} from "./Actor";
-import {GPU} from "../core/GPU";
-import {Vector3} from "../math/Vector3";
-import {Quaternion} from "../math/Quaternion";
-import {GLTFAnimationChannelTargetPath} from "../loaders/loadGLTF";
-// import {AnimationKeyframeValue} from "../core/AnimationKeyframes";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Quaternion} from "@/PaleGL/math/Quaternion";
+import {GLTFAnimationChannelTargetPath} from "@/PaleGL/loaders/loadGLTF";
+// import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone, debugBoneView?: boolean } & MeshArgs;
 

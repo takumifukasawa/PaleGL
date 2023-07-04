@@ -1,16 +1,16 @@
-﻿import {PostProcessPass} from "./PostProcessPass";
-import {UniformNames, UniformTypes} from "../constants";
-import {IPostProcessPass, PostProcessRenderArgs} from "./AbstractPostProcessPass";
-import {FragmentPass} from "./FragmentPass";
-import {gaussianBlurFragmentShader} from "../shaders/gaussianBlurShader";
-import {RenderTarget} from "../core/RenderTarget";
+﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
+import {UniformNames, UniformTypes} from "@/PaleGL/constants";
+import {IPostProcessPass, PostProcessRenderArgs} from "@/PaleGL/postprocess/AbstractPostProcessPass";
+import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass";
+import {gaussianBlurFragmentShader} from "@/PaleGL/shaders/gaussianBlurShader";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 // import {CopyPass} from "./CopyPass";
-import {Material} from "../materials/Material";
-import {getGaussianBlurWeights} from "../utilities/gaussialBlurUtilities";
-import {PlaneGeometry} from "../geometries/PlaneGeometry";
-import {GPU} from "../core/GPU";
-import {Camera} from "../actors/Camera";
-import {Renderer} from "../core/Renderer";
+import {Material} from "@/PaleGL/materials/Material";
+import {getGaussianBlurWeights} from "@/PaleGL/utilities/gaussialBlurUtilities";
+import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Camera} from "@/PaleGL/actors/Camera";
+import {Renderer} from "@/PaleGL/core/Renderer";
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる

@@ -6,7 +6,7 @@
 
 // .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
 
-import {AttributeDescriptor} from "../core/Attribute";
+import {AttributeDescriptor} from "@/PaleGL/core/Attribute";
 
 const pragmaRegex = /^#pragma(.*)/;
 

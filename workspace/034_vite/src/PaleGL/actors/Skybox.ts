@@ -1,18 +1,18 @@
-import {Mesh} from "./Mesh";
-import {UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames} from "./../constants";
-import {Material} from "./../materials/Material";
-// import {loadImg} from "./../loaders/loadImg";
-import {/*loadObj,*/ parseObj} from "./../loaders/loadObj";
-import {Geometry} from "./../geometries/Geometry";
-// import {CubeMap} from "./../core/CubeMap";
-// import {BoxGeometry} from "../geometries/BoxGeometry";
-// import {PlaneGeometry} from "../geometries/PlaneGeometry";
-import {Matrix4} from "../math/Matrix4";
-import {Vector3} from "../math/Vector3";
-import {CubeMap} from "../core/CubeMap";
-import {Attribute} from "../core/Attribute";
-import {GPU} from "../core/GPU";
-import {Camera} from "./Camera";
+import {Mesh} from "@/PaleGL/actors/Mesh";
+import {UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames} from "@/PaleGL/constants";
+import {Material} from "@/PaleGL/materials/Material";
+// import {loadImg} from "@/PaleGL/loaders/loadImg";
+import {/*loadObj,*/ parseObj} from "@/PaleGL/loaders/loadObj";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+// import {CubeMap} from "@/PaleGL/core/CubeMap";
+// import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry";
+// import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {CubeMap} from "@/PaleGL/core/CubeMap";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Camera} from "@/PaleGL/actors/Camera";
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `

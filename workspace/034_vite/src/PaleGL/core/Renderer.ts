@@ -4,16 +4,16 @@
     RenderQueueType,
     UniformNames,
     UniformTypes
-} from "./../constants";
-import {Matrix4} from "../math/Matrix4";
-import {GPU} from "./GPU";
-import {Stats} from "../utilities/Stats";
-import {Light} from "../actors/Light";
-import {Mesh} from "../actors/Mesh";
-import {Scene} from "./Scene";
-import {Camera, CameraRenderTargetType} from "../actors/Camera";
-import {Material} from "../materials/Material";
-import {Geometry} from "../geometries/Geometry";
+} from "@/PaleGL/constants";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Stats} from "@/PaleGL/utilities/Stats";
+import {Light} from "@/PaleGL/actors/Light";
+import {Mesh} from "@/PaleGL/actors/Mesh";
+import {Scene} from "@/PaleGL/core/Scene";
+import {Camera, CameraRenderTargetType} from "@/PaleGL/actors/Camera";
+import {Material} from "@/PaleGL/materials/Material";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
 
 type RenderMeshInfo = { actor: Mesh, materialIndex: number };
 

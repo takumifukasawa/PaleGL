@@ -1,11 +1,11 @@
-import {Mesh} from "./Mesh.js";
-import {Material} from "../materials/Material";
-import {parseObj} from "../loaders/loadObj";
-import {Geometry} from "../geometries/Geometry";
-import {AttributeNames, UniformNames} from "../constants";
-import {GPU} from "../core/GPU";
-import {Attribute} from "../core/Attribute";
-import {Vector3} from "../math/Vector3";
+import {Mesh} from "@/PaleGL/actors/Mesh";
+import {Material} from "@/PaleGL/materials/Material";
+import {parseObj} from "@/PaleGL/loaders/loadObj";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {AttributeNames, UniformNames} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {Vector3} from "@/PaleGL/math/Vector3";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1

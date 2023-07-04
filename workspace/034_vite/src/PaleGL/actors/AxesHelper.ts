@@ -1,10 +1,10 @@
-﻿import {Mesh} from "./Mesh";
-import {Material} from "../materials/Material";
-import {parseObj} from "../loaders/loadObj";
-import {Geometry} from "../geometries/Geometry";
-import {AttributeNames, UniformNames} from "../constants";
-import {Attribute} from "../core/Attribute";
-import {GPU} from "../core/GPU";
+﻿import {Mesh} from "@/PaleGL/actors/Mesh";
+import {Material} from "@/PaleGL/materials/Material";
+import {parseObj} from "@/PaleGL/loaders/loadObj";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
+import {AttributeNames, UniformNames} from "@/PaleGL/constants";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {GPU} from "@/PaleGL/core/GPU";
 
 const axesHelperGeometryData = `
 # Blender 3.3.1

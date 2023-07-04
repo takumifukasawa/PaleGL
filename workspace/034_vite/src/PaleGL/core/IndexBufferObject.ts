@@ -1,5 +1,5 @@
-﻿import {GLObject} from "./GLObject.js";
-import {GPU} from "./GPU";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export class IndexBufferObject extends GLObject {
     private ibo: WebGLBuffer;

@@ -1,6 +1,6 @@
-import {Vector3} from "../math/Vector3.js";
-import {clamp} from "../utilities/mathUtilities.js";
-import {Camera} from "../actors/Camera";
+import {Vector3} from "@/PaleGL/math/Vector3.js";
+import {clamp} from "@/PaleGL/utilities/mathUtilities.js";
+import {Camera} from "@/PaleGL/actors/Camera";
 
 export class OrbitCameraController {
     #camera: Camera;

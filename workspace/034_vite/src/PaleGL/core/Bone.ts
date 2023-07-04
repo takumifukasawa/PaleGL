@@ -1,7 +1,7 @@
-﻿import {NodeBase} from "./NodeBase";
-import {Matrix4} from "../math/Matrix4";
-import {Rotator} from "../math/Rotator";
-import {Vector3} from "../math/Vector3";
+﻿import {NodeBase} from "@/PaleGL/core/NodeBase";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Rotator} from "@/PaleGL/math/Rotator";
+import {Vector3} from "@/PaleGL/math/Vector3";
 
 export class Bone extends NodeBase {
     offsetMatrix: Matrix4 = Matrix4.identity; // 初期姿勢のボーンローカル座標

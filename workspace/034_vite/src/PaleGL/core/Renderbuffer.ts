@@ -1,6 +1,6 @@
-﻿import {GLObject} from "./GLObject";
-import {RenderbufferType, RenderbufferTypes} from "./../constants";
-import {GPU} from "./GPU";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
+import {RenderbufferType, RenderbufferTypes} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export class Renderbuffer extends GLObject {
     #gpu: GPU

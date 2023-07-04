@@ -1,4 +1,4 @@
-import {AnimationClip} from "./AnimationClip";
+import {AnimationClip} from "@/PaleGL/core/AnimationClip";
 
 export class Animator {
     private _animationClips: AnimationClip[];

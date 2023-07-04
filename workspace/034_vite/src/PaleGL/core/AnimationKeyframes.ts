@@ -1,12 +1,12 @@
-﻿import {AnimationKeyframeType, AnimationKeyframeTypes} from "../constants";
-import {Vector3} from "../math/Vector3";
-import {Quaternion} from "../math/Quaternion";
+﻿import {AnimationKeyframeType, AnimationKeyframeTypes} from "@/PaleGL/constants";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {Quaternion} from "@/PaleGL/math/Quaternion";
 import {
     GLTFAnimationChannelTargetPath,
     // GLTFAnimationKeyframeType,
     GLTFAnimationSamplerInterpolation,
     GLTFNodeActorKind
-} from "../loaders/loadGLTF";
+} from "@/PaleGL/loaders/loadGLTF";
 
 export type AnimationKeyframeValue = Vector3 | Quaternion;
 

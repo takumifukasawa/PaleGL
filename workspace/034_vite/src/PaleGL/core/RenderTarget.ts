@@ -1,6 +1,6 @@
-﻿import {Texture} from "./Texture";
-import {Framebuffer} from "./Framebuffer";
-import {Renderbuffer} from "./Renderbuffer";
+﻿import {Texture} from "@/PaleGL/core/Texture";
+import {Framebuffer} from "@/PaleGL/core/Framebuffer";
+import {Renderbuffer} from "@/PaleGL/core/Renderbuffer";
 import {
     RenderbufferTypes,
     RenderTargetType,
@@ -8,9 +8,9 @@ import {
     TextureFilterTypes,
     TextureTypes,
     GLColorAttachment,
-} from "./../constants";
-import {AbstractRenderTarget} from "./AbstractRenderTarget";
-import {GPU} from "./GPU";
+} from "@/PaleGL/constants";
+import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export type RenderTargetOptions = {
     // require

@@ -1,7 +1,7 @@
-﻿import {Actor} from "./Actor";
-import {Matrix4} from "../math/Matrix4";
-import {Vector4} from "../math/Vector4";
-// import {RenderTarget} from "./../core/RenderTarget";
+﻿import {Actor} from "@/PaleGL/actors/Actor";
+import {Matrix4} from "@/PaleGL/math/Matrix4";
+import {Vector4} from "@/PaleGL/math/Vector4";
+// import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {
     ActorTypes,
     AttributeNames,
@@ -9,19 +9,19 @@ import {
     BlendTypes, CameraType,
     PrimitiveTypes,
     UniformNames
-} from "../constants";
-// import {Vector3} from "../math/Vector3";
-import {Material} from "../materials/Material";
-import {Geometry} from "../geometries/Geometry";
+} from "@/PaleGL/constants";
+// import {Vector3} from "@/PaleGL/math/Vector3";
+import {Material} from "@/PaleGL/materials/Material";
+import {Geometry} from "@/PaleGL/geometries/Geometry";
 import {Mesh} from "./Mesh";
-import {Attribute} from "../core/Attribute";
-import {RenderTarget} from "../core/RenderTarget";
-// import {Color} from "../math/Color";
-import {Vector3} from "../math/Vector3";
-import {PostProcess} from "../postprocess/PostProcess";
-import {GPU} from "../core/GPU";
-// import {AbstractRenderTarget} from "../core/AbstractRenderTarget";
-import {GBufferRenderTargets} from "../core/GBufferRenderTargets";
+import {Attribute} from "@/PaleGL/core/Attribute";
+import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+// import {Color} from "@/PaleGL/math/Color";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {PostProcess} from "@/PaleGL/postprocess/PostProcess";
+import {GPU} from "@/PaleGL/core/GPU";
+// import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
+import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets";
 
 export const FrustumDirection = {
     nearLeftTop: "nearLeftTop",

@@ -1,7 +1,7 @@
 
-import {RenderTarget, RenderTargetOptions} from "./RenderTarget";
-// import {RenderTargetTypes} from "../constants";
-import {AbstractRenderTarget} from "./AbstractRenderTarget.js";
+import {RenderTarget, RenderTargetOptions} from "@/PaleGL/core/RenderTarget";
+// import {RenderTargetTypes} from "@/PaleGL/constants";
+import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
 
 export class DoubleBuffer extends AbstractRenderTarget {
     #renderTargets: RenderTarget[] = [];

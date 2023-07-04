@@ -1,4 +1,4 @@
-﻿import {Quaternion} from "./Quaternion";
+﻿import {Quaternion} from "@/PaleGL/math/Quaternion";
 
 export class Rotator {
     // x, y, z axes

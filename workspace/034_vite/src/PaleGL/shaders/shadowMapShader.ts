@@ -1,4 +1,4 @@
-import {UniformNames} from "../constants";
+import {UniformNames} from "@/PaleGL/constants";
 
 export const shadowMapVertexVaryings: () => string = () => `
 out vec4 vShadowMapProjectionUv;

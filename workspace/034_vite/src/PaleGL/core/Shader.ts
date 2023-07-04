@@ -1,5 +1,5 @@
-﻿import {GLObject} from "./GLObject";
-import {GPU} from "./GPU";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export class Shader extends GLObject {
     private program: WebGLProgram;

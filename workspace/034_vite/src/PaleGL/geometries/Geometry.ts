@@ -1,8 +1,8 @@
-﻿import {Attribute} from "../core/Attribute";
-import {VertexArrayObject} from "../core/VertexArrayObject";
-import {Vector3} from "../math/Vector3";
-import {AttributeUsageType} from "../constants";
-import {GPU} from "../core/GPU";
+﻿import {Attribute} from "@/PaleGL/core/Attribute";
+import {VertexArrayObject} from "@/PaleGL/core/VertexArrayObject";
+import {Vector3} from "@/PaleGL/math/Vector3";
+import {AttributeUsageType} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
 
 // TODO: location, divisorをいい感じに指定したい
 

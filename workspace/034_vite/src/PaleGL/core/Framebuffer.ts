@@ -1,6 +1,6 @@
-﻿import {GLObject} from "./GLObject";
-import {GLColorAttachment} from "../constants";
-import {GPU} from "./GPU";
+﻿import {GLObject} from "@/PaleGL/core/GLObject";
+import {GLColorAttachment} from "@/PaleGL/constants";
+import {GPU} from "@/PaleGL/core/GPU";
 
 export class Framebuffer extends GLObject {
     #framebuffer: WebGLFramebuffer;
