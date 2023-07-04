@@ -38,7 +38,8 @@ export class Attribute {
                 }: AttributeArgs) {
         this.name = name;
         this.data = data;
-        this.location = location || -1;
+        // this.location = location || -1;
+        this.location = location || 0;
         this.size = size;
         this.offset = offset || 0;
         this.usageType = usageType || AttributeUsageType.StaticDraw;

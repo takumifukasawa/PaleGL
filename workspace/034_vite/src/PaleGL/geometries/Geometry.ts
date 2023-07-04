@@ -45,13 +45,24 @@ export class Geometry {
             this.indices = indices;
         }
 
+        // fallback
+        // TOOD: fix
+        attributes.forEach((attribute, i) => {
+            attribute.location = i;
+            attribute.divisor = 0;
+        })
+
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
             attributes: [],
             indices: this.indices
         });
 
-        (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
+        // default
+        // (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
+        //     this.setAttribute(attribute);
+        // });
+        (attributes.filter(e => Object.keys(e).length > 0)).forEach((attribute) => {
             this.setAttribute(attribute);
         });
     }
@@ -78,6 +89,15 @@ export class Geometry {
 
     #createGeometry({gpu}: { gpu: GPU }) {
         console.log("[Geometry.createGeometry]", this.attributes)
+
+        // fallback
+        // TODO: fix
+        this.attributes.forEach((attribute, i) => {
+            attribute.location = i;
+            attribute.divisor = 0;
+            console.log("force: " + attribute)
+        })
+
         this.vertexArrayObject = new VertexArrayObject({
             gpu,
             attributes: this.attributes,

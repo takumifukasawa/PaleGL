@@ -66,7 +66,9 @@ import {OrthographicCamera} from "./PaleGL/actors/OrthographicCamera";
 import {Attribute} from "./PaleGL/core/Attribute";
 // import {Actor} from "./PaleGL/actors/Actor.ts";
 
-const debuggerStates = {
+const debuggerStates: {
+    instanceNum: number
+} = {
     instanceNum: 0,
 }
 
@@ -405,7 +407,9 @@ const createGLTFSkinnedMesh = async () => {
     return skinningMesh;
 }
 
+// @ts-ignore
 const main = async () => {
+    console.log("main")
     const particleImg = await loadImg("./images/particle-smoke.png");
     const particleMap = new Texture({
         gpu,
@@ -873,4 +877,4 @@ function initDebugger() {
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
 
-main();
+// main();

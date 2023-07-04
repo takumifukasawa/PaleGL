@@ -97,7 +97,9 @@ export class VertexArrayObject extends GLObject {
         }
 
         const {name, data, size, location, usageType, divisor} = attribute;
-        const newLocation = (location !== null && location !== undefined) ? location : this.vboList.length;
+        const newLocation = (location !== null && location !== undefined)
+            ? location
+            : this.vboList.length;
         const vbo = gl.createBuffer();
         if (!vbo) {
             throw "invalid vbo";

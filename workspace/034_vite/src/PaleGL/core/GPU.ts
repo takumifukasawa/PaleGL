@@ -18,7 +18,7 @@ import {Matrix4} from "../math/Matrix4";
 import {Color} from "../math/Color";
 import {CubeMap} from "./CubeMap";
 
-const createWhite1x1: () => HTMLCanvasElement = () => {
+export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) {

@@ -7,7 +7,8 @@ import {
     TextureWrapType,
     TextureWrapTypes
 } from "./../constants";
-import {GPU} from "./GPU";
+// @ts-ignore
+import {createWhite1x1, GPU} from "./GPU";
 
 export type TextureArgs = {
     // require
@@ -24,7 +25,6 @@ export type TextureArgs = {
     wrapT?: TextureWrapType,
     flipY?: boolean,
 };
-
 
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
@@ -71,9 +71,10 @@ export class Texture extends GLObject {
         this.flipY = flipY;
         this.width = width;
         this.height = height;
-
+        
         if (this.img === null) {
-            throw "invalid img";
+            // this.img = createWhite1x1();
+            // throw "invalid img";
         }
 
         if (!this.img && (!width || !height)) {
@@ -175,10 +176,19 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA:
                 if (width && height) {
                     // for render target
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                    }
                 } else {
                     // set img to texture
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+                    } else {
+                        // TODO: fix type
+                        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,null);
+                    }
                 }
                 break;
 
@@ -186,13 +196,22 @@ export class Texture extends GLObject {
                 if (width && height) {
                     // for render target
                     // 1: use 16bit
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
+                    }
                     // 2: use 32bit
                     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.img);
                 } else {
                     // set img to texture
                     // 1: use 16bit
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                    // TODO: fix img nullable
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                    // } else {
+                    //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
+                    }
                     // 2: use 32bit
                     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT, this.img);
                 }
@@ -200,17 +219,35 @@ export class Texture extends GLObject {
 
             case TextureTypes.RGBA16F:
                 if (width && height) {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+                    }
                 } else {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, this.img);
+                        // TODO: fix type
+                    // } else {
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, gl.RGBA, gl.FLOAT, null);
+                    }
                 }
                 break;
 
             case TextureTypes.RGBA32F:
                 if (width && height) {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, this.img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+                    }
                 } else {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.img);
+                    if(this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, this.img);
+                    } else {
+                        // TODO: fix type
+                    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.RGBA, gl.FLOAT, null);
+                    }
                 }
                 break;
 
