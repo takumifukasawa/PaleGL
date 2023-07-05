@@ -36,6 +36,7 @@ export class OrthographicCamera extends Camera {
     }
 
     setSize(width: number, height: number) {
+        console.log("ortho", this, width, height)
         super.setSize(width, height);
         // if (left && right && top && bottom) {
         //     this.left = left;

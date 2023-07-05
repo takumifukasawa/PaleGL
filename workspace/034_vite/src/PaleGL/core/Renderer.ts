@@ -70,10 +70,12 @@ export class Renderer {
     #shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
         castShadowLightActors.forEach(lightActor => {
             if (!lightActor.shadowMap) {
-                return;
+                throw "invalid shadow pass"
+                // return;
             }
             if (!lightActor.shadowCamera) {
-                return;
+                throw "invalid shadow camera"
+                // return;
             }
             this.setRenderTarget(lightActor.shadowMap.write);
             this.clear(0, 0, 0, 1);
@@ -81,7 +83,7 @@ export class Renderer {
             if (castShadowRenderMeshInfos.length < 1) {
                 return;
             }
-
+            
             castShadowRenderMeshInfos.forEach(({actor}) => {
                 const targetMaterial = actor.depthMaterial;
 
@@ -212,6 +214,13 @@ export class Renderer {
                     });
                 }
 
+                // console.log(
+                //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix],
+                //     targetMaterial.receiveShadow,
+                //     light.castShadow,
+                //     light.shadowCamera,
+                //     light.shadowMap
+                // )
                 if (
                     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&

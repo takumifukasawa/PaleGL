@@ -27,6 +27,7 @@ type EngineOnBeforeUpdateCallbackArgs = {
 
 export type EngineOnBeforeStartCallback = () => void;
 export type EngineOnStartCallback = (args: EngineOnStartCallbackArgs) => void;
+export type EngineOnAfterStartCallback = () => void;
 export type EngineOnBeforeFixedUpdateCallback = (args: EngineOnBeforeFixedUpdateCallbackArgs) => void;
 export type EngineOnBeforeUpdateCallback = (args: EngineOnBeforeUpdateCallbackArgs) => void;
 // export type EngineOnUpdateCallback = (args: EngineOnUpdateCallbackArgs) => void;
@@ -43,6 +44,7 @@ export class Engine {
     #updateFrameTimer: TimeSkipper;
     // callbacks
     #onBeforeStart: EngineOnBeforeStartCallback | null = null;
+    #onAfterStart: EngineOnAfterStartCallback | null = null;
     #onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null = null;
     #onBeforeUpdate: EngineOnBeforeUpdateCallback | null = null;
     #onRender: EngineOnRenderCallback | null = null;
@@ -54,7 +56,11 @@ export class Engine {
     set onBeforeStart(cb: EngineOnBeforeStartCallback) {
         this.#onBeforeStart = cb;
     }
-
+    
+    set onAfterStart(cb: EngineOnAfterStartCallback) { 
+        this.#onAfterStart = cb;
+    }
+    
     set onBeforeUpdate(cb: EngineOnBeforeUpdateCallback) {
         this.#onBeforeUpdate = cb;
     }
@@ -111,6 +117,9 @@ export class Engine {
         const t = performance.now() / 1000;
         this.#fixedUpdateFrameTimer.start(t);
         this.#updateFrameTimer.start(t);
+        if(this.#onAfterStart) {
+            this.#onAfterStart();
+        }
     }
 
     setSize(width: number, height: number) {

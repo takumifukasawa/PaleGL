@@ -222,18 +222,28 @@ captureSceneCamera.onFixedUpdate = () => {
 const directionalLight = new DirectionalLight();
 directionalLight.intensity = 1;
 directionalLight.color = Color.fromRGB(255, 210, 200);
+// shadows
+// TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
+if (directionalLight.shadowCamera) {
+    directionalLight.castShadow = true;
+    directionalLight.shadowCamera.near = 1;
+    directionalLight.shadowCamera.far = 30;
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    directionalLight.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+}
+
 directionalLight.onStart = ({actor}) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    // actor.castShadow = true;
-    // actor.castShadow = false;
-    const lightActor = actor as DirectionalLight;
-    if (lightActor.shadowCamera) {
-        lightActor.shadowCamera.near = 1;
-        lightActor.shadowCamera.far = 30;
-        (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
-        lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
-    }
+    // const lightActor = actor as DirectionalLight;
+    // lightActor.castShadow = true;
+    // // lightActor.castShadow = false;
+    // if (lightActor.shadowCamera) {
+    //     lightActor.shadowCamera.near = 1;
+    //     lightActor.shadowCamera.far = 30;
+    //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+    // }
 }
 captureScene.add(directionalLight);
 
@@ -777,6 +787,12 @@ void main() {
         orbitCameraController.start(20, -30);
     }
 
+    // engine.onAfterStart = () => {
+    //     window.setTimeout(() => {
+    //         onWindowResize()
+    //     },1000)
+    // }
+
     engine.onBeforeUpdate = () => {
         if (!debuggerGUI) initDebugger();
     };
@@ -817,6 +833,7 @@ void main() {
         showBuffersPass.material.updateUniform("uBaseColorTexture", gBufferRenderTarget.baseColorTexture);
         showBuffersPass.material.updateUniform("uNormalTexture", gBufferRenderTarget.normalTexture);
         showBuffersPass.material.updateUniform("uDepthTexture", gBufferRenderTarget.depthTexture);
+        // showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
         postProcess.render({
             gpu,
             renderer,

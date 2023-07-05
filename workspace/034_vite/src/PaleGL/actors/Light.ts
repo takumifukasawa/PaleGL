@@ -6,6 +6,9 @@ import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {OrthographicCamera} from "./OrthographicCamera";
 import {PerspectiveCamera} from "./PerspectiveCamera";
 
+export type LightArgs = {
+};
+
 // TODO: interfaceでいいかも
 export class Light extends Actor {
     intensity: number = 1;
@@ -17,11 +20,18 @@ export class Light extends Actor {
     hasShadowCamera() {
         return !!this.shadowCamera;
     }
-    
-    constructor() {
+
+    constructor({}: LightArgs = {}) {
         super(ActorTypes.Light);
     }
-    
+
+    setSize(width: number, height: number) {
+        super.setSize(width, height);
+        console.log("hogehoge")
+        console.log(this.shadowCamera)
+        console.log(this.shadowMap)
+    }
+
     setShadowSize() {
         throw "should implementation";
     }

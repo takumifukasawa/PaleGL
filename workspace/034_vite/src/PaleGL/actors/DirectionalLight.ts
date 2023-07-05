@@ -1,4 +1,4 @@
-﻿import {Light} from "@/PaleGL/actors/Light";
+﻿import {Light, LightArgs} from "@/PaleGL/actors/Light";
 import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
 import {Actor} from "@/PaleGL/actors/Actor";
 // import {PerspectiveCamera} from "./PerspectiveCamera";
@@ -8,8 +8,8 @@ import {Actor} from "@/PaleGL/actors/Actor";
 // import {RenderTargetTypes} from "@/PaleGL/constants";
 
 export class DirectionalLight extends Light {
-    constructor() {
-        super();
+    constructor(options: LightArgs = {}) {
+        super(options);
 
         this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 1);
         // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
