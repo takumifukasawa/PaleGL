@@ -332,12 +332,6 @@ captureSceneCamera.setPostProcess(postProcess);
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({gpu, path: gltfModelUrl});
 
-    console.log(gltfActor)
-    console.log(gltfActor.transform)
-    console.log(gltfActor.transform.children)
-    console.log(gltfActor.transform.children[0])
-    console.log(gltfActor.transform.children[0].transform)
-    console.log(gltfActor.transform.children[0].transform.children)
     // あるはずなのでignore
     // @ts-ignore
     // const skinningMesh = gltfActor.transform.children[0].transform.children[0];
@@ -440,21 +434,16 @@ const createGLTFSkinnedMesh = async () => {
         },
     });
 
-    console.log(skinningMesh)
-
     return skinningMesh;
 }
 
 // @ts-ignore
 const main = async () => {
-    console.log("main")
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
         gpu,
         img: particleImg,
     });
-
-    console.log(particleImg)
 
     const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
     floorDiffuseMap = new Texture({
@@ -467,8 +456,6 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
-    console.log(floorDiffuseImg)
-
     const floorNormalImg = await loadImg(leaveNormalImgUrl);
     floorNormalMap = new Texture({
         gpu,
@@ -480,8 +467,6 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
-    console.log(floorNormalImg)
-
     const images = {
         [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
         [CubeMapAxis.NegativeX]: CubeMapNegativeXImgUrl,
@@ -491,11 +476,7 @@ const main = async () => {
         [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl,
     };
 
-    console.log(images)
-
     const cubeMap = await loadCubeMap({gpu, images});
-
-    console.log(cubeMap)
 
     const skyboxMesh = new Skybox({
         gpu, cubeMap,

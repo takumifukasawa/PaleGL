@@ -27,9 +27,6 @@ export class Light extends Actor {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        console.log("hogehoge")
-        console.log(this.shadowCamera)
-        console.log(this.shadowMap)
     }
 
     setShadowSize() {
