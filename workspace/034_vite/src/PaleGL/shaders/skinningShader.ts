@@ -17,8 +17,10 @@ struct SkinAnimationClipData {
 };
 
 mat4 getJointMatrix(sampler2D jointTexture, uint jointIndex, int colNum) {
-    int colIndex = int(mod(float(jointIndex), float(colNum))); // 横
-    int rowIndex = int(floor(float(jointIndex) / float(colNum))); // 縦
+    // horizontal
+    int colIndex = int(mod(float(jointIndex), float(colNum)));
+    // vertical
+    int rowIndex = int(floor(float(jointIndex) / float(colNum)));
     mat4 jointMatrix = mat4(
         // 1: boneの行列が1個ずつ縦に並んでいる場合
         // texelFetch(jointTexture, ivec2(0, jointIndex), 0),
@@ -45,8 +47,10 @@ mat4 getJointMatrixGPUSkinning(
     float timeOffset
 ) {
     float offset = float(int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum);
-    int colIndex = int(mod(float(jointIndex) + offset, float(colNum))); // 横
-    int rowIndex = int(floor(float(jointIndex) + offset / float(colNum))); // 縦
+    // horizontal
+    int colIndex = int(mod(float(jointIndex) + offset, float(colNum)));
+    // vertical
+    int rowIndex = int(floor(float(jointIndex) + offset / float(colNum)));
 
     mat4 jointMatrix = mat4(
         texelFetch(jointTexture, ivec2(colIndex * 4 + 0, rowIndex), 0),

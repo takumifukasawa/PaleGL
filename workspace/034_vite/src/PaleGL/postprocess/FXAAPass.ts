@@ -97,33 +97,33 @@ vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY
 LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     LuminanceData l;
 
-    // 隣接ピクセルの色を取得
+    // get nearest side pixels
     vec3 rgbTop = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., texelSize.y).xyz;
     vec3 rgbRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, 0.).xyz;
     vec3 rgbBottom = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., -texelSize.y).xyz;
     vec3 rgbLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, 0.).xyz;
     vec3 rgbCenter = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., 0.).xyz;
 
-    // 角のピクセルの色を取得
+    // get nearest corner pixels
     vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, texelSize.y).xyz;
     vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, texelSize.y).xyz;
     vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, -texelSize.y).xyz;
     vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, -texelSize.y).xyz;
 
-    // 隣接ピクセルの輝度を取得
+    // get nearest side pixels luma
     float lumaTop = rgbToLuma(rgbTop);
     float lumaLeft = rgbToLuma(rgbLeft);
     float lumaCenter = rgbToLuma(rgbCenter);
     float lumaRight = rgbToLuma(rgbRight);
     float lumaBottom = rgbToLuma(rgbBottom);
 
-    // 角のピクセルの輝度を取得
+    // get nearest corner pixels luma
     float lumaTopLeft = rgbToLuma(rgbTopLeft);
     float lumaTopRight = rgbToLuma(rgbTopRight);
     float lumaBottomLeft = rgbToLuma(rgbBottomLeft);
     float lumaBottomRight = rgbToLuma(rgbBottomRight);
 
-    // 上下左右のピクセルからコントラストを計算
+    // get nearest side pixels contrast
     float lumaHighest = max(lumaCenter, max(max(lumaTop, lumaLeft), max(lumaBottom, lumaRight)));
     float lumaLowest = min(lumaCenter, min(min(lumaTop, lumaLeft), min(lumaBottom, lumaRight)));
     float lumaContrast = lumaHighest - lumaLowest;
@@ -174,7 +174,7 @@ float determinePixelBlendFactor(LuminanceData l) {
     // smoothstep to squared smoothstep
     pixelBlendFactor = pixelBlendFactor * pixelBlendFactor;
     
-    // sub-pixel の blend 率をかける
+    // multiply sub-pixel blend rate
     pixelBlendFactor *= uSubpixelBlending; 
     
     return pixelBlendFactor;

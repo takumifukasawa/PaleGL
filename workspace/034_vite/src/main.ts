@@ -1,4 +1,4 @@
-import "@/style.css";
+// import "@/style.css";
 
 // import smokeImgUrl from "../images/particle-smoke.png";
 // import leaveDiffuseImgUrl from "../images/brown_mud_leaves_01_diff_1k.jpg";
@@ -85,6 +85,49 @@ import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
 import {Attribute} from "@/PaleGL/core/Attribute";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
+
+const stylesText = `
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+#wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+}
+`;
+const styleElement = document.createElement("style");
+styleElement.innerText = stylesText;
+document.head.appendChild(styleElement);
+
 const debuggerStates: {
     instanceNum: number
 } = {
@@ -112,9 +155,14 @@ const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
 inputController.start();
 
-const wrapperElement = document.getElementById("wrapper")!;
+// const wrapperElement = document.getElementById("wrapper")!;
+const wrapperElement = document.createElement("div");
+document.body.appendChild(wrapperElement);
+wrapperElement.setAttribute("id", "wrapper");
 
-const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
+// const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
+const canvasElement = document.createElement("canvas")! as HTMLCanvasElement;
+wrapperElement.appendChild(canvasElement);
 
 const gl = canvasElement.getContext('webgl2', {antialias: false});
 
@@ -425,7 +473,9 @@ const createGLTFSkinnedMesh = async () => {
         0,                      0,                      aInstanceScale.z,       0,
         aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
     );
-    // 本当はworldMatrixをかける前の方がよい
+    
+    // NOTE: 本当はworldMatrixをかける前の方がよい
+    
     worldPosition = instanceTransform * worldPosition;
 `,
             outClipPositionPreProcess: `

@@ -302,7 +302,6 @@ in vec3 vNormal;
 ${receiveShadow ? shadowMapFragmentVaryings() : ""}
 ${normalMapFragmentVarying()}
 in vec3 vWorldPosition;
-// TODO: フラグで必要に応じて出し分け
 ${useVertexColor ? "in vec4 vVertexColor;" : ""}
 
 // out vec4 outColor;
