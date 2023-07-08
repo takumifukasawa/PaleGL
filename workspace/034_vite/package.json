@@ -8,15 +8,21 @@
     "dev-watch": "vite --watch",
     "build": "tsc && vite build",
     "build-watch": "vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bundle-glsl": "node glsl-bundler.js",
+    "watch-glsl": "nodemon -L --ext glsl --watch src/glsl --exec 'pnpm bundle-glsl'"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
     "vite-plugin-checker": "^0.6.1",
+    "vite-plugin-glsl": "^1.1.2",
     "vite-plugin-gltf": "^3.1.0",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-singlefile": "^0.13.5",
     "vite-tsconfig-paths": "^4.2.0"
+  },
+  "dependencies": {
+    "nodemon": "^2.0.22"
   }
 }

@@ -10,6 +10,10 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    
+    "types": [
+      "vite-plugin-glsl/ext"
+    ],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

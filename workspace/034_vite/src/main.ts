@@ -85,6 +85,13 @@ import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
 import {Attribute} from "@/PaleGL/core/Attribute";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
+import testVert from "./PaleGL/shaders/test-vert.glsl";
+import testFrag from "./PaleGL/shaders/test-frag.glsl";
+console.log("----- vert -----")
+console.log(testVert);
+console.log("----- frag -----")
+console.log(testFrag);
+console.log("----------------")
 
 const stylesText = `
 :root {
