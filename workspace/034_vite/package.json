@@ -2,7 +2,6 @@
   "name": "PaleGL",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "dev-watch": "vite --watch",
@@ -23,6 +22,9 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "nodemon": "^2.0.22"
+    "node-zopfli": "^2.1.4",
+    "nodemon": "^2.0.22",
+    "rimraf": "^5.0.1",
+    "tempy": "^3.0.0"
   }
 }

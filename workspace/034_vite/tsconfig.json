@@ -26,7 +26,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    
+    "moduleSuffixes": ["glsl", "shader", ""] 
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**", "dist/**"]

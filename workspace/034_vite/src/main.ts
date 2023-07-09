@@ -1,3 +1,4 @@
+
 // import "@/style.css";
 
 // import smokeImgUrl from "../images/particle-smoke.png";
@@ -85,8 +86,10 @@ import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
 import {Attribute} from "@/PaleGL/core/Attribute";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
-import testVert from "./PaleGL/shaders/test-vert.glsl";
-import testFrag from "./PaleGL/shaders/test-frag.glsl";
+// import testVert from "@/PaleGL/shaders/test-shader-vert.glsl?shader";
+// import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl?shader";
+import testVert from "@/PaleGL/shaders/test-shader-vert.glsl?shader";
+import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl?shader";
 console.log("----- vert -----")
 console.log(testVert);
 console.log("----- frag -----")
@@ -114,7 +117,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-}
+} 
 
 #wrapper {
   position: fixed;

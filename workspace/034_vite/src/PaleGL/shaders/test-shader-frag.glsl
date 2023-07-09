@@ -1,5 +1,5 @@
 ﻿
-#include common/vertex-attributes;
+// #include common/vertex-attributes;
 
 void main() {
     float r = testFunc();
