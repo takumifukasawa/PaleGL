@@ -10,7 +10,8 @@
     "build-watch": "vite build --watch",
     "preview": "vite preview",
     "bundle-glsl": "node glsl-bundler.js",
-    "watch-glsl": "nodemon -L --ext glsl --watch src/glsl --exec 'pnpm bundle-glsl'"
+    "watch-glsl": "nodemon -L --ext glsl --watch src/glsl --exec 'pnpm bundle-glsl'",
+    "serve:dist": "cd dist && python -m http.server 8000"
   },
   "devDependencies": {
     "typescript": "^5.0.2",

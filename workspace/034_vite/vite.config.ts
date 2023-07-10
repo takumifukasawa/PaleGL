@@ -9,7 +9,7 @@ import glsl from "vite-plugin-glsl"
 import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
 
 const isBundle = false;
-const isMinifyShader = true;
+const isMinifyShader = false;
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
