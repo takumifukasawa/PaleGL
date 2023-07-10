@@ -9,7 +9,7 @@ import glsl from "vite-plugin-glsl"
 import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
 
 const isBundle = false;
-const minifyShader = false;
+const isMinifyShader = false;
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
@@ -33,7 +33,7 @@ export default defineConfig({
             enforce: "pre",
         }),
         shaderMinifierPlugin({
-            minify: minifyShader,
+            minify: isMinifyShader,
             minifierOptions: {
                 // preserveExternals: true
             }
@@ -54,10 +54,9 @@ export default defineConfig({
                 : 0,
         rollupOptions: {
             input: {
-                // html含めてビルドする場合
-                main: resolve(__dirname, "index.html"),
-                // jsだけビルドする場合
-                // main: resolve(__dirname, "src/main.ts"), 
+                main: isBundle
+                    ? resolve(__dirname, "src/main.ts") // js一個にまとめる場合
+                    : resolve(__dirname, "index.html") // html含めてビルドする場合
             },
         },
     },
