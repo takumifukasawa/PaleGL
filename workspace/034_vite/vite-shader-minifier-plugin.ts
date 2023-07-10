@@ -23,6 +23,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from "crypto";
 import {rimraf} from "rimraf";
+import {Shader} from "./src/PaleGL/core/Shader";
 
 const exec = promisify(cp.exec);
 
@@ -134,6 +135,7 @@ async function readFileAysnc(path) {
 
 export const shaderMinifierPlugin: (
     options: ShaderMinifierPluginOptions
+    
 ) => Plugin = ({minify, minifierOptions}) => {
     return {
         name: 'shader-minifier',
@@ -194,11 +196,28 @@ export const shaderMinifierPlugin: (
 
                 // for debug
                 // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
-                if (minify === false) {
+                if (!minify) {
+                    // console.log("disabled minify content...: ", src)
                     return src;
                     // return `export default \`${src}\`;`;
                     // return `export default \`${bundledContent}\`;`;
                 }
+
+                var contentRegex = /^var\s([a-zA-Z_]*)_default\s\=\s\"(.*)\"/;
+                var bundledContent = src
+                    .split("\n")
+                    .join(" ")
+                    .match(contentRegex);
+
+                if (!bundledContent) {
+                    console.warn("unmatch bundledContent: ", src);
+                    return src;
+                }
+
+                let [, specifiedName, shaderContent] = bundledContent;
+                
+                shaderContent = shaderContent.replaceAll("\\n", " ");
+
 
                 // if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
                 //     console.warn(`\`#pragma shader_minifier_plugin bypass\` detected in ${id}. Bypassing shader minifier`);
@@ -236,7 +255,12 @@ export const shaderMinifierPlugin: (
                 // console.log("tmpTransformedFilePath: ", tmpTransformedFilePath)
                 await createDirectoryAsync(tmpHashOriginalSrcDirPath);
                 await createDirectoryAsync(tmpHashTransformedDirPath);
-                await writeFileAsync(tmpCopiedFilePath, src);
+
+                // vite-plugin-glsl 使わない場合
+                // await writeFileAsync(tmpCopiedFilePath, src);
+                // vite-plugin-glsl を挟む場合
+                await writeFileAsync(tmpCopiedFilePath, shaderContent);
+
                 // await writeFileAsync(tmpCopiedFilePath, bundledContent);
                 const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
                 console.log("command: ", minifyCommand)
@@ -254,9 +278,16 @@ export const shaderMinifierPlugin: (
                 // console.log("remove dir: ", tmpHashTransformedDirPath);
                 await rimraf(tmpHashTransformedDirPath);
 
+                const resultContent = `var ${specifiedName}_default = "${minifiedContent}";                           
+export {
+  ${specifiedName}_default as default
+}
+                `
+
                 return {
                     // code: `export default \`${minifiedContent}\`;`,
-                    code: minifiedContent,
+                    // code: minifiedContent,
+                    code: resultContent,
                 };
             }
         }
