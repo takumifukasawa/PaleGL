@@ -19,13 +19,5 @@
     "@typescript-eslint"
   ],
   "rules": {
-  },
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/",
-    "tmp/",
-    "vite.config.js",
-    "libs/packer.js",
-    "vite-shader-minifier-plugin.ts"
-  ]
+  }
 }
