@@ -22,6 +22,7 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
+    "glslify": "^7.1.1",
     "node-zopfli": "^2.1.4",
     "nodemon": "^2.0.22",
     "rimraf": "^5.0.1",
