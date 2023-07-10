@@ -26,9 +26,6 @@ import {rimraf} from "rimraf";
 
 const exec = promisify(cp.exec);
 
-const fileRegex = /\?shader$/;
-// const fileRegex = /\?glsl$/;
-
 export interface ShaderMinifierOptions {
     hlsl?: boolean;
     fieldNames?: string;
@@ -142,24 +139,72 @@ export const shaderMinifierPlugin: (
         name: 'shader-minifier',
         enforce: 'pre',
         async transform(src: string, id: string) {
+            // const fileRegex = /\?shader$/;
+            const fileRegex = /\.glsl$/;
             // console.log(`[shaderMinifierPlugin] id: ${id}`);
             if (fileRegex.test(id)) {
                 await wait(100);
-               
+
+                const basePath = "./";
+                const tmpDirPath = path.join(basePath, "tmp");
+
+                const name = path.basename(id);
+                // const name = path.basename(id).split('?')[0];
+                // const name = path.basename( id ).split( '.' )[ 0 ];
+
+                /*
+                // glslify
+
+                const hashGlslifySrc = crypto.createHash('sha512').update((+new Date()).toString()).digest('hex').slice(0, 16);
+                await wait(10);
+                const hashGlslifyBundled = crypto.createHash('sha512').update((+new Date()).toString()).digest('hex').slice(0, 16);
+                await wait(10);
+
+                const tmpHashGlslifySrcDirPath = path.join(tmpDirPath, hashGlslifySrc);
+                const tmpHashGlslifyBundledDirPath = path.join(tmpDirPath, hashGlslifyBundled);
+
+                const tmpGlslifySrcFilePath = path.join(tmpHashGlslifySrcDirPath, name);
+                const tmpGlslifyBundledFilePath = path.join(tmpHashGlslifyBundledDirPath, name);
+
+                await createDirectoryAsync(tmpDirPath);
+                await createDirectoryAsync(tmpHashGlslifySrcDirPath);
+                await createDirectoryAsync(tmpHashGlslifyBundledDirPath);
+
+                await writeFileAsync(tmpGlslifySrcFilePath, src);
+
+                await wait(10);
+
+                const glslifyCommand = `glslify ${tmpGlslifySrcFilePath} -o ${tmpGlslifyBundledFilePath}`;
+                console.log("glslify command: ", glslifyCommand)
+                await exec(glslifyCommand).catch(error => {
+                    console.log("error: ", error);
+                    throw new Error(`[shaderMinifierPlugin] glslify failed: ${error}`);
+                });
+                console.log("success glslify");
+
+                await wait(10);
+
+                const bundledContent = await readFileAysnc(tmpGlslifyBundledFilePath);
+
+                await rimraf(tmpHashGlslifySrcDirPath);
+                await rimraf(tmpHashGlslifyBundledDirPath);
+                */
+
+                // minify
+
                 // for debug
                 // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
                 if (minify === false) {
-                    return `export default \`${src}\`;`;
+                    return src;
+                    // return `export default \`${src}\`;`;
+                    // return `export default \`${bundledContent}\`;`;
                 }
 
-                if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
-                    console.warn(`\`#pragma shader_minifier_plugin bypass\` detected in ${id}. Bypassing shader minifier`);
+                // if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
+                //     console.warn(`\`#pragma shader_minifier_plugin bypass\` detected in ${id}. Bypassing shader minifier`);
 
-                    return `export default \`${src}\`;`;
-                }
-
-                const name = path.basename(id).split('?')[0];
-                // const name = path.basename( id ).split( '.' )[ 0 ];
+                //     return `export default \`${src}\`;`;
+                // }
 
                 // for debug
                 // console.log("name: ", name)
@@ -174,8 +219,7 @@ export const shaderMinifierPlugin: (
                 const hashTransformed = crypto.createHash('sha512').update((+new Date()).toString()).digest('hex').slice(0, 16);
                 await wait(10);
 
-                const basePath = "./";
-                const tmpDirPath = path.join(basePath, "tmp");
+
                 // for debug
                 // console.log("tmpDirPath: ", tmpDirPath)
                 const tmpHashOriginalSrcDirPath = path.join(tmpDirPath, hashOriginalSrc);
@@ -190,13 +234,13 @@ export const shaderMinifierPlugin: (
                 const tmpTransformedFilePath = path.join(tmpHashTransformedDirPath, name);
                 // for debug
                 // console.log("tmpTransformedFilePath: ", tmpTransformedFilePath)
-                await createDirectoryAsync(tmpDirPath);
                 await createDirectoryAsync(tmpHashOriginalSrcDirPath);
                 await createDirectoryAsync(tmpHashTransformedDirPath);
                 await writeFileAsync(tmpCopiedFilePath, src);
-                const command = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
-                console.log("command: ", command)
-                await exec(command).catch(error => {
+                // await writeFileAsync(tmpCopiedFilePath, bundledContent);
+                const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
+                console.log("command: ", minifyCommand)
+                await exec(minifyCommand).catch(error => {
                     console.log("error: ", error);
                     throw new Error(`[shaderMinifierPlugin] shader_minifier.exe failed: ${error}`);
                 });
@@ -209,9 +253,10 @@ export const shaderMinifierPlugin: (
                 // for debug
                 // console.log("remove dir: ", tmpHashTransformedDirPath);
                 await rimraf(tmpHashTransformedDirPath);
-                
+
                 return {
-                    code: `export default \`${minifiedContent}\`;`,
+                    // code: `export default \`${minifiedContent}\`;`,
+                    code: minifiedContent,
                 };
             }
         }

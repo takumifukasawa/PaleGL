@@ -20,23 +20,24 @@ export default defineConfig({
         tsconfigPaths(),
         checker({typescript: true}),
         gltf(),
+        glsl({
+            // compress: false,
+            include: [
+                "**/*.glsl"
+            ],
+            watch: true,
+            root: "src/PaleGL",
+            defaultExpression: 'glsl',
+            warnDuplicatedImports: true,
+            exclude: undefined,
+            enforce: "pre",
+        }),
         shaderMinifierPlugin({
             minify: minifyShader,
             minifierOptions: {
                 // preserveExternals: true
             }
         }),
-        // glsl({
-        //     // compress: false,
-        //     include: [
-        //         "**/*.glsl"
-        //     ],
-        //     watch: true,
-        //     root: "src/PaleGL",
-        //     defaultExpression: 'glsl',
-        //     warnDuplicatedImports: true,
-        //     exclude: undefined
-        // }),
         // replaceShaderPathPlugin(),
         ...(isBundle ? [
             viteSingleFile(),

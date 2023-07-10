@@ -88,8 +88,8 @@ import {Attribute} from "@/PaleGL/core/Attribute";
 
 // import testVert from "@/PaleGL/shaders/test-shader-vert.glsl?shader";
 // import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl?shader";
-import testVert from "@/PaleGL/shaders/test-shader-vert.glsl?shader";
-import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl?shader";
+import testVert from "@/PaleGL/shaders/test-shader-vert.glsl";
+import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl";
 console.log("----- vert -----")
 console.log(testVert);
 console.log("----- frag -----")
