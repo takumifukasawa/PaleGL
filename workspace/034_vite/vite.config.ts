@@ -9,6 +9,7 @@ import glsl from "vite-plugin-glsl"
 import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
 
 const isBundle = false;
+const minifyShader = false;
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
@@ -20,7 +21,7 @@ export default defineConfig({
         checker({typescript: true}),
         gltf(),
         shaderMinifierPlugin({
-            minify: true,
+            minify: minifyShader,
             minifierOptions: {
                 // preserveExternals: true
             }
