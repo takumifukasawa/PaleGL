@@ -7,6 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import gltf from "vite-plugin-gltf";
 import glsl from "vite-plugin-glsl"
 import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
+import checker from "vite-plugin-checker";
 
 const isBundle = false;
 const isMinifyShader = false;
@@ -36,6 +37,12 @@ export default defineConfig({
             minify: isMinifyShader,
             minifierOptions: {
                 // preserveExternals: true
+            }
+        }),
+        checker({
+            typescript: true,
+            eslint: {
+                lintCommand: 'eslint --ext .ts,.js ./'
             }
         }),
         // replaceShaderPathPlugin(),

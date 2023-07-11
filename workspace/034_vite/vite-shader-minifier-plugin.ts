@@ -16,14 +16,14 @@
 
 // Disclaimer: I'm pretty sure this published version will not be updated frequently
 
-import {Plugin} from 'vite';
-import {promisify} from 'util';
+import { Plugin } from 'vite';
+import { promisify } from 'util';
 import cp from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import crypto from "crypto";
-import {rimraf} from "rimraf";
-import {Shader} from "./src/PaleGL/core/Shader";
+import crypto from 'crypto';
+import { rimraf } from 'rimraf';
+import { Shader } from './src/PaleGL/core/Shader';
 
 const exec = promisify(cp.exec);
 
@@ -94,7 +94,7 @@ async function wait(msec) {
 async function createDirectoryAsync(path) {
     return new Promise((resolve, reject) => {
         if (fs.existsSync(path)) {
-            console.warn("directory already exists: ", path);
+            console.warn('directory already exists: ', path);
             resolve();
             return;
         }
@@ -105,7 +105,7 @@ async function createDirectoryAsync(path) {
             }
             resolve();
         });
-    })
+    });
 }
 
 async function writeFileAsync(path, data) {
@@ -117,26 +117,22 @@ async function writeFileAsync(path, data) {
             }
             resolve();
         });
-    })
+    });
 }
 
 async function readFileAysnc(path) {
     return new Promise((resolve, reject) => {
-        fs.readFile(path, "utf8", (err, data) => {
+        fs.readFile(path, 'utf8', (err, data) => {
             if (err) {
                 reject(err);
                 return;
             }
             resolve(data);
         });
-    })
+    });
 }
 
-
-export const shaderMinifierPlugin: (
-    options: ShaderMinifierPluginOptions
-    
-) => Plugin = ({minify, minifierOptions}) => {
+export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({ minify, minifierOptions }) => {
     return {
         name: 'shader-minifier',
         enforce: 'pre',
@@ -147,8 +143,8 @@ export const shaderMinifierPlugin: (
             if (fileRegex.test(id)) {
                 await wait(100);
 
-                const basePath = "./";
-                const tmpDirPath = path.join(basePath, "tmp");
+                const basePath = './';
+                const tmpDirPath = path.join(basePath, 'tmp');
 
                 const name = path.basename(id);
                 // const name = path.basename(id).split('?')[0];
@@ -204,20 +200,16 @@ export const shaderMinifierPlugin: (
                 }
 
                 var contentRegex = /^var\s([a-zA-Z_]*)_default\s\=\s\"(.*)\"/;
-                var bundledContent = src
-                    .split("\n")
-                    .join(" ")
-                    .match(contentRegex);
+                var bundledContent = src.split('\n').join(' ').match(contentRegex);
 
                 if (!bundledContent) {
-                    console.warn("unmatch bundledContent: ", src);
+                    console.warn('unmatch bundledContent: ', src);
                     return src;
                 }
 
                 let [, specifiedName, shaderContent] = bundledContent;
-                
-                shaderContent = shaderContent.replaceAll("\\n", " ");
 
+                shaderContent = shaderContent.replaceAll('\\n', ' ');
 
                 // if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
                 //     console.warn(`\`#pragma shader_minifier_plugin bypass\` detected in ${id}. Bypassing shader minifier`);
@@ -233,11 +225,18 @@ export const shaderMinifierPlugin: (
                 // for debug
                 // console.log("minifierOptionsString: ", minifierOptionsString)
 
-                const hashOriginalSrc = crypto.createHash('sha512').update((+new Date()).toString()).digest('hex').slice(0, 16);
+                const hashOriginalSrc = crypto
+                    .createHash('sha512')
+                    .update((+new Date()).toString())
+                    .digest('hex')
+                    .slice(0, 16);
                 await wait(10);
-                const hashTransformed = crypto.createHash('sha512').update((+new Date()).toString()).digest('hex').slice(0, 16);
+                const hashTransformed = crypto
+                    .createHash('sha512')
+                    .update((+new Date()).toString())
+                    .digest('hex')
+                    .slice(0, 16);
                 await wait(10);
-
 
                 // for debug
                 // console.log("tmpDirPath: ", tmpDirPath)
@@ -263,12 +262,12 @@ export const shaderMinifierPlugin: (
 
                 // await writeFileAsync(tmpCopiedFilePath, bundledContent);
                 const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
-                console.log("command: ", minifyCommand)
-                await exec(minifyCommand).catch(error => {
-                    console.log("error: ", error);
+                console.log('command: ', minifyCommand);
+                await exec(minifyCommand).catch((error) => {
+                    console.log('error: ', error);
                     throw new Error(`[shaderMinifierPlugin] shader_minifier.exe failed: ${error}`);
                 });
-                console.log("success shader_minifier.exe");
+                console.log('success shader_minifier.exe');
                 const minifiedContent = await readFileAysnc(tmpTransformedFilePath);
 
                 // for debug
@@ -282,7 +281,7 @@ export const shaderMinifierPlugin: (
 export {
   ${specifiedName}_default as default
 }
-                `
+                `;
 
                 return {
                     // code: `export default \`${minifiedContent}\`;`,
@@ -290,6 +289,6 @@ export {
                     code: resultContent,
                 };
             }
-        }
+        },
     };
 };
