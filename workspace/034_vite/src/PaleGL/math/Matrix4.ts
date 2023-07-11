@@ -1,6 +1,6 @@
-﻿import {Vector3} from "@/PaleGL/math/Vector3";
-import {Rotator} from "@/PaleGL/math/Rotator";
-import {Quaternion} from "@/PaleGL/math/Quaternion";
+﻿import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Rotator } from '@/PaleGL/math/Rotator';
+import { Quaternion } from '@/PaleGL/math/Quaternion';
 
 // memory layout is column order.
 // setter and getter are row order.
@@ -146,46 +146,72 @@ export class Matrix4 {
     }
 
     constructor(
-        n00: number, n01: number, n02: number, n03: number,
-        n10: number, n11: number, n12: number, n13: number,
-        n20: number, n21: number, n22: number, n23: number,
-        n30: number, n31: number, n32: number, n33: number,
+        n00: number,
+        n01: number,
+        n02: number,
+        n03: number,
+        n10: number,
+        n11: number,
+        n12: number,
+        n13: number,
+        n20: number,
+        n21: number,
+        n22: number,
+        n23: number,
+        n30: number,
+        n31: number,
+        n32: number,
+        n33: number
         // m00 = 0, m01 = 0, m02 = 0, m03 = 0,
         // m10 = 0, m11 = 0, m12 = 0, m13 = 0,
         // m20 = 0, m21 = 0, m22 = 0, m23 = 0,
         // m30 = 0, m31 = 0, m32 = 0, m33 = 0,
     ) {
-        this.set(
-            n00, n01, n02, n03,
-            n10, n11, n12, n13,
-            n20, n21, n22, n23,
-            n30, n31, n32, n33
-        );
+        this.set(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23, n30, n31, n32, n33);
     }
 
     // row-order in constructor args
     set(
-        n00: number, n01: number, n02: number, n03: number,
-        n10: number, n11: number, n12: number, n13: number,
-        n20: number, n21: number, n22: number, n23: number,
-        n30: number, n31: number, n32: number, n33: number,
+        n00: number,
+        n01: number,
+        n02: number,
+        n03: number,
+        n10: number,
+        n11: number,
+        n12: number,
+        n13: number,
+        n20: number,
+        n21: number,
+        n22: number,
+        n23: number,
+        n30: number,
+        n31: number,
+        n32: number,
+        n33: number
     ) {
         this.elements = new Float32Array([
-            n00, n10, n20, n30,
-            n01, n11, n21, n31,
-            n02, n12, n22, n32,
-            n03, n13, n23, n33
+            n00,
+            n10,
+            n20,
+            n30,
+            n01,
+            n11,
+            n21,
+            n31,
+            n02,
+            n12,
+            n22,
+            n32,
+            n03,
+            n13,
+            n23,
+            n33,
         ]);
         return this;
     }
 
     static get identity() {
-        return new Matrix4(
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1,
-        );
+        return new Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
     setTranslation(v: Vector3) {
@@ -196,77 +222,76 @@ export class Matrix4 {
     }
 
     static translationMatrix(v: Vector3) {
-        return new Matrix4(
-            1, 0, 0, v.x,
-            0, 1, 0, v.y,
-            0, 0, 1, v.z,
-            0, 0, 0, 1
-        );
+        return new Matrix4(1, 0, 0, v.x, 0, 1, 0, v.y, 0, 0, 1, v.z, 0, 0, 0, 1);
     }
 
     static scalingMatrix(v: Vector3) {
-        return new Matrix4(
-            v.x, 0, 0, 0,
-            0, v.y, 0, 0,
-            0, 0, v.z, 0,
-            0, 0, 0, 1
-        );
+        return new Matrix4(v.x, 0, 0, 0, 0, v.y, 0, 0, 0, 0, v.z, 0, 0, 0, 0, 1);
     }
 
     static rotationXMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(
-            1, 0, 0, 0,
-            0, c, -s, 0,
-            0, s, c, 0,
-            0, 0, 0, 1
-        );
+        return new Matrix4(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1);
     }
 
     static rotationYMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(
-            c, 0, s, 0,
-            0, 1, 0, 0,
-            -s, 0, c, 0,
-            0, 0, 0, 1
-        );
+        return new Matrix4(c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1);
     }
 
     static rotationZMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(
-            c, -s, 0, 0,
-            s, c, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1
-        );
+        return new Matrix4(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
     static multiplyMatrices(...matrices: Matrix4[]) {
         const m = Matrix4.identity;
-        matrices.forEach(matrix => m.multiply(matrix));
+        matrices.forEach((matrix) => m.multiply(matrix));
         return m;
     }
 
     multiply(m2: Matrix4) {
-        const m1 = this;
+        // const m1 = this;
 
-        const e1 = m1.elements;
+        const e1 = this.elements;
         const e2 = m2.elements;
 
-        const ma00 = e1[0], ma01 = e1[4], ma02 = e1[8], ma03 = e1[12];
-        const ma10 = e1[1], ma11 = e1[5], ma12 = e1[9], ma13 = e1[13];
-        const ma20 = e1[2], ma21 = e1[6], ma22 = e1[10], ma23 = e1[14];
-        const ma30 = e1[3], ma31 = e1[7], ma32 = e1[11], ma33 = e1[15];
+        const ma00 = e1[0],
+            ma01 = e1[4],
+            ma02 = e1[8],
+            ma03 = e1[12];
+        const ma10 = e1[1],
+            ma11 = e1[5],
+            ma12 = e1[9],
+            ma13 = e1[13];
+        const ma20 = e1[2],
+            ma21 = e1[6],
+            ma22 = e1[10],
+            ma23 = e1[14];
+        const ma30 = e1[3],
+            ma31 = e1[7],
+            ma32 = e1[11],
+            ma33 = e1[15];
 
-        const mb00 = e2[0], mb01 = e2[4], mb02 = e2[8], mb03 = e2[12];
-        const mb10 = e2[1], mb11 = e2[5], mb12 = e2[9], mb13 = e2[13];
-        const mb20 = e2[2], mb21 = e2[6], mb22 = e2[10], mb23 = e2[14];
-        const mb30 = e2[3], mb31 = e2[7], mb32 = e2[11], mb33 = e2[15];
+        const mb00 = e2[0],
+            mb01 = e2[4],
+            mb02 = e2[8],
+            mb03 = e2[12];
+        const mb10 = e2[1],
+            mb11 = e2[5],
+            mb12 = e2[9],
+            mb13 = e2[13];
+        const mb20 = e2[2],
+            mb21 = e2[6],
+            mb22 = e2[10],
+            mb23 = e2[14];
+        const mb30 = e2[3],
+            mb31 = e2[7],
+            mb32 = e2[11],
+            mb33 = e2[15];
 
         // r0
         const m00 = ma00 * mb00 + ma01 * mb10 + ma02 * mb20 + ma03 * mb30;
@@ -292,12 +317,7 @@ export class Matrix4 {
         const m32 = ma30 * mb02 + ma31 * mb12 + ma32 * mb22 + ma33 * mb32;
         const m33 = ma30 * mb03 + ma31 * mb13 + ma32 * mb23 + ma33 * mb33;
 
-        const m = new Matrix4(
-            m00, m01, m02, m03,
-            m10, m11, m12, m13,
-            m20, m21, m22, m23,
-            m30, m31, m32, m33
-        );
+        const m = new Matrix4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
 
         this.copy(m);
 
@@ -381,19 +401,52 @@ export class Matrix4 {
 
     // ref: https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
     invert() {
-
         // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
         const te = this.elements,
-
-            n11 = te[0], n21 = te[1], n31 = te[2], n41 = te[3],
-            n12 = te[4], n22 = te[5], n32 = te[6], n42 = te[7],
-            n13 = te[8], n23 = te[9], n33 = te[10], n43 = te[11],
-            n14 = te[12], n24 = te[13], n34 = te[14], n44 = te[15],
-
-            t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
-            t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
-            t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
-            t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+            n11 = te[0],
+            n21 = te[1],
+            n31 = te[2],
+            n41 = te[3],
+            n12 = te[4],
+            n22 = te[5],
+            n32 = te[6],
+            n42 = te[7],
+            n13 = te[8],
+            n23 = te[9],
+            n33 = te[10],
+            n43 = te[11],
+            n14 = te[12],
+            n24 = te[13],
+            n34 = te[14],
+            n44 = te[15],
+            t11 =
+                n23 * n34 * n42 -
+                n24 * n33 * n42 +
+                n24 * n32 * n43 -
+                n22 * n34 * n43 -
+                n23 * n32 * n44 +
+                n22 * n33 * n44,
+            t12 =
+                n14 * n33 * n42 -
+                n13 * n34 * n42 -
+                n14 * n32 * n43 +
+                n12 * n34 * n43 +
+                n13 * n32 * n44 -
+                n12 * n33 * n44,
+            t13 =
+                n13 * n24 * n42 -
+                n14 * n23 * n42 +
+                n14 * n22 * n43 -
+                n12 * n24 * n43 -
+                n13 * n22 * n44 +
+                n12 * n23 * n44,
+            t14 =
+                n14 * n23 * n32 -
+                n13 * n24 * n32 -
+                n14 * n22 * n33 +
+                n12 * n24 * n33 +
+                n13 * n22 * n34 -
+                n12 * n23 * n34;
 
         const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
@@ -402,24 +455,108 @@ export class Matrix4 {
         const detInv = 1 / det;
 
         te[0] = t11 * detInv;
-        te[1] = (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * detInv;
-        te[2] = (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * detInv;
-        te[3] = (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * detInv;
+        te[1] =
+            (n24 * n33 * n41 -
+                n23 * n34 * n41 -
+                n24 * n31 * n43 +
+                n21 * n34 * n43 +
+                n23 * n31 * n44 -
+                n21 * n33 * n44) *
+            detInv;
+        te[2] =
+            (n22 * n34 * n41 -
+                n24 * n32 * n41 +
+                n24 * n31 * n42 -
+                n21 * n34 * n42 -
+                n22 * n31 * n44 +
+                n21 * n32 * n44) *
+            detInv;
+        te[3] =
+            (n23 * n32 * n41 -
+                n22 * n33 * n41 -
+                n23 * n31 * n42 +
+                n21 * n33 * n42 +
+                n22 * n31 * n43 -
+                n21 * n32 * n43) *
+            detInv;
 
         te[4] = t12 * detInv;
-        te[5] = (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * detInv;
-        te[6] = (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * detInv;
-        te[7] = (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * detInv;
+        te[5] =
+            (n13 * n34 * n41 -
+                n14 * n33 * n41 +
+                n14 * n31 * n43 -
+                n11 * n34 * n43 -
+                n13 * n31 * n44 +
+                n11 * n33 * n44) *
+            detInv;
+        te[6] =
+            (n14 * n32 * n41 -
+                n12 * n34 * n41 -
+                n14 * n31 * n42 +
+                n11 * n34 * n42 +
+                n12 * n31 * n44 -
+                n11 * n32 * n44) *
+            detInv;
+        te[7] =
+            (n12 * n33 * n41 -
+                n13 * n32 * n41 +
+                n13 * n31 * n42 -
+                n11 * n33 * n42 -
+                n12 * n31 * n43 +
+                n11 * n32 * n43) *
+            detInv;
 
         te[8] = t13 * detInv;
-        te[9] = (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * detInv;
-        te[10] = (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * detInv;
-        te[11] = (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * detInv;
+        te[9] =
+            (n14 * n23 * n41 -
+                n13 * n24 * n41 -
+                n14 * n21 * n43 +
+                n11 * n24 * n43 +
+                n13 * n21 * n44 -
+                n11 * n23 * n44) *
+            detInv;
+        te[10] =
+            (n12 * n24 * n41 -
+                n14 * n22 * n41 +
+                n14 * n21 * n42 -
+                n11 * n24 * n42 -
+                n12 * n21 * n44 +
+                n11 * n22 * n44) *
+            detInv;
+        te[11] =
+            (n13 * n22 * n41 -
+                n12 * n23 * n41 -
+                n13 * n21 * n42 +
+                n11 * n23 * n42 +
+                n12 * n21 * n43 -
+                n11 * n22 * n43) *
+            detInv;
 
         te[12] = t14 * detInv;
-        te[13] = (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * detInv;
-        te[14] = (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * detInv;
-        te[15] = (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * detInv;
+        te[13] =
+            (n13 * n24 * n31 -
+                n14 * n23 * n31 +
+                n14 * n21 * n33 -
+                n11 * n24 * n33 -
+                n13 * n21 * n34 +
+                n11 * n23 * n34) *
+            detInv;
+        te[14] =
+            (n14 * n22 * n31 -
+                n12 * n24 * n31 -
+                n14 * n21 * n32 +
+                n11 * n24 * n32 +
+                n12 * n21 * n34 -
+                n11 * n22 * n34) *
+            detInv;
+        te[15] =
+            (n12 * n23 * n31 -
+                n13 * n22 * n31 +
+                n13 * n21 * n32 -
+                n11 * n23 * n32 -
+                n12 * n21 * n33 +
+                n11 * n22 * n33) *
+            detInv;
 
         return this;
     }
@@ -432,12 +569,7 @@ export class Matrix4 {
         const m03 = -(right + left) / (right - left); // translate x
         const m13 = -(top + bottom) / (top - bottom); // translate y
         const m23 = -(far + near) / (far - near); // translate z
-        return new Matrix4(
-            m00, 0, 0, m03,
-            0, m11, 0, m13,
-            0, 0, m22, m23,
-            0, 0, 0, 1
-        );
+        return new Matrix4(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
     }
 
     // ref
@@ -507,12 +639,7 @@ export class Matrix4 {
             : Vector3.subVectors(center, eye).normalize();
         const r = Vector3.crossVectors(up.normalize(), f).normalize();
         const u = Vector3.crossVectors(f, r);
-        const result = new Matrix4(
-            r.x, u.x, f.x, eye.x,
-            r.y, u.y, f.y, eye.y,
-            r.z, u.z, f.z, eye.z,
-            0, 0, 0, 1,
-        );
+        const result = new Matrix4(r.x, u.x, f.x, eye.x, r.y, u.y, f.y, eye.y, r.z, u.z, f.z, eye.z, 0, 0, 0, 1);
         return result;
     }
 
@@ -535,7 +662,7 @@ export class Matrix4 {
         return Matrix4.multiplyMatrices(
             Matrix4.rotationYMatrix(eulerRadian.y),
             Matrix4.rotationXMatrix(eulerRadian.x),
-            Matrix4.rotationZMatrix(eulerRadian.z),
+            Matrix4.rotationZMatrix(eulerRadian.z)
         );
     }
 

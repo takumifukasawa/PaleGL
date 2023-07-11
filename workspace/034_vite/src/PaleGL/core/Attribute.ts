@@ -1,21 +1,23 @@
-﻿import {AttributeUsageType} from "@/PaleGL/constants";
+﻿import { AttributeUsageType } from '@/PaleGL/constants';
+
+type AttributeDataConstructor = Float32ArrayConstructor | Uint16ArrayConstructor;
 
 export type AttributeDescriptor = {
-    location: number,
-    size: number,
-    name: string,
+    location: number;
+    size: number;
+    name: string;
     // dataType: Float32Array | Uint16Array
-    dataType: Function
-}
+    dataType: AttributeDataConstructor;
+};
 
 export type AttributeArgs = {
-    name: string,
-    data: Float32Array | Uint16Array,
-    location?: number,
-    size: number,
-    offset?: number,
-    usageType?: AttributeUsageType,
-    divisor?: number
+    name: string;
+    data: Float32Array | Uint16Array;
+    location?: number;
+    size: number;
+    offset?: number;
+    usageType?: AttributeUsageType;
+    divisor?: number;
 };
 
 export class Attribute {
@@ -28,14 +30,14 @@ export class Attribute {
     divisor: number;
 
     constructor({
-                    name,
-                    data,
-                    location, // TODO
-                    size,
-                    offset = 0,
-                    usageType = AttributeUsageType.StaticDraw,
-                    divisor = -1 // TODO
-                }: AttributeArgs) {
+        name,
+        data,
+        location, // TODO
+        size,
+        offset = 0,
+        usageType = AttributeUsageType.StaticDraw,
+        divisor = -1, // TODO
+    }: AttributeArgs) {
         this.name = name;
         this.data = data;
         // this.location = location || -1;
@@ -51,7 +53,7 @@ export class Attribute {
             name: this.name,
             location: this.location,
             size: this.size,
-            dataType: this.data.constructor
-        }
+            dataType: this.data.constructor as AttributeDataConstructor,
+        };
     }
 }

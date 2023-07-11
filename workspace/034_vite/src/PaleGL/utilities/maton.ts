@@ -6,7 +6,7 @@ function fillFunc<T>(arr: T[], value: T): T[] {
     }
     return newArr;
 
-    // 破壊的 
+    // 破壊的
     // for (let i = 0; i < arr.length; i++) {
     //     arr[i] = value;
     // }
@@ -14,15 +14,13 @@ function fillFunc<T>(arr: T[], value: T): T[] {
 }
 
 type MatonWrapper<T> = {
-    value: () => T[],
+    value: () => T[];
     // fill: () => T[]
-    fill: () => MatonWrapper<T>
+    fill: () => MatonWrapper<T>;
 };
 
 function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
-    let tmp: T[];
-
-    tmp = obj;
+    const tmp: T[] = obj;
 
     function fill(...args: T[]): MatonWrapper<T> {
         // if (Array.isArray(args[0])) {
@@ -30,28 +28,27 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         //     return fillFunc(args[0], args[1]);
         // }
         fillFunc(tmp, args[0]);
-        // return this as MatonWrapper<T>;
+        // TODO ignoreしちゃって問題ない？
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        return this;
+        return this as MatonWrapper<T>;
     }
 
     const value = () => {
         return tmp;
-    }
+    };
 
     return {
         value,
-        fill
+        fill,
     };
 }
 
 // wrapper
 const maton = <T>(obj: T[]) => {
     return matonWrapper(obj);
-}
+};
 
 maton.fill = fillFunc;
 
-export {
-    maton
-};
+export { maton };

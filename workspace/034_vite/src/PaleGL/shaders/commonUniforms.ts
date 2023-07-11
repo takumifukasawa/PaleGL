@@ -1,4 +1,3 @@
-
 export const transformVertexUniforms: () => string = () => `
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;

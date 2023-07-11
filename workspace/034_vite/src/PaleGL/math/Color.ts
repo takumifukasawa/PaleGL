@@ -54,7 +54,7 @@
             r: this.r255,
             g: this.g255,
             b: this.a255,
-        }
+        };
     }
 
     getHexCoord(withHash = true) {
@@ -86,15 +86,10 @@
 
     // hex ... #rrggbb or rrggbb
     static fromHex(hex: string) {
-        const coord = hex.slice(0, 1) === "#" ? hex.slice(1) : hex;
+        const coord = hex.slice(0, 1) === '#' ? hex.slice(1) : hex;
         const r = coord.slice(0, 2);
         const g = coord.slice(2, 4);
         const b = coord.slice(4, 6);
-        return new Color(
-            Number.parseInt(r, 16) / 255,
-            Number.parseInt(g, 16) / 255,
-            Number.parseInt(b, 16) / 255,
-            1
-        );
+        return new Color(Number.parseInt(r, 16) / 255, Number.parseInt(g, 16) / 255, Number.parseInt(b, 16) / 255, 1);
     }
 }

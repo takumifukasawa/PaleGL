@@ -3,7 +3,7 @@
     parent: NodeBase | null = null;
     children: NodeBase[] = [];
 
-    constructor({name}: { name: string }) {
+    constructor({ name }: { name: string }) {
         this.name = name;
     }
 
@@ -22,6 +22,6 @@
 
     // TODO: 引数でworldMatrixとdirty_flagを渡すべきな気がする
     updateMatrix() {
-        throw "should implementation"
+        throw 'should implementation';
     }
 }

@@ -2,7 +2,6 @@
 // type OnInputCallback = ((value: string) => void);
 
 export class DebuggerGUI {
-
     private parentElement: HTMLElement;
 
     get domElement() {
@@ -10,7 +9,7 @@ export class DebuggerGUI {
     }
 
     constructor() {
-        this.parentElement = document.createElement("div");
+        this.parentElement = document.createElement('div');
         this.parentElement.style.cssText = `
             background-color: rgb(200 200 255 / 70%);
             position: absolute;
@@ -24,7 +23,7 @@ export class DebuggerGUI {
     }
 
     #createDebuggerContentElement(label: string) {
-        const debuggerContentElement = document.createElement("div");
+        const debuggerContentElement = document.createElement('div');
         debuggerContentElement.style.cssText = `
             font-size: 10px;
             font-weight: bold;
@@ -33,8 +32,8 @@ export class DebuggerGUI {
         `;
 
         if (label) {
-            const labelWrapperElement = document.createElement("div");
-            const labelTextElement = document.createElement("p");
+            const labelWrapperElement = document.createElement('div');
+            const labelTextElement = document.createElement('p');
             labelTextElement.style.cssText = `
                 margin-right: 1em;
             `;
@@ -44,7 +43,7 @@ export class DebuggerGUI {
             debuggerContentElement.appendChild(labelWrapperElement);
         }
 
-        const debuggerInputElement = document.createElement("div");
+        const debuggerInputElement = document.createElement('div');
         debuggerContentElement.appendChild(debuggerInputElement);
 
         return {
@@ -56,28 +55,28 @@ export class DebuggerGUI {
     // options ... array
     // [ { label?, value },,, ]
     addPullDownDebugger({
-                            label,
-                            onChange,
-                            // onInput = null,
-                            initialValue = null,
-                            initialExec = true,
-                            // for select
-                            options = [],
-                        }: {
-        label: string,
-        onChange: ((value: string) => void),
-        initialValue: string | null,
-        initialExec: boolean,
-        options: { label: string | null, value: string, isDefault?: boolean } []
+        label,
+        onChange,
+        // onInput = null,
+        initialValue = null,
+        initialExec = true,
+        // for select
+        options = [],
+    }: {
+        label: string;
+        onChange: (value: string) => void;
+        initialValue: string | null;
+        initialExec: boolean;
+        options: { label: string | null; value: string; isDefault?: boolean }[];
     }) {
-        const {wrapperElement, contentElement} = this.#createDebuggerContentElement(label);
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
 
-        const selectElement = document.createElement("select");
+        const selectElement = document.createElement('select');
         selectElement.style.cssText = `
                     font-size: 10px;
                 `;
-        options.forEach(option => {
-            const optionElement = document.createElement("option");
+        options.forEach((option) => {
+            const optionElement = document.createElement('option');
             optionElement.value = option.value;
             optionElement.label = option.label || option.value;
             selectElement.appendChild(optionElement);
@@ -85,7 +84,7 @@ export class DebuggerGUI {
                 selectElement.value = option.value;
             }
         });
-        selectElement.addEventListener("change", () => {
+        selectElement.addEventListener('change', () => {
             onChange(selectElement.value);
         });
 
@@ -101,26 +100,26 @@ export class DebuggerGUI {
     }
 
     addColorDebugger({
-                         label,
-                         onChange,
-                         onInput = null,
-                         initialValue = null,
-                         initialExec = true,
-                     }: {
-        label: string,
-        onChange: (value: string) => void,
-        onInput: ((value: string) => void) | null,
-        initialValue: string | null,
-        initialExec: boolean
+        label,
+        onChange,
+        onInput = null,
+        initialValue = null,
+        initialExec = true,
+    }: {
+        label: string;
+        onChange: (value: string) => void;
+        onInput: ((value: string) => void) | null;
+        initialValue: string | null;
+        initialExec: boolean;
     }) {
-        const {wrapperElement, contentElement} = this.#createDebuggerContentElement(label);
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
 
-        const colorPickerInput = document.createElement("input");
-        colorPickerInput.type = "color";
-        colorPickerInput.addEventListener("change", () => {
+        const colorPickerInput = document.createElement('input');
+        colorPickerInput.type = 'color';
+        colorPickerInput.addEventListener('change', () => {
             onChange(colorPickerInput.value);
         });
-        colorPickerInput.addEventListener("input", () => {
+        colorPickerInput.addEventListener('input', () => {
             onInput ? onInput(colorPickerInput.value) : onChange(colorPickerInput.value);
         });
 
@@ -136,24 +135,24 @@ export class DebuggerGUI {
     }
 
     addToggleDebugger({
-                          label,
-                          onChange,
-                          // onInput = null,
-                          initialValue = null,
-                          initialExec = true,
-                      }: {
-        label: string,
-        onChange: (value: boolean) => void,
+        label,
+        onChange,
+        // onInput = null,
+        initialValue = null,
+        initialExec = true,
+    }: {
+        label: string;
+        onChange: (value: boolean) => void;
         // onInput: OnInputCallback | null,
-        initialValue: boolean | null,
-        initialExec?: boolean
+        initialValue: boolean | null;
+        initialExec?: boolean;
     }) {
-        const {wrapperElement, contentElement} = this.#createDebuggerContentElement(label);
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
 
-        const checkBoxInput = document.createElement("input");
-        checkBoxInput.type = "checkbox";
+        const checkBoxInput = document.createElement('input');
+        checkBoxInput.type = 'checkbox';
         checkBoxInput.checked = !!initialValue;
-        checkBoxInput.addEventListener("change", () => {
+        checkBoxInput.addEventListener('change', () => {
             onChange(checkBoxInput.checked);
         });
 
@@ -166,48 +165,48 @@ export class DebuggerGUI {
     }
 
     addSliderDebugger({
-                          label,
-                          onChange,
-                          onInput,
-                          initialValue,
-                          initialExec = true,
-                          minValue,
-                          maxValue,
-                          stepValue
-                      }: {
-        label: string,
-        onChange: (value: number) => void,
-        onInput?: ((value: number) => void) | null,
-        initialValue: number,
-        initialExec?: boolean,
-        minValue: number,
-        maxValue: number,
-        stepValue: number
+        label,
+        onChange,
+        onInput,
+        initialValue,
+        initialExec = true,
+        minValue,
+        maxValue,
+        stepValue,
+    }: {
+        label: string;
+        onChange: (value: number) => void;
+        onInput?: ((value: number) => void) | null;
+        initialValue: number;
+        initialExec?: boolean;
+        minValue: number;
+        maxValue: number;
+        stepValue: number;
     }) {
-        const {wrapperElement, contentElement} = this.#createDebuggerContentElement(label);
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
 
-        const sliderValueView = document.createElement("p");
-        const sliderInput = document.createElement("input");
+        const sliderValueView = document.createElement('p');
+        const sliderInput = document.createElement('input');
 
         const updateCurrentValueView = () => {
             sliderValueView.textContent = `value: ${sliderInput.value}`;
-        }
+        };
 
         const onUpdateSlider = () => {
             updateCurrentValueView();
             return Number.parseFloat(sliderInput.value);
         };
 
-        sliderInput.type = "range";
+        sliderInput.type = 'range';
         sliderInput.min = minValue.toString();
         sliderInput.max = maxValue.toString();
         if (stepValue !== null) {
             sliderInput.step = stepValue.toString();
         }
-        sliderInput.addEventListener("change", () => {
+        sliderInput.addEventListener('change', () => {
             return onUpdateSlider();
         });
-        sliderInput.addEventListener("input", () => {
+        sliderInput.addEventListener('input', () => {
             onInput ? onInput(onUpdateSlider()) : onChange(onUpdateSlider());
         });
 
@@ -226,15 +225,17 @@ export class DebuggerGUI {
     }
 
     addButtonDebugger({
-                          buttonLabel,
-                          onClick,
-                          // onInput,
-                      }: { buttonLabel: string, onClick: () => void }
-    ) {
-        const {wrapperElement, contentElement} = this.#createDebuggerContentElement("");
+        buttonLabel,
+        onClick,
+    } // onInput,
+    : {
+        buttonLabel: string;
+        onClick: () => void;
+    }) {
+        const { wrapperElement, contentElement } = this.#createDebuggerContentElement('');
 
-        const buttonInput = document.createElement("input");
-        buttonInput.type = "button";
+        const buttonInput = document.createElement('input');
+        buttonInput.type = 'button';
         buttonInput.value = buttonLabel;
 
         buttonInput.style.cssText = `
@@ -243,14 +244,14 @@ export class DebuggerGUI {
         padding: 1px 2px;
 `;
 
-        buttonInput.addEventListener("click", () => onClick());
+        buttonInput.addEventListener('click', () => onClick());
 
         contentElement.appendChild(buttonInput);
         this.parentElement.appendChild(wrapperElement);
     }
 
     addBorderSpacer() {
-        const borderElement = document.createElement("hr");
+        const borderElement = document.createElement('hr');
         borderElement.style.cssText = `
             width: 100%;
             height: 1px;

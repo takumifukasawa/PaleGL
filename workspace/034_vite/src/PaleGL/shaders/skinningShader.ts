@@ -1,4 +1,4 @@
-import {UniformNames} from "@/PaleGL/constants";
+import { UniformNames } from '@/PaleGL/constants';
 
 export const calcSkinningMatrixFunc: () => string = () => `
 mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
@@ -82,7 +82,9 @@ export const skinningVertex: (gpuSkinning: boolean) => string = (gpuSkinning = f
     //     aBoneWeights
     // );
 
-    ${gpuSkinning ? `
+    ${
+        gpuSkinning
+            ? `
     // gpu skinning
     float fps = 30.;
     mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[0], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
@@ -96,7 +98,8 @@ export const skinningVertex: (gpuSkinning: boolean) => string = (gpuSkinning = f
         jointMatrix3,
         aBoneWeights
     );
-    ` : `
+    `
+            : `
     mat4 jointMatrix0 = getJointMatrix(uJointTexture, aBoneIndices[0], uJointTextureColNum);
     mat4 jointMatrix1 = getJointMatrix(uJointTexture, aBoneIndices[1], uJointTextureColNum);
     mat4 jointMatrix2 = getJointMatrix(uJointTexture, aBoneIndices[2], uJointTextureColNum);
@@ -108,5 +111,6 @@ export const skinningVertex: (gpuSkinning: boolean) => string = (gpuSkinning = f
         jointMatrix3,
         aBoneWeights
     );
-    `}
+    `
+    }
 `;

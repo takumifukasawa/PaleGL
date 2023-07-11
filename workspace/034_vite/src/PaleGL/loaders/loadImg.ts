@@ -7,7 +7,7 @@
         };
         img.onerror = () => {
             reject(img);
-        }
+        };
         img.src = src;
     });
 }

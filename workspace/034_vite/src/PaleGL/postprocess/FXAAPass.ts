@@ -1,6 +1,6 @@
-﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
-import {UniformTypes,UniformNames} from "@/PaleGL/constants";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
+import { UniformTypes, UniformNames } from '@/PaleGL/constants';
+import { GPU } from '@/PaleGL/core/GPU';
 // import {IPostProcessPass} from "./AbstractPostProcessPass";
 // import {GPU} from "@/PaleGL/core/GPU";
 
@@ -11,16 +11,16 @@ import {GPU} from "@/PaleGL/core/GPU";
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
 export class FXAAPass extends PostProcessPass {
-// export class FXAAPass implements IPostProcessPass {
-   
+    // export class FXAAPass implements IPostProcessPass {
+
     // get gpu() {
     //     return this.gpu;
     // }
-    constructor({ gpu }: {gpu: GPU}) {
+    constructor({ gpu }: { gpu: GPU }) {
         // # high quality
-        const edgeStepsArray = [1., 1.5, 2., 2., 2., 2., 2., 2., 2., 4.];
+        const edgeStepsArray = [1, 1.5, 2, 2, 2, 2, 2, 2, 2, 4];
         const edgeStepCount = 10;
-        const edgeGuess = 8.;
+        const edgeGuess = 8;
         // # low quality
         // const edgeStepsArray = [1, 1.5, 2, 4];
         // const edgeStepCount = 4;
@@ -299,15 +299,18 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
-    return `
+${new Array(edgeStepCount - 1)
+    .fill(0)
+    .map((_, i) => {
+        return `
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
         pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
         pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
     }
 `;
-})).join("\n")}
+    })
+    .join('\n')}
     // }
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeGuess});
@@ -321,15 +324,18 @@ ${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
-${(new Array(edgeStepCount - 1).fill(0).map((_, i) => {
-    return `   
+${new Array(edgeStepCount - 1)
+    .fill(0)
+    .map((_, i) => {
+        return `   
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
         nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
         nAtEnd = abs(nLumaDelta) >= gradientThreshold;
     }
 `;
-        })).join("\n")}
+    })
+    .join('\n')}
     // }
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeGuess});
@@ -430,19 +436,18 @@ void main() {
                 },
                 uSubpixelBlending: {
                     type: UniformTypes.Float,
-                    value: 0.75
-                }
-            }
+                    value: 0.75,
+                },
+            },
         });
         // this.gpu = gpu;
     }
-    
+
     setSize(width: number, height: number) {
         super.setSize(width, height);
         // this.material.uniforms.uTargetWidth.value = width;
         // this.material.uniforms.uTargetHeight.value = height;
-        this.material.updateUniform("uTargetWidth", width);
-        this.material.updateUniform("uTargetHeight", height);
+        this.material.updateUniform('uTargetWidth', width);
+        this.material.updateUniform('uTargetHeight', height);
     }
-    
 }

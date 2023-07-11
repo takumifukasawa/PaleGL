@@ -1,12 +1,12 @@
-﻿import {AnimationKeyframeType, AnimationKeyframeTypes} from "@/PaleGL/constants";
-import {Vector3} from "@/PaleGL/math/Vector3";
-import {Quaternion} from "@/PaleGL/math/Quaternion";
+﻿import { AnimationKeyframeType, AnimationKeyframeTypes } from '@/PaleGL/constants';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Quaternion } from '@/PaleGL/math/Quaternion';
 import {
     GLTFAnimationChannelTargetPath,
     // GLTFAnimationKeyframeType,
     GLTFAnimationSamplerInterpolation,
-    GLTFNodeActorKind
-} from "@/PaleGL/loaders/loadGLTF";
+    GLTFNodeActorKind,
+} from '@/PaleGL/loaders/loadGLTF';
 
 export type AnimationKeyframeValue = Vector3 | Quaternion;
 
@@ -16,7 +16,7 @@ export class AnimationKeyframes {
     interpolation: GLTFAnimationSamplerInterpolation;
     private _data: Float32Array;
     private elementSize: number;
-    frameCount: number
+    frameCount: number;
     type: AnimationKeyframeType;
     start: number;
     end: number;
@@ -27,25 +27,25 @@ export class AnimationKeyframes {
     }
 
     constructor({
-                    target,
-                    type,
-                    key,
-                    interpolation,
-                    data,
-                    start,
-                    end,
-                    frameCount,
-                    frames
+        target,
+        type,
+        key,
+        interpolation,
+        data,
+        start,
+        end,
+        frameCount,
+        frames,
     }: {
-        target: GLTFNodeActorKind,
-        type: AnimationKeyframeType,
-        key: GLTFAnimationChannelTargetPath,
-        interpolation: GLTFAnimationSamplerInterpolation,
-        data: Float32Array,
-        start: number,
-        end: number,
-        frameCount : number,
-        frames: Float32Array
+        target: GLTFNodeActorKind;
+        type: AnimationKeyframeType;
+        key: GLTFAnimationChannelTargetPath;
+        interpolation: GLTFAnimationSamplerInterpolation;
+        data: Float32Array;
+        start: number;
+        end: number;
+        frameCount: number;
+        frames: Float32Array;
     }) {
         this.target = target;
         this.key = key;
@@ -57,7 +57,7 @@ export class AnimationKeyframes {
         this.frameCount = frameCount;
         this.frames = frames;
 
-        switch(this.type) {
+        switch (this.type) {
             case AnimationKeyframeTypes.Vector3:
                 this.elementSize = 3;
                 break;
@@ -65,14 +65,14 @@ export class AnimationKeyframes {
                 this.elementSize = 4;
                 break;
             default:
-                throw "[AnimationKeyframes.getFrameValue] invalid type";
-        }       
+                throw '[AnimationKeyframes.getFrameValue] invalid type';
+        }
     }
 
     getFrameValue(frame: number): AnimationKeyframeValue {
-        const arr = (new Array(this.elementSize)).fill(0).map((_, i) => this._data[frame * this.elementSize + i]);
+        const arr = new Array(this.elementSize).fill(0).map((_, i) => this._data[frame * this.elementSize + i]);
 
-        switch(this.type) {
+        switch (this.type) {
             case AnimationKeyframeTypes.Vector3:
                 // return new Vector3(...arr);
                 return new Vector3(arr[0], arr[1], arr[2]);
@@ -80,7 +80,7 @@ export class AnimationKeyframes {
                 // return new Quaternion(...arr);
                 return new Quaternion(arr[0], arr[1], arr[2], arr[3]);
             default:
-                throw "[AnimationKeyframes.getFrameValue] invalid type";
+                throw '[AnimationKeyframes.getFrameValue] invalid type';
         }
     }
 }

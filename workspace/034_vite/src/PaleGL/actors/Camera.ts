@@ -1,39 +1,40 @@
-﻿import {Actor} from "@/PaleGL/actors/Actor";
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {Vector4} from "@/PaleGL/math/Vector4";
+﻿import { Actor } from '@/PaleGL/actors/Actor';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Vector4 } from '@/PaleGL/math/Vector4';
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {
     ActorTypes,
     AttributeNames,
     AttributeUsageType,
-    BlendTypes, CameraType,
+    BlendTypes,
+    CameraType,
     PrimitiveTypes,
-    UniformNames
-} from "@/PaleGL/constants";
+    UniformNames,
+} from '@/PaleGL/constants';
 // import {Vector3} from "@/PaleGL/math/Vector3";
-import {Material} from "@/PaleGL/materials/Material";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
-import {Mesh} from "./Mesh";
-import {Attribute} from "@/PaleGL/core/Attribute";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+import { Material } from '@/PaleGL/materials/Material';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { Mesh } from './Mesh';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {Color} from "@/PaleGL/math/Color";
-import {Vector3} from "@/PaleGL/math/Vector3";
-import {PostProcess} from "@/PaleGL/postprocess/PostProcess";
-import {GPU} from "@/PaleGL/core/GPU";
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
+import { GPU } from '@/PaleGL/core/GPU';
 // import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
-import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets";
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
 
 export const FrustumDirection = {
-    nearLeftTop: "nearLeftTop",
-    nearRightTop: "nearRightTop",
-    nearLeftBottom: "nearLeftBottom",
-    nearRightBottom: "nearRightBottom",
-    farLeftTop: "farLeftTop",
-    farRightTop: "farRightTop",
-    farLeftBottom: "farLeftBottom",
-    farRightBottom: "farRightBottom",
+    nearLeftTop: 'nearLeftTop',
+    nearRightTop: 'nearRightTop',
+    nearLeftBottom: 'nearLeftBottom',
+    nearRightBottom: 'nearRightBottom',
+    farLeftTop: 'farLeftTop',
+    farRightTop: 'farRightTop',
+    farLeftBottom: 'farLeftBottom',
+    farRightBottom: 'farRightBottom',
 } as const;
-export type FrustumDirectionType = typeof FrustumDirection[keyof typeof FrustumDirection];
+export type FrustumDirectionType = (typeof FrustumDirection)[keyof typeof FrustumDirection];
 
 export type FrustumVectors = {
     [key in FrustumDirectionType]: Vector3;
@@ -52,7 +53,7 @@ export class Camera extends Actor {
     visibleFrustum: boolean = false;
     #visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
-   
+
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
         // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
@@ -94,10 +95,14 @@ export class Camera extends Actor {
     }
 
     // constructor({clearColor, postProcess}: { clearColor: Vector4, postProcess: PostProcess } = {}) {
-    constructor({cameraType, clearColor, postProcess}: {
-        cameraType: CameraType,
-        clearColor?: Vector4,
-        postProcess?: PostProcess
+    constructor({
+        cameraType,
+        clearColor,
+        postProcess,
+    }: {
+        cameraType: CameraType;
+        clearColor?: Vector4;
+        postProcess?: PostProcess;
     }) {
         super(ActorTypes.Camera);
         this.cameraType = cameraType;
@@ -130,9 +135,8 @@ export class Camera extends Actor {
         this.clearColor = clearColor;
     }
 
-    update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number }) {
-
-        super.update({gpu, time, deltaTime});
+    update({ gpu, time, deltaTime }: { gpu: GPU; time: number; deltaTime: number }) {
+        super.update({ gpu, time, deltaTime });
 
         if (this.visibleFrustum && !this.#visibleFrustumMesh) {
             this.#visibleFrustumMesh = new Mesh({
@@ -143,27 +147,18 @@ export class Camera extends Actor {
                             name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,
-                            usageType: AttributeUsageType.DynamicDraw
+                            usageType: AttributeUsageType.DynamicDraw,
                         }),
                     ],
                     drawCount: 2 * 12,
                     indices: [
                         // near clip
-                        0, 1,
-                        1, 3,
-                        3, 2,
-                        2, 0,
+                        0, 1, 1, 3, 3, 2, 2, 0,
                         // far clip
-                        4, 5,
-                        5, 7,
-                        7, 6,
-                        6, 4,
+                        4, 5, 5, 7, 7, 6, 6, 4,
                         // bridge
-                        0, 4,
-                        1, 5,
-                        2, 6,
-                        3, 7
-                    ]
+                        0, 4, 1, 5, 2, 6, 3, 7,
+                    ],
                 }),
                 material: new Material({
                     // gpu,
@@ -191,26 +186,29 @@ export class Camera extends Actor {
                     `,
                     primitiveType: PrimitiveTypes.Lines,
                     blendType: BlendTypes.Transparent,
-                    depthWrite: false
-                })
+                    depthWrite: false,
+                }),
             });
             this.addChild(this.#visibleFrustumMesh as Actor);
         }
 
         if (this.#visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
-            this.#visibleFrustumMesh.geometry.updateAttribute(AttributeNames.Position, new Float32Array([
-                // near clip
-                ...frustumPositions.nearLeftTop.elements,
-                ...frustumPositions.nearLeftBottom.elements,
-                ...frustumPositions.nearRightTop.elements,
-                ...frustumPositions.nearRightBottom.elements,
-                // far clip
-                ...frustumPositions.farLeftTop.elements,
-                ...frustumPositions.farLeftBottom.elements,
-                ...frustumPositions.farRightTop.elements,
-                ...frustumPositions.farRightBottom.elements,
-            ]));
+            this.#visibleFrustumMesh.geometry.updateAttribute(
+                AttributeNames.Position,
+                new Float32Array([
+                    // near clip
+                    ...frustumPositions.nearLeftTop.elements,
+                    ...frustumPositions.nearLeftBottom.elements,
+                    ...frustumPositions.nearRightTop.elements,
+                    ...frustumPositions.nearRightBottom.elements,
+                    // far clip
+                    ...frustumPositions.farLeftTop.elements,
+                    ...frustumPositions.farLeftBottom.elements,
+                    ...frustumPositions.farRightTop.elements,
+                    ...frustumPositions.farRightBottom.elements,
+                ])
+            );
         }
     }
 
@@ -223,16 +221,15 @@ export class Camera extends Actor {
         this.#renderTarget = renderTarget;
     }
 
-    // @ts-ignore
-    #updateProjectionMatrix() {
-        throw "should implementation";
+    updateProjectionMatrix() {
+        throw 'should implementation';
     }
 
     getFrustumLocalPositions(): FrustumVectors {
-        throw "should implementation";
+        throw 'should implementation';
     }
 
     getFrustumWorldPositions() {
-        throw "should implementation";
+        throw 'should implementation';
     }
 }

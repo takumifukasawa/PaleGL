@@ -1,4 +1,4 @@
-﻿import {Matrix4} from "@/PaleGL/math/Matrix4";
+﻿import { Matrix4 } from '@/PaleGL/math/Matrix4';
 
 export class Vector3 {
     elements: Float32Array = new Float32Array(3);
@@ -93,10 +93,7 @@ export class Vector3 {
 
     equals(v: Vector3) {
         const eps = 0.0000001;
-        const flag =
-            Math.abs(this.x - v.x) < eps &&
-            Math.abs(this.y - v.y) < eps &&
-            Math.abs(this.z - v.z) < eps;
+        const flag = Math.abs(this.x - v.x) < eps && Math.abs(this.y - v.y) < eps && Math.abs(this.z - v.z) < eps;
         return flag;
     }
 
@@ -138,7 +135,7 @@ export class Vector3 {
 
     static addVectors(...vectors: Vector3[]) {
         const v = Vector3.zero;
-        vectors.forEach(elem => {
+        vectors.forEach((elem) => {
             v.x += elem.x;
             v.y += elem.y;
             v.z += elem.z;
@@ -147,27 +144,19 @@ export class Vector3 {
     }
 
     static subVectors(v1: Vector3, v2: Vector3) {
-        return new Vector3(
-            v1.x - v2.x,
-            v1.y - v2.y,
-            v1.z - v2.z
-        );
+        return new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     }
 
     // v1 x v2
     static crossVectors(v1: Vector3, v2: Vector3) {
-        return new Vector3(
-            v1.y * v2.z - v1.z * v2.y,
-            v1.z * v2.x - v1.x * v2.z,
-            v1.x * v2.y - v1.y * v2.x
-        );
+        return new Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
     }
 
     static rotateVectorX(v: Vector3, degree: number) {
         const x = v.x;
         const y = v.y;
         const z = v.z;
-        const rad = degree / 180 * Math.PI;
+        const rad = (degree / 180) * Math.PI;
         const c = Math.cos(rad);
         const s = Math.sin(rad);
         const rx = x;
@@ -180,7 +169,7 @@ export class Vector3 {
         const x = v.x;
         const y = v.y;
         const z = v.z;
-        const rad = degree / 180 * Math.PI;
+        const rad = (degree / 180) * Math.PI;
         const c = Math.cos(rad);
         const s = Math.sin(rad);
         const rx = x * c + z * s;
@@ -193,7 +182,7 @@ export class Vector3 {
         const x = v.x;
         const y = v.y;
         const z = v.z;
-        const rad = degree / 180 * Math.PI;
+        const rad = (degree / 180) * Math.PI;
         const c = Math.cos(rad);
         const s = Math.sin(rad);
         const rx = x * c + y * -s;
@@ -222,11 +211,7 @@ export class Vector3 {
     }
 
     static lerpVectors(v1: Vector3, v2: Vector3, r: number) {
-        return new Vector3(
-            v1.x + (v2.x - v1.x) * r,
-            v1.y + (v2.y - v1.y) * r,
-            v1.z + (v2.z - v1.z) * r
-        );
+        return new Vector3(v1.x + (v2.x - v1.x) * r, v1.y + (v2.y - v1.y) * r, v1.z + (v2.z - v1.z) * r);
     }
 
     log() {

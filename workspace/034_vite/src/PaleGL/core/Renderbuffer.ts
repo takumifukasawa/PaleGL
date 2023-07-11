@@ -1,9 +1,9 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject";
-import {RenderbufferType, RenderbufferTypes} from "@/PaleGL/constants";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
+import { RenderbufferType, RenderbufferTypes } from '@/PaleGL/constants';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class Renderbuffer extends GLObject {
-    #gpu: GPU
+    #gpu: GPU;
     #type: RenderbufferType;
     #renderbuffer: WebGLRenderbuffer;
 
@@ -11,7 +11,7 @@ export class Renderbuffer extends GLObject {
         return this.#renderbuffer;
     }
 
-    constructor({gpu, type, width, height}: { gpu: GPU, type: RenderbufferType, width: number, height: number }) {
+    constructor({ gpu, type, width, height }: { gpu: GPU; type: RenderbufferType; width: number; height: number }) {
         super();
 
         this.#gpu = gpu;
@@ -21,7 +21,7 @@ export class Renderbuffer extends GLObject {
 
         const rb = gl.createRenderbuffer();
         if (!rb) {
-            throw "invalid render buffer";
+            throw 'invalid render buffer';
         }
         this.#renderbuffer = rb;
 
@@ -32,7 +32,7 @@ export class Renderbuffer extends GLObject {
                 gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
                 break;
             default:
-                throw "[Renderbuffer.constructor] invalid render buffer type.";
+                throw '[Renderbuffer.constructor] invalid render buffer type.';
         }
 
         // TODO: あったほうがよい？

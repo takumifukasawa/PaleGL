@@ -1,5 +1,5 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class Shader extends GLObject {
     private program: WebGLProgram;
@@ -8,7 +8,7 @@ export class Shader extends GLObject {
         return this.program;
     }
 
-    constructor({gpu, vertexShader, fragmentShader}: { gpu: GPU, vertexShader: string, fragmentShader: string }) {
+    constructor({ gpu, vertexShader, fragmentShader }: { gpu: GPU; vertexShader: string; fragmentShader: string }) {
         super();
 
         // cache
@@ -16,10 +16,10 @@ export class Shader extends GLObject {
 
         // vertex shader
 
-        // create vertex shader  
+        // create vertex shader
         const vs = gl.createShader(gl.VERTEX_SHADER);
-        if(!vs) {
-            throw new Error("invalid vs");
+        if (!vs) {
+            throw new Error('invalid vs');
         }
         // set shader source (string)
         gl.shaderSource(vs, vertexShader);
@@ -28,16 +28,16 @@ export class Shader extends GLObject {
         // check shader info log
         const vsInfo = gl.getShaderInfoLog(vs);
         if (!!vsInfo && vsInfo.length > 0) {
-            const errorInfo = Shader.buildErrorInfo(vsInfo, vertexShader, "[Shader] vertex shader has error");
+            const errorInfo = Shader.buildErrorInfo(vsInfo, vertexShader, '[Shader] vertex shader has error');
             throw errorInfo;
         }
 
         // fragment shader
 
-        // create fragment shader  
+        // create fragment shader
         const fs = gl.createShader(gl.FRAGMENT_SHADER);
-        if(!fs) {
-            throw new Error("invalid fs");
+        if (!fs) {
+            throw new Error('invalid fs');
         }
         // set shader source (string)
         gl.shaderSource(fs, fragmentShader);
@@ -46,15 +46,15 @@ export class Shader extends GLObject {
         const fsInfo = gl.getShaderInfoLog(fs);
         // check shader info log
         if (!!fsInfo && fsInfo.length > 0) {
-            const errorInfo = Shader.buildErrorInfo(fsInfo, fragmentShader, "[Shader] fragment shader has error");
+            const errorInfo = Shader.buildErrorInfo(fsInfo, fragmentShader, '[Shader] fragment shader has error');
             throw errorInfo;
         }
 
         // program object
 
         const program = gl.createProgram();
-        if(!program) {
-            throw new Error("invalid program");
+        if (!program) {
+            throw new Error('invalid program');
         }
         this.program = program;
 
@@ -81,9 +81,12 @@ ${infoLog}
 
 ---
             
-${shaderSource.split("\n").map((line, i) => {
-            return `${i + 1}: ${line}`;
-        }).join("\n")}       
+${shaderSource
+    .split('\n')
+    .map((line, i) => {
+        return `${i + 1}: ${line}`;
+    })
+    .join('\n')}       
 `;
     }
 }

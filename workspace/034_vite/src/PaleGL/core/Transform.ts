@@ -1,10 +1,10 @@
-﻿import {Vector3} from "@/PaleGL/math/Vector3.js";
-import {Matrix4} from "@/PaleGL/math/Matrix4.js";
-import {ActorTypes} from "@/PaleGL/constants.js";
-import {Rotator} from "@/PaleGL/math/Rotator.js";
-import {Actor} from "@/PaleGL/actors/Actor";
+﻿import { Vector3 } from '@/PaleGL/math/Vector3.js';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
+import { ActorTypes } from '@/PaleGL/constants.js';
+import { Rotator } from '@/PaleGL/math/Rotator.js';
+import { Actor } from '@/PaleGL/actors/Actor';
 
-// TODO: 
+// TODO:
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
 // - NodeBaseを継承
 export class Transform {
@@ -49,7 +49,7 @@ export class Transform {
     get worldForward() {
         return new Vector3(this.#worldMatrix.m02, this.#worldMatrix.m12, this.#worldMatrix.m22).normalize();
     }
-    
+
     constructor(actor: Actor) {
         this.actor = actor;
     }
@@ -67,17 +67,18 @@ export class Transform {
             // TODO:
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
-            const lookAtMatrix = this.actor.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up, true)
-                : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
+            const lookAtMatrix =
+                this.actor.type === ActorTypes.Camera
+                    ? Matrix4.getLookAtMatrix(this.position, this.lookAtTarget, Vector3.up, true)
+                    : Matrix4.getLookAtMatrix(this.position, this.lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
         } else {
             const translationMatrix = Matrix4.translationMatrix(this.position);
             const rotationAxes = this.rotation.getAxes();
-            const rotationXMatrix = Matrix4.rotationXMatrix(rotationAxes.x / 180 * Math.PI);
-            const rotationYMatrix = Matrix4.rotationYMatrix(rotationAxes.y / 180 * Math.PI);
-            const rotationZMatrix = Matrix4.rotationZMatrix(rotationAxes.z / 180 * Math.PI);
+            const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
+            const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
+            const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
             // roll(Z), pitch(X), yaw(Y)
             const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);

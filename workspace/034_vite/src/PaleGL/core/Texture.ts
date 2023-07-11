@@ -1,34 +1,33 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject";
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
 import {
     TextureFilterType,
     TextureFilterTypes,
     TextureType,
     TextureTypes,
     TextureWrapType,
-    TextureWrapTypes
-} from "@/PaleGL/constants";
-// @ts-ignore
-import {createWhite1x1, GPU} from "./GPU";
+    TextureWrapTypes,
+} from '@/PaleGL/constants';
+import { GPU } from './GPU';
 
 export type TextureArgs = {
     // require
-    gpu: GPU
+    gpu: GPU;
     // optional
-    img?: HTMLImageElement | HTMLCanvasElement | null,
-    type?: TextureType,
-    width?: number,
-    height?: number,
-    mipmap?: boolean,
-    minFilter?: TextureFilterType,
-    magFilter?: TextureFilterType,
-    wrapS?: TextureWrapType,
-    wrapT?: TextureWrapType,
-    flipY?: boolean,
+    img?: HTMLImageElement | HTMLCanvasElement | null;
+    type?: TextureType;
+    width?: number;
+    height?: number;
+    mipmap?: boolean;
+    minFilter?: TextureFilterType;
+    magFilter?: TextureFilterType;
+    wrapS?: TextureWrapType;
+    wrapT?: TextureWrapType;
+    flipY?: boolean;
 };
 
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
-    private texture: WebGLTexture
+    private texture: WebGLTexture;
     private img: HTMLImageElement | HTMLCanvasElement | null = null;
     private gpu: GPU;
     type;
@@ -47,15 +46,18 @@ export class Texture extends GLObject {
     }
 
     constructor({
-                    gpu,
-                    img,
-                    type = TextureTypes.RGBA,
-                    width, height,
-                    mipmap = false,
-                    minFilter = TextureFilterTypes.Nearest, magFilter = TextureFilterTypes.Nearest,
-                    wrapS = TextureWrapTypes.ClampToEdge, wrapT = TextureWrapTypes.ClampToEdge,
-                    flipY = false,
-                }: TextureArgs) {
+        gpu,
+        img,
+        type = TextureTypes.RGBA,
+        width,
+        height,
+        mipmap = false,
+        minFilter = TextureFilterTypes.Nearest,
+        magFilter = TextureFilterTypes.Nearest,
+        wrapS = TextureWrapTypes.ClampToEdge,
+        wrapT = TextureWrapTypes.ClampToEdge,
+        flipY = false,
+    }: TextureArgs) {
         super();
 
         this.gpu = gpu;
@@ -78,12 +80,12 @@ export class Texture extends GLObject {
         }
 
         if (!this.img && (!width || !height)) {
-            console.error("[Texture.constructor] invalid width or height")
+            console.error('[Texture.constructor] invalid width or height');
         }
 
         const texture = gl.createTexture();
         if (!texture) {
-            throw "invalid texture";
+            throw 'invalid texture';
         }
         this.texture = texture;
 
@@ -110,7 +112,7 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw "invalid min filter type"
+                        throw 'invalid min filter type';
                 }
                 // mag filter settings
                 switch (this.magFilter) {
@@ -121,7 +123,7 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw "invalid mag filter type"
+                        throw 'invalid mag filter type';
                 }
                 break;
 
@@ -138,7 +140,7 @@ export class Texture extends GLObject {
             //     break;
 
             default:
-                throw "invalid texture type";
+                throw 'invalid texture type';
         }
 
         // wrap settings
@@ -197,9 +199,29 @@ export class Texture extends GLObject {
                     // for render target
                     // 1: use 16bit
                     if (this.img) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                        gl.texImage2D(
+                            gl.TEXTURE_2D,
+                            0,
+                            gl.DEPTH_COMPONENT16,
+                            width,
+                            height,
+                            0,
+                            gl.DEPTH_COMPONENT,
+                            gl.UNSIGNED_SHORT,
+                            this.img
+                        );
                     } else {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
+                        gl.texImage2D(
+                            gl.TEXTURE_2D,
+                            0,
+                            gl.DEPTH_COMPONENT16,
+                            width,
+                            height,
+                            0,
+                            gl.DEPTH_COMPONENT,
+                            gl.UNSIGNED_SHORT,
+                            null
+                        );
                     }
                     // 2: use 32bit
                     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.img);
@@ -208,7 +230,14 @@ export class Texture extends GLObject {
                     // 1: use 16bit
                     // TODO: fix img nullable
                     if (this.img) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                        gl.texImage2D(
+                            gl.TEXTURE_2D,
+                            0,
+                            gl.DEPTH_COMPONENT16,
+                            gl.DEPTH_COMPONENT,
+                            gl.UNSIGNED_SHORT,
+                            this.img
+                        );
                         // } else {
                         //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
                     }
@@ -252,7 +281,7 @@ export class Texture extends GLObject {
                 break;
 
             default:
-                throw "[Texture.constructor] invalid type";
+                throw '[Texture.constructor] invalid type';
         }
 
         // TODO: あった方がよい？
@@ -284,9 +313,29 @@ export class Texture extends GLObject {
             case TextureTypes.Depth:
                 // 1: use 16bit
                 if (this.img) {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, this.img);
+                    gl.texImage2D(
+                        gl.TEXTURE_2D,
+                        0,
+                        gl.DEPTH_COMPONENT16,
+                        width,
+                        height,
+                        0,
+                        gl.DEPTH_COMPONENT,
+                        gl.UNSIGNED_SHORT,
+                        this.img
+                    );
                 } else {
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT16, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
+                    gl.texImage2D(
+                        gl.TEXTURE_2D,
+                        0,
+                        gl.DEPTH_COMPONENT16,
+                        width,
+                        height,
+                        0,
+                        gl.DEPTH_COMPONENT,
+                        gl.UNSIGNED_SHORT,
+                        null
+                    );
                 }
                 // 2: use 32bit
                 // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this.img);
@@ -309,13 +358,13 @@ export class Texture extends GLObject {
                 break;
 
             default:
-                throw "[Texture.setSize] invalid type";
+                throw '[Texture.setSize] invalid type';
         }
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    update({width, height, data}: { width: number, height: number, data: ArrayBufferView }) {
+    update({ width, height, data }: { width: number; height: number; data: ArrayBufferView }) {
         this.width = width;
         this.height = height;
 
@@ -340,7 +389,7 @@ export class Texture extends GLObject {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
                 break;
             default:
-                throw "[Texture.update] invalid type";
+                throw '[Texture.update] invalid type';
         }
 
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -351,11 +400,14 @@ export class Texture extends GLObject {
             gpu: this.gpu,
             img: this.img,
             type: this.type,
-            width: this.width, height: this.height,
+            width: this.width,
+            height: this.height,
             mipmap: this.mipmap,
-            minFilter: this.minFilter, magFilter: this.magFilter,
-            wrapS: this.wrapS, wrapT: this.wrapT,
-            flipY: this.flipY
+            minFilter: this.minFilter,
+            magFilter: this.magFilter,
+            wrapS: this.wrapS,
+            wrapT: this.wrapT,
+            flipY: this.flipY,
         });
     }
 }

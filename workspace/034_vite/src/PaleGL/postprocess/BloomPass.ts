@@ -1,23 +1,23 @@
-﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
-import {UniformNames, UniformTypes} from "@/PaleGL/constants";
-import {IPostProcessPass, PostProcessRenderArgs} from "@/PaleGL/postprocess/AbstractPostProcessPass";
-import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass";
-import {gaussianBlurFragmentShader} from "@/PaleGL/shaders/gaussianBlurShader";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
+import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
-import {Material} from "@/PaleGL/materials/Material";
-import {getGaussianBlurWeights} from "@/PaleGL/utilities/gaussialBlurUtilities";
-import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Camera} from "@/PaleGL/actors/Camera";
-import {Renderer} from "@/PaleGL/core/Renderer";
+import { Material } from '@/PaleGL/materials/Material';
+import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Camera } from '@/PaleGL/actors/Camera';
+import { Renderer } from '@/PaleGL/core/Renderer';
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
 // export class BloomPass extends AbstractPostProcessPass {
 export class BloomPass implements IPostProcessPass {
     // gpu: GPU;
-    name: string = "BloomPass";
+    name: string = 'BloomPass';
     enabled: boolean = false;
     width: number = 1;
     height: number = 1;
@@ -55,11 +55,16 @@ export class BloomPass implements IPostProcessPass {
     }
 
     constructor({
-                    gpu,
-                    threshold = 0.8,
-                    tone = 1,
-                    bloomAmount = 1
-                }: { gpu: GPU, threshold?: number, tone?: number, bloomAmount?: number }) {
+        gpu,
+        threshold = 0.8,
+        tone = 1,
+        bloomAmount = 1,
+    }: {
+        gpu: GPU;
+        threshold?: number;
+        tone?: number;
+        bloomAmount?: number;
+    }) {
         // super();
 
         // this.gpu = gpu;
@@ -69,18 +74,18 @@ export class BloomPass implements IPostProcessPass {
         this.bloomAmount = bloomAmount;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({gpu});
+        this.geometry = new PlaneGeometry({ gpu });
 
         // tmp
         // this.renderTargetExtractBrightness = new RenderTarget({gpu});
-        this.renderTargetBlurMip4_Horizontal = new RenderTarget({gpu})
-        this.renderTargetBlurMip4_Vertical = new RenderTarget({gpu})
-        this.renderTargetBlurMip8_Horizontal = new RenderTarget({gpu})
-        this.renderTargetBlurMip8_Vertical = new RenderTarget({gpu})
-        this.renderTargetBlurMip16_Horizontal = new RenderTarget({gpu})
-        this.renderTargetBlurMip16_Vertical = new RenderTarget({gpu})
-        this.renderTargetBlurMip32_Horizontal = new RenderTarget({gpu})
-        this.renderTargetBlurMip32_Vertical = new RenderTarget({gpu})
+        this.renderTargetBlurMip4_Horizontal = new RenderTarget({ gpu });
+        this.renderTargetBlurMip4_Vertical = new RenderTarget({ gpu });
+        this.renderTargetBlurMip8_Horizontal = new RenderTarget({ gpu });
+        this.renderTargetBlurMip8_Vertical = new RenderTarget({ gpu });
+        this.renderTargetBlurMip16_Horizontal = new RenderTarget({ gpu });
+        this.renderTargetBlurMip16_Vertical = new RenderTarget({ gpu });
+        this.renderTargetBlurMip32_Horizontal = new RenderTarget({ gpu });
+        this.renderTargetBlurMip32_Vertical = new RenderTarget({ gpu });
 
         // const copyPass = new CopyPass({ gpu });
         // this.#passes.push(copyPass);
@@ -120,9 +125,9 @@ void main() {
             uniforms: {
                 uThreshold: {
                     type: UniformTypes.Float,
-                    value: this.threshold
+                    value: this.threshold,
                 },
-            }
+            },
         });
 
         // 可変でもよい
@@ -134,12 +139,14 @@ void main() {
             // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: true,
+                pixelNum: blurPixelNum,
+                srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -151,20 +158,22 @@ void main() {
                 },
                 uBlurWeights: {
                     type: UniformTypes.FloatArray,
-                    value: new Float32Array(blurWeights)
+                    value: new Float32Array(blurWeights),
                 },
-            }
+            },
         });
         this.verticalBlurMaterial = new Material({
             // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
+                isHorizontal: false,
+                pixelNum: blurPixelNum,
+                srcTextureUniformName: UniformNames.SceneTexture,
             }),
             uniforms: {
                 [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -176,9 +185,9 @@ void main() {
                 },
                 uBlurWeights: {
                     type: UniformTypes.FloatArray,
-                    value: new Float32Array(blurWeights)
+                    value: new Float32Array(blurWeights),
                 },
-            }
+            },
         });
 
         // tmp
@@ -261,23 +270,23 @@ void main() {
             uniforms: {
                 [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uBlur4Texture: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uBlur8Texture: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uBlur16Texture: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uBlur32Texture: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 uTone: {
                     type: UniformTypes.Float,
@@ -285,9 +294,9 @@ void main() {
                 },
                 uBloomAmount: {
                     type: UniformTypes.Float,
-                    value: this.bloomAmount
-                }
-            }
+                    value: this.bloomAmount,
+                },
+            },
         });
     }
 
@@ -313,54 +322,62 @@ void main() {
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
-    render({gpu, camera, renderer, prevRenderTarget, isLastPass}: PostProcessRenderArgs) {
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs) {
         // 一回だけ呼びたい
         this.geometry.start();
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
 
         if (!this.horizontalBlurMaterial.isCompiledShader) {
-            this.horizontalBlurMaterial.start({gpu, attributeDescriptors: this.geometry.getAttributeDescriptors()});
+            this.horizontalBlurMaterial.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
         if (!this.verticalBlurMaterial.isCompiledShader) {
-            this.verticalBlurMaterial.start({gpu, attributeDescriptors: this.geometry.getAttributeDescriptors()});
+            this.verticalBlurMaterial.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
-        this.extractBrightnessPass.material.updateUniform("uThreshold", this.threshold);
-        this.extractBrightnessPass.render({gpu, camera, renderer, prevRenderTarget, isLastPass: false});
+        this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
+        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false });
 
         // for debug
         // this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
         // return;
 
-        const renderBlur = (horizontalRenderTarget: RenderTarget, verticalRenderTarget: RenderTarget, downSize: number) => {
+        const renderBlur = (
+            horizontalRenderTarget: RenderTarget,
+            verticalRenderTarget: RenderTarget,
+            downSize: number
+        ) => {
             const w = this.#width / downSize;
             const h = this.#height / downSize;
 
             renderer.setRenderTarget(horizontalRenderTarget);
-            renderer.clear(0, 0, 0, 1)
+            renderer.clear(0, 0, 0, 1);
             // this.horizontalBlurMaterial.uniforms[UniformNames.SceneTexture].value = this.extractBrightnessPass.renderTarget.texture;
             // this.horizontalBlurMaterial.uniforms.uTargetWidth.value = w;
             // this.horizontalBlurMaterial.uniforms.uTargetHeight.value = h;
-            this.horizontalBlurMaterial.updateUniform(UniformNames.SceneTexture, this.extractBrightnessPass.renderTarget.texture);
-            this.horizontalBlurMaterial.updateUniform("uTargetWidth", w);
-            this.horizontalBlurMaterial.updateUniform("uTargetHeight", w);
+            this.horizontalBlurMaterial.updateUniform(
+                UniformNames.SceneTexture,
+                this.extractBrightnessPass.renderTarget.texture
+            );
+            this.horizontalBlurMaterial.updateUniform('uTargetWidth', w);
+            this.horizontalBlurMaterial.updateUniform('uTargetHeight', w);
             renderer.renderMesh(this.geometry, this.horizontalBlurMaterial);
 
             renderer.setRenderTarget(verticalRenderTarget);
-            renderer.clear(0, 0, 0, 1)
-            // this.verticalBlurMaterial.uniforms[UniformNames.SceneTexture].value = horizontalRenderTarget.texture; 
+            renderer.clear(0, 0, 0, 1);
+            // this.verticalBlurMaterial.uniforms[UniformNames.SceneTexture].value = horizontalRenderTarget.texture;
             // this.verticalBlurMaterial.uniforms.uTargetWidth.value = w;
             // this.verticalBlurMaterial.uniforms.uTargetHeight.value = h;
             this.verticalBlurMaterial.updateUniform(UniformNames.SceneTexture, horizontalRenderTarget.texture);
-            this.verticalBlurMaterial.updateUniform("uTargetWidth", w);
-            this.verticalBlurMaterial.updateUniform("uTargetHeight", h);
+            this.verticalBlurMaterial.updateUniform('uTargetWidth', w);
+            this.verticalBlurMaterial.updateUniform('uTargetHeight', h);
             renderer.renderMesh(this.geometry, this.verticalBlurMaterial);
-        }
+        };
 
         // // for debug
         // renderBlur(this.renderTargetBlurMip4_Horizontal, this.renderTargetBlurMip4_Vertical, 4);
@@ -383,19 +400,19 @@ void main() {
         // this.compositePass.material.uniforms.uTone.value = this.tone;
         // this.compositePass.material.uniforms.uBloomAmount.value = this.bloomAmount;
         this.compositePass.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
-        this.compositePass.material.updateUniform("uBlur4Texture", this.renderTargetBlurMip4_Vertical.texture);
-        this.compositePass.material.updateUniform("uBlur8Texture", this.renderTargetBlurMip8_Vertical.texture);
-        this.compositePass.material.updateUniform("uBlur16Texture", this.renderTargetBlurMip16_Vertical.texture);
-        this.compositePass.material.updateUniform("uBlur32Texture", this.renderTargetBlurMip32_Vertical.texture);
-        this.compositePass.material.updateUniform("uTone", this.tone);
-        this.compositePass.material.updateUniform("uBloomAmount", this.bloomAmount);
+        this.compositePass.material.updateUniform('uBlur4Texture', this.renderTargetBlurMip4_Vertical.texture);
+        this.compositePass.material.updateUniform('uBlur8Texture', this.renderTargetBlurMip8_Vertical.texture);
+        this.compositePass.material.updateUniform('uBlur16Texture', this.renderTargetBlurMip16_Vertical.texture);
+        this.compositePass.material.updateUniform('uBlur32Texture', this.renderTargetBlurMip32_Vertical.texture);
+        this.compositePass.material.updateUniform('uTone', this.tone);
+        this.compositePass.material.updateUniform('uBloomAmount', this.bloomAmount);
 
         this.compositePass.render({
             gpu,
             camera,
             renderer,
             prevRenderTarget: null,
-            isLastPass
+            isLastPass,
         });
     }
 }

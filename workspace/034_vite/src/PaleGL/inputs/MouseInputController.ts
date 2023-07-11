@@ -1,24 +1,24 @@
-import {AbstractInputController} from "@/PaleGL/inputs/AbstractInputController";
-import {Vector2} from "@/PaleGL/math/Vector2";
+import { AbstractInputController } from '@/PaleGL/inputs/AbstractInputController';
+import { Vector2 } from '@/PaleGL/math/Vector2';
 
 export class MouseInputController extends AbstractInputController {
     #tmpIsDown = false;
     #tmpInputPosition = Vector2.zero;
-    
+
     constructor() {
         super();
     }
-    
+
     start() {
         window.addEventListener('mousedown', this.#onMouseDown.bind(this));
         window.addEventListener('mousemove', this.#onMouseMove.bind(this));
         window.addEventListener('mouseup', this.#onMouseUp.bind(this));
     }
-    
+
     fixedUpdate() {
         this.updateInternal({
             inputPosition: this.#tmpInputPosition,
-            isDown: this.#tmpIsDown
+            isDown: this.#tmpIsDown,
         });
     }
 

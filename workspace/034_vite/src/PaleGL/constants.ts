@@ -1,129 +1,129 @@
 ﻿export const PrimitiveTypes = {
-    Points: "Points",
-    Lines: "Lines",
-    LineLoop: "LineLoop",
-    LineStrip: "LineStrip",
-    Triangles: "Triangles",
-    TriangleStrip: "TriangleStrip",
-    TriangleFan: "TriangleFan",
+    Points: 'Points',
+    Lines: 'Lines',
+    LineLoop: 'LineLoop',
+    LineStrip: 'LineStrip',
+    Triangles: 'Triangles',
+    TriangleStrip: 'TriangleStrip',
+    TriangleFan: 'TriangleFan',
 } as const;
 
-export type PrimitiveType = typeof PrimitiveTypes[keyof typeof PrimitiveTypes];
+export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
 
 export const UniformTypes = {
-    Matrix4: "Matrix4",
-    Matrix4Array: "Matrix4Array",
-    Texture: "Texture",
-    CubeMap: "CubeMap",
-    Vector2: "Vector2",
-    Vector2Array: "Vector2Array",
-    Vector3: "Vector3",
-    Struct: "Struct",
-    Float: "Float",
-    FloatArray: "FloatArray",
-    Int: "Int",
-    Color: "Color",
-    ColorArray: "ColorArray",
+    Matrix4: 'Matrix4',
+    Matrix4Array: 'Matrix4Array',
+    Texture: 'Texture',
+    CubeMap: 'CubeMap',
+    Vector2: 'Vector2',
+    Vector2Array: 'Vector2Array',
+    Vector3: 'Vector3',
+    Struct: 'Struct',
+    Float: 'Float',
+    FloatArray: 'FloatArray',
+    Int: 'Int',
+    Color: 'Color',
+    ColorArray: 'ColorArray',
 } as const;
 
-export type UniformType = typeof UniformTypes[keyof typeof UniformTypes];
+export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
 
 export const TextureTypes = {
-    RGBA: "RGBA",
-    Depth: "Depth",
-    RGBA16F: "RGBA16F",
-    RGBA32F: "RGBA32F"
+    RGBA: 'RGBA',
+    Depth: 'Depth',
+    RGBA16F: 'RGBA16F',
+    RGBA32F: 'RGBA32F',
 } as const;
 
-export type TextureType = typeof TextureTypes[keyof typeof TextureTypes];
+export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
 
 export const TextureWrapTypes = {
-    Repeat: "Repeat",
-    ClampToEdge: "ClampToEdge",
+    Repeat: 'Repeat',
+    ClampToEdge: 'ClampToEdge',
 } as const;
 
-export type TextureWrapType = typeof TextureWrapTypes[keyof typeof TextureWrapTypes];
+export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
 
 export const TextureFilterTypes = {
-    Nearest: "Nearest", // min, mag
-    Linear: "Linear", // min, mag
-    NearestMipmapNearest: "NearestMipmapNearest", // only min filter
-    NearestMipmapLinear: "NearestMipmapLinear", // only min filter,
-    LinearMipmapNearest: "LinearMipmapNearest", // only min filter
-    LinearMipmapLinear: "LinearMipmapLinear", // only min filter
+    Nearest: 'Nearest', // min, mag
+    Linear: 'Linear', // min, mag
+    NearestMipmapNearest: 'NearestMipmapNearest', // only min filter
+    NearestMipmapLinear: 'NearestMipmapLinear', // only min filter,
+    LinearMipmapNearest: 'LinearMipmapNearest', // only min filter
+    LinearMipmapLinear: 'LinearMipmapLinear', // only min filter
 } as const;
 
-export type TextureFilterType = typeof TextureFilterTypes[keyof typeof TextureFilterTypes];
+export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
 
 export const BlendTypes = {
-    Opaque: "Opaque",
-    Transparent: "Transparent",
-    Additive: "Additive",
+    Opaque: 'Opaque',
+    Transparent: 'Transparent',
+    Additive: 'Additive',
 } as const;
 
-export type BlendType = typeof BlendTypes[keyof typeof BlendTypes];
+export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
 
 export const RenderQueueType = {
-    Skybox: "Skybox",
-    Opaque: "Opaque",
-    AlphaTest: "AlphaTest",
-    Transparent: "Transparent",
+    Skybox: 'Skybox',
+    Opaque: 'Opaque',
+    AlphaTest: 'AlphaTest',
+    Transparent: 'Transparent',
 } as const;
 
-export type RenderQueueType = typeof RenderQueueType[keyof typeof RenderQueueType];
+export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
 
 export const RenderQueues = {
     [RenderQueueType.Skybox]: 1,
     [RenderQueueType.Opaque]: 2,
     [RenderQueueType.AlphaTest]: 3,
-    [RenderQueueType.Transparent]: 4
+    [RenderQueueType.Transparent]: 4,
 } as const;
 
-export type RenderQueue = typeof RenderQueues[keyof typeof RenderQueues];
+export type RenderQueue = (typeof RenderQueues)[keyof typeof RenderQueues];
 
 export const RenderbufferTypes = {
-    Depth: "Depth",
+    Depth: 'Depth',
 } as const;
 
-export type RenderbufferType = typeof RenderbufferTypes[keyof typeof RenderbufferTypes];
+export type RenderbufferType = (typeof RenderbufferTypes)[keyof typeof RenderbufferTypes];
 
 export const ActorTypes = {
-    Null: "Null",
-    Mesh: "Mesh",
-    SkinnedMesh: "SkinnedMesh",
-    Light: "Light",
-    Skybox: "Skybox",
-    Camera: "Camera",
+    Null: 'Null',
+    Mesh: 'Mesh',
+    SkinnedMesh: 'SkinnedMesh',
+    Light: 'Light',
+    Skybox: 'Skybox',
+    Camera: 'Camera',
 } as const;
 
-export type ActorType = typeof ActorTypes[keyof typeof ActorTypes];
+export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
 
 export const CubeMapAxis = {
-    PositiveX: "PositiveX",
-    NegativeX: "NegativeX",
-    PositiveY: "PositiveY",
-    NegativeY: "NegativeY",
-    PositiveZ: "PositiveZ",
-    NegativeZ: "NegativeZ",
+    PositiveX: 'PositiveX',
+    NegativeX: 'NegativeX',
+    PositiveY: 'PositiveY',
+    NegativeY: 'NegativeY',
+    PositiveZ: 'PositiveZ',
+    NegativeZ: 'NegativeZ',
 } as const;
 
-export type CubeMapAxis = typeof CubeMapAxis[keyof typeof CubeMapAxis];
+export type CubeMapAxis = (typeof CubeMapAxis)[keyof typeof CubeMapAxis];
 
 export const FaceSide = {
-    Front: "Front",
-    Back: "Back",
-    Double: "Double"
+    Front: 'Front',
+    Back: 'Back',
+    Double: 'Double',
 } as const;
 
-export type FaceSide = typeof FaceSide[keyof typeof FaceSide];
+export type FaceSide = (typeof FaceSide)[keyof typeof FaceSide];
 
 // TODO: rename Type"s"
 export const AttributeUsageType = {
-    StaticDraw: "StaticDraw",
-    DynamicDraw: "DynamicDraw"
+    StaticDraw: 'StaticDraw',
+    DynamicDraw: 'DynamicDraw',
 } as const;
 
-export type AttributeUsageType = typeof AttributeUsageType[keyof typeof AttributeUsageType];
+export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
 
 // export type AttributeUsageType =
 // {
@@ -132,85 +132,85 @@ export type AttributeUsageType = typeof AttributeUsageType[keyof typeof Attribut
 // }
 
 export const RenderTargetTypes = {
-    RGBA: "RGBA",
-    Depth: "Depth",
-    Empty: "Empty",
+    RGBA: 'RGBA',
+    Depth: 'Depth',
+    Empty: 'Empty',
 } as const;
 
-export type RenderTargetType = typeof RenderTargetTypes[keyof typeof RenderTargetTypes];
+export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTargetTypes];
 
 export const AnimationKeyframeTypes = {
-    Vector3: "Vector3",
-    Quaternion: "Quaternion"
+    Vector3: 'Vector3',
+    Quaternion: 'Quaternion',
 } as const;
 
-export type AnimationKeyframeType = typeof AnimationKeyframeTypes[keyof typeof AnimationKeyframeTypes];
+export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof AnimationKeyframeTypes];
 
 export const AttributeNames = {
-    Position: "aPosition",
-    Color: "aColor",
-    Uv: "aUv",
-    Normal: "aNormal",
-    Tangent: "aTangent",
-    Binormal: "aBinormal",
+    Position: 'aPosition',
+    Color: 'aColor',
+    Uv: 'aUv',
+    Normal: 'aNormal',
+    Tangent: 'aTangent',
+    Binormal: 'aBinormal',
     // skinning
-    BoneIndices: "aBoneIndices",
-    BoneWeights: "aBoneWeighs",
+    BoneIndices: 'aBoneIndices',
+    BoneWeights: 'aBoneWeighs',
     // instancing
-    InstancePosition: "aInstancePosition",
-    InstanceScale: "aInstanceScale",
-    InstanceAnimationOffset: "aInstanceAnimationOffset",
-    InstanceVertexColor: "aInstanceVertexColor"
+    InstancePosition: 'aInstancePosition',
+    InstanceScale: 'aInstanceScale',
+    InstanceAnimationOffset: 'aInstanceAnimationOffset',
+    InstanceVertexColor: 'aInstanceVertexColor',
 } as const;
 
-export type AttributeName = typeof AttributeNames[keyof typeof AttributeNames];
+export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
 
 export const UniformNames = {
     // base
-    WorldMatrix: "uWorldMatrix",
-    ViewMatrix: "uViewMatrix",
-    ProjectionMatrix: "uProjectionMatrix",
-    NormalMatrix: "uNormalMatrix",
-    ViewPosition: "uViewPosition",
+    WorldMatrix: 'uWorldMatrix',
+    ViewMatrix: 'uViewMatrix',
+    ProjectionMatrix: 'uProjectionMatrix',
+    NormalMatrix: 'uNormalMatrix',
+    ViewPosition: 'uViewPosition',
     // skinning
-    JointMatrices: "uJointMatrices",
-    JointTexture: "uJointTexture",
+    JointMatrices: 'uJointMatrices',
+    JointTexture: 'uJointTexture',
     // shadow map
-    ShadowMap: "uShadowMap",
-    ShadowMapProjectionMatrix: "uShadowMapProjectionMatrix",
-    ShadowBias: "uShadowBias",
+    ShadowMap: 'uShadowMap',
+    ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
+    ShadowBias: 'uShadowBias',
     // post process
-    SceneTexture: "uSceneTexture",
+    SceneTexture: 'uSceneTexture',
     // time
-    Time: "uTime"
+    Time: 'uTime',
 } as const;
 
-export type UniformName = typeof UniformNames[keyof typeof UniformNames];
+export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
 export const CameraTypes = {
-    Perspective: "Perspective",
-    Orthographic: "Orthographic"
+    Perspective: 'Perspective',
+    Orthographic: 'Orthographic',
 } as const;
 
-export type CameraType = typeof CameraTypes[keyof typeof CameraTypes];
+export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
 
 export const GLColorAttachment = {
-    COLOR_ATTACHMENT0: 36064, // gl.COLOR_ATTACHMENT0 + 0 
-    COLOR_ATTACHMENT1: 36065, // gl.COLOR_ATTACHMENT0 + 1 
-    COLOR_ATTACHMENT2: 36066, // gl.COLOR_ATTACHMENT0 + 2 
-    COLOR_ATTACHMENT3: 36067, // gl.COLOR_ATTACHMENT0 + 3 
-    COLOR_ATTACHMENT4: 36068, // gl.COLOR_ATTACHMENT0 + 4 
-    COLOR_ATTACHMENT5: 36069, // gl.COLOR_ATTACHMENT0 + 5 
-    COLOR_ATTACHMENT6: 36070, // gl.COLOR_ATTACHMENT0 + 6 
-    COLOR_ATTACHMENT7: 36071, // gl.COLOR_ATTACHMENT0 + 7 
+    COLOR_ATTACHMENT0: 36064, // gl.COLOR_ATTACHMENT0 + 0
+    COLOR_ATTACHMENT1: 36065, // gl.COLOR_ATTACHMENT0 + 1
+    COLOR_ATTACHMENT2: 36066, // gl.COLOR_ATTACHMENT0 + 2
+    COLOR_ATTACHMENT3: 36067, // gl.COLOR_ATTACHMENT0 + 3
+    COLOR_ATTACHMENT4: 36068, // gl.COLOR_ATTACHMENT0 + 4
+    COLOR_ATTACHMENT5: 36069, // gl.COLOR_ATTACHMENT0 + 5
+    COLOR_ATTACHMENT6: 36070, // gl.COLOR_ATTACHMENT0 + 6
+    COLOR_ATTACHMENT7: 36071, // gl.COLOR_ATTACHMENT0 + 7
 } as const;
 
 export type GLColorAttachment =
-    36064 // gl.COLOR_ATTACHMENT0 + 0 
+    | 36064 // gl.COLOR_ATTACHMENT0 + 0
     | 36065 // gl.COLOR_ATTACHMENT0 + 1
     | 36066 // gl.COLOR_ATTACHMENT0 + 2
     | 36067 // gl.COLOR_ATTACHMENT0 + 3
     | 36068 // gl.COLOR_ATTACHMENT0 + 4
     | 36069 // gl.COLOR_ATTACHMENT0 + 5
     | 36070 // gl.COLOR_ATTACHMENT0 + 6
-    | 36071 // gl.COLOR_ATTACHMENT0 + 7
+    | 36071; // gl.COLOR_ATTACHMENT0 + 7

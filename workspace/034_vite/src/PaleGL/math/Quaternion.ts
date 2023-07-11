@@ -1,11 +1,10 @@
-
 export class Quaternion {
     elements: Float32Array = new Float32Array(4);
-    
-    get x () {
+
+    get x() {
         return this.elements[0];
     }
-    
+
     get y() {
         return this.elements[1];
     }
@@ -21,7 +20,7 @@ export class Quaternion {
     constructor(x: number, y: number, z: number, w: number) {
         this.set(x, y, z, w);
     }
-    
+
     set(x: number, y: number, z: number, w: number) {
         this.elements = new Float32Array([x, y, z, w]);
         return this;
@@ -39,24 +38,24 @@ export class Quaternion {
 
         return {
             // X-axis rotation
-            x: (Math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y))),
+            x: Math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y)),
             // Y-axis rotation
-            y: (t >= 1 ? Math.PI / 2 : (t <= -1 ? -Math.PI / 2 : Math.asin(t))),
+            y: t >= 1 ? Math.PI / 2 : t <= -1 ? -Math.PI / 2 : Math.asin(t),
             // Z-axis rotation
-            z: (Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+            z: Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)),
         };
     }
-    
+
     // degree
     toEulerDegree() {
         const rad = this.toEulerRadian();
         return {
-            x: rad.x * 180 / Math.PI,
-            y: rad.y * 180 / Math.PI,
-            z: rad.z * 180 / Math.PI,
+            x: (rad.x * 180) / Math.PI,
+            y: (rad.y * 180) / Math.PI,
+            z: (rad.z * 180) / Math.PI,
         };
     }
-    
+
     static identity() {
         return new Quaternion(0, 0, 0, 1);
     }

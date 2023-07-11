@@ -1,5 +1,5 @@
-import {AttributeNames} from "@/PaleGL/constants";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
+import { AttributeNames } from '@/PaleGL/constants';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
 
 export class Stats {
     domElement;
@@ -7,10 +7,10 @@ export class Stats {
     drawCallCountView;
     drawVertexCount = 0;
     drawCallCount = 0;
-    
-    constructor(args: { wrapperElement?: HTMLElement} = {}) {
+
+    constructor(args: { wrapperElement?: HTMLElement } = {}) {
         const { wrapperElement } = args;
-        this.domElement = document.createElement("div");
+        this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
 position: absolute;
 top: 0;
@@ -22,12 +22,12 @@ font-weight: bold;
 text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 `;
 
-        this.drawVertexCountView = document.createElement("p");
+        this.drawVertexCountView = document.createElement('p');
         this.domElement.appendChild(this.drawVertexCountView);
-        
-        this.drawCallCountView = document.createElement("p");
+
+        this.drawCallCountView = document.createElement('p');
         this.domElement.appendChild(this.drawCallCountView);
-        
+
         (wrapperElement || document.body).appendChild(this.domElement);
     }
 
@@ -38,16 +38,16 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 
     addDrawVertexCount(geometry: Geometry) {
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
-        if(!positionAttribute) {
+        if (!positionAttribute) {
             return;
         }
         this.drawVertexCount += positionAttribute.data.length / 3;
     }
-    
+
     incrementDrawCall() {
         this.drawCallCount++;
     }
-    
+
     updateView() {
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;

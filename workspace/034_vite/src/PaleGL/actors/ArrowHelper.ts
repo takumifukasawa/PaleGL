@@ -1,11 +1,11 @@
-import {Mesh} from "@/PaleGL/actors/Mesh";
-import {Material} from "@/PaleGL/materials/Material";
-import {parseObj} from "@/PaleGL/loaders/loadObj";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
-import {AttributeNames, UniformNames} from "@/PaleGL/constants";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Attribute} from "@/PaleGL/core/Attribute";
-import {Vector3} from "@/PaleGL/math/Vector3";
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { Material } from '@/PaleGL/materials/Material';
+import { parseObj } from '@/PaleGL/loaders/loadObj';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { AttributeNames, UniformNames } from '@/PaleGL/constants';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { Vector3 } from '@/PaleGL/math/Vector3';
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -162,27 +162,27 @@ f 8/26/15 17/48/15 16/46/15
 f 11/33/16 19/52/16 17/49/16
 f 9/28/17 18/51/17 19/52/17
 f 23/56/18 22/55/18 20/53/18
-`
+`;
 
 export class ArrowHelper extends Mesh {
-    constructor({gpu}: { gpu: GPU }) {
+    constructor({ gpu }: { gpu: GPU }) {
         const objData = parseObj(arrowHelperGeometryData);
         const geometry = new Geometry({
             gpu,
             attributes: [
                 new Attribute({
-                    name: "position",
+                    name: 'position',
                     data: new Float32Array(objData.positions),
-                    size: 3
+                    size: 3,
                 }),
                 new Attribute({
-                    name: "uv",
+                    name: 'uv',
                     data: new Float32Array(objData.uvs),
-                    size: 2
-                })
+                    size: 2,
+                }),
             ],
             indices: objData.indices,
-            drawCount: objData.indices.length
+            drawCount: objData.indices.length,
         });
         // const geometry = new ArrowGeometry({ gpu });
         const material = new Material({
@@ -212,9 +212,9 @@ export class ArrowHelper extends Mesh {
                 }
                 outColor = vec4(color, 1.);
             }
-            `
+            `,
         });
-        super({geometry, material});
+        super({ geometry, material });
     }
 
     // setPosition(p) {
@@ -224,5 +224,4 @@ export class ArrowHelper extends Mesh {
     setDirection(p: Vector3) {
         this.transform.lookAt(p);
     }
-
 }

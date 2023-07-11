@@ -1,4 +1,3 @@
-
 type Callback = (lastTime: number, interval: number) => void;
 
 export class TimeAccumulator {
@@ -8,7 +7,7 @@ export class TimeAccumulator {
     private lastTime: number = -Infinity;
 
     /**
-     * 
+     *
      * @param targetFPS
      * @param callback
      * @param maxChaseCount
@@ -28,18 +27,18 @@ export class TimeAccumulator {
     }
 
     /**
-     * 
+     *
      * @param time [sec]
      */
     exec(time: number) {
         const interval = 1 / this.targetFPS;
 
-        if ((time - interval) >= this.lastTime) {
+        if (time - interval >= this.lastTime) {
             const elapsedTime = time - this.lastTime;
             const n = Math.floor(elapsedTime / interval);
 
             if (n > this.maxChaseCount) {
-                console.warn("[TimeAccumulator.exec] jump frame");
+                console.warn('[TimeAccumulator.exec] jump frame');
                 this.lastTime += interval * n;
                 this.callback(this.lastTime, interval);
                 return;

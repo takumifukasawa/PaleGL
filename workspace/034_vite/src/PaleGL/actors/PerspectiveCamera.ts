@@ -1,13 +1,13 @@
-﻿import {Camera} from "@/PaleGL/actors/Camera";
-import {Matrix4} from "@/PaleGL/math/Matrix4.js";
-import {CameraTypes} from "@/PaleGL/constants";
+﻿import { Camera } from '@/PaleGL/actors/Camera';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
+import { CameraTypes } from '@/PaleGL/constants';
 
 export class PerspectiveCamera extends Camera {
     fov: number;
     aspect: number = 1;
 
     constructor(fov: number, aspect: number, near: number, far: number) {
-        super({cameraType: CameraTypes.Perspective});
+        super({ cameraType: CameraTypes.Perspective });
         this.fov = fov;
         this.aspect = aspect; // TODO: setSizeを呼ぶ必要がある
         this.near = near;
@@ -17,10 +17,10 @@ export class PerspectiveCamera extends Camera {
         this.setPerspectiveSize(aspect);
         // TODO: set width
     }
-    
+
     setPerspectiveSize(aspect: number) {
         this.aspect = aspect;
-        this.#updateProjectionMatrix();
+        this.updateProjectionMatrix();
         // this.setSize(width, height);
     }
 
@@ -31,8 +31,13 @@ export class PerspectiveCamera extends Camera {
         // this.#updateProjectionMatrix();
     }
 
-    #updateProjectionMatrix() {
-        this.projectionMatrix = Matrix4.getPerspectiveMatrix(this.fov * Math.PI / 180, this.aspect, this.near, this.far);
+    updateProjectionMatrix() {
+        this.projectionMatrix = Matrix4.getPerspectiveMatrix(
+            (this.fov * Math.PI) / 180,
+            this.aspect,
+            this.near,
+            this.far
+        );
     }
 
     // afterUpdatedTransform() {

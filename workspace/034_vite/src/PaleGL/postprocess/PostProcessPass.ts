@@ -1,13 +1,12 @@
-﻿import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
-import {Material, Uniforms} from "@/PaleGL/materials/Material";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget";
-import {Mesh} from "@/PaleGL/actors/Mesh";
-import {AttributeNames, PrimitiveTypes, UniformNames, UniformTypes} from "@/PaleGL/constants";
-import {IPostProcessPass} from "@/PaleGL/postprocess/AbstractPostProcessPass";
-import {Renderer} from "@/PaleGL/core/Renderer";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Camera} from "@/PaleGL/actors/Camera";
-
+﻿import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { Material, Uniforms } from '@/PaleGL/materials/Material';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { AttributeNames, PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { IPostProcessPass } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import { Renderer } from '@/PaleGL/core/Renderer';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Camera } from '@/PaleGL/actors/Camera';
 
 // export class PostProcessPass extends AbstractPostProcessPass {
 export class PostProcessPass implements IPostProcessPass {
@@ -20,7 +19,7 @@ export class PostProcessPass implements IPostProcessPass {
     mesh: Mesh;
     geometry: PlaneGeometry;
     material: Material;
-    renderTarget: RenderTarget
+    renderTarget: RenderTarget;
 
     static get baseVertexShader() {
         return `#version 300 es
@@ -37,12 +36,18 @@ void main() {
 `;
     }
 
-    constructor({gpu, vertexShader, fragmentShader, uniforms, name = ""}: {
-        gpu: GPU,
-        vertexShader?: string,
-        fragmentShader: string,
-        uniforms?: Uniforms,
-        name?: string
+    constructor({
+        gpu,
+        vertexShader,
+        fragmentShader,
+        uniforms,
+        name = '',
+    }: {
+        gpu: GPU;
+        vertexShader?: string;
+        fragmentShader: string;
+        uniforms?: Uniforms;
+        name?: string;
     }) {
         // super({name});
         this.name = name;
@@ -51,7 +56,7 @@ void main() {
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({gpu});
+        this.geometry = new PlaneGeometry({ gpu });
         this.material = new Material({
             // gpu,
             vertexShader,
@@ -60,22 +65,22 @@ void main() {
                 ...uniforms,
                 [UniformNames.SceneTexture]: {
                     type: UniformTypes.Texture,
-                    value: null
-                }
+                    value: null,
+                },
             },
-            primitiveType: PrimitiveTypes.Triangles
+            primitiveType: PrimitiveTypes.Triangles,
         });
 
         // TODO: mesh生成しなくていい気がする
         this.mesh = new Mesh({
             geometry: this.geometry,
-            material: this.material
+            material: this.material,
         });
 
         this.renderTarget = new RenderTarget({
             gpu,
             width: 1,
-            height: 1
+            height: 1,
         });
     }
 
@@ -94,12 +99,18 @@ void main() {
     }
 
     // TODO: rename "prevRenderTarget"
-    render({gpu, camera, renderer, prevRenderTarget, isLastPass}: {
-        gpu: GPU,
-        camera: Camera,
-        renderer: Renderer,
-        prevRenderTarget: RenderTarget | null,
-        isLastPass: boolean
+    render({
+        gpu,
+        camera,
+        renderer,
+        prevRenderTarget,
+        isLastPass,
+    }: {
+        gpu: GPU;
+        camera: Camera;
+        renderer: Renderer;
+        prevRenderTarget: RenderTarget | null;
+        isLastPass: boolean;
     }) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
@@ -121,7 +132,7 @@ void main() {
         }
 
         if (!this.material.isCompiledShader) {
-            this.material.start({gpu, attributeDescriptors: []})
+            this.material.start({ gpu, attributeDescriptors: [] });
         }
 
         renderer.renderMesh(this.geometry, this.material);

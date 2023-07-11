@@ -1,7 +1,7 @@
 export class AbstractRenderTarget {
     isSwappable: boolean; // bool
 
-    constructor({isSwappable = false}: { isSwappable: boolean } = {isSwappable: false}) {
+    constructor({ isSwappable = false }: { isSwappable: boolean } = { isSwappable: false }) {
         this.isSwappable = isSwappable;
     }
 

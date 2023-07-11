@@ -5,11 +5,11 @@
 }
 
 type ObjModelData = {
-    positions: number[],
-    uvs: number[],
-    normals: number[],
-    indices: number[]
-}
+    positions: number[];
+    uvs: number[];
+    normals: number[];
+    indices: number[];
+};
 
 export function parseObj(content: string): ObjModelData {
     const rawPositions: number[][] = [];
@@ -20,16 +20,16 @@ export function parseObj(content: string): ObjModelData {
     // for debug
     // console.log(content);
 
-    const lines = content.split("\n");
-    lines.forEach(line => {
-        const elements = line.split(" ");
+    const lines = content.split('\n');
+    lines.forEach((line) => {
+        const elements = line.split(' ');
         const header = elements[0];
         switch (header) {
             // ------------------------------------------------------------------------------
             // # format position
             // v x y z [,w]
             // ------------------------------------------------------------------------------
-            case "v":
+            case 'v':
                 rawPositions.push([
                     Number.parseFloat(elements[1]),
                     Number.parseFloat(elements[2]),
@@ -40,7 +40,7 @@ export function parseObj(content: string): ObjModelData {
             // # format normal. normal is may not be normalized
             // vn x y z
             // ------------------------------------------------------------------------------
-            case "vn":
+            case 'vn':
                 rawNormals.push([
                     Number.parseFloat(elements[1]),
                     Number.parseFloat(elements[2]),
@@ -51,11 +51,8 @@ export function parseObj(content: string): ObjModelData {
             // # format uv
             // vt u v [,w]
             // ------------------------------------------------------------------------------
-            case "vt":
-                rawUvs.push([
-                    Number.parseFloat(elements[1]),
-                    Number.parseFloat(elements[2]),
-                ]);
+            case 'vt':
+                rawUvs.push([Number.parseFloat(elements[1]), Number.parseFloat(elements[2])]);
                 break;
             // ------------------------------------------------------------------------------
             // # format face indices
@@ -69,12 +66,8 @@ export function parseObj(content: string): ObjModelData {
             // - pattern_3: has position, uv and normal
             // f p_index/uv_index/n_index p_index/uv_index/n_index p_index/uv_index/n_index
             // ------------------------------------------------------------------------------
-            case "f":
-                rawFaces.push([
-                    elements[1],
-                    elements[2],
-                    elements[3],
-                ]);
+            case 'f':
+                rawFaces.push([elements[1], elements[2], elements[3]]);
                 break;
         }
     });
@@ -86,9 +79,9 @@ export function parseObj(content: string): ObjModelData {
 
     // TODO: uv, normal がない時の対処
     rawFaces.forEach((face, i) => {
-        const v0 = face[0].split("/");
-        const v1 = face[1].split("/");
-        const v2 = face[2].split("/");
+        const v0 = face[0].split('/');
+        const v1 = face[1].split('/');
+        const v2 = face[2].split('/');
 
         // should offset -1 because face indices begin 1
 
@@ -104,36 +97,20 @@ export function parseObj(content: string): ObjModelData {
         const uv2Index = Number.parseInt(v2[1], 10) - 1;
         const normal2Index = Number.parseInt(v2[2], 10) - 1;
 
-        positions.push(
-            rawPositions[p0Index],
-            rawPositions[p1Index],
-            rawPositions[p2Index]
-        );
+        positions.push(rawPositions[p0Index], rawPositions[p1Index], rawPositions[p2Index]);
 
-        uvs.push(
-            rawUvs[uv0Index],
-            rawUvs[uv1Index],
-            rawUvs[uv2Index]
-        );
+        uvs.push(rawUvs[uv0Index], rawUvs[uv1Index], rawUvs[uv2Index]);
 
-        normals.push(
-            rawNormals[normal0Index],
-            rawNormals[normal1Index],
-            rawNormals[normal2Index]
-        );
+        normals.push(rawNormals[normal0Index], rawNormals[normal1Index], rawNormals[normal2Index]);
 
         const offset = i * 2;
-        indices.push(
-            i + offset,
-            i + offset + 1,
-            i + offset + 2
-        );
+        indices.push(i + offset, i + offset + 1, i + offset + 2);
     });
 
     return {
         positions: positions.flat(),
         uvs: uvs.flat(),
         normals: normals.flat(),
-        indices
-    }
+        indices,
+    };
 }

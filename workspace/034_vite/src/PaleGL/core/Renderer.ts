@@ -1,24 +1,18 @@
-﻿import {
-    ActorTypes,
-    BlendTypes,
-    RenderQueueType,
-    UniformNames,
-    UniformTypes
-} from "@/PaleGL/constants";
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Stats} from "@/PaleGL/utilities/Stats";
-import {Light} from "@/PaleGL/actors/Light";
-import {Mesh} from "@/PaleGL/actors/Mesh";
-import {Scene} from "@/PaleGL/core/Scene";
-import {Camera, CameraRenderTargetType} from "@/PaleGL/actors/Camera";
-import {Material} from "@/PaleGL/materials/Material";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
+﻿import { ActorTypes, BlendTypes, RenderQueueType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Stats } from '@/PaleGL/utilities/Stats';
+import { Light } from '@/PaleGL/actors/Light';
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { Scene } from '@/PaleGL/core/Scene';
+import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/Camera';
+import { Material } from '@/PaleGL/materials/Material';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
 
-type RenderMeshInfo = { actor: Mesh, materialIndex: number };
+type RenderMeshInfo = { actor: Mesh; materialIndex: number };
 
 type RenderMeshInfoEachQueue = {
-    [key in RenderQueueType]: RenderMeshInfo[]
+    [key in RenderQueueType]: RenderMeshInfo[];
 };
 
 export class Renderer {
@@ -29,7 +23,7 @@ export class Renderer {
     private realHeight: number = 1;
     #stats: Stats | null = null;
 
-    constructor({gpu, canvas, pixelRatio = 1.5}: { gpu: GPU, canvas: HTMLCanvasElement, pixelRatio: number }) {
+    constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }) {
         this.gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
@@ -50,10 +44,10 @@ export class Renderer {
 
     setRenderTarget(renderTarget: CameraRenderTargetType) {
         if (renderTarget) {
-            this.gpu.setFramebuffer(renderTarget.framebuffer)
+            this.gpu.setFramebuffer(renderTarget.framebuffer);
             this.gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
         } else {
-            this.gpu.setFramebuffer(null)
+            this.gpu.setFramebuffer(null);
             this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
         }
     }
@@ -68,13 +62,13 @@ export class Renderer {
     }
 
     #shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
-        castShadowLightActors.forEach(lightActor => {
+        castShadowLightActors.forEach((lightActor) => {
             if (!lightActor.shadowMap) {
-                throw "invalid shadow pass"
+                throw 'invalid shadow pass';
                 // return;
             }
             if (!lightActor.shadowCamera) {
-                throw "invalid shadow camera"
+                throw 'invalid shadow camera';
                 // return;
             }
             this.setRenderTarget(lightActor.shadowMap.write);
@@ -83,8 +77,8 @@ export class Renderer {
             if (castShadowRenderMeshInfos.length < 1) {
                 return;
             }
-            
-            castShadowRenderMeshInfos.forEach(({actor}) => {
+
+            castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
                 // // TODO: material 側でやった方がよい？
@@ -100,7 +94,7 @@ export class Renderer {
 
                 // TODO: material 側でやった方がよい？
                 if (!targetMaterial) {
-                    throw "invalid target material";
+                    throw 'invalid target material';
                 }
 
                 // 先頭でガードしてるので shadow camera はあるはず。
@@ -115,27 +109,17 @@ export class Renderer {
     #buildRenderMeshInfo(actor: Mesh, materialIndex: number = 0): RenderMeshInfo {
         return {
             actor,
-            materialIndex
-        }
+            materialIndex,
+        };
     }
 
-    #scenePass(
-        sortedRenderMeshInfos: RenderMeshInfo[],
-        camera: Camera,
-        lightActors: Light[],
-        clear: boolean = true
-    ) {
+    #scenePass(sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera, lightActors: Light[], clear: boolean = true) {
         // TODO: refactor
         if (clear) {
-            this.clear(
-                camera.clearColor.x,
-                camera.clearColor.y,
-                camera.clearColor.z,
-                camera.clearColor.w
-            );
+            this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         }
 
-        sortedRenderMeshInfos.forEach(({actor, materialIndex}) => {
+        sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
@@ -173,13 +157,16 @@ export class Renderer {
             targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
             targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
             targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            targetMaterial.updateUniform(UniformNames.NormalMatrix, actor.transform.worldMatrix.clone().invert().transpose());
+            targetMaterial.updateUniform(
+                UniformNames.NormalMatrix,
+                actor.transform.worldMatrix.clone().invert().transpose()
+            );
             targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
-            // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意 
-            lightActors.forEach(light => {
+            // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
+            lightActors.forEach((light) => {
                 if (targetMaterial.uniforms.uDirectionalLight) {
                     // targetMaterial.uniforms.uDirectionalLight = {
                     //     type: UniformTypes.Struct,
@@ -198,7 +185,7 @@ export class Renderer {
                     //         }
                     //     }
                     // }
-                    targetMaterial.updateUniform("uDirectionalLight", {
+                    targetMaterial.updateUniform('uDirectionalLight', {
                         direction: {
                             type: UniformTypes.Vector3,
                             value: light.transform.position,
@@ -209,8 +196,8 @@ export class Renderer {
                         },
                         color: {
                             type: UniformTypes.Color,
-                            value: light.color
-                        }
+                            value: light.color,
+                        },
                     });
                 }
 
@@ -229,12 +216,7 @@ export class Renderer {
                     light.shadowMap
                 ) {
                     // clip coord (-1 ~ 1) to uv (0 ~ 1)
-                    const textureMatrix = new Matrix4(
-                        0.5, 0, 0, 0.5,
-                        0, 0.5, 0, 0.5,
-                        0, 0, 0.5, 0.5,
-                        0, 0, 0, 1
-                    );
+                    const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
                     const textureProjectionMatrix = Matrix4.multiplyMatrices(
                         textureMatrix,
                         light.shadowCamera.projectionMatrix.clone(),
@@ -258,7 +240,7 @@ export class Renderer {
         });
     }
 
-    render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
+    render(scene: Scene, camera: Camera, { useShadowPass = true, clearScene = true }) {
         const renderMeshInfoEachQueue: RenderMeshInfoEachQueue = {
             [RenderQueueType.Skybox]: [],
             [RenderQueueType.Opaque]: [],
@@ -277,20 +259,26 @@ export class Renderer {
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
                     (actor as Mesh).materials.forEach((material, i) => {
-                        if (!!material.alphaTest) {
-                            renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(this.#buildRenderMeshInfo(actor as Mesh, i));
+                        if (material.alphaTest) {
+                            renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
+                                this.#buildRenderMeshInfo(actor as Mesh, i)
+                            );
                             return;
                         }
                         switch (material.blendType) {
                             case BlendTypes.Opaque:
-                                renderMeshInfoEachQueue[RenderQueueType.Opaque].push(this.#buildRenderMeshInfo(actor as Mesh, i));
+                                renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
+                                    this.#buildRenderMeshInfo(actor as Mesh, i)
+                                );
                                 return;
                             case BlendTypes.Transparent:
                             case BlendTypes.Additive:
-                                renderMeshInfoEachQueue[RenderQueueType.Transparent].push(this.#buildRenderMeshInfo(actor as Mesh, i));
+                                renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
+                                    this.#buildRenderMeshInfo(actor as Mesh, i)
+                                );
                                 return;
                             default:
-                                throw "[Renderer.render] invalid blend type";
+                                throw '[Renderer.render] invalid blend type';
                         }
                     });
                     break;
@@ -301,32 +289,33 @@ export class Renderer {
             }
         });
 
-        // TODO: depth sort 
+        // TODO: depth sort
 
         // sort by render queue
-        const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) => a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
+        const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) =>
+            a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
         // default
         // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
 
         // ts
         const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
             // .map(key => renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc)) // default
-            .map(key => {
+            .map((key) => {
                 const renderQueueType = key as RenderQueueType;
                 const info = renderMeshInfoEachQueue[renderQueueType];
                 return info.sort(sortRenderQueueCompareFunc);
             })
             .flat()
-            .filter(({actor}) => actor.enabled);
+            .filter(({ actor }) => actor.enabled);
 
         // ------------------------------------------------------------------------------
         // 1. shadow pass
         // ------------------------------------------------------------------------------
 
-        const castShadowLightActors = lightActors.filter(lightActor => lightActor.castShadow && lightActor.enabled);
+        const castShadowLightActors = lightActors.filter((lightActor) => lightActor.castShadow && lightActor.enabled);
 
         if (castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({actor}) => {
+            const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({ actor }) => {
                 if (actor.type === ActorTypes.Skybox) {
                     return false;
                 }
@@ -341,7 +330,7 @@ export class Renderer {
         // 2. scene pass
         // ------------------------------------------------------------------------------
 
-        // postprocessはrendererから外した方がよさそう  
+        // postprocessはrendererから外した方がよさそう
         // if (camera.enabledPostProcess) {
         //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
         // } else {
@@ -371,9 +360,8 @@ export class Renderer {
         // vertex
         this.gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
-        if(!material.shader)
-        {
-            throw "invalid material shader";
+        if (!material.shader) {
+            throw 'invalid material shader';
         }
         this.gpu.setShader(material.shader);
         // uniforms
@@ -393,7 +381,7 @@ export class Renderer {
                     depthWrite = false;
                     break;
                 default:
-                    throw "invalid depth write";
+                    throw 'invalid depth write';
             }
         }
 

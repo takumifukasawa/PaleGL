@@ -1,10 +1,10 @@
-﻿import {Mesh} from "@/PaleGL/actors/Mesh";
-import {Material} from "@/PaleGL/materials/Material";
-import {parseObj} from "@/PaleGL/loaders/loadObj";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
-import {AttributeNames, UniformNames} from "@/PaleGL/constants";
-import {Attribute} from "@/PaleGL/core/Attribute";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { Mesh } from '@/PaleGL/actors/Mesh';
+import { Material } from '@/PaleGL/materials/Material';
+import { parseObj } from '@/PaleGL/loaders/loadObj';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { AttributeNames, UniformNames } from '@/PaleGL/constants';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { GPU } from '@/PaleGL/core/GPU';
 
 const axesHelperGeometryData = `
 # Blender 3.3.1
@@ -163,7 +163,7 @@ f 23/56/18 22/55/18 20/53/18
 `;
 
 export class AxesHelper extends Mesh {
-    constructor({gpu}: { gpu: GPU }) {
+    constructor({ gpu }: { gpu: GPU }) {
         const objData = parseObj(axesHelperGeometryData);
         const geometry = new Geometry({
             gpu,
@@ -171,16 +171,16 @@ export class AxesHelper extends Mesh {
                 new Attribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(objData.positions),
-                    size: 3
+                    size: 3,
                 }),
                 new Attribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(objData.uvs),
-                    size: 2
-                })
+                    size: 2,
+                }),
             ],
             indices: objData.indices,
-            drawCount: objData.indices.length
+            drawCount: objData.indices.length,
         });
         const material = new Material({
             // gpu,
@@ -211,6 +211,6 @@ export class AxesHelper extends Mesh {
             }
             `,
         });
-        super({geometry, material});
+        super({ geometry, material });
     }
 }

@@ -1,6 +1,6 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject";
-import {GLColorAttachment} from "@/PaleGL/constants";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
+import { GLColorAttachment } from '@/PaleGL/constants';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class Framebuffer extends GLObject {
     #framebuffer: WebGLFramebuffer;
@@ -23,7 +23,7 @@ export class Framebuffer extends GLObject {
         this.#drawBuffersList.push(drawBufferName);
     }
 
-    constructor({gpu}: { gpu: GPU }) {
+    constructor({ gpu }: { gpu: GPU }) {
         super();
 
         this.#gpu = gpu;
@@ -31,7 +31,7 @@ export class Framebuffer extends GLObject {
 
         const fb = gl.createFramebuffer();
         if (!fb) {
-            throw "invalid framebuffer";
+            throw 'invalid framebuffer';
         }
         this.#framebuffer = fb;
     }

@@ -1,12 +1,14 @@
-﻿import {Actor} from "@/PaleGL/actors/Actor";
-import {ActorTypes} from "@/PaleGL/constants";
-import {Color} from "@/PaleGL/math/Color";
+﻿import { Actor } from '@/PaleGL/actors/Actor';
+import { ActorTypes } from '@/PaleGL/constants';
+import { Color } from '@/PaleGL/math/Color';
 // import {Camera} from "./Camera";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget";
-import {OrthographicCamera} from "./OrthographicCamera";
-import {PerspectiveCamera} from "./PerspectiveCamera";
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { OrthographicCamera } from './OrthographicCamera';
+import { PerspectiveCamera } from './PerspectiveCamera';
 
 export type LightArgs = {
+    intensity: number;
+    color: Color;
 };
 
 // TODO: interfaceでいいかも
@@ -21,8 +23,10 @@ export class Light extends Actor {
         return !!this.shadowCamera;
     }
 
-    constructor({}: LightArgs = {}) {
+    constructor({ intensity, color }: LightArgs) {
         super(ActorTypes.Light);
+        this.intensity = intensity;
+        this.color = color;
     }
 
     setSize(width: number, height: number) {
@@ -30,6 +34,6 @@ export class Light extends Actor {
     }
 
     setShadowSize() {
-        throw "should implementation";
+        throw 'should implementation';
     }
 }

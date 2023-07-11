@@ -1,11 +1,15 @@
 type Args = {
-    pixelNum: number,
-    isHorizontal: boolean,
-    srcTextureUniformName: string
+    pixelNum: number;
+    isHorizontal: boolean;
+    srcTextureUniformName: string;
 };
 
 // TODO: gaussの重みはuniformで送るべき
-export const gaussianBlurFragmentShader: (args: Args) => string = ({pixelNum, isHorizontal, srcTextureUniformName}: Args) => `#version 300 es
+export const gaussianBlurFragmentShader: (args: Args) => string = ({
+    pixelNum,
+    isHorizontal,
+    srcTextureUniformName,
+}: Args) => `#version 300 es
 
 precision mediump float;
 
@@ -28,7 +32,9 @@ void main() {
     for(int i = 0; i < pixelNum; i++) {
         float index = float(i) - width;
         float weight = uBlurWeights[i];
-        sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? "index" : "0."}, ${isHorizontal ? "0." : "index"}) * texelSize) * weight;
+        sampleColor += texture(${srcTextureUniformName}, vUv + vec2(${isHorizontal ? 'index' : '0.'}, ${
+            isHorizontal ? '0.' : 'index'
+        }) * texelSize) * weight;
     }
     
     outColor = sampleColor;

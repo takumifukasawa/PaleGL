@@ -1,6 +1,6 @@
-﻿import {Light, LightArgs} from "@/PaleGL/actors/Light";
-import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
-import {Actor} from "@/PaleGL/actors/Actor";
+﻿import { Light, LightArgs } from '@/PaleGL/actors/Light';
+import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
+import { Actor } from '@/PaleGL/actors/Actor';
 // import {PerspectiveCamera} from "./PerspectiveCamera";
 // import {Vector3} from "@/PaleGL/math/Vector3";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
@@ -8,7 +8,7 @@ import {Actor} from "@/PaleGL/actors/Actor";
 // import {RenderTargetTypes} from "@/PaleGL/constants";
 
 export class DirectionalLight extends Light {
-    constructor(options: LightArgs = {}) {
+    constructor(options: LightArgs) {
         super(options);
 
         this.shadowCamera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 1);

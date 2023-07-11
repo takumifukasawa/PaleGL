@@ -4,29 +4,30 @@
     FaceSide,
     PrimitiveType,
     PrimitiveTypes,
-    TextureWrapTypes, UniformType,
-    UniformTypes
-} from "@/PaleGL/constants";
-import {Texture} from "@/PaleGL/core/Texture";
-import {Shader} from "@/PaleGL/core/Shader";
-import {VertexArrayObject} from "@/PaleGL/core/VertexArrayObject";
-import {Framebuffer} from "@/PaleGL/core/Framebuffer";
-import {Uniforms, UniformStructValue, UniformValue} from "@/PaleGL/materials/Material";
-import {Vector2} from "@/PaleGL/math/Vector2";
-import {Vector3} from "@/PaleGL/math/Vector3";
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {Color} from "@/PaleGL/math/Color";
-import {CubeMap} from "@/PaleGL/core/CubeMap";
+    TextureWrapTypes,
+    UniformType,
+    UniformTypes,
+} from '@/PaleGL/constants';
+import { Texture } from '@/PaleGL/core/Texture';
+import { Shader } from '@/PaleGL/core/Shader';
+import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
+import { Framebuffer } from '@/PaleGL/core/Framebuffer';
+import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
+import { Vector2 } from '@/PaleGL/math/Vector2';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Color } from '@/PaleGL/math/Color';
+import { CubeMap } from '@/PaleGL/core/CubeMap';
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
-        throw "invalid context";
+        throw 'invalid context';
     }
     canvas.width = 1;
     canvas.height = 1;
-    ctx.fillStyle = "white";
+    ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 1, 1);
     return canvas;
 };
@@ -38,7 +39,7 @@ export class GPU {
     private uniforms: Uniforms = {};
     dummyTexture: Texture;
 
-    constructor({gl}: { gl: WebGL2RenderingContext }) {
+    constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
         this.dummyTexture = new Texture({
             gpu: this,
@@ -109,7 +110,7 @@ export class GPU {
             case PrimitiveTypes.Triangles:
                 return gl.TRIANGLES;
             default:
-                throw "invalid primitive type";
+                throw 'invalid primitive type';
         }
     }
 
@@ -146,7 +147,7 @@ export class GPU {
                 gl.frontFace(gl.CCW);
                 break;
             default:
-                throw "invalid face side";
+                throw 'invalid face side';
         }
 
         // depth write
@@ -166,7 +167,7 @@ export class GPU {
         // blend
         // gl.blendFunc(src, dest)
         // - src: current draw
-        // - dest: drawn 
+        // - dest: drawn
         switch (blendType) {
             case BlendTypes.Opaque:
                 gl.disable(gl.BLEND);
@@ -183,14 +184,14 @@ export class GPU {
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                 break;
             default:
-                throw "invalid blend type";
+                throw 'invalid blend type';
         }
 
-        if(!this.shader) {
-            throw "shader is not set";
+        if (!this.shader) {
+            throw 'shader is not set';
         }
-        if(!this.vao) {
-            throw "vao is not set";
+        if (!this.vao) {
+            throw 'vao is not set';
         }
 
         gl.useProgram(this.shader.glObject);
@@ -216,7 +217,7 @@ export class GPU {
                     gl.uniform2fv(location, (value as Vector2).elements);
                     break;
                 case UniformTypes.Vector2Array:
-                    gl.uniform2fv(location, (value as Vector2[]).map(v => [...v.elements]).flat());
+                    gl.uniform2fv(location, (value as Vector2[]).map((v) => [...v.elements]).flat());
                     break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, (value as Vector3).elements);
@@ -228,7 +229,7 @@ export class GPU {
                 case UniformTypes.Matrix4Array:
                     if (value) {
                         // arg[1] ... use transpose.
-                        gl.uniformMatrix4fv(location, false, (value as Matrix4[]).map(v => [...v.elements]).flat());
+                        gl.uniformMatrix4fv(location, false, (value as Matrix4[]).map((v) => [...v.elements]).flat());
                     }
                     break;
                 case UniformTypes.Color:
@@ -237,15 +238,12 @@ export class GPU {
                 case UniformTypes.ColorArray:
                     if (value) {
                         // arg[1] ... use transpose.
-                        gl.uniform4fv(location, (value as Color[]).map(v => [...v.elements]).flat());
+                        gl.uniform4fv(location, (value as Color[]).map((v) => [...v.elements]).flat());
                     }
                     break;
                 case UniformTypes.Texture:
                     gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                    gl.bindTexture(
-                        gl.TEXTURE_2D,
-                        value ? (value as Texture).glObject : this.dummyTexture.glObject
-                    );
+                    gl.bindTexture(gl.TEXTURE_2D, value ? (value as Texture).glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
                     break;
@@ -267,7 +265,7 @@ export class GPU {
         };
 
         // uniforms
-        Object.keys(this.uniforms).forEach(uniformName => {
+        Object.keys(this.uniforms).forEach((uniformName) => {
             const uniform = this.uniforms[uniformName];
             if (uniform.type === UniformTypes.Struct) {
                 // default
@@ -275,9 +273,13 @@ export class GPU {
                 //     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
                 // });
                 const uniformStructValue = uniform.value as UniformStructValue;
-                Object.keys(uniformStructValue).forEach(key => {
+                Object.keys(uniformStructValue).forEach((key) => {
                     // setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
-                    setUniformValue(uniformStructValue[key].type, `${uniformName}.${key}`, uniformStructValue[key].value);
+                    setUniformValue(
+                        uniformStructValue[key].type,
+                        `${uniformName}.${key}`,
+                        uniformStructValue[key].value
+                    );
                 });
             } else {
                 setUniformValue(uniform.type, uniformName, uniform.value);
@@ -294,7 +296,7 @@ export class GPU {
             // draw by indices
             // drawCount ... use indices count
             if (instanceCount) {
-                gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount)
+                gl.drawElementsInstanced(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset, instanceCount);
             } else {
                 gl.drawElements(glPrimitiveType, drawCount, gl.UNSIGNED_SHORT, startOffset);
             }

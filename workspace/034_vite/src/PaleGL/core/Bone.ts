@@ -1,7 +1,7 @@
-﻿import {NodeBase} from "@/PaleGL/core/NodeBase";
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {Rotator} from "@/PaleGL/math/Rotator";
-import {Vector3} from "@/PaleGL/math/Vector3";
+﻿import { NodeBase } from '@/PaleGL/core/NodeBase';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Rotator } from '@/PaleGL/math/Rotator';
+import { Vector3 } from '@/PaleGL/math/Vector3';
 
 export class Bone extends NodeBase {
     offsetMatrix: Matrix4 = Matrix4.identity; // 初期姿勢のボーンローカル座標
@@ -26,18 +26,18 @@ export class Bone extends NodeBase {
         return this.#jointMatrix;
     }
 
-    constructor({index, ...options}: { name: string, index: number }) {
+    constructor({ index, ...options }: { name: string; index: number }) {
         super(options);
         this.index = index;
     }
 
     calcBoneOffsetMatrix(parentBone?: Bone) {
-        this.#poseMatrix = !!parentBone
+        this.#poseMatrix = parentBone
             ? Matrix4.multiplyMatrices(parentBone.poseMatrix, this.offsetMatrix)
             : this.offsetMatrix;
 
         this.#boneOffsetMatrix = this.#poseMatrix.clone().invert();
-        this.children.forEach(childBone => (childBone as Bone).calcBoneOffsetMatrix(this));
+        this.children.forEach((childBone) => (childBone as Bone).calcBoneOffsetMatrix(this));
     }
 
     calcJointMatrix(parentBone?: Bone) {
@@ -45,14 +45,14 @@ export class Bone extends NodeBase {
         this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
 
         // 2: update joint matrix
-        this.#jointMatrix = !!parentBone
+        this.#jointMatrix = parentBone
             ? Matrix4.multiplyMatrices(parentBone.jointMatrix, this.offsetMatrix)
             : this.offsetMatrix;
 
         // NOTE: 無理やりpose状態にする時はこれを使う
         // this.#jointMatrix = this.#boneOffsetMatrix.clone().invert();
 
-        this.children.forEach(childBone => (childBone as Bone).calcJointMatrix(this));
+        this.children.forEach((childBone) => (childBone as Bone).calcJointMatrix(this));
     }
 
     traverse(callback: (bone: Bone) => void) {
@@ -60,6 +60,6 @@ export class Bone extends NodeBase {
         this.children.forEach((child: unknown) => {
             const c = child as Bone;
             c.traverse(callback);
-        })
+        });
     }
 }

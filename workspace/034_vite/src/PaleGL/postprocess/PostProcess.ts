@@ -1,10 +1,10 @@
-﻿import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera";
-import {Vector3} from "@/PaleGL/math/Vector3";
-import {Camera} from "@/PaleGL/actors/Camera";
-import {IPostProcessPass} from "@/PaleGL/postprocess/AbstractPostProcessPass";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Renderer} from "@/PaleGL/core/Renderer";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget";
+﻿import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Camera } from '@/PaleGL/actors/Camera';
+import { IPostProcessPass } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Renderer } from '@/PaleGL/core/Renderer';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
@@ -50,16 +50,24 @@ export class PostProcess {
     setSize(width: number, height: number) {
         this.#camera.setSize(width, height);
         // this.renderTarget.setSize(width, height);
-        this.passes.forEach(pass => pass.setSize(width, height));
+        this.passes.forEach((pass) => pass.setSize(width, height));
     }
 
     addPass(pass: IPostProcessPass) {
         this.passes.push(pass);
     }
 
-    render({gpu, renderer, sceneRenderTarget}: {gpu: GPU, renderer: Renderer, sceneRenderTarget: RenderTarget | null}) {
+    render({
+        gpu,
+        renderer,
+        sceneRenderTarget,
+    }: {
+        gpu: GPU;
+        renderer: Renderer;
+        sceneRenderTarget: RenderTarget | null;
+    }) {
         if (!sceneRenderTarget) {
-            throw "[PostProcess.render] scene render target is empty."
+            throw '[PostProcess.render] scene render target is empty.';
         }
 
         this.#camera.updateTransform();
@@ -67,10 +75,10 @@ export class PostProcess {
         // let prevRenderTarget = sceneRenderTarget || this.renderTarget;
         let prevRenderTarget = sceneRenderTarget;
         if (!prevRenderTarget) {
-            console.error("[PostProcess.render] scene render target is empty.");
+            console.error('[PostProcess.render] scene render target is empty.');
         }
 
-        const enabledPasses = this.passes.filter(pass => pass.enabled);
+        const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
 

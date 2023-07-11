@@ -1,4 +1,4 @@
-﻿declare module "*?shader" {
+﻿declare module '*?shader' {
     const content: string;
     export default content;
 }

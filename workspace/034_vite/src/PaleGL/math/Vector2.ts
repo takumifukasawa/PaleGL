@@ -1,5 +1,4 @@
-﻿
-export class Vector2 {
+﻿export class Vector2 {
     elements: Float32Array = new Float32Array(2);
 
     get x() {

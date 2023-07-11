@@ -1,5 +1,4 @@
-﻿
-// ------------------------------------------------------
+﻿// ------------------------------------------------------
 //
 // # 3x3
 // もしガウシアンブラーなら、
@@ -28,7 +27,7 @@
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 export function gaussCoefficient(sigma: number, x: number) {
     const sigma2 = sigma * sigma;
-    return Math.exp(-(x * x) / (2. * sigma2));
+    return Math.exp(-(x * x) / (2 * sigma2));
 }
 
 export function clamp(x: number, min: number, max: number) {

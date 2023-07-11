@@ -1,5 +1,5 @@
-import {AbstractInputController} from "@/PaleGL/inputs/AbstractInputController";
-import {Vector2} from "@/PaleGL/math/Vector2";
+import { AbstractInputController } from '@/PaleGL/inputs/AbstractInputController';
+import { Vector2 } from '@/PaleGL/math/Vector2';
 
 export class TouchInputController extends AbstractInputController {
     #tmpIsDown = false;
@@ -18,7 +18,7 @@ export class TouchInputController extends AbstractInputController {
     fixedUpdate() {
         this.updateInternal({
             inputPosition: this.#tmpInputPosition,
-            isDown: this.#tmpIsDown
+            isDown: this.#tmpIsDown,
         });
     }
 

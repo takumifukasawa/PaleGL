@@ -1,13 +1,13 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject.js";
-import {CubeMapAxis} from "@/PaleGL/constants.js";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { GLObject } from '@/PaleGL/core/GLObject.js';
+import { CubeMapAxis } from '@/PaleGL/constants.js';
+import { GPU } from '@/PaleGL/core/GPU';
 
-type CubeMapArgs =
-    {
-        gpu: GPU, images: {
-            [key in CubeMapAxis]: HTMLImageElement | null
-        }
+type CubeMapArgs = {
+    gpu: GPU;
+    images: {
+        [key in CubeMapAxis]: HTMLImageElement | null;
     };
+};
 
 export class CubeMap extends GLObject {
     #texture: WebGLTexture;
@@ -17,15 +17,16 @@ export class CubeMap extends GLObject {
     }
 
     constructor({
-                    gpu, images = {
+        gpu,
+        images = {
             [CubeMapAxis.PositiveX]: null,
             [CubeMapAxis.NegativeX]: null,
             [CubeMapAxis.PositiveY]: null,
             [CubeMapAxis.NegativeY]: null,
             [CubeMapAxis.PositiveZ]: null,
             [CubeMapAxis.NegativeZ]: null,
-        }
-                }: CubeMapArgs) {
+        },
+    }: CubeMapArgs) {
         super();
 
         const gl = gpu.gl;
@@ -61,7 +62,7 @@ export class CubeMap extends GLObject {
                     axis = gl.TEXTURE_CUBE_MAP_NEGATIVE_Z;
                     break;
                 default:
-                    throw "invalid axis"
+                    throw 'invalid axis';
             }
             if (images[key] === null) {
                 throw `[CubeMap] invalid img: ${key}`;

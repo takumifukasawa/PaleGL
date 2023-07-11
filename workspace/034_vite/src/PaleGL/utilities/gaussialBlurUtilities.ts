@@ -1,5 +1,4 @@
-﻿
-import { gaussCoefficient} from "@/PaleGL/utilities/mathUtilities";
+﻿import { gaussCoefficient } from '@/PaleGL/utilities/mathUtilities';
 
 // pixelNumは奇数であるべき
 export function getGaussianBlurWeights(pixelNum: number, sigma: number) {
@@ -13,5 +12,5 @@ export function getGaussianBlurWeights(pixelNum: number, sigma: number) {
         return weight;
     });
 
-    return rawWeights.map(w => w / sum);
+    return rawWeights.map((w) => w / sum);
 }

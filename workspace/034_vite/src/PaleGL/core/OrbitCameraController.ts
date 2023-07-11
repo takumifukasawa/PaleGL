@@ -1,6 +1,6 @@
-import {Vector3} from "@/PaleGL/math/Vector3.js";
-import {clamp} from "@/PaleGL/utilities/mathUtilities.js";
-import {Camera} from "@/PaleGL/actors/Camera";
+import { Vector3 } from '@/PaleGL/math/Vector3.js';
+import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
+import { Camera } from '@/PaleGL/actors/Camera';
 
 export class OrbitCameraController {
     #camera: Camera;
@@ -13,7 +13,7 @@ export class OrbitCameraController {
     maxAltitude: number = 45;
     azimuthSpeed: number = 100;
     altitudeSpeed: number = 100;
-    #cameraAngle: { azimuth: number, altitude: number } = {azimuth: 0, altitude: 0};
+    #cameraAngle: { azimuth: number; altitude: number } = { azimuth: 0, altitude: 0 };
     #lookAtTarget: Vector3 = Vector3.zero;
     distance: number = 10;
     attenuation: number = 0.001;
@@ -41,7 +41,7 @@ export class OrbitCameraController {
         // this.#currentCameraPosition = this.#targetCameraPosition.clone();
     }
 
-    setDelta(delta: { x: number, y: number }) {
+    setDelta(delta: { x: number; y: number }) {
         this.#targetX = delta.x * this.deltaAzimuthPower;
         this.#targetY = delta.y * this.deltaAltitudePower;
     }
@@ -63,10 +63,7 @@ export class OrbitCameraController {
 
         const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), this.#cameraAngle.altitude);
         const v2 = Vector3.rotateVectorY(v1, this.#cameraAngle.azimuth);
-        this.#targetCameraPosition = Vector3.addVectors(
-            this.#lookAtTarget,
-            v2.scale(this.distance)
-        );
+        this.#targetCameraPosition = Vector3.addVectors(this.#lookAtTarget, v2.scale(this.distance));
         this.#currentCameraPosition = Vector3.lerpVectors(
             this.#currentCameraPosition,
             this.#targetCameraPosition,

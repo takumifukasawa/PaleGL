@@ -1,30 +1,31 @@
-﻿import {Texture} from "@/PaleGL/core/Texture";
-import {Framebuffer} from "@/PaleGL/core/Framebuffer";
-import {Renderbuffer} from "@/PaleGL/core/Renderbuffer";
+﻿import { Texture } from '@/PaleGL/core/Texture';
+import { Framebuffer } from '@/PaleGL/core/Framebuffer';
+import { Renderbuffer } from '@/PaleGL/core/Renderbuffer';
 import {
     RenderbufferTypes,
     RenderTargetType,
-    RenderTargetTypes, TextureFilterType,
+    RenderTargetTypes,
+    TextureFilterType,
     TextureFilterTypes,
     TextureTypes,
     GLColorAttachment,
-} from "@/PaleGL/constants";
-import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
-import {GPU} from "@/PaleGL/core/GPU";
+} from '@/PaleGL/constants';
+import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export type RenderTargetOptions = {
     // require
-    gpu: GPU,
+    gpu: GPU;
     // optional
-    width?: number,
-    height?: number,
-    name?: string,
-    type?: RenderTargetType,
-    useDepthBuffer?: boolean,
-    writeDepthTexture?: boolean,
-    minFilter?: TextureFilterType,
-    magFilter?: TextureFilterType,
-    mipmap?: boolean,
+    width?: number;
+    height?: number;
+    name?: string;
+    type?: RenderTargetType;
+    useDepthBuffer?: boolean;
+    writeDepthTexture?: boolean;
+    minFilter?: TextureFilterType;
+    magFilter?: TextureFilterType;
+    mipmap?: boolean;
 };
 
 // TODO:
@@ -61,17 +62,17 @@ export class RenderTarget extends AbstractRenderTarget {
     }
 
     constructor({
-                    gpu,
-                    name = "",
-                    type = RenderTargetTypes.RGBA,
-                    width = 1,
-                    height = 1,
-                    useDepthBuffer = false,
-                    writeDepthTexture = false,
-                    minFilter = TextureFilterTypes.Linear,
-                    magFilter = TextureFilterTypes.Linear,
-                    mipmap = false,
-                }: RenderTargetOptions) {
+        gpu,
+        name = '',
+        type = RenderTargetTypes.RGBA,
+        width = 1,
+        height = 1,
+        useDepthBuffer = false,
+        writeDepthTexture = false,
+        minFilter = TextureFilterTypes.Linear,
+        magFilter = TextureFilterTypes.Linear,
+        mipmap = false,
+    }: RenderTargetOptions) {
         super();
 
         this.gpu = gpu;
@@ -83,16 +84,21 @@ export class RenderTarget extends AbstractRenderTarget {
         this.width = width;
         this.height = height;
 
-        this._framebuffer = new Framebuffer({gpu});
+        this._framebuffer = new Framebuffer({ gpu });
         this._framebuffer.bind();
 
         if (useDepthBuffer) {
-            this.depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
+            this.depthRenderbuffer = new Renderbuffer({ gpu, type: RenderbufferTypes.Depth, width, height });
         }
 
         // depth as render buffer
         if (this.depthRenderbuffer) {
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthRenderbuffer.glObject);
+            gl.framebufferRenderbuffer(
+                gl.FRAMEBUFFER,
+                gl.DEPTH_ATTACHMENT,
+                gl.RENDERBUFFER,
+                this.depthRenderbuffer.glObject
+            );
         }
 
         if (this.type === RenderTargetTypes.RGBA) {
@@ -103,15 +109,9 @@ export class RenderTarget extends AbstractRenderTarget {
                 mipmap,
                 type: TextureTypes.RGBA,
                 minFilter,
-                magFilter
+                magFilter,
             });
-            gl.framebufferTexture2D(
-                gl.FRAMEBUFFER,
-                gl.COLOR_ATTACHMENT0,
-                gl.TEXTURE_2D,
-                this._texture.glObject,
-                0
-            );
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
 
             // this._framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0);
             this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
@@ -128,20 +128,14 @@ export class RenderTarget extends AbstractRenderTarget {
                 // minFilter: TextureFilterTypes.Linear,
                 // magFilter: TextureFilterTypes.Linear
                 minFilter,
-                magFilter
-            })
+                magFilter,
+            });
             // depth as texture
-            gl.framebufferTexture2D(
-                gl.FRAMEBUFFER,
-                gl.DEPTH_ATTACHMENT,
-                gl.TEXTURE_2D,
-                this._depthTexture.glObject,
-                0
-            );
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
         }
 
         if (this._depthTexture && this.depthRenderbuffer) {
-            throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
+            throw '[RenderTarget.constructor] depth texture and depth render buffer are active.';
         }
 
         // unbind
@@ -172,13 +166,7 @@ export class RenderTarget extends AbstractRenderTarget {
         const gl = this.gpu.gl;
         this._texture = texture;
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._framebuffer.glObject);
-        gl.framebufferTexture2D(
-            gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0,
-            gl.TEXTURE_2D,
-            this._texture.glObject,
-            0
-        );
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
@@ -188,24 +176,24 @@ export class RenderTarget extends AbstractRenderTarget {
         this._framebuffer.bind();
         // gl.bindFramebuffer(gl.FRAMEBUFFER, this._framebuffer.glObject);
         // depth as texture
-        gl.framebufferTexture2D(
-            gl.FRAMEBUFFER,
-            gl.DEPTH_ATTACHMENT,
-            gl.TEXTURE_2D,
-            this._depthTexture.glObject,
-            0
-        );
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
         // Framebuffer.unbind();
         this._framebuffer.unbind();
         // // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    static blitDepth({gpu, sourceRenderTarget, destRenderTarget, width, height}: {
-        gpu: GPU,
-        sourceRenderTarget: RenderTarget,
-        destRenderTarget: RenderTarget,
-        width: number,
-        height: number
+    static blitDepth({
+        gpu,
+        sourceRenderTarget,
+        destRenderTarget,
+        width,
+        height,
+    }: {
+        gpu: GPU;
+        sourceRenderTarget: RenderTarget;
+        destRenderTarget: RenderTarget;
+        width: number;
+        height: number;
     }) {
         const gl = gpu.gl;
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, sourceRenderTarget.framebuffer.glObject);
@@ -213,17 +201,10 @@ export class RenderTarget extends AbstractRenderTarget {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.DEPTH_BUFFER_BIT);
         if (gl.checkFramebufferStatus(gl.READ_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
-            console.error("invalid state");
+            console.error('invalid state');
             return;
         }
-        gl.blitFramebuffer(
-            0, 0,
-            width, height,
-            0, 0,
-            width, height,
-            gl.DEPTH_BUFFER_BIT,
-            gl.NEAREST
-        );
+        gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST);
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
     }

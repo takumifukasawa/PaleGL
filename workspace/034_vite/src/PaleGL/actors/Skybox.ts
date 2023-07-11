@@ -1,18 +1,18 @@
-import {Mesh} from "@/PaleGL/actors/Mesh";
-import {UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames} from "@/PaleGL/constants";
-import {Material} from "@/PaleGL/materials/Material";
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames } from '@/PaleGL/constants';
+import { Material } from '@/PaleGL/materials/Material';
 // import {loadImg} from "@/PaleGL/loaders/loadImg";
-import {/*loadObj,*/ parseObj} from "@/PaleGL/loaders/loadObj";
-import {Geometry} from "@/PaleGL/geometries/Geometry";
+import { /*loadObj,*/ parseObj } from '@/PaleGL/loaders/loadObj';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
 // import {CubeMap} from "@/PaleGL/core/CubeMap";
 // import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry";
 // import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {Vector3} from "@/PaleGL/math/Vector3";
-import {CubeMap} from "@/PaleGL/core/CubeMap";
-import {Attribute} from "@/PaleGL/core/Attribute";
-import {GPU} from "@/PaleGL/core/GPU";
-import {Camera} from "@/PaleGL/actors/Camera";
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { CubeMap } from '@/PaleGL/core/CubeMap';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Camera } from '@/PaleGL/actors/Camera';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -133,11 +133,7 @@ void main() {
 `;
 
 export class Skybox extends Mesh {
-    constructor({gpu, cubeMap, rotationOffset = 0}: {
-        gpu: GPU,
-        cubeMap: CubeMap,
-        rotationOffset: number
-    }) {
+    constructor({ gpu, cubeMap, rotationOffset = 0 }: { gpu: GPU; cubeMap: CubeMap; rotationOffset: number }) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
@@ -145,7 +141,7 @@ export class Skybox extends Mesh {
                 new Attribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
-                    size: 3
+                    size: 3,
                 }),
                 new Attribute({
                     name: AttributeNames.Uv,
@@ -155,11 +151,11 @@ export class Skybox extends Mesh {
                 new Attribute({
                     name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
-                    size: 3
+                    size: 3,
                 }),
             ],
             indices: skyboxObjData.indices,
-            drawCount: skyboxObjData.indices.length
+            drawCount: skyboxObjData.indices.length,
         });
 
         const material = new Material({
@@ -172,7 +168,7 @@ export class Skybox extends Mesh {
             uniforms: {
                 uCubeTexture: {
                     type: UniformTypes.CubeMap,
-                    value: cubeMap
+                    value: cubeMap,
                 },
                 uViewDirectionProjectionInverse: {
                     type: UniformTypes.Matrix4,
@@ -180,12 +176,12 @@ export class Skybox extends Mesh {
                 },
                 uRotationOffset: {
                     type: UniformTypes.Float,
-                    value: rotationOffset
+                    value: rotationOffset,
                 },
-            }
+            },
         });
 
-        super({geometry, material, actorType: ActorTypes.Skybox});
+        super({ geometry, material, actorType: ActorTypes.Skybox });
     }
 
     // TODO: renderer側で2回走らないようにする

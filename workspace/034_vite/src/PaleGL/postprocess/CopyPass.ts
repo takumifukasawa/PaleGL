@@ -1,6 +1,5 @@
-﻿import {PostProcessPass} from "@/PaleGL/postprocess/PostProcessPass";
-import {GPU} from "@/PaleGL/core/GPU";
-
+﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class CopyPass extends PostProcessPass {
     constructor({ gpu }: { gpu: GPU }) {
@@ -21,6 +20,5 @@ void main() {
 `;
 
         super({ gpu, fragmentShader });
-        
     }
 }

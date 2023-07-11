@@ -1,5 +1,5 @@
-﻿import {GLObject} from "@/PaleGL/core/GLObject";
-import {GPU} from "@/PaleGL/core/GPU";
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class IndexBufferObject extends GLObject {
     private ibo: WebGLBuffer;
@@ -9,7 +9,7 @@ export class IndexBufferObject extends GLObject {
         return this.ibo;
     }
 
-    constructor({gpu, indices}: { gpu: GPU, indices: number[] }) {
+    constructor({ gpu, indices }: { gpu: GPU; indices: number[] }) {
         super();
 
         this.gpu = gpu;
