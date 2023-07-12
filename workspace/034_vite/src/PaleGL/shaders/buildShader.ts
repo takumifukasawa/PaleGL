@@ -19,15 +19,17 @@ type VertexShaderDefines = {
     useNormalMap?: boolean;
     useReceiveShadow?: boolean;
     useVertexColor?: boolean;
+    useAlphaTest?: boolean;
 };
 
-const buildVertexDefines = ({
+const buildShaderDefines = ({
     receiveShadow,
     isSkinning,
     gpuSkinning,
     useNormalMap,
     useReceiveShadow,
     useVertexColor,
+    useAlphaTest,
 }: VertexShaderDefines = {}): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -48,6 +50,9 @@ const buildVertexDefines = ({
     }
     if (useVertexColor) {
         arr.push('#define USE_VERTEX_COLOR');
+    }
+    if (useAlphaTest) {
+        arr.push('#define USE_ALPHA_TEST');
     }
 
     return arr;
@@ -138,7 +143,7 @@ export const buildVertexShader = (
 
         switch (pragmaName) {
             case 'BLOCK_DEFINE':
-                const defines = buildVertexDefines(defineOptions);
+                const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;
             case 'BLOCK_ATTRIBUTES':
@@ -261,7 +266,7 @@ export const buildVertexShader = (
     return joinShaderLines(resultShaderLines);
 };
 
-export const buildFragmentShader = (shader: string) => {
+export const buildFragmentShader = (shader: string, defineOptions: VertexShaderDefines) => {
     const shaderLines = shader.split('\n');
     const resultShaderLines: string[] = [];
 
@@ -279,6 +284,10 @@ export const buildFragmentShader = (shader: string) => {
         const pragmaName = pragmas[0];
 
         switch (pragmaName) {
+            case 'BLOCK_DEFINE':
+                const defines = buildShaderDefines(defineOptions);
+                newLines.push(...defines);
+                break;
             case 'uniform_vertex_matrices':
                 newLines.push(`uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;

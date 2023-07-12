@@ -24,6 +24,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
+import phongFrag from '@/PaleGL/shaders/phong-fragment.glsl';
 
 export type PhongMaterialArgs = {
     diffuseColor?: Color;
@@ -173,6 +174,9 @@ export class PhongMaterial extends Material {
         useAlphaTest: boolean;
         useVertexColor: boolean;
     }): string {
+      
+        return phongFrag;
+        
         return `#version 300 es
 
 precision mediump float;
