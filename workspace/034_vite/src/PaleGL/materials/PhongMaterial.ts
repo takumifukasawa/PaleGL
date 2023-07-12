@@ -142,18 +142,7 @@ export class PhongMaterial extends Material {
     }
 
     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
-        this.vertexShader = this.generateVertexShader({
-            isSkinning: !!this.isSkinning,
-            gpuSkinning: !!this.gpuSkinning,
-            jointNum: this.isSkinning ? this.jointNum : null,
-            receiveShadow: this.receiveShadow,
-            useNormalMap: !!this.useNormalMap,
-            isInstancing: this.isInstancing,
-            useVertexColor: this.useVertexColor,
-            // localPositionPostProcess: vertexShaderModifier.localPositionPostProcess || "",
-            vertexShaderModifier: this.vertexShaderModifier,
-            // attributeDescriptors: attributeDescriptors
-        });
+        this.vertexShader = phongVert;
 
         this.fragmentShader = this.generateFragmentShader({
             receiveShadow: this.receiveShadow,
@@ -171,114 +160,6 @@ export class PhongMaterial extends Material {
         
         // console.log(this.rawVertexShader)
         // console.log(this.rawFragmentShader)
-    }
-
-    generateVertexShader({
-        isSkinning,
-        // gpuSkinning,
-        jointNum,
-        receiveShadow,
-        useNormalMap,
-        // isInstancing,
-        useVertexColor,
-        vertexShaderModifier = {},
-        // attributeDescriptors,
-        insertUniforms,
-    }: {
-        isSkinning: boolean;
-        gpuSkinning: boolean;
-        jointNum: number | null;
-        receiveShadow: boolean;
-        useNormalMap: boolean;
-        isInstancing: boolean;
-        useVertexColor: boolean;
-        vertexShaderModifier: VertexShaderModifier;
-        // attributeDescriptors: AttributeDescriptor[],
-        insertUniforms?: string;
-    }): string {
-        return phongVert;
-        
-        const shader = `#version 300 es
-        
-#pragma attributes
-
-// varyings
-out vec2 vUv;
-out vec3 vWorldPosition;
-out vec3 vNormal;
-${useNormalMap ? '#pragma varying_normal_map' : ''}
-${receiveShadow ? '#pragma varying_receive_shadow' : ''}
-${useVertexColor ? '#pragma varying_vertex_color' : ''}
-
-// uniforms
-#pragma uniform_transform_vertex
-#pragma uniform_engine
-${receiveShadow ? '#pragma uniform_receive_shadow' : ''}
-
-${isSkinning ? '#pragma function_skinning' : ''}
-
-${isSkinning ? `#pragma uniform_skinning ${jointNum}` : ''}
-${insertUniforms || ''}
-
-void main() {
-    ${vertexShaderModifier.beginMain || ''}
-
-    ${
-        isSkinning
-            ? `
-    #pragma vertex_skinning gpu
-`
-            : ''
-    }
-
-    vec4 localPosition = vec4(aPosition, 1.);
-    ${
-        isSkinning
-            ? `
-    localPosition = skinMatrix * localPosition;`
-            : ''
-    }
-    ${vertexShaderModifier.localPositionPostProcess || ''}
-
-    ${
-        useNormalMap
-            ? isSkinning
-                ? `
-    #pragma vertex_normal_map skinning
-`
-                : `
-    #pragma vertex_normal_map
-`
-            : isSkinning
-            ? `
-    vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-`
-            : `
-    vNormal = mat3(uNormalMatrix) * aNormal;
-`
-    }
-
-    // assign common varyings 
-    vUv = aUv;
-
-    vec4 worldPosition = uWorldMatrix * localPosition;
-    ${vertexShaderModifier.worldPositionPostProcess || ''}
- 
-    vWorldPosition = worldPosition.xyz;
-
-    ${receiveShadow ? '#pragma vertex_receive_shadow' : ''}
-
-    vec4 viewPosition = uViewMatrix * worldPosition;
-    ${vertexShaderModifier.viewPositionPostProcess || ''}
- 
-    ${vertexShaderModifier.outClipPositionPreProcess || ''}
- 
-    gl_Position = uProjectionMatrix * viewPosition;
-
-    ${vertexShaderModifier.lastMain || ''} 
-}`;
-
-        return shader;
     }
 
     generateFragmentShader({
