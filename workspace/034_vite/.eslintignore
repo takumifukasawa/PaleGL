@@ -3,4 +3,5 @@ node_modules/**/**.ts
 dist/**/**.js
 vite.config.ts
 vite-shader-minifier-plugin.ts
-libs/packer.js
+libs/**/**.js
+packer/**/**.js
