@@ -64,6 +64,10 @@ export class Shader extends GLObject {
 
         // program link to gl context
         gl.linkProgram(this.program);
+       
+        // for debug
+        // console.log(vertexShader)
+        // console.log(fragmentShader)
 
         // check program info log
         const programInfo = gl.getProgramInfoLog(this.program);

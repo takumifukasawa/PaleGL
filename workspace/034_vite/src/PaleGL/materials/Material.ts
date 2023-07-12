@@ -389,12 +389,19 @@ export class Material {
             this.depthFragmentShader = this.depthFragmentShaderGenerator();
         }
 
-        const rawVertexShader = buildVertexShader(this.vertexShader, attributeDescriptors);
+        const rawVertexShader = buildVertexShader(this.vertexShader, attributeDescriptors, {
+            receiveShadow: !!this.receiveShadow,
+            isSkinning: !!this.isSkinning,
+            gpuSkinning: !!this.gpuSkinning,
+            useNormalMap: !!this.useNormalMap,
+            useReceiveShadow: !!this.receiveShadow,
+            useVertexColor: !!this.useVertexColor
+        }, this.vertexShaderModifier);
         const rawFragmentShader = buildFragmentShader(this.fragmentShader);
-
+        
         this.rawVertexShader = rawVertexShader;
         this.rawFragmentShader = rawFragmentShader;
-
+        
         this.shader = new Shader({
             gpu,
             // vertexShader: this.vertexShader,

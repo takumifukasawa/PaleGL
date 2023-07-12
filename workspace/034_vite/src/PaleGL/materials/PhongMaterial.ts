@@ -23,6 +23,8 @@ import { Texture } from '@/PaleGL/core/Texture';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
+import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
+
 export type PhongMaterialArgs = {
     diffuseColor?: Color;
     diffuseMap?: Texture;
@@ -166,6 +168,9 @@ export class PhongMaterial extends Material {
         });
 
         super.start({ gpu, attributeDescriptors });
+        
+        // console.log(this.rawVertexShader)
+        // console.log(this.rawFragmentShader)
     }
 
     generateVertexShader({
@@ -191,8 +196,10 @@ export class PhongMaterial extends Material {
         // attributeDescriptors: AttributeDescriptor[],
         insertUniforms?: string;
     }): string {
+        return phongVert;
+        
         const shader = `#version 300 es
-
+        
 #pragma attributes
 
 // varyings

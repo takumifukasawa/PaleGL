@@ -85,16 +85,17 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { Attribute } from '@/PaleGL/core/Attribute';
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
-// import testVert from "@/PaleGL/shaders/test-shader-vert.glsl?shader";
-// import testFrag from "@/PaleGL/shaders/test-shader-frag.glsl?shader";
-import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
-import testFrag from '@/PaleGL/shaders/test-shader-frag.glsl';
+// import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
+// import testFrag from '@/PaleGL/shaders/test-shader-frag.glsl';
+// import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 
-console.log('----- vert -----');
-console.log(testVert);
-console.log('----- frag -----');
-console.log(testFrag);
-console.log('----------------');
+// console.log('----- vert -----');
+// console.log(testVert);
+// console.log('----- frag -----');
+// console.log(testFrag);
+// console.log('----- phong vert -----');
+// console.log(phongVert);
+// console.log('----------------');
 
 const stylesText = `
 :root {
@@ -277,7 +278,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
 const directionalLight = new DirectionalLight({
     intensity: 1,
-    color: Color.fromRGB(255, 210, 200)
+    color: Color.fromRGB(255, 210, 200),
 });
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -399,7 +400,7 @@ const createGLTFSkinnedMesh = async () => {
 
     // skinned mesh おｎはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
-    console.log(gltfActor, skinningMesh)
+    console.log(gltfActor, skinningMesh);
 
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
@@ -675,7 +676,7 @@ const main = async () => {
         // gpu,
         vertexShader: `#version 300 es
 
-#pragma attributes
+#pragma BLOCK_ATTRIBUTES
 
 out vec2 vUv;
 out vec3 vWorldPosition;
