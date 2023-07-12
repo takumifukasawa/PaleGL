@@ -28,9 +28,10 @@ export default defineConfig({
             ],
             watch: true,
             root: "src/PaleGL",
-            defaultExpression: 'glsl',
+            defaultExtension: 'glsl',
             warnDuplicatedImports: true,
             exclude: undefined,
+            compress: false,
             enforce: "pre",
         }),
         shaderMinifierPlugin({
