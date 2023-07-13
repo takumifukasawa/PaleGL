@@ -7,10 +7,11 @@
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 
-const pragmaRegex = /^#pragma(.*)/;
-
 // import { calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms } from './skinningShader';
 import { VertexShaderModifier } from '@/PaleGL/materials/Material.ts';
+import defaultDepthFragment from "@/PaleGL/shaders/default-depth-fragment.glsl";
+
+const pragmaRegex = /^#pragma(.*)/;
 
 type VertexShaderDefines = {
     receiveShadow?: boolean;
@@ -314,13 +315,4 @@ float perspectiveDepthToLinearDepth(float depth, float near, float far) {
     return joinShaderLines(resultShaderLines);
 };
 
-export const defaultDepthFragmentShader = () => `#version 300 es
-
-precision mediump float;
-
-out vec4 outColor;
-
-void main() {
-    outColor = vec4(1., 1., 1., 1.);
-}
-`;
+export const defaultDepthFragmentShader = () => defaultDepthFragment;

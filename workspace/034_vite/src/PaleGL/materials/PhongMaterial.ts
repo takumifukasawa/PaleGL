@@ -1,18 +1,4 @@
 import { MaterialArgs, Material, Uniforms, VertexShaderModifier } from '@/PaleGL/materials/Material';
-import {
-    shadowMapFragmentFunc,
-    shadowMapFragmentUniforms,
-    shadowMapFragmentVaryings,
-} from '@/PaleGL/shaders/shadowMapShader';
-import {
-    alphaTestFragmentUniforms,
-    alphaTestFragmentFunc,
-    directionalLightFragmentUniforms,
-    normalMapFragmentFunc,
-    normalMapFragmentUniforms,
-    normalMapFragmentVarying,
-    phongSurfaceDirectionalLightFunc,
-} from '@/PaleGL/shaders/lightingCommon';
 import { UniformTypes } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
@@ -25,6 +11,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import phongFrag from '@/PaleGL/shaders/phong-fragment.glsl';
+import phongDepthFrag from '@/PaleGL/shaders/phong-depth-fragment.glsl';
 
 export type PhongMaterialArgs = {
     diffuseColor?: Color;
@@ -144,191 +131,12 @@ export class PhongMaterial extends Material {
 
     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = phongVert;
-
-        this.fragmentShader = this.generateFragmentShader({
-            receiveShadow: this.receiveShadow,
-            useNormalMap: !!this.useNormalMap,
-            useAlphaTest: this.useAlphaTest,
-            useVertexColor: this.useVertexColor,
-        });
-
-        this.depthFragmentShader = this.generateDepthFragmentShader({
-            useAlphaTest: this.useAlphaTest,
-            useVertexColor: this.useVertexColor,
-        });
+        this.fragmentShader = phongFrag;
+        this.depthFragmentShader = phongDepthFrag;
 
         super.start({ gpu, attributeDescriptors });
         
         // console.log(this.rawVertexShader)
         // console.log(this.rawFragmentShader)
-    }
-
-    generateFragmentShader({
-        receiveShadow,
-        useNormalMap,
-        useAlphaTest,
-        useVertexColor,
-    }: {
-        receiveShadow: boolean;
-        useNormalMap: boolean;
-        useAlphaTest: boolean;
-        useVertexColor: boolean;
-    }): string {
-      
-        return phongFrag;
-        
-        return `#version 300 es
-
-precision mediump float;
-
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap; 
-uniform vec2 uDiffuseMapUvScale;
-uniform float uSpecularAmount;
-${useNormalMap ? normalMapFragmentUniforms() : ''}
-${receiveShadow ? shadowMapFragmentUniforms() : ''}
-uniform vec3 uViewPosition;
-${useAlphaTest ? alphaTestFragmentUniforms() : ''}
-
-${directionalLightFragmentUniforms()}
-
-struct Surface {
-    vec3 worldNormal;
-    vec3 worldPosition;
-    vec4 diffuseColor;
-    float specularAmount;
-};
-
-struct Camera {
-    vec3 worldPosition;
-};
-
-in vec2 vUv;
-in vec3 vNormal;
-${receiveShadow ? shadowMapFragmentVaryings() : ''}
-${normalMapFragmentVarying()}
-in vec3 vWorldPosition;
-${useVertexColor ? 'in vec4 vVertexColor;' : ''}
-
-// out vec4 outColor;
-layout (location = 0) out vec4 outBaseColor;
-layout (location = 1) out vec4 outNormalColor;
-
-${phongSurfaceDirectionalLightFunc()}
-${useNormalMap ? normalMapFragmentFunc() : ''}
-${receiveShadow ? shadowMapFragmentFunc() : ''}
-${useAlphaTest ? alphaTestFragmentFunc() : ''}
-
-void main() {
-    vec2 uv = vUv * uDiffuseMapUvScale;
-   
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    
-    ${
-        useNormalMap
-            ? `
-    vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
-`
-            : `
-    vec3 worldNormal = normalize(vNormal);
-`
-    }
-
-    Surface surface;
-    surface.worldPosition = vWorldPosition;
-    surface.worldNormal = worldNormal;
-    ${
-        useVertexColor
-            ? `
-    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
-`
-            : `
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
-`
-    }
-    surface.specularAmount = uSpecularAmount;
-
-    Camera camera;
-    camera.worldPosition = uViewPosition;
-    
-    vec4 resultColor = vec4(0, 0, 0, 1);
-    
-    // directional light
-    resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-   
-    ${
-        receiveShadow
-            ? `
-    // TODO: apply shadow の中に入れても良さそう
-    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-        resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
-    }
-`
-            : ''
-    }
-    ${
-        useAlphaTest
-            ? `
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-`
-            : ''
-    }
-
-    // correct
-    outBaseColor = resultColor;
-    outNormalColor = vec4(worldNormal * .5 + .5, 1.); 
-
-    // this is dummy
-    // outBaseColor = vec4(1., 0., 0., 1.);
-    // outNormalColor = vec4(0., 1., 0., 1.); 
-}
-`;
-    }
-
-    generateDepthFragmentShader({ useAlphaTest, useVertexColor }: { useAlphaTest: boolean; useVertexColor: boolean }) {
-        return `#version 300 es
-
-precision mediump float;
-
-uniform vec4 uColor;
-uniform sampler2D uDiffuseMap; 
-uniform vec2 uDiffuseMapUvScale;
-${useAlphaTest ? alphaTestFragmentUniforms() : ''}
-
-in vec2 vUv;
-${useVertexColor ? 'in vec4 vVertexColor;' : ''}
-
-out vec4 outColor;
-
-${useAlphaTest ? alphaTestFragmentFunc() : ''}    
-
-void main() {
-    vec2 uv = vUv * uDiffuseMapUvScale;
-   
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-   
-    ${
-        useVertexColor
-            ? `
-    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
-`
-            : `
-    vec4 diffuseColor = uColor * diffuseMapColor;
-`
-    }
-
-    float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
-    
-    ${
-        useAlphaTest
-            ? `
-    checkAlphaTest(alpha, uAlphaTestThreshold);
-`
-            : ''
-    }
-
-    outColor = vec4(1., 1., 1., 1.);
-}
-`;
     }
 }
