@@ -7,7 +7,6 @@
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 
-// import { calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms } from './skinningShader';
 import { VertexShaderModifier } from '@/PaleGL/materials/Material.ts';
 import defaultDepthFragment from "@/PaleGL/shaders/default-depth-fragment.glsl";
 import {ShaderPragmas, VertexShaderModifiers} from "@/PaleGL/constants.ts";
@@ -191,70 +190,9 @@ export const buildVertexShader = (
             case ShaderPragmas.TRANSFORM_VERTEX_UNIFORMS:
                 newLines.push(transformVertexUniforms);
                 break;
-            //
-            //             case 'varying_receive_shadow':
-            //                 newLines.push(`
-            // out vec4 vShadowMapProjectionUv;
-            // `);
-            //                 break;
-            //
-            //             case 'uniform_receive_shadow':
-            //                 newLines.push(`
-            // uniform mat4 uShadowMapProjectionMatrix;
-            // `);
-            //                 break;
-            //
             case ShaderPragmas.ENGINE_UNIFORMS:
                 newLines.push(engineUniforms);
                 break;
-            //             case 'varying_normal_map':
-            //                 newLines.push(`
-            // out vec3 vTangent;
-            // out vec3 vBinormal;
-            // `);
-            //                 break;
-            //
-            //             case 'function_skinning':
-            //                 newLines.push(calcSkinningMatrixFunc());
-            //                 break;
-            //
-            //             case 'uniform_skinning':
-            //                 const jointNum = pragmas[1];
-            //                 newLines.push(skinningVertexUniforms(jointNum));
-            //                 break;
-            //
-            //             case 'vertex_normal_map':
-            //                 const isSkinningNormalMap = pragmas[1] && pragmas[1] === 'skinning';
-            //                 newLines.push(
-            //                     isSkinningNormalMap
-            //                         ? `
-            // vNormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aNormal;
-            // vTangent = mat3(uNormalMatrix) * mat3(skinMatrix) * aTangent;
-            // vBinormal = mat3(uNormalMatrix) * mat3(skinMatrix) * aBinormal;
-            //                 `
-            //                         : `
-            // vNormal = mat3(uNormalMatrix) * aNormal;
-            // vTangent = mat3(uNormalMatrix) * aTangent;
-            // vBinormal = mat3(uNormalMatrix) * aBinormal;
-            // `
-            //                 );
-            //                 break;
-            //
-            //             case 'vertex_skinning':
-            //                 newLines.push(skinningVertex(pragmas[1] === 'gpu'));
-            //                 break;
-            //
-            //             case 'vertex_receive_shadow':
-            //                 newLines.push(`
-            // vShadowMapProjectionUv = uShadowMapProjectionMatrix * worldPosition;
-            // `);
-            //                 break;
-            //
-            //             case 'varying_vertex_color':
-            //                 newLines.push(`
-            // out vec4 vVertexColor;
-            // `);
-            //                 break;
             default:
                 // throw `[buildVertexShader] invalid pragma: ${pragmaName}`;
                 break;
@@ -286,27 +224,9 @@ export const buildFragmentShader = (shader: string, defineOptions: VertexShaderD
                 const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;
-//             case 'uniform_vertex_matrices':
-//                 newLines.push(`uniform mat4 uWorldMatrix;
-// uniform mat4 uViewMatrix;
-// uniform mat4 uProjectionMatrix;`);
-//                 break;
             case ShaderPragmas.DEPTH_FUNCTIONS:
                 newLines.push(depthFunctions);
                 break;
-//             case 'function_depth':
-//                 newLines.push(`
-// // ref:
-// // https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-// float viewZToLinearDepth(float z, float near, float far) {
-//     return (z + near) / (near - far);
-// }
-// float perspectiveDepthToLinearDepth(float depth, float near, float far) {
-//     float nz = near * depth;
-//     return -nz / (far * (depth - 1.) - nz);
-// }
-// `);
-//                 break;
             default:
                 throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
         }
