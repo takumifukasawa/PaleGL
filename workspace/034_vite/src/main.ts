@@ -686,8 +686,8 @@ out vec4 vVertexColor;
 out vec4 vViewPosition;
 out vec4 vClipPosition;
 
-#pragma uniform_transform_vertex
-#pragma uniform_engine
+#pragma TRANSFORM_VERTEX_UNIFORMS
+#pragma ENGINE_UNIFORMS
 
 uniform vec2[4] uBillboardPositionConverters;
 

@@ -12,6 +12,8 @@ import { VertexShaderModifier } from '@/PaleGL/materials/Material.ts';
 import defaultDepthFragment from "@/PaleGL/shaders/default-depth-fragment.glsl";
 import {ShaderPragmas, VertexShaderModifiers} from "@/PaleGL/constants.ts";
 import depthFunctions from "@/PaleGL/shaders/partial/depth-functions.glsl";
+import engineUniforms from "@/PaleGL/shaders/partial/engine-uniforms.glsl";
+import transformVertexUniforms from "@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl";
 
 const pragmaRegex = /^#pragma(.*)/;
 
@@ -186,13 +188,8 @@ export const buildVertexShader = (
                 }
                 break;
 
-            case 'uniform_transform_vertex':
-                newLines.push(`
-            uniform mat4 uWorldMatrix;
-            uniform mat4 uViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            uniform mat4 uNormalMatrix;
-            `);
+            case ShaderPragmas.TRANSFORM_VERTEX_UNIFORMS:
+                newLines.push(transformVertexUniforms);
                 break;
             //
             //             case 'varying_receive_shadow':
@@ -207,10 +204,8 @@ export const buildVertexShader = (
             // `);
             //                 break;
             //
-            case 'uniform_engine':
-                newLines.push(`
-             uniform float uTime;
-             `);
+            case ShaderPragmas.ENGINE_UNIFORMS:
+                newLines.push(engineUniforms);
                 break;
             //             case 'varying_normal_map':
             //                 newLines.push(`
