@@ -23,7 +23,6 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { rimraf } from 'rimraf';
-import { Shader } from './src/PaleGL/core/Shader';
 
 const exec = promisify(cp.exec);
 
