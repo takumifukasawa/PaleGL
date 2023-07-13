@@ -1,4 +1,8 @@
-﻿export const PrimitiveTypes = {
+﻿// -----------------------------------------------------------------------------
+// engine
+// -----------------------------------------------------------------------------
+
+export const PrimitiveTypes = {
     Points: 'Points',
     Lines: 'Lines',
     LineLoop: 'LineLoop',
@@ -193,6 +197,47 @@ export const CameraTypes = {
 } as const;
 
 export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
+
+export const ShaderPragmas = {
+    BLOCK_DEFINE: 'BLOCK_DEFINE',
+    BLOCK_ATTRIBUTES: 'BLOCK_ATTRIBUTES',
+    BLOCK_VERTEX_SHADER_BEGIN_MAIN: 'BLOCK_VERTEX_SHADER_BEGIN_MAIN',
+    BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS',
+    BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS',
+    BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS',
+    BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS: 'BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS',
+    BLOCK_VERTEX_SHADER_LAST_MAIN: 'BLOCK_VERTEX_SHADER_LAST_MAIN',
+    DEPTH_FUNCTIONS: "DEPTH_FUNCTIONS"
+} as const;
+
+export type ShaderPragmas = (typeof ShaderPragmas)[keyof typeof ShaderPragmas];
+
+export const VertexShaderModifiers = {
+    beginMain: 'beginMain',
+    localPositionPostProcess: 'localPositionPostProcess',
+    worldPositionPostProcess: 'worldPositionPostProcess',
+    viewPositionPostProcess: 'viewPositionPostProcess',
+    outClipPositionPreProcess: 'outClipPositionPreProcess',
+    lastMain: 'lastMain',
+} as const;
+
+export type VertexShaderModifiers = (typeof VertexShaderModifiers)[keyof typeof VertexShaderModifiers];
+
+// export const FragmentShaderPragmas = {
+//     BLOCK_DEFINE: 'BLOCK_DEFINE',
+// } as const;
+// 
+// export type FragmentShaderPragmas = (typeof FragmentShaderPragmas)[keyof typeof FragmentShaderPragmas];
+
+export const FragmentShaderModifiers = {
+    BLOCK_DEFINE: 'BLOCK_DEFINE',
+};
+
+export type FragmentShaderModifiers = (typeof FragmentShaderModifiers)[keyof typeof FragmentShaderModifiers];
+
+// -----------------------------------------------------------------------------
+// webgl
+// -----------------------------------------------------------------------------
 
 export const GLColorAttachment = {
     COLOR_ATTACHMENT0: 36064, // gl.COLOR_ATTACHMENT0 + 0

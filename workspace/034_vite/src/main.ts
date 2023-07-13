@@ -738,7 +738,7 @@ uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 
-#pragma function_depth
+#pragma DEPTH_FUNCTIONS
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));

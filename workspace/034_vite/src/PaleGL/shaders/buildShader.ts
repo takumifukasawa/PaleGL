@@ -10,6 +10,8 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import { calcSkinningMatrixFunc, skinningVertex, skinningVertexUniforms } from './skinningShader';
 import { VertexShaderModifier } from '@/PaleGL/materials/Material.ts';
 import defaultDepthFragment from "@/PaleGL/shaders/default-depth-fragment.glsl";
+import {ShaderPragmas, VertexShaderModifiers} from "@/PaleGL/constants.ts";
+import depthFunctions from "@/PaleGL/shaders/partial/depth-functions.glsl";
 
 const pragmaRegex = /^#pragma(.*)/;
 
@@ -143,44 +145,44 @@ export const buildVertexShader = (
         const pragmaName = pragmas[0];
 
         switch (pragmaName) {
-            case 'BLOCK_DEFINE':
+            case ShaderPragmas.BLOCK_DEFINE:
                 const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;
-            case 'BLOCK_ATTRIBUTES':
+            case ShaderPragmas.BLOCK_ATTRIBUTES:
                 const attributes = buildVertexAttributeLayouts(attributeDescriptors);
                 newLines.push(...attributes);
                 break;
-            case 'BLOCK_VERTEX_SHADER_BEGIN_MAIN':
-                if (vertexShaderModifier['beginMain']) {
-                    newLines.push(vertexShaderModifier['beginMain']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_BEGIN_MAIN:
+                if (vertexShaderModifier[VertexShaderModifiers.beginMain]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.beginMain]);
                 }
                 break;
-            case 'BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS':
-                if (vertexShaderModifier['localPositionPostProcess']) {
-                    newLines.push(vertexShaderModifier['localPositionPostProcess']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS:
+                if (vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]);
                 }
                 break;
             // case 'worldPositionPostProcess':
-            case 'BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS':
-                if (vertexShaderModifier['worldPositionPostProcess']) {
-                    newLines.push(vertexShaderModifier['worldPositionPostProcess']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS:
+                if (vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]);
                 }
                 break;
-            case 'BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS':
-                if (vertexShaderModifier['viewPositionPostProcess']) {
-                    newLines.push(vertexShaderModifier['viewPositionPostProcess']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS:
+                if (vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]);
                 }
                 break;
             // case 'outClipPositionPreProcess':
-            case 'BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS':
-                if (vertexShaderModifier['outClipPositionPreProcess']) {
-                    newLines.push(vertexShaderModifier['outClipPositionPreProcess']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS:
+                if (vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]);
                 }
                 break;
-            case 'BLOCK_VERTEX_SHADER_LAST_MAIN':
-                if (vertexShaderModifier['lastMain']) {
-                    newLines.push(vertexShaderModifier['lastMain']);
+            case ShaderPragmas.BLOCK_VERTEX_SHADER_LAST_MAIN:
+                if (vertexShaderModifier[VertexShaderModifiers.lastMain]) {
+                    newLines.push(vertexShaderModifier[VertexShaderModifiers.lastMain]);
                 }
                 break;
 
@@ -285,28 +287,31 @@ export const buildFragmentShader = (shader: string, defineOptions: VertexShaderD
         const pragmaName = pragmas[0];
 
         switch (pragmaName) {
-            case 'BLOCK_DEFINE':
+            case ShaderPragmas.BLOCK_DEFINE:
                 const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;
-            case 'uniform_vertex_matrices':
-                newLines.push(`uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;`);
+//             case 'uniform_vertex_matrices':
+//                 newLines.push(`uniform mat4 uWorldMatrix;
+// uniform mat4 uViewMatrix;
+// uniform mat4 uProjectionMatrix;`);
+//                 break;
+            case ShaderPragmas.DEPTH_FUNCTIONS:
+                newLines.push(depthFunctions);
                 break;
-            case 'function_depth':
-                newLines.push(`
-// ref:
-// https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
-float viewZToLinearDepth(float z, float near, float far) {
-    return (z + near) / (near - far);
-}
-float perspectiveDepthToLinearDepth(float depth, float near, float far) {
-    float nz = near * depth;
-    return -nz / (far * (depth - 1.) - nz);
-}
-`);
-                break;
+//             case 'function_depth':
+//                 newLines.push(`
+// // ref:
+// // https://github.com/mebiusbox/docs/blob/master/%EF%BC%93%E6%AC%A1%E5%85%83%E5%BA%A7%E6%A8%99%E5%A4%89%E6%8F%9B%E3%81%AE%E3%83%A1%E3%83%A2%E6%9B%B8%E3%81%8D.pdf
+// float viewZToLinearDepth(float z, float near, float far) {
+//     return (z + near) / (near - far);
+// }
+// float perspectiveDepthToLinearDepth(float depth, float near, float far) {
+//     float nz = near * depth;
+//     return -nz / (far * (depth - 1.) - nz);
+// }
+// `);
+//                 break;
             default:
                 throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
         }
