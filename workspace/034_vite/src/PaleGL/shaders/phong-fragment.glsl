@@ -9,28 +9,16 @@ uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform float uSpecularAmount;
 
-#ifdef USE_NORMAL_MAP
-uniform sampler2D uNormalMap;
-uniform float uNormalStrength;
-#endif
+#include ./partial/fragment-normal-map-uniforms.glsl
 
-#ifdef USE_RECEIVE_SHADOW
-uniform sampler2D uShadowMap;
-uniform float uShadowBias;
-#endif
+#include ./partial/fragment-receive-shadow-uniforms.glsl
 
 uniform vec3 uViewPosition;
 
-#ifdef USE_ALPHA_TEST
-uniform float uAlphaTestThreshold;
-#endif
+#include ./partial/fragment-alpha-test-uniforms.glsl
 
-struct DirectionalLight {
-    vec3 direction;
-    float intensity;
-    vec4 color;
-};
-uniform DirectionalLight uDirectionalLight;
+#include ./partial/directional-light-struct.glsl
+#include ./partial/directional-light-uniforms.glsl
 
 struct Surface {
     vec3 worldNormal;
@@ -39,32 +27,22 @@ struct Surface {
     float specularAmount;
 };
 
-struct Camera {
-    vec3 worldPosition;
-};
+#include ./partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;
 
-#ifdef USE_RECEIVE_SHADOW
-in vec4 vShadowMapProjectionUv;
-#endif
+#include ./partial/fragment-receive-shadow-varyings.glsl
 
-#ifdef USE_NORMAL_MAP
-in vec3 vTangent;
-in vec3 vBinormal;
-#endif
+#include ./partial/fragment-normal-map-varyings.glsl
 
 in vec3 vWorldPosition;
 
-#ifdef USE_VERTEX_COLOR
-in vec4 vVertexColor;
-#endif
+#include ./partial/fragment-vertex-color-varyings.glsl
 
 // out vec4 outColor;
 layout (location = 0) out vec4 outBaseColor;
 layout (location = 1) out vec4 outNormalColor;
-
 
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
