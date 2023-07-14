@@ -23,6 +23,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { rimraf } from 'rimraf';
+import { wait } from './node-libs/wait';
+import {readFileAysnc,createDirectoryAsync,writeFileAsync} from './node-libs/file-io';
 
 const exec = promisify(cp.exec);
 
@@ -82,54 +84,6 @@ export interface ShaderMinifierPluginOptions {
     minifierOptions: ShaderMinifierOptions;
 }
 
-async function wait(msec) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, msec);
-    });
-}
-
-async function createDirectoryAsync(path) {
-    return new Promise((resolve, reject) => {
-        if (fs.existsSync(path)) {
-            console.warn('directory already exists: ', path);
-            resolve();
-            return;
-        }
-        fs.mkdir(path, (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve();
-        });
-    });
-}
-
-async function writeFileAsync(path, data) {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(path, data, (err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve();
-        });
-    });
-}
-
-async function readFileAysnc(path) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(path, 'utf8', (err, data) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(data);
-        });
-    });
-}
 
 export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({ minify, minifierOptions }) => {
     return {
@@ -193,7 +147,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
                 // TODO: entry point じゃないシェーダーはminifyしない？
                 if (!minify) {
-                    console.log('disabled minify content...: ', src);
+                    // console.log('disabled minify content...: ', src);
                     return src;
                     // return `export default \`${src}\`;`;
                     // return `export default \`${bundledContent}\`;`;
@@ -213,7 +167,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // TODO: devとprodで改行文字の入り方が違う？確認
                 shaderContent = shaderContent.replaceAll('\\n', '\n');
 
-                console.log("\n----- shader content -----\n")
+                console.log('\n----- shader content -----\n');
                 console.log(shaderContent);
 
                 // if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
