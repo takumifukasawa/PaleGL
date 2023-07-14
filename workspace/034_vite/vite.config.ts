@@ -14,7 +14,7 @@ import {createDirectoryAsync} from "./node-libs/file-io";
 import {wait} from "./node-libs/wait";
 
 const isBundle = false;
-const isMinifyShader = false;
+const isMinifyShader = true;
 
 export const deleteTmpCachesPlugin: () => Plugin = () => {
     return {
@@ -30,7 +30,6 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
         }
     }
 }
-
 
 // ref:
 // https://github.com/vitejs/vite/issues/621

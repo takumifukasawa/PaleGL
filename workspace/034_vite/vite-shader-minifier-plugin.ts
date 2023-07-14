@@ -232,7 +232,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     console.log('error: ', error);
                     throw new Error(`[shaderMinifierPlugin] shader_minifier.exe failed: ${error}`);
                 });
-                console.log('success shader_minifier.exe');
+                console.log(`success shader_minifier.exe: ${name}`);
                 const minifiedContent = await readFileAysnc(tmpTransformedFilePath);
                 await wait(ioInterval);
 
@@ -250,7 +250,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 //   ${specifiedName}_default as default
                 // }
                 //                 `;
-                const resultContent = `export default "${minifiedContent}"`;
+                const resultContent = `export default \`${minifiedContent}\``;
                 return {
                     // code: `export default \`${minifiedContent}\`;`,
                     // code: minifiedContent,
