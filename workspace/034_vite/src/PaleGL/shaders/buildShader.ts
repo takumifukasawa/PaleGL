@@ -7,12 +7,12 @@
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 
-import { VertexShaderModifier } from '@/PaleGL/materials/Material.ts';
-import defaultDepthFragment from "@/PaleGL/shaders/default-depth-fragment.glsl";
-import {ShaderPragmas, VertexShaderModifiers} from "@/PaleGL/constants.ts";
-import depthFunctions from "@/PaleGL/shaders/partial/depth-functions.glsl";
-import engineUniforms from "@/PaleGL/shaders/partial/engine-uniforms.glsl";
-import transformVertexUniforms from "@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl";
+import { VertexShaderModifier } from '@/PaleGL/materials/Material';
+import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
+import { ShaderPragmas, VertexShaderModifiers } from '@/PaleGL/constants';
+import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
+import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
+import transformVertexUniforms from '@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl';
 
 const pragmaRegex = /^#pragma(.*)/;
 

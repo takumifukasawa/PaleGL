@@ -191,14 +191,15 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
 
                 // for debug
                 // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
+                // TODO: entry point じゃないシェーダーはminifyしない？
                 if (!minify) {
-                    // console.log("disabled minify content...: ", src)
+                    console.log('disabled minify content...: ', src);
                     return src;
                     // return `export default \`${src}\`;`;
                     // return `export default \`${bundledContent}\`;`;
                 }
 
-                var contentRegex = /^var\s([a-zA-Z_]*)_default\s\=\s\"(.*)\"/;
+                var contentRegex = /^var\s([a-zA-Z_]*)_default\s?\=\s?\"(.*)\"/;
                 var bundledContent = src.split('\n').join(' ').match(contentRegex);
 
                 if (!bundledContent) {
@@ -208,7 +209,12 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
 
                 let [, specifiedName, shaderContent] = bundledContent;
 
-                shaderContent = shaderContent.replaceAll('\\n', ' ');
+                // TODO: minify時は改行消しちゃダメな気がする
+                // TODO: devとprodで改行文字の入り方が違う？確認
+                shaderContent = shaderContent.replaceAll('\\n', '\n');
+
+                console.log("\n----- shader content -----\n")
+                console.log(shaderContent);
 
                 // if (/^#pragma shader_minifier_plugin bypass$/m.test(src)) {
                 //     console.warn(`\`#pragma shader_minifier_plugin bypass\` detected in ${id}. Bypassing shader minifier`);
@@ -224,18 +230,21 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // for debug
                 // console.log("minifierOptionsString: ", minifierOptionsString)
 
+                const hashSliceNum = 32;
+                const ioInterval = 10;
+
                 const hashOriginalSrc = crypto
                     .createHash('sha512')
-                    .update((+new Date()).toString())
+                    .update(`${name}:${(+new Date()).toString()}`)
                     .digest('hex')
-                    .slice(0, 16);
-                await wait(10);
+                    .slice(0, hashSliceNum);
+                await wait(ioInterval);
                 const hashTransformed = crypto
                     .createHash('sha512')
-                    .update((+new Date()).toString())
+                    .update(`${name}:${(+new Date()).toString()}`)
                     .digest('hex')
-                    .slice(0, 16);
-                await wait(10);
+                    .slice(0, hashSliceNum);
+                await wait(ioInterval);
 
                 // for debug
                 // console.log("tmpDirPath: ", tmpDirPath)
@@ -252,12 +261,15 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // for debug
                 // console.log("tmpTransformedFilePath: ", tmpTransformedFilePath)
                 await createDirectoryAsync(tmpHashOriginalSrcDirPath);
+                await wait(ioInterval);
                 await createDirectoryAsync(tmpHashTransformedDirPath);
+                await wait(ioInterval);
 
                 // vite-plugin-glsl 使わない場合
                 // await writeFileAsync(tmpCopiedFilePath, src);
                 // vite-plugin-glsl を挟む場合
                 await writeFileAsync(tmpCopiedFilePath, shaderContent);
+                await wait(ioInterval);
 
                 // await writeFileAsync(tmpCopiedFilePath, bundledContent);
                 const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
@@ -268,20 +280,23 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 });
                 console.log('success shader_minifier.exe');
                 const minifiedContent = await readFileAysnc(tmpTransformedFilePath);
+                await wait(ioInterval);
 
                 // for debug
                 // console.log("remove dir: ", tmpHashOriginalSrcDirPath);
                 await rimraf(tmpHashOriginalSrcDirPath);
+                await wait(ioInterval);
                 // for debug
                 // console.log("remove dir: ", tmpHashTransformedDirPath);
                 await rimraf(tmpHashTransformedDirPath);
+                await wait(ioInterval);
 
-                const resultContent = `var ${specifiedName}_default = "${minifiedContent}";                           
-export {
-  ${specifiedName}_default as default
-}
-                `;
-
+                //                 const resultContent = `var ${specifiedName}_default = "${minifiedContent}";
+                // export {
+                //   ${specifiedName}_default as default
+                // }
+                //                 `;
+                const resultContent = `export default "${minifiedContent}"`;
                 return {
                     // code: `export default \`${minifiedContent}\`;`,
                     // code: minifiedContent,

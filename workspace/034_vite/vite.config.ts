@@ -10,7 +10,7 @@ import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
 import checker from "vite-plugin-checker";
 
 const isBundle = false;
-const isMinifyShader = false;
+const isMinifyShader = true;
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
