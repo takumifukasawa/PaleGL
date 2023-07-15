@@ -76,6 +76,7 @@ import {
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames,
+    VertexShaderModifiers,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -491,7 +492,8 @@ const createGLTFSkinnedMesh = async () => {
         isInstancing: true,
         useVertexColor: true,
         vertexShaderModifier: {
-            worldPositionPostProcess: `
+            // worldPositionPostProcess: `
+            [VertexShaderModifiers.worldPositionPostProcess]: `
     mat4 instanceTransform = mat4(
         aInstanceScale.x,       0,                      0,                      0,
         0,                      aInstanceScale.y,       0,                      0,
@@ -503,7 +505,8 @@ const createGLTFSkinnedMesh = async () => {
     
     worldPosition = instanceTransform * worldPosition;
 `,
-            outClipPositionPreProcess: `
+            // outClipPositionPreProcess: `
+            [VertexShaderModifiers.outClipPositionPreProcess]: `
     vVertexColor = aInstanceVertexColor;
 `,
         },

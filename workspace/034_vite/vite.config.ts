@@ -57,7 +57,7 @@ export default defineConfig({
         shaderMinifierPlugin({
             minify: isMinifyShader,
             minifierOptions: {
-                // preserveExternals: true
+                preserveExternals: true
             }
         }),
         checker({
