@@ -14,7 +14,7 @@ import {createDirectoryAsync} from "./node-libs/file-io";
 import {wait} from "./node-libs/wait";
 
 const isBundle = false;
-const isMinifyShader = true;
+const isMinifyShader = false;
 
 export const deleteTmpCachesPlugin: () => Plugin = () => {
     return {
