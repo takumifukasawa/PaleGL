@@ -18,9 +18,9 @@
 
 import { Plugin } from 'vite';
 import { promisify } from 'util';
-import cp from 'child_process';
-import path from 'path';
-import crypto from 'crypto';
+import * as cp from 'child_process';
+import * as path from 'path';
+import * as crypto from 'crypto';
 import { rimraf } from 'rimraf';
 import { wait } from './node-libs/wait';
 import {readFileAysnc,createDirectoryAsync,writeFileAsync} from './node-libs/file-io';
@@ -122,7 +122,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     return src;
                 }
 
-                let [, specifiedName, shaderContent] = bundledContent;
+                let [, , shaderContent] = bundledContent;
 
                 // TODO: minify時は改行消しちゃダメな気がする
                 // TODO: devとprodで改行文字の入り方が違う？確認

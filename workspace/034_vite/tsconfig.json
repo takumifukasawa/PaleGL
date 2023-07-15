@@ -16,6 +16,7 @@
       ]
     },
     "types": [
+      "node",
       "vite-plugin-glsl/ext"
     ],
     /* Bundler mode */
@@ -36,7 +37,10 @@
     ]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "vite.config.ts",
+    "vite-shader-minifier-plugin.ts",
+    "node-libs/**/*.ts"
   ],
   "exclude": [
     "node_modules",

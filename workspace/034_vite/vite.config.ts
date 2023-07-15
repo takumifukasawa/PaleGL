@@ -2,14 +2,14 @@ import {resolve} from "path";
 import {defineConfig, Plugin} from "vite";
 import {viteSingleFile} from "vite-plugin-singlefile";
 import {createHtmlPlugin} from "vite-plugin-html";
-import checker from 'vite-plugin-checker';
 import tsconfigPaths from "vite-tsconfig-paths";
+// @ts-ignore
 import gltf from "vite-plugin-gltf";
 import glsl from "vite-plugin-glsl"
-import {shaderMinifierPlugin, ShaderMinifierPluginOptions} from "./vite-shader-minifier-plugin";
+import {shaderMinifierPlugin} from "./vite-shader-minifier-plugin";
 import checker from "vite-plugin-checker";
 import {rimraf} from "rimraf";
-import path from "path";
+import * as path from "path";
 import {createDirectoryAsync} from "./node-libs/file-io";
 import {wait} from "./node-libs/wait";
 
@@ -52,7 +52,7 @@ export default defineConfig({
             warnDuplicatedImports: true,
             exclude: undefined,
             compress: false,
-            enforce: "pre",
+            // enforce: "pre",
         }),
         shaderMinifierPlugin({
             minify: isMinifyShader,

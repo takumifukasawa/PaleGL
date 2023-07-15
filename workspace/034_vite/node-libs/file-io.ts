@@ -1,6 +1,6 @@
-﻿import fs from 'fs';
+﻿import * as fs from 'fs';
 
-export async function createDirectoryAsync(path) {
+export async function createDirectoryAsync(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
         if (fs.existsSync(path)) {
             console.warn('directory already exists: ', path);
@@ -17,7 +17,7 @@ export async function createDirectoryAsync(path) {
     });
 }
 
-export async function writeFileAsync(path, data) {
+export async function writeFileAsync(path: string, data: string | NodeJS.ArrayBufferView): Promise<void> {
     return new Promise((resolve, reject) => {
         fs.writeFile(path, data, (err) => {
             if (err) {
@@ -29,7 +29,7 @@ export async function writeFileAsync(path, data) {
     });
 }
 
-export async function readFileAysnc(path) {
+export async function readFileAysnc(path: string) {
     return new Promise((resolve, reject) => {
         fs.readFile(path, 'utf8', (err, data) => {
             if (err) {
