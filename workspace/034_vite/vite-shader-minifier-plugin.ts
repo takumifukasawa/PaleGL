@@ -132,13 +132,13 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 const isEntryPoint = entryPointRegex.test(shaderContent);
                 
                 if(!isEntryPoint) {
-                    console.log(`skip minify because it\'s not entry point shader: ${id}`);
+                    console.log(`\nskip minify: ${id}\n`);
                     return src;
                 }
 
                 // for debug
-                console.log('\n----- entry point shader content -----\n');
-                console.log(shaderContent);
+                // console.log('\n----- entry point shader content -----\n');
+                // console.log(shaderContent);
 
                 const minifierOptionsString = buildMinifierOptionsString(minifierOptions);
 
