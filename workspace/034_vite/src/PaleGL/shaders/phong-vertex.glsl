@@ -1,8 +1,8 @@
 #version 300 es
 
-#pragma BLOCK_DEFINE
+#pragma DEFINES
 
-#pragma BLOCK_ATTRIBUTES
+#pragma ATTRIBUTES
 
 #include ./partial/vertex-skinning-functions.glsl
 
@@ -30,13 +30,13 @@ uniform float uTime;
 
 void main() {
 
-    #pragma BLOCK_VERTEX_SHADER_BEGIN_MAIN
+    #pragma BEGIN_MAIN
 
     vec4 localPosition = vec4(aPosition, 1.);
 
     #include ./partial/vertex-skinning-calc.glsl;
     
-    #pragma BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS
+    #pragma LOCAL_POSITION_POST_PROCESS
 
     #include ./partial/vertex-normal-map-calc.glsl;
 
@@ -58,7 +58,7 @@ void main() {
     worldPosition = instanceTransform * worldPosition;
 #endif
 
-    #pragma BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS
+    #pragma WORLD_POSITION_POST_PROCESS
  
     vWorldPosition = worldPosition.xyz;
 
@@ -66,15 +66,15 @@ void main() {
 
     vec4 viewPosition = uViewMatrix * worldPosition;
 
-    #pragma BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS
+    #pragma VIEW_POSITION_POST_PROCESS
 
-    #pragma BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS
+    #pragma OUT_CLIP_POSITION_PRE_PROCESS
     
-#ifdef USE_INSTANCING
+#if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     vVertexColor = aInstanceVertexColor;
 #endif
  
     gl_Position = uProjectionMatrix * viewPosition;
 
-    #pragma BLOCK_VERTEX_SHADER_LAST_MAIN
+    #pragma LAST_MAIN
 }

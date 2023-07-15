@@ -151,42 +151,42 @@ export const buildVertexShader = (
         const pragmaName = pragmas[0];
 
         switch (pragmaName) {
-            case ShaderPragmas.BLOCK_DEFINE:
+            case ShaderPragmas.DEFINES:
                 const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;
-            case ShaderPragmas.BLOCK_ATTRIBUTES:
+            case ShaderPragmas.ATTRIBUTES:
                 const attributes = buildVertexAttributeLayouts(attributeDescriptors);
                 newLines.push(...attributes);
                 break;
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_BEGIN_MAIN:
+            case ShaderPragmas.BEGIN_MAIN:
                 if (vertexShaderModifier[VertexShaderModifiers.beginMain]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.beginMain]);
                 }
                 break;
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS:
+            case ShaderPragmas.LOCAL_POSITION_POST_PROCESS:
                 if (vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]);
                 }
                 break;
             // case 'worldPositionPostProcess':
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS:
+            case ShaderPragmas.WORLD_POSITION_POST_PROCESS:
                 if (vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]);
                 }
                 break;
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS:
+            case ShaderPragmas.VIEW_POSITION_POST_PROCESS:
                 if (vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]);
                 }
                 break;
             // case 'outClipPositionPreProcess':
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS:
+            case ShaderPragmas.OUT_CLIP_POSITION_PRE_PROCESS:
                 if (vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]);
                 }
                 break;
-            case ShaderPragmas.BLOCK_VERTEX_SHADER_LAST_MAIN:
+            case ShaderPragmas.LAST_MAIN:
                 if (vertexShaderModifier[VertexShaderModifiers.lastMain]) {
                     newLines.push(vertexShaderModifier[VertexShaderModifiers.lastMain]);
                 }
@@ -225,7 +225,7 @@ export const buildFragmentShader = (shader: string, defineOptions: ShaderDefines
         const pragmaName = pragmas[0];
 
         switch (pragmaName) {
-            case ShaderPragmas.BLOCK_DEFINE:
+            case ShaderPragmas.DEFINES:
                 const defines = buildShaderDefines(defineOptions);
                 newLines.push(...defines);
                 break;

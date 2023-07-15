@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-#pragma BLOCK_DEFINE
+#pragma DEFINES
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 

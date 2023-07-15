@@ -199,14 +199,14 @@ export const CameraTypes = {
 export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
 
 export const ShaderPragmas = {
-    BLOCK_DEFINE: 'BLOCK_DEFINE',
-    BLOCK_ATTRIBUTES: 'BLOCK_ATTRIBUTES',
-    BLOCK_VERTEX_SHADER_BEGIN_MAIN: 'BLOCK_VERTEX_SHADER_BEGIN_MAIN',
-    BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_LOCAL_POSITION_POST_PROCESS',
-    BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS',
-    BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS: 'BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS',
-    BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS: 'BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS',
-    BLOCK_VERTEX_SHADER_LAST_MAIN: 'BLOCK_VERTEX_SHADER_LAST_MAIN',
+    DEFINES: 'DEFINES',
+    ATTRIBUTES: 'ATTRIBUTES',
+    BEGIN_MAIN: 'VERTEX_SHADER_BEGIN_MAIN',
+    LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
+    WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
+    VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
+    OUT_CLIP_POSITION_PRE_PROCESS: 'OUT_CLIP_POSITION_PRE_PROCESS',
+    LAST_MAIN: 'LAST_MAIN',
     DEPTH_FUNCTIONS: "DEPTH_FUNCTIONS",
     ENGINE_UNIFORMS: "ENGINE_UNIFORMS",
     TRANSFORM_VERTEX_UNIFORMS: "TRANSFORM_VERTEX_UNIFORMS"
@@ -224,18 +224,6 @@ export const VertexShaderModifiers = {
 } as const;
 
 export type VertexShaderModifiers = (typeof VertexShaderModifiers)[keyof typeof VertexShaderModifiers];
-
-// export const FragmentShaderPragmas = {
-//     BLOCK_DEFINE: 'BLOCK_DEFINE',
-// } as const;
-// 
-// export type FragmentShaderPragmas = (typeof FragmentShaderPragmas)[keyof typeof FragmentShaderPragmas];
-
-export const FragmentShaderModifiers = {
-    BLOCK_DEFINE: 'BLOCK_DEFINE',
-};
-
-export type FragmentShaderModifiers = (typeof FragmentShaderModifiers)[keyof typeof FragmentShaderModifiers];
 
 // -----------------------------------------------------------------------------
 // webgl

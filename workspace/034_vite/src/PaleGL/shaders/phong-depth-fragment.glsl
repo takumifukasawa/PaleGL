@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-#pragma BLOCK_DEFINE
+#pragma DEFINES
 
 uniform vec4 uColor;
 uniform sampler2D uDiffuseMap; 
@@ -32,11 +32,13 @@ void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    
+    vec4 diffuseColor = vec4(0.);
 
 #ifdef USE_VERTEX_COLOR
-    vec4 diffuseColor = vVertexColor * uColor * diffuseMapColor;
+    diffuseColor = vVertexColor * uColor * diffuseMapColor;
 #else
-    vec4 diffuseColor = uColor * diffuseMapColor;
+    diffuseColor = uColor * diffuseMapColor;
 #endif   
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける

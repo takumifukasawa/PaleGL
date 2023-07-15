@@ -344,7 +344,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
 
-#pragma function_depth
+#pragma DEPTH_FUNCTIONS
 
 float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
@@ -679,7 +679,9 @@ const main = async () => {
         // gpu,
         vertexShader: `#version 300 es
 
-#pragma BLOCK_ATTRIBUTES
+#pragma DEFINES
+
+#pragma ATTRIBUTES
 
 out vec2 vUv;
 out vec3 vWorldPosition;
@@ -724,7 +726,9 @@ void main() {
     vClipPosition = clipPosition;
 }`,
         fragmentShader: `#version 300 es
-            
+
+#pragma DEFINES
+
 precision highp float;
 
 in vec2 vUv;
