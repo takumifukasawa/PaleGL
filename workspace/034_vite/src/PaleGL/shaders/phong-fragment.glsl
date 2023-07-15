@@ -137,10 +137,12 @@ void main() {
    
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
    
+    vec3 worldNormal = vNormal;
+   
 #ifdef USE_NORMAL_MAP
-    vec3 worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
+    worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
 #else
-    vec3 worldNormal = normalize(vNormal);
+    worldNormal = normalize(vNormal);
 #endif  
 
     Surface surface;

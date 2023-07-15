@@ -13,7 +13,7 @@ import {
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { buildVertexShader, buildFragmentShader } from '@/PaleGL/shaders/buildShader';
+import {buildVertexShader, buildFragmentShader, ShaderDefines} from '@/PaleGL/shaders/buildShader';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
@@ -389,13 +389,15 @@ export class Material {
             this.depthFragmentShader = this.depthFragmentShaderGenerator();
         }
 
-        const shaderDefineOptions = {
+        const shaderDefineOptions: ShaderDefines = {
             receiveShadow: !!this.receiveShadow,
             isSkinning: !!this.isSkinning,
             gpuSkinning: !!this.gpuSkinning,
             useNormalMap: !!this.useNormalMap,
             useReceiveShadow: !!this.receiveShadow,
             useVertexColor: !!this.useVertexColor,
+            isInstancing: !!this.isInstancing,
+            useAlphaTest: !!this.alphaTest,
         };
 
         const rawVertexShader = buildVertexShader(
@@ -404,7 +406,10 @@ export class Material {
             shaderDefineOptions,
             this.vertexShaderModifier
         );
-        const rawFragmentShader = buildFragmentShader(this.fragmentShader, shaderDefineOptions);
+        const rawFragmentShader = buildFragmentShader(
+            this.fragmentShader,
+            shaderDefineOptions
+        );
 
         this.rawVertexShader = rawVertexShader;
         this.rawFragmentShader = rawFragmentShader;

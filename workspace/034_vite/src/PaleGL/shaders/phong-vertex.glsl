@@ -45,6 +45,19 @@ void main() {
 
     vec4 worldPosition = uWorldMatrix * localPosition;
 
+#ifdef USE_INSTANCING
+    mat4 instanceTransform = mat4(
+        aInstanceScale.x,       0,                      0,                      0,
+        0,                      aInstanceScale.y,       0,                      0,
+        0,                      0,                      aInstanceScale.z,       0,
+        aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
+    );
+    
+    // NOTE: 本当はworldMatrixをかける前の方がよい
+    
+    worldPosition = instanceTransform * worldPosition;
+#endif
+
     #pragma BLOCK_VERTEX_SHADER_WORLD_POSITION_POST_PROCESS
  
     vWorldPosition = worldPosition.xyz;
@@ -56,6 +69,10 @@ void main() {
     #pragma BLOCK_VERTEX_SHADER_VIEW_POSITION_POST_PROCESS
 
     #pragma BLOCK_VERTEX_SHADER_OUT_CLIP_POSITION_PRE_PROCESS
+    
+#ifdef USE_INSTANCING
+    vVertexColor = aInstanceVertexColor;
+#endif
  
     gl_Position = uProjectionMatrix * viewPosition;
 

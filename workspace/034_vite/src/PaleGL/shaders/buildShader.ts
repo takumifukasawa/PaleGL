@@ -16,14 +16,15 @@ import transformVertexUniforms from '@/PaleGL/shaders/partial/transform-vertex-u
 
 const pragmaRegex = /^#pragma(.*)/;
 
-type VertexShaderDefines = {
-    receiveShadow?: boolean;
-    isSkinning?: boolean;
-    gpuSkinning?: boolean;
-    useNormalMap?: boolean;
-    useReceiveShadow?: boolean;
-    useVertexColor?: boolean;
-    useAlphaTest?: boolean;
+export type ShaderDefines = {
+    receiveShadow: boolean;
+    isSkinning: boolean;
+    gpuSkinning: boolean;
+    useNormalMap: boolean;
+    useReceiveShadow: boolean;
+    useVertexColor: boolean;
+    useAlphaTest: boolean;
+    isInstancing: boolean;
 };
 
 const buildShaderDefines = ({
@@ -34,7 +35,8 @@ const buildShaderDefines = ({
     useReceiveShadow,
     useVertexColor,
     useAlphaTest,
-}: VertexShaderDefines = {}): string[] => {
+    isInstancing,
+}: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
         arr.push('#define USE_RECEIVE_SHADOW');
@@ -57,6 +59,9 @@ const buildShaderDefines = ({
     }
     if (useAlphaTest) {
         arr.push('#define USE_ALPHA_TEST');
+    }
+    if (isInstancing) {
+        arr.push('#define USE_INSTANCING');
     }
 
     return arr;
@@ -126,7 +131,7 @@ const joinShaderLines = (shaderLines: string[]) => {
 export const buildVertexShader = (
     shader: string,
     attributeDescriptors: AttributeDescriptor[],
-    defineOptions: VertexShaderDefines,
+    defineOptions: ShaderDefines,
     vertexShaderModifier: VertexShaderModifier
 ) => {
     const shaderLines = shader.split('\n');
@@ -202,7 +207,7 @@ export const buildVertexShader = (
     return joinShaderLines(resultShaderLines);
 };
 
-export const buildFragmentShader = (shader: string, defineOptions: VertexShaderDefines) => {
+export const buildFragmentShader = (shader: string, defineOptions: ShaderDefines) => {
     const shaderLines = shader.split('\n');
     const resultShaderLines: string[] = [];
 
