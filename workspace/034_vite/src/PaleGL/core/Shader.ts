@@ -33,7 +33,7 @@ export class Shader extends GLObject {
         }
 
         // fragment shader
-
+        
         // create fragment shader
         const fs = gl.createShader(gl.FRAGMENT_SHADER);
         if (!fs) {

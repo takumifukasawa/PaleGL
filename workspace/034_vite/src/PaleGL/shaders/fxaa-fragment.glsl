@@ -1,34 +1,4 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
-// import {IPostProcessPass} from "./AbstractPostProcessPass";
-// import {GPU} from "@/PaleGL/core/GPU";
-import fxaaFragmentShader from "@/PaleGL/shaders/fxaa-fragment.glsl";
-
-// ref:
-// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
-// http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
-// https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
-// http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
-
-export class FXAAPass extends PostProcessPass {
-    // export class FXAAPass implements IPostProcessPass {
-
-    // get gpu() {
-    //     return this.gpu;
-    // }
-    constructor({ gpu }: { gpu: GPU }) {
-        /*
-        // # high quality
-        const edgeStepsArray = [1, 1.5, 2, 2, 2, 2, 2, 2, 2, 4];
-        const edgeStepCount = 10;
-        const edgeGuess = 8;
-        // # low quality
-        // const edgeStepsArray = [1, 1.5, 2, 4];
-        // const edgeStepCount = 4;
-        // const edgeGuess = 12.;
-
-        const fragmentShader = `#version 300 es
+﻿#version 300 es
 
 precision mediump float;
 
@@ -36,7 +6,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D ${UniformNames.SrcTexture};
+uniform sampler2D uSrcTexture;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -100,17 +70,17 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     LuminanceData l;
 
     // get nearest side pixels
-    vec3 rgbTop = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., texelSize.y).xyz;
-    vec3 rgbRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., -texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., 0.).xyz;
+    vec3 rgbTop = sampleTextureOffset(uSrcTexture, uv, 0., texelSize.y).xyz;
+    vec3 rgbRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, 0.).xyz;
+    vec3 rgbBottom = sampleTextureOffset(uSrcTexture, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = sampleTextureOffset(uSrcTexture, uv, 0., 0.).xyz;
 
     // get nearest corner pixels
-    vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbBottomRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, -texelSize.y).xyz;
 
     // get nearest side pixels luma
     float lumaTop = rgbToLuma(rgbTop);
@@ -277,6 +247,21 @@ EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
 }
 
 float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelSize) {
+
+    // # high quality
+    // const edgeStepsArray = [1, 1.5, 2, 2, 2, 2, 2, 2, 2, 4];
+    // const edgeStepCount = 10;
+    // const edgeGuess = 8;
+    // # low quality
+    // const edgeStepsArray = [1, 1.5, 2, 4];
+    // const edgeStepCount = 4;
+    // const edgeGuess = 12.;
+
+
+    float[10] edgeStepsArray = float[](1., 1.5, 2., 2., 2., 2., 2., 2., 2., 4.);
+    const int edgeStepCount = 10;
+    float edgeGuess = 8.;
+
     vec2 uvEdge = uv; // copy
     vec2 edgeStep = vec2(0.);
 
@@ -296,51 +281,43 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     // +方向に一定回数edgeStepずらしながら輝度差,uv値を計算
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
 
-    vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
-    float pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, puv).xyz) - edgeLuma;
+    // vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
+    vec2 puv = uvEdge + edgeStep * vec2(edgeStepsArray[0]);
+    float pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
-    // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
-${new Array(edgeStepCount - 1)
-    .fill(0)
-    .map((_, i) => {
-        return `
-    if(!pAtEnd) {
-        puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-        pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, puv).xyz) - edgeLuma;
-        pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
+    // TODO: unroll
+    for(int i = 1; i < edgeStepCount && !pAtEnd; i++) {
+        if(!pAtEnd) {
+            puv += edgeStep * vec2(edgeStepsArray[i + 1]);
+            pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
+            pAtEnd = abs(pLumaDelta) >= gradientThreshold;
+        }
     }
-`;
-    })
-    .join('\n')}
-    // }
+
     if(!pAtEnd) {
-        puv += edgeStep * vec2(${edgeGuess});
+        puv += edgeStep * vec2(edgeGuess);
     }
+    
     
     // -方向に一定回数edgeStepずらしながら輝度差,uv値を計算
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
-    vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
-    float nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, nuv).xyz) - edgeLuma;
+    vec2 nuv = uvEdge - edgeStep * vec2(edgeStepsArray[0]);
+    float nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
-    // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
-${new Array(edgeStepCount - 1)
-    .fill(0)
-    .map((_, i) => {
-        return `   
-    if(!nAtEnd) {
-        nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-        nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, nuv).xyz) - edgeLuma;
-        nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+    // TODO: unroll
+    for(int i = 1; i < edgeStepCount && !nAtEnd; i++) {
+        if(!nAtEnd) {
+            nuv -= edgeStep * vec2(edgeStepsArray[i + 1]);
+            nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
+            nAtEnd = abs(nLumaDelta) >= gradientThreshold;
+        }
     }
-`;
-    })
-    .join('\n')}
-    // }
+
     if(!nAtEnd) {
-        nuv -= edgeStep * vec2(${edgeGuess});
+        nuv -= edgeStep * vec2(edgeGuess);
     }
     
     // 探索を打ち切った地点のuv値と自身のピクセルを元に+方向と-方向の距離を計算
@@ -388,7 +365,7 @@ void main() {
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
-        outColor = sampleTexture(${UniformNames.SrcTexture}, uv);
+        outColor = sampleTexture(uSrcTexture, uv);
         return;
     }
     
@@ -404,54 +381,6 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    outColor = sampleTexture(${UniformNames.SrcTexture}, uv);
+    outColor = sampleTexture(uSrcTexture, uv);
     // outColor = sampleTexture(${UniformNames.SrcTexture}, vUv);
-}
-`;
-*/
-        const fragmentShader = fxaaFragmentShader;
-
-        super({
-            gpu,
-            fragmentShader,
-            uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                // 1/32 = 0.03125 ... visible limit
-                // 1/16 = 0.0625 ... high quality
-                // 1/12 = 0.0833 ... upper limit
-                uContrastThreshold: {
-                    type: UniformTypes.Float,
-                    value: 0.0625,
-                },
-                // 1/3 = 0.333 ... too little
-                // 1/4 = 0.25 ... low quality
-                // 1/8 = 0.125 ... high quality
-                // 1/16 = 0.0625 ... overkill
-                uRelativeThreshold: {
-                    type: UniformTypes.Float,
-                    value: 0.125,
-                },
-                uSubpixelBlending: {
-                    type: UniformTypes.Float,
-                    value: 0.75,
-                },
-            },
-        });
-        // this.gpu = gpu;
-    }
-
-    setSize(width: number, height: number) {
-        super.setSize(width, height);
-        // this.material.uniforms.uTargetWidth.value = width;
-        // this.material.uniforms.uTargetHeight.value = height;
-        this.material.updateUniform('uTargetWidth', width);
-        this.material.updateUniform('uTargetHeight', height);
-    }
 }

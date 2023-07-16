@@ -1,12 +1,15 @@
 ﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
-import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
+// import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
+import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
+
+const BLUR_PIXEL_NUM = 7;
 
 // export class GaussianBlurPass extends AbstractPostProcessPass {
 export class GaussianBlurPass implements IPostProcessPass {
@@ -22,19 +25,21 @@ export class GaussianBlurPass implements IPostProcessPass {
         return this.#passes[this.#passes.length - 1].renderTarget;
     }
 
-    constructor({ gpu, blurPixelNum = 7 }: { gpu: GPU; blurPixelNum: number }) {
+    // constructor({ gpu, blurPixelNum = 7 }: { gpu: GPU; blurPixelNum: number }) {
+    constructor({ gpu }: { gpu: GPU }) {
         // super();
 
-        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 
         const horizontalBlurPass = new FragmentPass({
             name: 'horizontal blur pass',
             gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true,
-                pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SrcTexture
-            }),
+            fragmentShader: gaussianBlurFragmentShader,
+            // fragmentShader: gaussianBlurFragmentShader({
+            //     isHorizontal: true,
+            //     pixelNum: blurPixelNum,
+            //     srcTextureUniformName: UniformNames.SrcTexture
+            // }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -48,16 +53,21 @@ export class GaussianBlurPass implements IPostProcessPass {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
                 },
+                uIsHorizontal: {
+                    type: UniformTypes.Float,
+                    value: 1.
+                }
             },
         });
         const verticalBlurPass = new FragmentPass({
             name: 'vertical blur pass',
             gpu,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false,
-                pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SrcTexture,
-            }),
+            fragmentShader: gaussianBlurFragmentShader,
+            // fragmentShader: gaussianBlurFragmentShader({
+            //     isHorizontal: false,
+            //     pixelNum: blurPixelNum,
+            //     srcTextureUniformName: UniformNames.SrcTexture,
+            // }),
             uniforms: {
                 uTargetWidth: {
                     type: UniformTypes.Float,
@@ -70,6 +80,10 @@ export class GaussianBlurPass implements IPostProcessPass {
                 uBlurWeights: {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
+                },
+                uIsHorizontal: {
+                    type: UniformTypes.Float,
+                    value: 0.
                 },
             },
         });

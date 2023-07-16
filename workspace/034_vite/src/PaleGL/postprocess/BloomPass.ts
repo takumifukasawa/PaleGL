@@ -2,7 +2,7 @@
 import { UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
-import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
+// import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
 import { Material } from '@/PaleGL/materials/Material';
@@ -11,6 +11,11 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
+import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
+import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
+import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
+
+const BLUR_PIXEL_NUM = 7;
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
@@ -92,36 +97,37 @@ export class BloomPass implements IPostProcessPass {
 
         this.extractBrightnessPass = new FragmentPass({
             gpu,
-            fragmentShader: `#version 300 es
-            
-precision mediump float;
-
-out vec4 outColor;
-
-in vec2 vUv;
-
-uniform sampler2D ${UniformNames.SrcTexture};
-uniform float uThreshold;
-
-void main() {
-    vec4 color = texture(${UniformNames.SrcTexture}, vUv);
-    float k = uThreshold;
-    
-    // pattern_1
-    // ex
-    // k: 0.9, c: 1 => b = 1 
-    // k: 0.8, c: 1 => b = 0.25
-    vec4 b = (color - vec4(k)) / (1. - k);
-    
-    // pattern_2
-    // vec4 b = color - k;
-    
-    outColor = clamp(b, 0., 1.);
-
-    // for debug
-    // outColor = b;
-}
-            `,
+            fragmentShader: extractBrightnessFragmentShader,
+//             fragmentShader: `#version 300 es
+//             
+// precision mediump float;
+// 
+// out vec4 outColor;
+// 
+// in vec2 vUv;
+// 
+// uniform sampler2D ${UniformNames.SrcTexture};
+// uniform float uThreshold;
+// 
+// void main() {
+//     vec4 color = texture(${UniformNames.SrcTexture}, vUv);
+//     float k = uThreshold;
+//     
+//     // pattern_1
+//     // ex
+//     // k: 0.9, c: 1 => b = 1 
+//     // k: 0.8, c: 1 => b = 0.25
+//     vec4 b = (color - vec4(k)) / (1. - k);
+//     
+//     // pattern_2
+//     // vec4 b = color - k;
+//     
+//     outColor = clamp(b, 0., 1.);
+// 
+//     // for debug
+//     // outColor = b;
+// }
+//             `,
             uniforms: {
                 uThreshold: {
                     type: UniformTypes.Float,
@@ -130,19 +136,17 @@ void main() {
             },
         });
 
-        // 可変でもよい
-        const blurPixelNum = 7;
-
-        const blurWeights = getGaussianBlurWeights(blurPixelNum, Math.floor(blurPixelNum / 2));
+        const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 
         this.horizontalBlurMaterial = new Material({
             // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: true,
-                pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SrcTexture,
-            }),
+            fragmentShader: gaussianBlurFragmentShader,
+            // fragmentShader: gaussianBlurFragmentShader({
+            //     isHorizontal: true,
+            //     pixelNum: blurPixelNum,
+            //     srcTextureUniformName: UniformNames.SrcTexture,
+            // }),
             uniforms: {
                 [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
@@ -160,16 +164,21 @@ void main() {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
                 },
+                uIsHorizontal: {
+                    type: UniformTypes.Float,
+                    value: 1.
+                }
             },
         });
         this.verticalBlurMaterial = new Material({
             // gpu,
             vertexShader: PostProcessPass.baseVertexShader,
-            fragmentShader: gaussianBlurFragmentShader({
-                isHorizontal: false,
-                pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SrcTexture,
-            }),
+            fragmentShader: gaussianBlurFragmentShader,
+            // fragmentShader: gaussianBlurFragmentShader({
+            //     isHorizontal: false,
+            //     pixelNum: blurPixelNum,
+            //     srcTextureUniformName: UniformNames.SrcTexture,
+            // }),
             uniforms: {
                 [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
@@ -187,6 +196,10 @@ void main() {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
                 },
+                uIsHorizontal: {
+                    type: UniformTypes.Float,
+                    value: 0.
+                }
             },
         });
 
@@ -231,42 +244,43 @@ void main() {
 
         this.compositePass = new FragmentPass({
             gpu,
-            fragmentShader: `#version 300 es
-            
-precision mediump float;
-
-in vec2 vUv;
-
-out vec4 outColor;
-
-uniform sampler2D ${UniformNames.SrcTexture};
-uniform sampler2D uBlur4Texture;
-uniform sampler2D uBlur8Texture;
-uniform sampler2D uBlur16Texture;
-uniform sampler2D uBlur32Texture;
-uniform float uTone;
-uniform float uBloomAmount;
-
-void main() {
-    vec4 blur4Color = texture(uBlur4Texture, vUv);
-    vec4 blur8Color = texture(uBlur8Texture, vUv);
-    vec4 blur16Color = texture(uBlur16Texture, vUv);
-    vec4 blur32Color = texture(uBlur32Texture, vUv);
-    vec4 sceneColor = texture(${UniformNames.SrcTexture}, vUv) * uTone;
-
-    vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
-
-    outColor = sceneColor + blurColor;
-
-    // for debug
-    // outColor = blur4Color;
-    // outColor = blur8Color;
-    // outColor = blur16Color;
-    // outColor = blur32Color;
-    // outColor = blurColor;
-    // outColor = sceneColor;
-}           
-            `,
+            fragmentShader: bloomCompositeFragmentShader,
+//             fragmentShader: `#version 300 es
+//             
+// precision mediump float;
+// 
+// in vec2 vUv;
+// 
+// out vec4 outColor;
+// 
+// uniform sampler2D ${UniformNames.SrcTexture};
+// uniform sampler2D uBlur4Texture;
+// uniform sampler2D uBlur8Texture;
+// uniform sampler2D uBlur16Texture;
+// uniform sampler2D uBlur32Texture;
+// uniform float uTone;
+// uniform float uBloomAmount;
+// 
+// void main() {
+//     vec4 blur4Color = texture(uBlur4Texture, vUv);
+//     vec4 blur8Color = texture(uBlur8Texture, vUv);
+//     vec4 blur16Color = texture(uBlur16Texture, vUv);
+//     vec4 blur32Color = texture(uBlur32Texture, vUv);
+//     vec4 sceneColor = texture(${UniformNames.SrcTexture}, vUv) * uTone;
+// 
+//     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
+// 
+//     outColor = sceneColor + blurColor;
+// 
+//     // for debug
+//     // outColor = blur4Color;
+//     // outColor = blur8Color;
+//     // outColor = blur16Color;
+//     // outColor = blur32Color;
+//     // outColor = blurColor;
+//     // outColor = sceneColor;
+// }           
+//             `,
             uniforms: {
                 [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,

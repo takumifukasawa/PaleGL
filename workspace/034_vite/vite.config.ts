@@ -91,7 +91,7 @@ export default defineConfig({
     server: {
         watch: {
             usePolling: true,
-            interval: 500
+            interval: 1000
         }
     }
 });

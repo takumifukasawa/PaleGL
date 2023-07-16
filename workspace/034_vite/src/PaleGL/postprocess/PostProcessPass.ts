@@ -21,6 +21,7 @@ export class PostProcessPass implements IPostProcessPass {
     material: Material;
     renderTarget: RenderTarget;
 
+    // TODO: glslファイル化
     static get baseVertexShader() {
         return `#version 300 es
 
