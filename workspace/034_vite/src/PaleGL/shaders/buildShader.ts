@@ -7,14 +7,18 @@
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 
-import { VertexShaderModifier } from '@/PaleGL/materials/Material';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
-import { ShaderPragmas, VertexShaderModifiers } from '@/PaleGL/constants';
+import {
+    VertexShaderModifierPragmas,
+    FragmentShaderModifierPragmas,
+    ShaderPartialPragmas,
+    ShaderPragmas,
+    VertexShaderModifier,
+    FragmentShaderModifier,
+} from '@/PaleGL/constants';
 import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
 import transformVertexUniforms from '@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl';
-
-const pragmaRegex = /^#pragma(.*)/;
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -25,6 +29,14 @@ export type ShaderDefines = {
     useVertexColor: boolean;
     useAlphaTest: boolean;
     isInstancing: boolean;
+};
+
+const insertShaderPairs: {
+    [key in ShaderPartialPragmas]: string;
+} = {
+    [ShaderPartialPragmas.DEPTH_FUNCTIONS]: depthFunctions,
+    [ShaderPartialPragmas.ENGINE_UNIFORMS]: engineUniforms,
+    [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: transformVertexUniforms,
 };
 
 const buildShaderDefines = ({
@@ -121,12 +133,12 @@ export const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescr
     return attributesList;
 };
 
-const joinShaderLines = (shaderLines: string[]) => {
-    return shaderLines
-        .map((line) => line.replace(/^\s*$/, ''))
-        .join('\n')
-        .replaceAll(/\n{3,}/g, '\n');
-};
+// const joinShaderLines = (shaderLines: string[]) => {
+//     return shaderLines
+//         .map((line) => line.replace(/^\s*$/, ''))
+//         .join('\n')
+//         .replaceAll(/\n{3,}/g, '\n');
+// };
 
 export const buildVertexShader = (
     shader: string,
@@ -134,110 +146,117 @@ export const buildVertexShader = (
     defineOptions: ShaderDefines,
     vertexShaderModifier: VertexShaderModifier
 ) => {
-    const shaderLines = shader.split('\n');
-    const resultShaderLines: string[] = [];
+    let replacedShader: string = shader;
 
-    shaderLines.forEach((shaderLine) => {
-        const pragma = shaderLine.trim().match(pragmaRegex);
-
-        if (!pragma) {
-            resultShaderLines.push(shaderLine);
-            return;
-        }
-
-        const newLines = [];
-        const pragmas = pragma[1].trim().split(' ');
-
-        const pragmaName = pragmas[0];
-
-        switch (pragmaName) {
-            case ShaderPragmas.DEFINES:
-                const defines = buildShaderDefines(defineOptions);
-                newLines.push(...defines);
-                break;
-            case ShaderPragmas.ATTRIBUTES:
-                const attributes = buildVertexAttributeLayouts(attributeDescriptors);
-                newLines.push(...attributes);
-                break;
-            case ShaderPragmas.BEGIN_MAIN:
-                if (vertexShaderModifier[VertexShaderModifiers.beginMain]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.beginMain]);
-                }
-                break;
-            case ShaderPragmas.LOCAL_POSITION_POST_PROCESS:
-                if (vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.localPositionPostProcess]);
-                }
-                break;
-            // case 'worldPositionPostProcess':
-            case ShaderPragmas.WORLD_POSITION_POST_PROCESS:
-                if (vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.worldPositionPostProcess]);
-                }
-                break;
-            case ShaderPragmas.VIEW_POSITION_POST_PROCESS:
-                if (vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.viewPositionPostProcess]);
-                }
-                break;
-            // case 'outClipPositionPreProcess':
-            case ShaderPragmas.OUT_CLIP_POSITION_PRE_PROCESS:
-                if (vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.outClipPositionPreProcess]);
-                }
-                break;
-            case ShaderPragmas.LAST_MAIN:
-                if (vertexShaderModifier[VertexShaderModifiers.lastMain]) {
-                    newLines.push(vertexShaderModifier[VertexShaderModifiers.lastMain]);
-                }
-                break;
-
-            case ShaderPragmas.TRANSFORM_VERTEX_UNIFORMS:
-                newLines.push(transformVertexUniforms);
-                break;
-            case ShaderPragmas.ENGINE_UNIFORMS:
-                newLines.push(engineUniforms);
-                break;
-            default:
-                // throw `[buildVertexShader] invalid pragma: ${pragmaName}`;
-                break;
-        }
-        resultShaderLines.push(newLines.join('\n'));
+    // replace defines
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
+        const defines = buildShaderDefines(defineOptions);
+        return defines.join('\n');
     });
-    return joinShaderLines(resultShaderLines);
+
+    // replace attributes
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
+        const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+        return attributes.join('\n');
+    });
+
+    // replace shader block
+    Object.keys(VertexShaderModifierPragmas).forEach((key) => {
+        const pragma = key as VertexShaderModifierPragmas;
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+            if (!vertexShaderModifier[pragma]) {
+                return '';
+            }
+            return vertexShaderModifier[pragma] || '';
+        });
+    });
+
+    // replace partial shader
+    Object.keys(ShaderPartialPragmas).forEach((key) => {
+        const pragma = key as ShaderPartialPragmas;
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+            return insertShaderPairs[pragma];
+        });
+    });
+
+    return replacedShader;
+
+    // TODO: なくて大丈夫？
+    // return joinShaderLines(resultShaderLines);
 };
 
-export const buildFragmentShader = (shader: string, defineOptions: ShaderDefines) => {
-    const shaderLines = shader.split('\n');
-    const resultShaderLines: string[] = [];
+export const buildFragmentShader = (
+    shader: string,
+    defineOptions: ShaderDefines,
+    fragmentShaderModifier: FragmentShaderModifier
+) => {
+    // const shaderLines = shader.split('\n');
+    // const resultShaderLines: string[] = [];
 
-    shaderLines.forEach((shaderLine) => {
-        const pragma = shaderLine.trim().match(pragmaRegex);
+    // shaderLines.forEach((shaderLine) => {
+    //     const pragma = shaderLine.trim().match(pragmaRegex);
 
-        if (!pragma) {
-            resultShaderLines.push(shaderLine);
-            return;
-        }
+    //     if (!pragma) {
+    //         resultShaderLines.push(shaderLine);
+    //         return;
+    //     }
 
-        const newLines = [];
-        const pragmas = pragma[1].trim().split(' ');
+    //     const newLines = [];
+    //     const pragmas = pragma[1].trim().split(' ');
 
-        const pragmaName = pragmas[0];
+    //     const pragmaName = pragmas[0];
 
-        switch (pragmaName) {
-            case ShaderPragmas.DEFINES:
-                const defines = buildShaderDefines(defineOptions);
-                newLines.push(...defines);
-                break;
-            case ShaderPragmas.DEPTH_FUNCTIONS:
-                newLines.push(depthFunctions);
-                break;
-            default:
-                throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
-        }
-        resultShaderLines.push(newLines.join('\n'));
+    //     switch (pragmaName) {
+    //         case ShaderPragmas.DEFINES:
+    //             const defines = buildShaderDefines(defineOptions);
+    //             newLines.push(...defines);
+    //             break;
+    //         case ShaderPragmas.DEPTH_FUNCTIONS:
+    //             newLines.push(depthFunctions);
+    //             break;
+    //         default:
+    //             throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
+    //     }
+    //     resultShaderLines.push(newLines.join('\n'));
+    // });
+
+    let replacedShader: string = shader;
+
+    // replace defines
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
+        const defines = buildShaderDefines(defineOptions);
+        return defines.join('\n');
     });
-    return joinShaderLines(resultShaderLines);
+
+    // replace attributes
+    //replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
+    //    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
+    //    return attributes.join('\n');
+    //});
+
+    // replace shader block
+    Object.keys(FragmentShaderModifierPragmas).forEach((key) => {
+        const pragma = key as FragmentShaderModifierPragmas;
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+            if (!fragmentShaderModifier[pragma]) {
+                return '';
+            }
+            return fragmentShaderModifier[pragma] || '';
+        });
+    });
+
+    // replace partial shader
+    Object.keys(ShaderPartialPragmas).forEach((key) => {
+        const pragma = key as ShaderPartialPragmas;
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+            return insertShaderPairs[pragma];
+        });
+    });
+
+    return replacedShader;
+
+    // TODO: なくて大丈夫？
+    // return joinShaderLines(resultShaderLines);
 };
 
 export const defaultDepthFragmentShader = () => defaultDepthFragment;

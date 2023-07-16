@@ -75,8 +75,7 @@ import {
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
-    AttributeNames,
-    // VertexShaderModifiers,
+    AttributeNames, VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -491,6 +490,10 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
+        vertexShaderModifier: {
+            [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
+            [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
+        }
 //         vertexShaderModifier: {
 //             // worldPositionPostProcess: `
 //             [VertexShaderModifiers.worldPositionPostProcess]: `

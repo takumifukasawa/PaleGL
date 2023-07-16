@@ -76,5 +76,5 @@ void main() {
  
     gl_Position = uProjectionMatrix * viewPosition;
 
-    #pragma LAST_MAIN
+    #pragma END_MAIN
 }

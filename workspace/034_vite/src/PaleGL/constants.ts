@@ -198,32 +198,75 @@ export const CameraTypes = {
 
 export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
 
-export const ShaderPragmas = {
-    DEFINES: 'DEFINES',
-    ATTRIBUTES: 'ATTRIBUTES',
-    BEGIN_MAIN: 'VERTEX_SHADER_BEGIN_MAIN',
+const ShaderModifierPragmas = {
+    BEGIN_MAIN: 'BEGIN_MAIN',
+    END_MAIN: 'END_MAIN',
+} as const;
+
+type ShaderModifierPragmas = (typeof ShaderModifierPragmas)[keyof typeof ShaderModifierPragmas];
+
+export const VertexShaderModifierPragmas = {
     LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
     WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
     VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
     OUT_CLIP_POSITION_PRE_PROCESS: 'OUT_CLIP_POSITION_PRE_PROCESS',
-    LAST_MAIN: 'LAST_MAIN',
-    DEPTH_FUNCTIONS: "DEPTH_FUNCTIONS",
-    ENGINE_UNIFORMS: "ENGINE_UNIFORMS",
-    TRANSFORM_VERTEX_UNIFORMS: "TRANSFORM_VERTEX_UNIFORMS"
+    ...ShaderModifierPragmas,
+} as const;
+
+export type VertexShaderModifierPragmas =
+    (typeof VertexShaderModifierPragmas)[keyof typeof VertexShaderModifierPragmas];
+
+export const FragmentShaderModifierPragmas = {
+    ...ShaderModifierPragmas,
+} as const;
+export type FragmentShaderModifierPragmas =
+    (typeof FragmentShaderModifierPragmas)[keyof typeof FragmentShaderModifierPragmas];
+
+// TODO: key to type
+export type VertexShaderModifier = {
+    [key in VertexShaderModifierPragmas]?: string;
+};
+
+export type FragmentShaderModifier = {
+    [key in FragmentShaderModifierPragmas]?: string;
+};
+
+export const ShaderPartialPragmas = {
+    DEPTH_FUNCTIONS: 'DEPTH_FUNCTIONS',
+    ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
+    TRANSFORM_VERTEX_UNIFORMS: 'TRANSFORM_VERTEX_UNIFORMS',
+} as const;
+
+export type ShaderPartialPragmas = (typeof ShaderPartialPragmas)[keyof typeof ShaderPartialPragmas];
+
+export const ShaderPragmas = {
+    DEFINES: 'DEFINES',
+    ATTRIBUTES: 'ATTRIBUTES',
+    // BEGIN_MAIN: 'BEGIN_MAIN',
+    // LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
+    // WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
+    // VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
+    // OUT_CLIP_POSITION_PRE_PROCESS: 'OUT_CLIP_POSITION_PRE_PROCESS',
+    // LAST_MAIN: 'LAST_MAIN',
+    // DEPTH_FUNCTIONS: "DEPTH_FUNCTIONS",
+    // ENGINE_UNIFORMS: "ENGINE_UNIFORMS",
+    // TRANSFORM_VERTEX_UNIFORMS: "TRANSFORM_VERTEX_UNIFORMS",
+    ...ShaderModifierPragmas,
+    ...ShaderPartialPragmas,
 } as const;
 
 export type ShaderPragmas = (typeof ShaderPragmas)[keyof typeof ShaderPragmas];
 
-export const VertexShaderModifiers = {
-    beginMain: 'beginMain',
-    localPositionPostProcess: 'localPositionPostProcess',
-    worldPositionPostProcess: 'worldPositionPostProcess',
-    viewPositionPostProcess: 'viewPositionPostProcess',
-    outClipPositionPreProcess: 'outClipPositionPreProcess',
-    lastMain: 'lastMain',
-} as const;
-
-export type VertexShaderModifiers = (typeof VertexShaderModifiers)[keyof typeof VertexShaderModifiers];
+// export const VertexShaderModifiers = {
+//     beginMain: 'beginMain',
+//     localPositionPostProcess: 'localPositionPostProcess',
+//     worldPositionPostProcess: 'worldPositionPostProcess',
+//     viewPositionPostProcess: 'viewPositionPostProcess',
+//     outClipPositionPreProcess: 'outClipPositionPreProcess',
+//     lastMain: 'lastMain',
+// } as const;
+//
+// export type VertexShaderModifiers = (typeof VertexShaderModifiers)[keyof typeof VertexShaderModifiers];
 
 // -----------------------------------------------------------------------------
 // webgl

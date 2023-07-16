@@ -10,10 +10,12 @@ import {
     BlendType,
     RenderQueue,
     UniformType,
+    VertexShaderModifier,
+    FragmentShaderModifier,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import {buildVertexShader, buildFragmentShader, ShaderDefines} from '@/PaleGL/shaders/buildShader';
+import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/shaders/buildShader';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
@@ -43,6 +45,7 @@ export type MaterialArgs = {
     depthFragmentShaderGenerator?: DepthFragmentShaderGenerator;
 
     vertexShaderModifier?: VertexShaderModifier;
+    fragmentShaderModifier?: FragmentShaderModifier;
 
     primitiveType?: PrimitiveType;
     depthTest?: boolean | null;
@@ -92,16 +95,6 @@ export type UniformValue =
     | DirectionalLightStruct
     | UniformStructValue
     | null;
-
-// TODO: key to type
-export type VertexShaderModifier = {
-    beginMain?: string;
-    localPositionPostProcess?: string;
-    worldPositionPostProcess?: string;
-    viewPositionPostProcess?: string;
-    outClipPositionPreProcess?: string;
-    lastMain?: string;
-};
 
 export type VertexShaderGenerator = ({
     attributeDescriptors,
@@ -182,6 +175,7 @@ export class Material {
     private fragmentShaderGenerator: FragmentShaderGenerator | null = null;
     private depthFragmentShaderGenerator: DepthFragmentShaderGenerator | null = null;
     private _vertexShaderModifier: VertexShaderModifier = {};
+    private _fragmentShaderModifier: FragmentShaderModifier = {};
 
     get isCompiledShader() {
         return !!this.shader;
@@ -189,6 +183,10 @@ export class Material {
 
     get vertexShaderModifier() {
         return this._vertexShaderModifier;
+    }
+
+    get fragmentShaderModifier() {
+        return this._fragmentShaderModifier;
     }
 
     get useAlphaTest() {
@@ -408,7 +406,8 @@ export class Material {
         );
         const rawFragmentShader = buildFragmentShader(
             this.fragmentShader,
-            shaderDefineOptions
+            shaderDefineOptions,
+            this.fragmentShaderModifier
         );
 
         this.rawVertexShader = rawVertexShader;
