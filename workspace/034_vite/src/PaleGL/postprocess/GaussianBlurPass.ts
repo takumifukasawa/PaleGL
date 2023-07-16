@@ -33,7 +33,7 @@ export class GaussianBlurPass implements IPostProcessPass {
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: true,
                 pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SceneTexture,
+                srcTextureUniformName: UniformNames.SrcTexture
             }),
             uniforms: {
                 uTargetWidth: {
@@ -56,7 +56,7 @@ export class GaussianBlurPass implements IPostProcessPass {
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: false,
                 pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SceneTexture,
+                srcTextureUniformName: UniformNames.SrcTexture,
             }),
             uniforms: {
                 uTargetWidth: {
@@ -107,7 +107,7 @@ export class GaussianBlurPass implements IPostProcessPass {
             pass.mesh.updateTransform();
             // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             pass.material.updateUniform(
-                UniformNames.SceneTexture,
+                UniformNames.SrcTexture,
                 i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
             );
             if (!pass.material.isCompiledShader) {

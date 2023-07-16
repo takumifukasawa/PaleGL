@@ -100,11 +100,11 @@ out vec4 outColor;
 
 in vec2 vUv;
 
-uniform sampler2D ${UniformNames.SceneTexture};
+uniform sampler2D ${UniformNames.SrcTexture};
 uniform float uThreshold;
 
 void main() {
-    vec4 color = texture(${UniformNames.SceneTexture}, vUv);
+    vec4 color = texture(${UniformNames.SrcTexture}, vUv);
     float k = uThreshold;
     
     // pattern_1
@@ -141,10 +141,10 @@ void main() {
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: true,
                 pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SceneTexture,
+                srcTextureUniformName: UniformNames.SrcTexture,
             }),
             uniforms: {
-                [UniformNames.SceneTexture]: {
+                [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -168,10 +168,10 @@ void main() {
             fragmentShader: gaussianBlurFragmentShader({
                 isHorizontal: false,
                 pixelNum: blurPixelNum,
-                srcTextureUniformName: UniformNames.SceneTexture,
+                srcTextureUniformName: UniformNames.SrcTexture,
             }),
             uniforms: {
-                [UniformNames.SceneTexture]: {
+                [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -239,7 +239,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D ${UniformNames.SceneTexture};
+uniform sampler2D ${UniformNames.SrcTexture};
 uniform sampler2D uBlur4Texture;
 uniform sampler2D uBlur8Texture;
 uniform sampler2D uBlur16Texture;
@@ -252,7 +252,7 @@ void main() {
     vec4 blur8Color = texture(uBlur8Texture, vUv);
     vec4 blur16Color = texture(uBlur16Texture, vUv);
     vec4 blur32Color = texture(uBlur32Texture, vUv);
-    vec4 sceneColor = texture(${UniformNames.SceneTexture}, vUv) * uTone;
+    vec4 sceneColor = texture(${UniformNames.SrcTexture}, vUv) * uTone;
 
     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
 
@@ -268,7 +268,7 @@ void main() {
 }           
             `,
             uniforms: {
-                [UniformNames.SceneTexture]: {
+                [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -361,7 +361,7 @@ void main() {
             // this.horizontalBlurMaterial.uniforms.uTargetWidth.value = w;
             // this.horizontalBlurMaterial.uniforms.uTargetHeight.value = h;
             this.horizontalBlurMaterial.updateUniform(
-                UniformNames.SceneTexture,
+                UniformNames.SrcTexture,
                 this.extractBrightnessPass.renderTarget.texture
             );
             this.horizontalBlurMaterial.updateUniform('uTargetWidth', w);
@@ -373,7 +373,7 @@ void main() {
             // this.verticalBlurMaterial.uniforms[UniformNames.SceneTexture].value = horizontalRenderTarget.texture;
             // this.verticalBlurMaterial.uniforms.uTargetWidth.value = w;
             // this.verticalBlurMaterial.uniforms.uTargetHeight.value = h;
-            this.verticalBlurMaterial.updateUniform(UniformNames.SceneTexture, horizontalRenderTarget.texture);
+            this.verticalBlurMaterial.updateUniform(UniformNames.SrcTexture, horizontalRenderTarget.texture);
             this.verticalBlurMaterial.updateUniform('uTargetWidth', w);
             this.verticalBlurMaterial.updateUniform('uTargetHeight', h);
             renderer.renderMesh(this.geometry, this.verticalBlurMaterial);
@@ -399,7 +399,7 @@ void main() {
         // this.compositePass.material.uniforms.uBlur32Texture.value = this.renderTargetBlurMip32_Vertical.texture;
         // this.compositePass.material.uniforms.uTone.value = this.tone;
         // this.compositePass.material.uniforms.uBloomAmount.value = this.bloomAmount;
-        this.compositePass.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
+        this.compositePass.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         this.compositePass.material.updateUniform('uBlur4Texture', this.renderTargetBlurMip4_Vertical.texture);
         this.compositePass.material.updateUniform('uBlur8Texture', this.renderTargetBlurMip8_Vertical.texture);
         this.compositePass.material.updateUniform('uBlur16Texture', this.renderTargetBlurMip16_Vertical.texture);

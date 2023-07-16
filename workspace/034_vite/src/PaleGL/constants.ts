@@ -183,8 +183,8 @@ export const UniformNames = {
     ShadowMap: 'uShadowMap',
     ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
     ShadowBias: 'uShadowBias',
-    // post process
-    SceneTexture: 'uSceneTexture',
+    // mainly post process
+    SrcTexture: 'uSrcTexture',
     // time
     Time: 'uTime',
 } as const;

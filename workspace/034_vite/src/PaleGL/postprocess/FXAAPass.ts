@@ -34,7 +34,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D ${UniformNames.SceneTexture};
+uniform sampler2D ${UniformNames.SrcTexture};
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -98,17 +98,17 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     LuminanceData l;
 
     // get nearest side pixels
-    vec3 rgbTop = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., texelSize.y).xyz;
-    vec3 rgbRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., -texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(${UniformNames.SceneTexture}, uv, 0., 0.).xyz;
+    vec3 rgbTop = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., texelSize.y).xyz;
+    vec3 rgbRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, 0.).xyz;
+    vec3 rgbBottom = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = sampleTextureOffset(${UniformNames.SrcTexture}, uv, 0., 0.).xyz;
 
     // get nearest corner pixels
-    vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SceneTexture}, uv, texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SceneTexture}, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbBottomRight = sampleTextureOffset(${UniformNames.SrcTexture}, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = sampleTextureOffset(${UniformNames.SrcTexture}, uv, -texelSize.x, -texelSize.y).xyz;
 
     // get nearest side pixels luma
     float lumaTop = rgbToLuma(rgbTop);
@@ -295,7 +295,7 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
 
     vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
-    float pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
+    float pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !pAtEnd; i++) {
@@ -305,7 +305,7 @@ ${new Array(edgeStepCount - 1)
         return `
     if(!pAtEnd) {
         puv += edgeStep * vec2(${edgeStepsArray[i + 1]});
-        pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, puv).xyz) - edgeLuma;
+        pLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, puv).xyz) - edgeLuma;
         pAtEnd = abs(pLumaDelta) >= gradientThreshold;   
     }
 `;
@@ -320,7 +320,7 @@ ${new Array(edgeStepCount - 1)
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
     vec2 nuv = uvEdge - edgeStep * vec2(${edgeStepsArray[0]});
-    float nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
+    float nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // for(int i = 0; i < ${edgeStepCount} && !nAtEnd; i++) {
@@ -330,7 +330,7 @@ ${new Array(edgeStepCount - 1)
         return `   
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(${edgeStepsArray[i + 1]});
-        nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SceneTexture}, nuv).xyz) - edgeLuma;
+        nLumaDelta = rgbToLuma(sampleTexture(${UniformNames.SrcTexture}, nuv).xyz) - edgeLuma;
         nAtEnd = abs(nLumaDelta) >= gradientThreshold;
     }
 `;
@@ -386,7 +386,7 @@ void main() {
     LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
-        outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
+        outColor = sampleTexture(${UniformNames.SrcTexture}, uv);
         return;
     }
     
@@ -402,8 +402,8 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    outColor = sampleTexture(${UniformNames.SceneTexture}, uv);
-    // outColor = sampleTexture(${UniformNames.SceneTexture}, vUv);
+    outColor = sampleTexture(${UniformNames.SrcTexture}, uv);
+    // outColor = sampleTexture(${UniformNames.SrcTexture}, vUv);
 }
 `;
 

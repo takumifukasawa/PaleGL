@@ -63,7 +63,7 @@ void main() {
             fragmentShader,
             uniforms: {
                 ...uniforms,
-                [UniformNames.SceneTexture]: {
+                [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -128,7 +128,7 @@ void main() {
         // 渡してない場合はなにもしないことにする
         if (prevRenderTarget) {
             // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
-            this.material.updateUniform(UniformNames.SceneTexture, prevRenderTarget.texture);
+            this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
         if (!this.material.isCompiledShader) {
