@@ -62,6 +62,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
+import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 
 // inputs
 import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
@@ -84,6 +85,7 @@ import { Camera } from '@/PaleGL/actors/Camera';
 // import {Light} from "@/PaleGL/actors/Light";
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { Attribute } from '@/PaleGL/core/Attribute';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -323,6 +325,10 @@ const bloomPass = new BloomPass({
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
+const ssaoPass = new SSAOPass({ gpu });
+ssaoPass.enabled = false;
+postProcess.addPass(ssaoPass);
+
 const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
@@ -343,6 +349,7 @@ uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
+uniform mat4 uInverseViewProjectionMatrix;
 
 #pragma DEPTH_FUNCTIONS
 
@@ -350,10 +357,18 @@ float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
 }
 
+vec3 reconstructWorldPositionFromDepth(vec2 screenUV, float rawDepth) {
+    // depth[0~1] -> clipZ[-1~1]
+    vec4 clipPos = vec4(screenUV * 2. - 1., rawDepth * 2. - 1., 1.);
+    vec4 worldPos = uInverseViewProjectionMatrix * clipPos;
+    return worldPos.xyz / worldPos.w;
+}
+
 void main() {
     vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
     vec2 normalUV = vUv * 2. + vec2(-1., -1.);
-    vec2 depthUV = vUv * 2.;
+    vec2 depthUV = vUv * 2. + vec2(0., 0.);
+    vec2 worldPositionUV = vUv * 2. + vec2(-1., 0.);
     // vec2 depthUV = vUv;
     
     vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
@@ -363,7 +378,9 @@ void main() {
     // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip) * isArea(depthUV);
 
-    outColor = baseColor + normalColor + sceneDepth;
+    vec3 worldPosition = reconstructWorldPositionFromDepth(worldPositionUV, texture(uDepthTexture, worldPositionUV).x) * isArea(worldPositionUV);
+    
+    outColor = baseColor + normalColor + sceneDepth + vec4(worldPosition, 1.);
 }
 `,
     uniforms: {
@@ -387,9 +404,13 @@ void main() {
             type: UniformTypes.Float,
             value: captureSceneCamera.far,
         },
+        uInverseViewProjectionMatrix: {
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
     },
 });
-showBuffersPass.enabled = false;
+showBuffersPass.enabled = true;
 postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
@@ -913,11 +934,18 @@ void main() {
         showBuffersPass.material.updateUniform('uBaseColorTexture', gBufferRenderTarget.baseColorTexture);
         showBuffersPass.material.updateUniform('uNormalTexture', gBufferRenderTarget.normalTexture);
         showBuffersPass.material.updateUniform('uDepthTexture', gBufferRenderTarget.depthTexture);
+        const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+            captureSceneCamera.projectionMatrix,
+            captureSceneCamera.viewMatrix
+        ).invert();
+        showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
         // showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
         postProcess.render({
             gpu,
             renderer,
             sceneRenderTarget: afterGBufferRenderTarget,
+            gBufferRenderTargets: gBufferRenderTarget,
+            sceneCamera: captureSceneCamera,
         });
     };
 
@@ -999,6 +1027,14 @@ function initDebugger() {
         onChange: (value) => {
             bloomPass.tone = value;
         },
+    });
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'ssao pass enabled',
+        initialValue: ssaoPass.enabled,
+        onChange: (value) => (ssaoPass.enabled = value),
     });
 
     debuggerGUI.addBorderSpacer();

@@ -22,7 +22,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
-import { DirectionalLightStruct } from '@/PaleGL/shaders/lightingCommon';
+import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
 
 export type MaterialArgs = {
     // required
@@ -427,7 +427,8 @@ export class Material {
     // - 'updateUniformValue'の方が良い??
     updateUniform(name: string, value: UniformValue): void {
         if (!this.uniforms[name]) {
-            throw `[Material.updateUniform] invalid uniform key: ${name}`;
+            // throw `[Material.updateUniform] invalid uniform key: ${name}`;
+            return;
         }
         this.uniforms[name].value = value;
     }

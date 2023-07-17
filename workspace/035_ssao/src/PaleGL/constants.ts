@@ -102,6 +102,13 @@ export const ActorTypes = {
 
 export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
 
+export const CameraTypes = {
+    Perspective: 'Perspective',
+    Orthographic: 'Orthographic',
+} as const;
+
+export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
+
 export const CubeMapAxis = {
     PositiveX: 'PositiveX',
     NegativeX: 'NegativeX',
@@ -191,12 +198,18 @@ export const UniformNames = {
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
-export const CameraTypes = {
-    Perspective: 'Perspective',
-    Orthographic: 'Orthographic',
+export const PostProcessUniformNames = {
+    TargetWidth: 'uTargetWidth',
+    TargetHeight: 'uTargetHeight',
+    CameraNear: 'uCameraNear',
+    CameraFar: 'uCameraFar',
 } as const;
 
-export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
+export type PostProcessUniformName = (typeof PostProcessUniformNames)[keyof typeof PostProcessUniformNames];
+
+// -----------------------------------------------------------------------------
+// shaders
+// -----------------------------------------------------------------------------
 
 const ShaderModifierPragmas = {
     BEGIN_MAIN: 'BEGIN_MAIN',
@@ -242,31 +255,11 @@ export type ShaderPartialPragmas = (typeof ShaderPartialPragmas)[keyof typeof Sh
 export const ShaderPragmas = {
     DEFINES: 'DEFINES',
     ATTRIBUTES: 'ATTRIBUTES',
-    // BEGIN_MAIN: 'BEGIN_MAIN',
-    // LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
-    // WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
-    // VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
-    // OUT_CLIP_POSITION_PRE_PROCESS: 'OUT_CLIP_POSITION_PRE_PROCESS',
-    // LAST_MAIN: 'LAST_MAIN',
-    // DEPTH_FUNCTIONS: "DEPTH_FUNCTIONS",
-    // ENGINE_UNIFORMS: "ENGINE_UNIFORMS",
-    // TRANSFORM_VERTEX_UNIFORMS: "TRANSFORM_VERTEX_UNIFORMS",
     ...ShaderModifierPragmas,
     ...ShaderPartialPragmas,
 } as const;
 
 export type ShaderPragmas = (typeof ShaderPragmas)[keyof typeof ShaderPragmas];
-
-// export const VertexShaderModifiers = {
-//     beginMain: 'beginMain',
-//     localPositionPostProcess: 'localPositionPostProcess',
-//     worldPositionPostProcess: 'worldPositionPostProcess',
-//     viewPositionPostProcess: 'viewPositionPostProcess',
-//     outClipPositionPreProcess: 'outClipPositionPreProcess',
-//     lastMain: 'lastMain',
-// } as const;
-//
-// export type VertexShaderModifiers = (typeof VertexShaderModifiers)[keyof typeof VertexShaderModifiers];
 
 // -----------------------------------------------------------------------------
 // webgl

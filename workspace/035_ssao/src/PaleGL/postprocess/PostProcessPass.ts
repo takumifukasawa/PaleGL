@@ -2,8 +2,14 @@
 import { Material, Uniforms } from '@/PaleGL/materials/Material';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { Mesh } from '@/PaleGL/actors/Mesh';
-import { AttributeNames, PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { IPostProcessPass } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import {
+    AttributeNames,
+    PostProcessUniformNames,
+    PrimitiveTypes,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants';
+import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
@@ -37,6 +43,14 @@ void main() {
 `;
     }
 
+    /**
+     *
+     * @param gpu
+     * @param vertexShader
+     * @param fragmentShader
+     * @param uniforms
+     * @param name
+     */
     constructor({
         gpu,
         vertexShader,
@@ -85,12 +99,23 @@ void main() {
         });
     }
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
         this.renderTarget.setSize(width, height);
     }
 
+    /**
+     *
+     * @param renderer
+     * @param camera
+     * @param isLastPass
+     */
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
         if (isLastPass) {
             renderer.setRenderTarget(camera.renderTarget);
@@ -99,20 +124,17 @@ void main() {
         }
     }
 
-    // TODO: rename "prevRenderTarget"
-    render({
-        gpu,
-        camera,
-        renderer,
-        prevRenderTarget,
-        isLastPass,
-    }: {
-        gpu: GPU;
-        camera: Camera;
-        renderer: Renderer;
-        prevRenderTarget: RenderTarget | null;
-        isLastPass: boolean;
-    }) {
+    /**
+     * TODO: rename "prevRenderTarget"
+     *
+     * @param gpu
+     * @param camera
+     * @param renderer
+     * @param prevRenderTarget
+     * @param isLastPass
+     * @param sceneCamera
+     */
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass, sceneCamera }: PostProcessRenderArgs) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
         // TODO: ppごとに変えられるのが正しい
@@ -126,15 +148,18 @@ void main() {
         // ppの場合はいらない気がする
         this.mesh.updateTransform();
 
+        if (!this.material.isCompiledShader) {
+            this.material.start({ gpu, attributeDescriptors: [] });
+        }
+
         // 渡してない場合はなにもしないことにする
         if (prevRenderTarget) {
             // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
             this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
-        if (!this.material.isCompiledShader) {
-            this.material.start({ gpu, attributeDescriptors: [] });
-        }
+        this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
+        this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
 
         renderer.renderMesh(this.geometry, this.material);
     }

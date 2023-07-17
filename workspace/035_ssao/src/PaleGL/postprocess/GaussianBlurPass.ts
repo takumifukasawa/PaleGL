@@ -122,7 +122,8 @@ export class GaussianBlurPass implements IPostProcessPass {
             // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
             pass.material.updateUniform(
                 UniformNames.SrcTexture,
-                i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
+                // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
+                (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
             );
             if (!pass.material.isCompiledShader) {
                 pass.material.start({ gpu, attributeDescriptors: [] });

@@ -2,13 +2,16 @@
 import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 
 export type PostProcessRenderArgs = {
     gpu: GPU;
     camera: Camera;
     renderer: Renderer;
-    prevRenderTarget: RenderTarget;
+    prevRenderTarget: RenderTarget | null;
     isLastPass: boolean;
+    gBufferRenderTargets?: GBufferRenderTargets | null;
+    sceneCamera: Camera;
 };
 
 export interface IPostProcessPass {

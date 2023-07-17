@@ -123,6 +123,7 @@ export class Renderer {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+                    // TODO: engineでやるべき
                     actor.updateTransform(camera);
                     break;
             }

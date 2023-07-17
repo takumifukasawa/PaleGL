@@ -5,6 +5,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/AbstractPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
@@ -61,10 +62,14 @@ export class PostProcess {
         gpu,
         renderer,
         sceneRenderTarget,
+        gBufferRenderTargets,
+        sceneCamera
     }: {
         gpu: GPU;
         renderer: Renderer;
         sceneRenderTarget: RenderTarget | null;
+        gBufferRenderTargets?: GBufferRenderTargets | null;
+        sceneCamera: Camera;
     }) {
         if (!sceneRenderTarget) {
             throw '[PostProcess.render] scene render target is empty.';
@@ -88,6 +93,8 @@ export class PostProcess {
                 camera: this.#camera,
                 prevRenderTarget,
                 isLastPass,
+                sceneCamera,
+                gBufferRenderTargets
             });
 
             prevRenderTarget = pass.renderTarget;
