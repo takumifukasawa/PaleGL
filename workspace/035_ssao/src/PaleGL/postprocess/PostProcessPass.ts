@@ -169,20 +169,23 @@ void main() {
         }
 
         // TODO: postprocess側でセットした方が効率がよい
+        // TODO: 今、passごとにセットすればいい値も入ってしまっている
         this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
         this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
         this.material.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
+        const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+            sceneCamera.projectionMatrix,
+            sceneCamera.viewMatrix
+        ).invert();
+        this.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
+        const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
+        this.material.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
+        this.material.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
+        this.material.updateUniform('uTransposeInverseViewMatrix', sceneCamera.viewMatrix.clone().invert().transpose());
         if (gBufferRenderTargets) {
             this.material.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
             this.material.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
             this.material.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
-            const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-                sceneCamera.projectionMatrix,
-                sceneCamera.viewMatrix
-            ).invert();
-            this.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-            const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-            this.material.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
         }
 
         renderer.renderMesh(this.geometry, this.material);

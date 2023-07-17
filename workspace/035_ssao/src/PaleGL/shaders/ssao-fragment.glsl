@@ -1,6 +1,6 @@
 ﻿#version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 
@@ -14,6 +14,7 @@ uniform sampler2D uDepthTexture;
 uniform sampler2D uNormalTexture;
 uniform float uNearClip;
 uniform float uFarClip;
+uniform mat4 uTransposeInverseViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform float[6] uSamplingRotations;
@@ -57,15 +58,15 @@ void main() {
     float eps = .0001;
 
     vec2 uv = vUv;
-
+    
     vec4 baseColor = texture(uSrcTexture, uv);
 
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-
-    float depth = 0.;
-    vec3 viewNormal = vec3(0.);
-
+    
+    vec3 worldNormal = texture(uNormalTexture, uv).xyz * 2. - 1.;
+    vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
+    
     vec3 viewPosition = reconstructViewPositionFromDepth(
         uv,
         texture(uDepthTexture, uv).x,
@@ -104,10 +105,12 @@ void main() {
         float distA = distance(viewPositionA, viewPosition);
         float distB = distance(viewPositionB, viewPosition);
 
-        if (abs(depth - depthA) < uOcclusionBias) {
+        // TODO: depthによるbandが発生している
+
+        if (abs(sceneDepth - depthA) < uOcclusionBias) {
             continue;
         }
-        if (abs(depth - depthB) < uOcclusionBias) {
+        if (abs(sceneDepth - depthB) < uOcclusionBias) {
             continue;
         }
         if (distA < uOcclusionMinDistance || uOcclusionMaxDistance < distA) {
@@ -118,17 +121,31 @@ void main() {
         }
 
         vec3 surfaceToCameraDir = -normalize(viewPosition);
-        float dotA = dot(normalize(viewPositionA - viewPosition), surfaceToCameraDir);
-        float dotB = dot(normalize(viewPositionB - viewPosition), surfaceToCameraDir);
+        vec3 angleDirA = normalize(viewPositionA - viewPosition);
+        vec3 angleDirB = normalize(viewPositionB - viewPosition);
+        float cameraDirDotA = dot(angleDirA, surfaceToCameraDir);
+        float cameraDirDotB = dot(angleDirB, surfaceToCameraDir);
+        
+        float normalDotA = dot(viewNormal, angleDirA);
+        float normalDotB = dot(viewNormal, angleDirB);
+        
+        float clampedDotA = cameraDirDotA - min(normalDotA, 0.);
+        float clampedDotB = cameraDirDotB - min(normalDotB, 0.);
+        
         // pattern1: マイナスも考慮する場合
         // float ao = (dotA + dotB) * .5;
         // pattern2: マイナスを考慮しない場合
-        float ao = max(0., (dotA + dotB)) * .5;
+        // float ao = max(0., (cameraDirDotA + cameraDirDotB)) * .5;
+        // pattern3: 法線方向でclamp
+        float ao = max(0., clampedDotA + clampedDotB) * 1.;
+        // float ao = (clampedDotA + clampedDotB);
 
         occludedAcc += ao;
     }
-
+    
     float aoRate = occludedAcc / float(samplingCount);
+  
+    aoRate = clamp(aoRate, 0., 1.);
 
     vec4 color = mix(
         baseColor,
@@ -137,9 +154,9 @@ void main() {
     );
 
     // for debug
-    // color = vec4(vec3(aoRate), 1.);
+    color = vec4(vec3(aoRate), 1.);
 
     color.a = 1.;
-
+    
     outColor = color;
 }

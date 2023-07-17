@@ -1044,9 +1044,9 @@ function initDebugger() {
     });
     debuggerGUI.addSliderDebugger({
         label: 'ssao occlusion bias',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
+        minValue: 0.0001,
+        maxValue: 0.01,
+        stepValue: 0.0001,
         initialValue: ssaoPass.occlusionBias,
         onChange: (value) => {
             ssaoPass.occlusionBias = value;

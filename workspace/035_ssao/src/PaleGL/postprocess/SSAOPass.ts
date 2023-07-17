@@ -21,7 +21,7 @@ const createSamplingTables: () => { samplingRotations: number[]; samplingDistanc
         samplingRotations.push(rad);
         // const pieceDistance = (1 - baseDistance) / samplingCount;
         // const distance = randomRange(pieceDistance * i, pieceDistance * (i + 1));
-        const distance = randomRange(baseDistance, 1.);
+        const distance = randomRange(baseDistance, 1);
         samplingDistances.push(distance);
     }
     return {
@@ -31,10 +31,10 @@ const createSamplingTables: () => { samplingRotations: number[]; samplingDistanc
 };
 
 export class SSAOPass extends PostProcessPass {
-    occlusionSampleLength: number = 0.19;
-    occlusionBias: number = 0.01;
-    occlusionMinDistance: number = 0.01;
-    occlusionMaxDistance: number = 0.31;
+    occlusionSampleLength: number = 0.14;
+    occlusionBias: number = 0.0001;
+    occlusionMinDistance: number = 0.018;
+    occlusionMaxDistance: number = 0.25;
     occlusionColor: Color = new Color(1, 0, 0, 1);
     occlusionStrength: number = 1;
     blendRate: number = 1;
@@ -45,7 +45,7 @@ export class SSAOPass extends PostProcessPass {
      */
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = ssaoFragmentShader;
-        
+
         const { samplingRotations, samplingDistances } = createSamplingTables();
 
         super({
@@ -71,6 +71,10 @@ export class SSAOPass extends PostProcessPass {
                 uDepthTexture: {
                     type: UniformTypes.Texture,
                     value: null,
+                },
+                uTransposeInverseViewMatrix: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity,
                 },
                 uProjectionMatrix: {
                     type: UniformTypes.Matrix4,
@@ -147,7 +151,7 @@ export class SSAOPass extends PostProcessPass {
         this.material.updateUniform('uOcclusionMinDistance', this.occlusionMinDistance);
         this.material.updateUniform('uOcclusionMaxDistance', this.occlusionMaxDistance);
         this.material.updateUniform('uOcclusionColor', this.occlusionColor);
-        this.material.updateUniform('uOcclusionStrength', this.occlusionStrength)
+        this.material.updateUniform('uOcclusionStrength', this.occlusionStrength);
         this.material.updateUniform('uBlendRate', this.blendRate);
 
         super.render(options);
