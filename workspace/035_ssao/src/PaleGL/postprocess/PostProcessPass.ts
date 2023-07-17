@@ -13,6 +13,7 @@ import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/Ab
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 // export class PostProcessPass extends AbstractPostProcessPass {
 export class PostProcessPass implements IPostProcessPass {
@@ -133,8 +134,17 @@ void main() {
      * @param prevRenderTarget
      * @param isLastPass
      * @param sceneCamera
+     * @param gBufferRenderTargets
      */
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass, sceneCamera }: PostProcessRenderArgs) {
+    render({
+        gpu,
+        camera,
+        renderer,
+        prevRenderTarget,
+        isLastPass,
+        sceneCamera,
+        gBufferRenderTargets,
+    }: PostProcessRenderArgs) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
         // TODO: ppごとに変えられるのが正しい
@@ -158,8 +168,22 @@ void main() {
             this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
+        // TODO: postprocess側でセットした方が効率がよい
         this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
         this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
+        this.material.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
+        if (gBufferRenderTargets) {
+            this.material.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
+            this.material.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
+            this.material.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
+            const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+                sceneCamera.projectionMatrix,
+                sceneCamera.viewMatrix
+            ).invert();
+            this.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
+            const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
+            this.material.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
+        }
 
         renderer.renderMesh(this.geometry, this.material);
     }

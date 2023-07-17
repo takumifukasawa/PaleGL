@@ -77,7 +77,6 @@ import {
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames,
-    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -326,7 +325,7 @@ bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
 const ssaoPass = new SSAOPass({ gpu });
-ssaoPass.enabled = false;
+ssaoPass.enabled = true;
 postProcess.addPass(ssaoPass);
 
 const fxaaPass = new FXAAPass({ gpu });
@@ -357,13 +356,6 @@ float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
 }
 
-vec3 reconstructWorldPositionFromDepth(vec2 screenUV, float rawDepth) {
-    // depth[0~1] -> clipZ[-1~1]
-    vec4 clipPos = vec4(screenUV * 2. - 1., rawDepth * 2. - 1., 1.);
-    vec4 worldPos = uInverseViewProjectionMatrix * clipPos;
-    return worldPos.xyz / worldPos.w;
-}
-
 void main() {
     vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
     vec2 normalUV = vUv * 2. + vec2(-1., -1.);
@@ -378,7 +370,11 @@ void main() {
     // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip) * isArea(depthUV);
 
-    vec3 worldPosition = reconstructWorldPositionFromDepth(worldPositionUV, texture(uDepthTexture, worldPositionUV).x) * isArea(worldPositionUV);
+    vec3 worldPosition = reconstructWorldPositionFromDepth(
+        worldPositionUV,
+        texture(uDepthTexture, worldPositionUV).x,
+        uInverseViewProjectionMatrix
+    ) * isArea(worldPositionUV);
     
     outColor = baseColor + normalColor + sceneDepth + vec4(worldPosition, 1.);
 }
@@ -410,7 +406,7 @@ void main() {
         },
     },
 });
-showBuffersPass.enabled = true;
+showBuffersPass.enabled = false;
 postProcess.addPass(showBuffersPass);
 
 postProcess.enabled = true;
@@ -512,10 +508,10 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
-        vertexShaderModifier: {
-            [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
-            [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
-        },
+        // vertexShaderModifier: {
+        //     [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
+        //     [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
+        // },
         //         vertexShaderModifier: {
         //             // worldPositionPostProcess: `
         //             [VertexShaderModifiers.worldPositionPostProcess]: `
@@ -931,14 +927,14 @@ void main() {
             clearScene: false,
         });
 
-        showBuffersPass.material.updateUniform('uBaseColorTexture', gBufferRenderTarget.baseColorTexture);
-        showBuffersPass.material.updateUniform('uNormalTexture', gBufferRenderTarget.normalTexture);
-        showBuffersPass.material.updateUniform('uDepthTexture', gBufferRenderTarget.depthTexture);
-        const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-            captureSceneCamera.projectionMatrix,
-            captureSceneCamera.viewMatrix
-        ).invert();
-        showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
+        // showBuffersPass.material.updateUniform('uBaseColorTexture', gBufferRenderTarget.baseColorTexture);
+        // showBuffersPass.material.updateUniform('uNormalTexture', gBufferRenderTarget.normalTexture);
+        // showBuffersPass.material.updateUniform('uDepthTexture', gBufferRenderTarget.depthTexture);
+        // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+        //     captureSceneCamera.projectionMatrix,
+        //     captureSceneCamera.viewMatrix
+        // ).invert();
+        // showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
         // showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
         postProcess.render({
             gpu,
@@ -996,38 +992,38 @@ function initDebugger() {
         onChange: (value) => (bloomPass.enabled = value),
     });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'bloom amount',
-        minValue: 0,
-        maxValue: 4,
-        stepValue: 0.001,
-        initialValue: bloomPass.bloomAmount,
-        onChange: (value) => {
-            bloomPass.bloomAmount = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'bloom amount',
+    //     minValue: 0,
+    //     maxValue: 4,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.bloomAmount,
+    //     onChange: (value) => {
+    //         bloomPass.bloomAmount = value;
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'bloom threshold',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: bloomPass.threshold,
-        onChange: (value) => {
-            bloomPass.threshold = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'bloom threshold',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.threshold,
+    //     onChange: (value) => {
+    //         bloomPass.threshold = value;
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'bloom tone',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: bloomPass.tone,
-        onChange: (value) => {
-            bloomPass.tone = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'bloom tone',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: bloomPass.tone,
+    //     onChange: (value) => {
+    //         bloomPass.tone = value;
+    //     },
+    // });
 
     debuggerGUI.addBorderSpacer();
 
@@ -1035,6 +1031,78 @@ function initDebugger() {
         label: 'ssao pass enabled',
         initialValue: ssaoPass.enabled,
         onChange: (value) => (ssaoPass.enabled = value),
+    });
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao occlusion sample length',
+        minValue: 0.01,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssaoPass.occlusionSampleLength,
+        onChange: (value) => {
+            ssaoPass.occlusionSampleLength = value;
+        },
+    });
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao occlusion bias',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssaoPass.occlusionBias,
+        onChange: (value) => {
+            ssaoPass.occlusionBias = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao min distance',
+        minValue: 0,
+        maxValue: 0.05,
+        stepValue: 0.001,
+        initialValue: ssaoPass.occlusionMinDistance,
+        onChange: (value) => {
+            ssaoPass.occlusionMinDistance = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao max distance',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.001,
+        initialValue: ssaoPass.occlusionMaxDistance,
+        onChange: (value) => {
+            ssaoPass.occlusionMaxDistance = value;
+        },
+    });
+
+    debuggerGUI.addColorDebugger({
+        label: 'ssao color',
+        initialValue: ssaoPass.occlusionColor.getHexCoord(),
+        onChange: (value) => {
+            ssaoPass.occlusionColor = Color.fromHex(value);
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao occlusion strength',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssaoPass.occlusionStrength,
+        onChange: (value) => {
+            ssaoPass.occlusionStrength = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ssao blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssaoPass.blendRate,
+        onChange: (value) => {
+            ssaoPass.blendRate = value;
+        },
     });
 
     debuggerGUI.addBorderSpacer();

@@ -3,7 +3,23 @@
 float viewZToLinearDepth(float z, float near, float far) {
     return (z + near) / (near - far);
 }
+
 float perspectiveDepthToLinearDepth(float depth, float near, float far) {
     float nz = near * depth;
     return -nz / (far * (depth - 1.) - nz);
+}
+// end ref
+
+vec3 reconstructWorldPositionFromDepth(vec2 screenUV, float rawDepth, mat4 inverseViewProjectionMatrix) {
+    // depth[0~1] -> clipZ[-1~1]
+    vec4 clipPos = vec4(screenUV * 2. - 1., rawDepth * 2. - 1., 1.);
+    vec4 worldPos = inverseViewProjectionMatrix * clipPos;
+    return worldPos.xyz / worldPos.w;
+}
+
+vec3 reconstructViewPositionFromDepth(vec2 screenUV, float rawDepth, mat4 inverseProjectionMatrix) {
+    // depth[0~1] -> clipZ[-1~1]
+    vec4 clipPos = vec4(screenUV * 2. - 1., rawDepth * 2. - 1., 1.);
+    vec4 viewPos = inverseProjectionMatrix * clipPos;
+    return viewPos.xyz / viewPos.w;
 }

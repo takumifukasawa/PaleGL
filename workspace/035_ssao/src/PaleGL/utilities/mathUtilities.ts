@@ -33,3 +33,11 @@ export function gaussCoefficient(sigma: number, x: number) {
 export function clamp(x: number, min: number, max: number) {
     return Math.min(max, Math.max(x, min));
 }
+
+export function lerp(a: number, b: number, t: number) {
+    return a + (b - a) * t;
+}
+
+export function randomRange(a: number, b: number) {
+    return lerp(a, b, Math.random());
+}

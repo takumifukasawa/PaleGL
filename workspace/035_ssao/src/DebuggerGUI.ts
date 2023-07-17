@@ -25,8 +25,9 @@ export class DebuggerGUI {
     #createDebuggerContentElement(label: string) {
         const debuggerContentElement = document.createElement('div');
         debuggerContentElement.style.cssText = `
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
+            line-height: 1.6em;
             box-sizing: border-box;
             padding-top: 8px;
         `;
@@ -73,7 +74,7 @@ export class DebuggerGUI {
 
         const selectElement = document.createElement('select');
         selectElement.style.cssText = `
-                    font-size: 10px;
+                    font-size: 9px;
                 `;
         options.forEach((option) => {
             const optionElement = document.createElement('option');
@@ -108,9 +109,9 @@ export class DebuggerGUI {
     }: {
         label: string;
         onChange: (value: string) => void;
-        onInput: ((value: string) => void) | null;
+        onInput?: ((value: string) => void) | null;
         initialValue: string | null;
-        initialExec: boolean;
+        initialExec?: boolean;
     }) {
         const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
 
@@ -226,9 +227,8 @@ export class DebuggerGUI {
 
     addButtonDebugger({
         buttonLabel,
-        onClick,
-    } // onInput,
-    : {
+        onClick, // onInput,
+    }: {
         buttonLabel: string;
         onClick: () => void;
     }) {
@@ -241,6 +241,7 @@ export class DebuggerGUI {
         buttonInput.style.cssText = `
         font-size: 9px;
         font-weight: bold;
+        line-height: 1.6em;
         padding: 1px 2px;
 `;
 

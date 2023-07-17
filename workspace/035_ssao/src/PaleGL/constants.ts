@@ -201,8 +201,8 @@ export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 export const PostProcessUniformNames = {
     TargetWidth: 'uTargetWidth',
     TargetHeight: 'uTargetHeight',
-    CameraNear: 'uCameraNear',
-    CameraFar: 'uCameraFar',
+    CameraNear: 'uNearClip',
+    CameraFar: 'uFarClip',
 } as const;
 
 export type PostProcessUniformName = (typeof PostProcessUniformNames)[keyof typeof PostProcessUniformNames];
