@@ -1,5 +1,5 @@
-import { MaterialArgs, Material, Uniforms, VertexShaderModifier } from '@/PaleGL/materials/Material';
-import { UniformTypes } from '@/PaleGL/constants';
+import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
+import { UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -82,7 +82,7 @@ export class PhongMaterial extends Material {
             uNormalMapUvOffset: {
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
-                value: normalMapUvOffset || Vector2.one
+                value: normalMapUvOffset || Vector2.one,
             },
             uDirectionalLight: {
                 type: UniformTypes.Struct,
@@ -135,7 +135,7 @@ export class PhongMaterial extends Material {
         this.depthFragmentShader = phongDepthFrag;
 
         super.start({ gpu, attributeDescriptors });
-        
+
         // console.log(this.rawVertexShader)
         // console.log(this.rawFragmentShader)
     }
