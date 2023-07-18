@@ -5,9 +5,9 @@ import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import { randomRange } from '@/PaleGL/utilities/mathUtilities';
-
-const samplingCount = 6;
+// import { randomRange } from '@/PaleGL/utilities/mathUtilities';
+// 
+// const samplingCount = 6;
 
 // TODO: 4x4ピクセルのテーブル化させたい
 const createSamplingTables: () => { samplingRotations: number[]; samplingDistances: number[] } = () => {
@@ -19,6 +19,12 @@ const createSamplingTables: () => { samplingRotations: number[]; samplingDistanc
         Math.PI * 0.8,
         Math.PI * 1.2,
         Math.PI * 1.9,
+        // Math.PI * 0,
+        // Math.PI * 0,
+        // Math.PI * 0,
+        // Math.PI * 0,
+        // Math.PI * 0,
+        // Math.PI * 0,
     ];
     const samplingDistances: number[] = [
         1,

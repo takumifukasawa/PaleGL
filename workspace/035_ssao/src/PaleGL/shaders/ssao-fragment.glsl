@@ -29,6 +29,8 @@ uniform float uBlendRate;
 
 #pragma DEPTH_FUNCTIONS
 
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+
 mat2 getRotationMatrix(float rad) {
     float c = cos(rad);
     float s = sin(rad);
@@ -79,6 +81,7 @@ void main() {
     }
 
     for (int i = 0; i < samplingCount; i++) {
+        // mat2 rot = getRotationMatrix(uSamplingRotations[i] + rand((uv.x + uv.y) * 1000.));
         mat2 rot = getRotationMatrix(uSamplingRotations[i]);
 
         float offsetLen = uSamplingDistances[i] * uOcclusionSampleLength;
@@ -107,12 +110,12 @@ void main() {
 
         // TODO: depthによるbandが発生している
 
-        if (abs(sceneDepth - depthA) < uOcclusionBias) {
-            continue;
-        }
-        if (abs(sceneDepth - depthB) < uOcclusionBias) {
-            continue;
-        }
+        // if (abs(sceneDepth - depthA) < uOcclusionBias) {
+        //     continue;
+        // }
+        // if (abs(sceneDepth - depthB) < uOcclusionBias) {
+        //     continue;
+        // }
         if (distA < uOcclusionMinDistance || uOcclusionMaxDistance < distA) {
             continue;
         }
