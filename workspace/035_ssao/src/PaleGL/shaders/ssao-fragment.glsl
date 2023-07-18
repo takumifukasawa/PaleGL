@@ -64,7 +64,7 @@ void main() {
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
-    vec3 worldNormal = texture(uNormalTexture, uv).xyz * 2. - 1.;
+    vec3 worldNormal = normalize(texture(uNormalTexture, uv).xyz * 2. - 1.);
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
     vec3 viewPosition = reconstructViewPositionFromDepth(
@@ -84,7 +84,7 @@ void main() {
         float offsetLen = uSamplingDistances[i] * uOcclusionSampleLength;
         vec3 offsetA = vec3(rot * vec2(1., 0.), 0.) * offsetLen;
         vec3 offsetB = -offsetA;
-
+    
         float rawDepthA = sampleRawDepthByViewPosition(viewPosition, offsetA);
         float rawDepthB = sampleRawDepthByViewPosition(viewPosition, offsetB);
 
@@ -121,8 +121,10 @@ void main() {
         }
 
         vec3 surfaceToCameraDir = -normalize(viewPosition);
+        
         vec3 angleDirA = normalize(viewPositionA - viewPosition);
         vec3 angleDirB = normalize(viewPositionB - viewPosition);
+        
         float cameraDirDotA = dot(angleDirA, surfaceToCameraDir);
         float cameraDirDotB = dot(angleDirB, surfaceToCameraDir);
         
@@ -137,7 +139,7 @@ void main() {
         // pattern2: マイナスを考慮しない場合
         // float ao = max(0., (cameraDirDotA + cameraDirDotB)) * .5;
         // pattern3: 法線方向でclamp
-        float ao = max(0., clampedDotA + clampedDotB) * 1.;
+        float ao = max(0., clampedDotA + clampedDotB);
         // float ao = (clampedDotA + clampedDotB);
 
         occludedAcc += ao;
@@ -154,7 +156,7 @@ void main() {
     );
 
     // for debug
-    color = vec4(vec3(aoRate), 1.);
+    // color = vec4(vec3(aoRate), 1.);
 
     color.a = 1.;
     

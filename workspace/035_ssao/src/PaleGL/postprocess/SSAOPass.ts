@@ -9,21 +9,44 @@ import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 
 const samplingCount = 6;
 
+// TODO: 4x4ピクセルのテーブル化させたい
 const createSamplingTables: () => { samplingRotations: number[]; samplingDistances: number[] } = () => {
-    const samplingRotations: number[] = [];
-    const samplingDistances: number[] = [];
+    
+    const samplingRotations: number[] = [
+        Math.PI * 0.1,
+        Math.PI * 0.4,
+        Math.PI * 1.6,
+        Math.PI * 0.8,
+        Math.PI * 1.2,
+        Math.PI * 1.9,
+    ];
+    const samplingDistances: number[] = [
+        1,
+        1.5,
+        1.7,
+        2,
+        1.3,
+        1.9
+    ];
 
-    const baseDistance = 0.1;
-
-    for (let i = 0; i < samplingCount; i++) {
-        const pieceRad = (Math.PI * 2) / samplingCount;
-        const rad = randomRange(pieceRad * i, pieceRad * (i + 1));
-        samplingRotations.push(rad);
-        // const pieceDistance = (1 - baseDistance) / samplingCount;
-        // const distance = randomRange(pieceDistance * i, pieceDistance * (i + 1));
-        const distance = randomRange(baseDistance, 1);
-        samplingDistances.push(distance);
-    }
+    // // TODO: sampling rotations, distances は固定化できるとよい
+    // for (let i = 0; i < samplingCount; i++) {
+    //     // calc sampling rotations
+    //     const pieceRad = (Math.PI * 2) / samplingCount;
+    //     const rad = randomRange(pieceRad * i, pieceRad * (i + 1));
+    //     // samplingRotations.push(pieceRad * i);
+    //     samplingRotations.push(rad);
+    //     
+    //     // calc sampling distances 
+    //     // const baseDistance = 0.5;
+    //     // const pieceDistance = (1 - baseDistance) / samplingCount;
+    //     // const distance = randomRange(pieceDistance * i, pieceDistance * (i + 1));
+    //     const distance = randomRange(1, 2);
+    //     // const distance = baseDistance + pieceDistance * i;
+    //     samplingDistances.push(distance);
+    //     // samplingDistances.push(1);
+    // }
+    
     return {
         samplingRotations,
         samplingDistances,
@@ -31,10 +54,10 @@ const createSamplingTables: () => { samplingRotations: number[]; samplingDistanc
 };
 
 export class SSAOPass extends PostProcessPass {
-    occlusionSampleLength: number = 0.14;
+    occlusionSampleLength: number = 0.033;
     occlusionBias: number = 0.0001;
-    occlusionMinDistance: number = 0.018;
-    occlusionMaxDistance: number = 0.25;
+    occlusionMinDistance: number = 0.006;
+    occlusionMaxDistance: number = 0.244;
     occlusionColor: Color = new Color(1, 0, 0, 1);
     occlusionStrength: number = 1;
     blendRate: number = 1;

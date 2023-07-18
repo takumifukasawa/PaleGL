@@ -1056,7 +1056,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'ssao min distance',
         minValue: 0,
-        maxValue: 0.05,
+        maxValue: 0.1,
         stepValue: 0.001,
         initialValue: ssaoPass.occlusionMinDistance,
         onChange: (value) => {
@@ -1067,7 +1067,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'ssao max distance',
         minValue: 0,
-        maxValue: 5,
+        maxValue: 1,
         stepValue: 0.001,
         initialValue: ssaoPass.occlusionMaxDistance,
         onChange: (value) => {
