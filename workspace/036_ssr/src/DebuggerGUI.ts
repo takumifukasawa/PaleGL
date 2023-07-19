@@ -23,33 +23,40 @@ export class DebuggerGUI {
     }
 
     #createDebuggerContentElement(label: string) {
-        const debuggerContentElement = document.createElement('div');
-        debuggerContentElement.style.cssText = `
+        const wrapperElement = document.createElement('div');
+        wrapperElement.style.cssText = `
             font-size: 9px;
             font-weight: bold;
-            line-height: 1.6em;
+            line-height: 1.2em;
             box-sizing: border-box;
             padding-top: 8px;
         `;
+        
+        const headerElement = document.createElement('div');
+        wrapperElement.appendChild(headerElement);
+        
 
         if (label) {
-            const labelWrapperElement = document.createElement('div');
-            const labelTextElement = document.createElement('p');
+            // const labelWrapperElement = document.createElement('div');
+            // const labelTextElement = document.createElement('p');
+            const labelTextElement = document.createElement('span');
             labelTextElement.style.cssText = `
-                margin-right: 1em;
+                padding-right: 1em;
             `;
             labelTextElement.textContent = label;
 
-            labelWrapperElement.appendChild(labelTextElement);
-            debuggerContentElement.appendChild(labelWrapperElement);
+            // labelWrapperElement.appendChild(labelTextElement);
+            // wrapperElement.appendChild(labelWrapperElement);
+            headerElement.appendChild(labelTextElement);
         }
 
-        const debuggerInputElement = document.createElement('div');
-        debuggerContentElement.appendChild(debuggerInputElement);
+        const contentElement = document.createElement('div');
+        wrapperElement.appendChild(contentElement);
 
         return {
-            wrapperElement: debuggerContentElement,
-            contentElement: debuggerInputElement,
+            wrapperElement,
+            headerElement,
+            contentElement,
         };
     }
 
@@ -184,9 +191,9 @@ export class DebuggerGUI {
         maxValue: number;
         stepValue: number;
     }) {
-        const { wrapperElement, contentElement } = this.#createDebuggerContentElement(label);
+        const { wrapperElement, headerElement, contentElement } = this.#createDebuggerContentElement(label);
 
-        const sliderValueView = document.createElement('p');
+        const sliderValueView = document.createElement('span');
         const sliderInput = document.createElement('input');
 
         const updateCurrentValueView = () => {
@@ -220,7 +227,7 @@ export class DebuggerGUI {
             updateCurrentValueView();
         }
 
-        contentElement.appendChild(sliderValueView);
+        headerElement.appendChild(sliderValueView);
         contentElement.appendChild(sliderInput);
         this.parentElement.appendChild(wrapperElement);
     }
@@ -241,7 +248,7 @@ export class DebuggerGUI {
         buttonInput.style.cssText = `
         font-size: 9px;
         font-weight: bold;
-        line-height: 1.6em;
+        line-height: 1.2em;
         padding: 1px 2px;
 `;
 
@@ -258,7 +265,7 @@ export class DebuggerGUI {
             height: 1px;
             border: none;
             border-top: 1px solid black;
-            margin: 8px 0 4px 0;
+            margin: 0.5em 0 0.25em 0;
         `;
         this.parentElement.appendChild(borderElement);
     }

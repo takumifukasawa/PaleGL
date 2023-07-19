@@ -590,6 +590,7 @@ const main = async () => {
             // gpu,
             // diffuseMap: floorDiffuseMap,
             // normalMap: floorNormalMap,
+            diffuseColor: Color.black(),
             receiveShadow: true,
             specularAmount: 0.4,
         }),
@@ -973,22 +974,28 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: 'show buffers',
-        initialValue: showBuffersPass.enabled,
-        onChange: (value) => (showBuffersPass.enabled = value),
-    });
+    //
+    // show buffers
+    //
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'show buffers',
+    //     initialValue: showBuffersPass.enabled,
+    //     onChange: (value) => (showBuffersPass.enabled = value),
+    // });
 
-    debuggerGUI.addToggleDebugger({
-        label: 'bloom pass enabled',
-        initialValue: bloomPass.enabled,
-        onChange: (value) => (bloomPass.enabled = value),
-    });
+    // debuggerGUI.addBorderSpacer();
 
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'bloom pass enabled',
+    //     initialValue: bloomPass.enabled,
+    //     onChange: (value) => (bloomPass.enabled = value),
+    // });
+
+    //
     // bloom debuggers
     //
+
     // debuggerGUI.addSliderDebugger({
     //     label: 'bloom amount',
     //     minValue: 0,
@@ -1022,9 +1029,11 @@ function initDebugger() {
     //     },
     // });
 
-    debuggerGUI.addBorderSpacer();
-    
-    // ssao debuggers
+    // debuggerGUI.addBorderSpacer();
+   
+    //
+    // ssao
+    //
 
     debuggerGUI.addToggleDebugger({
         label: 'ssao pass enabled',
@@ -1116,13 +1125,162 @@ function initDebugger() {
             ssaoPass.blendRate = value;
         },
     });
-    
+
+    debuggerGUI.addBorderSpacer();
+
+    //
     // ssr debuggers
+    //
 
     debuggerGUI.addToggleDebugger({
         label: 'ssr pass enabled',
         initialValue: ssrPass.enabled,
         onChange: (value) => (ssrPass.enabled = value),
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'depth bias',
+        minValue: 0.001,
+        maxValue: 0.1,
+        stepValue: 0.001,
+        initialValue: ssrPass.rayDepthBias,
+        onChange: (value) => {
+            ssrPass.rayDepthBias = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray nearest distance',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.rayNearestDistance,
+        onChange: (value) => {
+            ssrPass.rayNearestDistance = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray max distance',
+        minValue: 0.001,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: ssrPass.rayMaxDistance,
+        onChange: (value) => {
+            ssrPass.rayMaxDistance = value;
+        },
+    });
+
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray thickness',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionRayThickness,
+        onChange: (value) => {
+            ssrPass.reflectionRayThickness = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'jitter size x',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionRayJitterSizeX,
+        onChange: (value) => {
+            ssrPass.reflectionRayJitterSizeX = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'jitter size y',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionRayJitterSizeY,
+        onChange: (value) => {
+            ssrPass.reflectionRayJitterSizeY = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'fade min distance',
+        minValue: 0.001,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionFadeMinDistance,
+        onChange: (value) => {
+            ssrPass.reflectionFadeMinDistance = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'fade max distance',
+        minValue: 0.001,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionFadeMaxDistance,
+        onChange: (value) => {
+            ssrPass.reflectionFadeMaxDistance = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'edge fade factor min x',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinX,
+        onChange: (value) => {
+            ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'edge fade factor max x',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxX,
+        onChange: (value) => {
+            ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
+        },
+    });
+
+
+    debuggerGUI.addSliderDebugger({
+        label: 'edge fade factor min y',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinY,
+        onChange: (value) => {
+            ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'edge fade factor max y',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxY,
+        onChange: (value) => {
+            ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
+        },
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: 'additional rate',
+        minValue: 0.01,
+        maxValue: 1,
+        stepValue: 0.01,
+        initialValue: ssrPass.reflectionAdditionalRate,
+        onChange: (value) => {
+            ssrPass.reflectionAdditionalRate = value;
+        },
     });
 
     debuggerGUI.addSliderDebugger({
@@ -1136,8 +1294,11 @@ function initDebugger() {
         },
     });
 
-
     debuggerGUI.addBorderSpacer();
+
+    //
+    // fxaa
+    //
 
     debuggerGUI.addToggleDebugger({
         label: 'fxaa pass enabled',

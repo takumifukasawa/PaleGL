@@ -20,6 +20,24 @@ uniform mat4 uInverseProjectionMatrix;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform float uBlendRate;
 
+uniform float uRayDepthBias;
+uniform float uRayNearestDistance;
+uniform float uRayMaxDistance;
+uniform float uReflectionRayThickness;
+
+uniform float uReflectionRayJitterSizeX;
+uniform float uReflectionRayJitterSizeY;
+
+uniform float uReflectionFadeMinDistance;
+uniform float uReflectionFadeMaxDistance;
+
+uniform float uReflectionScreenEdgeFadeFactorMinX;
+uniform float uReflectionScreenEdgeFadeFactorMaxX;
+uniform float uReflectionScreenEdgeFadeFactorMinY;
+uniform float uReflectionScreenEdgeFadeFactorMaxY;
+
+uniform float uReflectionAdditionalRate;
+
 #pragma DEPTH_FUNCTIONS
 
 // https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
@@ -31,22 +49,6 @@ float noise(vec2 seed)
 void main() {
     float eps = .001;
 
-    float uRayDepthBias = .0099;
-    float uRayNearestDistance = .13;
-    float uRayMaxDistance = 3.25;
-    float uReflectionAdditionalRate = .355;
-    float uReflectionRayThickness = .3;
-
-    float uReflectionRayJitterSizeX = .05;
-    float uReflectionRayJitterSizeY = .05;
-
-    float uReflectionFadeMinDistance = 0.;
-    float uReflectionFadeMaxDistance = 4.2;
-
-    float uReflectionScreenEdgeFadeFactorMinX = .42;
-    float uReflectionScreenEdgeFadeFactorMaxX = .955;
-    float uReflectionScreenEdgeFadeFactorMinY = .444;
-    float uReflectionScreenEdgeFadeFactorMaxY = 1.;
 
     int maxIterationNum = 32;
     int binarySearchNum = 8;
@@ -137,8 +139,7 @@ void main() {
         }
     }
     
-    outColor = vec4(isHit ? 1. : 0., 1., 1., 1.);
-    return;
+    float fadeFactor = 1.;
 
     if (isHit) {
         currentRayInView -= rayViewDir * rayDeltaStep;
@@ -171,19 +172,30 @@ void main() {
         float screenEdgeFadeFactorX = (abs(uv.x * 2. - 1.) - uReflectionScreenEdgeFadeFactorMinX) / max(uReflectionScreenEdgeFadeFactorMaxX - uReflectionScreenEdgeFadeFactorMinX, eps);
         float screenEdgeFadeFactorY = (abs(uv.y * 2. - 1.) - uReflectionScreenEdgeFadeFactorMinY) / max(uReflectionScreenEdgeFadeFactorMaxY - uReflectionScreenEdgeFadeFactorMinY, eps);
 
-        screenEdgeFadeFactorX = clamp(screenEdgeFadeFactorX, 0., 1.);
-        screenEdgeFadeFactorY = clamp(screenEdgeFadeFactorY, 0., 1.);
+        screenEdgeFadeFactorX = 1. - clamp(screenEdgeFadeFactorX, 0., 1.);
+        screenEdgeFadeFactorY = 1. - clamp(screenEdgeFadeFactorY, 0., 1.);
 
         float rayWithSampledPositionDistance = distance(viewPosition, sampledViewPosition);
         float distanceFadeRate = (rayWithSampledPositionDistance - uReflectionFadeMinDistance) / max(uReflectionFadeMaxDistance - uReflectionFadeMinDistance, eps);
         distanceFadeRate = clamp(distanceFadeRate, 0., 1.);
         distanceFadeRate = 1. - distanceFadeRate * distanceFadeRate;
 
-        float fadeFactor = distanceFadeRate * screenEdgeFadeFactorX * screenEdgeFadeFactorY;
+        fadeFactor = distanceFadeRate * screenEdgeFadeFactorX * screenEdgeFadeFactorY;
+    
+        // pattern1: add reflection
         baseColor += texture(uSrcTexture, rayUV) * fadeFactor * uReflectionAdditionalRate;
+        
+        // pattern2: [wip] blend reflection
+        // baseColor += texture(uSrcTexture, rayUV);
     }
 
-    vec4 color = mix(cachedBaseColor, baseColor, uBlendRate);
+    // outColor = vec4(fadeFactor, 0., 0., 1.);
+    // return;
+    // 
+    // outColor = baseColor;
+  
+    // return;
 
+    vec4 color = mix(cachedBaseColor, baseColor, uBlendRate);
     outColor = color;
 }
