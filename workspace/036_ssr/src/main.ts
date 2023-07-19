@@ -891,7 +891,7 @@ void main() {
     };
 
     // engine.onRender = (time: number, deltaTime: number) => {
-    engine.onRender = () => {
+    engine.onRender = (time: number) => {
         captureSceneCamera.setRenderTarget(gBufferRenderTarget);
         skyboxMesh.enabled = true;
         floorPlaneMesh.enabled = true;
@@ -938,6 +938,7 @@ void main() {
             sceneRenderTarget: afterGBufferRenderTarget,
             gBufferRenderTargets: gBufferRenderTarget,
             sceneCamera: captureSceneCamera,
+            time
         });
     };
 
@@ -1030,7 +1031,7 @@ function initDebugger() {
     // });
 
     // debuggerGUI.addBorderSpacer();
-   
+
     //
     // ssao
     //
@@ -1040,7 +1041,7 @@ function initDebugger() {
         initialValue: ssaoPass.enabled,
         onChange: (value) => (ssaoPass.enabled = value),
     });
-   
+
     //
     // debuggerGUI.addSliderDebugger({
     //     label: 'ssao occlusion sample length',
@@ -1271,7 +1272,7 @@ function initDebugger() {
             ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
         },
     });
-    
+
     debuggerGUI.addSliderDebugger({
         label: 'additional rate',
         minValue: 0.01,

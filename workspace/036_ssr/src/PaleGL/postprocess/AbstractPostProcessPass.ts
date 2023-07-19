@@ -1,7 +1,7 @@
-﻿import { Renderer } from '@/PaleGL/core/Renderer';
-import { Camera } from '@/PaleGL/actors/Camera';
-import { GPU } from '@/PaleGL/core/GPU';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+﻿import {Renderer} from '@/PaleGL/core/Renderer';
+import {Camera} from '@/PaleGL/actors/Camera';
+import {GPU} from '@/PaleGL/core/GPU';
+import {RenderTarget} from '@/PaleGL/core/RenderTarget';
 import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 
 export type PostProcessRenderArgs = {
@@ -12,6 +12,7 @@ export type PostProcessRenderArgs = {
     isLastPass: boolean;
     gBufferRenderTargets?: GBufferRenderTargets | null;
     sceneCamera: Camera;
+    time: number;
 };
 
 export interface IPostProcessPass {
@@ -24,7 +25,7 @@ export interface IPostProcessPass {
 
     setSize: (width: number, height: number) => void;
     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
-    render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs) => void;
+    render: ({gpu, camera, renderer, prevRenderTarget, isLastPass, time}: PostProcessRenderArgs) => void;
 }
 
 // export abstract class AbstractPostProcessPass implements IPostProcessPass {

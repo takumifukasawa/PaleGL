@@ -8,6 +8,8 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+uniform float uTime;
+
 uniform sampler2D uSrcTexture;
 uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
@@ -81,7 +83,9 @@ void main() {
 
     bool isHit = false;
 
-    float jitter = noise(uv) * 2. - 1.;
+    float fadeFactor = 1.;
+
+    float jitter = noise(uv + uTime) * 2. - 1.;
 
     vec2 jitterOffset = vec2(
         jitter * uReflectionRayJitterSizeX,
@@ -138,8 +142,6 @@ void main() {
             break;
         }
     }
-    
-    float fadeFactor = 1.;
 
     if (isHit) {
         currentRayInView -= rayViewDir * rayDeltaStep;

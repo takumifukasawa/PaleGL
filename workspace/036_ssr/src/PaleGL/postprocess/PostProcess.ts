@@ -63,13 +63,15 @@ export class PostProcess {
         renderer,
         sceneRenderTarget,
         gBufferRenderTargets,
-        sceneCamera
+        sceneCamera,
+        time
     }: {
         gpu: GPU;
         renderer: Renderer;
         sceneRenderTarget: RenderTarget | null;
         gBufferRenderTargets?: GBufferRenderTargets | null;
         sceneCamera: Camera;
+        time: number;
     }) {
         if (!sceneRenderTarget) {
             throw '[PostProcess.render] scene render target is empty.';
@@ -94,7 +96,8 @@ export class PostProcess {
                 prevRenderTarget,
                 isLastPass,
                 sceneCamera,
-                gBufferRenderTargets
+                gBufferRenderTargets,
+                time
             });
 
             prevRenderTarget = pass.renderTarget;

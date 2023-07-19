@@ -144,6 +144,7 @@ void main() {
         isLastPass,
         sceneCamera,
         gBufferRenderTargets,
+        time
     }: PostProcessRenderArgs) {
         this.setRenderTarget(renderer, camera, isLastPass);
 
@@ -170,6 +171,7 @@ void main() {
 
         // TODO: postprocess側でセットした方が効率がよい
         // TODO: 今、passごとにセットすればいい値も入ってしまっている
+        this.material.updateUniform('uTime', time);
         this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
         this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
         this.material.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
