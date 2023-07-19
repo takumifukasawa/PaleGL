@@ -16,6 +16,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform mat4 uTransposeInverseViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uInverseViewProjectionMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform float[6] uSamplingRotations;
 uniform float[6] uSamplingDistances;
@@ -45,14 +46,6 @@ mat2 getRotationMatrix(float rad) {
     );
 }
 
-float sampleRawDepthByViewPosition(vec3 viewPosition, vec3 offset) {
-    vec4 offsetPosition = vec4(viewPosition + offset, 1.);
-    vec4 projectedPosition = uProjectionMatrix * offsetPosition;
-    vec3 projectedPositionNDC = projectedPosition.xyz / projectedPosition.w;
-    vec2 projectedPositionUV = projectedPositionNDC.xy * .5 + .5;
-    return texture(uDepthTexture, projectedPositionUV).x;
-}
-
 void main() {
 
     float occludedAcc = 0.;
@@ -75,6 +68,20 @@ void main() {
         texture(uDepthTexture, uv).x,
         uInverseProjectionMatrix
     );
+   
+    // for debug
+    // vec3 worldPosition = reconstructWorldPositionFromDepth(
+    //     uv,
+    //     texture(uDepthTexture, uv).x,
+    //     uInverseViewProjectionMatrix
+    // );
+    // if (sceneDepth > 1. - eps) {
+    //     outColor = baseColor;
+    //     return;
+    // }
+    // outColor = vec4(viewPosition, 1.);
+    // outColor = vec4(worldPosition, 1.);
+    // return;
 
     vec2 samplingTableCoord = gl_FragCoord.xy / 4.; // tex: 4x4
     vec4 samplingTable = texture(uSamplingTexture, samplingTableCoord);
@@ -97,8 +104,8 @@ void main() {
         vec3 offsetA = vec3(rot * vec2(1., 0.), 0.) * offsetLen;
         vec3 offsetB = -offsetA;
     
-        float rawDepthA = sampleRawDepthByViewPosition(viewPosition, offsetA);
-        float rawDepthB = sampleRawDepthByViewPosition(viewPosition, offsetB);
+        float rawDepthA = sampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetA);
+        float rawDepthB = sampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetB);
 
         float depthA = perspectiveDepthToLinearDepth(rawDepthA, uNearClip, uFarClip);
         float depthB = perspectiveDepthToLinearDepth(rawDepthB, uNearClip, uFarClip);

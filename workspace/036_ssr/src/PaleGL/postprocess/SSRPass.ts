@@ -51,6 +51,10 @@ export class SSRPass extends PostProcessPass {
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity,
                 },
+                uInverseViewProjectionMatrix: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity,
+                },
                 [PostProcessUniformNames.CameraNear]: {
                     type: UniformTypes.Float,
                     value: 1,

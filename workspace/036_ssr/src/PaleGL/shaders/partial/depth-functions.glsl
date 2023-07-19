@@ -23,3 +23,16 @@ vec3 reconstructViewPositionFromDepth(vec2 screenUV, float rawDepth, mat4 invers
     vec4 viewPos = inverseProjectionMatrix * clipPos;
     return viewPos.xyz / viewPos.w;
 }
+
+float sampleRawDepthByViewPosition(
+    sampler2D depthTexture,
+    vec3 viewPosition,
+    mat4 projectionMatrix,
+    vec3 offset
+) {
+    vec4 offsetPosition = vec4(viewPosition + offset, 1.);
+    vec4 projectedPosition = projectionMatrix * offsetPosition;
+    vec3 projectedPositionNDC = projectedPosition.xyz / projectedPosition.w;
+    vec2 projectedPositionUV = projectedPositionNDC.xy * .5 + .5;
+    return texture(depthTexture, projectedPositionUV).x;
+}

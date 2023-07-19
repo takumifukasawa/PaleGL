@@ -83,13 +83,13 @@ const createSamplingTables: (gpu: GPU) => {
 };
 
 export class SSAOPass extends PostProcessPass {
-    occlusionSampleLength: number = 0.059;
+    occlusionSampleLength: number = 0.121;
     occlusionBias: number = 0.0001;
     occlusionMinDistance: number = 0.006;
-    occlusionMaxDistance: number = 0.244;
-    occlusionColor: Color = new Color(1, 0, 0, 1);
-    occlusionPower: number = 1.4;
-    occlusionStrength: number = 1;
+    occlusionMaxDistance: number = 0.2;
+    occlusionColor: Color = new Color(0, 0, 0, 1);
+    occlusionPower: number = 1.85;
+    occlusionStrength: number = 0.448;
     blendRate: number = 1;
 
     samplingTexture: Texture;
@@ -136,6 +136,10 @@ export class SSAOPass extends PostProcessPass {
                     value: Matrix4.identity,
                 },
                 uInverseProjectionMatrix: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity,
+                },
+                uInverseViewProjectionMatrix: {
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity,
                 },

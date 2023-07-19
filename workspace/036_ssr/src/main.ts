@@ -1,18 +1,8 @@
 // import "@/style.css";
 
-// import smokeImgUrl from "../images/particle-smoke.png";
-// import leaveDiffuseImgUrl from "../images/brown_mud_leaves_01_diff_1k.jpg";
-// import leaveNormalImgUrl from "../images/brown_mud_leaves_01_nor_gl_1k.jpg"
-// import CubeMapPositiveXImgUrl from "../images/px.jpg";
-// import CubeMapNegativeXImgUrl from "../images/nx.jpg";
-// import CubeMapPositiveYImgUrl from "../images/py.jpg";
-// import CubeMapNegativeYImgUrl from "../images/ny.jpg";
-// import CubeMapPositiveZImgUrl from "../images/pz.jpg";
-// import CubeMapNegativeZImgUrl from "../images/nz.jpg";
-// import gltfModelUrl from "../models/glass-wind-poly.gltf";
 import smokeImgUrl from '../images/particle-smoke.png?url';
-import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
-import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+// import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
+// import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../images/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../images/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
@@ -22,70 +12,70 @@ import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
 import gltfModelUrl from '../models/glass-wind-poly.gltf?url';
 
 // actors
-import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
-import { Mesh } from '@/PaleGL/actors/Mesh';
-import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
-import { Skybox } from '@/PaleGL/actors/Skybox';
-import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
+import {DirectionalLight} from '@/PaleGL/actors/DirectionalLight';
+import {Mesh} from '@/PaleGL/actors/Mesh';
+import {PerspectiveCamera} from '@/PaleGL/actors/PerspectiveCamera';
+import {Skybox} from '@/PaleGL/actors/Skybox';
+import {SkinnedMesh} from '@/PaleGL/actors/SkinnedMesh';
 
 // core
-import { Engine } from '@/PaleGL/core/Engine';
-import { Renderer } from '@/PaleGL/core/Renderer';
-import { GPU } from '@/PaleGL/core/GPU';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
-import { Scene } from '@/PaleGL/core/Scene';
-import { Texture } from '@/PaleGL/core/Texture';
-import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
+import {Engine} from '@/PaleGL/core/Engine';
+import {Renderer} from '@/PaleGL/core/Renderer';
+import {GPU} from '@/PaleGL/core/GPU';
+import {RenderTarget} from '@/PaleGL/core/RenderTarget';
+import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
+import {Scene} from '@/PaleGL/core/Scene';
+import {Texture} from '@/PaleGL/core/Texture';
+import {OrbitCameraController} from '@/PaleGL/core/OrbitCameraController';
 
 // geometries
-import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import {Geometry} from '@/PaleGL/geometries/Geometry';
+import {PlaneGeometry} from '@/PaleGL/geometries/PlaneGeometry';
 
 // loaders
-import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
-import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
-import { loadImg } from '@/PaleGL/loaders/loadImg';
+import {loadCubeMap} from '@/PaleGL/loaders/loadCubeMap';
+import {loadGLTF} from '@/PaleGL/loaders/loadGLTF';
+import {loadImg} from '@/PaleGL/loaders/loadImg';
 
 // materials
-import { Material } from '@/PaleGL/materials/Material';
-import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
+import {Material} from '@/PaleGL/materials/Material';
+import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
 
 // math
-import { Color } from '@/PaleGL/math/Color';
-import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+import {Color} from '@/PaleGL/math/Color';
+import {Vector2} from '@/PaleGL/math/Vector2';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {Vector4} from '@/PaleGL/math/Vector4';
 
 // postprocess
-import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
-import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
-import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
-import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
+import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
+import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
+import {FXAAPass} from '@/PaleGL/postprocess/FXAAPass';
+import {BloomPass} from '@/PaleGL/postprocess/BloomPass';
+import {SSAOPass} from '@/PaleGL/postprocess/SSAOPass';
 import {SSRPass} from "@/PaleGL/postprocess/SSRPass";
 
 // inputs
-import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
-import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
+import {TouchInputController} from '@/PaleGL/inputs/TouchInputController';
+import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
 
 // others
 import {
     UniformTypes,
-    TextureWrapTypes,
-    TextureFilterTypes,
+    // TextureWrapTypes,
+    // TextureFilterTypes,
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames,
 } from '@/PaleGL/constants';
 
-import { DebuggerGUI } from '@/DebuggerGUI';
-import { Camera } from '@/PaleGL/actors/Camera';
+import {DebuggerGUI} from '@/DebuggerGUI';
+import {Camera} from '@/PaleGL/actors/Camera';
 // import {Light} from "@/PaleGL/actors/Light";
-import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-import { Attribute } from '@/PaleGL/core/Attribute';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
+import {Attribute} from '@/PaleGL/core/Attribute';
+import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -158,8 +148,8 @@ debuggerStates.instanceNum = instanceNum;
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-let floorDiffuseMap: Texture;
-let floorNormalMap: Texture;
+// let floorDiffuseMap: Texture;
+// let floorNormalMap: Texture;
 let skinnedMesh: SkinnedMesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
@@ -175,13 +165,13 @@ wrapperElement.setAttribute('id', 'wrapper');
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', { antialias: false });
+const gl = canvasElement.getContext('webgl2', {antialias: false});
 
 if (!gl) {
     throw 'invalid gl';
 }
 
-const gpu = new GPU({ gl });
+const gpu = new GPU({gl});
 
 const instanceNumView = document.createElement('p');
 instanceNumView.textContent = `instance num: ${instanceNum}`;
@@ -210,7 +200,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({ gpu, renderer });
+const engine = new Engine({gpu, renderer});
 
 engine.setScenes([captureScene, compositeScene]);
 
@@ -264,7 +254,7 @@ const copyDepthDestRenderTarget = new RenderTarget({
     name: 'copy depth dest render target',
 });
 
-captureSceneCamera.onStart = ({ actor }) => {
+captureSceneCamera.onStart = ({actor}) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 };
 // captureSceneCamera.onFixedUpdate = ({ actor}: {actor: Actor}) => {
@@ -298,7 +288,7 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.onStart = ({ actor }) => {
+directionalLight.onStart = ({actor}) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     // const lightActor = actor as DirectionalLight;
@@ -325,15 +315,15 @@ const bloomPass = new BloomPass({
 bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
-const ssaoPass = new SSAOPass({ gpu });
+const ssaoPass = new SSAOPass({gpu});
 ssaoPass.enabled = false;
 postProcess.addPass(ssaoPass);
 
-const ssrPass = new SSRPass({ gpu});
+const ssrPass = new SSRPass({gpu});
 ssrPass.enabled = true;
 postProcess.addPass(ssrPass);
 
-const fxaaPass = new FXAAPass({ gpu });
+const fxaaPass = new FXAAPass({gpu});
 fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
@@ -419,7 +409,7 @@ postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfModelUrl });
+    const gltfActor = await loadGLTF({gpu, path: gltfModelUrl});
 
     // skinned mesh おｎはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
@@ -548,27 +538,27 @@ const main = async () => {
         img: particleImg,
     });
 
-    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    floorDiffuseMap = new Texture({
-        gpu,
-        img: floorDiffuseImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
+    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    // floorDiffuseMap = new Texture({
+    //     gpu,
+    //     img: floorDiffuseImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
 
-    const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    floorNormalMap = new Texture({
-        gpu,
-        img: floorNormalImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
+    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    // floorNormalMap = new Texture({
+    //     gpu,
+    //     img: floorNormalImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
 
     const images = {
         [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
@@ -576,10 +566,10 @@ const main = async () => {
         [CubeMapAxis.PositiveY]: CubeMapPositiveYImgUrl,
         [CubeMapAxis.NegativeY]: CubeMapNegativeYImgUrl,
         [CubeMapAxis.PositiveZ]: CubeMapPositiveZImgUrl,
-        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl,
+        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl
     };
 
-    const cubeMap = await loadCubeMap({ gpu, images });
+    const cubeMap = await loadCubeMap({gpu, images});
 
     const skyboxMesh = new Skybox({
         gpu,
@@ -598,14 +588,14 @@ const main = async () => {
         geometry: floorGeometry,
         material: new PhongMaterial({
             // gpu,
-            diffuseMap: floorDiffuseMap,
-            normalMap: floorNormalMap,
+            // diffuseMap: floorDiffuseMap,
+            // normalMap: floorNormalMap,
             receiveShadow: true,
             specularAmount: 0.4,
         }),
         castShadow: false,
     });
-    floorPlaneMesh.onStart = ({ actor }) => {
+    floorPlaneMesh.onStart = ({actor}) => {
         const meshActor = actor as Mesh;
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
@@ -847,7 +837,7 @@ void main() {
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    particleMesh.onFixedUpdate = ({ fixedTime }) => {
+    particleMesh.onFixedUpdate = ({fixedTime}) => {
         // particleMaterial.uniforms.uTime.value = fixedTime;
         particleMaterial.updateUniform('uTime', fixedTime);
     };
@@ -997,6 +987,8 @@ function initDebugger() {
         onChange: (value) => (bloomPass.enabled = value),
     });
 
+    // bloom debuggers
+    //
     // debuggerGUI.addSliderDebugger({
     //     label: 'bloom amount',
     //     minValue: 0,
@@ -1031,84 +1023,88 @@ function initDebugger() {
     // });
 
     debuggerGUI.addBorderSpacer();
+    
+    // ssao debuggers
 
     debuggerGUI.addToggleDebugger({
         label: 'ssao pass enabled',
         initialValue: ssaoPass.enabled,
         onChange: (value) => (ssaoPass.enabled = value),
     });
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao occlusion sample length',
-        minValue: 0.01,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssaoPass.occlusionSampleLength,
-        onChange: (value) => {
-            ssaoPass.occlusionSampleLength = value;
-        },
-    });
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao occlusion bias',
-        minValue: 0.0001,
-        maxValue: 0.01,
-        stepValue: 0.0001,
-        initialValue: ssaoPass.occlusionBias,
-        onChange: (value) => {
-            ssaoPass.occlusionBias = value;
-        },
-    });
+   
+    //
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao occlusion sample length',
+    //     minValue: 0.01,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssaoPass.occlusionSampleLength,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionSampleLength = value;
+    //     },
+    // });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao occlusion bias',
+    //     minValue: 0.0001,
+    //     maxValue: 0.01,
+    //     stepValue: 0.0001,
+    //     initialValue: ssaoPass.occlusionBias,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionBias = value;
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao min distance',
-        minValue: 0,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: ssaoPass.occlusionMinDistance,
-        onChange: (value) => {
-            ssaoPass.occlusionMinDistance = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao min distance',
+    //     minValue: 0,
+    //     maxValue: 0.1,
+    //     stepValue: 0.001,
+    //     initialValue: ssaoPass.occlusionMinDistance,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionMinDistance = value;
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao max distance',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssaoPass.occlusionMaxDistance,
-        onChange: (value) => {
-            ssaoPass.occlusionMaxDistance = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao max distance',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssaoPass.occlusionMaxDistance,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionMaxDistance = value;
+    //     },
+    // });
 
-    debuggerGUI.addColorDebugger({
-        label: 'ssao color',
-        initialValue: ssaoPass.occlusionColor.getHexCoord(),
-        onChange: (value) => {
-            ssaoPass.occlusionColor = Color.fromHex(value);
-        },
-    });
+    // debuggerGUI.addColorDebugger({
+    //     label: 'ssao color',
+    //     initialValue: ssaoPass.occlusionColor.getHexCoord(),
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionColor = Color.fromHex(value);
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao occlusion power',
-        minValue: 0.5,
-        maxValue: 4,
-        stepValue: 0.01,
-        initialValue: ssaoPass.occlusionPower,
-        onChange: (value) => {
-            ssaoPass.occlusionPower = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao occlusion power',
+    //     minValue: 0.5,
+    //     maxValue: 4,
+    //     stepValue: 0.01,
+    //     initialValue: ssaoPass.occlusionPower,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionPower = value;
+    //     },
+    // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao occlusion strength',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssaoPass.occlusionStrength,
-        onChange: (value) => {
-            ssaoPass.occlusionStrength = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao occlusion strength',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssaoPass.occlusionStrength,
+    //     onChange: (value) => {
+    //         ssaoPass.occlusionStrength = value;
+    //     },
+    // });
 
     debuggerGUI.addSliderDebugger({
         label: 'ssao blend rate',
@@ -1120,6 +1116,26 @@ function initDebugger() {
             ssaoPass.blendRate = value;
         },
     });
+    
+    // ssr debuggers
+
+    debuggerGUI.addToggleDebugger({
+        label: 'ssr pass enabled',
+        initialValue: ssrPass.enabled,
+        onChange: (value) => (ssrPass.enabled = value),
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ssr blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: ssrPass.blendRate,
+        onChange: (value) => {
+            ssrPass.blendRate = value;
+        },
+    });
+
 
     debuggerGUI.addBorderSpacer();
 
