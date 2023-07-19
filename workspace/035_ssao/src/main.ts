@@ -1084,6 +1084,17 @@ function initDebugger() {
     });
 
     debuggerGUI.addSliderDebugger({
+        label: 'ssao occlusion power',
+        minValue: 0.5,
+        maxValue: 4,
+        stepValue: 0.01,
+        initialValue: ssaoPass.occlusionPower,
+        onChange: (value) => {
+            ssaoPass.occlusionPower = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
         label: 'ssao occlusion strength',
         minValue: 0,
         maxValue: 1,

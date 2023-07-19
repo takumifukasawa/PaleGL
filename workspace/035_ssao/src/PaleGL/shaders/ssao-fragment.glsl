@@ -19,17 +19,18 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform float[6] uSamplingRotations;
 uniform float[6] uSamplingDistances;
+uniform mat4 uSamplingTableMatrix;
+uniform sampler2D uSamplingTexture;
 uniform float uOcclusionSampleLength;
 uniform float uOcclusionBias;
 uniform float uOcclusionMinDistance;
 uniform float uOcclusionMaxDistance;
 uniform vec4 uOcclusionColor;
+uniform float uOcclusionPower;
 uniform float uOcclusionStrength;
 uniform float uBlendRate;
 
 #pragma DEPTH_FUNCTIONS
-
-float rand(float n){return fract(sin(n) * 43758.5453123);}
 
 mat2 getRotationMatrix(float rad) {
     float c = cos(rad);
@@ -75,16 +76,24 @@ void main() {
         uInverseProjectionMatrix
     );
 
+    vec2 samplingTableCoord = gl_FragCoord.xy / 4.; // tex: 4x4
+    vec4 samplingTable = texture(uSamplingTexture, samplingTableCoord);
+    float samplingOffsetRad = samplingTable.x;
+    float samplingOffsetLen = samplingTable.y;
+   
+    // for debug
+    // outColor = vec4(samplingOffsetRad, samplingOffsetLen, 1., 1.);
+    // return;
+
     if (sceneDepth > 1. - eps) {
         outColor = baseColor;
         return;
     }
 
     for (int i = 0; i < samplingCount; i++) {
-        // mat2 rot = getRotationMatrix(uSamplingRotations[i] + rand((uv.x + uv.y) * 1000.));
-        mat2 rot = getRotationMatrix(uSamplingRotations[i]);
+        mat2 rot = getRotationMatrix(uSamplingRotations[i] + samplingOffsetRad);
 
-        float offsetLen = uSamplingDistances[i] * uOcclusionSampleLength;
+        float offsetLen = uSamplingDistances[i] * samplingOffsetLen * uOcclusionSampleLength;
         vec3 offsetA = vec3(rot * vec2(1., 0.), 0.) * offsetLen;
         vec3 offsetB = -offsetA;
     
@@ -108,8 +117,7 @@ void main() {
         float distA = distance(viewPositionA, viewPosition);
         float distB = distance(viewPositionB, viewPosition);
 
-        // TODO: depthによるbandが発生している
-
+        // biasでのclampはなくてもいいかもしれない
         // if (abs(sceneDepth - depthA) < uOcclusionBias) {
         //     continue;
         // }
@@ -151,6 +159,8 @@ void main() {
     float aoRate = occludedAcc / float(samplingCount);
   
     aoRate = clamp(aoRate, 0., 1.);
+    
+    aoRate = pow(aoRate, uOcclusionPower);
 
     vec4 color = mix(
         baseColor,

@@ -666,6 +666,27 @@ export class Matrix4 {
         );
     }
 
+    static fromArray(arr: number[]) {
+        return new Matrix4(
+            arr[0],
+            arr[1],
+            arr[2],
+            arr[3],
+            arr[4],
+            arr[5],
+            arr[6],
+            arr[7],
+            arr[8],
+            arr[9],
+            arr[10],
+            arr[11],
+            arr[12],
+            arr[13],
+            arr[14],
+            arr[15]
+        );
+    }
+
     log() {
         console.log(`--------------------
 ${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},

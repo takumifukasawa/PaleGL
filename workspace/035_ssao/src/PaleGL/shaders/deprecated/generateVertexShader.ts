@@ -1,5 +1,6 @@
 // NOTE: deprecated
 
+/*
 import { skinningVertexUniforms, calcSkinningMatrixFunc, skinningVertex } from '@/PaleGL/shaders/skinningShader';
 import { engineCommonUniforms, transformVertexUniforms } from '@/PaleGL/shaders/commonUniforms';
 import { shadowMapVertex, shadowMapVertexUniforms, shadowMapVertexVaryings } from '@/PaleGL/shaders/shadowMapShader';
@@ -229,3 +230,4 @@ void main() {
 }
 `;
 };
+*/

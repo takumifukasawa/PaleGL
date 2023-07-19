@@ -1,72 +1,98 @@
 ﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { PostProcessUniformNames, UniformTypes } from '@/PaleGL/constants';
+import { PostProcessUniformNames, TextureTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
-// import { randomRange } from '@/PaleGL/utilities/mathUtilities';
-// 
-// const samplingCount = 6;
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import { Color } from '@/PaleGL/math/Color';
+import { Texture } from '@/PaleGL/core/Texture.ts';
+import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 
-// TODO: 4x4ピクセルのテーブル化させたい
-const createSamplingTables: () => { samplingRotations: number[]; samplingDistances: number[] } = () => {
-    
+/**
+ *
+ * @param gpu
+ */
+const createSamplingTables: (gpu: GPU) => {
+    samplingRotations: number[];
+    samplingDistances: number[];
+    samplingTexture: Texture;
+} = (gpu) => {
+    // 任意にtableを作成
     const samplingRotations: number[] = [
-        Math.PI * 0.1,
-        Math.PI * 0.4,
-        Math.PI * 1.6,
-        Math.PI * 0.8,
-        Math.PI * 1.2,
-        Math.PI * 1.9,
-        // Math.PI * 0,
-        // Math.PI * 0,
-        // Math.PI * 0,
-        // Math.PI * 0,
-        // Math.PI * 0,
-        // Math.PI * 0,
+        Math.PI * ((1 / 3) * 0 + 0.1),
+        Math.PI * ((1 / 3) * 4 + 0.1),
+        Math.PI * ((1 / 3) * 2 + 0.1),
+        Math.PI * ((1 / 3) * 1 + 0.1),
+        Math.PI * ((1 / 3) * 3 + 0.1),
+        Math.PI * ((1 / 3) * 5 + 0.1),
     ];
     const samplingDistances: number[] = [
-        1,
-        1.5,
-        1.7,
-        2,
-        1.3,
-        1.9
+        ((0.9 - 0.1) / 6) * 0 + 0.1,
+        ((0.9 - 0.1) / 6) * 4 + 0.1,
+        ((0.9 - 0.1) / 6) * 2 + 0.1,
+        ((0.9 - 0.1) / 6) * 1 + 0.1,
+        ((0.9 - 0.1) / 6) * 3 + 0.1,
+        ((0.9 - 0.1) / 6) * 5 + 0.1,
     ];
 
-    // // TODO: sampling rotations, distances は固定化できるとよい
-    // for (let i = 0; i < samplingCount; i++) {
-    //     // calc sampling rotations
-    //     const pieceRad = (Math.PI * 2) / samplingCount;
-    //     const rad = randomRange(pieceRad * i, pieceRad * (i + 1));
-    //     // samplingRotations.push(pieceRad * i);
-    //     samplingRotations.push(rad);
-    //     
-    //     // calc sampling distances 
-    //     // const baseDistance = 0.5;
-    //     // const pieceDistance = (1 - baseDistance) / samplingCount;
-    //     // const distance = randomRange(pieceDistance * i, pieceDistance * (i + 1));
-    //     const distance = randomRange(1, 2);
-    //     // const distance = baseDistance + pieceDistance * i;
-    //     samplingDistances.push(distance);
-    //     // samplingDistances.push(1);
-    // }
-    
+    const tableWidth = 4;
+    const tableHeight = 4;
+    const pixelNum = tableWidth * tableHeight;
+
+    // const minRad = 0;
+    // const maxRad = Math.PI * 2;
+    const minLen = 1;
+    const maxLen = 2;
+    const pieceRad = (1 / pixelNum) * Math.PI * 2;
+    const pieceLen = (maxLen - minLen) / pixelNum;
+
+    const data = new Array(pixelNum)
+        .fill(0)
+        .map((_, i) => {
+            // const rad = randomRange(minRad, maxRad);
+            // const len = randomRange(minLen, maxLen);
+            // radを適当にoffset
+            const rad = randomRange(pieceRad * (i * 4), pieceRad * (i * 4 + 4)) % (Math.PI * 2);
+            const len = minLen + pieceLen * i;
+            // for debug
+            // console.log(rad, len);
+            return [rad, len, 1, 1];
+        })
+        .flat();
+
+    const samplingTexture = new Texture({
+        gpu,
+        width: 4,
+        height: 4,
+        type: TextureTypes.RGBA32F,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+    });
+
+    samplingTexture.update({
+        width: 4,
+        height: 4,
+        data: new Float32Array(data),
+    });
+
     return {
         samplingRotations,
         samplingDistances,
+        samplingTexture,
     };
 };
 
 export class SSAOPass extends PostProcessPass {
-    occlusionSampleLength: number = 0.033;
+    occlusionSampleLength: number = 0.059;
     occlusionBias: number = 0.0001;
     occlusionMinDistance: number = 0.006;
     occlusionMaxDistance: number = 0.244;
     occlusionColor: Color = new Color(1, 0, 0, 1);
+    occlusionPower: number = 1.4;
     occlusionStrength: number = 1;
     blendRate: number = 1;
+
+    samplingTexture: Texture;
 
     /**
      *
@@ -75,7 +101,7 @@ export class SSAOPass extends PostProcessPass {
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = ssaoFragmentShader;
 
-        const { samplingRotations, samplingDistances } = createSamplingTables();
+        const { samplingRotations, samplingDistances, samplingTexture } = createSamplingTables(gpu);
 
         super({
             gpu,
@@ -129,6 +155,10 @@ export class SSAOPass extends PostProcessPass {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(samplingDistances),
                 },
+                uSamplingTexture: {
+                    type: UniformTypes.Texture,
+                    value: samplingTexture,
+                },
                 uOcclusionSampleLength: {
                     type: UniformTypes.Float,
                     value: 1,
@@ -149,6 +179,10 @@ export class SSAOPass extends PostProcessPass {
                     type: UniformTypes.Color,
                     value: new Color(0, 0, 0, 1),
                 },
+                uOcclusionPower: {
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
                 uOcclusionStrength: {
                     type: UniformTypes.Float,
                     value: 1,
@@ -159,6 +193,8 @@ export class SSAOPass extends PostProcessPass {
                 },
             },
         });
+
+        this.samplingTexture = samplingTexture;
     }
 
     /**
@@ -180,8 +216,10 @@ export class SSAOPass extends PostProcessPass {
         this.material.updateUniform('uOcclusionMinDistance', this.occlusionMinDistance);
         this.material.updateUniform('uOcclusionMaxDistance', this.occlusionMaxDistance);
         this.material.updateUniform('uOcclusionColor', this.occlusionColor);
+        this.material.updateUniform('uOcclusionPower', this.occlusionPower);
         this.material.updateUniform('uOcclusionStrength', this.occlusionStrength);
         this.material.updateUniform('uBlendRate', this.blendRate);
+        this.material.updateUniform('uSamplingTexture', this.samplingTexture);
 
         super.render(options);
     }
