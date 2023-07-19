@@ -34,5 +34,6 @@ float sampleRawDepthByViewPosition(
     vec4 projectedPosition = projectionMatrix * offsetPosition;
     vec3 projectedPositionNDC = projectedPosition.xyz / projectedPosition.w;
     vec2 projectedPositionUV = projectedPositionNDC.xy * .5 + .5;
-    return texture(depthTexture, projectedPositionUV).x;
+    // return texture(depthTexture, projectedPositionUV).x;
+    return textureLod(depthTexture, projectedPositionUV, 0.).x;
 }

@@ -52,8 +52,8 @@ void main() {
     float eps = .001;
 
 
-    int maxIterationNum = 32;
-    int binarySearchNum = 8;
+    int maxIterationNum = 16;
+    int binarySearchNum = 4;
 
     //
 
@@ -98,23 +98,6 @@ void main() {
         outColor = baseColor;
         return;
     }
-
-    // // debugs
-    // float sampledDepth = sampleRawDepthByViewPosition(
-    //     uDepthTexture,
-    //     currentRayInView,
-    //     uProjectionMatrix,
-    //     vec3(0.)
-    // );
-    // // currentRayInView = rayViewOrigin;
-    // float stepLength = rayDeltaStep * (float(10) + 1.) + uRayNearestDistance;
-    // currentRayInView = rayViewOrigin + vec3(jitterOffset, 0.) + rayViewDir * stepLength;
-    // vec3 sampledViewPosition = reconstructViewPositionFromDepth(uv, sampledDepth, uInverseProjectionMatrix);
-    // vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
-    // currentRayInClip.xyz = currentRayInClip.xyz / currentRayInClip.w;
-    // outColor = vec4(currentRayInClip.xyz, 1.);
-    // float dist = sampledViewPosition.z - currentRayInView.z;
-    // return;
 
     for (int i = 0; i < maxIterationNum; i++) {
         float stepLength = rayDeltaStep * (float(i) + 1.) + uRayNearestDistance;
@@ -190,13 +173,6 @@ void main() {
         // pattern2: [wip] blend reflection
         // baseColor += texture(uSrcTexture, rayUV);
     }
-
-    // outColor = vec4(fadeFactor, 0., 0., 1.);
-    // return;
-    // 
-    // outColor = baseColor;
-  
-    // return;
 
     vec4 color = mix(cachedBaseColor, baseColor, uBlendRate);
     outColor = color;

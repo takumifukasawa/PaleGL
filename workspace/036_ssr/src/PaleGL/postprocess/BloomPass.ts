@@ -349,6 +349,7 @@ export class BloomPass implements IPostProcessPass {
         isLastPass,
         gBufferRenderTargets,
         sceneCamera,
+        time
     }: PostProcessRenderArgs) {
         // 一回だけ呼びたい
         this.geometry.start();
@@ -363,7 +364,7 @@ export class BloomPass implements IPostProcessPass {
         }
 
         this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
-        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, sceneCamera });
+        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, sceneCamera, time });
 
         // for debug
         // this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
@@ -441,6 +442,7 @@ export class BloomPass implements IPostProcessPass {
             isLastPass,
             sceneCamera,
             gBufferRenderTargets,
+            time
         });
     }
 }

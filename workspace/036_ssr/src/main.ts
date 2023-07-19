@@ -1187,7 +1187,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'jitter size x',
         minValue: 0.001,
-        maxValue: 1,
+        maxValue: 0.1,
         stepValue: 0.001,
         initialValue: ssrPass.reflectionRayJitterSizeX,
         onChange: (value) => {
@@ -1198,7 +1198,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'jitter size y',
         minValue: 0.001,
-        maxValue: 1,
+        maxValue: 0.1,
         stepValue: 0.001,
         initialValue: ssrPass.reflectionRayJitterSizeY,
         onChange: (value) => {
