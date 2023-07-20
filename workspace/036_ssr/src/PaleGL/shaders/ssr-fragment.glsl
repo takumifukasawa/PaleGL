@@ -51,7 +51,6 @@ float noise(vec2 seed)
 void main() {
     float eps = .001;
 
-
     int maxIterationNum = 16;
     int binarySearchNum = 4;
 
@@ -61,6 +60,8 @@ void main() {
 
     vec3 worldNormal = normalize(texture(uNormalTexture, uv).xyz * 2. - 1.);
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
+    
+    // TODO: PBRな場合はroughnessを考慮
 
     vec4 baseColor = texture(uSrcTexture, uv);
     vec4 cachedBaseColor = baseColor;
