@@ -56,7 +56,11 @@ export type MaterialArgs = {
     blendType?: BlendType;
     renderQueue?: RenderQueue;
 
+    // normal map
     useNormalMap?: boolean | null;
+    
+    // env map
+    useEnvMap?: boolean | null;
 
     // skinning
     isSkinning?: boolean | null;
@@ -151,6 +155,8 @@ export class Material {
     queue: RenderQueue | null;
 
     useNormalMap: boolean | null;
+    
+    useEnvMap: boolean | null;
 
     // skinning
     isSkinning: boolean | null;
@@ -229,6 +235,9 @@ export class Material {
 
         // vertex color
         useVertexColor = false,
+        
+        // env map
+        useEnvMap = false,
 
         queue,
         uniforms = {},
@@ -299,7 +308,11 @@ export class Material {
         this.isInstancing = !!isInstancing;
         this.useVertexColor = !!useVertexColor;
 
+        // normal map
         this.useNormalMap = !!useNormalMap;
+        
+        // env map
+        this.useEnvMap = !!useEnvMap;
 
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
@@ -392,6 +405,7 @@ export class Material {
             isSkinning: !!this.isSkinning,
             gpuSkinning: !!this.gpuSkinning,
             useNormalMap: !!this.useNormalMap,
+            useEnvMap: !!this.useEnvMap,
             useReceiveShadow: !!this.receiveShadow,
             useVertexColor: !!this.useVertexColor,
             isInstancing: !!this.isInstancing,

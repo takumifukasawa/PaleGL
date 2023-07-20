@@ -1,17 +1,18 @@
-import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import { UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
-import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Color } from '@/PaleGL/math/Color';
+import {MaterialArgs, Material, Uniforms} from '@/PaleGL/materials/Material';
+import {UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
+import {Vector2} from '@/PaleGL/math/Vector2';
+import {Color} from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
-import { GPU } from '@/PaleGL/core/GPU';
-import { Texture } from '@/PaleGL/core/Texture';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+import {AttributeDescriptor} from '@/PaleGL/core/Attribute';
+import {GPU} from '@/PaleGL/core/GPU';
+import {Texture} from '@/PaleGL/core/Texture';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {Vector4} from '@/PaleGL/math/Vector4';
 
 import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import phongFrag from '@/PaleGL/shaders/phong-fragment.glsl';
 import phongDepthFrag from '@/PaleGL/shaders/phong-depth-fragment.glsl';
+import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
 
 export type PhongMaterialArgs = {
     diffuseColor?: Color;
@@ -22,6 +23,7 @@ export type PhongMaterialArgs = {
     normalMap?: Texture;
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
+    envMap?: CubeMap,
     vertexShaderModifier?: VertexShaderModifier;
     uniforms?: Uniforms;
 } & MaterialArgs;
@@ -32,19 +34,20 @@ export class PhongMaterial extends Material {
     // specularAmount;
 
     constructor({
-        diffuseColor,
-        diffuseMap,
-        diffuseMapUvScale, // vec2
-        diffuseMapUvOffset, // vec2
-        specularAmount,
-        normalMap,
-        normalMapUvScale, // vec2
-        normalMapUvOffset, // vec2,
-        // TODO: 外部化
-        vertexShaderModifier = {},
-        uniforms = {},
-        ...options
-    }: PhongMaterialArgs) {
+                    diffuseColor,
+                    diffuseMap,
+                    diffuseMapUvScale, // vec2
+                    diffuseMapUvOffset, // vec2
+                    specularAmount,
+                    normalMap,
+                    normalMapUvScale, // vec2
+                    normalMapUvOffset, // vec2,
+                    envMap,
+                    // TODO: 外部化
+                    vertexShaderModifier = {},
+                    uniforms = {},
+                    ...options
+                }: PhongMaterialArgs) {
         // this.specularAmount =
 
         const baseUniforms: Uniforms = {
@@ -92,6 +95,10 @@ export class PhongMaterial extends Material {
                     color: new Vector4(0, 0, 0, 0),
                 },
             },
+            uEnvMap: {
+                type: UniformTypes.CubeMap,
+                value: envMap || null
+            }
         };
 
         const mergedUniforms: Uniforms = {
@@ -126,15 +133,16 @@ export class PhongMaterial extends Material {
             uniforms: mergedUniforms,
             depthUniforms,
             useNormalMap: !!normalMap,
+            useEnvMap: !!envMap
         });
     }
 
-    start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
+    start({gpu, attributeDescriptors = []}: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = phongVert;
         this.fragmentShader = phongFrag;
         this.depthFragmentShader = phongDepthFrag;
 
-        super.start({ gpu, attributeDescriptors });
+        super.start({gpu, attributeDescriptors});
 
         // console.log(this.rawVertexShader)
         // console.log(this.rawFragmentShader)

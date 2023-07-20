@@ -25,6 +25,7 @@ export type ShaderDefines = {
     isSkinning: boolean;
     gpuSkinning: boolean;
     useNormalMap: boolean;
+    useEnvMap: boolean;
     useReceiveShadow: boolean;
     useVertexColor: boolean;
     useAlphaTest: boolean;
@@ -44,6 +45,7 @@ const buildShaderDefines = ({
     isSkinning,
     gpuSkinning,
     useNormalMap,
+    useEnvMap,
     useReceiveShadow,
     useVertexColor,
     useAlphaTest,
@@ -62,6 +64,9 @@ const buildShaderDefines = ({
     }
     if (useNormalMap) {
         arr.push('#define USE_NORMAL_MAP');
+    }
+    if(useEnvMap) {
+        arr.push('#define USE_ENV_MAP');
     }
     if (useReceiveShadow) {
         arr.push('#define USE_RECEIVE_SHADOW');

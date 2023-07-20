@@ -1,8 +1,8 @@
 // import "@/style.css";
 
 import smokeImgUrl from '../images/particle-smoke.png?url';
-// import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
-// import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
+import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../images/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../images/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
@@ -62,8 +62,8 @@ import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
 // others
 import {
     UniformTypes,
-    // TextureWrapTypes,
-    // TextureFilterTypes,
+    TextureWrapTypes,
+    TextureFilterTypes,
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
@@ -76,6 +76,7 @@ import {Camera} from '@/PaleGL/actors/Camera';
 import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
 import {Attribute} from '@/PaleGL/core/Attribute';
 import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
+import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -148,9 +149,10 @@ debuggerStates.instanceNum = instanceNum;
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-// let floorDiffuseMap: Texture;
-// let floorNormalMap: Texture;
+let floorDiffuseMap: Texture;
+let floorNormalMap: Texture;
 let skinnedMesh: SkinnedMesh;
+let cubeMap: CubeMap;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -312,7 +314,7 @@ const bloomPass = new BloomPass({
     threshold: 0.9,
     bloomAmount: 0.8,
 });
-bloomPass.enabled = true;
+bloomPass.enabled = false;
 postProcess.addPass(bloomPass);
 
 const ssaoPass = new SSAOPass({gpu});
@@ -320,7 +322,7 @@ ssaoPass.enabled = false;
 postProcess.addPass(ssaoPass);
 
 const ssrPass = new SSRPass({gpu});
-ssrPass.enabled = true;
+ssrPass.enabled = false;
 postProcess.addPass(ssrPass);
 
 const fxaaPass = new FXAAPass({gpu});
@@ -503,6 +505,7 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
+        // envMap: cubeMap,
         // vertexShaderModifier: {
         //     [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
         //     [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
@@ -538,27 +541,27 @@ const main = async () => {
         img: particleImg,
     });
 
-    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    // floorDiffuseMap = new Texture({
-    //     gpu,
-    //     img: floorDiffuseImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    floorDiffuseMap = new Texture({
+        gpu,
+        img: floorDiffuseImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
-    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    // floorNormalMap = new Texture({
-    //     gpu,
-    //     img: floorNormalImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    floorNormalMap = new Texture({
+        gpu,
+        img: floorNormalImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
     const images = {
         [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
@@ -569,7 +572,7 @@ const main = async () => {
         [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl
     };
 
-    const cubeMap = await loadCubeMap({gpu, images});
+    cubeMap = await loadCubeMap({gpu, images});
 
     const skyboxMesh = new Skybox({
         gpu,
@@ -588,8 +591,9 @@ const main = async () => {
         geometry: floorGeometry,
         material: new PhongMaterial({
             // gpu,
-            // diffuseMap: floorDiffuseMap,
-            // normalMap: floorNormalMap,
+            diffuseMap: floorDiffuseMap,
+            normalMap: floorNormalMap,
+            envMap: cubeMap,
             diffuseColor: Color.black(),
             receiveShadow: true,
             specularAmount: 0.4,
@@ -839,7 +843,6 @@ void main() {
         material: particleMaterial,
     });
     particleMesh.onFixedUpdate = ({fixedTime}) => {
-        // particleMaterial.uniforms.uTime.value = fixedTime;
         particleMaterial.updateUniform('uTime', fixedTime);
     };
 
@@ -986,12 +989,18 @@ function initDebugger() {
     // });
 
     // debuggerGUI.addBorderSpacer();
+    
+    //
+    // bloom debuggers
+    //
 
-    // debuggerGUI.addToggleDebugger({
-    //     label: 'bloom pass enabled',
-    //     initialValue: bloomPass.enabled,
-    //     onChange: (value) => (bloomPass.enabled = value),
-    // });
+    debuggerGUI.addToggleDebugger({
+        label: 'bloom pass enabled',
+        initialValue: bloomPass.enabled,
+        onChange: (value) => (bloomPass.enabled = value),
+    });
+
+    debuggerGUI.addBorderSpacer();
 
     //
     // bloom debuggers

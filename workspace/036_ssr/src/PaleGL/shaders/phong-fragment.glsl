@@ -8,6 +8,7 @@ uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
 uniform float uSpecularAmount;
+uniform samplerCube uEnvMap;
 
 #include ./partial/fragment-normal-map-uniforms.glsl
 
@@ -55,7 +56,7 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     // original lambert
     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
     
-    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * uDirectionalLight.color.xyz;
+    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * directionalLight.color.xyz;
 
     vec3 P = surface.worldPosition;
     vec3 E = camera.worldPosition;
@@ -68,12 +69,8 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     specularRate = pow(specularRate, specularPower) * surface.specularAmount;
     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
 
-    // TODO: 外から渡せるようにする
-    // vec3 ambientColor = vec3(.12, .11, .1);
-    vec3 ambientColor = vec3(.1);
-
     vec4 resultColor = vec4(
-        diffuseColor + specularColor + ambientColor,
+        diffuseColor + specularColor,
         surface.diffuseColor.a
     );
     
@@ -164,6 +161,12 @@ void main() {
     
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
+        
+    // ambient light
+        #ifdef USE_ENV_MAP
+    resultColor.xyz = texture(uEnvMap, vec3(uv, 1.)).xyz;
+        #endif
+    // resultColor.xyz = vec3(uv, 1.);
 
 #ifdef USE_RECEIVE_SHADOW
     // TODO: apply shadow の中に入れても良さそう
