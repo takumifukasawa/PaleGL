@@ -11,13 +11,13 @@ uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
 
-#include ./partial/fragment-normal-map-uniforms.glsl
+#include ./partial/normal-map-fragment-uniforms.glsl
 
-#include ./partial/fragment-receive-shadow-uniforms.glsl
+#include ./partial/receive-shadow-fragment-uniforms.glsl
 
 uniform vec3 uViewPosition;
 
-#include ./partial/fragment-alpha-test-uniforms.glsl
+#include ./partial/alpha-test-fragment-uniforms.glsl
 
 #include ./partial/directional-light-struct.glsl
 #include ./partial/directional-light-uniforms.glsl
@@ -34,13 +34,13 @@ struct Surface {
 in vec2 vUv;
 in vec3 vNormal;
 
-#include ./partial/fragment-receive-shadow-varyings.glsl
+#include ./partial/receive-shadow-fragment-varyings.glsl
 
-#include ./partial/fragment-normal-map-varyings.glsl
+#include ./partial/normal-map-fragment-varyings.glsl
 
 in vec3 vWorldPosition;
 
-#include ./partial/fragment-vertex-color-varyings.glsl
+#include ./partial/vertex-color-fragment-varyings.glsl
 
 // out vec4 outColor;
 layout (location = 0) out vec4 outBaseColor;
@@ -130,7 +130,7 @@ void checkAlphaTest(float value, float threshold) {
 }
 #endif
 
-#include ./partial/fragment-env-map-functions.glsl
+#include ./partial/env-map-fragment-functions.glsl
 
 mat2 rotate(float r) {
     float c = cos(r);

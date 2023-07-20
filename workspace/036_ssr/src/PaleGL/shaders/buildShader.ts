@@ -6,8 +6,6 @@
 // .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
-
-import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import {
     VertexShaderModifierPragmas,
     FragmentShaderModifierPragmas,
@@ -16,6 +14,7 @@ import {
     VertexShaderModifier,
     FragmentShaderModifier,
 } from '@/PaleGL/constants';
+import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
 import transformVertexUniforms from '@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl';

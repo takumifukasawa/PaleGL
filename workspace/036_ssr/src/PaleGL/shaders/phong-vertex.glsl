@@ -4,16 +4,16 @@
 
 #pragma ATTRIBUTES
 
-#include ./partial/vertex-skinning-functions.glsl
+#include ./partial/skinning-vertex-functions.glsl
 
 // varyings
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
 
-#include ./partial/vertex-normal-map-varyings.glsl
-#include ./partial/vertex-receive-shadow-varyings.glsl
-#include ./partial/vertex-color-varyings.glsl
+#include ./partial/normal-map-vertex-varyings.glsl
+#include ./partial/receive-shadow-vertex-varyings.glsl
+#include ./partial/vertex-color-vertex-varyings.glsl
 
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
@@ -22,8 +22,8 @@ uniform mat4 uNormalMatrix;
 
 uniform float uTime;
 
-#include ./partial/vertex-receive-shadow-uniforms.glsl
-#include ./partial/vertex-skinning-uniforms.glsl
+#include ./partial/receive-shadow-vertex-uniforms.glsl
+#include ./partial/skinning-vertex-uniforms.glsl
 
 // TODO: needs??
 // ${insertUniforms || ''}
@@ -34,11 +34,11 @@ void main() {
 
     vec4 localPosition = vec4(aPosition, 1.);
 
-    #include ./partial/vertex-skinning-calc.glsl;
+    #include ./partial/skinning-vertex-calc.glsl;
     
     #pragma LOCAL_POSITION_POST_PROCESS
 
-    #include ./partial/vertex-normal-map-calc.glsl;
+    #include ./partial/normal-map-vertex-calc.glsl;
 
     // assign common varyings 
     vUv = aUv;
@@ -62,7 +62,7 @@ void main() {
  
     vWorldPosition = worldPosition.xyz;
 
-    #include ./partial/vertex-receive-shadow-calc.glsl
+    #include ./partial/receive-shadow-vertex-calc.glsl
 
     vec4 viewPosition = uViewMatrix * worldPosition;
 

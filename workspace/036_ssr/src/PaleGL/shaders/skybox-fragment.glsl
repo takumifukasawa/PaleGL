@@ -17,7 +17,7 @@ uniform float uRotationOffset;
 layout (location = 0) out vec4 outBaseColor;
 layout (location = 1) out vec4 outNormalColor;
 
-#include ./partial/fragment-env-map-functions.glsl
+#include ./partial/env-map-fragment-functions.glsl
 
 void main() {
     // pattern_1: inverse normal
