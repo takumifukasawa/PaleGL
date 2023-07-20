@@ -24,6 +24,7 @@ export type PhongMaterialArgs = {
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
     envMap?: CubeMap,
+    ambientAmount?: number;
     vertexShaderModifier?: VertexShaderModifier;
     uniforms?: Uniforms;
 } & MaterialArgs;
@@ -43,6 +44,7 @@ export class PhongMaterial extends Material {
                     normalMapUvScale, // vec2
                     normalMapUvOffset, // vec2,
                     envMap,
+                    ambientAmount,
                     // TODO: 外部化
                     vertexShaderModifier = {},
                     uniforms = {},
@@ -98,6 +100,10 @@ export class PhongMaterial extends Material {
             uEnvMap: {
                 type: UniformTypes.CubeMap,
                 value: envMap || null
+            },
+            uAmbientAmount: {
+                type: UniformTypes.Float,
+                value: ambientAmount || 1,
             }
         };
 

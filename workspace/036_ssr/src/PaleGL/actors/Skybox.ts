@@ -13,6 +13,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
+import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -90,50 +91,54 @@ void main() {
 }
 `;
 
-const skyboxFragmentShader = `#version 300 es
-
-precision mediump float;
-
-in vec2 vUv;
-in vec3 vNormal;
-in vec3 vWorldPosition;
-
-uniform samplerCube uCubeTexture;
-uniform vec3 uViewPosition;
-uniform mat4 uViewDirectionProjectionInverse;
-uniform float uRotationOffset;
-
-// out vec4 outColor;
-layout (location = 0) out vec4 outBaseColor;
-layout (location = 1) out vec4 outNormalColor;
-
-mat2 rotate(float r) {
-    float c = cos(r);
-    float s = sin(r);
-    return mat2(c, s, -s, c);
-}
-
-void main() {
-    // pattern_1: inverse normal
-    vec3 N = normalize(vNormal);
-    vec3 reflectDir = -N;
-
-    // pattern_2: world position dir
-    // skyboxの中心 = カメラの中心なので、こちらでもよい
-    // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
-
-    reflectDir.x *= -1.;
-    reflectDir.xz *= rotate(3.14 + uRotationOffset);
-    vec4 textureColor = texture(uCubeTexture, reflectDir);
-    
-    // outColor = textureColor;
-    outBaseColor = textureColor;
-    outNormalColor = vec4(0., 0., 0., 1.);
-}
-`;
+// const skyboxFragmentShader = `#version 300 es
+// 
+// precision mediump float;
+// 
+// in vec2 vUv;
+// in vec3 vNormal;
+// in vec3 vWorldPosition;
+// 
+// uniform samplerCube uCubeTexture;
+// uniform vec3 uViewPosition;
+// uniform mat4 uViewDirectionProjectionInverse;
+// uniform float uRotationOffset;
+// 
+// // out vec4 outColor;
+// layout (location = 0) out vec4 outBaseColor;
+// layout (location = 1) out vec4 outNormalColor;
+// 
+// // mat2 rotate(float r) {
+// //     float c = cos(r);
+// //     float s = sin(r);
+// //     return mat2(c, s, -s, c);
+// // }
+// 
+// #include ./partial/fragment-env-map-functions.glsl
+// 
+// void main() {
+//     // pattern_1: inverse normal
+//     vec3 N = normalize(vNormal);
+//     vec3 reflectDir = -N;
+// 
+//     // pattern_2: world position dir
+//     // skyboxの中心 = カメラの中心なので、こちらでもよい
+//     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
+// 
+//     // reflectDir.x *= -1.;
+//     // reflectDir.xz *= rotate(3.14 + uRotationOffset);
+//     // vec4 textureColor = texture(uCubeTexture, reflectDir);
+//     
+//     vec3 envMapColor = calcEnvMap(uCubeTexture, reflectDir, uRotationOffset);
+//     
+//     // outColor = textureColor;
+//     outBaseColor = vec4(envMapColor, 1.);
+//     outNormalColor = vec4(0., 0., 0., 1.);
+// }
+// `;
 
 export class Skybox extends Mesh {
-    constructor({ gpu, cubeMap, rotationOffset = 0 }: { gpu: GPU; cubeMap: CubeMap; rotationOffset: number }) {
+    constructor({ gpu, cubeMap, rotationOffset = 0 }: { gpu: GPU; cubeMap: CubeMap; rotationOffset?: number }) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
@@ -165,6 +170,7 @@ export class Skybox extends Mesh {
             primitiveType: PrimitiveTypes.Triangles,
             depthTest: true,
             depthWrite: false,
+            useEnvMap: true,
             uniforms: {
                 uCubeTexture: {
                     type: UniformTypes.CubeMap,

@@ -505,7 +505,8 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
-        // envMap: cubeMap,
+        envMap: cubeMap,
+        ambientAmount: 0.2
         // vertexShaderModifier: {
         //     [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
         //     [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
@@ -577,7 +578,7 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        rotationOffset: 0.8,
+        // rotationOffset: 0.8,
     });
 
     skinnedMesh = await createGLTFSkinnedMesh();
@@ -591,12 +592,13 @@ const main = async () => {
         geometry: floorGeometry,
         material: new PhongMaterial({
             // gpu,
-            diffuseMap: floorDiffuseMap,
-            normalMap: floorNormalMap,
+            // diffuseMap: floorDiffuseMap,
+            // normalMap: floorNormalMap,
             envMap: cubeMap,
-            diffuseColor: Color.black(),
+            diffuseColor: new Color(0, 0, 0, 1),
             receiveShadow: true,
             specularAmount: 0.4,
+            ambientAmount: 0.2,
         }),
         castShadow: false,
     });

@@ -9,6 +9,7 @@ uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
+uniform float uAmbientAmount;
 
 #include ./partial/fragment-normal-map-uniforms.glsl
 
@@ -129,6 +130,14 @@ void checkAlphaTest(float value, float threshold) {
 }
 #endif
 
+#include ./partial/fragment-env-map-functions.glsl
+
+mat2 rotate(float r) {
+    float c = cos(r);
+    float s = sin(r);
+    return mat2(c, s, -s, c);
+}
+
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
    
@@ -163,10 +172,13 @@ void main() {
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
         
     // ambient light
-        #ifdef USE_ENV_MAP
-    resultColor.xyz = texture(uEnvMap, vec3(uv, 1.)).xyz;
-        #endif
-    // resultColor.xyz = vec3(uv, 1.);
+#ifdef USE_ENV_MAP
+    vec3 envDir = reflect(
+        normalize(surface.worldPosition - camera.worldPosition),
+        normalize(surface.worldNormal)
+    );
+    resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
+#endif
 
 #ifdef USE_RECEIVE_SHADOW
     // TODO: apply shadow の中に入れても良さそう
@@ -182,8 +194,4 @@ void main() {
     // correct
     outBaseColor = resultColor;
     outNormalColor = vec4(worldNormal * .5 + .5, 1.); 
-
-    // this is dummy
-    // outBaseColor = vec4(1., 0., 0., 1.);
-    // outNormalColor = vec4(0., 1., 0., 1.); 
 }
