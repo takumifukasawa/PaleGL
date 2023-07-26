@@ -6,6 +6,8 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
+import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 
@@ -87,32 +89,33 @@ export class PostProcess {
             console.error('[PostProcess.render] scene render target is empty.');
         }
 
+        const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+            sceneCamera.projectionMatrix,
+            sceneCamera.viewMatrix
+        ).invert();
+        const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
+
+        // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
 
-            // pass.materials.forEach((passMaterial) => {
-            //     // TODO: postprocess側でセットした方が効率がよいが...
-            //     // TODO: 今、passごとにセットすればいい値も入ってしまっている
-            //     passMaterial.updateUniform('uTime', time);
-            //     passMaterial.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
-            //     passMaterial.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
-            //     passMaterial.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
-            //     const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-            //         sceneCamera.projectionMatrix,
-            //         sceneCamera.viewMatrix
-            //     ).invert();
-            //     passMaterial.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-            //     const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-            //     passMaterial.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
-            //     passMaterial.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
-            //     passMaterial.updateUniform('uTransposeInverseViewMatrix', sceneCamera.viewMatrix.clone().invert().transpose());
-            //     if (gBufferRenderTargets) {
-            //         passMaterial.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
-            //         passMaterial.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
-            //         passMaterial.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
-            //     }
-            // });
+            pass.materials.forEach((passMaterial) => {
+                passMaterial.updateUniform('uTime', time);
+                passMaterial.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
+                passMaterial.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
+                passMaterial.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
+                passMaterial.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
+                passMaterial.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
+                passMaterial.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
+                passMaterial.updateUniform('uTransposeInverseViewMatrix', sceneCamera.viewMatrix.clone().invert().transpose());
+                // TODO: もうgbufferは前提でいい気がする
+                if (gBufferRenderTargets) {
+                    passMaterial.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
+                    passMaterial.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
+                    passMaterial.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
+                }
+            });
 
             pass.render({
                 gpu,

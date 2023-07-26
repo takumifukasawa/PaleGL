@@ -100,36 +100,6 @@ export class BloomPass implements IPostProcessPass {
         this.extractBrightnessPass = new FragmentPass({
             gpu,
             fragmentShader: extractBrightnessFragmentShader,
-            //             fragmentShader: `#version 300 es
-            //
-            // precision mediump float;
-            //
-            // out vec4 outColor;
-            //
-            // in vec2 vUv;
-            //
-            // uniform sampler2D ${UniformNames.SrcTexture};
-            // uniform float uThreshold;
-            //
-            // void main() {
-            //     vec4 color = texture(${UniformNames.SrcTexture}, vUv);
-            //     float k = uThreshold;
-            //
-            //     // pattern_1
-            //     // ex
-            //     // k: 0.9, c: 1 => b = 1
-            //     // k: 0.8, c: 1 => b = 0.25
-            //     vec4 b = (color - vec4(k)) / (1. - k);
-            //
-            //     // pattern_2
-            //     // vec4 b = color - k;
-            //
-            //     outColor = clamp(b, 0., 1.);
-            //
-            //     // for debug
-            //     // outColor = b;
-            // }
-            //             `,
             uniforms: {
                 uThreshold: {
                     type: UniformTypes.Float,
@@ -137,6 +107,7 @@ export class BloomPass implements IPostProcessPass {
                 },
             },
         });
+        this.materials.push(...this.extractBrightnessPass.materials);
 
         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 
@@ -172,6 +143,8 @@ export class BloomPass implements IPostProcessPass {
                 },
             },
         });
+        this.materials.push(this.horizontalBlurMaterial);
+        
         this.verticalBlurMaterial = new Material({
             // gpu,
             vertexShader: PostProcessPassBase.baseVertexShader,
@@ -204,6 +177,7 @@ export class BloomPass implements IPostProcessPass {
                 },
             },
         });
+        this.materials.push(this.verticalBlurMaterial);
 
         this.compositePass = new FragmentPass({
             gpu,
@@ -239,6 +213,7 @@ export class BloomPass implements IPostProcessPass {
                 },
             },
         });
+        this.materials.push(...this.compositePass.materials);
     }
 
     #width = 1;

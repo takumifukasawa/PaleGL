@@ -200,7 +200,7 @@ export class SSRPass extends PostProcessPassBase {
        
         this.material.updateUniform('uReflectionAdditionalRate', this.reflectionAdditionalRate);
         this.material.updateUniform('uBlendRate', this.blendRate);
-
+        
         super.render(options);
     }
 }

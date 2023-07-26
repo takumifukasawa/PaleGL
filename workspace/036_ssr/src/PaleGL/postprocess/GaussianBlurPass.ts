@@ -64,6 +64,9 @@ export class GaussianBlurPass implements IPostProcessPass {
                 }
             },
         });
+        this.#passes.push(horizontalBlurPass);
+        this.materials.push(...horizontalBlurPass.materials);
+
         const verticalBlurPass = new FragmentPass({
             name: 'vertical blur pass',
             gpu,
@@ -92,11 +95,7 @@ export class GaussianBlurPass implements IPostProcessPass {
                 },
             },
         });
-
-        this.#passes.push(horizontalBlurPass);
         this.#passes.push(verticalBlurPass);
-        
-        this.materials.push(...horizontalBlurPass.materials);
         this.materials.push(...verticalBlurPass.materials);
     }
 
