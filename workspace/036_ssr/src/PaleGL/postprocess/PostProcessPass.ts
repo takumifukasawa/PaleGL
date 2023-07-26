@@ -173,7 +173,7 @@ void main() {
         }
 
         // TODO: postprocess側でセットした方が効率がよいが...
-        // TODO: 今、passごとにセットすればいい値も入ってしまっている
+        // TODO: 今、passごとにセットすればいい値もセットしようとしている。実際にはセットされないけど
         this.material.updateUniform('uTime', time);
         this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
         this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
