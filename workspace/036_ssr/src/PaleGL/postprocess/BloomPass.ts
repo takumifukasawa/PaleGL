@@ -1,6 +1,5 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -14,6 +13,7 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -26,6 +26,8 @@ export class BloomPass implements IPostProcessPass {
     enabled: boolean = false;
     width: number = 1;
     height: number = 1;
+    
+    materials: Material[] = [];
 
     private extractBrightnessPass;
 
@@ -140,7 +142,7 @@ export class BloomPass implements IPostProcessPass {
 
         this.horizontalBlurMaterial = new Material({
             // gpu,
-            vertexShader: PostProcessPass.baseVertexShader,
+            vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
             // fragmentShader: gaussianBlurFragmentShader({
             //     isHorizontal: true,
@@ -172,7 +174,7 @@ export class BloomPass implements IPostProcessPass {
         });
         this.verticalBlurMaterial = new Material({
             // gpu,
-            vertexShader: PostProcessPass.baseVertexShader,
+            vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
             // fragmentShader: gaussianBlurFragmentShader({
             //     isHorizontal: false,
@@ -203,84 +205,9 @@ export class BloomPass implements IPostProcessPass {
             },
         });
 
-        // tmp
-        // this.horizontalBlurPass = new FragmentPass({
-        //     name: "horizontal blur pass",
-        //     gpu,
-        //     fragmentShader: gaussianBlurFragmentShader({
-        //         isHorizontal: true, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
-        //     }),
-        //     uniforms: {
-        //         uTargetWidth: {
-        //             type: UniformTypes.Float,
-        //             value: 1,
-        //         },
-        //         uTargetHeight: {
-        //             type: UniformTypes.Float,
-        //             value: 1,
-        //         }
-        //     }
-        // });
-        // this.verticalBlurPass = new FragmentPass({
-        //     name: "vertical blur pass",
-        //     gpu,
-        //     fragmentShader: gaussianBlurFragmentShader({
-        //         isHorizontal: false, pixelNum: blurPixelNum, srcTextureUniformName: UniformNames.SceneTexture,
-        //     }),
-        //     uniforms: {
-        //         uTargetWidth: {
-        //             type: UniformTypes.Float,
-        //             value: 1,
-        //         },
-        //         uTargetHeight: {
-        //             type: UniformTypes.Float,
-        //             value: 1,
-        //         }
-        //     }
-        // });
-
-        // this.#lastPass = new CopyPass({ gpu });
-        // this.#passes.push(this.#lastPass);
-
         this.compositePass = new FragmentPass({
             gpu,
             fragmentShader: bloomCompositeFragmentShader,
-            //             fragmentShader: `#version 300 es
-            //
-            // precision mediump float;
-            //
-            // in vec2 vUv;
-            //
-            // out vec4 outColor;
-            //
-            // uniform sampler2D ${UniformNames.SrcTexture};
-            // uniform sampler2D uBlur4Texture;
-            // uniform sampler2D uBlur8Texture;
-            // uniform sampler2D uBlur16Texture;
-            // uniform sampler2D uBlur32Texture;
-            // uniform float uTone;
-            // uniform float uBloomAmount;
-            //
-            // void main() {
-            //     vec4 blur4Color = texture(uBlur4Texture, vUv);
-            //     vec4 blur8Color = texture(uBlur8Texture, vUv);
-            //     vec4 blur16Color = texture(uBlur16Texture, vUv);
-            //     vec4 blur32Color = texture(uBlur32Texture, vUv);
-            //     vec4 sceneColor = texture(${UniformNames.SrcTexture}, vUv) * uTone;
-            //
-            //     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
-            //
-            //     outColor = sceneColor + blurColor;
-            //
-            //     // for debug
-            //     // outColor = blur4Color;
-            //     // outColor = blur8Color;
-            //     // outColor = blur16Color;
-            //     // outColor = blur32Color;
-            //     // outColor = blurColor;
-            //     // outColor = sceneColor;
-            // }
-            //             `,
             uniforms: {
                 [UniformNames.SrcTexture]: {
                     type: UniformTypes.Texture,
@@ -366,10 +293,6 @@ export class BloomPass implements IPostProcessPass {
         this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
         this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, sceneCamera, time });
 
-        // for debug
-        // this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
-        // return;
-
         const renderBlur = (
             horizontalRenderTarget: RenderTarget,
             verticalRenderTarget: RenderTarget,
@@ -380,9 +303,6 @@ export class BloomPass implements IPostProcessPass {
 
             renderer.setRenderTarget(horizontalRenderTarget);
             renderer.clear(0, 0, 0, 1);
-            // this.horizontalBlurMaterial.uniforms[UniformNames.SceneTexture].value = this.extractBrightnessPass.renderTarget.texture;
-            // this.horizontalBlurMaterial.uniforms.uTargetWidth.value = w;
-            // this.horizontalBlurMaterial.uniforms.uTargetHeight.value = h;
             this.horizontalBlurMaterial.updateUniform(
                 UniformNames.SrcTexture,
                 this.extractBrightnessPass.renderTarget.texture
@@ -393,18 +313,11 @@ export class BloomPass implements IPostProcessPass {
 
             renderer.setRenderTarget(verticalRenderTarget);
             renderer.clear(0, 0, 0, 1);
-            // this.verticalBlurMaterial.uniforms[UniformNames.SceneTexture].value = horizontalRenderTarget.texture;
-            // this.verticalBlurMaterial.uniforms.uTargetWidth.value = w;
-            // this.verticalBlurMaterial.uniforms.uTargetHeight.value = h;
             this.verticalBlurMaterial.updateUniform(UniformNames.SrcTexture, horizontalRenderTarget.texture);
             this.verticalBlurMaterial.updateUniform('uTargetWidth', w);
             this.verticalBlurMaterial.updateUniform('uTargetHeight', h);
             renderer.renderMesh(this.geometry, this.verticalBlurMaterial);
         };
-
-        // // for debug
-        // renderBlur(this.renderTargetBlurMip4_Horizontal, this.renderTargetBlurMip4_Vertical, 4);
-        // return;
 
         // 1 / 4
         renderBlur(this.renderTargetBlurMip4_Horizontal, this.renderTargetBlurMip4_Vertical, 4);
@@ -415,13 +328,6 @@ export class BloomPass implements IPostProcessPass {
         // 1 / 32
         renderBlur(this.renderTargetBlurMip32_Horizontal, this.renderTargetBlurMip32_Vertical, 32);
 
-        // this.compositePass.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
-        // this.compositePass.material.uniforms.uBlur4Texture.value = this.renderTargetBlurMip4_Vertical.texture;
-        // this.compositePass.material.uniforms.uBlur8Texture.value = this.renderTargetBlurMip8_Vertical.texture;
-        // this.compositePass.material.uniforms.uBlur16Texture.value = this.renderTargetBlurMip16_Vertical.texture;
-        // this.compositePass.material.uniforms.uBlur32Texture.value = this.renderTargetBlurMip32_Vertical.texture;
-        // this.compositePass.material.uniforms.uTone.value = this.tone;
-        // this.compositePass.material.uniforms.uBloomAmount.value = this.bloomAmount;
         if (prevRenderTarget) {
             this.compositePass.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         } else {

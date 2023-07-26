@@ -1,8 +1,9 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { GPU } from '@/PaleGL/core/GPU';
+﻿import { GPU } from '@/PaleGL/core/GPU';
 import copyPassFragmentShader from '@/PaleGL/shaders/copy-pass-fragment.glsl';
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
-export class CopyPass extends PostProcessPass {
+// export class CopyPass extends PostProcessPass {
+export class CopyPass extends PostProcessPassBase {
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = copyPassFragmentShader;
 //         const fragmentShader = `#version 300 es

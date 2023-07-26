@@ -1,12 +1,12 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { PostProcessUniformNames, TextureTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessUniformNames, TextureTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import { PostProcessRenderArgs } from '@/PaleGL/postprocess/IPostProcessPass';
 import { Color } from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 /**
  *
@@ -82,7 +82,7 @@ const createSamplingTables: (gpu: GPU) => {
     };
 };
 
-export class SSAOPass extends PostProcessPass {
+export class SSAOPass extends PostProcessPassBase {
     occlusionSampleLength: number = 0.121;
     occlusionBias: number = 0.0001;
     occlusionMinDistance: number = 0.006;

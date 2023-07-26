@@ -12,52 +12,52 @@ import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
 import gltfModelUrl from '../models/glass-wind-poly.gltf?url';
 
 // actors
-import {DirectionalLight} from '@/PaleGL/actors/DirectionalLight';
-import {Mesh} from '@/PaleGL/actors/Mesh';
-import {PerspectiveCamera} from '@/PaleGL/actors/PerspectiveCamera';
-import {Skybox} from '@/PaleGL/actors/Skybox';
-import {SkinnedMesh} from '@/PaleGL/actors/SkinnedMesh';
+import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
+import { Skybox } from '@/PaleGL/actors/Skybox';
+import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
 
 // core
-import {Engine} from '@/PaleGL/core/Engine';
-import {Renderer} from '@/PaleGL/core/Renderer';
-import {GPU} from '@/PaleGL/core/GPU';
-import {RenderTarget} from '@/PaleGL/core/RenderTarget';
-import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import {Scene} from '@/PaleGL/core/Scene';
-import {Texture} from '@/PaleGL/core/Texture';
-import {OrbitCameraController} from '@/PaleGL/core/OrbitCameraController';
+import { Engine } from '@/PaleGL/core/Engine';
+import { Renderer } from '@/PaleGL/core/Renderer';
+import { GPU } from '@/PaleGL/core/GPU';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
+import { Scene } from '@/PaleGL/core/Scene';
+import { Texture } from '@/PaleGL/core/Texture';
+import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // geometries
-import {Geometry} from '@/PaleGL/geometries/Geometry';
-import {PlaneGeometry} from '@/PaleGL/geometries/PlaneGeometry';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 
 // loaders
-import {loadCubeMap} from '@/PaleGL/loaders/loadCubeMap';
-import {loadGLTF} from '@/PaleGL/loaders/loadGLTF';
-import {loadImg} from '@/PaleGL/loaders/loadImg';
+import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
+import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
+import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import {Material} from '@/PaleGL/materials/Material';
-import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
+import { Material } from '@/PaleGL/materials/Material';
+import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
-import {Color} from '@/PaleGL/math/Color';
-import {Vector2} from '@/PaleGL/math/Vector2';
-import {Vector3} from '@/PaleGL/math/Vector3';
-import {Vector4} from '@/PaleGL/math/Vector4';
+import { Color } from '@/PaleGL/math/Color';
+import { Vector2 } from '@/PaleGL/math/Vector2';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Vector4 } from '@/PaleGL/math/Vector4';
 
 // postprocess
-import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
-import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
-import {FXAAPass} from '@/PaleGL/postprocess/FXAAPass';
-import {BloomPass} from '@/PaleGL/postprocess/BloomPass';
-import {SSAOPass} from '@/PaleGL/postprocess/SSAOPass';
-import {SSRPass} from "@/PaleGL/postprocess/SSRPass";
+import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
+import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
+import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
+import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
+import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 
 // inputs
-import {TouchInputController} from '@/PaleGL/inputs/TouchInputController';
-import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
+import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
+import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 
 // others
 import {
@@ -70,13 +70,13 @@ import {
     AttributeNames,
 } from '@/PaleGL/constants';
 
-import {DebuggerGUI} from '@/DebuggerGUI';
-import {Camera} from '@/PaleGL/actors/Camera';
+import { DebuggerGUI } from '@/DebuggerGUI';
+import { Camera } from '@/PaleGL/actors/Camera';
 // import {Light} from "@/PaleGL/actors/Light";
-import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
-import {Attribute} from '@/PaleGL/core/Attribute';
-import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
-import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
+import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -167,13 +167,13 @@ wrapperElement.setAttribute('id', 'wrapper');
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', {antialias: false});
+const gl = canvasElement.getContext('webgl2', { antialias: false });
 
 if (!gl) {
     throw 'invalid gl';
 }
 
-const gpu = new GPU({gl});
+const gpu = new GPU({ gl });
 
 const instanceNumView = document.createElement('p');
 instanceNumView.textContent = `instance num: ${instanceNum}`;
@@ -202,7 +202,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({gpu, renderer});
+const engine = new Engine({ gpu, renderer });
 
 engine.setScenes([captureScene, compositeScene]);
 
@@ -256,7 +256,7 @@ const copyDepthDestRenderTarget = new RenderTarget({
     name: 'copy depth dest render target',
 });
 
-captureSceneCamera.onStart = ({actor}) => {
+captureSceneCamera.onStart = ({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 };
 // captureSceneCamera.onFixedUpdate = ({ actor}: {actor: Actor}) => {
@@ -290,7 +290,7 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.onStart = ({actor}) => {
+directionalLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     // const lightActor = actor as DirectionalLight;
@@ -314,18 +314,18 @@ const bloomPass = new BloomPass({
     threshold: 0.9,
     bloomAmount: 0.8,
 });
-bloomPass.enabled = false;
+bloomPass.enabled = true;
 postProcess.addPass(bloomPass);
 
-const ssaoPass = new SSAOPass({gpu});
-ssaoPass.enabled = false;
+const ssaoPass = new SSAOPass({ gpu });
+ssaoPass.enabled = true;
 postProcess.addPass(ssaoPass);
 
-const ssrPass = new SSRPass({gpu});
-ssrPass.enabled = false;
+const ssrPass = new SSRPass({ gpu });
+ssrPass.enabled = true;
 postProcess.addPass(ssrPass);
 
-const fxaaPass = new FXAAPass({gpu});
+const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = true;
 postProcess.addPass(fxaaPass);
 
@@ -411,7 +411,7 @@ postProcess.enabled = true;
 captureSceneCamera.setPostProcess(postProcess);
 
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({gpu, path: gltfModelUrl});
+    const gltfActor = await loadGLTF({ gpu, path: gltfModelUrl });
 
     // skinned mesh おｎはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
@@ -506,7 +506,7 @@ const createGLTFSkinnedMesh = async () => {
         isInstancing: true,
         useVertexColor: true,
         envMap: cubeMap,
-        ambientAmount: 0.2
+        ambientAmount: 0.2,
         // vertexShaderModifier: {
         //     [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
         //     [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
@@ -570,10 +570,10 @@ const main = async () => {
         [CubeMapAxis.PositiveY]: CubeMapPositiveYImgUrl,
         [CubeMapAxis.NegativeY]: CubeMapNegativeYImgUrl,
         [CubeMapAxis.PositiveZ]: CubeMapPositiveZImgUrl,
-        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl
+        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl,
     };
 
-    cubeMap = await loadCubeMap({gpu, images});
+    cubeMap = await loadCubeMap({ gpu, images });
 
     const skyboxMesh = new Skybox({
         gpu,
@@ -602,7 +602,7 @@ const main = async () => {
         }),
         castShadow: false,
     });
-    floorPlaneMesh.onStart = ({actor}) => {
+    floorPlaneMesh.onStart = ({ actor }) => {
         const meshActor = actor as Mesh;
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
@@ -844,7 +844,7 @@ void main() {
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    particleMesh.onFixedUpdate = ({fixedTime}) => {
+    particleMesh.onFixedUpdate = ({ fixedTime }) => {
         particleMaterial.updateUniform('uTime', fixedTime);
     };
 
@@ -943,7 +943,7 @@ void main() {
             sceneRenderTarget: afterGBufferRenderTarget,
             gBufferRenderTargets: gBufferRenderTarget,
             sceneCamera: captureSceneCamera,
-            time
+            time,
         });
     };
 
@@ -991,18 +991,18 @@ function initDebugger() {
     // });
 
     // debuggerGUI.addBorderSpacer();
-    
+
     //
     // bloom debuggers
     //
 
-    debuggerGUI.addToggleDebugger({
-        label: 'bloom pass enabled',
-        initialValue: bloomPass.enabled,
-        onChange: (value) => (bloomPass.enabled = value),
-    });
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'bloom pass enabled',
+    //     initialValue: bloomPass.enabled,
+    //     onChange: (value) => (bloomPass.enabled = value),
+    // });
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
     //
     // bloom debuggers
@@ -1183,7 +1183,6 @@ function initDebugger() {
         },
     });
 
-
     debuggerGUI.addSliderDebugger({
         label: 'ray thickness',
         minValue: 0.001,
@@ -1260,7 +1259,6 @@ function initDebugger() {
             ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
         },
     });
-
 
     debuggerGUI.addSliderDebugger({
         label: 'edge fade factor min y',

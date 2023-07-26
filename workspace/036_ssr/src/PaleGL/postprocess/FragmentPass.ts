@@ -1,8 +1,8 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { GPU } from '@/PaleGL/core/GPU';
-import {Uniforms} from "@/PaleGL/materials/Material";
+﻿import { GPU } from '@/PaleGL/core/GPU';
+import { Uniforms } from '@/PaleGL/materials/Material';
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
-export class FragmentPass extends PostProcessPass {
+export class FragmentPass extends PostProcessPassBase {
     constructor({
         gpu,
         fragmentShader,

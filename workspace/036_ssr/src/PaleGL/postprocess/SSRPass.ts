@@ -1,9 +1,9 @@
-﻿import {PostProcessPass} from '@/PaleGL/postprocess/PostProcessPass';
-import {PostProcessUniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import {PostProcessUniformNames, UniformTypes} from '@/PaleGL/constants';
 import {GPU} from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {Matrix4} from '@/PaleGL/math/Matrix4';
-import {PostProcessRenderArgs} from '@/PaleGL/postprocess/AbstractPostProcessPass';
+import {PostProcessRenderArgs} from '@/PaleGL/postprocess/IPostProcessPass';
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 /*
 float eps = .001;
@@ -30,7 +30,7 @@ int maxIterationNum = 32;
 int binarySearchNum = 8;
 */
 
-export class SSRPass extends PostProcessPass {
+export class SSRPass extends PostProcessPassBase {
     rayDepthBias = 0.0099;
     rayNearestDistance = 0.13;
     rayMaxDistance = 3.25;

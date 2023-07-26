@@ -1,9 +1,9 @@
-﻿import { PostProcessPass } from '@/PaleGL/postprocess/PostProcessPass';
-import { UniformTypes } from '@/PaleGL/constants';
+﻿import { UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 // import {IPostProcessPass} from "./AbstractPostProcessPass";
 // import {GPU} from "@/PaleGL/core/GPU";
 import fxaaFragmentShader from "@/PaleGL/shaders/fxaa-fragment.glsl";
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
@@ -11,7 +11,7 @@ import fxaaFragmentShader from "@/PaleGL/shaders/fxaa-fragment.glsl";
 // https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
-export class FXAAPass extends PostProcessPass {
+export class FXAAPass extends PostProcessPassBase {
     // export class FXAAPass implements IPostProcessPass {
 
     // get gpu() {
