@@ -1,28 +1,9 @@
-﻿// import { Renderer } from '@/PaleGL/core/Renderer';
-// import { Camera } from '@/PaleGL/actors/Camera';
-// import { GPU } from '@/PaleGL/core/GPU';
-// import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-// import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-// import { Material } from '@/PaleGL/materials/Material.ts';
-//
-
-// import { IPostProcessPass, PostProcessRenderArgs } from '@/PaleGL/postprocess/AbstractPostProcessPass.ts';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+﻿import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-// import {
-//     AttributeNames,
-//     PostProcessUniformNames,
-//     PrimitiveTypes,
-//     UniformNames,
-//     UniformTypes,
-// } from '@/PaleGL/constants.ts';
-// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-// import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-// import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 
 export type PostProcessRenderArgs = {
     gpu: GPU;
