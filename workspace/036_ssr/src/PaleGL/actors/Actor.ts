@@ -18,7 +18,7 @@ export class Actor {
     type: ActorType;
     uuid: number;
     isStarted: boolean = false;
-    animator: Animator; // NOTE: いよいよcomponentっぽくしたくなってきた
+    animator: Animator; // TODO: いよいよcomponentっぽくしたくなってきた
     // lifecycle callback
     private _onStart: OnStartCallback | null = null;
     private _onFixedUpdate: OnFixedUpdateCallback | null = null;
