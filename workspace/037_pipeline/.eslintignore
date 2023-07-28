@@ -1,0 +1,8 @@
+node_modules/**/**.js
+node_modules/**/**.ts
+dist/**/**.js
+vite.config.ts
+vite-shader-minifier-plugin.ts
+libs/**/**.js
+packer/**/**.js
+node-libs/**/**.ts
