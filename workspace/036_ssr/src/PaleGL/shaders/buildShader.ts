@@ -39,6 +39,18 @@ const insertShaderPairs: {
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: transformVertexUniforms,
 };
 
+/**
+ * 
+ * @param receiveShadow
+ * @param isSkinning
+ * @param gpuSkinning
+ * @param useNormalMap
+ * @param useEnvMap
+ * @param useReceiveShadow
+ * @param useVertexColor
+ * @param useAlphaTest
+ * @param isInstancing
+ */
 const buildShaderDefines = ({
     receiveShadow,
     isSkinning,
@@ -83,7 +95,11 @@ const buildShaderDefines = ({
     return arr;
 };
 
-export const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescriptor[]): string[] => {
+/**
+ * 
+ * @param attributeDescriptors
+ */
+const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescriptor[]): string[] => {
     const sortedAttributeDescriptors = [...attributeDescriptors].sort((a, b) => a.location - b.location);
 
     const attributesList = sortedAttributeDescriptors.map(({ location, size, name, dataType }) => {
@@ -137,13 +153,13 @@ export const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescr
     return attributesList;
 };
 
-// const joinShaderLines = (shaderLines: string[]) => {
-//     return shaderLines
-//         .map((line) => line.replace(/^\s*$/, ''))
-//         .join('\n')
-//         .replaceAll(/\n{3,}/g, '\n');
-// };
-
+/**
+ * 
+ * @param shader
+ * @param attributeDescriptors
+ * @param defineOptions
+ * @param vertexShaderModifier
+ */
 export const buildVertexShader = (
     shader: string,
     attributeDescriptors: AttributeDescriptor[],
@@ -194,36 +210,6 @@ export const buildFragmentShader = (
     defineOptions: ShaderDefines,
     fragmentShaderModifier: FragmentShaderModifier
 ) => {
-    // const shaderLines = shader.split('\n');
-    // const resultShaderLines: string[] = [];
-
-    // shaderLines.forEach((shaderLine) => {
-    //     const pragma = shaderLine.trim().match(pragmaRegex);
-
-    //     if (!pragma) {
-    //         resultShaderLines.push(shaderLine);
-    //         return;
-    //     }
-
-    //     const newLines = [];
-    //     const pragmas = pragma[1].trim().split(' ');
-
-    //     const pragmaName = pragmas[0];
-
-    //     switch (pragmaName) {
-    //         case ShaderPragmas.DEFINES:
-    //             const defines = buildShaderDefines(defineOptions);
-    //             newLines.push(...defines);
-    //             break;
-    //         case ShaderPragmas.DEPTH_FUNCTIONS:
-    //             newLines.push(depthFunctions);
-    //             break;
-    //         default:
-    //             throw `[buildFragmentShader] invalid pragma: ${pragmaName}`;
-    //     }
-    //     resultShaderLines.push(newLines.join('\n'));
-    // });
-
     let replacedShader: string = shader;
 
     // replace defines
@@ -231,12 +217,6 @@ export const buildFragmentShader = (
         const defines = buildShaderDefines(defineOptions);
         return defines.join('\n');
     });
-
-    // replace attributes
-    //replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
-    //    const attributes = buildVertexAttributeLayouts(attributeDescriptors);
-    //    return attributes.join('\n');
-    //});
 
     // replace shader block
     Object.keys(FragmentShaderModifierPragmas).forEach((key) => {

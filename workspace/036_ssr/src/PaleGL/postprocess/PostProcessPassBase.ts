@@ -4,16 +4,10 @@ import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-import {
-    AttributeNames,
-    // PostProcessUniformNames,
-    PrimitiveTypes,
-    UniformNames,
-    UniformTypes,
-} from '@/PaleGL/constants.ts';
-// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import postProcessPassVertexSahder from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 
 export type PostProcessRenderArgs = {
     gpu: GPU;
@@ -38,19 +32,6 @@ export interface IPostProcessPass {
     setSize: (width: number, height: number) => void;
     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
     render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time }: PostProcessRenderArgs) => void;
-
-    // updateCommonUniforms: ({
-    //     gBufferRenderTargets,
-    //     sceneCamera,
-    //     time,
-    // }: {
-    //     gpu: GPU;
-    //     renderer: Renderer;
-    //     sceneRenderTarget: RenderTarget | null;
-    //     gBufferRenderTargets?: GBufferRenderTargets | null;
-    //     sceneCamera: Camera;
-    //     time: number;
-    // }) => void;
 }
 
 export class PostProcessPassBase implements IPostProcessPass {
@@ -73,18 +54,7 @@ export class PostProcessPassBase implements IPostProcessPass {
 
     // TODO: glslファイル化
     static get baseVertexShader() {
-        return `#version 300 es
-
-layout (location = 0) in vec3 ${AttributeNames.Position};
-layout (location = 1) in vec2 ${AttributeNames.Uv};
-
-out vec2 vUv;
-
-void main() {
-    vUv = aUv;
-    gl_Position = vec4(aPosition, 1);
-}
-`;
+        return postProcessPassVertexSahder;
     }
 
     /**
@@ -180,99 +150,21 @@ void main() {
      * @param sceneCamera
      * @param gBufferRenderTargets
      */
-    render({
-        gpu,
-        camera,
-        renderer,
-        prevRenderTarget,
-        isLastPass,
-        // sceneCamera,
-        // gBufferRenderTargets,
-        // time,
-    }: PostProcessRenderArgs): void {
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs): void {
         this.setRenderTarget(renderer, camera, isLastPass);
-
-        // TODO: ppごとに変えられるのが正しい
-        // renderer.clear(
-        //     camera.clearColor.x,
-        //     camera.clearColor.y,
-        //     camera.clearColor.z,
-        //     camera.clearColor.w
-        // );
 
         // ppの場合はいらない気がする
         this.mesh.updateTransform();
 
         if (!this.material.isCompiledShader) {
-            this.material.start({ gpu, attributeDescriptors: [] });
+            this.material.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
         // 渡してない場合はなにもしないことにする
         if (prevRenderTarget) {
-            // this.material.uniforms[UniformNames.SceneTexture].value = prevRenderTarget.texture;
             this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
-        // // TODO: postprocess側でセットした方が効率がよいが...
-        // // TODO: 今、passごとにセットすればいい値も入ってしまっている
-        // this.material.updateUniform('uTime', time);
-        // this.material.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
-        // this.material.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
-        // this.material.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
-        // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-        //     sceneCamera.projectionMatrix,
-        //     sceneCamera.viewMatrix
-        // ).invert();
-        // this.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-        // const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-        // this.material.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
-        // this.material.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
-        // this.material.updateUniform('uTransposeInverseViewMatrix', sceneCamera.viewMatrix.clone().invert().transpose());
-        // if (gBufferRenderTargets) {
-        //     this.material.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
-        //     this.material.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
-        //     this.material.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
-        // }
-
         renderer.renderMesh(this.geometry, this.material);
     }
-
-    // updateCommonUniforms({
-    //     gBufferRenderTargets,
-    //     sceneCamera,
-    //     time,
-    // }: {
-    //     gpu: GPU;
-    //     renderer: Renderer;
-    //     sceneRenderTarget: RenderTarget | null;
-    //     gBufferRenderTargets?: GBufferRenderTargets | null;
-    //     sceneCamera: Camera;
-    //     time: number;
-    // }) {
-    //     this.materials.forEach((passMaterial) => {
-    //         // TODO: postprocess側でセットした方が効率がよいが...
-    //         // TODO: 今、passごとにセットすればいい値も入ってしまっている
-    //         passMaterial.updateUniform('uTime', time);
-    //         passMaterial.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
-    //         passMaterial.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
-    //         passMaterial.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
-    //         const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-    //             sceneCamera.projectionMatrix,
-    //             sceneCamera.viewMatrix
-    //         ).invert();
-    //         passMaterial.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-    //         const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-    //         passMaterial.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
-    //         passMaterial.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
-    //         passMaterial.updateUniform(
-    //             'uTransposeInverseViewMatrix',
-    //             sceneCamera.viewMatrix.clone().invert().transpose()
-    //         );
-    //         if (gBufferRenderTargets) {
-    //             passMaterial.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
-    //             passMaterial.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
-    //             passMaterial.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
-    //         }
-    //     });
-    // }
 }

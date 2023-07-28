@@ -4,14 +4,13 @@ import {
     PostProcessRenderArgs
 } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
-// import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
-import {Material} from "@/PaleGL/materials/Material.ts";
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {Material} from "@/PaleGL/materials/Material";
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase";
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -102,10 +101,6 @@ export class GaussianBlurPass implements IPostProcessPass {
     setSize(width: number, height: number) {
         this.#passes.forEach((pass) => {
             pass.setSize(width, height);
-            // pass.material.uniforms.uTargetWidth.value = width;
-            // pass.material.uniforms.uTargetHeight.value = height;
-            // this.material.updateUniform("uTargetWidth", width);
-            // this.material.updateUniform("uTargetHeight", height);
             pass.material.updateUniform('uTargetWidth', width);
             pass.material.updateUniform('uTargetHeight', height);
         });

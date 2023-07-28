@@ -214,6 +214,10 @@ export class SSAOPass extends PostProcessPassBase {
         this.material.updateUniform(PostProcessUniformNames.TargetHeight, height);
     }
 
+    /**
+     * 
+     * @param options
+     */
     render(options: PostProcessRenderArgs) {
         this.material.updateUniform('uOcclusionSampleLength', this.occlusionSampleLength);
         this.material.updateUniform('uOcclusionBias', this.occlusionBias);

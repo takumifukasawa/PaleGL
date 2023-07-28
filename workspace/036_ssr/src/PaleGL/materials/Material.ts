@@ -378,7 +378,7 @@ export class Material {
         this.depthUniforms = { ...commonUniforms, ...depthUniforms };
     }
 
-    start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }): void {
+    start({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }): void {
         // for debug
         // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
 
