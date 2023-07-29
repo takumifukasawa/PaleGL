@@ -1,10 +1,10 @@
-﻿import { TimeSkipper } from '@/PaleGL/utilities/TimeSkipper';
-import { TimeAccumulator } from '@/PaleGL/utilities/TimeAccumulator';
-import { ActorTypes } from '@/PaleGL/constants';
-import { Stats } from '@/PaleGL/utilities/Stats';
-import { GPU } from '@/PaleGL/core/GPU';
-import { Scene } from '@/PaleGL/core/Scene';
-import { Renderer } from '@/PaleGL/core/Renderer';
+﻿import {TimeSkipper} from '@/PaleGL/utilities/TimeSkipper';
+import {TimeAccumulator} from '@/PaleGL/utilities/TimeAccumulator';
+import {ActorTypes} from '@/PaleGL/constants';
+import {Stats} from '@/PaleGL/utilities/Stats';
+import {GPU} from '@/PaleGL/core/GPU';
+import {Scene} from '@/PaleGL/core/Scene';
+import {Renderer} from '@/PaleGL/core/Renderer';
 
 // type EngineOnBeforeStartCallbackArgs = void;
 
@@ -38,7 +38,8 @@ export class Engine {
     #gpu: GPU;
     #stats: Stats;
     #renderer: Renderer;
-    #scenes: Scene[] = [];
+    #scene: Scene | null = null;
+    // #scenes: Scene[] = [];
     // timers
     #fixedUpdateFrameTimer: TimeAccumulator;
     #updateFrameTimer: TimeSkipper;
@@ -47,7 +48,7 @@ export class Engine {
     #onAfterStart: EngineOnAfterStartCallback | null = null;
     #onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null = null;
     #onBeforeUpdate: EngineOnBeforeUpdateCallback | null = null;
-    #onRender: EngineOnRenderCallback | null = null;
+    private _onRender: EngineOnRenderCallback | null = null;
 
     get renderer() {
         return this.#renderer;
@@ -70,16 +71,16 @@ export class Engine {
     }
 
     set onRender(cb: EngineOnRenderCallback) {
-        this.#onRender = cb;
+        this._onRender = cb;
     }
 
     constructor({
-        gpu,
-        renderer,
-        onBeforeFixedUpdate,
-        onBeforeUpdate,
-        onRender,
-    }: {
+                    gpu,
+                    renderer,
+                    onBeforeFixedUpdate,
+                    onBeforeUpdate,
+                    onRender,
+                }: {
         gpu: GPU;
         renderer: Renderer;
         onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback;
@@ -98,17 +99,17 @@ export class Engine {
 
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate || null;
         this.#onBeforeUpdate = onBeforeUpdate || null;
-        this.#onRender = onRender || null;
+        this._onRender = onRender || null;
     }
 
     setScene(scene: Scene) {
-        // this.#scene = scene;
-        this.#scenes.push(scene);
+        this.#scene = scene;
+        // this.#scenes.push(scene);
     }
 
-    setScenes(scenes: Scene[]) {
-        this.#scenes = scenes;
-    }
+    // setScenes(scenes: Scene[]) {
+    //     this.#scenes = scenes;
+    // }
 
     start() {
         if (this.#onBeforeStart) {
@@ -127,55 +128,67 @@ export class Engine {
         const rh = height * this.renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        // this.#scene.traverse((actor) => actor.setSize(w, h));
-        this.#scenes.forEach((scene) => {
-            scene.traverse((actor) => actor.setSize(w, h));
-        });
+        this.#scene?.traverse((actor) => actor.setSize(w, h));
+        // this.#scenes.forEach((scene) => {
+        //     scene.traverse((actor) => actor.setSize(w, h));
+        // });
         // this.#renderer.setSize(w, h, rw, rh);
         this.#renderer.setSize(rw, rh);
     }
 
     fixedUpdate(fixedTime: number, fixedDeltaTime: number) {
         if (this.#onBeforeFixedUpdate) {
-            this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
+            this.#onBeforeFixedUpdate({fixedTime, fixedDeltaTime});
         }
 
-        // this.#scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
-        this.#scenes.forEach((scene) => {
-            scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
-        });
+        this.#scene?.traverse((actor) => actor.fixedUpdate({gpu: this.#gpu, fixedTime, fixedDeltaTime}));
+        // this.#scenes.forEach((scene) => {
+        //     scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
+        // });
 
         // update all actors matrix
         // TODO
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
-        // this.#scene.traverse((actor) => actor.updateTransform());
-        this.#scenes.forEach((scene) => {
-            scene.traverse((actor) => actor.updateTransform());
-        });
+        this.#scene?.traverse((actor) => actor.updateTransform());
+        // this.#scenes.forEach((scene) => {
+        //     scene.traverse((actor) => actor.updateTransform());
+        // });
     }
 
     update(time: number, deltaTime: number) {
         if (this.#onBeforeUpdate) {
-            this.#onBeforeUpdate({ time, deltaTime });
+            this.#onBeforeUpdate({time, deltaTime});
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        this.#scenes.forEach((scene) => {
-            scene.traverse((actor) => {
-                actor.update({ gpu: this.#gpu, time, deltaTime });
-                switch (actor.type) {
-                    case ActorTypes.Skybox:
-                    case ActorTypes.Mesh:
-                    case ActorTypes.SkinnedMesh:
-                        actor.beforeRender({ gpu: this.#gpu });
-                        break;
-                    default:
-                        break;
-                }
-            });
+        this.#scene?.traverse((actor) => {
+            actor.update({gpu: this.#gpu, time, deltaTime});
+            switch (actor.type) {
+                case ActorTypes.Skybox:
+                case ActorTypes.Mesh:
+                case ActorTypes.SkinnedMesh:
+                    actor.beforeRender({gpu: this.#gpu});
+                    break;
+                default:
+                    break;
+            }
         });
+        // this.#scenes.forEach((scene) => {
+        //     scene.traverse((actor) => {
+        //         actor.update({ gpu: this.#gpu, time, deltaTime });
+        //         switch (actor.type) {
+        //             case ActorTypes.Skybox:
+        //             case ActorTypes.Mesh:
+        //             case ActorTypes.SkinnedMesh:
+        //                 actor.beforeRender({ gpu: this.#gpu });
+        //                 break;
+        //             default:
+        //                 break;
+        //         }
+        //     });
+        // });
 
         this.render(time, deltaTime);
     }
@@ -186,9 +199,13 @@ export class Engine {
         // this.#scenes.forEach(scene => {
         //     this.#renderer.render(scene, scene.mainCamera);
         // });
-        if (this.#onRender) {
-            this.#onRender(time, deltaTime);
+        if (this._onRender) {
+            this._onRender(time, deltaTime);
         }
+
+        // TODO: ここにrenderer.renderを書く
+        this.#renderer.renderScene(this.#scene!);
+
         this.#stats.updateView();
     }
 

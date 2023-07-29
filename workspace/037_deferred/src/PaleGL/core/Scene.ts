@@ -1,11 +1,19 @@
 ﻿import { Actor } from '@/PaleGL/actors/Actor';
 import { Transform } from '@/PaleGL/core/Transform';
+import {Camera} from "@/PaleGL/actors/Camera.ts";
+import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
 
 type TraverseFunc = (actor: Actor) => void;
 
 export class Scene {
     children: Transform[] = []; // transform hierarchy
-    // mainCamera;
+    mainCamera: Camera | null = null; // TODO: findしたい
+    postProcess: PostProcess | null = null // TODO: cameraにもたせてもいいかも
+    
+    // constructor(mainCamera: Camera, postProcess: PostProcess) {
+    //     this.mainCamera = mainCamera;
+    //     this.postProcess = postProcess;
+    // }
 
     add(actor: Actor) {
         this.children.push(actor.transform);

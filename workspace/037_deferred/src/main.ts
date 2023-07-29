@@ -190,7 +190,7 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = new Scene();
-const compositeScene = new Scene();
+// const compositeScene = new Scene();
 
 const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
 // const pixelRatio = Math.min(window.devicePixelRatio, 1);
@@ -204,11 +204,13 @@ const renderer = new Renderer({
 
 const engine = new Engine({ gpu, renderer });
 
-engine.setScenes([captureScene, compositeScene]);
+// engine.setScenes([captureScene, compositeScene]);
+engine.setScene(captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
+captureScene.mainCamera = captureSceneCamera;
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
@@ -308,6 +310,7 @@ captureScene.add(directionalLight);
 // const postProcess = new PostProcess({gpu, renderer});
 // const postProcess = new PostProcess({gpu});
 const postProcess = new PostProcess();
+captureScene.postProcess = postProcess;
 
 const bloomPass = new BloomPass({
     gpu,
@@ -928,15 +931,6 @@ void main() {
             clearScene: false,
         });
 
-        // showBuffersPass.material.updateUniform('uBaseColorTexture', gBufferRenderTarget.baseColorTexture);
-        // showBuffersPass.material.updateUniform('uNormalTexture', gBufferRenderTarget.normalTexture);
-        // showBuffersPass.material.updateUniform('uDepthTexture', gBufferRenderTarget.depthTexture);
-        // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-        //     captureSceneCamera.projectionMatrix,
-        //     captureSceneCamera.viewMatrix
-        // ).invert();
-        // showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-        // showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
         postProcess.render({
             gpu,
             renderer,
