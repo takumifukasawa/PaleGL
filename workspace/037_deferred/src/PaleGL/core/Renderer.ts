@@ -271,7 +271,7 @@ export class Renderer {
             if (actor.type === ActorTypes.Skybox) {
                 return false;
             }
-            return actor.castShadow;
+            return actor;
         });
         this.depthPrePass(depthPrePassRenderMeshInfos, camera);
 
@@ -585,13 +585,6 @@ export class Renderer {
                     });
                 }
 
-                // console.log(
-                //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix],
-                //     targetMaterial.receiveShadow,
-                //     light.castShadow,
-                //     light.shadowCamera,
-                //     light.shadowMap
-                // )
                 if (
                     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
                     targetMaterial.receiveShadow &&
@@ -606,15 +599,6 @@ export class Renderer {
                         light.shadowCamera.projectionMatrix.clone(),
                         light.shadowCamera.viewMatrix.clone()
                     );
-
-                    // // TODO:
-                    // // - directional light の構造体に持たせた方がいいかもしれない
-                    // if(targetMaterial.uniforms[UniformNames.ShadowMap]) {
-                    //     targetMaterial.uniforms[UniformNames.ShadowMap].value = light.shadowMap.read.texture;
-                    // }
-                    // if(targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix]) {
-                    //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix].value = textureProjectionMatrix;
-                    // }
                     targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
                     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
                 }

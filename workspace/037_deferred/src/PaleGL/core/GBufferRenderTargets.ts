@@ -4,6 +4,7 @@ import { GLColorAttachment, TextureFilterTypes, TextureTypes } from '@/PaleGL/co
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
+// TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 export class GBufferRenderTargets extends AbstractRenderTarget {
     gpu: GPU;
     name: string;
