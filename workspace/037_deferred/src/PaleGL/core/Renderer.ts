@@ -291,7 +291,7 @@ export class Renderer {
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
 
         // ------------------------------------------------------------------------------
-        // 3. transparent pass
+        // transparent pass
         // ------------------------------------------------------------------------------
 
         // console.log(this.realWidth, this.realHeight, this._gBufferRenderTarget, this._afterGBufferRenderTarget, this._copyDepthSourceRenderTarget,  this._copyDepthDestRenderTarget)
@@ -324,15 +324,13 @@ export class Renderer {
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
 
         // ------------------------------------------------------------------------------
-        // 4. full screen pass
+        // full screen pass
+        // TODO: mainCameraかつcameraにpostProcessがあるときの対応
         // ------------------------------------------------------------------------------
 
         if (onBeforePostProcess) {
             onBeforePostProcess(this._gBufferRenderTargets);
         }
-
-        // camera.setRenderTarget(null);
-        // this.setRenderTarget(null);
 
         const targetPostProcesses: PostProcess[] = [];
         if (camera.mainCamera) {
@@ -342,7 +340,7 @@ export class Renderer {
             targetPostProcesses.push(camera.postProcess);
         }
 
-        targetPostProcesses.forEach(postProcess => {
+        targetPostProcesses.forEach((postProcess, i) => {
             postProcess.render({
                 gpu: this.gpu,
                 renderer: this,
@@ -350,6 +348,7 @@ export class Renderer {
                 gBufferRenderTargets: this._gBufferRenderTargets,
                 targetCamera: camera,
                 time: performance.now() / 1000, // TODO: engineから渡したい
+                isCameraLastPass: i === targetPostProcesses.length - 1
             });
         });
     }

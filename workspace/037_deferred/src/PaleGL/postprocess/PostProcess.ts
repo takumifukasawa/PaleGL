@@ -69,6 +69,7 @@ export class PostProcess {
                gBufferRenderTargets,
                targetCamera,
                time,
+               isCameraLastPass
            }: {
         gpu: GPU;
         renderer: Renderer;
@@ -76,6 +77,7 @@ export class PostProcess {
         gBufferRenderTargets?: GBufferRenderTargets | null;
         targetCamera: Camera;
         time: number;
+        isCameraLastPass: boolean,
     }) {
         if (!sceneRenderTarget) {
             throw '[PostProcess.render] scene render target is empty.';
@@ -98,7 +100,7 @@ export class PostProcess {
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
-            const isLastPass = i === enabledPasses.length - 1;
+            const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;
 
             pass.materials.forEach((passMaterial) => {
                 passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
