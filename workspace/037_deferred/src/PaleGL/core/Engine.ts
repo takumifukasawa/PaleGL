@@ -204,7 +204,7 @@ export class Engine {
         }
 
         // TODO: ここにrenderer.renderを書く
-        this.#renderer.renderScene(this.#scene!);
+        // this.#renderer.renderScene(this.#scene!);
 
         this.#stats.updateView();
     }

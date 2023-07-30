@@ -85,7 +85,10 @@ export class RenderTarget extends AbstractRenderTarget {
         this.height = height;
 
         this._framebuffer = new Framebuffer({ gpu });
-        this._framebuffer.bind();
+        this._framebuffer.bind()
+       
+        // for debug 
+        // console.log(useDepthBuffer, writeDepthTexture, this.type, writeDepthTexture)
 
         if (useDepthBuffer) {
             this.depthRenderbuffer = new Renderbuffer({ gpu, type: RenderbufferTypes.Depth, width, height });
@@ -195,11 +198,13 @@ export class RenderTarget extends AbstractRenderTarget {
         width: number;
         height: number;
     }) {
+        // console.log("================")
         const gl = gpu.gl;
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, sourceRenderTarget.framebuffer.glObject);
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, destRenderTarget.framebuffer.glObject);
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.DEPTH_BUFFER_BIT);
+        // console.log(width, height)
         if (gl.checkFramebufferStatus(gl.READ_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
             console.error('invalid state');
             return;
@@ -207,5 +212,6 @@ export class RenderTarget extends AbstractRenderTarget {
         gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST);
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+        // console.log(sourceRenderTarget, destRenderTarget)
     }
 }

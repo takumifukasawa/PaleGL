@@ -1,6 +1,6 @@
-﻿import { Actor } from '@/PaleGL/actors/Actor';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+﻿import {Actor} from '@/PaleGL/actors/Actor';
+import {Matrix4} from '@/PaleGL/math/Matrix4';
+import {Vector4} from '@/PaleGL/math/Vector4';
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {
     ActorTypes,
@@ -12,17 +12,20 @@ import {
     UniformNames,
 } from '@/PaleGL/constants';
 // import {Vector3} from "@/PaleGL/math/Vector3";
-import { Material } from '@/PaleGL/materials/Material';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { Mesh } from './Mesh';
-import { Attribute } from '@/PaleGL/core/Attribute';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import {Material} from '@/PaleGL/materials/Material';
+import {Geometry} from '@/PaleGL/geometries/Geometry';
+import {Mesh} from './Mesh';
+import {Attribute} from '@/PaleGL/core/Attribute';
+import {RenderTarget} from '@/PaleGL/core/RenderTarget';
 // import {Color} from "@/PaleGL/math/Color";
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
-import { GPU } from '@/PaleGL/core/GPU';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
+import {GPU} from '@/PaleGL/core/GPU';
 // import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
+import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
+// import {Renderer} from "@/PaleGL/core/Renderer.ts";
+// import {Renderer} from "@/PaleGL/core/Renderer.ts";
+// import {Scene} from "@/PaleGL/core/Scene.ts";
 
 export const FrustumDirection = {
     nearLeftTop: 'nearLeftTop',
@@ -53,6 +56,7 @@ export class Camera extends Actor {
     visibleFrustum: boolean = false;
     #visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
+    mainCamera: boolean = false;
 
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
@@ -96,10 +100,10 @@ export class Camera extends Actor {
 
     // constructor({clearColor, postProcess}: { clearColor: Vector4, postProcess: PostProcess } = {}) {
     constructor({
-        cameraType,
-        clearColor,
-        postProcess,
-    }: {
+                    cameraType,
+                    clearColor,
+                    postProcess,
+                }: {
         cameraType: CameraType;
         clearColor?: Vector4;
         postProcess?: PostProcess;
@@ -110,6 +114,11 @@ export class Camera extends Actor {
         this.#postProcess = postProcess || null;
     }
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         // if (!this.#postProcess) {
         //     return;
@@ -127,16 +136,30 @@ export class Camera extends Actor {
         }
     }
 
+    /**
+     *
+     * @param postProcess
+     */
     setPostProcess(postProcess: PostProcess) {
         this.#postProcess = postProcess;
     }
 
+    /**
+     *
+     * @param clearColor
+     */
     setClearColor(clearColor: Vector4) {
         this.clearColor = clearColor;
     }
 
-    update({ gpu, time, deltaTime }: { gpu: GPU; time: number; deltaTime: number }) {
-        super.update({ gpu, time, deltaTime });
+    /**
+     *
+     * @param gpu
+     * @param time
+     * @param deltaTime
+     */
+    update({gpu, time, deltaTime}: { gpu: GPU; time: number; deltaTime: number }) {
+        super.update({gpu, time, deltaTime});
 
         if (this.visibleFrustum && !this.#visibleFrustumMesh) {
             this.#visibleFrustumMesh = new Mesh({
@@ -212,24 +235,51 @@ export class Camera extends Actor {
         }
     }
 
+    /**
+     *
+     */
     updateTransform() {
         super.updateTransform();
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
     }
 
+    /**
+     *
+     * @param renderTarget
+     */
     setRenderTarget(renderTarget: RenderTarget | GBufferRenderTargets | null) {
         this.#renderTarget = renderTarget;
     }
 
+    /**
+     *
+     */
     updateProjectionMatrix() {
         throw 'should implementation';
     }
 
+    /**
+     *
+     */
     getFrustumLocalPositions(): FrustumVectors {
         throw 'should implementation';
     }
 
+    /**
+     *
+     */
     getFrustumWorldPositions() {
         throw 'should implementation';
     }
+
+    /**
+     *
+     * @param renderer
+     * @param scene
+     * @param useShadowPass
+     * @param clearScene
+     */
+    // render(renderer: Renderer) {
+    //     renderer.render();
+    // }
 }

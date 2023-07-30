@@ -94,7 +94,7 @@ export class PostProcess {
             sceneCamera.viewMatrix
         ).invert();
         const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-
+        
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
