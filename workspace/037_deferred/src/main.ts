@@ -23,7 +23,7 @@ import {Engine} from '@/PaleGL/core/Engine';
 import {Renderer} from '@/PaleGL/core/Renderer';
 import {GPU} from '@/PaleGL/core/GPU';
 import {RenderTarget} from '@/PaleGL/core/RenderTarget';
-import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
+// import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import {Scene} from '@/PaleGL/core/Scene';
 import {Texture} from '@/PaleGL/core/Texture';
 import {OrbitCameraController} from '@/PaleGL/core/OrbitCameraController';
@@ -846,16 +846,20 @@ void main() {
     };
     
     engine.onRender = () => {
-        renderer.render(captureScene, captureSceneCamera, (_gBufferRenderTarget: GBufferRenderTargets) => {
-            showBuffersPass.material.updateUniform('uBaseColorTexture', _gBufferRenderTarget.baseColorTexture);
-            showBuffersPass.material.updateUniform('uNormalTexture', _gBufferRenderTarget.normalTexture);
-            showBuffersPass.material.updateUniform('uDepthTexture', _gBufferRenderTarget.depthTexture);
-            const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-                captureSceneCamera.projectionMatrix,
-                captureSceneCamera.viewMatrix
-            ).invert();
-            showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-            showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
+        renderer.render(captureScene, captureSceneCamera, () => {
+            // const gBufferRenderTargets = renderer.gBufferRenderTargets;
+            // // const depthPrePassRenderTarget = renderer.depthPrePassRenderTarget;
+            // // showBuffersPass.material.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
+            // // showBuffersPass.material.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
+            // // showBuffersPass.material.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
+            // // showBuffersPass.material.updateUniform('uDepthTexture', depthPrePassRenderTarget.depthTexture);
+            // // if debug light depth
+            // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+            //     captureSceneCamera.projectionMatrix,
+            //     captureSceneCamera.viewMatrix
+            // ).invert();
+            // showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
+            // // showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
         });
     };
 

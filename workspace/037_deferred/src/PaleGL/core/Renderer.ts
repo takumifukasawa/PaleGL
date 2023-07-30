@@ -30,12 +30,14 @@ type RenderMeshInfoEachQueue = {
 
 /**
  * 描画パイプライン的な役割
- * TODO:
+ * TODO: pass
  * - depth pre-pass
  * - g-buffer pass (color, normal, material info)
  * - ao pass
  * - shading pass
  * - post process pass
+ * TODO:
+ * - depth prepass 使わない場合。offscreen する時とか
  */
 export class Renderer {
     // --------------------------------------------------------------
@@ -53,6 +55,13 @@ export class Renderer {
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
         this._scenePostProcess = new PostProcess();
+        this._depthPrePassRenderTarget = new RenderTarget({
+            gpu,
+            type: RenderTargetTypes.Depth,
+            width: 1,
+            height: 1,
+            name: 'depth prepass render target',
+        });
         this._gBufferRenderTargets = new GBufferRenderTargets({
             gpu,
             width: 1,
@@ -93,6 +102,10 @@ export class Renderer {
     canvas;
     pixelRatio;
 
+    get depthPrePassRenderTarget() {
+        return this._depthPrePassRenderTarget;
+    }
+    
     get gBufferRenderTargets() {
         return this._gBufferRenderTargets;
     }
@@ -123,6 +136,7 @@ export class Renderer {
 
         this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
 
+        this._depthPrePassRenderTarget.setSize(realWidth, realHeight);
         this._gBufferRenderTargets.setSize(realWidth, realHeight);
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
@@ -170,7 +184,7 @@ export class Renderer {
      * @param clearScene
      */
     // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
-    render(scene: Scene, camera: Camera, onBeforePostProcess?: (gBufferRenderTargets: GBufferRenderTargets) => void) {
+    render(scene: Scene, camera: Camera, onBeforePostProcess?: () => void) {
         // ------------------------------------------------------------------------------
         // setup render mesh infos
         // TODO: depth sort
@@ -228,12 +242,9 @@ export class Renderer {
         // sort by render queue
         const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) =>
             a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-        // default
-        // const sortedRenderMeshInfos = Object.keys(renderMeshInfoEachQueue).map(key => (renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc))).flat().filter(actor => actor.enabled);
 
         // all mesh infos
         const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
-            // .map(key => renderMeshInfoEachQueue[key].sort(sortRenderQueueCompareFunc)) // default
             .map((key) => {
                 const renderQueueType = key as RenderQueueType;
                 const info = renderMeshInfoEachQueue[renderQueueType];
@@ -241,6 +252,7 @@ export class Renderer {
             })
             .flat()
             .filter(({actor}) => actor.enabled);
+
         // base pass mesh infos
         const sortedBasePassRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(renderMeshInfo => {
             return renderMeshInfo.queue === RenderQueueType.Skybox ||
@@ -252,41 +264,40 @@ export class Renderer {
         const sortedTransparentRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(renderMeshInfo => renderMeshInfo.queue === RenderQueueType.Transparent);
 
         // ------------------------------------------------------------------------------
-        // shadow pass
+        // depth pre-pass
         // ------------------------------------------------------------------------------
 
-        // renderMeshInfoEachQueue[RenderQueueType.Skybox].forEach((renderMeshInfo) => {
-        //     renderMeshInfo.actor.enabled = false;
-        // });
+        const depthPrePassRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({actor}) => {
+            if (actor.type === ActorTypes.Skybox) {
+                return false;
+            }
+            return actor.castShadow;
+        });
+        this.depthPrePass(depthPrePassRenderMeshInfos, camera);
+
+        // ------------------------------------------------------------------------------
+        // shadow pass
+        // ------------------------------------------------------------------------------
 
         const castShadowLightActors = lightActors.filter((lightActor) => lightActor.castShadow && lightActor.enabled);
 
         if (castShadowLightActors.length > 0) {
             const castShadowRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({actor}) => {
-                // const castShadowRenderMeshInfos = sortedRenderMeshInfos.filter(({actor}) => {
                 if (actor.type === ActorTypes.Skybox) {
                     return false;
                 }
                 return actor.castShadow;
             });
-            // tmp
-            // if (useShadowPass) {
-            //    this.shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
-            // }
             this.shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
         }
 
         // ------------------------------------------------------------------------------
-        // begin g-buffer
+        // g-buffer opaque pass
         // ------------------------------------------------------------------------------
 
         // TODO: camera...はなくていいかも
         // camera.setRenderTarget(this._gBufferRenderTargets);
-        this.setRenderTarget(this._gBufferRenderTargets.write);
-
-        // ------------------------------------------------------------------------------
-        // opaque pass
-        // ------------------------------------------------------------------------------
+        // this.setRenderTarget(this._gBufferRenderTargets.write);
 
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
 
@@ -294,15 +305,13 @@ export class Renderer {
         // transparent pass
         // ------------------------------------------------------------------------------
 
-        // console.log(this.realWidth, this.realHeight, this._gBufferRenderTarget, this._afterGBufferRenderTarget, this._copyDepthSourceRenderTarget,  this._copyDepthDestRenderTarget)
-        // copy depth texture
-        // return;
-
         this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
-        this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
+        // this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
+        this._afterGBufferRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         // // TODO: copy depth texture
-        this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
+        // this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
+        this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
         RenderTarget.blitDepth({
             gpu: this.gpu,
             sourceRenderTarget: this._copyDepthSourceRenderTarget,
@@ -329,7 +338,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         if (onBeforePostProcess) {
-            onBeforePostProcess(this._gBufferRenderTargets);
+            onBeforePostProcess();
         }
 
         const targetPostProcesses: PostProcess[] = [];
@@ -418,6 +427,7 @@ export class Renderer {
     private realHeight: number = 1;
     private stats: Stats | null = null;
     private _scenePostProcess: PostProcess;
+    private _depthPrePassRenderTarget: RenderTarget;
     private _gBufferRenderTargets: GBufferRenderTargets;
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
@@ -435,6 +445,32 @@ export class Renderer {
             queue,
             materialIndex,
         };
+    }
+
+    /**
+     *
+     * @param depthPrePassRenderMeshInfos
+     * @param camera
+     * @private
+     */
+    private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+        this.setRenderTarget(this._depthPrePassRenderTarget);
+
+        // depthなのでclear
+        this.clear(0, 0, 0, 1);
+
+        depthPrePassRenderMeshInfos.forEach(({actor}) => {
+            const depthMaterial = actor.depthMaterial;
+
+            if (!depthMaterial) {
+                throw '[Renderer.depthPrePass] invalid depth material';
+            }
+
+            depthMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            depthMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
+            depthMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            this.renderMesh(actor.geometry, depthMaterial);
+        });
     }
 
     /**
@@ -497,6 +533,11 @@ export class Renderer {
      * @private
      */
     private scenePass(sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera, lightActors: Light[], clear: boolean = true) {
+        // NOTE: DepthTextureはあるはず
+        this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
+
+        this.setRenderTarget(this._gBufferRenderTargets.write);
+
         // TODO: refactor
         if (clear) {
             this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);

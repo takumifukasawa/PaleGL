@@ -1,44 +1,38 @@
 ﻿import { Texture } from '@/PaleGL/core/Texture';
 import { Framebuffer } from '@/PaleGL/core/Framebuffer';
-// import {Renderbuffer} from "./Renderbuffer";
-// import {RenderbufferTypes, RenderTargetTypes, TextureFilterTypes, TextureTypes} from "@/PaleGL/constants";
 import { GLColorAttachment, TextureFilterTypes, TextureTypes } from '@/PaleGL/constants';
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
-// NOTE:
-// renderer用
 export class GBufferRenderTargets extends AbstractRenderTarget {
+    gpu: GPU;
     name: string;
-    #framebuffer: Framebuffer;
-    // #depthRenderbuffer;
     width: number;
     height: number;
-    #textures: Texture[] = [];
-    #baseColorTexture: Texture;
-    #normalTexture: Texture;
-    #depthTexture: Texture;
-
-    // type;
+    private _framebuffer: Framebuffer;
+    private _textures: Texture[] = [];
+    private _baseColorTexture: Texture;
+    private _normalTexture: Texture;
+    private _depthTexture: Texture | null = null
 
     get textures() {
-        return this.#textures;
+        return this._textures;
     }
 
     get baseColorTexture() {
-        return this.#baseColorTexture;
+        return this._baseColorTexture;
     }
 
     get normalTexture() {
-        return this.#normalTexture;
+        return this._normalTexture;
     }
 
     get depthTexture() {
-        return this.#depthTexture;
+        return this._depthTexture;
     }
 
     get framebuffer() {
-        return this.#framebuffer;
+        return this._framebuffer;
     }
 
     get read() {
@@ -52,12 +46,9 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     constructor({
         gpu,
         name,
-        // type = RenderTargetTypes.RGBA,
         width = 1,
         height = 1,
-    } // useDepthBuffer = false,
-    // writeDepthTexture = false,
-    // mipmap = false,
+    }
     : {
         gpu: GPU;
         name: string;
@@ -65,6 +56,8 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         height: number;
     }) {
         super();
+        
+        this.gpu = gpu;
 
         const minFilter = TextureFilterTypes.Linear;
         const magFilter = TextureFilterTypes.Linear;
@@ -72,25 +65,15 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         const gl = gpu.gl;
 
         this.name = name;
-        // this.type = type;
 
         this.width = width;
         this.height = height;
 
-        this.#framebuffer = new Framebuffer({ gpu });
-        this.#framebuffer.bind();
-
-        // if (useDepthBuffer) {
-        //     this.#depthRenderbuffer = new Renderbuffer({gpu, type: RenderbufferTypes.Depth, width, height});
-        // }
-
-        // depth as render buffer
-        // if (this.#depthRenderbuffer) {
-        //     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.#depthRenderbuffer.glObject);
-        // }
+        this._framebuffer = new Framebuffer({ gpu });
+        this._framebuffer.bind();
 
         // 1: base scene
-        this.#baseColorTexture = new Texture({
+        this._baseColorTexture = new Texture({
             gpu,
             width: this.width,
             height: this.height,
@@ -103,14 +86,14 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + 0,
             gl.TEXTURE_2D,
-            this.#baseColorTexture.glObject,
+            this._baseColorTexture.glObject,
             0
         );
-        this.#textures.push(this.#baseColorTexture);
+        this._textures.push(this._baseColorTexture);
         this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 0) as GLColorAttachment);
 
         // 2: normal
-        this.#normalTexture = new Texture({
+        this._normalTexture = new Texture({
             gpu,
             width: this.width,
             height: this.height,
@@ -123,52 +106,48 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + 1,
             gl.TEXTURE_2D,
-            this.#normalTexture.glObject,
+            this._normalTexture.glObject,
             0
         );
         this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 1) as GLColorAttachment);
 
-        this.#textures.push(this.#normalTexture);
+        this._textures.push(this._normalTexture);
 
         // 3: depth
-        this.#depthTexture = new Texture({
-            gpu,
-            width: this.width,
-            height: this.height,
-            mipmap: false,
-            type: TextureTypes.Depth,
-            // 一旦linear固定
-            minFilter,
-            magFilter,
-            // minFilter: TextureFilterTypes.Nearest,
-            // magFilter: TextureFilterTypes.Nearest
-        });
-        // depth as texture
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.#depthTexture.glObject, 0);
-
-        // if(this.#depthTexture && this.#depthRenderbuffer) {
-        //     throw "[RenderTarget.constructor] depth texture and depth render buffer are active.";
-        // }
+        // this._depthTexture = new Texture({
+        //     gpu,
+        //     width: this.width,
+        //     height: this.height,
+        //     mipmap: false,
+        //     type: TextureTypes.Depth,
+        //     // 一旦linear固定
+        //     minFilter,
+        //     magFilter,
+        // });
+        // // depth as texture
+        // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
 
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);
-        // if (this.#depthRenderbuffer) {
-        //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        // }
-        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         this.framebuffer.unbind();
-        // Framebuffer.unbind();
     }
 
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.#textures.forEach((texture) => texture.setSize(this.width, this.height));
-        if (this.#depthTexture) {
-            this.#depthTexture.setSize(this.width, this.height);
+        this._textures.forEach((texture) => texture.setSize(this.width, this.height));
+        if (this._depthTexture) {
+            this._depthTexture.setSize(this.width, this.height);
         }
-        // if (this.#depthRenderbuffer) {
-        //     this.#depthRenderbuffer.setSize(width, height);
-        // }
+    }
+
+    // TODO: render target と共通化できる
+    setDepthTexture(depthTexture: Texture) {
+        const gl = this.gpu.gl;
+        this._depthTexture = depthTexture;
+        this._framebuffer.bind();
+        // depth as texture
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
+        this._framebuffer.unbind();
     }
 }

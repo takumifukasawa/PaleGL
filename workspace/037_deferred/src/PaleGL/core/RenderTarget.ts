@@ -177,12 +177,9 @@ export class RenderTarget extends AbstractRenderTarget {
         const gl = this.gpu.gl;
         this._depthTexture = depthTexture;
         this._framebuffer.bind();
-        // gl.bindFramebuffer(gl.FRAMEBUFFER, this._framebuffer.glObject);
         // depth as texture
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
-        // Framebuffer.unbind();
         this._framebuffer.unbind();
-        // // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
     static blitDepth({
