@@ -189,7 +189,7 @@ export const UniformNames = {
     TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
     // g-buffer
     GBufferBaseColorTexture: 'uBaseColorTexture',
-    GBufferNormalTexture: 'uNormalTexture',
+    GBufferNormalTexture: 'uNormalTexture', // TODO: normalmapっぽく見えるので命名を変えたい
     DepthTexture: 'uDepthTexture',
     // skinning
     JointMatrices: 'uJointMatrices',

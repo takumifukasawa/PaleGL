@@ -250,7 +250,7 @@ export class BloomPass implements IPostProcessPass {
         prevRenderTarget,
         isLastPass,
         gBufferRenderTargets,
-        sceneCamera,
+        targetCamera,
         time
     }: PostProcessRenderArgs) {
         // 一回だけ呼びたい
@@ -266,7 +266,7 @@ export class BloomPass implements IPostProcessPass {
         }
 
         this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
-        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, sceneCamera, time });
+        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, targetCamera, time });
 
         const renderBlur = (
             horizontalRenderTarget: RenderTarget,
@@ -321,7 +321,7 @@ export class BloomPass implements IPostProcessPass {
             renderer,
             prevRenderTarget: null,
             isLastPass,
-            sceneCamera,
+            targetCamera,
             gBufferRenderTargets,
             time
         });

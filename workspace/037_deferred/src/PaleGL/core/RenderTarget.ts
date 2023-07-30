@@ -203,7 +203,7 @@ export class RenderTarget extends AbstractRenderTarget {
         gl.clear(gl.DEPTH_BUFFER_BIT);
         // console.log(width, height)
         if (gl.checkFramebufferStatus(gl.READ_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
-            console.error('invalid state');
+            console.error('[RenderTarget.blitDepth] invalid state');
             return;
         }
         gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST);
