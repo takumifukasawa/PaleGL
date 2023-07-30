@@ -12,7 +12,7 @@ export type PostProcessRenderArgs = {
     prevRenderTarget: RenderTarget | null;
     isLastPass: boolean;
     gBufferRenderTargets?: GBufferRenderTargets | null;
-    sceneCamera: Camera;
+    targetCamera: Camera;
     time: number;
 };
 

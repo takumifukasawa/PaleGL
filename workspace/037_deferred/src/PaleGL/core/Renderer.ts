@@ -52,8 +52,8 @@ export class Renderer {
         this.gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
-        this._postProcess = new PostProcess();
-        this._gBufferRenderTarget = new GBufferRenderTargets({
+        this._scenePostProcess = new PostProcess();
+        this._gBufferRenderTargets = new GBufferRenderTargets({
             gpu,
             width: 1,
             height: 1,
@@ -93,8 +93,12 @@ export class Renderer {
     canvas;
     pixelRatio;
 
-    get postProcess() {
-        return this._postProcess;
+    get gBufferRenderTargets() {
+        return this._gBufferRenderTargets;
+    }
+
+    get scenePostProcess() {
+        return this._scenePostProcess;
     }
 
     /**
@@ -119,7 +123,7 @@ export class Renderer {
 
         this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
 
-        this._gBufferRenderTarget.setSize(realWidth, realHeight);
+        this._gBufferRenderTargets.setSize(realWidth, realHeight);
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
@@ -157,57 +161,6 @@ export class Renderer {
     clear(r: number, g: number, b: number, a: number) {
         this.gpu.clear(r, g, b, a);
     }
-
-    /**
-     *
-     * @param scene
-     */
-
-    // renderScene(scene: Scene, camera: Camera) {
-    //     camera.setRenderTarget(this._gBufferRenderTarget);
-    //     skyboxMesh.enabled = true;
-    //     floorPlaneMesh.enabled = true;
-    //     skinnedMesh.enabled = true;
-    //     particleMesh.enabled = false;
-    //     renderer.render(captureScene, captureSceneCamera, {});
-
-    //     afterGBufferRenderTarget.setTexture(gBufferRenderTarget.baseColorTexture);
-    //     afterGBufferRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
-
-    //     // TODO: copy depth texture
-    //     copyDepthSourceRenderTarget.setDepthTexture(gBufferRenderTarget.depthTexture);
-    //     RenderTarget.blitDepth({
-    //         gpu,
-    //         sourceRenderTarget: copyDepthSourceRenderTarget,
-    //         destRenderTarget: copyDepthDestRenderTarget,
-    //         width: width * pixelRatio,
-    //         height: height * pixelRatio,
-    //     });
-    //     particleMesh.material.updateUniform('uDepthTexture', copyDepthDestRenderTarget.depthTexture);
-
-    //     captureSceneCamera.setRenderTarget(afterGBufferRenderTarget);
-    //     skyboxMesh.enabled = false;
-    //     floorPlaneMesh.enabled = false;
-    //     skinnedMesh.enabled = false;
-    //     particleMesh.enabled = true;
-    //     renderer.render(captureScene, captureSceneCamera, {
-    //         useShadowPass: false,
-    //         clearScene: false,
-    //     });
-
-    //     postProcess.render({
-    //         gpu,
-    //         renderer,
-    //         sceneRenderTarget: afterGBufferRenderTarget,
-    //         gBufferRenderTargets: gBufferRenderTarget,
-    //         sceneCamera: captureSceneCamera,
-    //         time,
-    //     });
-
-    // }
-
-    //  renderOffscreen() {
-    //  }
 
     /**
      *
@@ -328,15 +281,15 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         // TODO: camera...はなくていいかも
-        camera.setRenderTarget(this._gBufferRenderTarget);
-        this.setRenderTarget(this._gBufferRenderTarget.write);
+        // camera.setRenderTarget(this._gBufferRenderTargets);
+        this.setRenderTarget(this._gBufferRenderTargets.write);
 
         // ------------------------------------------------------------------------------
         // opaque pass
         // ------------------------------------------------------------------------------
 
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
-        
+
         // ------------------------------------------------------------------------------
         // 3. transparent pass
         // ------------------------------------------------------------------------------
@@ -345,11 +298,11 @@ export class Renderer {
         // copy depth texture
         // return;
 
-        this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTarget.baseColorTexture);
-        this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTarget.depthTexture);
+        this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
+        this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
 
         // // TODO: copy depth texture
-        this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTarget.depthTexture);
+        this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         RenderTarget.blitDepth({
             gpu: this.gpu,
             sourceRenderTarget: this._copyDepthSourceRenderTarget,
@@ -359,13 +312,13 @@ export class Renderer {
         });
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
-            renderMeshInfo.actor.material.updateUniform('uDepthTexture', this._copyDepthDestRenderTarget.depthTexture);
+            renderMeshInfo.actor.material.updateUniform(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
         });
 
         // return;
 
         // TODO: camera...はなくていいかも
-        camera.setRenderTarget(this._afterGBufferRenderTarget);
+        // camera.setRenderTarget(this._afterGBufferRenderTarget);
         this.setRenderTarget(this._afterGBufferRenderTarget.write);
 
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
@@ -374,19 +327,30 @@ export class Renderer {
         // 4. full screen pass
         // ------------------------------------------------------------------------------
 
-        if(onBeforePostProcess) {
-            onBeforePostProcess(this._gBufferRenderTarget);
+        if (onBeforePostProcess) {
+            onBeforePostProcess(this._gBufferRenderTargets);
         }
-        
-        camera.setRenderTarget(null);
+
+        // camera.setRenderTarget(null);
         // this.setRenderTarget(null);
-        this._postProcess.render({
-            gpu: this.gpu,
-            renderer: this,
-            sceneRenderTarget: this._afterGBufferRenderTarget,
-            gBufferRenderTargets: this._gBufferRenderTarget,
-            sceneCamera: camera,
-            time: performance.now() / 1000, // TODO: engineから渡したい
+
+        const targetPostProcesses: PostProcess[] = [];
+        if (camera.mainCamera) {
+            targetPostProcesses.push(this._scenePostProcess);
+        }
+        if (camera.postProcess) {
+            targetPostProcesses.push(camera.postProcess);
+        }
+
+        targetPostProcesses.forEach(postProcess => {
+            postProcess.render({
+                gpu: this.gpu,
+                renderer: this,
+                sceneRenderTarget: this._afterGBufferRenderTarget,
+                gBufferRenderTargets: this._gBufferRenderTargets,
+                targetCamera: camera,
+                time: performance.now() / 1000, // TODO: engineから渡したい
+            });
         });
     }
 
@@ -454,8 +418,8 @@ export class Renderer {
     private realWidth: number = 1;
     private realHeight: number = 1;
     private stats: Stats | null = null;
-    private _postProcess: PostProcess;
-    private _gBufferRenderTarget: GBufferRenderTargets;
+    private _scenePostProcess: PostProcess;
+    private _gBufferRenderTargets: GBufferRenderTargets;
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
@@ -549,30 +513,6 @@ export class Renderer {
             }
 
             const targetMaterial = actor.materials[materialIndex];
-            // const targetMaterial = actor.depthMaterial;
-
-            // reset
-            // NOTE: 余計なresetとかしない方がいい気がする
-            // if(targetMaterial.uniforms.uShadowMap) {
-            //     targetMaterial.uniforms.uShadowMap.value = null;
-            // }
-
-            // // TODO: material 側でやった方がよい？
-            // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
-            // }
-            // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
-            // }
-            // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
-            // }
-            // if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
-            // }
-            // if (targetMaterial.uniforms[UniformNames.ViewPosition]) {
-            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = camera.transform.worldMatrix.position;
-            // }
 
             // TODO: material 側でやった方がよい？
             targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
@@ -588,25 +528,8 @@ export class Renderer {
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             lightActors.forEach((light) => {
-                if (targetMaterial.uniforms.uDirectionalLight) {
-                    // targetMaterial.uniforms.uDirectionalLight = {
-                    //     type: UniformTypes.Struct,
-                    //     value: {
-                    //         direction: {
-                    //             type: UniformTypes.Vector3,
-                    //             value: light.transform.position,
-                    //         },
-                    //         intensity: {
-                    //             type: UniformTypes.Float,
-                    //             value: light.intensity,
-                    //         },
-                    //         color: {
-                    //             type: UniformTypes.Color,
-                    //             value: light.color
-                    //         }
-                    //     }
-                    // }
-                    targetMaterial.updateUniform('uDirectionalLight', {
+                if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
+                    targetMaterial.updateUniform(UniformNames.DirectionalLight, {
                         direction: {
                             type: UniformTypes.Vector3,
                             value: light.transform.position,
@@ -691,9 +614,10 @@ export class Renderer {
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
+            // - opaqueと共通処理なのでまとめたい
             lightActors.forEach((light) => {
-                if (targetMaterial.uniforms.uDirectionalLight) {
-                    targetMaterial.updateUniform('uDirectionalLight', {
+                if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
+                    targetMaterial.updateUniform(UniformNames.DirectionalLight, {
                         direction: {
                             type: UniformTypes.Vector3,
                             value: light.transform.position,

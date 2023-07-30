@@ -210,65 +210,14 @@ engine.setScene(captureScene);
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
-captureScene.mainCamera = captureSceneCamera;
+// captureScene.mainCamera = captureSceneCamera;
 captureSceneCamera.mainCamera = true;
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
-// const captureSceneDepthRenderTarget = new RenderTarget({
-//     gpu,
-//     width: 1, height: 1,
-//     type: RenderTargetTypes.Depth,
-//     writeDepthTexture: true,
-//     name: "capture scene depth render target"
-// });
-// const captureSceneColorRenderTarget = new RenderTarget({
-//     gpu,
-//     width: 1, height: 1,
-//     type: RenderTargetTypes.RGBA,
-//     useDepthBuffer: true,
-//     name: "capture scene color render target"
-// });
-
-// TODO: remove targets
-// console.log("===============")
-const gBufferRenderTarget = new GBufferRenderTargets({
-    gpu,
-    width: 1,
-    height: 1,
-    name: 'g-buffer render target',
-});
-// console.log(gBufferRenderTarget)
-const afterGBufferRenderTarget = new RenderTarget({
-    gpu,
-    type: RenderTargetTypes.Empty,
-    width: 1,
-    height: 1,
-    name: 'after g-buffer render target',
-});
-// console.log(afterGBufferRenderTarget)
-const copyDepthSourceRenderTarget = new RenderTarget({
-    gpu,
-    type: RenderTargetTypes.Empty,
-    width: 1,
-    height: 1,
-    name: 'copy depth source render target',
-});
-// console.log(copyDepthSourceRenderTarget)
-const copyDepthDestRenderTarget = new RenderTarget({
-    gpu,
-    type: RenderTargetTypes.Depth,
-    width: 1,
-    height: 1,
-    name: 'copy depth dest render target',
-});
-// console.log(copyDepthDestRenderTarget)
-// console.log("===============")
-
 captureSceneCamera.onStart = ({actor}) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 };
-// captureSceneCamera.onFixedUpdate = ({ actor}: {actor: Actor}) => {
 captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
@@ -314,11 +263,8 @@ directionalLight.onStart = ({actor}) => {
 };
 captureScene.add(directionalLight);
 
-// const postProcess = new PostProcess({gpu, renderer});
-// const postProcess = new PostProcess({gpu});
-// const postProcess = new PostProcess();
-const postProcess = renderer.postProcess;
-captureScene.postProcess = postProcess;
+const scenePostProcess = renderer.scenePostProcess;
+// captureScene.scenePostProcess = scenePostProcess;
 
 const bloomPass = new BloomPass({
     gpu,
@@ -326,19 +272,19 @@ const bloomPass = new BloomPass({
     bloomAmount: 0.8,
 });
 bloomPass.enabled = true;
-postProcess.addPass(bloomPass);
+scenePostProcess.addPass(bloomPass);
 
 const ssaoPass = new SSAOPass({gpu});
 ssaoPass.enabled = true;
-postProcess.addPass(ssaoPass);
+scenePostProcess.addPass(ssaoPass);
 
 const ssrPass = new SSRPass({gpu});
 ssrPass.enabled = true;
-postProcess.addPass(ssrPass);
+scenePostProcess.addPass(ssrPass);
 
 const fxaaPass = new FXAAPass({gpu});
 fxaaPass.enabled = true;
-postProcess.addPass(fxaaPass);
+scenePostProcess.addPass(fxaaPass);
 
 const showBuffersPass = new FragmentPass({
     gpu,
@@ -415,11 +361,11 @@ void main() {
     },
 });
 showBuffersPass.enabled = true;
-postProcess.addPass(showBuffersPass);
+scenePostProcess.addPass(showBuffersPass);
 
-postProcess.enabled = true;
+scenePostProcess.enabled = true;
 // TODO: set post process いらないかも
-captureSceneCamera.setPostProcess(postProcess);
+captureSceneCamera.setPostProcess(scenePostProcess);
 
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({gpu, path: gltfModelUrl});
@@ -868,11 +814,6 @@ void main() {
         height = wrapperElement.offsetHeight;
         inputController.setSize(width, height);
         engine.setSize(width, height);
-
-        gBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        afterGBufferRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        copyDepthSourceRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
-        copyDepthDestRenderTarget.setSize(width * pixelRatio, height * pixelRatio);
     };
 
     engine.onBeforeStart = () => {
@@ -904,12 +845,7 @@ void main() {
         inputController.fixedUpdate();
     };
     
-    // engine.onRender = (time: number, deltaTime: number) => {
     engine.onRender = () => {
-
-        // if render to render target
-        // renderer.render(subScene, subCamera, {});
-        // render main
         renderer.render(captureScene, captureSceneCamera, (_gBufferRenderTarget: GBufferRenderTargets) => {
             showBuffersPass.material.updateUniform('uBaseColorTexture', _gBufferRenderTarget.baseColorTexture);
             showBuffersPass.material.updateUniform('uNormalTexture', _gBufferRenderTarget.normalTexture);
@@ -920,39 +856,7 @@ void main() {
             ).invert();
             showBuffersPass.material.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
             showBuffersPass.material.updateUniform("uDepthTexture", directionalLight.shadowMap!.read.depthTexture);
-
         });
-        return;
-        
-        // for tmp
-        
-        // captureSceneCamera.setRenderTarget(gBufferRenderTarget);
-        // skyboxMesh.enabled = true;
-        // floorPlaneMesh.enabled = true;
-        // skinnedMesh.enabled = true;
-        // particleMesh.enabled = false;
-        // renderer.render(captureScene, captureSceneCamera, {});
-
-        // console.log(gBufferRenderTarget, afterGBufferRenderTarget, copyDepthSourceRenderTarget, copyDepthDestRenderTarget);
-
-        // captureSceneCamera.setRenderTarget(afterGBufferRenderTarget);
-        // skyboxMesh.enabled = false;
-        // floorPlaneMesh.enabled = false;
-        // skinnedMesh.enabled = false;
-        // particleMesh.enabled = true;
-        // renderer.render(captureScene, captureSceneCamera, {
-        //     useShadowPass: false,
-        //     clearScene: false,
-        // });
-
-        // postProcess.render({
-        //     gpu,
-        //     renderer,
-        //     sceneRenderTarget: afterGBufferRenderTarget,
-        //     gBufferRenderTargets: gBufferRenderTarget,
-        //     sceneCamera: captureSceneCamera,
-        //     time,
-        // });
     };
 
     const tick = (time: number) => {

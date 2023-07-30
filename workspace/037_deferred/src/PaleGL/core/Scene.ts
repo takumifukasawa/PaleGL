@@ -1,16 +1,16 @@
 ﻿import { Actor } from '@/PaleGL/actors/Actor';
 import { Transform } from '@/PaleGL/core/Transform';
-import {Camera} from "@/PaleGL/actors/Camera.ts";
-import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
-import {Skybox} from "@/PaleGL/actors/Skybox.ts";
+// import {Camera} from "@/PaleGL/actors/Camera.ts";
+// import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
+// import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 
 type TraverseFunc = (actor: Actor) => void;
 
 export class Scene {
     children: Transform[] = []; // transform hierarchy
-    mainCamera: Camera | null = null; // TODO: findしたい
-    postProcess: PostProcess | null = null // TODO: cameraにもたせてもいいかも
-    skybox: Skybox | null = null; // TODO: findしたい
+    // mainCamera: Camera | null = null; // TODO: findしたい
+    // postProcess: PostProcess | null = null // TODO: cameraにもたせてもいいかも
+    // skybox: Skybox | null = null; // TODO: findしたい
     
     // constructor(mainCamera: Camera, postProcess: PostProcess) {
     //     this.mainCamera = mainCamera;

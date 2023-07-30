@@ -177,12 +177,20 @@ export const AttributeNames = {
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
 
 export const UniformNames = {
-    // base
+    // position
+    ViewPosition: 'uViewPosition',
+    // matrices
     WorldMatrix: 'uWorldMatrix',
     ViewMatrix: 'uViewMatrix',
     ProjectionMatrix: 'uProjectionMatrix',
     NormalMatrix: 'uNormalMatrix',
-    ViewPosition: 'uViewPosition',
+    InverseViewProjectionMatrix: 'uInverseViewProjectionMatrix',
+    InverseProjectionMatrix: 'uInverseProjectionMatrix',
+    TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
+    // g-buffer
+    GBufferBaseColorTexture: 'uBaseColorTexture',
+    GBufferNormalTexture: 'uNormalTexture',
+    DepthTexture: 'uDepthTexture',
     // skinning
     JointMatrices: 'uJointMatrices',
     JointTexture: 'uJointTexture',
@@ -194,18 +202,26 @@ export const UniformNames = {
     SrcTexture: 'uSrcTexture',
     // time
     Time: 'uTime',
+    // usualily post process
+    TargetWidth: 'uTargetWidth',
+    TargetHeight: 'uTargetHeight',
+    // camera
+    CameraNear: 'uNearClip',
+    CameraFar: 'uFarClip',
+    // light
+    DirectionalLight: "uDirectionalLight",
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
-export const PostProcessUniformNames = {
-    TargetWidth: 'uTargetWidth',
-    TargetHeight: 'uTargetHeight',
-    CameraNear: 'uNearClip',
-    CameraFar: 'uFarClip',
-} as const;
+// export const PostProcessUniformNames = {
+//     TargetWidth: 'uTargetWidth',
+//     TargetHeight: 'uTargetHeight',
+//     CameraNear: 'uNearClip',
+//     CameraFar: 'uFarClip',
+// } as const;
 
-export type PostProcessUniformName = (typeof PostProcessUniformNames)[keyof typeof PostProcessUniformNames];
+// export type PostProcessUniformName = (typeof PostProcessUniformNames)[keyof typeof PostProcessUniformNames];
 
 // -----------------------------------------------------------------------------
 // shaders

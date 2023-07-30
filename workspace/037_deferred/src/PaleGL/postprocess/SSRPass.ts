@@ -1,4 +1,4 @@
-﻿import {PostProcessUniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import {UniformNames, UniformTypes} from '@/PaleGL/constants';
 import {GPU} from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {Matrix4} from '@/PaleGL/math/Matrix4';
@@ -62,11 +62,11 @@ export class SSRPass extends PostProcessPassBase {
             gpu,
             fragmentShader,
             uniforms: {
-                [PostProcessUniformNames.TargetWidth]: {
+                [UniformNames.TargetWidth]: {
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                [PostProcessUniformNames.TargetHeight]: {
+                [UniformNames.TargetHeight]: {
                     type: UniformTypes.Float,
                     value: 1,
                 },
@@ -98,11 +98,11 @@ export class SSRPass extends PostProcessPassBase {
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity,
                 },
-                [PostProcessUniformNames.CameraNear]: {
+                [UniformNames.CameraNear]: {
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                [PostProcessUniformNames.CameraFar]: {
+                [UniformNames.CameraFar]: {
                     type: UniformTypes.Float,
                     value: 1,
                 },
@@ -176,8 +176,8 @@ export class SSRPass extends PostProcessPassBase {
         super.setSize(width, height);
         // this.material.uniforms.uTargetWidth.value = width;
         // this.material.uniforms.uTargetHeight.value = height;
-        this.material.updateUniform(PostProcessUniformNames.TargetWidth, width);
-        this.material.updateUniform(PostProcessUniformNames.TargetHeight, height);
+        this.material.updateUniform(UniformNames.TargetWidth, width);
+        this.material.updateUniform(UniformNames.TargetHeight, height);
     }
 
     render(options: PostProcessRenderArgs) {

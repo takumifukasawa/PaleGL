@@ -7,7 +7,8 @@ import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
-import postProcessPassVertexSahder from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
+import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
+import {IPostProcessPass} from "@/PaleGL/postprocess/IPostProcessPass.ts";
 
 export type PostProcessRenderArgs = {
     gpu: GPU;
@@ -16,23 +17,23 @@ export type PostProcessRenderArgs = {
     prevRenderTarget: RenderTarget | null;
     isLastPass: boolean;
     gBufferRenderTargets?: GBufferRenderTargets | null;
-    sceneCamera: Camera;
+    targetCamera: Camera;
     time: number;
 };
 
-export interface IPostProcessPass {
-    // gpu: GPU;
-    name: string;
-    enabled: boolean;
-    width: number;
-    height: number;
-    renderTarget: RenderTarget;
-    materials: Material[];
-
-    setSize: (width: number, height: number) => void;
-    setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
-    render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time }: PostProcessRenderArgs) => void;
-}
+// export interface IPostProcessPass {
+//     // gpu: GPU;
+//     name: string;
+//     enabled: boolean;
+//     width: number;
+//     height: number;
+//     renderTarget: RenderTarget;
+//     materials: Material[];
+// 
+//     setSize: (width: number, height: number) => void;
+//     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
+//     render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time }: PostProcessRenderArgs) => void;
+// }
 
 export class PostProcessPassBase implements IPostProcessPass {
     // protected gpu: GPU;
@@ -54,7 +55,7 @@ export class PostProcessPassBase implements IPostProcessPass {
 
     // TODO: glslファイル化
     static get baseVertexShader() {
-        return postProcessPassVertexSahder;
+        return postProcessPassVertexShader;
     }
 
     /**
@@ -147,11 +148,11 @@ export class PostProcessPassBase implements IPostProcessPass {
      * @param renderer
      * @param prevRenderTarget
      * @param isLastPass
-     * @param sceneCamera
+     * @param targetCamera
      * @param gBufferRenderTargets
      */
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs): void {
-        this.setRenderTarget(renderer, camera, isLastPass);
+    render({ gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs): void {
+        this.setRenderTarget(renderer, targetCamera, isLastPass);
 
         // ppの場合はいらない気がする
         this.mesh.updateTransform();

@@ -1,12 +1,12 @@
-﻿import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Camera } from '@/PaleGL/actors/Camera';
-import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
-import { GPU } from '@/PaleGL/core/GPU';
-import { Renderer } from '@/PaleGL/core/Renderer';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
+﻿import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {Camera} from '@/PaleGL/actors/Camera';
+import {IPostProcessPass} from '@/PaleGL/postprocess/IPostProcessPass';
+import {GPU} from '@/PaleGL/core/GPU';
+import {Renderer} from '@/PaleGL/core/Renderer';
+import {RenderTarget} from '@/PaleGL/core/RenderTarget';
+import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets.ts';
+import {UniformNames} from "@/PaleGL/constants.ts";
 import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
@@ -15,7 +15,7 @@ import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 export class PostProcess {
     passes: IPostProcessPass[] = [];
     // renderTarget;
-    #camera: Camera;
+    #postProcessCamera: Camera;
 
     #selfEnabled = true;
 
@@ -48,12 +48,12 @@ export class PostProcess {
         //     width: 1, height: 1,
         // });
 
-        this.#camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-        this.#camera.transform.setTranslation(new Vector3(0, 0, 1));
+        this.#postProcessCamera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+        this.#postProcessCamera.transform.setTranslation(new Vector3(0, 0, 1));
     }
 
     setSize(width: number, height: number) {
-        this.#camera.setSize(width, height);
+        this.#postProcessCamera.setSize(width, height);
         // this.renderTarget.setSize(width, height);
         this.passes.forEach((pass) => pass.setSize(width, height));
     }
@@ -63,25 +63,25 @@ export class PostProcess {
     }
 
     render({
-        gpu,
-        renderer,
-        sceneRenderTarget,
-        gBufferRenderTargets,
-        sceneCamera,
-        time,
-    }: {
+               gpu,
+               renderer,
+               sceneRenderTarget,
+               gBufferRenderTargets,
+               targetCamera,
+               time,
+           }: {
         gpu: GPU;
         renderer: Renderer;
         sceneRenderTarget: RenderTarget | null;
         gBufferRenderTargets?: GBufferRenderTargets | null;
-        sceneCamera: Camera;
+        targetCamera: Camera;
         time: number;
     }) {
         if (!sceneRenderTarget) {
             throw '[PostProcess.render] scene render target is empty.';
         }
 
-        this.#camera.updateTransform();
+        this.#postProcessCamera.updateTransform();
         // TODO: render target を外から渡したほうが分かりやすいかも
         // let prevRenderTarget = sceneRenderTarget || this.renderTarget;
         let prevRenderTarget = sceneRenderTarget;
@@ -90,40 +90,37 @@ export class PostProcess {
         }
 
         const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-            sceneCamera.projectionMatrix,
-            sceneCamera.viewMatrix
+            targetCamera.projectionMatrix,
+            targetCamera.viewMatrix
         ).invert();
-        const inverseProjectionMatrix = sceneCamera.projectionMatrix.clone().invert();
-        
+        const inverseProjectionMatrix = targetCamera.projectionMatrix.clone().invert();
+
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = i === enabledPasses.length - 1;
 
             pass.materials.forEach((passMaterial) => {
-                passMaterial.updateUniform('uTime', time);
-                passMaterial.updateUniform(PostProcessUniformNames.CameraNear, sceneCamera.near);
-                passMaterial.updateUniform(PostProcessUniformNames.CameraFar, sceneCamera.far);
-                passMaterial.updateUniform('uProjectionMatrix', sceneCamera.projectionMatrix);
-                passMaterial.updateUniform('uInverseViewProjectionMatrix', inverseViewProjectionMatrix);
-                passMaterial.updateUniform('uInverseProjectionMatrix', inverseProjectionMatrix);
-                passMaterial.updateUniform('uViewMatrix', sceneCamera.viewMatrix);
-                passMaterial.updateUniform('uTransposeInverseViewMatrix', sceneCamera.viewMatrix.clone().invert().transpose());
-                // TODO: もうgbufferは前提でいい気がする
-                if (gBufferRenderTargets) {
-                    passMaterial.updateUniform('uBaseColorTexture', gBufferRenderTargets.baseColorTexture);
-                    passMaterial.updateUniform('uNormalTexture', gBufferRenderTargets.normalTexture);
-                    passMaterial.updateUniform('uDepthTexture', gBufferRenderTargets.depthTexture);
-                }
+                passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
+                passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
+                passMaterial.updateUniform(UniformNames.Time, time);
+                passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
+                passMaterial.updateUniform(UniformNames.InverseViewProjectionMatrix, inverseViewProjectionMatrix);
+                passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, inverseProjectionMatrix);
+                passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
+                passMaterial.updateUniform(UniformNames.TransposeInverseViewMatrix, targetCamera.viewMatrix.clone().invert().transpose());
+                passMaterial.updateUniform(UniformNames.GBufferBaseColorTexture, renderer.gBufferRenderTargets.baseColorTexture);
+                passMaterial.updateUniform(UniformNames.GBufferNormalTexture, renderer.gBufferRenderTargets.normalTexture);
+                passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
             });
 
             pass.render({
                 gpu,
                 renderer,
-                camera: this.#camera,
+                camera: this.#postProcessCamera,
                 prevRenderTarget,
                 isLastPass,
-                sceneCamera,
+                targetCamera,
                 gBufferRenderTargets,
                 time,
             });

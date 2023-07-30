@@ -1,5 +1,5 @@
 import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import { UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import {UniformNames, UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -89,7 +89,7 @@ export class PhongMaterial extends Material {
                 // value: Vector2.one,
                 value: normalMapUvOffset || Vector2.one,
             },
-            uDirectionalLight: {
+            [UniformNames.DirectionalLight]: {
                 type: UniformTypes.Struct,
                 value: {
                     direction: Vector3.zero,
