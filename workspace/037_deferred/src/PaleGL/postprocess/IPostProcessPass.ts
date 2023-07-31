@@ -2,19 +2,7 @@
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-
-export type PostProcessRenderArgs = {
-    gpu: GPU;
-    camera: Camera;
-    renderer: Renderer;
-    prevRenderTarget: RenderTarget | null;
-    isLastPass: boolean;
-    gBufferRenderTargets?: GBufferRenderTargets | null;
-    targetCamera: Camera;
-    time: number;
-};
+import {PostProcessRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 export interface IPostProcessPass {
     // gpu: GPU;

@@ -32,6 +32,10 @@ export class PostProcess {
 
         return false;
     }
+    
+    get postProcessCamera() {
+        return this.#postProcessCamera;
+    }
 
     set enabled(value) {
         this.#selfEnabled = value;

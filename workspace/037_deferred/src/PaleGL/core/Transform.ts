@@ -7,6 +7,7 @@ import { Actor } from '@/PaleGL/actors/Actor';
 // TODO:
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
 // - NodeBaseを継承
+// - dirtyNeedsUpdate flag
 export class Transform {
     actor: Actor;
     parent: Transform | null = null;

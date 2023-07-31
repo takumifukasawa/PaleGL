@@ -18,6 +18,7 @@ import {Geometry} from '@/PaleGL/geometries/Geometry';
 import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
 import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
 import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
+import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
@@ -93,6 +94,14 @@ export class Renderer {
             name: 'copy depth dest render target',
         });
         // console.log(this._copyDepthDestRenderTarget)
+        this._deferredLightingPass = new PostProcessPassBase({
+            gpu,
+            fragmentShader: `#version 300 es
+void main() {
+    gl_FragColor = vec4(1., 0., 0., 1.);
+}
+`
+        });
     }
 
     // --------------------------------------------------------------
@@ -141,6 +150,7 @@ export class Renderer {
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
+        this._deferredLightingPass.setSize(realWidth, realHeight);
     }
 
     /**
@@ -302,6 +312,22 @@ export class Renderer {
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
 
         // ------------------------------------------------------------------------------
+        // deferred lighting pass
+        // ------------------------------------------------------------------------------
+
+        // TODO: ここでライティングのパスが必要
+
+        this._deferredLightingPass.render({
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            targetCamera: camera,
+            renderer: this,
+            prevRenderTarget:  null,
+            isLastPass: false,
+            time: performance.now()
+        });
+
+        // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
 
@@ -432,6 +458,7 @@ export class Renderer {
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
+    private _deferredLightingPass: PostProcessPassBase;
 
     /**
      *

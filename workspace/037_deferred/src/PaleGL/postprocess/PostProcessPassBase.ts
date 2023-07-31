@@ -81,7 +81,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     }) {
         // super({name});
         this.name = name;
-
+        
         const baseVertexShader = PostProcessPassBase.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;
 
@@ -161,7 +161,8 @@ export class PostProcessPassBase implements IPostProcessPass {
             this.material.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
-        // 渡してない場合はなにもしないことにする
+        // 渡してない場合はなにもしない. src texture がいらないとみなす
+        // TODO: 無理やり渡しちゃっても良い気もしなくもない
         if (prevRenderTarget) {
             this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
         }

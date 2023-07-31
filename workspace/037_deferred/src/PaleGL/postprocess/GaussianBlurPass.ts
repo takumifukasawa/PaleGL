@@ -1,7 +1,6 @@
 ﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
 import {
     IPostProcessPass,
-    PostProcessRenderArgs
 } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
@@ -10,7 +9,7 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import {Material} from "@/PaleGL/materials/Material";
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase";
+import {PostProcessPassBase, PostProcessRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase";
 
 const BLUR_PIXEL_NUM = 7;
 
