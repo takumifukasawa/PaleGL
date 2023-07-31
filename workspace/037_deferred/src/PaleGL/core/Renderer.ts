@@ -20,9 +20,11 @@ import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
 import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass.ts";
+import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera.ts";
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
+import deferredLightingFragmentShader from '@/PaleGL/shaders/deferred-lighting-fragment.glsl';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number, queue: RenderQueueType };
 
@@ -56,7 +58,7 @@ export class Renderer {
         this.gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
-        this._scenePostProcess = new PostProcess();
+        this._scenePostProcess = new PostProcess(this.screenQuadCamera);
         this._depthPrePassRenderTarget = new RenderTarget({
             gpu,
             type: RenderTargetTypes.Depth,
@@ -97,15 +99,7 @@ export class Renderer {
         // console.log(this._copyDepthDestRenderTarget)
         this._deferredLightingPass = new FragmentPass({
             gpu,
-            fragmentShader: `#version 300 es
-            
-            precision highp float;
-            
-            out vec4 outColor;
-void main() {
-    outColor = vec4(1., 0., 0., 1.);
-}
-`
+            fragmentShader: deferredLightingFragmentShader
         });
     }
 
@@ -337,22 +331,6 @@ void main() {
             time: performance.now() // TODO: engineから渡したい
         });
         
-        // this._scenePostProcess.updatePassMaterial({
-        //     pass: this._deferredLightingPass,
-        //     renderer:this,
-        //     targetCamera: camera,
-        //     time: performance.now() // TODO: engineから渡したい
-        // })
-        // this._deferredLightingPass.render({
-        //     gpu: this.gpu,
-        //     camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-        //     targetCamera: camera,
-        //     renderer: this,
-        //     prevRenderTarget: null,
-        //     isLastPass: false,
-        //     time: performance.now() // TODO: engineから渡したい
-        // });
-
         // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
@@ -485,6 +463,7 @@ void main() {
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
     private _deferredLightingPass: FragmentPass;
+    private screenQuadCamera: Camera = OrthographicCamera.CreateFullQuadOrthographicCamera();
 
     /**
      *

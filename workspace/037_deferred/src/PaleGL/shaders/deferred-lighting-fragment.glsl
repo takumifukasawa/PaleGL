@@ -23,11 +23,10 @@ struct Surface {
 #include ./partial/camera-struct.glsl
 
 in vec2 vUv;
-in vec3 vNormal;
 
-#include ./partial/receive-shadow-fragment-varyings.glsl
-
-// uniform sampler2D uAOTexture; // TODO
+// TODO
+// uniform sampler2D uAOTexture; 
+uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uNormalTexture;
 
@@ -65,37 +64,13 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     return resultColor;
 }
 
-vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
-    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
-    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
-    float sceneDepth = projectionShadowColor.r;
-    float depthFromLight = projectionUv.z;
-    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
-    float shadowAreaRect =
-        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-    float shadowRate = shadowOccluded * shadowAreaRect;
-    
-    vec4 resultColor = vec4(1.);
-    resultColor.xyz = mix(
-       surfaceColor.xyz,
-       mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
-       shadowRate
-    );
-    resultColor.a = surfaceColor.a;
-
-    return resultColor;
-}
-
-#include ./partial/env-map-fragment-functions.glsl
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapUvScale;
+    vec2 uv = vUv;
+
+    vec4 baseColor = texture(uBaseColorTexture, uv);
    
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-   
-    vec3 worldNormal = vNormal;
+    vec3 worldNormal = texture(uNormalTexture, uv).xyz * .5 + .5;
    
 #ifdef USE_NORMAL_MAP
     worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);

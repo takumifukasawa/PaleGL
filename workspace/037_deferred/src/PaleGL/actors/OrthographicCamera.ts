@@ -137,4 +137,10 @@ export class OrthographicCamera extends Camera {
         // });
         return worldPositions;
     }
+    
+    static CreateFullQuadOrthographicCamera(): Camera {
+        const camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+        camera.transform.setTranslation(new Vector3(0, 0, 1));
+        return camera;
+    }
 }

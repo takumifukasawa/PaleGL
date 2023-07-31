@@ -53,7 +53,7 @@ export class PostProcess {
     }
 
     // constructor({gpu}: {gpu: GPU}) {
-    constructor() {
+    constructor(postProcessCamera?: Camera) {
         // // TODO: renderTargetがいらない時もあるので出し分けたい
         // this.renderTarget = new RenderTarget({
         //     gpu,
@@ -63,8 +63,11 @@ export class PostProcess {
         //     width: 1, height: 1,
         // });
 
-        this.#postProcessCamera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-        this.#postProcessCamera.transform.setTranslation(new Vector3(0, 0, 1));
+        if(postProcessCamera) {
+            this.#postProcessCamera = postProcessCamera;
+        } else {
+            this.#postProcessCamera = OrthographicCamera.CreateFullQuadOrthographicCamera();
+        }
     }
 
     setSize(width: number, height: number) {
