@@ -9,7 +9,7 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import {Material} from "@/PaleGL/materials/Material";
-import {PostProcessPassBase, PostProcessRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase";
+import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase";
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -111,7 +111,7 @@ export class GaussianBlurPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs) {
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs) {
         this.#passes.forEach((pass, i) => {
             pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
 

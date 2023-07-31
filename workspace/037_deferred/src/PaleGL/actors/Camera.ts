@@ -48,6 +48,8 @@ export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | null;
 export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
     projectionMatrix = Matrix4.identity;
+    inverseViewProjectionMatrix = Matrix4.identity;
+    inverseProjectionMatrix = Matrix4.identity;
     #renderTarget: CameraRenderTargetType = null;
     clearColor: Vector4; // TODO: color class
     #postProcess: PostProcess | null;
@@ -241,6 +243,11 @@ export class Camera extends Actor {
     updateTransform() {
         super.updateTransform();
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
+        this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
+        this.inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+            this.projectionMatrix,
+            this.viewMatrix
+        ).invert();
     }
 
     /**

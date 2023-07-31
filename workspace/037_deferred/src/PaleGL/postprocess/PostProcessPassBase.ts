@@ -10,7 +10,7 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import {IPostProcessPass} from "@/PaleGL/postprocess/IPostProcessPass.ts";
 
-export type PostProcessRenderArgs = {
+export type PostProcessPassRenderArgs = {
     gpu: GPU;
     camera: Camera;
     renderer: Renderer;
@@ -48,6 +48,8 @@ export class PostProcessPassBase implements IPostProcessPass {
     private _renderTarget: RenderTarget;
 
     materials: Material[] = [];
+    
+    beforeRender: (() => void) | null = null;
 
     get renderTarget(): RenderTarget {
         return this._renderTarget;
@@ -149,9 +151,8 @@ export class PostProcessPassBase implements IPostProcessPass {
      * @param prevRenderTarget
      * @param isLastPass
      * @param targetCamera
-     * @param gBufferRenderTargets
      */
-    render({ gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessRenderArgs): void {
+    render({ gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs): void {
         this.setRenderTarget(renderer, targetCamera, isLastPass);
 
         // ppの場合はいらない気がする
@@ -165,6 +166,10 @@ export class PostProcessPassBase implements IPostProcessPass {
         // TODO: 無理やり渡しちゃっても良い気もしなくもない
         if (prevRenderTarget) {
             this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
+        }
+
+        if(this.beforeRender){
+            this.beforeRender();
         }
 
         renderer.renderMesh(this.geometry, this.material);

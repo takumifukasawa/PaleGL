@@ -18,7 +18,8 @@ import {Geometry} from '@/PaleGL/geometries/Geometry';
 import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
 import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
 import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+// import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass.ts";
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
@@ -94,11 +95,15 @@ export class Renderer {
             name: 'copy depth dest render target',
         });
         // console.log(this._copyDepthDestRenderTarget)
-        this._deferredLightingPass = new PostProcessPassBase({
+        this._deferredLightingPass = new FragmentPass({
             gpu,
             fragmentShader: `#version 300 es
+            
+            precision highp float;
+            
+            out vec4 outColor;
 void main() {
-    gl_FragColor = vec4(1., 0., 0., 1.);
+    outColor = vec4(1., 0., 0., 1.);
 }
 `
         });
@@ -114,13 +119,17 @@ void main() {
     get depthPrePassRenderTarget() {
         return this._depthPrePassRenderTarget;
     }
-    
+
     get gBufferRenderTargets() {
         return this._gBufferRenderTargets;
     }
 
     get scenePostProcess() {
         return this._scenePostProcess;
+    }
+    
+    get deferredLightingPass() {
+        return this._deferredLightingPass;
     }
 
     /**
@@ -190,7 +199,7 @@ void main() {
      *
      * @param scene
      * @param camera
-     * @param useShadowPass
+     * @param
      * @param clearScene
      */
     // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
@@ -317,15 +326,32 @@ void main() {
 
         // TODO: ここでライティングのパスが必要
 
-        this._deferredLightingPass.render({
+        PostProcess.renderPass({
+            pass: this._deferredLightingPass,
+            renderer:this,
+            targetCamera: camera,
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            targetCamera: camera,
-            renderer: this,
-            prevRenderTarget:  null,
+            prevRenderTarget: null,
             isLastPass: false,
-            time: performance.now()
+            time: performance.now() // TODO: engineから渡したい
         });
+        
+        // this._scenePostProcess.updatePassMaterial({
+        //     pass: this._deferredLightingPass,
+        //     renderer:this,
+        //     targetCamera: camera,
+        //     time: performance.now() // TODO: engineから渡したい
+        // })
+        // this._deferredLightingPass.render({
+        //     gpu: this.gpu,
+        //     camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+        //     targetCamera: camera,
+        //     renderer: this,
+        //     prevRenderTarget: null,
+        //     isLastPass: false,
+        //     time: performance.now() // TODO: engineから渡したい
+        // });
 
         // ------------------------------------------------------------------------------
         // transparent pass
@@ -379,7 +405,7 @@ void main() {
             postProcess.render({
                 gpu: this.gpu,
                 renderer: this,
-                sceneRenderTarget: this._afterGBufferRenderTarget,
+                prevRenderTarget: this._afterGBufferRenderTarget,
                 gBufferRenderTargets: this._gBufferRenderTargets,
                 targetCamera: camera,
                 time: performance.now() / 1000, // TODO: engineから渡したい
@@ -458,7 +484,7 @@ void main() {
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
-    private _deferredLightingPass: PostProcessPassBase;
+    private _deferredLightingPass: FragmentPass;
 
     /**
      *

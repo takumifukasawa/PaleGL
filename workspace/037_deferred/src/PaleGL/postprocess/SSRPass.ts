@@ -2,8 +2,7 @@
 import {GPU} from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {Matrix4} from '@/PaleGL/math/Matrix4';
-import {PostProcessRenderArgs} from '@/PaleGL/postprocess/IPostProcessPass';
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 /*
 float eps = .001;
@@ -180,7 +179,7 @@ export class SSRPass extends PostProcessPassBase {
         this.material.updateUniform(UniformNames.TargetHeight, height);
     }
 
-    render(options: PostProcessRenderArgs) {
+    render(options: PostProcessPassRenderArgs) {
 
         this.material.updateUniform('uRayDepthBias', this.rayDepthBias);
         this.material.updateUniform('uRayNearestDistance', this.rayNearestDistance);

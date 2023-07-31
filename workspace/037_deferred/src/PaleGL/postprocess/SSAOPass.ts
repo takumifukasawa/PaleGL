@@ -2,11 +2,10 @@
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { PostProcessRenderArgs } from '@/PaleGL/postprocess/IPostProcessPass';
 import { Color } from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 /**
  *
@@ -218,7 +217,7 @@ export class SSAOPass extends PostProcessPassBase {
      * 
      * @param options
      */
-    render(options: PostProcessRenderArgs) {
+    render(options: PostProcessPassRenderArgs) {
         this.material.updateUniform('uOcclusionSampleLength', this.occlusionSampleLength);
         this.material.updateUniform('uOcclusionBias', this.occlusionBias);
         this.material.updateUniform('uOcclusionMinDistance', this.occlusionMinDistance);

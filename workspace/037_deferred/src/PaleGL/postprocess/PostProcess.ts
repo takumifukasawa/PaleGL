@@ -7,9 +7,20 @@ import {Renderer} from '@/PaleGL/core/Renderer';
 import {RenderTarget} from '@/PaleGL/core/RenderTarget';
 import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets.ts';
 import {UniformNames} from "@/PaleGL/constants.ts";
-import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+import {PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+// import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+
+type PostProcessRenderArgs = {
+    gpu: GPU;
+    renderer: Renderer;
+    prevRenderTarget: RenderTarget | null;
+    gBufferRenderTargets?: GBufferRenderTargets | null;
+    targetCamera: Camera;
+    time: number;
+    isCameraLastPass: boolean,
+};
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
@@ -65,63 +76,92 @@ export class PostProcess {
     addPass(pass: IPostProcessPass) {
         this.passes.push(pass);
     }
+   
+    /**
+     * 
+     * @param pass
+     * @param renderer
+     * @param targetCamera
+     * @param time
+     */
+    static updatePassMaterial({pass, renderer, targetCamera, time}: {pass: IPostProcessPass, renderer: Renderer, targetCamera: Camera, time: number}) {
+        pass.materials.forEach((passMaterial) => {
+            passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
+            passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
+            passMaterial.updateUniform(UniformNames.Time, time);
+            passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
+            passMaterial.updateUniform(UniformNames.InverseViewProjectionMatrix, targetCamera.inverseViewProjectionMatrix);
+            passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
+            passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
+            passMaterial.updateUniform(UniformNames.TransposeInverseViewMatrix, targetCamera.viewMatrix.clone().invert().transpose());
+            passMaterial.updateUniform(UniformNames.GBufferBaseColorTexture, renderer.gBufferRenderTargets.baseColorTexture);
+            passMaterial.updateUniform(UniformNames.GBufferNormalTexture, renderer.gBufferRenderTargets.normalTexture);
+            // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
+            passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
+        });
+
+    }
+    
+    static renderPass({ pass, gpu, renderer, camera, prevRenderTarget, targetCamera, gBufferRenderTargets, time, isLastPass}: PostProcessPassRenderArgs & {pass: IPostProcessPass, camera: Camera, isLastPass: boolean}) {
+        PostProcess.updatePassMaterial({ pass, renderer, targetCamera, time });
+        pass.render({
+            gpu,
+            renderer,
+            camera,
+            prevRenderTarget,
+            isLastPass,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
+    }
 
     render({
                gpu,
                renderer,
-               sceneRenderTarget,
+               prevRenderTarget,
                gBufferRenderTargets,
                targetCamera,
                time,
                isCameraLastPass
-           }: {
-        gpu: GPU;
-        renderer: Renderer;
-        sceneRenderTarget: RenderTarget | null;
-        gBufferRenderTargets?: GBufferRenderTargets | null;
-        targetCamera: Camera;
-        time: number;
-        isCameraLastPass: boolean,
-    }) {
-        if (!sceneRenderTarget) {
-            throw '[PostProcess.render] scene render target is empty.';
-        }
+           }: PostProcessRenderArgs) {
+        // if (!sceneRenderTarget) {
+        //     throw '[PostProcess.render] scene render target is empty.';
+        // }
 
         this.#postProcessCamera.updateTransform();
         // TODO: render target を外から渡したほうが分かりやすいかも
         // let prevRenderTarget = sceneRenderTarget || this.renderTarget;
-        let prevRenderTarget = sceneRenderTarget;
+        // let prevRenderTarget = sceneRenderTarget;
         if (!prevRenderTarget) {
             console.error('[PostProcess.render] scene render target is empty.');
         }
 
-        const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-            targetCamera.projectionMatrix,
-            targetCamera.viewMatrix
-        ).invert();
-        const inverseProjectionMatrix = targetCamera.projectionMatrix.clone().invert();
+        // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
+        //     targetCamera.projectionMatrix,
+        //     targetCamera.viewMatrix
+        // ).invert();
+        // const inverseProjectionMatrix = targetCamera.projectionMatrix.clone().invert();
 
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
         enabledPasses.forEach((pass, i) => {
             const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;
 
-            pass.materials.forEach((passMaterial) => {
-                passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
-                passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
-                passMaterial.updateUniform(UniformNames.Time, time);
-                passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
-                passMaterial.updateUniform(UniformNames.InverseViewProjectionMatrix, inverseViewProjectionMatrix);
-                passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, inverseProjectionMatrix);
-                passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
-                passMaterial.updateUniform(UniformNames.TransposeInverseViewMatrix, targetCamera.viewMatrix.clone().invert().transpose());
-                passMaterial.updateUniform(UniformNames.GBufferBaseColorTexture, renderer.gBufferRenderTargets.baseColorTexture);
-                passMaterial.updateUniform(UniformNames.GBufferNormalTexture, renderer.gBufferRenderTargets.normalTexture);
-                // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
-                passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
-            });
-
-            pass.render({
+            // this.updatePassMaterial({pass, renderer, targetCamera, time});
+            // pass.render({
+            //     gpu,
+            //     renderer,
+            //     camera: this.#postProcessCamera,
+            //     prevRenderTarget,
+            //     isLastPass,
+            //     targetCamera,
+            //     gBufferRenderTargets,
+            //     time,
+            // });
+            
+            PostProcess.renderPass({
+                pass,
                 gpu,
                 renderer,
                 camera: this.#postProcessCamera,

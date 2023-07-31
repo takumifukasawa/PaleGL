@@ -362,6 +362,9 @@ void main() {
 });
 showBuffersPass.enabled = false;
 scenePostProcess.addPass(showBuffersPass);
+showBuffersPass.beforeRender = () => {
+    showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
+}
 
 scenePostProcess.enabled = true;
 // TODO: set post process いらないかも

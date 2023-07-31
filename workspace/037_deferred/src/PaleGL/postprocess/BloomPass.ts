@@ -13,7 +13,7 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
-import {PostProcessPassBase, PostProcessRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -252,7 +252,7 @@ export class BloomPass implements IPostProcessPass {
         gBufferRenderTargets,
         targetCamera,
         time
-    }: PostProcessRenderArgs) {
+    }: PostProcessPassRenderArgs) {
         // 一回だけ呼びたい
         this.geometry.start();
         // ppの場合はいらない気がする
