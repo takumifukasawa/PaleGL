@@ -361,9 +361,10 @@ void main() {
         },
     },
 });
-showBuffersPass.enabled = true;
+showBuffersPass.enabled = false;
 scenePostProcess.addPass(showBuffersPass);
 showBuffersPass.beforeRender = () => {
+    showBuffersPass.material.updateUniform('uBaseColorTexture', directionalLight.shadowMap!.read.depthTexture);
     // showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 }
 

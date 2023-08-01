@@ -4,10 +4,14 @@ precision mediump float;
 
 #pragma DEFINES
 
-uniform vec3 uViewPosition;
+// -----------------------------------------------------------
+// struct
+// -----------------------------------------------------------
+
 
 #include ./partial/directional-light-struct.glsl
-#include ./partial/directional-light-uniforms.glsl
+
+#include ./partial/camera-struct.glsl
 
 struct Surface {
     vec3 worldNormal;
@@ -16,20 +20,66 @@ struct Surface {
     float specularAmount;
 };
 
-#include ./partial/camera-struct.glsl
+// -----------------------------------------------------------
+// functions
+// -----------------------------------------------------------
 
 #pragma DEPTH_FUNCTIONS
 
 #include ./partial/env-map-fragment-functions.glsl
 
+#ifdef USE_RECEIVE_SHADOW
+vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
+    vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
+    vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
+    float sceneDepth = projectionShadowColor.r;
+    float depthFromLight = projectionUv.z;
+    float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
+    float shadowAreaRect =
+    step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
+    step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
+    step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
+    float shadowRate = shadowOccluded * shadowAreaRect;
+    
+    vec4 resultColor = vec4(1.);
+    resultColor.xyz = mix(
+        surfaceColor.xyz,
+        mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
+        shadowRate
+    );
+    resultColor.a = surfaceColor.a;
+    
+    return resultColor;
+}
+#endif
+
+
+// -----------------------------------------------------------
+// varyings
+// -----------------------------------------------------------
+
 in vec2 vUv;
+#include ./partial/receive-shadow-fragment-varyings.glsl
+
+// -----------------------------------------------------------
+// uniforms
+// -----------------------------------------------------------
+
+#include ./partial/directional-light-uniforms.glsl
+#include ./partial/receive-shadow-fragment-uniforms.glsl
+
+#ifdef USE_RECEIVE_SHADOW
+uniform mat4 uShadowMapProjectionMatrix;
+#endif
+
+uniform vec3 uViewPosition;
 
 // TODO
 // uniform sampler2D uAOTexture; 
 uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uNormalTexture;
-uniform sampler2D uShadowMap;
+// uniform sampler2D uShadowMap;
 uniform samplerCube uEnvMap;
 
 uniform float uNearClip;
@@ -38,7 +88,7 @@ uniform float uFarClip;
 uniform float uTime;
 
 uniform mat4 uInverseViewProjectionMatrix;
-
+        
 layout (location = 0) out vec4 outColor;
 
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
@@ -129,6 +179,17 @@ void main() {
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
 
+#ifdef USE_RECEIVE_SHADOW
+    vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
+    // TODO: apply shadow の中に入れても良さそう
+    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+        resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
+    }
+#endif
+
+    // vec4 shadowColor = texture(uShadowMap, uv);
+    // // outColor = shadowColor;
+    // // outColor = vec4(shadowColor.xxx, 1.);
     // resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
 
     // correct

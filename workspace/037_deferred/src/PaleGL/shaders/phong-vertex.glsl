@@ -62,7 +62,7 @@ void main() {
  
     vWorldPosition = worldPosition.xyz;
 
-    #include ./partial/receive-shadow-vertex-calc.glsl
+    #include ./partial/receive-shadow-uv-calc.glsl
 
     vec4 viewPosition = uViewMatrix * worldPosition;
 

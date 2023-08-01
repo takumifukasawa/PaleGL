@@ -19,7 +19,7 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 // import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
-import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
+// import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera.ts';
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
@@ -29,6 +29,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 import {DeferredShadingPass} from "@/PaleGL/postprocess/DeferresShadingPass.ts";
+import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -101,7 +102,7 @@ export class Renderer {
             name: 'copy depth dest render target',
         });
         // console.log(this._copyDepthDestRenderTarget)
-        this._deferredLightingPass = new DeferredShadingPass({
+        this._deferredShadingPass = new DeferredShadingPass({
             gpu,
             fragmentShader: deferredShadingFragmentShader,
             uniforms: {
@@ -117,6 +118,10 @@ export class Renderer {
                 [UniformNames.DepthTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
+                },
+                [UniformNames.ShadowMap]: {
+                    type: UniformTypes.Texture,
+                    value: null
                 },
                 [UniformNames.ViewPosition]: {
                     type: UniformTypes.Vector3,
@@ -185,8 +190,8 @@ export class Renderer {
         return this._scenePostProcess;
     }
 
-    get deferredLightingPass() {
-        return this._deferredLightingPass;
+    get deferredShadingPass() {
+        return this._deferredShadingPass;
     }
 
     /**
@@ -216,7 +221,7 @@ export class Renderer {
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
-        this._deferredLightingPass.setSize(realWidth, realHeight);
+        this._deferredShadingPass.setSize(realWidth, realHeight);
     }
 
     /**
@@ -396,8 +401,9 @@ export class Renderer {
         // TODO: - light actor の中で lightの種類別に処理を分ける
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
         lightActors.forEach((light) => {
-            if (this._deferredLightingPass.material.uniforms[UniformNames.DirectionalLight]) {
-                this._deferredLightingPass.material.updateUniform(UniformNames.DirectionalLight, {
+            const targetMaterial = this._deferredShadingPass.material;
+            if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
+                targetMaterial.updateUniform(UniformNames.DirectionalLight, {
                     direction: {
                         type: UniformTypes.Vector3,
                         value: light.transform.position,
@@ -411,16 +417,37 @@ export class Renderer {
                         value: light.color,
                     },
                 });
+                if(light.shadowMap) {
+                    this._deferredShadingPass.material.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.texture);
+                }
+            }
+            if (
+                targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
+                targetMaterial.receiveShadow &&
+                light.castShadow &&
+                light.shadowCamera &&
+                light.shadowMap
+            ) {
+                // clip coord (-1 ~ 1) to uv (0 ~ 1)
+                const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+                const textureProjectionMatrix = Matrix4.multiplyMatrices(
+                    textureMatrix,
+                    light.shadowCamera.projectionMatrix.clone(),
+                    light.shadowCamera.viewMatrix.clone()
+                );
+                targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+                targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
             }
         });
         // update cubemap
         sortedSkyboxRenderMeshInfos.forEach(skyboxRenderMeshInfo => {
             const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-            this._deferredLightingPass.material.updateUniform("uEnvMap", skyboxActor.cubeMap)
+            const cubeMap: CubeMap = skyboxActor.cubeMap;
+            this._deferredShadingPass.material.updateUniform("uEnvMap", cubeMap);
         });
 
         PostProcess.renderPass({
-            pass: this._deferredLightingPass,
+            pass: this._deferredShadingPass,
             renderer: this,
             targetCamera: camera,
             gpu: this.gpu,
@@ -429,14 +456,15 @@ export class Renderer {
             isLastPass: false,
             time: performance.now() / 1000, // TODO: engineから渡したい
         });
-        // console.log(this._deferredLightingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
+        // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
         // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
 
-        this._afterGBufferRenderTarget.setTexture(this._deferredLightingPass.renderTarget.texture!);
+        this._afterGBufferRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
+        
         // pattern1: g-buffer depth
         // this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         // pattern2: depth prepass
@@ -568,7 +596,7 @@ export class Renderer {
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
-    private _deferredLightingPass: FragmentPass;
+    private _deferredShadingPass: DeferredShadingPass;
     private screenQuadCamera: Camera = OrthographicCamera.CreateFullQuadOrthographicCamera();
 
     /**
