@@ -1,5 +1,5 @@
 import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import {UniformNames, UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
+import { UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -7,7 +7,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+// import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import phongFrag from '@/PaleGL/shaders/phong-fragment.glsl';
@@ -92,9 +92,21 @@ export class PhongMaterial extends Material {
             [UniformNames.DirectionalLight]: {
                 type: UniformTypes.Struct,
                 value: {
-                    direction: Vector3.zero,
-                    intensity: 0,
-                    color: new Vector4(0, 0, 0, 0),
+                    // direction: Vector3.zero,
+                    // intensity: 0,
+                    // color: new Vector4(0, 0, 0, 0),
+                    direction: {
+                        type: UniformTypes.Vector3,
+                        value: Vector3.zero,
+                    },
+                    intensity: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    color: {
+                        type: UniformTypes.Color,
+                        value: new Color(0, 0, 0, 1),
+                    },
                 },
             },
             uEnvMap: {

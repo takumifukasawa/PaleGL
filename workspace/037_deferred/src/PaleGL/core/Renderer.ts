@@ -4,30 +4,33 @@
     RenderQueueType,
     RenderTargetTypes,
     UniformNames,
-    UniformTypes
+    UniformTypes,
 } from '@/PaleGL/constants';
-import {Matrix4} from '@/PaleGL/math/Matrix4';
-import {GPU} from '@/PaleGL/core/GPU';
-import {Stats} from '@/PaleGL/utilities/Stats';
-import {Light} from '@/PaleGL/actors/Light';
-import {Mesh} from '@/PaleGL/actors/Mesh';
-import {Scene} from '@/PaleGL/core/Scene';
-import {Camera, CameraRenderTargetType} from '@/PaleGL/actors/Camera';
-import {Material} from '@/PaleGL/materials/Material';
-import {Geometry} from '@/PaleGL/geometries/Geometry';
-import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
-import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
-import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Stats } from '@/PaleGL/utilities/Stats';
+import { Light } from '@/PaleGL/actors/Light';
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { Scene } from '@/PaleGL/core/Scene';
+import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/Camera';
+import { Material } from '@/PaleGL/materials/Material';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 // import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
-import {FragmentPass} from "@/PaleGL/postprocess/FragmentPass.ts";
-import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera.ts";
+import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera.ts';
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
-import {Vector3} from "@/PaleGL/math/Vector3.ts";
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Color } from '@/PaleGL/math/Color.ts';
+import {Skybox} from "@/PaleGL/actors/Skybox.ts";
+import {DeferredShadingPass} from "@/PaleGL/postprocess/DeferresShadingPass.ts";
 
-type RenderMeshInfo = { actor: Mesh; materialIndex: number, queue: RenderQueueType };
+type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
 type RenderMeshInfoEachQueue = {
     [key in RenderQueueType]: RenderMeshInfo[];
@@ -55,7 +58,7 @@ export class Renderer {
      * @param canvas
      * @param pixelRatio
      */
-    constructor({gpu, canvas, pixelRatio = 1.5}: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }) {
+    constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }) {
         this.gpu = gpu;
         this.canvas = canvas;
         this.pixelRatio = pixelRatio;
@@ -98,7 +101,7 @@ export class Renderer {
             name: 'copy depth dest render target',
         });
         // console.log(this._copyDepthDestRenderTarget)
-        this._deferredLightingPass = new FragmentPass({
+        this._deferredLightingPass = new DeferredShadingPass({
             gpu,
             fragmentShader: deferredShadingFragmentShader,
             uniforms: {
@@ -107,27 +110,55 @@ export class Renderer {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                [UniformNames.GBufferNormalTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 [UniformNames.DepthTexture]: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 [UniformNames.ViewPosition]: {
                     type: UniformTypes.Vector3,
-                    value: Vector3.zero
+                    value: Vector3.zero,
                 },
                 [UniformNames.InverseViewProjectionMatrix]: {
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity
+                    value: Matrix4.identity,
                 },
                 [UniformNames.CameraNear]: {
                     type: UniformTypes.Float,
-                    value:0,
+                    value: 0,
                 },
                 [UniformNames.CameraFar]: {
                     type: UniformTypes.Float,
-                    value:0,
-                }
-            }
+                    value: 0,
+                },
+                [UniformNames.DirectionalLight]: {
+                    type: UniformTypes.Struct,
+                    value: {
+                        // direction: Vector3.zero,
+                        // intensity: 0,
+                        // color: new Vector4(0, 0, 0, 0),
+                        direction: {
+                            type: UniformTypes.Vector3,
+                            value: Vector3.zero,
+                        },
+                        intensity: {
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        color: {
+                            type: UniformTypes.Color,
+                            value: new Color(0, 0, 0, 1),
+                        },
+                    },
+                },
+                uEnvMap: {
+                    type: UniformTypes.CubeMap,
+                    value: null,
+                },
+            },
         });
     }
 
@@ -149,7 +180,7 @@ export class Renderer {
     get scenePostProcess() {
         return this._scenePostProcess;
     }
-    
+
     get deferredLightingPass() {
         return this._deferredLightingPass;
     }
@@ -243,7 +274,9 @@ export class Renderer {
         scene.traverse((actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    renderMeshInfoEachQueue[RenderQueueType.Skybox].push(this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox));
+                    renderMeshInfoEachQueue[RenderQueueType.Skybox].push(
+                        this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox)
+                    );
                     // TODO: skyboxの中で処理したい
                     // actor.transform.parent = camera.transform;
                     return;
@@ -292,23 +325,32 @@ export class Renderer {
                 return info.sort(sortRenderQueueCompareFunc);
             })
             .flat()
-            .filter(({actor}) => actor.enabled);
+            .filter(({ actor }) => actor.enabled);
 
+        // skybox
+        const sortedSkyboxRenderMeshInfos: RenderMeshInfo[] =sortedRenderMeshInfos.filter((renderMeshInfo) => {
+            return renderMeshInfo.queue === RenderQueueType.Skybox;
+        });
+        
         // base pass mesh infos
-        const sortedBasePassRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(renderMeshInfo => {
-            return renderMeshInfo.queue === RenderQueueType.Skybox ||
+        const sortedBasePassRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
+            return (
+                renderMeshInfo.queue === RenderQueueType.Skybox ||
                 renderMeshInfo.queue === RenderQueueType.Opaque ||
                 renderMeshInfo.queue === RenderQueueType.AlphaTest
+            );
         });
 
         // transparent mesh infos
-        const sortedTransparentRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(renderMeshInfo => renderMeshInfo.queue === RenderQueueType.Transparent);
+        const sortedTransparentRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(
+            (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
+        );
 
         // ------------------------------------------------------------------------------
         // depth pre-pass
         // ------------------------------------------------------------------------------
 
-        const depthPrePassRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({actor}) => {
+        const depthPrePassRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({ actor }) => {
             if (actor.type === ActorTypes.Skybox) {
                 return false;
             }
@@ -323,7 +365,7 @@ export class Renderer {
         const castShadowLightActors = lightActors.filter((lightActor) => lightActor.castShadow && lightActor.enabled);
 
         if (castShadowLightActors.length > 0) {
-            const castShadowRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({actor}) => {
+            const castShadowRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({ actor }) => {
                 if (actor.type === ActorTypes.Skybox) {
                     return false;
                 }
@@ -347,25 +389,53 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         // TODO: ここでライティングのパスが必要
+        // TODO: - light actor の中で lightの種類別に処理を分ける
+        // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
+        lightActors.forEach((light) => {
+            if (this._deferredLightingPass.material.uniforms[UniformNames.DirectionalLight]) {
+                this._deferredLightingPass.material.updateUniform(UniformNames.DirectionalLight, {
+                    direction: {
+                        type: UniformTypes.Vector3,
+                        value: light.transform.position,
+                    },
+                    intensity: {
+                        type: UniformTypes.Float,
+                        value: light.intensity,
+                    },
+                    color: {
+                        type: UniformTypes.Color,
+                        value: light.color,
+                    },
+                });
+            }
+        });
+        // update cubemap
+        sortedSkyboxRenderMeshInfos.forEach(skyboxRenderMeshInfo => {
+            const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
+            this._deferredLightingPass.material.updateUniform("uEnvMap", skyboxActor.cubeMap)
+        });
 
         PostProcess.renderPass({
             pass: this._deferredLightingPass,
-            renderer:this,
+            renderer: this,
             targetCamera: camera,
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
             isLastPass: false,
-            time: performance.now() / 1000 // TODO: engineから渡したい
+            time: performance.now() / 1000, // TODO: engineから渡したい
         });
         // console.log(this._deferredLightingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
-        
+
         // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
 
-        this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
+        this._afterGBufferRenderTarget.setTexture(this._deferredLightingPass.renderTarget.texture!);
+        // this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
+        // pattern1: g-buffer depth
         // this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
+        // pattern2: depth prepass
         this._afterGBufferRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         // // TODO: copy depth texture
@@ -380,7 +450,10 @@ export class Renderer {
         });
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
-            renderMeshInfo.actor.material.updateUniform(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
+            renderMeshInfo.actor.material.updateUniform(
+                UniformNames.DepthTexture,
+                this._copyDepthDestRenderTarget.depthTexture
+            );
         });
 
         // return;
@@ -416,7 +489,7 @@ export class Renderer {
                 gBufferRenderTargets: this._gBufferRenderTargets,
                 targetCamera: camera,
                 time: performance.now() / 1000, // TODO: engineから渡したい
-                isCameraLastPass: i === targetPostProcesses.length - 1
+                isCameraLastPass: i === targetPostProcesses.length - 1,
             });
         });
     }
@@ -478,7 +551,7 @@ export class Renderer {
     }
 
     // --------------------------------------------------------------
-    // private 
+    // private
     // --------------------------------------------------------------
 
     private gpu;
@@ -520,7 +593,7 @@ export class Renderer {
         // depthなのでclear
         this.clear(0, 0, 0, 1);
 
-        depthPrePassRenderMeshInfos.forEach(({actor}) => {
+        depthPrePassRenderMeshInfos.forEach(({ actor }) => {
             const depthMaterial = actor.depthMaterial;
 
             if (!depthMaterial) {
@@ -557,7 +630,7 @@ export class Renderer {
                 return;
             }
 
-            castShadowRenderMeshInfos.forEach(({actor}) => {
+            castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
                 // // TODO: material 側でやった方がよい？
@@ -593,7 +666,12 @@ export class Renderer {
      * @param clear
      * @private
      */
-    private scenePass(sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera, lightActors: Light[], clear: boolean = true) {
+    private scenePass(
+        sortedRenderMeshInfos: RenderMeshInfo[],
+        camera: Camera,
+        lightActors: Light[],
+        clear: boolean = true
+    ) {
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
@@ -604,7 +682,7 @@ export class Renderer {
             this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         }
 
-        sortedRenderMeshInfos.forEach(({actor, materialIndex}) => {
+        sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
@@ -669,7 +747,6 @@ export class Renderer {
         });
     }
 
-
     /**
      *
      * @param sortedRenderMeshInfos
@@ -678,13 +755,18 @@ export class Renderer {
      * @param clear
      * @private
      */
-    private transparentPass(sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera, lightActors: Light[], clear: boolean) {
+    private transparentPass(
+        sortedRenderMeshInfos: RenderMeshInfo[],
+        camera: Camera,
+        lightActors: Light[],
+        clear: boolean
+    ) {
         // TODO: refactor
         if (clear) {
             this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         }
 
-        sortedRenderMeshInfos.forEach(({actor, materialIndex}) => {
+        sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             const targetMaterial = actor.materials[materialIndex];
 
             targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);

@@ -20,6 +20,14 @@ struct Surface {
 
 #pragma DEPTH_FUNCTIONS
 
+#include ./partial/env-map-fragment-functions.glsl
+
+mat2 rotate(float r) {
+    float c = cos(r);
+    float s = sin(r);
+    return mat2(c, s, -s, c);
+}
+
 in vec2 vUv;
 
 // TODO
@@ -27,9 +35,13 @@ in vec2 vUv;
 uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uNormalTexture;
+uniform sampler2D uShadowMap;
+uniform samplerCube uEnvMap;
 
 uniform float uNearClip;
 uniform float uFarClip;
+
+uniform float uTime;
 
 uniform mat4 uInverseViewProjectionMatrix;
 
@@ -67,17 +79,23 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
     return resultColor;
 }
 
-
-uniform float uTime;
 void main() {
+    float eps = .0001; 
+
     vec2 uv = vUv;
 
     vec4 baseColor = texture(uBaseColorTexture, uv);
    
-    vec3 worldNormal = texture(uNormalTexture, uv).xyz * .5 + .5;
+    vec3 worldNormal = texture(uNormalTexture, uv).xyz * 2. - 1.;
    
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    
+    // depth guard
+    if(step(rawDepth, 1. - eps) < .5) {
+        outColor = baseColor;
+        return;
+    }
 
     vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
@@ -90,10 +108,7 @@ void main() {
     surface.worldPosition = worldPosition;
     surface.worldNormal = worldNormal;
     surface.diffuseColor = baseColor;
-    
-    outColor = baseColor;
-    return;
-
+   
     // TODO: bufferから引っ張ってくる
     surface.specularAmount = .5;
 
@@ -104,22 +119,28 @@ void main() {
     
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-        
+   
+    outColor = resultColor;
+    // outColor.xyz = worldNormal;
+    // return;
+    
     // ambient light
 #ifdef USE_ENV_MAP
     vec3 envDir = reflect(
         normalize(surface.worldPosition - camera.worldPosition),
         normalize(surface.worldNormal)
     );
+    // TODO: bufferからか何かしらで引っ張ってくる
+    float uAmbientAmount = 1.;
+    // TODO: fixme
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
+    outColor.xyz = envDir;
+    return;
 #endif
+   
+    
 
-#ifdef USE_RECEIVE_SHADOW
-    // TODO: apply shadow の中に入れても良さそう
-    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-        resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
-    }
-#endif
+        // resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
 
     // correct
     outColor = resultColor;

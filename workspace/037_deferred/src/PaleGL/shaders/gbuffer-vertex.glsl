@@ -1,108 +1,80 @@
 #version 300 es
 
-precision mediump float;
-
 #pragma DEFINES
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap; 
-uniform vec2 uDiffuseMapUvScale;
-uniform float uSpecularAmount;
-uniform samplerCube uEnvMap;
-uniform float uAmbientAmount;
+#pragma ATTRIBUTES
 
-#include ./partial/normal-map-fragment-uniforms.glsl
+#include ./partial/skinning-vertex-functions.glsl
 
-uniform vec3 uViewPosition;
+// varyings
+out vec2 vUv;
+out vec3 vWorldPosition;
+out vec3 vNormal;
 
-#include ./partial/alpha-test-fragment-uniforms.glsl
+#include ./partial/normal-map-vertex-varyings.glsl
+#include ./partial/receive-shadow-vertex-varyings.glsl
+#include ./partial/vertex-color-vertex-varyings.glsl
 
-#include ./partial/directional-light-struct.glsl
-#include ./partial/directional-light-uniforms.glsl
+uniform mat4 uWorldMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform mat4 uNormalMatrix;
 
-struct Surface {
-    vec3 worldNormal;
-    vec3 worldPosition;
-    vec4 diffuseColor;
-    float specularAmount;
-};
+uniform float uTime;
 
-#include ./partial/camera-struct.glsl
+#include ./partial/receive-shadow-vertex-uniforms.glsl
+#include ./partial/skinning-vertex-uniforms.glsl
 
-in vec2 vUv;
-in vec3 vNormal;
-
-#include ./partial/normal-map-fragment-varyings.glsl
-
-in vec3 vWorldPosition;
-
-#include ./partial/vertex-color-fragment-varyings.glsl
-
-layout (location = 0) out vec4 outGBufferA;
-layout (location = 1) out vec4 outGBufferB;
-
-#ifdef USE_NORMAL_MAP
-vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
-    vec3 n = normalize(normal);
-    vec3 t = normalize(tangent);
-    vec3 b = normalize(binormal);
-    mat3 tbn = mat3(t, b, n);
-    vec3 nt = texture(normalMap, uv).xyz;
-    nt = nt * 2. - 1.;
-
-    // 2: normal from normal map
-    vec3 resultNormal = normalize(tbn * nt);
-    // blend mesh normal ~ normal map
-    // vec3 normal = mix(normal, normalize(tbn * nt));
-    // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
-
-    return resultNormal;
-}
-#endif
-
-#ifdef USE_ALPHA_TEST
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-#endif
+// TODO: needs??
+// ${insertUniforms || ''}
 
 void main() {
-    vec4 resultColor = vec4(0, 0, 0, 1);
-    
-    vec2 uv = vUv * uDiffuseMapUvScale;
-   
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-   
-    vec3 worldNormal = vNormal;
-   
-#ifdef USE_NORMAL_MAP
-    worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
-#else
-    worldNormal = normalize(vNormal);
-#endif  
 
-    Surface surface;
-    surface.worldPosition = vWorldPosition;
-    surface.worldNormal = worldNormal;
+    #pragma BEGIN_MAIN
+
+    vec4 localPosition = vec4(aPosition, 1.);
+
+    #include ./partial/skinning-vertex-calc.glsl;
     
-#ifdef USE_VERTEX_COLOR
-    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
-#else
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
+    #pragma LOCAL_POSITION_POST_PROCESS
+
+    #include ./partial/normal-map-vertex-calc.glsl;
+
+    // assign common varyings 
+    vUv = aUv;
+
+    vec4 worldPosition = uWorldMatrix * localPosition;
+
+#ifdef USE_INSTANCING
+    mat4 instanceTransform = mat4(
+        aInstanceScale.x,       0,                      0,                      0,
+        0,                      aInstanceScale.y,       0,                      0,
+        0,                      0,                      aInstanceScale.z,       0,
+        aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
+    );
+    
+    // NOTE: 本当はworldMatrixをかける前の方がよい
+    
+    worldPosition = instanceTransform * worldPosition;
 #endif
 
-    surface.specularAmount = uSpecularAmount;
+    #pragma WORLD_POSITION_POST_PROCESS
+ 
+    vWorldPosition = worldPosition.xyz;
+
+    #include ./partial/receive-shadow-vertex-calc.glsl
+
+    vec4 viewPosition = uViewMatrix * worldPosition;
+
+    #pragma VIEW_POSITION_POST_PROCESS
+
+    #pragma OUT_CLIP_POSITION_PRE_PROCESS
     
-    resulColor = surface.diffuseColor;
-
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+#if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
+    vVertexColor = aInstanceVertexColor;
 #endif
+ 
+    gl_Position = uProjectionMatrix * viewPosition;
 
-    // correct
-    outGBufferA = resultColor;
-    // outBaseColor = surface.diffuseColor;
-    outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
+    #pragma END_MAIN
 }

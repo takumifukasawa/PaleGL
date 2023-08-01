@@ -39,7 +39,7 @@ import {loadImg} from '@/PaleGL/loaders/loadImg';
 
 // materials
 import {Material} from '@/PaleGL/materials/Material';
-import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
+// import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
 
 // math
 import {Color} from '@/PaleGL/math/Color';
@@ -77,6 +77,7 @@ import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
 import {Attribute} from '@/PaleGL/core/Attribute';
 import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 import {CubeMap} from '@/PaleGL/core/CubeMap.ts';
+import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -468,7 +469,7 @@ const createGLTFSkinnedMesh = async () => {
     //     envMap: cubeMap,
     //     ambientAmount: 0.2,
     // });
-    skinningMesh.material = new PhongMaterial({
+    skinningMesh.material = new GBufferMaterial({
         // gpu,
         specularAmount: 0.5,
         receiveShadow: true,
@@ -476,8 +477,6 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
-        envMap: cubeMap,
-        ambientAmount: 0.2,
     });
 
     return skinningMesh;
@@ -538,15 +537,25 @@ const main = async () => {
     });
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
-        material: new PhongMaterial({
+        // material: new PhongMaterial({
+        //     // gpu,
+        //     // diffuseMap: floorDiffuseMap,
+        //     // normalMap: floorNormalMap,
+        //     envMap: cubeMap,
+        //     diffuseColor: new Color(0, 0, 0, 1),
+        //     receiveShadow: true,
+        //     specularAmount: 0.4,
+        //     ambientAmount: 0.2,
+        // }),
+        material: new GBufferMaterial({
             // gpu,
             // diffuseMap: floorDiffuseMap,
             // normalMap: floorNormalMap,
-            envMap: cubeMap,
+            // envMap: cubeMap,
             diffuseColor: new Color(0, 0, 0, 1),
             receiveShadow: true,
             specularAmount: 0.4,
-            ambientAmount: 0.2,
+            // ambientAmount: 0.2,
         }),
         castShadow: false,
     });

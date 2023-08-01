@@ -73,12 +73,14 @@ export class PostProcessPassBase implements IPostProcessPass {
         vertexShader,
         fragmentShader,
         uniforms,
+        useEnvMap,
         name = '',
     }: {
         gpu: GPU;
         vertexShader?: string;
         fragmentShader: string;
         uniforms?: Uniforms;
+        useEnvMap?: boolean;
         name?: string;
     }) {
         // super({name});
@@ -100,6 +102,7 @@ export class PostProcessPassBase implements IPostProcessPass {
                     value: null,
                 },
             },
+            useEnvMap: !!useEnvMap,
             primitiveType: PrimitiveTypes.Triangles,
         });
         this.materials.push(this.material);

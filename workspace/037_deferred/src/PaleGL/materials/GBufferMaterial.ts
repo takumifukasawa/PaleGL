@@ -1,5 +1,5 @@
 import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import {UniformNames, UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
+import { UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";

@@ -95,7 +95,7 @@ void main() {
 
     surface.specularAmount = uSpecularAmount;
     
-    resulColor = surface.diffuseColor;
+    resultColor = surface.diffuseColor;
 
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
