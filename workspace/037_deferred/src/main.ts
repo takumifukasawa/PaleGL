@@ -457,6 +457,17 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1,
         })
     );
+    // skinningMesh.material = new PhongMaterial({
+    //     // gpu,
+    //     specularAmount: 0.5,
+    //     receiveShadow: true,
+    //     isSkinning: true,
+    //     gpuSkinning: true,
+    //     isInstancing: true,
+    //     useVertexColor: true,
+    //     envMap: cubeMap,
+    //     ambientAmount: 0.2,
+    // });
     skinningMesh.material = new PhongMaterial({
         // gpu,
         specularAmount: 0.5,
@@ -467,29 +478,6 @@ const createGLTFSkinnedMesh = async () => {
         useVertexColor: true,
         envMap: cubeMap,
         ambientAmount: 0.2,
-        // vertexShaderModifier: {
-        //     [VertexShaderModifierPragmas.BEGIN_MAIN]: `vec3 hoge = vec3(0.);`,
-        //     [VertexShaderModifierPragmas.OUT_CLIP_POSITION_PRE_PROCESS]: `vVertexColor = aInstanceVertexColor;`,
-        // },
-        //         vertexShaderModifier: {
-        //             // worldPositionPostProcess: `
-        //             [VertexShaderModifiers.worldPositionPostProcess]: `
-        //     mat4 instanceTransform = mat4(
-        //         aInstanceScale.x,       0,                      0,                      0,
-        //         0,                      aInstanceScale.y,       0,                      0,
-        //         0,                      0,                      aInstanceScale.z,       0,
-        //         aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
-        //     );
-        //
-        //     // NOTE: 本当はworldMatrixをかける前の方がよい
-        //
-        //     worldPosition = instanceTransform * worldPosition;
-        // `,
-        //             // outClipPositionPreProcess: `
-        //             [VertexShaderModifiers.outClipPositionPreProcess]: `
-        //     vVertexColor = aInstanceVertexColor;
-        // `,
-        //         },
     });
 
     return skinningMesh;
