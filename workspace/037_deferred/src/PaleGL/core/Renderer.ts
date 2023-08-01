@@ -24,7 +24,7 @@ import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera.ts";
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
-import deferredLightingFragmentShader from '@/PaleGL/shaders/deferred-lighting-fragment.glsl';
+import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number, queue: RenderQueueType };
@@ -100,7 +100,7 @@ export class Renderer {
         // console.log(this._copyDepthDestRenderTarget)
         this._deferredLightingPass = new FragmentPass({
             gpu,
-            fragmentShader: deferredLightingFragmentShader,
+            fragmentShader: deferredShadingFragmentShader,
             uniforms: {
                 // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
                 uBaseColorTexture: {
