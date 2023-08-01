@@ -25,6 +25,7 @@ import {OrthographicCamera} from "@/PaleGL/actors/OrthographicCamera.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
 import deferredLightingFragmentShader from '@/PaleGL/shaders/deferred-lighting-fragment.glsl';
+import {Vector3} from "@/PaleGL/math/Vector3.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number, queue: RenderQueueType };
 
@@ -99,7 +100,34 @@ export class Renderer {
         // console.log(this._copyDepthDestRenderTarget)
         this._deferredLightingPass = new FragmentPass({
             gpu,
-            fragmentShader: deferredLightingFragmentShader
+            fragmentShader: deferredLightingFragmentShader,
+            uniforms: {
+                // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
+                uBaseColorTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                [UniformNames.DepthTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                [UniformNames.ViewPosition]: {
+                    type: UniformTypes.Vector3,
+                    value: Vector3.zero
+                },
+                [UniformNames.InverseViewProjectionMatrix]: {
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity
+                },
+                [UniformNames.CameraNear]: {
+                    type: UniformTypes.Float,
+                    value:0,
+                },
+                [UniformNames.CameraFar]: {
+                    type: UniformTypes.Float,
+                    value:0,
+                }
+            }
         });
     }
 
@@ -328,8 +356,9 @@ export class Renderer {
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
             isLastPass: false,
-            time: performance.now() // TODO: engineから渡したい
+            time: performance.now() / 1000 // TODO: engineから渡したい
         });
+        // console.log(this._deferredLightingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
         
         // ------------------------------------------------------------------------------
         // transparent pass

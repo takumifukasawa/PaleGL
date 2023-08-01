@@ -360,7 +360,7 @@ void main() {
         },
     },
 });
-showBuffersPass.enabled = false;
+showBuffersPass.enabled = true;
 scenePostProcess.addPass(showBuffersPass);
 showBuffersPass.beforeRender = () => {
     showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);

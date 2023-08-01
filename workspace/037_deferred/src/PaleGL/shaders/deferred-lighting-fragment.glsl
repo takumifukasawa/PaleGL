@@ -4,11 +4,7 @@ precision mediump float;
 
 #pragma DEFINES
 
-#include ./partial/receive-shadow-fragment-uniforms.glsl
-
 uniform vec3 uViewPosition;
-
-#include ./partial/alpha-test-fragment-uniforms.glsl
 
 #include ./partial/directional-light-struct.glsl
 #include ./partial/directional-light-uniforms.glsl
@@ -22,6 +18,8 @@ struct Surface {
 
 #include ./partial/camera-struct.glsl
 
+#pragma DEPTH_FUNCTIONS
+
 in vec2 vUv;
 
 // TODO
@@ -30,7 +28,12 @@ uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uNormalTexture;
 
-layout (location = 0) out vec4 outBaseColor;
+uniform float uNearClip;
+uniform float uFarClip;
+
+uniform mat4 uInverseViewProjectionMatrix;
+
+layout (location = 0) out vec4 outColor;
 
 vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
     vec3 N = normalize(surface.worldNormal);
@@ -65,6 +68,7 @@ vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Ca
 }
 
 
+uniform float uTime;
 void main() {
     vec2 uv = vUv;
 
@@ -72,23 +76,26 @@ void main() {
    
     vec3 worldNormal = texture(uNormalTexture, uv).xyz * .5 + .5;
    
-#ifdef USE_NORMAL_MAP
-    worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
-#else
-    worldNormal = normalize(vNormal);
-#endif  
+    float rawDepth = texture(uDepthTexture, uv).r; 
+    float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+
+    vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+
+    outColor = vec4(worldPosition, 1.);
+    // outColor = vec4(vec3(depth), 1.);
+    // outColor = vec4(mod(uTime, 1.), 1., 1., 1.);
+    outColor = vec4(uViewPosition, 1.);
 
     Surface surface;
-    surface.worldPosition = vWorldPosition;
+    surface.worldPosition = worldPosition;
     surface.worldNormal = worldNormal;
+    surface.diffuseColor = baseColor;
     
-#ifdef USE_VERTEX_COLOR
-    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
-#else
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
-#endif
+    outColor = baseColor;
+    return;
 
-    surface.specularAmount = uSpecularAmount;
+    // TODO: bufferから引っ張ってくる
+    surface.specularAmount = .5;
 
     Camera camera;
     camera.worldPosition = uViewPosition;

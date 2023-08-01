@@ -193,5 +193,6 @@ void main() {
 
     // correct
     outBaseColor = resultColor;
+    // outBaseColor = surface.diffuseColor;
     outNormalColor = vec4(worldNormal * .5 + .5, 1.); 
 }

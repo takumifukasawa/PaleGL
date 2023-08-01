@@ -1,5 +1,5 @@
 ﻿import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
-import {Vector3} from '@/PaleGL/math/Vector3';
+// import {Vector3} from '@/PaleGL/math/Vector3';
 import {Camera} from '@/PaleGL/actors/Camera';
 import {IPostProcessPass} from '@/PaleGL/postprocess/IPostProcessPass';
 import {GPU} from '@/PaleGL/core/GPU';
