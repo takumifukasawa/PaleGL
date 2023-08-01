@@ -364,7 +364,7 @@ void main() {
 showBuffersPass.enabled = true;
 scenePostProcess.addPass(showBuffersPass);
 showBuffersPass.beforeRender = () => {
-    showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
+    // showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 }
 
 scenePostProcess.enabled = true;
@@ -552,7 +552,7 @@ const main = async () => {
             // diffuseMap: floorDiffuseMap,
             // normalMap: floorNormalMap,
             // envMap: cubeMap,
-            diffuseColor: new Color(0, 0, 0, 1),
+            diffuseColor: new Color(0.05, 0.05, 0.05, 1),
             receiveShadow: true,
             specularAmount: 0.4,
             // ambientAmount: 0.2,

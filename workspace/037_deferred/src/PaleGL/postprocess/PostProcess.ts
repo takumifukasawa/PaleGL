@@ -92,6 +92,7 @@ export class PostProcess {
             passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
             passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
             passMaterial.updateUniform(UniformNames.Time, time);
+            passMaterial.updateUniform(UniformNames.ViewPosition, targetCamera.transform.position);
             passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
             passMaterial.updateUniform(UniformNames.InverseViewProjectionMatrix, targetCamera.inverseViewProjectionMatrix);
             passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);

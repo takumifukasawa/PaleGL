@@ -134,6 +134,10 @@ export class Renderer {
                     type: UniformTypes.Float,
                     value: 0,
                 },
+                [UniformNames.ViewPosition]: {
+                    type: UniformTypes.Vector3,
+                    value: Vector3.zero
+                },
                 [UniformNames.DirectionalLight]: {
                     type: UniformTypes.Struct,
                     value: {

@@ -22,12 +22,6 @@ struct Surface {
 
 #include ./partial/env-map-fragment-functions.glsl
 
-mat2 rotate(float r) {
-    float c = cos(r);
-    float s = sin(r);
-    return mat2(c, s, -s, c);
-}
-
 in vec2 vUv;
 
 // TODO
@@ -120,7 +114,7 @@ void main() {
     // directional light
     resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
    
-    outColor = resultColor;
+    // outColor = resultColor;
     // outColor.xyz = worldNormal;
     // return;
     
@@ -131,16 +125,11 @@ void main() {
         normalize(surface.worldNormal)
     );
     // TODO: bufferからか何かしらで引っ張ってくる
-    float uAmbientAmount = 1.;
-    // TODO: fixme
+    float uAmbientAmount = .4;
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
-    outColor.xyz = envDir;
-    return;
 #endif
-   
-    
 
-        // resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
+    // resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
 
     // correct
     outColor = resultColor;
