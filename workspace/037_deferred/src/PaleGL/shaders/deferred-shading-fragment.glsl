@@ -76,9 +76,9 @@ uniform vec3 uViewPosition;
 
 // TODO
 // uniform sampler2D uAOTexture; 
-uniform sampler2D uBaseColorTexture;
+uniform sampler2D uGBufferATexture;
+uniform sampler2D uGBufferBTexture;
 uniform sampler2D uDepthTexture;
-uniform sampler2D uNormalTexture;
 // uniform sampler2D uShadowMap;
 uniform samplerCube uEnvMap;
 
@@ -128,9 +128,9 @@ void main() {
 
     vec2 uv = vUv;
 
-    vec4 baseColor = texture(uBaseColorTexture, uv);
+    vec4 baseColor = texture(uGBufferATexture, uv);
    
-    vec3 worldNormal = texture(uNormalTexture, uv).xyz * 2. - 1.;
+    vec3 worldNormal = texture(uGBufferBTexture, uv).xyz * 2. - 1.;
    
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);

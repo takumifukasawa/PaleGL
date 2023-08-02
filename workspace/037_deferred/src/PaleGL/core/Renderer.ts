@@ -107,11 +107,11 @@ export class Renderer {
             fragmentShader: deferredShadingFragmentShader,
             uniforms: {
                 // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
-                uBaseColorTexture: {
+                [UniformNames.GBufferATexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.GBufferNormalTexture]: {
+                [UniformNames.GBufferBTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },

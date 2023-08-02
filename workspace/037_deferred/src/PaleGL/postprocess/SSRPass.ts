@@ -69,10 +69,14 @@ export class SSRPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uBaseColorTexture: {
+                [UniformNames.GBufferBTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                // uBaseColorTexture: {
+                //     type: UniformTypes.Texture,
+                //     value: null,
+                // },
                 uNormalTexture: {
                     type: UniformTypes.Texture,
                     value: null,

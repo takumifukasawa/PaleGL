@@ -11,9 +11,10 @@ out vec4 outColor;
 uniform float uTime;
 
 uniform sampler2D uSrcTexture;
-uniform sampler2D uBaseColorTexture;
+// uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
-uniform sampler2D uNormalTexture;
+// uniform sampler2D uNormalTexture;
+uniform sampler2D uGBufferBTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform mat4 uTransposeInverseViewMatrix;
@@ -58,7 +59,7 @@ void main() {
 
     vec2 uv = vUv;
 
-    vec3 worldNormal = normalize(texture(uNormalTexture, uv).xyz * 2. - 1.);
+    vec3 worldNormal = normalize(texture(uGBufferBTexture, uv).xyz * 2. - 1.);
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
     // TODO: PBRな場合はroughnessを考慮

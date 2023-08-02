@@ -4,6 +4,12 @@ import { GLColorAttachment, TextureFilterTypes, TextureTypes } from '@/PaleGL/co
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
+// ---------------------------------------------------------
+// [GBufferA: RGBA8] rgb: base color, a: unused
+// [GBufferB: RGBA8] rgb: normal, a: unused
+// [Depth] depth prepass depth
+// ---------------------------------------------------------
+
 // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 export class GBufferRenderTargets extends AbstractRenderTarget {
     gpu: GPU;
@@ -12,20 +18,20 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     height: number;
     private _framebuffer: Framebuffer;
     private _textures: Texture[] = [];
-    private _baseColorTexture: Texture;
-    private _normalTexture: Texture;
+    private _gBufferATexture: Texture;
+    private _gBufferBTexture: Texture;
     private _depthTexture: Texture | null = null
 
     get textures() {
         return this._textures;
     }
 
-    get baseColorTexture() {
-        return this._baseColorTexture;
+    get gBufferATexture() {
+        return this._gBufferATexture;
     }
 
-    get normalTexture() {
-        return this._normalTexture;
+    get gBufferBTexture() {
+        return this._gBufferBTexture;
     }
 
     get depthTexture() {
@@ -74,7 +80,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         this._framebuffer.bind();
 
         // 1: base scene
-        this._baseColorTexture = new Texture({
+        this._gBufferATexture = new Texture({
             gpu,
             width: this.width,
             height: this.height,
@@ -87,14 +93,14 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + 0,
             gl.TEXTURE_2D,
-            this._baseColorTexture.glObject,
+            this._gBufferATexture.glObject,
             0
         );
-        this._textures.push(this._baseColorTexture);
+        this._textures.push(this._gBufferATexture);
         this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 0) as GLColorAttachment);
 
         // 2: normal
-        this._normalTexture = new Texture({
+        this._gBufferBTexture = new Texture({
             gpu,
             width: this.width,
             height: this.height,
@@ -107,12 +113,12 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + 1,
             gl.TEXTURE_2D,
-            this._normalTexture.glObject,
+            this._gBufferBTexture.glObject,
             0
         );
         this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 1) as GLColorAttachment);
 
-        this._textures.push(this._normalTexture);
+        this._textures.push(this._gBufferBTexture);
 
         // 3: depth
         // this._depthTexture = new Texture({

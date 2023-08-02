@@ -114,6 +114,10 @@ export class SSAOPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: 1,
                 },
+                [UniformNames.GBufferBTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null
+                },
                 uBaseColorTexture: {
                     type: UniformTypes.Texture,
                     value: null,
