@@ -297,9 +297,10 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+uniform sampler2D uDepthTexture;
 uniform sampler2D uBaseColorTexture;
 uniform sampler2D uNormalTexture;
-uniform sampler2D uDepthTexture;
+uniform sampler2D uDirectionalLightShadowMap;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
@@ -312,10 +313,11 @@ float isArea(vec2 uv) {
 }
 
 void main() {
-    vec2 baseColorUV = vUv * 2. + vec2(0., -1.);
-    vec2 normalUV = vUv * 2. + vec2(-1., -1.);
-    vec2 depthUV = vUv * 2. + vec2(0., 0.);
-    vec2 worldPositionUV = vUv * 2. + vec2(-1., 0.);
+    vec2 baseColorUV = vUv * 3. + vec2(0., -2.);
+    vec2 depthUV = vUv * 3. + vec2(-1., -2.);
+    vec2 normalUV = vUv * 3. + vec2(-2., -2.);
+    vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
+    vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
     // vec2 depthUV = vUv;
     
     vec4 baseColor = texture(uBaseColorTexture, baseColorUV) * isArea(baseColorUV);
@@ -331,7 +333,14 @@ void main() {
         uInverseViewProjectionMatrix
     ) * isArea(worldPositionUV);
     
-    outColor = baseColor + normalColor + sceneDepth + vec4(worldPosition, 1.);
+    vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
+
+    outColor =
+        baseColor +
+        normalColor +
+        sceneDepth +
+        directionalShadowMapColor +
+        vec4(worldPosition, 1.);
 }
 `,
     uniforms: {
@@ -344,6 +353,10 @@ void main() {
             value: null,
         },
         uDepthTexture: {
+            type: UniformTypes.Texture,
+            value: null,
+        },
+        uDirectionalLightShadowMap: {
             type: UniformTypes.Texture,
             value: null,
         },
@@ -361,10 +374,10 @@ void main() {
         },
     },
 });
-showBuffersPass.enabled = false;
+showBuffersPass.enabled = true;
 scenePostProcess.addPass(showBuffersPass);
 showBuffersPass.beforeRender = () => {
-    showBuffersPass.material.updateUniform('uBaseColorTexture', directionalLight.shadowMap!.read.depthTexture);
+    showBuffersPass.material.updateUniform('uDirectionalLightShadowMap', directionalLight.shadowMap!.read.depthTexture);
     // showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 }
 
