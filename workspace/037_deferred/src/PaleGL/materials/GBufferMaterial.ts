@@ -1,5 +1,5 @@
 import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import { UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import { DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -117,7 +117,7 @@ export class GBufferMaterial extends Material {
         // TODO: できるだけconstructorの直後に持っていきたい
         super({
             ...options,
-            name: 'PhongMaterial',
+            name: 'GBufferMaterial',
             // vertexShaderGenerator,
             // vertexShader,
             // fragmentShaderGenerator,
@@ -126,6 +126,9 @@ export class GBufferMaterial extends Material {
             uniforms: mergedUniforms,
             depthUniforms,
             useNormalMap: !!normalMap,
+            depthTest: true,
+            depthWrite: false,
+            depthFuncType: DepthFuncTypes.Equal,
         });
     }
 

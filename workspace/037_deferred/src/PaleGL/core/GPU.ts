@@ -1,6 +1,6 @@
 ﻿import {
     BlendType,
-    BlendTypes,
+    BlendTypes, DepthFuncType, DepthFuncTypes,
     FaceSide,
     PrimitiveType,
     PrimitiveTypes,
@@ -122,6 +122,7 @@ export class GPU {
         primitiveType: PrimitiveType,
         depthTest: boolean,
         depthWrite: boolean,
+        depthFuncType: DepthFuncType,
         blendType: BlendType,
         faceSide: FaceSide,
         instanceCount: number | null,
@@ -149,16 +150,27 @@ export class GPU {
             default:
                 throw 'invalid face side';
         }
+        
+        // console.log(depthTest, depthWrite, depthFuncType)
 
         // depth write
         gl.depthMask(depthWrite);
         // for debug
         // console.log(gl.getParameter(gl.DEPTH_WRITEMASK));
-
+        
         // depth test
         if (depthTest) {
             gl.enable(gl.DEPTH_TEST);
-            gl.depthFunc(gl.LEQUAL); // TODO: set by arg
+            switch(depthFuncType) {
+                case DepthFuncTypes.Equal:
+                    gl.depthFunc(gl.EQUAL);
+                    break;
+                case DepthFuncTypes.Lequal:
+                    gl.depthFunc(gl.LEQUAL);
+                    break;
+                default:
+                    throw 'invalid depth func type';
+            }
         } else {
             gl.disable(gl.DEPTH_TEST);
         }

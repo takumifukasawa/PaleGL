@@ -27,9 +27,9 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import {Skybox} from "@/PaleGL/actors/Skybox.ts";
-import {DeferredShadingPass} from "@/PaleGL/postprocess/DeferresShadingPass.ts";
-import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
+import { Skybox } from '@/PaleGL/actors/Skybox.ts';
+import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts';
+import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -121,7 +121,7 @@ export class Renderer {
                 },
                 [UniformNames.ShadowMap]: {
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 [UniformNames.ViewPosition]: {
                     type: UniformTypes.Vector3,
@@ -141,7 +141,7 @@ export class Renderer {
                 },
                 [UniformNames.ViewPosition]: {
                     type: UniformTypes.Vector3,
-                    value: Vector3.zero
+                    value: Vector3.zero,
                 },
                 [UniformNames.DirectionalLight]: {
                     type: UniformTypes.Struct,
@@ -337,10 +337,10 @@ export class Renderer {
             .filter(({ actor }) => actor.enabled);
 
         // skybox
-        const sortedSkyboxRenderMeshInfos: RenderMeshInfo[] =sortedRenderMeshInfos.filter((renderMeshInfo) => {
+        const sortedSkyboxRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
             return renderMeshInfo.queue === RenderQueueType.Skybox;
         });
-        
+
         // base pass mesh infos
         const sortedBasePassRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
             return (
@@ -391,7 +391,8 @@ export class Renderer {
         // camera.setRenderTarget(this._gBufferRenderTargets);
         // this.setRenderTarget(this._gBufferRenderTargets.write);
 
-        this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
+        // this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
+        this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
         // deferred lighting pass
@@ -417,8 +418,11 @@ export class Renderer {
                         value: light.color,
                     },
                 });
-                if(light.shadowMap) {
-                    this._deferredShadingPass.material.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.texture);
+                if (light.shadowMap) {
+                    this._deferredShadingPass.material.updateUniform(
+                        UniformNames.ShadowMap,
+                        light.shadowMap.read.texture
+                    );
                 }
             }
             if (
@@ -440,10 +444,10 @@ export class Renderer {
             }
         });
         // update cubemap
-        sortedSkyboxRenderMeshInfos.forEach(skyboxRenderMeshInfo => {
+        sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
             const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
             const cubeMap: CubeMap = skyboxActor.cubeMap;
-            this._deferredShadingPass.material.updateUniform("uEnvMap", cubeMap);
+            this._deferredShadingPass.material.updateUniform('uEnvMap', cubeMap);
         });
 
         PostProcess.renderPass({
@@ -464,7 +468,7 @@ export class Renderer {
 
         this._afterGBufferRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterGBufferRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
-        
+
         // pattern1: g-buffer depth
         // this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         // pattern2: depth prepass
@@ -512,6 +516,8 @@ export class Renderer {
         if (camera.postProcess) {
             targetPostProcesses.push(camera.postProcess);
         }
+        
+        // console.log("--------- postprocess pass ---------");
 
         targetPostProcesses.forEach((postProcess, i) => {
             postProcess.render({
@@ -570,12 +576,16 @@ export class Renderer {
         // setup depth test
         const depthTest = !!material.depthTest;
 
+        // depth func type
+        const depthFuncType = material.depthFuncType;
+
         // draw
         this.gpu.draw(
             geometry.drawCount,
             material.primitiveType,
             depthTest,
             depthWrite,
+            depthFuncType,
             material.blendType,
             material.faceSide,
             geometry.instanceCount
@@ -620,6 +630,8 @@ export class Renderer {
      * @private
      */
     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+        // console.log("--------- depth pre pass ---------");
+        
         this.setRenderTarget(this._depthPrePassRenderTarget);
 
         // depthなのでclear
@@ -631,6 +643,8 @@ export class Renderer {
             if (!depthMaterial) {
                 throw '[Renderer.depthPrePass] invalid depth material';
             }
+
+            // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
             depthMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
             depthMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
@@ -646,6 +660,8 @@ export class Renderer {
      * @private
      */
     private shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
+        // console.log("--------- shadow pass ---------");
+        
         castShadowLightActors.forEach((lightActor) => {
             if (!lightActor.shadowMap) {
                 throw 'invalid shadow pass';
@@ -702,17 +718,19 @@ export class Renderer {
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
         lightActors: Light[],
-        clear: boolean = true
+        // clear: boolean = true
     ) {
+        // console.log("--------- scene pass ---------");
+        
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         this.setRenderTarget(this._gBufferRenderTargets.write);
 
-        // TODO: refactor
-        if (clear) {
-            this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
-        }
+        // TODO: depth prepass しない場合は必要
+        // if (clear) {
+        //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        // }
 
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
@@ -793,6 +811,8 @@ export class Renderer {
         lightActors: Light[],
         clear: boolean
     ) {
+        // console.log("--------- transparent pass ---------");
+        
         // TODO: refactor
         if (clear) {
             this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);

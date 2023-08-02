@@ -11,7 +11,7 @@ import {
     RenderQueue,
     UniformType,
     VertexShaderModifier,
-    FragmentShaderModifier,
+    FragmentShaderModifier, DepthFuncType, DepthFuncTypes,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
@@ -50,6 +50,7 @@ export type MaterialArgs = {
     primitiveType?: PrimitiveType;
     depthTest?: boolean | null;
     depthWrite?: boolean | null;
+    depthFuncType?: DepthFuncType;
     alphaTest?: number | null;
     faceSide?: FaceSide;
     receiveShadow?: boolean;
@@ -148,6 +149,7 @@ export class Material {
     depthUniforms: Uniforms;
     depthTest: boolean | null;
     depthWrite: boolean | null;
+    depthFuncType: DepthFuncType;
     alphaTest: number | null;
     // culling;
     faceSide: FaceSide;
@@ -217,6 +219,7 @@ export class Material {
         primitiveType,
         depthTest = true,
         depthWrite = true,
+        depthFuncType = DepthFuncTypes.Lequal,
         alphaTest = null,
         faceSide = FaceSide.Front,
         receiveShadow = false,
@@ -275,8 +278,11 @@ export class Material {
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
         this.blendType = blendType || BlendTypes.Opaque;
 
-        this.depthTest = depthTest ? !!depthTest : true;
+        // this.depthTest = depthTest ? !!depthTest : true;
+        this.depthTest = !!depthTest;
         this.depthWrite = !!depthWrite;
+        this.depthFuncType = depthFuncType;
+        
         this.alphaTest = typeof alphaTest === 'number' ? alphaTest : null;
 
         this.faceSide = faceSide || FaceSide.Front;

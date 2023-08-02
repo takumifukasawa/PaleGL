@@ -14,6 +14,13 @@ export const PrimitiveTypes = {
 
 export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
 
+export const DepthFuncTypes = {
+    Lequal: "LEQUAL",
+    Equal: "EQUAL",
+} as const;
+
+export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
+
 export const UniformTypes = {
     Matrix4: 'Matrix4',
     Matrix4Array: 'Matrix4Array',
