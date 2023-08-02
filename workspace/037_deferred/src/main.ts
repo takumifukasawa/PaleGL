@@ -48,12 +48,13 @@ import {Vector3} from '@/PaleGL/math/Vector3';
 import {Vector4} from '@/PaleGL/math/Vector4';
 
 // postprocess
-import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
+// import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
 // import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
 import {FXAAPass} from '@/PaleGL/postprocess/FXAAPass';
 import {BloomPass} from '@/PaleGL/postprocess/BloomPass';
 import {SSAOPass} from '@/PaleGL/postprocess/SSAOPass';
 import {SSRPass} from '@/PaleGL/postprocess/SSRPass';
+import {BufferVisualizerPass} from '@/PaleGL/postprocess/BufferVisualizerPass';
 
 // inputs
 import {TouchInputController} from '@/PaleGL/inputs/TouchInputController';
@@ -67,7 +68,7 @@ import {
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
-    AttributeNames, UniformNames,
+    AttributeNames,
 } from '@/PaleGL/constants';
 
 import {DebuggerGUI} from '@/DebuggerGUI';
@@ -75,7 +76,7 @@ import {Camera} from '@/PaleGL/actors/Camera';
 // import {Light} from "@/PaleGL/actors/Light";
 import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
 import {Attribute} from '@/PaleGL/core/Attribute';
-import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
+// import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 import {CubeMap} from '@/PaleGL/core/CubeMap.ts';
 import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
@@ -287,98 +288,12 @@ const fxaaPass = new FXAAPass({gpu});
 fxaaPass.enabled = true;
 scenePostProcess.addPass(fxaaPass);
 
-const showBuffersPass = new FragmentPass({
-    gpu,
-    fragmentShader: `#version 300 es
- 
-precision highp float;
-
-in vec2 vUv;
-
-out vec4 outColor;
-
-uniform sampler2D uDepthTexture;
-uniform sampler2D uGBufferATexture;
-uniform sampler2D uGBufferBTexture;
-uniform sampler2D uDirectionalLightShadowMap;
-uniform float uNearClip;
-uniform float uFarClip;
-uniform float uShowGBuffer;
-uniform mat4 uInverseViewProjectionMatrix;
-
-#pragma DEPTH_FUNCTIONS
-
-float isArea(vec2 uv) {
-    return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
-}
-
-void main() {
-    vec2 depthUV = vUv * 3. + vec2(0., -2.);
-    vec2 gBufferAUV = vUv * 3. + vec2(-1., -2.);
-    vec2 gBufferBUV = vUv * 3. + vec2(-2., -2.);
-    vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
-    vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
-    // vec2 depthUV = vUv;
-    
-    vec4 baseColor = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
-    vec4 normalColor = (texture(uGBufferBTexture, gBufferBUV) * 2. - 1.) * isArea(gBufferBUV);
-    
-    float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
-    // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip) * isArea(depthUV);
-
-    vec3 worldPosition = reconstructWorldPositionFromDepth(
-        worldPositionUV,
-        texture(uDepthTexture, worldPositionUV).x,
-        uInverseViewProjectionMatrix
-    ) * isArea(worldPositionUV);
-    
-    vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
-
-    outColor =
-        baseColor +
-        normalColor +
-        sceneDepth +
-        directionalShadowMapColor +
-        vec4(worldPosition, 1.);
-}
-`,
-    uniforms: {
-        [UniformNames.GBufferATexture]: {
-            type: UniformTypes.Texture,
-            value: null,
-        },
-        [UniformNames.GBufferBTexture]: {
-            type: UniformTypes.Texture,
-            value: null,
-        },
-        uDepthTexture: {
-            type: UniformTypes.Texture,
-            value: null,
-        },
-        uDirectionalLightShadowMap: {
-            type: UniformTypes.Texture,
-            value: null,
-        },
-        uNearClip: {
-            type: UniformTypes.Float,
-            value: captureSceneCamera.near,
-        },
-        uFarClip: {
-            type: UniformTypes.Float,
-            value: captureSceneCamera.far,
-        },
-        uInverseViewProjectionMatrix: {
-            type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
-        },
-    },
-});
-showBuffersPass.enabled = true;
-scenePostProcess.addPass(showBuffersPass);
-showBuffersPass.beforeRender = () => {
-    showBuffersPass.material.updateUniform('uDirectionalLightShadowMap', directionalLight.shadowMap!.read.depthTexture);
-    // showBuffersPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
+const bufferVisualizerPass = new BufferVisualizerPass({gpu});
+bufferVisualizerPass.enabled = true;
+scenePostProcess.addPass(bufferVisualizerPass);
+bufferVisualizerPass.beforeRender = () => {
+    bufferVisualizerPass.material.updateUniform('uDirectionalLightShadowMap', directionalLight.shadowMap!.read.depthTexture);
+    // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 }
 
 scenePostProcess.enabled = true;
@@ -860,7 +775,7 @@ void main() {
     engine.onBeforeFixedUpdate = () => {
         inputController.fixedUpdate();
     };
-    
+
     engine.onRender = () => {
         renderer.render(captureScene, captureSceneCamera);
     };
@@ -904,8 +819,8 @@ function initDebugger() {
 
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
-        initialValue: showBuffersPass.enabled,
-        onChange: (value) => (showBuffersPass.enabled = value),
+        initialValue: bufferVisualizerPass.enabled,
+        onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
 
     debuggerGUI.addBorderSpacer();
