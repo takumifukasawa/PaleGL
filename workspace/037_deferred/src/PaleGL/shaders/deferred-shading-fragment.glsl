@@ -175,7 +175,7 @@ void main() {
         normalize(surface.worldNormal)
     );
     // TODO: bufferからか何かしらで引っ張ってくる
-    float uAmbientAmount = .4;
+    float uAmbientAmount = .2;
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
 

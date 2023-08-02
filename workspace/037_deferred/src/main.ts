@@ -39,7 +39,7 @@ import {loadImg} from '@/PaleGL/loaders/loadImg';
 
 // materials
 import {Material} from '@/PaleGL/materials/Material';
-import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
+// import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
 
 // math
 import {Color} from '@/PaleGL/math/Color';
@@ -313,8 +313,8 @@ float isArea(vec2 uv) {
 }
 
 void main() {
-    vec2 baseColorUV = vUv * 3. + vec2(0., -2.);
-    vec2 depthUV = vUv * 3. + vec2(-1., -2.);
+    vec2 depthUV = vUv * 3. + vec2(0., -2.);
+    vec2 baseColorUV = vUv * 3. + vec2(-1., -2.);
     vec2 normalUV = vUv * 3. + vec2(-2., -2.);
     vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
     vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
@@ -551,26 +551,27 @@ const main = async () => {
     });
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
-        material: new PhongMaterial({
-            // gpu,
-            // diffuseMap: floorDiffuseMap,
-            // normalMap: floorNormalMap,
-            envMap: cubeMap,
-            diffuseColor: new Color(0, 0, 0, 1),
-            receiveShadow: true,
-            specularAmount: 0.4,
-            ambientAmount: 0.2,
-        }),
-        // material: new GBufferMaterial({
+        // material: new PhongMaterial({
         //     // gpu,
         //     // diffuseMap: floorDiffuseMap,
         //     // normalMap: floorNormalMap,
-        //     // envMap: cubeMap,
-        //     diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+        //     envMap: cubeMap,
+        //     diffuseColor: new Color(0, 0, 0, 1),
         //     receiveShadow: true,
         //     specularAmount: 0.4,
-        //     // ambientAmount: 0.2,
+        //     ambientAmount: 0.2,
         // }),
+        material: new GBufferMaterial({
+            // gpu,
+            // diffuseMap: floorDiffuseMap,
+            // normalMap: floorNormalMap,
+            // envMap: cubeMap,
+            // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+            diffuseColor: new Color(0, 0, 0, 1),
+            receiveShadow: true,
+            specularAmount: 0.4,
+            // ambientAmount: 0.2,
+        }),
         castShadow: false,
     });
     floorPlaneMesh.onStart = ({actor}) => {
