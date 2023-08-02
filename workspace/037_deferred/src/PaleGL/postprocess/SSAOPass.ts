@@ -118,10 +118,10 @@ export class SSAOPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null
                 },
-                uBaseColorTexture: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
+                // uBaseColorTexture: {
+                //     type: UniformTypes.Texture,
+                //     value: null,
+                // },
                 uNormalTexture: {
                     type: UniformTypes.Texture,
                     value: null,
