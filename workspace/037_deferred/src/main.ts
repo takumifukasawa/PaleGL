@@ -1,8 +1,8 @@
 // import "@/style.css";
 
 import smokeImgUrl from '../images/particle-smoke.png?url';
-// import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
-// import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
+import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../images/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../images/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
@@ -39,7 +39,7 @@ import {loadImg} from '@/PaleGL/loaders/loadImg';
 
 // materials
 import {Material} from '@/PaleGL/materials/Material';
-import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
+// import {PhongMaterial} from '@/PaleGL/materials/PhongMaterial';
 
 // math
 import {Color} from '@/PaleGL/math/Color';
@@ -62,8 +62,8 @@ import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
 // others
 import {
     UniformTypes,
-    // TextureWrapTypes,
-    // TextureFilterTypes,
+    TextureWrapTypes,
+    TextureFilterTypes,
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
@@ -150,8 +150,8 @@ debuggerStates.instanceNum = instanceNum;
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-// let floorDiffuseMap: Texture;
-// let floorNormalMap: Texture;
+let floorDiffuseMap: Texture;
+let floorNormalMap: Texture;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 
@@ -503,27 +503,27 @@ const main = async () => {
         img: particleImg,
     });
 
-    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    // floorDiffuseMap = new Texture({
-    //     gpu,
-    //     img: floorDiffuseImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    floorDiffuseMap = new Texture({
+        gpu,
+        img: floorDiffuseImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
-    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    // floorNormalMap = new Texture({
-    //     gpu,
-    //     img: floorNormalImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    floorNormalMap = new Texture({
+        gpu,
+        img: floorNormalImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
     const images = {
         [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
@@ -551,28 +551,28 @@ const main = async () => {
     });
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
-        material: new PhongMaterial({
-            // gpu,
-            // diffuseMap: floorDiffuseMap,
-            // normalMap: floorNormalMap,
-            envMap: cubeMap,
-            diffuseColor: new Color(0, 0, 0, 1),
-            receiveShadow: true,
-            specularAmount: 0.4,
-            ambientAmount: 0.2,
-        }),
-        // material: new GBufferMaterial({
+        // material: new PhongMaterial({
         //     // gpu,
-        //     diffuseMap: floorDiffuseMap,
-        //     normalMap: floorNormalMap,
-        //     // envMap: cubeMap,
-        //     // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+        //     // diffuseMap: floorDiffuseMap,
+        //     // normalMap: floorNormalMap,
+        //     envMap: cubeMap,
         //     diffuseColor: new Color(0, 0, 0, 1),
-        //     // diffuseColor: new Color(1, 1, 1, 1),
         //     receiveShadow: true,
         //     specularAmount: 0.4,
-        //     // ambientAmount: 0.2,
+        //     ambientAmount: 0.2,
         // }),
+        material: new GBufferMaterial({
+            // gpu,
+            diffuseMap: floorDiffuseMap,
+            normalMap: floorNormalMap,
+            // envMap: cubeMap,
+            // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+            // diffuseColor: new Color(0, 0, 0, 1),
+            diffuseColor: new Color(1, 1, 1, 1),
+            receiveShadow: true,
+            specularAmount: 0.4,
+            // ambientAmount: 0.2,
+        }),
         castShadow: false,
     });
     floorPlaneMesh.onStart = ({actor}) => {
@@ -1222,17 +1222,21 @@ function initDebugger() {
         },
     });
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
     //
     // fxaa
     //
 
-    debuggerGUI.addToggleDebugger({
-        label: 'fxaa pass enabled',
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => (fxaaPass.enabled = value),
-    });
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'fxaa pass enabled',
+    //     initialValue: fxaaPass.enabled,
+    //     onChange: (value) => (fxaaPass.enabled = value),
+    // });
+
+    //
+    // add debugger ui
+    //
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
