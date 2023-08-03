@@ -447,7 +447,7 @@ export class Material {
     // - 'updateUniformValue'の方が良い??
     updateUniform(name: string, value: UniformValue): void {
         if (!this.uniforms[name]) {
-            // throw `[Material.updateUniform] invalid uniform key: ${name}`;
+            // throw `[Material.updateUniform] material: ${this.name}, invalid uniform key: ${name}`;
             return;
         }
         this.uniforms[name].value = value;

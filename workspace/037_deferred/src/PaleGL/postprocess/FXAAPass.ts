@@ -17,14 +17,14 @@ export class FXAAPass extends PostProcessPassBase {
             gpu,
             fragmentShader,
             uniforms: {
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
+                // uTargetWidth: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // uTargetHeight: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
                 // 1/32 = 0.03125 ... visible limit
                 // 1/16 = 0.0625 ... high quality
                 // 1/12 = 0.0833 ... upper limit
@@ -44,6 +44,7 @@ export class FXAAPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: 0.75,
                 },
+                // ...PostProcessPassBase.commonUniforms,
             },
         });
         // this.gpu = gpu;

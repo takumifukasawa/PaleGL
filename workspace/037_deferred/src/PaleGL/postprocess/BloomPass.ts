@@ -13,7 +13,7 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -26,7 +26,7 @@ export class BloomPass implements IPostProcessPass {
     enabled: boolean = false;
     width: number = 1;
     height: number = 1;
-    
+
     materials: Material[] = [];
 
     private extractBrightnessPass;
@@ -125,14 +125,14 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
+                // uTargetWidth: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // uTargetHeight: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
                 uBlurWeights: {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
@@ -141,10 +141,11 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: 1,
                 },
+                ...PostProcessPassBase.commonUniforms,
             },
         });
         this.materials.push(this.horizontalBlurMaterial);
-        
+
         this.verticalBlurMaterial = new Material({
             // gpu,
             vertexShader: PostProcessPassBase.baseVertexShader,
@@ -159,14 +160,6 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTargetWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uTargetHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
                 uBlurWeights: {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
@@ -175,6 +168,15 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: 0,
                 },
+                ...PostProcessPassBase.commonUniforms,
+                // uTargetWidth: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // uTargetHeight: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
             },
         });
         this.materials.push(this.verticalBlurMaterial);
@@ -211,6 +213,7 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.bloomAmount,
                 },
+                ...PostProcessPassBase.commonUniforms,
             },
         });
         this.materials.push(...this.compositePass.materials);
@@ -251,7 +254,7 @@ export class BloomPass implements IPostProcessPass {
         isLastPass,
         gBufferRenderTargets,
         targetCamera,
-        time
+        time,
     }: PostProcessPassRenderArgs) {
         // 一回だけ呼びたい
         this.geometry.start();
@@ -266,7 +269,15 @@ export class BloomPass implements IPostProcessPass {
         }
 
         this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
-        this.extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass: false, targetCamera, time });
+        this.extractBrightnessPass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget,
+            isLastPass: false,
+            targetCamera,
+            time,
+        });
 
         const renderBlur = (
             horizontalRenderTarget: RenderTarget,
@@ -323,7 +334,7 @@ export class BloomPass implements IPostProcessPass {
             isLastPass,
             targetCamera,
             gBufferRenderTargets,
-            time
+            time,
         });
     }
 }

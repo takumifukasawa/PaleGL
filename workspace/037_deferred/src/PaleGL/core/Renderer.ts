@@ -395,6 +395,12 @@ export class Renderer {
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
+        // ambient occlusion pass
+        // ------------------------------------------------------------------------------
+
+        // TODO
+        
+        // ------------------------------------------------------------------------------
         // deferred lighting pass
         // ------------------------------------------------------------------------------
 
@@ -607,6 +613,7 @@ export class Renderer {
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
     private _deferredShadingPass: DeferredShadingPass;
+    // private _ambientOcclusionPass: RenderTarget;
     private screenQuadCamera: Camera = OrthographicCamera.CreateFullQuadOrthographicCamera();
 
     /**

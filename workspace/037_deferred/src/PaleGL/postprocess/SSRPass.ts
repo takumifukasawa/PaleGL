@@ -1,8 +1,7 @@
-﻿import {UniformNames, UniformTypes} from '@/PaleGL/constants';
-import {GPU} from '@/PaleGL/core/GPU';
+﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { GPU } from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
-import {Matrix4} from '@/PaleGL/math/Matrix4';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
 /*
 float eps = .001;
@@ -38,13 +37,13 @@ export class SSRPass extends PostProcessPassBase {
     reflectionRayJitterSizeX = 0.05;
     reflectionRayJitterSizeY = 0.05;
 
-    reflectionFadeMinDistance = 0.;
+    reflectionFadeMinDistance = 0;
     reflectionFadeMaxDistance = 4.2;
 
     reflectionScreenEdgeFadeFactorMinX = 0.42;
     reflectionScreenEdgeFadeFactorMaxX = 0.955;
     reflectionScreenEdgeFadeFactorMinY = 0.444;
-    reflectionScreenEdgeFadeFactorMaxY = 1.;
+    reflectionScreenEdgeFadeFactorMaxY = 1;
 
     reflectionAdditionalRate = 0.355;
 
@@ -54,119 +53,81 @@ export class SSRPass extends PostProcessPassBase {
      *
      * @param gpu
      */
-    constructor({gpu}: { gpu: GPU }) {
+    constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = ssrFragmentShader;
+
+        const baseUniforms = {
+            [UniformNames.GBufferBTexture]: {
+                type: UniformTypes.Texture,
+                value: null,
+            },
+
+            uDepthTexture: {
+                type: UniformTypes.Texture,
+                value: null,
+            },
+            uRayDepthBias: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uRayNearestDistance: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uRayMaxDistance: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionAdditionalRate: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionRayThickness: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionRayJitterSizeX: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionRayJitterSizeY: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionFadeMinDistance: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionFadeMaxDistance: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionScreenEdgeFadeFactorMinX: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionScreenEdgeFadeFactorMaxX: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionScreenEdgeFadeFactorMinY: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uReflectionScreenEdgeFadeFactorMaxY: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uBlendRate: {
+                type: UniformTypes.Float,
+                value: 1,
+            },
+        };
 
         super({
             gpu,
             fragmentShader,
-            uniforms: {
-                [UniformNames.TargetWidth]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                [UniformNames.TargetHeight]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                [UniformNames.GBufferBTexture]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                // uBaseColorTexture: {
-                //     type: UniformTypes.Texture,
-                //     value: null,
-                // },
-                uNormalTexture: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                uDepthTexture: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                uTransposeInverseViewMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uInverseProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uInverseViewProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                [UniformNames.CameraNear]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                [UniformNames.CameraFar]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uRayDepthBias: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uRayNearestDistance: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uRayMaxDistance: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionAdditionalRate: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionRayThickness: {
-
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionRayJitterSizeX: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionRayJitterSizeY: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionFadeMinDistance: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionFadeMaxDistance: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionScreenEdgeFadeFactorMinX: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionScreenEdgeFadeFactorMaxX: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionScreenEdgeFadeFactorMinY: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uReflectionScreenEdgeFadeFactorMaxY: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                uBlendRate: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-            },
+            uniforms: baseUniforms,
         });
     }
 
@@ -184,7 +145,6 @@ export class SSRPass extends PostProcessPassBase {
     }
 
     render(options: PostProcessPassRenderArgs) {
-
         this.material.updateUniform('uRayDepthBias', this.rayDepthBias);
         this.material.updateUniform('uRayNearestDistance', this.rayNearestDistance);
         this.material.updateUniform('uRayMaxDistance', this.rayMaxDistance);
@@ -200,10 +160,10 @@ export class SSRPass extends PostProcessPassBase {
         this.material.updateUniform('uReflectionScreenEdgeFadeFactorMaxX', this.reflectionScreenEdgeFadeFactorMaxX);
         this.material.updateUniform('uReflectionScreenEdgeFadeFactorMinY', this.reflectionScreenEdgeFadeFactorMinY);
         this.material.updateUniform('uReflectionScreenEdgeFadeFactorMaxY', this.reflectionScreenEdgeFadeFactorMaxY);
-       
+
         this.material.updateUniform('uReflectionAdditionalRate', this.reflectionAdditionalRate);
         this.material.updateUniform('uBlendRate', this.blendRate);
-        
+
         super.render(options);
     }
 }

@@ -1,7 +1,7 @@
 ﻿import { UniformNames, TextureTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+// import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
@@ -106,14 +106,14 @@ export class SSAOPass extends PostProcessPassBase {
             gpu,
             fragmentShader,
             uniforms: {
-                [UniformNames.TargetWidth]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                [UniformNames.TargetHeight]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
+                // [UniformNames.TargetWidth]: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // [UniformNames.TargetHeight]: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
                 [UniformNames.GBufferBTexture]: {
                     type: UniformTypes.Texture,
                     value: null
@@ -130,30 +130,30 @@ export class SSAOPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTransposeInverseViewMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uInverseProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                uInverseViewProjectionMatrix: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                [UniformNames.CameraNear]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                [UniformNames.CameraFar]: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
+                // uTransposeInverseViewMatrix: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
+                // uProjectionMatrix: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
+                // uInverseProjectionMatrix: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
+                // uInverseViewProjectionMatrix: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
+                // [UniformNames.CameraNear]: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // [UniformNames.CameraFar]: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
                 uSamplingRotations: {
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(samplingRotations),
