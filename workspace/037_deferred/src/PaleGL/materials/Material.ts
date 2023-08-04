@@ -445,6 +445,7 @@ export class Material {
     // TODO:
     // - structみたいな深い階層もupdateができるようにしたい
     // - 'updateUniformValue'の方が良い??
+    // - 予期せぬsetしたくないのでthrowするかどうか
     updateUniform(name: string, value: UniformValue): void {
         if (!this.uniforms[name]) {
             // throw `[Material.updateUniform] material: ${this.name}, invalid uniform key: ${name}`;
