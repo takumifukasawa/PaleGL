@@ -300,6 +300,7 @@ bufferVisualizerPass.beforeRender = () => {
         'uAmbientOcclusionTexture',
         renderer.ambientOcclusionRenderTarget.read.texture
     );
+    // console.log(renderer.ambientOcclusionRenderTarget)
     // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 };
 

@@ -78,13 +78,13 @@ export class Renderer {
             height: 1,
             name: 'g-buffer render target',
         });
-        this._ambientOcclusionRenderTarget = new RenderTarget({
-            gpu,
-            type: RenderTargetTypes.RGBA,
-            width: 1,
-            height: 1,
-            name: 'ambient occlusion render target',
-        });
+        // this._ambientOcclusionRenderTarget = new RenderTarget({
+        //     gpu,
+        //     type: RenderTargetTypes.RGBA,
+        //     width: 1,
+        //     height: 1,
+        //     name: 'ambient occlusion render target',
+        // });
         // console.log(this._gBufferRenderTarget)
         this._afterGBufferRenderTarget = new RenderTarget({
             gpu,
@@ -204,7 +204,8 @@ export class Renderer {
     }
     
     get ambientOcclusionRenderTarget() {
-        return this._ambientOcclusionRenderTarget;
+        // return this._ambientOcclusionRenderTarget;
+        return this._ambientOcclusionPass.renderTarget;
     }
 
     get deferredShadingPass() {
@@ -236,7 +237,7 @@ export class Renderer {
         // render targets
         this._depthPrePassRenderTarget.setSize(realWidth, realHeight);
         this._gBufferRenderTargets.setSize(realWidth, realHeight);
-        this._ambientOcclusionRenderTarget.setSize(realWidth, realHeight);
+        // this._ambientOcclusionRenderTarget.setSize(realWidth, realHeight);
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
@@ -537,9 +538,10 @@ export class Renderer {
         }
 
         const targetPostProcesses: PostProcess[] = [];
-        if (camera.mainCamera) {
-            targetPostProcesses.push(this._scenePostProcess);
-        }
+        // TODO: こっちいる？
+        // if (camera.mainCamera) {
+        //     targetPostProcesses.push(this._scenePostProcess);
+        // }
         if (camera.postProcess) {
             targetPostProcesses.push(camera.postProcess);
         }
@@ -633,7 +635,7 @@ export class Renderer {
     // render targets
     private _depthPrePassRenderTarget: RenderTarget;
     private _gBufferRenderTargets: GBufferRenderTargets;
-    private _ambientOcclusionRenderTarget: RenderTarget;
+    // private _ambientOcclusionRenderTarget: RenderTarget;
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
@@ -835,11 +837,11 @@ export class Renderer {
      * @private
      */
     private ambientOcclusionPass(camera: Camera) {
-        console.log("--------- ambient occlusion pass ---------");
+        // console.log("--------- ambient occlusion pass ---------");
 
-        this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
+        // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
 
-        this.clear(0, 0, 0, 1);
+        // this.clear(0, 0, 0, 1);
         
         // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
       

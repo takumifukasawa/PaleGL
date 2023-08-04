@@ -221,6 +221,7 @@ export class PostProcessPassBase implements IPostProcessPass {
      * @param targetCamera
      */
     render({ gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs): void {
+        // TODO: 整理したい. render時にsetRenderTargetしちゃって問題ない？？
         this.setRenderTarget(renderer, targetCamera, isLastPass);
 
         // ppの場合はいらない気がする

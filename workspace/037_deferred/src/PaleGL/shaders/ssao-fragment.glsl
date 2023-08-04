@@ -59,8 +59,8 @@ void main() {
     // vec4 baseColor = texture(uSrcTexture, uv);
     vec4 baseColor = vec4(1., 1., 1., 0.);
     
-    outColor = vec4(1., 0., 0., 1.);
-    return;
+    // outColor = vec4(1., 0., 0., 1.);
+    // return;
 
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);

@@ -1,13 +1,13 @@
-﻿import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
+﻿import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 // import {Vector3} from '@/PaleGL/math/Vector3';
-import {Camera} from '@/PaleGL/actors/Camera';
-import {IPostProcessPass} from '@/PaleGL/postprocess/IPostProcessPass';
-import {GPU} from '@/PaleGL/core/GPU';
-import {Renderer} from '@/PaleGL/core/Renderer';
-import {RenderTarget} from '@/PaleGL/core/RenderTarget';
-import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets.ts';
-import {UniformNames} from "@/PaleGL/constants.ts";
-import {PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import { Camera } from '@/PaleGL/actors/Camera';
+import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Renderer } from '@/PaleGL/core/Renderer';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import { UniformNames } from '@/PaleGL/constants.ts';
+import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
@@ -19,7 +19,7 @@ type PostProcessRenderArgs = {
     gBufferRenderTargets?: GBufferRenderTargets | null;
     targetCamera: Camera;
     time: number;
-    isCameraLastPass: boolean,
+    isCameraLastPass: boolean;
 };
 
 // TODO: actorを継承してもいいかもしれない
@@ -43,7 +43,7 @@ export class PostProcess {
 
         return false;
     }
-    
+
     get postProcessCamera() {
         return this.#postProcessCamera;
     }
@@ -63,7 +63,7 @@ export class PostProcess {
         //     width: 1, height: 1,
         // });
 
-        if(postProcessCamera) {
+        if (postProcessCamera) {
             this.#postProcessCamera = postProcessCamera;
         } else {
             this.#postProcessCamera = OrthographicCamera.CreateFullQuadOrthographicCamera();
@@ -79,34 +79,71 @@ export class PostProcess {
     addPass(pass: IPostProcessPass) {
         this.passes.push(pass);
     }
-   
+
     /**
-     * 
+     *
      * @param pass
      * @param renderer
      * @param targetCamera
      * @param time
      */
-    static updatePassMaterial({pass, renderer, targetCamera, time}: {pass: IPostProcessPass, renderer: Renderer, targetCamera: Camera, time: number}) {
+    static updatePassMaterial({
+        pass,
+        renderer,
+        targetCamera,
+        time,
+    }: {
+        pass: IPostProcessPass;
+        renderer: Renderer;
+        targetCamera: Camera;
+        time: number;
+    }) {
         pass.materials.forEach((passMaterial) => {
             passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
             passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
             passMaterial.updateUniform(UniformNames.Time, time);
             passMaterial.updateUniform(UniformNames.ViewPosition, targetCamera.transform.position);
             passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
-            passMaterial.updateUniform(UniformNames.InverseViewProjectionMatrix, targetCamera.inverseViewProjectionMatrix);
+            passMaterial.updateUniform(
+                UniformNames.InverseViewProjectionMatrix,
+                targetCamera.inverseViewProjectionMatrix
+            );
             passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
             passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
-            passMaterial.updateUniform(UniformNames.TransposeInverseViewMatrix, targetCamera.viewMatrix.clone().invert().transpose());
+            passMaterial.updateUniform(
+                UniformNames.TransposeInverseViewMatrix,
+                targetCamera.viewMatrix.clone().invert().transpose()
+            );
             passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
             passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
             // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
             passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
         });
-
     }
-    
-    static renderPass({ pass, gpu, renderer, camera, prevRenderTarget, targetCamera, gBufferRenderTargets, time, isLastPass}: PostProcessPassRenderArgs & {pass: IPostProcessPass, camera: Camera, isLastPass: boolean}) {
+
+    /**
+     * 
+     * @param pass
+     * @param gpu
+     * @param renderer
+     * @param camera
+     * @param prevRenderTarget
+     * @param targetCamera
+     * @param gBufferRenderTargets
+     * @param time
+     * @param isLastPass
+     */
+    static renderPass({
+        pass,
+        gpu,
+        renderer,
+        camera,
+        prevRenderTarget,
+        targetCamera,
+        gBufferRenderTargets,
+        time,
+        isLastPass,
+    }: PostProcessPassRenderArgs & { pass: IPostProcessPass; camera: Camera; isLastPass: boolean }) {
         PostProcess.updatePassMaterial({ pass, renderer, targetCamera, time });
         pass.render({
             gpu,
@@ -121,14 +158,14 @@ export class PostProcess {
     }
 
     render({
-               gpu,
-               renderer,
-               prevRenderTarget,
-               gBufferRenderTargets,
-               targetCamera,
-               time,
-               isCameraLastPass
-           }: PostProcessRenderArgs) {
+        gpu,
+        renderer,
+        prevRenderTarget,
+        gBufferRenderTargets,
+        targetCamera,
+        time,
+        isCameraLastPass,
+    }: PostProcessRenderArgs) {
         // if (!sceneRenderTarget) {
         //     throw '[PostProcess.render] scene render target is empty.';
         // }
@@ -163,7 +200,7 @@ export class PostProcess {
             //     gBufferRenderTargets,
             //     time,
             // });
-            
+
             PostProcess.renderPass({
                 pass,
                 gpu,
