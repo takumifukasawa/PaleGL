@@ -471,12 +471,17 @@ export class Renderer {
                 targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
             }
         });
+        
         // update cubemap
+        // TODO: skyboxは一個だけ想定のいいはず
         sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
             const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
             const cubeMap: CubeMap = skyboxActor.cubeMap;
             this._deferredShadingPass.material.updateUniform('uEnvMap', cubeMap);
         });
+
+        // set ao texture
+        this._deferredShadingPass.material.updateUniform('uAmbientOcclusionTexture', this._ambientOcclusionPass.renderTarget.read.texture);
 
         PostProcess.renderPass({
             pass: this._deferredShadingPass,

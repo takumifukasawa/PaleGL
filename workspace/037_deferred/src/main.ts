@@ -52,7 +52,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 // import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
-import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
+// import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 
@@ -276,9 +276,9 @@ const bloomPass = new BloomPass({
 bloomPass.enabled = true;
 scenePostProcess.addPass(bloomPass);
 
-const ssaoPass = new SSAOPass({ gpu });
-ssaoPass.enabled = false;
-scenePostProcess.addPass(ssaoPass);
+// const ssaoPass = new SSAOPass({ gpu });
+// ssaoPass.enabled = false;
+// scenePostProcess.addPass(ssaoPass);
 
 const ssrPass = new SSRPass({ gpu });
 ssrPass.enabled = true;
@@ -886,13 +886,14 @@ function initDebugger() {
 
     //
     // ssao
+    // TODO: ssao pass の参照を renderer に変える
     //
 
-    debuggerGUI.addToggleDebugger({
-        label: 'ssao pass enabled',
-        initialValue: ssaoPass.enabled,
-        onChange: (value) => (ssaoPass.enabled = value),
-    });
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'ssao pass enabled',
+    //     initialValue: ssaoPass.enabled,
+    //     onChange: (value) => (ssaoPass.enabled = value),
+    // });
 
     //
     // debuggerGUI.addSliderDebugger({
@@ -968,18 +969,18 @@ function initDebugger() {
     //     },
     // });
 
-    debuggerGUI.addSliderDebugger({
-        label: 'ssao blend rate',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssaoPass.blendRate,
-        onChange: (value) => {
-            ssaoPass.blendRate = value;
-        },
-    });
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssao blend rate',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssaoPass.blendRate,
+    //     onChange: (value) => {
+    //         ssaoPass.blendRate = value;
+    //     },
+    // });
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
     //
     // ssr debuggers

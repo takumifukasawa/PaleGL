@@ -79,6 +79,7 @@ uniform vec3 uViewPosition;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uDepthTexture;
+uniform sampler2D uAmbientOcclusionTexture;
 // uniform sampler2D uShadowMap;
 uniform samplerCube uEnvMap;
 
@@ -130,8 +131,6 @@ void main() {
 
     vec4 baseColor = texture(uGBufferATexture, uv);
    
-    vec3 worldNormal = texture(uGBufferBTexture, uv).xyz * 2. - 1.;
-   
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
@@ -141,12 +140,19 @@ void main() {
         return;
     }
 
+    vec3 worldNormal = texture(uGBufferBTexture, uv).xyz * 2. - 1.;
+    
+    float aoRate = texture(uAmbientOcclusionTexture, uv).r;
+
     vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
-    outColor = vec4(worldPosition, 1.);
+    // for debug
+    // outColor = vec4(worldPosition, 1.);
     // outColor = vec4(vec3(depth), 1.);
     // outColor = vec4(mod(uTime, 1.), 1., 1., 1.);
-    outColor = vec4(uViewPosition, 1.);
+    // outColor = vec4(uViewPosition, 1.);
+    // outColor = vec4(vec3(aoRate), 1.);
+    // return;
 
     Surface surface;
     surface.worldPosition = worldPosition;
@@ -186,6 +192,9 @@ void main() {
         resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
     }
 #endif
+
+    // TODO: aoを考慮したライティング計算
+    resultColor.xyz *= aoRate;
 
     // vec4 shadowColor = texture(uShadowMap, uv);
     // // outColor = shadowColor;
