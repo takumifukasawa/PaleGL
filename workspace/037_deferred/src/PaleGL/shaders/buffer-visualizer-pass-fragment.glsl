@@ -10,6 +10,7 @@ uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uDirectionalLightShadowMap;
+uniform sampler2D uAmbientOcclusionTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
@@ -27,7 +28,7 @@ void main() {
     vec2 gBufferBUV = vUv * 3. + vec2(-2., -2.);
     vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
     vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
-    // vec2 depthUV = vUv;
+    vec2 aoUV = vUv * 3. + vec2(-2., -1.);
     
     vec4 baseColor = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
     vec4 normalColor = (texture(uGBufferBTexture, gBufferBUV) * 2. - 1.) * isArea(gBufferBUV);
@@ -43,11 +44,13 @@ void main() {
     ) * isArea(worldPositionUV);
     
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
+    vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
     
     outColor =
         baseColor +
         normalColor +
         sceneDepth +
         directionalShadowMapColor +
-        vec4(worldPosition, 1.);
+        vec4(worldPosition, 1.) +
+        aoColor;
 }

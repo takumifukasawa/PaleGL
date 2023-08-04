@@ -30,6 +30,7 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -77,6 +78,13 @@ export class Renderer {
             height: 1,
             name: 'g-buffer render target',
         });
+        this._ambientOcclusionRenderTarget = new RenderTarget({
+            gpu,
+            type: RenderTargetTypes.RGBA,
+            width: 1,
+            height: 1,
+            name: 'ambient occlusion render target',
+        });
         // console.log(this._gBufferRenderTarget)
         this._afterGBufferRenderTarget = new RenderTarget({
             gpu,
@@ -101,6 +109,7 @@ export class Renderer {
             height: 1,
             name: 'copy depth dest render target',
         });
+        this._ambientOcclusionPass = new SSAOPass({ gpu });
         // console.log(this._copyDepthDestRenderTarget)
         this._deferredShadingPass = new DeferredShadingPass({
             gpu,
@@ -123,26 +132,30 @@ export class Renderer {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.ViewPosition]: {
-                    type: UniformTypes.Vector3,
-                    value: Vector3.zero,
+                uAmbientOcclusionTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
                 },
-                [UniformNames.InverseViewProjectionMatrix]: {
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
-                [UniformNames.CameraNear]: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                [UniformNames.CameraFar]: {
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                [UniformNames.ViewPosition]: {
-                    type: UniformTypes.Vector3,
-                    value: Vector3.zero,
-                },
+                // [UniformNames.ViewPosition]: {
+                //     type: UniformTypes.Vector3,
+                //     value: Vector3.zero,
+                // },
+                // [UniformNames.InverseViewProjectionMatrix]: {
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
+                // [UniformNames.CameraNear]: {
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
+                // [UniformNames.CameraFar]: {
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
+                // [UniformNames.ViewPosition]: {
+                //     type: UniformTypes.Vector3,
+                //     value: Vector3.zero,
+                // },
                 [UniformNames.DirectionalLight]: {
                     type: UniformTypes.Struct,
                     value: {
@@ -189,6 +202,10 @@ export class Renderer {
     get scenePostProcess() {
         return this._scenePostProcess;
     }
+    
+    get ambientOcclusionRenderTarget() {
+        return this._ambientOcclusionRenderTarget;
+    }
 
     get deferredShadingPass() {
         return this._deferredShadingPass;
@@ -216,11 +233,15 @@ export class Renderer {
 
         this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
 
+        // render targets
         this._depthPrePassRenderTarget.setSize(realWidth, realHeight);
         this._gBufferRenderTargets.setSize(realWidth, realHeight);
+        this._ambientOcclusionRenderTarget.setSize(realWidth, realHeight);
         this._afterGBufferRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
+        // passes
+        this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
     }
 
@@ -398,8 +419,8 @@ export class Renderer {
         // ambient occlusion pass
         // ------------------------------------------------------------------------------
 
-        // TODO
-        
+        this.ambientOcclusionPass(camera);
+
         // ------------------------------------------------------------------------------
         // deferred lighting pass
         // ------------------------------------------------------------------------------
@@ -522,7 +543,7 @@ export class Renderer {
         if (camera.postProcess) {
             targetPostProcesses.push(camera.postProcess);
         }
-        
+
         // console.log("--------- postprocess pass ---------");
 
         targetPostProcesses.forEach((postProcess, i) => {
@@ -607,14 +628,18 @@ export class Renderer {
     private realHeight: number = 1;
     private stats: Stats | null = null;
     private _scenePostProcess: PostProcess;
+    // internal cmmera
+    private screenQuadCamera: Camera = OrthographicCamera.CreateFullQuadOrthographicCamera();
+    // render targets
     private _depthPrePassRenderTarget: RenderTarget;
     private _gBufferRenderTargets: GBufferRenderTargets;
+    private _ambientOcclusionRenderTarget: RenderTarget;
     private _afterGBufferRenderTarget: RenderTarget;
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
+    // pass
+    private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
-    // private _ambientOcclusionPass: RenderTarget;
-    private screenQuadCamera: Camera = OrthographicCamera.CreateFullQuadOrthographicCamera();
 
     /**
      *
@@ -638,7 +663,7 @@ export class Renderer {
      */
     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
         // console.log("--------- depth pre pass ---------");
-        
+
         this.setRenderTarget(this._depthPrePassRenderTarget);
 
         // depthなのでclear
@@ -668,7 +693,7 @@ export class Renderer {
      */
     private shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
         // console.log("--------- shadow pass ---------");
-        
+
         castShadowLightActors.forEach((lightActor) => {
             if (!lightActor.shadowMap) {
                 throw 'invalid shadow pass';
@@ -724,11 +749,11 @@ export class Renderer {
     private scenePass(
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
-        lightActors: Light[],
+        lightActors: Light[]
         // clear: boolean = true
     ) {
         // console.log("--------- scene pass ---------");
-        
+
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
@@ -805,6 +830,33 @@ export class Renderer {
     }
 
     /**
+     * 
+     * @param camera
+     * @private
+     */
+    private ambientOcclusionPass(camera: Camera) {
+        console.log("--------- ambient occlusion pass ---------");
+
+        this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
+
+        this.clear(0, 0, 0, 1);
+        
+        // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
+      
+        // this._ambientOcclusionPass.enabled = true;  
+        PostProcess.renderPass({
+            pass: this._ambientOcclusionPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: null,
+            isLastPass: false,
+            time: performance.now() / 1000, // TODO: engineから渡したい
+        });
+    }
+
+    /**
      *
      * @param sortedRenderMeshInfos
      * @param camera
@@ -819,8 +871,8 @@ export class Renderer {
         clear: boolean
     ) {
         // console.log("--------- transparent pass ---------");
-        
-        // TODO: refactor
+
+        // TODO: 常にclearしない、で良い気がする
         if (clear) {
             this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         }

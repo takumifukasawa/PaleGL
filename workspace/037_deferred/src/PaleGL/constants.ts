@@ -199,6 +199,8 @@ export const UniformNames = {
     GBufferBTexture: 'uGBufferBTexture',
     // depth
     DepthTexture: 'uDepthTexture',
+    // ao
+    // AmbientOcclusionTexture: "uAmbientOcclusionTexture",
     // skinning
     JointMatrices: 'uJointMatrices',
     JointTexture: 'uJointTexture',

@@ -34,6 +34,10 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                uAmbientOcclusionTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 uNearClip: {
                     type: UniformTypes.Float,
                     value: 0.1,
@@ -51,6 +55,11 @@ export class BufferVisualizerPass extends PostProcessPassBase {
         // this.gpu = gpu;
     }
 
+    // render(options: PostProcessPassRenderArgs) {
+    //     super.render(options);
+    //     console.log(this.material.uniforms)
+    // }
+    
     // setSize(width: number, height: number) {
     //     super.setSize(width, height);
     //     this.material.updateUniform('uTargetWidth', width);

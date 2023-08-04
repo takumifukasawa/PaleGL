@@ -8,7 +8,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uSrcTexture;
+// uniform sampler2D uSrcTexture;
 // uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 // uniform sampler2D uNormalTexture;
@@ -56,7 +56,11 @@ void main() {
 
     vec2 uv = vUv;
     
-    vec4 baseColor = texture(uSrcTexture, uv);
+    // vec4 baseColor = texture(uSrcTexture, uv);
+    vec4 baseColor = vec4(1., 1., 1., 0.);
+    
+    outColor = vec4(1., 0., 0., 1.);
+    return;
 
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
