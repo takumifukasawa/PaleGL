@@ -16,6 +16,10 @@ export class Stats {
     fpsCounter: FPSCounter;
     fpsCounterView;
 
+    /**
+     * 
+     * @param args
+     */
     constructor(args: { wrapperElement?: HTMLElement } = {}) {
         const {wrapperElement} = args;
         this.domElement = document.createElement('div');
@@ -52,19 +56,25 @@ white-space: break-spaces;
         this.fpsCounter = new FPSCounter();
     }
 
+    // ------------------------------------------------------------
+    // public
+    // ------------------------------------------------------------
+
+    /**
+     * 
+     */
     clear() {
         this.passes = [];
         this.drawVertexCount = 0;
         this.drawCallCount = 0;
     }
 
-    private addPassGroup(groupLabel: string, passInfo: PassInfo) {
-        this.passes.push({
-            groupLabel: groupLabel,
-            passInfos: [passInfo],
-        });
-    }
-
+    /**
+     * 
+     * @param groupLabel
+     * @param passLabel
+     * @param geometry
+     */
     addPassInfo(groupLabel: string, passLabel: string, geometry: Geometry) {
         const passIndex = this.passes.findIndex((elem) => elem.groupLabel === groupLabel);
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
@@ -82,6 +92,10 @@ white-space: break-spaces;
         });
     }
 
+    /**
+     * 
+     * @param geometry
+     */
     addDrawVertexCount(geometry: Geometry) {
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
         if (!positionAttribute) {
@@ -90,15 +104,25 @@ white-space: break-spaces;
         this.drawVertexCount += positionAttribute.data.length / 3;
     }
 
+    /**
+     * 
+     */
     incrementDrawCall() {
         this.drawCallCount++;
     }
 
+    /**
+     * 
+     * @param time
+     */
     update(time: number) {
         this.fpsCounter.calculate(time);
         this.updateView();
     }
-    
+
+    /**
+     * 
+     */
     updateView() {
         this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
         
@@ -117,4 +141,22 @@ white-space: break-spaces;
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
     }
+    
+    // ------------------------------------------------------------
+    // private 
+    // ------------------------------------------------------------
+
+    /**
+     * 
+     * @param groupLabel
+     * @param passInfo
+     * @private
+     */
+    private addPassGroup(groupLabel: string, passInfo: PassInfo) {
+        this.passes.push({
+            groupLabel: groupLabel,
+            passInfos: [passInfo],
+        });
+    }
+
 }
