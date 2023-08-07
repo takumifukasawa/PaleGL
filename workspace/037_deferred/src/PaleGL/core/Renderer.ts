@@ -511,7 +511,7 @@ export class Renderer {
         // this._afterGBufferRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         // pattern2: depth prepass
         this._afterGBufferRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
-
+        
         // // TODO: copy depth texture
         // this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
