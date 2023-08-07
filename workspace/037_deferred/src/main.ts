@@ -181,13 +181,16 @@ const instanceNumView = document.createElement('p');
 instanceNumView.textContent = `instance num: ${instanceNum}`;
 instanceNumView.style.cssText = `
 position: absolute;
-bottom: 0;
+top: 0;
 left: 0;
+right: 0;
+margin: auto;
 padding: 0.2em 0.5em;
 font-size: 9px;
 color: white;
 font-weight: bold;
 text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+text-align: center;
 `;
 wrapperElement?.appendChild(instanceNumView);
 
@@ -784,8 +787,8 @@ void main() {
         inputController.fixedUpdate();
     };
 
-    engine.onRender = () => {
-        renderer.render(captureScene, captureSceneCamera);
+    engine.onRender = (time ) => {
+        renderer.render(captureScene, captureSceneCamera, { time });
     };
 
     const tick = (time: number) => {

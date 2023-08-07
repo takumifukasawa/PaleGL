@@ -1,10 +1,10 @@
-﻿import {TimeSkipper} from '@/PaleGL/utilities/TimeSkipper';
-import {TimeAccumulator} from '@/PaleGL/utilities/TimeAccumulator';
-import {ActorTypes} from '@/PaleGL/constants';
-import {Stats} from '@/PaleGL/utilities/Stats';
-import {GPU} from '@/PaleGL/core/GPU';
-import {Scene} from '@/PaleGL/core/Scene';
-import {Renderer} from '@/PaleGL/core/Renderer';
+﻿import { TimeSkipper } from '@/PaleGL/utilities/TimeSkipper';
+import { TimeAccumulator } from '@/PaleGL/utilities/TimeAccumulator';
+import { ActorTypes } from '@/PaleGL/constants';
+import { Stats } from '@/PaleGL/utilities/Stats';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Scene } from '@/PaleGL/core/Scene';
+import { Renderer } from '@/PaleGL/core/Renderer';
 
 // type EngineOnBeforeStartCallbackArgs = void;
 
@@ -75,12 +75,12 @@ export class Engine {
     }
 
     constructor({
-                    gpu,
-                    renderer,
-                    onBeforeFixedUpdate,
-                    onBeforeUpdate,
-                    onRender,
-                }: {
+        gpu,
+        renderer,
+        onBeforeFixedUpdate,
+        onBeforeUpdate,
+        onRender,
+    }: {
         gpu: GPU;
         renderer: Renderer;
         onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback;
@@ -138,10 +138,10 @@ export class Engine {
 
     fixedUpdate(fixedTime: number, fixedDeltaTime: number) {
         if (this.#onBeforeFixedUpdate) {
-            this.#onBeforeFixedUpdate({fixedTime, fixedDeltaTime});
+            this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
 
-        this.#scene?.traverse((actor) => actor.fixedUpdate({gpu: this.#gpu, fixedTime, fixedDeltaTime}));
+        this.#scene?.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
         // this.#scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.fixedUpdate({ gpu: this.#gpu, fixedTime, fixedDeltaTime }));
         // });
@@ -159,17 +159,17 @@ export class Engine {
 
     update(time: number, deltaTime: number) {
         if (this.#onBeforeUpdate) {
-            this.#onBeforeUpdate({time, deltaTime});
+            this.#onBeforeUpdate({ time, deltaTime });
         }
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
         this.#scene?.traverse((actor) => {
-            actor.update({gpu: this.#gpu, time, deltaTime});
+            actor.update({ gpu: this.#gpu, time, deltaTime });
             switch (actor.type) {
                 case ActorTypes.Skybox:
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
-                    actor.beforeRender({gpu: this.#gpu});
+                    actor.beforeRender({ gpu: this.#gpu });
                     break;
                 default:
                     break;
@@ -206,7 +206,7 @@ export class Engine {
         // TODO: ここにrenderer.renderを書く
         // this.#renderer.renderScene(this.#scene!);
 
-        this.#stats.updateView();
+        this.#stats.update(time);
     }
 
     // time [sec]

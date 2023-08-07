@@ -283,11 +283,13 @@ export class Renderer {
      *
      * @param scene
      * @param camera
+     * @param time
+     * @param deltaTime
+     * @param onBeforePostProcess
      * @param
-     * @param clearScene
      */
     // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
-    render(scene: Scene, camera: Camera, onBeforePostProcess?: () => void) {
+    render(scene: Scene, camera: Camera, {time, onBeforePostProcess}: { time: number, deltaTime?: number, onBeforePostProcess?: () => void }) {
         // ------------------------------------------------------------------------------
         // setup render mesh infos
         // TODO: depth sort
@@ -420,7 +422,7 @@ export class Renderer {
         // ambient occlusion pass
         // ------------------------------------------------------------------------------
 
-        this.ambientOcclusionPass(camera);
+        this.ambientOcclusionPass(camera, time);
 
         // ------------------------------------------------------------------------------
         // deferred lighting pass
@@ -494,7 +496,7 @@ export class Renderer {
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
             isLastPass: false,
-            time: performance.now() / 1000, // TODO: engineから渡したい
+            time, // TODO: engineから渡したい
         });
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
@@ -563,7 +565,7 @@ export class Renderer {
                 prevRenderTarget: this._afterGBufferRenderTarget,
                 gBufferRenderTargets: this._gBufferRenderTargets,
                 targetCamera: camera,
-                time: performance.now() / 1000, // TODO: engineから渡したい
+                time, // TODO: engineから渡したい
                 isCameraLastPass: i === targetPostProcesses.length - 1,
             });
         });
@@ -856,7 +858,7 @@ export class Renderer {
      * @param camera
      * @private
      */
-    private ambientOcclusionPass(camera: Camera) {
+    private ambientOcclusionPass(camera: Camera, time: number) {
         // console.log("--------- ambient occlusion pass ---------");
 
         // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
@@ -874,7 +876,7 @@ export class Renderer {
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
             isLastPass: false,
-            time: performance.now() / 1000, // TODO: engineから渡したい
+            time, // TODO: engineから渡したい
         });
     }
 

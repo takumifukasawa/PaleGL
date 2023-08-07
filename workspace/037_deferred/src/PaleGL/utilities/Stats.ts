@@ -1,5 +1,6 @@
 import {AttributeNames} from '@/PaleGL/constants';
 import {Geometry} from '@/PaleGL/geometries/Geometry';
+import {FPSCounter} from "@/PaleGL/utilities/FPSCounter.ts";
 
 type PassInfo = { passLabel: string; vertexCount: number };
 
@@ -11,6 +12,9 @@ export class Stats {
     drawCallCountView;
     drawVertexCount = 0;
     drawCallCount = 0;
+    
+    fpsCounter: FPSCounter;
+    fpsCounterView;
 
     constructor(args: { wrapperElement?: HTMLElement } = {}) {
         const {wrapperElement} = args;
@@ -27,16 +31,25 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 white-space: break-spaces;
 `;
 
+        // fps counter
+        this.fpsCounterView = document.createElement('p');
+        this.domElement.appendChild(this.fpsCounterView);
+
+        // pass info
         this.passInfoView = document.createElement('p');
         this.domElement.appendChild(this.passInfoView);
 
+        // total vertex count
         this.drawVertexCountView = document.createElement('p');
         this.domElement.appendChild(this.drawVertexCountView);
 
+        // total draw call count
         this.drawCallCountView = document.createElement('p');
         this.domElement.appendChild(this.drawCallCountView);
 
         (wrapperElement || document.body).appendChild(this.domElement);
+        
+        this.fpsCounter = new FPSCounter();
     }
 
     clear() {
@@ -81,8 +94,16 @@ white-space: break-spaces;
         this.drawCallCount++;
     }
 
+    update(time: number) {
+        this.fpsCounter.calculate(time);
+        this.updateView();
+    }
+    
     updateView() {
+        this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
+        
         const passesStrings = [];
+        passesStrings.push("-------------")
         for (let i = 0; i < this.passes.length; i++) {
             passesStrings.push(this.passes[i].groupLabel);
             for (let j = 0; j < this.passes[i].passInfos.length; j++) {
