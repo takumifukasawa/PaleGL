@@ -24,7 +24,7 @@ export class Light extends Actor {
     }
 
     constructor({ intensity, color }: LightArgs) {
-        super(ActorTypes.Light);
+        super({ type: ActorTypes.Light });
         this.intensity = intensity;
         this.color = color;
     }

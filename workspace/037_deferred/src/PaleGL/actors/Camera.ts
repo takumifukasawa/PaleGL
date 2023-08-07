@@ -110,7 +110,7 @@ export class Camera extends Actor {
         clearColor?: Vector4;
         postProcess?: PostProcess;
     }) {
-        super(ActorTypes.Camera);
+        super({ type: ActorTypes.Camera });
         this.cameraType = cameraType;
         this.clearColor = clearColor || new Vector4(0, 0, 0, 1);
         this.#postProcess = postProcess || null;

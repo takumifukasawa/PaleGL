@@ -165,7 +165,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
 
     console.log(gltf);
 
-    const rootActor = new Actor();
+    const rootActor = new Actor({});
 
     // for debug
     console.log('[loadGLTF]', gltf);
@@ -439,7 +439,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
             if (cacheNodes[nodeIndex]) {
                 targetNode.children!.forEach((child) => findNode(child, parentActor));
             } else {
-                const anchorActor = new Actor();
+                const anchorActor = new Actor({});
                 parentActor.addChild(anchorActor);
                 cacheNodes[nodeIndex] = anchorActor;
                 targetNode.children!.forEach((child) => findNode(child, anchorActor));

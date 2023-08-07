@@ -202,7 +202,7 @@ export class Renderer {
     get scenePostProcess() {
         return this._scenePostProcess;
     }
-    
+
     get ambientOcclusionRenderTarget() {
         // return this._ambientOcclusionRenderTarget;
         return this._ambientOcclusionPass.renderTarget;
@@ -471,7 +471,7 @@ export class Renderer {
                 targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
             }
         });
-        
+
         // update cubemap
         // TODO: skyboxは一個だけ想定のいいはず
         sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
@@ -481,7 +481,10 @@ export class Renderer {
         });
 
         // set ao texture
-        this._deferredShadingPass.material.updateUniform('uAmbientOcclusionTexture', this._ambientOcclusionPass.renderTarget.read.texture);
+        this._deferredShadingPass.material.updateUniform(
+            'uAmbientOcclusionTexture',
+            this._ambientOcclusionPass.renderTarget.read.texture
+        );
 
         PostProcess.renderPass({
             pass: this._deferredShadingPass,
@@ -689,6 +692,10 @@ export class Renderer {
             depthMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
             depthMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
             this.renderMesh(actor.geometry, depthMaterial);
+
+            if (this.stats) {
+                this.stats.addPassInfo('depth pre pass', actor.name, actor.geometry);
+            }
         });
     }
 
@@ -741,6 +748,10 @@ export class Renderer {
                 targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
                 targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
                 this.renderMesh(actor.geometry, targetMaterial);
+
+                if (this.stats) {
+                    this.stats.addPassInfo('shadow pass', actor.name, actor.geometry);
+                }
             });
         });
     }
@@ -833,11 +844,15 @@ export class Renderer {
             });
 
             this.renderMesh(actor.geometry, targetMaterial);
+
+            if (this.stats) {
+                this.stats.addPassInfo('scene pass', actor.name, actor.geometry);
+            }
         });
     }
 
     /**
-     * 
+     *
      * @param camera
      * @private
      */
@@ -847,10 +862,10 @@ export class Renderer {
         // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
 
         // this.clear(0, 0, 0, 1);
-        
+
         // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
-      
-        // this._ambientOcclusionPass.enabled = true;  
+
+        // this._ambientOcclusionPass.enabled = true;
         PostProcess.renderPass({
             pass: this._ambientOcclusionPass,
             renderer: this,
@@ -939,6 +954,10 @@ export class Renderer {
             });
 
             this.renderMesh(actor.geometry, targetMaterial);
+
+            if (this.stats) {
+                this.stats.addPassInfo('transparent pass', actor.name, actor.geometry);
+            }
         });
     }
 }

@@ -14,6 +14,7 @@ export type ActorFixedUpdateArgs = { gpu: GPU; fixedTime: number; fixedDeltaTime
 export type ActorUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
 
 export class Actor {
+    name: string;
     transform: Transform;
     type: ActorType;
     uuid: number;
@@ -45,7 +46,8 @@ export class Actor {
         this._onUpdate = value;
     }
 
-    constructor(type: ActorType = ActorTypes.Null) {
+    constructor({ name = '', type = ActorTypes.Null }: { name?: string; type?: ActorType }) {
+        this.name = name;
         this.transform = new Transform(this);
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
