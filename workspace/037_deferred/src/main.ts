@@ -313,7 +313,7 @@ const createGLTFSkinnedMesh = async () => {
 
     // skinned mesh おｎはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
-    console.log(gltfActor, skinningMesh);
+    // console.log(gltfActor, skinningMesh);
 
     // ルートにanimatorをattachしてるので一旦ここでassign
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);

@@ -1,5 +1,5 @@
-import { AttributeNames } from '@/PaleGL/constants';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import {AttributeNames} from '@/PaleGL/constants';
+import {Geometry} from '@/PaleGL/geometries/Geometry';
 
 type PassInfo = { passLabel: string; vertexCount: number };
 
@@ -13,7 +13,7 @@ export class Stats {
     drawCallCount = 0;
 
     constructor(args: { wrapperElement?: HTMLElement } = {}) {
-        const { wrapperElement } = args;
+        const {wrapperElement} = args;
         this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
 position: absolute;
@@ -24,6 +24,7 @@ font-size: 9px;
 color: white;
 font-weight: bold;
 text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+white-space: break-spaces;
 `;
 
         this.passInfoView = document.createElement('p');
@@ -59,7 +60,7 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
         }
         const vertexCount = positionAttribute.data.length / 3;
         if (passIndex < 0) {
-            this.addPassGroup(groupLabel, { passLabel: passLabel, vertexCount });
+            this.addPassGroup(groupLabel, {passLabel: passLabel, vertexCount});
             return;
         }
         this.passes[passIndex].passInfos.push({
@@ -82,12 +83,16 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 
     updateView() {
         const passesStrings = [];
-        for(let i = 0; i < this.passes.length; i++) {
+        for (let i = 0; i < this.passes.length; i++) {
             passesStrings.push(this.passes[i].groupLabel);
-            for(let j = 0; j < this.passes[j].passInfos; j++) {
+            for (let j = 0; j < this.passes[i].passInfos.length; j++) {
+                const passInfo = this.passes[i].passInfos[j];
+                const str = `${passInfo.passLabel} - vertex count: ${passInfo.vertexCount}`;
+                passesStrings.push(str);
             }
         }
-        this.passInfoView.textContent = this.passes.join("\n");
+        passesStrings.push("-------------")
+        this.passInfoView.textContent = passesStrings.join("\n");
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
     }
