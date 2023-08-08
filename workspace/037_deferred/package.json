@@ -35,5 +35,8 @@
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-singlefile": "^0.13.5",
     "vite-tsconfig-paths": "^4.2.0"
+  },
+  "dependencies": {
+    "terser": "^5.19.2"
   }
 }
