@@ -6,3 +6,4 @@ vite-shader-minifier-plugin.ts
 libs/**/**.js
 packer/**/**.js
 node-libs/**/**.ts
+bin/**/**.js

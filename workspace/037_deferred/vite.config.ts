@@ -47,11 +47,6 @@ export const minifyBundles: () => Plugin = () => {
                         },
                         toplevel: true,
                     });
-                    console.log('\n=====================\n');
-                    console.log(chunk.code);
-                    console.log('\n---------------------\n');
-                    console.log(minifyCode.code);
-                    console.log('\n=====================\n');
                     chunk.code = minifyCode.code!;
                 }
             }
@@ -59,8 +54,6 @@ export const minifyBundles: () => Plugin = () => {
         },
     };
 };
-
-// export const reTerserPlugin: () => Plugin = () => {
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
