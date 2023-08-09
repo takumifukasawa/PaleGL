@@ -5,6 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@types/rollup':
+    specifier: ^0.54.0
+    version: 0.54.0
+  rollup:
+    specifier: ^3.28.0
+    version: 3.28.0
   terser:
     specifier: ^5.19.2
     version: 5.19.2
@@ -51,16 +57,16 @@ devDependencies:
     version: 0.6.1(eslint@8.44.0)(typescript@5.0.2)(vite@4.3.9)
   vite-plugin-glsl:
     specifier: ^1.1.2
-    version: 1.1.2(rollup@3.25.3)(vite@4.3.9)
+    version: 1.1.2(rollup@3.28.0)(vite@4.3.9)
   vite-plugin-gltf:
     specifier: ^3.1.0
-    version: 3.1.0(@gltf-transform/core@2.5.1)(@gltf-transform/extensions@2.5.1)(@gltf-transform/functions@2.5.1)(rollup@3.25.3)
+    version: 3.1.0(@gltf-transform/core@2.5.1)(@gltf-transform/extensions@2.5.1)(@gltf-transform/functions@2.5.1)(rollup@3.28.0)
   vite-plugin-html:
     specifier: ^3.2.0
     version: 3.2.0(vite@4.3.9)
   vite-plugin-singlefile:
     specifier: ^0.13.5
-    version: 0.13.5(rollup@3.25.3)(vite@4.3.9)
+    version: 0.13.5(rollup@3.28.0)(vite@4.3.9)
   vite-tsconfig-paths:
     specifier: ^4.2.0
     version: 4.2.0(typescript@5.0.2)(vite@4.3.9)
@@ -456,7 +462,7 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@rollup/pluginutils@5.0.2(rollup@3.25.3):
+  /@rollup/pluginutils@5.0.2(rollup@3.28.0):
     resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -468,7 +474,7 @@ packages:
       '@types/estree': 1.0.1
       estree-walker: 2.0.2
       picomatch: 2.3.1
-      rollup: 3.25.3
+      rollup: 3.28.0
     dev: true
 
   /@types/estree@1.0.1:
@@ -486,6 +492,13 @@ packages:
   /@types/node@20.4.2:
     resolution: {integrity: sha512-Dd0BYtWgnWJKwO1jkmTrzofjK2QXXcai0dmtzvIBhcA+RsG5h8R3xlyta0kGOZRNfL9GuRtb1knmPEhQrePCEw==}
     dev: true
+
+  /@types/rollup@0.54.0:
+    resolution: {integrity: sha512-oeYztLHhQ98jnr+u2cs1c3tHOGtpzrm9DJlIdEjznwoXWidUbrI+X6ib7zCkPIbB7eJ7VbbKNQ5n/bPnSg6Naw==}
+    deprecated: This is a stub types definition for rollup (https://github.com/rollup/rollup). rollup provides its own type definitions, so you don't need @types/rollup installed!
+    dependencies:
+      rollup: 3.28.0
+    dev: false
 
   /@types/semver@7.5.0:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
@@ -1456,7 +1469,6 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
-    dev: true
     optional: true
 
   /gauge@2.7.4:
@@ -2420,13 +2432,12 @@ packages:
       glob: 10.3.3
     dev: true
 
-  /rollup@3.25.3:
-    resolution: {integrity: sha512-ZT279hx8gszBj9uy5FfhoG4bZx8c+0A1sbqtr7Q3KNWIizpTdDEPZbV2xcbvHsnFp4MavCQYZyzApJ+virB8Yw==}
+  /rollup@3.28.0:
+    resolution: {integrity: sha512-d7zhvo1OUY2SXSM6pfNjgD5+d0Nz87CUp4mt8l/GgVP3oBsPwzNvSzyu1me6BSG9JIgWNTVcafIXBIyM8yQ3yw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -2884,19 +2895,19 @@ packages:
       vscode-uri: 3.0.7
     dev: true
 
-  /vite-plugin-glsl@1.1.2(rollup@3.25.3)(vite@4.3.9):
+  /vite-plugin-glsl@1.1.2(rollup@3.28.0)(vite@4.3.9):
     resolution: {integrity: sha512-zmXsfc1vn2MlYve9t3FAoWuhLyoCkNS1TuQL+TkXZL7tGmBjRErp10eNYxcse5tK9oUC5MyJpNc4ElpQnx8DoA==}
     engines: {node: '>= 16.15.1', npm: '>= 8.11.0'}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0
     dependencies:
-      '@rollup/pluginutils': 5.0.2(rollup@3.25.3)
+      '@rollup/pluginutils': 5.0.2(rollup@3.28.0)
       vite: 4.3.9(@types/node@20.4.2)(terser@5.19.2)
     transitivePeerDependencies:
       - rollup
     dev: true
 
-  /vite-plugin-gltf@3.1.0(@gltf-transform/core@2.5.1)(@gltf-transform/extensions@2.5.1)(@gltf-transform/functions@2.5.1)(rollup@3.25.3):
+  /vite-plugin-gltf@3.1.0(@gltf-transform/core@2.5.1)(@gltf-transform/extensions@2.5.1)(@gltf-transform/functions@2.5.1)(rollup@3.28.0):
     resolution: {integrity: sha512-Fc6NEsp1Y1jLDXghdXTOi9YIFDHD6qwgroNV7xj5UZmZRmHS3eozyiun2xmi0zzz6NXgDRkOYXexFnSx5xDm/g==}
     peerDependencies:
       '@gltf-transform/core': 2.x
@@ -2906,7 +2917,7 @@ packages:
       '@gltf-transform/core': 2.5.1
       '@gltf-transform/extensions': 2.5.1
       '@gltf-transform/functions': 2.5.1
-      '@rollup/pluginutils': 5.0.2(rollup@3.25.3)
+      '@rollup/pluginutils': 5.0.2(rollup@3.28.0)
       draco3dgltf: 1.5.6
       meshoptimizer: 0.18.1
     transitivePeerDependencies:
@@ -2933,7 +2944,7 @@ packages:
       vite: 4.3.9(@types/node@20.4.2)(terser@5.19.2)
     dev: true
 
-  /vite-plugin-singlefile@0.13.5(rollup@3.25.3)(vite@4.3.9):
+  /vite-plugin-singlefile@0.13.5(rollup@3.28.0)(vite@4.3.9):
     resolution: {integrity: sha512-y/aRGh8qHmw2f1IhaI/C6PJAaov47ESYDvUv1am1YHMhpY+19B5k5Odp8P+tgs+zhfvak6QB1ykrALQErEAo7g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -2941,7 +2952,7 @@ packages:
       vite: '>=3.2.0'
     dependencies:
       micromatch: 4.0.5
-      rollup: 3.25.3
+      rollup: 3.28.0
       vite: 4.3.9(@types/node@20.4.2)(terser@5.19.2)
     dev: true
 
@@ -2990,7 +3001,7 @@ packages:
       '@types/node': 20.4.2
       esbuild: 0.17.19
       postcss: 8.4.24
-      rollup: 3.25.3
+      rollup: 3.28.0
       terser: 5.19.2
     optionalDependencies:
       fsevents: 2.3.2

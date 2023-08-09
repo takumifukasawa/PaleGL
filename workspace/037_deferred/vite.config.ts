@@ -6,12 +6,14 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // @ts-ignore
 import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
-import { shaderMinifierPlugin } from './vite-shader-minifier-plugin';
 import checker from 'vite-plugin-checker';
 import { rimraf } from 'rimraf';
 import * as path from 'path';
+import { minify } from 'terser';
+import { shaderMinifierPlugin } from './vite-shader-minifier-plugin';
 import { createDirectoryAsync } from './node-libs/file-io';
 import { wait } from './node-libs/wait';
+import { NormalizedOutputOptions, OutputBundle, OutputChunk } from 'rollup';
 
 const isBundle = false;
 const isMinifyShader = false;
@@ -30,6 +32,35 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
         },
     };
 };
+
+// ref: https://github.com/vitejs/vite/issues/6555
+export const minifyBundles: () => Plugin = () => {
+    return {
+        name: 'minifyBundles',
+        async generateBundle(_: NormalizedOutputOptions, bundle: OutputBundle) {
+            for (let key in bundle) {
+                if (bundle[key].type == 'chunk' && key.endsWith('.js')) {
+                    const chunk = (bundle[key] as OutputChunk);
+                    const minifyCode = await minify(chunk.code, {
+                        mangle: {
+                            properties: true
+                        },
+                        toplevel: true,
+                    });
+                    console.log('\n=====================\n');
+                    console.log(chunk.code);
+                    console.log('\n---------------------\n');
+                    console.log(minifyCode.code);
+                    console.log('\n=====================\n');
+                    chunk.code = minifyCode.code!;
+                }
+            }
+            // return bundle;
+        },
+    };
+};
+
+// export const reTerserPlugin: () => Plugin = () => {
 
 // ref:
 // https://github.com/vitejs/vite/issues/621
@@ -64,7 +95,7 @@ export default defineConfig({
                 lintCommand: 'eslint --ext .ts,.js ./',
             },
         }),
-        // replaceShaderPathPlugin(),
+        // minifyBundles(),
         ...(isBundle ? [viteSingleFile(), createHtmlPlugin()] : []),
     ],
     assetsInclude: ['**/*.gltf'],
@@ -85,13 +116,13 @@ export default defineConfig({
         terserOptions: {
             // keep_classnames: false,
             // keep_fnames: false,
-            // mangle: {
-            //     toplevel: true,
-            //     module: true,
-            //     // properties: {
-            //     //     regex: /^$/
-            //     // }
-            // },
+            mangle: {
+                toplevel: true,
+                properties: true
+                // properties: {
+                //     regex: /^$/
+                // }
+            },
             compress: {
                 drop_console: true,
                 drop_debugger: true,
