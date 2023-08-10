@@ -29,28 +29,28 @@ void main() {
     vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
     vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
     vec2 aoUV = vUv * 3. + vec2(-2., -1.);
-    
+
     vec4 baseColor = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
     vec4 normalColor = (texture(uGBufferBTexture, gBufferBUV) * 2. - 1.) * isArea(gBufferBUV);
-    
+
     float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
     // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip) * isArea(depthUV);
-    
+
     vec3 worldPosition = reconstructWorldPositionFromDepth(
         worldPositionUV,
         texture(uDepthTexture, worldPositionUV).x,
         uInverseViewProjectionMatrix
     ) * isArea(worldPositionUV);
-    
+
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
-    
+
     outColor =
-        baseColor +
-        normalColor +
-        sceneDepth +
-        directionalShadowMapColor +
-        vec4(worldPosition, 1.) +
-        aoColor;
+    baseColor +
+    normalColor +
+    sceneDepth +
+    directionalShadowMapColor +
+    vec4(worldPosition, 1.) +
+    aoColor;
 }

@@ -127,6 +127,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // TODO: minify時は改行消しちゃダメな気がする
                 // TODO: devとprodで改行文字の入り方が違う？確認
                 shaderContent = shaderContent.replaceAll('\\n', '\n');
+                shaderContent = shaderContent.replaceAll('\\r', '\n');
                 
                 const entryPointRegex = /void main\(/;
                 const isEntryPoint = entryPointRegex.test(shaderContent);
@@ -135,10 +136,6 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     console.log(`\nskip minify: ${id}\n`);
                     return src;
                 }
-
-                // for debug
-                // console.log('\n----- entry point shader content -----\n');
-                // console.log(shaderContent);
 
                 const minifierOptionsString = buildMinifierOptionsString(minifierOptions);
 
@@ -174,6 +171,11 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // シェーダーをコピー
                 await writeFileAsync(tmpCopiedFilePath, shaderContent);
                 await wait(ioInterval);
+
+                // for debug
+                // console.log(`\n----- entry point shader content - name: ${name} -----\n`);
+                // console.log(shaderContent);
+                // console.log('\n-----------\n');
 
                 // minify
                 const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
