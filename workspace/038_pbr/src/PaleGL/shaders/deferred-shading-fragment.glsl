@@ -27,7 +27,7 @@ struct Surface {
 
 #pragma DEPTH_FUNCTIONS
 
-// #include ./partial/env-map-fragment-functions.glsl
+#include ./partial/env-map-fragment-functions.glsl
 
 #ifdef USE_RECEIVE_SHADOW
 vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
@@ -171,51 +171,49 @@ void main() {
     // phong
     // directional light
     // resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
-            
-    // wip: pbr
+    
+    // pbr
     GeometricContext geometry;
     geometry.position = surface.worldPosition;
     geometry.normal = surface.worldNormal;
     geometry.viewDir = normalize(camera.worldPosition - surface.worldPosition);
     Material material;
-    float metallic = 0.;
-    float roughness = .6;
+    // TODO: bufferから引っ張ってくる
+    float metallic = 1.;
+    float roughness = 0.;
     vec3 albedo = baseColor.xyz;
     material.diffuseColor = mix(albedo, vec3(0.), metallic);
     material.specularColor = mix(vec3(.04), albedo, metallic);
     material.specularRoughness = roughness;
     ReflectedLight reflectedLight = ReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
+    // TODO: bufferから引っ張ってくる
     vec3 emissive = vec3(0.);
     float opacity = 1.;
         
     IncidentLight directLight;
+        
     // directional light
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
-    // getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    // point light
-    PointLight pointLight;
-    pointLight.position = uDirectionalLight.direction * 5.;
-    pointLight.color = uDirectionalLight.color;
-    pointLight.distance = 100.;
-    pointLight.decay = 1.;
-    getPointLightIrradiance(pointLight, geometry, directLight);
+    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
         
+    // point light
+    // PointLight pointLight;
+    // pointLight.position = uDirectionalLight.direction * 5.;
+    // pointLight.color = uDirectionalLight.color;
+    // pointLight.distance = 100.;
+    // pointLight.decay = 1.;
+    // getPointLightIrradiance(pointLight, geometry, directLight);
+    
+    // calc render equations
     RE_Direct(directLight, geometry, material, reflectedLight);
+
     vec3 outgoingLight = emissive + reflectedLight.directDiffuse + reflectedLight.directSpecular;
     resultColor = vec4(outgoingLight, opacity);
-        outColor = resultColor;
-        return;
-        
-    // for debug
-    // resultColor.xyz = surface.worldNormal;
-    // // resultColor.xyz = surface.worldPosition;
-    // // resultColor.xyz = baseColor.xyz;
-    // outColor = resultColor;
-    // return;
-            
+
     // ambient light
+// TODO: IBL for pbr
 #ifdef USE_ENV_MAP
     vec3 envDir = reflect(
         normalize(surface.worldPosition - camera.worldPosition),
@@ -223,8 +221,7 @@ void main() {
     );
     // TODO: bufferからか何かしらで引っ張ってくる
     float uAmbientAmount = .2;
-    // TODO: 復活
-    // resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
+    resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
 
 #ifdef USE_RECEIVE_SHADOW
@@ -236,8 +233,7 @@ void main() {
 #endif
 
     // TODO: aoを考慮したライティング計算
-    // TODO: 復活
-    // resultColor.xyz *= aoRate;
+    resultColor.xyz *= aoRate;
 
     // correct
     outColor = resultColor;

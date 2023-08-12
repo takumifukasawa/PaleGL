@@ -1,6 +1,8 @@
 ﻿// ref: https://zenn.dev/mebiusbox/books/619c81d2fbeafd/viewer/7c1069
 
+// -------------------------------------------------------------------------------
 // defines
+// -------------------------------------------------------------------------------
 
 #define saturate(a) clamp(a, 0., 1.)
 
@@ -11,7 +13,9 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
+// -------------------------------------------------------------------------------
 // struct
+// -------------------------------------------------------------------------------
 
 struct IncidentLight {
     vec3 color;
@@ -43,7 +47,9 @@ struct Material {
     // float clearCoatRoughness;
 };
 
+// -------------------------------------------------------------------------------
 // lights
+// -------------------------------------------------------------------------------
 
 bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
     return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
@@ -56,6 +62,8 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 
     return 1.;
 }
+
+// directional light
 
 struct DirectionalLight {
     // vec3 direction;
@@ -70,6 +78,8 @@ void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, c
     directLight.direction = directionalLight.direction;
     directLight.visible = true;
 }
+
+// point light
 
 struct PointLight {
     vec3 position;
@@ -92,6 +102,8 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
         directLight.visible = false;
     }
 }
+
+// spot light
 
 struct SpotLight {
     vec3 position;
@@ -126,35 +138,39 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
     }
 }
 
+// -------------------------------------------------------------------------------
 // skybox
+// -------------------------------------------------------------------------------
 
-struct Skybox {
-    samplerCube envMap;
-    float rotationOffset;
-    float amount;
-};
+// struct Skybox {
+//     samplerCube envMap;
+//     float rotationOffset;
+//     float amount;
+// };
+// 
+// vec3 calcEnvMap(samplerCube envMap, vec3 reflectDir, float rotationOffset) {
+//     reflectDir.x *= -1.;
+//     float c = cos(3.14 + rotationOffset);
+//     float s = sin(3.14 + rotationOffset);
+//     reflectDir.xz *= mat2(c, s, -s, c);
+//     return texture(envMap, reflectDir).xyz;
+// }
+// 
+// void getSkyboxIrradiance(const in Skybox skybox, const in GeometricContext geometry, out IncidentLight directLight) {
+//     vec3 envDir = reflect(
+//         -geometry.viewDir,
+//         geometry.normal
+//     );
+//     // vec3 diffuseEnvColor = calcEnvMap(skybox.envMap, specularEnvDir, skybox.rotationOffset);
+//     vec3 envColor = calcEnvMap(skybox.envMap, envDir, skybox.rotationOffset);
+//     directLight.color = envColor;
+//     directLight.visible = true;
+//     directLight.direction = envDir;
+// }
 
-vec3 calcEnvMap(samplerCube envMap, vec3 reflectDir, float rotationOffset) {
-    reflectDir.x *= -1.;
-    float c = cos(3.14 + rotationOffset);
-    float s = sin(3.14 + rotationOffset);
-    reflectDir.xz *= mat2(c, s, -s, c);
-    return texture(envMap, reflectDir).xyz;
-}
-
-void getSkyboxIrradiance(const in Skybox skybox, const in GeometricContext geometry, out IncidentLight directLight) {
-    vec3 envDir = reflect(
-        -geometry.viewDir,
-        geometry.normal
-    );
-    // vec3 diffuseEnvColor = calcEnvMap(skybox.envMap, specularEnvDir, skybox.rotationOffset);
-    vec3 envColor = calcEnvMap(skybox.envMap, envDir, skybox.rotationOffset);
-    directLight.color = envColor;
-    directLight.visible = true;
-    directLight.direction = envDir;
-}
-
+// -------------------------------------------------------------------------------
 // lights uniforms
+// -------------------------------------------------------------------------------
 
 // #define LIGHT_MAX 4
 // uniform DirectionalLight directionalLights[LIGHT_MAX];
@@ -164,7 +180,9 @@ void getSkyboxIrradiance(const in Skybox skybox, const in GeometricContext geome
 // uniform int numPointLights;
 // uniform int numSpotLights;
 
+// -------------------------------------------------------------------------------
 // brdfs
+// -------------------------------------------------------------------------------
 
 // normalized lambert
 
@@ -213,7 +231,9 @@ vec3 SpecularBRDF(const in IncidentLight directLight, const in GeometricContext 
     return (F * (G * D)) / (4. * dotNL * dotNV + EPSILON);
 }
 
+// -------------------------------------------------------------------------------
 // render equations
+// -------------------------------------------------------------------------------
 
 void RE_Direct(const in IncidentLight directLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
