@@ -8,8 +8,9 @@ precision mediump float;
 // struct
 // -----------------------------------------------------------
 
+#include ./partial/lighting.glsl
 
-#include ./partial/directional-light-struct.glsl
+// #include ./partial/directional-light-struct.glsl
 
 #include ./partial/camera-struct.glsl
 
@@ -26,7 +27,7 @@ struct Surface {
 
 #pragma DEPTH_FUNCTIONS
 
-#include ./partial/env-map-fragment-functions.glsl
+// #include ./partial/env-map-fragment-functions.glsl
 
 #ifdef USE_RECEIVE_SHADOW
 vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
@@ -92,37 +93,37 @@ uniform mat4 uInverseViewProjectionMatrix;
         
 layout (location = 0) out vec4 outColor;
 
-vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
-    vec3 N = normalize(surface.worldNormal);
-    vec3 L = normalize(directionalLight.direction);
-    
-    // lambert
-    float diffuseRate = clamp(dot(N, L), 0., 1.);
-    // half lambert
-    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
-    // original lambert
-    // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
-    
-    vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * directionalLight.color.xyz;
-
-    vec3 P = surface.worldPosition;
-    vec3 E = camera.worldPosition;
-    vec3 PtoL = L; // for directional light
-    vec3 PtoE = normalize(E - P);
-    vec3 H = normalize(PtoL + PtoE);
-    // TODO: surfaceに持たせる
-    float specularPower = 32.;
-    float specularRate = clamp(dot(H, N), 0., 1.);
-    specularRate = pow(specularRate, specularPower) * surface.specularAmount;
-    vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
-
-    vec4 resultColor = vec4(
-        diffuseColor + specularColor,
-        surface.diffuseColor.a
-    );
-    
-    return resultColor;
-}
+// vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
+//     vec3 N = normalize(surface.worldNormal);
+//     vec3 L = normalize(directionalLight.direction);
+//     
+//     // lambert
+//     float diffuseRate = clamp(dot(N, L), 0., 1.);
+//     // half lambert
+//     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
+//     // original lambert
+//     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
+//     
+//     vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * directionalLight.color.xyz;
+// 
+//     vec3 P = surface.worldPosition;
+//     vec3 E = camera.worldPosition;
+//     vec3 PtoL = L; // for directional light
+//     vec3 PtoE = normalize(E - P);
+//     vec3 H = normalize(PtoL + PtoE);
+//     // TODO: surfaceに持たせる
+//     float specularPower = 32.;
+//     float specularRate = clamp(dot(H, N), 0., 1.);
+//     specularRate = pow(specularRate, specularPower) * surface.specularAmount;
+//     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
+// 
+//     vec4 resultColor = vec4(
+//         diffuseColor + specularColor,
+//         surface.diffuseColor.a
+//     );
+//     
+//     return resultColor;
+// }
 
 void main() {
     float eps = .0001; 
@@ -166,14 +167,54 @@ void main() {
     camera.worldPosition = uViewPosition;
     
     vec4 resultColor = vec4(0, 0, 0, 1);
-    
-    // directional light
-    resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
    
+    // phong
+    // directional light
+    // resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
+            
+    // wip: pbr
+    GeometricContext geometry;
+    geometry.position = surface.worldPosition;
+    geometry.normal = surface.worldNormal;
+    geometry.viewDir = normalize(camera.worldPosition - surface.worldPosition);
+    Material material;
+    float metallic = 0.;
+    float roughness = .6;
+    vec3 albedo = baseColor.xyz;
+    material.diffuseColor = mix(albedo, vec3(0.), metallic);
+    material.specularColor = mix(vec3(.04), albedo, metallic);
+    material.specularRoughness = roughness;
+    ReflectedLight reflectedLight = ReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
+    vec3 emissive = vec3(0.);
+    float opacity = 1.;
+        
+    IncidentLight directLight;
+    // directional light
+    DirectionalLight directionalLight;
+    directionalLight.direction = uDirectionalLight.direction;
+    directionalLight.color = uDirectionalLight.color;
+    // getDirectionalLightIrradiance(directionalLight, geometry, directLight);
+    // point light
+    PointLight pointLight;
+    pointLight.position = uDirectionalLight.direction * 5.;
+    pointLight.color = uDirectionalLight.color;
+    pointLight.distance = 100.;
+    pointLight.decay = 1.;
+    getPointLightIrradiance(pointLight, geometry, directLight);
+        
+    RE_Direct(directLight, geometry, material, reflectedLight);
+    vec3 outgoingLight = emissive + reflectedLight.directDiffuse + reflectedLight.directSpecular;
+    resultColor = vec4(outgoingLight, opacity);
+        outColor = resultColor;
+        return;
+        
+    // for debug
+    // resultColor.xyz = surface.worldNormal;
+    // // resultColor.xyz = surface.worldPosition;
+    // // resultColor.xyz = baseColor.xyz;
     // outColor = resultColor;
-    // outColor.xyz = worldNormal;
     // return;
-    
+            
     // ambient light
 #ifdef USE_ENV_MAP
     vec3 envDir = reflect(
@@ -182,7 +223,8 @@ void main() {
     );
     // TODO: bufferからか何かしらで引っ張ってくる
     float uAmbientAmount = .2;
-    resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
+    // TODO: 復活
+    // resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
 
 #ifdef USE_RECEIVE_SHADOW
@@ -194,12 +236,8 @@ void main() {
 #endif
 
     // TODO: aoを考慮したライティング計算
-    resultColor.xyz *= aoRate;
-
-    // vec4 shadowColor = texture(uShadowMap, uv);
-    // // outColor = shadowColor;
-    // // outColor = vec4(shadowColor.xxx, 1.);
-    // resultColor = applyShadow(resultColor, uShadowMap, vShadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
+    // TODO: 復活
+    // resultColor.xyz *= aoRate;
 
     // correct
     outColor = resultColor;

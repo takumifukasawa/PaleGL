@@ -16,7 +16,7 @@ import { wait } from './node-libs/wait';
 import { NormalizedOutputOptions, OutputBundle, OutputChunk } from 'rollup';
 
 const isBundle = false;
-const isMinifyShader = true;
+const isMinifyShader = false;
 
 export const deleteTmpCachesPlugin: () => Plugin = () => {
     return {

@@ -1,4 +1,3 @@
-
 // import "@/style.css";
 
 import smokeImgUrl from '../images/particle-smoke.png?url';
@@ -10,7 +9,8 @@ import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
 import CubeMapNegativeYImgUrl from '../images/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../images/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
-import gltfModelUrl from '../models/glass-wind-poly.gltf?url';
+import gltfLSphereModelUrl from '../models/sphere-32x32.gltf?url';
+import gltfLGlassModelUrl from '../models/glass-wind-poly.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
@@ -40,7 +40,7 @@ import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
 import { Material } from '@/PaleGL/materials/Material';
-import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
+// import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
 import { Color } from '@/PaleGL/math/Color';
@@ -154,6 +154,7 @@ let width: number, height: number;
 let floorPlaneMesh: Mesh;
 // let floorDiffuseMap: Texture;
 // let floorNormalMap: Texture;
+let sphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 
@@ -237,7 +238,8 @@ captureSceneCamera.onFixedUpdate = () => {
 
 const directionalLight = new DirectionalLight({
     intensity: 1,
-    color: Color.fromRGB(255, 210, 200),
+    // color: Color.fromRGB(255, 210, 200),
+    color: Color.white(),
 });
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -277,7 +279,7 @@ const bloomPass = new BloomPass({
     threshold: 0.9,
     bloomAmount: 0.8,
 });
-bloomPass.enabled = true;
+bloomPass.enabled = false;
 scenePostProcess.addPass(bloomPass);
 
 // const ssaoPass = new SSAOPass({ gpu });
@@ -285,7 +287,7 @@ scenePostProcess.addPass(bloomPass);
 // scenePostProcess.addPass(ssaoPass);
 
 const ssrPass = new SSRPass({ gpu });
-ssrPass.enabled = true;
+ssrPass.enabled = false;
 scenePostProcess.addPass(ssrPass);
 
 const fxaaPass = new FXAAPass({ gpu });
@@ -293,7 +295,7 @@ fxaaPass.enabled = true;
 scenePostProcess.addPass(fxaaPass);
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
-bufferVisualizerPass.enabled = true;
+bufferVisualizerPass.enabled = false;
 scenePostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.updateUniform(
@@ -312,8 +314,26 @@ scenePostProcess.enabled = true;
 // TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(scenePostProcess);
 
+const createGLTFSphereMesh = async () => {
+    const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
+    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    mesh.material = new GBufferMaterial({
+        // gpu,
+        // diffuseMap: floorDiffuseMap,
+        // normalMap: floorNormalMap,
+        // envMap: cubeMap,
+        // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+        // diffuseColor: new Color(0, 0, 0, 1),
+        diffuseColor: new Color(1, 1, 1, 1),
+        receiveShadow: true,
+        specularAmount: 0.4,
+        // ambientAmount: 0.2,
+    });
+    return mesh;
+};
+
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfModelUrl });
+    const gltfActor = await loadGLTF({ gpu, path: gltfLGlassModelUrl });
 
     // skinned mesh おｎはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
@@ -469,6 +489,12 @@ const main = async () => {
         // rotationOffset: 0.8,
     });
 
+    sphereMesh = await createGLTFSphereMesh();
+    sphereMesh.onStart = ({ actor }) => {
+        actor.transform.setScaling(Vector3.fill(2));
+        actor.transform.setTranslation(new Vector3(0, 2, 0));
+    };
+
     skinnedMesh = await createGLTFSkinnedMesh();
 
     const floorGeometry = new PlaneGeometry({
@@ -478,28 +504,28 @@ const main = async () => {
     });
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
-        material: new PhongMaterial({
+        // material: new PhongMaterial({
+        //     // gpu,
+        //     // diffuseMap: floorDiffuseMap,
+        //     // normalMap: floorNormalMap,
+        //     envMap: cubeMap,
+        //     diffuseColor: new Color(0, 0, 0, 1),
+        //     receiveShadow: true,
+        //     specularAmount: 0.4,
+        //     ambientAmount: 0.2,
+        // }),
+        material: new GBufferMaterial({
             // gpu,
             // diffuseMap: floorDiffuseMap,
             // normalMap: floorNormalMap,
-            envMap: cubeMap,
+            // envMap: cubeMap,
+            // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+            // diffuseColor: new Color(0, 0, 0, 1),
             diffuseColor: new Color(0, 0, 0, 1),
             receiveShadow: true,
             specularAmount: 0.4,
-            ambientAmount: 0.2,
+            // ambientAmount: 0.2,
         }),
-        // material: new GBufferMaterial({
-        //     // gpu,
-        //     diffuseMap: floorDiffuseMap,
-        //     normalMap: floorNormalMap,
-        //     // envMap: cubeMap,
-        //     // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
-        //     // diffuseColor: new Color(0, 0, 0, 1),
-        //     diffuseColor: new Color(1, 1, 1, 1),
-        //     receiveShadow: true,
-        //     specularAmount: 0.4,
-        //     // ambientAmount: 0.2,
-        // }),
         castShadow: false,
     });
     floorPlaneMesh.onStart = ({ actor }) => {
@@ -746,6 +772,7 @@ void main() {
         particleMaterial.updateUniform('uTime', fixedTime);
     };
 
+    captureScene.add(sphereMesh);
     captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
@@ -788,7 +815,7 @@ void main() {
         inputController.fixedUpdate();
     };
 
-    engine.onRender = (time ) => {
+    engine.onRender = (time) => {
         renderer.render(captureScene, captureSceneCamera, { time });
     };
 

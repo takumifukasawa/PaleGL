@@ -437,7 +437,10 @@ export class Renderer {
                 targetMaterial.updateUniform(UniformNames.DirectionalLight, {
                     direction: {
                         type: UniformTypes.Vector3,
-                        value: light.transform.position,
+                        // pattern1: そのまま渡す
+                        // value: light.transform.position,
+                        // pattern2: normalizeしてから渡す
+                        value: light.transform.position.clone().normalize(),
                     },
                     intensity: {
                         type: UniformTypes.Float,

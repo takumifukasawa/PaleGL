@@ -46,7 +46,7 @@ export class Actor {
         this._onUpdate = value;
     }
 
-    constructor({ name = '', type = ActorTypes.Null }: { name?: string; type?: ActorType }) {
+    constructor({ name = '', type = ActorTypes.Null }: { name?: string; type?: ActorType } = {}) {
         this.name = name;
         this.transform = new Transform(this);
         this.type = type || ActorTypes.Null;
