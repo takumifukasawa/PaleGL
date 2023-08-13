@@ -137,18 +137,21 @@ void main() {
 // }
 // `;
 
-type SkyboxArgs = 
-    { gpu: GPU; cubeMap: CubeMap;
-        diffuseIntensity: number,
-        specularIntensity: number,
-        rotationOffset?: number };
+type SkyboxArgs = {
+    gpu: GPU;
+    cubeMap: CubeMap;
+    diffuseIntensity: number;
+    specularIntensity: number;
+    rotationOffset?: number;
+};
 
 export class Skybox extends Mesh {
     cubeMap: CubeMap;
     diffuseIntensity: number = 1;
     specularIntensity: number = 1;
+    rotationOffset: number = 0;
 
-    constructor({ gpu, cubeMap, diffuseIntensity, specularIntensity,  rotationOffset = 0 }: SkyboxArgs) {
+    constructor({ gpu, cubeMap, diffuseIntensity, specularIntensity, rotationOffset = 0 }: SkyboxArgs) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
@@ -198,10 +201,11 @@ export class Skybox extends Mesh {
         });
 
         super({ geometry, material, actorType: ActorTypes.Skybox });
-       
+
         this.cubeMap = cubeMap;
         this.diffuseIntensity = diffuseIntensity;
         this.specularIntensity = specularIntensity;
+        this.rotationOffset = rotationOffset;
     }
 
     // TODO: renderer側で2回走らないようにする

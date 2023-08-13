@@ -25,6 +25,7 @@ struct Skybox {
     samplerCube cubeMap;
     float diffuseIntensity;
     float specularIntensity;
+    float rotationOffset;
 };
 
 // -----------------------------------------------------------
@@ -33,7 +34,7 @@ struct Skybox {
 
 #pragma DEPTH_FUNCTIONS
 
-#include ./partial/env-map-fragment-functions.glsl
+// #include ./partial/env-map-fragment-functions.glsl
 
 #ifdef USE_RECEIVE_SHADOW
 vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
@@ -215,7 +216,8 @@ void main() {
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-        
+    RE_Direct(directLight, geometry, material, reflectedLight);
+
     // point light
     // PointLight pointLight;
     // pointLight.position = uDirectionalLight.direction * 5.;
@@ -223,31 +225,38 @@ void main() {
     // pointLight.distance = 100.;
     // pointLight.decay = 1.;
     // getPointLightIrradiance(pointLight, geometry, directLight);
+    // RE_Direct(directLight, geometry, material, reflectedLight);
     
     // calc render equations
-    RE_Direct(directLight, geometry, material, reflectedLight);
 
-    vec3 outgoingLight = emissive + reflectedLight.directDiffuse + reflectedLight.directSpecular;
-    resultColor = vec4(outgoingLight, opacity);
 
     // ambient light
 // TODO: IBL for pbr
-#ifdef USE_ENV_MAP
-    vec3 envDir = reflect(
-        normalize(surface.worldPosition - camera.worldPosition),
-        normalize(surface.worldNormal)
-    );
-    // TODO: bufferからか何かしらで引っ張ってくる
-    // add ambient diffuse
-    resultColor.xyz += calcEnvMap(uSkybox.cubeMap, surface.worldNormal, 0.) * uSkybox.diffuseIntensity;
-    // add ambient specular
-    resultColor.xyz += calcEnvMap(uSkybox.cubeMap, envDir, 0.) * uSkybox.specularIntensity;
-#endif
+// #ifdef USE_ENV_MAP
+    SkyboxLight skyboxLight;
+    skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
+    skyboxLight.specularIntensity = uSkybox.specularIntensity;
+    skyboxLight.rotationOffset = uSkybox.rotationOffset;
+    IncidentSkyboxLight directSkyboxLight;
+    getSkyboxLightIrradiance(uSkybox.cubeMap, skyboxLight, geometry, directSkyboxLight);
+    RE_DirectSkybox(directSkyboxLight, geometry, material, reflectedLight);
+
+// #endif
+
+
+vec3 outgoingLight =
+    emissive +
+    reflectedLight.directDiffuse +
+    reflectedLight.directSpecular +
+    reflectedLight.indirectDiffuse +
+    reflectedLight.indirectSpecular;
+    resultColor = vec4(outgoingLight, opacity);
+
 
 #ifdef USE_RECEIVE_SHADOW
     vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
-    // TODO: apply shadow の中に入れても良さそう
     if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+        // TODO: blend rate は light か何かに持たせたい
         resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
     }
 #endif

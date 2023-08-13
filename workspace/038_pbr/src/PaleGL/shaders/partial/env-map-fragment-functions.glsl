@@ -1,5 +1,5 @@
 ﻿
-#ifdef USE_ENV_MAP
+// #ifdef USE_ENV_MAP
 
 vec3 calcEnvMap(samplerCube envMap, vec3 reflectDir, float rotationOffset) {
     reflectDir.x *= -1.;
@@ -9,4 +9,4 @@ vec3 calcEnvMap(samplerCube envMap, vec3 reflectDir, float rotationOffset) {
     return texture(envMap, reflectDir).xyz;
 }
 
-#endif
+// #endif

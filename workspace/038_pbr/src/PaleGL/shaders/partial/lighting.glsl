@@ -13,6 +13,7 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
+
 // -------------------------------------------------------------------------------
 // struct
 // -------------------------------------------------------------------------------
@@ -21,6 +22,15 @@ struct IncidentLight {
     vec3 color;
     vec3 direction;
     bool visible;
+};
+
+struct IncidentSkyboxLight {
+    vec3 diffuseColor;
+    vec3 diffuseDirection;
+    float diffuseIntensity;
+    vec3 specularColor;
+    vec3 specularDirection;
+    float specularIntensity;
 };
 
 struct ReflectedLight {
@@ -66,8 +76,6 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 // directional light
 
 struct DirectionalLight {
-    // vec3 direction;
-    // vec3 color;
     vec3 direction;
     float intensity;
     vec4 color;
@@ -142,31 +150,33 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
 // skybox
 // -------------------------------------------------------------------------------
 
-// struct Skybox {
-//     samplerCube envMap;
-//     float rotationOffset;
-//     float amount;
-// };
-// 
-// vec3 calcEnvMap(samplerCube envMap, vec3 reflectDir, float rotationOffset) {
-//     reflectDir.x *= -1.;
-//     float c = cos(3.14 + rotationOffset);
-//     float s = sin(3.14 + rotationOffset);
-//     reflectDir.xz *= mat2(c, s, -s, c);
-//     return texture(envMap, reflectDir).xyz;
-// }
-// 
-// void getSkyboxIrradiance(const in Skybox skybox, const in GeometricContext geometry, out IncidentLight directLight) {
-//     vec3 envDir = reflect(
-//         -geometry.viewDir,
-//         geometry.normal
-//     );
-//     // vec3 diffuseEnvColor = calcEnvMap(skybox.envMap, specularEnvDir, skybox.rotationOffset);
-//     vec3 envColor = calcEnvMap(skybox.envMap, envDir, skybox.rotationOffset);
-//     directLight.color = envColor;
-//     directLight.visible = true;
-//     directLight.direction = envDir;
-// }
+struct SkyboxLight {
+    // samplerCube cubeMap;
+    float diffuseIntensity;
+    float specularIntensity;
+    float rotationOffset;
+    // vec3 diffuseColor;
+    // vec3 specularColor;
+    // vec3 diffuseDirection;
+    // vec3 specularDirection;
+    // bool visible;
+};
+
+#include ./env-map-fragment-functions.glsl
+
+void getSkyboxLightIrradiance(const in samplerCube cubeMap, const in SkyboxLight skyboxLight, const in GeometricContext geometry, out IncidentSkyboxLight directLight) {
+    vec3 envDir = reflect(
+        -geometry.viewDir,
+        // normalize(geometry.position - camera.worldPosition),
+        normalize(geometry.normal)
+    );
+    directLight.diffuseColor = calcEnvMap(cubeMap, geometry.normal, skyboxLight.rotationOffset);
+    directLight.diffuseDirection = geometry.normal;
+    directLight.diffuseIntensity = skyboxLight.diffuseIntensity;
+    directLight.specularColor = calcEnvMap(cubeMap, envDir, skyboxLight.rotationOffset);
+    directLight.specularDirection = envDir;
+    directLight.specularIntensity = skyboxLight.specularIntensity;
+}
 
 // -------------------------------------------------------------------------------
 // lights uniforms
@@ -210,11 +220,13 @@ float G_Smith_Shlick_GGX(float a, float dotNV, float dotNL) {
 
 // cook-torrance
 
-vec3 SpecularBRDF(const in IncidentLight directLight, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+// vec3 SpecularBRDF(const in IncidentLight directLight, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
     vec3 N = normalize(geometry.normal);
     vec3 V = normalize(geometry.viewDir);
-    vec3 L = normalize(directLight.direction);
-    
+    // vec3 L = normalize(directLight.direction);
+    vec3 L = normalize(lightDirection);
+
     float dotNL = saturate(dot(N, L));
     float dotNV = saturate(dot(N, V));
     vec3 H = normalize(L + V);
@@ -241,8 +253,63 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
     
     // punctual light
     irradiance *= PI;
+   
+    // diffuse
+    reflectedLight.directDiffuse +=
+        irradiance *
+        DiffuseBRDF(material.diffuseColor);
+    // specular
+    // reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.specularRoughness);
+    reflectedLight.directSpecular +=
+        irradiance *
+        SpecularBRDF(
+            directLight.direction,
+            geometry,
+            material.specularColor,
+            material.specularRoughness
+        );
+}
+
+// TODO: IBL
+void RE_DirectSkybox(const in IncidentSkyboxLight skyboxLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
+    // TODO: fix cosines
+    // float diffuseDotNL = saturate(dot(geometry.normal, skyboxLight.diffuseDirection));
+    float diffuseDotNL = 1.;
+    // float specularDotNL = saturate(dot(geometry.normal, skyboxLight.specularDirection));
+    float specularDotNL = 1.;
     
-    // correct
-    reflectedLight.directDiffuse += irradiance * DiffuseBRDF(material.diffuseColor);
-    reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.specularRoughness);
+    vec3 diffuseIrradiance = diffuseDotNL * skyboxLight.diffuseColor * skyboxLight.diffuseIntensity;
+    vec3 specularIrradiance = specularDotNL * skyboxLight.specularColor * skyboxLight.specularIntensity;
+
+    // punctual light
+    diffuseIrradiance *= PI;
+    specularIrradiance *= PI;
+
+    // diffuse
+    reflectedLight.directDiffuse +=
+        diffuseIrradiance *
+        DiffuseBRDF(material.diffuseColor);
+
+    // TODO: なぜかsaturateが必要
+    reflectedLight.directDiffuse = saturate(reflectedLight.directDiffuse);
+           
+    // specular
+    reflectedLight.directSpecular +=
+        specularIrradiance *
+        SpecularBRDF(
+            skyboxLight.specularDirection,
+            geometry,
+            material.specularColor,
+            material.specularRoughness
+        );
+
+    // TODO: なぜかsaturateが必要
+    reflectedLight.directSpecular  = saturate(reflectedLight.directSpecular);
+
+// reflectedLight.directSpecular = step(vec3(0.), SpecularBRDF(
+//     skyboxLight.specularDirection,
+//     geometry,
+//     material.specularColor,
+//     material.specularRoughness
+// ));
 }

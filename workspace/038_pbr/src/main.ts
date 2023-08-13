@@ -317,17 +317,18 @@ captureSceneCamera.setPostProcess(scenePostProcess);
 const createGLTFSphereMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    mesh.castShadow = true;
     mesh.material = new GBufferMaterial({
         // gpu,
         // diffuseMap: floorDiffuseMap,
         // normalMap: floorNormalMap,
         // envMap: cubeMap,
-        // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
+        diffuseColor: new Color(0.5, 0.05, 0.05, 1),
         // diffuseColor: new Color(0, 0, 0, 1),
-        diffuseColor: new Color(1, 1, 1, 1),
+        // diffuseColor: new Color(1, 1, 1, 1),
         receiveShadow: true,
-        metallic: 1,
-        roughness: 0,
+        metallic: 0,
+        roughness: 1,
         // specularAmount: 0.4,
         // ambientAmount: 0.2,
     });
@@ -427,8 +428,9 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.material = new GBufferMaterial({
         // gpu,
         // specularAmount: 0.5,
+        // diffuseColor: Color.white(),
         metallic: 0,
-        roughness: 1,
+        roughness: 0.9,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -482,8 +484,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: 0.1,
-        specularIntensity: 0.1
+        diffuseIntensity: .05,
+        specularIntensity: .05 
         // rotationOffset: 0.8,
     });
 
