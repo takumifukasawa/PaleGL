@@ -230,6 +230,7 @@ void main() {
     );
     // TODO: bufferからか何かしらで引っ張ってくる
     float uAmbientAmount = .2;
+    // add ambient specular
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
 
@@ -243,6 +244,8 @@ void main() {
 
     // TODO: aoを考慮したライティング計算
     resultColor.xyz *= aoRate;
+    // for debug
+    // resultColor.xyz = vec3(aoRate);
 
     // correct
     outColor = resultColor;

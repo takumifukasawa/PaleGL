@@ -1,8 +1,8 @@
 // import "@/style.css";
 
 import smokeImgUrl from '../images/particle-smoke.png?url';
-// import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
-// import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
+import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../images/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../images/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
@@ -64,8 +64,8 @@ import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 // others
 import {
     UniformTypes,
-    // TextureWrapTypes,
-    // TextureFilterTypes,
+    TextureWrapTypes,
+    TextureFilterTypes,
     BlendTypes,
     CubeMapAxis,
     RenderTargetTypes,
@@ -152,8 +152,8 @@ debuggerStates.instanceNum = instanceNum;
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-// let floorDiffuseMap: Texture;
-// let floorNormalMap: Texture;
+let floorDiffuseMap: Texture;
+let floorNormalMap: Texture;
 let sphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
@@ -388,8 +388,6 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstancePosition,
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
-            // usageType: AttributeUsageType.StaticDraw,
-            divisor: 1,
         })
     );
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
@@ -398,8 +396,6 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
-            // usageType: AttributeUsageType.StaticDraw,
-            divisor: 1,
         })
     );
     // aInstanceAnimationOffsetは予約語
@@ -408,8 +404,6 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceAnimationOffset,
             data: new Float32Array(animationOffsetInfo),
             size: 1,
-            // usageType: AttributeUsageType.StaticDraw,
-            divisor: 1,
         })
     );
     skinningMesh.geometry.setAttribute(
@@ -417,8 +411,6 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceVertexColor,
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
-            // usageType: AttributeUsageType.StaticDraw,
-            divisor: 1,
         })
     );
     // skinningMesh.material = new PhongMaterial({
@@ -436,7 +428,7 @@ const createGLTFSkinnedMesh = async () => {
         // gpu,
         // specularAmount: 0.5,
         metallic: 0,
-        roughness: 0.5,
+        roughness: 1,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -454,27 +446,27 @@ const main = async () => {
         img: particleImg,
     });
 
-    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    // floorDiffuseMap = new Texture({
-    //     gpu,
-    //     img: floorDiffuseImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    floorDiffuseMap = new Texture({
+        gpu,
+        img: floorDiffuseImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
-    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    // floorNormalMap = new Texture({
-    //     gpu,
-    //     img: floorNormalImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
+    const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    floorNormalMap = new Texture({
+        gpu,
+        img: floorNormalImg,
+        // mipmap: true,
+        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TextureWrapTypes.Repeat,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
 
     const images = {
         [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
@@ -520,12 +512,12 @@ const main = async () => {
         // }),
         material: new GBufferMaterial({
             // gpu,
-            // diffuseMap: floorDiffuseMap,
-            // normalMap: floorNormalMap,
+            diffuseMap: floorDiffuseMap,
+            normalMap: floorNormalMap,
             // envMap: cubeMap,
             // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
             // diffuseColor: new Color(0, 0, 0, 1),
-            diffuseColor: new Color(0, 0, 0, 1),
+            diffuseColor: new Color(1, 1, 1, 1),
             receiveShadow: true,
             // specularAmount: 0.4,
             metallic: 0,

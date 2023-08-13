@@ -34,16 +34,19 @@ export class GBufferMaterial extends Material {
     // specularAmount;
 
     constructor({
+        // diffuse
         diffuseColor,
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
-        // specularAmount,
-        metallic,
-        roughness,
+        // normal
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
+        // params
+        // specularAmount,
+        metallic,
+        roughness,
         // TODO: 外部化
         vertexShaderModifier = {},
         uniforms = {},
