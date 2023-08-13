@@ -230,6 +230,8 @@ void main() {
     );
     // TODO: bufferからか何かしらで引っ張ってくる
     float uAmbientAmount = .2;
+    // add ambient diffuse
+    resultColor.xyz += calcEnvMap(uEnvMap, surface.worldNormal, 0.) * uAmbientAmount;
     // add ambient specular
     resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
 #endif
