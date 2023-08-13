@@ -44,7 +44,7 @@ in vec3 vWorldPosition;
 // layout (location = 1) out vec4 outGBufferB;
 // layout (location = 2) out vec4 outGBufferC;
 
-#include ./partial/gbuffer-layout.glsl
+#include ./partial/gbuffer-functions.glsl
 
 #ifdef USE_NORMAL_MAP
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
@@ -72,6 +72,8 @@ void checkAlphaTest(float value, float threshold) {
     }
 }
 #endif
+
+#include ./partial/gbuffer-layout.glsl
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
@@ -107,8 +109,10 @@ void main() {
 #endif
 
     // correct
-    outGBufferA = vec4(resultColor.rgb, 1.);
-    // outBaseColor = surface.diffuseColor;
-    outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
-    outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
+    // outGBufferA = vec4(resultColor.rgb, 1.);
+    // outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
+    // outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
+    outGBufferA = EncodeGBufferA(resultColor.rgb);
+    outGBufferB = EncodeGBufferB(worldNormal);
+    outGBufferC = EncodeGBufferC(uMetallic, uRoughness);
 }

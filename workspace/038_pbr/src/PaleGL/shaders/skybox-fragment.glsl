@@ -18,9 +18,11 @@ uniform float uRotationOffset;
 // layout (location = 1) out vec4 outGBufferB;
 // layout (location = 2) out vec4 outGBufferC;
 
-#include ./partial/gbuffer-layout.glsl
-
 #include ./partial/env-map-fragment-functions.glsl
+
+#include ./partial/gbuffer-functions.glsl
+
+#include ./partial/gbuffer-layout.glsl
 
 void main() {
     // pattern_1: inverse normal
@@ -34,8 +36,10 @@ void main() {
     // USE_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
     vec3 envMapColor = calcEnvMap(uCubeTexture, reflectDir, uRotationOffset);
     
-    // outColor = textureColor;
-    outGBufferA = vec4(envMapColor, 1.);
-    outGBufferB = vec4(0., 0., 0., 1.);
-    outGBufferC = vec4(0., 0., 0., 1.);
+    // outGBufferA = vec4(envMapColor, 1.);
+    // outGBufferB = vec4(0., 0., 0., 1.);
+    // outGBufferC = vec4(0., 0., 0., 1.);
+    outGBufferA = EncodeGBufferA(envMapColor);
+    outGBufferB = EncodeGBufferB(vec3(0.));
+    outGBufferC = EncodeGBufferC(0., 0.);
 }
