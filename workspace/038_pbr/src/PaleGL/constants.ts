@@ -98,6 +98,12 @@ export const RenderbufferTypes = {
 
 export type RenderbufferType = (typeof RenderbufferTypes)[keyof typeof RenderbufferTypes];
 
+export const LightTypes = {
+    Directional: 'Directional',
+} as const;
+
+export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
+
 export const ActorTypes = {
     Null: 'Null',
     Mesh: 'Mesh',

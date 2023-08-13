@@ -11,7 +11,9 @@ import {
     RenderQueue,
     UniformType,
     VertexShaderModifier,
-    FragmentShaderModifier, DepthFuncType, DepthFuncTypes,
+    FragmentShaderModifier,
+    DepthFuncType,
+    DepthFuncTypes,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
@@ -22,7 +24,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
-import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
+import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 
 export type MaterialArgs = {
     // required
@@ -59,7 +61,7 @@ export type MaterialArgs = {
 
     // normal map
     useNormalMap?: boolean | null;
-    
+
     // env map
     useEnvMap?: boolean | null;
 
@@ -157,7 +159,7 @@ export class Material {
     queue: RenderQueue | null;
 
     useNormalMap: boolean | null;
-    
+
     useEnvMap: boolean | null;
 
     // skinning
@@ -238,7 +240,7 @@ export class Material {
 
         // vertex color
         useVertexColor = false,
-        
+
         // env map
         useEnvMap = false,
 
@@ -282,7 +284,7 @@ export class Material {
         this.depthTest = !!depthTest;
         this.depthWrite = !!depthWrite;
         this.depthFuncType = depthFuncType;
-        
+
         this.alphaTest = typeof alphaTest === 'number' ? alphaTest : null;
 
         this.faceSide = faceSide || FaceSide.Front;
@@ -316,7 +318,7 @@ export class Material {
 
         // normal map
         this.useNormalMap = !!useNormalMap;
-        
+
         // env map
         this.useEnvMap = !!useEnvMap;
 

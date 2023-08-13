@@ -24,9 +24,9 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera.ts';
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 // import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets.ts";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget.ts";
-import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+// import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
+// import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+// import { Color } from '@/PaleGL/math/Color.ts';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
@@ -111,81 +111,7 @@ export class Renderer {
         });
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         // console.log(this._copyDepthDestRenderTarget)
-        this._deferredShadingPass = new DeferredShadingPass({
-            gpu,
-            fragmentShader: deferredShadingFragmentShader,
-            uniforms: {
-                // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
-                [UniformNames.GBufferATexture]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                [UniformNames.GBufferBTexture]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                [UniformNames.GBufferCTexture]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                [UniformNames.DepthTexture]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                [UniformNames.ShadowMap]: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                uAmbientOcclusionTexture: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                // [UniformNames.ViewPosition]: {
-                //     type: UniformTypes.Vector3,
-                //     value: Vector3.zero,
-                // },
-                // [UniformNames.InverseViewProjectionMatrix]: {
-                //     type: UniformTypes.Matrix4,
-                //     value: Matrix4.identity,
-                // },
-                // [UniformNames.CameraNear]: {
-                //     type: UniformTypes.Float,
-                //     value: 0,
-                // },
-                // [UniformNames.CameraFar]: {
-                //     type: UniformTypes.Float,
-                //     value: 0,
-                // },
-                // [UniformNames.ViewPosition]: {
-                //     type: UniformTypes.Vector3,
-                //     value: Vector3.zero,
-                // },
-                [UniformNames.DirectionalLight]: {
-                    type: UniformTypes.Struct,
-                    value: {
-                        // direction: Vector3.zero,
-                        // intensity: 0,
-                        // color: new Vector4(0, 0, 0, 0),
-                        direction: {
-                            type: UniformTypes.Vector3,
-                            value: Vector3.zero,
-                        },
-                        intensity: {
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        color: {
-                            type: UniformTypes.Color,
-                            value: new Color(0, 0, 0, 1),
-                        },
-                    },
-                },
-                uEnvMap: {
-                    type: UniformTypes.CubeMap,
-                    value: null,
-                },
-            },
-        });
+        this._deferredShadingPass = new DeferredShadingPass({ gpu });
     }
 
     // --------------------------------------------------------------
@@ -437,48 +363,49 @@ export class Renderer {
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
         lightActors.forEach((light) => {
             const targetMaterial = this._deferredShadingPass.material;
-            if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
-                targetMaterial.updateUniform(UniformNames.DirectionalLight, {
-                    direction: {
-                        type: UniformTypes.Vector3,
-                        // pattern1: そのまま渡す
-                        // value: light.transform.position,
-                        // pattern2: normalizeしてから渡す
-                        value: light.transform.position.clone().normalize(),
-                    },
-                    intensity: {
-                        type: UniformTypes.Float,
-                        value: light.intensity,
-                    },
-                    color: {
-                        type: UniformTypes.Color,
-                        value: light.color,
-                    },
-                });
-                if (light.shadowMap) {
-                    this._deferredShadingPass.material.updateUniform(
-                        UniformNames.ShadowMap,
-                        light.shadowMap.read.texture
-                    );
-                }
-            }
-            if (
-                targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-                targetMaterial.receiveShadow &&
-                light.castShadow &&
-                light.shadowCamera &&
-                light.shadowMap
-            ) {
-                // clip coord (-1 ~ 1) to uv (0 ~ 1)
-                const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-                const textureProjectionMatrix = Matrix4.multiplyMatrices(
-                    textureMatrix,
-                    light.shadowCamera.projectionMatrix.clone(),
-                    light.shadowCamera.viewMatrix.clone()
-                );
-                targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-                targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
-            }
+            light.updateUniform(targetMaterial);
+            // if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
+            //     targetMaterial.updateUniform(UniformNames.DirectionalLight, {
+            //         direction: {
+            //             type: UniformTypes.Vector3,
+            //             // pattern1: そのまま渡す
+            //             // value: light.transform.position,
+            //             // pattern2: normalizeしてから渡す
+            //             value: light.transform.position.clone().normalize(),
+            //         },
+            //         intensity: {
+            //             type: UniformTypes.Float,
+            //             value: light.intensity,
+            //         },
+            //         color: {
+            //             type: UniformTypes.Color,
+            //             value: light.color,
+            //         },
+            //     });
+            //     if (light.shadowMap) {
+            //         this._deferredShadingPass.material.updateUniform(
+            //             UniformNames.ShadowMap,
+            //             light.shadowMap.read.texture
+            //         );
+            //     }
+            // }
+            // if (
+            //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
+            //     targetMaterial.receiveShadow &&
+            //     light.castShadow &&
+            //     light.shadowCamera &&
+            //     light.shadowMap
+            // ) {
+            //     // clip coord (-1 ~ 1) to uv (0 ~ 1)
+            //     const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+            //     const textureProjectionMatrix = Matrix4.multiplyMatrices(
+            //         textureMatrix,
+            //         light.shadowCamera.projectionMatrix.clone(),
+            //         light.shadowCamera.viewMatrix.clone()
+            //     );
+            //     targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+            //     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
+            // }
         });
 
         // update cubemap
@@ -816,40 +743,43 @@ export class Renderer {
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             lightActors.forEach((light) => {
-                if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
-                    targetMaterial.updateUniform(UniformNames.DirectionalLight, {
-                        direction: {
-                            type: UniformTypes.Vector3,
-                            value: light.transform.position,
-                        },
-                        intensity: {
-                            type: UniformTypes.Float,
-                            value: light.intensity,
-                        },
-                        color: {
-                            type: UniformTypes.Color,
-                            value: light.color,
-                        },
-                    });
-                }
+                // const targetMaterial = this._deferredShadingPass.material;
+                light.updateUniform(targetMaterial);
+                
+                // if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
+                //     targetMaterial.updateUniform(UniformNames.DirectionalLight, {
+                //         direction: {
+                //             type: UniformTypes.Vector3,
+                //             value: light.transform.position,
+                //         },
+                //         intensity: {
+                //             type: UniformTypes.Float,
+                //             value: light.intensity,
+                //         },
+                //         color: {
+                //             type: UniformTypes.Color,
+                //             value: light.color,
+                //         },
+                //     });
+                // }
 
-                if (
-                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-                    targetMaterial.receiveShadow &&
-                    light.castShadow &&
-                    light.shadowCamera &&
-                    light.shadowMap
-                ) {
-                    // clip coord (-1 ~ 1) to uv (0 ~ 1)
-                    const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-                    const textureProjectionMatrix = Matrix4.multiplyMatrices(
-                        textureMatrix,
-                        light.shadowCamera.projectionMatrix.clone(),
-                        light.shadowCamera.viewMatrix.clone()
-                    );
-                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-                    targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
-                }
+                // if (
+                //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
+                //     targetMaterial.receiveShadow &&
+                //     light.castShadow &&
+                //     light.shadowCamera &&
+                //     light.shadowMap
+                // ) {
+                //     // clip coord (-1 ~ 1) to uv (0 ~ 1)
+                //     const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+                //     const textureProjectionMatrix = Matrix4.multiplyMatrices(
+                //         textureMatrix,
+                //         light.shadowCamera.projectionMatrix.clone(),
+                //         light.shadowCamera.viewMatrix.clone()
+                //     );
+                //     targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+                //     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
+                // }
             });
 
             this.renderMesh(actor.geometry, targetMaterial);
