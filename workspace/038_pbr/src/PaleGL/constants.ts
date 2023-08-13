@@ -227,6 +227,7 @@ export const UniformNames = {
     CameraFar: 'uFarClip',
     // light
     DirectionalLight: "uDirectionalLight",
+    Skybox: "uSkybox"
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];

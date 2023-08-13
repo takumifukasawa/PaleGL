@@ -87,6 +87,7 @@ export class PostProcess {
      * @param targetCamera
      * @param time
      */
+    // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
     static updatePassMaterial({
         pass,
         renderer,

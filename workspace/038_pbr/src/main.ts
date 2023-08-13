@@ -482,6 +482,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
+        diffuseIntensity: 0.1,
+        specularIntensity: 0.1
         // rotationOffset: 0.8,
     });
 

@@ -1,10 +1,11 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
 // import { Uniforms } from '@/PaleGL/materials/Material';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {PostProcessPassBase} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
+import {Skybox} from "@/PaleGL/actors/Skybox.ts";
 
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
@@ -66,11 +67,30 @@ export class DeferredShadingPass extends PostProcessPassBase {
                     },
                 },
             },
-            // TODO: pass skybox env
-            uEnvMap: {
-                type: UniformTypes.CubeMap,
-                value: null,
+           
+            [UniformNames.Skybox]: {
+                type: UniformTypes.Struct,
+                value: {
+                    cubeMap: {
+                        type: UniformTypes.CubeMap,
+                        value: null
+                    },
+                    diffuseIntensity: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    specularIntensity: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                }
             },
+            
+            // // TODO: pass skybox env
+            // uEnvMap: {
+            //     type: UniformTypes.CubeMap,
+            //     value: null,
+            // },
         };
 
         super({
@@ -80,6 +100,23 @@ export class DeferredShadingPass extends PostProcessPassBase {
             uniforms,
             useEnvMap: true,
             receiveShadow: true,
+        });
+    }
+    
+    updateSkyboxUniforms(skybox: Skybox) {
+        this.material.updateUniform(UniformNames.Skybox, {
+            cubeMap: {
+                type: UniformTypes.CubeMap,
+                value: skybox.cubeMap
+            },
+            diffuseIntensity: {
+                type: UniformTypes.Float,
+                value: skybox.diffuseIntensity,
+            },
+            specularIntensity: {
+                type: UniformTypes.Float,
+                value: skybox.specularIntensity,
+            },
         });
     }
     

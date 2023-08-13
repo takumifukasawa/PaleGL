@@ -20,6 +20,12 @@ struct Surface {
     vec4 diffuseColor;
     float specularAmount;
 };
+        
+struct Skybox {
+    samplerCube cubeMap;
+    float diffuseIntensity;
+    float specularIntensity;
+};
 
 // -----------------------------------------------------------
 // functions
@@ -83,7 +89,7 @@ uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 // uniform sampler2D uShadowMap;
-uniform samplerCube uEnvMap;
+// uniform samplerCube uEnvMap;
 
 uniform float uNearClip;
 uniform float uFarClip;
@@ -91,6 +97,9 @@ uniform float uFarClip;
 uniform float uTime;
 
 uniform mat4 uInverseViewProjectionMatrix;
+       
+// TODO: loop
+uniform Skybox uSkybox;
         
 layout (location = 0) out vec4 outColor;
 
@@ -229,11 +238,10 @@ void main() {
         normalize(surface.worldNormal)
     );
     // TODO: bufferからか何かしらで引っ張ってくる
-    float uAmbientAmount = .2;
     // add ambient diffuse
-    resultColor.xyz += calcEnvMap(uEnvMap, surface.worldNormal, 0.) * uAmbientAmount;
+    resultColor.xyz += calcEnvMap(uSkybox.cubeMap, surface.worldNormal, 0.) * uSkybox.diffuseIntensity;
     // add ambient specular
-    resultColor.xyz += calcEnvMap(uEnvMap, envDir, 0.) * uAmbientAmount;
+    resultColor.xyz += calcEnvMap(uSkybox.cubeMap, envDir, 0.) * uSkybox.specularIntensity;
 #endif
 
 #ifdef USE_RECEIVE_SHADOW

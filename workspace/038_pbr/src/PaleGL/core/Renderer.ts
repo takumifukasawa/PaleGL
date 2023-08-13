@@ -29,7 +29,7 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera.ts';
 // import { Color } from '@/PaleGL/math/Color.ts';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts';
-import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+// import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
@@ -358,6 +358,16 @@ export class Renderer {
         // deferred lighting pass
         // ------------------------------------------------------------------------------
 
+        // update cubemap to deferred lighting pass
+        // TODO: skyboxは一個だけ想定のいいはず
+        sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
+            const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
+            // const cubeMap: CubeMap = skyboxActor.cubeMap;
+            // this._deferredShadingPass.material.updateUniform('uEnvMap', cubeMap);
+            this._deferredShadingPass.updateSkyboxUniforms(skyboxActor);
+        });
+
+        // update lights to deferred lighting pass
         // TODO: ここでライティングのパスが必要
         // TODO: - light actor の中で lightの種類別に処理を分ける
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
@@ -408,13 +418,6 @@ export class Renderer {
             // }
         });
 
-        // update cubemap
-        // TODO: skyboxは一個だけ想定のいいはず
-        sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
-            const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-            const cubeMap: CubeMap = skyboxActor.cubeMap;
-            this._deferredShadingPass.material.updateUniform('uEnvMap', cubeMap);
-        });
 
         // set ao texture
         this._deferredShadingPass.material.updateUniform(
