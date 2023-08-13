@@ -79,6 +79,7 @@ uniform vec3 uViewPosition;
 // uniform sampler2D uAOTexture; 
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
+uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 // uniform sampler2D uShadowMap;
@@ -130,18 +131,26 @@ void main() {
 
     vec2 uv = vUv;
 
-    vec4 baseColor = texture(uGBufferATexture, uv);
-   
+    vec4 gBufferA = texture(uGBufferATexture, uv);
+    vec4 gBufferB = texture(uGBufferBTexture, uv);
+    vec4 gBufferC = texture(uGBufferCTexture, uv);
+        
+    // surface
+    vec3 baseColor = gBufferA.xyz;
+    float metallic = gBufferC.x;
+    float roughness = gBufferC.y;
+  
+    // depth
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
     // depth guard
     if(step(rawDepth, 1. - eps) < .5) {
-        outColor = baseColor;
+        outColor = vec4(baseColor, 1.);
         return;
     }
 
-    vec3 worldNormal = texture(uGBufferBTexture, uv).xyz * 2. - 1.;
+    vec3 worldNormal = gBufferB.xyz * 2. - 1.;
     
     float aoRate = texture(uAmbientOcclusionTexture, uv).r;
 
@@ -158,7 +167,7 @@ void main() {
     Surface surface;
     surface.worldPosition = worldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = baseColor;
+    surface.diffuseColor = vec4(baseColor, 1.);
    
     // TODO: bufferから引っ張ってくる
     surface.specularAmount = .5;
@@ -178,10 +187,10 @@ void main() {
     geometry.normal = surface.worldNormal;
     geometry.viewDir = normalize(camera.worldPosition - surface.worldPosition);
     Material material;
-    // TODO: bufferから引っ張ってくる
-    float metallic = 1.;
-    float roughness = 0.;
-    vec3 albedo = baseColor.xyz;
+    // // TODO: bufferから引っ張ってくる
+    // float metallic = 1.;
+    // float roughness = 0.;
+    vec3 albedo = baseColor;
     material.diffuseColor = mix(albedo, vec3(0.), metallic);
     material.specularColor = mix(vec3(.04), albedo, metallic);
     material.specularRoughness = roughness;

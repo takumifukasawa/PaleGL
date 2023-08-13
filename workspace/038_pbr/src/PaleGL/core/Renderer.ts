@@ -124,6 +124,10 @@ export class Renderer {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                [UniformNames.GBufferCTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 [UniformNames.DepthTexture]: {
                     type: UniformTypes.Texture,
                     value: null,

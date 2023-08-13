@@ -18,7 +18,9 @@ export type GBufferMaterialArgs = {
     diffuseMap?: Texture;
     diffuseMapUvScale?: Vector2;
     diffuseMapUvOffset?: Vector2;
-    specularAmount?: number;
+    // specularAmount?: number;
+    metallic?: number;
+    roughness?: number;
     normalMap?: Texture;
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
@@ -36,7 +38,9 @@ export class GBufferMaterial extends Material {
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
-        specularAmount,
+        // specularAmount,
+        metallic,
+        roughness,
         normalMap,
         normalMapUvScale, // vec2
         normalMapUvOffset, // vec2,
@@ -66,9 +70,17 @@ export class GBufferMaterial extends Material {
                 // value: Vector2.one,
                 value: diffuseMapUvOffset || Vector2.one,
             },
-            uSpecularAmount: {
+            // uSpecularAmount: {
+            //     type: UniformTypes.Float,
+            //     value: specularAmount || 1,
+            // },
+            uMetallic: {
                 type: UniformTypes.Float,
-                value: specularAmount || 1,
+                value: metallic || 0,
+            },
+            uRoughness: {
+                type: UniformTypes.Float,
+                value: roughness || 0,
             },
             uNormalMap: {
                 type: UniformTypes.Texture,

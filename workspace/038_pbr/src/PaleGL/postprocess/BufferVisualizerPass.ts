@@ -4,11 +4,6 @@ import {PostProcessPassBase} from '@/PaleGL/postprocess/PostProcessPassBase';
 import {Matrix4} from "@/PaleGL/math/Matrix4";
 import {GPU} from "@/PaleGL/core/GPU";
 
-// ref:
-// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
-// http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
-// https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
-// http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
 export class BufferVisualizerPass extends PostProcessPassBase {
     constructor({gpu}: { gpu: GPU }) {
@@ -23,6 +18,10 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     value: null,
                 },
                 [UniformNames.GBufferBTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                [UniformNames.GBufferCTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },

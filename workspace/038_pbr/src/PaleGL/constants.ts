@@ -197,6 +197,7 @@ export const UniformNames = {
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',
+    GBufferCTexture: 'uGBufferCTexture',
     // depth
     DepthTexture: 'uDepthTexture',
     // ao

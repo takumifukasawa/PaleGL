@@ -14,8 +14,11 @@ uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 
 // out vec4 outColor;
-layout (location = 0) out vec4 outBaseColor;
-layout (location = 1) out vec4 outNormalColor;
+// layout (location = 0) out vec4 outGBufferA;
+// layout (location = 1) out vec4 outGBufferB;
+// layout (location = 2) out vec4 outGBufferC;
+
+#include ./partial/gbuffer-layout.glsl
 
 #include ./partial/env-map-fragment-functions.glsl
 
@@ -32,6 +35,7 @@ void main() {
     vec3 envMapColor = calcEnvMap(uCubeTexture, reflectDir, uRotationOffset);
     
     // outColor = textureColor;
-    outBaseColor = vec4(envMapColor, 1.);
-    outNormalColor = vec4(0., 0., 0., 1.);
+    outGBufferA = vec4(envMapColor, 1.);
+    outGBufferB = vec4(0., 0., 0., 1.);
+    outGBufferC = vec4(0., 0., 0., 1.);
 }

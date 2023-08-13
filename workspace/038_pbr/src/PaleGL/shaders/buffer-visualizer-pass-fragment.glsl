@@ -9,6 +9,7 @@ out vec4 outColor;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
+uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uAmbientOcclusionTexture;
 uniform float uNearClip;
@@ -22,15 +23,23 @@ float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
 }
 
-void main() {
-    vec2 depthUV = vUv * 3. + vec2(0., -2.);
-    vec2 gBufferAUV = vUv * 3. + vec2(-1., -2.);
-    vec2 gBufferBUV = vUv * 3. + vec2(-2., -2.);
-    vec2 worldPositionUV = vUv * 3. + vec2(0., -1.);
-    vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-1., -1.);
-    vec2 aoUV = vUv * 3. + vec2(-2., -1.);
+int bitShift(int data, int order) {
+    return data >> order;
+}
 
-    vec4 baseColor = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
+void main() {
+    vec2 gBufferAUV = vUv * 3. + vec2(0., -2.);
+    vec2 gBufferBUV = vUv * 3. + vec2(-1., -2.);
+    vec2 gBufferCUV = vUv * 3. + vec2(-2., -2.);
+    vec2 depthUV = vUv * 3. + vec2(0., -1.);
+    vec2 worldPositionUV = vUv * 3. + vec2(-1, -1.);
+    vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-2., -1.);
+    vec2 aoUV = vUv * 3. + vec2(0., 0.);
+    
+    vec4 gBufferA = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
+    vec4 gBufferC = texture(uGBufferCTexture, gBufferCUV) * isArea(gBufferCUV);
+
+    vec3 baseColor = gBufferA.xyz;
     vec4 normalColor = (texture(uGBufferBTexture, gBufferBUV) * 2. - 1.) * isArea(gBufferBUV);
 
     float rawDepth = texture(uDepthTexture, depthUV).x * isArea(depthUV);
@@ -46,11 +55,21 @@ void main() {
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
 
+    // test
+    // float roughness = gBufferA.a;
+    // int packedA = int(gBufferA.a * 255.);
+    // int packedRoughnessInt = 15 & 15;
+    // float packedRoughnessFloat = float(packedRoughnessInt);
+    // // outColor = vec4(vec3(roughness), 1.);
+    // outColor = vec4(vec3(packedRoughnessFloat), 1.) * isArea(gBufferAUV);
+    // return;
+    
     outColor =
-    baseColor +
-    normalColor +
-    sceneDepth +
-    directionalShadowMapColor +
-    vec4(worldPosition, 1.) +
-    aoColor;
+        vec4(baseColor, 1.) +
+        normalColor +
+        gBufferC +
+        sceneDepth +
+        directionalShadowMapColor +
+        vec4(worldPosition, 1.) +
+        aoColor;
 }

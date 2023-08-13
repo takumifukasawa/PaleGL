@@ -326,7 +326,9 @@ const createGLTFSphereMesh = async () => {
         // diffuseColor: new Color(0, 0, 0, 1),
         diffuseColor: new Color(1, 1, 1, 1),
         receiveShadow: true,
-        specularAmount: 0.4,
+        metallic: 1,
+        roughness: 0,
+        // specularAmount: 0.4,
         // ambientAmount: 0.2,
     });
     return mesh;
@@ -432,7 +434,9 @@ const createGLTFSkinnedMesh = async () => {
     // });
     skinningMesh.material = new GBufferMaterial({
         // gpu,
-        specularAmount: 0.5,
+        // specularAmount: 0.5,
+        metallic: 0,
+        roughness: 0.5,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -523,7 +527,9 @@ const main = async () => {
             // diffuseColor: new Color(0, 0, 0, 1),
             diffuseColor: new Color(0, 0, 0, 1),
             receiveShadow: true,
-            specularAmount: 0.4,
+            // specularAmount: 0.4,
+            metallic: 0,
+            roughness: 0.5,
             // ambientAmount: 0.2,
         }),
         castShadow: false,

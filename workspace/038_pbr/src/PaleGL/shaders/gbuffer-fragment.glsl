@@ -10,6 +10,8 @@ uniform vec2 uDiffuseMapUvScale;
 uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
+uniform float uMetallic;
+uniform float uRoughness;
 
 #include ./partial/normal-map-fragment-uniforms.glsl
 
@@ -24,7 +26,7 @@ struct Surface {
     vec3 worldNormal;
     vec3 worldPosition;
     vec4 diffuseColor;
-    float specularAmount;
+    // float specularAmount;
 };
 
 #include ./partial/camera-struct.glsl
@@ -38,8 +40,11 @@ in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
 
-layout (location = 0) out vec4 outGBufferA;
-layout (location = 1) out vec4 outGBufferB;
+// layout (location = 0) out vec4 outGBufferA;
+// layout (location = 1) out vec4 outGBufferB;
+// layout (location = 2) out vec4 outGBufferC;
+
+#include ./partial/gbuffer-layout.glsl
 
 #ifdef USE_NORMAL_MAP
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
@@ -93,7 +98,7 @@ void main() {
     surface.diffuseColor = uDiffuseColor * diffuseMapColor;
 #endif
 
-    surface.specularAmount = uSpecularAmount;
+    // surface.specularAmount = uSpecularAmount;
     
     resultColor = surface.diffuseColor;
 
@@ -102,7 +107,8 @@ void main() {
 #endif
 
     // correct
-    outGBufferA = resultColor;
+    outGBufferA = vec4(resultColor.rgb, 1.);
     // outBaseColor = surface.diffuseColor;
     outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
+    outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
 }

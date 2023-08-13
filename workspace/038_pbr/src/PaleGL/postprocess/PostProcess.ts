@@ -114,8 +114,10 @@ export class PostProcess {
                 UniformNames.TransposeInverseViewMatrix,
                 targetCamera.viewMatrix.clone().invert().transpose()
             );
+            // g-buffers
             passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
             passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
+            passMaterial.updateUniform(UniformNames.GBufferCTexture, renderer.gBufferRenderTargets.gBufferCTexture);
             // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
             passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
         });

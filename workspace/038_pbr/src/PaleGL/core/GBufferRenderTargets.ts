@@ -4,11 +4,12 @@ import { GLColorAttachment, TextureFilterTypes, TextureTypes } from '@/PaleGL/co
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
-// ---------------------------------------------------------
-// [GBufferA: RGBA8] rgb: base color, a: unused
-// [GBufferB: RGBA8] rgb: normal, a: unused
+// ---------------------------------------------------------------------
+// [GBufferA: RGBA8] rgb: base color
+// [GBufferB: RGBA8] rgb: normal
+// [GBufferC: RGBA8] r: metallic, g: roughness
 // [Depth] depth prepass depth
-// ---------------------------------------------------------
+// ---------------------------------------------------------------------
 
 // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 export class GBufferRenderTargets extends AbstractRenderTarget {
@@ -17,14 +18,15 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     width: number;
     height: number;
     private _framebuffer: Framebuffer;
-    private _textures: Texture[] = [];
+    private _gBufferTextures: Texture[] = [];
     private _gBufferATexture: Texture;
     private _gBufferBTexture: Texture;
+    private _gBufferCTexture: Texture;
     private _depthTexture: Texture | null = null
 
-    get textures() {
-        return this._textures;
-    }
+    // get textures() {
+    //     return this._gBufferTextures;
+    // }
 
     get gBufferATexture() {
         return this._gBufferATexture;
@@ -32,6 +34,10 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
 
     get gBufferBTexture() {
         return this._gBufferBTexture;
+    }
+    
+    get gBufferCTexture() {
+        return this._gBufferCTexture;
     }
 
     get depthTexture() {
@@ -79,7 +85,10 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         this._framebuffer = new Framebuffer({ gpu });
         this._framebuffer.bind();
 
-        // 1: base scene
+        //
+        // 1: GBufferA
+        //
+        const gBufferAAttachment = gl.COLOR_ATTACHMENT0 + 0;
         this._gBufferATexture = new Texture({
             gpu,
             width: this.width,
@@ -91,15 +100,18 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         });
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0 + 0,
+            gBufferAAttachment,
             gl.TEXTURE_2D,
             this._gBufferATexture.glObject,
             0
         );
-        this._textures.push(this._gBufferATexture);
-        this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 0) as GLColorAttachment);
+        this._gBufferTextures.push(this._gBufferATexture);
+        this.framebuffer.registerDrawBuffer(gBufferAAttachment as GLColorAttachment);
 
-        // 2: normal
+        //
+        // 2: GBufferB
+        //
+        const gBufferBAttachment =gl.COLOR_ATTACHMENT0 + 1;
         this._gBufferBTexture = new Texture({
             gpu,
             width: this.width,
@@ -111,15 +123,37 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         });
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER,
-            gl.COLOR_ATTACHMENT0 + 1,
+            gBufferBAttachment,
             gl.TEXTURE_2D,
             this._gBufferBTexture.glObject,
             0
         );
-        this.framebuffer.registerDrawBuffer((gl.COLOR_ATTACHMENT0 + 1) as GLColorAttachment);
+        this.framebuffer.registerDrawBuffer(gBufferBAttachment as GLColorAttachment);
+        this._gBufferTextures.push(this._gBufferBTexture);
 
-        this._textures.push(this._gBufferBTexture);
-
+        //
+        // 3: GBufferC
+        //
+        const gBufferCAttachment = gl.COLOR_ATTACHMENT0 + 2;
+        this._gBufferCTexture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: TextureTypes.RGBA,
+            minFilter,
+            magFilter,
+        });
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gBufferCAttachment,
+            gl.TEXTURE_2D,
+            this._gBufferCTexture.glObject,
+            0
+        );
+        this.framebuffer.registerDrawBuffer(gBufferCAttachment as GLColorAttachment);
+        this._gBufferTextures.push(this._gBufferCTexture);
+        
         // 3: depth
         // this._depthTexture = new Texture({
         //     gpu,
@@ -142,7 +176,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this._textures.forEach((texture) => texture.setSize(this.width, this.height));
+        this._gBufferTextures.forEach((texture) => texture.setSize(this.width, this.height));
         if (this._depthTexture) {
             this._depthTexture.setSize(this.width, this.height);
         }
