@@ -49,11 +49,12 @@ struct GeometricContext {
 };
 
 struct Material {
+    vec3 baseColor;
     vec3 diffuseColor;
     vec3 specularColor;
-    float specularRoughness;
-    // float specularRoughnessSquared;
-    // float metalness;
+    float roughness;
+    float metallic;
+    // float roughnessSquared;
     // float reflectivity;
     // float clearCoat;
     // float clearCoatRoughness;
@@ -208,8 +209,15 @@ vec3 DiffuseBRDF(vec3 diffuseColor) {
     return diffuseColor / PI;
 }
 
+// TODO: schlickの公式まとめる
+        
 vec3 F_Shhlick(vec3 specularColor, vec3 H, vec3 V) {
     return (specularColor + (1. - specularColor) * pow(1. - saturate(dot(V, H)), 5.));
+}
+
+// ref: http://d.hatena.ne.jp/hanecci/20130525/p3
+vec3 schlick(vec3 f0, float product) {
+    return f0 + (1. - f0) * pow((1. - product), 5.);
 }
 
 float D_GGX(float a, float dotNH) {
@@ -219,7 +227,7 @@ float D_GGX(float a, float dotNH) {
     return a2 / (PI * d * d);
 }
 
-float G_Smith_Shlick_GGX(float a, float dotNV, float dotNL) {
+float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
     float k = a * a * .5 + EPSILON;
     float gl = dotNL / (dotNL * (1. - k) + k);
     float gv = dotNV / (dotNV * (1. - k) + k);
@@ -245,7 +253,7 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
     float a = roughnessFactor * roughnessFactor;
     
     float D = D_GGX(a, dotNH);
-    float G = G_Smith_Shlick_GGX(a, dotNV, dotNL);
+    float G = G_Smith_Schlick_GGX(a, dotNV, dotNL);
     vec3 F = F_Shhlick(specularColor, V, H);
     
     return (F * (G * D)) / (4. * dotNL * dotNV + EPSILON);
@@ -267,45 +275,58 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
         irradiance *
         DiffuseBRDF(material.diffuseColor);
     // specular
-    // reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.specularRoughness);
+    // reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.roughness);
     reflectedLight.directSpecular +=
         irradiance *
         SpecularBRDF(
             directLight.direction,
             geometry,
             material.specularColor,
-            material.specularRoughness
+            material.roughness
         );
 }
 
-// TODO: IBL
-void RE_DirectSkybox(samplerCube cubeMap, const in IncidentSkyboxLight skyboxLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
-    // float diffuseDotNL = saturate(dot(geometry.normal, skyboxLight.diffuseDirection));
-    // float specularDotNL = saturate(dot(geometry.normal, skyboxLight.specularDirection));
-
+// base: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
+void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight skyboxLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
+    //
+    // diffuse
+    //
+            
     vec3 envDiffuseColor = textureLod(
         cubeMap,
         skyboxLight.diffuseDirection,
         skyboxLight.maxLodLevel
     ).xyz;
         
-    float specularLod = log2(material.specularRoughness * pow(2., skyboxLight.maxLodLevel));
+    // 拡散: metalness,roughnessを考慮しない
+    reflectedLight.directDiffuse =
+        material.diffuseColor
+        * envDiffuseColor
+        * skyboxLight.diffuseIntensity;
+
+    //
+    // specular
+    //
+
+    float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
     vec3 envSpecularColor = textureLod(
         cubeMap,
         skyboxLight.specularDirection,
         specularLod
     ).xyz;
-    
-    vec3 diffuseIrradiance = envDiffuseColor * skyboxLight.diffuseIntensity;
-    // vec3 diffuseIrradiance = diffuseDotNL * envDiffuseColor * skyboxLight.diffuseIntensity;
-    vec3 specularIrradiance = envSpecularColor * skyboxLight.specularIntensity;
-    // vec3 specularIrradiance = specularDotNL * envSpecularColor * skyboxLight.specularIntensity;
 
-    // punctual light
-    // diffuseIrradiance *= PI;
-    // specularIrradiance *= PI;
+    vec3 f0 = mix(vec3(.04), material.baseColor, material.metallic);
 
-    reflectedLight.directDiffuse = diffuseIrradiance;
-
-    reflectedLight.directSpecular = specularIrradiance;
+    vec3 fresnel = schlick(f0, max(0., dot(geometry.viewDir, geometry.normal)));
+        
+    //
+    // result
+    //
+      
+    // 鏡面反射: metalness,roughnes を考慮
+    reflectedLight.directSpecular = mix(
+        envSpecularColor * skyboxLight.specularIntensity * f0,
+        envSpecularColor * skyboxLight.specularIntensity,
+        fresnel
+    );
 }

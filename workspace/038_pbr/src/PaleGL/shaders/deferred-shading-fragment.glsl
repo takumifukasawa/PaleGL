@@ -202,9 +202,11 @@ void main() {
     // float metallic = 1.;
     // float roughness = 0.;
     vec3 albedo = baseColor;
-    material.diffuseColor = mix(albedo, vec3(0.), metallic);
-    material.specularColor = mix(vec3(.04), albedo, metallic);
-    material.specularRoughness = roughness;
+    material.baseColor = albedo;
+    material.diffuseColor = mix(albedo, vec3(0.), metallic); // 金属は拡散反射しない
+    material.specularColor = mix(vec3(.04), albedo, metallic); // 非金属でも4%は鏡面反射をさせる（多くの不導体に対応）
+    material.roughness = roughness;
+    material.metallic = metallic;
     ReflectedLight reflectedLight = ReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
     // TODO: bufferから引っ張ってくる
     vec3 emissive = vec3(0.);
@@ -239,7 +241,7 @@ void main() {
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
-    RE_DirectSkybox(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+    RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 
 // #endif
 
