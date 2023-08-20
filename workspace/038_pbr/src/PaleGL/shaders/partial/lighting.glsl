@@ -315,9 +315,9 @@ void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight sk
         specularLod
     ).xyz;
 
-    vec3 f0 = mix(vec3(.04), material.baseColor, material.metallic);
+    // vec3 f0 = mix(vec3(.04), material.baseColor, material.metallic);
 
-    vec3 fresnel = schlick(f0, max(0., dot(geometry.viewDir, geometry.normal)));
+    vec3 fresnel = schlick(material.specularColor, max(0., dot(geometry.viewDir, geometry.normal)));
         
     //
     // result
@@ -325,7 +325,7 @@ void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight sk
       
     // 鏡面反射: metalness,roughnes を考慮
     reflectedLight.directSpecular += mix(
-        envSpecularColor * skyboxLight.specularIntensity * f0,
+        envSpecularColor * skyboxLight.specularIntensity * material.specularColor,
         envSpecularColor * skyboxLight.specularIntensity,
         fresnel
     );
