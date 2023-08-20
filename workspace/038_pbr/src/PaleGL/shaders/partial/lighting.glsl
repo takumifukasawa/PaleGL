@@ -299,7 +299,7 @@ void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight sk
     ).xyz;
         
     // 拡散: metalness,roughnessを考慮しない
-    reflectedLight.directDiffuse =
+    reflectedLight.directDiffuse +=
         material.diffuseColor
         * envDiffuseColor
         * skyboxLight.diffuseIntensity;
@@ -324,7 +324,7 @@ void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight sk
     //
       
     // 鏡面反射: metalness,roughnes を考慮
-    reflectedLight.directSpecular = mix(
+    reflectedLight.directSpecular += mix(
         envSpecularColor * skyboxLight.specularIntensity * f0,
         envSpecularColor * skyboxLight.specularIntensity,
         fresnel

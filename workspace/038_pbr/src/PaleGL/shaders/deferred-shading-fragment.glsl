@@ -213,13 +213,13 @@ void main() {
     float opacity = 1.;
         
     IncidentLight directLight;
-        
+
     // directional light
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    // RE_Direct(directLight, geometry, material, reflectedLight);
+    RE_Direct(directLight, geometry, material, reflectedLight);
 
     // point light
     // PointLight pointLight;
