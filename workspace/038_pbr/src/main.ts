@@ -431,7 +431,7 @@ const createGLTFSkinnedMesh = async () => {
         // specularAmount: 0.5,
         // diffuseColor: Color.white(),
         metallic: 0,
-        roughness: 0.9,
+        roughness: .6,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
