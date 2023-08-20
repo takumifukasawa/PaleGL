@@ -26,6 +26,7 @@ struct Skybox {
     float diffuseIntensity;
     float specularIntensity;
     float rotationOffset;
+    float maxLodLevel;
 };
 
 // -----------------------------------------------------------
@@ -216,7 +217,7 @@ void main() {
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    RE_Direct(directLight, geometry, material, reflectedLight);
+    // RE_Direct(directLight, geometry, material, reflectedLight);
 
     // point light
     // PointLight pointLight;
@@ -226,23 +227,23 @@ void main() {
     // pointLight.decay = 1.;
     // getPointLightIrradiance(pointLight, geometry, directLight);
     // RE_Direct(directLight, geometry, material, reflectedLight);
-    
-    // calc render equations
-
 
     // ambient light
 // TODO: IBL for pbr
 // #ifdef USE_ENV_MAP
     SkyboxLight skyboxLight;
+    // skyboxLight.cubeMap = uSkybox.cubeMap;
     skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
     skyboxLight.specularIntensity = uSkybox.specularIntensity;
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
+    skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
-    getSkyboxLightIrradiance(uSkybox.cubeMap, skyboxLight, geometry, directSkyboxLight);
-    RE_DirectSkybox(directSkyboxLight, geometry, material, reflectedLight);
+    getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
+    RE_DirectSkybox(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 
 // #endif
 
+// calc render equations
 
 vec3 outgoingLight =
     emissive +

@@ -7,10 +7,15 @@ type CubeMapArgs = {
     images: {
         [key in CubeMapAxis]: HTMLImageElement | null;
     };
+    width: number;
+    height: number;
 };
 
 export class CubeMap extends GLObject {
     #texture: WebGLTexture;
+    width: number;
+    height: number;
+    maxLodLevel;
 
     get glObject() {
         return this.#texture;
@@ -26,10 +31,16 @@ export class CubeMap extends GLObject {
             [CubeMapAxis.PositiveZ]: null,
             [CubeMapAxis.NegativeZ]: null,
         },
+        width,
+        height
     }: CubeMapArgs) {
         super();
 
         const gl = gpu.gl;
+        
+        this.width = width;
+        this.height = height;
+        this.maxLodLevel = Math.log2(Math.max(this.width, this.height));
 
         // NOTE: 作れるはずという前提
         this.#texture = gl.createTexture()!;
@@ -71,12 +82,13 @@ export class CubeMap extends GLObject {
             gl.texImage2D(axis, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[key]!);
         });
 
-        gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
-
-        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
 
         // TODO: unbindしない方がよい？
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);

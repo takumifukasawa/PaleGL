@@ -25,7 +25,7 @@ uniform float uRotationOffset;
 #include ./partial/gbuffer-layout.glsl
 
 void main() {
-    // pattern_1: inverse normal
+    // pattern_1: inverse normal. 法線が内側を向いた球体なので
     vec3 N = normalize(vNormal);
     vec3 reflectDir = -N;
     
@@ -34,7 +34,10 @@ void main() {
     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
     
     // USE_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
-    vec3 envMapColor = calcEnvMap(uCubeTexture, reflectDir, uRotationOffset);
+    vec3 skyboxSampleDir = calcEnvMapSampleDir(reflectDir, uRotationOffset);
+    // vec3 envMapColor = calcEnvMap(uCubeTexture);
+    // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;
+    vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
     
     // outGBufferA = vec4(envMapColor, 1.);
     // outGBufferB = vec4(0., 0., 0., 1.);

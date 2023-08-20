@@ -323,12 +323,13 @@ const createGLTFSphereMesh = async () => {
         // diffuseMap: floorDiffuseMap,
         // normalMap: floorNormalMap,
         // envMap: cubeMap,
-        diffuseColor: new Color(0.5, 0.05, 0.05, 1),
+        // diffuseColor: new Color(0.5, 0.05, 0.05, 1),
+        diffuseColor: new Color(0, 0, 0, 1),
         // diffuseColor: new Color(0, 0, 0, 1),
         // diffuseColor: new Color(1, 1, 1, 1),
         receiveShadow: true,
-        metallic: 0,
-        roughness: 1,
+        metallic: 1,
+        roughness: 0,
         // specularAmount: 0.4,
         // ambientAmount: 0.2,
     });
@@ -484,8 +485,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .05,
-        specularIntensity: .05 
+        diffuseIntensity: 1.,
+        specularIntensity: 1. 
         // rotationOffset: 0.8,
     });
 

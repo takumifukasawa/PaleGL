@@ -43,7 +43,13 @@ export async function loadCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDi
         result.forEach(({ axis, img }) => {
             data[axis] = img;
         });
-        return new CubeMap({ gpu, images: data });
+        return new CubeMap({
+            gpu,
+            images: data,
+            // axisごとに同じサイズ想定のはず
+            width: data[CubeMapAxis.PositiveX].width,
+            height: data[CubeMapAxis.PositiveX].height,
+        });
 
         //const d = Object.keys(CubeMapAxis).reduce((acc, cv) => {
         //    const axis = cv as CubeMapAxis;

@@ -86,6 +86,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
                         type: UniformTypes.Float,
                         value: 0,
                     },
+                    maxLodLevel: {
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
                 },
             },
 
@@ -124,6 +128,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 type: UniformTypes.Float,
                 value: skybox.rotationOffset,
             },
+            maxLodLevel: {
+                type: UniformTypes.Float,
+                value: skybox.cubeMap.maxLodLevel
+            }
         });
     }
 
