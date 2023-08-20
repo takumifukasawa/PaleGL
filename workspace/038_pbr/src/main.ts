@@ -328,8 +328,8 @@ const createGLTFSphereMesh = async () => {
         // diffuseColor: new Color(0, 0, 0, 1),
         // diffuseColor: new Color(1, 1, 1, 1),
         receiveShadow: true,
-        metallic: 0,
-        roughness: 1,
+        metallic: 1,
+        roughness: 0,
         // specularAmount: 0.4,
         // ambientAmount: 0.2,
     });
