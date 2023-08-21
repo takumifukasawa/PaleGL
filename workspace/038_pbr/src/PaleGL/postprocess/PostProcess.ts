@@ -163,7 +163,7 @@ export class PostProcess {
     render({
         gpu,
         renderer,
-        prevRenderTarget,
+        prevRenderTarget, // TODO: このパラメーターなくしたい
         gBufferRenderTargets,
         targetCamera,
         time,

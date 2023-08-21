@@ -15,8 +15,8 @@ export const PrimitiveTypes = {
 export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
 
 export const DepthFuncTypes = {
-    Lequal: "LEQUAL",
-    Equal: "EQUAL",
+    Lequal: 'LEQUAL',
+    Equal: 'EQUAL',
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
@@ -226,8 +226,8 @@ export const UniformNames = {
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',
     // light
-    DirectionalLight: "uDirectionalLight",
-    Skybox: "uSkybox"
+    DirectionalLight: 'uDirectionalLight',
+    Skybox: 'uSkybox',
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
@@ -282,6 +282,7 @@ export const ShaderPartialPragmas = {
     DEPTH_FUNCTIONS: 'DEPTH_FUNCTIONS',
     ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
     TRANSFORM_VERTEX_UNIFORMS: 'TRANSFORM_VERTEX_UNIFORMS',
+    PSEUDO_HDR: 'PSEUDO_HDR',
 } as const;
 
 export type ShaderPartialPragmas = (typeof ShaderPartialPragmas)[keyof typeof ShaderPartialPragmas];

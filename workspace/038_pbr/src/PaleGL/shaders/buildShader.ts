@@ -18,6 +18,7 @@ import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
 import transformVertexUniforms from '@/PaleGL/shaders/partial/transform-vertex-uniforms.glsl';
+import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -37,6 +38,7 @@ const insertShaderPairs: {
     [ShaderPartialPragmas.DEPTH_FUNCTIONS]: depthFunctions,
     [ShaderPartialPragmas.ENGINE_UNIFORMS]: engineUniforms,
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: transformVertexUniforms,
+    [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR
 };
 
 /**

@@ -38,7 +38,7 @@ void main() {
     // vec3 envMapColor = calcEnvMap(uCubeTexture);
     // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;
     vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
-    
+        
     // outGBufferA = vec4(envMapColor, 1.);
     // outGBufferB = vec4(0., 0., 0., 1.);
     // outGBufferC = vec4(0., 0., 0., 1.);

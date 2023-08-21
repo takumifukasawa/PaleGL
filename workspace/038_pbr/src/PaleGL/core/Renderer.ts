@@ -31,6 +31,7 @@ import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts';
 // import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass.ts';
+import {ToneMappingPass} from "@/PaleGL/postprocess/ToneMappingPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -112,6 +113,7 @@ export class Renderer {
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         // console.log(this._copyDepthDestRenderTarget)
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
+        this._toneMappingPass = new ToneMappingPass({ gpu });
     }
 
     // --------------------------------------------------------------
@@ -140,6 +142,10 @@ export class Renderer {
 
     get deferredShadingPass() {
         return this._deferredShadingPass;
+    }
+    
+    get toneMappingRenderTarget() {
+        return this._toneMappingPass.renderTarget;
     }
 
     /**
@@ -174,6 +180,7 @@ export class Renderer {
         // passes
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
+        this._toneMappingPass.setSize(realWidth, realHeight);
     }
 
     /**
@@ -476,6 +483,12 @@ export class Renderer {
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
 
         // ------------------------------------------------------------------------------
+        // tone mapping pass
+        // ------------------------------------------------------------------------------
+
+        this.toneMappingPass(camera, time);
+
+        // ------------------------------------------------------------------------------
         // full screen pass
         // TODO: mainCameraかつcameraにpostProcessがあるときの対応
         // ------------------------------------------------------------------------------
@@ -499,7 +512,8 @@ export class Renderer {
             postProcess.render({
                 gpu: this.gpu,
                 renderer: this,
-                prevRenderTarget: this._afterGBufferRenderTarget,
+                // prevRenderTarget: this._afterGBufferRenderTarget,
+                prevRenderTarget: this._toneMappingPass.renderTarget,
                 gBufferRenderTargets: this._gBufferRenderTargets,
                 targetCamera: camera,
                 time, // TODO: engineから渡したい
@@ -589,6 +603,7 @@ export class Renderer {
     // pass
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
+    private _toneMappingPass: ToneMappingPass;
 
     /**
      *
@@ -902,4 +917,29 @@ export class Renderer {
             }
         });
     }
+
+
+    /**
+     *
+     * @param camera
+     * @private
+     */
+    private toneMappingPass(camera: Camera, time: number) {
+        // console.log("--------- tone mapping pass ---------");
+
+        // this._toneMappingPass.material.updateUniform(UniformNames.SrcTexture, );
+
+        // this._toneMappingPass.enabled = true;
+        PostProcess.renderPass({
+            pass: this._toneMappingPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: this._afterGBufferRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+        });
+    }
+
 }

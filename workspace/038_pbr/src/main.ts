@@ -698,6 +698,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 
 #pragma DEPTH_FUNCTIONS
+#pragma PSEUDO_HDR
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));
