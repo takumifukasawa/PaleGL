@@ -33,7 +33,7 @@ struct Skybox {
 // functions
 // -----------------------------------------------------------
 
-#include ./partial/pseudo-hdr.glsl       
+// #include ./partial/pseudo-hdr.glsl       
         
 #pragma DEPTH_FUNCTIONS
 
@@ -159,7 +159,9 @@ void main() {
     
     // depth guard
     if(step(rawDepth, 1. - eps) < .5) {
-        outColor = encodePseudoHDR(baseColor);
+        outColor = vec4(baseColor, 1.);
+        // 疑似HDRする場合
+        // outColor = encodePseudoHDR(baseColor);
         return;
     }
 
@@ -271,7 +273,7 @@ vec3 outgoingLight =
     // for debug
     // resultColor.xyz = vec3(aoRate);
 
-    // correct
-    // outColor = resultColor;
-    outColor = encodePseudoHDR(resultColor.xyz);
+    outColor = resultColor;
+    // 疑似HDRの場合
+    // outColor = encodePseudoHDR(resultColor.xyz);
 }
