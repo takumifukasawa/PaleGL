@@ -30,16 +30,16 @@ export class Texture extends GLObject {
     private texture: WebGLTexture;
     private img: HTMLImageElement | HTMLCanvasElement | null = null;
     private gpu: GPU;
-    type;
+    type: TextureType;
 
-    minFilter;
-    magFilter;
-    mipmap;
-    wrapS;
-    wrapT;
-    flipY;
-    width;
-    height;
+    minFilter: TextureFilterType;
+    magFilter: TextureFilterType;
+    mipmap: boolean;
+    wrapS: TextureWrapType;
+    wrapT: TextureWrapType;
+    flipY: boolean;
+    width: number | undefined;
+    height: number | undefined;
 
     get glObject() {
         return this.texture;
@@ -82,7 +82,7 @@ export class Texture extends GLObject {
         if (!this.img && (!width || !height)) {
             console.error('[Texture.constructor] invalid width or height');
         }
-
+  
         const texture = gl.createTexture();
         if (!texture) {
             throw 'invalid texture';

@@ -4,7 +4,7 @@ import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-import { PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {PrimitiveTypes, RenderTargetType, RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
@@ -76,6 +76,7 @@ export class PostProcessPassBase implements IPostProcessPass {
      * @param useEnvMap
      * @param receiveShadow
      * @param name
+     * @param renderTargetType
      */
     constructor({
         gpu,
@@ -85,6 +86,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         useEnvMap = false,
         receiveShadow = false,
         name = '',
+        renderTargetType = RenderTargetTypes.RGBA
     }: {
         gpu: GPU;
         vertexShader?: string;
@@ -93,6 +95,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         useEnvMap?: boolean;
         receiveShadow?: boolean;
         name?: string;
+        renderTargetType?: RenderTargetType
     }) {
         // super({name});
         this.name = name;
@@ -130,6 +133,7 @@ export class PostProcessPassBase implements IPostProcessPass {
             gpu,
             width: 1,
             height: 1,
+            type: renderTargetType
         });
     }
 

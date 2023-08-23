@@ -1,6 +1,8 @@
 ﻿import {
     BlendType,
-    BlendTypes, DepthFuncType, DepthFuncTypes,
+    BlendTypes,
+    DepthFuncType,
+    DepthFuncTypes,
     FaceSide,
     PrimitiveType,
     PrimitiveTypes,
@@ -38,6 +40,8 @@ export class GPU {
     private vao: VertexArrayObject | null = null;
     private uniforms: Uniforms = {};
     dummyTexture: Texture;
+    private validExtensions: string[] = [];
+    private invalidExtensions: string[] = [];
 
     constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
@@ -100,6 +104,25 @@ export class GPU {
         // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
+    checkExtension(extensionName: string): boolean {
+        if(this.validExtensions.includes(extensionName))
+        {
+            return true;
+        }
+        
+        if(this.invalidExtensions.includes(extensionName)) {
+            return false;
+        }
+
+        const ext = this.gl.getExtension(extensionName) != null;
+        if (!ext) {
+            this.invalidExtensions.push(extensionName);
+            return false;
+        }
+        this.validExtensions.push(extensionName);
+        return true;
+    }
+
     #getGLPrimitive(primitiveType: PrimitiveType) {
         const gl = this.gl;
         switch (primitiveType) {
@@ -150,18 +173,18 @@ export class GPU {
             default:
                 throw 'invalid face side';
         }
-        
+
         // console.log(depthTest, depthWrite, depthFuncType)
 
         // depth write
         gl.depthMask(depthWrite);
         // for debug
         // console.log(gl.getParameter(gl.DEPTH_WRITEMASK));
-        
+
         // depth test
         if (depthTest) {
             gl.enable(gl.DEPTH_TEST);
-            switch(depthFuncType) {
+            switch (depthFuncType) {
                 case DepthFuncTypes.Equal:
                     gl.depthFunc(gl.EQUAL);
                     break;

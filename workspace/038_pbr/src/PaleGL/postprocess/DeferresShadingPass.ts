@@ -1,7 +1,7 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
 // import { Uniforms } from '@/PaleGL/materials/Material';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
@@ -10,8 +10,8 @@ import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
-    } // uniforms,
-    // name,
+        // uniforms,
+    } // name,
     : {
         gpu: GPU;
         // fragmentShader: string;
@@ -105,8 +105,9 @@ export class DeferredShadingPass extends PostProcessPassBase {
             name: 'DeferredShadingPass',
             fragmentShader: deferredShadingFragmentShader,
             uniforms,
-            useEnvMap: true,
-            receiveShadow: true,
+            // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
+            receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
+            renderTargetType: RenderTargetTypes.RGBA16F,
         });
     }
 
@@ -130,8 +131,8 @@ export class DeferredShadingPass extends PostProcessPassBase {
             },
             maxLodLevel: {
                 type: UniformTypes.Float,
-                value: skybox.cubeMap.maxLodLevel
-            }
+                value: skybox.cubeMap.maxLodLevel,
+            },
         });
     }
 

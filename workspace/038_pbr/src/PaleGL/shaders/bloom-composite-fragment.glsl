@@ -31,5 +31,5 @@ void main() {
     // outColor = blur16Color;
     // outColor = blur32Color;
     // outColor = blurColor;
-    // outColor = sceneColor;
+    // outColor = vec4(vec3(step(3., outColor.r)), 1.0);
 }           

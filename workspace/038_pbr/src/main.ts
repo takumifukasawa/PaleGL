@@ -279,7 +279,7 @@ const bloomPass = new BloomPass({
     threshold: 0.9,
     bloomAmount: 0.8,
 });
-bloomPass.enabled = false;
+bloomPass.enabled = true;
 scenePostProcess.addPass(bloomPass);
 
 // const ssaoPass = new SSAOPass({ gpu });

@@ -9,6 +9,7 @@ import {
     TextureFilterTypes,
     TextureTypes,
     GLColorAttachment,
+    GLFrameBufferStatus, GLExtensionName,
 } from '@/PaleGL/constants';
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -61,6 +62,19 @@ export class RenderTarget extends AbstractRenderTarget {
         return this;
     }
 
+    /**
+     *
+     * @param gpu
+     * @param name
+     * @param type
+     * @param width
+     * @param height
+     * @param useDepthBuffer
+     * @param writeDepthTexture
+     * @param minFilter
+     * @param magFilter
+     * @param mipmap
+     */
     constructor({
         gpu,
         name = '',
@@ -85,9 +99,9 @@ export class RenderTarget extends AbstractRenderTarget {
         this.height = height;
 
         this._framebuffer = new Framebuffer({ gpu });
-        this._framebuffer.bind()
-       
-        // for debug 
+        this._framebuffer.bind();
+
+        // for debug
         // console.log(useDepthBuffer, writeDepthTexture, this.type, writeDepthTexture)
 
         if (useDepthBuffer) {
@@ -104,6 +118,7 @@ export class RenderTarget extends AbstractRenderTarget {
             );
         }
 
+        // RGBA8整数バッファ
         if (this.type === RenderTargetTypes.RGBA) {
             this._texture = new Texture({
                 gpu,
@@ -120,7 +135,30 @@ export class RenderTarget extends AbstractRenderTarget {
             this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
         }
 
-        if (this.type === RenderTargetTypes.Depth || writeDepthTexture) {
+        // RGBA16F浮動小数点バッファ
+        else if (this.type === RenderTargetTypes.RGBA16F) {
+            if (!gpu.checkExtension(GLExtensionName.ColorBufferFloat)) {
+                throw 'EXT_color_buffer_float not supported';
+            }
+            this._texture = new Texture({
+                gpu,
+                width: this.width,
+                height: this.height,
+                mipmap,
+                type: TextureTypes.RGBA16F,
+                minFilter,
+                magFilter,
+            });
+            console.log(this._texture)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
+            const checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+            if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {
+                throw 'framebuffer not completed';
+            }
+        }
+
+        // 深度バッファをテクスチャとして扱う場合
+        else if (this.type === RenderTargetTypes.Depth || writeDepthTexture) {
             this._depthTexture = new Texture({
                 gpu,
                 width: this.width,
@@ -137,6 +175,7 @@ export class RenderTarget extends AbstractRenderTarget {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
         }
 
+        // depth texture と depth render buffer は両立できないので確認のエラー
         if (this._depthTexture && this.depthRenderbuffer) {
             throw '[RenderTarget.constructor] depth texture and depth render buffer are active.';
         }
@@ -151,6 +190,11 @@ export class RenderTarget extends AbstractRenderTarget {
         // Framebuffer.unbind();
     }
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
@@ -165,6 +209,10 @@ export class RenderTarget extends AbstractRenderTarget {
         }
     }
 
+    /**
+     *
+     * @param texture
+     */
     setTexture(texture: Texture) {
         const gl = this.gpu.gl;
         this._texture = texture;
@@ -173,6 +221,10 @@ export class RenderTarget extends AbstractRenderTarget {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
+    /**
+     *
+     * @param depthTexture
+     */
     setDepthTexture(depthTexture: Texture) {
         const gl = this.gpu.gl;
         this._depthTexture = depthTexture;
@@ -182,6 +234,14 @@ export class RenderTarget extends AbstractRenderTarget {
         this._framebuffer.unbind();
     }
 
+    /**
+     *
+     * @param gpu
+     * @param sourceRenderTarget
+     * @param destRenderTarget
+     * @param width
+     * @param height
+     */
     static blitDepth({
         gpu,
         sourceRenderTarget,

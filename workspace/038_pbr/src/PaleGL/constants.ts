@@ -21,51 +21,6 @@ export const DepthFuncTypes = {
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
 
-export const UniformTypes = {
-    Matrix4: 'Matrix4',
-    Matrix4Array: 'Matrix4Array',
-    Texture: 'Texture',
-    CubeMap: 'CubeMap',
-    Vector2: 'Vector2',
-    Vector2Array: 'Vector2Array',
-    Vector3: 'Vector3',
-    Struct: 'Struct',
-    Float: 'Float',
-    FloatArray: 'FloatArray',
-    Int: 'Int',
-    Color: 'Color',
-    ColorArray: 'ColorArray',
-} as const;
-
-export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
-
-export const TextureTypes = {
-    RGBA: 'RGBA',
-    Depth: 'Depth',
-    RGBA16F: 'RGBA16F',
-    RGBA32F: 'RGBA32F',
-} as const;
-
-export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
-
-export const TextureWrapTypes = {
-    Repeat: 'Repeat',
-    ClampToEdge: 'ClampToEdge',
-} as const;
-
-export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
-
-export const TextureFilterTypes = {
-    Nearest: 'Nearest', // min, mag
-    Linear: 'Linear', // min, mag
-    NearestMipmapNearest: 'NearestMipmapNearest', // only min filter
-    NearestMipmapLinear: 'NearestMipmapLinear', // only min filter,
-    LinearMipmapNearest: 'LinearMipmapNearest', // only min filter
-    LinearMipmapLinear: 'LinearMipmapLinear', // only min filter
-} as const;
-
-export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
-
 export const BlendTypes = {
     Opaque: 'Opaque',
     Transparent: 'Transparent',
@@ -141,27 +96,59 @@ export const FaceSide = {
 
 export type FaceSide = (typeof FaceSide)[keyof typeof FaceSide];
 
-// TODO: rename Type"s"
-export const AttributeUsageType = {
-    StaticDraw: 'StaticDraw',
-    DynamicDraw: 'DynamicDraw',
-} as const;
-
-export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
-
 // export type AttributeUsageType =
 // {
 //     StaticDraw: "StaticDraw",
 //     DynamicDraw: "DynamicDraw"
 // }
 
+// -----------------------------------------------------------------------------
+// texture
+// -----------------------------------------------------------------------------
+
+export const TextureTypes = {
+    RGBA: 'RGBA',
+    Depth: 'Depth',
+    RGBA16F: 'RGBA16F',
+    RGBA32F: 'RGBA32F',
+} as const;
+
+export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
+
+export const TextureWrapTypes = {
+    Repeat: 'Repeat',
+    ClampToEdge: 'ClampToEdge',
+} as const;
+
+export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
+
+export const TextureFilterTypes = {
+    Nearest: 'Nearest', // min, mag
+    Linear: 'Linear', // min, mag
+    NearestMipmapNearest: 'NearestMipmapNearest', // only min filter
+    NearestMipmapLinear: 'NearestMipmapLinear', // only min filter,
+    LinearMipmapNearest: 'LinearMipmapNearest', // only min filter
+    LinearMipmapLinear: 'LinearMipmapLinear', // only min filter
+} as const;
+
+export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
+
+// -----------------------------------------------------------------------------
+// render target types
+// -----------------------------------------------------------------------------
+
 export const RenderTargetTypes = {
     RGBA: 'RGBA',
     Depth: 'Depth',
     Empty: 'Empty',
+    RGBA16F: 'RGBA16F',
 } as const;
 
 export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTargetTypes];
+
+// -----------------------------------------------------------------------------
+// animation keyframes
+// -----------------------------------------------------------------------------
 
 export const AnimationKeyframeTypes = {
     Vector3: 'Vector3',
@@ -169,6 +156,18 @@ export const AnimationKeyframeTypes = {
 } as const;
 
 export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof AnimationKeyframeTypes];
+
+// -----------------------------------------------------------------------------
+// geometry attributes
+// -----------------------------------------------------------------------------
+
+// TODO: rename Type"s"
+export const AttributeUsageType = {
+    StaticDraw: 'StaticDraw',
+    DynamicDraw: 'DynamicDraw',
+} as const;
+
+export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
 
 export const AttributeNames = {
     Position: 'aPosition',
@@ -188,6 +187,28 @@ export const AttributeNames = {
 } as const;
 
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
+
+// -----------------------------------------------------------------------------
+// uniforms
+// -----------------------------------------------------------------------------
+
+export const UniformTypes = {
+    Matrix4: 'Matrix4',
+    Matrix4Array: 'Matrix4Array',
+    Texture: 'Texture',
+    CubeMap: 'CubeMap',
+    Vector2: 'Vector2',
+    Vector2Array: 'Vector2Array',
+    Vector3: 'Vector3',
+    Struct: 'Struct',
+    Float: 'Float',
+    FloatArray: 'FloatArray',
+    Int: 'Int',
+    Color: 'Color',
+    ColorArray: 'ColorArray',
+} as const;
+
+export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
 
 export const UniformNames = {
     // position
@@ -320,3 +341,15 @@ export type GLColorAttachment =
     | 36069 // gl.COLOR_ATTACHMENT0 + 5
     | 36070 // gl.COLOR_ATTACHMENT0 + 6
     | 36071; // gl.COLOR_ATTACHMENT0 + 7
+
+export const GLFrameBufferStatus = {
+    FRAMEBUFFER_COMPLETE: 36053,
+    FRAMEBUFFER_INCOMPLETE_ATTACHMENT: 36054,
+    FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: 36055,
+    FRAMEBUFFER_INCOMPLETE_DIMENSIONS: 36057,
+    FRAMEBUFFER_UNSUPPORTED: 36061,
+} as const;
+
+export const GLExtensionName = {
+    ColorBufferFloat: 'EXT_color_buffer_float'
+} as const;
