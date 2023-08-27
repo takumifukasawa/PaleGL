@@ -27,8 +27,8 @@ export class ToneMappingPass extends PostProcessPassBase {
             name: 'ToneMappingPass',
             fragmentShader: toneMappingFragmentShader,
             uniforms,
-            useEnvMap: true,
-            receiveShadow: true,
+            // useEnvMap: false,
+            // receiveShadow: false,
         });
     }
     

@@ -170,14 +170,13 @@ export class RenderTarget extends AbstractRenderTarget {
                 });
 
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
-                console.log(this._texture)
                 break;
 
             default:
                 break;
         }
 
-        // check frame buffer status
+        // check frame buffer status for color attachment
         if (this._texture) {
             const checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
             if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {

@@ -279,7 +279,7 @@ const bloomPass = new BloomPass({
     threshold: 0.9,
     bloomAmount: 0.8,
 });
-bloomPass.enabled = true;
+bloomPass.enabled = false;
 scenePostProcess.addPass(bloomPass);
 
 // const ssaoPass = new SSAOPass({ gpu });
@@ -485,8 +485,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .7,
-        specularIntensity: .7 
+        diffuseIntensity: 1.,
+        specularIntensity: 1. 
         // rotationOffset: 0.8,
     });
 

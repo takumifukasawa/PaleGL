@@ -274,6 +274,7 @@ vec3 outgoingLight =
     // resultColor.xyz = vec3(aoRate);
 
     outColor = resultColor;
+
     // 疑似HDRの場合
     // outColor = encodePseudoHDR(resultColor.xyz);
 }
