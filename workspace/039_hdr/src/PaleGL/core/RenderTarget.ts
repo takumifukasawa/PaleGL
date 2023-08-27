@@ -118,9 +118,10 @@ export class RenderTarget extends AbstractRenderTarget {
                 this.depthRenderbuffer.glObject
             );
         }
-        
-        let checkFramebufferStatus: number = 0;
 
+        //
+        // create texture
+        //
         switch (this.type) {
             // RGBA8整数バッファ
             case RenderTargetTypes.RGBA:
@@ -134,12 +135,6 @@ export class RenderTarget extends AbstractRenderTarget {
                     magFilter,
                 });
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
-                checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-                if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {
-                    throw 'framebuffer not completed';
-                }
-                // this._framebuffer.registerDrawBuffer(gl.COLOR_ATTACHMENT0);
-                this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
                 break;
 
             // RGBA16F浮動小数点バッファ
@@ -157,13 +152,8 @@ export class RenderTarget extends AbstractRenderTarget {
                     magFilter,
                 });
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
-                checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-                if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {
-                    throw 'framebuffer not completed';
-                }
-                this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
                 break;
-                
+
             case RenderTargetTypes.R11F_G11F_B10F:
                 // TODO: r11g11b10 の場合はなくてもよい？
                 if (!gpu.checkExtension(GLExtensionName.ColorBufferFloat)) {
@@ -174,20 +164,26 @@ export class RenderTarget extends AbstractRenderTarget {
                     width: this.width,
                     height: this.height,
                     mipmap,
-                    type: TextureTypes.RGBA16F,
+                    type: TextureTypes.R11F_G11F_B10F,
                     minFilter,
                     magFilter,
                 });
+
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
-                checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-                if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {
-                    throw 'framebuffer not completed';
-                }
-                this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
+                console.log(this._texture)
                 break;
 
             default:
                 break;
+        }
+
+        // check frame buffer status
+        if (this._texture) {
+            const checkFramebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+            if (checkFramebufferStatus !== GLFrameBufferStatus.FRAMEBUFFER_COMPLETE) {
+                throw 'framebuffer not completed';
+            }
+            this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
         }
 
         // 深度バッファをテクスチャとして扱う場合
@@ -212,6 +208,10 @@ export class RenderTarget extends AbstractRenderTarget {
         if (this._depthTexture && this.depthRenderbuffer) {
             throw '[RenderTarget.constructor] depth texture and depth render buffer are active.';
         }
+
+        //
+        // TODO: check frame buffer depth status
+        //
 
         // unbind
         gl.bindTexture(gl.TEXTURE_2D, null);

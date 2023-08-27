@@ -107,8 +107,8 @@ export class DeferredShadingPass extends PostProcessPassBase {
             uniforms,
             // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
-            // renderTargetType: RenderTargetTypes.R11F_G11F_B10F
-            renderTargetType: RenderTargetTypes.RGBA16F,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F
+            // renderTargetType: RenderTargetTypes.RGBA16F,
         });
     }
 
