@@ -222,6 +222,7 @@ void main() {
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
+    directionalLight.intensity = uDirectionalLight.intensity;
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
     RE_Direct(directLight, geometry, material, reflectedLight);
 

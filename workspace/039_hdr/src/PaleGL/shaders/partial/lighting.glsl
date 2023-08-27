@@ -22,6 +22,7 @@ struct IncidentLight {
     vec3 color;
     vec3 direction;
     bool visible;
+    float intensity;
 };
 
 struct IncidentSkyboxLight {
@@ -88,6 +89,7 @@ void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, c
     directLight.color = directionalLight.color.xyz;
     directLight.direction = directionalLight.direction;
     directLight.visible = true;
+    directLight.intensity = directionalLight.intensity;
 }
 
 // point light
@@ -269,7 +271,8 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
     
     // punctual light
     irradiance *= PI;
-   
+    irradiance *= directLight.intensity;
+
     // diffuse
     reflectedLight.directDiffuse +=
         irradiance *

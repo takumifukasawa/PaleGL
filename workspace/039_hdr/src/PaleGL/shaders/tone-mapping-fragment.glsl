@@ -43,7 +43,7 @@ void main() {
     // outColor = vec4(resultColor, 1.);
     // return;
 
-    // resultColor = reinhardExposure(resultColor, 1.);
+    // resultColor = reinhardExposure(resultColor, 1000000000.);
     // resultColor = reinhard(resultColor);
     resultColor = aces(resultColor);
     // resultColor = reinhard(resultColor);

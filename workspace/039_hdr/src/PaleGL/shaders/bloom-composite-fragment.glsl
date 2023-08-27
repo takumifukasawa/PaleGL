@@ -6,6 +6,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+// uniform sampler2D uBrightnessTexture;
 uniform sampler2D uSrcTexture;
 uniform sampler2D uBlur4Texture;
 uniform sampler2D uBlur8Texture;
@@ -15,6 +16,7 @@ uniform float uTone;
 uniform float uBloomAmount;
 
 void main() {
+    // vec4 brightnessColor = texture(uBrightnessTexture, vUv);
     vec4 blur4Color = texture(uBlur4Texture, vUv);
     vec4 blur8Color = texture(uBlur8Texture, vUv);
     vec4 blur16Color = texture(uBlur16Texture, vUv);
@@ -26,6 +28,7 @@ void main() {
     outColor = sceneColor + blurColor;
 
     // for debug
+    // outColor = brightnessColor;
     // outColor = blur4Color;
     // outColor = blur8Color;
     // outColor = blur16Color;
