@@ -40,6 +40,8 @@ void main() {
     // outColor = vec4(color.xyz, 1.);
 
     vec3 resultColor = texture(uSrcTexture, vUv).xyz;
+    // outColor = vec4(resultColor, 1.);
+    // return;
 
     // resultColor = reinhardExposure(resultColor, 1.);
     // resultColor = reinhard(resultColor);

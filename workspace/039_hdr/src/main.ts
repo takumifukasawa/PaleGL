@@ -52,7 +52,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 // import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
 // import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
-import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
+// import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 // import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
@@ -274,13 +274,13 @@ captureScene.add(directionalLight);
 const scenePostProcess = renderer.scenePostProcess;
 // captureScene.scenePostProcess = scenePostProcess;
 
-const bloomPass = new BloomPass({
-    gpu,
-    threshold: 0.9,
-    bloomAmount: 0.8,
-});
-bloomPass.enabled = false;
-scenePostProcess.addPass(bloomPass);
+// const bloomPass = new BloomPass({
+//     gpu,
+//     threshold: 0.9,
+//     bloomAmount: 0.8,
+// });
+// bloomPass.enabled = true;
+// scenePostProcess.addPass(bloomPass);
 
 // const ssaoPass = new SSAOPass({ gpu });
 // ssaoPass.enabled = false;

@@ -32,6 +32,7 @@ import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass.ts
 // import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass.ts';
 import {ToneMappingPass} from "@/PaleGL/postprocess/ToneMappingPass.ts";
+import {BloomPass} from "@/PaleGL/postprocess/BloomPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -112,6 +113,10 @@ export class Renderer {
         });
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
+        this._bloomPass = new BloomPass({ gpu,
+            threshold: 0.9,
+            bloomAmount: 0.8
+        });
         this._toneMappingPass = new ToneMappingPass({ gpu });
     }
 
@@ -141,6 +146,10 @@ export class Renderer {
 
     get deferredShadingPass() {
         return this._deferredShadingPass;
+    }
+    
+    get bloomPass() {
+        return this._bloomPass;
     }
     
     get toneMappingRenderTarget() {
@@ -179,6 +188,7 @@ export class Renderer {
         // passes
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
+        this._bloomPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
     }
 
@@ -482,10 +492,16 @@ export class Renderer {
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
 
         // ------------------------------------------------------------------------------
+        // bloom pass
+        // ------------------------------------------------------------------------------
+
+        this.renderBloomPass(camera, time);
+        
+        // ------------------------------------------------------------------------------
         // tone mapping pass
         // ------------------------------------------------------------------------------
 
-        this.toneMappingPass(camera, time);
+        this.renderToneMappingPass(camera, time);
 
         // ------------------------------------------------------------------------------
         // full screen pass
@@ -603,6 +619,7 @@ export class Renderer {
     // pass
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
+    private _bloomPass: BloomPass;
     private _toneMappingPass: ToneMappingPass;
 
     /**
@@ -918,13 +935,33 @@ export class Renderer {
         });
     }
 
+    /**
+     * 
+     * @param camera
+     * @param time
+     * @private
+     */
+    private renderBloomPass(camera: Camera, time: number) {
+        PostProcess.renderPass({
+            pass: this._bloomPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            // tone mapping 挟む場合
+            prevRenderTarget: this._afterGBufferRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+            // prevRenderTarget: null,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+        });
+    }
 
     /**
      *
      * @param camera
      * @private
      */
-    private toneMappingPass(camera: Camera, time: number) {
+    private renderToneMappingPass(camera: Camera, time: number) {
         // console.log("--------- tone mapping pass ---------");
 
         // this._toneMappingPass.material.updateUniform(UniformNames.SrcTexture, );
@@ -937,7 +974,7 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             // tone mapping 挟む場合
-            prevRenderTarget: this._afterGBufferRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+            prevRenderTarget: this._bloomPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
             // prevRenderTarget: null,
             isLastPass: false,
             time, // TODO: engineから渡したい

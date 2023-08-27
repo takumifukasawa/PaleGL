@@ -1,4 +1,4 @@
-﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
@@ -215,6 +215,8 @@ export class BloomPass implements IPostProcessPass {
                 },
                 ...PostProcessPassBase.commonUniforms,
             },
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F
+            // renderTargetType: RenderTargetTypes.RGBA
         });
         this.materials.push(...this.compositePass.materials);
     }
