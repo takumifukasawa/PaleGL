@@ -18,6 +18,8 @@ uniform float uRotationOffset;
 // layout (location = 1) out vec4 outGBufferB;
 // layout (location = 2) out vec4 outGBufferC;
 
+#include ./partial/tone-mapping.glsl
+
 #include ./partial/env-map-fragment-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
@@ -38,6 +40,9 @@ void main() {
     // vec3 envMapColor = calcEnvMap(uCubeTexture);
     // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;
     vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
+  
+    // NOTE: テクスチャはhdrじゃなくてsrgb想定 
+    envMapColor = gamma(envMapColor); 
         
     // outGBufferA = vec4(envMapColor, 1.);
     // outGBufferB = vec4(0., 0., 0., 1.);

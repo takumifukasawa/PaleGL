@@ -237,7 +237,7 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
-    intensity: .7,
+    intensity: 1.,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white(),
 });
@@ -324,7 +324,7 @@ const createGLTFSphereMesh = async () => {
         // normalMap: floorNormalMap,
         // envMap: cubeMap,
         // diffuseColor: new Color(0.5, 0.05, 0.05, 1),
-        diffuseColor: new Color(1., 0.76, 0.336, 1),
+        diffuseColor: new Color(1, 0.76, 0.336, 1),
         // diffuseColor: new Color(0, 0, 0, 1),
         // diffuseColor: new Color(1, 1, 1, 1),
         receiveShadow: true,
@@ -431,7 +431,7 @@ const createGLTFSkinnedMesh = async () => {
         // specularAmount: 0.5,
         // diffuseColor: Color.white(),
         metallic: 0,
-        roughness: .6,
+        roughness: 0.6,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -485,8 +485,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: 1.,
-        specularIntensity: 1. 
+        diffuseIntensity: .5,
+        specularIntensity: .5,
         // rotationOffset: 0.8,
     });
 

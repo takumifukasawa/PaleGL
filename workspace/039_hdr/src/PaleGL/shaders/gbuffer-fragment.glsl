@@ -13,6 +13,8 @@ uniform float uAmbientAmount;
 uniform float uMetallic;
 uniform float uRoughness;
 
+#include ./partial/tone-mapping.glsl
+
 #include ./partial/normal-map-fragment-uniforms.glsl
 
 uniform vec3 uViewPosition;
@@ -107,6 +109,8 @@ void main() {
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 #endif
+
+    resultColor.rgb = gamma(resultColor.rgb);
 
     // correct
     // outGBufferA = vec4(resultColor.rgb, 1.);
