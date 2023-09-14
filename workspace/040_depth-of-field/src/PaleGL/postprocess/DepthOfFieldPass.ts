@@ -8,7 +8,9 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
 import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
+import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {Vector2} from "@/PaleGL/math/Vector2.ts";
 
 // import { Texture } from '@/PaleGL/core/Texture.ts';
 
@@ -86,17 +88,38 @@ export class DepthOfFieldPass implements IPostProcessPass {
             fragmentShader: dofBokehFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                uSrcTextureWidth: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
-                uSrcTextureHeight: {
-                    type: UniformTypes.Float,
-                    value: 1,
-                },
+                // uSrcTextureWidth: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                // uSrcTextureHeight: {
+                //     type: UniformTypes.Float,
+                //     value: 1,
+                // },
+                uTexelSize: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.zero
+                }
             },
         });
         this.materials.push(...this.dofBokehPass.materials);
+        
+        //
+        // bokeh blur pass
+        // 
+        
+        this.bokehBlurPass = new FragmentPass({
+            gpu,
+            fragmentShader: dofBokehBlurFragmentShader,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniforms: {
+                uTexelSize: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.zero
+                }
+            },
+        });
+        this.materials.push(...this.bokehBlurPass.materials);
     }
 
     /**
@@ -123,6 +146,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
 
         this.circleOfConfusionPass.setSize(width, height);
         this.dofBokehPass.setSize(width, height);
+        this.bokehBlurPass.setSize(width, height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
@@ -168,8 +192,12 @@ export class DepthOfFieldPass implements IPostProcessPass {
             time,
         });
 
-        this.dofBokehPass.material.updateUniform('uSrcTextureWidth', this.circleOfConfusionPass.width);
-        this.dofBokehPass.material.updateUniform('uSrcTextureHeight', this.circleOfConfusionPass.height);
+        // this.dofBokehPass.material.updateUniform('uSrcTextureWidth', this.circleOfConfusionPass.width);
+        // this.dofBokehPass.material.updateUniform('uSrcTextureHeight', this.circleOfConfusionPass.height);
+        this.dofBokehPass.material.updateUniform(
+            'uTexelSize',
+            new Vector2(1 / this.circleOfConfusionPass.width, 1 / this.circleOfConfusionPass.height)
+        );
 
         this.dofBokehPass.render({
             gpu,
@@ -177,6 +205,23 @@ export class DepthOfFieldPass implements IPostProcessPass {
             renderer,
             // prevRenderTarget: this.circleOfConfusionPass.renderTarget,
             prevRenderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
+        
+        this.bokehBlurPass.material.updateUniform(
+            'uTexelSize',
+            new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
+        );
+
+        this.bokehBlurPass.render({
+            gpu,
+            camera,
+            renderer,
+            // prevRenderTarget: this.circleOfConfusionPass.renderTarget,
+            prevRenderTarget: this.dofBokehPass.renderTarget,
             isLastPass,
             targetCamera,
             gBufferRenderTargets,
@@ -194,6 +239,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     // #lastPass;
     private circleOfConfusionPass: FragmentPass;
     private dofBokehPass: FragmentPass;
+    private bokehBlurPass: FragmentPass;
 
     private geometry: PlaneGeometry;
 }

@@ -11,8 +11,9 @@ in vec2 vUv;
 out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
-uniform float uSrcTextureWidth;
-uniform float uSrcTextureHeight;
+// uniform float uSrcTextureWidth;
+// uniform float uSrcTextureHeight;
+uniform vec2 uTexelSize;
 
 #define BOKEH_KERNEL_MEDIUM
 
@@ -75,7 +76,7 @@ void main() {
     vec3 color = vec3(0.);
     float weight = 0.;
     
-    vec2 texelSize = vec2(1. / uSrcTextureWidth, 1. / uSrcTextureHeight);
+    vec2 texelSize = uTexelSize;
    
     // // 1. rectangle sample 
     // for(int u = -4; u <= 4; u++) {
