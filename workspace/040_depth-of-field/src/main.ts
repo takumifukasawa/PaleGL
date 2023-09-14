@@ -1219,6 +1219,17 @@ function initDebugger() {
             renderer.depthOfFieldPass.focusRange = value;
         },
     });
+    
+    debuggerGUI.addSliderDebugger({
+        label: 'DoF bokeh radius',
+        minValue: 1,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: renderer.depthOfFieldPass.bokehRadius,
+        onChange: (value) => {
+            renderer.depthOfFieldPass.bokehRadius = value;
+        },
+    });
 
     //
     // add debugger ui

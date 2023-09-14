@@ -12,12 +12,13 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform vec2 uTexelSize;
+uniform float uBokehRadius;
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
 
     // tent filter
-    vec4 offset = uTexelSize.xyxy * vec2(.5, -.5).xxyy;
+    vec4 offset = uTexelSize.xyxy * vec2(.5, -.5).xxyy * uBokehRadius;
     vec4 s =
         texture(uSrcTexture, vUv + offset.xy) +
         texture(uSrcTexture, vUv + offset.zy) +

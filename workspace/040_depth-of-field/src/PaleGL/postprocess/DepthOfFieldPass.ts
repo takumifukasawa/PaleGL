@@ -22,6 +22,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     // params
     focusDistance: number = 10;
     focusRange: number = 3;
+    bokehRadius = 4;
 
     // gpu: GPU;
     name: string = 'DepthOfFieldPass';
@@ -116,6 +117,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
                 uTexelSize: {
                     type: UniformTypes.Vector2,
                     value: Vector2.zero
+                },
+                uBokehRadius: {
+                    type: UniformTypes.Float,
+                    value: 1,
                 }
             },
         });
@@ -214,6 +219,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.bokehBlurPass.material.updateUniform(
             'uTexelSize',
             new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
+        );
+        this.bokehBlurPass.material.updateUniform(
+            'uBokehRadius',
+            this.bokehRadius
         );
 
         this.bokehBlurPass.render({
