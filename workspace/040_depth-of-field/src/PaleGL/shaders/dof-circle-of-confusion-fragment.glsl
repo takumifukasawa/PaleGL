@@ -24,17 +24,15 @@ void main() {
     // float coc = (depth - uFocusDistance) / uFocusRange;
     float coc = (eyeDepth - uFocusDistance) / uFocusRange;
     coc = clamp(coc, -1., 1.);
-    if(coc < 0.) {
-        outColor = vec4(-coc, 0., 0., 1.);
-        return;
-    }
+    
+    // check negative coc
+    // if(coc < 0.) {
+    //     outColor = vec4(-coc, 0., 0., 1.);
+    //     return;
+    // }
 
+    // for debug
     // outColor = sceneColor;
-    // outColor = vec4(vec3(rawDepth), 1.);
-    // outColor = vec4(vec3(depth), 1.);
-    // outColor = vec4(vec3(depthDist), 1.);
+    
     outColor = vec4(vec3(coc), 1.);
-    // outColor = vec4(vUv, 1., 1.);
-    // outColor = vec4(viewPosition, 1.);
-    // outColor = vec4(vec3(viewPosition.x), 1.);
 }           
