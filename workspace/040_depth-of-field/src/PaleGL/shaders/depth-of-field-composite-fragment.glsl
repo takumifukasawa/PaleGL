@@ -19,13 +19,15 @@ uniform mat4 uInverseProjectionMatrix;
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
     float rawDepth = texture(uDepthTexture, vUv).r;
-    float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    float depthDist = mix(uNearClip, uFarClip, depth);
-    
-    vec3 viewPosition = reconstructViewPositionFromDepth(vUv, rawDepth, uInverseProjectionMatrix);
+    float eyeDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
     
     // float coc = (depth - uFocusDistance) / uFocusRange;
-    float coc = (depthDist - uFocusDistance) / uFocusRange;
+    float coc = (eyeDepth - uFocusDistance) / uFocusRange;
+    coc = clamp(coc, -1., 1.);
+    if(coc < 0.) {
+        outColor = vec4(-coc, 0., 0., 1.);
+        return;
+    }
 
     // outColor = sceneColor;
     // outColor = vec4(vec3(rawDepth), 1.);

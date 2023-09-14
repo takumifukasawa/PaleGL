@@ -4,10 +4,17 @@ float viewZToLinearDepth(float z, float near, float far) {
     return (z + near) / (near - far);
 }
 
-float perspectiveDepthToLinearDepth(float depth, float near, float far) {
-    float nz = near * depth;
-    return -nz / (far * (depth - 1.) - nz);
+float perspectiveDepthToLinearDepth(float rawDepth, float near, float far) {
+    float nz = near * rawDepth;
+    return -nz / (far * (rawDepth - 1.) - nz);
 }
+
+// view space に置ける絶対値（= カメラからの距離）
+float perspectiveDepthToEyeDepth(float rawDepth, float near, float far) {
+    float depth = perspectiveDepthToLinearDepth(rawDepth, near, far);
+    return mix(near, far, depth);
+}
+
 // end ref
 
 vec3 reconstructWorldPositionFromDepth(vec2 screenUV, float rawDepth, mat4 inverseViewProjectionMatrix) {
