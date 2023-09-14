@@ -8,25 +8,33 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import depthOfFieldFragmentShader from '@/PaleGL/shaders/depth-of-field-composite-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// import { Texture } from '@/PaleGL/core/Texture.ts';
 
 export class DepthOfFieldPass implements IPostProcessPass {
+    // --------------------------------------------------------------------------------
+    // public
+    // --------------------------------------------------------------------------------
+
+    // params
+    focusDistance: number = 10;
+    focusRange: number = 3;
+
     // gpu: GPU;
-    name: string = 'BloomPass';
+    name: string = 'DepthOfFieldPass';
     enabled: boolean = false;
     width: number = 1;
     height: number = 1;
 
     materials: Material[] = [];
 
-    // #lastPass;
-    private compositePass: FragmentPass;
-
-    private geometry: PlaneGeometry;
-
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
 
+    /**
+     *
+     * @param gpu
+     */
     constructor({ gpu }: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number }) {
         // super();
 
@@ -43,6 +51,18 @@ export class DepthOfFieldPass implements IPostProcessPass {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                [UniformNames.DepthTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                "uFocusDistance": {
+                    type: UniformTypes.Float,
+                    value: this.focusDistance,
+                },
+                "uFocusRange": {
+                    type: UniformTypes.Float,
+                    value: this.focusRange,
+                },
                 ...PostProcessPassBase.commonUniforms,
             },
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -51,14 +71,25 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.materials.push(...this.compositePass.materials);
     }
 
-    #width = 1;
-    #height = 1;
+    /**
+     * 
+     */
+    setup() {
+        // this.compositePass.material.updateUniform(UniformNames.CameraNear, camera.near);
+        // this.compositePass.material.updateUniform(UniformNames.CameraFar, camera.far);
+        // this.compositePass.material.updateUniform(UniformNames.DepthTexture, depthTexture);
+        this.compositePass.material.updateUniform("uFocusDistance", this.focusDistance);
+        this.compositePass.material.updateUniform("uFocusRange", this.focusRange);
+    }
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         this.#width = width;
         this.#height = height;
-
-        console.log(this.#width, this.#height);
 
         this.compositePass.setSize(width, height);
     }
@@ -69,6 +100,17 @@ export class DepthOfFieldPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
+    /**
+     *
+     * @param gpu
+     * @param camera
+     * @param renderer
+     * @param prevRenderTarget
+     * @param isLastPass
+     * @param gBufferRenderTargets
+     * @param targetCamera
+     * @param time
+     */
     render({
         gpu,
         camera,
@@ -95,4 +137,16 @@ export class DepthOfFieldPass implements IPostProcessPass {
             time,
         });
     }
+
+    // --------------------------------------------------------------------------------
+    // private
+    // --------------------------------------------------------------------------------
+
+    #width = 1;
+    #height = 1;
+
+    // #lastPass;
+    private compositePass: FragmentPass;
+
+    private geometry: PlaneGeometry;
 }

@@ -485,8 +485,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .2,
-        specularIntensity: .2,
+        diffuseIntensity: 0.2,
+        specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
 
@@ -1191,6 +1191,34 @@ function initDebugger() {
     //     initialValue: fxaaPass.enabled,
     //     onChange: (value) => (fxaaPass.enabled = value),
     // });
+
+    debuggerGUI.addBorderSpacer();
+
+    //
+    // depth of field
+    //
+    
+    debuggerGUI.addSliderDebugger({
+        label: 'DoF focus distance',
+        minValue: 0.1,
+        maxValue: 100,
+        stepValue: 0.001,
+        initialValue: renderer.depthOfFieldPass.focusDistance,
+        onChange: (value) => {
+            renderer.depthOfFieldPass.focusDistance = value;
+        },
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: 'DoF focus range',
+        minValue: 0.1,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: renderer.depthOfFieldPass.focusRange,
+        onChange: (value) => {
+            renderer.depthOfFieldPass.focusRange = value;
+        },
+    });
 
     //
     // add debugger ui

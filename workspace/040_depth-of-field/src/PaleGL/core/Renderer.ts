@@ -515,51 +515,53 @@ export class Renderer {
 
         this.renderDepthOfFieldPass(camera, time);
 
-        // ------------------------------------------------------------------------------
-        // bloom pass
-        // ------------------------------------------------------------------------------
+        // TODO: 以下の処理を全部復活させる
+        
+        // // ------------------------------------------------------------------------------
+        // // bloom pass
+        // // ------------------------------------------------------------------------------
 
-        this.renderBloomPass(camera, time);
+        // this.renderBloomPass(camera, time);
 
-        // ------------------------------------------------------------------------------
-        // tone mapping pass
-        // ------------------------------------------------------------------------------
+        // // ------------------------------------------------------------------------------
+        // // tone mapping pass
+        // // ------------------------------------------------------------------------------
 
-        this.renderToneMappingPass(camera, time);
+        // this.renderToneMappingPass(camera, time);
 
-        // ------------------------------------------------------------------------------
-        // full screen pass
-        // TODO: mainCameraかつcameraにpostProcessがあるときの対応
-        // ------------------------------------------------------------------------------
+        // // ------------------------------------------------------------------------------
+        // // full screen pass
+        // // TODO: mainCameraかつcameraにpostProcessがあるときの対応
+        // // ------------------------------------------------------------------------------
 
-        if (onBeforePostProcess) {
-            onBeforePostProcess();
-        }
-
-        const targetPostProcesses: PostProcess[] = [];
-        // TODO: こっちいる？
-        // if (camera.mainCamera) {
-        //     targetPostProcesses.push(this._scenePostProcess);
+        // if (onBeforePostProcess) {
+        //     onBeforePostProcess();
         // }
-        if (camera.postProcess) {
-            targetPostProcesses.push(camera.postProcess);
-        }
 
-        // console.log("--------- postprocess pass ---------");
+        // const targetPostProcesses: PostProcess[] = [];
+        // // TODO: こっちいる？
+        // // if (camera.mainCamera) {
+        // //     targetPostProcesses.push(this._scenePostProcess);
+        // // }
+        // if (camera.postProcess) {
+        //     targetPostProcesses.push(camera.postProcess);
+        // }
 
-        targetPostProcesses.forEach((postProcess, i) => {
-            postProcess.render({
-                gpu: this.gpu,
-                renderer: this,
-                // prevRenderTarget: this._afterDeferredShadingRenderTarget,
-                // tone mapping 挟む場合
-                prevRenderTarget: this._toneMappingPass.renderTarget,
-                gBufferRenderTargets: this._gBufferRenderTargets,
-                targetCamera: camera,
-                time, // TODO: engineから渡したい
-                isCameraLastPass: i === targetPostProcesses.length - 1,
-            });
-        });
+        // // console.log("--------- postprocess pass ---------");
+
+        // targetPostProcesses.forEach((postProcess, i) => {
+        //     postProcess.render({
+        //         gpu: this.gpu,
+        //         renderer: this,
+        //         // prevRenderTarget: this._afterDeferredShadingRenderTarget,
+        //         // tone mapping 挟む場合
+        //         prevRenderTarget: this._toneMappingPass.renderTarget,
+        //         gBufferRenderTargets: this._gBufferRenderTargets,
+        //         targetCamera: camera,
+        //         time, // TODO: engineから渡したい
+        //         isCameraLastPass: i === targetPostProcesses.length - 1,
+        //     });
+        // });
     }
 
     /**
@@ -961,12 +963,14 @@ export class Renderer {
     }
 
     /**
-     * 
+     *
      * @param camera
      * @param time
      * @private
      */
     private renderDepthOfFieldPass(camera: Camera, time: number) {
+        this._depthOfFieldPass.setup();
+
         PostProcess.renderPass({
             pass: this._depthOfFieldPass,
             renderer: this,
@@ -976,7 +980,7 @@ export class Renderer {
             // tone mapping 挟む場合
             prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
             // prevRenderTarget: null,
-            isLastPass: false,
+            isLastPass: true, // for debug
             time, // TODO: engineから渡したい
         });
     }
