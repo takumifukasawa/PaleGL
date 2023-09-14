@@ -231,7 +231,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     if (inputController.isDown) {
-        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+        // orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
 };
@@ -1222,8 +1222,8 @@ function initDebugger() {
     
     debuggerGUI.addSliderDebugger({
         label: 'DoF bokeh radius',
-        minValue: 1,
-        maxValue: 10,
+        minValue: 0.01,
+        maxValue: 20,
         stepValue: 0.001,
         initialValue: renderer.depthOfFieldPass.bokehRadius,
         onChange: (value) => {

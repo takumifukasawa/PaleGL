@@ -120,5 +120,5 @@ void main() {
     outColor = vec4(color, 1.);
     
     // for debug
-    // outColor = sceneColor;
+    outColor = sceneColor;
 }           

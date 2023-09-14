@@ -399,6 +399,7 @@ export class Texture extends GLObject {
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, this.img);
                 } else {
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, null);
+                    console.log(width, height)
                 }
                 break;
 

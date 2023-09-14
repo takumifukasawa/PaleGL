@@ -18,12 +18,16 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
 
     // tent filter
-    vec4 offset = uTexelSize.xyxy * vec2(.5, -.5).xxyy * uBokehRadius;
+    vec4 kernel = uTexelSize.xyxy * vec2(-.5, .5).xxyy * uBokehRadius;
     vec4 s =
-        texture(uSrcTexture, vUv + offset.xy) +
-        texture(uSrcTexture, vUv + offset.zy) +
-        texture(uSrcTexture, vUv + offset.xw) +
-        texture(uSrcTexture, vUv + offset.zw);
+        texture(uSrcTexture, vUv + kernel.xy) +
+        texture(uSrcTexture, vUv + kernel.zy) +
+        texture(uSrcTexture, vUv + kernel.xw) +
+        texture(uSrcTexture, vUv + kernel.zw);
+        // texture(uSrcTexture, vUv + vec2(uTexelSize.x * -.5, uTexelSize.y * -.5) * uBokehRadius) +
+        // texture(uSrcTexture, vUv + vec2(uTexelSize.x * -.5, uTexelSize.y * .5) * uBokehRadius) +
+        // texture(uSrcTexture, vUv + vec2(uTexelSize.x * .5, uTexelSize.y * -.5) * uBokehRadius) +
+        // texture(uSrcTexture, vUv + vec2(uTexelSize.x * .5, uTexelSize.y * .5) * uBokehRadius);
     outColor = s * .25;
         
 

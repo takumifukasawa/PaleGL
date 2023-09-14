@@ -115,12 +115,12 @@ export class Renderer {
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
-        this._bloomPass = new BloomPass({
-            gpu,
-            threshold: 0.9,
-            bloomAmount: 0.8,
-        });
-        this._toneMappingPass = new ToneMappingPass({ gpu });
+        // this._bloomPass = new BloomPass({
+        //     gpu,
+        //     threshold: 0.9,
+        //     bloomAmount: 0.8,
+        // });
+        // this._toneMappingPass = new ToneMappingPass({ gpu });
     }
 
     // --------------------------------------------------------------
@@ -196,8 +196,8 @@ export class Renderer {
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
-        this._bloomPass.setSize(realWidth, realHeight);
-        this._toneMappingPass.setSize(realWidth, realHeight);
+        // this._bloomPass.setSize(realWidth, realHeight);
+        // this._toneMappingPass.setSize(realWidth, realHeight);
     }
 
     /**
@@ -969,7 +969,7 @@ export class Renderer {
      * @private
      */
     private renderDepthOfFieldPass(camera: Camera, time: number) {
-        this._depthOfFieldPass.setup();
+        // this._depthOfFieldPass.setup();
 
         PostProcess.renderPass({
             pass: this._depthOfFieldPass,
