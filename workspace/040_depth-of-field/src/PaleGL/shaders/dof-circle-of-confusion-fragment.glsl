@@ -1,4 +1,8 @@
 ﻿#version 300 es
+
+//
+// ref: https://catlikecoding.com/unity/tutorials/advanced-rendering/depth-of-field/
+//
             
 precision mediump float;
 
