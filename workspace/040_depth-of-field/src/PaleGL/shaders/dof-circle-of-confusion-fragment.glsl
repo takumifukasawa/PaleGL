@@ -18,6 +18,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform float uFocusDistance;
 uniform float uFocusRange;
+uniform float uBokehRadius;
 uniform mat4 uInverseProjectionMatrix;
 
 void main() {
@@ -27,16 +28,21 @@ void main() {
     
     // float coc = (depth - uFocusDistance) / uFocusRange;
     float coc = (eyeDepth - uFocusDistance) / uFocusRange;
-    coc = clamp(coc, -1., 1.);
+    coc = clamp(coc, -1., 1.) * uBokehRadius;
     
     // check negative coc
     // if(coc < 0.) {
     //     outColor = vec4(-coc, 0., 0., 1.);
     //     return;
     // }
+    
+    outColor = vec4(vec3(coc), 1.);
 
     // for debug
     // outColor = sceneColor;
-    
-    outColor = vec4(vec3(coc), 1.);
+    // outColor = vec4(vec3(uBokehRadius), 1.);
+    // outColor = vec4(vec3(coc), 1.);
+    // if(coc < 0.) {
+    //     outColor = vec4(1., 0., 0., 1.) * abs(coc);
+    // }
 }           

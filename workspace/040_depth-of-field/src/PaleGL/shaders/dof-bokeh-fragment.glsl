@@ -11,9 +11,11 @@ in vec2 vUv;
 out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
+// uniform sampler2D uCocTexture;
 // uniform float uSrcTextureWidth;
 // uniform float uSrcTextureHeight;
 uniform vec2 uTexelSize;
+uniform float uBokehRadius;
 
 #define BOKEH_KERNEL_MEDIUM
 
@@ -69,12 +71,16 @@ const vec2[kernelSampleCount] kernel = vec2[](
 );
 #endif
 
+float weight(float coc, float radius) {
+    // return coc >= radius ? 1. : 0.;
+    return clamp((coc - radius + 2.) / 2., 0., 1.);
+}
 
 void main() {
-    vec4 sceneColor = texture(uSrcTexture, vUv);
+    vec4 srcColor = texture(uSrcTexture, vUv);
 
-    vec3 color = vec3(0.);
-    float weight = 0.;
+    // vec3 color = vec3(0.);
+    // float weight = 0.;
     
     vec2 texelSize = uTexelSize;
    
@@ -103,22 +109,66 @@ void main() {
     // }
     // color *= 1. / weight;
  
-    // 3. kernel sample
+    // // 3. kernel sample
+    // for(int k = 0; k < kernelSampleCount; k++) {
+    //     vec2 kernelTexelUv = kernel[k];
+    //     if(length(kernelTexelUv) <= 4.) {
+    //         kernelTexelUv *= texelSize * 8.;
+    //         vec2 uv = vUv + kernelTexelUv;
+    //         color += texture(uSrcTexture, uv).rgb;
+    //         weight += 1.;
+    //     }
+    // }
+    // color *= 1. / float(kernelSampleCount);
+
+    vec3 bgColor = vec3(0.);
+    vec3 fgColor = vec3(0.);
+    float bgWeight = 0.;
+    float fgWeight = 0.;
+ 
+    float coc = texture(uSrcTexture, vUv).a;
+    // coc = texture(uSrcTexture, vUv).r;
+    // outColor = vec4(vec3(coc), 1.);
+    // outColor = vec4(texture(uSrcTexture, vUv).a, 1., 1., 1.);
+    // return;
+  
+    // 4. kernel sample
     for(int k = 0; k < kernelSampleCount; k++) {
-        vec2 kernelTexelUv = kernel[k];
-        if(length(kernelTexelUv) <= 4.) {
-            kernelTexelUv *= texelSize * 8.;
-            vec2 uv = vUv + kernelTexelUv;
-            color += texture(uSrcTexture, uv).rgb;
-            weight += 1.;
-        }
+        vec2 o = kernel[k] * uBokehRadius;
+        float radius = length(o);
+        o *= texelSize;
+        vec4 s = texture(uSrcTexture, vUv + o);
+        
+        float bgw = weight(max(0., min(s.a, coc)), radius);
+        bgColor += s.rgb * bgw;
+        bgWeight += bgw;
+        
+        float fgw = weight(-s.a, radius);
+        fgColor += s.rgb * fgw;
+        fgWeight += fgw;
+        
+        // float sw = checkWeight(abs(s.a), radius);
+        // color += s.rgb * sw;
+        // weight += sw;
+        // if(abs(s.a) >= radius) {
+        //     color += s.rgb;
+        //     weight += 1.;
+        // }
     }
-    color *= 1. / float(kernelSampleCount);
-  
-  
+   
+    bgColor *= vec3(1.) / (bgWeight + (bgWeight == 0. ? 1. : 0.)); 
+    fgColor *= vec3(1.) / (fgWeight + (fgWeight == 0. ? 1. : 0.));
+    float bgfg = min(1., fgWeight * 3.141592 / float(kernelSampleCount));
     
-    outColor = vec4(color, 1.);
+    vec3 color = mix(bgColor, fgColor, bgfg);
+    
+    outColor = vec4(color, bgfg);
     
     // for debug
-    outColor = sceneColor;
+    // outColor = srcColor;
+    outColor = vec4(vec3(coc), 1.);
+    
+    // if(coc < 0.) {
+    //     outColor = vec4(1., 0., 0., 1.);
+    // }
 }           

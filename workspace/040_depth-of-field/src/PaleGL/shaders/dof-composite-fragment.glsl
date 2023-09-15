@@ -26,5 +26,6 @@ void main() {
     // float coc = (coc0 + coc1 + coc2 + coc3) * .25;
     
     // for debug
-    outColor = sceneColor;
+    // outColor = sceneColor;
+    outColor = vec4(sceneColor.xyz, 1.);
 }           
