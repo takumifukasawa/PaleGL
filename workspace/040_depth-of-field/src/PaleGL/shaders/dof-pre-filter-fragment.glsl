@@ -33,7 +33,8 @@ void main() {
     float w1 = weight(s1);
     float w2 = weight(s2);
     float w3 = weight(s3);
-    
+   
+    // TODO: 輝度値を考慮する必要があるはず？ 
     vec3 color = s0 * w0 + s1 * w1 + s2 * w2 + s3 * w3;
     color /= max(w0 + w1 + w2 + s3, 0.00001);
     
