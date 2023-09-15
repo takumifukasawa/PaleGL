@@ -22,8 +22,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
     // --------------------------------------------------------------------------------
 
     // params
-    focusDistance: number = 10;
-    focusRange: number = 3;
+    focusDistance: number = 14;
+    focusRange: number = 10;
     bokehRadius = 4;
 
     // gpu: GPU;

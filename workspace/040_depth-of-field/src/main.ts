@@ -138,8 +138,10 @@ document.head.appendChild(styleElement);
 
 const debuggerStates: {
     instanceNum: number;
+    orbitControlsEnabled: boolean
 } = {
     instanceNum: 0,
+    orbitControlsEnabled: true
 };
 
 const searchParams = new URLSearchParams(location.search);
@@ -230,8 +232,8 @@ captureSceneCamera.onFixedUpdate = () => {
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
     // 2: orbit controls
-    if (inputController.isDown) {
-        // orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+    if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
 };
@@ -854,6 +856,18 @@ function initDebugger() {
     });
 
     debuggerGUI.addBorderSpacer();
+    
+    //
+    // orbit controls
+    //
+
+    debuggerGUI.addToggleDebugger({
+        label: 'orbit controls enabled',
+        initialValue: debuggerStates.orbitControlsEnabled,
+        onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
+    });
+
+    debuggerGUI.addBorderSpacer();
 
     //
     // show buffers
@@ -1212,7 +1226,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'DoF focus range',
         minValue: 0.1,
-        maxValue: 10,
+        maxValue: 20,
         stepValue: 0.001,
         initialValue: renderer.depthOfFieldPass.focusRange,
         onChange: (value) => {
@@ -1223,7 +1237,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'DoF bokeh radius',
         minValue: 0.01,
-        maxValue: 20,
+        maxValue: 10,
         stepValue: 0.001,
         initialValue: renderer.depthOfFieldPass.bokehRadius,
         onChange: (value) => {
