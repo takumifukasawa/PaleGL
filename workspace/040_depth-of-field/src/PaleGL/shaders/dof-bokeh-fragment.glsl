@@ -78,86 +78,39 @@ float weight(float coc, float radius) {
 
 void main() {
     vec4 srcColor = texture(uSrcTexture, vUv);
-
-    // vec3 color = vec3(0.);
-    // float weight = 0.;
     
     vec2 texelSize = uTexelSize;
    
-    // // 1. rectangle sample 
-    // for(int u = -4; u <= 4; u++) {
-    //     for(int v = -4; v <= 4; v++) {
-    //         vec2 kernelTexelUv = vec2(u, v);
-    //         vec2 offset = kernelTexelUv * texelSize * 2.;
-    //         vec2 uv = vUv + offset;
-    //         color += texture(uSrcTexture, uv).rgb;
-    //     }
-    // }
-    // color /= 81.;
-  
-    // // 2. circular sample 
-    // for(int u = -4; u <= 4; u++) {
-    //     for(int v = -4; v <= 4; v++) {
-    //         vec2 kernelTexelUv = vec2(u, v);
-    //         if(length(kernelTexelUv) <= 4.) {
-    //             kernelTexelUv *= texelSize * 4.;
-    //             vec2 uv = vUv + kernelTexelUv;
-    //             color += texture(uSrcTexture, uv).rgb;
-    //             weight += 1.;
-    //         }
-    //     }
-    // }
-    // color *= 1. / weight;
- 
-    // // 3. kernel sample
-    // for(int k = 0; k < kernelSampleCount; k++) {
-    //     vec2 kernelTexelUv = kernel[k];
-    //     if(length(kernelTexelUv) <= 4.) {
-    //         kernelTexelUv *= texelSize * 8.;
-    //         vec2 uv = vUv + kernelTexelUv;
-    //         color += texture(uSrcTexture, uv).rgb;
-    //         weight += 1.;
-    //     }
-    // }
-    // color *= 1. / float(kernelSampleCount);
-
     vec3 bgColor = vec3(0.);
     vec3 fgColor = vec3(0.);
     float bgWeight = 0.;
     float fgWeight = 0.;
  
     float coc = texture(uSrcTexture, vUv).a;
-    // coc = texture(uSrcTexture, vUv).r;
-    // outColor = vec4(vec3(coc), 1.);
-    // outColor = vec4(texture(uSrcTexture, vUv).a, 1., 1., 1.);
-    // return;
-  
-    // 4. kernel sample
+
     for(int k = 0; k < kernelSampleCount; k++) {
         vec2 o = kernel[k] * uBokehRadius;
         float radius = length(o);
         o *= texelSize;
         vec4 s = texture(uSrcTexture, vUv + o);
-        
+      
+        // 後ボケ抜き出し 
+        // 後ボケが前にかぶらないように、現在ピクセルのcocと、kernel上のcoc の最大値を比較して使う 
         float bgw = weight(max(0., min(s.a, coc)), radius);
         bgColor += s.rgb * bgw;
         bgWeight += bgw;
-        
+       
+        // 前ボケ抜き出し 
+        // 前ボケはcocがマイナス
         float fgw = weight(-s.a, radius);
         fgColor += s.rgb * fgw;
         fgWeight += fgw;
-        
-        // float sw = checkWeight(abs(s.a), radius);
-        // color += s.rgb * sw;
-        // weight += sw;
-        // if(abs(s.a) >= radius) {
-        //     color += s.rgb;
-        //     weight += 1.;
-        // }
     }
    
     bgColor *= vec3(1.) / (bgWeight + (bgWeight == 0. ? 1. : 0.)); 
     fgColor *= vec3(1.) / (fgWeight + (fgWeight == 0. ? 1. : 0.));
+    
+    // 前ボケと後ボケがどのように合成されたか
     float bgfg = min(1., fgWeight * 3.141592 / float(kernelSampleCount));
     
     vec3 color = mix(bgColor, fgColor, bgfg);

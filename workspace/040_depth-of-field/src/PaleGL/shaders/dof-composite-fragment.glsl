@@ -21,7 +21,10 @@ void main() {
     vec4 dof = texture(uDofTexture, vUv);
     
     float dofStrength = smoothstep(.1, 1., abs(coc)); 
+    
+    // interpolate
     float rate = dofStrength + dof.a - dofStrength * dof.a;
+    
     // rate = pow(rate, 8.);
     vec3 color = mix(
         sceneColor.rgb,

@@ -28,6 +28,8 @@ void main() {
         // texture(uSrcTexture, vUv + vec2(uTexelSize.x * -.5, uTexelSize.y * .5) * uBokehRadius) +
         // texture(uSrcTexture, vUv + vec2(uTexelSize.x * .5, uTexelSize.y * -.5) * uBokehRadius) +
         // texture(uSrcTexture, vUv + vec2(uTexelSize.x * .5, uTexelSize.y * .5) * uBokehRadius);
+        
+    // TODO: 輝度値を考慮する必要がある？
     outColor = s * .25;
         
 
