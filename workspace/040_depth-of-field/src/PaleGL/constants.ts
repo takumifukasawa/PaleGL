@@ -112,6 +112,7 @@ export const TextureTypes = {
     RGBA16F: 'RGBA16F',
     RGBA32F: 'RGBA32F',
     R11F_G11F_B10F: 'R11F_G11F_B10F',
+    R16F: 'R16F',
 } as const;
 
 export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
@@ -144,6 +145,7 @@ export const RenderTargetTypes = {
     Empty: 'Empty',
     RGBA16F: 'RGBA16F',
     R11F_G11F_B10F: 'R11F_G11F_B10F',
+    R16F: 'R16F',
 } as const;
 
 export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTargetTypes];

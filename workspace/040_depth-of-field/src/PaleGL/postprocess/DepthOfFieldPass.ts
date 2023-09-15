@@ -83,7 +83,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
             },
             // TODO: r11f_g11f_b10fだとunsignedなのでr16fにする
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            renderTargetType: RenderTargetTypes.RGBA16F
+            // renderTargetType: RenderTargetTypes.RGBA16F
+            renderTargetType: RenderTargetTypes.R16F
             // renderTargetType: RenderTargetTypes.RGBA
         });
         this.materials.push(...this.circleOfConfusionPass.materials);

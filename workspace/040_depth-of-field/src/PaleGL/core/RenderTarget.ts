@@ -172,6 +172,20 @@ export class RenderTarget extends AbstractRenderTarget {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
                 break;
 
+            case RenderTargetTypes.R16F:
+                this._texture = new Texture({
+                    gpu,
+                    width: this.width,
+                    height: this.height,
+                    mipmap,
+                    type: TextureTypes.R16F,
+                    minFilter,
+                    magFilter,
+                });
+
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
+                break;
+
             default:
                 break;
         }

@@ -85,7 +85,7 @@ export class Texture extends GLObject {
   
         const texture = gl.createTexture();
         if (!texture) {
-            throw 'invalid texture';
+            throw '[Texture.constructor] invalid texture';
         }
         this.texture = texture;
 
@@ -107,6 +107,7 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA16F:
             case TextureTypes.RGBA32F:
             case TextureTypes.R11F_G11F_B10F:
+            case TextureTypes.R16F:
                 // min filter settings
                 switch (this.minFilter) {
                     case TextureFilterTypes.Nearest:
@@ -116,7 +117,7 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw 'invalid min filter type';
+                        throw '[Texture.constructor] invalid min filter type';
                 }
                 // mag filter settings
                 switch (this.magFilter) {
@@ -127,7 +128,7 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw 'invalid mag filter type';
+                        throw '[Texture.constructor] invalid mag filter type';
                 }
                 break;
 
@@ -144,7 +145,7 @@ export class Texture extends GLObject {
             //     break;
 
             default:
-                throw 'invalid texture type';
+                throw '[Texture.constructor] invalid texture type';
         }
 
         //
@@ -311,6 +312,22 @@ export class Texture extends GLObject {
                 }
                 break;
 
+            case TextureTypes.R16F:
+                if (width && height) {
+                    if (this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.FLOAT, this.img);
+                    } else {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.FLOAT, null);
+                    }
+                } else {
+                    if (this.img) {
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, gl.RED, gl.FLOAT, this.img);
+                    } else {
+                        // TODO: fix type
+                        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, gl.RED, gl.FLOAT, null);
+                    }
+                }
+                break;
 
             default:
                 throw '[Texture.constructor] invalid type';
@@ -401,6 +418,15 @@ export class Texture extends GLObject {
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, null);
                 }
                 break;
+
+            case TextureTypes.R16F:
+                if (this.img) {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.FLOAT, this.img);
+                } else {
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.FLOAT, null);
+                }
+                break;
+
 
             default:
                 throw '[Texture.setSize] invalid type';
