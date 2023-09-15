@@ -20,6 +20,7 @@ void main() {
     float coc = texture(uCocTexture, vUv).r;
     vec4 dof = texture(uDofTexture, vUv);
     
+    // float dofStrength = smoothstep(.1, 1., abs(coc)); 
     float dofStrength = smoothstep(.1, 1., abs(coc)); 
     
     // interpolate
