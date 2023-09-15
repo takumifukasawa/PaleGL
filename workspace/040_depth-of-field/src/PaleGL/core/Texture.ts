@@ -344,8 +344,10 @@ export class Texture extends GLObject {
      * @param height
      */
     setSize(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+        // this.width = width;
+        // this.height = height;
+        this.width = Math.floor(width);
+        this.height = Math.floor(height);
 
         // if (this.img === null) {
         //     throw "[Texture.setSize] invalid img";

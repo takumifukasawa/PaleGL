@@ -242,8 +242,10 @@ export class RenderTarget extends AbstractRenderTarget {
      * @param height
      */
     setSize(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+        // this.width = width;
+        // this.height = height;
+        this.width = Math.floor(width);
+        this.height = Math.floor(height);
         if (this._texture) {
             this._texture.setSize(this.width, this.height);
         }

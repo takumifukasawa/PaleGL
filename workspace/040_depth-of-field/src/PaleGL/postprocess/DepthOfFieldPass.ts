@@ -171,7 +171,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.bokehBlurPass = new FragmentPass({
             gpu,
             fragmentShader: dofBokehBlurFragmentShader,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RenderTargetTypes.RGBA16F,
             uniforms: {
                 uTexelSize: {
                     type: UniformTypes.Vector2,
@@ -194,10 +195,14 @@ export class DepthOfFieldPass implements IPostProcessPass {
             fragmentShader: dofCompositeFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                // uCocTexture: {
-                //     type: UniformTypes.Texture,
-                //     value: null,
-                // },
+                uCocTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                uDofTexture: {
+                    type: UniformTypes.Texture,
+                    value: null
+                }
             },
         });
 
@@ -312,7 +317,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
         //
 
         // this.dofBokehPass.material.updateUniform('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
-        this.dofBokehPass.material.updateUniform('uTexelSize', new Vector2(1 / this.width, 1 / this.height));
+        this.dofBokehPass.material.updateUniform(
+            'uTexelSize',
+            new Vector2(1 / this.preFilterPass.width, 1 / this.preFilterPass.height)
+        );
         this.dofBokehPass.material.updateUniform('uBokehRadius', this.bokehRadius);
 
         this.dofBokehPass.render({
@@ -354,14 +362,19 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 4: render composite pass
         //
 
+        // this.compositePass.material.updateUniform('uCocTexture', this.preFilterPass.renderTarget.texture);
+        this.compositePass.material.updateUniform('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
+        this.compositePass.material.updateUniform('uDofTexture', this.bokehBlurPass.renderTarget.texture);
+
         this.compositePass.render({
             gpu,
             camera,
             renderer,
             // prevRenderTarget: this.circleOfConfusionPass.renderTarget,
-            prevRenderTarget: this.preFilterPass.renderTarget,
+            // prevRenderTarget: this.preFilterPass.renderTarget,
             // prevRenderTarget: this.dofBokehPass.renderTarget,
             // prevRenderTarget: this.bokehBlurPass.renderTarget,
+            prevRenderTarget,
             isLastPass,
             targetCamera,
             gBufferRenderTargets,

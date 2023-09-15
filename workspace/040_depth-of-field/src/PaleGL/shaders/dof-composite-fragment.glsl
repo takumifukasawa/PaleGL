@@ -12,20 +12,31 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uCocTexture;
+uniform sampler2D uDofTexture;
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
-
-    // vec4 kernel = uTexelSize.xyxy * vec2(.5, -.5).xxyy * uBokehRadius;
-    // 
-    // float coc0 = texture(uCocTexture, vUv + kernel.xy).r;
-    // float coc1 = texture(uCocTexture, vUv + kernel.zy).r;
-    // float coc2 = texture(uCocTexture, vUv + kernel.xw).r;
-    // float coc3 = texture(uCocTexture, vUv + kernel.zw).r;
-    // 
-    // float coc = (coc0 + coc1 + coc2 + coc3) * .25;
+   
+    float coc = texture(uCocTexture, vUv).r;
+    vec4 dof = texture(uDofTexture, vUv);
     
+    float dofStrength = smoothstep(.1, 1., abs(coc)); 
+    float rate = dofStrength + dof.a - dofStrength * dof.a;
+    // rate = pow(rate, 8.);
+    vec3 color = mix(
+        sceneColor.rgb,
+        dof.rgb,
+        rate
+    );
+    
+    outColor = vec4(color, 1.);
+   
     // for debug
     // outColor = sceneColor;
-    outColor = vec4(sceneColor.xyz, 1.);
+    // outColor = dof;
+    // outColor = vec4(sceneColor.xyz, 1.);
+    // outColor = vec4(vec3(dofStrength + dof.a - dofStrength * dof.a), 1.);
+    // outColor = vec4(vec3(dofStrength), 1.);
+    // outColor = vec4(vec3(dof.a), 1.);
+    // outColor = vec4(vec3(rate), 1.);
 }           

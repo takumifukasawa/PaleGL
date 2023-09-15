@@ -18,7 +18,7 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
 
     // tent filter
-    vec4 kernel = uTexelSize.xyxy * vec2(-.5, .5).xxyy * uBokehRadius;
+    vec4 kernel = uTexelSize.xyxy * vec2(-.5, .5).xxyy;
     vec4 s =
         texture(uSrcTexture, vUv + kernel.xy) +
         texture(uSrcTexture, vUv + kernel.zy) +

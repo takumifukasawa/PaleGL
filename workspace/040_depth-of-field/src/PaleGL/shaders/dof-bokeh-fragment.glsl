@@ -166,7 +166,7 @@ void main() {
     
     // for debug
     // outColor = srcColor;
-    outColor = vec4(vec3(coc), 1.);
+    // outColor = vec4(vec3(coc), 1.);
     
     // if(coc < 0.) {
     //     outColor = vec4(1., 0., 0., 1.);

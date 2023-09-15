@@ -54,8 +54,8 @@ void main() {
     // outColor = sceneColor;
     // outColor = cocColor;
     // outColor = vec4(vec3(coc), 1.);
-    outColor = vec4(vec3(coc), 1.);
-    if(cocColor.r < 0.) {
-        outColor = vec4(1., 0., 0., 1.) * abs(cocColor.r);
-    }
+    // outColor = vec4(vec3(coc), 1.);
+    // if(cocColor.r <= 0.) {
+    //     outColor = vec4(1., 0., 0., 1.) * abs(cocColor.r);
+    // }
 }           
