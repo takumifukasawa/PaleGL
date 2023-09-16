@@ -239,7 +239,7 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
-    intensity: 5,
+    intensity: 1,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white(),
 });

@@ -49,7 +49,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     materials: Material[] = [];
 
     get renderTarget() {
-        return this.circleOfConfusionPass.renderTarget;
+        return this.compositePass.renderTarget;
     }
 
     /**
