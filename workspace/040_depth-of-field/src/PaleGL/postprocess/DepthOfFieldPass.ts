@@ -13,8 +13,15 @@ import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import {Vector4} from "@/PaleGL/math/Vector4.ts";
 
 // import { Texture } from '@/PaleGL/core/Texture.ts';
+
+//
+// ref:
+// https://catlikecoding.com/unity/tutorials/advanced-rendering/depth-of-field/
+// https://github.com/keijiro/KinoBokeh/tree/master
+//
 
 export class DepthOfFieldPass implements IPostProcessPass {
     // --------------------------------------------------------------------------------
@@ -25,6 +32,13 @@ export class DepthOfFieldPass implements IPostProcessPass {
     focusDistance: number = 14;
     focusRange: number = 10;
     bokehRadius = 4;
+
+    // wip blade bokeh
+    // focalLength: number = 200;
+    // aperture: number = 2.8;
+    // bladeCount: number = 5;
+    // bladeCurvature: number = 0;
+    // bladeRotation: number = 0;
 
     // gpu: GPU;
     name: string = 'DepthOfFieldPass';
@@ -78,6 +92,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
                 uBokehRadius: {
                     type: UniformTypes.Float,
                     value: this.bokehRadius,
+                },
+                uCocParams: {
+                    type: UniformTypes.Vector4,
+                    value: Vector4.zero,
                 },
                 ...PostProcessPassBase.commonUniforms,
             },
@@ -156,6 +174,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.bokehRadius,
                 },
+                uBokehKernel: {
+                    type: UniformTypes.Vector4Array,
+                    value: [],
+                }
                 // uCocTexture: {
                 //     type: UniformTypes.Texture,
                 //     value: null,

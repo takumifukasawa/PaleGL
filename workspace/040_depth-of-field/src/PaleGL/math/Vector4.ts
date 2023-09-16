@@ -1,8 +1,16 @@
 ﻿export class Vector4 {
-    private elements: Float32Array = new Float32Array(4);
+    elements: Float32Array = new Float32Array(4);
 
     constructor(x: number, y: number, z: number, w: number) {
         this.set(x, y, z, w);
+    }
+    
+    static get one() {
+        return new Vector4(1, 1, 1, 1);
+    }
+    
+    static get zero() {
+        return new Vector4(0, 0, 0, 0);
     }
 
     get x() {

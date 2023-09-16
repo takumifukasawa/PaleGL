@@ -25,6 +25,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
+import {Vector4} from "@/PaleGL/math/Vector4.ts";
 
 export type MaterialArgs = {
     // required
@@ -92,6 +93,8 @@ export type UniformValue =
     | Vector2[]
     | Vector3
     | Vector3[]
+    | Vector4
+    | Vector4[]
     | Matrix4
     | Matrix4[]
     | Texture

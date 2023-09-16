@@ -204,6 +204,8 @@ export const UniformTypes = {
     Vector2: 'Vector2',
     Vector2Array: 'Vector2Array',
     Vector3: 'Vector3',
+    Vector4: 'Vector4',
+    Vector4Array: 'Vector4Array',
     Struct: 'Struct',
     Float: 'Float',
     FloatArray: 'FloatArray',

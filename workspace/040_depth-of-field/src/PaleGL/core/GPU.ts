@@ -20,6 +20,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
+import {Vector4} from "@/PaleGL/math/Vector4.ts";
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement('canvas');
@@ -256,6 +257,12 @@ export class GPU {
                     break;
                 case UniformTypes.Vector3:
                     gl.uniform3fv(location, (value as Vector3).elements);
+                    break;
+                case UniformTypes.Vector4:
+                    gl.uniform4fv(location, (value as Vector4).elements);
+                    break;
+                case UniformTypes.Vector4Array:
+                    gl.uniform4fv(location, (value as Vector4[]).map((v) => [...v.elements]).flat());
                     break;
                 case UniformTypes.Matrix4:
                     // arg[1] ... use transpose.

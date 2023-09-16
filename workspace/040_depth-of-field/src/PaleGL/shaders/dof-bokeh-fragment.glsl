@@ -1,7 +1,9 @@
 ﻿#version 300 es
 
 //
-// ref: https://catlikecoding.com/unity/tutorials/advanced-rendering/depth-of-field/
+// ref:
+// https://catlikecoding.com/unity/tutorials/advanced-rendering/depth-of-field/
+// https://github.com/keijiro/KinoBokeh/tree/master
 //
             
 precision mediump float;
@@ -18,12 +20,14 @@ uniform vec2 uTexelSize;
 uniform float uBokehRadius;
 
 #define BOKEH_KERNEL_MEDIUM
+// #define BOKEH_KERNEL_SMALL
 
 #if defined(BOKEH_KERNEL_SMALL)
 
-// ref: https://github.com/Unity-Technologies/PostProcessing/blob/v2/PostProcessing/Shaders/Builtins/DiskKernels.hlsl
+// ref: https://github.com/keijiro/KinoBokeh/blob/master/Assets/Kino/Bokeh/Shader/DiskKernel.cginc
 const int kernelSampleCount = 16;
 const vec2[kernelSampleCount] kernel = vec2[](
+    // original
 	vec2(0, 0),
 	vec2(0.54545456, 0),
 	vec2(0.16855472, 0.5187581),
@@ -69,6 +73,7 @@ const vec2[kernelSampleCount] kernel = vec2[](
 	vec2(0.6234897, -0.7818316),
 	vec2(0.90096885, -0.43388376)
 );
+
 #endif
 
 float weight(float coc, float radius) {
@@ -89,7 +94,7 @@ void main() {
     float coc = texture(uSrcTexture, vUv).a;
 
     for(int k = 0; k < kernelSampleCount; k++) {
-        vec2 o = kernel[k] * uBokehRadius;
+        vec2 o = kernel[k].xy * uBokehRadius;
         float radius = length(o);
         o *= texelSize;
         vec4 s = texture(uSrcTexture, vUv + o);
