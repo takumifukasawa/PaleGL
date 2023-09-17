@@ -55,7 +55,7 @@ export class PhongMaterial extends Material {
         const baseUniforms: Uniforms = {
             uDiffuseColor: {
                 type: UniformTypes.Color,
-                value: diffuseColor || Color.white(),
+                value: diffuseColor || Color.white,
             },
             uDiffuseMap: {
                 type: UniformTypes.Texture,

@@ -11,6 +11,7 @@ import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-verte
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {Light} from "@/PaleGL/actors/Light.ts";
 
 export type PostProcessPassRenderArgs = {
     gpu: GPU;
@@ -21,6 +22,7 @@ export type PostProcessPassRenderArgs = {
     gBufferRenderTargets?: GBufferRenderTargets | null;
     targetCamera: Camera;
     time: number;
+    lightActors?: Light[];
 };
 
 // export interface IPostProcessPass {
@@ -168,6 +170,10 @@ export class PostProcessPassBase implements IPostProcessPass {
                 value: Matrix4.identity,
             },
             [UniformNames.ProjectionMatrix]: {
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            [UniformNames.InverseViewMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },

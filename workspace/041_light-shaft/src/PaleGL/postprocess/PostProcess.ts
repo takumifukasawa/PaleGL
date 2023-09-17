@@ -8,6 +8,7 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { Light } from '@/PaleGL/actors/Light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
@@ -20,6 +21,7 @@ type PostProcessRenderArgs = {
     targetCamera: Camera;
     time: number;
     isCameraLastPass: boolean;
+    lightActors?: Light[];
 };
 
 // TODO: actorを継承してもいいかもしれない
@@ -53,30 +55,28 @@ export class PostProcess {
     }
 
     get hasEnabledPass() {
-        for(let i = 0; i < this.passes.length; i++){
-            if(this.passes[i].enabled) {
+        for (let i = 0; i < this.passes.length; i++) {
+            if (this.passes[i].enabled) {
                 return true;
             }
         }
         return false;
     }
-    
+
     get lastRenderTarget() {
         let lastPass: IPostProcessPass | null = null;
-        for(let i = this.passes.length - 1; i >= 0; i--)
-        {
-            if(this.passes[i].enabled)
-            {
+        for (let i = this.passes.length - 1; i >= 0; i--) {
+            if (this.passes[i].enabled) {
                 lastPass = this.passes[i];
                 break;
             }
         }
-        if(lastPass == null) {
+        if (lastPass == null) {
             return null;
         }
         return lastPass.renderTarget;
     }
-    
+
     // constructor({gpu}: {gpu: GPU}) {
     constructor(postProcessCamera?: Camera) {
         // // TODO: renderTargetがいらない時もあるので出し分けたい
@@ -96,7 +96,7 @@ export class PostProcess {
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
      */
@@ -107,7 +107,7 @@ export class PostProcess {
     }
 
     /**
-     * 
+     *
      * @param pass
      */
     addPass(pass: IPostProcessPass) {
@@ -120,6 +120,7 @@ export class PostProcess {
      * @param renderer
      * @param targetCamera
      * @param time
+     * @param lightActors
      */
     // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
     static updatePassMaterial({
@@ -127,13 +128,29 @@ export class PostProcess {
         renderer,
         targetCamera,
         time,
+        lightActors,
     }: {
         pass: IPostProcessPass;
         renderer: Renderer;
         targetCamera: Camera;
         time: number;
+        lightActors?: Light[];
     }) {
         pass.materials.forEach((passMaterial) => {
+            //
+            // light
+            //
+            if (lightActors) {
+                // TODO: light情報はまとめてから渡したい
+                lightActors.forEach((light) => {
+                    light.updateUniform(passMaterial);
+                });
+            }
+
+            //
+            // basic
+            //
+
             passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
             passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
             passMaterial.updateUniform(UniformNames.Time, time);
@@ -143,6 +160,7 @@ export class PostProcess {
                 UniformNames.InverseViewProjectionMatrix,
                 targetCamera.inverseViewProjectionMatrix
             );
+            passMaterial.updateUniform(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
             passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
             passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
             passMaterial.updateUniform(
@@ -159,7 +177,7 @@ export class PostProcess {
     }
 
     /**
-     * 
+     *
      * @param pass
      * @param gpu
      * @param renderer
@@ -169,6 +187,7 @@ export class PostProcess {
      * @param gBufferRenderTargets
      * @param time
      * @param isLastPass
+     * @param lightActors
      */
     static renderPass({
         pass,
@@ -180,8 +199,15 @@ export class PostProcess {
         gBufferRenderTargets,
         time,
         isLastPass,
+        lightActors,
     }: PostProcessPassRenderArgs & { pass: IPostProcessPass; camera: Camera; isLastPass: boolean }) {
-        PostProcess.updatePassMaterial({ pass, renderer, targetCamera, time });
+        PostProcess.updatePassMaterial({
+            pass,
+            renderer,
+            targetCamera,
+            time,
+            lightActors
+        });
         pass.render({
             gpu,
             renderer,
@@ -191,6 +217,7 @@ export class PostProcess {
             targetCamera,
             gBufferRenderTargets,
             time,
+            lightActors,
         });
     }
 
@@ -202,6 +229,7 @@ export class PostProcess {
         targetCamera,
         time,
         isCameraLastPass,
+        lightActors,
     }: PostProcessRenderArgs) {
         // if (!sceneRenderTarget) {
         //     throw '[PostProcess.render] scene render target is empty.';
@@ -223,7 +251,7 @@ export class PostProcess {
 
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
-       
+
         enabledPasses.forEach((pass, i) => {
             const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;
 
@@ -238,7 +266,7 @@ export class PostProcess {
             //     gBufferRenderTargets,
             //     time,
             // });
-
+            
             PostProcess.renderPass({
                 pass,
                 gpu,
@@ -249,6 +277,7 @@ export class PostProcess {
                 targetCamera,
                 gBufferRenderTargets,
                 time,
+                lightActors,
             });
 
             prevRenderTarget = pass.renderTarget;

@@ -55,6 +55,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 // import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 // import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
+import { LightShaftPass } from "@/PaleGL/postprocess/LightShaftPass";
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 
 // inputs
@@ -81,6 +82,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
+// import {Light} from "@/PaleGL/actors/Light.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -242,7 +244,7 @@ captureSceneCamera.onFixedUpdate = () => {
 const directionalLight = new DirectionalLight({
     intensity: 1.2,
     // color: Color.fromRGB(255, 210, 200),
-    color: Color.white(),
+    color: Color.white,
 });
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -294,8 +296,10 @@ const ssrPass = new SSRPass({ gpu });
 ssrPass.enabled = false;
 cameraPostProcess.addPass(ssrPass);
 
+const lightShaftPass = new LightShaftPass({ gpu });
+cameraPostProcess.addPass(lightShaftPass);
+
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = true;
 cameraPostProcess.addPass(fxaaPass);
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
@@ -1288,7 +1292,63 @@ function initDebugger() {
 
     // debuggerGUI.addBorderSpacer();
 
-   
+    //
+    // light shaft
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'light shaft pass enabled',
+        initialValue: lightShaftPass.enabled,
+        onChange: (value) => (lightShaftPass.enabled = value),
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: lightShaftPass.blendRate,
+        onChange: (value) => {
+            lightShaftPass.blendRate = value;
+        },
+    });
+
+
+    debuggerGUI.addSliderDebugger({
+        label: 'attenuation base',
+        minValue: 0,
+        maxValue: 128,
+        stepValue: 0.01,
+        initialValue: lightShaftPass.attenuationBase,
+        onChange: (value) => {
+            lightShaftPass.attenuationBase = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'attenuation power',
+        minValue: 0,
+        maxValue: 64,
+        stepValue: 0.001,
+        initialValue: lightShaftPass.attenuationPower,
+        onChange: (value) => {
+            lightShaftPass.attenuationPower = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray step',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.001,
+        initialValue: lightShaftPass.rayStep,
+        onChange: (value) => {
+            lightShaftPass.rayStep = value;
+        },
+    });
+
     //
     // fxaa
     //

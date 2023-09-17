@@ -4,9 +4,7 @@
     RenderQueueType,
     RenderTargetTypes,
     UniformNames,
-    UniformTypes,
 } from '@/PaleGL/constants';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/Stats';
 import { Light } from '@/PaleGL/actors/Light';
@@ -246,7 +244,6 @@ export class Renderer {
      * @param time
      * @param deltaTime
      * @param onBeforePostProcess
-     * @param
      */
     // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
     render(
@@ -402,6 +399,7 @@ export class Renderer {
             prevRenderTarget: null,
             isLastPass: false,
             time, // TODO: engineから渡したい
+            // lightActors,
         });
 
         // ------------------------------------------------------------------------------
@@ -424,48 +422,6 @@ export class Renderer {
         lightActors.forEach((light) => {
             const targetMaterial = this._deferredShadingPass.material;
             light.updateUniform(targetMaterial);
-            // if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
-            //     targetMaterial.updateUniform(UniformNames.DirectionalLight, {
-            //         direction: {
-            //             type: UniformTypes.Vector3,
-            //             // pattern1: そのまま渡す
-            //             // value: light.transform.position,
-            //             // pattern2: normalizeしてから渡す
-            //             value: light.transform.position.clone().normalize(),
-            //         },
-            //         intensity: {
-            //             type: UniformTypes.Float,
-            //             value: light.intensity,
-            //         },
-            //         color: {
-            //             type: UniformTypes.Color,
-            //             value: light.color,
-            //         },
-            //     });
-            //     if (light.shadowMap) {
-            //         this._deferredShadingPass.material.updateUniform(
-            //             UniformNames.ShadowMap,
-            //             light.shadowMap.read.texture
-            //         );
-            //     }
-            // }
-            // if (
-            //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-            //     targetMaterial.receiveShadow &&
-            //     light.castShadow &&
-            //     light.shadowCamera &&
-            //     light.shadowMap
-            // ) {
-            //     // clip coord (-1 ~ 1) to uv (0 ~ 1)
-            //     const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-            //     const textureProjectionMatrix = Matrix4.multiplyMatrices(
-            //         textureMatrix,
-            //         light.shadowCamera.projectionMatrix.clone(),
-            //         light.shadowCamera.viewMatrix.clone()
-            //     );
-            //     targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-            //     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
-            // }
         });
 
         // set ao texture
@@ -483,6 +439,7 @@ export class Renderer {
             prevRenderTarget: null,
             isLastPass: false,
             time, // TODO: engineから渡したい
+            lightActors,
         });
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
@@ -516,31 +473,9 @@ export class Renderer {
             );
         });
 
-        // return;
-
-        // TODO: camera...はなくていいかも
-        // camera.setRenderTarget(this._afterDeferredShadingRenderTarget);
         this.setRenderTarget(this._afterDeferredShadingRenderTarget.write);
 
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
-
-        // // ------------------------------------------------------------------------------
-        // // depth of field pass
-        // // ------------------------------------------------------------------------------
-
-        // this.renderDepthOfFieldPass(camera, time);
-
-        // // ------------------------------------------------------------------------------
-        // // bloom pass
-        // // ------------------------------------------------------------------------------
-
-        // this.renderBloomPass(camera, time);
-
-        // // ------------------------------------------------------------------------------
-        // // tone mapping pass
-        // // ------------------------------------------------------------------------------
-
-        // this.renderToneMappingPass(camera, time);
 
         // ------------------------------------------------------------------------------
         // full screen pass
@@ -550,15 +485,6 @@ export class Renderer {
         if (onBeforePostProcess) {
             onBeforePostProcess();
         }
-
-        // const targetPostProcesses: PostProcess[] = [];
-        // // TODO: こっちいる？
-        // // if (camera.mainCamera) {
-        // //     targetPostProcesses.push(this._scenePostProcess);
-        // // }
-        // if (camera.postProcess) {
-        //     targetPostProcesses.push(camera.postProcess);
-        // }
 
         if (!this._scenePostProcess.hasEnabledPass) {
             // 何もenabledがないのはおかしい. tonemappingは最低限有効化されていないとおかしい(HDRなので)
@@ -577,6 +503,7 @@ export class Renderer {
             targetCamera: camera,
             time, // TODO: engineから渡したい
             isCameraLastPass: isCameraLastPassAndHasNotPostProcess,
+            // lightActors,
         });
 
         if (isCameraLastPassAndHasNotPostProcess) {
@@ -585,17 +512,20 @@ export class Renderer {
 
         prevRenderTarget = this._scenePostProcess.lastRenderTarget!;
 
-        camera.postProcess!.render({
-            gpu: this.gpu,
-            renderer: this,
-            prevRenderTarget,
-            // tone mapping 挟む場合
-            // prevRenderTarget: this._toneMappingPass.renderTarget,
-            gBufferRenderTargets: this._gBufferRenderTargets,
-            targetCamera: camera,
-            time, // TODO: engineから渡したい
-            isCameraLastPass: !camera.renderTarget,
-        });
+        if (camera.hasEnabledPostProcessPass) {
+            camera.postProcess!.render({
+                gpu: this.gpu,
+                renderer: this,
+                prevRenderTarget,
+                // tone mapping 挟む場合
+                // prevRenderTarget: this._toneMappingPass.renderTarget,
+                gBufferRenderTargets: this._gBufferRenderTargets,
+                targetCamera: camera,
+                time, // TODO: engineから渡したい
+                isCameraLastPass: !camera.renderTarget,
+                lightActors,
+            });
+        }
     }
 
     /**
@@ -951,41 +881,7 @@ export class Renderer {
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             // - opaqueと共通処理なのでまとめたい
             lightActors.forEach((light) => {
-                if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
-                    targetMaterial.updateUniform(UniformNames.DirectionalLight, {
-                        direction: {
-                            type: UniformTypes.Vector3,
-                            value: light.transform.position,
-                        },
-                        intensity: {
-                            type: UniformTypes.Float,
-                            value: light.intensity,
-                        },
-                        color: {
-                            type: UniformTypes.Color,
-                            value: light.color,
-                        },
-                    });
-                }
-
-                if (
-                    targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-                    targetMaterial.receiveShadow &&
-                    light.castShadow &&
-                    light.shadowCamera &&
-                    light.shadowMap
-                ) {
-                    // clip coord (-1 ~ 1) to uv (0 ~ 1)
-                    const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-                    const textureProjectionMatrix = Matrix4.multiplyMatrices(
-                        textureMatrix,
-                        light.shadowCamera.projectionMatrix.clone(),
-                        light.shadowCamera.viewMatrix.clone()
-                    );
-
-                    targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-                    targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
-                }
+                light.updateUniform(targetMaterial);
             });
 
             this.renderMesh(actor.geometry, targetMaterial);
@@ -995,73 +891,4 @@ export class Renderer {
             }
         });
     }
-
-    // /**
-    //  *
-    //  * @param camera
-    //  * @param time
-    //  * @private
-    //  */
-    // private renderDepthOfFieldPass(camera: Camera, time: number) {
-    //     // this._depthOfFieldPass.setup();
-
-    //     PostProcess.renderPass({
-    //         pass: this._depthOfFieldPass,
-    //         renderer: this,
-    //         targetCamera: camera,
-    //         gpu: this.gpu,
-    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-    //         // tone mapping 挟む場合
-    //         prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-    //         // prevRenderTarget: null,
-    //         isLastPass: false, // for debug
-    //         time, // TODO: engineから渡したい
-    //     });
-    // }
-
-    // /**
-    //  *
-    //  * @param camera
-    //  * @param time
-    //  * @private
-    //  */
-    // private renderBloomPass(camera: Camera, time: number) {
-    //     PostProcess.renderPass({
-    //         pass: this._bloomPass,
-    //         renderer: this,
-    //         targetCamera: camera,
-    //         gpu: this.gpu,
-    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-    //         prevRenderTarget: this._depthOfFieldPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-    //         // prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-    //         // prevRenderTarget: null,
-    //         isLastPass: false,
-    //         time, // TODO: engineから渡したい
-    //     });
-    // }
-
-    // /**
-    //  *
-    //  * @param camera
-    //  * @private
-    //  */
-    // private renderToneMappingPass(camera: Camera, time: number) {
-    //     // console.log("--------- tone mapping pass ---------");
-
-    //     // this._toneMappingPass.material.updateUniform(UniformNames.SrcTexture, );
-
-    //     // this._toneMappingPass.enabled = true;
-    //     PostProcess.renderPass({
-    //         pass: this._toneMappingPass,
-    //         renderer: this,
-    //         targetCamera: camera,
-    //         gpu: this.gpu,
-    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-    //         // tone mapping 挟む場合
-    //         prevRenderTarget: this._bloomPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-    //         // prevRenderTarget: null,
-    //         isLastPass: false,
-    //         time, // TODO: engineから渡したい
-    //     });
-    // }
 }

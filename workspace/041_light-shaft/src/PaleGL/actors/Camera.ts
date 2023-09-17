@@ -49,6 +49,7 @@ export class Camera extends Actor {
     viewMatrix = Matrix4.identity;
     projectionMatrix = Matrix4.identity;
     inverseViewProjectionMatrix = Matrix4.identity;
+    inverseViewMatrix = Matrix4.identity;
     inverseProjectionMatrix = Matrix4.identity;
     #renderTarget: CameraRenderTargetType = null;
     clearColor: Vector4; // TODO: color class
@@ -251,6 +252,7 @@ export class Camera extends Actor {
         super.updateTransform();
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
         this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
+        this.inverseViewMatrix = this.viewMatrix.clone().invert();
         this.inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
             this.projectionMatrix,
             this.viewMatrix

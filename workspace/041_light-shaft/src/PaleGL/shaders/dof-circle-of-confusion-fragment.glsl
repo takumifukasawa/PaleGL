@@ -21,7 +21,7 @@ uniform float uFarClip;
 uniform float uFocusDistance;
 uniform float uFocusRange;
 uniform float uBokehRadius;
-uniform mat4 uInverseProjectionMatrix;
+// uniform mat4 uInverseProjectionMatrix;
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);

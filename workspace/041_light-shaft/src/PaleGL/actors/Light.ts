@@ -6,6 +6,7 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { OrthographicCamera } from './OrthographicCamera';
 import { PerspectiveCamera } from './PerspectiveCamera';
 import { Material } from '@/PaleGL/materials/Material.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 export type LightArgs = {
     intensity: number;
@@ -19,10 +20,11 @@ export interface ILight {
 // TODO: interfaceでいいかも
 export class Light extends Actor implements ILight {
     intensity: number = 1;
-    color: Color = Color.white();
+    color: Color = Color.white;
     castShadow: boolean = false; // bool
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
+    shadowMapProjectionMatrix: Matrix4 = Matrix4.identity;
 
     hasShadowCamera() {
         return !!this.shadowCamera;

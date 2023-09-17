@@ -68,7 +68,7 @@
         return str;
     }
 
-    static white() {
+    static get white() {
         return new Color(1, 1, 1, 1);
     }
 

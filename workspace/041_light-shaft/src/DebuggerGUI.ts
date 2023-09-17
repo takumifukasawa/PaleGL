@@ -30,6 +30,7 @@ export class DebuggerGUI {
             line-height: 1.2em;
             box-sizing: border-box;
             padding-top: 8px;
+            min-width: 180px;
         `;
         
         const headerElement = document.createElement('div');

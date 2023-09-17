@@ -15,5 +15,5 @@ export interface IPostProcessPass {
 
     setSize: (width: number, height: number) => void;
     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
-    render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time }: PostProcessPassRenderArgs) => void;
+    render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time, lightActors }: PostProcessPassRenderArgs) => void;
 }
