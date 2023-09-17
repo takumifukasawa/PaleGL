@@ -42,7 +42,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
 
     // gpu: GPU;
     name: string = 'DepthOfFieldPass';
-    enabled: boolean = false;
+    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 

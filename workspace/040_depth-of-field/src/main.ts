@@ -80,6 +80,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 // import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
@@ -239,7 +240,7 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
-    intensity: 1,
+    intensity: 1.2,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white(),
 });
@@ -273,7 +274,8 @@ directionalLight.onStart = ({ actor }) => {
 };
 captureScene.add(directionalLight);
 
-const scenePostProcess = renderer.scenePostProcess;
+const cameraPostProcess = new PostProcess();
+// const scenePostProcess = renderer.scenePostProcess;
 // captureScene.scenePostProcess = scenePostProcess;
 
 // const bloomPass = new BloomPass({
@@ -290,15 +292,15 @@ const scenePostProcess = renderer.scenePostProcess;
 
 const ssrPass = new SSRPass({ gpu });
 ssrPass.enabled = false;
-scenePostProcess.addPass(ssrPass);
+cameraPostProcess.addPass(ssrPass);
 
 const fxaaPass = new FXAAPass({ gpu });
 fxaaPass.enabled = true;
-scenePostProcess.addPass(fxaaPass);
+cameraPostProcess.addPass(fxaaPass);
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
 bufferVisualizerPass.enabled = false;
-scenePostProcess.addPass(bufferVisualizerPass);
+cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.updateUniform(
         'uDirectionalLightShadowMap',
@@ -312,9 +314,9 @@ bufferVisualizerPass.beforeRender = () => {
     // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 };
 
-scenePostProcess.enabled = true;
+cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも
-captureSceneCamera.setPostProcess(scenePostProcess);
+captureSceneCamera.setPostProcess(cameraPostProcess);
 
 const createGLTFSphereMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
@@ -854,12 +856,12 @@ function initDebugger() {
             location.replace(url);
         },
     });
-
-    debuggerGUI.addBorderSpacer();
     
     //
     // orbit controls
     //
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: 'orbit controls enabled',
@@ -867,19 +869,17 @@ function initDebugger() {
         onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
     });
 
-    debuggerGUI.addBorderSpacer();
-
     //
     // show buffers
     //
+
+    debuggerGUI.addBorderSpacer();
 
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
-
-    debuggerGUI.addBorderSpacer();
 
     //
     // bloom debuggers
@@ -1028,190 +1028,19 @@ function initDebugger() {
     //     },
     // });
 
-    // debuggerGUI.addBorderSpacer();
-
-    //
-    // ssr debuggers
-    //
-
-    debuggerGUI.addToggleDebugger({
-        label: 'ssr pass enabled',
-        initialValue: ssrPass.enabled,
-        onChange: (value) => (ssrPass.enabled = value),
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'depth bias',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: ssrPass.rayDepthBias,
-        onChange: (value) => {
-            ssrPass.rayDepthBias = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray nearest distance',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.rayNearestDistance,
-        onChange: (value) => {
-            ssrPass.rayNearestDistance = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray max distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: ssrPass.rayMaxDistance,
-        onChange: (value) => {
-            ssrPass.rayMaxDistance = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray thickness',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionRayThickness,
-        onChange: (value) => {
-            ssrPass.reflectionRayThickness = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'jitter size x',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionRayJitterSizeX,
-        onChange: (value) => {
-            ssrPass.reflectionRayJitterSizeX = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'jitter size y',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionRayJitterSizeY,
-        onChange: (value) => {
-            ssrPass.reflectionRayJitterSizeY = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'fade min distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionFadeMinDistance,
-        onChange: (value) => {
-            ssrPass.reflectionFadeMinDistance = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'fade max distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionFadeMaxDistance,
-        onChange: (value) => {
-            ssrPass.reflectionFadeMaxDistance = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'edge fade factor min x',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinX,
-        onChange: (value) => {
-            ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'edge fade factor max x',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxX,
-        onChange: (value) => {
-            ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'edge fade factor min y',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinY,
-        onChange: (value) => {
-            ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'edge fade factor max y',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxY,
-        onChange: (value) => {
-            ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'additional rate',
-        minValue: 0.01,
-        maxValue: 1,
-        stepValue: 0.01,
-        initialValue: ssrPass.reflectionAdditionalRate,
-        onChange: (value) => {
-            ssrPass.reflectionAdditionalRate = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ssr blend rate',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: ssrPass.blendRate,
-        onChange: (value) => {
-            ssrPass.blendRate = value;
-        },
-    });
-
-    // debuggerGUI.addBorderSpacer();
-
-    //
-    // fxaa
-    //
-
-    // debuggerGUI.addToggleDebugger({
-    //     label: 'fxaa pass enabled',
-    //     initialValue: fxaaPass.enabled,
-    //     onChange: (value) => (fxaaPass.enabled = value),
-    // });
-
-    debuggerGUI.addBorderSpacer();
-
     //
     // depth of field
     //
-    
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'DoF pass enabled',
+        initialValue: renderer.depthOfFieldPass.enabled,
+        onChange: (value) => (renderer.depthOfFieldPass.enabled = value),
+    });
+
+
     debuggerGUI.addSliderDebugger({
         label: 'DoF focus distance',
         minValue: 0.1,
@@ -1222,7 +1051,7 @@ function initDebugger() {
             renderer.depthOfFieldPass.focusDistance = value;
         },
     });
-    
+
     debuggerGUI.addSliderDebugger({
         label: 'DoF focus range',
         minValue: 0.1,
@@ -1233,7 +1062,7 @@ function initDebugger() {
             renderer.depthOfFieldPass.focusRange = value;
         },
     });
-    
+
     debuggerGUI.addSliderDebugger({
         label: 'DoF bokeh radius',
         minValue: 0.01,
@@ -1243,6 +1072,233 @@ function initDebugger() {
         onChange: (value) => {
             renderer.depthOfFieldPass.bokehRadius = value;
         },
+    });
+
+    //
+    // bloom
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'Bloom pass enabled',
+        initialValue: renderer.bloomPass.enabled,
+        onChange: (value) => (renderer.bloomPass.enabled = value),
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'bloom amount',
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: renderer.bloomPass.bloomAmount,
+        onChange: (value) => {
+            renderer.bloomPass.bloomAmount = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'bloom threshold',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.bloomPass.threshold,
+        onChange: (value) => {
+            renderer.bloomPass.threshold = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'bloom tone',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.bloomPass.tone,
+        onChange: (value) => {
+            renderer.bloomPass.tone = value;
+        },
+    });
+
+
+    //
+    // ssr debuggers
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'ssr pass enabled',
+        initialValue: ssrPass.enabled,
+        onChange: (value) => (ssrPass.enabled = value),
+    });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'depth bias',
+    //     minValue: 0.001,
+    //     maxValue: 0.1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.rayDepthBias,
+    //     onChange: (value) => {
+    //         ssrPass.rayDepthBias = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ray nearest distance',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.rayNearestDistance,
+    //     onChange: (value) => {
+    //         ssrPass.rayNearestDistance = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ray max distance',
+    //     minValue: 0.001,
+    //     maxValue: 10,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.rayMaxDistance,
+    //     onChange: (value) => {
+    //         ssrPass.rayMaxDistance = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ray thickness',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionRayThickness,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionRayThickness = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'jitter size x',
+    //     minValue: 0.001,
+    //     maxValue: 0.1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionRayJitterSizeX,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionRayJitterSizeX = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'jitter size y',
+    //     minValue: 0.001,
+    //     maxValue: 0.1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionRayJitterSizeY,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionRayJitterSizeY = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'fade min distance',
+    //     minValue: 0.001,
+    //     maxValue: 10,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionFadeMinDistance,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionFadeMinDistance = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'fade max distance',
+    //     minValue: 0.001,
+    //     maxValue: 10,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionFadeMaxDistance,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionFadeMaxDistance = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'edge fade factor min x',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinX,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'edge fade factor max x',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxX,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'edge fade factor min y',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionScreenEdgeFadeFactorMinY,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'edge fade factor max y',
+    //     minValue: 0.001,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.reflectionScreenEdgeFadeFactorMaxY,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'additional rate',
+    //     minValue: 0.01,
+    //     maxValue: 1,
+    //     stepValue: 0.01,
+    //     initialValue: ssrPass.reflectionAdditionalRate,
+    //     onChange: (value) => {
+    //         ssrPass.reflectionAdditionalRate = value;
+    //     },
+    // });
+
+    // debuggerGUI.addSliderDebugger({
+    //     label: 'ssr blend rate',
+    //     minValue: 0,
+    //     maxValue: 1,
+    //     stepValue: 0.001,
+    //     initialValue: ssrPass.blendRate,
+    //     onChange: (value) => {
+    //         ssrPass.blendRate = value;
+    //     },
+    // });
+
+    // debuggerGUI.addBorderSpacer();
+
+   
+    //
+    // fxaa
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addToggleDebugger({
+        label: 'fxaa pass enabled',
+        initialValue: fxaaPass.enabled,
+        onChange: (value) => (fxaaPass.enabled = value),
     });
 
     //

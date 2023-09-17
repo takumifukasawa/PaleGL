@@ -52,6 +52,31 @@ export class PostProcess {
         this.#selfEnabled = value;
     }
 
+    get hasEnabledPass() {
+        for(let i = 0; i < this.passes.length; i++){
+            if(this.passes[i].enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    get lastRenderTarget() {
+        let lastPass: IPostProcessPass | null = null;
+        for(let i = this.passes.length - 1; i >= 0; i--)
+        {
+            if(this.passes[i].enabled)
+            {
+                lastPass = this.passes[i];
+                break;
+            }
+        }
+        if(lastPass == null) {
+            return null;
+        }
+        return lastPass.renderTarget;
+    }
+    
     // constructor({gpu}: {gpu: GPU}) {
     constructor(postProcessCamera?: Camera) {
         // // TODO: renderTargetがいらない時もあるので出し分けたい
@@ -70,12 +95,21 @@ export class PostProcess {
         }
     }
 
+    /**
+     * 
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         this.#postProcessCamera.setSize(width, height);
         // this.renderTarget.setSize(width, height);
         this.passes.forEach((pass) => pass.setSize(width, height));
     }
 
+    /**
+     * 
+     * @param pass
+     */
     addPass(pass: IPostProcessPass) {
         this.passes.push(pass);
     }
@@ -189,6 +223,7 @@ export class PostProcess {
 
         // set uniform and render pass
         const enabledPasses = this.passes.filter((pass) => pass.enabled);
+       
         enabledPasses.forEach((pass, i) => {
             const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;
 

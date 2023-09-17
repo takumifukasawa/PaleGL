@@ -23,7 +23,7 @@ const BLUR_PIXEL_NUM = 7;
 export class BloomPass implements IPostProcessPass {
     // gpu: GPU;
     name: string = 'BloomPass';
-    enabled: boolean = false;
+    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 
@@ -231,23 +231,22 @@ export class BloomPass implements IPostProcessPass {
         this.materials.push(...this.compositePass.materials);
     }
 
-    #width = 1;
-    #height = 1;
-
     setSize(width: number, height: number) {
-        this.#width = width;
-        this.#height = height;
+        this.width = width;
+        this.height = height;
+        this.width = width;
+        this.height = height;
 
         this.extractBrightnessPass.setSize(width, height);
 
-        this.renderTargetBlurMip4_Horizontal.setSize(this.#width / 4, this.#height / 4);
-        this.renderTargetBlurMip4_Vertical.setSize(this.#width / 4, this.#height / 4);
-        this.renderTargetBlurMip8_Horizontal.setSize(this.#width / 8, this.#height / 8);
-        this.renderTargetBlurMip8_Vertical.setSize(this.#width / 8, this.#height / 8);
-        this.renderTargetBlurMip16_Horizontal.setSize(this.#width / 16, this.#height / 16);
-        this.renderTargetBlurMip16_Vertical.setSize(this.#width / 16, this.#height / 16);
-        this.renderTargetBlurMip32_Horizontal.setSize(this.#width / 32, this.#height / 32);
-        this.renderTargetBlurMip32_Vertical.setSize(this.#width / 32, this.#height / 32);
+        this.renderTargetBlurMip4_Horizontal.setSize(this.width / 4, this.height / 4);
+        this.renderTargetBlurMip4_Vertical.setSize(this.width / 4, this.height / 4);
+        this.renderTargetBlurMip8_Horizontal.setSize(this.width / 8, this.height / 8);
+        this.renderTargetBlurMip8_Vertical.setSize(this.width / 8, this.height / 8);
+        this.renderTargetBlurMip16_Horizontal.setSize(this.width / 16, this.height / 16);
+        this.renderTargetBlurMip16_Vertical.setSize(this.width / 16, this.height / 16);
+        this.renderTargetBlurMip32_Horizontal.setSize(this.width / 32, this.height / 32);
+        this.renderTargetBlurMip32_Vertical.setSize(this.width / 32, this.height / 32);
 
         this.compositePass.setSize(width, height);
     }
@@ -296,8 +295,8 @@ export class BloomPass implements IPostProcessPass {
             verticalRenderTarget: RenderTarget,
             downSize: number
         ) => {
-            const w = this.#width / downSize;
-            const h = this.#height / downSize;
+            const w = this.width / downSize;
+            const h = this.height / downSize;
 
             renderer.setRenderTarget(horizontalRenderTarget);
             renderer.clear(0, 0, 0, 1);

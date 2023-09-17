@@ -40,7 +40,7 @@ export type PostProcessPassRenderArgs = {
 export class PostProcessPassBase implements IPostProcessPass {
     // protected gpu: GPU;
     name: string;
-    enabled: boolean = false;
+    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 

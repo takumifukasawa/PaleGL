@@ -114,13 +114,19 @@ export class Renderer {
         });
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
+
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
+        this._scenePostProcess.addPass(this._depthOfFieldPass);
+
         this._bloomPass = new BloomPass({
             gpu,
             threshold: 0.9,
             bloomAmount: 0.8,
         });
+        this._scenePostProcess.addPass(this._bloomPass);
+
         this._toneMappingPass = new ToneMappingPass({ gpu });
+        this._scenePostProcess.addPass(this._toneMappingPass);
     }
 
     // --------------------------------------------------------------
@@ -138,18 +144,18 @@ export class Renderer {
         return this._gBufferRenderTargets;
     }
 
-    get scenePostProcess() {
-        return this._scenePostProcess;
-    }
+    // get scenePostProcess() {
+    //     return this._scenePostProcess;
+    // }
 
     get ambientOcclusionRenderTarget() {
         // return this._ambientOcclusionRenderTarget;
         return this._ambientOcclusionPass.renderTarget;
     }
 
-    get deferredShadingPass() {
-        return this._deferredShadingPass;
-    }
+    // get deferredShadingPass() {
+    //     return this._deferredShadingPass;
+    // }
 
     get depthOfFieldPass() {
         return this._depthOfFieldPass;
@@ -159,9 +165,9 @@ export class Renderer {
         return this._bloomPass;
     }
 
-    get toneMappingRenderTarget() {
-        return this._toneMappingPass.renderTarget;
-    }
+    // get toneMappingRenderTarget() {
+    //     return this._toneMappingPass.renderTarget;
+    // }
 
     /**
      *
@@ -387,7 +393,16 @@ export class Renderer {
         // ambient occlusion pass
         // ------------------------------------------------------------------------------
 
-        this.ambientOcclusionPass(camera, time);
+        PostProcess.renderPass({
+            pass: this._ambientOcclusionPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: null,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+        });
 
         // ------------------------------------------------------------------------------
         // deferred lighting pass
@@ -509,23 +524,23 @@ export class Renderer {
 
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
 
-        // ------------------------------------------------------------------------------
-        // depth of field pass
-        // ------------------------------------------------------------------------------
+        // // ------------------------------------------------------------------------------
+        // // depth of field pass
+        // // ------------------------------------------------------------------------------
 
-        this.renderDepthOfFieldPass(camera, time);
+        // this.renderDepthOfFieldPass(camera, time);
 
-        // ------------------------------------------------------------------------------
-        // bloom pass
-        // ------------------------------------------------------------------------------
+        // // ------------------------------------------------------------------------------
+        // // bloom pass
+        // // ------------------------------------------------------------------------------
 
-        this.renderBloomPass(camera, time);
+        // this.renderBloomPass(camera, time);
 
-        // ------------------------------------------------------------------------------
-        // tone mapping pass
-        // ------------------------------------------------------------------------------
+        // // ------------------------------------------------------------------------------
+        // // tone mapping pass
+        // // ------------------------------------------------------------------------------
 
-        this.renderToneMappingPass(camera, time);
+        // this.renderToneMappingPass(camera, time);
 
         // ------------------------------------------------------------------------------
         // full screen pass
@@ -536,29 +551,50 @@ export class Renderer {
             onBeforePostProcess();
         }
 
-        const targetPostProcesses: PostProcess[] = [];
-        // TODO: こっちいる？
-        // if (camera.mainCamera) {
-        //     targetPostProcesses.push(this._scenePostProcess);
+        // const targetPostProcesses: PostProcess[] = [];
+        // // TODO: こっちいる？
+        // // if (camera.mainCamera) {
+        // //     targetPostProcesses.push(this._scenePostProcess);
+        // // }
+        // if (camera.postProcess) {
+        //     targetPostProcesses.push(camera.postProcess);
         // }
-        if (camera.postProcess) {
-            targetPostProcesses.push(camera.postProcess);
+
+        if (!this._scenePostProcess.hasEnabledPass) {
+            // 何もenabledがないのはおかしい. tonemappingは最低限有効化されていないとおかしい(HDRなので)
+            throw 'invalid postprocess';
         }
-        
+
         // console.log("--------- postprocess pass ---------");
 
-        targetPostProcesses.forEach((postProcess, i) => {
-            postProcess.render({
-                gpu: this.gpu,
-                renderer: this,
-                // prevRenderTarget: this._afterDeferredShadingRenderTarget,
-                // tone mapping 挟む場合
-                prevRenderTarget: this._toneMappingPass.renderTarget,
-                gBufferRenderTargets: this._gBufferRenderTargets,
-                targetCamera: camera,
-                time, // TODO: engineから渡したい
-                isCameraLastPass: i === targetPostProcesses.length - 1,
-            });
+        let prevRenderTarget: RenderTarget = this._afterDeferredShadingRenderTarget;
+        const isCameraLastPassAndHasNotPostProcess = !camera.renderTarget && !camera.hasEnabledPostProcessPass;
+        this._scenePostProcess.render({
+            gpu: this.gpu,
+            renderer: this,
+            prevRenderTarget,
+            gBufferRenderTargets: this._gBufferRenderTargets,
+            targetCamera: camera,
+            time, // TODO: engineから渡したい
+            isCameraLastPass: isCameraLastPassAndHasNotPostProcess,
+        });
+
+        if (isCameraLastPassAndHasNotPostProcess) {
+            return;
+        }
+
+        prevRenderTarget = this._scenePostProcess.lastRenderTarget!;
+
+        camera.postProcess!.render({
+            gpu: this.gpu,
+            renderer: this,
+            prevRenderTarget,
+            // tone mapping 挟む場合
+            // prevRenderTarget: this._toneMappingPass.renderTarget,
+            gBufferRenderTargets: this._gBufferRenderTargets,
+            targetCamera: camera,
+            time, // TODO: engineから渡したい
+            isCameraLastPass: !camera.renderTarget,
         });
     }
 
@@ -855,27 +891,27 @@ export class Renderer {
      * @param camera
      * @private
      */
-    private ambientOcclusionPass(camera: Camera, time: number) {
-        // console.log("--------- ambient occlusion pass ---------");
+    // private ambientOcclusionPass(camera: Camera, time: number) {
+    //     // console.log("--------- ambient occlusion pass ---------");
 
-        // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
+    //     // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
 
-        // this.clear(0, 0, 0, 1);
+    //     // this.clear(0, 0, 0, 1);
 
-        // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
+    //     // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
 
-        // this._ambientOcclusionPass.enabled = true;
-        PostProcess.renderPass({
-            pass: this._ambientOcclusionPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: null,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-        });
-    }
+    //     // this._ambientOcclusionPass.enabled = true;
+    //     PostProcess.renderPass({
+    //         pass: this._ambientOcclusionPass,
+    //         renderer: this,
+    //         targetCamera: camera,
+    //         gpu: this.gpu,
+    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+    //         prevRenderTarget: null,
+    //         isLastPass: false,
+    //         time, // TODO: engineから渡したい
+    //     });
+    // }
 
     /**
      *
@@ -960,72 +996,72 @@ export class Renderer {
         });
     }
 
-    /**
-     *
-     * @param camera
-     * @param time
-     * @private
-     */
-    private renderDepthOfFieldPass(camera: Camera, time: number) {
-        // this._depthOfFieldPass.setup();
+    // /**
+    //  *
+    //  * @param camera
+    //  * @param time
+    //  * @private
+    //  */
+    // private renderDepthOfFieldPass(camera: Camera, time: number) {
+    //     // this._depthOfFieldPass.setup();
 
-        PostProcess.renderPass({
-            pass: this._depthOfFieldPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            // tone mapping 挟む場合
-            prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-            // prevRenderTarget: null,
-            isLastPass: false, // for debug
-            time, // TODO: engineから渡したい
-        });
-    }
+    //     PostProcess.renderPass({
+    //         pass: this._depthOfFieldPass,
+    //         renderer: this,
+    //         targetCamera: camera,
+    //         gpu: this.gpu,
+    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+    //         // tone mapping 挟む場合
+    //         prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+    //         // prevRenderTarget: null,
+    //         isLastPass: false, // for debug
+    //         time, // TODO: engineから渡したい
+    //     });
+    // }
 
-    /**
-     *
-     * @param camera
-     * @param time
-     * @private
-     */
-    private renderBloomPass(camera: Camera, time: number) {
-        PostProcess.renderPass({
-            pass: this._bloomPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: this._depthOfFieldPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-            // prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-            // prevRenderTarget: null,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-        });
-    }
+    // /**
+    //  *
+    //  * @param camera
+    //  * @param time
+    //  * @private
+    //  */
+    // private renderBloomPass(camera: Camera, time: number) {
+    //     PostProcess.renderPass({
+    //         pass: this._bloomPass,
+    //         renderer: this,
+    //         targetCamera: camera,
+    //         gpu: this.gpu,
+    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+    //         prevRenderTarget: this._depthOfFieldPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+    //         // prevRenderTarget: this._afterDeferredShadingRenderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+    //         // prevRenderTarget: null,
+    //         isLastPass: false,
+    //         time, // TODO: engineから渡したい
+    //     });
+    // }
 
-    /**
-     *
-     * @param camera
-     * @private
-     */
-    private renderToneMappingPass(camera: Camera, time: number) {
-        // console.log("--------- tone mapping pass ---------");
+    // /**
+    //  *
+    //  * @param camera
+    //  * @private
+    //  */
+    // private renderToneMappingPass(camera: Camera, time: number) {
+    //     // console.log("--------- tone mapping pass ---------");
 
-        // this._toneMappingPass.material.updateUniform(UniformNames.SrcTexture, );
+    //     // this._toneMappingPass.material.updateUniform(UniformNames.SrcTexture, );
 
-        // this._toneMappingPass.enabled = true;
-        PostProcess.renderPass({
-            pass: this._toneMappingPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            // tone mapping 挟む場合
-            prevRenderTarget: this._bloomPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
-            // prevRenderTarget: null,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-        });
-    }
+    //     // this._toneMappingPass.enabled = true;
+    //     PostProcess.renderPass({
+    //         pass: this._toneMappingPass,
+    //         renderer: this,
+    //         targetCamera: camera,
+    //         gpu: this.gpu,
+    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+    //         // tone mapping 挟む場合
+    //         prevRenderTarget: this._bloomPass.renderTarget, // TODO: これを渡さなくても良い感じにしたい。ややこしいので
+    //         // prevRenderTarget: null,
+    //         isLastPass: false,
+    //         time, // TODO: engineから渡したい
+    //     });
+    // }
 }
