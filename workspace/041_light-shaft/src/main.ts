@@ -82,6 +82,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
+import {GaussianBlurPass} from "@/PaleGL/postprocess/GaussianBlurPass.ts";
 // import {Light} from "@/PaleGL/actors/Light.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
@@ -305,6 +306,11 @@ lightShaftPass.blendRate = 0.7;
 lightShaftPass.rayStep = 0.35;
 lightShaftPass.attenuationBase = 64;
 lightShaftPass.attenuationPower = 4;
+lightShaftPass.enabled = false;
+
+const gaussianBlurPass = new GaussianBlurPass({ gpu });
+cameraPostProcess.addPass(gaussianBlurPass);
+gaussianBlurPass.enabled = true;
 
 const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);

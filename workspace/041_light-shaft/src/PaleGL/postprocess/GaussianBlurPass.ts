@@ -1,4 +1,4 @@
-﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { UniformTypes } from '@/PaleGL/constants';
 import {
     IPostProcessPass,
 } from '@/PaleGL/postprocess/IPostProcessPass';
@@ -10,6 +10,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import {Material} from "@/PaleGL/materials/Material";
 import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase";
+import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -21,6 +22,10 @@ export class GaussianBlurPass implements IPostProcessPass {
     width: number = 1;
     height: number = 1;
     materials: Material[] = [];
+    
+    private geometry: PlaneGeometry;
+    private horizontalBlurPass: FragmentPass;
+    private verticalBlurPass: FragmentPass;
 
     #passes: PostProcessPassBase[] = [];
 
@@ -31,10 +36,11 @@ export class GaussianBlurPass implements IPostProcessPass {
     // constructor({ gpu, blurPixelNum = 7 }: { gpu: GPU; blurPixelNum: number }) {
     constructor({ gpu }: { gpu: GPU }) {
         // super();
+        this.geometry = new PlaneGeometry({ gpu });
 
         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 
-        const horizontalBlurPass = new FragmentPass({
+        this.horizontalBlurPass = new FragmentPass({
             name: 'horizontal blur pass',
             gpu,
             fragmentShader: gaussianBlurFragmentShader,
@@ -62,10 +68,10 @@ export class GaussianBlurPass implements IPostProcessPass {
                 }
             },
         });
-        this.#passes.push(horizontalBlurPass);
-        this.materials.push(...horizontalBlurPass.materials);
+        this.#passes.push(this.horizontalBlurPass);
+        this.materials.push(...this.horizontalBlurPass.materials);
 
-        const verticalBlurPass = new FragmentPass({
+        this.verticalBlurPass = new FragmentPass({
             name: 'vertical blur pass',
             gpu,
             fragmentShader: gaussianBlurFragmentShader,
@@ -93,16 +99,17 @@ export class GaussianBlurPass implements IPostProcessPass {
                 },
             },
         });
-        this.#passes.push(verticalBlurPass);
-        this.materials.push(...verticalBlurPass.materials);
+        this.#passes.push(this.verticalBlurPass);
+        this.materials.push(...this.verticalBlurPass.materials);
     }
 
     setSize(width: number, height: number) {
-        this.#passes.forEach((pass) => {
-            pass.setSize(width, height);
-            pass.material.updateUniform('uTargetWidth', width);
-            pass.material.updateUniform('uTargetHeight', height);
-        });
+        this.horizontalBlurPass.setSize(width, height);
+        this.horizontalBlurPass.material.updateUniform('uTargetWidth', width);
+        this.horizontalBlurPass.material.updateUniform('uTargetHeight', height);
+        this.verticalBlurPass.setSize(width, height);
+        this.verticalBlurPass.material.updateUniform('uTargetWidth', width);
+        this.verticalBlurPass.material.updateUniform('uTargetHeight', height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
@@ -111,26 +118,50 @@ export class GaussianBlurPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs) {
-        this.#passes.forEach((pass, i) => {
-            pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
-
-            // TODO: pass内で好きに設定してよさそう
-            renderer.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
-
-            // TODO: mesh経由する必要たぶんない
-            pass.mesh.updateTransform();
-            // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
-            pass.material.updateUniform(
-                UniformNames.SrcTexture,
-                // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
-                (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
-            );
-            if (!pass.material.isCompiledShader) {
-                pass.material.start({ gpu, attributeDescriptors: [] });
-            }
-
-            renderer.renderMesh(pass.geometry, pass.material);
+    render({ gpu, camera, renderer, prevRenderTarget, isLastPass, targetCamera, gBufferRenderTargets, time }: PostProcessPassRenderArgs) {
+        this.geometry.start();
+        
+        this.horizontalBlurPass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
         });
+
+        this.verticalBlurPass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget,
+            isLastPass,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
+
+        // this.#passes.forEach((pass, i) => {
+        //     pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
+
+        //     // TODO: pass内で好きに設定してよさそう
+        //     renderer.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+
+        //     // TODO: mesh経由する必要たぶんない
+        //     pass.mesh.updateTransform();
+        //     // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+        //     pass.material.updateUniform(
+        //         UniformNames.SrcTexture,
+        //         // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
+        //         (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
+        //     );
+        //     if (!pass.material.isCompiledShader) {
+        //         pass.material.start({ gpu, attributeDescriptors: [] });
+        //     }
+
+        //     renderer.renderMesh(pass.geometry, pass.material);
+        // });
     }
 }
