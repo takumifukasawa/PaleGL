@@ -10,6 +10,11 @@ const int MAX_ITERATION_NUM = 64;
 
 #include ./partial/depth-functions.glsl
 
+// ref: https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float rand(vec2 co){
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 in vec2 vUv;
 
 out vec4 outColor;
@@ -21,6 +26,7 @@ uniform float uFarClip;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform mat4 uProjectionMatrix;
+uniform float uTime;
 
 uniform float uRayStep;
 uniform float uRayNearOffset;
@@ -28,6 +34,8 @@ uniform float uAttenuationBase;
 uniform float uAttenuationPower;
 uniform float uBlendRate;
 uniform float uDepthBias;
+uniform float uRayJitterSizeX;
+uniform float uRayJitterSizeY;
 
 uniform sampler2D uShadowMap;
 uniform mat4 uShadowMapProjectionMatrix;
@@ -54,10 +62,12 @@ void main() {
     //     outColor = vec4(vec3(0.), 1.);
     // }
     // return;
+   
+    vec2 jitterOffset = (rand(vUv * uTime) * 2. - 1.) * vec2(uRayJitterSizeX, uRayJitterSizeY);
     
     for(int i = 0; i < MAX_ITERATION_NUM; i++) {
         vec3 currentRayStep = rayDirInView * vec3(rayStep * float(i) + uRayNearOffset);
-        vec3 currentRayPositionInView = rayOriginInView + currentRayStep;
+        vec3 currentRayPositionInView = rayOriginInView + currentRayStep + vec3(jitterOffset, 0.);
         vec3 currentRayPositionInWorld = (uInverseViewMatrix * vec4(currentRayPositionInView, 1.)).xyz;
         
         vec4 shadowMapUv = uShadowMapProjectionMatrix * vec4(currentRayPositionInWorld, 1.);
@@ -75,7 +85,6 @@ void main() {
             shadowAreaRect < .5
             || sampleShadow >= 1.
             || (sampleShadow - uDepthBias) >= projectionUv.z
-            // TODO: カメラから遮蔽されているところは打ち切ってもよいはず
         ) {
             alpha += (1. / uAttenuationBase);
         }
@@ -84,9 +93,12 @@ void main() {
         currentRayInClip.xyz /= currentRayInClip.w;
         float currentRayRawDepth = currentRayInClip.z;
         
-        if(currentRayRawDepth > rawDepth) {
+        // カメラから遮蔽されているところは打ち切ってもよいはず
+        if(currentRayRawDepth >= rawDepth) {
             break;
         }
+        
+        // TODO: カメラとライトの角度でfalloff
     }
     
     alpha = clamp(alpha, 0., 1.);

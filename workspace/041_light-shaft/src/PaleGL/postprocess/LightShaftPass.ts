@@ -105,6 +105,14 @@ export class LightShaftPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.blendRate,
                 },
+                uRayJitterSizeX: {
+                    type: UniformTypes.Float,
+                    value: this.rayJitterSizeX,
+                },
+                uRayJitterSizeY: {
+                    type: UniformTypes.Float,
+                    value: this.rayJitterSizeY,
+                },
                 uDepthBias: {
                     type: UniformTypes.Float,
                     value: this.depthBias,
@@ -224,6 +232,9 @@ export class LightShaftPass implements IPostProcessPass {
         this.lightShaftSamplePass.material.updateUniform('uAttenuationPower', this.attenuationPower);
         this.lightShaftSamplePass.material.updateUniform('uBlendRate', this.blendRate);
         this.lightShaftSamplePass.material.updateUniform('uDepthBias', this.depthBias);
+        this.lightShaftSamplePass.material.updateUniform('uRayJitterSizeX', this.rayJitterSizeX);
+        // TODO: aspect比かけた方がよい？
+        this.lightShaftSamplePass.material.updateUniform('uRayJitterSizeY', this.rayJitterSizeY);
         this.lightShaftSamplePass.render({
             gpu,
             camera,

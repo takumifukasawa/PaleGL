@@ -1373,6 +1373,29 @@ function initDebugger() {
         },
     });
 
+    debuggerGUI.addSliderDebugger({
+        label: 'ray jitter size x',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: lightShaftPass.rayJitterSizeX,
+        onChange: (value) => {
+            lightShaftPass.rayJitterSizeX = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray jitter size y',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: lightShaftPass.rayJitterSizeY,
+        onChange: (value) => {
+            lightShaftPass.rayJitterSizeY = value;
+        },
+    });
+
+
     //
     // fxaa
     //
