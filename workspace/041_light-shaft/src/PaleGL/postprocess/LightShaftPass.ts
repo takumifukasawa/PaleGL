@@ -6,7 +6,8 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import lightShaftFragmentShader from '@/PaleGL/shaders/light-shaft-fragment.glsl';
+import lightShaftSampleFragmentShader from '@/PaleGL/shaders/light-shaft-sample-fragment.glsl';
+import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -70,12 +71,12 @@ export class LightShaftPass implements IPostProcessPass {
         this.geometry = new PlaneGeometry({ gpu });
 
         //
-        // composite pass
+        // light shaft pass
         //
 
-        this.compositePass = new FragmentPass({
+        this.lightShaftSamplePass = new FragmentPass({
             gpu,
-            fragmentShader: lightShaftFragmentShader,
+            fragmentShader: lightShaftSampleFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 [UniformNames.DepthTexture]: {
@@ -129,6 +130,17 @@ export class LightShaftPass implements IPostProcessPass {
             },
         });
 
+        this.materials.push(...this.lightShaftSamplePass.materials);
+        
+        //
+        // composite pass
+        //
+        
+        this.compositePass = new FragmentPass({
+            gpu,
+            fragmentShader: lightShaftCompositeFragmentShader
+        });
+        
         this.materials.push(...this.compositePass.materials);
     }
 
@@ -141,6 +153,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.width = width;
         this.height = height;
 
+        this.lightShaftSamplePass.setSize(width, height);
         this.compositePass.setSize(width, height);
     }
 
@@ -177,24 +190,35 @@ export class LightShaftPass implements IPostProcessPass {
         // this.mesh.updateTransform();
 
         //
-        // composite pass
+        // light shaft sample pass
         //
         
-        this.compositePass.material.updateUniform('uRayStep', this.rayStep);
-        this.compositePass.material.updateUniform('uRayNearOffset', this.rayNearOffset);
-        this.compositePass.material.updateUniform('uAttenuationBase', this.attenuationBase);
-        this.compositePass.material.updateUniform('uAttenuationPower', this.attenuationPower);
-        this.compositePass.material.updateUniform('uBlendRate', this.blendRate);
-        this.compositePass.material.updateUniform('uDepthBias', this.depthBias);
+        this.lightShaftSamplePass.material.updateUniform('uRayStep', this.rayStep);
+        this.lightShaftSamplePass.material.updateUniform('uRayNearOffset', this.rayNearOffset);
+        this.lightShaftSamplePass.material.updateUniform('uAttenuationBase', this.attenuationBase);
+        this.lightShaftSamplePass.material.updateUniform('uAttenuationPower', this.attenuationPower);
+        this.lightShaftSamplePass.material.updateUniform('uBlendRate', this.blendRate);
+        this.lightShaftSamplePass.material.updateUniform('uDepthBias', this.depthBias);
+        this.lightShaftSamplePass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
+        
+        //
+        // light shaft composite pass
+        //
+        
         this.compositePass.render({
             gpu,
             camera,
             renderer,
-            // prevRenderTarget: this.circleOfConfusionPass.renderTarget,
-            // prevRenderTarget: this.preFilterPass.renderTarget,
-            // prevRenderTarget: this.dofBokehPass.renderTarget,
-            // prevRenderTarget: this.bokehBlurPass.renderTarget,
-            prevRenderTarget,
+            prevRenderTarget: this.lightShaftSamplePass.renderTarget,
             isLastPass,
             targetCamera,
             gBufferRenderTargets,
@@ -210,6 +234,7 @@ export class LightShaftPass implements IPostProcessPass {
     // #height = 1;
 
     // #lastPass;
+    private lightShaftSamplePass: FragmentPass;
     private compositePass: FragmentPass;
 
     private geometry: PlaneGeometry;
