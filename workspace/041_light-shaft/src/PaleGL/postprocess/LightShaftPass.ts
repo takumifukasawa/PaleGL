@@ -13,6 +13,7 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 
 //
 // ref:
@@ -131,16 +132,27 @@ export class LightShaftPass implements IPostProcessPass {
         });
 
         this.materials.push(...this.lightShaftSamplePass.materials);
-        
+
         //
         // composite pass
         //
-        
+
+        // TODO: レンダリングに差し込む場合はr11g11b10fがよいはず
         this.compositePass = new FragmentPass({
             gpu,
-            fragmentShader: lightShaftCompositeFragmentShader
+            fragmentShader: lightShaftCompositeFragmentShader,
+            uniforms: {
+                uLightShaftTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                uTexelSize: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.one,
+                },
+            },
         });
-        
+
         this.materials.push(...this.compositePass.materials);
     }
 
@@ -153,7 +165,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.width = width;
         this.height = height;
 
-        this.lightShaftSamplePass.setSize(width, height);
+        this.lightShaftSamplePass.setSize(width / 2, height / 2);
         this.compositePass.setSize(width, height);
     }
 
@@ -192,7 +204,7 @@ export class LightShaftPass implements IPostProcessPass {
         //
         // light shaft sample pass
         //
-        
+
         this.lightShaftSamplePass.material.updateUniform('uRayStep', this.rayStep);
         this.lightShaftSamplePass.material.updateUniform('uRayNearOffset', this.rayNearOffset);
         this.lightShaftSamplePass.material.updateUniform('uAttenuationBase', this.attenuationBase);
@@ -209,16 +221,24 @@ export class LightShaftPass implements IPostProcessPass {
             gBufferRenderTargets,
             time,
         });
-        
+
         //
         // light shaft composite pass
         //
-        
+
+        this.compositePass.material.updateUniform(
+            'uLightShaftTexture',
+            this.lightShaftSamplePass.renderTarget.read.texture
+        );
+        this.compositePass.material.updateUniform(
+            'uLightShaftTexelSize',
+            new Vector2(1 / this.lightShaftSamplePass.width, 1 / this.lightShaftSamplePass.height)
+        );
         this.compositePass.render({
             gpu,
             camera,
             renderer,
-            prevRenderTarget: this.lightShaftSamplePass.renderTarget,
+            prevRenderTarget,
             isLastPass,
             targetCamera,
             gBufferRenderTargets,

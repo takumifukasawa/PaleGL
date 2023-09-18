@@ -93,9 +93,9 @@ void main() {
     alpha = clamp(alpha, 0., 1.);
     
     alpha = pow(alpha, uAttenuationPower);
-   
-    vec3 color = mix(sceneColor.rgb, vec3(1., 0., 0.), alpha * uBlendRate);
-    
+
+    vec3 color = mix(vec3(0.), vec3(1., 1., 1.), alpha * uBlendRate);
+ 
     outColor = vec4(color, 1.);
 
     // for debug
