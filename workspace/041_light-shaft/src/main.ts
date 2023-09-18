@@ -306,11 +306,11 @@ lightShaftPass.blendRate = 0.7;
 lightShaftPass.rayStep = 0.35;
 lightShaftPass.attenuationBase = 64;
 lightShaftPass.attenuationPower = 4;
-lightShaftPass.enabled = false;
+lightShaftPass.enabled = true;
 
-const gaussianBlurPass = new GaussianBlurPass({ gpu });
-cameraPostProcess.addPass(gaussianBlurPass);
-gaussianBlurPass.enabled = true;
+// const gaussianBlurPass = new GaussianBlurPass({ gpu });
+// cameraPostProcess.addPass(gaussianBlurPass);
+// gaussianBlurPass.enabled = true;
 
 const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);
@@ -1364,9 +1364,9 @@ function initDebugger() {
     
     debuggerGUI.addSliderDebugger({
         label: 'depth bias',
-        minValue: -0.1,
-        maxValue: 0.1,
-        stepValue: 0.0001,
+        minValue: -0.05,
+        maxValue: 0.05,
+        stepValue: 0.001,
         initialValue: lightShaftPass.depthBias,
         onChange: (value) => {
             lightShaftPass.depthBias = value;

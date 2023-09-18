@@ -8,10 +8,14 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
+uniform sampler2D uBlurTexture;
 uniform vec2 uLightShaftTexelSize;
+
+// TODO: blur前の light shaft texture でマスクするべき？
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
+    float blurLightShaft = texture(uBlurTexture, vUv).r;
     float lightShaft = texture(uLightShaftTexture, vUv).r;
 
     vec2 texelSize = uLightShaftTexelSize;
@@ -24,11 +28,18 @@ void main() {
     // vec3 shaftColor = vec3(1., 1., 1.);
     vec3 shaftColor = vec3(1., 0., 0.);
 
-    vec3 color = mix(sceneColor.rgb, shaftColor, lw);
+    float blendRate = max(blurLightShaft, lightShaft);
+    // float blendRate = lightShaft;
+    // float blendRate = blurLightShaft;
+
+    // vec3 color = mix(sceneColor.rgb, shaftColor, lw);
+    vec3 color = mix(sceneColor.rgb, shaftColor, blendRate);
 
     outColor = vec4(color, 1.);
 
     // for debug
+    // outColor = sceneColor;
+    // outColor = blurColor;
     // outColor = vec4(vec3(alpha), 1.);
     // outColor = texture(uShadowMap, vUv);
     // outColor = sceneColor;
