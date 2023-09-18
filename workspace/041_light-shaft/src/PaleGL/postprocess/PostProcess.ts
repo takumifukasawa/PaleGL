@@ -156,6 +156,7 @@ export class PostProcess {
             passMaterial.updateUniform(UniformNames.Time, time);
             passMaterial.updateUniform(UniformNames.ViewPosition, targetCamera.transform.position);
             passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
+            passMaterial.updateUniform(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
             passMaterial.updateUniform(
                 UniformNames.InverseViewProjectionMatrix,
                 targetCamera.inverseViewProjectionMatrix

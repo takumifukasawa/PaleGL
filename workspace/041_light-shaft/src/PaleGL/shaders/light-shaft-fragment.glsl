@@ -18,6 +18,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
+uniform mat4 uProjectionMatrix;
 
 uniform float uRayStep;
 uniform float uRayNearOffset;
@@ -53,7 +54,7 @@ void main() {
     //     outColor = vec4(vec3(0.), 1.);
     // }
     // return;
-
+    
     for(int i = 0; i < maxIterationNum; i++) {
         vec3 currentRayStep = rayDirInView * vec3(rayStep * float(i) + uRayNearOffset);
         vec3 currentRayPositionInView = rayOriginInView + currentRayStep;
@@ -68,9 +69,18 @@ void main() {
         // float shadowRate = shadowOccluded * shadowAreaRect;
         
         // float shadowRate = texture(uShadowMap, projectionUv.xy).r * shadowAreaRect;
-        float shadowRate = texture(uShadowMap, projectionUv.xy).r;
-       
-        if(shadowAreaRect < .5 || shadowRate >= 1.) {
+        float sampleShadow = texture(uShadowMap, projectionUv.xy).r;
+
+        // vec4 currentRayClipPosition = uProjectionMatrix * vec4(currentRayPositionInView, 1.);
+        // currentRayClipPosition.xyz /= currentRayClipPosition.w;
+        // float currentRayRawDepth = currentRayClipPosition.z;
+        // float currentRayLinearDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
+
+        if(
+            shadowAreaRect < .5
+            || sampleShadow >= 1.
+            || sampleShadow >= projectionUv.z
+        ) {
             alpha += (1. / uAttenuationBase);
         }
         
@@ -95,4 +105,5 @@ void main() {
     // outColor = vec4(uAttenuationBase);
     // outColor = sceneColor;
     // outColor = vec4(vec3(eyeDepth), 1.);
-}           
+    // outColor = vec4(vec3(d), 1.);
+}

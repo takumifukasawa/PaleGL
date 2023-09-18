@@ -173,6 +173,10 @@ export class PostProcessPassBase implements IPostProcessPass {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
+            [UniformNames.ViewProjectionMatrix]: {
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
             [UniformNames.InverseViewMatrix]: {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,

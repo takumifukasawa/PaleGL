@@ -223,6 +223,7 @@ export const UniformNames = {
     WorldMatrix: 'uWorldMatrix',
     ViewMatrix: 'uViewMatrix',
     ProjectionMatrix: 'uProjectionMatrix',
+    ViewProjectionMatrix: 'uViewProjectionMatrix',
     NormalMatrix: 'uNormalMatrix',
     InverseViewMatrix: 'uInverseViewMatrix',
     InverseViewProjectionMatrix: 'uInverseViewProjectionMatrix',

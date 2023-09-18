@@ -301,7 +301,10 @@ cameraPostProcess.addPass(ssrPass);
 
 const lightShaftPass = new LightShaftPass({ gpu });
 cameraPostProcess.addPass(lightShaftPass);
+lightShaftPass.blendRate = 0.7;
 lightShaftPass.rayStep = 0.35;
+lightShaftPass.attenuationBase = 64;
+lightShaftPass.attenuationPower = 4;
 
 const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);
