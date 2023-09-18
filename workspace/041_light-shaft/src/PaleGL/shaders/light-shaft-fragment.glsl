@@ -67,10 +67,10 @@ void main() {
         step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
         // float shadowRate = shadowOccluded * shadowAreaRect;
         
-        float shadowRate = texture(uShadowMap, projectionUv.xy).r * shadowAreaRect;
-        // float shadowRate = texture(uShadowMap, projectionUv.xy).r;
-        
-        if(shadowRate >= 1.) {
+        // float shadowRate = texture(uShadowMap, projectionUv.xy).r * shadowAreaRect;
+        float shadowRate = texture(uShadowMap, projectionUv.xy).r;
+       
+        if(shadowAreaRect < .5 || shadowRate >= 1.) {
             alpha += (1. / uAttenuationBase);
         }
         
