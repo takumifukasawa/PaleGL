@@ -254,8 +254,8 @@ if (directionalLight.shadowCamera) {
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 30;
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -1326,7 +1326,7 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'attenuation base',
         minValue: 0,
-        maxValue: 128,
+        maxValue: 256,
         stepValue: 0.01,
         initialValue: lightShaftPass.attenuationBase,
         onChange: (value) => {

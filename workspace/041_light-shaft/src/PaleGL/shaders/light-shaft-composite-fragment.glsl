@@ -21,6 +21,7 @@ void main() {
     float lw3 = texture(uLightShaftTexture, vUv + vec2(texelSize.x * -.5f, texelSize.y * -.5f)).r;
     float lw = (lw0 + lw1 + lw2 + lw3) * .25;
 
+    // vec3 shaftColor = vec3(1., 1., 1.);
     vec3 shaftColor = vec3(1., 0., 0.);
 
     vec3 color = mix(sceneColor.rgb, shaftColor, lw);
@@ -31,6 +32,7 @@ void main() {
     // outColor = vec4(vec3(alpha), 1.);
     // outColor = texture(uShadowMap, vUv);
     // outColor = sceneColor;
+    // outColor = vec4(vec3(lightShaft), 1.);
     // outColor = vec4(rayDirInView, 1.);
     // outColor = vec4(uAttenuationBase);
     // outColor = sceneColor;

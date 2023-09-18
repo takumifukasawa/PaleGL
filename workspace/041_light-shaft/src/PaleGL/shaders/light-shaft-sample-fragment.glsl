@@ -5,6 +5,8 @@
 //
             
 precision mediump float;
+   
+const int MAX_ITERATION_NUM = 64;
 
 #include ./partial/depth-functions.glsl
 
@@ -33,9 +35,8 @@ uniform mat4 uShadowMapProjectionMatrix;
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
     float rawDepth = texture(uDepthTexture, vUv).r;
-    // float eyeDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
     float linearDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-   
+    
     vec3 rayOriginInView = vec3(0.);
     vec3 rayEndPositionInView = reconstructViewPositionFromDepth(vUv, rawDepth, uInverseProjectionMatrix);
     
@@ -44,8 +45,6 @@ void main() {
     float alpha = 0.;
     
     float rayStep = uRayStep;
-   
-    int maxIterationNum = 64;
     
     // vec3 v = (uInverseViewMatrix * vec4(rayEndPositionInView, 1.)).xyz;
     // // outColor = vec4(vec3(step(0., v.x)), 1.);
@@ -56,7 +55,7 @@ void main() {
     // }
     // return;
     
-    for(int i = 0; i < maxIterationNum; i++) {
+    for(int i = 0; i < MAX_ITERATION_NUM; i++) {
         vec3 currentRayStep = rayDirInView * vec3(rayStep * float(i) + uRayNearOffset);
         vec3 currentRayPositionInView = rayOriginInView + currentRayStep;
         vec3 currentRayPositionInWorld = (uInverseViewMatrix * vec4(currentRayPositionInView, 1.)).xyz;
@@ -72,22 +71,22 @@ void main() {
         // float shadowRate = texture(uShadowMap, projectionUv.xy).r * shadowAreaRect;
         float sampleShadow = texture(uShadowMap, projectionUv.xy).r;
 
-        // vec4 currentRayClipPosition = uProjectionMatrix * vec4(currentRayPositionInView, 1.);
-        // currentRayClipPosition.xyz /= currentRayClipPosition.w;
-        // float currentRayRawDepth = currentRayClipPosition.z;
-        // float currentRayLinearDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
-
         if(
             shadowAreaRect < .5
             || sampleShadow >= 1.
             || (sampleShadow - uDepthBias) >= projectionUv.z
+            // TODO: カメラから遮蔽されているところは打ち切ってもよいはず
         ) {
             alpha += (1. / uAttenuationBase);
         }
+       
+        vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayPositionInView, 1.); 
+        currentRayInClip.xyz /= currentRayInClip.w;
+        float currentRayRawDepth = currentRayInClip.z;
         
-        // if(shadowAreaRect > .5) {
-        //     alpha += 1.;
-        // }
+        if(currentRayRawDepth > rawDepth) {
+            break;
+        }
     }
     
     alpha = clamp(alpha, 0., 1.);
