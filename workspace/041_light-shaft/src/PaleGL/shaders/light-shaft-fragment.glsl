@@ -25,6 +25,7 @@ uniform float uRayNearOffset;
 uniform float uAttenuationBase;
 uniform float uAttenuationPower;
 uniform float uBlendRate;
+uniform float uDepthBias;
 
 uniform sampler2D uShadowMap;
 uniform mat4 uShadowMapProjectionMatrix;
@@ -79,7 +80,7 @@ void main() {
         if(
             shadowAreaRect < .5
             || sampleShadow >= 1.
-            || sampleShadow >= projectionUv.z
+            || (sampleShadow - uDepthBias) >= projectionUv.z
         ) {
             alpha += (1. / uAttenuationBase);
         }

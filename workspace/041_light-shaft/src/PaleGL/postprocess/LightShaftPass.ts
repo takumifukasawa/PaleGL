@@ -42,6 +42,8 @@ export class LightShaftPass implements IPostProcessPass {
     rayJitterSizeX = 0.005;
     // [Range(0, 0.2f)]
     rayJitterSizeY = 0.005;
+    // depthBias = 0.001;
+    depthBias = 0;
 
     // gpu: GPU;
     name: string = 'LightShaftPass';
@@ -99,6 +101,10 @@ export class LightShaftPass implements IPostProcessPass {
                 uBlendRate: {
                     type: UniformTypes.Float,
                     value: this.blendRate,
+                },
+                uDepthBias: {
+                    type: UniformTypes.Float,
+                    value: this.depthBias,
                 },
                 // [UniformNames.ViewMatrix]: {
                 //     type: UniformTypes.Matrix4,
@@ -179,6 +185,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.compositePass.material.updateUniform('uAttenuationBase', this.attenuationBase);
         this.compositePass.material.updateUniform('uAttenuationPower', this.attenuationPower);
         this.compositePass.material.updateUniform('uBlendRate', this.blendRate);
+        this.compositePass.material.updateUniform('uDepthBias', this.depthBias);
         this.compositePass.render({
             gpu,
             camera,

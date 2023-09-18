@@ -791,7 +791,7 @@ void main() {
     };
 
     captureScene.add(sphereMesh);
-    // captureScene.add(skinnedMesh);
+    captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
@@ -1348,11 +1348,22 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'ray step',
         minValue: 0,
-        maxValue: 5,
+        maxValue: 1,
         stepValue: 0.001,
         initialValue: lightShaftPass.rayStep,
         onChange: (value) => {
             lightShaftPass.rayStep = value;
+        },
+    });
+    
+    debuggerGUI.addSliderDebugger({
+        label: 'depth bias',
+        minValue: -0.1,
+        maxValue: 0.1,
+        stepValue: 0.0001,
+        initialValue: lightShaftPass.depthBias,
+        onChange: (value) => {
+            lightShaftPass.depthBias = value;
         },
     });
 
