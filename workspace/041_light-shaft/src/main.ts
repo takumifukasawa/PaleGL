@@ -230,7 +230,7 @@ const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 captureSceneCamera.onStart = ({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 };
-captureSceneCamera.onFixedUpdate = () => {
+captureSceneCamera.onFixedUpdate = ({ actor }) => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -249,10 +249,13 @@ const directionalLight = new DirectionalLight({
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
+    directionalLight.shadowCamera.visibleFrustum = true;
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 30;
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -298,6 +301,7 @@ cameraPostProcess.addPass(ssrPass);
 
 const lightShaftPass = new LightShaftPass({ gpu });
 cameraPostProcess.addPass(lightShaftPass);
+lightShaftPass.rayStep = 0.35;
 
 const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);
@@ -501,7 +505,7 @@ const main = async () => {
     sphereMesh = await createGLTFSphereMesh();
     sphereMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(2));
-        actor.transform.setTranslation(new Vector3(0, 2, 0));
+        actor.transform.setTranslation(new Vector3(0, 4, 0));
     };
 
     skinnedMesh = await createGLTFSkinnedMesh();
@@ -784,7 +788,7 @@ void main() {
     };
 
     captureScene.add(sphereMesh);
-    captureScene.add(skinnedMesh);
+    // captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);

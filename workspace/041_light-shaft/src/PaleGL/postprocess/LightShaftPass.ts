@@ -170,12 +170,10 @@ export class LightShaftPass implements IPostProcessPass {
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
 
-        console.log(this.materials)
-        
         //
         // composite pass
         //
-
+        
         this.compositePass.material.updateUniform('uRayStep', this.rayStep);
         this.compositePass.material.updateUniform('uRayNearOffset', this.rayNearOffset);
         this.compositePass.material.updateUniform('uAttenuationBase', this.attenuationBase);

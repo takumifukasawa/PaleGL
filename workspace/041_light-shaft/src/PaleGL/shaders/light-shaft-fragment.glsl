@@ -32,7 +32,7 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
     float rawDepth = texture(uDepthTexture, vUv).r;
     // float eyeDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
-    float eyeDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float linearDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
    
     vec3 rayOriginInView = vec3(0.);
     vec3 rayEndPositionInView = reconstructViewPositionFromDepth(vUv, rawDepth, uInverseProjectionMatrix);
@@ -45,6 +45,15 @@ void main() {
    
     int maxIterationNum = 64;
     
+    // vec3 v = (uInverseViewMatrix * vec4(rayEndPositionInView, 1.)).xyz;
+    // // outColor = vec4(vec3(step(0., v.x)), 1.);
+    // // outColor = vec4(rayDirInView, 1.);
+    // outColor = vec4(vec3(step(0., rayDirInView.y)), 1.);
+    // if(linearDepth > .99) {
+    //     outColor = vec4(vec3(0.), 1.);
+    // }
+    // return;
+
     for(int i = 0; i < maxIterationNum; i++) {
         vec3 currentRayStep = rayDirInView * vec3(rayStep * float(i) + uRayNearOffset);
         vec3 currentRayPositionInView = rayOriginInView + currentRayStep;
@@ -52,12 +61,22 @@ void main() {
         
         vec4 shadowMapUv = uShadowMapProjectionMatrix * vec4(currentRayPositionInWorld, 1.);
         vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
+        float shadowAreaRect =
+        step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
+        step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
+        step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
+        // float shadowRate = shadowOccluded * shadowAreaRect;
         
-        float shadow = texture(uShadowMap, projectionUv.xy).r;
+        float shadowRate = texture(uShadowMap, projectionUv.xy).r * shadowAreaRect;
+        // float shadowRate = texture(uShadowMap, projectionUv.xy).r;
         
-        if(shadow >= 1.) {
+        if(shadowRate >= 1.) {
             alpha += (1. / uAttenuationBase);
         }
+        
+        // if(shadowAreaRect > .5) {
+        //     alpha += 1.;
+        // }
     }
     
     alpha = clamp(alpha, 0., 1.);
