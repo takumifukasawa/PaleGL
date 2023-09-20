@@ -55,7 +55,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 // import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 // import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
-import { LightShaftPass } from "@/PaleGL/postprocess/LightShaftPass";
+// import { LightShaftPass } from "@/PaleGL/postprocess/LightShaftPass";
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 
 // inputs
@@ -82,7 +82,6 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
-import {GaussianBlurPass} from "@/PaleGL/postprocess/GaussianBlurPass.ts";
 // import {Light} from "@/PaleGL/actors/Light.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
@@ -231,7 +230,7 @@ const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 captureSceneCamera.onStart = ({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 };
-captureSceneCamera.onFixedUpdate = ({ actor }) => {
+captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -300,13 +299,13 @@ const ssrPass = new SSRPass({ gpu });
 ssrPass.enabled = false;
 cameraPostProcess.addPass(ssrPass);
 
-const lightShaftPass = new LightShaftPass({ gpu });
-cameraPostProcess.addPass(lightShaftPass);
-lightShaftPass.blendRate = 0.7;
-lightShaftPass.rayStep = 0.35;
-lightShaftPass.attenuationBase = 64;
-lightShaftPass.attenuationPower = 4;
-lightShaftPass.enabled = true;
+// const lightShaftPass = new LightShaftPass({ gpu });
+// cameraPostProcess.addPass(lightShaftPass);
+// lightShaftPass.blendRate = 0.7;
+// lightShaftPass.rayStep = 0.35;
+// lightShaftPass.attenuationBase = 64;
+// lightShaftPass.attenuationPower = 4;
+// lightShaftPass.enabled = true;
 
 // const gaussianBlurPass = new GaussianBlurPass({ gpu });
 // cameraPostProcess.addPass(gaussianBlurPass);
@@ -1313,8 +1312,8 @@ function initDebugger() {
 
     debuggerGUI.addToggleDebugger({
         label: 'light shaft pass enabled',
-        initialValue: lightShaftPass.enabled,
-        onChange: (value) => (lightShaftPass.enabled = value),
+        initialValue: renderer.lightShaftPass.enabled,
+        onChange: (value) => (renderer.lightShaftPass.enabled = value),
     });
 
     debuggerGUI.addSliderDebugger({
@@ -1322,9 +1321,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: lightShaftPass.blendRate,
+        initialValue: renderer.lightShaftPass.blendRate,
         onChange: (value) => {
-            lightShaftPass.blendRate = value;
+            renderer.lightShaftPass.blendRate = value;
         },
     });
 
@@ -1334,9 +1333,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 256,
         stepValue: 0.01,
-        initialValue: lightShaftPass.attenuationBase,
+        initialValue: renderer.lightShaftPass.attenuationBase,
         onChange: (value) => {
-            lightShaftPass.attenuationBase = value;
+            renderer.lightShaftPass.attenuationBase = value;
         },
     });
 
@@ -1345,9 +1344,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 64,
         stepValue: 0.001,
-        initialValue: lightShaftPass.attenuationPower,
+        initialValue: renderer.lightShaftPass.attenuationPower,
         onChange: (value) => {
-            lightShaftPass.attenuationPower = value;
+            renderer.lightShaftPass.attenuationPower = value;
         },
     });
 
@@ -1356,9 +1355,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: lightShaftPass.rayStep,
+        initialValue: renderer.lightShaftPass.rayStep,
         onChange: (value) => {
-            lightShaftPass.rayStep = value;
+            renderer.lightShaftPass.rayStep = value;
         },
     });
     
@@ -1367,9 +1366,9 @@ function initDebugger() {
         minValue: -0.05,
         maxValue: 0.05,
         stepValue: 0.001,
-        initialValue: lightShaftPass.depthBias,
+        initialValue: renderer.lightShaftPass.depthBias,
         onChange: (value) => {
-            lightShaftPass.depthBias = value;
+            renderer.lightShaftPass.depthBias = value;
         },
     });
 
@@ -1378,9 +1377,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: lightShaftPass.rayJitterSizeX,
+        initialValue: renderer.lightShaftPass.rayJitterSizeX,
         onChange: (value) => {
-            lightShaftPass.rayJitterSizeX = value;
+            renderer.lightShaftPass.rayJitterSizeX = value;
         },
     });
 
@@ -1389,9 +1388,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: lightShaftPass.rayJitterSizeY,
+        initialValue: renderer.lightShaftPass.rayJitterSizeY,
         onChange: (value) => {
-            lightShaftPass.rayJitterSizeY = value;
+            renderer.lightShaftPass.rayJitterSizeY = value;
         },
     });
 

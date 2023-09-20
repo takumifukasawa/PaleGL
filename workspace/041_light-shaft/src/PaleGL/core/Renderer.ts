@@ -32,6 +32,7 @@ import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
+import {LightShaftPass} from "@/PaleGL/postprocess/LightShaftPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -110,8 +111,16 @@ export class Renderer {
             height: 1,
             name: 'copy depth dest render target',
         });
+        
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
+
+        this._lightShaftPass = new LightShaftPass({ gpu });
+        // this._scenePostProcess.addPass(this._lightShaftPass);
+        this._lightShaftPass.blendRate = 0.7;
+        this._lightShaftPass.rayStep = 0.35;
+        this._lightShaftPass.attenuationBase = 64;
+        this._lightShaftPass.attenuationPower = 4;
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
         this._scenePostProcess.addPass(this._depthOfFieldPass);
@@ -154,6 +163,10 @@ export class Renderer {
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
+    
+    get lightShaftPass() {
+        return this._lightShaftPass;
+    }
 
     get depthOfFieldPass() {
         return this._depthOfFieldPass;
@@ -199,6 +212,7 @@ export class Renderer {
         // passes
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
+        this._lightShaftPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
         this._bloomPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
@@ -430,6 +444,7 @@ export class Renderer {
             this._ambientOcclusionPass.renderTarget.read.texture
         );
 
+
         PostProcess.renderPass({
             pass: this._deferredShadingPass,
             renderer: this,
@@ -444,11 +459,36 @@ export class Renderer {
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
         // ------------------------------------------------------------------------------
+        // light shaft pass
+        // ------------------------------------------------------------------------------
+
+        PostProcess.updatePassMaterial({
+            pass: this._lightShaftPass,
+            renderer: this,
+            targetCamera: this._scenePostProcess.postProcessCamera,
+            time,
+            lightActors
+        });
+        
+        PostProcess.renderPass({
+            pass: this._lightShaftPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: this._deferredShadingPass.renderTarget,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+            // lightActors,
+        });
+
+        // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
 
-        this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
+        // this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterDeferredShadingRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
+        this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
 
         // pattern1: g-buffer depth
         // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
@@ -609,6 +649,7 @@ export class Renderer {
     // pass
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
+    private _lightShaftPass: LightShaftPass;
     private _depthOfFieldPass: DepthOfFieldPass;
     private _bloomPass: BloomPass;
     private _toneMappingPass: ToneMappingPass;
