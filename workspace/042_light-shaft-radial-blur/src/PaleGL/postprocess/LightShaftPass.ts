@@ -15,6 +15,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import {GaussianBlurPass} from "@/PaleGL/postprocess/GaussianBlurPass.ts";
+import {RadialBlurPass} from "@/PaleGL/postprocess/RadialBlurPass.ts";
 
 //
 // ref:
@@ -157,6 +158,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.compositePass = new FragmentPass({
             gpu,
             fragmentShader: lightShaftCompositeFragmentShader,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 uBlurTexture: {
                     type: UniformTypes.Texture,
@@ -172,6 +174,10 @@ export class LightShaftPass implements IPostProcessPass {
                 // },
             },
         });
+        
+        this.compositePass = new RadialBlurPass({
+            gpu,
+        })
 
         this.materials.push(...this.compositePass.materials);
     }

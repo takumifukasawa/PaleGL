@@ -131,6 +131,7 @@ export class Renderer {
             threshold: 0.9,
             bloomAmount: 0.8,
         });
+        this._bloomPass.enabled = false;
         this._scenePostProcess.addPass(this._bloomPass);
 
         this._toneMappingPass = new ToneMappingPass({ gpu });
