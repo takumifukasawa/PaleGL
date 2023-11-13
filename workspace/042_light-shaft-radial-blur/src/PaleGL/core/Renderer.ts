@@ -123,6 +123,7 @@ export class Renderer {
         this._lightShaftPass.attenuationPower = 4;
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
+        this._depthOfFieldPass.enabled = false;
         this._scenePostProcess.addPass(this._depthOfFieldPass);
 
         this._bloomPass = new BloomPass({

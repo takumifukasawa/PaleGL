@@ -11,6 +11,10 @@ uniform sampler2D uLightShaftTexture;
 uniform sampler2D uBlurTexture;
 uniform vec2 uLightShaftTexelSize;
 
+float rand(vec2 co){
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 // TODO: blur前の light shaft texture でマスクするべき？
 
 void main() {
@@ -36,6 +40,30 @@ void main() {
     vec3 color = mix(sceneColor.rgb, shaftColor, blendRate);
 
     outColor = vec4(color, 1.);
+   
+    // WIP: zoom blur
+    
+    vec2 centerUv = vec2(.5);
+    vec2 centerToCurrent = vUv - centerUv;
+    float totalWeight = 0.;
+    vec4 destColor = vec4(vec3(0.), 1.);
+
+    float strength = 2.;
+    for(int i = 0; i <= 30; i++) {
+        float nflag = (1. / 30.);
+        float fi = float(i);
+        float per = (fi + rand(vUv)) * nflag;
+        float weight = per - per * per;
+        vec2 t = vUv + (-centerToCurrent * per * strength * nflag);
+        // destColor.xyz += texture(uSrcTexture, t * texelSize).xyz * weight;
+        destColor.xyz += texture(uSrcTexture, t).xyz * weight;
+        totalWeight += weight;
+    }
+    
+    destColor.xyz /= totalWeight;
+    
+    outColor = destColor;
+
 
     // for debug
     // outColor = sceneColor;
