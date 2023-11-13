@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": [
+      "ES2021",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "types": [
+      "node",
+      "vite-plugin-glsl/ext"
+      // "vite/client",
+    ],
+    /* Bundler mode */
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleSuffixes": [
+      "glsl",
+      "shader",
+      ""
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "vite.config.ts",
+    "vite-shader-minifier-plugin.ts",
+    "node-libs/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "bin/**/*.js"
+  ]
+}
