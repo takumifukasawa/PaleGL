@@ -87,8 +87,8 @@ export class LightShaftPass implements IPostProcessPass {
         this.lightShaftDownSamplePass = new FragmentPass({
             gpu,
             fragmentShader: lightShaftDownSampleFragmentShader,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            // renderTargetType: RenderTargetTypes.R16F,
+            // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RenderTargetTypes.R16F,
             uniforms: {
                 [UniformNames.DepthTexture]: {
                     type: UniformTypes.Texture,
@@ -222,8 +222,8 @@ export class LightShaftPass implements IPostProcessPass {
         this.width = width;
         this.height = height;
 
-        // this.lightShaftDownSamplePass.setSize(width / 2, height / 2);
-        this.lightShaftDownSamplePass.setSize(width, height);
+        this.lightShaftDownSamplePass.setSize(width / 2, height / 2);
+        // this.lightShaftDownSamplePass.setSize(width, height);
         // this.lightShaftSamplePass.setSize(width / 2, height / 2);
         // this.blurPass.setSize(width / 2, height / 2);
         this.compositePass.setSize(width, height);

@@ -18,10 +18,14 @@ void main() {
     float rawDepth = texture(uDepthTexture, vUv).r;
     // float eyeDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
     float eyeDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+   
+    // float mask = step(.0001, 1. - eyeDepth);
+    float mask = step(.0001, 1. - rawDepth);
     
-    outColor = sceneColor;
-    outColor = vec4(vec3(eyeDepth), 1.);
-}           
+    // outColor = sceneColor;
+    outColor = vec4(vec3(mask), 1.);
+    // outColor = vec4(vec3(mask), 1.);
+}
 
 // #version 300 es
 // 
