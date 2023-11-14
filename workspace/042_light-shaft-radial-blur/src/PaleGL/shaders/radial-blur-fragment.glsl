@@ -41,5 +41,5 @@ void main() {
     
     // debug
     
-    outColor = resultColor;
+    // outColor = resultColor;
 }

@@ -117,10 +117,12 @@ export class Renderer {
 
         this._lightShaftPass = new LightShaftPass({ gpu });
         // this._scenePostProcess.addPass(this._lightShaftPass);
+        // this.lightShaftPass.enabled = false;
         this._lightShaftPass.blendRate = 0.7;
         this._lightShaftPass.rayStep = 0.35;
         this._lightShaftPass.attenuationBase = 64;
         this._lightShaftPass.attenuationPower = 4;
+        // this._scenePostProcess.addPass(this._lightShaftPass)
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
         this._depthOfFieldPass.enabled = false;
@@ -131,7 +133,7 @@ export class Renderer {
             threshold: 0.9,
             bloomAmount: 0.8,
         });
-        this._bloomPass.enabled = false;
+        // this._bloomPass.enabled = false;
         this._scenePostProcess.addPass(this._bloomPass);
 
         this._toneMappingPass = new ToneMappingPass({ gpu });
@@ -471,6 +473,14 @@ export class Renderer {
             time,
             lightActors
         });
+
+        // this._lightShaftPass.materials.forEach((mat) => {
+        //     mat.updateUniform(
+        //         UniformNames.DepthTexture,
+        //         this._depthPrePassRenderTarget.depthTexture
+        //         // this._copyDepthDestRenderTarget.depthTexture
+        //     );
+        // });
         
         PostProcess.renderPass({
             pass: this._lightShaftPass,
@@ -483,6 +493,8 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
+        
+        // return;
 
         // ------------------------------------------------------------------------------
         // transparent pass
