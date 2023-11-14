@@ -1,16 +1,17 @@
-﻿import {RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
-import {IPostProcessPass} from '@/PaleGL/postprocess/IPostProcessPass';
-import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
-import {Material} from '@/PaleGL/materials/Material';
-import {PlaneGeometry} from '@/PaleGL/geometries/PlaneGeometry';
-import {GPU} from '@/PaleGL/core/GPU';
-import {Camera} from '@/PaleGL/actors/Camera';
-import {Renderer} from '@/PaleGL/core/Renderer';
+﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
+import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { Material } from '@/PaleGL/materials/Material';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { GPU } from '@/PaleGL/core/GPU';
+import { Camera } from '@/PaleGL/actors/Camera';
+import { Renderer } from '@/PaleGL/core/Renderer';
 // import lightShaftSampleFragmentShader from '@/PaleGL/shaders/light-shaft-sample-fragment.glsl';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase';
-import {Color} from '@/PaleGL/math/Color.ts';
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { Color } from '@/PaleGL/math/Color.ts';
+import { RadialBlurPass } from '@/PaleGL/postprocess/RadialBlurPass.ts';
 // import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 // import {Vector3} from '@/PaleGL/math/Vector3.ts';
 // import {Vector4} from '@/PaleGL/math/Vector4.ts';
@@ -68,13 +69,13 @@ export class LightShaftPass implements IPostProcessPass {
      *
      * @param gpu
      */
-    constructor({gpu}: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number }) {
+    constructor({ gpu }: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number }) {
         // super();
 
         // this.gpu = gpu;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({gpu});
+        this.geometry = new PlaneGeometry({ gpu });
 
         //
         // light shaft down sample
@@ -87,15 +88,15 @@ export class LightShaftPass implements IPostProcessPass {
         this.lightShaftDownSamplePass = new FragmentPass({
             gpu,
             fragmentShader: lightShaftDownSampleFragmentShader,
-            // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            renderTargetType: RenderTargetTypes.R16F,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            // renderTargetType: RenderTargetTypes.R16F,
             uniforms: {
                 [UniformNames.DepthTexture]: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            }
+            },
             // uniforms: {}
         });
         // this.lightShaftDownSamplePass = new RadialBlurPass({
@@ -103,7 +104,7 @@ export class LightShaftPass implements IPostProcessPass {
         // });
 
         this.materials.push(...this.lightShaftDownSamplePass.materials);
-        
+
         //
         // light shaft pass
         //
@@ -174,12 +175,17 @@ export class LightShaftPass implements IPostProcessPass {
 
         // this.materials.push(...this.lightShaftSamplePass.materials);
 
-        // //
-        // // blur pass
-        // //
+        //
+        // blur 1 pass
+        //
 
-        // this.blurPass = new GaussianBlurPass({gpu});
-        // this.materials.push(...this.blurPass.materials);
+        // this.blur1Pass = new GaussianBlurPass({gpu});
+        this.blur1Pass = new RadialBlurPass({
+            gpu,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            // renderTargetType: RenderTargetTypes.R16F,
+        });
+        this.materials.push(...this.blur1Pass.materials);
 
         //
         // composite pass
@@ -225,7 +231,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.lightShaftDownSamplePass.setSize(width / 2, height / 2);
         // this.lightShaftDownSamplePass.setSize(width, height);
         // this.lightShaftSamplePass.setSize(width / 2, height / 2);
-        // this.blurPass.setSize(width / 2, height / 2);
+        this.blur1Pass.setSize(width / 2, height / 2);
         this.compositePass.setSize(width, height);
     }
 
@@ -233,8 +239,7 @@ export class LightShaftPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
-    }
+    setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
     /**
      *
@@ -248,21 +253,21 @@ export class LightShaftPass implements IPostProcessPass {
      * @param time
      */
     render({
-               gpu,
-               camera,
-               renderer,
-               prevRenderTarget,
-               isLastPass,
-               gBufferRenderTargets,
-               targetCamera,
-               time,
-           }: PostProcessPassRenderArgs) {
+        gpu,
+        camera,
+        renderer,
+        prevRenderTarget,
+        isLastPass,
+        gBufferRenderTargets,
+        targetCamera,
+        time,
+    }: PostProcessPassRenderArgs) {
         // 一回だけ呼びたい
         this.geometry.start();
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
 
-        // TODO: shadowmapを使った方法からの置き換え 
+        // TODO: shadowmapを使った方法からの置き換え
 
         this.lightShaftDownSamplePass.render({
             gpu,
@@ -272,10 +277,10 @@ export class LightShaftPass implements IPostProcessPass {
             isLastPass,
             targetCamera,
             gBufferRenderTargets,
-            time
+            time,
         });
         // console.log(this.lightShaftDownSamplePass.materials)
-        
+
         // console.log(this.lightShaftDownSamplePass)
 
         //
@@ -306,16 +311,16 @@ export class LightShaftPass implements IPostProcessPass {
         // blur pass
         //
 
-        // this.blurPass.render({
-        //     gpu,
-        //     camera,
-        //     renderer,
-        //     prevRenderTarget: this.lightShaftSamplePass.renderTarget,
-        //     isLastPass: false,
-        //     targetCamera,
-        //     gBufferRenderTargets,
-        //     time,
-        // });
+        this.blur1Pass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: this.lightShaftDownSamplePass.renderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
 
         //
         // light shaft composite pass
@@ -329,7 +334,10 @@ export class LightShaftPass implements IPostProcessPass {
         // //     'uLightShaftTexelSize',
         // //     new Vector2(1 / this.lightShaftSamplePass.width, 1 / this.lightShaftSamplePass.height)
         // // );
-        this.compositePass.material.updateUniform('uBlurTexture', this.lightShaftDownSamplePass.renderTarget.read.texture);
+        this.compositePass.material.updateUniform(
+            'uBlurTexture',
+            this.blur1Pass.renderTarget.read.texture
+        );
 
         this.compositePass.render({
             gpu,
@@ -353,7 +361,7 @@ export class LightShaftPass implements IPostProcessPass {
     // #lastPass;
     private lightShaftDownSamplePass: FragmentPass;
     // private lightShaftSamplePass: FragmentPass;
-    // private blurPass: GaussianBlurPass;
+    private blur1Pass: RadialBlurPass;
     private compositePass: FragmentPass;
 
     private geometry: PlaneGeometry;

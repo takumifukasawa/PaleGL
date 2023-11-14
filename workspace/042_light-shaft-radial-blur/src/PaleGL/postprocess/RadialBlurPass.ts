@@ -1,22 +1,22 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase';
-import {RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
+import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { RenderTargetType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import radialBlurFragmentShader from '@/PaleGL/shaders/radial-blur-fragment.glsl';
 
 export class RadialBlurPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
         // uniforms,
-    } // name,
-    : {
+        renderTargetType, // name,
+    }: {
         gpu: GPU;
         // fragmentShader: string;
-        // uniforms?: Uniforms;
+        renderTargetType?: RenderTargetType;
         // name?: string;
     }) {
         const uniforms = {
             [UniformNames.SrcTexture]: {
-            // uSrcTexture: {
+                // uSrcTexture: {
                 type: UniformTypes.Texture,
                 value: null,
             },
@@ -27,13 +27,9 @@ export class RadialBlurPass extends PostProcessPassBase {
             name: 'RadialBlurPass',
             fragmentShader: radialBlurFragmentShader,
             uniforms,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F
+            renderTargetType,
             // useEnvMap: false,
             // receiveShadow: false,
         });
-    }
-    
-    render(opts: PostProcessPassRenderArgs) {
-        super.render(opts);
     }
 }

@@ -20,11 +20,11 @@ void main() {
     float eyeDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
    
     // float mask = step(.0001, 1. - eyeDepth);
-    float mask = step(.0001, 1. - rawDepth);
-    
+    float mask = step(.0001, 1. - rawDepth) * rawDepth;
+
     // outColor = sceneColor;
     outColor = vec4(vec3(mask), 1.);
-    // outColor = vec4(vec3(mask), 1.);
+    // outColor = vec4(vec3(rawDepth), 1.);
 }
 
 // #version 300 es
