@@ -176,16 +176,29 @@ export class LightShaftPass implements IPostProcessPass {
         // this.materials.push(...this.lightShaftSamplePass.materials);
 
         //
-        // blur 1 pass
+        // blur passes
         //
 
-        // this.blur1Pass = new GaussianBlurPass({gpu});
+        // blur 1
         this.blur1Pass = new RadialBlurPass({
             gpu,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            // renderTargetType: RenderTargetTypes.R16F,
         });
         this.materials.push(...this.blur1Pass.materials);
+
+        // blur 2
+        this.blur2Pass = new RadialBlurPass({
+            gpu,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        });
+        this.materials.push(...this.blur2Pass.materials);
+
+        // blur 3
+        this.blur3Pass = new RadialBlurPass({
+            gpu,
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        });
+        this.materials.push(...this.blur3Pass.materials);
 
         //
         // composite pass
@@ -205,16 +218,8 @@ export class LightShaftPass implements IPostProcessPass {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                // uTexelSize: {
-                //     type: UniformTypes.Vector2,
-                //     value: Vector2.one,
-                // },
             },
         });
-
-        // this.compositePass = new RadialBlurPass({
-        //     gpu,
-        // });
 
         this.materials.push(...this.compositePass.materials);
     }
@@ -229,9 +234,9 @@ export class LightShaftPass implements IPostProcessPass {
         this.height = height;
 
         this.lightShaftDownSamplePass.setSize(width / 2, height / 2);
-        // this.lightShaftDownSamplePass.setSize(width, height);
-        // this.lightShaftSamplePass.setSize(width / 2, height / 2);
         this.blur1Pass.setSize(width / 2, height / 2);
+        this.blur2Pass.setSize(width / 2, height / 2);
+        this.blur3Pass.setSize(width / 2, height / 2);
         this.compositePass.setSize(width, height);
     }
 
@@ -321,6 +326,26 @@ export class LightShaftPass implements IPostProcessPass {
             gBufferRenderTargets,
             time,
         });
+        this.blur2Pass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: this.blur1Pass.renderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
+        this.blur3Pass.render({
+            gpu,
+            camera,
+            renderer,
+            prevRenderTarget: this.blur2Pass.renderTarget,
+            isLastPass: false,
+            targetCamera,
+            gBufferRenderTargets,
+            time,
+        });
 
         //
         // light shaft composite pass
@@ -334,10 +359,7 @@ export class LightShaftPass implements IPostProcessPass {
         // //     'uLightShaftTexelSize',
         // //     new Vector2(1 / this.lightShaftSamplePass.width, 1 / this.lightShaftSamplePass.height)
         // // );
-        this.compositePass.material.updateUniform(
-            'uBlurTexture',
-            this.blur1Pass.renderTarget.read.texture
-        );
+        this.compositePass.material.updateUniform('uBlurTexture', this.blur3Pass.renderTarget.read.texture);
 
         this.compositePass.render({
             gpu,
@@ -362,6 +384,8 @@ export class LightShaftPass implements IPostProcessPass {
     private lightShaftDownSamplePass: FragmentPass;
     // private lightShaftSamplePass: FragmentPass;
     private blur1Pass: RadialBlurPass;
+    private blur2Pass: RadialBlurPass;
+    private blur3Pass: RadialBlurPass;
     private compositePass: FragmentPass;
 
     private geometry: PlaneGeometry;

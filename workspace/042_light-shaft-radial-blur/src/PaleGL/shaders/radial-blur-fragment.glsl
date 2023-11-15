@@ -18,7 +18,7 @@ void main() {
     vec4 resultColor = texture(uSrcTexture, vUv);
     outColor = resultColor;
        
-    vec2 blurCenter = vec2(.5, 0.);
+    vec2 blurCenter = vec2(.5, 1.);
     vec2 currentToCenter = blurCenter - vUv;
     float totalWeight = 0.;
     vec4 destColor = vec4(0.);
