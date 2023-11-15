@@ -179,10 +179,18 @@ export class LightShaftPass implements IPostProcessPass {
         // blur passes
         //
 
+        const blurPassIndexUniformKey = "uRadialBlurPassIndex";
+        
         // blur 1
         this.blur1Pass = new RadialBlurPass({
             gpu,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniforms: {
+                [blurPassIndexUniformKey]: {
+                    type: UniformTypes.Float,
+                    value: 0
+                }
+            }
         });
         this.materials.push(...this.blur1Pass.materials);
 
@@ -190,6 +198,12 @@ export class LightShaftPass implements IPostProcessPass {
         this.blur2Pass = new RadialBlurPass({
             gpu,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniforms: {
+                [blurPassIndexUniformKey]: {
+                    type: UniformTypes.Float,
+                    value: 1
+                }
+            }
         });
         this.materials.push(...this.blur2Pass.materials);
 
@@ -197,6 +211,12 @@ export class LightShaftPass implements IPostProcessPass {
         this.blur3Pass = new RadialBlurPass({
             gpu,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniforms: {
+                [blurPassIndexUniformKey]: {
+                    type: UniformTypes.Float,
+                    value: 2
+                }
+            }
         });
         this.materials.push(...this.blur3Pass.materials);
 
@@ -210,10 +230,10 @@ export class LightShaftPass implements IPostProcessPass {
             fragmentShader: lightShaftCompositeFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                uBlurTexture: {
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
+                // uBlurTexture: {
+                //     type: UniformTypes.Texture,
+                //     value: null,
+                // },
                 uLightShaftTexture: {
                     type: UniformTypes.Texture,
                     value: null,
@@ -359,7 +379,7 @@ export class LightShaftPass implements IPostProcessPass {
         // //     'uLightShaftTexelSize',
         // //     new Vector2(1 / this.lightShaftSamplePass.width, 1 / this.lightShaftSamplePass.height)
         // // );
-        this.compositePass.material.updateUniform('uBlurTexture', this.blur3Pass.renderTarget.read.texture);
+        this.compositePass.material.updateUniform('uLightShaftTexture', this.blur3Pass.renderTarget.read.texture);
 
         this.compositePass.render({
             gpu,

@@ -22,6 +22,15 @@ void main() {
     // float mask = step(.0001, 1. - eyeDepth);
     float mask = step(.0001, 1. - rawDepth) * rawDepth;
 
+    float edgeWidth = .05; 
+    float edgeMask =
+        smoothstep(0., edgeWidth, vUv.x) *
+        (1. - smoothstep(1. - edgeWidth, 1., vUv.x)) *
+        smoothstep(0., edgeWidth, vUv.y) *
+        (1. - smoothstep(1. - edgeWidth, 1., vUv.y));
+        
+    mask *= edgeMask;
+    
     // outColor = sceneColor;
     outColor = vec4(vec3(mask), 1.);
     // outColor = vec4(vec3(rawDepth), 1.);

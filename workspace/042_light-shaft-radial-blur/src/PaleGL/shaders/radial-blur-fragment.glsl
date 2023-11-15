@@ -7,6 +7,7 @@ in vec2 vUv;
 out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
+uniform float uRadialBlurPassIndex;
 
 const int sampleCount = 12;
 
@@ -17,14 +18,19 @@ const int sampleCount = 12;
 void main() {
     vec4 resultColor = texture(uSrcTexture, vUv);
     outColor = resultColor;
-       
+        
+    // TODO: pass center from js
     vec2 blurCenter = vec2(.5, 1.);
-    vec2 currentToCenter = blurCenter - vUv;
+   
+    float passScale = pow(.4 * float(sampleCount), uRadialBlurPassIndex);
+    
+    vec2 currentToCenter = (blurCenter - vUv) * passScale;
     float totalWeight = 0.;
     vec4 destColor = vec4(0.);
 
-    float strength = .005;
+    float strength = .01;
     vec2 currentToCenterStep = currentToCenter * strength;
+    // vec2 currentToCenterStep = currentToCenter * passScale;
         
     for(int i = 0; i <= sampleCount; i++) {
         float fi = float(i);
@@ -44,7 +50,7 @@ void main() {
     }
     
     destColor /= totalWeight;
-    
+  
     outColor = destColor;
     
     // debug
