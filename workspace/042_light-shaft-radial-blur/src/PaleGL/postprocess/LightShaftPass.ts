@@ -274,7 +274,7 @@ export class LightShaftPass implements IPostProcessPass {
             camera,
             renderer,
             prevRenderTarget,
-            isLastPass,
+            isLastPass: false,
             targetCamera,
             gBufferRenderTargets,
             time,

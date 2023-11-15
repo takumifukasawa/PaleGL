@@ -10,45 +10,44 @@ uniform sampler2D uSrcTexture;
 
 const int sampleCount = 12;
 
-float rand(vec2 co){
-    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
+// float rand(vec2 co){
+//     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+// }
 
 void main() {
     vec4 resultColor = texture(uSrcTexture, vUv);
     outColor = resultColor;
        
-    // WIP: zoom blur
-    
-    vec2 blurCenter = vec2(.5, .5);
-    vec2 centerToCurrent = vUv - blurCenter;
+    vec2 blurCenter = vec2(.5, 0.);
+    vec2 currentToCenter = blurCenter - vUv;
     float totalWeight = 0.;
     vec4 destColor = vec4(0.);
 
-    float strength = 1.;
+    float strength = .005;
+    vec2 currentToCenterStep = currentToCenter * strength;
+        
     for(int i = 0; i <= sampleCount; i++) {
-        float nflag = (1. / float(sampleCount));
         float fi = float(i);
-        // float per = (fi + (rand(vUv) * 2. - 1.) * 1.) * nflag;
-        // float weight = per - per * per;
-        // vec2 uv = vUv + (-centerToCurrent * per * strength * nflag);
-        vec2 uv = vUv + (-centerToCurrent * nflag * fi);
+        float weight = (float(sampleCount) - float(i)) / float(sampleCount);
+        vec2 currentStep = currentToCenterStep * fi;
+        vec2 uv = vUv + currentStep;
         uv = vec2(
             clamp(uv.x, 0., 1.),
             clamp(uv.y, 0., 1.)
         );
+        // use weight
         // destColor += texture(uSrcTexture, uv) * weight;
-        destColor += texture(uSrcTexture, uv);
         // totalWeight += weight;
-        // totalWeight += nflag;
-        // totalWeight += 1.;
+        // simple convolution
+        destColor += texture(uSrcTexture, uv);
+        totalWeight += 1.;
     }
     
-    // destColor /= totalWeight;
-    destColor /= float(sampleCount);
+    destColor /= totalWeight;
+    
+    outColor = destColor;
     
     // debug
     
     // outColor = resultColor;
-    // outColor = destColor;
 }
