@@ -145,6 +145,11 @@ export class Matrix4 {
         return new Vector3(this.m03, this.m13, this.m23);
     }
 
+    // get clipPosition() {
+    //     const w = this.m33 === 0 ? 0.0001 : this.m33; // TODO: cheap NaN fallback
+    //     return new Vector3(this.m03 / w, this.m13 / w, this.m23 / w);
+    // }
+
     constructor(
         n00: number,
         n01: number,

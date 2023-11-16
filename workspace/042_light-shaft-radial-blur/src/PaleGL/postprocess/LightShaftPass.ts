@@ -9,9 +9,11 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 // import lightShaftSampleFragmentShader from '@/PaleGL/shaders/light-shaft-sample-fragment.glsl';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
+import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
-import { Color } from '@/PaleGL/math/Color.ts';
-import { RadialBlurPass } from '@/PaleGL/postprocess/RadialBlurPass.ts';
+import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { RadialBlurPass } from '@/PaleGL/postprocess/RadialBlurPass.ts';
 // import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 // import {Vector3} from '@/PaleGL/math/Vector3.ts';
 // import {Vector4} from '@/PaleGL/math/Vector4.ts';
@@ -30,34 +32,18 @@ export class LightShaftPass implements IPostProcessPass {
 
     // params
 
-    // [Range(0, 1)]
     blendRate = 1;
-    // [Range(0, 1)]
-    globalAlpha = 1;
-    shaftColor = Color.white;
-    // [Range(0, 128)]
-    attenuationBase = 64;
-    // [Range(0, 64)]
-    attenuationPower = 1;
-    // [Range(1, 128)]
-    // [Range(0, 5)]
-    rayStep = 0.1;
-    // [Range(0, 5)]
-    rayNearOffset = 0.01;
-    // [Range(0, 0.2f)]
-    rayJitterSizeX = 0.005;
-    // [Range(0, 0.2f)]
-    rayJitterSizeY = 0.005;
-    // depthBias = 0.001;
-    depthBias = 0;
 
-    // gpu: GPU;
     name: string = 'LightShaftPass';
     enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 
     materials: Material[] = [];
+
+    #directionalLight: DirectionalLight | null = null;
+    
+    #radialBlurUniformName: string = "uRadialBlurOrigin";
 
     get renderTarget() {
         // TODO: composite pass の方にちゃんと書き換えましょう
@@ -106,118 +92,66 @@ export class LightShaftPass implements IPostProcessPass {
         this.materials.push(...this.lightShaftDownSamplePass.materials);
 
         //
-        // light shaft pass
-        //
-
-        // this.lightShaftSamplePass = new FragmentPass({
-        //     gpu,
-        //     fragmentShader: lightShaftSampleFragmentShader,
-        //     renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        //     uniforms: {
-        //         [UniformNames.DepthTexture]: {
-        //             type: UniformTypes.Texture,
-        //             value: null,
-        //         },
-        //         uRayStep: {
-        //             type: UniformTypes.Float,
-        //             value: this.rayStep,
-        //         },
-        //         uRayNearOffset: {
-        //             type: UniformTypes.Float,
-        //             value: this.rayNearOffset,
-        //         },
-        //         uAttenuationBase: {
-        //             type: UniformTypes.Float,
-        //             value: this.attenuationBase,
-        //         },
-        //         uAttenuationPower: {
-        //             type: UniformTypes.Float,
-        //             value: this.attenuationPower,
-        //         },
-        //         uBlendRate: {
-        //             type: UniformTypes.Float,
-        //             value: this.blendRate,
-        //         },
-        //         uRayJitterSizeX: {
-        //             type: UniformTypes.Float,
-        //             value: this.rayJitterSizeX,
-        //         },
-        //         uRayJitterSizeY: {
-        //             type: UniformTypes.Float,
-        //             value: this.rayJitterSizeY,
-        //         },
-        //         uDepthBias: {
-        //             type: UniformTypes.Float,
-        //             value: this.depthBias,
-        //         },
-        //         // [UniformNames.ViewMatrix]: {
-        //         //     type: UniformTypes.Matrix4,
-        //         //     value: Matrix4.identity,
-        //         // },
-        //         [UniformNames.DirectionalLight]: {
-        //             type: UniformTypes.Struct,
-        //             value: {
-        //                 direction: Vector3.zero,
-        //                 intensity: 0,
-        //                 color: new Vector4(0, 0, 0, 0),
-        //             },
-        //         },
-        //         [UniformNames.ShadowMap]: {
-        //             type: UniformTypes.Texture,
-        //             value: null,
-        //         },
-        //         [UniformNames.ShadowMapProjectionMatrix]: {
-        //             type: UniformTypes.Matrix4,
-        //             value: Matrix4.identity,
-        //         },
-        //     },
-        // });
-
-        // this.materials.push(...this.lightShaftSamplePass.materials);
-
-        //
         // blur passes
         //
 
-        const blurPassIndexUniformKey = "uRadialBlurPassIndex";
-        
+        const blurPassIndexUniformKey = 'uRadialBlurPassIndex';
+
         // blur 1
-        this.blur1Pass = new RadialBlurPass({
+        this.blur1Pass = new FragmentPass({
             gpu,
+            fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 [blurPassIndexUniformKey]: {
                     type: UniformTypes.Float,
-                    value: 0
+                    value: 0,
+                },
+                [this.#radialBlurUniformName]: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.identity
                 }
-            }
+            },
         });
+
         this.materials.push(...this.blur1Pass.materials);
 
         // blur 2
-        this.blur2Pass = new RadialBlurPass({
+        this.blur2Pass = new FragmentPass({
             gpu,
+            fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 [blurPassIndexUniformKey]: {
                     type: UniformTypes.Float,
-                    value: 1
+                    value: 1,
+                },
+                [this.#radialBlurUniformName]: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.identity
                 }
-            }
+            },
         });
+
         this.materials.push(...this.blur2Pass.materials);
 
         // blur 3
-        this.blur3Pass = new RadialBlurPass({
+        this.blur3Pass = new FragmentPass({
             gpu,
+            fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 [blurPassIndexUniformKey]: {
                     type: UniformTypes.Float,
-                    value: 2
+                    value: 2,
+                },
+                [this.#radialBlurUniformName]: {
+                    type: UniformTypes.Vector2,
+                    value: Vector2.identity
                 }
-            }
+            },
         });
+
         this.materials.push(...this.blur3Pass.materials);
 
         //
@@ -230,10 +164,6 @@ export class LightShaftPass implements IPostProcessPass {
             fragmentShader: lightShaftCompositeFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                // uBlurTexture: {
-                //     type: UniformTypes.Texture,
-                //     value: null,
-                // },
                 uLightShaftTexture: {
                     type: UniformTypes.Texture,
                     value: null,
@@ -304,37 +234,20 @@ export class LightShaftPass implements IPostProcessPass {
             gBufferRenderTargets,
             time,
         });
-        // console.log(this.lightShaftDownSamplePass.materials)
-
-        // console.log(this.lightShaftDownSamplePass)
-
-        //
-        // light shaft sample pass
-        //
-
-        // this.lightShaftSamplePass.material.updateUniform('uRayStep', this.rayStep);
-        // this.lightShaftSamplePass.material.updateUniform('uRayNearOffset', this.rayNearOffset);
-        // this.lightShaftSamplePass.material.updateUniform('uAttenuationBase', this.attenuationBase);
-        // this.lightShaftSamplePass.material.updateUniform('uAttenuationPower', this.attenuationPower);
-        // this.lightShaftSamplePass.material.updateUniform('uBlendRate', this.blendRate);
-        // this.lightShaftSamplePass.material.updateUniform('uDepthBias', this.depthBias);
-        // this.lightShaftSamplePass.material.updateUniform('uRayJitterSizeX', this.rayJitterSizeX);
-        // // TODO: aspect比かけた方がよい？
-        // this.lightShaftSamplePass.material.updateUniform('uRayJitterSizeY', this.rayJitterSizeY);
-        // this.lightShaftSamplePass.render({
-        //     gpu,
-        //     camera,
-        //     renderer,
-        //     prevRenderTarget,
-        //     isLastPass: false,
-        //     targetCamera,
-        //     gBufferRenderTargets,
-        //     time,
-        // });
 
         //
         // blur pass
         //
+        
+        // -1 ~ 1 (in screen)
+        const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
+        // 0 ~ 1
+        const lightPositionInUv = new Vector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
+        // this.#directionalLight!.transform.getPositionInScreen(targetCamera);
+
+        this.blur1Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
+        this.blur2Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
+        this.blur3Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
 
         this.blur1Pass.render({
             gpu,
@@ -371,15 +284,8 @@ export class LightShaftPass implements IPostProcessPass {
         // light shaft composite pass
         //
 
-        // this.compositePass.material.updateUniform(
-        //     'uLightShaftTexture',
-        //     this.lightShaftSamplePass.renderTarget.read.texture
-        // );
-        // // this.compositePass.material.updateUniform(
-        // //     'uLightShaftTexelSize',
-        // //     new Vector2(1 / this.lightShaftSamplePass.width, 1 / this.lightShaftSamplePass.height)
-        // // );
         this.compositePass.material.updateUniform('uLightShaftTexture', this.blur3Pass.renderTarget.read.texture);
+        this.compositePass.material.updateUniform('uBlendRate', this.blendRate);
 
         this.compositePass.render({
             gpu,
@@ -393,6 +299,11 @@ export class LightShaftPass implements IPostProcessPass {
         });
     }
 
+    setDirectionalLight(light: DirectionalLight) {
+        // light.transform.position
+        this.#directionalLight = light;
+    }
+
     // --------------------------------------------------------------------------------
     // private
     // --------------------------------------------------------------------------------
@@ -403,9 +314,9 @@ export class LightShaftPass implements IPostProcessPass {
     // #lastPass;
     private lightShaftDownSamplePass: FragmentPass;
     // private lightShaftSamplePass: FragmentPass;
-    private blur1Pass: RadialBlurPass;
-    private blur2Pass: RadialBlurPass;
-    private blur3Pass: RadialBlurPass;
+    private blur1Pass: FragmentPass;
+    private blur2Pass: FragmentPass;
+    private blur3Pass: FragmentPass;
     private compositePass: FragmentPass;
 
     private geometry: PlaneGeometry;

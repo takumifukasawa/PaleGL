@@ -513,7 +513,7 @@ const main = async () => {
     sphereMesh = await createGLTFSphereMesh();
     sphereMesh.onStart = ({ actor }) => {
         actor.transform.setScaling(Vector3.fill(2));
-        actor.transform.setTranslation(new Vector3(0, 4, 0));
+        actor.transform.setTranslation(new Vector3(0, 5, 0));
     };
 
     skinnedMesh = await createGLTFSkinnedMesh();
@@ -895,6 +895,46 @@ function initDebugger() {
         label: 'show buffers',
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
+    });
+
+    //
+    // directional light
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addSliderDebugger({
+        label: 'dir light pos x',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: directionalLight.transform.position.x,
+        onChange: (value) => {
+            directionalLight.transform.position.x = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'dir light pos y',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: directionalLight.transform.position.y,
+        onChange: (value) => {
+            directionalLight.transform.position.y = value;
+        },
+    });
+
+
+    debuggerGUI.addSliderDebugger({
+        label: 'dir light pos z',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: directionalLight.transform.position.z,
+        onChange: (value) => {
+            directionalLight.transform.position.z = value;
+        },
     });
 
     //
@@ -1326,74 +1366,6 @@ function initDebugger() {
             renderer.lightShaftPass.blendRate = value;
         },
     });
-
-
-    debuggerGUI.addSliderDebugger({
-        label: 'attenuation base',
-        minValue: 0,
-        maxValue: 256,
-        stepValue: 0.01,
-        initialValue: renderer.lightShaftPass.attenuationBase,
-        onChange: (value) => {
-            renderer.lightShaftPass.attenuationBase = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'attenuation power',
-        minValue: 0,
-        maxValue: 64,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.attenuationPower,
-        onChange: (value) => {
-            renderer.lightShaftPass.attenuationPower = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray step',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayStep,
-        onChange: (value) => {
-            renderer.lightShaftPass.rayStep = value;
-        },
-    });
-    
-    debuggerGUI.addSliderDebugger({
-        label: 'depth bias',
-        minValue: -0.05,
-        maxValue: 0.05,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.depthBias,
-        onChange: (value) => {
-            renderer.lightShaftPass.depthBias = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray jitter size x',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayJitterSizeX,
-        onChange: (value) => {
-            renderer.lightShaftPass.rayJitterSizeX = value;
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'ray jitter size y',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayJitterSizeY,
-        onChange: (value) => {
-            renderer.lightShaftPass.rayJitterSizeY = value;
-        },
-    });
-
 
     //
     // fxaa

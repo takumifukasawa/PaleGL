@@ -1,6 +1,7 @@
 ﻿import {
     ActorTypes,
     BlendTypes,
+    LightTypes,
     RenderQueueType,
     RenderTargetTypes,
     UniformNames,
@@ -32,7 +33,7 @@ import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
-import {LightShaftPass} from "@/PaleGL/postprocess/LightShaftPass.ts";
+import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -111,18 +112,11 @@ export class Renderer {
             height: 1,
             name: 'copy depth dest render target',
         });
-        
+
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
 
         this._lightShaftPass = new LightShaftPass({ gpu });
-        // this._scenePostProcess.addPass(this._lightShaftPass);
-        // this.lightShaftPass.enabled = false;
-        this._lightShaftPass.blendRate = 0.7;
-        this._lightShaftPass.rayStep = 0.35;
-        this._lightShaftPass.attenuationBase = 64;
-        this._lightShaftPass.attenuationPower = 4;
-        // this._scenePostProcess.addPass(this._lightShaftPass)
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
         this._depthOfFieldPass.enabled = false;
@@ -167,7 +161,7 @@ export class Renderer {
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
-    
+
     get lightShaftPass() {
         return this._lightShaftPass;
     }
@@ -448,7 +442,6 @@ export class Renderer {
             this._ambientOcclusionPass.renderTarget.read.texture
         );
 
-
         PostProcess.renderPass({
             pass: this._deferredShadingPass,
             renderer: this,
@@ -471,7 +464,7 @@ export class Renderer {
             renderer: this,
             targetCamera: this._scenePostProcess.postProcessCamera,
             time,
-            lightActors
+            lightActors,
         });
 
         // this._lightShaftPass.materials.forEach((mat) => {
@@ -481,19 +474,24 @@ export class Renderer {
         //         // this._copyDepthDestRenderTarget.depthTexture
         //     );
         // });
-        
-        PostProcess.renderPass({
-            pass: this._lightShaftPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: this._deferredShadingPass.renderTarget,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-            // lightActors,
-        });
-        
+
+        // TODO: directional light がない場合の対応
+        const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
+        if (directionalLight) {
+            this._lightShaftPass.setDirectionalLight(directionalLight);
+            PostProcess.renderPass({
+                pass: this._lightShaftPass,
+                renderer: this,
+                targetCamera: camera,
+                gpu: this.gpu,
+                camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+                prevRenderTarget: this._deferredShadingPass.renderTarget,
+                isLastPass: false,
+                time, // TODO: engineから渡したい
+                // lightActors,
+            });
+        }
+
         // return;
 
         // ------------------------------------------------------------------------------

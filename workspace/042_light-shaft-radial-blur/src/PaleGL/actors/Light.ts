@@ -1,5 +1,5 @@
 ﻿import { Actor } from '@/PaleGL/actors/Actor';
-import { ActorTypes, LightType } from '@/PaleGL/constants';
+import {ActorTypes, LightType} from '@/PaleGL/constants';
 import { Color } from '@/PaleGL/math/Color';
 // import {Camera} from "./Camera";
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -21,6 +21,7 @@ export interface ILight {
 export class Light extends Actor implements ILight {
     intensity: number = 1;
     color: Color = Color.white;
+    lightType: LightType;
     castShadow: boolean = false; // bool
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
@@ -30,10 +31,11 @@ export class Light extends Actor implements ILight {
         return !!this.shadowCamera;
     }
 
-    constructor({ intensity, color }: LightArgs & { lightType: LightType }) {
+    constructor({ intensity, color, lightType }: LightArgs & { lightType: LightType }) {
         super({ type: ActorTypes.Light });
         this.intensity = intensity;
         this.color = color;
+        this.lightType = lightType;
     }
 
     setSize(width: number, height: number) {

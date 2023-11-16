@@ -1,6 +1,6 @@
-﻿import {Actor} from '@/PaleGL/actors/Actor';
-import {Matrix4} from '@/PaleGL/math/Matrix4';
-import {Vector4} from '@/PaleGL/math/Vector4';
+﻿import { Actor } from '@/PaleGL/actors/Actor';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Vector4 } from '@/PaleGL/math/Vector4';
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
 import {
     ActorTypes,
@@ -12,17 +12,18 @@ import {
     UniformNames,
 } from '@/PaleGL/constants';
 // import {Vector3} from "@/PaleGL/math/Vector3";
-import {Material} from '@/PaleGL/materials/Material';
-import {Geometry} from '@/PaleGL/geometries/Geometry';
-import {Mesh} from './Mesh';
-import {Attribute} from '@/PaleGL/core/Attribute';
-import {RenderTarget} from '@/PaleGL/core/RenderTarget';
+import { Material } from '@/PaleGL/materials/Material';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { Mesh } from './Mesh';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {Color} from "@/PaleGL/math/Color";
-import {Vector3} from '@/PaleGL/math/Vector3';
-import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
-import {GPU} from '@/PaleGL/core/GPU';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
+import { GPU } from '@/PaleGL/core/GPU';
 // import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
-import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
+// import { Transform } from '@/PaleGL/core/Transform.ts';
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
 // import {Scene} from "@/PaleGL/core/Scene.ts";
@@ -82,9 +83,9 @@ export class Camera extends Actor {
         }
         return this.postProcess.enabled;
     }
-    
+
     get hasEnabledPostProcessPass(): boolean {
-        if(!this.enabledPostProcess){
+        if (!this.enabledPostProcess) {
             return false;
         }
         return this.postProcess!.hasEnabledPass;
@@ -111,10 +112,10 @@ export class Camera extends Actor {
 
     // constructor({clearColor, postProcess}: { clearColor: Vector4, postProcess: PostProcess } = {}) {
     constructor({
-                    cameraType,
-                    clearColor,
-                    postProcess,
-                }: {
+        cameraType,
+        clearColor,
+        postProcess,
+    }: {
         cameraType: CameraType;
         clearColor?: Vector4;
         postProcess?: PostProcess;
@@ -169,8 +170,8 @@ export class Camera extends Actor {
      * @param time
      * @param deltaTime
      */
-    update({gpu, time, deltaTime}: { gpu: GPU; time: number; deltaTime: number }) {
-        super.update({gpu, time, deltaTime});
+    update({ gpu, time, deltaTime }: { gpu: GPU; time: number; deltaTime: number }) {
+        super.update({ gpu, time, deltaTime });
 
         if (this.visibleFrustum && !this.#visibleFrustumMesh) {
             this.#visibleFrustumMesh = new Mesh({
@@ -254,11 +255,24 @@ export class Camera extends Actor {
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
         this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
         this.inverseViewMatrix = this.viewMatrix.clone().invert();
-        this.viewProjectionMatrix = Matrix4.multiplyMatrices(
-            this.projectionMatrix,
-            this.viewMatrix
-        )
+        this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
         this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
+    }
+
+    /**
+     *
+     * @param transform
+     */
+    transformScreenPoint(p: Vector3) {
+        const matInProjection = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix, Matrix4.translationMatrix(p));
+        const clipPosition = matInProjection.position;
+        const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
+        return new Vector3(clipPosition.x / w, clipPosition.y / w, clipPosition.z / w);
+        // debug
+        // console.log("--------")
+        // this.#worldMatrix.position.log();
+        // camera.viewMatrix.position.log();
+        // v.log();
     }
 
     /**

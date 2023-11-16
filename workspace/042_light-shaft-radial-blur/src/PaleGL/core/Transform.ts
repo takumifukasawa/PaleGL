@@ -3,6 +3,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import { Rotator } from '@/PaleGL/math/Rotator.js';
 import { Actor } from '@/PaleGL/actors/Actor';
+// import { Camera } from '@/PaleGL/actors/Camera.ts';
 
 // TODO:
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
@@ -113,4 +114,16 @@ export class Transform {
     lookAt(lookAtTarget: Vector3) {
         this.lookAtTarget = lookAtTarget;
     }
+
+    // TODO: Cameraに持たせた方がいい気がする
+    // getPositionInScreen(camera: Camera) {
+    //     const matInProjection = Matrix4.multiplyMatrices(camera.projectionMatrix, camera.viewMatrix, this.#worldMatrix);
+    //     const clipPosition = matInProjection.position;
+    //     const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
+    //     return new Vector3(clipPosition.x / w, clipPosition.y / w, clipPosition.z / w);
+    //     // console.log("--------")
+    //     // this.#worldMatrix.position.log();
+    //     // camera.viewMatrix.position.log();
+    //     // v.log();
+    // }
 }
