@@ -32,9 +32,9 @@ export class LightShaftPass implements IPostProcessPass {
 
     // params
 
-    blendRate: number = 1;
-    passScaleBase: number = 0.178;
-    rayStepStrength: number = 0.008;
+    blendRate: number = 0.65;
+    passScaleBase: number = 0.2;
+    rayStepStrength: number = 0.012;
 
     name: string = 'LightShaftPass';
     enabled: boolean = true;
@@ -195,6 +195,10 @@ export class LightShaftPass implements IPostProcessPass {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                uBlendRate: {
+                    type: UniformTypes.Float,
+                    value: this.blendRate,
+                },
             },
         });
 
@@ -283,7 +287,7 @@ export class LightShaftPass implements IPostProcessPass {
         this.blur3Pass.material.updateUniform(this.#radialBlurOriginUniformName, lightPositionInUv);
         this.blur3Pass.material.updateUniform(this.#radialBlurPassScaleBaseUniformName, this.passScaleBase);
         this.blur3Pass.material.updateUniform(this.#radialBlurRayStepStrengthUniformName, this.rayStepStrength);
-        
+
         this.blur1Pass.render({
             gpu,
             camera,
