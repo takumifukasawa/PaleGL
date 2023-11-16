@@ -8,7 +8,9 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform vec2 uRadialBlurOrigin; // in texcoord
+uniform float uRadialBlurPassScaleBase;
 uniform float uRadialBlurPassIndex;
+uniform float uRadialBlurRayStepStrength;
 
 const int sampleCount = 12;
 
@@ -24,13 +26,15 @@ void main() {
     // vec2 blurCenter = vec2(.5, 1.);
     vec2 blurCenter = uRadialBlurOrigin;
    
-    float passScale = pow(.4 * float(sampleCount), uRadialBlurPassIndex);
-    
+    // float passScale = pow(.4 * float(sampleCount), uRadialBlurPassIndex);
+    float passScale = pow(uRadialBlurPassScaleBase * float(sampleCount), uRadialBlurPassIndex);
+
     vec2 currentToCenter = (blurCenter - vUv) * passScale;
     float totalWeight = 0.;
     vec4 destColor = vec4(0.);
 
-    float strength = .01;
+    // float strength = .01;
+    float strength = uRadialBlurRayStepStrength;
     vec2 currentToCenterStep = currentToCenter * strength;
     // vec2 currentToCenterStep = currentToCenter * passScale;
         

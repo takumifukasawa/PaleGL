@@ -1367,6 +1367,29 @@ function initDebugger() {
         },
     });
 
+    debuggerGUI.addSliderDebugger({
+        label: 'pass scale',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.lightShaftPass.passScaleBase,
+        onChange: (value) => {
+            renderer.lightShaftPass.passScaleBase = value;
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'ray step strength',
+        minValue: 0.001,
+        maxValue: 0.05,
+        stepValue: 0.001,
+        initialValue: renderer.lightShaftPass.rayStepStrength,
+        onChange: (value) => {
+            renderer.lightShaftPass.rayStepStrength = value;
+        },
+    });
+
+
     //
     // fxaa
     //

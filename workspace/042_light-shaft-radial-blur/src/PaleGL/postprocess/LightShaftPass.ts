@@ -32,7 +32,9 @@ export class LightShaftPass implements IPostProcessPass {
 
     // params
 
-    blendRate = 1;
+    blendRate: number = 1;
+    passScaleBase: number = 0.178;
+    rayStepStrength: number = 0.008;
 
     name: string = 'LightShaftPass';
     enabled: boolean = true;
@@ -42,8 +44,11 @@ export class LightShaftPass implements IPostProcessPass {
     materials: Material[] = [];
 
     #directionalLight: DirectionalLight | null = null;
-    
-    #radialBlurUniformName: string = "uRadialBlurOrigin";
+
+    #radialBlurOriginUniformName: string = 'uRadialBlurOrigin';
+    #radialBlurPassScaleBaseUniformName: string = 'uRadialBlurPassScaleBase';
+    #radialBlurPassIndexUniformName: string = 'uRadialBlurPassIndex';
+    #radialBlurRayStepStrengthUniformName: string = 'uRadialBlurRayStepStrength';
 
     get renderTarget() {
         // TODO: composite pass の方にちゃんと書き換えましょう
@@ -95,22 +100,28 @@ export class LightShaftPass implements IPostProcessPass {
         // blur passes
         //
 
-        const blurPassIndexUniformKey = 'uRadialBlurPassIndex';
-
         // blur 1
         this.blur1Pass = new FragmentPass({
             gpu,
             fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                [blurPassIndexUniformKey]: {
+                [this.#radialBlurPassIndexUniformName]: {
                     type: UniformTypes.Float,
                     value: 0,
                 },
-                [this.#radialBlurUniformName]: {
+                [this.#radialBlurOriginUniformName]: {
                     type: UniformTypes.Vector2,
-                    value: Vector2.identity
-                }
+                    value: Vector2.identity,
+                },
+                [this.#radialBlurPassScaleBaseUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.passScaleBase,
+                },
+                [this.#radialBlurRayStepStrengthUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.rayStepStrength,
+                },
             },
         });
 
@@ -122,14 +133,22 @@ export class LightShaftPass implements IPostProcessPass {
             fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                [blurPassIndexUniformKey]: {
+                [this.#radialBlurPassIndexUniformName]: {
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                [this.#radialBlurUniformName]: {
+                [this.#radialBlurOriginUniformName]: {
                     type: UniformTypes.Vector2,
-                    value: Vector2.identity
-                }
+                    value: Vector2.identity,
+                },
+                [this.#radialBlurPassScaleBaseUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.passScaleBase,
+                },
+                [this.#radialBlurRayStepStrengthUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.rayStepStrength,
+                },
             },
         });
 
@@ -141,14 +160,22 @@ export class LightShaftPass implements IPostProcessPass {
             fragmentShader: lightShaftRadialBlurFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
-                [blurPassIndexUniformKey]: {
+                [this.#radialBlurPassIndexUniformName]: {
                     type: UniformTypes.Float,
                     value: 2,
                 },
-                [this.#radialBlurUniformName]: {
+                [this.#radialBlurOriginUniformName]: {
                     type: UniformTypes.Vector2,
-                    value: Vector2.identity
-                }
+                    value: Vector2.identity,
+                },
+                [this.#radialBlurPassScaleBaseUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.passScaleBase,
+                },
+                [this.#radialBlurRayStepStrengthUniformName]: {
+                    type: UniformTypes.Float,
+                    value: this.rayStepStrength,
+                },
             },
         });
 
@@ -238,17 +265,25 @@ export class LightShaftPass implements IPostProcessPass {
         //
         // blur pass
         //
-        
+
         // -1 ~ 1 (in screen)
         const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
         // 0 ~ 1
         const lightPositionInUv = new Vector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
         // this.#directionalLight!.transform.getPositionInScreen(targetCamera);
 
-        this.blur1Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
-        this.blur2Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
-        this.blur3Pass.material.updateUniform(this.#radialBlurUniformName, lightPositionInUv);
+        this.blur1Pass.material.updateUniform(this.#radialBlurOriginUniformName, lightPositionInUv);
+        this.blur1Pass.material.updateUniform(this.#radialBlurPassScaleBaseUniformName, this.passScaleBase);
+        this.blur1Pass.material.updateUniform(this.#radialBlurRayStepStrengthUniformName, this.rayStepStrength);
 
+        this.blur2Pass.material.updateUniform(this.#radialBlurOriginUniformName, lightPositionInUv);
+        this.blur2Pass.material.updateUniform(this.#radialBlurPassScaleBaseUniformName, this.passScaleBase);
+        this.blur2Pass.material.updateUniform(this.#radialBlurRayStepStrengthUniformName, this.rayStepStrength);
+
+        this.blur3Pass.material.updateUniform(this.#radialBlurOriginUniformName, lightPositionInUv);
+        this.blur3Pass.material.updateUniform(this.#radialBlurPassScaleBaseUniformName, this.passScaleBase);
+        this.blur3Pass.material.updateUniform(this.#radialBlurRayStepStrengthUniformName, this.rayStepStrength);
+        
         this.blur1Pass.render({
             gpu,
             camera,
