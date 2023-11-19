@@ -2,15 +2,18 @@
 // type OnInputCallback = ((value: string) => void);
 
 export class DebuggerGUI {
-    private parentElement: HTMLElement;
+    private rootElement: HTMLElement;
+    private contentElement: HTMLElement;
 
     get domElement() {
-        return this.parentElement;
+        return this.rootElement;
     }
 
-    constructor() {
-        this.parentElement = document.createElement('div');
-        this.parentElement.style.cssText = `
+    constructor(isRoot = true) {
+        this.rootElement = document.createElement('div');
+
+        if (isRoot) {
+            this.rootElement.style.cssText = `
             background-color: rgb(200 200 255 / 70%);
             position: absolute;
             top: 0px;
@@ -19,23 +22,35 @@ export class DebuggerGUI {
             padding: 0px 10px 10px 10px;
             display: grid;
             justify-items: start;
+            
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 1.2em;
+            min-width: 180px;
         `;
+        }
+
+        this.contentElement = document.createElement('div');
+        this.rootElement.appendChild(this.contentElement);
     }
 
     #createDebuggerContentElement(label: string) {
         const wrapperElement = document.createElement('div');
+        // wrapperElement.style.cssText = `
+        //     font-size: 9px;
+        //     font-weight: bold;
+        //     line-height: 1.2em;
+        //     box-sizing: border-box;
+        //     padding-top: 8px;
+        //     min-width: 180px;
+        // `;
         wrapperElement.style.cssText = `
-            font-size: 9px;
-            font-weight: bold;
-            line-height: 1.2em;
             box-sizing: border-box;
             padding-top: 8px;
-            min-width: 180px;
         `;
-        
+
         const headerElement = document.createElement('div');
         wrapperElement.appendChild(headerElement);
-        
 
         if (label) {
             // const labelWrapperElement = document.createElement('div');
@@ -59,6 +74,56 @@ export class DebuggerGUI {
             headerElement,
             contentElement,
         };
+    }
+
+    /**
+     *
+     * @param name
+     */
+    addGroup(name: string, initialHidden = false) {
+        const group = new DebuggerGUI(false);
+
+        const label = document.createElement('p');
+        label.textContent = name;
+        label.style.cssText = `
+            font-style: italic;
+            box-sizing: border-box;
+            padding: 8px 0 0 0;
+            cursor: pointer;
+        `;
+        group.rootElement.insertBefore(label, group.contentElement);
+
+        const show = () => {
+            group.contentElement.classList.remove('is-hidden');
+            group.contentElement.style.cssText = ``;
+            label.textContent = `▼ ${name}`;
+        };
+
+        const hide = () => {
+            group.contentElement.classList.add('is-hidden');
+            group.contentElement.style.cssText = `display: none;`;
+            label.textContent = `▶ ${name}`;
+        };
+
+        label.addEventListener('click', () => {
+            if (group.contentElement.classList.contains('is-hidden')) {
+                // 表示
+                show();
+            } else {
+                // 非表示
+                hide();
+            }
+        });
+
+        if (initialHidden) {
+            hide();
+        } else {
+            show();
+        }
+
+        this.contentElement.appendChild(group.domElement);
+
+        return group;
     }
 
     // options ... array
@@ -105,7 +170,7 @@ export class DebuggerGUI {
         }
 
         contentElement.appendChild(selectElement);
-        this.parentElement.appendChild(wrapperElement);
+        this.contentElement.appendChild(wrapperElement);
     }
 
     addColorDebugger({
@@ -140,7 +205,7 @@ export class DebuggerGUI {
         }
 
         contentElement.appendChild(colorPickerInput);
-        this.parentElement.appendChild(wrapperElement);
+        this.contentElement.appendChild(wrapperElement);
     }
 
     addToggleDebugger({
@@ -170,10 +235,11 @@ export class DebuggerGUI {
         }
 
         contentElement.appendChild(checkBoxInput);
-        this.parentElement.appendChild(wrapperElement);
+        this.contentElement.appendChild(wrapperElement);
     }
 
     addSliderDebugger({
+        // parent,
         label,
         onChange,
         onInput,
@@ -183,6 +249,7 @@ export class DebuggerGUI {
         maxValue,
         stepValue,
     }: {
+        // parent?: HTMLDivElement;
         label: string;
         onChange: (value: number) => void;
         onInput?: ((value: number) => void) | null;
@@ -230,7 +297,9 @@ export class DebuggerGUI {
 
         headerElement.appendChild(sliderValueView);
         contentElement.appendChild(sliderInput);
-        this.parentElement.appendChild(wrapperElement);
+
+        // (parent ? parent : this.contentElement).appendChild(wrapperElement);
+        this.contentElement.appendChild(wrapperElement);
     }
 
     addButtonDebugger({
@@ -256,7 +325,7 @@ export class DebuggerGUI {
         buttonInput.addEventListener('click', () => onClick());
 
         contentElement.appendChild(buttonInput);
-        this.parentElement.appendChild(wrapperElement);
+        this.contentElement.appendChild(wrapperElement);
     }
 
     addBorderSpacer() {
@@ -268,6 +337,6 @@ export class DebuggerGUI {
             border-top: 1px solid black;
             margin: 0.5em 0 0.25em 0;
         `;
-        this.parentElement.appendChild(borderElement);
+        this.contentElement.appendChild(borderElement);
     }
 }

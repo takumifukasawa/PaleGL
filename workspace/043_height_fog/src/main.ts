@@ -903,7 +903,9 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addSliderDebugger({
+    const directionalLightDebuggerGroup = debuggerGUI.addGroup("directional light");
+
+    directionalLightDebuggerGroup.addSliderDebugger({
         label: 'dir light pos x',
         minValue: -10,
         maxValue: 10,
