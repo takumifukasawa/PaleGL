@@ -34,7 +34,7 @@ import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
 import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
-import { HeightFogPass } from "@/PaleGL/postprocess/HeightFog.ts";
+import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -120,7 +120,7 @@ export class Renderer {
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
 
         this._lightShaftPass = new LightShaftPass({ gpu });
-        this._heightFogPass = new HeightFogPass({ gpu });
+        this._fogPass = new FogPass({ gpu });
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
         this._depthOfFieldPass.enabled = false;
@@ -165,7 +165,7 @@ export class Renderer {
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
-    
+
     get ambientOcclusionPass() {
         return this._ambientOcclusionPass;
     }
@@ -173,9 +173,9 @@ export class Renderer {
     get lightShaftPass() {
         return this._lightShaftPass;
     }
-    
-    get heightFogPass() {
-        return this._heightFogPass;
+
+    get fogPass() {
+        return this._fogPass;
     }
 
     get depthOfFieldPass() {
@@ -223,7 +223,7 @@ export class Renderer {
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
         this._lightShaftPass.setSize(realWidth, realHeight);
-        this._heightFogPass.setSize(realWidth, realHeight);
+        this._fogPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
         this._bloomPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
@@ -510,17 +510,17 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         PostProcess.updatePassMaterial({
-            pass: this._heightFogPass,
+            pass: this._fogPass,
             renderer: this,
             targetCamera: this._scenePostProcess.postProcessCamera,
             time,
             lightActors,
         });
 
-        this._heightFogPass.setLightShaftMap(this._lightShaftPass.renderTarget);
-        
+        this._fogPass.setLightShaftMap(this._lightShaftPass.renderTarget);
+
         PostProcess.renderPass({
-            pass: this._heightFogPass,
+            pass: this._fogPass,
             renderer: this,
             targetCamera: camera,
             gpu: this.gpu,
@@ -538,7 +538,7 @@ export class Renderer {
         // this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterDeferredShadingRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
         // this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
-        this._afterDeferredShadingRenderTarget.setTexture(this._heightFogPass.renderTarget.read.texture!);
+        this._afterDeferredShadingRenderTarget.setTexture(this._fogPass.renderTarget.read.texture!);
 
         // pattern1: g-buffer depth
         // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
@@ -700,7 +700,7 @@ export class Renderer {
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
     private _lightShaftPass: LightShaftPass;
-    private _heightFogPass: HeightFogPass;
+    private _fogPass: FogPass;
     private _depthOfFieldPass: DepthOfFieldPass;
     private _bloomPass: BloomPass;
     private _toneMappingPass: ToneMappingPass;

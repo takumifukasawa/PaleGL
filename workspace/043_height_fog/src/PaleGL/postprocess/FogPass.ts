@@ -1,16 +1,16 @@
 ﻿// import { UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
-import heightFogFragmentShader from '@/PaleGL/shaders/height-fog-fragment.glsl';
+import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { RenderTargetTypes, UniformTypes } from '@/PaleGL/constants.ts';
 
-export class HeightFogPass extends PostProcessPassBase {
+export class FogPass extends PostProcessPassBase {
     
     private static lightShaftTextureUniformName = "uLightShaftTexture";
     
     constructor({ gpu }: { gpu: GPU }) {
-        const fragmentShader = heightFogFragmentShader;
+        const fragmentShader = fogFragmentShader;
 
         super({
             gpu,
@@ -18,7 +18,7 @@ export class HeightFogPass extends PostProcessPassBase {
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: {
                 // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
-                [HeightFogPass.lightShaftTextureUniformName]: {
+                [FogPass.lightShaftTextureUniformName]: {
                     type: UniformTypes.Texture,
                     value: null, 
                 },
@@ -28,6 +28,6 @@ export class HeightFogPass extends PostProcessPassBase {
     }
 
     setLightShaftMap(rt: RenderTarget) {
-        this.material.updateUniform(HeightFogPass.lightShaftTextureUniformName, rt.read.texture);
+        this.material.updateUniform(FogPass.lightShaftTextureUniformName, rt.read.texture);
     }
 }

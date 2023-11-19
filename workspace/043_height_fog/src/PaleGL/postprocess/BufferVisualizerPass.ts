@@ -1,12 +1,11 @@
-﻿import {UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
 import bufferVisualizerPassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-pass-fragment.glsl';
-import {PostProcessPassBase} from '@/PaleGL/postprocess/PostProcessPassBase';
-import {Matrix4} from "@/PaleGL/math/Matrix4";
-import {GPU} from "@/PaleGL/core/GPU";
-
+import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { GPU } from '@/PaleGL/core/GPU';
 
 export class BufferVisualizerPass extends PostProcessPassBase {
-    constructor({gpu}: { gpu: GPU }) {
+    constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = bufferVisualizerPassFragmentShader;
 
         super({
@@ -37,6 +36,10 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                uLightShaftTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 uNearClip: {
                     type: UniformTypes.Float,
                     value: 0.1,
@@ -58,7 +61,7 @@ export class BufferVisualizerPass extends PostProcessPassBase {
     //     super.render(options);
     //     console.log(this.material.uniforms)
     // }
-    
+
     // setSize(width: number, height: number) {
     //     super.setSize(width, height);
     //     this.material.updateUniform('uTargetWidth', width);

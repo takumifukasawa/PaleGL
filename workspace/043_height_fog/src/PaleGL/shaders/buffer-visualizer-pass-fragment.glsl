@@ -12,6 +12,7 @@ uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uAmbientOcclusionTexture;
+uniform sampler2D uLightShaftTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
@@ -30,13 +31,15 @@ int bitShift(int data, int order) {
 }
 
 void main() {
-    vec2 gBufferAUV = vUv * 3. + vec2(0., -2.);
-    vec2 gBufferBUV = vUv * 3. + vec2(-1., -2.);
-    vec2 gBufferCUV = vUv * 3. + vec2(-2., -2.);
-    vec2 depthUV = vUv * 3. + vec2(0., -1.);
-    vec2 worldPositionUV = vUv * 3. + vec2(-1, -1.);
-    vec2 directionalLightShadowMapUV = vUv * 3. + vec2(-2., -1.);
-    vec2 aoUV = vUv * 3. + vec2(0., 0.);
+    vec2 tiling = vec2(3.);
+    vec2 gBufferAUV = vUv * tiling + vec2(0., -2.);
+    vec2 gBufferBUV = vUv * tiling + vec2(-1., -2.);
+    vec2 gBufferCUV = vUv * tiling + vec2(-2., -2.);
+    vec2 depthUV = vUv * tiling + vec2(0., -1.);
+    vec2 worldPositionUV = vUv * tiling + vec2(-1, -1.);
+    vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-2., -1.);
+    vec2 aoUV = vUv * tiling + vec2(0., 0.);
+    vec2 lightShaftUV = vUv * tiling + vec2(-1., 0.);
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);
@@ -61,6 +64,8 @@ void main() {
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
 
+    vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUV);
+
     // test bit
     // float roughness = gBufferA.a;
     // int packedA = int(gBufferA.a * 255.);
@@ -79,5 +84,6 @@ void main() {
         sceneDepth +
         directionalShadowMapColor +
         vec4(worldPosition, 1.) +
-        aoColor;
+        aoColor +
+        vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV);
 }

@@ -82,6 +82,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
+// import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
 // import {Actor} from "@/PaleGL/actors/Actor.ts";
 
@@ -326,6 +327,10 @@ bufferVisualizerPass.beforeRender = () => {
         'uAmbientOcclusionTexture',
         // renderer.ambientOcclusionRenderTarget.read.texture
         renderer.ambientOcclusionPass.renderTarget.read.texture
+    );
+    bufferVisualizerPass.material.updateUniform(
+        'uLightShaftTexture',
+        renderer.lightShaftPass.renderTarget.read.texture
     );
     // console.log(renderer.ambientOcclusionRenderTarget)
     // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
