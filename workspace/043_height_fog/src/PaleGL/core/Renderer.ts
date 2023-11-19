@@ -472,13 +472,13 @@ export class Renderer {
         // light shaft pass
         // ------------------------------------------------------------------------------
 
-        PostProcess.updatePassMaterial({
-            pass: this._lightShaftPass,
-            renderer: this,
-            targetCamera: this._scenePostProcess.postProcessCamera,
-            time,
-            lightActors,
-        });
+        // PostProcess.updatePassMaterial({
+        //     pass: this._lightShaftPass,
+        //     renderer: this,
+        //     targetCamera: this._scenePostProcess.postProcessCamera,
+        //     time,
+        //     lightActors,
+        // });
 
         // this._lightShaftPass.materials.forEach((mat) => {
         //     mat.updateUniform(
@@ -509,13 +509,13 @@ export class Renderer {
         // height fog pass
         // ------------------------------------------------------------------------------
 
-        PostProcess.updatePassMaterial({
-            pass: this._fogPass,
-            renderer: this,
-            targetCamera: this._scenePostProcess.postProcessCamera,
-            time,
-            lightActors,
-        });
+        // PostProcess.updatePassMaterial({
+        //     pass: this._fogPass,
+        //     renderer: this,
+        //     targetCamera: this._scenePostProcess.postProcessCamera,
+        //     time,
+        //     lightActors,
+        // });
 
         this._fogPass.setLightShaftMap(this._lightShaftPass.renderTarget);
 

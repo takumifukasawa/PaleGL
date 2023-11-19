@@ -1,4 +1,5 @@
 ﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material } from '@/PaleGL/materials/Material';

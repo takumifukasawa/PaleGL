@@ -126,7 +126,8 @@ export class SSAOPass extends PostProcessPassBase {
                 //     type: UniformTypes.Texture,
                 //     value: null,
                 // },
-                uDepthTexture: {
+                [UniformNames.DepthTexture]: {
+                // uDepthTexture: {
                     type: UniformTypes.Texture,
                     value: null,
                 },

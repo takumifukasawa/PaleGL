@@ -123,7 +123,7 @@ export class PostProcess {
      * @param lightActors
      */
     // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
-    static updatePassMaterial({
+    private static updatePassMaterial({
         pass,
         renderer,
         targetCamera,

@@ -254,9 +254,9 @@ if (directionalLight.shadowCamera) {
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 30;
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -1045,6 +1045,79 @@ function initDebugger() {
     });
 
     //
+    // light shaft
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft');
+
+    lightShaftDebuggerGroup.addToggleDebugger({
+        label: 'light shaft pass enabled',
+        initialValue: renderer.lightShaftPass.enabled,
+        onChange: (value) => (renderer.lightShaftPass.enabled = value),
+    });
+
+    lightShaftDebuggerGroup.addSliderDebugger({
+        label: 'blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.lightShaftPass.blendRate,
+        onChange: (value) => {
+            renderer.lightShaftPass.blendRate = value;
+        },
+    });
+
+    lightShaftDebuggerGroup.addSliderDebugger({
+        label: 'pass scale',
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.lightShaftPass.passScaleBase,
+        onChange: (value) => {
+            renderer.lightShaftPass.passScaleBase = value;
+        },
+    });
+
+    lightShaftDebuggerGroup.addSliderDebugger({
+        label: 'ray step strength',
+        minValue: 0.001,
+        maxValue: 0.05,
+        stepValue: 0.001,
+        initialValue: renderer.lightShaftPass.rayStepStrength,
+        onChange: (value) => {
+            renderer.lightShaftPass.rayStepStrength = value;
+        },
+    });
+
+    //
+    // light shaft
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const fogDebuggerGroup = debuggerGUI.addGroup('fog');
+
+    // fogDebuggerGroup.addToggleDebugger({
+    //     label: 'fog pass enabled',
+    //     initialValue: renderer.lightShaftPass.enabled,
+    //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
+    // });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'strength',
+        minValue: 0,
+        maxValue: 0.2,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.uFogStrength,
+        onChange: (value) => {
+            renderer.fogPass.uFogStrength = value;
+        },
+    });
+
+
+    //
     // depth of field
     //
 
@@ -1305,53 +1378,6 @@ function initDebugger() {
     //         ssrPass.blendRate = value;
     //     },
     // });
-
-    //
-    // light shaft
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft');
-
-    lightShaftDebuggerGroup.addToggleDebugger({
-        label: 'light shaft pass enabled',
-        initialValue: renderer.lightShaftPass.enabled,
-        onChange: (value) => (renderer.lightShaftPass.enabled = value),
-    });
-
-    lightShaftDebuggerGroup.addSliderDebugger({
-        label: 'blend rate',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.blendRate,
-        onChange: (value) => {
-            renderer.lightShaftPass.blendRate = value;
-        },
-    });
-
-    lightShaftDebuggerGroup.addSliderDebugger({
-        label: 'pass scale',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.passScaleBase,
-        onChange: (value) => {
-            renderer.lightShaftPass.passScaleBase = value;
-        },
-    });
-
-    lightShaftDebuggerGroup.addSliderDebugger({
-        label: 'ray step strength',
-        minValue: 0.001,
-        maxValue: 0.05,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayStepStrength,
-        onChange: (value) => {
-            renderer.lightShaftPass.rayStepStrength = value;
-        },
-    });
 
     //
     // fxaa
