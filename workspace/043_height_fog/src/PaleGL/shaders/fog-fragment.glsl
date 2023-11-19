@@ -43,7 +43,7 @@ float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, f
         ret = exp(tmp / kvy * (exp(-kvy) - 1.));
     }
     
-    return ret;
+    return 1. - ret;
 }
 
 float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float fogDensity, float fogEndHeight) {
@@ -83,17 +83,21 @@ void main() {
     float constantFogScale = .1;
   
     vec3 fogColor = vec3(.8);
+    // constant fog
+    // TODO: constant fog も考慮すべき？
     // カメラから見て奥は-z
     float rate = constantFogScale * max(0., 1. - exp(-uFogStrength * -viewPositionFromDepth.z));
     
-    // float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
-    float fogRate = calcFogHeightUniform(worldPositionFromDepth, uViewPosition, uFogDensity, uFogEndHeight);
+    float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
+    // float fogRate = calcFogHeightUniform(worldPositionFromDepth, uViewPosition, uFogDensity, uFogEndHeight);
     fogRate *= 1. - step(1. - .0001, rawDepth);
     fogRate = saturate(fogRate);
 
     destColor = sceneColor * (1. - occlusion);
 
     outColor = destColor;
+    
+    // TODO: light shaft を考慮
     outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, fogRate), 1.);
     
     // for debug
