@@ -8,12 +8,16 @@ import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constant
 export class FogPass extends PostProcessPassBase {
     private static lightShaftTextureUniformName = 'uLightShaftTexture';
 
-    uFogStrength: number = 0;
+    fogStrength: number = 0;
+    fogDensity = 0.01;
+    fogDensityAttenuation = 0.01;
 
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = fogFragmentShader;
         
         const fogStrength = 0.01;
+        const fogDensity = 0.01;
+        const fogDensityAttenuation = 0.01;
 
         super({
             gpu,
@@ -33,11 +37,21 @@ export class FogPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: fogStrength,
                 },
+                uFogDensity: {
+                    type: UniformTypes.Float,
+                    value: fogDensity
+                },
+                uFogDensityAttenuation: {
+                    type: UniformTypes.Float,
+                    value: fogDensityAttenuation
+                }
                 // ...PostProcessPassBase.commonUniforms,
             },
         });
         
-        this.uFogStrength = fogStrength;
+        this.fogStrength = fogStrength;
+        this.fogDensity = fogDensity;
+        this.fogDensityAttenuation = fogDensityAttenuation;
     }
 
     setLightShaftMap(rt: RenderTarget) {
@@ -45,8 +59,9 @@ export class FogPass extends PostProcessPassBase {
     }
     
     render(options: PostProcessPassRenderArgs) {
-        this.material.updateUniform('uFogStrength', this.uFogStrength);
-
+        this.material.updateUniform('uFogStrength', this.fogStrength);
+        this.material.updateUniform('uFogDensity', this.fogDensity);
+        this.material.updateUniform('uFogDensityAttenuation', this.fogDensityAttenuation);
         super.render(options);
     }   
 }

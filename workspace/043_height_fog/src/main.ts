@@ -1110,12 +1110,33 @@ function initDebugger() {
         minValue: 0,
         maxValue: 0.2,
         stepValue: 0.0001,
-        initialValue: renderer.fogPass.uFogStrength,
+        initialValue: renderer.fogPass.fogStrength,
         onChange: (value) => {
-            renderer.fogPass.uFogStrength = value;
+            renderer.fogPass.fogStrength = value;
         },
     });
 
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'density',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.fogDensity,
+        onChange: (value) => {
+            renderer.fogPass.fogDensity = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'attenuation',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.fogDensityAttenuation,
+        onChange: (value) => {
+            renderer.fogPass.fogDensityAttenuation = value;
+        },
+    });
 
     //
     // depth of field
