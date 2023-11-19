@@ -40,6 +40,10 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                uFogTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 uNearClip: {
                     type: UniformTypes.Float,
                     value: 0.1,

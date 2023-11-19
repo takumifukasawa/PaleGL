@@ -25,6 +25,7 @@ uniform vec3 uViewPosition;
 uniform float uFogStrength;
 uniform float uFogDensity;
 uniform float uFogDensityAttenuation;
+uniform float uFogEndHeight;
 
 #pragma DEPTH_FUNCTIONS
 
@@ -43,6 +44,27 @@ float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, f
     }
     
     return ret;
+}
+
+float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float fogDensity, float fogEndHeight) {
+    vec3 v = cameraPositionInWorld - objectPositionInWorld;
+    float t;
+    if(objectPositionInWorld.y < fogEndHeight) {
+        if(cameraPositionInWorld.y > fogEndHeight) {
+            t = (fogEndHeight - objectPositionInWorld.y) / v.y;
+        } else {
+            t = 1.;
+        }
+    } else {
+        if(cameraPositionInWorld.y < fogEndHeight) {
+            t = (cameraPositionInWorld.y - fogEndHeight) / v.y;
+        } else {
+            t = 0.;
+        }
+    }
+    float dist = length(v) * t;
+    float fog = exp(-dist * fogDensity);
+    return 1. - fog;
 }
 
 void main() {
@@ -64,18 +86,22 @@ void main() {
     // カメラから見て奥は-z
     float rate = constantFogScale * max(0., 1. - exp(-uFogStrength * -viewPositionFromDepth.z));
     
-    float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
+    // float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
+    float fogRate = calcFogHeightUniform(worldPositionFromDepth, uViewPosition, uFogDensity, uFogEndHeight);
     fogRate *= 1. - step(1. - .0001, rawDepth);
+    fogRate = saturate(fogRate);
 
     destColor = sceneColor * (1. - occlusion);
 
     outColor = destColor;
+    outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, fogRate), 1.);
     
     // for debug
     // outColor = vec4(vec3(occlusion), 1.);
-    outColor = vec4(vec3(sceneDepth), 1.);
-    outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, rate), 1.);
-    outColor = vec4(vec3(fogRate), 1.);
+    // outColor = vec4(vec3(sceneDepth), 1.);
+    // outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, rate), 1.);
+    // outColor = vec4(vec3(fogRate), 1.);
+    // outColor = vec4(vec3(worldPositionFromDepth.y), 1.);
     // outColor = vec4(worldPositionFromDepth, 1.);
     // outColor = vec4(vec3(uFogStrength), 1.);
 }           

@@ -13,6 +13,7 @@ uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uAmbientOcclusionTexture;
 uniform sampler2D uLightShaftTexture;
+uniform sampler2D uFogTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uShowGBuffer;
@@ -40,6 +41,7 @@ void main() {
     vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-2., -1.);
     vec2 aoUV = vUv * tiling + vec2(0., 0.);
     vec2 lightShaftUV = vUv * tiling + vec2(-1., 0.);
+    vec2 fogUV = vUv * tiling + vec2(-2., 0.);
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);
@@ -65,6 +67,7 @@ void main() {
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
 
     vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUV);
+    vec4 fogColor = texture(uFogTexture, fogUV);
 
     // test bit
     // float roughness = gBufferA.a;
@@ -85,5 +88,6 @@ void main() {
         directionalShadowMapColor +
         vec4(worldPosition, 1.) +
         aoColor +
-        vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV);
+        vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV) +
+        vec4(fogColor.rgb, 1.) * isArea(fogUV);
 }

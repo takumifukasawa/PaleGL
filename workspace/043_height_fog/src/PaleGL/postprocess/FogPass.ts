@@ -11,6 +11,7 @@ export class FogPass extends PostProcessPassBase {
     fogStrength: number = 0;
     fogDensity = 0.01;
     fogDensityAttenuation = 0.01;
+    fogEndHeight = 1.;
 
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = fogFragmentShader;
@@ -18,6 +19,7 @@ export class FogPass extends PostProcessPassBase {
         const fogStrength = 0.01;
         const fogDensity = 0.01;
         const fogDensityAttenuation = 0.01;
+        const fogEndHeight = 1.;
 
         super({
             gpu,
@@ -44,6 +46,10 @@ export class FogPass extends PostProcessPassBase {
                 uFogDensityAttenuation: {
                     type: UniformTypes.Float,
                     value: fogDensityAttenuation
+                },
+                uFogEndHeight: {
+                    type: UniformTypes.Float,
+                    value: fogEndHeight
                 }
                 // ...PostProcessPassBase.commonUniforms,
             },
@@ -52,6 +58,7 @@ export class FogPass extends PostProcessPassBase {
         this.fogStrength = fogStrength;
         this.fogDensity = fogDensity;
         this.fogDensityAttenuation = fogDensityAttenuation;
+        this.fogEndHeight = fogEndHeight;
     }
 
     setLightShaftMap(rt: RenderTarget) {
@@ -62,6 +69,7 @@ export class FogPass extends PostProcessPassBase {
         this.material.updateUniform('uFogStrength', this.fogStrength);
         this.material.updateUniform('uFogDensity', this.fogDensity);
         this.material.updateUniform('uFogDensityAttenuation', this.fogDensityAttenuation);
+        this.material.updateUniform('uFogEndHeight', this.fogEndHeight);
         super.render(options);
     }   
 }

@@ -332,6 +332,10 @@ bufferVisualizerPass.beforeRender = () => {
         'uLightShaftTexture',
         renderer.lightShaftPass.renderTarget.read.texture
     );
+    bufferVisualizerPass.material.updateUniform(
+        'uFogTexture',
+        renderer.fogPass.renderTarget.read.texture
+    );
     // console.log(renderer.ambientOcclusionRenderTarget)
     // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 };
@@ -1137,6 +1141,18 @@ function initDebugger() {
             renderer.fogPass.fogDensityAttenuation = value;
         },
     });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'fog end height',
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.fogEndHeight,
+        onChange: (value) => {
+            renderer.fogPass.fogEndHeight = value;
+        },
+    });
+
 
     //
     // depth of field
