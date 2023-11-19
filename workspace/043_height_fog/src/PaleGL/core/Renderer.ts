@@ -157,14 +157,18 @@ export class Renderer {
     //     return this._scenePostProcess;
     // }
 
-    get ambientOcclusionRenderTarget() {
-        // return this._ambientOcclusionRenderTarget;
-        return this._ambientOcclusionPass.renderTarget;
-    }
+    // get ambientOcclusionRenderTarget() {
+    //     // return this._ambientOcclusionRenderTarget;
+    //     return this._ambientOcclusionPass.renderTarget;
+    // }
 
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
+    
+    get ambientOcclusionPass() {
+        return this._ambientOcclusionPass;
+    }
 
     get lightShaftPass() {
         return this._lightShaftPass;

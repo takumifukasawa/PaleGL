@@ -14,23 +14,26 @@ export class DebuggerGUI {
 
         if (isRoot) {
             this.rootElement.style.cssText = `
-            background-color: rgb(200 200 255 / 70%);
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            box-sizing: border-box;
-            padding: 0px 10px 10px 10px;
-            display: grid;
-            justify-items: start;
-            
-            font-size: 9px;
-            font-weight: bold;
-            line-height: 1.2em;
-            min-width: 180px;
+                background-color: rgb(200 200 255 / 70%);
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                box-sizing: border-box;
+                padding: 0px 10px 10px 10px;
+                display: grid;
+                justify-items: start;
+                
+                font-size: 9px;
+                font-weight: bold;
+                line-height: 1.2em;
+                min-width: 200px;
         `;
         }
 
         this.contentElement = document.createElement('div');
+        this.contentElement.style.cssText = `
+            width: 100%;
+        `;
         this.rootElement.appendChild(this.contentElement);
     }
 
@@ -80,15 +83,16 @@ export class DebuggerGUI {
      *
      * @param name
      */
-    addGroup(name: string, initialHidden = false) {
+    addGroup(name: string, initialVisible = true) {
         const group = new DebuggerGUI(false);
 
         const label = document.createElement('p');
         label.textContent = name;
         label.style.cssText = `
+            font-size: 11px;
             font-style: italic;
             box-sizing: border-box;
-            padding: 8px 0 0 0;
+            padding: 4px 0 0 0;
             cursor: pointer;
         `;
         group.rootElement.insertBefore(label, group.contentElement);
@@ -115,10 +119,10 @@ export class DebuggerGUI {
             }
         });
 
-        if (initialHidden) {
-            hide();
-        } else {
+        if (initialVisible) {
             show();
+        } else {
+            hide();
         }
 
         this.contentElement.appendChild(group.domElement);
@@ -334,7 +338,7 @@ export class DebuggerGUI {
             width: 100%;
             height: 1px;
             border: none;
-            border-top: 1px solid black;
+            border-top: 1px solid #777;
             margin: 0.5em 0 0.25em 0;
         `;
         this.contentElement.appendChild(borderElement);
