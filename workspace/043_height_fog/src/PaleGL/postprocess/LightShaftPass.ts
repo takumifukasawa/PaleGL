@@ -271,7 +271,12 @@ export class LightShaftPass implements IPostProcessPass {
         //
 
         // -1 ~ 1 (in screen)
-        const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
+        // directional light の位置をそのまま使う場合
+        // const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
+        // 適当に遠いところに飛ばす場合 TODO: directionを考慮。位置だけだとダメ
+        const lightPositionInClip = targetCamera.transformScreenPoint(
+            this.#directionalLight!.transform.position.clone().scale(10000)
+        );
         // 0 ~ 1
         const lightPositionInUv = new Vector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
         // this.#directionalLight!.transform.getPositionInScreen(targetCamera);

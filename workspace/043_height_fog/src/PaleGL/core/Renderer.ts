@@ -34,6 +34,7 @@ import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
 import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
+import { HeightFogPass } from "@/PaleGL/postprocess/HeightFog.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -51,6 +52,8 @@ type RenderMeshInfoEachQueue = {
  * - post process pass
  * TODO:
  * - depth prepass 使わない場合。offscreen する時とか
+ * TODO:
+ * - offscreen rendering
  */
 export class Renderer {
     // --------------------------------------------------------------
@@ -117,6 +120,7 @@ export class Renderer {
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
 
         this._lightShaftPass = new LightShaftPass({ gpu });
+        this._heightFogPass = new HeightFogPass({ gpu });
 
         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
         this._depthOfFieldPass.enabled = false;
@@ -165,6 +169,10 @@ export class Renderer {
     get lightShaftPass() {
         return this._lightShaftPass;
     }
+    
+    get heightFogPass() {
+        return this._heightFogPass;
+    }
 
     get depthOfFieldPass() {
         return this._depthOfFieldPass;
@@ -211,6 +219,7 @@ export class Renderer {
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
         this._lightShaftPass.setSize(realWidth, realHeight);
+        this._heightFogPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
         this._bloomPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
@@ -492,7 +501,31 @@ export class Renderer {
             });
         }
 
-        // return;
+        // ------------------------------------------------------------------------------
+        // height fog pass
+        // ------------------------------------------------------------------------------
+
+        PostProcess.updatePassMaterial({
+            pass: this._heightFogPass,
+            renderer: this,
+            targetCamera: this._scenePostProcess.postProcessCamera,
+            time,
+            lightActors,
+        });
+
+        this._heightFogPass.setLightShaftMap(this._lightShaftPass.renderTarget);
+        
+        PostProcess.renderPass({
+            pass: this._heightFogPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: this._deferredShadingPass.renderTarget,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+            // lightActors,
+        });
 
         // ------------------------------------------------------------------------------
         // transparent pass
@@ -500,7 +533,8 @@ export class Renderer {
 
         // this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterDeferredShadingRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
-        this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
+        // this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
+        this._afterDeferredShadingRenderTarget.setTexture(this._heightFogPass.renderTarget.read.texture!);
 
         // pattern1: g-buffer depth
         // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
@@ -662,6 +696,7 @@ export class Renderer {
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
     private _lightShaftPass: LightShaftPass;
+    private _heightFogPass: HeightFogPass;
     private _depthOfFieldPass: DepthOfFieldPass;
     private _bloomPass: BloomPass;
     private _toneMappingPass: ToneMappingPass;
