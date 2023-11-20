@@ -178,7 +178,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // console.log('\n-----------\n');
 
                 // minify
-                const minifyCommand = `shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
+                const minifyCommand = `./libs/shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
                 console.log('command: ', minifyCommand);
                 await exec(minifyCommand).catch((error) => {
                     console.log('error: ', error);
