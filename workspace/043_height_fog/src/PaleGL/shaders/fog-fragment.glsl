@@ -73,6 +73,7 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, uv);
     vec4 destColor = sceneColor;
     vec4 lightShaftColor = texture(uLightShaftTexture, uv);
+    // 高ければ高いほど遮蔽されてる
     float occlusion = saturate(lightShaftColor.x);
 
     float rawDepth = texture(uDepthTexture, uv).x;
@@ -91,14 +92,14 @@ void main() {
     float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
     // float fogRate = calcFogHeightUniform(worldPositionFromDepth, uViewPosition, uFogDensity, uFogEndHeight);
     fogRate *= 1. - step(1. - .0001, rawDepth);
+    // fogRate *= saturate(1. - occlusion);
+    // fogRate *= saturate(occlusion);
+    // fogRate -= saturate(occlusion);
     fogRate = saturate(fogRate);
 
-    destColor = sceneColor * (1. - occlusion);
-
-    outColor = destColor;
-    
-    // TODO: light shaft を考慮
-    outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, fogRate), 1.);
+    // TODO: fog->occlusionの方が正しい？
+    vec4 applyOcclusionColor = sceneColor * (1. - occlusion);
+    outColor = vec4(mix(applyOcclusionColor.xyz, fogColor.xyz, fogRate), 1.);
     
     // for debug
     // outColor = vec4(vec3(occlusion), 1.);

@@ -1110,16 +1110,16 @@ function initDebugger() {
     //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
     // });
 
-    fogDebuggerGroup.addSliderDebugger({
-        label: 'strength',
-        minValue: 0,
-        maxValue: 0.2,
-        stepValue: 0.0001,
-        initialValue: renderer.fogPass.fogStrength,
-        onChange: (value) => {
-            renderer.fogPass.fogStrength = value;
-        },
-    });
+    // fogDebuggerGroup.addSliderDebugger({
+    //     label: 'strength',
+    //     minValue: 0,
+    //     maxValue: 0.2,
+    //     stepValue: 0.0001,
+    //     initialValue: renderer.fogPass.fogStrength,
+    //     onChange: (value) => {
+    //         renderer.fogPass.fogStrength = value;
+    //     },
+    // });
 
     fogDebuggerGroup.addSliderDebugger({
         label: 'density',
@@ -1143,16 +1143,16 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
-        label: 'fog end height',
-        minValue: -5,
-        maxValue: 5,
-        stepValue: 0.0001,
-        initialValue: renderer.fogPass.fogEndHeight,
-        onChange: (value) => {
-            renderer.fogPass.fogEndHeight = value;
-        },
-    });
+    // fogDebuggerGroup.addSliderDebugger({
+    //     label: 'fog end height',
+    //     minValue: -5,
+    //     maxValue: 5,
+    //     stepValue: 0.0001,
+    //     initialValue: renderer.fogPass.fogEndHeight,
+    //     onChange: (value) => {
+    //         renderer.fogPass.fogEndHeight = value;
+    //     },
+    // });
 
 
     //

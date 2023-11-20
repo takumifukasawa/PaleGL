@@ -17,8 +17,8 @@ export class FogPass extends PostProcessPassBase {
         const fragmentShader = fogFragmentShader;
         
         const fogStrength = 0.01;
-        const fogDensity = 0.01;
-        const fogDensityAttenuation = 0.01;
+        const fogDensity = 0.023;
+        const fogDensityAttenuation = 0.45;
         const fogEndHeight = 1.;
 
         super({
