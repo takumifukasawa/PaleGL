@@ -32,16 +32,16 @@ int bitShift(int data, int order) {
 }
 
 void main() {
-    vec2 tiling = vec2(3.);
-    vec2 gBufferAUV = vUv * tiling + vec2(0., -2.);
-    vec2 gBufferBUV = vUv * tiling + vec2(-1., -2.);
-    vec2 gBufferCUV = vUv * tiling + vec2(-2., -2.);
-    vec2 depthUV = vUv * tiling + vec2(0., -1.);
-    vec2 worldPositionUV = vUv * tiling + vec2(-1, -1.);
-    vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-2., -1.);
-    vec2 aoUV = vUv * tiling + vec2(0., 0.);
-    vec2 lightShaftUV = vUv * tiling + vec2(-1., 0.);
-    vec2 fogUV = vUv * tiling + vec2(-2., 0.);
+    vec2 tiling = vec2(4.);
+    vec2 gBufferAUV = vUv * tiling + vec2(0., -3.);
+    vec2 gBufferBUV = vUv * tiling + vec2(-1., -3.);
+    vec2 gBufferCUV = vUv * tiling + vec2(-2., -3.);
+    vec2 depthUV = vUv * tiling + vec2(-3., -3.);
+    vec2 worldPositionUV = vUv * tiling + vec2(0., -2.);
+    vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-1., -2.);
+    vec2 aoUV = vUv * tiling + vec2(-2., -2.);
+    vec2 lightShaftUV = vUv * tiling + vec2(-3., -2.);
+    vec2 fogUV = vUv * tiling + vec2(0., -1.);
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);

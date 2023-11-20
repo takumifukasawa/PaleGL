@@ -30,6 +30,7 @@ import { Skybox } from '@/PaleGL/actors/Skybox';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
+import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
 import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
@@ -118,7 +119,7 @@ export class Renderer {
 
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
-
+        this._ssrPass = new SSRPass({ gpu });
         this._lightShaftPass = new LightShaftPass({ gpu });
         this._fogPass = new FogPass({ gpu });
 
@@ -168,6 +169,10 @@ export class Renderer {
 
     get ambientOcclusionPass() {
         return this._ambientOcclusionPass;
+    }
+    
+    get ssrPass() {
+        return this._ssrPass;
     }
 
     get lightShaftPass() {
@@ -222,6 +227,7 @@ export class Renderer {
         // passes
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
+        this._ssrPass.setSize(realWidth, realHeight);
         this._lightShaftPass.setSize(realWidth, realHeight);
         this._fogPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
@@ -469,6 +475,22 @@ export class Renderer {
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
         // ------------------------------------------------------------------------------
+        // ssr pass
+        // ------------------------------------------------------------------------------
+
+        PostProcess.renderPass({
+            pass: this._ssrPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: this._deferredShadingPass.renderTarget,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+            // lightActors,
+        });
+
+        // ------------------------------------------------------------------------------
         // light shaft pass
         // ------------------------------------------------------------------------------
 
@@ -525,12 +547,13 @@ export class Renderer {
             targetCamera: camera,
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: this._deferredShadingPass.renderTarget,
+            // prevRenderTarget: this._deferredShadingPass.renderTarget,
+            prevRenderTarget: this._ssrPass.renderTarget,
             isLastPass: false,
             time, // TODO: engineから渡したい
             // lightActors,
         });
-        
+
         // ------------------------------------------------------------------------------
         // transparent pass
         // ------------------------------------------------------------------------------
@@ -699,6 +722,7 @@ export class Renderer {
     // pass
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
+    private _ssrPass: SSRPass;
     private _lightShaftPass: LightShaftPass;
     private _fogPass: FogPass;
     private _depthOfFieldPass: DepthOfFieldPass;
