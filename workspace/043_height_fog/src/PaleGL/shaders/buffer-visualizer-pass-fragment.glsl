@@ -12,6 +12,7 @@ uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uAmbientOcclusionTexture;
+uniform sampler2D uDeferredShadingTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uFogTexture;
 uniform float uNearClip;
@@ -40,8 +41,9 @@ void main() {
     vec2 worldPositionUV = vUv * tiling + vec2(0., -2.);
     vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-1., -2.);
     vec2 aoUV = vUv * tiling + vec2(-2., -2.);
-    vec2 lightShaftUV = vUv * tiling + vec2(-3., -2.);
-    vec2 fogUV = vUv * tiling + vec2(0., -1.);
+    vec2 deferredShadingUV = vUv * tiling + vec2(-3., -2.);
+    vec2 lightShaftUV = vUv * tiling + vec2(0., -1.);
+    vec2 fogUV = vUv * tiling + vec2(-1., -1.);
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);
@@ -65,7 +67,7 @@ void main() {
 
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
-
+    vec4 deferredShadingColor = texture(uDeferredShadingTexture, deferredShadingUV);
     vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUV);
     vec4 fogColor = texture(uFogTexture, fogUV);
 
@@ -88,6 +90,7 @@ void main() {
         directionalShadowMapColor +
         vec4(worldPosition, 1.) +
         aoColor +
+        vec4(deferredShadingColor.rgb, 1.) * isArea(deferredShadingUV) +
         vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV) +
         vec4(fogColor.rgb, 1.) * isArea(fogUV);
 }

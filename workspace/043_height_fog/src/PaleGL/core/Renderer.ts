@@ -174,6 +174,10 @@ export class Renderer {
     get ssrPass() {
         return this._ssrPass;
     }
+    
+    get deferredShadingPass() {
+        return this._deferredShadingPass;
+    }
 
     get lightShaftPass() {
         return this._lightShaftPass;

@@ -325,8 +325,11 @@ bufferVisualizerPass.beforeRender = () => {
     );
     bufferVisualizerPass.material.updateUniform(
         'uAmbientOcclusionTexture',
-        // renderer.ambientOcclusionRenderTarget.read.texture
         renderer.ambientOcclusionPass.renderTarget.read.texture
+    );
+    bufferVisualizerPass.material.updateUniform(
+        'uDeferredShadingTexture',
+        renderer.deferredShadingPass.renderTarget.read.texture
     );
     bufferVisualizerPass.material.updateUniform(
         'uLightShaftTexture',
@@ -336,8 +339,6 @@ bufferVisualizerPass.beforeRender = () => {
         'uFogTexture',
         renderer.fogPass.renderTarget.read.texture
     );
-    // console.log(renderer.ambientOcclusionRenderTarget)
-    // bufferVisualizerPass.material.updateUniform('uBaseColorTexture', renderer.deferredLightingPass.renderTarget.texture);
 };
 
 cameraPostProcess.enabled = true;

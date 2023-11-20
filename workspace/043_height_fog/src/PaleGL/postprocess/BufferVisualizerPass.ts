@@ -36,6 +36,10 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
+                uDeferredShadingTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 uLightShaftTexture: {
                     type: UniformTypes.Texture,
                     value: null,
