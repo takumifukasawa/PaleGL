@@ -51,7 +51,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     material: Material;
     private _renderTarget: RenderTarget;
 
-    materials: Material[];
+    materials: Material[] = [];
 
     beforeRender: (() => void) | null = null;
 
@@ -101,7 +101,6 @@ export class PostProcessPassBase implements IPostProcessPass {
     }) {
         // super({name});
         this.name = name;
-        this.materials = [];
 
         const baseVertexShader = PostProcessPassBase.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;

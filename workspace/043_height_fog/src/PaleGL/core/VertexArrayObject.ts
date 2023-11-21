@@ -13,7 +13,7 @@ type VertexBufferObject = {
 export class VertexArrayObject extends GLObject {
     private gpu: GPU;
     private vao: WebGLVertexArrayObject;
-    private vboList: VertexBufferObject[];
+    private vboList: VertexBufferObject[] = [];
     private ibo: IndexBufferObject | null = null;
 
     get hasIndices() {
@@ -48,8 +48,6 @@ export class VertexArrayObject extends GLObject {
         indices: number[] | null;
     }) {
         super();
-        
-        this.vboList = [];
 
         this.gpu = gpu;
 

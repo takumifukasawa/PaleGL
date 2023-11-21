@@ -20,7 +20,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {Vector4} from "@/PaleGL/math/Vector4.ts";
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement('canvas');
@@ -41,8 +41,8 @@ export class GPU {
     private vao: VertexArrayObject | null = null;
     private uniforms: Uniforms = {};
     dummyTexture: Texture;
-    private validExtensions: string[];
-    private invalidExtensions: string[];
+    private validExtensions: string[] = [];
+    private invalidExtensions: string[] = [];
 
     constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
@@ -52,8 +52,6 @@ export class GPU {
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
-        this.validExtensions = [];
-        this.invalidExtensions = [];
     }
 
     setShader(shader: Shader) {
@@ -108,11 +106,12 @@ export class GPU {
     }
 
     checkExtension(extensionName: string): boolean {
-        if (this.validExtensions.includes(extensionName)) {
+        if(this.validExtensions.includes(extensionName))
+        {
             return true;
         }
-
-        if (this.invalidExtensions.includes(extensionName)) {
+        
+        if(this.invalidExtensions.includes(extensionName)) {
             return false;
         }
 

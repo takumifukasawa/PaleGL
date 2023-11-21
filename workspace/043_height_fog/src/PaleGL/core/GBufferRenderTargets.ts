@@ -58,8 +58,6 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
 
     constructor({ gpu, name, width = 1, height = 1 }: { gpu: GPU; name: string; width: number; height: number }) {
         super();
-        
-        this._gBufferTextures = [];
 
         this.gpu = gpu;
 
@@ -90,7 +88,6 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             magFilter,
         });
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gBufferAAttachment, gl.TEXTURE_2D, this._gBufferATexture.glObject, 0);
-        console.log(this._gBufferTextures, this._gBufferATexture)
         this._gBufferTextures.push(this._gBufferATexture);
         this.framebuffer.registerDrawBuffer(gBufferAAttachment as GLColorAttachment);
 
