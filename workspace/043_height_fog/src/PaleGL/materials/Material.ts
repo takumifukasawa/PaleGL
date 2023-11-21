@@ -13,7 +13,7 @@ import {
     VertexShaderModifier,
     FragmentShaderModifier,
     DepthFuncType,
-    DepthFuncTypes,
+    DepthFuncTypes, RenderQueueType,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
@@ -228,7 +228,7 @@ export class Material {
         alphaTest = null,
         faceSide = FaceSide.Front,
         receiveShadow = false,
-        blendType,
+        blendType = BlendTypes.Opaque,
         renderQueue,
 
         useNormalMap = null,
@@ -298,17 +298,19 @@ export class Material {
         } else {
             switch (this.blendType) {
                 case BlendTypes.Opaque:
-                    this.renderQueue = RenderQueues.Opaque;
+                    this.renderQueue = RenderQueues[RenderQueueType.Opaque];
                     break;
                 case BlendTypes.Transparent:
                 case BlendTypes.Additive:
-                    this.renderQueue = RenderQueues.Transparent;
+                    this.renderQueue = RenderQueues[RenderQueueType.Transparent];
                     break;
             }
         }
+        
+        // console.log(renderQueue, this.renderQueue, this.blendType);
 
         if (!this.renderQueue) {
-            throw '[Material.constructor] invalid render queue';
+            console.error(`[Material.constructor] invalid render queue: ${renderQueue}`);
         }
 
         // skinning
