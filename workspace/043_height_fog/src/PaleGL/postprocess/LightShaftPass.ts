@@ -42,7 +42,7 @@ export class LightShaftPass implements IPostProcessPass {
     width: number = 1;
     height: number = 1;
 
-    materials: Material[] = [];
+    materials: Material[];
 
     #directionalLight: DirectionalLight | null = null;
 
@@ -65,6 +65,8 @@ export class LightShaftPass implements IPostProcessPass {
         // super();
 
         // this.gpu = gpu;
+        
+        this.materials = [];
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });

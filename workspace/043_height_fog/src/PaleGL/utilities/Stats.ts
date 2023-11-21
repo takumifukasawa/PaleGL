@@ -6,7 +6,7 @@ type PassInfo = { passLabel: string; vertexCount: number };
 
 export class Stats {
     domElement;
-    passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
+    passes: { groupLabel: string; passInfos: PassInfo[] }[];
     passInfoView;
     drawVertexCountView;
     drawCallCountView;
@@ -22,6 +22,7 @@ export class Stats {
      */
     constructor(args: { wrapperElement?: HTMLElement } = {}) {
         const {wrapperElement} = args;
+        this.passes = [];
         this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
 position: absolute;

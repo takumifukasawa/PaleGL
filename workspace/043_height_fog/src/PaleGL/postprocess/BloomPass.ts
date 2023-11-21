@@ -27,7 +27,7 @@ export class BloomPass implements IPostProcessPass {
     width: number = 1;
     height: number = 1;
 
-    materials: Material[] = [];
+    materials: Material[];
 
     private extractBrightnessPass;
 
@@ -75,6 +75,8 @@ export class BloomPass implements IPostProcessPass {
         // super();
 
         // this.gpu = gpu;
+        
+        this.materials = [];
 
         this.threshold = threshold;
         this.tone = tone;

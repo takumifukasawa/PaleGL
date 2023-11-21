@@ -46,7 +46,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     width: number = 1;
     height: number = 1;
 
-    materials: Material[] = [];
+    materials: Material[];
 
     get renderTarget() {
         return this.compositePass.renderTarget;
@@ -60,6 +60,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // super();
 
         // this.gpu = gpu;
+        
+        this.materials = [];
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });

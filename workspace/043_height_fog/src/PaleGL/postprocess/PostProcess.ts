@@ -26,7 +26,7 @@ type PostProcessRenderArgs = {
 
 // TODO: actorを継承してもいいかもしれない
 export class PostProcess {
-    passes: IPostProcessPass[] = [];
+    passes: IPostProcessPass[];
     // renderTarget;
     #postProcessCamera: Camera;
 
@@ -87,6 +87,8 @@ export class PostProcess {
         //     writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
         //     width: 1, height: 1,
         // });
+        
+        this.passes = [];
 
         if (postProcessCamera) {
             this.#postProcessCamera = postProcessCamera;
