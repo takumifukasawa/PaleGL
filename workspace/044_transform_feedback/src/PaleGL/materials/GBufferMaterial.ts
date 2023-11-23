@@ -51,7 +51,7 @@ export class GBufferMaterial extends Material {
         vertexShaderModifier = {},
         uniforms = {},
         ...options
-    }: GBufferMaterialArgs) {
+    }: GBufferMaterialArgs = {}) {
         // this.specularAmount =
 
         const baseUniforms: Uniforms = {

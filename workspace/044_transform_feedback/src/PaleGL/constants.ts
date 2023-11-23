@@ -279,6 +279,7 @@ export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 const ShaderModifierPragmas = {
     BEGIN_MAIN: 'BEGIN_MAIN',
     END_MAIN: 'END_MAIN',
+    UNIFORMS_BLOCK: 'UNIFORMS_BLOCK',
 } as const;
 
 type ShaderModifierPragmas = (typeof ShaderModifierPragmas)[keyof typeof ShaderModifierPragmas];

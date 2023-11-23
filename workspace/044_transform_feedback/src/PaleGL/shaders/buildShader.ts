@@ -181,6 +181,7 @@ export const buildVertexShader = (
         const attributes = buildVertexAttributeLayouts(attributeDescriptors);
         return attributes.join('\n');
     });
+    
 
     // replace shader block
     Object.keys(VertexShaderModifierPragmas).forEach((key) => {

@@ -19,9 +19,10 @@ uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
-
 uniform float uTime;
 
+#pragma UNIFORMS_BLOCK
+        
 #include ./partial/receive-shadow-vertex-uniforms.glsl
 #include ./partial/skinning-vertex-uniforms.glsl
 

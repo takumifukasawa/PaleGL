@@ -39,7 +39,7 @@ export class TransformFeedbackDoubleBuffer {
 
     // transformFeedback: TransformFeedback;
 
-    transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
+    private transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
 
     // outputs: {
     //     buffer: WebGLBuffer;
