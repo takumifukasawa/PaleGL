@@ -18,6 +18,7 @@ export type AttributeArgs = {
     offset?: number;
     usageType?: AttributeUsageType;
     divisor?: number;
+    // buffer?: WebGLBuffer | null;
 };
 
 export class Attribute {
@@ -28,6 +29,7 @@ export class Attribute {
     offset: number;
     usageType: AttributeUsageType;
     divisor: number;
+    // buffer: WebGLBuffer | null = null;
 
     constructor({
         name,
@@ -37,6 +39,7 @@ export class Attribute {
         offset = 0,
         usageType = AttributeUsageType.StaticDraw,
         divisor = 1, // TODO
+        // buffer = null,
     }: AttributeArgs) {
         this.name = name;
         this.data = data;
@@ -46,7 +49,12 @@ export class Attribute {
         this.offset = offset || 0;
         this.usageType = usageType || AttributeUsageType.StaticDraw;
         this.divisor = divisor || 0;
+        // this.buffer = buffer || null
     }
+    
+    // setBuffer(buffer: WebGLBuffer) {
+    //     this.buffer = buffer;
+    // }
 
     getDescriptor(): AttributeDescriptor {
         return {

@@ -82,6 +82,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
+import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -216,35 +217,36 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const transformFeedbackBuffer = new TransformFeedbackBuffer({
-    gpu,
-    attributes: [
-        new Attribute({
-            name: 'aPosition',
-            data: new Float32Array([1, 2, 3, 4, 5, 6]),
-            size: 3,
-            usageType: AttributeUsageType.DynamicDraw,
-        }),
-        new Attribute({
-            name: 'aVelocity',
-            data: new Float32Array([7, 8, 9, 10, 11, 12]),
-            size: 3,
-            usageType: AttributeUsageType.DynamicDraw,
-        }),
-    ],
-    varyings: [
-        {
-            name: 'vPosition',
-            data: new Float32Array([0, 0, 0, 0, 0, 0]),
-            // size: 3,
-        },
-        {
-            name: 'vVelocity',
-            data: new Float32Array([0, 0, 0, 0, 0, 0]),
-            // size: 3,
-        },
-    ],
-    vertexShader: `#version 300 es
+{
+    const transformFeedbackBuffer = new TransformFeedbackBuffer({
+        gpu,
+        attributes: [
+            new Attribute({
+                name: 'aPosition',
+                data: new Float32Array([1, 2, 3, 4, 5, 6]),
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+            new Attribute({
+                name: 'aVelocity',
+                data: new Float32Array([7, 8, 9, 10, 11, 12]),
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+        ],
+        varyings: [
+            {
+                name: 'vPosition',
+                data: new Float32Array([0, 0, 0, 0, 0, 0]),
+                // size: 3,
+            },
+            {
+                name: 'vVelocity',
+                data: new Float32Array([0, 0, 0, 0, 0, 0]),
+                // size: 3,
+            },
+        ],
+        vertexShader: `#version 300 es
 
         precision highp float;
 
@@ -259,22 +261,114 @@ const transformFeedbackBuffer = new TransformFeedbackBuffer({
             vVelocity = aVelocity * 3.;
         }
         `,
-    fragmentShader: `#version 300 es
+        fragmentShader: `#version 300 es
 
         precision highp float;
 
         void main() {
         }
         `,
-    drawCount: 2,
-});
-gpu.updateTransformFeedback(transformFeedbackBuffer);
-transformFeedbackBuffer.outputs.forEach(({ buffer }) => {
-    const results = new Float32Array(6);
-    gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
-    console.log(results);
-});
+        drawCount: 2,
+    });
+    gpu.updateTransformFeedback({
+        shader: transformFeedbackBuffer.shader,
+        vertexArrayObject: transformFeedbackBuffer.vertexArrayObject,
+        transformFeedback: transformFeedbackBuffer.transformFeedback,
+        drawCount: transformFeedbackBuffer.drawCount,
+    });
+    transformFeedbackBuffer.outputs.forEach(({ buffer }) => {
+        const results = new Float32Array(6);
+        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
+        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        console.log(results);
+    });
+
+    const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
+        gpu,
+        attributes: [
+            new Attribute({
+                name: 'aPosition',
+                data: new Float32Array([1, 2, 3, 4, 5, 6]),
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+            new Attribute({
+                name: 'aVelocity',
+                data: new Float32Array([7, 8, 9, 10, 11, 12]),
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+        ],
+        varyings: [
+            {
+                name: 'vPosition',
+                data: new Float32Array([0, 0, 0, 0, 0, 0]),
+                // size: 3,
+            },
+            {
+                name: 'vVelocity',
+                data: new Float32Array([0, 0, 0, 0, 0, 0]),
+                // size: 3,
+            },
+        ],
+        vertexShader: `#version 300 es
+
+        precision highp float;
+
+        layout(location = 0) in vec3 aPosition;
+        layout(location = 1) in vec3 aVelocity;
+
+        out vec3 vPosition;
+        out vec3 vVelocity;
+
+        void main() {
+            vPosition = aPosition * 2.;
+            vVelocity = aVelocity * 3.;
+        }
+        `,
+        fragmentShader: `#version 300 es
+
+        precision highp float;
+
+        void main() {
+        }
+        `,
+        drawCount: 2,
+    });
+    console.log("===============================")
+    const logBuffer = (buffer: WebGLBuffer, len: number) => {
+        const results = new Float32Array(len);
+        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
+        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        console.log(results);
+    }
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aPosition"), 6);
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aVelocity"), 6);
+    
+    gpu.updateTransformFeedback({
+        shader: transformFeedbackDoubleBuffer.shader,
+        vertexArrayObject: transformFeedbackDoubleBuffer.read.vertexArrayObject,
+        transformFeedback: transformFeedbackDoubleBuffer.read.transformFeedback,
+        drawCount: transformFeedbackDoubleBuffer.drawCount,
+    });
+    transformFeedbackDoubleBuffer.swap();
+    
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aPosition"), 6);
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aVelocity"), 6);
+    
+    gpu.updateTransformFeedback({
+        shader: transformFeedbackDoubleBuffer.shader,
+        vertexArrayObject: transformFeedbackDoubleBuffer.read.vertexArrayObject,
+        transformFeedback: transformFeedbackDoubleBuffer.read.transformFeedback,
+        drawCount: transformFeedbackDoubleBuffer.drawCount,
+    });
+    transformFeedbackDoubleBuffer.swap();
+    
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aPosition"), 6);
+    logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aVelocity"), 6);
+}
 
 const engine = new Engine({ gpu, renderer });
 

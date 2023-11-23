@@ -38,15 +38,7 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
-    constructor({
-        gpu,
-        attributes = [],
-        indices,
-    }: {
-        gpu: GPU;
-        attributes: Attribute[];
-        indices?: number[] | null;
-    }) {
+    constructor({ gpu, attributes = [], indices }: { gpu: GPU; attributes: Attribute[]; indices?: number[] | null }) {
         super();
 
         this.gpu = gpu;
@@ -83,31 +75,16 @@ export class VertexArrayObject extends GLObject {
             this.ibo.unbind();
         }
     }
-    
+
     bind() {
-        const { gl} = this.gpu;
+        const { gl } = this.gpu;
         gl.bindVertexArray(this.glObject);
     }
-    
+
     unbind() {
-        const { gl} = this.gpu;
+        const { gl } = this.gpu;
         gl.bindVertexArray(null);
     }
-
-    updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
-        const gl = this.gpu.gl;
-        const targetVBO = this.vboList.find(({ name }) => key === name);
-        if (!targetVBO) {
-            throw 'invalid target vbo';
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
-        gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
-    
-    // getBuffers() {
-    //     return this.vboList.map(({ vbo }) => vbo);
-    // }
 
     setAttribute(attribute: Attribute, push = false) {
         const gl = this.gpu.gl;
@@ -152,5 +129,59 @@ export class VertexArrayObject extends GLObject {
             gl.bindVertexArray(null);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
+    }
+
+    updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
+        const gl = this.gpu.gl;
+        // const targetVBO = this.vboList.find(({ name }) => key === name);
+        const targetVBO = this.findVertexBufferObjectInfo(key);
+        // if (!targetVBO) {
+        //     throw 'invalid target vbo';
+        // }
+        gl.bindBuffer(gl.ARRAY_BUFFER, targetVBO.vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+
+    // setBuffer(key: string, buffer: WebGLBuffer) {
+    //     const gl = this.gpu.gl;
+    //     // const targetVBO = this.vboList.find(({ name }) => key === name);
+    //     const targetVBO = this.findVertexBufferObjectInfo(key);
+    //     // if (!targetVBO) {
+    //     //     throw 'invalid target vbo';
+    //     // }
+    //     gl.bindVertexArray(this.vao);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    //     gl.bufferData(gl.ARRAY_BUFFER, , targetVBO.usage);
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    //     gl.bindVertexArray(null);
+    // }
+
+    getBuffers() {
+        return this.vboList.map(({ vbo }) => vbo);
+    }
+
+    // getBuffer(name: string) {
+    //     const buffer = this.vboList.find(({ name: key }) => key === name);
+    //     if (!buffer) {
+    //         throw 'invalid name';
+    //     }
+    //     return buffer;
+    // }
+
+    findVertexBufferObjectInfo(key: string) {
+        const vbo = this.vboList.find(({ name }) => key === name);
+        if (!vbo) {
+            throw 'invalid target vbo';
+        }
+        return vbo;
+    }
+
+    findBuffer(key: string) {
+        const target = this.findVertexBufferObjectInfo(key);
+        if (!target) {
+            throw 'invalid name';
+        }
+        return target.vbo;
     }
 }

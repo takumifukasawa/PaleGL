@@ -24,8 +24,6 @@ type GeometryArgs = {
     // }[]
 };
 
-// NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
-// TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 export class TransformFeedbackBuffer {
     // private gpu: GPU;
 
@@ -63,20 +61,7 @@ export class TransformFeedbackBuffer {
             attributes,
         });
 
-        // default
-        // (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
-        //     this.setAttribute(attribute);
-        // });
-        // attributes
-        //     .filter((e) => Object.keys(e).length > 0)
-        //     .forEach((attribute) => {
-        //         this.setAttribute(attribute);
-        //     });
-        // attributes.forEach(attribute => {
-        //     console.log(attribute.data.length);
-        // });
-
-        const buffers = varyings.map(({ data }) => {
+        const outputBuffers = varyings.map(({ data }) => {
             const buffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -87,73 +72,6 @@ export class TransformFeedbackBuffer {
             return buffer!;
         });
 
-        this.transformFeedback = new TransformFeedback({ gpu, buffers });
+        this.transformFeedback = new TransformFeedback({ gpu, buffers: outputBuffers });
     }
-
-    /**
-     *
-     * @param attribute
-     */
-    // setAttribute(attribute: Attribute) {
-    //     const location = attribute.location ? attribute.location : this.attributes.length;
-
-    //     const attr = new Attribute({
-    //         name: attribute.name,
-    //         data: attribute.data,
-    //         location,
-    //         size: attribute.size,
-    //         offset: attribute.offset,
-    //         usageType: attribute.usageType || AttributeUsageType.StaticDraw,
-    //         divisor: attribute.divisor,
-    //     });
-    //     this.attributes.push(attr);
-
-    //     this.vertexArrayObject.setAttribute(attr, true);
-    // }
-
-    // #createGeometry({ gpu }: { gpu: GPU }) {
-    //     console.log('[Geometry.createGeometry]', this.attributes);
-
-    //     // fallback
-    //     // TODO: fix
-    //     this.attributes.forEach((attribute, i) => {
-    //         attribute.location = i;
-    //         attribute.divisor = 0;
-    //         console.log('force: ', attribute);
-    //     });
-
-    //     this.vertexArrayObject = new VertexArrayObject({
-    //         gpu,
-    //         attributes: this.attributes,
-    //     });
-    // }
-
-    // start() {
-    //     if (!this.vertexArrayObject) {
-    //         this.#createGeometry({ gpu: this.gpu });
-    //     }
-    // }
-
-    // update() {
-    //     if (!this.vertexArrayObject) {
-    //         this.#createGeometry({ gpu: this.gpu });
-    //     }
-    // }
-
-    // updateAttribute(key: string, data: Float32Array) {
-    //     const attribute = this.attributes.find(({ name }) => name === key);
-    //     if (!attribute) {
-    //         throw 'invalid attribute';
-    //     }
-    //     attribute.data = data;
-    //     this.vertexArrayObject.updateAttribute(key, attribute.data);
-    // }
-
-    // getAttribute(key: string) {
-    //     return this.attributes.find(({ name }) => name === key);
-    // }
-
-    // getAttributeDescriptors() {
-    //     return this.attributes.map((attribute) => attribute.getDescriptor());
-    // }
 }
