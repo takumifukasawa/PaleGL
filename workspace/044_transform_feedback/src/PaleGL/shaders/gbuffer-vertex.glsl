@@ -4,6 +4,8 @@
 
 #pragma ATTRIBUTES
 
+#pragma APPND_ATTRIBUTES
+
 #include ./partial/skinning-vertex-functions.glsl
 
 // varyings

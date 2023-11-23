@@ -69,7 +69,8 @@ import {
     CubeMapAxis,
     RenderTargetTypes,
     AttributeNames,
-    AttributeUsageType, VertexShaderModifierPragmas,
+    AttributeUsageType,
+    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -345,7 +346,7 @@ cameraPostProcess.enabled = true;
 captureSceneCamera.setPostProcess(cameraPostProcess);
 
 /**
- * 
+ *
  */
 const createTransformFeedbackDrivenMesh = () => {
     const transformFeedbackBuffer = new TransformFeedbackBuffer({
@@ -502,7 +503,18 @@ const createTransformFeedbackDrivenMesh = () => {
     const planeGeometryData = createPlaneGeometryData();
     const geometry = new Geometry({
         gpu,
-        attributes: planeGeometryData.attributes,
+        attributes: [
+            ...planeGeometryData.attributes,
+            new Attribute({
+                name: 'aVelocity',
+                data: new Float32Array(
+                    new Array(4).fill(0).map(() => {
+                        return 0;
+                    })
+                ),
+                size: 3,
+            }),
+        ],
         indices: planeGeometryData.indices,
         drawCount: planeGeometryData.drawCount,
     });
@@ -511,23 +523,25 @@ const createTransformFeedbackDrivenMesh = () => {
     // });
     const material = new GBufferMaterial({
         vertexShaderModifier: {
-            [VertexShaderModifierPragmas.UNIFORMS_BLOCK]: `uniform float uTest;`
-        }
+            // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
+            [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
+        },
     });
     const mesh = new Mesh({
         geometry,
         material,
     });
+    console.log(geometry)
     mesh.transform.setScaling(new Vector3(3, 3, 3));
     mesh.onUpdate = () => {
-        // console.log(material.rawVertexShader)
-    }
+        // mesh.geometry.vertexArrayObject.upda
+    };
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
 };
 
 /**
- * 
+ *
  */
 const createGLTFSphereMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
@@ -552,7 +566,7 @@ const createGLTFSphereMesh = async () => {
 };
 
 /**
- * 
+ *
  */
 const createGLTFSkinnedMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfLGlassModelUrl });
