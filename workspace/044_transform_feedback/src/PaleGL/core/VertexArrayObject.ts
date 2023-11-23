@@ -16,26 +16,18 @@ export class VertexArrayObject extends GLObject {
     private vboList: VertexBufferObject[] = [];
     private ibo: IndexBufferObject | null = null;
 
+    /**
+     * 
+     */
     get hasIndices() {
         return !!this.ibo;
     }
 
+    /**
+     * 
+     */
     get glObject() {
         return this.vao;
-    }
-
-    // get vboList() {
-    // }
-
-    getUsage(gl: WebGL2RenderingContext, usageType: AttributeUsageType) {
-        switch (usageType) {
-            case AttributeUsageType.StaticDraw:
-                return gl.STATIC_DRAW;
-            case AttributeUsageType.DynamicDraw:
-                return gl.DYNAMIC_DRAW;
-            default:
-                throw '[VertexArrayObject.getUsage] invalid usage';
-        }
     }
 
     constructor({ gpu, attributes = [], indices }: { gpu: GPU; attributes: Attribute[]; indices?: number[] | null }) {
@@ -76,16 +68,43 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
+    /**
+     * 
+     * @param gl
+     * @param usageType
+     */
+    getUsage(gl: WebGL2RenderingContext, usageType: AttributeUsageType) {
+        switch (usageType) {
+            case AttributeUsageType.StaticDraw:
+                return gl.STATIC_DRAW;
+            case AttributeUsageType.DynamicDraw:
+                return gl.DYNAMIC_DRAW;
+            default:
+                throw '[VertexArrayObject.getUsage] invalid usage';
+        }
+    }
+
+    /**
+     * 
+     */
     bind() {
         const { gl } = this.gpu;
         gl.bindVertexArray(this.glObject);
     }
 
+    /**
+     * 
+     */
     unbind() {
         const { gl } = this.gpu;
         gl.bindVertexArray(null);
     }
 
+    /**
+     * 
+     * @param attribute
+     * @param push
+     */
     setAttribute(attribute: Attribute, push = false) {
         const gl = this.gpu.gl;
 
@@ -131,6 +150,11 @@ export class VertexArrayObject extends GLObject {
         }
     }
 
+    /**
+     * 
+     * @param key
+     * @param data
+     */
     updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
         const gl = this.gpu.gl;
         // const targetVBO = this.vboList.find(({ name }) => key === name);
@@ -157,6 +181,9 @@ export class VertexArrayObject extends GLObject {
     //     gl.bindVertexArray(null);
     // }
 
+    /**
+     * 
+     */
     getBuffers() {
         return this.vboList.map(({ vbo }) => vbo);
     }
@@ -169,6 +196,10 @@ export class VertexArrayObject extends GLObject {
     //     return buffer;
     // }
 
+    /**
+     * 
+     * @param key
+     */
     findVertexBufferObjectInfo(key: string) {
         const vbo = this.vboList.find(({ name }) => key === name);
         if (!vbo) {
@@ -177,6 +208,10 @@ export class VertexArrayObject extends GLObject {
         return vbo;
     }
 
+    /**
+     * 
+     * @param key
+     */
     findBuffer(key: string) {
         const target = this.findVertexBufferObjectInfo(key);
         if (!target) {

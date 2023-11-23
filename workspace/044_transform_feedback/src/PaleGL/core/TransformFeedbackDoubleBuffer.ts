@@ -46,40 +46,22 @@ export class TransformFeedbackDoubleBuffer {
     //     // size: number
     // }[] = [];
 
+    // NOTE: readもwriteも実態は同じだがapiとして分ける
+    
     get read() {
-        // return { buffers: this.transformFeedbackBuffers[0] };
         const buffer = this.transformFeedbackBuffers[0];
         return {
             vertexArrayObject: buffer.srcVertexArrayObject,
-            transformFeedback: this.transformFeedbackBuffers[0].transformFeedback,
+            transformFeedback: buffer.transformFeedback,
         }
     }
     get write() {
-        const buffer = this.transformFeedbackBuffers[1];
-        // return { buffers: this.transformFeedbackBuffers[0] };
+        const buffer = this.transformFeedbackBuffers[0];
         return {
             vertexArrayObject: buffer.srcVertexArrayObject,
-            transformFeedback: this.transformFeedbackBuffers[0].transformFeedback,
+            transformFeedback: buffer.transformFeedback,
         }
     }
-
-    // getBuffer(name: string): WebGLBuffer {
-    //     // const vao = this.read.srcVertexArrayObject;
-    //     const vao = this.write.srcVertexArrayObject;
-    //     const vboInfo = vao.findVertexBufferObjectInfo(name);
-    //     return vboInfo.vbo;
-    //     
-    //     // const { attributes } = this.transformFeedbackBuffers[0];
-    //     // const targetAttribute = attributes.find((attribute) => attribute.name == name);
-    //     // if (!targetAttribute) {
-    //     //     throw 'invalid attribute name';
-    //     // }
-    //     // return targetAttribute.data;
-    // }
-
-    // get write() {
-    //     return { buffers: this.buffers[1].outputVertexArrayobject };
-    // }
 
     constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings }: GeometryArgs) {
         // this.gpu = gpu;

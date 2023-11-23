@@ -349,8 +349,8 @@ const renderer = new Renderer({
     
     gpu.updateTransformFeedback({
         shader: transformFeedbackDoubleBuffer.shader,
-        vertexArrayObject: transformFeedbackDoubleBuffer.read.vertexArrayObject,
-        transformFeedback: transformFeedbackDoubleBuffer.read.transformFeedback,
+        vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
+        transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
         drawCount: transformFeedbackDoubleBuffer.drawCount,
     });
     transformFeedbackDoubleBuffer.swap();
@@ -360,12 +360,12 @@ const renderer = new Renderer({
     
     gpu.updateTransformFeedback({
         shader: transformFeedbackDoubleBuffer.shader,
-        vertexArrayObject: transformFeedbackDoubleBuffer.read.vertexArrayObject,
-        transformFeedback: transformFeedbackDoubleBuffer.read.transformFeedback,
+        vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
+        transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
         drawCount: transformFeedbackDoubleBuffer.drawCount,
     });
     transformFeedbackDoubleBuffer.swap();
-    
+
     logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aPosition"), 6);
     logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer("aVelocity"), 6);
 }
