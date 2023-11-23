@@ -1,5 +1,6 @@
 ﻿// -----------------------------------------------------------------------------
 // engine
+// TODO: ビルド最適化のために一個一個exportする
 // -----------------------------------------------------------------------------
 
 export const PrimitiveTypes = {
@@ -30,6 +31,7 @@ export const BlendTypes = {
 export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
 
 export const RenderQueueType = {
+    // TransformFeedback: 'TransformFeedback',
     Skybox: 'Skybox',
     Opaque: 'Opaque',
     AlphaTest: 'AlphaTest',

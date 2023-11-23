@@ -20,7 +20,8 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import { TransformFeedbackBuffer } from '@/PaleGL/geometries/TransformFeedbackBuffer.ts';
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement('canvas');
@@ -38,12 +39,17 @@ export const createWhite1x1: () => HTMLCanvasElement = () => {
 export class GPU {
     gl: WebGL2RenderingContext;
     private shader: Shader | null = null;
+    // private transformFeedback: TransformFeedback | null = null;
     private vao: VertexArrayObject | null = null;
     private uniforms: Uniforms = {};
     dummyTexture: Texture;
     private validExtensions: string[] = [];
     private invalidExtensions: string[] = [];
 
+    /**
+     *
+     * @param gl
+     */
     constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
         this.dummyTexture = new Texture({
@@ -54,22 +60,45 @@ export class GPU {
         });
     }
 
+    /**
+     *
+     * @param shader
+     */
     setShader(shader: Shader) {
         this.shader = shader;
     }
 
+    /**
+     *
+     * @param vao
+     */
     setVertexArrayObject(vao: VertexArrayObject) {
         this.vao = vao;
     }
 
+    /**
+     *
+     * @param uniforms
+     */
     setUniforms(uniforms: Uniforms) {
         this.uniforms = uniforms;
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
     setSize(x: number, y: number, width: number, height: number) {
         this.gl.viewport(x, y, width, height);
     }
 
+    /**
+     *
+     * @param framebuffer
+     */
     setFramebuffer(framebuffer: Framebuffer | null) {
         const gl = this.gl;
         if (!framebuffer) {
@@ -87,10 +116,20 @@ export class GPU {
         //     : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
+    /**
+     *
+     */
     flush() {
         this.gl.flush();
     }
 
+    /**
+     *
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
     clear(r: number, g: number, b: number, a: number) {
         const gl = this.gl;
         // TODO: mask設定は外側からやった方がよい気がする
@@ -105,13 +144,16 @@ export class GPU {
         // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
+    /**
+     *
+     * @param extensionName
+     */
     checkExtension(extensionName: string): boolean {
-        if(this.validExtensions.includes(extensionName))
-        {
+        if (this.validExtensions.includes(extensionName)) {
             return true;
         }
-        
-        if(this.invalidExtensions.includes(extensionName)) {
+
+        if (this.invalidExtensions.includes(extensionName)) {
             return false;
         }
 
@@ -124,6 +166,11 @@ export class GPU {
         return true;
     }
 
+    /**
+     *
+     * @param primitiveType
+     * @private
+     */
     #getGLPrimitive(primitiveType: PrimitiveType) {
         const gl = this.gl;
         switch (primitiveType) {
@@ -138,9 +185,49 @@ export class GPU {
         }
     }
 
-    // TODO:
-    // - start offset と instanceCount は逆の方が良い
-    // - なんなら object destructuring の方がよさそう
+    // setTransformFeedback() {
+    // }
+
+    updateTransformFeedback(transformFeedbackBuffer: TransformFeedbackBuffer) {
+        const gl = this.gl;
+
+        const { shader, vertexArrayObject, drawCount, transformFeedback } = transformFeedbackBuffer;
+
+        gl.bindVertexArray(vertexArrayObject.glObject);
+
+        gl.useProgram(shader.glObject);
+
+        gl.enable(gl.RASTERIZER_DISCARD);
+
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback.glObject);
+        gl.beginTransformFeedback(gl.POINTS);
+        gl.drawArrays(gl.POINTS, 0, drawCount);
+        gl.endTransformFeedback();
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+
+        gl.disable(gl.RASTERIZER_DISCARD);
+
+        gl.useProgram(null);
+
+        gl.bindVertexArray(null);
+    }
+
+    /**
+     *
+     * TODO:
+     * - start offset と instanceCount は逆の方が良い
+     * - なんなら object destructuring の方がよさそう
+     *
+     * @param drawCount
+     * @param primitiveType
+     * @param depthTest
+     * @param depthWrite
+     * @param depthFuncType
+     * @param blendType
+     * @param faceSide
+     * @param instanceCount
+     * @param startOffset
+     */
     draw(
         drawCount: number,
         primitiveType: PrimitiveType,

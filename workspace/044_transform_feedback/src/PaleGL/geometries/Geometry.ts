@@ -19,6 +19,7 @@ export type GeometryArgs = {
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
+// TODO: vaoの生成2回走ってる
 export class Geometry {
     attributes: Attribute[] = [];
     vertexCount: number = 0;

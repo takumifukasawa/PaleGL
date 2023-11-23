@@ -1,5 +1,29 @@
-﻿import { GLObject } from '@/PaleGL/core/GLObject';
-import { GPU } from '@/PaleGL/core/GPU';
+﻿import {GLObject} from '@/PaleGL/core/GLObject';
+import {GPU} from '@/PaleGL/core/GPU';
+
+type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[]; };
+
+function createShader(
+    gl: WebGL2RenderingContext,
+    type: number,
+    src: string) {
+    // create vertex shader
+    const shader = gl.createShader(type);
+    if (!shader) {
+        throw new Error('invalid shader');
+    }
+    // set shader source (string)
+    gl.shaderSource(shader, src);
+    // compile shader
+    gl.compileShader(shader);
+    // check shader info log
+    const info = gl.getShaderInfoLog(shader);
+    if (!!info && info.length > 0) {
+        throw Shader.buildErrorInfo(info, src, '[Shader] shader has error');
+    }
+
+    return shader;
+}
 
 export class Shader extends GLObject {
     private program: WebGLProgram;
@@ -8,72 +32,61 @@ export class Shader extends GLObject {
         return this.program;
     }
 
-    constructor({ gpu, vertexShader, fragmentShader }: { gpu: GPU; vertexShader: string; fragmentShader: string }) {
+    constructor({gpu, vertexShader, fragmentShader, transformFeedbackVaryings}: ShaderParams) {
         super();
 
-        // cache
-        const gl = gpu.gl;
-
-        // vertex shader
-
-        // create vertex shader
-        const vs = gl.createShader(gl.VERTEX_SHADER);
-        if (!vs) {
-            throw new Error('invalid vs');
-        }
-        // set shader source (string)
-        gl.shaderSource(vs, vertexShader);
-        // compile vertex shader
-        gl.compileShader(vs);
-        // check shader info log
-        const vsInfo = gl.getShaderInfoLog(vs);
-        if (!!vsInfo && vsInfo.length > 0) {
-            const errorInfo = Shader.buildErrorInfo(vsInfo, vertexShader, '[Shader] vertex shader has error');
-            throw errorInfo;
-        }
-
-        // fragment shader
-        
-        // create fragment shader
-        const fs = gl.createShader(gl.FRAGMENT_SHADER);
-        if (!fs) {
-            throw new Error('invalid fs');
-        }
-        // set shader source (string)
-        gl.shaderSource(fs, fragmentShader);
-        // compile fragment shader
-        gl.compileShader(fs);
-        const fsInfo = gl.getShaderInfoLog(fs);
-        // check shader info log
-        if (!!fsInfo && fsInfo.length > 0) {
-            const errorInfo = Shader.buildErrorInfo(fsInfo, fragmentShader, '[Shader] fragment shader has error');
-            throw errorInfo;
-        }
-
-        // program object
-
+        const {gl} = gpu;
         const program = gl.createProgram();
+
         if (!program) {
             throw new Error('invalid program');
         }
-        this.program = program;
 
-        // attach shaders
-        gl.attachShader(this.program, vs);
-        gl.attachShader(this.program, fs);
+        //
+        // vertex shader
+        //
+
+        const vs = createShader(gl, gl.VERTEX_SHADER, vertexShader);
+        gl.attachShader(program, vs);
+
+        //
+        // fragment shader
+        //
+
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, fragmentShader)
+        gl.attachShader(program, fs);
+
+        //
+        // transform feedback
+        //
+
+        if (transformFeedbackVaryings && transformFeedbackVaryings.length > 0) {
+            gl.transformFeedbackVaryings(
+                program,
+                transformFeedbackVaryings,
+                // bufferと頂点属性が別の場合に限定している
+                gl.SEPARATE_ATTRIBS // or INTERLEAVED_ATTRIBS
+            );
+        }
+
+        //
+        // program object
+        //
 
         // program link to gl context
-        gl.linkProgram(this.program);
-       
+        gl.linkProgram(program);
+
         // for debug
         // console.log(vertexShader)
         // console.log(fragmentShader)
 
         // check program info log
-        const programInfo = gl.getProgramInfoLog(this.program);
+        const programInfo = gl.getProgramInfoLog(program);
         if (!!programInfo && programInfo.length > 0) {
             throw programInfo;
         }
+
+        this.program = program;
     }
 
     static buildErrorInfo(infoLog: string, shaderSource: string, header: string) {
@@ -86,11 +99,11 @@ ${infoLog}
 ---
             
 ${shaderSource
-    .split('\n')
-    .map((line, i) => {
-        return `${i + 1}: ${line}`;
-    })
-    .join('\n')}       
+            .split('\n')
+            .map((line, i) => {
+                return `${i + 1}: ${line}`;
+            })
+            .join('\n')}       
 `;
     }
 }

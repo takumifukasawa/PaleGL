@@ -41,11 +41,11 @@ export class VertexArrayObject extends GLObject {
     constructor({
         gpu,
         attributes = [],
-        indices = null,
+        indices,
     }: {
         gpu: GPU;
         attributes: Attribute[];
-        indices: number[] | null;
+        indices?: number[] | null;
     }) {
         super();
 
@@ -59,26 +59,39 @@ export class VertexArrayObject extends GLObject {
         this.vao = vao;
 
         // bind vertex array to webgl context
-        gl.bindVertexArray(this.vao);
+        // gl.bindVertexArray(this.vao);
+        this.bind();
 
         attributes.forEach((attribute) => {
-            this.setAttribute(attribute);
+            this.setAttribute(attribute, true);
         });
 
         if (indices) {
             this.ibo = new IndexBufferObject({ gpu, indices });
         }
 
-        // unbind vertex array to webgl context
-        gl.bindVertexArray(null);
-
+        // set attribute の方でやってるのでいらないはず
         // unbind array buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        // unbind vertex array to webgl context
+        // gl.bindVertexArray(null);
+        this.unbind();
 
         // unbind index buffer
         if (this.ibo) {
             this.ibo.unbind();
         }
+    }
+    
+    bind() {
+        const { gl} = this.gpu;
+        gl.bindVertexArray(this.glObject);
+    }
+    
+    unbind() {
+        const { gl} = this.gpu;
+        gl.bindVertexArray(null);
     }
 
     updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
@@ -91,6 +104,10 @@ export class VertexArrayObject extends GLObject {
         gl.bufferData(gl.ARRAY_BUFFER, data, targetVBO.usage);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
+    
+    // getBuffers() {
+    //     return this.vboList.map(({ vbo }) => vbo);
+    // }
 
     setAttribute(attribute: Attribute, push = false) {
         const gl = this.gpu.gl;
