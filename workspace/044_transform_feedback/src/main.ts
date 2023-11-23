@@ -548,7 +548,7 @@ const createTransformFeedbackDrivenMesh = () => {
         transformFeedbackDoubleBuffer.swap();
     };
     mesh.onUpdate = () => {
-        geometry.vertexArrayObject.updateBuffer(
+        geometry.vertexArrayObject.replaceBuffer(
             'aVelocity',
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
         );

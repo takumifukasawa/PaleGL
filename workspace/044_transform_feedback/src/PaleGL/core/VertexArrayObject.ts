@@ -172,7 +172,7 @@ export class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
     
-    updateBuffer(key: string, buffer: WebGLBuffer) {
+    replaceBuffer(key: string, buffer: WebGLBuffer) {
         const { gl } = this.gpu;
         
         const { location, size } = this.findVertexBufferObjectInfo(key);
