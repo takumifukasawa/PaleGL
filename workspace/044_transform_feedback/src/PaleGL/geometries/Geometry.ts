@@ -126,7 +126,7 @@ export class Geometry {
             throw 'invalid attribute';
         }
         attribute.data = data;
-        this.vertexArrayObject.updateAttribute(key, attribute.data);
+        this.vertexArrayObject.updateBufferData(key, attribute.data);
     }
 
     getAttribute(key: string) {

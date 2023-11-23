@@ -8,6 +8,8 @@ type VertexBufferObject = {
     name: string;
     vbo: WebGLBuffer;
     usage: number;
+    location: number;
+    size: number;
 };
 
 export class VertexArrayObject extends GLObject {
@@ -142,7 +144,7 @@ export class VertexArrayObject extends GLObject {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.vboList.push({ name, vbo, usage });
+        this.vboList.push({ name, vbo, usage, location, size });
 
         if (push) {
             gl.bindVertexArray(null);
@@ -155,9 +157,9 @@ export class VertexArrayObject extends GLObject {
      * @param key
      * @param data
      */
-    updateAttribute(key: string, data: ArrayBufferView | BufferSource) {
-        const gl = this.gpu.gl;
-        const { vboInfo } = this.findVertexBufferObjectInfo(key);
+    updateBufferData(key: string, data: ArrayBufferView | BufferSource) {
+        const { gl } = this.gpu;
+        const vboInfo = this.findVertexBufferObjectInfo(key);
        
         // performance overhead
         // gl.bindBuffer(gl.ARRAY_BUFFER, vboInfo.vbo);
@@ -168,6 +170,26 @@ export class VertexArrayObject extends GLObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, vboInfo.vbo);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+    
+    updateBuffer(key: string, buffer: WebGLBuffer) {
+        const { gl } = this.gpu;
+        
+        const { location, size } = this.findVertexBufferObjectInfo(key);
+        const index = this.findVertexBufferObjectInfoIndex(key);
+
+        this.bind();
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.enableVertexAttribArray(location);
+        // TODO: 毎フレームやるの重くない？大丈夫？
+        gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        
+        this.unbind();
+
+        // replace buffer
+        this.vboList[index].vbo = buffer;
     }
 
     // setBuffer(key: string, buffer: WebGLBuffer) {
@@ -203,23 +225,34 @@ export class VertexArrayObject extends GLObject {
      *
      * @param key
      */
-    findVertexBufferObjectInfo(key: string): { vboInfo: VertexBufferObject; index: number } {
-        let vboInfo: VertexBufferObject | null = null;
-        let index: number = -1;
-        for (let i = 0; i < this.vboList.length; i++) {
-            if (key === this.vboList[i].name) {
-                vboInfo = this.vboList[i];
-                index = i;
-                break;
-            }
-        }
-        // const vbo = this.vboList.find(({ name }) => key === name);
+    findVertexBufferObjectInfo(key: string): VertexBufferObject {
+        // let vboInfo: VertexBufferObject | null = null;
+        // let index: number = -1;
+        // for (let i = 0; i < this.vboList.length; i++) {
+        //     if (key === this.vboList[i].name) {
+        //         vboInfo = this.vboList[i];
+        //         index = i;
+        //         break;
+        //     }
+        // }
+        const vboInfo = this.vboList.find(({ name }) => key === name);
         // const vbo = this.vboList.find(({ name }) => key === name);
         if (!vboInfo) {
             throw 'invalid target vbo';
         }
-        return { vboInfo, index };
+        return vboInfo;
     }
+
+    findVertexBufferObjectInfoIndex(key: string): number {
+        for (let i = 0; i < this.vboList.length; i++) {
+            if (key === this.vboList[i].name) {
+                return i;
+            }
+        }
+        throw 'invalid target vbo';
+
+    }
+
 
     /**
      *
@@ -230,6 +263,7 @@ export class VertexArrayObject extends GLObject {
         if (!target) {
             throw 'invalid name';
         }
-        return target.vboInfo.vbo;
+        // return target.vboInfo.vbo;
+        return target.vbo;
     }
 }
