@@ -81,7 +81,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-import { TransformFeedbackBaker } from '@/PaleGL/core/TransformFeedbackBaker.ts';
+import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -216,7 +216,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const transformFeedbackBaker = new TransformFeedbackBaker({
+const transformFeedbackBuffer = new TransformFeedbackBuffer({
     gpu,
     attributes: [
         new Attribute({
@@ -268,8 +268,8 @@ const transformFeedbackBaker = new TransformFeedbackBaker({
         `,
     drawCount: 2,
 });
-gpu.updateTransformFeedback(transformFeedbackBaker);
-transformFeedbackBaker.outputs.forEach(({ buffer }) => {
+gpu.updateTransformFeedback(transformFeedbackBuffer);
+transformFeedbackBuffer.outputs.forEach(({ buffer }) => {
     const results = new Float32Array(6);
     gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
