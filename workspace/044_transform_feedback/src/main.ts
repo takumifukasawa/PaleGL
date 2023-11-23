@@ -71,6 +71,7 @@ import {
     AttributeNames,
     AttributeUsageType,
     VertexShaderModifierPragmas,
+    UniformNames,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -403,6 +404,7 @@ const createTransformFeedbackDrivenMesh = () => {
     });
     gpu.updateTransformFeedback({
         shader: transformFeedbackBuffer.shader,
+        uniforms: transformFeedbackBuffer.uniforms,
         vertexArrayObject: transformFeedbackBuffer.vertexArrayObject,
         transformFeedback: transformFeedbackBuffer.transformFeedback,
         drawCount: transformFeedbackBuffer.drawCount,
@@ -452,11 +454,14 @@ const createTransformFeedbackDrivenMesh = () => {
 
         out vec3 vPosition;
         out vec3 vVelocity;
+        
+        uniform float uTime;
 
         void main() {
             vPosition = aPosition * 2.;
             // vVelocity = aVelocity * 3.;
-            vVelocity = aVelocity + vec3(0., .01, 0.);
+            // vVelocity = aVelocity + vec3(0., .01, 0.);
+            vVelocity = vec3(sin(uTime) * 2., 1., 0.);
         }
         `,
         fragmentShader: `#version 300 es
@@ -466,6 +471,12 @@ const createTransformFeedbackDrivenMesh = () => {
         void main() {
         }
         `,
+        uniforms: {
+            [UniformNames.Time]: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+        },
         drawCount: 4,
     });
 
@@ -535,12 +546,12 @@ const createTransformFeedbackDrivenMesh = () => {
         geometry,
         material,
     });
-    console.log(geometry);
     mesh.transform.setScaling(new Vector3(1, 1, 1));
-    mesh.onFixedUpdate = () => {
-        // mesh.geometry.vertexArrayObject.upda
+    mesh.onFixedUpdate = ({ fixedTime }) => {
+        transformFeedbackDoubleBuffer.uniforms.uTime.value = fixedTime;
         gpu.updateTransformFeedback({
             shader: transformFeedbackDoubleBuffer.shader,
+            uniforms: transformFeedbackDoubleBuffer.uniforms,
             vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
             transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
             drawCount: transformFeedbackDoubleBuffer.drawCount,

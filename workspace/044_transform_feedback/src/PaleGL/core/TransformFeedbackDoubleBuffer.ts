@@ -1,24 +1,12 @@
 ﻿import { Attribute } from '@/PaleGL/core/Attribute';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 // import { AttributeUsageType } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
+import { TransformFeedbackBufferArgs } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
+import { Uniforms } from '@/PaleGL/materials/Material.ts';
 
 // TODO: location, divisorをいい感じに指定したい
-
-type GeometryArgs = {
-    gpu: GPU;
-    attributes: Attribute[];
-    drawCount: number;
-    vertexShader: string;
-    fragmentShader: string;
-    // transformFeedbackVaryings: string[]
-    varyings: {
-        name: string;
-        data: Float32Array | Uint16Array;
-    }[];
-};
 
 type TransformFeedbackBuffer = {
     attributes: Attribute[];
@@ -41,29 +29,32 @@ export class TransformFeedbackDoubleBuffer {
 
     private transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
 
+    uniforms: Uniforms = {};
+
     // outputs: {
     //     buffer: WebGLBuffer;
     //     // size: number
     // }[] = [];
 
     // NOTE: readもwriteも実態は同じだがapiとして分ける
-    
+
     get read() {
         const buffer = this.transformFeedbackBuffers[0];
         return {
             vertexArrayObject: buffer.srcVertexArrayObject,
             transformFeedback: buffer.transformFeedback,
-        }
+        };
     }
+
     get write() {
         const buffer = this.transformFeedbackBuffers[0];
         return {
             vertexArrayObject: buffer.srcVertexArrayObject,
             transformFeedback: buffer.transformFeedback,
-        }
+        };
     }
 
-    constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings }: GeometryArgs) {
+    constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings, uniforms = {} }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         // const {gl} = gpu;
 
@@ -71,6 +62,7 @@ export class TransformFeedbackDoubleBuffer {
         this.shader = new Shader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings });
 
         this.drawCount = drawCount;
+        this.uniforms = uniforms;
 
         // fallback
         // TODO: fix

@@ -4,10 +4,11 @@ import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
+import { Uniforms } from '@/PaleGL/materials/Material.ts';
 
 // TODO: location, divisorをいい感じに指定したい
 
-type GeometryArgs = {
+export type TransformFeedbackBufferArgs = {
     gpu: GPU;
     attributes: Attribute[];
     drawCount: number;
@@ -17,6 +18,7 @@ type GeometryArgs = {
         name: string;
         data: Float32Array | Uint16Array;
     }[];
+    uniforms?: Uniforms;
     // shader: Shader;
     // targets: {
     //     data: Float32Array | Uint16Array,
@@ -33,6 +35,8 @@ export class TransformFeedbackBuffer {
     vertexArrayObject: VertexArrayObject;
     drawCount: number;
 
+    uniforms: Uniforms = {};
+
     transformFeedback: TransformFeedback;
 
     outputs: {
@@ -40,14 +44,15 @@ export class TransformFeedbackBuffer {
         // size: number
     }[] = [];
 
-    constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings }: GeometryArgs) {
+    constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings, uniforms = {} }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         const { gl } = gpu;
         const transformFeedbackVaryings = varyings.map(({ name }) => name);
         this.shader = new Shader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings });
+        this.uniforms = uniforms;
 
         this.drawCount = drawCount;
-        
+
         // fallback
         // TODO: fix
         attributes.forEach((attribute, i) => {
