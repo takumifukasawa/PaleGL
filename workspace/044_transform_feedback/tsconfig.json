@@ -8,6 +8,13 @@
       "DOM",
       // "DOM.Iterable"
     ],
+   
+    // // write .d.ts files
+    // "rootDir": "./src",
+    // "outDir": "types",
+    // "declaration": true,
+    // "emitDeclarationOnly": true,
+    
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {

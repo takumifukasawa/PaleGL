@@ -26,7 +26,7 @@ type GeometryArgs = {
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
-export class TransformFeedbackBuffer {
+export class TransformFeedbackBaker {
     // private gpu: GPU;
 
     shader: Shader;
@@ -49,7 +49,7 @@ export class TransformFeedbackBuffer {
         this.shader = new Shader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings });
 
         this.drawCount = drawCount;
-
+        
         // fallback
         // TODO: fix
         attributes.forEach((attribute, i) => {

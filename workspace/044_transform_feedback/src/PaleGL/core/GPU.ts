@@ -21,7 +21,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
-import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
+import { TransformFeedbackBaker } from '@/PaleGL/core/TransformFeedbackBaker.ts';
 
 export const createWhite1x1: () => HTMLCanvasElement = () => {
     const canvas = document.createElement('canvas');
@@ -188,10 +188,10 @@ export class GPU {
     // setTransformFeedback() {
     // }
 
-    updateTransformFeedback(transformFeedbackBuffer: TransformFeedbackBuffer) {
+    updateTransformFeedback(transformFeedbackBaker: TransformFeedbackBaker) {
         const gl = this.gl;
 
-        const { shader, vertexArrayObject, drawCount, transformFeedback } = transformFeedbackBuffer;
+        const { shader, vertexArrayObject, drawCount, transformFeedback } = transformFeedbackBaker;
 
         gl.bindVertexArray(vertexArrayObject.glObject);
 
