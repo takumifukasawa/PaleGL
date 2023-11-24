@@ -497,8 +497,9 @@ const createTransformFeedbackDrivenMesh = () => {
         uniform float uTime;
 
         void main() {
-            vPosition = aPosition;
-            vVelocity = vec3(sin(uTime + aTimeOffset) * 2., 0., 0.);
+            vPosition = aPosition + aVelocity;
+            // vVelocity = vec3(sin(uTime + aTimeOffset) * 2., 0., 0.);
+            vVelocity = vec3(sin(uTime + aTimeOffset) * .01, 0., 0.);
             vTimeOffset = aTimeOffset;
         }
         `,
@@ -570,6 +571,9 @@ const createTransformFeedbackDrivenMesh = () => {
             return [1, 1, 1];
         })
         .flat();
+    const accPositions = maton.range(3 * planeNum).map(() => {
+        return 0;
+    });
     const velocities = maton.range(3 * planeNum).map(() => {
         return 0;
     });
@@ -605,6 +609,12 @@ const createTransformFeedbackDrivenMesh = () => {
             //     size: 2,
             // }),
             new Attribute({
+                name: 'aAccPosition',
+                data: new Float32Array(accPositions),
+                size: 3,
+                divisor: 1,
+            }),
+            new Attribute({
                 name: 'aVelocity',
                 data: new Float32Array(velocities),
                 size: 3,
@@ -639,12 +649,14 @@ const createTransformFeedbackDrivenMesh = () => {
         vertexShaderModifier: {
             // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
             [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
-            [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
+            [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
+            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
         },
     });
     const mesh = new Mesh({
         geometry,
         material,
+        castShadow: true,
     });
     mesh.transform.setScaling(new Vector3(1, 1, 1));
     mesh.onStart = () => {
@@ -663,9 +675,13 @@ const createTransformFeedbackDrivenMesh = () => {
     };
     mesh.onUpdate = () => {
         geometry.vertexArrayObject.replaceBuffer(
-            'aVelocity',
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+            'aAccPosition',
+            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
         );
+        // geometry.vertexArrayObject.replaceBuffer(
+        //     'aVelocity',
+        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+        // );
     };
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
