@@ -29,7 +29,7 @@ import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // geometries
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { createPlaneGeometryData, PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { createPlaneGeometryRawData, PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 
 // loaders
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
@@ -85,7 +85,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
-import {maton} from "@/PaleGL/utilities/maton.ts";
+import { maton } from '@/PaleGL/utilities/maton.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -515,23 +515,82 @@ const createTransformFeedbackDrivenMesh = () => {
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
 
-    const planeGeometryData = createPlaneGeometryData();
+    // const planeGeometryData = createPlaneGeometryData();
+    const planeGeometryRawData = createPlaneGeometryRawData();
+    const planeNum = 3;
+    const positions = new Float32Array(
+        maton
+            .range(planeNum, true)
+            .map((i) => {
+                return [
+                    ...planeGeometryRawData.positions.map((p) => {
+                        return p + i * 1;
+                    }),
+                ];
+            })
+            .flat()
+    );
+    // const normals = new Float32Array(maton.range(3 * 4 * planeNum));
+    const normals = new Float32Array(
+        maton
+            .range(planeNum)
+            .map(() => {
+                return [...planeGeometryRawData.normals];
+            })
+            .flat()
+    );
+    // const uvs =new Float32Array(maton.range(2 * 4 * planeNum));
+    const uvs = new Float32Array(
+        maton
+            .range(planeNum)
+            .map(() => {
+                return [...planeGeometryRawData.uvs];
+            })
+            .flat()
+    );
+    // const indices = maton.range(6 * planeNum);
+    const indices = maton
+        .range(planeNum)
+        .map((_, i) => {
+            return planeGeometryRawData.indices.map((index) => {
+                return index + i * 4;
+            });
+        })
+        .flat();
+    // const velocities =new Float32Array(maton.range(3 * 4 * planeNum));
+    const velocities = new Float32Array(
+        maton.range(4 * 3 * planeNum).map(() => {
+            return 0;
+        })
+    );
+    const drawCount = planeGeometryRawData.drawCount * planeNum;
     const geometry = new Geometry({
         gpu,
         attributes: [
-            ...planeGeometryData.attributes,
+            // ...planeGeometryData.attributes,
+            new Attribute({
+                name: AttributeNames.Position,
+                data: positions,
+                size: 3,
+            }),
+            new Attribute({
+                name: AttributeNames.Normal,
+                data: normals,
+                size: 3,
+            }),
+            new Attribute({
+                name: AttributeNames.Uv,
+                data: uvs,
+                size: 2,
+            }),
             new Attribute({
                 name: 'aVelocity',
-                data: new Float32Array(
-                    maton.range(4).map(() => {
-                        return 0;
-                    })
-                ),
+                data: velocities,
                 size: 3,
             }),
         ],
-        indices: planeGeometryData.indices,
-        drawCount: planeGeometryData.drawCount,
+        indices,
+        drawCount,
     });
     // const material = new Material({
     //     vertexShader: `#version 300 es`
@@ -560,10 +619,10 @@ const createTransformFeedbackDrivenMesh = () => {
         transformFeedbackDoubleBuffer.swap();
     };
     mesh.onUpdate = () => {
-        geometry.vertexArrayObject.replaceBuffer(
-            'aVelocity',
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
-        );
+        // geometry.vertexArrayObject.replaceBuffer(
+        //     'aVelocity',
+        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+        // );
     };
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
@@ -699,8 +758,8 @@ const createGLTFSkinnedMesh = async () => {
         useVertexColor: true,
     });
     skinningMesh.onStart = () => {
-        console.log(skinnedMesh.material)
-    }
+        console.log(skinnedMesh.material);
+    };
 
     return skinningMesh;
 };
@@ -816,7 +875,8 @@ const main = async () => {
                 name: AttributeNames.Position.toString(),
                 // dummy data
                 data: new Float32Array(
-                    maton.range(particleNum)
+                    maton
+                        .range(particleNum)
                         .map(() => {
                             const x = Math.random() * 18 - 10;
                             const y = Math.random() * 0.5;
@@ -831,7 +891,8 @@ const main = async () => {
             new Attribute({
                 name: AttributeNames.Uv.toString(),
                 data: new Float32Array(
-                    maton.range(particleNum)
+                    maton
+                        .range(particleNum)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
                         .flat()
                 ),
@@ -840,7 +901,8 @@ const main = async () => {
             new Attribute({
                 name: AttributeNames.Color.toString(),
                 data: new Float32Array(
-                    maton.range(particleNum)
+                    maton
+                        .range(particleNum)
                         .map(() => {
                             const c = Color.fromRGB(
                                 Math.random() * 50 + 200,
@@ -857,7 +919,8 @@ const main = async () => {
             new Attribute({
                 name: 'aBillboardSize',
                 data: new Float32Array(
-                    maton.range(particleNum)
+                    maton
+                        .range(particleNum)
                         .map(() => {
                             const s = Math.random() * 3.5 + 0.5;
                             return [s, s, s, s];
@@ -869,7 +932,8 @@ const main = async () => {
             new Attribute({
                 name: 'aBillboardRateOffset',
                 data: new Float32Array(
-                    maton.range(particleNum)
+                    maton
+                        .range(particleNum)
                         .map(() => {
                             const r = Math.random();
                             return [r, r, r, r];
@@ -879,14 +943,14 @@ const main = async () => {
                 size: 1,
             }),
         ],
-        indices: 
-            maton.range(particleNum)
-                .map((_, i) => {
-                    const offset = i * 4;
-                    const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
-                    return index;
-                })
-                .flat(),
+        indices: maton
+            .range(particleNum)
+            .map((_, i) => {
+                const offset = i * 4;
+                const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
+                return index;
+            })
+            .flat(),
         drawCount: particleNum * 6,
     });
     const particleMaterial = new Material({

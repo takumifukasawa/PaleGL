@@ -4,7 +4,7 @@
 
 #pragma ATTRIBUTES
 
-#pragma APPND_ATTRIBUTES
+#pragma APPEND_ATTRIBUTES
 
 #include ./partial/skinning-vertex-functions.glsl
 
@@ -23,7 +23,7 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 uniform float uTime;
 
-#pragma UNIFORMS_BLOCK
+#pragma APPEND_UNIFORMS
         
 #include ./partial/receive-shadow-vertex-uniforms.glsl
 #include ./partial/skinning-vertex-uniforms.glsl

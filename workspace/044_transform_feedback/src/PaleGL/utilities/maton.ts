@@ -13,9 +13,13 @@ function fillFunc<T>(arr: T[], value: T): T[] {
     // return arr;
 }
 
-function rangeFunc(length: number): number[]{
-    // とりあえず0埋め
-    return new Array(length).fill(0) as number[];
+function rangeFunc(length: number, fillIndex: boolean = false): number[]{
+    // とりあえずindex埋め
+    const array = (new Array(length)).fill(0) as number[];
+    if(!fillIndex) {
+        return array;
+    }
+    return array.map((_, i) => i);
 }
 
 type MatonWrapper<T> = {
