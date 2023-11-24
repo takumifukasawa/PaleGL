@@ -99,9 +99,12 @@ export class AbstractInputController {
         this.#currentInputPosition.copy(inputPosition);
         const diff = Vector2.subVectors(this.#currentInputPosition, this.#beforeInputPosition);
         this.#deltaInputPosition.copy(diff);
+        const vmin = Math.min(this.#width, this.#height);
         this.#deltaNormalizedInputPosition.set(
-            this.#deltaInputPosition.x / this.#width,
-            this.#deltaInputPosition.y / this.#height
+            // this.#deltaInputPosition.x / this.#width,
+            // this.#deltaInputPosition.y / this.#height
+            this.#deltaInputPosition.x / vmin,
+            this.#deltaInputPosition.y / vmin
         );
     }
 
