@@ -420,56 +420,69 @@ const createTransformFeedbackDrivenMesh = () => {
 
     const planeNum = 4;
 
-    const timeOffsetData = new Float32Array(maton.range(planeNum).map((_, i) => {
-        return i;
+    const initialPosition = new Float32Array(maton.range(planeNum).map(() => {
+        return [0, 0, 0];
     }).flat());
     const initialVelocity = new Float32Array(maton.range(planeNum).map((_, i) => {
         return [i, i, i];
+    }).flat());
+    const  initialTimeOffset = new Float32Array(maton.range(planeNum).map((_, i) => {
+        return i;
     }).flat());
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
             new Attribute({
-                name: 'aTimeOffset',
-                data: timeOffsetData,
-                size: 1,
+                name: 'aPosition',
+                data: initialPosition,
+                size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
             new Attribute({
                 name: 'aVelocity',
-                // data: new Float32Array(maton.range(3 * planeNum)),
                 data: initialVelocity,
                 size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+            new Attribute({
+                name: 'aTimeOffset',
+                data: initialTimeOffset,
+                size: 1,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
         ],
         varyings: [
             {
-                name: 'vTimeOffset',
-                data: new Float32Array(timeOffsetData),
-                // size: 3,
+                name: 'vPosition',
+                data: new Float32Array(initialPosition),
             },
             {
                 name: 'vVelocity',
                 data: new Float32Array(initialVelocity),
-                // size: 3,
+            },
+            {
+                name: 'vTimeOffset',
+                data: new Float32Array(initialTimeOffset),
             },
         ],
         vertexShader: `#version 300 es
 
         precision highp float;
 
-        layout(location = 0) in float aTimeOffset;
+        layout(location = 0) in vec3 aPosition;
         layout(location = 1) in vec3 aVelocity;
+        layout(location = 2) in float aTimeOffset;
 
-        out float vTimeOffset;
+        out vec3 vPosition;
         out vec3 vVelocity;
-        
+        out float vTimeOffset;
+
         uniform float uTime;
 
         void main() {
+            vPosition = aPosition;
+            vVelocity = vec3(sin(uTime + aTimeOffset) * 2., 0., 0.);
             vTimeOffset = aTimeOffset;
-            vVelocity = vec3(sin(uTime + vTimeOffset) * 2., 0., 0.);
         }
         `,
         fragmentShader: `#version 300 es
@@ -485,7 +498,7 @@ const createTransformFeedbackDrivenMesh = () => {
                 value: 0,
             },
         },
-        drawCount: 4,
+        drawCount: planeNum,
     });
 
     // transform feedback double buffer check
@@ -599,7 +612,6 @@ const createTransformFeedbackDrivenMesh = () => {
         drawCount: planeGeometryData.drawCount,
         instanceCount: planeNum
     });
-    console.log(planeGeometryData)
     const material = new GBufferMaterial({
         isInstancing: true,
         useVertexColor: true,
