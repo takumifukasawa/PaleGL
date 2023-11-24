@@ -46,6 +46,10 @@ export class AbstractInputController {
         this.#height = height;
     }
 
+    update() {
+        throw "[AbstractInputController] should implementation 'update' method.";
+    }
+
     // inputPosition ... v2
     // isDown ... bool
     updateInternal({ inputPosition, isDown }: { inputPosition: Vector2; isDown: boolean }) {

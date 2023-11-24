@@ -15,7 +15,7 @@ export class MouseInputController extends AbstractInputController {
         window.addEventListener('mouseup', this.#onMouseUp.bind(this));
     }
 
-    fixedUpdate() {
+    update() {
         this.updateInternal({
             inputPosition: this.#tmpInputPosition,
             isDown: this.#tmpIsDown,

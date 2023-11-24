@@ -348,21 +348,18 @@ cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(cameraPostProcess);
 
-/**
- *
- */
-const createTransformFeedbackDrivenMesh = () => {
+const debugTransformFeedback = () => {
     const transformFeedbackBuffer = new TransformFeedbackBuffer({
         gpu,
         attributes: [
             new Attribute({
-                name: 'aPosition',
+                name: 'aArg1',
                 data: new Float32Array([1, 2, 3, 4, 5, 6]),
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
             new Attribute({
-                name: 'aVelocity',
+                name: 'aArg2',
                 data: new Float32Array([7, 8, 9, 10, 11, 12]),
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
@@ -370,12 +367,12 @@ const createTransformFeedbackDrivenMesh = () => {
         ],
         varyings: [
             {
-                name: 'vPosition',
+                name: 'vArg1',
                 data: new Float32Array([0, 0, 0, 0, 0, 0]),
                 // size: 3,
             },
             {
-                name: 'vVelocity',
+                name: 'vArg2',
                 data: new Float32Array([0, 0, 0, 0, 0, 0]),
                 // size: 3,
             },
@@ -384,15 +381,15 @@ const createTransformFeedbackDrivenMesh = () => {
 
         precision highp float;
 
-        layout(location = 0) in vec3 aPosition;
-        layout(location = 1) in vec3 aVelocity;
+        layout(location = 0) in vec3 aArg1;
+        layout(location = 1) in vec3 aArg2;
 
-        out vec3 vPosition;
-        out vec3 vVelocity;
+        out vec3 vArg1;
+        out vec3 vArg2;
 
         void main() {
-            vPosition = aPosition * 2.;
-            vVelocity = aVelocity * 3.;
+            vArg1 = aArg1 * 2.;
+            vArg2 = aArg2 * 3.;
         }
         `,
         fragmentShader: `#version 300 es
@@ -418,6 +415,20 @@ const createTransformFeedbackDrivenMesh = () => {
         gpu.gl.bindBuffer(gl.ARRAY_BUFFER, null);
         console.log(results);
     });
+};
+
+/**
+ *
+ */
+const createTransformFeedbackDrivenMesh = () => {
+    //
+    // debugs
+    //
+    debugTransformFeedback();
+
+    //
+    // begin create mesh
+    //
 
     const planeNum = 4;
 
@@ -425,15 +436,20 @@ const createTransformFeedbackDrivenMesh = () => {
         maton
             .range(planeNum)
             .map(() => {
-                return [0, 0, 0];
+                return [
+                    0, 0, 0,
+                    // Math.random() * 4 - 2,
+                    // Math.random() * 4 + 2,
+                    // Math.random() * 4 - 2,
+                ];
             })
             .flat()
     );
     const initialVelocity = new Float32Array(
         maton
             .range(planeNum)
-            .map((_, i) => {
-                return [i, i, i];
+            .map(() => {
+                return [0, 0, 0];
             })
             .flat()
     );
@@ -560,9 +576,8 @@ const createTransformFeedbackDrivenMesh = () => {
 
     const instancePosition = maton
         .range(planeNum, true)
-        .map((i) => {
-            const p = i * 1;
-            return [p, p, p];
+        .map(() => {
+            return [Math.random() * 4 - 2, Math.random() * 4 + 2, Math.random() * 4 - 2];
         })
         .flat();
     const instanceScale = maton
@@ -662,8 +677,11 @@ const createTransformFeedbackDrivenMesh = () => {
     mesh.onStart = () => {
         console.log(mesh);
     };
-    mesh.onFixedUpdate = ({ fixedTime }) => {
-        transformFeedbackDoubleBuffer.uniforms.uTime.value = fixedTime;
+    // mesh.onFixedUpdate = ({ fixedTime }) => {
+    mesh.onUpdate = ({ time }) => {
+        //     console.log(inputController.normalizedInputPosition.x, inputController.normalizedInputPosition.y);
+        // console.log(inputController.inputPosition.x, inputController.inputPosition.y);
+        transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         gpu.updateTransformFeedback({
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
@@ -672,8 +690,8 @@ const createTransformFeedbackDrivenMesh = () => {
             drawCount: transformFeedbackDoubleBuffer.drawCount,
         });
         transformFeedbackDoubleBuffer.swap();
-    };
-    mesh.onUpdate = () => {
+        // };
+        // mesh.onUpdate = () => {
         geometry.vertexArrayObject.replaceBuffer(
             'aAccPosition',
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
@@ -1202,10 +1220,11 @@ void main() {
 
     engine.onBeforeUpdate = () => {
         if (!debuggerGUI) initDebugger();
+        inputController.update();
     };
 
     engine.onBeforeFixedUpdate = () => {
-        inputController.fixedUpdate();
+        // inputController.fixedUpdate();
     };
 
     engine.onRender = (time) => {

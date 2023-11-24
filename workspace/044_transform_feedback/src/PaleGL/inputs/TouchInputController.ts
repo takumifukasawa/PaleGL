@@ -15,7 +15,7 @@ export class TouchInputController extends AbstractInputController {
         window.addEventListener('touchend', this.#onTouchEnd.bind(this));
     }
 
-    fixedUpdate() {
+    update() {
         this.updateInternal({
             inputPosition: this.#tmpInputPosition,
             isDown: this.#tmpIsDown,
