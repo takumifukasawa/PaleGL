@@ -85,6 +85,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
+import {maton} from "@/PaleGL/utilities/maton.ts";
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -522,7 +523,7 @@ const createTransformFeedbackDrivenMesh = () => {
             new Attribute({
                 name: 'aVelocity',
                 data: new Float32Array(
-                    new Array(4).fill(0).map(() => {
+                    maton.range(4).map(() => {
                         return 0;
                     })
                 ),
@@ -615,8 +616,7 @@ const createGLTFSkinnedMesh = async () => {
         scale: [],
         color: [],
     };
-    // new Array(instanceNum).fill(0).forEach((_, i) => {
-    new Array(instanceNum).fill(0).forEach(() => {
+    maton.range(instanceNum).forEach(() => {
         const posRangeX = 7.4;
         const posRangeZ = 7.4;
         const px = (Math.random() * 2 - 1) * posRangeX;
@@ -698,6 +698,9 @@ const createGLTFSkinnedMesh = async () => {
         isInstancing: true,
         useVertexColor: true,
     });
+    skinningMesh.onStart = () => {
+        console.log(skinnedMesh.material)
+    }
 
     return skinningMesh;
 };
@@ -813,8 +816,7 @@ const main = async () => {
                 name: AttributeNames.Position.toString(),
                 // dummy data
                 data: new Float32Array(
-                    new Array(particleNum)
-                        .fill(0)
+                    maton.range(particleNum)
                         .map(() => {
                             const x = Math.random() * 18 - 10;
                             const y = Math.random() * 0.5;
@@ -829,8 +831,7 @@ const main = async () => {
             new Attribute({
                 name: AttributeNames.Uv.toString(),
                 data: new Float32Array(
-                    new Array(particleNum)
-                        .fill(0)
+                    maton.range(particleNum)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
                         .flat()
                 ),
@@ -839,8 +840,7 @@ const main = async () => {
             new Attribute({
                 name: AttributeNames.Color.toString(),
                 data: new Float32Array(
-                    new Array(particleNum)
-                        .fill(0)
+                    maton.range(particleNum)
                         .map(() => {
                             const c = Color.fromRGB(
                                 Math.random() * 50 + 200,
@@ -857,8 +857,7 @@ const main = async () => {
             new Attribute({
                 name: 'aBillboardSize',
                 data: new Float32Array(
-                    new Array(particleNum)
-                        .fill(0)
+                    maton.range(particleNum)
                         .map(() => {
                             const s = Math.random() * 3.5 + 0.5;
                             return [s, s, s, s];
@@ -870,8 +869,7 @@ const main = async () => {
             new Attribute({
                 name: 'aBillboardRateOffset',
                 data: new Float32Array(
-                    new Array(particleNum)
-                        .fill(0)
+                    maton.range(particleNum)
                         .map(() => {
                             const r = Math.random();
                             return [r, r, r, r];
@@ -881,14 +879,14 @@ const main = async () => {
                 size: 1,
             }),
         ],
-        indices: new Array(particleNum)
-            .fill(0)
-            .map((_, i) => {
-                const offset = i * 4;
-                const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
-                return index;
-            })
-            .flat(),
+        indices: 
+            maton.range(particleNum)
+                .map((_, i) => {
+                    const offset = i * 4;
+                    const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
+                    return index;
+                })
+                .flat(),
         drawCount: particleNum * 6,
     });
     const particleMaterial = new Material({

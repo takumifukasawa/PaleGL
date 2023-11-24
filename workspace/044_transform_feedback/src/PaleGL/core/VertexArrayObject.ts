@@ -171,7 +171,12 @@ export class VertexArrayObject extends GLObject {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
-    
+
+    /**
+     * 
+     * @param key
+     * @param buffer
+     */
     replaceBuffer(key: string, buffer: WebGLBuffer) {
         const { gl } = this.gpu;
         

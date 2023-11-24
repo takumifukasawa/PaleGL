@@ -13,10 +13,16 @@ function fillFunc<T>(arr: T[], value: T): T[] {
     // return arr;
 }
 
+function rangeFunc(length: number): number[]{
+    // とりあえず0埋め
+    return new Array(length).fill(0) as number[];
+}
+
 type MatonWrapper<T> = {
     value: () => T[];
     // fill: () => T[]
     fill: () => MatonWrapper<T>;
+    range: (length: number) => MatonWrapper<T>;
 };
 
 function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
@@ -28,7 +34,13 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         //     return fillFunc(args[0], args[1]);
         // }
         fillFunc(tmp, args[0]);
-        // TODO ignoreしちゃって問題ない？
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return this as MatonWrapper<T>;
+    }
+    
+    function range(length: number): MatonWrapper<T> {
+        rangeFunc(length);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
@@ -41,14 +53,16 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
     return {
         value,
         fill,
+        range
     };
 }
 
 // wrapper
-const maton = <T>(obj: T[]) => {
+const maton = <T>(obj: T[] = []) => {
     return matonWrapper(obj);
 };
 
 maton.fill = fillFunc;
+maton.range = rangeFunc;
 
 export { maton };
