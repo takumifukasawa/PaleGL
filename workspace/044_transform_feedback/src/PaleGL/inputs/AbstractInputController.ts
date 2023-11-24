@@ -5,6 +5,7 @@ export class AbstractInputController {
     #currentInputPosition = Vector2.zero;
     #deltaInputPosition = Vector2.zero;
     #deltaNormalizedInputPosition = Vector2.zero;
+    #normalizedInputPosition = Vector2.zero;
 
     #isPressed = false;
     #isDown = false;
@@ -32,9 +33,13 @@ export class AbstractInputController {
     get deltaNormalizedInputPosition() {
         return this.#deltaNormalizedInputPosition;
     }
+    
+    get normalizedInputPosition() {
+        return this.#normalizedInputPosition;
+    }
 
     constructor() {
-        this.clearInputPositions();
+        // this.clearInputPositions();
     }
 
     start() {
@@ -85,19 +90,22 @@ export class AbstractInputController {
     }
 
     #updateInputPositions(inputPosition: Vector2) {
-        // up
+        // this.#beforeInputPosition.copy(this.#currentInputPosition);
+        // this.#currentInputPosition.copy(inputPosition);
+        
         if (this.isUp) {
-            this.clearInputPositions();
-            return;
-        }
-        // pressed
-        if (this.isPressed) {
+            // this.clearInputPositions();
+            // NOTE: mousemoveを考慮してreturnしてない
+            // return;
+        } else if (this.isPressed) {
             this.#currentInputPosition.copy(inputPosition);
             this.#beforeInputPosition.copy(this.#currentInputPosition);
             this.#deltaInputPosition.set(0, 0);
             this.#deltaNormalizedInputPosition.set(0, 0);
-            return;
+            // NOTE: mousemoveを考慮してreturnしてない
+            // return;
         }
+
         // move
         this.#beforeInputPosition.copy(this.#currentInputPosition);
         this.#currentInputPosition.copy(inputPosition);
@@ -107,8 +115,13 @@ export class AbstractInputController {
         this.#deltaNormalizedInputPosition.set(
             // this.#deltaInputPosition.x / this.#width,
             // this.#deltaInputPosition.y / this.#height
+            // deltaはvminを考慮
             this.#deltaInputPosition.x / vmin,
             this.#deltaInputPosition.y / vmin
+        );
+        this.#normalizedInputPosition.set(
+            this.#currentInputPosition.x / this.#width,
+            this.#currentInputPosition.y / this.#height
         );
     }
 

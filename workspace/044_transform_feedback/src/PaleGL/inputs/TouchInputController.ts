@@ -33,9 +33,11 @@ export class TouchInputController extends AbstractInputController {
         this.setInputPosition(t.clientX, t.clientY);
     }
 
-    #onTouchEnd() {
+    #onTouchEnd(e: TouchEvent) {
         this.#tmpIsDown = false;
-        this.setInputPosition(-Infinity, -Infinity);
+        const t = e.touches[0];
+        this.setInputPosition(t.clientX, t.clientY);
+        // this.setInputPosition(-Infinity, -Infinity);
     }
 
     setInputPosition(x: number, y: number) {

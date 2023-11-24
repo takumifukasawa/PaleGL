@@ -31,9 +31,10 @@ export class MouseInputController extends AbstractInputController {
         this.setInputPosition(e.clientX, e.clientY);
     }
 
-    #onMouseUp() {
+    #onMouseUp(e: MouseEvent) {
         this.#tmpIsDown = false;
-        this.setInputPosition(-Infinity, -Infinity);
+        this.setInputPosition(e.clientX, e.clientY);
+        // this.setInputPosition(-Infinity, -Infinity);
     }
 
     setInputPosition(x: number, y: number) {
