@@ -29,7 +29,7 @@ import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // geometries
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { createPlaneGeometryData, PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 
 // loaders
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
@@ -86,6 +86,7 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
+import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -420,15 +421,30 @@ const createTransformFeedbackDrivenMesh = () => {
 
     const planeNum = 4;
 
-    const initialPosition = new Float32Array(maton.range(planeNum).map(() => {
-        return [0, 0, 0];
-    }).flat());
-    const initialVelocity = new Float32Array(maton.range(planeNum).map((_, i) => {
-        return [i, i, i];
-    }).flat());
-    const  initialTimeOffset = new Float32Array(maton.range(planeNum).map((_, i) => {
-        return i;
-    }).flat());
+    const initialPosition = new Float32Array(
+        maton
+            .range(planeNum)
+            .map(() => {
+                return [0, 0, 0];
+            })
+            .flat()
+    );
+    const initialVelocity = new Float32Array(
+        maton
+            .range(planeNum)
+            .map((_, i) => {
+                return [i, i, i];
+            })
+            .flat()
+    );
+    const initialTimeOffset = new Float32Array(
+        maton
+            .range(planeNum)
+            .map((_, i) => {
+                return i;
+            })
+            .flat()
+    );
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
@@ -469,6 +485,7 @@ const createTransformFeedbackDrivenMesh = () => {
 
         precision highp float;
 
+        // TODO: ここ動的に構築してもいい
         layout(location = 0) in vec3 aPosition;
         layout(location = 1) in vec3 aVelocity;
         layout(location = 2) in float aTimeOffset;
@@ -502,7 +519,7 @@ const createTransformFeedbackDrivenMesh = () => {
     });
 
     // transform feedback double buffer check
-    
+
     // const elemLength = 12;
     // console.log('===============================');
     // const logBuffer = (buffer: WebGLBuffer, len: number) => {
@@ -537,7 +554,8 @@ const createTransformFeedbackDrivenMesh = () => {
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
 
-    const planeGeometryData = createPlaneGeometryData();
+    const boxGeometryData = createBoxGeometryData();
+    // const planeGeometryData = createPlaneGeometryData();
 
     const instancePosition = maton
         .range(planeNum, true)
@@ -555,19 +573,22 @@ const createTransformFeedbackDrivenMesh = () => {
     const velocities = maton.range(3 * planeNum).map(() => {
         return 0;
     });
-    const instanceColor = maton.range(planeNum).map(() => {
-        const c = Color.fromRGB(
-            Math.floor(Math.random() * 240 + 15),
-            Math.floor(Math.random() * 10 + 245),
-            Math.floor(Math.random() * 245 + 10)
-        );
-        return [...c.elements];
-    }).flat();
-    
+    const instanceColor = maton
+        .range(planeNum)
+        .map(() => {
+            const c = Color.fromRGB(
+                Math.floor(Math.random() * 240 + 15),
+                Math.floor(Math.random() * 10 + 245),
+                Math.floor(Math.random() * 245 + 10)
+            );
+            return [...c.elements];
+        })
+        .flat();
+
     const geometry = new Geometry({
         gpu,
         attributes: [
-            ...planeGeometryData.attributes,
+            ...boxGeometryData.attributes,
             // new Attribute({
             //     name: AttributeNames.Position,
             //     data: planeGeometryRawData.positions,
@@ -593,24 +614,24 @@ const createTransformFeedbackDrivenMesh = () => {
                 name: AttributeNames.InstancePosition,
                 data: new Float32Array(instancePosition),
                 size: 3,
-                divisor: 1
+                divisor: 1,
             }),
             new Attribute({
                 name: AttributeNames.InstanceScale,
                 data: new Float32Array(instanceScale),
                 size: 3,
-                divisor: 1
+                divisor: 1,
             }),
             new Attribute({
                 name: AttributeNames.InstanceVertexColor,
                 data: new Float32Array(instanceColor),
                 size: 4,
-                divisor: 1
+                divisor: 1,
             }),
         ],
-        indices: planeGeometryData.indices,
-        drawCount: planeGeometryData.drawCount,
-        instanceCount: planeNum
+        indices: boxGeometryData.indices,
+        drawCount: boxGeometryData.drawCount,
+        instanceCount: planeNum,
     });
     const material = new GBufferMaterial({
         isInstancing: true,
@@ -628,7 +649,7 @@ const createTransformFeedbackDrivenMesh = () => {
     mesh.transform.setScaling(new Vector3(1, 1, 1));
     mesh.onStart = () => {
         console.log(mesh);
-    }
+    };
     mesh.onFixedUpdate = ({ fixedTime }) => {
         transformFeedbackDoubleBuffer.uniforms.uTime.value = fixedTime;
         gpu.updateTransformFeedback({
@@ -724,14 +745,14 @@ const createGLTFSkinnedMesh = async () => {
 
     skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
-  
+
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstancePosition,
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
-            divisor: 1
+            divisor: 1,
         })
     );
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
@@ -740,7 +761,7 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
-            divisor: 1
+            divisor: 1,
         })
     );
     // aInstanceAnimationOffsetは予約語
@@ -749,7 +770,7 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceAnimationOffset,
             data: new Float32Array(animationOffsetInfo),
             size: 1,
-            divisor: 1
+            divisor: 1,
         })
     );
     skinningMesh.geometry.setAttribute(
@@ -757,7 +778,7 @@ const createGLTFSkinnedMesh = async () => {
             name: AttributeNames.InstanceVertexColor,
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
-            divisor: 1
+            divisor: 1,
         })
     );
     // skinningMesh.material = new PhongMaterial({

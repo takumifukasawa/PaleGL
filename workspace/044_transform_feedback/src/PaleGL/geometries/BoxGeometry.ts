@@ -3,7 +3,7 @@ import { AttributeNames } from '@/PaleGL/constants';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 
-export function createBoxGeometryData() {
+export function createBoxGeometryRawData() {
     // -----------------------------
     //
     //   6 ---- 4
@@ -83,6 +83,35 @@ export function createBoxGeometryData() {
         indices,
         drawCount,
     };
+}
+
+export function createBoxGeometryData() {
+    const rawData = createBoxGeometryRawData();
+
+    // TODO: uniqでfilter
+    const attributes = [
+        new Attribute({
+            name: AttributeNames.Position,
+            data: new Float32Array(rawData.positions),
+            size: 3,
+        }),
+        new Attribute({
+            name: AttributeNames.Uv,
+            data: new Float32Array(rawData.uvs),
+            size: 2,
+        }),
+        new Attribute({
+            name: AttributeNames.Normal,
+            data: new Float32Array(rawData.normals),
+            size: 3,
+        }),
+    ];
+    
+    return {
+        attributes,
+        indices: rawData.indices,
+        drawCount: rawData.drawCount,
+    };   
 }
 
 export class BoxGeometry extends Geometry {
