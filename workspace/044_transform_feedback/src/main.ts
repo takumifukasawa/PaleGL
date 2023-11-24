@@ -449,7 +449,11 @@ const createTransformFeedbackDrivenMesh = () => {
         maton
             .range(planeNum)
             .map(() => {
-                return [0, 0, 0];
+                return [
+                    (Math.random() * 1 - .5) * .5,
+                    (Math.random() * 1 + .5) * .5,
+                    (Math.random() * 1 - .5) * .5,
+                ];
             })
             .flat()
     );
@@ -516,17 +520,21 @@ const createTransformFeedbackDrivenMesh = () => {
 
         void main() {
             vPosition = aPosition + aVelocity * .5;
-            // vVelocity = vec3(sin(uTime + aTimeOffset) * 2., 0., 0.);
             vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
             i *= vec2(1., -1.);
-            vec3 target = vec3(i.x, i.y, sin(uTime * 4. + aTimeOffset) * 1.) * 3.;
+            vec3 target = vec3(
+                i.x * 2. + cos(uTime * .1 + aTimeOffset) * .25,
+                i.y + 2. + sin(uTime * .1 + aTimeOffset) * .25,
+                sin(uTime * .1 + aTimeOffset) * 2.
+            );
             vec3 v = target - aPosition;
             vec3 dir = normalize(v);
             // vVelocity = vec3(sin(uTime + aTimeOffset) * uNormalizedInputPosition.x, 0., 0.);
             vVelocity = mix(
-                vVelocity,
-                vVelocity + dir * 2. * uAttractRate,
-                .05
+                aVelocity,
+                // normalize(aVelocity),
+                dir * (.1 + uAttractRate * .5),
+                .1
             );
             vTimeOffset = aTimeOffset;
         }
