@@ -10,6 +10,7 @@ type VertexBufferObject = {
     usage: number;
     location: number;
     size: number;
+    divisor: number;
 };
 
 export class VertexArrayObject extends GLObject {
@@ -144,7 +145,7 @@ export class VertexArrayObject extends GLObject {
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
-        this.vboList.push({ name, vbo, usage, location, size });
+        this.vboList.push({ name, vbo, usage, location, size, divisor });
 
         if (push) {
             gl.bindVertexArray(null);
@@ -171,7 +172,7 @@ export class VertexArrayObject extends GLObject {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
-
+  
     /**
      * 
      * @param key
@@ -180,8 +181,9 @@ export class VertexArrayObject extends GLObject {
     replaceBuffer(key: string, buffer: WebGLBuffer) {
         const { gl } = this.gpu;
         
-        const { location, size } = this.findVertexBufferObjectInfo(key);
+        // const { location, size } = this.findVertexBufferObjectInfo(key);
         const index = this.findVertexBufferObjectInfoIndex(key);
+        const { location, size } = this.vboList[index];
 
         this.bind();
         
@@ -189,6 +191,10 @@ export class VertexArrayObject extends GLObject {
         gl.enableVertexAttribArray(location);
         // TODO: 毎フレームやるの重くない？大丈夫？
         gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+        // divisorはもう一度指定しなくてもいいっぽい
+        // if (divisor) {
+        //     gl.vertexAttribDivisor(location, divisor);
+        // }
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         
         this.unbind();

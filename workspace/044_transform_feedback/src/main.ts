@@ -418,31 +418,40 @@ const createTransformFeedbackDrivenMesh = () => {
         console.log(results);
     });
 
+    const planeNum = 4;
+
+    const timeOffsetData = new Float32Array(maton.range(planeNum).map((_, i) => {
+        return i;
+    }).flat());
+    const initialVelocity = new Float32Array(maton.range(planeNum).map((_, i) => {
+        return [i, i, i];
+    }).flat());
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
             new Attribute({
-                name: 'aPosition',
-                data: new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-                size: 3,
+                name: 'aTimeOffset',
+                data: timeOffsetData,
+                size: 1,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
             new Attribute({
                 name: 'aVelocity',
-                data: new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                // data: new Float32Array(maton.range(3 * planeNum)),
+                data: initialVelocity,
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
         ],
         varyings: [
             {
-                name: 'vPosition',
-                data: new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                name: 'vTimeOffset',
+                data: new Float32Array(timeOffsetData),
                 // size: 3,
             },
             {
                 name: 'vVelocity',
-                data: new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                data: new Float32Array(initialVelocity),
                 // size: 3,
             },
         ],
@@ -450,19 +459,17 @@ const createTransformFeedbackDrivenMesh = () => {
 
         precision highp float;
 
-        layout(location = 0) in vec3 aPosition;
+        layout(location = 0) in float aTimeOffset;
         layout(location = 1) in vec3 aVelocity;
 
-        out vec3 vPosition;
+        out float vTimeOffset;
         out vec3 vVelocity;
         
         uniform float uTime;
 
         void main() {
-            vPosition = aPosition * 2.;
-            // vVelocity = aVelocity * 3.;
-            // vVelocity = aVelocity + vec3(0., .01, 0.);
-            vVelocity = vec3(sin(uTime) * 2., 1., 0.);
+            vTimeOffset = aTimeOffset;
+            vVelocity = vec3(sin(uTime + vTimeOffset) * 2., 0., 0.);
         }
         `,
         fragmentShader: `#version 300 es
@@ -481,6 +488,8 @@ const createTransformFeedbackDrivenMesh = () => {
         drawCount: 4,
     });
 
+    // transform feedback double buffer check
+    
     // const elemLength = 12;
     // console.log('===============================');
     // const logBuffer = (buffer: WebGLBuffer, len: number) => {
@@ -516,38 +525,7 @@ const createTransformFeedbackDrivenMesh = () => {
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
 
     const planeGeometryData = createPlaneGeometryData();
-    // const planeGeometryRawData = createPlaneGeometryRawData();
-    const planeNum = 4;
-    // const positions = maton
-    //     .range(planeNum, true)
-    //     .map(() => {
-    //         return [
-    //             ...planeGeometryRawData.positions.map((p) => {
-    //                 return p;
-    //             }),
-    //         ];
-    //     })
-    //     .flat();
-    // const normals = maton
-    //     .range(planeNum)
-    //     .map(() => {
-    //         return [...planeGeometryRawData.normals];
-    //     })
-    //     .flat();
-    // const uvs = maton
-    //     .range(planeNum)
-    //     .map(() => {
-    //         return [...planeGeometryRawData.uvs];
-    //     })
-    //     .flat();
-    // const indices = maton
-    //     .range(planeNum)
-    //     .map((_, i) => {
-    //         return planeGeometryRawData.indices.map((index) => {
-    //             return index + i * 4;
-    //         });
-    //     })
-    //     .flat();
+
     const instancePosition = maton
         .range(planeNum, true)
         .map((i) => {
@@ -561,7 +539,7 @@ const createTransformFeedbackDrivenMesh = () => {
             return [1, 1, 1];
         })
         .flat();
-    const velocities = maton.range(4 * 3).map(() => {
+    const velocities = maton.range(3 * planeNum).map(() => {
         return 0;
     });
     const instanceColor = maton.range(planeNum).map(() => {
@@ -596,6 +574,7 @@ const createTransformFeedbackDrivenMesh = () => {
                 name: 'aVelocity',
                 data: new Float32Array(velocities),
                 size: 3,
+                divisor: 1,
             }),
             new Attribute({
                 name: AttributeNames.InstancePosition,
@@ -650,10 +629,10 @@ const createTransformFeedbackDrivenMesh = () => {
         transformFeedbackDoubleBuffer.swap();
     };
     mesh.onUpdate = () => {
-        // geometry.vertexArrayObject.replaceBuffer(
-        //     'aVelocity',
-        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
-        // );
+        geometry.vertexArrayObject.replaceBuffer(
+            'aVelocity',
+            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+        );
     };
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
