@@ -38,7 +38,7 @@ export class Attribute {
         size,
         offset = 0,
         usageType = AttributeUsageType.StaticDraw,
-        divisor = 1, // TODO
+        divisor = 0, // TODO
         // buffer = null,
     }: AttributeArgs) {
         this.name = name;

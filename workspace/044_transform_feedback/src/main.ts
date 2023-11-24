@@ -29,7 +29,7 @@ import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // geometries
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { createPlaneGeometryRawData, PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { createPlaneGeometryData, PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 
 // loaders
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
@@ -515,87 +515,115 @@ const createTransformFeedbackDrivenMesh = () => {
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
     // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
 
-    // const planeGeometryData = createPlaneGeometryData();
-    const planeGeometryRawData = createPlaneGeometryRawData();
-    const planeNum = 3;
-    const positions = new Float32Array(
-        maton
-            .range(planeNum, true)
-            .map((i) => {
-                return [
-                    ...planeGeometryRawData.positions.map((p) => {
-                        return p + i * 1;
-                    }),
-                ];
-            })
-            .flat()
-    );
-    // const normals = new Float32Array(maton.range(3 * 4 * planeNum));
-    const normals = new Float32Array(
-        maton
-            .range(planeNum)
-            .map(() => {
-                return [...planeGeometryRawData.normals];
-            })
-            .flat()
-    );
-    // const uvs =new Float32Array(maton.range(2 * 4 * planeNum));
-    const uvs = new Float32Array(
-        maton
-            .range(planeNum)
-            .map(() => {
-                return [...planeGeometryRawData.uvs];
-            })
-            .flat()
-    );
-    // const indices = maton.range(6 * planeNum);
-    const indices = maton
-        .range(planeNum)
-        .map((_, i) => {
-            return planeGeometryRawData.indices.map((index) => {
-                return index + i * 4;
-            });
+    const planeGeometryData = createPlaneGeometryData();
+    // const planeGeometryRawData = createPlaneGeometryRawData();
+    const planeNum = 4;
+    // const positions = maton
+    //     .range(planeNum, true)
+    //     .map(() => {
+    //         return [
+    //             ...planeGeometryRawData.positions.map((p) => {
+    //                 return p;
+    //             }),
+    //         ];
+    //     })
+    //     .flat();
+    // const normals = maton
+    //     .range(planeNum)
+    //     .map(() => {
+    //         return [...planeGeometryRawData.normals];
+    //     })
+    //     .flat();
+    // const uvs = maton
+    //     .range(planeNum)
+    //     .map(() => {
+    //         return [...planeGeometryRawData.uvs];
+    //     })
+    //     .flat();
+    // const indices = maton
+    //     .range(planeNum)
+    //     .map((_, i) => {
+    //         return planeGeometryRawData.indices.map((index) => {
+    //             return index + i * 4;
+    //         });
+    //     })
+    //     .flat();
+    const instancePosition = maton
+        .range(planeNum, true)
+        .map((i) => {
+            const p = i * 1;
+            return [p, p, p];
         })
         .flat();
-    // const velocities =new Float32Array(maton.range(3 * 4 * planeNum));
-    const velocities = new Float32Array(
-        maton.range(4 * 3 * planeNum).map(() => {
-            return 0;
+    const instanceScale = maton
+        .range(planeNum, true)
+        .map(() => {
+            return [1, 1, 1];
         })
-    );
-    const drawCount = planeGeometryRawData.drawCount * planeNum;
+        .flat();
+    const velocities = maton.range(4 * 3).map(() => {
+        return 0;
+    });
+    const instanceColor = maton.range(planeNum).map(() => {
+        const c = Color.fromRGB(
+            Math.floor(Math.random() * 240 + 15),
+            Math.floor(Math.random() * 10 + 245),
+            Math.floor(Math.random() * 245 + 10)
+        );
+        return [...c.elements];
+    }).flat();
+    
     const geometry = new Geometry({
         gpu,
         attributes: [
-            // ...planeGeometryData.attributes,
-            new Attribute({
-                name: AttributeNames.Position,
-                data: positions,
-                size: 3,
-            }),
-            new Attribute({
-                name: AttributeNames.Normal,
-                data: normals,
-                size: 3,
-            }),
-            new Attribute({
-                name: AttributeNames.Uv,
-                data: uvs,
-                size: 2,
-            }),
+            ...planeGeometryData.attributes,
+            // new Attribute({
+            //     name: AttributeNames.Position,
+            //     data: planeGeometryRawData.positions,
+            //     size: 3,
+            // }),
+            // new Attribute({
+            //     name: AttributeNames.Normal,
+            //     data: planeGeometryRawData.no,
+            //     size: 3,
+            // }),
+            // new Attribute({
+            //     name: AttributeNames.Uv,
+            //     data: new Float32Array(uvs),
+            //     size: 2,
+            // }),
             new Attribute({
                 name: 'aVelocity',
-                data: velocities,
+                data: new Float32Array(velocities),
                 size: 3,
             }),
+            new Attribute({
+                name: AttributeNames.InstancePosition,
+                data: new Float32Array(instancePosition),
+                size: 3,
+                divisor: 1
+            }),
+            new Attribute({
+                name: AttributeNames.InstanceScale,
+                data: new Float32Array(instanceScale),
+                size: 3,
+                divisor: 1
+            }),
+            new Attribute({
+                name: AttributeNames.InstanceVertexColor,
+                data: new Float32Array(instanceColor),
+                size: 4,
+                divisor: 1
+            }),
         ],
-        indices,
-        drawCount,
+        indices: planeGeometryData.indices,
+        drawCount: planeGeometryData.drawCount,
+        instanceCount: planeNum
     });
-    // const material = new Material({
-    //     vertexShader: `#version 300 es`
-    // });
+    console.log(planeGeometryData)
     const material = new GBufferMaterial({
+        isInstancing: true,
+        useVertexColor: true,
         vertexShaderModifier: {
             // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
             [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
@@ -607,6 +635,9 @@ const createTransformFeedbackDrivenMesh = () => {
         material,
     });
     mesh.transform.setScaling(new Vector3(1, 1, 1));
+    mesh.onStart = () => {
+        console.log(mesh);
+    }
     mesh.onFixedUpdate = ({ fixedTime }) => {
         transformFeedbackDoubleBuffer.uniforms.uTime.value = fixedTime;
         gpu.updateTransformFeedback({
@@ -702,36 +733,44 @@ const createGLTFSkinnedMesh = async () => {
 
     skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
-
+  
+    console.log("hoge a")
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstancePosition,
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
+            divisor: 1
         })
     );
+    console.log("hoge b")
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
+            divisor: 1
         })
     );
+    console.log("hoge c")
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstanceAnimationOffset,
             data: new Float32Array(animationOffsetInfo),
             size: 1,
+            divisor: 1
         })
     );
+    console.log("hoge d")
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstanceVertexColor,
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
+            divisor: 1
         })
     );
     // skinningMesh.material = new PhongMaterial({
@@ -758,8 +797,9 @@ const createGLTFSkinnedMesh = async () => {
         useVertexColor: true,
     });
     skinningMesh.onStart = () => {
-        console.log(skinnedMesh.material);
+        console.log(skinnedMesh);
     };
+    skinningMesh.enabled = false;
 
     return skinningMesh;
 };

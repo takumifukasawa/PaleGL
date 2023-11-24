@@ -47,12 +47,14 @@ export class Geometry {
         if (indices) {
             this.indices = indices;
         }
+        
+        // TODO: vaoの生成2回やっちゃってる. constructorとstartで
 
         // fallback
         // TOOD: fix
         attributes.forEach((attribute, i) => {
             attribute.location = i;
-            attribute.divisor = 0;
+            attribute.divisor = attribute.divisor || 0;
         });
 
         this.vertexArrayObject = new VertexArrayObject({

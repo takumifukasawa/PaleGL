@@ -141,6 +141,7 @@ export class VertexArrayObject extends GLObject {
         }
 
         if (divisor) {
+            console.log(divisor)
             gl.vertexAttribDivisor(newLocation, divisor);
         }
 
