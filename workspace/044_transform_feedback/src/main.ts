@@ -734,7 +734,6 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
   
-    console.log("hoge a")
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
@@ -744,7 +743,6 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1
         })
     );
-    console.log("hoge b")
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
@@ -754,7 +752,6 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1
         })
     );
-    console.log("hoge c")
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute(
         new Attribute({
@@ -764,7 +761,6 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1
         })
     );
-    console.log("hoge d")
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstanceVertexColor,
@@ -796,10 +792,10 @@ const createGLTFSkinnedMesh = async () => {
         isInstancing: true,
         useVertexColor: true,
     });
-    skinningMesh.onStart = () => {
-        console.log(skinnedMesh);
-    };
-    skinningMesh.enabled = false;
+    // skinningMesh.onStart = () => {
+    //     console.log(skinnedMesh);
+    // };
+    // skinningMesh.enabled = false;
 
     return skinningMesh;
 };
