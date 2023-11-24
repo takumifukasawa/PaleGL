@@ -34,6 +34,10 @@ export function clamp(x: number, min: number, max: number) {
     return Math.min(max, Math.max(x, min));
 }
 
+export function saturate(x: number) {
+    return clamp(x, 0, 1);
+}
+
 export function lerp(a: number, b: number, t: number) {
     return a + (b - a) * t;
 }

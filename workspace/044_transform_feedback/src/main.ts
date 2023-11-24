@@ -87,6 +87,7 @@ import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.t
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
+import {saturate} from "@/PaleGL/utilities/mathUtilities.ts";
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -430,7 +431,7 @@ const createTransformFeedbackDrivenMesh = () => {
     // begin create mesh
     //
 
-    const planeNum = 4;
+    const planeNum = 1024;
 
     const initialPosition = new Float32Array(
         maton
@@ -523,19 +524,19 @@ const createTransformFeedbackDrivenMesh = () => {
             vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
             i *= vec2(1., -1.);
             vec3 target = vec3(
-                i.x * 2. + cos(uTime * .1 + aTimeOffset) * .25,
-                i.y + 2. + sin(uTime * .1 + aTimeOffset) * .25,
-                sin(uTime * .1 + aTimeOffset) * 2.
+                i.x * 6. + cos(uTime * 2. + aTimeOffset * 8.) * 3.,
+                i.y + 2. + sin(uTime * 2. + aTimeOffset * 8.) * 1.,
+                sin(uTime * .1 + aTimeOffset * 4.) * 3.
             );
             vec3 v = target - aPosition;
             vec3 dir = normalize(v);
             // vVelocity = vec3(sin(uTime + aTimeOffset) * uNormalizedInputPosition.x, 0., 0.);
             vVelocity = mix(
-                aVelocity,
+                normalize(aVelocity),
                 // normalize(aVelocity),
-                dir * (.1 + uAttractRate * .5),
-                .1
-            );
+                dir,
+                .04 + uAttractRate * .05
+            ) * (.3 + uAttractRate * .5);
             vTimeOffset = aTimeOffset;
         }
         `,
@@ -612,7 +613,11 @@ const createTransformFeedbackDrivenMesh = () => {
     const instanceScale = maton
         .range(planeNum, true)
         .map(() => {
-            return [1, 1, 1];
+            return [
+                Math.random() * 0.4 + 0.2,
+                Math.random() * 0.4 + 0.2,
+                Math.random() * 0.4 + 0.2,
+            ];
         })
         .flat();
     const accPositions = maton.range(3 * planeNum).map(() => {
@@ -706,7 +711,8 @@ const createTransformFeedbackDrivenMesh = () => {
     mesh.onStart = () => {
         console.log(mesh);
     };
-    mesh.onUpdate = ({ time }) => {
+    let attractRate = 0;
+    mesh.onUpdate = ({ time, deltaTime }) => {
         // if(inputController.isDown)
         // {
         // console.log(inputController.normalizedInputPosition.x, inputController.normalizedInputPosition.y);
@@ -715,7 +721,10 @@ const createTransformFeedbackDrivenMesh = () => {
         // console.log(inputController.inputPosition.x, inputController.inputPosition.y);
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
-        transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = inputController.isDown ? 1 : 0;
+       
+        attractRate += 2. * (inputController.isDown ? 1 : -1) * deltaTime;
+        attractRate = saturate(attractRate);
+        transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = attractRate;
         gpu.updateTransformFeedback({
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
