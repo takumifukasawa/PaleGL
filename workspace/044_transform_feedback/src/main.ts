@@ -512,19 +512,23 @@ const createTransformFeedbackDrivenMesh = () => {
 
         uniform float uTime;
         uniform vec2 uNormalizedInputPosition;
+        uniform float uAttractRate;
 
         void main() {
+            vPosition = aPosition + aVelocity * .5;
             // vVelocity = vec3(sin(uTime + aTimeOffset) * 2., 0., 0.);
             vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
             i *= vec2(1., -1.);
-            vec3 target = vec3(i.x, i.y, 0.) * 3.;
+            vec3 target = vec3(i.x, i.y, sin(uTime * 4. + aTimeOffset) * 1.) * 3.;
             vec3 v = target - aPosition;
             vec3 dir = normalize(v);
             // vVelocity = vec3(sin(uTime + aTimeOffset) * uNormalizedInputPosition.x, 0., 0.);
-            vVelocity = vVelocity + dir * .05;
+            vVelocity = mix(
+                vVelocity,
+                vVelocity + dir * 2. * uAttractRate,
+                .05
+            );
             vTimeOffset = aTimeOffset;
-
-            vPosition = aPosition + aVelocity;
         }
         `,
         fragmentShader: `#version 300 es
@@ -542,7 +546,11 @@ const createTransformFeedbackDrivenMesh = () => {
             "uNormalizedInputPosition": {
                 type: UniformTypes.Vector2,
                 value: Vector2.zero
-            }
+            },
+            "uAttractRate": {
+                type: UniformTypes.Float,
+                value: 0
+            },
         },
         drawCount: planeNum,
     });
@@ -699,6 +707,7 @@ const createTransformFeedbackDrivenMesh = () => {
         // console.log(inputController.inputPosition.x, inputController.inputPosition.y);
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
+        transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = inputController.isDown ? 1 : 0;
         gpu.updateTransformFeedback({
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
