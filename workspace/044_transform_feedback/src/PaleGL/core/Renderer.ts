@@ -129,8 +129,6 @@ export class Renderer {
 
         this._bloomPass = new BloomPass({
             gpu,
-            threshold: 0.9,
-            bloomAmount: 0.8,
         });
         // this._bloomPass.enabled = false;
         this._scenePostProcess.addPass(this._bloomPass);
@@ -170,11 +168,11 @@ export class Renderer {
     get ambientOcclusionPass() {
         return this._ambientOcclusionPass;
     }
-    
+
     get ssrPass() {
         return this._ssrPass;
     }
-    
+
     get deferredShadingPass() {
         return this._deferredShadingPass;
     }
@@ -296,10 +294,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
         // transform feedback
         // ------------------------------------------------------------------------------
-      
-        
-       
-        
+
         // ------------------------------------------------------------------------------
         // setup render mesh infos
         // TODO: depth sort

@@ -5,7 +5,8 @@ import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
 // ---------------------------------------------------------------------
-// [GBufferA: RGBA8] rgb: base color
+// // [GBufferA: RGBA8] rgb: base color
+// [GBufferA: R11G11B10] rgb: base color + emissive color
 // [GBufferB: RGBA8] rgb: normal
 // [GBufferC: RGBA8] r: metallic, g: roughness
 // [Depth] depth prepass depth
@@ -83,7 +84,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             width: this.width,
             height: this.height,
             mipmap: false,
-            type: TextureTypes.RGBA,
+            type: TextureTypes.R11F_G11F_B10F,
             minFilter,
             magFilter,
         });

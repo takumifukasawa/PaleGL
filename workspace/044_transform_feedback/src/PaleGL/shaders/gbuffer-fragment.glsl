@@ -12,6 +12,7 @@ uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
 uniform float uMetallic;
 uniform float uRoughness;
+uniform vec4 uEmissiveColor;
 
 #include ./partial/tone-mapping.glsl
 
@@ -105,6 +106,9 @@ void main() {
     // surface.specularAmount = uSpecularAmount;
     
     resultColor = surface.diffuseColor;
+    
+    // emissiveはそのまま足す
+    resultColor += uEmissiveColor;
 
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);

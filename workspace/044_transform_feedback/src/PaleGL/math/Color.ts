@@ -72,11 +72,11 @@
         return new Color(1, 1, 1, 1);
     }
 
-    static black() {
+    static get black() {
         return new Color(0, 0, 0, 1);
     }
 
-    static green() {
+    static get green() {
         return new Color(0, 0, 1, 1);
     }
 

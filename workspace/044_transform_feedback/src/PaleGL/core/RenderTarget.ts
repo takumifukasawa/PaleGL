@@ -153,7 +153,8 @@ export class RenderTarget extends AbstractRenderTarget {
                 });
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
                 break;
-
+                
+            // R11G11B10F浮動小数点バッファ
             case RenderTargetTypes.R11F_G11F_B10F:
                 // TODO: r11g11b10 の場合はなくてもよい？
                 if (!gpu.checkExtension(GLExtensionName.ColorBufferFloat)) {

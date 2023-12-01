@@ -21,6 +21,7 @@ export type GBufferMaterialArgs = {
     // specularAmount?: number;
     metallic?: number;
     roughness?: number;
+    emissiveColor?: Color;
     normalMap?: Texture;
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
@@ -47,6 +48,8 @@ export class GBufferMaterial extends Material {
         // specularAmount,
         metallic,
         roughness,
+        // emissive
+        emissiveColor,
         // TODO: 外部化
         vertexShaderModifier = {},
         uniforms = {},
@@ -98,6 +101,10 @@ export class GBufferMaterial extends Material {
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
                 value: normalMapUvOffset || Vector2.one,
+            },
+            uEmissiveColor: {
+                type: UniformTypes.Color,
+                value: emissiveColor || Color.black,
             },
             [UniformNames.DirectionalLight]: {
                 type: UniformTypes.Struct,

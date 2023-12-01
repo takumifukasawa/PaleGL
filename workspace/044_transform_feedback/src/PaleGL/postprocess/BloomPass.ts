@@ -53,9 +53,9 @@ export class BloomPass implements IPostProcessPass {
     horizontalBlurMaterial: Material;
     verticalBlurMaterial: Material;
 
-    threshold: number = 0.8;
+    threshold: number = 0.9;
     tone: number = 1;
-    bloomAmount: number = 1;
+    bloomAmount: number = 0.8;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
@@ -223,6 +223,10 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.bloomAmount,
                 },
+                uExtractTexture: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
                 ...PostProcessPassBase.commonUniforms,
             },
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -335,6 +339,7 @@ export class BloomPass implements IPostProcessPass {
         this.compositePass.material.updateUniform('uBlur8Texture', this.renderTargetBlurMip8_Vertical.texture);
         this.compositePass.material.updateUniform('uBlur16Texture', this.renderTargetBlurMip16_Vertical.texture);
         this.compositePass.material.updateUniform('uBlur32Texture', this.renderTargetBlurMip32_Vertical.texture);
+        this.compositePass.material.updateUniform('uExtractTexture', this.extractBrightnessPass.renderTarget.texture);
         this.compositePass.material.updateUniform('uTone', this.tone);
         this.compositePass.material.updateUniform('uBloomAmount', this.bloomAmount);
 
