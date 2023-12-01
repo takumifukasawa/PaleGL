@@ -941,11 +941,20 @@ const main = async () => {
 
     sphereMesh = await createGLTFSphereMesh();
     sphereMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(3));
-        actor.transform.setTranslation(new Vector3(0, 3, 0));
+        actor.transform.setScaling(Vector3.fill(1));
+        // actor.transform.setTranslation(new Vector3(0, 3, 0));
     };
-    // TODO: デバッグで非表示にしてる
-    sphereMesh.enabled = false;
+    sphereMesh.onFixedUpdate = () => {
+        const w = 10;
+        const d = 10;
+        const ix = inputController.normalizedInputPosition.x * 2 - 1;
+        const iy = inputController.normalizedInputPosition.y * 2 - 1;
+        const x = ix * w;
+        const z = iy * d;
+        const y = 1;
+        sphereMesh.transform.setTranslation(new Vector3(x, y, z));
+        // console.log(inputController.normalizedInputPosition.x);
+    }
 
     skinnedMesh = await createGLTFSkinnedMesh();
 
@@ -1244,7 +1253,7 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = isSP ? 20 : 15;
+        orbitCameraController.distance = isSP ? 20 : 20;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
         orbitCameraController.azimuthSpeed = 100;
@@ -1252,7 +1261,7 @@ void main() {
         orbitCameraController.deltaAzimuthPower = 2;
         orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
-        orbitCameraController.start(20, -30);
+        orbitCameraController.start(0, -30);
     };
 
     // engine.onAfterStart = () => {
