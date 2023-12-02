@@ -7,10 +7,14 @@ out vec4 outColor;
 in vec2 vUv;
 
 uniform sampler2D uSrcTexture;
+uniform sampler2D uGBufferDTexture;
 uniform float uThreshold;
 
 void main() {
     vec4 color = texture(uSrcTexture, vUv);
+    // TODO: partialから引っ張ってくる
+    vec3 emissiveColor = texture(uGBufferDTexture, vUv).xyz;
+
     float k = uThreshold;
     
     // pattern_1
@@ -26,7 +30,8 @@ void main() {
 
     // pattern_3: HDR
     // color.xyz = clamp(color.xyz, vec3(0.), vec3(1.));
-    vec3 b = max(color.xyz - vec3(1.), vec3(0.));
+    // vec3 b = max(color.xyz - vec3(1.), vec3(0.));
+    vec3 b = max(emissiveColor.xyz - vec3(1.), vec3(0.));
     
     outColor = vec4(b, 1.);
 }

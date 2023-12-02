@@ -137,6 +137,10 @@ export class BloomPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.threshold,
                 },
+                [UniformNames.GBufferDTexture]: {
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
             },
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA
@@ -283,6 +287,7 @@ export class BloomPass implements IPostProcessPass {
             this.verticalBlurMaterial.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
+        this.extractBrightnessPass.material.updateUniform(UniformNames.GBufferDTexture, gBufferRenderTargets!.gBufferDTexture);
         this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
         this.extractBrightnessPass.render({
             gpu,

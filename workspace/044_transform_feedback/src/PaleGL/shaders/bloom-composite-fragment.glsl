@@ -28,6 +28,7 @@ void main() {
     vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color) * uBloomAmount;
 
     outColor = sceneColor + blurColor;
+    // outColor = extractColor;
 
     // for debug
     // outColor = sceneColor * .1 + blurColor * 1000.;
