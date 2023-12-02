@@ -29,9 +29,9 @@ void main() {
     // outColor = clamp(b, 0., 1.);
 
     // pattern_3: HDR
-    // color.xyz = clamp(color.xyz, vec3(0.), vec3(1.));
-    // vec3 b = max(color.xyz - vec3(1.), vec3(0.));
-    vec3 b = max(emissiveColor.xyz - vec3(1.), vec3(0.));
-    
+    // TODO: powerなどで調整したい
+    vec3 b = max(color.xyz - vec3(1.), vec3(0.));
+    // vec3 b = max(emissiveColor.xyz - vec3(1.), vec3(0.));
+
     outColor = vec4(b, 1.);
 }

@@ -277,7 +277,8 @@ vec3 outgoingLight =
     resultColor.xyz *= aoRate;
     // for debug
     // resultColor.xyz = vec3(aoRate);
-    
+  
+    // 自己発光も足す。1より溢れている場合はbloomで光が滲む感じになる
     resultColor.xyz += emissiveColor;
 
     outColor = resultColor;

@@ -27,7 +27,7 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 // import { Color } from '@/PaleGL/math/Color';
 import { Skybox } from '@/PaleGL/actors/Skybox';
-import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferresShadingPass';
+import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';

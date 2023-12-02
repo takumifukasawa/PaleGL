@@ -769,7 +769,7 @@ const createGLTFSphereMesh = async () => {
         roughness: 0,
         // specularAmount: 0.4,
         // ambientAmount: 0.2,
-        emissiveColor: new Color(2., 2., 2., 1.)
+        emissiveColor: new Color(1., 1., 1., 1.)
     });
     return mesh;
 };

@@ -10,6 +10,7 @@ uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
+uniform sampler2D uGBufferDTexture;
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uAmbientOcclusionTexture;
 uniform sampler2D uDeferredShadingTexture;
@@ -34,20 +35,25 @@ int bitShift(int data, int order) {
 
 void main() {
     vec2 tiling = vec2(4.);
+    // row: 0
     vec2 gBufferAUV = vUv * tiling + vec2(0., -3.);
     vec2 gBufferBUV = vUv * tiling + vec2(-1., -3.);
     vec2 gBufferCUV = vUv * tiling + vec2(-2., -3.);
-    vec2 depthUV = vUv * tiling + vec2(-3., -3.);
-    vec2 worldPositionUV = vUv * tiling + vec2(0., -2.);
-    vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-1., -2.);
-    vec2 aoUV = vUv * tiling + vec2(-2., -2.);
-    vec2 deferredShadingUV = vUv * tiling + vec2(-3., -2.);
-    vec2 lightShaftUV = vUv * tiling + vec2(0., -1.);
-    vec2 fogUV = vUv * tiling + vec2(-1., -1.);
+    vec2 gBufferDUV = vUv * tiling + vec2(-3., -3.);
+    // row: 1
+    vec2 depthUV = vUv * tiling + vec2(0., -2.);
+    vec2 worldPositionUV = vUv * tiling + vec2(-1., -2.);
+    vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-2., -2.);
+    vec2 aoUV = vUv * tiling + vec2(-3., -2.);
+    // row: 2
+    vec2 deferredShadingUV = vUv * tiling + vec2(0., -1.);
+    vec2 lightShaftUV = vUv * tiling + vec2(-1., -1.);
+    vec2 fogUV = vUv * tiling + vec2(-2., -1.);
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);
     GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, gBufferCUV);
+    GBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, gBufferDUV);
 
     // vec4 gBufferA = texture(uGBufferATexture, gBufferAUV) * isArea(gBufferAUV);
     // vec4 gBufferC = texture(uGBufferCTexture, gBufferCUV) * isArea(gBufferCUV);
@@ -84,6 +90,7 @@ void main() {
         vec4(gBufferA.baseColor, 1.) * isArea(gBufferAUV) +
         vec4(gBufferB.normal, 1.) * isArea(gBufferBUV) +
         vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.) * isArea(gBufferCUV) +
+        vec4(gBufferD.emissiveColor, 1.) * isArea(gBufferDUV) +
         // normalColor +
         // gBufferC +
         sceneDepth +
