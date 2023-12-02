@@ -105,57 +105,29 @@ uniform mat4 uInverseViewProjectionMatrix;
        
 // TODO: loop
 uniform Skybox uSkybox;
+
+#include ./partial/gbuffer-functions.glsl
         
 layout (location = 0) out vec4 outColor;
-
-// vec4 calcDirectionalLight(Surface surface, DirectionalLight directionalLight, Camera camera) {
-//     vec3 N = normalize(surface.worldNormal);
-//     vec3 L = normalize(directionalLight.direction);
-//     
-//     // lambert
-//     float diffuseRate = clamp(dot(N, L), 0., 1.);
-//     // half lambert
-//     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .5 + .5;
-//     // original lambert
-//     // float diffuseRate = clamp(dot(N, L), 0., 1.) * .9 + .1;
-//     
-//     vec3 diffuseColor = surface.diffuseColor.xyz * diffuseRate * uDirectionalLight.intensity * directionalLight.color.xyz;
-// 
-//     vec3 P = surface.worldPosition;
-//     vec3 E = camera.worldPosition;
-//     vec3 PtoL = L; // for directional light
-//     vec3 PtoE = normalize(E - P);
-//     vec3 H = normalize(PtoL + PtoE);
-//     // TODO: surfaceに持たせる
-//     float specularPower = 32.;
-//     float specularRate = clamp(dot(H, N), 0., 1.);
-//     specularRate = pow(specularRate, specularPower) * surface.specularAmount;
-//     vec3 specularColor = specularRate * directionalLight.intensity * directionalLight.color.xyz;
-// 
-//     vec4 resultColor = vec4(
-//         diffuseColor + specularColor,
-//         surface.diffuseColor.a
-//     );
-//     
-//     return resultColor;
-// }
 
 void main() {
     float eps = .0001; 
 
     vec2 uv = vUv;
 
-    vec4 gBufferA = texture(uGBufferATexture, uv);
-    vec4 gBufferB = texture(uGBufferBTexture, uv);
-    vec4 gBufferC = texture(uGBufferCTexture, uv);
-    vec4 gBufferD = texture(uGBufferDTexture, uv);
+    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
+    GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
+    GBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, uv);
        
     // TODO: use encode func
     // surface
-    vec3 baseColor = gBufferA.xyz;
-    float metallic = gBufferC.x;
-    float roughness = gBufferC.y;
-    vec3 emissiveColor = gBufferD.xyz;
+    vec3 baseColor = gBufferA.baseColor;
+    float metallic = gBufferC.metallic;
+    float roughness = gBufferC.roughness;
+    vec3 emissiveColor = gBufferD.emissiveColor;
+    float shadingModelId = gBufferB.shadingModelId;
+    vec3 worldNormal = gBufferB.normal * 2. - 1.;
   
     // depth
     float rawDepth = texture(uDepthTexture, uv).r; 
@@ -168,8 +140,16 @@ void main() {
         // outColor = encodePseudoHDR(baseColor);
         return;
     }
-
-    vec3 worldNormal = gBufferB.xyz * 2. - 1.;
+    
+    // unlit guard
+    // unlit shading model id = 2
+    if(1.5 < shadingModelId && shadingModelId < 2.5) {
+        outColor = vec4(emissiveColor, 1.);
+        // TODO: receive shadow
+        return;
+    }
+    // outColor = vec4(vec3(step(1.5, shadingModelId)), 1.);
+    // return;
     
     float aoRate = texture(uAmbientOcclusionTexture, uv).r;
 
@@ -206,9 +186,6 @@ void main() {
     geometry.normal = surface.worldNormal;
     geometry.viewDir = normalize(camera.worldPosition - surface.worldPosition);
     Material material;
-    // // TODO: bufferから引っ張ってくる
-    // float metallic = 1.;
-    // float roughness = 0.;
     vec3 albedo = baseColor;
     material.baseColor = albedo;
     material.diffuseColor = mix(albedo, vec3(0.), metallic); // 金属は拡散反射しない
@@ -216,8 +193,7 @@ void main() {
     material.roughness = roughness;
     material.metallic = metallic;
     ReflectedLight reflectedLight = ReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
-    // TODO: bufferから引っ張ってくる
-    vec3 emissive = vec3(0.);
+    // TODO: なくていい？
     float opacity = 1.;
         
     IncidentLight directLight;
@@ -257,7 +233,6 @@ void main() {
 // calc render equations
 
 vec3 outgoingLight =
-    emissive +
     reflectedLight.directDiffuse +
     reflectedLight.directSpecular +
     reflectedLight.indirectDiffuse +
@@ -280,7 +255,7 @@ vec3 outgoingLight =
   
     // 自己発光も足す。1より溢れている場合はbloomで光が滲む感じになる
     resultColor.xyz += emissiveColor;
-
+    
     outColor = resultColor;
 
     // 疑似HDRの場合

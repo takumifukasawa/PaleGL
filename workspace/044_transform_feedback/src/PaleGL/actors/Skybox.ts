@@ -14,6 +14,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
+import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -196,6 +197,10 @@ export class Skybox extends Mesh {
                 uRotationOffset: {
                     type: UniformTypes.Float,
                     value: rotationOffset,
+                },
+                [UniformNames.ShadingModelId]: {
+                    type: UniformTypes.Int,
+                    value: ShadingModelIds.Skybox,
                 },
             },
         });

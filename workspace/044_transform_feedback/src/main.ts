@@ -88,6 +88,7 @@ import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDo
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
 import {saturate} from "@/PaleGL/utilities/mathUtilities.ts";
+import {UnlitMaterial} from "@/PaleGL/materials/UnlitMaterial.ts";
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -755,22 +756,27 @@ const createGLTFSphereMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
-    mesh.material = new GBufferMaterial({
-        // gpu,
-        // diffuseMap: floorDiffuseMap,
-        // normalMap: floorNormalMap,
-        // envMap: cubeMap,
-        // diffuseColor: new Color(0.5, 0.05, 0.05, 1),
-        diffuseColor: new Color(1, 0.76, 0.336, 1),
-        // diffuseColor: new Color(0, 0, 0, 1),
-        // diffuseColor: new Color(1, 1, 1, 1),
+    mesh.material = new UnlitMaterial({
+        diffuseColor: new Color(0, 0., 0.336, 1),
+        emissiveColor: new Color(2, 2, 2, 2),
         receiveShadow: true,
-        metallic: 0,
-        roughness: 0,
-        // specularAmount: 0.4,
-        // ambientAmount: 0.2,
-        emissiveColor: new Color(1., 1., 1., 1.)
     });
+    // mesh.material = new GBufferMaterial({
+    //     // gpu,
+    //     // diffuseMap: floorDiffuseMap,
+    //     // normalMap: floorNormalMap,
+    //     // envMap: cubeMap,
+    //     // diffuseColor: new Color(0.5, 0.05, 0.05, 1),
+    //     diffuseColor: new Color(1, 0.76, 0.336, 1),
+    //     // diffuseColor: new Color(0, 0, 0, 1),
+    //     // diffuseColor: new Color(1, 1, 1, 1),
+    //     receiveShadow: true,
+    //     metallic: 0,
+    //     roughness: 0,
+    //     // specularAmount: 0.4,
+    //     // ambientAmount: 0.2,
+    //     emissiveColor: new Color(1., 1., 1., 1.)
+    // });
     return mesh;
 };
 
@@ -1346,6 +1352,19 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
+
+
+    directionalLightDebuggerGroup.addSliderDebugger({
+        label: 'intensity',
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: directionalLight.intensity,
+        onChange: (value) => {
+            directionalLight.intensity = value;
+        },
+    });
+
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'pos x',

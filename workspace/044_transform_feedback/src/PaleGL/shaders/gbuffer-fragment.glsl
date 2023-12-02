@@ -13,6 +13,7 @@ uniform float uAmbientAmount;
 uniform float uMetallic;
 uniform float uRoughness;
 uniform vec4 uEmissiveColor;
+uniform int uShadingModelId;
 
 #include ./partial/tone-mapping.glsl
 
@@ -83,8 +84,9 @@ void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
     
     vec2 uv = vUv * uDiffuseMapUvScale;
-   
+  
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
    
     vec3 worldNormal = vNormal;
    
@@ -93,18 +95,17 @@ void main() {
 #else
     worldNormal = normalize(vNormal);
 #endif  
+    
+#ifdef USE_VERTEX_COLOR
+    diffuseColor *= vVertexColor;
+#endif
+
+    // surface.specularAmount = uSpecularAmount;
 
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    
-#ifdef USE_VERTEX_COLOR
-    surface.diffuseColor = vVertexColor * uDiffuseColor * diffuseMapColor;
-#else
-    surface.diffuseColor = uDiffuseColor * diffuseMapColor;
-#endif
-
-    // surface.specularAmount = uSpecularAmount;
+    surface.diffuseColor = diffuseColor;
     
     resultColor = surface.diffuseColor;
     
@@ -119,7 +120,7 @@ void main() {
     // outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
     // outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
     outGBufferA = EncodeGBufferA(resultColor.rgb);
-    outGBufferB = EncodeGBufferB(worldNormal);
+    outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(uMetallic, uRoughness);
     outGBufferD = EncodeGBufferD(uEmissiveColor.rgb);
 }

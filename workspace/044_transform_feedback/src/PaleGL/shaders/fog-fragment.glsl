@@ -102,6 +102,7 @@ void main() {
     outColor = vec4(mix(applyOcclusionColor.xyz, fogColor.xyz, fogRate), 1.);
     
     // for debug
+    // outColor = sceneColor;
     // outColor = vec4(vec3(occlusion), 1.);
     // outColor = vec4(vec3(sceneDepth), 1.);
     // outColor = vec4(mix(sceneColor.xyz, fogColor.xyz, rate), 1.);

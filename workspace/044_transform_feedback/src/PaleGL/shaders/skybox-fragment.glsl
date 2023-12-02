@@ -12,6 +12,7 @@ uniform samplerCube uCubeTexture;
 uniform vec3 uViewPosition;
 uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
+uniform int uShadingModelId;
 
 // out vec4 outColor;
 // layout (location = 0) out vec4 outGBufferA;
@@ -48,7 +49,7 @@ void main() {
     // outGBufferB = vec4(0., 0., 0., 1.);
     // outGBufferC = vec4(0., 0., 0., 1.);
     outGBufferA = EncodeGBufferA(envMapColor);
-    outGBufferB = EncodeGBufferB(vec3(0.));
+    outGBufferB = EncodeGBufferB(vec3(0.), uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(vec3(0.));
 }

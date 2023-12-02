@@ -7,13 +7,10 @@ out vec4 outColor;
 in vec2 vUv;
 
 uniform sampler2D uSrcTexture;
-uniform sampler2D uGBufferDTexture;
 uniform float uThreshold;
 
 void main() {
     vec4 color = texture(uSrcTexture, vUv);
-    // TODO: partialから引っ張ってくる
-    vec3 emissiveColor = texture(uGBufferDTexture, vUv).xyz;
 
     float k = uThreshold;
     

@@ -6,8 +6,9 @@ import { GPU } from '@/PaleGL/core/GPU';
 
 // ---------------------------------------------------------------------
 // TODO: B,Cはまとめられる気がする
+// TODO: shading model は RGB10A2 で rgb: normal + a: shading model でいい気がする
 // [GBufferA: RGBA8] rgb: base color
-// [GBufferB: RGBA8] rgb: normal
+// [GBufferB: RGBA8] rgb: normal, a: shading model
 // [GBufferC: RGBA8] r: metallic, g: roughness
 // [GBufferD: R11G11B10] rgb: emissive color
 // [Depth] depth prepass depth

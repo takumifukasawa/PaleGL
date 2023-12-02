@@ -236,6 +236,8 @@ export const UniformNames = {
     GBufferBTexture: 'uGBufferBTexture',
     GBufferCTexture: 'uGBufferCTexture',
     GBufferDTexture: 'uGBufferDTexture',
+    // shading model id
+    ShadingModelId: 'uShadingModelId',
     // depth
     DepthTexture: 'uDepthTexture',
     // ao

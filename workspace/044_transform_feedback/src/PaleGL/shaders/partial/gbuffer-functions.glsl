@@ -1,4 +1,6 @@
 ﻿
+#define SHADING_MODEL_NUM 3.
+
 struct GBufferA {
     vec3 baseColor; // rgb
     // a
@@ -6,7 +8,7 @@ struct GBufferA {
 
 struct GBufferB {
     vec3 normal; // rgb
-    // a
+    float shadingModelId; // a
 };
 
 struct GBufferC {
@@ -23,8 +25,10 @@ vec4 EncodeGBufferA(vec3 baseColor) {
     return vec4(baseColor, 1.);
 }
 
-vec4 EncodeGBufferB(vec3 normal) {
-    return vec4(normal * .5 + .5, 1.);
+vec4 EncodeGBufferB(vec3 normal, int shadingModelId) {
+    // shading model の数で clampする
+    float id = float(shadingModelId) / SHADING_MODEL_NUM;
+    return vec4(normal * .5 + .5, id);
 }
 
 vec4 EncodeGBufferC(float metallic, float roughness) {
@@ -46,6 +50,7 @@ GBufferB DecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
     vec4 color = texture(gBufferBTexture, uv);
     GBufferB gBufferB;
     gBufferB.normal = color.rgb * 2. - 1.;
+    gBufferB.shadingModelId = color.a * SHADING_MODEL_NUM;
     return gBufferB;
 }
 

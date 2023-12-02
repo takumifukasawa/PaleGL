@@ -1,3 +1,39 @@
+// import { MaterialArgs, Uniforms } from '@/PaleGL/materials/Material';
+// import { VertexShaderModifier } from '@/PaleGL/constants';
+// import { Vector2 } from '@/PaleGL/math/Vector2';
+// import { Color } from '@/PaleGL/math/Color';
+// import { Texture } from '@/PaleGL/core/Texture';
+//
+// import { GBufferMaterial, ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
+//
+// export type UnlitMaterialArgs = {
+//     diffuseColor?: Color;
+//     diffuseMap?: Texture;
+//     diffuseMapUvScale?: Vector2;
+//     diffuseMapUvOffset?: Vector2;
+//     emissiveColor?: Color;
+//     vertexShaderModifier?: VertexShaderModifier;
+//     uniforms?: Uniforms;
+// } & MaterialArgs;
+//
+// // NOTE:
+// // GBufferのLitのシェーダー使ってるけど普通にunlit専用のシェーダーがある方が本当はきれい. 容量の問題
+//
+// export class UnlitMaterial extends GBufferMaterial {
+//     // // params
+//     // diffuseColor;
+//     // specularAmount;
+//
+//     constructor({ ...options }: UnlitMaterialArgs = {}) {
+//         // TODO: できるだけconstructorの直後に持っていきたい
+//         super({
+//             ...options,
+//             name: 'UnlitMaterial',
+//             shadingModelId: ShadingModelIds.Unlit,
+//         });
+//     }
+// }
+
 import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
 import { DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
@@ -6,71 +42,40 @@ import { Color } from '@/PaleGL/math/Color';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import gBufferFrag from '@/PaleGL/shaders/gbuffer-fragment.glsl';
+import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
+import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
 
-export const ShadingModelIds = {
-    Lit: 1,
-    Unlit: 2,
-    Skybox: 3
-};
-
-export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
-
-export type GBufferMaterialArgs = {
+export type UnlitMaterialArgs = {
     diffuseColor?: Color;
     diffuseMap?: Texture;
     diffuseMapUvScale?: Vector2;
     diffuseMapUvOffset?: Vector2;
-    // specularAmount?: number;
-    metallic?: number;
-    roughness?: number;
     emissiveColor?: Color;
-    normalMap?: Texture;
-    normalMapUvScale?: Vector2;
-    normalMapUvOffset?: Vector2;
     vertexShaderModifier?: VertexShaderModifier;
     uniforms?: Uniforms;
-    shadingModelId?: ShadingModelIds
 } & MaterialArgs;
 
-export class GBufferMaterial extends Material {
-    // // params
-    // diffuseColor;
-    // specularAmount;
-
+export class UnlitMaterial extends Material {
     constructor({
-        // diffuse
         diffuseColor,
         diffuseMap,
         diffuseMapUvScale, // vec2
         diffuseMapUvOffset, // vec2
-        // normal
-        normalMap,
-        normalMapUvScale, // vec2
-        normalMapUvOffset, // vec2,
-        // params
-        // specularAmount,
-        metallic,
-        roughness,
-        // emissive
         emissiveColor,
         // TODO: 外部化
         vertexShaderModifier = {},
-        shadingModelId = ShadingModelIds.Lit,
         uniforms = {},
         ...options
-    }: GBufferMaterialArgs = {}) {
+    }: UnlitMaterialArgs = {}) {
         // this.specularAmount =
 
         const baseUniforms: Uniforms = {
             uDiffuseColor: {
                 type: UniformTypes.Color,
-                value: diffuseColor || Color.white,
+                value: diffuseColor || Color.black,
             },
             uDiffuseMap: {
                 type: UniformTypes.Texture,
@@ -78,56 +83,19 @@ export class GBufferMaterial extends Material {
             },
             uDiffuseMapUvScale: {
                 type: UniformTypes.Vector2,
-                // value: Vector2.one,
                 value: diffuseMapUvScale || Vector2.one,
             },
             uDiffuseMapUvOffset: {
                 type: UniformTypes.Vector2,
-                // value: Vector2.one,
                 value: diffuseMapUvOffset || Vector2.one,
-            },
-            // uSpecularAmount: {
-            //     type: UniformTypes.Float,
-            //     value: specularAmount || 1,
-            // },
-            uMetallic: {
-                type: UniformTypes.Float,
-                value: metallic || 0,
-            },
-            uRoughness: {
-                type: UniformTypes.Float,
-                value: roughness || 0,
-            },
-            uNormalMap: {
-                type: UniformTypes.Texture,
-                value: normalMap || null,
-            },
-            uNormalMapUvScale: {
-                type: UniformTypes.Vector2,
-                // value: Vector2.one,
-                value: normalMapUvScale || Vector2.one,
-            },
-            uNormalMapUvOffset: {
-                type: UniformTypes.Vector2,
-                // value: Vector2.one,
-                value: normalMapUvOffset || Vector2.one,
             },
             uEmissiveColor: {
                 type: UniformTypes.Color,
                 value: emissiveColor || Color.black,
             },
-            [UniformNames.DirectionalLight]: {
-                type: UniformTypes.Struct,
-                value: {
-                    direction: Vector3.zero,
-                    intensity: 0,
-                    color: new Vector4(0, 0, 0, 0),
-                },
-            },
             [UniformNames.ShadingModelId]: {
-                type: UniformTypes.Int, // float,intどちらでもいい
-                // value: shadingModelId,
-                value: shadingModelId,
+                type: UniformTypes.Int,
+                value: ShadingModelIds.Unlit,
             },
         };
 
@@ -154,29 +122,21 @@ export class GBufferMaterial extends Material {
         // TODO: できるだけconstructorの直後に持っていきたい
         super({
             ...options,
-            name: 'GBufferMaterial',
-            // vertexShaderGenerator,
-            // vertexShader,
-            // fragmentShaderGenerator,
-            // depthFragmentShaderGenerator,
+            name: 'UnlitMaterial',
             vertexShaderModifier,
             uniforms: mergedUniforms,
             depthUniforms,
-            useNormalMap: !!normalMap,
+            useNormalMap: false,
             depthTest: true,
-            depthWrite: false,
-            depthFuncType: DepthFuncTypes.Equal,
+            depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき
+            depthFuncType: DepthFuncTypes.Equal, // TODO: これはGBufferの場合
         });
     }
 
     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = gBufferVert;
-        this.fragmentShader = gBufferFrag;
+        this.fragmentShader = unlitFrag;
         this.depthFragmentShader = gBufferDepthFrag;
-
         super.start({ gpu, attributeDescriptors });
-
-        // console.log(this.rawVertexShader)
-        // console.log(this.rawFragmentShader)
     }
 }
