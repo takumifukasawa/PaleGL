@@ -757,8 +757,7 @@ const createGLTFSphereMesh = async () => {
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = new UnlitMaterial({
-        diffuseColor: new Color(0, 0., 0.336, 1),
-        emissiveColor: new Color(5, 5, 5, 1),
+        emissiveColor: new Color(2, 2, 2, 1),
         receiveShadow: true,
     });
     // mesh.material = new GBufferMaterial({

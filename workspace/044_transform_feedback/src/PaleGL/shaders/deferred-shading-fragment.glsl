@@ -111,7 +111,9 @@ uniform Skybox uSkybox;
 layout (location = 0) out vec4 outColor;
 
 void main() {
-    float eps = .0001; 
+    float eps = .0001;
+
+    vec4 resultColor = vec4(0, 0, 0, 1);
 
     vec2 uv = vUv;
 
@@ -133,6 +135,9 @@ void main() {
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
+    // geometry
+    vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    
     // depth guard
     if(step(rawDepth, 1. - eps) < .5) {
         outColor = vec4(baseColor, 1.);
@@ -144,16 +149,21 @@ void main() {
     // unlit guard
     // unlit shading model id = 2
     if(1.5 < shadingModelId && shadingModelId < 2.5) {
-        outColor = vec4(emissiveColor, 1.);
-        // TODO: receive shadow
+        resultColor = vec4(emissiveColor, 1.);
+        // TODO: unlitの場合って receive shadow なくてもいいよね？
+// #ifdef USE_RECEIVE_SHADOW
+//         vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
+//         if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+//             resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
+//         }
+// #endif
+        outColor = resultColor;
         return;
     }
     // outColor = vec4(vec3(step(1.5, shadingModelId)), 1.);
     // return;
     
     float aoRate = texture(uAmbientOcclusionTexture, uv).r;
-
-    vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
     // for debug
     // outColor = vec4(worldPosition, 1.);
@@ -173,8 +183,6 @@ void main() {
 
     Camera camera;
     camera.worldPosition = uViewPosition;
-    
-    vec4 resultColor = vec4(0, 0, 0, 1);
    
     // phong
     // directional light
