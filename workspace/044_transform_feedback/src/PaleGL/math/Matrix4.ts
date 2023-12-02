@@ -227,29 +227,59 @@ export class Matrix4 {
     }
 
     static translationMatrix(v: Vector3) {
-        return new Matrix4(1, 0, 0, v.x, 0, 1, 0, v.y, 0, 0, 1, v.z, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            1, 0, 0, v.x,
+            0, 1, 0, v.y,
+            0, 0, 1, v.z,
+            0, 0, 0, 1
+        );
     }
 
     static scalingMatrix(v: Vector3) {
-        return new Matrix4(v.x, 0, 0, 0, 0, v.y, 0, 0, 0, 0, v.z, 0, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            v.x, 0, 0, 0,
+            0, v.y, 0, 0,
+            0, 0, v.z, 0,
+            0, 0, 0, 1
+        );
     }
 
     static rotationXMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            1, 0, 0, 0,
+            0, c, -s, 0,
+            0, s, c,0,
+            0, 0, 0, 1
+        );
     }
 
     static rotationYMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            c, 0, s, 0,
+            0, 1, 0, 0,
+            -s, 0, c, 0,
+            0, 0, 0, 1
+        );
     }
 
     static rotationZMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
-        return new Matrix4(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            c, -s, 0, 0,
+            s, c, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
     }
 
     static multiplyMatrices(...matrices: Matrix4[]) {
@@ -322,7 +352,13 @@ export class Matrix4 {
         const m32 = ma30 * mb02 + ma31 * mb12 + ma32 * mb22 + ma33 * mb32;
         const m33 = ma30 * mb03 + ma31 * mb13 + ma32 * mb23 + ma33 * mb33;
 
-        const m = new Matrix4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+        // prettier-ignore
+        const m = new Matrix4(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        );
 
         this.copy(m);
 
@@ -574,7 +610,13 @@ export class Matrix4 {
         const m03 = -(right + left) / (right - left); // translate x
         const m13 = -(top + bottom) / (top - bottom); // translate y
         const m23 = -(far + near) / (far - near); // translate z
-        return new Matrix4(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
+        // prettier-ignore
+        return new Matrix4(
+            m00, 0, 0, m03,
+            0, m11, 0, m13,
+            0, 0, m22, m23,
+            0, 0, 0, 1
+        );
     }
 
     // ref
@@ -644,7 +686,13 @@ export class Matrix4 {
             : Vector3.subVectors(center, eye).normalize();
         const r = Vector3.crossVectors(up.normalize(), f).normalize();
         const u = Vector3.crossVectors(f, r);
-        const result = new Matrix4(r.x, u.x, f.x, eye.x, r.y, u.y, f.y, eye.y, r.z, u.z, f.z, eye.z, 0, 0, 0, 1);
+        // prettier-ignore
+        const result = new Matrix4(
+            r.x, u.x, f.x, eye.x,
+            r.y, u.y, f.y, eye.y,
+            r.z, u.z, f.z, eye.z,
+            0, 0, 0, 1
+        );
         return result;
     }
 

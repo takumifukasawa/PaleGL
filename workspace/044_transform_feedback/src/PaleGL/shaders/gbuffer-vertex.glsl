@@ -28,8 +28,83 @@ uniform float uTime;
 #include ./partial/receive-shadow-vertex-uniforms.glsl
 #include ./partial/skinning-vertex-uniforms.glsl
 
-// TODO: needs??
-// ${insertUniforms || ''}
+
+mat4 getRotationXMat(float rad) {
+    float c = cos(rad);
+    float s = sin(rad);
+    // 行オーダー
+    return mat4(
+        // 行オーダー
+        // 1., 0., 0., 0.,
+        // 0., c, -s, 0.,
+        // 0., s, c, 0.,
+        // 0., 0., 0., 1.
+        // 列オーダー
+        1., 0., 0., 0.,
+        0., c, s, 0.,
+        0., -s, c, 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getRotationYMat(float rad) {
+    float c = cos(rad);
+    float s = sin(rad);
+    return mat4(
+        // 行オーダー
+        // c, 0., s, 0.,
+        // 0., 1., 0., 0.,
+        // -s, 0., c, 0.,
+        // 0., 0., 0., 1.
+        // 列オーダー
+        c, 0., -s, 0.,
+        0., 1., 0., 0.,
+        s, 0., c, 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getRotationZMat(float rad) {
+    float c = cos(rad);
+    float s = sin(rad);
+    return mat4(
+        // 行オーダー
+        // c, -s, 0., 0.,
+        // s, c, 0., 0.,
+        // 0., 0., 1., 0.,
+        // 0., 0., 0., 1.
+        // 列オーダー
+        c, s, 0., 0.,
+        -s, c, 0., 0.,
+        0., 0., 1., 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getTranslationMat(vec3 p) {
+    return mat4(
+        // 行オーダー
+        // 1., 0., 0., aInstancePosition.x,
+        // 0., 1., 0., aInstancePosition.y,
+        // 0., 0., 1., aInstancePosition.z,
+        // 0., 0., 0., 1
+        // 列オーダー
+        1., 0., 0., 0.,
+        0., 1., 0., 0.,
+        0., 0., 1., 0.,
+        p.x, p.y, p.z, 1.
+    );
+}
+
+mat4 getScalingMat(vec3 s) {
+    return mat4(
+        // 行オーダー / 列オーダー
+        s.x, 0., 0., 0.,
+        0., s.y, 0., 0.,
+        0., 0., s.z, 0.,
+        0., 0., 0., 1.
+    );
+}
 
 void main() {
 
@@ -49,12 +124,17 @@ void main() {
     vec4 worldPosition = uWorldMatrix * localPosition;
 
 #ifdef USE_INSTANCING
-    mat4 instanceTransform = mat4(
-        aInstanceScale.x,       0,                      0,                      0,
-        0,                      aInstanceScale.y,       0,                      0,
-        0,                      0,                      aInstanceScale.z,       0,
-        aInstancePosition.x,    aInstancePosition.y,    aInstancePosition.z,    1
-    );
+    mat4 instanceTranslation = getTranslationMat(aInstancePosition);
+    mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
+    mat4 instanceRotationX = getRotationXMat(0.);
+    mat4 instanceRotationY = getRotationYMat(0.);
+    mat4 instanceRotationZ = getRotationZMat(0.);
+    mat4 instanceTransform =
+        instanceTranslation *
+        instanceRotationY *
+        instanceRotationX *
+        instanceRotationZ *
+        instanceScaling;
     
     // NOTE: 本当はworldMatrixをかける前の方がよい
     worldPosition = instanceTransform * worldPosition;

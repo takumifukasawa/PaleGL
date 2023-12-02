@@ -528,6 +528,39 @@ const createTransformFeedbackDrivenMesh = () => {
         {
             return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
         }
+        
+        mat4 rotX(float deg) {
+            float c = cos(deg);
+            float s = sin(deg);
+            return mat4(
+                1., 0., 0., 0.,
+                0., c, -s, 0.,
+                0., s, c, 0.,
+                0., 0., 0., 1.
+            );
+        }
+        
+        mat4 rotY(float deg) {
+            float c = cos(deg);
+            float s = sin(deg);
+            return mat4(
+                c, 0., s, 0.,
+                0., 1., 0., 0.,
+                -s, 0., c, 0.,
+                0., 0., 0., 1.
+            );
+        }
+        
+        mat4 rotZ(float deg) {
+            float c = cos(deg);
+            float s = sin(deg);
+            return mat4(
+                c, -s, 0., 0.,
+                s, c, 0., 0.,
+                0., 0., 1., 0.,
+                0., 0., 0., 1.
+            );
+        }
 
         void main() {
             vPosition = aPosition + aVelocity;
