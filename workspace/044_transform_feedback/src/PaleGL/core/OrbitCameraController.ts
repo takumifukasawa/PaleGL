@@ -22,6 +22,8 @@ export class OrbitCameraController {
     deltaAzimuthPower: number = 1;
     deltaAltitudePower: number = 1;
 
+    enabled: boolean = true;
+
     #targetCameraPosition = Vector3.zero;
     #currentCameraPosition = Vector3.zero;
 
@@ -42,11 +44,18 @@ export class OrbitCameraController {
     }
 
     setDelta(delta: { x: number; y: number }) {
+        if (!this.enabled) {
+            return;
+        }
         this.#targetX = delta.x * this.deltaAzimuthPower;
         this.#targetY = delta.y * this.deltaAltitudePower;
     }
 
     fixedUpdate() {
+        if (!this.enabled) {
+            return;
+        }
+       
         this.#targetX = Math.sign(this.#targetX) * Math.max(0, Math.abs(this.#targetX) - this.attenuation);
         this.#targetY = Math.sign(this.#targetY) * Math.max(0, Math.abs(this.#targetY) - this.attenuation);
 

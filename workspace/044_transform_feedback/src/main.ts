@@ -150,10 +150,10 @@ document.head.appendChild(styleElement);
 
 const debuggerStates: {
     instanceNum: number;
-    orbitControlsEnabled: boolean;
+    // orbitControlsEnabled: boolean;
 } = {
     instanceNum: 0,
-    orbitControlsEnabled: true,
+    // orbitControlsEnabled: true,
 };
 
 const searchParams = new URLSearchParams(location.search);
@@ -244,7 +244,8 @@ captureSceneCamera.onFixedUpdate = () => {
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
     // 2: orbit controls
-    if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+    // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+    if (orbitCameraController.enabled) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
@@ -1266,8 +1267,9 @@ void main() {
         orbitCameraController.altitudeSpeed = 100;
         orbitCameraController.deltaAzimuthPower = 2;
         orbitCameraController.deltaAltitudePower = 2;
-        orbitCameraController.lookAtTarget = new Vector3(0, -1, 0);
-        orbitCameraController.start(0, -30);
+        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
+        orbitCameraController.start(0, -40);
+        orbitCameraController.enabled = false;
     };
 
     // engine.onAfterStart = () => {
@@ -1328,8 +1330,10 @@ function initDebugger() {
 
     debuggerGUI.addToggleDebugger({
         label: 'orbit controls enabled',
-        initialValue: debuggerStates.orbitControlsEnabled,
-        onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
+        // initialValue: debuggerStates.orbitControlsEnabled,
+        // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
+        initialValue: orbitCameraController.enabled,
+        onChange: (value) => (orbitCameraController.enabled = value),
     });
 
     //
