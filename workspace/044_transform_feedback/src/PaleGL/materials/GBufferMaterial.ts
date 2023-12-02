@@ -10,7 +10,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import gBufferFrag from '@/PaleGL/shaders/gbuffer-fragment.glsl';
+import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 
 export const ShadingModelIds = {
@@ -38,6 +38,7 @@ export type GBufferMaterialArgs = {
     shadingModelId?: ShadingModelIds
 } & MaterialArgs;
 
+// TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
 export class GBufferMaterial extends Material {
     // // params
     // diffuseColor;
@@ -171,7 +172,7 @@ export class GBufferMaterial extends Material {
 
     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = gBufferVert;
-        this.fragmentShader = gBufferFrag;
+        this.fragmentShader = litFrag;
         this.depthFragmentShader = gBufferDepthFrag;
 
         super.start({ gpu, attributeDescriptors });
