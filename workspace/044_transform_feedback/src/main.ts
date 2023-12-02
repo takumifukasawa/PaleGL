@@ -758,7 +758,7 @@ const createGLTFSphereMesh = async () => {
     mesh.castShadow = true;
     mesh.material = new UnlitMaterial({
         diffuseColor: new Color(0, 0., 0.336, 1),
-        emissiveColor: new Color(2, 2, 2, 2),
+        emissiveColor: new Color(5, 5, 5, 1),
         receiveShadow: true,
     });
     // mesh.material = new GBufferMaterial({
@@ -1679,7 +1679,7 @@ function initDebugger() {
     bloomDebuggerGroup.addSliderDebugger({
         label: 'bloom threshold',
         minValue: 0,
-        maxValue: 1,
+        maxValue: 2,
         stepValue: 0.001,
         initialValue: renderer.bloomPass.threshold,
         onChange: (value) => {

@@ -27,7 +27,7 @@ void main() {
 
     // pattern_3: HDR
     // TODO: powerなどで調整したい
-    vec3 b = max(color.xyz - vec3(1.), vec3(0.));
+    vec3 b = max(color.xyz - vec3(1. + uThreshold), vec3(0.));
     // vec3 b = max(emissiveColor.xyz - vec3(1.), vec3(0.));
 
     outColor = vec4(b, 1.);

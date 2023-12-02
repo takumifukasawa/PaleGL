@@ -53,7 +53,7 @@ export class BloomPass implements IPostProcessPass {
     horizontalBlurMaterial: Material;
     verticalBlurMaterial: Material;
 
-    threshold: number = 0.9;
+    threshold: number = 0;
     tone: number = 1;
     bloomAmount: number = 0.8;
 
@@ -63,7 +63,7 @@ export class BloomPass implements IPostProcessPass {
 
     constructor({
         gpu,
-        threshold = 0.8,
+        threshold = 0,
         tone = 1,
         bloomAmount = 1,
     }: {
