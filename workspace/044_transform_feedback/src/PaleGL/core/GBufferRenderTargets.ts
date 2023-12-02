@@ -5,10 +5,11 @@ import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
 
 // ---------------------------------------------------------------------
-// // [GBufferA: RGBA8] rgb: base color
-// [GBufferA: R11G11B10] rgb: base color + emissive color
+// TODO: B,Cはまとめられる気がする
+// [GBufferA: RGBA8] rgb: base color
 // [GBufferB: RGBA8] rgb: normal
 // [GBufferC: RGBA8] r: metallic, g: roughness
+// [GBufferD: R11G11B10] rgb: emissive color
 // [Depth] depth prepass depth
 // ---------------------------------------------------------------------
 
@@ -23,6 +24,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
     private _gBufferATexture: Texture;
     private _gBufferBTexture: Texture;
     private _gBufferCTexture: Texture;
+    private _gBufferDTexture: Texture;
     private _depthTexture: Texture | null = null;
 
     // get textures() {
@@ -39,6 +41,10 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
 
     get gBufferCTexture() {
         return this._gBufferCTexture;
+    }
+    
+    get gBufferDTexture() {
+        return this._gBufferDTexture;
     }
 
     get depthTexture() {
@@ -84,7 +90,7 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
             width: this.width,
             height: this.height,
             mipmap: false,
-            type: TextureTypes.R11F_G11F_B10F,
+            type: TextureTypes.RGBA,
             minFilter,
             magFilter,
         });
@@ -125,6 +131,23 @@ export class GBufferRenderTargets extends AbstractRenderTarget {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gBufferCAttachment, gl.TEXTURE_2D, this._gBufferCTexture.glObject, 0);
         this.framebuffer.registerDrawBuffer(gBufferCAttachment as GLColorAttachment);
         this._gBufferTextures.push(this._gBufferCTexture);
+
+        //
+        // 4: GBufferD
+        //
+        const gBufferDAttachment = gl.COLOR_ATTACHMENT0 + 3;
+        this._gBufferDTexture = new Texture({
+            gpu,
+            width: this.width,
+            height: this.height,
+            mipmap: false,
+            type: TextureTypes.R11F_G11F_B10F,
+            minFilter,
+            magFilter,
+        });
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gBufferDAttachment, gl.TEXTURE_2D, this._gBufferDTexture.glObject, 0);
+        this.framebuffer.registerDrawBuffer(gBufferDAttachment as GLColorAttachment);
+        this._gBufferTextures.push(this._gBufferDTexture);
 
         // 3: depth
         // this._depthTexture = new Texture({

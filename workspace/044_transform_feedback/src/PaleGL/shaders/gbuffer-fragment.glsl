@@ -46,6 +46,7 @@ in vec3 vWorldPosition;
 // layout (location = 0) out vec4 outGBufferA;
 // layout (location = 1) out vec4 outGBufferB;
 // layout (location = 2) out vec4 outGBufferC;
+// layout (location = 3) out vec4 outGBufferD;
 
 #include ./partial/gbuffer-functions.glsl
 
@@ -107,9 +108,6 @@ void main() {
     
     resultColor = surface.diffuseColor;
     
-    // emissiveはそのまま足す
-    resultColor += uEmissiveColor;
-
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 #endif
@@ -123,4 +121,5 @@ void main() {
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal);
     outGBufferC = EncodeGBufferC(uMetallic, uRoughness);
+    outGBufferD = EncodeGBufferD(uEmissiveColor.rgb);
 }

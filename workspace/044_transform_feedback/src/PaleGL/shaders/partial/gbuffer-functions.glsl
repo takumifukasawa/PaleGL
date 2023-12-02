@@ -14,6 +14,11 @@ struct GBufferC {
     float roughness; // y
 };
 
+struct GBufferD {
+    vec3 emissiveColor; // rga
+    // a
+};
+
 vec4 EncodeGBufferA(vec3 baseColor) {
     return vec4(baseColor, 1.);
 }
@@ -24,6 +29,10 @@ vec4 EncodeGBufferB(vec3 normal) {
 
 vec4 EncodeGBufferC(float metallic, float roughness) {
     return vec4(metallic, roughness, 0., 1.);
+}
+
+vec4 EncodeGBufferD(vec3 emissiveColor) {
+    return vec4(emissiveColor, 1.);
 }
 
 GBufferA DecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {
@@ -46,4 +55,11 @@ GBufferC DecodeGBufferC(sampler2D gBufferCTexture, vec2 uv) {
     gBufferC.metallic = color.x;
     gBufferC.roughness = color.y;
     return gBufferC;
+}
+
+GBufferD DecodeGBufferD(sampler2D gBufferDTexture, vec2 uv) {
+    vec4 color = texture(gBufferDTexture, uv);
+    GBufferD gBufferD;
+    gBufferD.emissiveColor = color.rgb;
+    return gBufferD;
 }

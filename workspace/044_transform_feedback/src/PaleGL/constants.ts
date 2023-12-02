@@ -235,6 +235,7 @@ export const UniformNames = {
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',
     GBufferCTexture: 'uGBufferCTexture',
+    GBufferDTexture: 'uGBufferDTexture',
     // depth
     DepthTexture: 'uDepthTexture',
     // ao

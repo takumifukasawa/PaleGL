@@ -50,4 +50,5 @@ void main() {
     outGBufferA = EncodeGBufferA(envMapColor);
     outGBufferB = EncodeGBufferB(vec3(0.));
     outGBufferC = EncodeGBufferC(0., 0.);
+    outGBufferD = EncodeGBufferD(vec3(0.));
 }

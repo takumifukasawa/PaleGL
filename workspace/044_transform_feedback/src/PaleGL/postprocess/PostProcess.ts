@@ -172,6 +172,7 @@ export class PostProcess {
             passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
             passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
             passMaterial.updateUniform(UniformNames.GBufferCTexture, renderer.gBufferRenderTargets.gBufferCTexture);
+            passMaterial.updateUniform(UniformNames.GBufferDTexture, renderer.gBufferRenderTargets.gBufferDTexture);
             // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
             passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
         });

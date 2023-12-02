@@ -90,6 +90,7 @@ uniform vec3 uViewPosition;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
+uniform sampler2D uGBufferDTexture;
 uniform sampler2D uDepthTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 // uniform sampler2D uShadowMap;
@@ -147,11 +148,14 @@ void main() {
     vec4 gBufferA = texture(uGBufferATexture, uv);
     vec4 gBufferB = texture(uGBufferBTexture, uv);
     vec4 gBufferC = texture(uGBufferCTexture, uv);
-        
+    vec4 gBufferD = texture(uGBufferDTexture, uv);
+       
+    // TODO: use encode func
     // surface
     vec3 baseColor = gBufferA.xyz;
     float metallic = gBufferC.x;
     float roughness = gBufferC.y;
+    vec3 emissiveColor = gBufferD.xyz;
   
     // depth
     float rawDepth = texture(uDepthTexture, uv).r; 
@@ -273,6 +277,8 @@ vec3 outgoingLight =
     resultColor.xyz *= aoRate;
     // for debug
     // resultColor.xyz = vec3(aoRate);
+    
+    resultColor.xyz += emissiveColor;
 
     outColor = resultColor;
 

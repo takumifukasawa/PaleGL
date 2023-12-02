@@ -32,6 +32,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 type: UniformTypes.Texture,
                 value: null,
             },
+            [UniformNames.GBufferDTexture]: {
+                type: UniformTypes.Texture,
+                value: null,
+            },
             [UniformNames.DepthTexture]: {
                 type: UniformTypes.Texture,
                 value: null,
