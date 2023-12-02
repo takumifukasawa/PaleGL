@@ -188,6 +188,7 @@ export const AttributeNames = {
     // instancing
     InstancePosition: 'aInstancePosition',
     InstanceScale: 'aInstanceScale',
+    InstanceRotation: 'aInstanceRotation',
     InstanceAnimationOffset: 'aInstanceAnimationOffset',
     InstanceVertexColor: 'aInstanceVertexColor',
 } as const;
@@ -290,6 +291,7 @@ type ShaderModifierPragmas = (typeof ShaderModifierPragmas)[keyof typeof ShaderM
 
 export const VertexShaderModifierPragmas = {
     LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
+    INSTANCE_TRANSFORM_PRE_PROCESS: 'INSTANCE_TRANSFORM_PRE_PROCESS',
     WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
     VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
     OUT_CLIP_POSITION_PRE_PROCESS: 'OUT_CLIP_POSITION_PRE_PROCESS',

@@ -28,11 +28,9 @@ uniform float uTime;
 #include ./partial/receive-shadow-vertex-uniforms.glsl
 #include ./partial/skinning-vertex-uniforms.glsl
 
-
 mat4 getRotationXMat(float rad) {
     float c = cos(rad);
     float s = sin(rad);
-    // 行オーダー
     return mat4(
         // 行オーダー
         // 1., 0., 0., 0.,
@@ -106,6 +104,18 @@ mat4 getScalingMat(vec3 s) {
     );
 }
 
+mat4 getLookAtMat(vec3 lookAt, vec3 p) {
+    vec3 f = normalize(lookAt - p);
+    vec3 r = normalize(cross(vec3(0., 1., 0.), f));
+    vec3 u = cross(f, r);
+    return mat4(
+        r.x, r.y, r.z, 0.,
+        u.x, u.y, u.z, 0.,
+        f.x, f.y, f.z, 0.,
+        0., 0., 0., 1.
+    );
+}
+
 void main() {
 
     #pragma BEGIN_MAIN
@@ -121,24 +131,23 @@ void main() {
     // assign common varyings 
     vUv = aUv;
 
-    vec4 worldPosition = uWorldMatrix * localPosition;
-
 #ifdef USE_INSTANCING
     mat4 instanceTranslation = getTranslationMat(aInstancePosition);
     mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
-    mat4 instanceRotationX = getRotationXMat(0.);
-    mat4 instanceRotationY = getRotationYMat(0.);
-    mat4 instanceRotationZ = getRotationZMat(0.);
-    mat4 instanceTransform =
-        instanceTranslation *
+    mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
+    mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
+    mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
+    mat4 instanceRotation =
         instanceRotationY *
         instanceRotationX *
-        instanceRotationZ *
-        instanceScaling;
-    
-    // NOTE: 本当はworldMatrixをかける前の方がよい
-    worldPosition = instanceTransform * worldPosition;
+        instanceRotationZ;
+
+    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+
+    localPosition = instanceTranslation * instanceRotation * instanceScaling * localPosition;
 #endif
+
+    vec4 worldPosition = uWorldMatrix * localPosition;
 
     #pragma WORLD_POSITION_POST_PROCESS
  

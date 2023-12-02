@@ -70,8 +70,9 @@ import {
     RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
-    VertexShaderModifierPragmas,
+    // VertexShaderModifierPragmas,
     UniformNames,
+    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -87,8 +88,8 @@ import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.t
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
-import {saturate} from "@/PaleGL/utilities/mathUtilities.ts";
-import {UnlitMaterial} from "@/PaleGL/materials/UnlitMaterial.ts";
+import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
+import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
 // import * as buffer from 'buffer';
 // import {Light} from "@/PaleGL/actors/Light.ts";
@@ -433,39 +434,50 @@ const createTransformFeedbackDrivenMesh = () => {
     // begin create mesh
     //
 
-    const planeNum = 2048;
+    const planeNum = 10;
 
     const initialPosition = new Float32Array(
         maton
             .range(planeNum)
-            .map(() => {
+            .map((_, i) => {
                 return [
-                    // i, 0, 0
-                    Math.random() * 4 - 2,
-                    Math.random() * 4 + 2,
-                    Math.random() * 4 - 2,
+                    i,
+                    0,
+                    0,
+                    // Math.random() * 4 - 2,
+                    // Math.random() * 4 + 2,
+                    // Math.random() * 4 - 2,
                 ];
             })
             .flat()
     );
+    // const initialTransform = new Float32Array(
+    //     maton
+    //         .range(planeNum)
+    //         .map(() => {
+    //             // prettier-ignore
+    //             return [
+    //                 1, 0, 0, 0,
+    //                 0, 1, 0, 0,
+    //                 0, 0, 1, 0,
+    //                 0, 0, 0, 1
+    //                 // (Math.random() * 1 - .5) * .5,
+    //                 // (Math.random() * 1 + .5) * .5,
+    //                 // (Math.random() * 1 - .5) * .5,
+    //             ];
+    //         })
+    //         .flat()
+    // );
     const initialVelocity = new Float32Array(
         maton
             .range(planeNum)
             .map(() => {
                 return [
-                    0, 0, 0
+                    0, 0, 0,
                     // (Math.random() * 1 - .5) * .5,
                     // (Math.random() * 1 + .5) * .5,
                     // (Math.random() * 1 - .5) * .5,
                 ];
-            })
-            .flat()
-    );
-    const initialTimeOffset = new Float32Array(
-        maton
-            .range(planeNum)
-            .map((_, i) => {
-                return i;
             })
             .flat()
     );
@@ -484,12 +496,12 @@ const createTransformFeedbackDrivenMesh = () => {
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
-            new Attribute({
-                name: 'aTimeOffset',
-                data: initialTimeOffset,
-                size: 1,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
+            // new Attribute({
+            //     name: 'aTransform',
+            //     data: initialTransform,
+            //     size: 16,
+            //     usageType: AttributeUsageType.DynamicDraw,
+            // }),
         ],
         varyings: [
             {
@@ -500,10 +512,10 @@ const createTransformFeedbackDrivenMesh = () => {
                 name: 'vVelocity',
                 data: new Float32Array(initialVelocity),
             },
-            {
-                name: 'vTimeOffset',
-                data: new Float32Array(initialTimeOffset),
-            },
+            // {
+            //     name: 'vTransform',
+            //     data: new Float32Array(initialTransform),
+            // },
         ],
         vertexShader: `#version 300 es
 
@@ -512,11 +524,11 @@ const createTransformFeedbackDrivenMesh = () => {
         // TODO: ここ動的に構築してもいい
         layout(location = 0) in vec3 aPosition;
         layout(location = 1) in vec3 aVelocity;
-        layout(location = 2) in float aTimeOffset;
+        // layout(location = 2) in mat4 aTransform;
 
         out vec3 vPosition;
+        // out mat4 vTransform;
         out vec3 vVelocity;
-        out float vTimeOffset;
 
         uniform float uTime;
         uniform vec2 uNormalizedInputPosition;
@@ -529,54 +541,28 @@ const createTransformFeedbackDrivenMesh = () => {
             return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
         }
         
-        mat4 rotX(float deg) {
-            float c = cos(deg);
-            float s = sin(deg);
-            return mat4(
-                1., 0., 0., 0.,
-                0., c, -s, 0.,
-                0., s, c, 0.,
-                0., 0., 0., 1.
-            );
-        }
-        
-        mat4 rotY(float deg) {
-            float c = cos(deg);
-            float s = sin(deg);
-            return mat4(
-                c, 0., s, 0.,
-                0., 1., 0., 0.,
-                -s, 0., c, 0.,
-                0., 0., 0., 1.
-            );
-        }
-        
-        mat4 rotZ(float deg) {
-            float c = cos(deg);
-            float s = sin(deg);
-            return mat4(
-                c, -s, 0., 0.,
-                s, c, 0., 0.,
-                0., 0., 1., 0.,
-                0., 0., 0., 1.
-            );
-        }
+        // mat4 getLookAtMat(vec3 lookAt, vec3 p) {
+        //     vec3 f = normalize(lookAt - p);
+        //     vec3 r = normalize(cross(vec3(0., 1., 0.), f));
+        //     vec3 u = cross(f, r);
+        //     return mat4(
+        //         r.x, r.y, r.z, 0.,
+        //         u.x, u.y, u.z, 0.,
+        //         f.x, f.y, f.z, 0.,
+        //         0., 0., 0., 1.
+        //     );
+        // }
 
         void main() {
             vPosition = aPosition + aVelocity;
-            // vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
-            // i *= vec2(1., -1.);
-            // vec3 target = vec3(
-            //     i.x * 6. + cos(uTime * 2. + aTimeOffset * 8.) * 3.,
-            //     i.y + 2. + sin(uTime * 2. + aTimeOffset * 8.) * 1.,
-            //     sin(uTime * .1 + aTimeOffset * 4.) * 3.
-            // );
+            vPosition = aPosition;
+            // vTransform = aTransform;
             vec3 target = uAttractTargetPosition;
             vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
             target += vec3(
-                cos(noise(seed) * 2. + uTime * 2. + aTimeOffset * 8.) * 2.,
-                sin(noise(seed) * 4. + uTime * 2. + aTimeOffset * 8.) * 2.,
-                sin(noise(seed) * 6. + uTime * .1 + aTimeOffset * 4.) * 2.
+                cos(noise(seed) * 2. + uTime * 2. + float(gl_VertexID) * 8.) * 2.,
+                sin(noise(seed) * 4. + uTime * 2. + float(gl_VertexID) * 8.) * 2.,
+                sin(noise(seed) * 6. + uTime * .1 + float(gl_VertexID) * 4.) * 2.
             );
             vec3 v = target - vPosition;
             vec3 dir = normalize(v);
@@ -586,7 +572,6 @@ const createTransformFeedbackDrivenMesh = () => {
                 .02 + sin(float(gl_VertexID)) * .015
                 // .04 + uAttractRate * .0
             );
-            vTimeOffset = aTimeOffset;
         }
         `,
         fragmentShader: `#version 300 es
@@ -601,17 +586,17 @@ const createTransformFeedbackDrivenMesh = () => {
                 type: UniformTypes.Float,
                 value: 0,
             },
-            "uNormalizedInputPosition": {
+            uNormalizedInputPosition: {
                 type: UniformTypes.Vector2,
-                value: Vector2.zero
+                value: Vector2.zero,
             },
-            "uAttractTargetPosition": {
+            uAttractTargetPosition: {
                 type: UniformTypes.Vector3,
-                value: Vector3.zero
+                value: Vector3.zero,
             },
-            "uAttractRate": {
+            uAttractRate: {
                 type: UniformTypes.Float,
-                value: 0
+                value: 0,
             },
         },
         drawCount: planeNum,
@@ -623,7 +608,7 @@ const createTransformFeedbackDrivenMesh = () => {
         .range(planeNum, true)
         .map(() => {
             // return [i, 0, 0]
-            return [0, 0, 0]
+            return [0, 0, 0];
         })
         .flat();
     const instanceScale = maton
@@ -637,12 +622,19 @@ const createTransformFeedbackDrivenMesh = () => {
             ];
         })
         .flat();
-    const accPositions = maton.range(3 * planeNum).map(() => {
-        return 0;
-    });
-    const velocities = maton.range(3 * planeNum).map(() => {
-        return 0;
-    });
+    const instanceRotation = maton
+        .range(planeNum, true)
+        .map(() => {
+            // return [i, 0, 0]
+            return [0, 0, 0];
+        })
+        .flat();
+    // const accPositions = maton.range(3 * planeNum).map(() => {
+    //     return 0;
+    // });
+    // const velocities = maton.range(3 * planeNum).map(() => {
+    //     return 0;
+    // });
     const instanceColor = maton
         .range(planeNum)
         .map(() => {
@@ -674,18 +666,18 @@ const createTransformFeedbackDrivenMesh = () => {
             //     data: new Float32Array(uvs),
             //     size: 2,
             // }),
-            new Attribute({
-                name: 'aAccPosition',
-                data: new Float32Array(accPositions),
-                size: 3,
-                divisor: 1,
-            }),
-            new Attribute({
-                name: 'aVelocity',
-                data: new Float32Array(velocities),
-                size: 3,
-                divisor: 1,
-            }),
+            // new Attribute({
+            //     name: 'aAccPosition',
+            //     data: new Float32Array(accPositions),
+            //     size: 3,
+            //     divisor: 1,
+            // }),
+            // new Attribute({
+            //     name: 'aVelocity',
+            //     data: new Float32Array(velocities),
+            //     size: 3,
+            //     divisor: 1,
+            // }),
             new Attribute({
                 name: AttributeNames.InstancePosition,
                 data: new Float32Array(instancePosition),
@@ -695,6 +687,12 @@ const createTransformFeedbackDrivenMesh = () => {
             new Attribute({
                 name: AttributeNames.InstanceScale,
                 data: new Float32Array(instanceScale),
+                size: 3,
+                divisor: 1,
+            }),
+            new Attribute({
+                name: AttributeNames.InstanceRotation,
+                data: new Float32Array(instanceRotation),
                 size: 3,
                 divisor: 1,
             }),
@@ -713,10 +711,21 @@ const createTransformFeedbackDrivenMesh = () => {
         isInstancing: true,
         useVertexColor: true,
         vertexShaderModifier: {
+            [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform vec3 uAttractTargetPosition;`,
+            [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
+                instanceRotation = getLookAtMat(uAttractTargetPosition, aInstancePosition);
+                // instanceRotation = getLookAtMat(vec3(0., 0., 20.), aInstancePosition);
+            `,
             // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
-            [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
-            [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
+            // [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
+            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
             // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
+        },
+        uniforms: {
+            uAttractTargetPosition: {
+                type: UniformTypes.Vector3,
+                value: Vector3.zero,
+            },
         },
     });
     const mesh = new Mesh({
@@ -725,17 +734,22 @@ const createTransformFeedbackDrivenMesh = () => {
         castShadow: true,
     });
     mesh.transform.setScaling(new Vector3(1, 1, 1));
-    mesh.onStart = () => {
-        console.log(mesh);
-    };
     let attractRate = 0;
     mesh.onUpdate = ({ time, deltaTime }) => {
+        mesh.material.uniforms.uAttractTargetPosition.value = new Vector3(
+            // 0, 0, 20
+            sphereMesh.transform.position.x,
+            0,
+            sphereMesh.transform.position.z,
+        );
+        console.log(mesh.material)
+
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
         transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = sphereMesh.transform.position;
-       
-        attractRate += 2. * (inputController.isDown ? 1 : -1) * deltaTime;
+
+        attractRate += 2 * (inputController.isDown ? 1 : -1) * deltaTime;
         attractRate = saturate(attractRate);
         transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = attractRate;
         gpu.updateTransformFeedback({
@@ -811,10 +825,12 @@ const createGLTFSkinnedMesh = async () => {
     const instanceInfo: {
         position: number[][];
         scale: number[][];
+        rotation: number[][];
         color: number[][];
     } = {
         position: [],
         scale: [],
+        rotation: [],
         color: [],
     };
     maton.range(instanceNum).forEach(() => {
@@ -829,6 +845,8 @@ const createGLTFSkinnedMesh = async () => {
         const randomScaleRange = 0.08;
         const s = Math.random() * randomScaleRange + baseScale;
         instanceInfo.scale.push([s, s * 2, s]);
+
+        instanceInfo.rotation.push([0, 0, 0]);
 
         const c = Color.fromRGB(
             Math.floor(Math.random() * 240 + 15),
@@ -854,11 +872,18 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1,
         })
     );
-    // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
         new Attribute({
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
+            size: 3,
+            divisor: 1,
+        })
+    );
+    skinningMesh.geometry.setAttribute(
+        new Attribute({
+            name: AttributeNames.InstanceRotation,
+            data: new Float32Array(instanceInfo.rotation.flat()),
             size: 3,
             divisor: 1,
         })
@@ -976,7 +1001,7 @@ const main = async () => {
         const y = 0.5;
         sphereMesh.transform.setTranslation(new Vector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
-    }
+    };
 
     skinnedMesh = await createGLTFSkinnedMesh();
 
@@ -1284,7 +1309,7 @@ void main() {
         orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
-        orbitCameraController.enabled = false;
+        // orbitCameraController.enabled = false;
     };
 
     // engine.onAfterStart = () => {
@@ -1371,7 +1396,6 @@ function initDebugger() {
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
 
-
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -1382,7 +1406,6 @@ function initDebugger() {
             directionalLight.intensity = value;
         },
     });
-
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'pos x',

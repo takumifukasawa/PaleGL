@@ -175,7 +175,26 @@ export class Matrix4 {
         this.set(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23, n30, n31, n32, n33);
     }
 
-    // row-order in constructor args
+    /**
+     *
+     // row-order in constructor args
+     * @param n00
+     * @param n01
+     * @param n02
+     * @param n03
+     * @param n10
+     * @param n11
+     * @param n12
+     * @param n13
+     * @param n20
+     * @param n21
+     * @param n22
+     * @param n23
+     * @param n30
+     * @param n31
+     * @param n32
+     * @param n33
+     */
     set(
         n00: number,
         n01: number,
@@ -215,10 +234,17 @@ export class Matrix4 {
         return this;
     }
 
+    /**
+     * 
+     */
     static get identity() {
         return new Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
+    /**
+     * 
+     * @param v
+     */
     setTranslation(v: Vector3) {
         this.m03 = v.x;
         this.m13 = v.y;
@@ -226,6 +252,10 @@ export class Matrix4 {
         return this;
     }
 
+    /**
+     * 
+     * @param v
+     */
     static translationMatrix(v: Vector3) {
         // prettier-ignore
         return new Matrix4(
@@ -236,6 +266,10 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param v
+     */
     static scalingMatrix(v: Vector3) {
         // prettier-ignore
         return new Matrix4(
@@ -246,6 +280,10 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param rad
+     */
     static rotationXMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
@@ -253,11 +291,15 @@ export class Matrix4 {
         return new Matrix4(
             1, 0, 0, 0,
             0, c, -s, 0,
-            0, s, c,0,
+            0, s, c, 0,
             0, 0, 0, 1
         );
     }
 
+    /**
+     * 
+     * @param rad
+     */
     static rotationYMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
@@ -270,6 +312,10 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param rad
+     */
     static rotationZMatrix(rad: number) {
         const c = Math.cos(rad);
         const s = Math.sin(rad);
@@ -282,12 +328,20 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param matrices
+     */
     static multiplyMatrices(...matrices: Matrix4[]) {
         const m = Matrix4.identity;
         matrices.forEach((matrix) => m.multiply(matrix));
         return m;
     }
 
+    /**
+     * 
+     * @param m2
+     */
     multiply(m2: Matrix4) {
         // const m1 = this;
 
@@ -365,6 +419,10 @@ export class Matrix4 {
         return this;
     }
 
+    /**
+     * 
+     * @param m
+     */
     copy(m: Matrix4) {
         this.m00 = m.m00;
         this.m01 = m.m01;
@@ -385,6 +443,9 @@ export class Matrix4 {
         return this;
     }
 
+    /**
+     * 
+     */
     clone() {
         const m = Matrix4.identity;
         m.m00 = this.m00;
@@ -406,6 +467,9 @@ export class Matrix4 {
         return m;
     }
 
+    /**
+     * 
+     */
     transpose() {
         const m01 = this.m01;
         const m10 = this.m10;
@@ -440,7 +504,10 @@ export class Matrix4 {
         return this;
     }
 
-    // ref: https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
+    /**
+     // ref: https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
+     *
+     */
     invert() {
         // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
         const te = this.elements,
@@ -602,7 +669,16 @@ export class Matrix4 {
         return this;
     }
 
-    // ref: https://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20090829
+    /**
+     *
+     // ref: https://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20090829
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param near
+     * @param far
+     */
     static getOrthographicMatrix(left: number, right: number, bottom: number, top: number, near: number, far: number) {
         const m00 = 2 / (right - left); // scale x
         const m11 = 2 / (top - bottom); // scale y
@@ -619,10 +695,17 @@ export class Matrix4 {
         );
     }
 
-    // ref
-    // https://developer.mozilla.org/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection
-    // fov ... rad
-    // aspect ... w / h
+    /**
+     *
+     // ref
+     // https://developer.mozilla.org/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection
+     // fov ... rad
+     // aspect ... w / h
+     * @param fov
+     * @param aspect
+     * @param near
+     * @param far
+     */
     static getPerspectiveMatrix(fov: number, aspect: number, near: number, far: number) {
         const f = 1 / Math.tan(fov / 2);
         // const nf = 1 / (near - far);
@@ -680,6 +763,13 @@ export class Matrix4 {
         return pjm;
     }
 
+    /**
+     * 
+     * @param eye
+     * @param center
+     * @param up
+     * @param inverseForward
+     */
     static getLookAtMatrix(eye: Vector3, center: Vector3, up = new Vector3(0, 1, 0), inverseForward = false) {
         const f = inverseForward
             ? Vector3.subVectors(eye, center).normalize() // ex. 主にカメラ。投影の関係で逆になるので。
@@ -696,9 +786,15 @@ export class Matrix4 {
         return result;
     }
 
-    // position ... vector3
-    // rotation ... rotator
-    // scaling ... vector3
+    /**
+     *
+     // position ... vector3
+     // rotation ... rotator
+     // scaling ... vector3
+     * @param position
+     * @param rotation
+     * @param scaling
+     */
     static fromTRS(position: Vector3, rotation: Rotator, scaling: Vector3) {
         const rotationRadians = rotation.getAxesRadians();
         return Matrix4.multiplyMatrices(
@@ -710,6 +806,10 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param q
+     */
     static fromQuaternion(q: Quaternion) {
         const eulerRadian = q.toEulerRadian();
         return Matrix4.multiplyMatrices(
@@ -719,6 +819,10 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     * @param arr
+     */
     static fromArray(arr: number[]) {
         return new Matrix4(
             arr[0],
@@ -740,6 +844,9 @@ export class Matrix4 {
         );
     }
 
+    /**
+     * 
+     */
     log() {
         console.log(`--------------------
 ${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},
@@ -749,6 +856,9 @@ ${this.m30}, ${this.m31}, ${this.m32}, ${this.m33},
 --------------------`);
     }
 
+    /**
+     * 
+     */
     getPrettyLine() {
         return `--------------------
 ${this.m00}, ${this.m01}, ${this.m02}, ${this.m03},

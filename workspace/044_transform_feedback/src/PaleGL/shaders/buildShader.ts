@@ -1,9 +1,9 @@
 // -----------------------------------------------
 // TODO:
 // - out varying を centroid できるようにしたい
+// NOTE:
+// - modifierを使っているときはshader_minifierを使うとバグになる。変数名が変わるので
 // -----------------------------------------------
-
-// .matchAll(/#pragma\s([a-zA-Z0-9_\s]+)/g)
 
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import {

@@ -15,6 +15,8 @@ uniform float uRoughness;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
+#pragma APPEND_UNIFORMS
+
 #include ./partial/tone-mapping.glsl
 
 #include ./partial/normal-map-fragment-uniforms.glsl
