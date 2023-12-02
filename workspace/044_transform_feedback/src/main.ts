@@ -263,7 +263,7 @@ if (directionalLight.shadowCamera) {
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 30;
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
@@ -433,17 +433,17 @@ const createTransformFeedbackDrivenMesh = () => {
     // begin create mesh
     //
 
-    const planeNum = 1024;
+    const planeNum = 2048;
 
     const initialPosition = new Float32Array(
         maton
             .range(planeNum)
             .map(() => {
                 return [
-                    0, 0, 0,
-                    // Math.random() * 4 - 2,
-                    // Math.random() * 4 + 2,
-                    // Math.random() * 4 - 2,
+                    // i, 0, 0
+                    Math.random() * 4 - 2,
+                    Math.random() * 4 + 2,
+                    Math.random() * 4 - 2,
                 ];
             })
             .flat()
@@ -453,9 +453,10 @@ const createTransformFeedbackDrivenMesh = () => {
             .range(planeNum)
             .map(() => {
                 return [
-                    (Math.random() * 1 - .5) * .5,
-                    (Math.random() * 1 + .5) * .5,
-                    (Math.random() * 1 - .5) * .5,
+                    0, 0, 0
+                    // (Math.random() * 1 - .5) * .5,
+                    // (Math.random() * 1 + .5) * .5,
+                    // (Math.random() * 1 - .5) * .5,
                 ];
             })
             .flat()
@@ -519,26 +520,39 @@ const createTransformFeedbackDrivenMesh = () => {
 
         uniform float uTime;
         uniform vec2 uNormalizedInputPosition;
+        uniform vec3 uAttractTargetPosition;
         uniform float uAttractRate;
 
+        // https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+        float noise(vec2 seed)
+        {
+            return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+
         void main() {
-            vPosition = aPosition + aVelocity * .5;
-            vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
-            i *= vec2(1., -1.);
-            vec3 target = vec3(
-                i.x * 6. + cos(uTime * 2. + aTimeOffset * 8.) * 3.,
-                i.y + 2. + sin(uTime * 2. + aTimeOffset * 8.) * 1.,
-                sin(uTime * .1 + aTimeOffset * 4.) * 3.
+            vPosition = aPosition + aVelocity;
+            // vec2 i = uNormalizedInputPosition.xy * 2. - 1.;
+            // i *= vec2(1., -1.);
+            // vec3 target = vec3(
+            //     i.x * 6. + cos(uTime * 2. + aTimeOffset * 8.) * 3.,
+            //     i.y + 2. + sin(uTime * 2. + aTimeOffset * 8.) * 1.,
+            //     sin(uTime * .1 + aTimeOffset * 4.) * 3.
+            // );
+            vec3 target = uAttractTargetPosition;
+            vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
+            target += vec3(
+                cos(noise(seed) * 2. + uTime * 2. + aTimeOffset * 8.) * 2.,
+                sin(noise(seed) * 4. + uTime * 2. + aTimeOffset * 8.) * 2.,
+                sin(noise(seed) * 6. + uTime * .1 + aTimeOffset * 4.) * 2.
             );
-            vec3 v = target - aPosition;
+            vec3 v = target - vPosition;
             vec3 dir = normalize(v);
-            // vVelocity = vec3(sin(uTime + aTimeOffset) * uNormalizedInputPosition.x, 0., 0.);
             vVelocity = mix(
-                normalize(aVelocity),
-                // normalize(aVelocity),
-                dir,
-                .04 + uAttractRate * .05
-            ) * (.3 + uAttractRate * .5);
+                aVelocity,
+                dir * (.3 + uAttractRate * .5),
+                .02 + sin(float(gl_VertexID)) * .015
+                // .04 + uAttractRate * .0
+            );
             vTimeOffset = aTimeOffset;
         }
         `,
@@ -558,6 +572,10 @@ const createTransformFeedbackDrivenMesh = () => {
                 type: UniformTypes.Vector2,
                 value: Vector2.zero
             },
+            "uAttractTargetPosition": {
+                type: UniformTypes.Vector3,
+                value: Vector3.zero
+            },
             "uAttractRate": {
                 type: UniformTypes.Float,
                 value: 0
@@ -566,56 +584,20 @@ const createTransformFeedbackDrivenMesh = () => {
         drawCount: planeNum,
     });
 
-    // transform feedback double buffer check
-
-    // const elemLength = 12;
-    // console.log('===============================');
-    // const logBuffer = (buffer: WebGLBuffer, len: number) => {
-    //     const results = new Float32Array(len);
-    //     gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    //     gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
-    //     gpu.gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    //     console.log(results);
-    // };
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
-
-    // gpu.updateTransformFeedback({
-    //     shader: transformFeedbackDoubleBuffer.shader,
-    //     vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
-    //     transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
-    //     drawCount: transformFeedbackDoubleBuffer.drawCount,
-    // });
-    // transformFeedbackDoubleBuffer.swap();
-
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
-
-    // gpu.updateTransformFeedback({
-    //     shader: transformFeedbackDoubleBuffer.shader,
-    //     vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
-    //     transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
-    //     drawCount: transformFeedbackDoubleBuffer.drawCount,
-    // });
-    // transformFeedbackDoubleBuffer.swap();
-
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition'), elemLength);
-    // logBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity'), elemLength);
-
     const boxGeometryData = createBoxGeometryData();
-    // const planeGeometryData = createPlaneGeometryData();
 
     const instancePosition = maton
         .range(planeNum, true)
         .map(() => {
+            // return [i, 0, 0]
             return [0, 0, 0]
-            // return [Math.random() * 4 - 2, Math.random() * 4 + 2, Math.random() * 4 - 2];
         })
         .flat();
     const instanceScale = maton
         .range(planeNum, true)
         .map(() => {
             return [
+                // 1, 1, 1
                 Math.random() * 0.4 + 0.2,
                 Math.random() * 0.4 + 0.2,
                 Math.random() * 0.4 + 0.2,
@@ -715,14 +697,10 @@ const createTransformFeedbackDrivenMesh = () => {
     };
     let attractRate = 0;
     mesh.onUpdate = ({ time, deltaTime }) => {
-        // if(inputController.isDown)
-        // {
-        // console.log(inputController.normalizedInputPosition.x, inputController.normalizedInputPosition.y);
-        // }
-        //     console.log(inputController.normalizedInputPosition.x, inputController.normalizedInputPosition.y);
-        // console.log(inputController.inputPosition.x, inputController.inputPosition.y);
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
+        // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
+        transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = sphereMesh.transform.position;
        
         attractRate += 2. * (inputController.isDown ? 1 : -1) * deltaTime;
         attractRate = saturate(attractRate);
@@ -738,9 +716,13 @@ const createTransformFeedbackDrivenMesh = () => {
         // };
         // mesh.onUpdate = () => {
         geometry.vertexArrayObject.replaceBuffer(
-            'aAccPosition',
+            AttributeNames.InstancePosition,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
         );
+        // geometry.vertexArrayObject.replaceBuffer(
+        //     'aAccPosition',
+        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
+        // );
         // geometry.vertexArrayObject.replaceBuffer(
         //     'aVelocity',
         //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
@@ -948,7 +930,7 @@ const main = async () => {
 
     sphereMesh = await createGLTFSphereMesh();
     sphereMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(1));
+        actor.transform.setScaling(Vector3.fill(0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     };
     sphereMesh.onFixedUpdate = () => {
@@ -958,7 +940,7 @@ const main = async () => {
         const iy = inputController.normalizedInputPosition.y * 2 - 1;
         const x = ix * w;
         const z = iy * d;
-        const y = 1;
+        const y = 0.5;
         sphereMesh.transform.setTranslation(new Vector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     }

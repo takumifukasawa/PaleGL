@@ -57,7 +57,6 @@ void main() {
     );
     
     // NOTE: 本当はworldMatrixをかける前の方がよい
-    
     worldPosition = instanceTransform * worldPosition;
 #endif
 
