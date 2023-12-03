@@ -45,7 +45,11 @@ mat4 getJointMatrixGPUSkinning(
     float time,
     float timeOffset
 ) {
-    // TODO: 停止機能
+    //
+    // TODO: play / pause
+    // TODO: playback speed
+    // TODO: アニメーションのフレーム指定
+    //
 
     float offset = float(int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum);
     // horizontal

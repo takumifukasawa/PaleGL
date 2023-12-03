@@ -58,27 +58,29 @@ export class TransformFeedbackDoubleBuffer {
         // this.gpu = gpu;
         // const {gl} = gpu;
 
+        console.log(attributes)
+
         const transformFeedbackVaryings = varyings.map(({ name }) => name);
         this.shader = new Shader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings });
+        
+        console.log(this.shader)
 
         this.drawCount = drawCount;
         this.uniforms = uniforms;
 
-        // fallback
-        // TODO: fix
         attributes.forEach((attribute, i) => {
             attribute.location = i;
-            attribute.divisor = 0;
+            attribute.divisor = 0; // divisorはない想定で問題ないはず？
         });
         const attributes1 = attributes;
 
-        const attributes2 = attributes.map((attribute, i) => {
+        // copy
+        const attributes2 = attributes.map((attribute) => {
             return {
                 ...attribute,
-                data: varyings[i].data, // replace
             } as Attribute;
         });
-
+        
         const vertexArrayObject1 = new VertexArrayObject({
             gpu,
             attributes: attributes1,

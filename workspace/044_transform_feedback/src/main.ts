@@ -10,7 +10,8 @@ import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
 import gltfSphereModelUrl from '../models/sphere-32x32.gltf?url';
 // import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
-import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
+// import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
+import gltfButterflyModelUrl from '../models/butterfly-forward-thin.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
@@ -813,43 +814,35 @@ const createInstanceUpdater = (instanceNum: number) => {
         maton
             .range(instanceNum)
             .map(() => {
+                const range = 10;
                 return [
-                    // i,
-                    // 0,
-                    // 0,
-                    Math.random() * 4 - 2,
+                    Math.random() * range - range * 0.5,
                     Math.random() * 4 + 2,
-                    Math.random() * 4 - 2,
+                    Math.random() * range - range * 0.5,
                 ];
             })
             .flat()
     );
-    // const initialTransform = new Float32Array(
-    //     maton
-    //         .range(planeNum)
-    //         .map(() => {
-    //             // prettier-ignore
-    //             return [
-    //                 1, 0, 0, 0,
-    //                 0, 1, 0, 0,
-    //                 0, 0, 1, 0,
-    //                 0, 0, 0, 1
-    //                 // (Math.random() * 1 - .5) * .5,
-    //                 // (Math.random() * 1 + .5) * .5,
-    //                 // (Math.random() * 1 - .5) * .5,
-    //             ];
-    //         })
-    //         .flat()
-    // );
+
     const initialVelocity = new Float32Array(
         maton
             .range(instanceNum)
             .map(() => {
+                return [0, 0, 0];
+            })
+            .flat()
+    );
+
+    const initialSeed = new Float32Array(
+        maton
+            .range(instanceNum, true)
+            .map((i) => {
                 return [
-                    0, 0, 0,
-                    // (Math.random() * 1 - .5) * .5,
-                    // (Math.random() * 1 + .5) * .5,
-                    // (Math.random() * 1 - .5) * .5,
+                    i,
+                    i,
+                    // i + Math.floor(Math.random() * 100000),
+                    // // Math.floor(Math.random() * 10000),
+                    // Math.floor(Math.random() * 100000)
                 ];
             })
             .flat()
@@ -870,12 +863,12 @@ const createInstanceUpdater = (instanceNum: number) => {
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
-            // new Attribute({
-            //     name: 'aTransform',
-            //     data: initialTransform,
-            //     size: 16,
-            //     usageType: AttributeUsageType.DynamicDraw,
-            // }),
+            new Attribute({
+                name: 'aSeed',
+                data: initialSeed,
+                size: 2,
+                usageType: AttributeUsageType.StaticDraw,
+            }),
         ],
         varyings: [
             {
@@ -886,10 +879,6 @@ const createInstanceUpdater = (instanceNum: number) => {
                 name: 'vVelocity',
                 data: new Float32Array(initialVelocity),
             },
-            // {
-            //     name: 'vTransform',
-            //     data: new Float32Array(initialTransform),
-            // },
         ],
         vertexShader: `#version 300 es
 
@@ -898,7 +887,7 @@ const createInstanceUpdater = (instanceNum: number) => {
         // TODO: ここ動的に構築してもいい
         layout(location = 0) in vec3 aPosition;
         layout(location = 1) in vec3 aVelocity;
-        // layout(location = 2) in mat4 aTransform;
+        layout(location = 2) in vec2 aSeed;
 
         out vec3 vPosition;
         // out mat4 vTransform;
@@ -917,22 +906,20 @@ const createInstanceUpdater = (instanceNum: number) => {
         
         void main() {
             vPosition = aPosition + aVelocity;
-            // vPosition = aPosition;
-            // vTransform = aTransform;
             vec3 target = uAttractTargetPosition;
-            vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
+            vec2 seed = aSeed;
+            float rand = noise(seed);
             target += vec3(
-                cos(noise(seed) * 2. + uTime * 6. + float(gl_VertexID) * 16.) * 2.,
-                sin(noise(seed) * 4. + uTime * 3. + float(gl_VertexID) * 8.) * 2.,
-                sin(noise(seed) * 6. + uTime * 4. + float(gl_VertexID) * 4.) * 2.
+                cos(uTime + rand * 100. + seed.x) * (2. + rand * 1.),
+                sin(uTime - rand * 400. + seed.x) * (1. + rand * 1.) + 1.,
+                cos(uTime - rand * 300. + seed.x) * (2. + rand * 1.)
             );
             vec3 v = target - vPosition;
             vec3 dir = normalize(v);
             vVelocity = mix(
                 aVelocity,
-                dir * (.2 + uAttractRate * .2),
-                .02 + sin(float(gl_VertexID)) * .01
-                // .04 + uAttractRate * .0
+                dir * (.1 + uAttractRate * .1),
+                .03 + sin(uTime * .2 + rand * 100.) * .02
             );
         }
         `,
@@ -1005,19 +992,19 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         color: [],
     };
     maton.range(instanceNum).forEach(() => {
-        const posRangeX = 7.4;
-        const posRangeZ = 7.4;
-        const px = (Math.random() * 2 - 1) * posRangeX;
-        const py = 0.5 + Math.random();
-        const pz = (Math.random() * 2 - 1) * posRangeZ;
-        const p = [px, py, pz];
-        instanceInfo.position.push(p);
-        // instanceInfo.position.push([0, 0, 0]);
+        // const posRangeX = 20;
+        // const posRangeZ = 20;
+        // const px = (Math.random() * 2 - 1) * posRangeX;
+        // const py = 0.5 + Math.random() * 2.;
+        // const pz = (Math.random() * 2 - 1) * posRangeZ;
+        // const p = [px, py, pz];
+        // instanceInfo.position.push(p);
+        instanceInfo.position.push([0, 0, 0]);
 
         // const baseScale = 0.04;
         // const randomScaleRange = 0.08;
-        const baseScale = 1;
-        const randomScaleRange = 0;
+        const baseScale = 0.2;
+        const randomScaleRange = 0.6;
         const s = Math.random() * randomScaleRange + baseScale;
         // instanceInfo.scale.push([s, s * 2, s]);
         instanceInfo.scale.push([s, s, s]);
@@ -1028,15 +1015,17 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
         const c = Color.fromRGB(
             Math.floor(Math.random() * 200 + 30),
-            Math.floor(Math.random() * 10 + 15),
-            Math.floor(Math.random() * 205 + 30)
+            Math.floor(Math.random() * 80 + 20),
+            Math.floor(Math.random() * 200 + 30)
         );
         instanceInfo.color.push([...c.elements]);
     });
-    const animationOffsetInfo = instanceInfo.position.map(([x, , z]) => {
-        const animationOffsetAdjust = Math.random() * 0.6 - 0.3 + 2;
-        return (-x + z) * animationOffsetAdjust;
-    });
+    const animationOffsetInfo = maton
+        .range(instanceNum)
+        .map(() => {
+            return Math.random() * 30;
+        })
+        .flat();
 
     skinningMesh.castShadow = true;
     skinningMesh.geometry.instanceCount = instanceNum;
@@ -1109,7 +1098,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // specularAmount: 0.5,
         // diffuseColor: Color.white(),
         metallic: 0,
-        roughness: 0.6,
+        roughness: 1,
         receiveShadow: true,
         isSkinning: true,
         gpuSkinning: true,
@@ -1134,7 +1123,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
         transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = sphereMesh.transform.position;
 
-        attractRate += 2 * (inputController.isDown ? 1 : -1) * deltaTime;
+        attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
         transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = attractRate;
         gpu.updateTransformFeedback({

@@ -170,12 +170,10 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
     const response = await fetch(path);
     const gltf = (await response.json()) as GLTFFormat;
 
-    console.log(gltf);
-
     const rootActor = new Actor({});
 
     // for debug
-    console.log('[loadGLTF]', gltf);
+    // console.log('[loadGLTF]', gltf);
 
     const cacheNodes: GLTFNodeActorKind[] = [];
 
@@ -279,7 +277,8 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         let weights: Float32Array = new Float32Array();
         let rootBone: Bone | null = null;
 
-        console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
+        // for debug
+        // console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
 
         const mesh = gltf.meshes[meshIndex];
 
@@ -339,7 +338,8 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         });
 
         if (skinIndex !== null) {
-            console.log('[loadGLTF.createMesh] mesh has skin');
+            // for debug
+            // console.log('[loadGLTF.createMesh] mesh has skin');
 
             const skin = gltf.skins[skinIndex];
 
@@ -542,7 +542,8 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
     // console.log("cache nodes", cacheNodes)
 
     if (gltf.animations && gltf.animations.length > 0) {
-        console.log('[loadGLTF] has animations');
+        // for debug
+        // console.log('[loadGLTF] has animations');
         const animationClips = createAnimationClips();
         // for debug
         // console.log("animation clips", animationClips);
