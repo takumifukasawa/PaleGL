@@ -72,9 +72,8 @@ import {
     RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
-    // VertexShaderModifierPragmas,
-    UniformNames,
     VertexShaderModifierPragmas,
+    UniformNames,
     FaceSide,
 } from '@/PaleGL/constants';
 
@@ -87,10 +86,10 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
+// import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
+// import { createBoxGeometryData } from '@/PaleGL/geometries/BoxGeometry.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
@@ -162,10 +161,10 @@ const debuggerStates: {
 
 const searchParams = new URLSearchParams(location.search);
 const instanceNumStr = searchParams.get('instance-num');
-const instanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
-console.log(`instance num: ${instanceNum}`);
+const initialInstanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
+console.log(`instance num: ${initialInstanceNum}`);
 
-debuggerStates.instanceNum = instanceNum;
+debuggerStates.instanceNum = initialInstanceNum;
 
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
@@ -198,7 +197,7 @@ if (!gl) {
 const gpu = new GPU({ gl });
 
 const instanceNumView = document.createElement('p');
-instanceNumView.textContent = `instance num: ${instanceNum}`;
+instanceNumView.textContent = `instance num: ${initialInstanceNum}`;
 instanceNumView.style.cssText = `
 position: absolute;
 top: 0;
@@ -355,6 +354,7 @@ cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(cameraPostProcess);
 
+/*
 const debugTransformFeedback = () => {
     const transformFeedbackBuffer = new TransformFeedbackBuffer({
         gpu,
@@ -424,9 +424,6 @@ const debugTransformFeedback = () => {
     });
 };
 
-/**
- *
- */
 const createTransformFeedbackDrivenMesh = () => {
     //
     // debugs
@@ -776,10 +773,8 @@ const createTransformFeedbackDrivenMesh = () => {
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
 };
+*/
 
-/**
- *
- */
 const createGLTFSphereMesh = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -807,10 +802,175 @@ const createGLTFSphereMesh = async () => {
     return mesh;
 };
 
+const createInstanceUpdater = (instanceNum: number) => {
+    //
+    // begin create mesh
+    //
+
+    // const planeNum = 512;
+
+    const initialPosition = new Float32Array(
+        maton
+            .range(instanceNum)
+            .map(() => {
+                return [
+                    // i,
+                    // 0,
+                    // 0,
+                    Math.random() * 4 - 2,
+                    Math.random() * 4 + 2,
+                    Math.random() * 4 - 2,
+                ];
+            })
+            .flat()
+    );
+    // const initialTransform = new Float32Array(
+    //     maton
+    //         .range(planeNum)
+    //         .map(() => {
+    //             // prettier-ignore
+    //             return [
+    //                 1, 0, 0, 0,
+    //                 0, 1, 0, 0,
+    //                 0, 0, 1, 0,
+    //                 0, 0, 0, 1
+    //                 // (Math.random() * 1 - .5) * .5,
+    //                 // (Math.random() * 1 + .5) * .5,
+    //                 // (Math.random() * 1 - .5) * .5,
+    //             ];
+    //         })
+    //         .flat()
+    // );
+    const initialVelocity = new Float32Array(
+        maton
+            .range(instanceNum)
+            .map(() => {
+                return [
+                    0, 0, 0,
+                    // (Math.random() * 1 - .5) * .5,
+                    // (Math.random() * 1 + .5) * .5,
+                    // (Math.random() * 1 - .5) * .5,
+                ];
+            })
+            .flat()
+    );
+
+    const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
+        gpu,
+        attributes: [
+            new Attribute({
+                name: 'aPosition',
+                data: initialPosition,
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+            new Attribute({
+                name: 'aVelocity',
+                data: initialVelocity,
+                size: 3,
+                usageType: AttributeUsageType.DynamicDraw,
+            }),
+            // new Attribute({
+            //     name: 'aTransform',
+            //     data: initialTransform,
+            //     size: 16,
+            //     usageType: AttributeUsageType.DynamicDraw,
+            // }),
+        ],
+        varyings: [
+            {
+                name: 'vPosition',
+                data: new Float32Array(initialPosition),
+            },
+            {
+                name: 'vVelocity',
+                data: new Float32Array(initialVelocity),
+            },
+            // {
+            //     name: 'vTransform',
+            //     data: new Float32Array(initialTransform),
+            // },
+        ],
+        vertexShader: `#version 300 es
+
+        precision highp float;
+
+        // TODO: ここ動的に構築してもいい
+        layout(location = 0) in vec3 aPosition;
+        layout(location = 1) in vec3 aVelocity;
+        // layout(location = 2) in mat4 aTransform;
+
+        out vec3 vPosition;
+        // out mat4 vTransform;
+        out vec3 vVelocity;
+
+        uniform float uTime;
+        uniform vec2 uNormalizedInputPosition;
+        uniform vec3 uAttractTargetPosition;
+        uniform float uAttractRate;
+
+        // https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+        float noise(vec2 seed)
+        {
+            return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+        
+        void main() {
+            vPosition = aPosition + aVelocity;
+            // vPosition = aPosition;
+            // vTransform = aTransform;
+            vec3 target = uAttractTargetPosition;
+            vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
+            target += vec3(
+                cos(noise(seed) * 2. + uTime * 6. + float(gl_VertexID) * 16.) * 2.,
+                sin(noise(seed) * 4. + uTime * 3. + float(gl_VertexID) * 8.) * 2.,
+                sin(noise(seed) * 6. + uTime * 4. + float(gl_VertexID) * 4.) * 2.
+            );
+            vec3 v = target - vPosition;
+            vec3 dir = normalize(v);
+            vVelocity = mix(
+                aVelocity,
+                dir * (.2 + uAttractRate * .2),
+                .02 + sin(float(gl_VertexID)) * .01
+                // .04 + uAttractRate * .0
+            );
+        }
+        `,
+        fragmentShader: `#version 300 es
+
+        precision highp float;
+
+        void main() {
+        }
+        `,
+        uniforms: {
+            [UniformNames.Time]: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            uNormalizedInputPosition: {
+                type: UniformTypes.Vector2,
+                value: Vector2.zero,
+            },
+            uAttractTargetPosition: {
+                type: UniformTypes.Vector3,
+                value: Vector3.zero,
+            },
+            uAttractRate: {
+                type: UniformTypes.Float,
+                value: 0,
+            },
+        },
+        drawCount: instanceNum,
+    });
+
+    return transformFeedbackDoubleBuffer;
+};
+
 /**
  *
  */
-const createGLTFSkinnedMesh = async () => {
+const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
 
     // skinned mesh のはずなので cast
@@ -848,7 +1008,7 @@ const createGLTFSkinnedMesh = async () => {
         const posRangeX = 7.4;
         const posRangeZ = 7.4;
         const px = (Math.random() * 2 - 1) * posRangeX;
-        const py = .5 + Math.random();
+        const py = 0.5 + Math.random();
         const pz = (Math.random() * 2 - 1) * posRangeZ;
         const p = [px, py, pz];
         instanceInfo.position.push(p);
@@ -867,9 +1027,9 @@ const createGLTFSkinnedMesh = async () => {
         instanceInfo.velocity.push([0, 0, 0]);
 
         const c = Color.fromRGB(
-            Math.floor(Math.random() * 240 + 15),
-            Math.floor(Math.random() * 10 + 245),
-            Math.floor(Math.random() * 245 + 10)
+            Math.floor(Math.random() * 200 + 30),
+            Math.floor(Math.random() * 10 + 15),
+            Math.floor(Math.random() * 205 + 30)
         );
         instanceInfo.color.push([...c.elements]);
     });
@@ -956,8 +1116,47 @@ const createGLTFSkinnedMesh = async () => {
         isInstancing: true,
         useVertexColor: true,
         faceSide: FaceSide.Double,
+        vertexShaderModifier: {
+            [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
+                instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+            `,
+        },
     });
-    
+
+    const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
+
+    let attractRate = 0;
+    skinningMesh.onUpdate = ({ time, deltaTime }) => {
+        // mesh.material.uniforms.uTime.value = time;
+
+        transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
+        transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
+        // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
+        transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = sphereMesh.transform.position;
+
+        attractRate += 2 * (inputController.isDown ? 1 : -1) * deltaTime;
+        attractRate = saturate(attractRate);
+        transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = attractRate;
+        gpu.updateTransformFeedback({
+            shader: transformFeedbackDoubleBuffer.shader,
+            uniforms: transformFeedbackDoubleBuffer.uniforms,
+            vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
+            transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
+            drawCount: transformFeedbackDoubleBuffer.drawCount,
+        });
+        transformFeedbackDoubleBuffer.swap();
+        // };
+        // mesh.onUpdate = () => {
+        skinnedMesh.geometry.vertexArrayObject.replaceBuffer(
+            AttributeNames.InstancePosition,
+            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
+        );
+        skinnedMesh.geometry.vertexArrayObject.replaceBuffer(
+            AttributeNames.InstanceVelocity,
+            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+        );
+    };
+
     // skinningMesh.debugBoneView = true;
     // skinningMesh.enabled = false;
 
@@ -1012,7 +1211,7 @@ const main = async () => {
         // rotationOffset: 0.8,
     });
 
-    captureScene.add(createTransformFeedbackDrivenMesh());
+    // captureScene.add(createTransformFeedbackDrivenMesh());
 
     sphereMesh = await createGLTFSphereMesh();
     sphereMesh.onStart = ({ actor }) => {
@@ -1031,7 +1230,7 @@ const main = async () => {
         // console.log(inputController.normalizedInputPosition.x);
     };
 
-    skinnedMesh = await createGLTFSkinnedMesh();
+    skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
 
     const floorGeometry = new PlaneGeometry({
         gpu,
@@ -1337,7 +1536,7 @@ void main() {
         orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
-        // orbitCameraController.enabled = false;
+        orbitCameraController.enabled = false;
     };
 
     // engine.onAfterStart = () => {
