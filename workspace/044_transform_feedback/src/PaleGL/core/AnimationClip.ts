@@ -119,11 +119,11 @@ export class AnimationClip {
             this.onUpdateProxy(keyframes);
         } else {
             this._keyframes.forEach((animationKeyframes) => {
+                // console.log("-------")
                 const frameValue = animationKeyframes.getFrameValue(this.currentFrame);
                 switch (animationKeyframes.key) {
                     case 'translation':
                         const p = frameValue as Vector3;
-                        // TODO: actor position
                         if ((animationKeyframes.target as Actor).transform) {
                             (animationKeyframes.target as Actor).transform.position = p;
                         } else {
@@ -131,9 +131,16 @@ export class AnimationClip {
                         }
                         break;
                     case 'rotation':
-                        // TODO: rotationはquaternionなのでquaternionであるべき
+                       
+                        // TODO: quaternion-bug: 本当はこっちを使いたい
+                        // const q = frameValue as Quaternion;
+                        // const r = Rotator.fromQuaternion(q);
+
                         const q = frameValue as Quaternion;
-                        const r = Rotator.fromQuaternion(q);
+                        const r = Rotator.fromMatrix4(q.toMatrix4());
+                        
+                        // for debug
+                        // console.log("[AnimationClip.update] rotation", this.currentFrame, frameValue.elements, r.getAxes());
                         if ((animationKeyframes.target as Actor).transform) {
                             (animationKeyframes.target as Actor).transform.rotation = r;
                         } else {

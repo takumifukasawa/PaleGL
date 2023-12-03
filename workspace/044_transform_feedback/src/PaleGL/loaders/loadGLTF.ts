@@ -111,7 +111,14 @@ type GLTFAnimationChannel = {
     sampler: number;
 };
 
-export type GLTFAnimationSamplerInterpolation = 'LINEAR' | 'STEP' | 'CATMULLROMSPLINE' | 'CUBICSPLINE';
+export const GLTFAnimationSamplerInterpolation = {
+    LINEAR: 'LINEAR',
+    STEP: 'STEP',
+    CATMULLROMSPLINE: 'CATMULLROMSPLINE',
+    CUBICSPLINE: 'CUBICSPLINE'
+} as const;
+
+export type GLTFAnimationSamplerInterpolation = (typeof GLTFAnimationSamplerInterpolation)[keyof typeof GLTFAnimationSamplerInterpolation];
 
 type GLTFAnimationSampler = {
     input: number;
@@ -214,6 +221,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity
         // );
         // use trs
+        // console.log('[loadGLTF.createBone]', node.translation, node.rotation, node.scale)
         const offsetMatrix = Matrix4.fromTRS(
             // node.translation ? new Vector3(...node.translation) : Vector3.zero,
             // node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
@@ -223,7 +231,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
                 : Vector3.zero,
             node.rotation
                 ? Rotator.fromQuaternion(
-                      new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[2])
+                      new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])
                   )
                 : new Rotator(0, 0, 0),
             node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one

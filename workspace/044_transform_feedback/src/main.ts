@@ -7,8 +7,9 @@ import CubeMapPositiveYImgUrl from '../images/py.jpg?url';
 import CubeMapNegativeYImgUrl from '../images/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../images/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
-import gltfLSphereModelUrl from '../models/sphere-32x32.gltf?url';
-import gltfLGlassModelUrl from '../models/glass-wind-poly.gltf?url';
+import gltfSphereModelUrl from '../models/sphere-32x32.gltf?url';
+// import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
+import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
@@ -73,6 +74,7 @@ import {
     // VertexShaderModifierPragmas,
     UniformNames,
     VertexShaderModifierPragmas,
+    FaceSide,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -159,7 +161,7 @@ const debuggerStates: {
 
 const searchParams = new URLSearchParams(location.search);
 const instanceNumStr = searchParams.get('instance-num');
-const instanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 500;
+const instanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 1;
 console.log(`instance num: ${instanceNum}`);
 
 debuggerStates.instanceNum = instanceNum;
@@ -246,7 +248,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (orbitCameraController.enabled) {
+    if (inputController.isDown && orbitCameraController.enabled) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
@@ -434,19 +436,19 @@ const createTransformFeedbackDrivenMesh = () => {
     // begin create mesh
     //
 
-    const planeNum = 10;
+    const planeNum = 512;
 
     const initialPosition = new Float32Array(
         maton
             .range(planeNum)
-            .map((_, i) => {
+            .map(() => {
                 return [
-                    i,
-                    0,
-                    0,
-                    // Math.random() * 4 - 2,
-                    // Math.random() * 4 + 2,
-                    // Math.random() * 4 - 2,
+                    // i,
+                    // 0,
+                    // 0,
+                    Math.random() * 4 - 2,
+                    Math.random() * 4 + 2,
+                    Math.random() * 4 - 2,
                 ];
             })
             .flat()
@@ -541,35 +543,23 @@ const createTransformFeedbackDrivenMesh = () => {
             return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
         }
         
-        // mat4 getLookAtMat(vec3 lookAt, vec3 p) {
-        //     vec3 f = normalize(lookAt - p);
-        //     vec3 r = normalize(cross(vec3(0., 1., 0.), f));
-        //     vec3 u = cross(f, r);
-        //     return mat4(
-        //         r.x, r.y, r.z, 0.,
-        //         u.x, u.y, u.z, 0.,
-        //         f.x, f.y, f.z, 0.,
-        //         0., 0., 0., 1.
-        //     );
-        // }
-
         void main() {
             vPosition = aPosition + aVelocity;
-            vPosition = aPosition;
+            // vPosition = aPosition;
             // vTransform = aTransform;
             vec3 target = uAttractTargetPosition;
             vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
             target += vec3(
-                cos(noise(seed) * 2. + uTime * 2. + float(gl_VertexID) * 8.) * 2.,
-                sin(noise(seed) * 4. + uTime * 2. + float(gl_VertexID) * 8.) * 2.,
-                sin(noise(seed) * 6. + uTime * .1 + float(gl_VertexID) * 4.) * 2.
+                cos(noise(seed) * 2. + uTime * 6. + float(gl_VertexID) * 16.) * 2.,
+                sin(noise(seed) * 4. + uTime * 3. + float(gl_VertexID) * 8.) * 2.,
+                sin(noise(seed) * 6. + uTime * 4. + float(gl_VertexID) * 4.) * 2.
             );
             vec3 v = target - vPosition;
             vec3 dir = normalize(v);
             vVelocity = mix(
                 aVelocity,
-                dir * (.3 + uAttractRate * .5),
-                .02 + sin(float(gl_VertexID)) * .015
+                dir * (.2 + uAttractRate * .2),
+                .02 + sin(float(gl_VertexID)) * .01
                 // .04 + uAttractRate * .0
             );
         }
@@ -616,6 +606,7 @@ const createTransformFeedbackDrivenMesh = () => {
         .map(() => {
             return [
                 // 1, 1, 1
+                // 0.7, 0.7, 0.7,
                 Math.random() * 0.4 + 0.2,
                 Math.random() * 0.4 + 0.2,
                 Math.random() * 0.4 + 0.2,
@@ -623,6 +614,13 @@ const createTransformFeedbackDrivenMesh = () => {
         })
         .flat();
     const instanceRotation = maton
+        .range(planeNum, true)
+        .map(() => {
+            // return [i, 0, 0]
+            return [0, 0, 0];
+        })
+        .flat();
+    const instanceVelocity = maton
         .range(planeNum, true)
         .map(() => {
             // return [i, 0, 0]
@@ -702,6 +700,12 @@ const createTransformFeedbackDrivenMesh = () => {
                 size: 4,
                 divisor: 1,
             }),
+            new Attribute({
+                name: AttributeNames.InstanceVelocity,
+                data: new Float32Array(instanceVelocity),
+                size: 3,
+                divisor: 1,
+            }),
         ],
         indices: boxGeometryData.indices,
         drawCount: boxGeometryData.drawCount,
@@ -711,21 +715,13 @@ const createTransformFeedbackDrivenMesh = () => {
         isInstancing: true,
         useVertexColor: true,
         vertexShaderModifier: {
-            [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform vec3 uAttractTargetPosition;`,
             [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
-                instanceRotation = getLookAtMat(uAttractTargetPosition, aInstancePosition);
-                // instanceRotation = getLookAtMat(vec3(0., 0., 20.), aInstancePosition);
+                instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
             `,
             // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
             // [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
             // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
             // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
-        },
-        uniforms: {
-            uAttractTargetPosition: {
-                type: UniformTypes.Vector3,
-                value: Vector3.zero,
-            },
         },
     });
     const mesh = new Mesh({
@@ -733,16 +729,10 @@ const createTransformFeedbackDrivenMesh = () => {
         material,
         castShadow: true,
     });
-    mesh.transform.setScaling(new Vector3(1, 1, 1));
+    // mesh.transform.setScaling(new Vector3(1, 1, 1));
     let attractRate = 0;
     mesh.onUpdate = ({ time, deltaTime }) => {
-        mesh.material.uniforms.uAttractTargetPosition.value = new Vector3(
-            // 0, 0, 20
-            sphereMesh.transform.position.x,
-            0,
-            sphereMesh.transform.position.z,
-        );
-        console.log(mesh.material)
+        // mesh.material.uniforms.uTime.value = time;
 
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
@@ -766,6 +756,10 @@ const createTransformFeedbackDrivenMesh = () => {
             AttributeNames.InstancePosition,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
         );
+        geometry.vertexArrayObject.replaceBuffer(
+            AttributeNames.InstanceVelocity,
+            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
+        );
         // geometry.vertexArrayObject.replaceBuffer(
         //     'aAccPosition',
         //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
@@ -775,6 +769,9 @@ const createTransformFeedbackDrivenMesh = () => {
         //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
         // );
     };
+   
+    mesh.enabled = false;
+    
     // mesh.transform.setTranslation(new Vector3(0, 2, 0));
     return mesh;
 };
@@ -783,7 +780,7 @@ const createTransformFeedbackDrivenMesh = () => {
  *
  */
 const createGLTFSphereMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfLSphereModelUrl });
+    const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = new UnlitMaterial({
@@ -813,40 +810,59 @@ const createGLTFSphereMesh = async () => {
  *
  */
 const createGLTFSkinnedMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfLGlassModelUrl });
+    const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
 
-    // skinned mesh おｎはずなので cast
+    // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
 
     // ルートにanimatorをattachしてるので一旦ここでassign
+    // TODO: set animation clips いらない気がする. animatorの設定さえあれば
+    skinningMesh.animator = gltfActor.animator;
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
+    skinningMesh.onStart = () => {
+        gltfActor.animator.play('Fly', true);
+        // gltfActor.animator.animationClips[0].speed = 0.2;
+        skinningMesh.transform.setScaling(new Vector3(5, 5, 5))
+    };
+    // skinningMesh.onUpdate = ({ deltaTime }) => {
+    //     // skinningMesh.animator.update(deltaTime);
+    //     // gltfActor.animator.update(deltaTime);
+    // };
 
     const instanceInfo: {
         position: number[][];
         scale: number[][];
         rotation: number[][];
+        velocity: number[][];
         color: number[][];
     } = {
         position: [],
         scale: [],
         rotation: [],
+        velocity: [],
         color: [],
     };
     maton.range(instanceNum).forEach(() => {
-        const posRangeX = 7.4;
-        const posRangeZ = 7.4;
-        const px = (Math.random() * 2 - 1) * posRangeX;
-        const pz = (Math.random() * 2 - 1) * posRangeZ;
-        const p = [px, 0, pz];
-        instanceInfo.position.push(p);
+        // const posRangeX = 7.4;
+        // const posRangeZ = 7.4;
+        // const px = (Math.random() * 2 - 1) * posRangeX;
+        // const pz = (Math.random() * 2 - 1) * posRangeZ;
+        // const p = [px, 0, pz];
+        // instanceInfo.position.push(p);
+        instanceInfo.position.push([0, 0, 0]);
 
-        const baseScale = 0.04;
-        const randomScaleRange = 0.08;
+        // const baseScale = 0.04;
+        // const randomScaleRange = 0.08;
+        const baseScale = 1;
+        const randomScaleRange = 0;
         const s = Math.random() * randomScaleRange + baseScale;
-        instanceInfo.scale.push([s, s * 2, s]);
+        // instanceInfo.scale.push([s, s * 2, s]);
+        instanceInfo.scale.push([s, s, s]);
 
         instanceInfo.rotation.push([0, 0, 0]);
+
+        instanceInfo.velocity.push([0, 0, 0]);
 
         const c = Color.fromRGB(
             Math.floor(Math.random() * 240 + 15),
@@ -905,6 +921,16 @@ const createGLTFSkinnedMesh = async () => {
             divisor: 1,
         })
     );
+
+    skinningMesh.geometry.setAttribute(
+        new Attribute({
+            name: AttributeNames.InstanceVelocity,
+            data: new Float32Array(instanceInfo.velocity.flat()),
+            size: 3,
+            divisor: 1,
+        })
+    );
+
     // skinningMesh.material = new PhongMaterial({
     //     // gpu,
     //     specularAmount: 0.5,
@@ -927,10 +953,12 @@ const createGLTFSkinnedMesh = async () => {
         gpuSkinning: true,
         isInstancing: true,
         useVertexColor: true,
+        faceSide: FaceSide.Double,
     });
-    // skinningMesh.onStart = () => {
-    //     console.log(skinnedMesh);
-    // };
+    skinningMesh.debugBoneView = true;
+
+    // skinningMesh.transform.setScaling(new Vector3(2, 2, 2));
+
     // skinningMesh.enabled = false;
 
     return skinningMesh;

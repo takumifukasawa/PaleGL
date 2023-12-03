@@ -16,12 +16,13 @@ export class Animator {
         this._animationClips = animationClips;
     }
 
-    play(name: string) {
+    play(name: string, loop: boolean = false) {
         const animationClip = this._animationClips.find((animationClip) => name === animationClip.name);
         if (!animationClip) {
             return;
         }
         animationClip.play();
+        animationClip.loop = loop;
         this.playingAnimationClip = animationClip;
     }
 
@@ -30,6 +31,7 @@ export class Animator {
         if (!this.playingAnimationClip) {
             return;
         }
+        this.playingAnimationClip.loop = true;
         this.playingAnimationClip.update(deltaTime);
     }
 }

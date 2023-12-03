@@ -41,8 +41,17 @@ export class Bone extends NodeBase {
     }
 
     calcJointMatrix(parentBone?: Bone) {
+        // console.log(this.index, this.position.elements, this.rotation.elements, this.scale.elements)
+        // console.log("[Bone.calcJointMatrix]", this.index, this.rotation.elements)
+        
         // 1: update offset matrix
-        this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
+        // TODO: quaternion-bug: 本当はこっちを使いたい
+        // this.offsetMatrix = Matrix4.fromTRS(this.position, this.rotation, this.scale);
+        this.offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(this.position),
+            this.rotation.rawMatrix!,
+            Matrix4.scalingMatrix(this.scale)
+        );
 
         // 2: update joint matrix
         this.#jointMatrix = parentBone

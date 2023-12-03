@@ -191,6 +191,7 @@ export const AttributeNames = {
     InstanceRotation: 'aInstanceRotation',
     InstanceAnimationOffset: 'aInstanceAnimationOffset',
     InstanceVertexColor: 'aInstanceVertexColor',
+    InstanceVelocity: 'aInstanceVelocity',
 } as const;
 
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];

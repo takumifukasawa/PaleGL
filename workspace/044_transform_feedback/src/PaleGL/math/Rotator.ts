@@ -1,9 +1,11 @@
 ﻿import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 
 export class Rotator {
     // x, y, z axes
     // 一旦そのままdegreeが入る想定
     elements: Float32Array = new Float32Array(3);
+    rawMatrix: Matrix4 | null = null;
 
     // degree
     get x() {
@@ -75,7 +77,14 @@ export class Rotator {
         const euler = q.toEulerDegree();
         return new Rotator(euler.x, euler.y, euler.z);
     }
-
+   
+    // TODO: gltfのquaternionからdegreeを複合するところのバグの回避のため使ってる関数なので本当はよくない
+    static fromMatrix4(m: Matrix4) {
+        const r = new Rotator(0, 0, 0);
+        r.rawMatrix = m;
+        return r;
+    }
+    
     setRotationX(degree: number) {
         this.elements[0] = degree;
     }

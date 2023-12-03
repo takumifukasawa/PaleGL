@@ -95,6 +95,8 @@ export class SkinnedMesh extends Mesh {
 
     start({ gpu }: { gpu: GPU }) {
         this.bones.calcBoneOffsetMatrix();
+        
+        console.log('s', this.bones)
 
         // ボーンオフセット行列を計算
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
@@ -187,7 +189,9 @@ export class SkinnedMesh extends Mesh {
                             targetBone.position = translation;
                         }
                         if (rotation) {
-                            targetBone.rotation = Rotator.fromQuaternion(rotation);
+                            // TODO: quaternion-bug: 本当はこっちを使いたい
+                            // targetBone.rotation = Rotator.fromQuaternion(rotation);
+                            targetBone.rotation = Rotator.fromMatrix4(rotation.toMatrix4());
                         }
                         if (scale) {
                             targetBone.scale = scale;
@@ -266,9 +270,12 @@ matrix elements: ${jointData.length}`);
 
         // if (this.debugBoneView) {
         if (this.boneLines && this.bonePoints) {
-            const boneLinePositions: number[][] = this.#boneOrderedIndex.map((bone) => [
+            // console.log("--------")
+            const boneLinePositions: number[][] = this.#boneOrderedIndex.map((bone) => {
+                // console.log(bone.jointMatrix.position.elements)
+                return[
                 ...bone.jointMatrix.position.elements,
-            ]);
+            ]});
             // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
             // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
             this.boneLines.geometry.updateAttribute(
@@ -394,6 +401,11 @@ matrix elements: ${jointData.length}`);
             }
         };
         checkChildNum(this.bones);
+        
+        console.log("===============")
+        console.log(this.bones)
+        console.log(this.#boneIndicesForLines)
+        console.log("===============")
 
         this.boneLines = new Mesh({
             // gpu,

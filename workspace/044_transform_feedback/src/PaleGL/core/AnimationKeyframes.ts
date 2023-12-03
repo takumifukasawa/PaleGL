@@ -2,9 +2,8 @@
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 import {
-    GLTFAnimationChannelTargetPath,
+    GLTFAnimationChannelTargetPath, GLTFAnimationSamplerInterpolation,
     // GLTFAnimationKeyframeType,
-    GLTFAnimationSamplerInterpolation,
     GLTFNodeActorKind,
 } from '@/PaleGL/loaders/loadGLTF';
 
@@ -69,9 +68,27 @@ export class AnimationKeyframes {
         }
     }
 
+    /**
+     * 
+     * @param frame
+     */
     getFrameValue(frame: number): AnimationKeyframeValue {
-        const arr = new Array(this.elementSize).fill(0).map((_, i) => this._data[frame * this.elementSize + i]);
+        const arr = new Array(this.elementSize).fill(0).map((_, i) => {
+            switch (this.interpolation) {
+                case GLTFAnimationSamplerInterpolation.LINEAR:
+                    return this._data[frame * this.elementSize + i];
+                case GLTFAnimationSamplerInterpolation.STEP:
+                    // TODO: Stepの場合って0frameだけ見て問題ない？
+                    return this._data[i];
+                default:
+                    throw 'invalid interp';
+            }
+        });
 
+        // for debug
+        // console.log("data", this.interpolation, this._data, arr)
+        // console.log("data", frame, this.interpolation, arr)
+        
         switch (this.type) {
             case AnimationKeyframeTypes.Vector3:
                 // return new Vector3(...arr);
