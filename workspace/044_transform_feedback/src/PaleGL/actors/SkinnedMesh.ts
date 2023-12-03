@@ -95,8 +95,6 @@ export class SkinnedMesh extends Mesh {
 
     start({ gpu }: { gpu: GPU }) {
         this.bones.calcBoneOffsetMatrix();
-        
-        console.log('s', this.bones)
 
         // ボーンオフセット行列を計算
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
@@ -151,11 +149,11 @@ export class SkinnedMesh extends Mesh {
                         const boneIndex = (elem.target as Bone).index;
                         if (!animationData[i][frameIndex][boneIndex]) {
                             animationData[i][frameIndex][boneIndex] = {
+                                // NOTE: { [elem.key]: elem.frameValue }
                                 bone: elem.target as Bone,
-                                // [elem.key]: elem.frameValue
                             };
                         }
-                        // animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue;
+                        // NOTE: animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue;
                         // TODO: 上手くまとめる方法ない？
                         switch (elem.key) {
                             case GLTFAnimationChannelTargetPath.translation:
@@ -402,11 +400,6 @@ matrix elements: ${jointData.length}`);
         };
         checkChildNum(this.bones);
         
-        console.log("===============")
-        console.log(this.bones)
-        console.log(this.#boneIndicesForLines)
-        console.log("===============")
-
         this.boneLines = new Mesh({
             // gpu,
             geometry: new Geometry({

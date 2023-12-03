@@ -9,7 +9,7 @@ import { AnimationClip } from '@/PaleGL/core/AnimationClip';
 import { AnimationKeyframeTypes } from '@/PaleGL/constants';
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
-import { Rotator } from '@/PaleGL/math/Rotator';
+// import { Rotator } from '@/PaleGL/math/Rotator';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 
@@ -222,20 +222,33 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         // );
         // use trs
         // console.log('[loadGLTF.createBone]', node.translation, node.rotation, node.scale)
-        const offsetMatrix = Matrix4.fromTRS(
-            // node.translation ? new Vector3(...node.translation) : Vector3.zero,
-            // node.rotation ? Rotator.fromQuaternion(new Quaternion(...node.rotation)) : new Rotator(0, 0, 0),
-            // node.scale ? new Vector3(...node.scale) : Vector3.one
+
+        // TODO: quaternion-bug: 本当はこっちを使いたい
+        // const offsetMatrix = Matrix4.fromTRS(
+        //     node.translation
+        //         ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
+        //         : Vector3.zero,
+        //     node.rotation
+        //         ? Rotator.fromQuaternion(
+        //             new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])
+        //         )
+        //         : new Rotator(0, 0, 0),
+        //     node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one
+        // );
+
+        const offsetMatrix = Matrix4.multiplyMatrices(
+            Matrix4.translationMatrix(
             node.translation
                 ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
-                : Vector3.zero,
-            node.rotation
-                ? Rotator.fromQuaternion(
-                      new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])
-                  )
-                : new Rotator(0, 0, 0),
-            node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one
+                : Vector3.zero
+            ),
+            (node.rotation
+                ? (new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])).toMatrix4()
+                : Quaternion.identity().toMatrix4()
+            ),
+            Matrix4.scalingMatrix(node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one)
         );
+
         bone.offsetMatrix = offsetMatrix;
 
         if (parentBone) {

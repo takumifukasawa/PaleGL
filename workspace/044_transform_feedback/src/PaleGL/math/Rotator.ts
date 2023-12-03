@@ -78,7 +78,7 @@ export class Rotator {
         return new Rotator(euler.x, euler.y, euler.z);
     }
    
-    // TODO: gltfのquaternionからdegreeを複合するところのバグの回避のため使ってる関数なので本当はよくない
+    // TODO: quaternion-bug: gltfのquaternionからdegreeを複合するところのバグの回避のため使ってる関数なので本当はよくない
     static fromMatrix4(m: Matrix4) {
         const r = new Rotator(0, 0, 0);
         r.rawMatrix = m;

@@ -45,6 +45,8 @@ mat4 getJointMatrixGPUSkinning(
     float time,
     float timeOffset
 ) {
+    // TODO: 停止機能
+
     float offset = float(int(mod(floor(time + timeOffset), float(totalFrameCount))) * jointNum);
     // horizontal
     int colIndex = int(mod(float(jointIndex) + offset, float(colNum)));

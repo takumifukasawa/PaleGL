@@ -9,7 +9,8 @@ import CubeMapPositiveZImgUrl from '../images/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../images/nz.jpg?url';
 import gltfSphereModelUrl from '../models/sphere-32x32.gltf?url';
 // import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
-import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
+// import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
+import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
@@ -161,7 +162,7 @@ const debuggerStates: {
 
 const searchParams = new URLSearchParams(location.search);
 const instanceNumStr = searchParams.get('instance-num');
-const instanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 1;
+const instanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
 console.log(`instance num: ${instanceNum}`);
 
 debuggerStates.instanceNum = instanceNum;
@@ -821,9 +822,9 @@ const createGLTFSkinnedMesh = async () => {
     skinningMesh.animator = gltfActor.animator;
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
     skinningMesh.onStart = () => {
-        gltfActor.animator.play('Fly', true);
+        // CPU skinning
+        // gltfActor.animator.play('Fly', true);
         // gltfActor.animator.animationClips[0].speed = 0.2;
-        skinningMesh.transform.setScaling(new Vector3(5, 5, 5))
     };
     // skinningMesh.onUpdate = ({ deltaTime }) => {
     //     // skinningMesh.animator.update(deltaTime);
@@ -844,13 +845,14 @@ const createGLTFSkinnedMesh = async () => {
         color: [],
     };
     maton.range(instanceNum).forEach(() => {
-        // const posRangeX = 7.4;
-        // const posRangeZ = 7.4;
-        // const px = (Math.random() * 2 - 1) * posRangeX;
-        // const pz = (Math.random() * 2 - 1) * posRangeZ;
-        // const p = [px, 0, pz];
-        // instanceInfo.position.push(p);
-        instanceInfo.position.push([0, 0, 0]);
+        const posRangeX = 7.4;
+        const posRangeZ = 7.4;
+        const px = (Math.random() * 2 - 1) * posRangeX;
+        const py = .5 + Math.random();
+        const pz = (Math.random() * 2 - 1) * posRangeZ;
+        const p = [px, py, pz];
+        instanceInfo.position.push(p);
+        // instanceInfo.position.push([0, 0, 0]);
 
         // const baseScale = 0.04;
         // const randomScaleRange = 0.08;
@@ -955,10 +957,8 @@ const createGLTFSkinnedMesh = async () => {
         useVertexColor: true,
         faceSide: FaceSide.Double,
     });
-    skinningMesh.debugBoneView = true;
-
-    // skinningMesh.transform.setScaling(new Vector3(2, 2, 2));
-
+    
+    // skinningMesh.debugBoneView = true;
     // skinningMesh.enabled = false;
 
     return skinningMesh;
