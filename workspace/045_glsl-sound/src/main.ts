@@ -1156,13 +1156,13 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
 const createSound = () => {
     const vertexShader = soundVertexShader;
-    
+
+    const glslSound = new GLSLSound({
+        gpu,
+        vertexShader,
+        duration: 180
+    });
     window.document.addEventListener('click', () => {
-        const glslSound = new GLSLSound({
-            gpu,
-            vertexShader,
-            duration: 180
-        });
         glslSound.play();
         // glslSound.play();
     });

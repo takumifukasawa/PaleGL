@@ -1,11 +1,5 @@
 #version 300 es
 
-// precision highp float;
-
-layout(location = 0) in float aPosition;
-
-// precision highp float;
-
 uniform float uBlockOffset;
 uniform float uSampleRate;
 

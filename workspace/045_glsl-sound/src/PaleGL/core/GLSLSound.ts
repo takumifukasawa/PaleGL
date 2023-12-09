@@ -4,7 +4,7 @@ import { GPU } from '@/PaleGL/core/GPU.ts';
 // import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
-import { Attribute } from '@/PaleGL/core/Attribute.ts';
+// import { Attribute } from '@/PaleGL/core/Attribute.ts';
 
 // ------------------------------------------------------------------------------
 // ref:
@@ -65,14 +65,7 @@ export class GLSLSound {
 
         const transformFeedbackBuffer = new TransformFeedbackBuffer({
             gpu,
-            attributes: [
-                new Attribute({
-                    name: 'aPosition',
-                    data: new Float32Array(SAMPLES * 2),
-                    size: 1,
-                    usageType: AttributeUsageType.DynamicDraw,
-                }),
-            ],
+            attributes: [],
             varyings: [
                 {
                     name: varyingName,
