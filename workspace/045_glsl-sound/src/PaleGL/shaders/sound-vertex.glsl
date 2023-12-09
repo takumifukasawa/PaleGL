@@ -1,5 +1,11 @@
 #version 300 es
 
+// ------------------------------------------------------------------------------
+// ref:
+// https://qiita.com/aa_debdeb/items/5e1204987236f7b52393
+// https://raku-phys.hatenablog.com/entry/2020/04/19/002400
+// ------------------------------------------------------------------------------
+
 uniform float uBlockOffset;
 uniform float uSampleRate;
 
