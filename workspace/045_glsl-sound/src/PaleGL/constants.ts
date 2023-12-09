@@ -171,6 +171,7 @@ export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof
 export const AttributeUsageType = {
     StaticDraw: 'StaticDraw',
     DynamicDraw: 'DynamicDraw',
+    DynamicCopy: 'DynamicCopy'
 } as const;
 
 export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];

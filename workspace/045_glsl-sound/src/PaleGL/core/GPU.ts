@@ -1,4 +1,5 @@
 ﻿import {
+    AttributeUsageType,
     BlendType,
     BlendTypes,
     DepthFuncType,
@@ -34,6 +35,19 @@ export const createWhite1x1: () => HTMLCanvasElement = () => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 1, 1);
     return canvas;
+};
+
+export const getAttributeUsage = (gl: WebGL2RenderingContext, usageType: AttributeUsageType) => {
+    switch (usageType) {
+        case AttributeUsageType.StaticDraw:
+            return gl.STATIC_DRAW;
+        case AttributeUsageType.DynamicDraw:
+            return gl.DYNAMIC_DRAW;
+        case AttributeUsageType.DynamicCopy:
+            return gl.DYNAMIC_COPY;
+        default:
+            throw '[getAttributeUsage] invalid usage';
+    }
 };
 
 export class GPU {
@@ -189,15 +203,14 @@ export class GPU {
     // }
 
     /**
-     * 
+     *
      */
-    setUniformValues ()  {
+    setUniformValues() {
         const gl = this.gl;
-        
+
         let activeTextureIndex = 0;
 
         const setUniformValueInternal = (type: UniformType, uniformName: string, value: UniformValue) => {
-
             const location = gl.getUniformLocation(this.shader!.glObject, uniformName);
             // TODO:
             // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
@@ -266,7 +279,7 @@ export class GPU {
                 default:
                     throw `invalid uniform - name: ${uniformName}, type: ${type}`;
             }
-        }
+        };
 
         // uniforms
         Object.keys(this.uniforms).forEach((uniformName) => {
@@ -293,7 +306,6 @@ export class GPU {
         });
     }
 
-
     updateTransformFeedback({
         shader,
         uniforms,
@@ -316,7 +328,7 @@ export class GPU {
         gl.bindVertexArray(this.vao.glObject);
 
         gl.useProgram(this.shader.glObject);
-        
+
         this.setUniformValues();
 
         gl.enable(gl.RASTERIZER_DISCARD);
@@ -332,7 +344,7 @@ export class GPU {
         gl.useProgram(null);
 
         gl.bindVertexArray(null);
-       
+
         this.shader = null;
         this.uniforms = {};
         this.vao = null;
@@ -444,7 +456,7 @@ export class GPU {
         }
 
         gl.useProgram(this.shader.glObject);
-        
+
         this.setUniformValues();
 
         // let activeTextureIndex = 0;

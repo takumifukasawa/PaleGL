@@ -101,6 +101,8 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
 // import testFrag from '@/PaleGL/shaders/test-shader-frag.glsl';
 // import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
+import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
+import {GLSLSound} from "@/PaleGL/core/GLSLSound.ts";
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -923,13 +925,13 @@ const createInstanceUpdater = (instanceNum: number) => {
             );
         }
         `,
-        fragmentShader: `#version 300 es
+        // fragmentShader: `#version 300 es
 
-        precision highp float;
+        // precision highp float;
 
-        void main() {
-        }
-        `,
+        // void main() {
+        // }
+        // `,
         uniforms: {
             [UniformNames.Time]: {
                 type: UniformTypes.Float,
@@ -1152,7 +1154,23 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
+const createSound = () => {
+    const vertexShader = soundVertexShader;
+    
+    window.document.addEventListener('click', () => {
+        const glslSound = new GLSLSound({
+            gpu,
+            vertexShader,
+            duration: 180
+        });
+        glslSound.play();
+        // glslSound.play();
+    });
+}
+
 const main = async () => {
+    createSound();
+    
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
         gpu,

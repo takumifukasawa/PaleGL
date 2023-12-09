@@ -1,10 +1,12 @@
 ﻿import { Attribute } from '@/PaleGL/core/Attribute';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 // import { AttributeUsageType } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import {getAttributeUsage, GPU} from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { Uniforms } from '@/PaleGL/materials/Material.ts';
+import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
+import {AttributeUsageType} from "@/PaleGL/constants.ts";
 
 // TODO: location, divisorをいい感じに指定したい
 
@@ -13,17 +15,13 @@ export type TransformFeedbackBufferArgs = {
     attributes: Attribute[];
     drawCount: number;
     vertexShader: string;
-    fragmentShader: string;
+    // fragmentShader: string;
     varyings: {
         name: string;
         data: Float32Array | Uint16Array;
+        usageType?: AttributeUsageType
     }[];
     uniforms?: Uniforms;
-    // shader: Shader;
-    // targets: {
-    //     data: Float32Array | Uint16Array,
-    //     size: number
-    // }[]
 };
 
 export class TransformFeedbackBuffer {
@@ -40,15 +38,29 @@ export class TransformFeedbackBuffer {
     transformFeedback: TransformFeedback;
 
     outputs: {
+        // name: string;
         buffer: WebGLBuffer;
         // size: number
     }[] = [];
 
-    constructor({ gpu, attributes, drawCount, vertexShader, fragmentShader, varyings, uniforms = {} }: TransformFeedbackBufferArgs) {
+    constructor({
+        gpu,
+        attributes,
+        drawCount,
+        vertexShader,
+        // fragmentShader,
+        varyings,
+        uniforms = {},
+    }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         const { gl } = gpu;
         const transformFeedbackVaryings = varyings.map(({ name }) => name);
-        this.shader = new Shader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings });
+        this.shader = new Shader({
+            gpu,
+            vertexShader,
+            fragmentShader: transformFeedbackFragmentShader,
+            transformFeedbackVaryings,
+        });
         this.uniforms = uniforms;
 
         this.drawCount = drawCount;
@@ -66,12 +78,13 @@ export class TransformFeedbackBuffer {
             attributes,
         });
 
-        const outputBuffers = varyings.map(({ data }) => {
+        const outputBuffers = varyings.map(({ data, usageType }) => {
             const buffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, data, getAttributeUsage(gl, usageType || AttributeUsageType.DynamicDraw));
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
             this.outputs.push({
+                // name,
                 buffer: buffer!,
             });
             return buffer!;
@@ -79,4 +92,8 @@ export class TransformFeedbackBuffer {
 
         this.transformFeedback = new TransformFeedback({ gpu, buffers: outputBuffers });
     }
+
+    // getBufferSubData(name: string) {
+    //     return this.outputs.find(elem => elem.name === name)?.buffer;
+    // }
 }

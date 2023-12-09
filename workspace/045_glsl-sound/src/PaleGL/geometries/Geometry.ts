@@ -89,7 +89,8 @@ export class Geometry {
         });
         this.attributes.push(attr);
 
-        this.vertexArrayObject.setAttribute(attr, true);
+        // this.vertexArrayObject.setAttribute(attr, true);
+        this.vertexArrayObject.setAttribute(attr);
     }
 
     #createGeometry({ gpu }: { gpu: GPU }) {
