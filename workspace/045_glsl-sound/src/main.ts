@@ -177,6 +177,7 @@ let floorNormalMap: Texture;
 let sphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
+let glslSound: GLSLSound;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -1157,14 +1158,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 const createSound = () => {
     const vertexShader = soundVertexShader;
 
-    const glslSound = new GLSLSound({
+    glslSound = new GLSLSound({
         gpu,
         vertexShader,
         duration: 180
-    });
-    window.document.addEventListener('click', () => {
-        glslSound.play();
-        // glslSound.play();
     });
 }
 
@@ -1593,6 +1590,21 @@ function initDebugger() {
         onClick: () => {
             const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
             location.replace(url);
+        },
+    });
+
+    //
+    // play sound
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addButtonDebugger({
+        buttonLabel: 'play sound',
+        onClick: () => {
+            if(glslSound) {
+                glslSound.play();
+            }
         },
     });
 
