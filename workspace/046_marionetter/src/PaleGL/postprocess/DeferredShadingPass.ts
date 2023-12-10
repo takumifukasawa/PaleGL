@@ -1,5 +1,4 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-// import { Uniforms } from '@/PaleGL/materials/Material';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -7,12 +6,13 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
-        // name,
-    } // uniforms,
+        // uniforms,
+    } // name,
     : {
         gpu: GPU;
         // fragmentShader: string;
@@ -50,6 +50,11 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 name: UniformNames.ShadowMap,
                 type: UniformTypes.Texture,
                 value: null,
+            },
+            {
+                name: UniformNames.ShadowMapProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
             },
             {
                 name: 'uAmbientOcclusionTexture',
@@ -160,9 +165,4 @@ export class DeferredShadingPass extends PostProcessPassBase {
             },
         ]);
     }
-
-    // render(options: PostProcessPassRenderArgs) {
-    //     super.render(options);
-    //     console.log(this.material.uniforms)
-    // }
 }

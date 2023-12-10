@@ -253,7 +253,7 @@ vec3 outgoingLight =
     reflectedLight.indirectSpecular;
     resultColor = vec4(outgoingLight, opacity);
 
-
+// TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
 #ifdef USE_RECEIVE_SHADOW
     vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
     if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {

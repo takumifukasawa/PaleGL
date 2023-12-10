@@ -222,6 +222,7 @@ export const UniformTypes = {
 export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
 
 // TODO: Texture -> Map にしたい？
+// TODO: objectじゃなくて単体のconst_stringにするべき
 export const UniformNames = {
     // position
     ViewPosition: 'uViewPosition',

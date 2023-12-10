@@ -492,7 +492,7 @@ export class Renderer {
             lightActors,
         });
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
-
+        
         // ------------------------------------------------------------------------------
         // ssr pass
         // ------------------------------------------------------------------------------
@@ -577,6 +577,7 @@ export class Renderer {
         // transparent pass
         // ------------------------------------------------------------------------------
 
+        // TODO: 直前のパスを明示的に指定する必要があるのはめんどうなのでうまいこと管理したい
         // this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
         // this._afterDeferredShadingRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
         // this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
@@ -587,8 +588,6 @@ export class Renderer {
         // pattern2: depth prepass
         this._afterDeferredShadingRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
-        // // TODO: copy depth texture
-        // this._copyDepthSourceRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture);
         this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
         RenderTarget.blitDepth({
             gpu: this.gpu,
@@ -605,9 +604,11 @@ export class Renderer {
             );
         });
 
+        // TODO: colorだけクリアするべきのはず？
         this.setRenderTarget(this._afterDeferredShadingRenderTarget.write);
 
-        this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
+        // this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
+        this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
         // full screen pass
@@ -866,7 +867,7 @@ export class Renderer {
         lightActors: Light[]
         // clear: boolean = true
     ) {
-        console.log("--------- scene pass ---------");
+        // console.log("--------- scene pass ---------");
 
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
@@ -963,15 +964,15 @@ export class Renderer {
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
         lightActors: Light[],
-        clear: boolean
+        // clear: boolean
     ) {
         // console.log("--------- transparent pass ---------");
 
         // TODO: 常にclearしない、で良い気がする
-        if (clear) {
-            // this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
-            this.gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
-        }
+        // if (clear) {
+        //     // this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        //     this.gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        // }
 
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             const targetMaterial = actor.materials[materialIndex];

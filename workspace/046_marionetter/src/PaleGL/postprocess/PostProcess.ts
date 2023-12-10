@@ -163,6 +163,8 @@ export class PostProcess {
             );
             passMaterial.uniforms.setValue(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
             passMaterial.uniforms.setValue(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
+            // console.log(targetCamera.inverseViewProjectionMatrix)
+            // console.log(targetCamera.inverseProjectionMatrix)
             passMaterial.uniforms.setValue(UniformNames.ViewMatrix, targetCamera.viewMatrix);
             passMaterial.uniforms.setValue(
                 UniformNames.TransposeInverseViewMatrix,

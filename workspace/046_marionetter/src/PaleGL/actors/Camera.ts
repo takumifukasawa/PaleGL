@@ -253,10 +253,10 @@ export class Camera extends Actor {
     updateTransform() {
         super.updateTransform();
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
-        // this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
-        // this.inverseViewMatrix = this.viewMatrix.clone().invert();
-        // this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
-        // this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
+        this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
+        this.inverseViewMatrix = this.viewMatrix.clone().invert();
+        this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
+        this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
     }
 
     /**

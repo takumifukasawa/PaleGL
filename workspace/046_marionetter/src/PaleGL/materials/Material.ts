@@ -407,6 +407,7 @@ export class Material {
                 : []),
         ];
 
+        // TODO: いまやdeferred-shading-passでしか使ってないのでここでやる必要がないかも
         const shadowUniforms: UniformsData = this.receiveShadow
             ? [
                   {

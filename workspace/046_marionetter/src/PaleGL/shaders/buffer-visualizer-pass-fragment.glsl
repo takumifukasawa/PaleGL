@@ -69,7 +69,7 @@ void main() {
         worldPositionUV,
         texture(uDepthTexture, worldPositionUV).x,
         uInverseViewProjectionMatrix
-    ) * isArea(worldPositionUV);
+    );
 
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
@@ -95,7 +95,7 @@ void main() {
         // gBufferC +
         sceneDepth +
         directionalShadowMapColor +
-        vec4(worldPosition, 1.) +
+        vec4(worldPosition, 1.) * isArea(worldPositionUV) +
         aoColor +
         vec4(deferredShadingColor.rgb, 1.) * isArea(deferredShadingUV) +
         vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV) +
