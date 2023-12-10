@@ -5,7 +5,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 type CubeMapArgs = {
     gpu: GPU;
     images: {
-        [key in CubeMapAxis]: HTMLImageElement | null;
+        [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement | null;
     };
     width: number;
     height: number;

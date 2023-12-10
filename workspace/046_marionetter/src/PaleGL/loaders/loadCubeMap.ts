@@ -17,9 +17,19 @@ type CubeMapDirectionImagePaths = {
     [key in CubeMapAxis]: string;
 };
 
-type CubeMapDirectionImages = {
-    [key in CubeMapAxis]: HTMLImageElement;
+export type CubeMapDirectionImages = {
+    [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement;
 };
+
+export function createCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDirectionImages }) {
+    return new CubeMap({
+        gpu,
+        images,
+        // axisごとに同じサイズ想定のはず
+        width: images[CubeMapAxis.PositiveX].width,
+        height: images[CubeMapAxis.PositiveX].height,
+    });
+}
 
 export async function loadCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDirectionImagePaths }) {
     return await Promise.all(
@@ -43,39 +53,13 @@ export async function loadCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDi
         result.forEach(({ axis, img }) => {
             data[axis] = img;
         });
-        return new CubeMap({
-            gpu,
-            images: data,
-            // axisごとに同じサイズ想定のはず
-            width: data[CubeMapAxis.PositiveX].width,
-            height: data[CubeMapAxis.PositiveX].height,
-        });
-
-        //const d = Object.keys(CubeMapAxis).reduce((acc, cv) => {
-        //    const axis = cv as CubeMapAxis;
-        //    acc[axis] = axis;
-        //    return {[axis]: img};
-        //}, {})
-
-        //const data = result.map(({ axis, img }) => {
-        //})
-        //
-        //const data = {
-        //    [CubeMapAxis.PositiveX]: result[CubeMapAxis.PositiveX].img
-        //}
-        //result.reduce()
-        //const keys = Object.keys(CubeMapAxis).reduce((acc, cv) => {
-        //    const axis = cv as CubeMapAxis;
-        //    acc[axis] = axis;
-        //    return {[axis]: img};
-        //}, {})
-        //const data = result.map(({ key, img }) => {
-        //    const axis = key as CubeMapAxis;
-        //    return {
-        //        axis
-        //    }
-        //    data[axis] = img
-        //});
-        //return new CubeMap({ gpu, images: data });
+        return createCubeMap({ gpu, images: data });
+        // return new CubeMap({
+        //     gpu,
+        //     images: data,
+        //     // axisごとに同じサイズ想定のはず
+        //     width: data[CubeMapAxis.PositiveX].width,
+        //     height: data[CubeMapAxis.PositiveX].height,
+        // });
     });
 }

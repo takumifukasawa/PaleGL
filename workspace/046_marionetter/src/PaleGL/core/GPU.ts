@@ -2,6 +2,7 @@
     AttributeUsageType,
     BlendType,
     BlendTypes,
+    CubeMapAxis,
     DepthFuncType,
     DepthFuncTypes,
     FaceSide,
@@ -23,8 +24,9 @@ import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
+import { createCubeMap, CubeMapDirectionImages } from '@/PaleGL/loaders/loadCubeMap.ts';
 
-export const createWhite1x1: () => HTMLCanvasElement = () => {
+export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -32,7 +34,7 @@ export const createWhite1x1: () => HTMLCanvasElement = () => {
     }
     canvas.width = 1;
     canvas.height = 1;
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = color;
     ctx.fillRect(0, 0, 1, 1);
     return canvas;
 };
@@ -57,6 +59,7 @@ export class GPU {
     private vao: VertexArrayObject | null = null;
     private uniforms: Uniforms = {};
     dummyTexture: Texture;
+    dummyCubeTexture: CubeMap;
     private validExtensions: string[] = [];
     private invalidExtensions: string[] = [];
 
@@ -66,12 +69,23 @@ export class GPU {
      */
     constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
-        this.dummyTexture = new Texture({
-            gpu: this,
-            img: createWhite1x1(),
-            wrapS: TextureWrapTypes.Repeat,
-            wrapT: TextureWrapTypes.Repeat,
-        });
+            this.dummyTexture =
+                new Texture({
+                    gpu: this,
+                    img: create1x1(),
+                    wrapS: TextureWrapTypes.Repeat,
+                    wrapT: TextureWrapTypes.Repeat,
+                });
+
+        const images: CubeMapDirectionImages = {
+            [CubeMapAxis.PositiveX]: create1x1(),
+            [CubeMapAxis.NegativeX]: create1x1(),
+            [CubeMapAxis.PositiveY]: create1x1(),
+            [CubeMapAxis.NegativeY]: create1x1(),
+            [CubeMapAxis.PositiveZ]: create1x1(),
+            [CubeMapAxis.NegativeZ]: create1x1(),
+        };
+        this.dummyCubeTexture = createCubeMap({ gpu: this, images });
     }
 
     /**
@@ -202,6 +216,8 @@ export class GPU {
     // setTransformFeedback() {
     // }
 
+    dummyTextureIndex = 0;
+
     /**
      *
      */
@@ -209,9 +225,11 @@ export class GPU {
         const gl = this.gl;
 
         let activeTextureIndex = 0;
+        // let dummyTextureIndex = 0;
 
         const setUniformValueInternal = (type: UniformType, uniformName: string, value: UniformValue) => {
             const location = gl.getUniformLocation(this.shader!.glObject, uniformName);
+
             // TODO:
             // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
             switch (type) {
@@ -260,21 +278,29 @@ export class GPU {
                     break;
                 case UniformTypes.Texture:
                     gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                    // if (value != null) {
+                    //     gl.bindTexture(gl.TEXTURE_2D, (value as Texture).glObject);
+                    // } else {
+                    //     gl.bindTexture(gl.TEXTURE_2D, this.dummyTexture.glObject);
+                    // }
                     gl.bindTexture(gl.TEXTURE_2D, value ? (value as Texture).glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
                     break;
                 case UniformTypes.CubeMap:
                     // TODO: valueのguardなくて大丈夫なはず
-                    if (value) {
-                        gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                        gl.bindTexture(
-                            gl.TEXTURE_CUBE_MAP,
-                            value ? (value as CubeMap).glObject : this.dummyTexture.glObject
-                        );
-                        gl.uniform1i(location, activeTextureIndex);
-                        activeTextureIndex++;
-                    }
+                    gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                    // if (value != null) {
+                    //     gl.bindTexture(gl.TEXTURE_CUBE_MAP, (value as CubeMap).glObject);
+                    // } else {
+                    //     gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.dummyCubeTexture.glObject);
+                    // }
+                    gl.bindTexture(
+                        gl.TEXTURE_CUBE_MAP,
+                        value ? (value as CubeMap).glObject : this.dummyCubeTexture.glObject
+                    );
+                    gl.uniform1i(location, activeTextureIndex);
+                    activeTextureIndex++;
                     break;
                 default:
                     throw `invalid uniform - name: ${uniformName}, type: ${type}`;
