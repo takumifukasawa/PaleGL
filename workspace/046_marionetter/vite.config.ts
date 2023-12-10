@@ -55,6 +55,7 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
 // };
 
 // ref:
+// https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
 export default defineConfig(({ mode}) => {
