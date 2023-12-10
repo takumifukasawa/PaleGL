@@ -2,6 +2,7 @@ import { CurveKeyframe, curveUtilityEvaluateCurve } from '@/Marionetter/curveUti
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 
+// TODO: 短縮系を渡すようにした
 const PROPERTY_LOCAL_POSITION_X = 'm_LocalPosition.x';
 const PROPERTY_LOCAL_POSITION_Y = 'm_LocalPosition.y';
 const PROPERTY_LOCAL_POSITION_Z = 'm_LocalPosition.z';
@@ -20,6 +21,8 @@ type AnimationClip = {
         keyframes: CurveKeyframe[];
     }[];
 };
+
+// export function createLightTrackBinder(animationClips: AnimationClip[], time: number) {}
 
 /**
  *
@@ -45,6 +48,8 @@ export function createAnimationTrackBinder(animationClips: AnimationClip[], time
         return;
     }
     const { start, bindings } = animationClip;
+    
+    // TODO: typeがあった方がよい. ex) animation clip, light control clip
     bindings.forEach(({ propertyName, keyframes }) => {
         // Debug.Log(binding.type.FullName);
         // animated transform

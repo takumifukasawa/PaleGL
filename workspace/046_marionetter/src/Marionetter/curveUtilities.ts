@@ -1,3 +1,5 @@
+
+// TODO: 短縮系への対応
 export type CurveKeyframe = {
     time: number;
     value: number;

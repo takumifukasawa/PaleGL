@@ -239,6 +239,7 @@ const createGLTFSphereMesh = async () => {
     mesh.material = new UnlitMaterial({
         emissiveColor: new Color(2, 2, 2, 1),
     });
+    mesh.transform.position = new Vector3(0, 2, 0);
     return mesh;
 };
 
