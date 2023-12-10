@@ -31,13 +31,15 @@
     "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    // "isolatedModules": true,
     "noEmit": true,
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    // "preserveConstEnums": false,
+    "preserveConstEnums": true,
     "moduleSuffixes": [
       "glsl",
       "shader",

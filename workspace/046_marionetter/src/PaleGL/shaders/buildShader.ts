@@ -184,8 +184,8 @@ export const buildVertexShader = (
     
 
     // replace shader block
-    Object.keys(VertexShaderModifierPragmas).forEach((key) => {
-        const pragma = key as VertexShaderModifierPragmas;
+    Object.values(VertexShaderModifierPragmas).forEach((value) => {
+        const pragma = value as VertexShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             if (!vertexShaderModifier[pragma]) {
                 return '';
@@ -195,8 +195,8 @@ export const buildVertexShader = (
     });
 
     // replace partial shader
-    Object.keys(ShaderPartialPragmas).forEach((key) => {
-        const pragma = key as ShaderPartialPragmas;
+    Object.values(ShaderPartialPragmas).forEach((value) => {
+        const pragma = value as ShaderPartialPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             return insertShaderPairs[pragma];
         });
@@ -208,6 +208,12 @@ export const buildVertexShader = (
     // return joinShaderLines(resultShaderLines);
 };
 
+/**
+ * 
+ * @param shader
+ * @param defineOptions
+ * @param fragmentShaderModifier
+ */
 export const buildFragmentShader = (
     shader: string,
     defineOptions: ShaderDefines,
@@ -220,10 +226,10 @@ export const buildFragmentShader = (
         const defines = buildShaderDefines(defineOptions);
         return defines.join('\n');
     });
-
+    
     // replace shader block
-    Object.keys(FragmentShaderModifierPragmas).forEach((key) => {
-        const pragma = key as FragmentShaderModifierPragmas;
+    Object.values(FragmentShaderModifierPragmas).forEach((value) => {
+        const pragma = value as FragmentShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             if (!fragmentShaderModifier[pragma]) {
                 return '';
@@ -233,8 +239,8 @@ export const buildFragmentShader = (
     });
 
     // replace partial shader
-    Object.keys(ShaderPartialPragmas).forEach((key) => {
-        const pragma = key as ShaderPartialPragmas;
+    Object.values(ShaderPartialPragmas).forEach((value) => {
+        const pragma = value as ShaderPartialPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             return insertShaderPairs[pragma];
         });

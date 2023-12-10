@@ -1,7 +1,3 @@
-import gltfSphereModelUrl from '../models/sphere-32x32.gltf?url';
-import leaveDiffuseImgUrl from '../images/brown_mud_leaves_01_diff_1k.jpg?url';
-import leaveNormalImgUrl from '../images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
-
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
 import { Mesh } from '@/PaleGL/actors/Mesh';
@@ -17,7 +13,6 @@ import { Scene } from '@/PaleGL/core/Scene';
 import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // loaders
-import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 
 // materials
 
@@ -36,20 +31,21 @@ import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 
 // others
 import {
-    RenderTargetTypes, TextureFilterTypes, TextureWrapTypes,
+    RenderTargetTypes,
+    // TextureFilterTypes, TextureWrapTypes,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
-import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
-import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
-import {Texture} from "@/PaleGL/core/Texture.ts";
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import {wait} from "@/utilities/wait.ts";
+// import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
+// import {Texture} from "@/PaleGL/core/Texture.ts";
 
 const stylesText = `
 :root {
@@ -96,7 +92,6 @@ document.head.appendChild(styleElement);
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-let sphereMesh: Mesh;
 let glslSound: GLSLSound;
 // let marionetter: Marionetter;
 
@@ -230,21 +225,7 @@ cameraPostProcess.enabled = true;
 captureSceneCamera.setPostProcess(cameraPostProcess);
 
 /**
- * 
- */
-const createGLTFSphereMesh = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
-    mesh.castShadow = true;
-    mesh.material = new UnlitMaterial({
-        emissiveColor: new Color(2, 2, 2, 1),
-    });
-    mesh.transform.position = new Vector3(0, 2, 0);
-    return mesh;
-};
-
-/**
- * 
+ *
  */
 const createSound = () => {
     const vertexShader = soundVertexShader;
@@ -262,7 +243,7 @@ const createSound = () => {
 // };
 
 // let trackCubeMesh: Mesh | null = null;
-// 
+//
 // const appendTrackCube = () => {
 //     const geometry = new BoxGeometry({ gpu });
 //     const material = new GBufferMaterial({});
@@ -272,39 +253,39 @@ const createSound = () => {
 //         castShadow: true
 //     });
 //     captureScene.add(mesh);
-//     
+//
 //     trackCubeMesh = mesh;
 // }
 
-async function createFloorPlaneMesh() {
+function createFloorPlaneMesh() {
     const floorGeometry = new PlaneGeometry({
         gpu,
         calculateTangent: true,
         calculateBinormal: true,
     });
 
-    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    const floorDiffuseMap = new Texture({
-        gpu,
-        img: floorDiffuseImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
+    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    // const floorDiffuseMap = new Texture({
+    //     gpu,
+    //     img: floorDiffuseImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
 
-    const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    const floorNormalMap = new Texture({
-        gpu,
-        img: floorNormalImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
-    
+    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    // const floorNormalMap = new Texture({
+    //     gpu,
+    //     img: floorNormalImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
+
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
         // material: new PhongMaterial({
@@ -318,9 +299,9 @@ async function createFloorPlaneMesh() {
         //     ambientAmount: 0.2,
         // }),
         material: new GBufferMaterial({
-            diffuseMap: floorDiffuseMap,
-            normalMap: floorNormalMap,
-            diffuseColor: new Color(1, 1, 1, 1),
+            // diffuseMap: floorDiffuseMap,
+            // normalMap: floorNormalMap,
+            diffuseColor: new Color(.4, .4, .5, 1),
             receiveShadow: true,
             metallic: 0,
             roughness: 0.5,
@@ -331,7 +312,7 @@ async function createFloorPlaneMesh() {
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
     };
-    
+
     return floorPlaneMesh;
 }
 
@@ -340,10 +321,10 @@ const main = async () => {
     // createMarionetter();
     // appendTrackCube();
     
-    sphereMesh = await createGLTFSphereMesh();
-    floorPlaneMesh = await createFloorPlaneMesh();
-    
-    captureScene.add(sphereMesh);
+    await wait(0);
+
+    floorPlaneMesh = createFloorPlaneMesh();
+
     captureScene.add(floorPlaneMesh);
 
     // TODO: engine側に移譲したい
@@ -381,9 +362,9 @@ const main = async () => {
         inputController.update();
     };
 
-    engine.onBeforeFixedUpdate = () => {
-        // inputController.fixedUpdate();
-    };
+    // engine.onBeforeFixedUpdate = () => {
+    //     // inputController.fixedUpdate();
+    // };
 
     engine.onRender = (time) => {
         renderer.render(captureScene, captureSceneCamera, { time });
@@ -391,6 +372,7 @@ const main = async () => {
 
     const tick = (time: number) => {
         engine.run(time);
+        // renderer.render(captureScene, captureSceneCamera, { time });
         requestAnimationFrame(tick);
     };
 

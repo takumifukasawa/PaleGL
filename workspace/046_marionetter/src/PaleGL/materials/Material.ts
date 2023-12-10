@@ -440,6 +440,10 @@ export class Material {
         this.rawVertexShader = rawVertexShader;
         this.rawFragmentShader = rawFragmentShader;
 
+        // for debug
+        // console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, rawFragmentShader)
+        // console.log(rawFragmentShader)
+        
         this.shader = new Shader({
             gpu,
             // vertexShader: this.vertexShader,

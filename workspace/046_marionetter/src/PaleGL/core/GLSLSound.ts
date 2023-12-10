@@ -3,7 +3,8 @@ import { GPU } from '@/PaleGL/core/GPU.ts';
 // import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 // import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
-import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
+import {AttributeUsageType, UniformTypes} from '@/PaleGL/constants.ts';
+// import {Uniforms} from "@/PaleGL/materials/Material.ts";
 // import { Attribute } from '@/PaleGL/core/Attribute.ts';
 
 // ------------------------------------------------------------------------------
@@ -13,6 +14,8 @@ import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 // ------------------------------------------------------------------------------
 
 const SAMPLES = 65536;
+
+// const enum Uniforms {uBlockTest}
 
 export class GLSLSound {
     // bpm;
@@ -47,19 +50,26 @@ export class GLSLSound {
         //    return locations;
         //};
 
-        const uniforms = {
-            uBlockOffset: {
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            uSampleRate: {
-                type: UniformTypes.Float,
-                value: 0,
-            },
-        };
+        // console.log(Uniforms.uBlockTest)
+        // const uniforms: Uniforms = {
+        //     // [Uniforms[Uniforms.uBlockTest]]: {
+        //     //     type: UniformTypes.Float,
+        //     //     value: 0,
+        //     // },
+        //     "uBlockOffset": {
+        //         type: UniformTypes.Float,
+        //         value: 0,
+        //     },
+        //     "uSampleRate": {
+        //         type: UniformTypes.Float,
+        //         value: 0,
+        //     },
+        // };
         // const uniformLocations = getUniformLocations(gl, shader.glObject);
 
         const data = new Float32Array(this.channelNum * SAMPLES);
+
+        const HOGE_FUGA = "uBlockOffset";
 
         const varyingName = 'vSound';
 
@@ -74,7 +84,17 @@ export class GLSLSound {
                 },
             ],
             vertexShader,
-            uniforms,
+            uniforms: {
+                // uBlockOffset: {
+                [HOGE_FUGA]: {
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                uSampleRate: {
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+            },
             // fragmentShader: transformFeedbackFragmentShader,
             drawCount: SAMPLES,
         });
@@ -88,8 +108,8 @@ export class GLSLSound {
         console.log(`[GLSLSound] duration: ${duration}`);
         console.log(`[GLSLSound] samples: ${SAMPLES}`);
         console.log(`[GLSLSound] num blocks: ${numBlocks}`);
-        console.log(`[GLSLSound] outputL len: ${outputL.length}`);
-        console.log(`[GLSLSound] outputR len: ${outputR.length}`);
+        console.log(`[GLSLSound] outputL length: ${outputL.length}`);
+        console.log(`[GLSLSound] outputR length: ${outputR.length}`);
         console.log(`[GLSLSound] ----------------------------------------`);
 
         transformFeedbackBuffer.uniforms.uSampleRate.value = audioContext.sampleRate;
@@ -103,7 +123,7 @@ export class GLSLSound {
             // TODO: vao, shader の bind,unbind がたくさん発生するので最適化した方がよい
             gpu.updateTransformFeedback({
                 shader: transformFeedbackBuffer.shader,
-                uniforms,
+                uniforms: transformFeedbackBuffer.uniforms,
                 transformFeedback: transformFeedbackBuffer.transformFeedback,
                 vertexArrayObject: transformFeedbackBuffer.vertexArrayObject,
                 drawCount: SAMPLES,

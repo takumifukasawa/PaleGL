@@ -71,7 +71,7 @@ export class GPU {
         this.gl = gl;
         this.dummyTexture = new Texture({
             gpu: this,
-            img: create1x1(),
+            img: create1x1("white"),
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
@@ -261,6 +261,8 @@ export class GPU {
         // let dummyTextureIndex = 0;
 
         const setUniformValueInternal = (type: UniformType, uniformName: string, value: UniformValue) => {
+            console.log("setUniformValueInternal", type, uniformName, value);
+            
             const location = gl.getUniformLocation(this.shader!.glObject, uniformName);
 
             // TODO:

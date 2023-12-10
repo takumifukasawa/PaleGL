@@ -468,7 +468,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         }
     };
 
-    gltf.scenes.forEach((scene: GLTFScene) => {
+    gltf["scenes"].forEach((scene: GLTFScene) => {
         scene.nodes.forEach((node) => {
             findNode(node, rootActor);
         });

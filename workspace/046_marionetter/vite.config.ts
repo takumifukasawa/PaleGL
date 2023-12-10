@@ -63,10 +63,12 @@ export default defineConfig(({ mode}) => {
 
     const isBundle = env.VITE_BUNDLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
+    const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true';
     
     console.log("=== env ===");
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
+    console.log(`isMangleProperties: ${isMangleProperties}`);
     console.log("===========");
     
     return {
@@ -117,16 +119,17 @@ export default defineConfig(({ mode}) => {
             target: 'es2022',
             terserOptions: {
                 // keep_classnames: false,
-                // keep_fnames: false,
+                // keep_fnames: true,
                 mangle: {
                     toplevel: true,
-                    properties: true,
+                    properties: isMangleProperties,
                     // properties: {
-                    //     regex: /^$/
+                    //     regex: /^_/
+                    //     // regex: /^(Hoge)$/
                     // }
                 },
                 compress: {
-                    drop_console: true,
+                    // drop_console: true,
                     drop_debugger: true,
                 },
             },
