@@ -86,6 +86,7 @@ void main() {
     // }
     // outColor = vec4(viewPosition, 1.);
     // outColor = vec4(worldPosition, 1.);
+    // outColor = vec4(viewNormal, 1.);
     // return;
 
     vec2 samplingTableCoord = gl_FragCoord.xy / 4.; // tex: 4x4
@@ -180,10 +181,13 @@ void main() {
         clamp(aoRate * uBlendRate * uOcclusionStrength, 0., 1.)
     );
 
-    // for debug
-    // color = vec4(vec3(aoRate), 1.);
-
     color.a = 1.;
     
     outColor = color;
+
+    // for debug
+    // color = vec4(vec3(aoRate), 1.);
+    // // outColor = vec4(vec3(sceneDepth), 1.);
+    // outColor = vec4(worldNormal, 1.);
+    // outColor = vec4(viewPosition, 1.);
 }

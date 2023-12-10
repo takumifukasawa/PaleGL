@@ -132,12 +132,13 @@ export class BloomPass implements IPostProcessPass {
         this.extractBrightnessPass = new FragmentPass({
             gpu,
             fragmentShader: extractBrightnessFragmentShader,
-            uniforms: {
-                uThreshold: {
+            uniforms: [
+                {
+                    name: 'uThreshold',
                     type: UniformTypes.Float,
                     value: this.threshold,
                 },
-            },
+            ],
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA
         });
@@ -148,50 +149,57 @@ export class BloomPass implements IPostProcessPass {
         this.horizontalBlurMaterial = new Material({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
-            uniforms: {
-                [UniformNames.SrcTexture]: {
+            uniforms: [
+                {
+                    name: UniformNames.SrcTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uBlurWeights: {
+                {
+                    name: 'uBlurWeights',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
                 },
-                uIsHorizontal: {
+                {
+                    name: 'uIsHorizontal',
                     type: UniformTypes.Float,
                     value: 1,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            },
+            ],
         });
         this.materials.push(this.horizontalBlurMaterial);
 
         this.verticalBlurMaterial = new Material({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
-            uniforms: {
-                [UniformNames.SrcTexture]: {
+            uniforms: [
+                {
+                    name: UniformNames.SrcTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uBlurWeights: {
+                {
+                    name: 'uBlurWeights',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
                 },
-                uIsHorizontal: {
+                {
+                    name: 'uIsHorizontal',
                     type: UniformTypes.Float,
                     value: 0,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            },
+            ],
         });
         this.materials.push(this.verticalBlurMaterial);
 
         this.compositePass = new FragmentPass({
             gpu,
             fragmentShader: bloomCompositeFragmentShader,
-            uniforms: {
-                [UniformNames.SrcTexture]: {
+            uniforms: [
+                {
+                    name: UniformNames.SrcTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -199,36 +207,43 @@ export class BloomPass implements IPostProcessPass {
                 //     type: UniformTypes.Texture,
                 //     value: null,
                 // },
-                uBlur4Texture: {
+                {
+                    name: 'uBlur4Texture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uBlur8Texture: {
+                {
+                    name: 'uBlur8Texture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uBlur16Texture: {
+                {
+                    name: 'uBlur16Texture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uBlur32Texture: {
+                {
+                    name: 'uBlur32Texture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTone: {
+                {
+                    name: 'uTone',
                     type: UniformTypes.Float,
                     value: this.tone,
                 },
-                uBloomAmount: {
+                {
+                    name: 'uBloomAmount',
                     type: UniformTypes.Float,
                     value: this.bloomAmount,
                 },
-                uExtractTexture: {
+                {
+                    name: 'uExtractTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            },
+            ],
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA
         });
@@ -283,7 +298,7 @@ export class BloomPass implements IPostProcessPass {
             this.verticalBlurMaterial.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
-        this.extractBrightnessPass.material.updateUniform('uThreshold', this.threshold);
+        this.extractBrightnessPass.material.uniforms.setValue('uThreshold', this.threshold);
         this.extractBrightnessPass.render({
             gpu,
             camera,
@@ -304,19 +319,19 @@ export class BloomPass implements IPostProcessPass {
 
             renderer.setRenderTarget(horizontalRenderTarget, true);
             // renderer.clearColor(0, 0, 0, 1);
-            this.horizontalBlurMaterial.updateUniform(
+            this.horizontalBlurMaterial.uniforms.setValue(
                 UniformNames.SrcTexture,
                 this.extractBrightnessPass.renderTarget.texture
             );
-            this.horizontalBlurMaterial.updateUniform('uTargetWidth', w);
-            this.horizontalBlurMaterial.updateUniform('uTargetHeight', w);
+            this.horizontalBlurMaterial.uniforms.setValue('uTargetWidth', w);
+            this.horizontalBlurMaterial.uniforms.setValue('uTargetHeight', w);
             renderer.renderMesh(this.geometry, this.horizontalBlurMaterial);
 
             renderer.setRenderTarget(verticalRenderTarget, true);
             // renderer.clearColor(0, 0, 0, 1);
-            this.verticalBlurMaterial.updateUniform(UniformNames.SrcTexture, horizontalRenderTarget.texture);
-            this.verticalBlurMaterial.updateUniform('uTargetWidth', w);
-            this.verticalBlurMaterial.updateUniform('uTargetHeight', h);
+            this.verticalBlurMaterial.uniforms.setValue(UniformNames.SrcTexture, horizontalRenderTarget.texture);
+            this.verticalBlurMaterial.uniforms.setValue('uTargetWidth', w);
+            this.verticalBlurMaterial.uniforms.setValue('uTargetHeight', h);
             renderer.renderMesh(this.geometry, this.verticalBlurMaterial);
         };
 
@@ -330,18 +345,21 @@ export class BloomPass implements IPostProcessPass {
         renderBlur(this.renderTargetBlurMip32_Horizontal, this.renderTargetBlurMip32_Vertical, 32);
 
         if (prevRenderTarget) {
-            this.compositePass.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
+            this.compositePass.material.uniforms.setValue(UniformNames.SrcTexture, prevRenderTarget.texture);
         } else {
             console.error('invalid prev render target');
         }
-        // this.compositePass.material.updateUniform('uBrightnessTexture', this.extractBrightnessPass.renderTarget.texture);
-        this.compositePass.material.updateUniform('uBlur4Texture', this.renderTargetBlurMip4_Vertical.texture);
-        this.compositePass.material.updateUniform('uBlur8Texture', this.renderTargetBlurMip8_Vertical.texture);
-        this.compositePass.material.updateUniform('uBlur16Texture', this.renderTargetBlurMip16_Vertical.texture);
-        this.compositePass.material.updateUniform('uBlur32Texture', this.renderTargetBlurMip32_Vertical.texture);
-        this.compositePass.material.updateUniform('uExtractTexture', this.extractBrightnessPass.renderTarget.texture);
-        this.compositePass.material.updateUniform('uTone', this.tone);
-        this.compositePass.material.updateUniform('uBloomAmount', this.bloomAmount);
+        // this.compositePass.material.uniforms.setValue('uBrightnessTexture', this.extractBrightnessPass.renderTarget.texture);
+        this.compositePass.material.uniforms.setValue('uBlur4Texture', this.renderTargetBlurMip4_Vertical.texture);
+        this.compositePass.material.uniforms.setValue('uBlur8Texture', this.renderTargetBlurMip8_Vertical.texture);
+        this.compositePass.material.uniforms.setValue('uBlur16Texture', this.renderTargetBlurMip16_Vertical.texture);
+        this.compositePass.material.uniforms.setValue('uBlur32Texture', this.renderTargetBlurMip32_Vertical.texture);
+        this.compositePass.material.uniforms.setValue(
+            'uExtractTexture',
+            this.extractBrightnessPass.renderTarget.texture
+        );
+        this.compositePass.material.uniforms.setValue('uTone', this.tone);
+        this.compositePass.material.uniforms.setValue('uBloomAmount', this.bloomAmount);
 
         this.compositePass.render({
             gpu,

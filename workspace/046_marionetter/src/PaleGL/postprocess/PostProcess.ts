@@ -143,7 +143,7 @@ export class PostProcess {
             if (lightActors) {
                 // TODO: light情報はまとめてから渡したい
                 lightActors.forEach((light) => {
-                    light.updateUniform(passMaterial);
+                    light.applyUniformsValues(passMaterial);
                 });
             }
 
@@ -151,30 +151,30 @@ export class PostProcess {
             // basic
             //
 
-            passMaterial.updateUniform(UniformNames.CameraNear, targetCamera.near);
-            passMaterial.updateUniform(UniformNames.CameraFar, targetCamera.far);
-            passMaterial.updateUniform(UniformNames.Time, time);
-            passMaterial.updateUniform(UniformNames.ViewPosition, targetCamera.transform.position);
-            passMaterial.updateUniform(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
-            passMaterial.updateUniform(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
-            passMaterial.updateUniform(
+            passMaterial.uniforms.setValue(UniformNames.CameraNear, targetCamera.near);
+            passMaterial.uniforms.setValue(UniformNames.CameraFar, targetCamera.far);
+            passMaterial.uniforms.setValue(UniformNames.Time, time);
+            passMaterial.uniforms.setValue(UniformNames.ViewPosition, targetCamera.transform.position);
+            passMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
+            passMaterial.uniforms.setValue(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
+            passMaterial.uniforms.setValue(
                 UniformNames.InverseViewProjectionMatrix,
                 targetCamera.inverseViewProjectionMatrix
             );
-            passMaterial.updateUniform(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
-            passMaterial.updateUniform(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
-            passMaterial.updateUniform(UniformNames.ViewMatrix, targetCamera.viewMatrix);
-            passMaterial.updateUniform(
+            passMaterial.uniforms.setValue(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
+            passMaterial.uniforms.setValue(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
+            passMaterial.uniforms.setValue(UniformNames.ViewMatrix, targetCamera.viewMatrix);
+            passMaterial.uniforms.setValue(
                 UniformNames.TransposeInverseViewMatrix,
                 targetCamera.viewMatrix.clone().invert().transpose()
             );
             // g-buffers
-            passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
-            passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
-            passMaterial.updateUniform(UniformNames.GBufferCTexture, renderer.gBufferRenderTargets.gBufferCTexture);
-            passMaterial.updateUniform(UniformNames.GBufferDTexture, renderer.gBufferRenderTargets.gBufferDTexture);
-            // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
-            passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
+            passMaterial.uniforms.setValue(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
+            passMaterial.uniforms.setValue(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
+            passMaterial.uniforms.setValue(UniformNames.GBufferCTexture, renderer.gBufferRenderTargets.gBufferCTexture);
+            passMaterial.uniforms.setValue(UniformNames.GBufferDTexture, renderer.gBufferRenderTargets.gBufferDTexture);
+            // passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
+            passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
         });
     }
 

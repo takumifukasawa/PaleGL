@@ -253,10 +253,10 @@ export class Camera extends Actor {
     updateTransform() {
         super.updateTransform();
         this.viewMatrix = this.transform.worldMatrix.clone().invert();
-        this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
-        this.inverseViewMatrix = this.viewMatrix.clone().invert();
-        this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
-        this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
+        // this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
+        // this.inverseViewMatrix = this.viewMatrix.clone().invert();
+        // this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
+        // this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
     }
 
     /**
@@ -268,11 +268,6 @@ export class Camera extends Actor {
         const clipPosition = matInProjection.position;
         const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
         return new Vector3(clipPosition.x / w, clipPosition.y / w, clipPosition.z / w);
-        // debug
-        // console.log("--------")
-        // this.#worldMatrix.position.log();
-        // camera.viewMatrix.position.log();
-        // v.log();
     }
 
     /**

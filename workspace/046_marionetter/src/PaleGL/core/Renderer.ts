@@ -433,7 +433,7 @@ export class Renderer {
 
         // this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
-
+        
         // ------------------------------------------------------------------------------
         // ambient occlusion pass
         // ------------------------------------------------------------------------------
@@ -449,6 +449,8 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
+
+        // return;
 
         // ------------------------------------------------------------------------------
         // deferred lighting pass
@@ -469,11 +471,11 @@ export class Renderer {
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
         lightActors.forEach((light) => {
             const targetMaterial = this._deferredShadingPass.material;
-            light.updateUniform(targetMaterial);
+            light.applyUniformsValues(targetMaterial);
         });
 
         // set ao texture
-        this._deferredShadingPass.material.updateUniform(
+        this._deferredShadingPass.material.uniforms.setValue(
             'uAmbientOcclusionTexture',
             this._ambientOcclusionPass.renderTarget.read.texture
         );
@@ -597,7 +599,7 @@ export class Renderer {
         });
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
-            renderMeshInfo.actor.material.updateUniform(
+            renderMeshInfo.actor.material.uniforms.setValue(
                 UniformNames.DepthTexture,
                 this._copyDepthDestRenderTarget.depthTexture
             );
@@ -772,9 +774,6 @@ export class Renderer {
         this.setRenderTarget(this._depthPrePassRenderTarget, false, true);
         this.gpu.clearDepth(0, 0, 0, 1);
 
-        // depthなのでclear
-        // this.clear(0, 0, 0, 1);
-
         depthPrePassRenderMeshInfos.forEach(({ actor }) => {
             const depthMaterial = actor.depthMaterial;
 
@@ -784,9 +783,9 @@ export class Renderer {
 
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
-            depthMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            depthMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
-            depthMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
             this.renderMesh(actor.geometry, depthMaterial);
 
             if (this.stats) {
@@ -841,9 +840,9 @@ export class Renderer {
                 }
 
                 // 先頭でガードしてるので shadow camera はあるはず。
-                targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                targetMaterial.updateUniform(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                targetMaterial.updateUniform(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
+                targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
+                targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
                 this.renderMesh(actor.geometry, targetMaterial);
 
                 if (this.stats) {
@@ -867,18 +866,19 @@ export class Renderer {
         lightActors: Light[]
         // clear: boolean = true
     ) {
-        // console.log("--------- scene pass ---------");
+        console.log("--------- scene pass ---------");
 
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         this.setRenderTarget(this._gBufferRenderTargets.write, true);
+        // this.clearDepth(0, 0, 0, 1);
+        // this.clearColor(0, 0, 0, 1);
 
         // TODO: depth prepass しない場合は必要
         // if (clear) {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
-
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -891,21 +891,21 @@ export class Renderer {
             const targetMaterial = actor.materials[materialIndex];
 
             // TODO: material 側でやった方がよい？
-            targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
-            targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            targetMaterial.updateUniform(
+            targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            targetMaterial.uniforms.setValue(
                 UniformNames.NormalMatrix,
                 actor.transform.worldMatrix.clone().invert().transpose()
             );
-            targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
+            targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             lightActors.forEach((light) => {
                 // const targetMaterial = this._deferredShadingPass.material;
-                light.updateUniform(targetMaterial);
+                light.applyUniformsValues(targetMaterial);
 
                 // if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
                 //     targetMaterial.updateUniform(UniformNames.DirectionalLight, {
@@ -976,21 +976,21 @@ export class Renderer {
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             const targetMaterial = actor.materials[materialIndex];
 
-            targetMaterial.updateUniform(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            targetMaterial.updateUniform(UniformNames.ViewMatrix, camera.viewMatrix);
-            targetMaterial.updateUniform(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            targetMaterial.updateUniform(
+            targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            targetMaterial.uniforms.setValue(
                 UniformNames.NormalMatrix,
                 actor.transform.worldMatrix.clone().invert().transpose()
             );
-            targetMaterial.updateUniform(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
+            targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             // - opaqueと共通処理なのでまとめたい
             lightActors.forEach((light) => {
-                light.updateUniform(targetMaterial);
+                light.applyUniformsValues(targetMaterial);
             });
 
             this.renderMesh(actor.geometry, targetMaterial);

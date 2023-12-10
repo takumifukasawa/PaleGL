@@ -178,4 +178,7 @@ void main() {
 
     vec4 color = mix(cachedBaseColor, baseColor, uBlendRate);
     outColor = color;
+    
+    // for debug
+    // outColor = cachedBaseColor;
 }

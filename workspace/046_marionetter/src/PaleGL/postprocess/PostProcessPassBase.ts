@@ -1,17 +1,18 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { Material, Uniforms } from '@/PaleGL/materials/Material.ts';
+import { Material } from '@/PaleGL/materials/Material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
-import {PrimitiveTypes, RenderTargetType, RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
+import { PrimitiveTypes, RenderTargetType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import {Light} from "@/PaleGL/actors/Light.ts";
+import { Light } from '@/PaleGL/actors/Light.ts';
+import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type PostProcessPassRenderArgs = {
     gpu: GPU;
@@ -84,20 +85,20 @@ export class PostProcessPassBase implements IPostProcessPass {
         gpu,
         vertexShader,
         fragmentShader,
-        uniforms,
+        uniforms = [],
         useEnvMap = false,
         receiveShadow = false,
         name = '',
-        renderTargetType = RenderTargetTypes.RGBA
+        renderTargetType = RenderTargetTypes.RGBA,
     }: {
         gpu: GPU;
         vertexShader?: string;
         fragmentShader: string;
-        uniforms?: Uniforms;
+        uniforms?: UniformsData;
         useEnvMap?: boolean;
         receiveShadow?: boolean;
         name?: string;
-        renderTargetType?: RenderTargetType
+        renderTargetType?: RenderTargetType;
     }) {
         // super({name});
         this.name = name;
@@ -111,14 +112,15 @@ export class PostProcessPassBase implements IPostProcessPass {
             // gpu,
             vertexShader,
             fragmentShader,
-            uniforms: {
+            uniforms: [
                 ...uniforms,
                 ...PostProcessPassBase.commonUniforms,
-                [UniformNames.SrcTexture]: {
+                {
+                    name: UniformNames.SrcTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-            },
+            ],
             useEnvMap: !!useEnvMap,
             receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
@@ -139,61 +141,74 @@ export class PostProcessPassBase implements IPostProcessPass {
         });
     }
 
-    static get commonUniforms(): Uniforms {
-        return {
-            [UniformNames.TargetWidth]: {
+    static get commonUniforms(): UniformsData {
+        return [
+            {
+                name: UniformNames.TargetWidth,
                 type: UniformTypes.Float,
                 value: 1,
             },
-            [UniformNames.TargetHeight]: {
+            {
+                name: UniformNames.TargetHeight,
                 type: UniformTypes.Float,
                 value: 1,
             },
-            [UniformNames.CameraNear]: {
+            {
+                name: UniformNames.CameraNear,
                 type: UniformTypes.Float,
                 value: 0,
             },
-            [UniformNames.CameraFar]: {
+            {
+                name: UniformNames.CameraFar,
                 type: UniformTypes.Float,
                 value: 0,
             },
-            [UniformNames.Time]: {
+            {
+                name: UniformNames.Time,
                 type: UniformTypes.Float,
                 value: 0,
             },
-            [UniformNames.ViewPosition]: {
+            {
+                name: UniformNames.ViewPosition,
                 type: UniformTypes.Vector3,
                 value: Vector3.zero,
             },
-            [UniformNames.ViewMatrix]: {
+            {
+                name: UniformNames.ViewMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.ProjectionMatrix]: {
+            {
+                name: UniformNames.ProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.ViewProjectionMatrix]: {
+            {
+                name: UniformNames.ViewProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.InverseViewMatrix]: {
+            {
+                name: UniformNames.InverseViewMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.InverseProjectionMatrix]: {
+            {
+                name: UniformNames.InverseProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.InverseViewProjectionMatrix]: {
+            {
+                name: UniformNames.InverseViewProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.TransposeInverseViewMatrix]: {
+            {
+                name: UniformNames.TransposeInverseViewMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-        };
+        ];
         // passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
         // passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);
         // passMaterial.updateUniform(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.depthTexture);
@@ -248,7 +263,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         // 渡してない場合はなにもしない. src texture がいらないとみなす
         // TODO: 無理やり渡しちゃっても良い気もしなくもない
         if (prevRenderTarget) {
-            this.material.updateUniform(UniformNames.SrcTexture, prevRenderTarget.texture);
+            this.material.uniforms.setValue(UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
         if (this.beforeRender) {

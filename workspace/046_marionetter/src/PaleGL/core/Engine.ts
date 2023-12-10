@@ -151,7 +151,7 @@ export class Engine {
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
-        this.#scene?.traverse((actor) => actor.updateTransform());
+        this.#scene?.traverse((actor) => {actor.updateTransform()});
         // this.#scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.updateTransform());
         // });
@@ -175,6 +175,7 @@ export class Engine {
                     break;
             }
         });
+        
         // this.#scenes.forEach((scene) => {
         //     scene.traverse((actor) => {
         //         actor.update({ gpu: this.#gpu, time, deltaTime });
@@ -190,6 +191,7 @@ export class Engine {
         //     });
         // });
 
+        this.#scene?.traverse((actor) => {actor.updateTransform()});
         this.render(time, deltaTime);
     }
 

@@ -171,7 +171,7 @@ export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof
 export const AttributeUsageType = {
     StaticDraw: 'StaticDraw',
     DynamicDraw: 'DynamicDraw',
-    DynamicCopy: 'DynamicCopy'
+    DynamicCopy: 'DynamicCopy',
 } as const;
 
 export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
@@ -221,6 +221,7 @@ export const UniformTypes = {
 
 export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
 
+// TODO: Texture -> Map にしたい？
 export const UniformNames = {
     // position
     ViewPosition: 'uViewPosition',
@@ -234,6 +235,7 @@ export const UniformNames = {
     InverseViewProjectionMatrix: 'uInverseViewProjectionMatrix',
     InverseProjectionMatrix: 'uInverseProjectionMatrix',
     TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
+    ViewDirectionProjectionInverse: "uViewDirectionProjectionInverse",
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',
@@ -248,6 +250,9 @@ export const UniformNames = {
     // skinning
     JointMatrices: 'uJointMatrices',
     JointTexture: 'uJointTexture',
+    BoneCount: 'uBoneCount',
+    JointTextureColNum: 'uJointTextureColNum',
+    TotalFrameCount: "uTotalFrameCount", // TODO: 名前変えたい
     // shadow map
     ShadowMap: 'uShadowMap',
     ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
@@ -262,9 +267,13 @@ export const UniformNames = {
     // camera
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',
+    // cubemap
+    CubeTexture: "uCubeTexture",
     // light
     DirectionalLight: 'uDirectionalLight',
+    // skybox
     Skybox: 'uSkybox',
+    RotationOffset: "uRotationOffset", // TODO: 名前変えたい
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];

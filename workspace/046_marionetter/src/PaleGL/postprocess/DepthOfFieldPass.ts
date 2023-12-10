@@ -13,7 +13,7 @@ import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 // import { Texture } from '@/PaleGL/core/Texture.ts';
 
@@ -72,37 +72,43 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.circleOfConfusionPass = new FragmentPass({
             gpu,
             fragmentShader: dofCircleOfConfusionFragmentShader,
-            uniforms: {
-                [UniformNames.SrcTexture]: {
+            uniforms: [
+                {
+                    name: UniformNames.SrcTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.DepthTexture]: {
+                {
+                    name: UniformNames.DepthTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uFocusDistance: {
+                {
+                    name: 'uFocusDistance',
                     type: UniformTypes.Float,
                     value: this.focusDistance,
                 },
-                uFocusRange: {
+                {
+                    name: 'uFocusRange',
                     type: UniformTypes.Float,
                     value: this.focusRange,
                 },
-                uBokehRadius: {
+                {
+                    name: 'uBokehRadius',
                     type: UniformTypes.Float,
                     value: this.bokehRadius,
                 },
-                uCocParams: {
+                {
+                    name: 'uCocParams',
                     type: UniformTypes.Vector4,
                     value: Vector4.zero,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            },
+            ],
             // TODO: r11f_g11f_b10fだとunsignedなのでr16fにする
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F
-            renderTargetType: RenderTargetTypes.R16F
+            renderTargetType: RenderTargetTypes.R16F,
             // renderTargetType: RenderTargetTypes.RGBA
         });
         this.materials.push(...this.circleOfConfusionPass.materials);
@@ -115,7 +121,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.preFilterPass = new FragmentPass({
             gpu,
             fragmentShader: dofPreFilterFragmentShader,
-            uniforms: {
+            uniforms: [
                 // [UniformNames.SrcTexture]: {
                 //     type: UniformTypes.Texture,
                 //     value: null,
@@ -131,17 +137,19 @@ export class DepthOfFieldPass implements IPostProcessPass {
                 // uFocusRange: {
                 //     type: UniformTypes.Float,
                 //     value: this.focusRange,
-                // },
-                uCocTexture: {
+                // }
+                {
+                    name: 'uCocTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uTexelSize: {
+                {
+                    name: 'uTexelSize',
                     type: UniformTypes.Vector2,
                     value: Vector2.zero,
                 },
                 ...PostProcessPassBase.commonUniforms,
-            },
+            ],
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             renderTargetType: RenderTargetTypes.RGBA16F,
             // renderTargetType: RenderTargetTypes.RGBA
@@ -157,7 +165,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
             fragmentShader: dofBokehFragmentShader,
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             renderTargetType: RenderTargetTypes.RGBA16F,
-            uniforms: {
+            uniforms: [
                 // uSrcTextureWidth: {
                 //     type: UniformTypes.Float,
                 //     value: 1,
@@ -166,23 +174,26 @@ export class DepthOfFieldPass implements IPostProcessPass {
                 //     type: UniformTypes.Float,
                 //     value: 1,
                 // },
-                uTexelSize: {
+                {
+                    name: 'uTexelSize',
                     type: UniformTypes.Vector2,
                     value: Vector2.zero,
                 },
-                uBokehRadius: {
+                {
+                    name: 'uBokehRadius',
                     type: UniformTypes.Float,
                     value: this.bokehRadius,
                 },
-                uBokehKernel: {
+                {
+                    name: 'uBokehKernel',
                     type: UniformTypes.Vector4Array,
                     value: [],
-                }
+                },
                 // uCocTexture: {
                 //     type: UniformTypes.Texture,
                 //     value: null,
                 // },
-            },
+            ],
         });
         this.materials.push(...this.dofBokehPass.materials);
 
@@ -195,16 +206,18 @@ export class DepthOfFieldPass implements IPostProcessPass {
             fragmentShader: dofBokehBlurFragmentShader,
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             renderTargetType: RenderTargetTypes.RGBA16F,
-            uniforms: {
-                uTexelSize: {
+            uniforms: [
+                {
+                    name: 'uTexelSize',
                     type: UniformTypes.Vector2,
                     value: Vector2.zero,
                 },
-                uBokehRadius: {
+                {
+                    name: 'uBokehRadius',
                     type: UniformTypes.Float,
                     value: this.bokehRadius,
                 },
-            },
+            ],
         });
         this.materials.push(...this.bokehBlurPass.materials);
 
@@ -216,16 +229,18 @@ export class DepthOfFieldPass implements IPostProcessPass {
             gpu,
             fragmentShader: dofCompositeFragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            uniforms: {
-                uCocTexture: {
+            uniforms: [
+                {
+                    name: 'uCocTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uDofTexture: {
+                {
+                    name: 'uDofTexture',
                     type: UniformTypes.Texture,
-                    value: null
-                }
-            },
+                    value: null,
+                },
+            ],
         });
 
         this.materials.push(...this.compositePass.materials);
@@ -235,9 +250,9 @@ export class DepthOfFieldPass implements IPostProcessPass {
     //  *
     //  */
     // setup() {
-    //     // this.circleOfConfusionPass.material.updateUniform(UniformNames.CameraNear, camera.near);
-    //     // this.circleOfConfusionPass.material.updateUniform(UniformNames.CameraFar, camera.far);
-    //     // this.circleOfConfusionPass.material.updateUniform(UniformNames.DepthTexture, depthTexture);
+    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraNear, camera.near);
+    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraFar, camera.far);
+    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.DepthTexture, depthTexture);
     // }
 
     /**
@@ -297,9 +312,9 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 0: render coc pass
         //
 
-        this.circleOfConfusionPass.material.updateUniform('uFocusDistance', this.focusDistance);
-        this.circleOfConfusionPass.material.updateUniform('uFocusRange', this.focusRange);
-        this.circleOfConfusionPass.material.updateUniform('uBokehRadius', this.bokehRadius);
+        this.circleOfConfusionPass.material.uniforms.setValue('uFocusDistance', this.focusDistance);
+        this.circleOfConfusionPass.material.uniforms.setValue('uFocusRange', this.focusRange);
+        this.circleOfConfusionPass.material.uniforms.setValue('uBokehRadius', this.bokehRadius);
 
         this.circleOfConfusionPass.render({
             gpu,
@@ -316,9 +331,9 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 1: render prefilter pass
         //
 
-        this.preFilterPass.material.updateUniform('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
+        this.preFilterPass.material.uniforms.setValue('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
 
-        this.preFilterPass.material.updateUniform(
+        this.preFilterPass.material.uniforms.setValue(
             'uTexelSize',
             new Vector2(1 / this.circleOfConfusionPass.width, 1 / this.circleOfConfusionPass.height)
         );
@@ -338,12 +353,12 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 2: render dof bokeh pass
         //
 
-        // this.dofBokehPass.material.updateUniform('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
-        this.dofBokehPass.material.updateUniform(
+        // this.dofBokehPass.material.uniforms.setValue('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
+        this.dofBokehPass.material.uniforms.setValue(
             'uTexelSize',
             new Vector2(1 / this.preFilterPass.width, 1 / this.preFilterPass.height)
         );
-        this.dofBokehPass.material.updateUniform('uBokehRadius', this.bokehRadius);
+        this.dofBokehPass.material.uniforms.setValue('uBokehRadius', this.bokehRadius);
 
         this.dofBokehPass.render({
             gpu,
@@ -361,12 +376,12 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 3: render bokeh blur pass
         //
 
-        this.bokehBlurPass.material.updateUniform(
+        this.bokehBlurPass.material.uniforms.setValue(
             'uTexelSize',
             // new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
             new Vector2(1 / this.dofBokehPass.width, 1 / this.dofBokehPass.height)
         );
-        this.bokehBlurPass.material.updateUniform('uBokehRadius', this.bokehRadius);
+        this.bokehBlurPass.material.uniforms.setValue('uBokehRadius', this.bokehRadius);
 
         this.bokehBlurPass.render({
             gpu,
@@ -384,9 +399,9 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 4: render composite pass
         //
 
-        // this.compositePass.material.updateUniform('uCocTexture', this.preFilterPass.renderTarget.texture);
-        this.compositePass.material.updateUniform('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
-        this.compositePass.material.updateUniform('uDofTexture', this.bokehBlurPass.renderTarget.texture);
+        // this.compositePass.material.uniforms.setValue('uCocTexture', this.preFilterPass.renderTarget.texture);
+        this.compositePass.material.uniforms.setValue('uCocTexture', this.circleOfConfusionPass.renderTarget.texture);
+        this.compositePass.material.uniforms.setValue('uDofTexture', this.bokehBlurPass.renderTarget.texture);
 
         this.compositePass.render({
             gpu,

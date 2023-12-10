@@ -34,7 +34,7 @@
 //     }
 // }
 
-import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
+import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
 import { DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
@@ -47,6 +47,7 @@ import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
+import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type UnlitMaterialArgs = {
     diffuseColor?: Color;
@@ -55,7 +56,7 @@ export type UnlitMaterialArgs = {
     diffuseMapUvOffset?: Vector2;
     emissiveColor?: Color;
     vertexShaderModifier?: VertexShaderModifier;
-    uniforms?: Uniforms;
+    uniforms?: UniformsData;
 } & MaterialArgs;
 
 export class UnlitMaterial extends Material {
@@ -67,57 +68,63 @@ export class UnlitMaterial extends Material {
         emissiveColor,
         // TODO: 外部化
         vertexShaderModifier = {},
-        uniforms = {},
+        uniforms = [],
         ...options
     }: UnlitMaterialArgs = {}) {
         // this.specularAmount =
 
-        const baseUniforms: Uniforms = {
-            uDiffuseColor: {
+        const baseUniforms: UniformsData = [
+            {
+                name: 'uDiffuseColor',
                 type: UniformTypes.Color,
                 value: diffuseColor || Color.black,
             },
-            uDiffuseMap: {
+            {
+                name: 'uDiffuseMap',
                 type: UniformTypes.Texture,
                 value: diffuseMap || null,
             },
-            uDiffuseMapUvScale: {
+            {
+                name: 'uDiffuseMapUvScale',
                 type: UniformTypes.Vector2,
                 value: diffuseMapUvScale || Vector2.one,
             },
-            uDiffuseMapUvOffset: {
+            {
+                name: 'uDiffuseMapUvOffset',
                 type: UniformTypes.Vector2,
                 value: diffuseMapUvOffset || Vector2.one,
             },
-            uEmissiveColor: {
+            {
+                name: 'uEmissiveColor',
                 type: UniformTypes.Color,
                 value: emissiveColor || Color.black,
             },
-            [UniformNames.ShadingModelId]: {
+            {
+                name: UniformNames.ShadingModelId,
                 type: UniformTypes.Int,
                 value: ShadingModelIds.Unlit,
             },
-        };
+        ];
 
-        const mergedUniforms: Uniforms = {
-            ...baseUniforms,
-            ...(uniforms ? uniforms : {}),
-        };
+        const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
 
-        const depthUniforms: Uniforms = {
-            uDiffuseMap: {
+        const depthUniforms: UniformsData = [
+            {
+                name: 'uDiffuseMap',
                 type: UniformTypes.Texture,
                 value: diffuseMap || null,
             },
-            uDiffuseMapUvScale: {
+            {
+                name: 'uDiffuseMapUvScale',
                 type: UniformTypes.Vector2,
                 value: Vector2.one,
             },
-            uDiffuseMapUvOffset: {
+            {
+                name: 'uDiffuseMapUvOffset',
                 type: UniformTypes.Vector2,
                 value: Vector2.one,
             },
-        };
+        ];
 
         // TODO: できるだけconstructorの直後に持っていきたい
         super({

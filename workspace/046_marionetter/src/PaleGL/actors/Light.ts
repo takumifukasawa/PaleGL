@@ -14,7 +14,7 @@ export type LightArgs = {
 };
 
 export interface ILight {
-    updateUniform(targetMaterial: Material): void;
+    applyUniformsValues(targetMaterial: Material): void;
 }
 
 // TODO: interfaceでいいかも
@@ -47,7 +47,7 @@ export class Light extends Actor implements ILight {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateUniform(_targetMaterial: Material) {
+    applyUniformsValues(_targetMaterial: Material) {
         throw 'should implementation';
     }
 }

@@ -185,24 +185,28 @@ export class Skybox extends Mesh {
             depthTest: true,
             depthWrite: false,
             useEnvMap: true,
-            uniforms: {
-                uCubeTexture: {
+            uniforms: [
+                {
+                    name: UniformNames.CubeTexture,
                     type: UniformTypes.CubeMap,
                     value: cubeMap,
                 },
-                uViewDirectionProjectionInverse: {
+                {
+                    name: UniformNames.ViewDirectionProjectionInverse,
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity,
                 },
-                uRotationOffset: {
+                {
+                    name: UniformNames.RotationOffset,
                     type: UniformTypes.Float,
                     value: rotationOffset,
                 },
-                [UniformNames.ShadingModelId]: {
+                {
+                    name: UniformNames.ShadingModelId,
                     type: UniformTypes.Int,
                     value: ShadingModelIds.Skybox,
                 },
-            },
+            ],
         });
 
         super({ geometry, material, actorType: ActorTypes.Skybox });

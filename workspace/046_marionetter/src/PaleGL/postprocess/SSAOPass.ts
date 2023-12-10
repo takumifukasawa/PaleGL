@@ -5,7 +5,7 @@ import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 import { Color } from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
 /**
  *
@@ -105,7 +105,7 @@ export class SSAOPass extends PostProcessPassBase {
         super({
             gpu,
             fragmentShader,
-            uniforms: {
+            uniforms: [
                 // [UniformNames.TargetWidth]: {
                 //     type: UniformTypes.Float,
                 //     value: 1,
@@ -114,9 +114,10 @@ export class SSAOPass extends PostProcessPassBase {
                 //     type: UniformTypes.Float,
                 //     value: 1,
                 // },
-                [UniformNames.GBufferBTexture]: {
+                {
+                    name: UniformNames.GBufferBTexture,
                     type: UniformTypes.Texture,
-                    value: null
+                    value: null,
                 },
                 // uBaseColorTexture: {
                 //     type: UniformTypes.Texture,
@@ -126,8 +127,9 @@ export class SSAOPass extends PostProcessPassBase {
                 //     type: UniformTypes.Texture,
                 //     value: null,
                 // },
-                [UniformNames.DepthTexture]: {
-                // uDepthTexture: {
+                {
+                    name: UniformNames.DepthTexture,
+                    // uDepthTexture: {
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -155,51 +157,62 @@ export class SSAOPass extends PostProcessPassBase {
                 //     type: UniformTypes.Float,
                 //     value: 1,
                 // },
-                uSamplingRotations: {
+                {
+                    name: 'uSamplingRotations',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(samplingRotations),
                 },
-                uSamplingDistances: {
+                {
+                    name: 'uSamplingDistances',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(samplingDistances),
                 },
-                uSamplingTexture: {
+                {
+                    name: 'uSamplingTexture',
                     type: UniformTypes.Texture,
                     value: samplingTexture,
                 },
-                uOcclusionSampleLength: {
+                {
+                    name: 'uOcclusionSampleLength',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uOcclusionBias: {
+                {
+                    name: 'uOcclusionBias',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uOcclusionMinDistance: {
+                {
+                    name: 'uOcclusionMinDistance',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uOcclusionMaxDistance: {
+                {
+                    name: 'uOcclusionMaxDistance',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uOcclusionColor: {
+                {
+                    name: 'uOcclusionColor',
                     type: UniformTypes.Color,
                     value: new Color(0, 0, 0, 1),
                 },
-                uOcclusionPower: {
+                {
+                    name: 'uOcclusionPower',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uOcclusionStrength: {
+                {
+                    name: 'uOcclusionStrength',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uBlendRate: {
+                {
+                    name: 'uBlendRate',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-            },
+            ],
         });
 
         this.samplingTexture = samplingTexture;
@@ -214,25 +227,25 @@ export class SSAOPass extends PostProcessPassBase {
         super.setSize(width, height);
         // this.material.uniforms.uTargetWidth.value = width;
         // this.material.uniforms.uTargetHeight.value = height;
-        this.material.updateUniform(UniformNames.TargetWidth, width);
-        this.material.updateUniform(UniformNames.TargetHeight, height);
+        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
+        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
     }
 
     /**
-     * 
+     *
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
-        this.material.updateUniform('uOcclusionSampleLength', this.occlusionSampleLength);
-        this.material.updateUniform('uOcclusionBias', this.occlusionBias);
-        this.material.updateUniform('uOcclusionMinDistance', this.occlusionMinDistance);
-        this.material.updateUniform('uOcclusionMaxDistance', this.occlusionMaxDistance);
-        this.material.updateUniform('uOcclusionColor', this.occlusionColor);
-        this.material.updateUniform('uOcclusionPower', this.occlusionPower);
-        this.material.updateUniform('uOcclusionStrength', this.occlusionStrength);
-        this.material.updateUniform('uBlendRate', this.blendRate);
-        this.material.updateUniform('uSamplingTexture', this.samplingTexture);
-
+        this.material.uniforms.setValue('uOcclusionSampleLength', this.occlusionSampleLength);
+        this.material.uniforms.setValue('uOcclusionBias', this.occlusionBias);
+        this.material.uniforms.setValue('uOcclusionMinDistance', this.occlusionMinDistance);
+        this.material.uniforms.setValue('uOcclusionMaxDistance', this.occlusionMaxDistance);
+        this.material.uniforms.setValue('uOcclusionColor', this.occlusionColor);
+        this.material.uniforms.setValue('uOcclusionPower', this.occlusionPower);
+        this.material.uniforms.setValue('uOcclusionStrength', this.occlusionStrength);
+        this.material.uniforms.setValue('uBlendRate', this.blendRate);
+        this.material.uniforms.setValue('uSamplingTexture', this.samplingTexture);
+        
         super.render(options);
     }
 }

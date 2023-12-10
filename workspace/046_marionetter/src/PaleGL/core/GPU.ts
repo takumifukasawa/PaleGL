@@ -16,7 +16,7 @@ import { Texture } from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/Shader';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 import { Framebuffer } from '@/PaleGL/core/Framebuffer';
-import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
+// import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
@@ -25,6 +25,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { createCubeMap, CubeMapDirectionImages } from '@/PaleGL/loaders/loadCubeMap.ts';
+import {Uniforms, UniformStructValue, UniformValue} from '@/PaleGL/core/Uniforms.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
@@ -57,7 +58,7 @@ export class GPU {
     private shader: Shader | null = null;
     // private transformFeedback: TransformFeedback | null = null;
     private vao: VertexArrayObject | null = null;
-    private uniforms: Uniforms = {};
+    private uniforms: Uniforms | null = null;
     dummyTexture: Texture;
     dummyCubeTexture: CubeMap;
     private validExtensions: string[] = [];
@@ -71,7 +72,7 @@ export class GPU {
         this.gl = gl;
         this.dummyTexture = new Texture({
             gpu: this,
-            img: create1x1("white"),
+            img: create1x1('white'),
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
@@ -151,7 +152,7 @@ export class GPU {
     }
 
     /**
-     * 
+     *
      * @param r
      * @param g
      * @param b
@@ -166,7 +167,7 @@ export class GPU {
     }
 
     /**
-     * 
+     *
      * @param r
      * @param g
      * @param b
@@ -249,7 +250,7 @@ export class GPU {
     // setTransformFeedback() {
     // }
 
-    dummyTextureIndex = 0;
+    // dummyTextureIndex = 0;
 
     /**
      *
@@ -261,8 +262,9 @@ export class GPU {
         // let dummyTextureIndex = 0;
 
         const setUniformValueInternal = (type: UniformType, uniformName: string, value: UniformValue) => {
-            console.log("setUniformValueInternal", type, uniformName, value);
-            
+            // for debug
+            // console.log("setUniformValueInternal", type, uniformName, value);
+
             const location = gl.getUniformLocation(this.shader!.glObject, uniformName);
 
             // TODO:
@@ -343,28 +345,53 @@ export class GPU {
         };
 
         // uniforms
-        Object.keys(this.uniforms).forEach((uniformName) => {
-            const uniform = this.uniforms[uniformName];
-            if (uniform.type === UniformTypes.Struct) {
-                // default
-                // Object.keys(uniform.value).forEach(key => {
-                //     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
-                // });
-                const uniformStructValue = uniform.value as UniformStructValue;
-                Object.keys(uniformStructValue).forEach((key) => {
-                    // setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
-                    setUniformValueInternal(
-                        uniformStructValue[key].type,
-                        `${uniformName}.${key}`,
-                        uniformStructValue[key].value
-                    );
-                });
-            } else {
-                setUniformValueInternal(uniform.type, uniformName, uniform.value);
-                // console.log(uniformName === "uDepthTexture");
-                // console.log(uniform.type, uniformName, uniform.value);
-            }
-        });
+        if (this.uniforms) {
+            this.uniforms.data.forEach((uniformData) => {
+                if (uniformData.type === UniformTypes.Struct) {
+                    // default
+                    // Object.keys(uniform.value).forEach(key => {
+                    //     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                    // });
+                    const uniformStructValue = uniformData.value as UniformStructValue;
+                    uniformStructValue.forEach((structData) => {
+                        // setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+                        setUniformValueInternal(
+                            structData.type,
+                            `${uniformData.name}.${structData.name}`,
+                            structData.value
+                        );
+                    });
+                } else {
+                    setUniformValueInternal(uniformData.type, uniformData.name, uniformData.value);
+                    // console.log(uniformName === "uDepthTexture");
+                    // console.log(uniform.type, uniformName, uniform.value);
+                }
+            });
+
+            // tmp
+            // this.uniforms.data.forEach((uniformName) => {
+            //     const uniform = this.uniforms[uniformName];
+            //     if (uniform.type === UniformTypes.Struct) {
+            //         // default
+            //         // Object.keys(uniform.value).forEach(key => {
+            //         //     setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+            //         // });
+            //         const uniformStructValue = uniform.value as UniformStructValue;
+            //         Object.keys(uniformStructValue).forEach((key) => {
+            //             // setUniformValue(uniform.value[key].type, `${uniformName}.${key}`, uniform.value[key].value)
+            //             setUniformValueInternal(
+            //                 uniformStructValue[key].type,
+            //                 `${uniformName}.${key}`,
+            //                 uniformStructValue[key].value
+            //             );
+            //         });
+            //     } else {
+            //         setUniformValueInternal(uniform.type, uniformName, uniform.value);
+            //         // console.log(uniformName === "uDepthTexture");
+            //         // console.log(uniform.type, uniformName, uniform.value);
+            //     }
+            // });
+        }
     }
 
     updateTransformFeedback({
@@ -407,7 +434,7 @@ export class GPU {
         gl.bindVertexArray(null);
 
         this.shader = null;
-        this.uniforms = {};
+        this.uniforms = null;
         this.vao = null;
     }
 

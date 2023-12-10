@@ -1,5 +1,5 @@
-import { MaterialArgs, Material, Uniforms } from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
+import {DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -12,11 +12,12 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
+import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export const ShadingModelIds = {
     Lit: 1,
     Unlit: 2,
-    Skybox: 3
+    Skybox: 3,
 };
 
 export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
@@ -34,8 +35,8 @@ export type GBufferMaterialArgs = {
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
     vertexShaderModifier?: VertexShaderModifier;
-    uniforms?: Uniforms;
-    shadingModelId?: ShadingModelIds
+    uniforms?: UniformsData;
+    shadingModelId?: ShadingModelIds;
 } & MaterialArgs;
 
 // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
@@ -63,26 +64,30 @@ export class GBufferMaterial extends Material {
         // TODO: 外部化
         vertexShaderModifier = {},
         shadingModelId = ShadingModelIds.Lit,
-        uniforms = {},
+        uniforms = [],
         ...options
     }: GBufferMaterialArgs = {}) {
         // this.specularAmount =
 
-        const baseUniforms: Uniforms = {
-            uDiffuseColor: {
+        const baseUniforms: UniformsData = [
+            {
+                name: 'uDiffuseColor',
                 type: UniformTypes.Color,
                 value: diffuseColor || Color.white,
             },
-            uDiffuseMap: {
+            {
+                name: 'uDiffuseMap',
                 type: UniformTypes.Texture,
                 value: diffuseMap || null,
             },
-            uDiffuseMapUvScale: {
+            {
+                name: 'uDiffuseMapUvScale',
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
                 value: diffuseMapUvScale || Vector2.one,
             },
-            uDiffuseMapUvOffset: {
+            {
+                name: 'uDiffuseMapUvOffset',
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
                 value: diffuseMapUvOffset || Vector2.one,
@@ -91,33 +96,40 @@ export class GBufferMaterial extends Material {
             //     type: UniformTypes.Float,
             //     value: specularAmount || 1,
             // },
-            uMetallic: {
+            {
+                name: 'uMetallic',
                 type: UniformTypes.Float,
                 value: metallic || 0,
             },
-            uRoughness: {
+            {
+                name: 'uRoughness',
                 type: UniformTypes.Float,
                 value: roughness || 0,
             },
-            uNormalMap: {
+            {
+                name: 'uNormalMap',
                 type: UniformTypes.Texture,
                 value: normalMap || null,
             },
-            uNormalMapUvScale: {
+            {
+                name: 'uNormalMapUvScale',
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
                 value: normalMapUvScale || Vector2.one,
             },
-            uNormalMapUvOffset: {
+            {
+                name: 'uNormalMapUvOffset',
                 type: UniformTypes.Vector2,
                 // value: Vector2.one,
                 value: normalMapUvOffset || Vector2.one,
             },
-            uEmissiveColor: {
+            {
+                name: 'uEmissiveColor',
                 type: UniformTypes.Color,
                 value: emissiveColor || Color.black,
             },
-            [UniformNames.DirectionalLight]: {
+            {
+                name: UniformNames.DirectionalLight,
                 type: UniformTypes.Struct,
                 value: {
                     direction: Vector3.zero,
@@ -125,32 +137,33 @@ export class GBufferMaterial extends Material {
                     color: new Vector4(0, 0, 0, 0),
                 },
             },
-            [UniformNames.ShadingModelId]: {
+            {
+                name: UniformNames.ShadingModelId,
                 type: UniformTypes.Int, // float,intどちらでもいい
                 // value: shadingModelId,
                 value: shadingModelId,
             },
-        };
+        ];
 
-        const mergedUniforms: Uniforms = {
-            ...baseUniforms,
-            ...(uniforms ? uniforms : {}),
-        };
+        const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
 
-        const depthUniforms: Uniforms = {
-            uDiffuseMap: {
+        const depthUniforms: UniformsData = [
+            {
+                name: 'uDiffuseMap',
                 type: UniformTypes.Texture,
                 value: diffuseMap || null,
             },
-            uDiffuseMapUvScale: {
+            {
+                name: 'uDiffuseMapUvScale',
                 type: UniformTypes.Vector2,
                 value: Vector2.one,
             },
-            uDiffuseMapUvOffset: {
+            {
+                name: 'uDiffuseMapUvOffset',
                 type: UniformTypes.Vector2,
                 value: Vector2.one,
             },
-        };
+        ];
 
         // TODO: できるだけconstructorの直後に持っていきたい
         super({

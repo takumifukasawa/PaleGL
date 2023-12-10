@@ -9,23 +9,25 @@ import {
     PrimitiveType,
     BlendType,
     RenderQueue,
-    UniformType,
+    // UniformType,
     VertexShaderModifier,
     FragmentShaderModifier,
     DepthFuncType,
-    DepthFuncTypes, RenderQueueType,
+    DepthFuncTypes,
+    RenderQueueType,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/shaders/buildShader';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Texture } from '@/PaleGL/core/Texture';
+// import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
-import { CubeMap } from '@/PaleGL/core/CubeMap';
-import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Color } from '@/PaleGL/math/Color';
-import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+// import { CubeMap } from '@/PaleGL/core/CubeMap';
+// import { Vector2 } from '@/PaleGL/math/Vector2';
+// import { Color } from '@/PaleGL/math/Color';
+// import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
+// import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import {Uniforms, UniformsData} from '@/PaleGL/core/Uniforms.ts';
 
 export type MaterialArgs = {
     // required
@@ -37,7 +39,7 @@ export type MaterialArgs = {
 
     // optional
 
-    uniforms?: Uniforms;
+    uniforms?: UniformsData;
 
     name?: string;
 
@@ -78,33 +80,33 @@ export type MaterialArgs = {
     useVertexColor?: boolean;
 
     queue?: RenderQueue;
-    depthUniforms?: Uniforms;
+    depthUniforms?: UniformsData;
 };
 
-export type UniformStructValue = {
-    [key: string]: UniformTypeValuePair;
-};
-
-// TODO: fix type
-export type UniformValue =
-    | number
-    | number[]
-    | Vector2
-    | Vector2[]
-    | Vector3
-    | Vector3[]
-    | Vector4
-    | Vector4[]
-    | Matrix4
-    | Matrix4[]
-    | Texture
-    | CubeMap
-    | Color
-    | Color[]
-    | Float32Array
-    | DirectionalLightStruct
-    | UniformStructValue
-    | null;
+// export type UniformStructValue = {
+//     [key: string]: UniformTypeValuePair;
+// };
+//
+// // TODO: fix type
+// export type UniformValue =
+//     | number
+//     | number[]
+//     | Vector2
+//     | Vector2[]
+//     | Vector3
+//     | Vector3[]
+//     | Vector4
+//     | Vector4[]
+//     | Matrix4
+//     | Matrix4[]
+//     | Texture
+//     | CubeMap
+//     | Color
+//     | Color[]
+//     | Float32Array
+//     | DirectionalLightStruct
+//     | UniformStructValue
+//     | null;
 
 export type VertexShaderGenerator = ({
     attributeDescriptors,
@@ -128,14 +130,14 @@ export type FragmentShaderGenerator = ({
 
 export type DepthFragmentShaderGenerator = () => string;
 
-type UniformTypeValuePair = {
-    type: UniformType;
-    value: UniformValue;
-};
-
-export interface Uniforms {
-    [name: string]: UniformTypeValuePair;
-}
+// type UniformTypeValuePair = {
+//     type: UniformType;
+//     value: UniformValue;
+// };
+//
+// export interface Uniforms {
+//     [name: string]: UniformTypeValuePair;
+// }
 
 // -------------------------------------------------------------------
 // TODO:
@@ -150,7 +152,7 @@ export class Material {
     primitiveType: PrimitiveType;
     blendType: BlendType;
     renderQueue: RenderQueue;
-    uniforms: Uniforms = {};
+    uniforms: Uniforms;
     depthUniforms: Uniforms;
     depthTest: boolean | null;
     depthWrite: boolean | null;
@@ -206,6 +208,36 @@ export class Material {
         return this.alphaTest !== null;
     }
 
+    /**
+     * 
+     * @param name
+     * @param vertexShader
+     * @param fragmentShader
+     * @param depthFragmentShader
+     * @param vertexShaderGenerator
+     * @param fragmentShaderGenerator
+     * @param depthFragmentShaderGenerator
+     * @param vertexShaderModifier
+     * @param primitiveType
+     * @param depthTest
+     * @param depthWrite
+     * @param depthFuncType
+     * @param alphaTest
+     * @param faceSide
+     * @param receiveShadow
+     * @param blendType
+     * @param renderQueue
+     * @param useNormalMap
+     * @param isSkinning
+     * @param gpuSkinning
+     * @param jointNum
+     * @param isInstancing
+     * @param useVertexColor
+     * @param useEnvMap
+     * @param queue
+     * @param uniforms
+     * @param depthUniforms
+     */
     constructor({
         // gpu,
 
@@ -248,9 +280,11 @@ export class Material {
         useEnvMap = false,
 
         queue,
-        uniforms = {},
-        depthUniforms = {},
-    }: MaterialArgs) {
+        uniforms = [],
+        depthUniforms = [],
+    } // uniforms = {},
+    // depthUniforms = {},
+    : MaterialArgs) {
         this.name = name || '';
 
         // 外側から任意のタイミングでcompileした方が都合が良さそう
@@ -306,7 +340,7 @@ export class Material {
                     break;
             }
         }
-        
+
         // console.log(renderQueue, this.renderQueue, this.blendType);
 
         if (!this.renderQueue) {
@@ -330,67 +364,85 @@ export class Material {
         // TODO:
         // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
         // - skinning回りもここで入れたい？
-        const commonUniforms: Uniforms = {
-            [UniformNames.WorldMatrix]: {
+        const commonUniforms: UniformsData = [
+            {
+                name: UniformNames.WorldMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.ViewMatrix]: {
+            {
+                name: UniformNames.ViewMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.ProjectionMatrix]: {
+            {
+                name: UniformNames.ProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            [UniformNames.NormalMatrix]: {
+            {
+                name: UniformNames.NormalMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            // TODO: viewmatrixから引っ張ってきてもよい
-            [UniformNames.ViewPosition]: {
+            {
+                // TODO: viewmatrixから引っ張ってきてもよい
+                name: UniformNames.ViewPosition,
                 type: UniformTypes.Vector3,
                 value: Vector3.zero,
             },
-            [UniformNames.Time]: {
+            {
+                name: UniformNames.Time,
                 type: UniformTypes.Float,
                 value: 0,
             },
             ...(this.alphaTest
-                ? {
-                      uAlphaTestThreshold: {
+                ? [
+                      {
+                          name: 'uAlphaTestThreshold',
                           type: UniformTypes.Float,
                           value: this.alphaTest,
                       },
-                  }
-                : {}),
-        };
+                  ]
+                : []),
+        ];
 
-        const shadowUniforms: Uniforms = this.receiveShadow
-            ? {
-                  [UniformNames.ShadowMap]: {
+        const shadowUniforms: UniformsData = this.receiveShadow
+            ? [
+                  {
+                      name: UniformNames.ShadowMap,
                       type: UniformTypes.Texture,
                       value: null,
                   },
-                  [UniformNames.ShadowMapProjectionMatrix]: {
+                  {
+                      name: UniformNames.ShadowMapProjectionMatrix,
                       type: UniformTypes.Matrix4,
                       value: Matrix4.identity,
                   },
-                  // TODO: shadow map class を作って bias 持たせた方がよい
-                  [UniformNames.ShadowBias]: {
+                  {
+                      // TODO: shadow map class を作って bias 持たせた方がよい
+                      name: UniformNames.ShadowBias,
                       type: UniformTypes.Float,
                       value: 0.01,
                   },
-              }
-            : {};
+              ]
+            : [];
 
         this.queue = queue || null;
 
-        this.uniforms = { ...commonUniforms, ...shadowUniforms, ...uniforms };
+        this.uniforms = new Uniforms(commonUniforms, shadowUniforms, uniforms);
 
-        this.depthUniforms = { ...commonUniforms, ...depthUniforms };
+        this.depthUniforms = new Uniforms(commonUniforms, depthUniforms);
     }
+    
+    // createDepthMaterial() {
+    // }
 
+    /**
+     * 
+     * @param gpu
+     * @param attributeDescriptors
+     */
     start({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }): void {
         // for debug
         // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
@@ -443,7 +495,7 @@ export class Material {
         // for debug
         // console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, rawFragmentShader)
         // console.log(rawFragmentShader)
-        
+
         this.shader = new Shader({
             gpu,
             // vertexShader: this.vertexShader,
@@ -451,30 +503,5 @@ export class Material {
             // fragmentShader: this.fragmentShader
             fragmentShader: rawFragmentShader,
         });
-    }
-
-    // TODO:
-    // - structみたいな深い階層もupdateができるようにしたい
-    // - 'updateUniformValue'の方が良い??
-    // - 予期せぬsetしたくないのでthrowするかどうか
-    updateUniform(name: string, value: UniformValue): void {
-        if (!this.uniforms[name]) {
-            // throw `[Material.updateUniform] material: ${this.name}, invalid uniform key: ${name}`;
-            return;
-        }
-        this.uniforms[name].value = value;
-    }
-
-    // // NOTE: renderer側でmaterial側のuniformをアップデートする用
-    // updateUniforms({ gpu } = {}) {}
-
-    // // TODO: engine向けのuniformの更新をrendererかmaterialでやるか悩ましい
-    // updateEngineUniforms() {}
-
-    getUniform(name: string): UniformValue {
-        if (!this.uniforms[name]) {
-            throw `[Material.getUniform] invalid uniform key: ${name}`;
-        }
-        return this.uniforms[name].value;
     }
 }

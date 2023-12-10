@@ -49,24 +49,24 @@ export class GaussianBlurPass implements IPostProcessPass {
             //     pixelNum: blurPixelNum,
             //     srcTextureUniformName: UniformNames.SrcTexture
             // }),
-            uniforms: {
-                uTargetWidth: {
+            uniforms: [{
+                name: "uTargetWidth",
                     type: UniformTypes.Float,
                     value: 1,
-                },
-                uTargetHeight: {
+                }, {
+                name: "uTargetHeight",
                     type: UniformTypes.Float,
                     value: 1,
-                },
-                uBlurWeights: {
+                }, {
+                name: "uBlurWeights",
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
-                },
-                uIsHorizontal: {
+                }, {
+                name: "uIsHorizontal",
                     type: UniformTypes.Float,
                     value: 1.
                 }
-            },
+            ],
         });
         this.#passes.push(this.horizontalBlurPass);
         this.materials.push(...this.horizontalBlurPass.materials);
@@ -80,24 +80,24 @@ export class GaussianBlurPass implements IPostProcessPass {
             //     pixelNum: blurPixelNum,
             //     srcTextureUniformName: UniformNames.SrcTexture,
             // }),
-            uniforms: {
-                uTargetWidth: {
+            uniforms: [{
+                name: "uTargetWidth",
                     type: UniformTypes.Float,
                     value: 1,
-                },
-                uTargetHeight: {
+                }, {
+                name: "uTargetHeight",
                     type: UniformTypes.Float,
                     value: 1,
-                },
-                uBlurWeights: {
+                }, {
+                name: "uBlurWeights",
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
-                },
-                uIsHorizontal: {
+                }, {
+                name: "uIsHorizontal",
                     type: UniformTypes.Float,
                     value: 0.
                 },
-            },
+            ],
         });
         this.#passes.push(this.verticalBlurPass);
         this.materials.push(...this.verticalBlurPass.materials);
@@ -105,11 +105,11 @@ export class GaussianBlurPass implements IPostProcessPass {
 
     setSize(width: number, height: number) {
         this.horizontalBlurPass.setSize(width, height);
-        this.horizontalBlurPass.material.updateUniform('uTargetWidth', width);
-        this.horizontalBlurPass.material.updateUniform('uTargetHeight', height);
+        this.horizontalBlurPass.material.uniforms.setValue('uTargetWidth', width);
+        this.horizontalBlurPass.material.uniforms.setValue('uTargetHeight', height);
         this.verticalBlurPass.setSize(width, height);
-        this.verticalBlurPass.material.updateUniform('uTargetWidth', width);
-        this.verticalBlurPass.material.updateUniform('uTargetHeight', height);
+        this.verticalBlurPass.material.uniforms.setValue('uTargetWidth', width);
+        this.verticalBlurPass.material.uniforms.setValue('uTargetHeight', height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
@@ -152,7 +152,7 @@ export class GaussianBlurPass implements IPostProcessPass {
         //     // TODO: mesh経由する必要たぶんない
         //     pass.mesh.updateTransform();
         //     // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
-        //     pass.material.updateUniform(
+        //     pass.material.uniforms.setValue(
         //         UniformNames.SrcTexture,
         //         // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
         //         (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture

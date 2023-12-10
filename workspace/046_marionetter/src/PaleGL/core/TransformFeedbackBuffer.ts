@@ -4,9 +4,9 @@ import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 import {getAttributeUsage, GPU} from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
-import { Uniforms } from '@/PaleGL/materials/Material.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 import {AttributeUsageType} from "@/PaleGL/constants.ts";
+import {Uniforms, UniformsData} from "@/PaleGL/core/Uniforms.ts";
 
 // TODO: location, divisorをいい感じに指定したい
 
@@ -21,7 +21,7 @@ export type TransformFeedbackBufferArgs = {
         data: Float32Array | Uint16Array;
         usageType?: AttributeUsageType
     }[];
-    uniforms?: Uniforms;
+    uniforms?: UniformsData
 };
 
 export class TransformFeedbackBuffer {
@@ -33,7 +33,7 @@ export class TransformFeedbackBuffer {
     vertexArrayObject: VertexArrayObject;
     drawCount: number;
 
-    uniforms: Uniforms = {};
+    uniforms: Uniforms;
 
     transformFeedback: TransformFeedback;
 
@@ -50,7 +50,7 @@ export class TransformFeedbackBuffer {
         vertexShader,
         // fragmentShader,
         varyings,
-        uniforms = {},
+        uniforms = [],
     }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         const { gl } = gpu;
@@ -61,7 +61,7 @@ export class TransformFeedbackBuffer {
             fragmentShader: transformFeedbackFragmentShader,
             transformFeedbackVaryings,
         });
-        this.uniforms = uniforms;
+        this.uniforms = new Uniforms(uniforms);
 
         this.drawCount = drawCount;
 

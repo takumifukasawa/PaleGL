@@ -69,8 +69,6 @@ export class GLSLSound {
 
         const data = new Float32Array(this.channelNum * SAMPLES);
 
-        const HOGE_FUGA = "uBlockOffset";
-
         const varyingName = 'vSound';
 
         const transformFeedbackBuffer = new TransformFeedbackBuffer({
@@ -84,17 +82,17 @@ export class GLSLSound {
                 },
             ],
             vertexShader,
-            uniforms: {
-                // uBlockOffset: {
-                [HOGE_FUGA]: {
+            uniforms: [
+                {
+                name: "uBlockOffset",
                     type: UniformTypes.Float,
                     value: 0,
-                },
-                uSampleRate: {
+                },{
+                    name: "uSampleRate",
                     type: UniformTypes.Float,
                     value: 0,
-                },
-            },
+                }
+                ],
             // fragmentShader: transformFeedbackFragmentShader,
             drawCount: SAMPLES,
         });
@@ -112,13 +110,13 @@ export class GLSLSound {
         console.log(`[GLSLSound] outputR length: ${outputR.length}`);
         console.log(`[GLSLSound] ----------------------------------------`);
 
-        transformFeedbackBuffer.uniforms.uSampleRate.value = audioContext.sampleRate;
+        transformFeedbackBuffer.uniforms.setValue("uSampleRate", audioContext.sampleRate);
 
         for (let i = 0; i < numBlocks; i++) {
             const blockOffset = (i * SAMPLES) / audioContext.sampleRate;
             // gl.uniform1f(uniformLocations['uBlockOffset'], blockOffset);
 
-            transformFeedbackBuffer.uniforms.uBlockOffset.value = blockOffset;
+            transformFeedbackBuffer.uniforms.setValue("uBlockOffset", blockOffset);
 
             // TODO: vao, shader の bind,unbind がたくさん発生するので最適化した方がよい
             gpu.updateTransformFeedback({

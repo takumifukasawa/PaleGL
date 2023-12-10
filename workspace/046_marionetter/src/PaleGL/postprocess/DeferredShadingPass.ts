@@ -6,95 +6,110 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
+import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
-        // uniforms,
-    } // name,
+        // name,
+    } // uniforms,
     : {
         gpu: GPU;
         // fragmentShader: string;
         // uniforms?: Uniforms;
         // name?: string;
     }) {
-        const uniforms = {
+        const uniforms: UniformsData = [
             // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
-            [UniformNames.GBufferATexture]: {
+            {
+                name: UniformNames.GBufferATexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            [UniformNames.GBufferBTexture]: {
+            {
+                name: UniformNames.GBufferBTexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            [UniformNames.GBufferCTexture]: {
+            {
+                name: UniformNames.GBufferCTexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            [UniformNames.GBufferDTexture]: {
+            {
+                name: UniformNames.GBufferDTexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            [UniformNames.DepthTexture]: {
+            {
+                name: UniformNames.DepthTexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            [UniformNames.ShadowMap]: {
+            {
+                name: UniformNames.ShadowMap,
                 type: UniformTypes.Texture,
                 value: null,
             },
-            uAmbientOcclusionTexture: {
+            {
+                name: 'uAmbientOcclusionTexture',
                 type: UniformTypes.Texture,
                 value: null,
             },
 
-            // TODO: pass all lights
-            [UniformNames.DirectionalLight]: {
+            {
+                // TODO: pass all lights
+                name: UniformNames.DirectionalLight,
                 type: UniformTypes.Struct,
-                value: {
-                    // direction: Vector3.zero,
-                    // intensity: 0,
-                    // color: new Vector4(0, 0, 0, 0),
-                    direction: {
+                value: [
+                    {
+                        name: 'direction',
                         type: UniformTypes.Vector3,
                         value: Vector3.zero,
                     },
-                    intensity: {
+                    {
+                        name: 'intensity',
                         type: UniformTypes.Float,
                         value: 0,
                     },
-                    color: {
+                    {
+                        name: 'color',
                         type: UniformTypes.Color,
                         value: new Color(0, 0, 0, 1),
                     },
-                },
+                ],
             },
 
-            [UniformNames.Skybox]: {
+            {
+                name: UniformNames.Skybox,
                 type: UniformTypes.Struct,
-                value: {
-                    cubeMap: {
+                value: [
+                    {
+                        name: 'cubeMap',
                         type: UniformTypes.CubeMap,
                         value: null,
                     },
-                    diffuseIntensity: {
+                    {
+                        name: 'diffuseIntensity',
                         type: UniformTypes.Float,
                         value: 0,
                     },
-                    specularIntensity: {
+                    {
+                        name: 'specularIntensity',
                         type: UniformTypes.Float,
                         value: 0,
                     },
-                    rotationOffset: {
+                    {
+                        name: 'rotationOffset',
                         type: UniformTypes.Float,
                         value: 0,
                     },
-                    maxLodLevel: {
+                    {
+                        name: 'maxLodLevel',
                         type: UniformTypes.Float,
                         value: 0,
                     },
-                },
+                ],
             },
 
             // // TODO: pass skybox env
@@ -102,7 +117,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
             //     type: UniformTypes.CubeMap,
             //     value: null,
             // },
-        };
+        ];
 
         super({
             gpu,
@@ -111,34 +126,39 @@ export class DeferredShadingPass extends PostProcessPassBase {
             uniforms,
             // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F
+            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
     }
 
     updateSkyboxUniforms(skybox: Skybox) {
-        this.material.updateUniform(UniformNames.Skybox, {
-            cubeMap: {
+        this.material.uniforms.setValue(UniformNames.Skybox, [
+            {
+                name: 'cubeMap',
                 type: UniformTypes.CubeMap,
                 value: skybox.cubeMap,
             },
-            diffuseIntensity: {
+            {
+                name: 'diffuseIntensity',
                 type: UniformTypes.Float,
                 value: skybox.diffuseIntensity,
             },
-            specularIntensity: {
+            {
+                name: 'specularIntensity',
                 type: UniformTypes.Float,
                 value: skybox.specularIntensity,
             },
-            rotationOffset: {
+            {
+                name: 'rotationOffset',
                 type: UniformTypes.Float,
                 value: skybox.rotationOffset,
             },
-            maxLodLevel: {
+            {
+                name: 'maxLodLevel',
                 type: UniformTypes.Float,
                 value: skybox.cubeMap.maxLodLevel,
             },
-        });
+        ]);
     }
 
     // render(options: PostProcessPassRenderArgs) {

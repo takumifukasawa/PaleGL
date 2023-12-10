@@ -16,7 +16,7 @@ export class FXAAPass extends PostProcessPassBase {
         super({
             gpu,
             fragmentShader,
-            uniforms: {
+            uniforms: [
                 // uTargetWidth: {
                 //     type: UniformTypes.Float,
                 //     value: 1,
@@ -28,7 +28,8 @@ export class FXAAPass extends PostProcessPassBase {
                 // 1/32 = 0.03125 ... visible limit
                 // 1/16 = 0.0625 ... high quality
                 // 1/12 = 0.0833 ... upper limit
-                uContrastThreshold: {
+                {
+                name: "uContrastThreshold",
                     type: UniformTypes.Float,
                     value: 0.0625,
                 },
@@ -36,23 +37,24 @@ export class FXAAPass extends PostProcessPassBase {
                 // 1/4 = 0.25 ... low quality
                 // 1/8 = 0.125 ... high quality
                 // 1/16 = 0.0625 ... overkill
-                uRelativeThreshold: {
+                {
+                name: "uRelativeThreshold",
                     type: UniformTypes.Float,
                     value: 0.125,
-                },
-                uSubpixelBlending: {
+                },{
+                name:"uSubpixelBlending",
                     type: UniformTypes.Float,
                     value: 0.75,
                 },
                 // ...PostProcessPassBase.commonUniforms,
-            },
+            ],
         });
         // this.gpu = gpu;
     }
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.updateUniform('uTargetWidth', width);
-        this.material.updateUniform('uTargetHeight', height);
+        this.material.uniforms.setValue('uTargetWidth', width);
+        this.material.uniforms.setValue('uTargetHeight', height);
     }
 }

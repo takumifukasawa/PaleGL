@@ -11,72 +11,73 @@ export class BufferVisualizerPass extends PostProcessPassBase {
         super({
             gpu,
             fragmentShader,
-            uniforms: {
-                [UniformNames.GBufferATexture]: {
+            uniforms: [
+                {
+                    name: UniformNames.GBufferATexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.GBufferBTexture]: {
+                {
+                    name: UniformNames.GBufferBTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.GBufferCTexture]: {
+                {
+                    name: UniformNames.GBufferCTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                [UniformNames.GBufferDTexture]: {
+                {
+                    name: UniformNames.GBufferDTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uDepthTexture: {
+                {
+                    name: UniformNames.DepthTexture,
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uDirectionalLightShadowMap: {
+                {
+                    name: 'uDirectionalLightShadowMap',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uAmbientOcclusionTexture: {
+                {
+                    name: 'uAmbientOcclusionTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uDeferredShadingTexture: {
+                {
+                    name: 'uDeferredShadingTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uLightShaftTexture: {
+                {
+                    name: 'uLightShaftTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uFogTexture: {
+                {
+                    name: 'uFogTexture',
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                uNearClip: {
+                {
+                    name: 'uNearClip',
                     type: UniformTypes.Float,
                     value: 0.1,
                 },
-                uFarClip: {
+                {
+                    name: 'uFarClip',
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                uInverseViewProjectionMatrix: {
+                {
+                    name: 'uInverseViewProjectionMatrix',
                     type: UniformTypes.Matrix4,
                     value: Matrix4.identity,
                 },
-            },
+            ],
         });
-        // this.gpu = gpu;
     }
-
-    // render(options: PostProcessPassRenderArgs) {
-    //     super.render(options);
-    //     console.log(this.material.uniforms)
-    // }
-
-    // setSize(width: number, height: number) {
-    //     super.setSize(width, height);
-    //     this.material.updateUniform('uTargetWidth', width);
-    //     this.material.updateUniform('uTargetHeight', height);
-    // }
 }

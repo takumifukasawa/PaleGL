@@ -1,19 +1,19 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import { Uniforms } from '@/PaleGL/materials/Material';
-import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase";
-import {RenderTargetType} from "@/PaleGL/constants";
+import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { RenderTargetType } from '@/PaleGL/constants';
+import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export class FragmentPass extends PostProcessPassBase {
     constructor({
         gpu,
         fragmentShader,
-        uniforms,
+        uniforms = [],
         name,
-        renderTargetType
+        renderTargetType,
     }: {
         gpu: GPU;
         fragmentShader: string;
-        uniforms?: Uniforms;
+        uniforms?: UniformsData;
         name?: string;
         renderTargetType?: RenderTargetType;
     }) {

@@ -160,6 +160,12 @@ void main() {
         outColor = resultColor;
         return;
     }
+   
+    // for debug
+    // outColor = vec4(baseColor, 1.);
+    // outColor = vec4(baseColor, 1.);
+    // outColor = vec4(vec3(metallic), 1.);
+    // return;
     // outColor = vec4(vec3(step(1.5, shadingModelId)), 1.);
     // return;
     
@@ -258,8 +264,6 @@ vec3 outgoingLight =
 
     // TODO: aoを考慮したライティング計算
     resultColor.xyz *= aoRate;
-    // for debug
-    // resultColor.xyz = vec3(aoRate);
   
     // 自己発光も足す。1より溢れている場合はbloomで光が滲む感じになる
     resultColor.xyz += emissiveColor;
@@ -268,4 +272,22 @@ vec3 outgoingLight =
 
     // 疑似HDRの場合
     // outColor = encodePseudoHDR(resultColor.xyz);
+
+    // for debug
+    // outColor = vec4(outgoingLight, 1.);
+    // outColor = vec4(worldNormal, 1.);
+    // outColor = vec4(depth, 1., 1., 1.);
+
+    // // TODO: use encode func
+    // // surface
+    // vec3 baseColor = gBufferA.baseColor;
+    // float metallic = gBufferC.metallic;
+    // float roughness = gBufferC.roughness;
+    // vec3 emissiveColor = gBufferD.emissiveColor;
+    // float shadingModelId = gBufferB.shadingModelId;
+    // vec3 worldNormal = gBufferB.normal * 2. - 1.;
+    // float rawDepth = texture(uDepthTexture, uv).r;
+    // float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+
 }
