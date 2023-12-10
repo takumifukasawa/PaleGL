@@ -218,9 +218,9 @@ export class PostProcessPassBase implements IPostProcessPass {
      */
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {
         if (isLastPass) {
-            renderer.setRenderTarget(camera.renderTarget);
+            renderer.setRenderTarget(camera.renderTarget, true);
         } else {
-            renderer.setRenderTarget(this._renderTarget);
+            renderer.setRenderTarget(this._renderTarget, true);
         }
     }
 

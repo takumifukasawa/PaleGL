@@ -211,7 +211,6 @@ export class Renderer {
      * @param realHeight
      */
     setSize(realWidth: number, realHeight: number) {
-        // setSize(width: number, height: number, realWidth: number, realHeight: number) {
         this.realWidth = realWidth;
         this.realHeight = realHeight;
         this.canvas.width = this.realWidth;
@@ -222,7 +221,6 @@ export class Renderer {
         // render targets
         this._depthPrePassRenderTarget.setSize(realWidth, realHeight);
         this._gBufferRenderTargets.setSize(realWidth, realHeight);
-        // this._ambientOcclusionRenderTarget.setSize(realWidth, realHeight);
         this._afterDeferredShadingRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
@@ -240,14 +238,23 @@ export class Renderer {
     /**
      *
      * @param renderTarget
+     * @param clearColor
+     * @param clearDepth
      */
-    setRenderTarget(renderTarget: CameraRenderTargetType) {
+    // TODO: 本当はclearcolorの色も渡せるとよい
+    setRenderTarget(renderTarget: CameraRenderTargetType, clearColor: boolean = false, clearDepth: boolean = false) {
         if (renderTarget) {
             this.gpu.setFramebuffer(renderTarget.framebuffer);
             this.gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
         } else {
             this.gpu.setFramebuffer(null);
             this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
+        }
+        if (clearColor) {
+            this.gpu.clearColor(0, 0, 0, 0);
+        }
+        if (clearDepth) {
+            this.gpu.clearDepth(1, 1, 1, 1);
         }
     }
 
@@ -266,8 +273,12 @@ export class Renderer {
      * @param a
      */
     // TODO: pass Color
-    clear(r: number, g: number, b: number, a: number) {
-        this.gpu.clear(r, g, b, a);
+    clearColor(r: number, g: number, b: number, a: number) {
+        this.gpu.clearColor(r, g, b, a);
+    }
+
+    clearDepth(r: number, g: number, b: number, a: number) {
+        this.gpu.clearDepth(r, g, b, a);
     }
 
     /**
@@ -758,10 +769,11 @@ export class Renderer {
     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
         // console.log("--------- depth pre pass ---------");
 
-        this.setRenderTarget(this._depthPrePassRenderTarget);
+        this.setRenderTarget(this._depthPrePassRenderTarget, false, true);
+        this.gpu.clearDepth(0, 0, 0, 1);
 
         // depthなのでclear
-        this.clear(0, 0, 0, 1);
+        // this.clear(0, 0, 0, 1);
 
         depthPrePassRenderMeshInfos.forEach(({ actor }) => {
             const depthMaterial = actor.depthMaterial;
@@ -801,8 +813,9 @@ export class Renderer {
                 throw 'invalid shadow camera';
                 // return;
             }
-            this.setRenderTarget(lightActor.shadowMap.write);
-            this.clear(0, 0, 0, 1);
+            this.setRenderTarget(lightActor.shadowMap.write, false, true);
+            // this.clear(0, 0, 0, 1);
+            // this.gpu.clearDepth(0, 0, 0, 1);
 
             if (castShadowRenderMeshInfos.length < 1) {
                 return;
@@ -859,7 +872,7 @@ export class Renderer {
         // NOTE: DepthTextureはあるはず
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
-        this.setRenderTarget(this._gBufferRenderTargets.write);
+        this.setRenderTarget(this._gBufferRenderTargets.write, true);
 
         // TODO: depth prepass しない場合は必要
         // if (clear) {
@@ -940,33 +953,6 @@ export class Renderer {
 
     /**
      *
-     * @param camera
-     * @private
-     */
-    // private ambientOcclusionPass(camera: Camera, time: number) {
-    //     // console.log("--------- ambient occlusion pass ---------");
-
-    //     // this.setRenderTarget(this._ambientOcclusionRenderTarget.write);
-
-    //     // this.clear(0, 0, 0, 1);
-
-    //     // this._ambientOcclusionPass.material.updateUniform(UniformNames.SrcTexture, );
-
-    //     // this._ambientOcclusionPass.enabled = true;
-    //     PostProcess.renderPass({
-    //         pass: this._ambientOcclusionPass,
-    //         renderer: this,
-    //         targetCamera: camera,
-    //         gpu: this.gpu,
-    //         camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-    //         prevRenderTarget: null,
-    //         isLastPass: false,
-    //         time, // TODO: engineから渡したい
-    //     });
-    // }
-
-    /**
-     *
      * @param sortedRenderMeshInfos
      * @param camera
      * @param lightActors
@@ -983,7 +969,8 @@ export class Renderer {
 
         // TODO: 常にclearしない、で良い気がする
         if (clear) {
-            this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+            // this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+            this.gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         }
 
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {

@@ -69,13 +69,12 @@ export class GPU {
      */
     constructor({ gl }: { gl: WebGL2RenderingContext }) {
         this.gl = gl;
-            this.dummyTexture =
-                new Texture({
-                    gpu: this,
-                    img: create1x1(),
-                    wrapS: TextureWrapTypes.Repeat,
-                    wrapT: TextureWrapTypes.Repeat,
-                });
+        this.dummyTexture = new Texture({
+            gpu: this,
+            img: create1x1(),
+            wrapS: TextureWrapTypes.Repeat,
+            wrapT: TextureWrapTypes.Repeat,
+        });
 
         const images: CubeMapDirectionImages = {
             [CubeMapAxis.PositiveX]: create1x1(),
@@ -152,6 +151,36 @@ export class GPU {
     }
 
     /**
+     * 
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
+    clearDepth(r: number, g: number, b: number, a: number) {
+        const gl = this.gl;
+        gl.depthMask(true);
+        gl.colorMask(false, false, false, false);
+        gl.clearColor(r, g, b, a);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+    }
+
+    /**
+     * 
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
+    clearColor(r: number, g: number, b: number, a: number) {
+        const gl = this.gl;
+        gl.depthMask(false);
+        gl.colorMask(true, true, true, true);
+        gl.clearColor(r, g, b, a);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
+    /**
      *
      * @param r
      * @param g
@@ -159,17 +188,21 @@ export class GPU {
      * @param a
      */
     clear(r: number, g: number, b: number, a: number) {
-        const gl = this.gl;
-        // TODO: mask設定は外側からやった方がよい気がする
-        gl.depthMask(true);
-        gl.colorMask(true, true, true, true);
-        gl.enable(gl.CULL_FACE);
-        gl.enable(gl.DEPTH_TEST);
-        gl.clearColor(r, g, b, a);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        this.clearDepth(r, g, b, a);
+        this.clearColor(r, g, b, a);
+
+        // tmp
+        // const {gl} = this;
         // gl.depthMask(true);
         // gl.colorMask(true, true, true, true);
+        // gl.enable(gl.CULL_FACE);
+        // gl.enable(gl.DEPTH_TEST);
+        // gl.clearColor(0, 0, 0, 1);
         // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        //
+        // TODO: デフォルトに戻した方がよい？
+        //
     }
 
     /**

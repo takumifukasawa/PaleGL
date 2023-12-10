@@ -302,8 +302,8 @@ export class BloomPass implements IPostProcessPass {
             const w = this.width / downSize;
             const h = this.height / downSize;
 
-            renderer.setRenderTarget(horizontalRenderTarget);
-            renderer.clear(0, 0, 0, 1);
+            renderer.setRenderTarget(horizontalRenderTarget, true);
+            // renderer.clearColor(0, 0, 0, 1);
             this.horizontalBlurMaterial.updateUniform(
                 UniformNames.SrcTexture,
                 this.extractBrightnessPass.renderTarget.texture
@@ -312,8 +312,8 @@ export class BloomPass implements IPostProcessPass {
             this.horizontalBlurMaterial.updateUniform('uTargetHeight', w);
             renderer.renderMesh(this.geometry, this.horizontalBlurMaterial);
 
-            renderer.setRenderTarget(verticalRenderTarget);
-            renderer.clear(0, 0, 0, 1);
+            renderer.setRenderTarget(verticalRenderTarget, true);
+            // renderer.clearColor(0, 0, 0, 1);
             this.verticalBlurMaterial.updateUniform(UniformNames.SrcTexture, horizontalRenderTarget.texture);
             this.verticalBlurMaterial.updateUniform('uTargetWidth', w);
             this.verticalBlurMaterial.updateUniform('uTargetHeight', h);
