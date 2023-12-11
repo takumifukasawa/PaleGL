@@ -111,7 +111,7 @@ export default defineConfig(({ mode}) => {
             rollupOptions: {
                 input: {
                     main: isBundle
-                        ? resolve(__dirname, 'src/main.ts') // js一個にまとめる場合
+                        ? resolve(__dirname, 'main.ts') // js一個にまとめる場合
                         : resolve(__dirname, 'index.html'), // html含めてビルドする場合
                 },
             },
