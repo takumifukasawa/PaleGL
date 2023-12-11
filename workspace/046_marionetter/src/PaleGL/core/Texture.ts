@@ -82,7 +82,7 @@ export class Texture extends GLObject {
         if (!this.img && (!width || !height)) {
             console.error('[Texture.constructor] invalid width or height');
         }
-  
+ 
         const texture = gl.createTexture();
         if (!texture) {
             throw '[Texture.constructor] invalid texture';

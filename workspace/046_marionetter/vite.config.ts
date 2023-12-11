@@ -91,6 +91,8 @@ export default defineConfig(({ mode}) => {
                 minify: isMinifyShader,
                 minifierOptions: {
                     preserveExternals: true,
+                    // preserveAllGlobals: true,
+                    // noRenaming: true
                 },
             }),
             checker({
@@ -113,6 +115,9 @@ export default defineConfig(({ mode}) => {
                     main: isBundle
                         ? resolve(__dirname, 'main.ts') // js一個にまとめる場合
                         : resolve(__dirname, 'index.html'), // html含めてビルドする場合
+                    // sandbox: isBundle
+                    //     ? resolve(__dirname, 'sandbox/main.ts') // js一個にまとめる場合
+                    //     : resolve(__dirname, 'sandbox/index.html'), // html含めてビルドする場合
                 },
             },
             minify: 'terser',
