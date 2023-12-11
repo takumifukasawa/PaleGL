@@ -27,7 +27,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import { Color } from '@/PaleGL/math/Color';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
-import {Uniforms, UniformsData} from '@/PaleGL/core/Uniforms.ts';
+import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type MaterialArgs = {
     // required
@@ -36,6 +36,9 @@ export type MaterialArgs = {
     // TODO: required じゃなくて大丈夫??
     vertexShader?: string;
     fragmentShader?: string;
+
+    rawVertexShader?: string;
+    rawFragmentShader?: string;
 
     // optional
 
@@ -184,6 +187,7 @@ export class Material {
 
     rawVertexShader: string | null = null;
     rawFragmentShader: string | null = null;
+
     rawDepthFragmentShader: string | null = null;
 
     private vertexShaderGenerator: VertexShaderGenerator | null = null;
@@ -209,7 +213,7 @@ export class Material {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param vertexShader
      * @param fragmentShader
@@ -246,6 +250,8 @@ export class Material {
         vertexShader = '',
         fragmentShader = '',
         depthFragmentShader,
+        rawVertexShader,
+        rawFragmentShader,
 
         vertexShaderGenerator,
         fragmentShaderGenerator,
@@ -281,9 +287,8 @@ export class Material {
 
         queue,
         uniforms = [],
-        depthUniforms = [],
-    } // uniforms = {},
-    // depthUniforms = {},
+        depthUniforms = [], // uniforms = {},
+    } // depthUniforms = {},
     : MaterialArgs) {
         this.name = name || '';
 
@@ -295,9 +300,17 @@ export class Material {
         // }
         // if (fragmentShader) {
         this.fragmentShader = fragmentShader || '';
+
         // }
         if (depthFragmentShader) {
             this.depthFragmentShader = depthFragmentShader;
+        }
+
+        if (rawVertexShader) {
+            this.rawVertexShader = rawVertexShader;
+        }
+        if (rawFragmentShader) {
+            this.rawFragmentShader = rawFragmentShader;
         }
 
         if (vertexShaderGenerator) {
@@ -435,12 +448,12 @@ export class Material {
 
         this.depthUniforms = new Uniforms(commonUniforms, depthUniforms);
     }
-    
+
     // createDepthMaterial() {
     // }
 
     /**
-     * 
+     *
      * @param gpu
      * @param attributeDescriptors
      */
@@ -448,20 +461,6 @@ export class Material {
         // for debug
         // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
 
-        if (!this.vertexShader && this.vertexShaderGenerator) {
-            this.vertexShader = this.vertexShaderGenerator({
-                attributeDescriptors,
-                isSkinning: !!this.isSkinning,
-                jointNum: this.jointNum,
-                gpuSkinning: this.gpuSkinning,
-                isInstancing: this.isInstancing,
-            });
-        }
-        if (!this.fragmentShader && this.fragmentShaderGenerator) {
-            this.fragmentShader = this.fragmentShaderGenerator({
-                attributeDescriptors,
-            });
-        }
         if (!this.depthFragmentShader && this.depthFragmentShaderGenerator) {
             this.depthFragmentShader = this.depthFragmentShaderGenerator();
         }
@@ -478,33 +477,53 @@ export class Material {
             useAlphaTest: !!this.alphaTest,
         };
 
-        const rawVertexShader = buildVertexShader(
-            this.vertexShader,
-            attributeDescriptors,
-            shaderDefineOptions,
-            this.vertexShaderModifier
-        );
-        const rawFragmentShader = buildFragmentShader(
-            this.fragmentShader,
-            shaderDefineOptions,
-            this.fragmentShaderModifier
-        );
+        if (!this.rawVertexShader) {
+            if (!this.vertexShader && this.vertexShaderGenerator) {
+                this.vertexShader = this.vertexShaderGenerator({
+                    attributeDescriptors,
+                    isSkinning: !!this.isSkinning,
+                    jointNum: this.jointNum,
+                    gpuSkinning: this.gpuSkinning,
+                    isInstancing: this.isInstancing,
+                });
+            }
+            const rawVertexShader = buildVertexShader(
+                this.vertexShader,
+                attributeDescriptors,
+                shaderDefineOptions,
+                this.vertexShaderModifier
+            );
+            this.rawVertexShader = rawVertexShader;
+        }
 
-        this.rawVertexShader = rawVertexShader;
-        this.rawFragmentShader = rawFragmentShader;
+        if (!this.rawFragmentShader) {
+            if (!this.fragmentShader && this.fragmentShaderGenerator) {
+                this.fragmentShader = this.fragmentShaderGenerator({
+                    attributeDescriptors,
+                });
+            }
+            const rawFragmentShader = buildFragmentShader(
+                this.fragmentShader,
+                shaderDefineOptions,
+                this.fragmentShaderModifier
+            );
+            this.rawFragmentShader = rawFragmentShader;
+        }
 
         // for debug
-        // console.log("-------------------------------")
-        // console.log(this.name)
-        // console.log(this.vertexShader, shaderDefineOptions, this.vertexShaderModifier, rawVertexShader)
-        // console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, rawFragmentShader)
+        // if (this.showLog) {
+        //     console.log('-------------------------------');
+        //     console.log(this.name);
+        //     console.log(this.vertexShader, shaderDefineOptions, this.vertexShaderModifier, this.rawVertexShader);
+        //     console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, this.rawFragmentShader);
+        // }
 
         this.shader = new Shader({
             gpu,
             // vertexShader: this.vertexShader,
-            vertexShader: rawVertexShader,
+            vertexShader: this.rawVertexShader,
             // fragmentShader: this.fragmentShader
-            fragmentShader: rawFragmentShader,
+            fragmentShader: this.rawFragmentShader,
         });
     }
 }

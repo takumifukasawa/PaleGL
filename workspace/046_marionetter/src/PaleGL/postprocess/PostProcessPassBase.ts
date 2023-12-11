@@ -85,6 +85,8 @@ export class PostProcessPassBase implements IPostProcessPass {
         gpu,
         vertexShader,
         fragmentShader,
+        rawVertexShader,
+        rawFragmentShader,
         uniforms = [],
         useEnvMap = false,
         receiveShadow = false,
@@ -93,7 +95,9 @@ export class PostProcessPassBase implements IPostProcessPass {
     }: {
         gpu: GPU;
         vertexShader?: string;
-        fragmentShader: string;
+        fragmentShader?: string;
+        rawVertexShader?: string;
+        rawFragmentShader?: string;
         uniforms?: UniformsData;
         useEnvMap?: boolean;
         receiveShadow?: boolean;
@@ -110,8 +114,11 @@ export class PostProcessPassBase implements IPostProcessPass {
         this.geometry = new PlaneGeometry({ gpu });
         this.material = new Material({
             // gpu,
+            name,
             vertexShader,
             fragmentShader,
+            rawVertexShader,
+            rawFragmentShader,
             uniforms: [
                 ...uniforms,
                 ...PostProcessPassBase.commonUniforms,
