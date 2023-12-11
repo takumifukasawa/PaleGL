@@ -43,8 +43,8 @@ import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
-import {wait} from "@/utilities/wait.ts";
-import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry.ts";
+import { wait } from '@/utilities/wait.ts';
+import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
@@ -250,10 +250,10 @@ const appendTrackCube = () => {
     const mesh = new Mesh({
         geometry,
         material,
-        castShadow: true
+        castShadow: true,
     });
     captureScene.add(mesh);
-}
+};
 
 function createFloorPlaneMesh() {
     const floorGeometry = new PlaneGeometry({
@@ -299,7 +299,7 @@ function createFloorPlaneMesh() {
         material: new GBufferMaterial({
             // diffuseMap: floorDiffuseMap,
             // normalMap: floorNormalMap,
-            diffuseColor: new Color(.4, .4, .5, 1),
+            diffuseColor: new Color(0.4, 0.4, 0.5, 1),
             receiveShadow: true,
             metallic: 0.5,
             roughness: 0.5,
@@ -318,7 +318,7 @@ const main = async () => {
     createSound();
     // createMarionetter();
     appendTrackCube();
-    
+
     await wait(0);
 
     floorPlaneMesh = createFloorPlaneMesh();
