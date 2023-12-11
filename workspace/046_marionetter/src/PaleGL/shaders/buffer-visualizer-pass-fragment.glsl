@@ -21,7 +21,8 @@ uniform float uFarClip;
 uniform float uShowGBuffer;
 uniform mat4 uInverseViewProjectionMatrix;
 
-#pragma DEPTH_FUNCTIONS
+// #pragma DEPTH_FUNCTIONS
+#include ./partial/depth-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
 
@@ -33,6 +34,7 @@ int bitShift(int data, int order) {
     return data >> order;
 }
 
+#define MINIFY
 void main() {
     vec2 tiling = vec2(4.);
     // row: 0

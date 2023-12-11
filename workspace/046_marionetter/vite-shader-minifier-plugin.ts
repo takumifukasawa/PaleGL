@@ -23,7 +23,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { rimraf } from 'rimraf';
 import { wait } from './node-libs/wait';
-import {readFileAysnc,createDirectoryAsync,writeFileAsync} from './node-libs/file-io';
+import { readFileAysnc, createDirectoryAsync, writeFileAsync } from './node-libs/file-io';
 
 export interface ShaderMinifierOptions {
     hlsl?: boolean;
@@ -86,7 +86,6 @@ export interface ShaderMinifierPluginOptions {
     minifierOptions: ShaderMinifierOptions;
 }
 
-
 export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({ minify, minifierOptions }) => {
     return {
         name: 'shader-minifier',
@@ -128,12 +127,13 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // TODO: devとprodで改行文字の入り方が違う？確認
                 shaderContent = shaderContent.replaceAll('\\n', '\n');
                 shaderContent = shaderContent.replaceAll('\\r', '\n');
-                
-                const entryPointRegex = /void main\(/;
+
+                // const entryPointRegex = /void main\(/;
+                const entryPointRegex = /#define MINIFY\nvoid main\(/;
                 const isEntryPoint = entryPointRegex.test(shaderContent);
-                
-                if(!isEntryPoint) {
-                    console.log(`\nskip minify: ${id}\n`);
+
+                if (!isEntryPoint) {
+                    console.log(`\nskip minify: ${id}`);
                     return src;
                 }
 
@@ -146,7 +146,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     .digest('hex')
                     .slice(0, hashSliceNum);
                 await wait(ioInterval);
-                
+
                 // minify格納ディレクトリのhashを作成
                 const hashTransformed = crypto
                     .createHash('sha512')
@@ -163,7 +163,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // シェーダーをコピーするディレクトリを作成
                 await createDirectoryAsync(tmpHashOriginalSrcDirPath);
                 await wait(ioInterval);
-               
+
                 // シェーダーをminifyするディレクトリを作成
                 await createDirectoryAsync(tmpHashTransformedDirPath);
                 await wait(ioInterval);
@@ -185,7 +185,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     throw new Error(`[shaderMinifierPlugin] shader_minifier.exe failed: ${error}`);
                 });
                 console.log(`success shader_minifier.exe: ${name}`);
-                
+
                 // minifyしたシェーダーを読み込む
                 const minifiedContent = await readFileAysnc(tmpTransformedFilePath);
                 await wait(ioInterval);
@@ -193,7 +193,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // シェーダーをコピーしたディレクトリを削除
                 await rimraf(tmpHashOriginalSrcDirPath);
                 await wait(ioInterval);
-               
+
                 // minifyしたシェーダーのディレクトリを削除
                 await rimraf(tmpHashTransformedDirPath);
                 await wait(ioInterval);
