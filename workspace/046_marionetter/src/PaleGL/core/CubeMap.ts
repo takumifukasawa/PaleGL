@@ -63,7 +63,8 @@ export class CubeMap extends GLObject {
         gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, negYImage);
         gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, posZImage);
         gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, negZImage);
-        
+
+        // tmp
         // Object.keys(images).forEach((key) => {
         //     const keyIndex = key as unknown as CubeMapAxis;
         //     let axis = null;
