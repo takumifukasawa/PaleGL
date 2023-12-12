@@ -128,8 +128,8 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 shaderContent = shaderContent.replaceAll('\\n', '\n');
                 shaderContent = shaderContent.replaceAll('\\r', '\n');
 
-                // const entryPointRegex = /void main\(/;
-                const entryPointRegex = /#define MINIFY\nvoid main\(/;
+                const entryPointRegex = /void main\(/;
+                // const entryPointRegex = /#define MINIFY\nvoid main\(/;
                 const isEntryPoint = entryPointRegex.test(shaderContent);
 
                 if (!isEntryPoint) {
