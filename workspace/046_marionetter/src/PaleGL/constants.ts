@@ -1,99 +1,100 @@
 ﻿// -----------------------------------------------------------------------------
 // engine
+// TODO: const assertion の連番、自動で作ることはできない？ union型でいい感じにするしかない？
 // TODO: ビルド最適化のために一個一個exportする
 // -----------------------------------------------------------------------------
 
 export const PrimitiveTypes = {
-    Points: 'Points',
-    Lines: 'Lines',
-    LineLoop: 'LineLoop',
-    LineStrip: 'LineStrip',
-    Triangles: 'Triangles',
-    TriangleStrip: 'TriangleStrip',
-    TriangleFan: 'TriangleFan',
+    Points: 0,
+    Lines: 1,
+    LineLoop: 2,
+    LineStrip: 3,
+    Triangles: 4,
+    TriangleStrip: 5,
+    TriangleFan: 6,
 } as const;
 
 export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
 
 export const DepthFuncTypes = {
-    Lequal: 'LEQUAL',
-    Equal: 'EQUAL',
+    Lequal: 0,
+    Equal: 1,
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
 
 export const BlendTypes = {
-    Opaque: 'Opaque',
-    Transparent: 'Transparent',
-    Additive: 'Additive',
+    Opaque: 0,
+    Transparent: 1,
+    Additive: 2,
 } as const;
 
 export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
 
 export const RenderQueueType = {
     // TransformFeedback: 'TransformFeedback',
-    Skybox: 'Skybox',
-    Opaque: 'Opaque',
-    AlphaTest: 'AlphaTest',
-    Transparent: 'Transparent',
+    Skybox: "s",
+    Opaque: "o",
+    AlphaTest: "a",
+    Transparent: "t",
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
 
 export const RenderQueues = {
-    [RenderQueueType.Skybox]: 1,
-    [RenderQueueType.Opaque]: 2,
-    [RenderQueueType.AlphaTest]: 3,
-    [RenderQueueType.Transparent]: 4,
+    [RenderQueueType.Skybox]: 0,
+    [RenderQueueType.Opaque]: 1,
+    [RenderQueueType.AlphaTest]: 2,
+    [RenderQueueType.Transparent]: 3,
 } as const;
 
 export type RenderQueue = (typeof RenderQueues)[keyof typeof RenderQueues];
 
 export const RenderbufferTypes = {
-    Depth: 'Depth',
+    Depth: 0,
 } as const;
 
 export type RenderbufferType = (typeof RenderbufferTypes)[keyof typeof RenderbufferTypes];
 
 export const LightTypes = {
-    Directional: 'Directional',
+    Directional: 0,
 } as const;
 
 export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 
 export const ActorTypes = {
-    Null: 'Null',
-    Mesh: 'Mesh',
-    SkinnedMesh: 'SkinnedMesh',
-    Light: 'Light',
-    Skybox: 'Skybox',
-    Camera: 'Camera',
+    Null: 0,
+    Mesh: 1,
+    SkinnedMesh: 2,
+    Light: 3,
+    Skybox: 4,
+    Camera: 5,
 } as const;
 
 export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
 
 export const CameraTypes = {
-    Perspective: 'Perspective',
-    Orthographic: 'Orthographic',
+    Perspective: 0,
+    Orthographic: 1,
 } as const;
 
 export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
 
 export const CubeMapAxis = {
-    PositiveX: 'PositiveX',
-    NegativeX: 'NegativeX',
-    PositiveY: 'PositiveY',
-    NegativeY: 'NegativeY',
-    PositiveZ: 'PositiveZ',
-    NegativeZ: 'NegativeZ',
+    PositiveX: 0,
+    NegativeX: 1,
+    PositiveY: 2,
+    NegativeY: 3,
+    PositiveZ: 4,
+    NegativeZ: 5,
 } as const;
 
 export type CubeMapAxis = (typeof CubeMapAxis)[keyof typeof CubeMapAxis];
 
 export const FaceSide = {
-    Front: 'Front',
-    Back: 'Back',
-    Double: 'Double',
+    Front: 0,
+    Back: 1,
+    Double: 2,
 } as const;
 
 export type FaceSide = (typeof FaceSide)[keyof typeof FaceSide];
@@ -109,30 +110,30 @@ export type FaceSide = (typeof FaceSide)[keyof typeof FaceSide];
 // -----------------------------------------------------------------------------
 
 export const TextureTypes = {
-    RGBA: 'RGBA',
-    Depth: 'Depth',
-    RGBA16F: 'RGBA16F',
-    RGBA32F: 'RGBA32F',
-    R11F_G11F_B10F: 'R11F_G11F_B10F',
-    R16F: 'R16F',
+    RGBA: 0,
+    Depth: 1,
+    RGBA16F: 2,
+    RGBA32F: 3,
+    R11F_G11F_B10F: 4,
+    R16F: 5,
 } as const;
 
 export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
 
 export const TextureWrapTypes = {
-    Repeat: 'Repeat',
-    ClampToEdge: 'ClampToEdge',
+    Repeat: 0,
+    ClampToEdge: 1,
 } as const;
 
 export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
 
 export const TextureFilterTypes = {
-    Nearest: 'Nearest', // min, mag
-    Linear: 'Linear', // min, mag
-    NearestMipmapNearest: 'NearestMipmapNearest', // only min filter
-    NearestMipmapLinear: 'NearestMipmapLinear', // only min filter,
-    LinearMipmapNearest: 'LinearMipmapNearest', // only min filter
-    LinearMipmapLinear: 'LinearMipmapLinear', // only min filter
+    Nearest: 0, // min, mag
+    Linear: 1, // min, mag
+    NearestMipmapNearest: 2, // only min filter
+    NearestMipmapLinear: 3, // only min filter,
+    LinearMipmapNearest: 4, // only min filter
+    LinearMipmapLinear: 5, // only min filter
 } as const;
 
 export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
@@ -142,12 +143,12 @@ export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof Texture
 // -----------------------------------------------------------------------------
 
 export const RenderTargetTypes = {
-    RGBA: 'RGBA',
-    Depth: 'Depth',
-    Empty: 'Empty',
-    RGBA16F: 'RGBA16F',
-    R11F_G11F_B10F: 'R11F_G11F_B10F',
-    R16F: 'R16F',
+    RGBA: 0,
+    Depth: 1,
+    Empty: 2,
+    RGBA16F: 3,
+    R11F_G11F_B10F: 4,
+    R16F: 5,
 } as const;
 
 export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTargetTypes];
@@ -157,8 +158,8 @@ export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTar
 // -----------------------------------------------------------------------------
 
 export const AnimationKeyframeTypes = {
-    Vector3: 'Vector3',
-    Quaternion: 'Quaternion',
+    Vector3: 0,
+    Quaternion: 1,
 } as const;
 
 export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof AnimationKeyframeTypes];
@@ -169,9 +170,9 @@ export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof
 
 // TODO: rename Type"s"
 export const AttributeUsageType = {
-    StaticDraw: 'StaticDraw',
-    DynamicDraw: 'DynamicDraw',
-    DynamicCopy: 'DynamicCopy',
+    StaticDraw: 0,
+    DynamicDraw: 1,
+    DynamicCopy: 2,
 } as const;
 
 export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
@@ -202,24 +203,24 @@ export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames]
 // -----------------------------------------------------------------------------
 
 export const UniformTypes = {
-    Matrix4: 'Matrix4',
-    Matrix4Array: 'Matrix4Array',
-    Texture: 'Texture',
-    CubeMap: 'CubeMap',
-    Vector2: 'Vector2',
-    Vector2Array: 'Vector2Array',
-    Vector3: 'Vector3',
-    Vector4: 'Vector4',
-    Vector4Array: 'Vector4Array',
-    Struct: 'Struct',
-    Float: 'Float',
-    FloatArray: 'FloatArray',
-    Int: 'Int',
-    Color: 'Color',
-    ColorArray: 'ColorArray',
+    Matrix4: 0,
+    Matrix4Array: 1,
+    Texture: 2,
+    CubeMap: 3,
+    Vector2: 4,
+    Vector2Array: 5,
+    Vector3: 6,
+    Vector4: 7,
+    Vector4Array: 8,
+    Struct: 9,
+    Float: 10,
+    FloatArray: 11,
+    Int: 12,
+    Color: 13,
+    ColorArray: 14,
 } as const;
 
-export type UniformType = (typeof UniformTypes)[keyof typeof UniformTypes];
+export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
 
 // TODO: Texture -> Map にしたい？
 // TODO: objectじゃなくて単体のconst_stringにするべき
@@ -236,7 +237,7 @@ export const UniformNames = {
     InverseViewProjectionMatrix: 'uInverseViewProjectionMatrix',
     InverseProjectionMatrix: 'uInverseProjectionMatrix',
     TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
-    ViewDirectionProjectionInverse: "uViewDirectionProjectionInverse",
+    ViewDirectionProjectionInverse: 'uViewDirectionProjectionInverse',
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',
@@ -253,7 +254,7 @@ export const UniformNames = {
     JointTexture: 'uJointTexture',
     BoneCount: 'uBoneCount',
     JointTextureColNum: 'uJointTextureColNum',
-    TotalFrameCount: "uTotalFrameCount", // TODO: 名前変えたい
+    TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
     // shadow map
     ShadowMap: 'uShadowMap',
     ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
@@ -269,12 +270,12 @@ export const UniformNames = {
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',
     // cubemap
-    CubeTexture: "uCubeTexture",
+    CubeTexture: 'uCubeTexture',
     // light
     DirectionalLight: 'uDirectionalLight',
     // skybox
     Skybox: 'uSkybox',
-    RotationOffset: "uRotationOffset", // TODO: 名前変えたい
+    RotationOffset: 'uRotationOffset', // TODO: 名前変えたい
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];

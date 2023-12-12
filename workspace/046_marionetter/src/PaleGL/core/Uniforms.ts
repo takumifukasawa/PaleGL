@@ -1,4 +1,3 @@
-import {UniformType} from '@/PaleGL/constants.ts';
 import {Vector2} from "@/PaleGL/math/Vector2.ts";
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
 import {Vector4} from "@/PaleGL/math/Vector4.ts";
@@ -7,9 +6,10 @@ import {Texture} from "@/PaleGL/core/Texture.ts";
 import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
 import {Color} from "@/PaleGL/math/Color.ts";
 import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
+import {UniformTypes} from "@/PaleGL/constants.ts";
 
 type UniformTypeValuePair = {
-    type: UniformType;
+    type: UniformTypes;
     value: UniformValue;
 }
 

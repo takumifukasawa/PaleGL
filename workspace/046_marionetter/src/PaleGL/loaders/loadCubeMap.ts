@@ -13,29 +13,75 @@ import { GPU } from '@/PaleGL/core/GPU';
 //     [CubeMapAxis.NegativeZ]: "xxx.png",
 // };
 
-type CubeMapDirectionImagePaths = {
-    [key in CubeMapAxis]: string;
-};
+// type CubeMapDirectionImagePaths = {
+//     [key in CubeMapAxis]: string;
+// };
 
-export type CubeMapDirectionImages = {
-    [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement;
-};
+// export type CubeMapDirectionImages = {
+//     [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement;
+// };
 
-export function createCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDirectionImages }) {
-    return new CubeMap({
+export function createCubeMap(
+    gpu: GPU,
+    posXImage: HTMLImageElement | HTMLCanvasElement,
+    negXImage: HTMLImageElement | HTMLCanvasElement,
+    posYImage: HTMLImageElement | HTMLCanvasElement,
+    negYImage: HTMLImageElement | HTMLCanvasElement,
+    posZImage: HTMLImageElement | HTMLCanvasElement,
+    negZImage: HTMLImageElement | HTMLCanvasElement
+) {
+    return new CubeMap(
         gpu,
-        images,
-        // axisごとに同じサイズ想定のはず
-        width: images[CubeMapAxis.PositiveX].width,
-        height: images[CubeMapAxis.PositiveX].height,
-    });
+        posXImage.width,
+        posXImage.height,
+        posXImage,
+        negXImage,
+        posYImage,
+        negYImage,
+        posZImage,
+        negZImage
+    );
 }
 
-export async function loadCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDirectionImagePaths }) {
+export async function loadCubeMap(
+    gpu: GPU,
+    posXImage: string,
+    negXImage: string,
+    posYImage: string,
+    negYImage: string,
+    posZImage: string,
+    negZImage: string
+) {
+    const paths = [
+        {
+            axis: CubeMapAxis.PositiveX,
+            path: posXImage,
+        },
+        {
+            axis: CubeMapAxis.NegativeX,
+            path: negXImage,
+        },
+        {
+            axis: CubeMapAxis.PositiveY,
+            path: posYImage,
+        },
+        {
+            axis: CubeMapAxis.NegativeY,
+            path: negYImage,
+        },
+        {
+            axis: CubeMapAxis.PositiveZ,
+            path: posZImage,
+        },
+        {
+            axis: CubeMapAxis.NegativeZ,
+            path: negZImage,
+        },
+    ];
+
     return await Promise.all(
-        Object.keys(images).map(async (key) => {
-            const axis = key as CubeMapAxis;
-            const img = await loadImg(images[axis]);
+        paths.map(async ({ axis, path }) => {
+            const img = await loadImg(path);
             return { axis, img };
         })
     ).then<CubeMap>((result) => {
@@ -49,11 +95,11 @@ export async function loadCubeMap({ gpu, images }: { gpu: GPU; images: CubeMapDi
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const data: CubeMapDirectionImages = {};
-        result.forEach(({ axis, img }) => {
-            data[axis] = img;
-        });
-        return createCubeMap({ gpu, images: data });
+        // const data: CubeMapDirectionImages = {};
+        // result.forEach(({ axis, img }) => {
+        //     data[axis] = img;
+        // });
+        return createCubeMap(gpu, ...result.map(({ img }) => img));
         // return new CubeMap({
         //     gpu,
         //     images: data,

@@ -2,14 +2,12 @@
     AttributeUsageType,
     BlendType,
     BlendTypes,
-    CubeMapAxis,
     DepthFuncType,
     DepthFuncTypes,
     FaceSide,
     PrimitiveType,
     PrimitiveTypes,
     TextureWrapTypes,
-    UniformType,
     UniformTypes,
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/Texture';
@@ -24,8 +22,8 @@ import { Color } from '@/PaleGL/math/Color';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
-import { createCubeMap, CubeMapDirectionImages } from '@/PaleGL/loaders/loadCubeMap.ts';
-import {Uniforms, UniformStructValue, UniformValue} from '@/PaleGL/core/Uniforms.ts';
+import { createCubeMap } from '@/PaleGL/loaders/loadCubeMap.ts';
+import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/core/Uniforms.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
@@ -77,15 +75,15 @@ export class GPU {
             wrapT: TextureWrapTypes.Repeat,
         });
 
-        const images: CubeMapDirectionImages = {
-            [CubeMapAxis.PositiveX]: create1x1(),
-            [CubeMapAxis.NegativeX]: create1x1(),
-            [CubeMapAxis.PositiveY]: create1x1(),
-            [CubeMapAxis.NegativeY]: create1x1(),
-            [CubeMapAxis.PositiveZ]: create1x1(),
-            [CubeMapAxis.NegativeZ]: create1x1(),
-        };
-        this.dummyCubeTexture = createCubeMap({ gpu: this, images });
+        this.dummyCubeTexture = createCubeMap(
+            this,
+            create1x1(),
+            create1x1(),
+            create1x1(),
+            create1x1(),
+            create1x1(),
+            create1x1()
+        );
     }
 
     /**
@@ -261,7 +259,7 @@ export class GPU {
         let activeTextureIndex = 0;
         // let dummyTextureIndex = 0;
 
-        const setUniformValueInternal = (type: UniformType, uniformName: string, value: UniformValue) => {
+        const setUniformValueInternal = (type: UniformTypes, uniformName: string, value: UniformValue) => {
             // for debug
             // console.log("setUniformValueInternal", type, uniformName, value);
 

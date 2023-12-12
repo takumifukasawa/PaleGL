@@ -38,8 +38,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "preserveConstEnums": false,
     // "preserveConstEnums": false,
-    "preserveConstEnums": true,
     "moduleSuffixes": [
       "glsl",
       "shader",

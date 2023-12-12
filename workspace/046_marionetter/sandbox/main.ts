@@ -69,7 +69,6 @@ import {
     TextureWrapTypes,
     TextureFilterTypes,
     BlendTypes,
-    CubeMapAxis,
     RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
@@ -1198,16 +1197,15 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
-    const images = {
-        [CubeMapAxis.PositiveX]: CubeMapPositiveXImgUrl,
-        [CubeMapAxis.NegativeX]: CubeMapNegativeXImgUrl,
-        [CubeMapAxis.PositiveY]: CubeMapPositiveYImgUrl,
-        [CubeMapAxis.NegativeY]: CubeMapNegativeYImgUrl,
-        [CubeMapAxis.PositiveZ]: CubeMapPositiveZImgUrl,
-        [CubeMapAxis.NegativeZ]: CubeMapNegativeZImgUrl,
-    };
-
-    cubeMap = await loadCubeMap({ gpu, images });
+    cubeMap = await loadCubeMap(
+        gpu,
+        CubeMapPositiveXImgUrl,
+        CubeMapNegativeXImgUrl,
+        CubeMapPositiveYImgUrl,
+        CubeMapNegativeYImgUrl,
+        CubeMapPositiveZImgUrl,
+        CubeMapNegativeZImgUrl
+    );
 
     const skyboxMesh = new Skybox({
         gpu,
