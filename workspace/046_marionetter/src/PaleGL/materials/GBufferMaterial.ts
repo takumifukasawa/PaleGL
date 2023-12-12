@@ -180,6 +180,7 @@ export class GBufferMaterial extends Material {
             depthTest: true,
             depthWrite: false,
             depthFuncType: DepthFuncTypes.Equal,
+            // showLog: true
         });
     }
 

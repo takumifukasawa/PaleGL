@@ -73,7 +73,6 @@ import {
     RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
-    VertexShaderModifierPragmas,
     UniformNames,
     FaceSide,
 } from '@/PaleGL/constants';
@@ -1110,13 +1109,9 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         isSkinning: true,
         gpuSkinning: true,
         isInstancing: true,
+        useInstanceLookDirection: true,
         useVertexColor: true,
         faceSide: FaceSide.Double,
-        vertexShaderModifier: {
-            [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
-                instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
-            `,
-        },
     });
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);

@@ -78,12 +78,15 @@ export type MaterialArgs = {
 
     // instancing
     isInstancing?: boolean;
+    useInstanceLookDirection?: boolean;
 
     // vertex color
     useVertexColor?: boolean;
 
     queue?: RenderQueue;
     depthUniforms?: UniformsData;
+
+    showLog?: boolean;
 };
 
 // export type UniformStructValue = {
@@ -117,12 +120,14 @@ export type VertexShaderGenerator = ({
     jointNum,
     gpuSkinning,
     isInstancing,
+    useInstanceLookDirection,
 }: {
     attributeDescriptors: AttributeDescriptor[];
     isSkinning: boolean;
     jointNum: number | null;
     gpuSkinning: boolean | null;
     isInstancing: boolean;
+    useInstanceLookDirection: boolean;
 }) => string;
 
 export type FragmentShaderGenerator = ({
@@ -177,6 +182,7 @@ export class Material {
 
     // instancing
     isInstancing: boolean;
+    useInstanceLookDirection: boolean;
 
     // vertex color
     useVertexColor: boolean;
@@ -189,6 +195,8 @@ export class Material {
     rawFragmentShader: string | null = null;
 
     rawDepthFragmentShader: string | null = null;
+
+    showLog: boolean;
 
     private vertexShaderGenerator: VertexShaderGenerator | null = null;
     private fragmentShaderGenerator: FragmentShaderGenerator | null = null;
@@ -278,6 +286,7 @@ export class Material {
 
         // instancing
         isInstancing = false,
+        useInstanceLookDirection = false,
 
         // vertex color
         useVertexColor = false,
@@ -288,8 +297,9 @@ export class Material {
         queue,
         uniforms = [],
         depthUniforms = [], // uniforms = {},
-    } // depthUniforms = {},
-    : MaterialArgs) {
+
+        showLog = false, // depthUniforms = {},
+    }: MaterialArgs) {
         this.name = name || '';
 
         // 外側から任意のタイミングでcompileした方が都合が良さそう
@@ -366,6 +376,7 @@ export class Material {
         this.jointNum = typeof jointNum == 'number' ? jointNum : null;
 
         this.isInstancing = !!isInstancing;
+        this.useInstanceLookDirection = !!useInstanceLookDirection;
         this.useVertexColor = !!useVertexColor;
 
         // normal map
@@ -447,6 +458,8 @@ export class Material {
         this.uniforms = new Uniforms(commonUniforms, shadowUniforms, uniforms);
 
         this.depthUniforms = new Uniforms(commonUniforms, depthUniforms);
+
+        this.showLog = showLog;
     }
 
     // createDepthMaterial() {
@@ -475,6 +488,7 @@ export class Material {
             useVertexColor: !!this.useVertexColor,
             isInstancing: !!this.isInstancing,
             useAlphaTest: !!this.alphaTest,
+            useInstanceLookDirection: !!this.useInstanceLookDirection,
         };
 
         if (!this.rawVertexShader) {
@@ -485,6 +499,7 @@ export class Material {
                     jointNum: this.jointNum,
                     gpuSkinning: this.gpuSkinning,
                     isInstancing: this.isInstancing,
+                    useInstanceLookDirection: this.useInstanceLookDirection,
                 });
             }
             const rawVertexShader = buildVertexShader(
@@ -511,12 +526,12 @@ export class Material {
         }
 
         // for debug
-        // if (this.showLog) {
-        //     console.log('-------------------------------');
-        //     console.log(this.name);
-        //     console.log(this.vertexShader, shaderDefineOptions, this.vertexShaderModifier, this.rawVertexShader);
-        //     console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, this.rawFragmentShader);
-        // }
+        if (this.showLog) {
+            console.log('-------------------------------');
+            // console.log(this.name);
+            console.log(this.vertexShader, shaderDefineOptions, this.vertexShaderModifier, this.rawVertexShader);
+            // console.log(this.fragmentShader, shaderDefineOptions, this.fragmentShaderModifier, this.rawFragmentShader);
+        }
 
         this.shader = new Shader({
             gpu,

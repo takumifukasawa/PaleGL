@@ -32,7 +32,9 @@ uniform float uOcclusionPower;
 uniform float uOcclusionStrength;
 uniform float uBlendRate;
 
-#pragma DEPTH_FUNCTIONS
+// #pragma DEPTH_FUNCTIONS
+#include ./partial/depth-functions.glsl
+
 
 mat2 getRotationMatrix(float rad) {
     float c = cos(rad);

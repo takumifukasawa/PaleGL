@@ -116,6 +116,7 @@ mat4 getLookAtMat(vec3 lookAt, vec3 p) {
     );
 }
 
+#define MINIFY
 void main() {
 
     #pragma BEGIN_MAIN
@@ -141,6 +142,11 @@ void main() {
         instanceRotationY *
         instanceRotationX *
         instanceRotationZ;
+    
+// instanceごとのvelocityが必要なことに注意
+#ifdef USE_INSTANCE_LOOK_DIRECTION
+    instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+#endif
 
     #pragma INSTANCE_TRANSFORM_PRE_PROCESS
 
@@ -154,18 +160,21 @@ void main() {
     vWorldPosition = worldPosition.xyz;
 
     #include ./partial/receive-shadow-uv-calc.glsl
+    
+// NOTE: shader minify の時に p * v * w を直接入れないとなぜか掛ける順番がおかしくなる
+//     vec4 viewPosition = uViewMatrix * worldPosition;
+//  
+//     #pragma VIEW_POSITION_POST_PROCESS
+//  
+//     #pragma OUT_CLIP_POSITION_PRE_PROCESS
+//     
+//     gl_Position = uProjectionMatrix * viewPosition;
 
-    vec4 viewPosition = uViewMatrix * worldPosition;
-
-    #pragma VIEW_POSITION_POST_PROCESS
-
-    #pragma OUT_CLIP_POSITION_PRE_PROCESS
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
     
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     vVertexColor = aInstanceVertexColor;
 #endif
- 
-    gl_Position = uProjectionMatrix * viewPosition;
 
     #pragma END_MAIN
 }

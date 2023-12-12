@@ -30,6 +30,7 @@ export type ShaderDefines = {
     useVertexColor: boolean;
     useAlphaTest: boolean;
     isInstancing: boolean;
+    useInstanceLookDirection: boolean;
 };
 
 const insertShaderPairs: {
@@ -59,10 +60,11 @@ const buildShaderDefines = ({
     gpuSkinning,
     useNormalMap,
     useEnvMap,
-    useReceiveShadow,
+    // useReceiveShadow,
     useVertexColor,
     useAlphaTest,
     isInstancing,
+    useInstanceLookDirection
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -81,9 +83,9 @@ const buildShaderDefines = ({
     if(useEnvMap) {
         arr.push('#define USE_ENV_MAP');
     }
-    if (useReceiveShadow) {
-        arr.push('#define USE_RECEIVE_SHADOW');
-    }
+    // if (useReceiveShadow) {
+    //     arr.push('#define USE_RECEIVE_SHADOW');
+    // }
     if (useVertexColor) {
         arr.push('#define USE_VERTEX_COLOR');
     }
@@ -92,6 +94,9 @@ const buildShaderDefines = ({
     }
     if (isInstancing) {
         arr.push('#define USE_INSTANCING');
+    }
+    if(useInstanceLookDirection) {
+        arr.push('#define USE_INSTANCE_LOOK_DIRECTION');
     }
 
     return arr;

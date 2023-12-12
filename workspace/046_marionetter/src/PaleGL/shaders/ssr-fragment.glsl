@@ -41,7 +41,8 @@ uniform float uReflectionScreenEdgeFadeFactorMaxY;
 
 uniform float uReflectionAdditionalRate;
 
-#pragma DEPTH_FUNCTIONS
+// #pragma DEPTH_FUNCTIONS
+#include ./partial/depth-functions.glsl
 
 // https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
 float noise(vec2 seed)

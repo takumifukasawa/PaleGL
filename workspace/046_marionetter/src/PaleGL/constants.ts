@@ -262,7 +262,7 @@ export const UniformNames = {
     SrcTexture: 'uSrcTexture',
     // time
     Time: 'uTime',
-    // usualily post process
+    // usualy post process
     TargetWidth: 'uTargetWidth',
     TargetHeight: 'uTargetHeight',
     // camera
