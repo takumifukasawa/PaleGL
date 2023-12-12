@@ -34,7 +34,6 @@ int bitShift(int data, int order) {
     return data >> order;
 }
 
-#define MINIFY
 void main() {
     vec2 tiling = vec2(4.);
     // row: 0
