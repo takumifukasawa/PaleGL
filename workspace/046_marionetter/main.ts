@@ -37,7 +37,7 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import sceneJsonUrl from "./data/scene.json";
+import sceneJsonUrl from './assets/data/scene.json';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
 import { Camera } from '@/PaleGL/actors/Camera';
@@ -49,7 +49,7 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-import {createAnimationTrackBinder} from "@/Marionetter/createTrackBinder.ts";
+import { createAnimationTrackBinder } from '@/Marionetter/createTrackBinder.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
@@ -323,15 +323,23 @@ function createFloorPlaneMesh() {
 }
 
 const fetchAndParseScene = async () => {
+    console.log('hogehoge');
     await wait(10);
+    const { name } = sceneJsonUrl;
+    console.log(name);
     console.log(sceneJsonUrl);
+    console.log(sceneJsonUrl.name);
+    console.log(sceneJsonUrl.objects);
     // const response = await fetch(sceneJsonUrl);
     createAnimationTrackBinder([], 0);
-}
+    console.log('fugafuga');
+};
 
 const main = async () => {
-    await fetchAndParseScene()
-    
+    await fetchAndParseScene();
+
+    console.log('hogahoga');
+
     createSound();
     // createMarionetter();
     appendTrackCube();

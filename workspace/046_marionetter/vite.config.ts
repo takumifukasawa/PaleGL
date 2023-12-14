@@ -127,14 +127,15 @@ export default defineConfig(({ mode}) => {
                 // keep_fnames: true,
                 mangle: {
                     toplevel: true,
-                    properties: isMangleProperties,
+                    properties: isMangleProperties, // TODO: 出し分けできてないかも
+                    // WIP
                     // properties: {
                     //     regex: /^_/
                     //     // regex: /^(Hoge)$/
                     // }
                 },
                 compress: {
-                    drop_console: true,
+                    drop_console: false,
                     drop_debugger: true,
                 },
             },

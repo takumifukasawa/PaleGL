@@ -1,21 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    // "useDefineForClassFields": true,
+    "target": "ESNext",
     "useDefineForClassFields": false,
     "module": "ESNext",
     "lib": [
-      "ES2022",
-      "DOM",
-      // "DOM.Iterable"
+      "ESNext",
+      "DOM"
     ],
-   
     // // write .d.ts files
     // "rootDir": "./src",
     // "outDir": "types",
     // "declaration": true,
     // "emitDeclarationOnly": true,
-   
+
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
@@ -26,10 +23,9 @@
     "types": [
       "node",
       "vite-plugin-glsl/ext"
-      // "vite/client",
     ],
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     // "isolatedModules": true,
@@ -40,7 +36,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "preserveConstEnums": false,
-    // "preserveConstEnums": false,
     "moduleSuffixes": [
       "glsl",
       "shader",
