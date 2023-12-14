@@ -35,6 +35,10 @@ import {
     // TextureFilterTypes, TextureWrapTypes,
 } from '@/PaleGL/constants';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import sceneJsonUrl from "./data/scene.json";
+
 import { DebuggerGUI } from '@/DebuggerGUI';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
@@ -45,8 +49,12 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
+import {createAnimationTrackBinder} from "@/Marionetter/createTrackBinder.ts";
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
+
+// import { hoge } from '@/externals/test.js';
+// console.log(hoge());
 
 const stylesText = `
 :root {
@@ -314,7 +322,16 @@ function createFloorPlaneMesh() {
     return floorPlaneMesh;
 }
 
+const fetchAndParseScene = async () => {
+    await wait(10);
+    console.log(sceneJsonUrl);
+    // const response = await fetch(sceneJsonUrl);
+    createAnimationTrackBinder([], 0);
+}
+
 const main = async () => {
+    await fetchAndParseScene()
+    
     createSound();
     // createMarionetter();
     appendTrackCube();

@@ -64,12 +64,12 @@ export default defineConfig(({ mode}) => {
     const isBundle = env.VITE_BUNDLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true';
-    
-    console.log("=== env ===");
+   
+    console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
-    console.log("===========");
+    console.log("===========================");
     
     return {
         base: './',

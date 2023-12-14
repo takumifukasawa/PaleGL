@@ -2,7 +2,7 @@ import { CurveKeyframe, curveUtilityEvaluateCurve } from '@/Marionetter/curveUti
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 
-// TODO: 短縮系を渡すようにした
+// TODO: 短縮系を渡すようにしたい
 const PROPERTY_LOCAL_POSITION_X = 'm_LocalPosition.x';
 const PROPERTY_LOCAL_POSITION_Y = 'm_LocalPosition.y';
 const PROPERTY_LOCAL_POSITION_Z = 'm_LocalPosition.z';
