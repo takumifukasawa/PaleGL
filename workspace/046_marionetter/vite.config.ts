@@ -58,19 +58,19 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
 // https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
-export default defineConfig(({ mode}) => {
+export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd());
 
     const isBundle = env.VITE_BUNDLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true';
-   
+
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
-    console.log("===========================");
-    
+    console.log('===========================');
+
     return {
         base: './',
         plugins: [
@@ -146,5 +146,5 @@ export default defineConfig(({ mode}) => {
                 interval: 2000,
             },
         },
-    }
+    };
 });
