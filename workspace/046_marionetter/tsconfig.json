@@ -22,6 +22,7 @@
     },
     "types": [
       "node",
+      "vite/client",
       "vite-plugin-glsl/ext"
     ],
     /* Bundler mode */
