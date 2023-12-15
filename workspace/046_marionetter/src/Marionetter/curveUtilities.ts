@@ -41,7 +41,7 @@ function curveUtilityEvaluateRaw(t: number, k0: CurveKeyframe, k1: CurveKeyframe
 function curveUtilityEvaluate(t: number, k0: CurveKeyframe, k1: CurveKeyframe) {
     // const rt = Mathf.InverseLerp(k0.time, k1.time, t);
     const rt = (t - k0.time) / (k1.time - k0.time);
-    curveUtilityEvaluateRaw(rt, k0, k1);
+    return curveUtilityEvaluateRaw(rt, k0, k1);
 }
 
 /**
@@ -79,7 +79,7 @@ export function curveUtilityEvaluateCurve(t: number, keys: CurveKeyframe[]) {
             // for debug
             //Debug.Log($"time: {t}, k0.time: {k0.time}");
             //Debug.Log($"{i} -> {i + 1}");
-            curveUtilityEvaluate(t, k0, k1);
+            return curveUtilityEvaluate(t, k0, k1);
         }
     }
 

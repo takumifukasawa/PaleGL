@@ -49,7 +49,11 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-import { createAnimationTrackBinder } from '@/Marionetter/createTrackBinder.ts';
+import {
+    createAnimationTrackBinder,
+    MarionetterPlayableDirectorComponentInfo,
+    MarionetterScene,
+} from '@/Marionetter/createTrackBinder.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
@@ -251,7 +255,8 @@ const createSound = () => {
 //     console.log("marionetter", marionetter);
 // };
 
-//
+let centralCube: Mesh | null = null;
+
 const appendTrackCube = () => {
     const geometry = new BoxGeometry({ gpu });
     const material = new GBufferMaterial({});
@@ -261,6 +266,7 @@ const appendTrackCube = () => {
         castShadow: true,
     });
     captureScene.add(mesh);
+    centralCube = mesh;
 };
 
 function createFloorPlaneMesh() {
@@ -322,23 +328,16 @@ function createFloorPlaneMesh() {
     return floorPlaneMesh;
 }
 
+let playableDirector: MarionetterPlayableDirectorComponentInfo | null = null;
+
 const fetchAndParseScene = async () => {
-    console.log('hogehoge');
     await wait(10);
-    const { name } = sceneJsonUrl;
-    console.log(name);
-    console.log(sceneJsonUrl);
-    console.log(sceneJsonUrl.name);
-    console.log(sceneJsonUrl.objects);
-    // const response = await fetch(sceneJsonUrl);
-    createAnimationTrackBinder([], 0);
-    console.log('fugafuga');
+    const sceneJson = sceneJsonUrl as unknown as MarionetterScene;
+    playableDirector = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
 };
 
 const main = async () => {
     await fetchAndParseScene();
-
-    console.log('hogahoga');
 
     createSound();
     // createMarionetter();
@@ -390,6 +389,15 @@ const main = async () => {
     // };
 
     engine.onRender = (time) => {
+
+        if(playableDirector !== null && centralCube !== null) {
+            const tracks = playableDirector.tracks;
+            // const t = 4.99643333332736;
+            const t = time % playableDirector.duration;
+            const trackBinder = createAnimationTrackBinder(tracks[0].animationClips, t, 30);
+            trackBinder?.assignProperty(centralCube);
+        }
+        
         renderer.render(captureScene, captureSceneCamera, { time });
     };
 
@@ -986,6 +994,8 @@ function initDebugger() {
 
     wrapperElement.appendChild(debuggerGUI.domElement);
 }
+
+// console.log(import.meta.env);
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

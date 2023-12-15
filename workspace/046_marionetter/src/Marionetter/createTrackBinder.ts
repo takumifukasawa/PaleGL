@@ -1,4 +1,4 @@
-import { CurveKeyframe, curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
+import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 
@@ -13,13 +13,87 @@ const PROPERTY_LOCAL_SCALE_X = 'm_LocalScale.x';
 const PROPERTY_LOCAL_SCALE_Y = 'm_LocalScale.y';
 const PROPERTY_LOCAL_SCALE_Z = 'm_LocalScale.z';
 
-type AnimationClip = {
-    start: number;
-    duration: number;
-    bindings: {
-        propertyName: string;
-        keyframes: CurveKeyframe[];
-    }[];
+//
+// scene
+//
+
+export type MarionetterScene = {
+    name: string; // shorthand: n
+    objects: MarionetterObjectInfo[]; // shorthand: o
+};
+
+type MarionetterObjectInfo = {
+    name: string; // shorthand: n
+    transform: MarionetterTransformInfo; // shorthand: t
+    components: MarionetterComponentInfoTypes[]; // shorthand: c
+    children: MarionetterObjectInfo[]; // shorthand: o
+};
+
+type MarionetterTransformInfo = {
+    localPosition: Vector3; // shorthand: lp
+    localRotation: Vector3; // shorthand: lr
+    localScale: Vector3; // shorthand: ls
+};
+
+//
+// track
+//
+
+type MarionetterTrack = {
+    animationClips: MarionetterAnimationClipInfoTypes[];
+};
+
+type MarionetterAnimationClipInfoTypes = (MarionetterAnimationClipInfo | MarionetterLightControlClipInfo);
+
+type MarionetterAnimationClipBase = {
+    start: number; // shorthand: s
+    duration: number; // shorthand: d
+    bindings: MarionetterAnimationClipBinding[]; // shorthand: b
+};
+
+type MarionetterAnimationClipInfo = MarionetterAnimationClipBase & {
+    offsetPosition: Vector3; // shorthand: op
+    offsetRotation: Vector3; // shorthand: or
+};
+
+type MarionetterLightControlClipInfo = MarionetterAnimationClipBase; // TODO: 追加が必要なはず
+
+type MarionetterAnimationClipBinding = {
+    propertyName: string; // short hand: n
+    keyframes: MarionetterAnimationClipKeyframe[];
+};
+
+type MarionetterAnimationClipKeyframe = {
+    time: number; // shorthand: t
+    value: number; // shorthand: v
+    inTangent: number; // shorthand: i
+    outTangent: number; // shorthand: o
+}
+
+//
+// components
+//
+
+type MarionetterComponentInfoBase = {
+    type: MarionetterComponentType;
+};
+
+const enum MarionetterComponentType {
+    PlayableDirector = 0,
+    Light = 1,
+}
+
+type MarionetterComponentInfoTypes = (MarionetterPlayableDirectorComponentInfo | MarionetterLightComponentInfo);
+
+export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
+    name: string; // shorthand: n
+    duration: number; // shorthand: d
+    tracks: MarionetterTrack[]; // shorthand: t
+};
+
+type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
+    lightType: string; // shorthand: l
+    color: string; // shorthand: c, hex string
 };
 
 // export function createLightTrackBinder(animationClips: AnimationClip[], time: number) {}
@@ -27,7 +101,7 @@ type AnimationClip = {
 /**
  *
  */
-export function createAnimationTrackBinder(animationClips: AnimationClip[], time: number) {
+export function createAnimationTrackBinder(animationClips: MarionetterAnimationClipInfoTypes[], rawTime: number, fps: number) {
     // ---------------------------------------------------------------------------
     // public
     // ---------------------------------------------------------------------------
@@ -38,17 +112,19 @@ export function createAnimationTrackBinder(animationClips: AnimationClip[], time
     const localPosition: Vector3 = Vector3.zero;
     const localRotationEuler: Vector3 = Vector3.zero;
     const localScale: Vector3 = Vector3.one;
+   
+    const spf = 1 / fps;
+    const frameTime = Math.floor(rawTime / spf) * spf - 1;
 
     // TODO: pre-extrapolate, post-extrapolate
-    // constructor(animationClip, time) {
-    // constructor(animationClips: AnimationClip[], time: number) {
-    // // NOTE: 一個だけ抽出 = animation clip の blend は対応していない
-    const animationClip = animationClips.find((ac) => ac.start <= time && time < ac.start + ac.duration);
+    // NOTE: 一個だけ抽出 = animation clip の blend は対応していない
+    // const animationClip = animationClips.find((ac) => ac.start <= time && time < ac.start + ac.duration);
+    const animationClip = animationClips.find((ac) => ac.start <= frameTime && frameTime < ac.start + ac.duration);
     if (!animationClip) {
         return;
     }
     const { start, bindings } = animationClip;
-    
+
     // TODO: typeがあった方がよい. ex) animation clip, light control clip
     bindings.forEach(({ propertyName, keyframes }) => {
         // Debug.Log(binding.type.FullName);
@@ -59,7 +135,7 @@ export function createAnimationTrackBinder(animationClips: AnimationClip[], time
         // var curve = AnimationUtility.GetEditorCurve(animationClip, binding);
         // for debug
         // Debug.Log(binding.propertyName);
-        const value = curveUtilityEvaluateCurve(time - start, keyframes);
+        const value = curveUtilityEvaluateCurve(frameTime - start, keyframes);
 
         // // animated transform
         // if (binding.type.FullName == typeof(Transform).FullName)
