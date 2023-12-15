@@ -50,7 +50,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import {
-    createAnimationTrackBinder,
+    createMarionetterAnimationTrackBinder,
     MarionetterPlayableDirectorComponentInfo,
     MarionetterScene,
 } from '@/Marionetter/createTrackBinder.ts';
@@ -392,9 +392,9 @@ const main = async () => {
 
         if(playableDirector !== null && centralCube !== null) {
             const tracks = playableDirector.tracks;
-            // const t = 4.99643333332736;
             const t = time % playableDirector.duration;
-            const trackBinder = createAnimationTrackBinder(tracks[0].animationClips, t, 30);
+            // const trackBinder = createMarionetterAnimationTrackBinder(tracks[0].animationClips, t, 30);
+            const trackBinder = createMarionetterAnimationTrackBinder(tracks[0].animationClips, t);
             trackBinder?.assignProperty(centralCube);
         }
         

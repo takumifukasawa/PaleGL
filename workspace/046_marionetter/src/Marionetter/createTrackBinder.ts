@@ -101,7 +101,7 @@ type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
 /**
  *
  */
-export function createAnimationTrackBinder(animationClips: MarionetterAnimationClipInfoTypes[], rawTime: number, fps: number) {
+export function createMarionetterAnimationTrackBinder(animationClips: MarionetterAnimationClipInfoTypes[], rawTime: number) {
     // ---------------------------------------------------------------------------
     // public
     // ---------------------------------------------------------------------------
@@ -113,8 +113,9 @@ export function createAnimationTrackBinder(animationClips: MarionetterAnimationC
     const localRotationEuler: Vector3 = Vector3.zero;
     const localScale: Vector3 = Vector3.one;
    
-    const spf = 1 / fps;
-    const frameTime = Math.floor(rawTime / spf) * spf - 1;
+    // const spf = 1 / fps;
+    // const frameTime = Math.floor(rawTime / spf) * spf;
+    const frameTime = rawTime;
 
     // TODO: pre-extrapolate, post-extrapolate
     // NOTE: 一個だけ抽出 = animation clip の blend は対応していない

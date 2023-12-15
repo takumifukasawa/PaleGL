@@ -23,7 +23,7 @@
       "components": [
         {
           "name": "MainTimeline",
-          "duration": 4.999999999999,
+          "duration": 1.999999999999,
           "tracks": [
             {
               "animationClips": [
@@ -261,247 +261,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "offsetPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "offsetRotation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "start": 4.983333,
-                  "duration": 0.0166666675,
-                  "bindings": [
-                    {
-                      "propertyName": "localEulerAnglesRaw.x",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.98333335,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.z",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.6,
-                          "value": 24.99762,
-                          "inTangent": 56.8809166,
-                          "outTangent": 56.8809166
-                        },
-                        {
-                          "time": 1.33333337,
-                          "value": 75.8412247,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.98333335,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalScale.x",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.5,
-                          "value": 2.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.5,
-                          "value": 2.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.98333335,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalScale.y",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.5,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.5,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.98333335,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalScale.z",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.5,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.0,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.5,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.98333335,
-                          "value": 1.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.y",
-                      "keyframes": [
-                        {
-                          "time": 0.216666669,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.0,
-                          "value": -45.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.x",
-                      "keyframes": [
-                        {
-                          "time": 0.116666667,
-                          "value": 2.68629456,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.816666663,
-                          "value": 1.14391088,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.y",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 4.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.65,
-                          "value": 1.80744934,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.35,
-                          "value": 4.795023,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.z",
-                      "keyframes": [
-                        {
-                          "time": 0.06666667,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    }
-                  ]
                 }
               ]
             },
@@ -509,7 +268,7 @@
               "animationClips": [
                 {
                   "start": 0.0,
-                  "duration": 1.51666665,
+                  "duration": 2.0,
                   "bindings": [
                     {
                       "propertyName": "color.r",
@@ -701,7 +460,7 @@
               ]
             }
           ],
-          "type": 1
+          "type": 0
         }
       ],
       "children": []
@@ -755,16 +514,16 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 2.5820055,
+          "y": 2.38023639,
           "z": 0.0
         },
         "localRotation": {
-          "x": -8.53773656E-07,
-          "y": -42.3027649,
-          "z": 47.9706726
+          "x": 0.0,
+          "y": -40.4795647,
+          "z": 44.52564
         },
         "localScale": {
-          "x": 1.13792586,
+          "x": 1.22552419,
           "y": 1.0,
           "z": 1.0
         }
@@ -838,8 +597,8 @@
       "components": [
         {
           "lightType": "Directional",
-          "color": "6D2092FF",
-          "type": 0
+          "color": "821A7DFF",
+          "type": 1
         }
       ],
       "children": []
