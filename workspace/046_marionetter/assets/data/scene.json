@@ -267,7 +267,7 @@
               ]
             },
             {
-              "targetName": "Directional Light",
+              "targetName": "DirectionalLight",
               "animationClips": [
                 {
                   "type": 1,
@@ -518,21 +518,49 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 4.0,
+          "y": 2.16598082,
           "z": 0.0
         },
         "localRotation": {
-          "x": -30.0000038,
-          "y": -30.0000019,
-          "z": 30.0000019
+          "x": -2.13443414E-07,
+          "y": -12.0944338,
+          "z": 18.2234859
         },
         "localScale": {
-          "x": 1.0,
-          "y": 2.0,
-          "z": 3.0
+          "x": 1.99674082,
+          "y": 1.0,
+          "z": 1.0
         }
       },
       "components": [],
+      "children": []
+    },
+    {
+      "name": "DirectionalLight",
+      "transform": {
+        "localPosition": {
+          "x": 0.0,
+          "y": 3.0,
+          "z": 0.0
+        },
+        "localRotation": {
+          "x": -50.0,
+          "y": -330.0,
+          "z": 0.0
+        },
+        "localScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
+      },
+      "components": [
+        {
+          "lightType": "Directional",
+          "color": "FF0202FF",
+          "type": 1
+        }
+      ],
       "children": []
     },
     {
@@ -577,34 +605,6 @@
         }
       },
       "components": [],
-      "children": []
-    },
-    {
-      "name": "Directional Light",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 3.0,
-          "z": 0.0
-        },
-        "localRotation": {
-          "x": -50.0,
-          "y": -330.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [
-        {
-          "lightType": "Directional",
-          "color": "17E1C8129FF",
-          "type": 1
-        }
-      ],
       "children": []
     },
     {

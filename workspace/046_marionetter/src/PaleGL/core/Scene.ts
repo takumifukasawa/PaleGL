@@ -11,7 +11,7 @@ export class Scene {
     // mainCamera: Camera | null = null; // TODO: findしたい
     // postProcess: PostProcess | null = null // TODO: cameraにもたせてもいいかも
     // skybox: Skybox | null = null; // TODO: findしたい
-    
+
     // constructor(mainCamera: Camera, postProcess: PostProcess) {
     //     this.mainCamera = mainCamera;
     //     this.postProcess = postProcess;
@@ -25,6 +25,10 @@ export class Scene {
         for (let i = 0; i < this.children.length; i++) {
             this.#recursiveTraverseActor(this.children[i].actor, execFunc);
         }
+    }
+
+    find(name: string) {
+        return this.children.find((child) => child.actor.name === name);
     }
 
     #recursiveTraverseActor(actor: Actor, execFunc: TraverseFunc) {

@@ -1,8 +1,9 @@
 import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
-import {Color} from "@/PaleGL/math/Color.ts";
-import {Light} from "@/PaleGL/actors/Light.ts";
+import { Color } from '@/PaleGL/math/Color.ts';
+import { Light } from '@/PaleGL/actors/Light.ts';
+import { Scene } from '@/PaleGL/core/Scene.ts';
 
 // TODO: 短縮系を渡すようにしたい
 const PROPERTY_COLOR_R = 'color.r';
@@ -114,193 +115,180 @@ type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
     color: string; // shorthand: c, hex string
 };
 
-// export function createLightTrackBinder(animationClips: AnimationClip[], time: number) {}
+//
+// timeline
+//
 
-export function createMarionetterTrackBinder(animationClips: MarionetterAnimationClipInfoKinds[], rawTime: number) {
-    // pattern1: use frame
-    // const spf = 1 / fps;
-    // const frameTime = Math.floor(rawTime / spf) * spf;
-    // pattern2: use raw time
-    const frameTime = rawTime;
+export type MarionetterTimeline = {
+    tracks: MarionetterTimelineTrack[];
+    execute: (time: number) => void;
+};
 
-    // TODO: pre-extrapolate, post-extrapolate
-    // NOTE: 一個だけ抽出 = animation clip の blend は対応していない
-    // const animationClip = animationClips.find((ac) => ac.start <= time && time < ac.start + ac.duration);
-    const animationClip = animationClips.find((ac) => ac.start <= frameTime && frameTime < ac.start + ac.duration);
-    if (!animationClip) {
-        return;
+type MarionetterTimelineTrack = {
+    targetName: string;
+    // targetObj: Actor | null;
+    clips: MarionetterAnimationClipKinds[];
+    execute: (time: number) => void;
+};
+
+type MarionetterAnimationClipKinds = MarionetterAnimationClip | MarionetterLightControlClip;
+
+type MarionetterAnimationClip = {
+    type: 'AnimationClip';
+    clipInfo: MarionetterAnimationClipInfo;
+    // bind: (actor: Actor) => void;
+    execute: (actor: Actor, time: number) => void;
+};
+
+type MarionetterLightControlClip = {
+    type: 'LightControlClip';
+    clipInfo: MarionetterLightControlClipInfo;
+    // bind: (light: Light) => void;
+    execute: (actor: Actor, time: number) => void;
+};
+
+/**
+ *
+ * @param marionetterPlayableDirectorComponentInfo
+ */
+export function buildMarionetterTimeline(
+    scene: Scene,
+    marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo
+): MarionetterTimeline {
+    const tracks: MarionetterTimelineTrack[] = [];
+    for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
+        const { targetName, animationClips } = marionetterPlayableDirectorComponentInfo.tracks[i];
+        const transform = scene.find(targetName);
+        const targetActor = transform ? transform.actor : null;
+        const clips = createMarionetterClips(animationClips);
+        const execute = (time: number) => {
+            for (let j = 0; j < clips.length; j++) {
+                if (targetActor != null) {
+                    clips[j].execute(targetActor, time);
+                }
+            }
+        };
+        tracks.push({
+            targetName,
+            clips,
+            execute,
+        });
     }
-    switch (animationClip.type) {
-        case MarionetterAnimationClipInfoType.AnimationClip:
-            return createMarionetterAnimationTrackBinder(animationClip as MarionetterAnimationClipInfo, frameTime);
-        case MarionetterAnimationClipInfoType.LightControlClip:
-            return createmarionetterLightControlTrackBinder(animationClip as MarionetterLightControlClipInfo, frameTime);
-            break;
-    }
+    const execute = (time: number) => {
+        // pattern1: use frame
+        // const spf = 1 / fps;
+        // const frameTime = Math.floor(rawTime / spf) * spf;
+        // pattern2: use raw time
+        const frameTime = time % marionetterPlayableDirectorComponentInfo.duration;
+        for (let i = 0; i < tracks.length; i++) {
+            tracks[i].execute(frameTime);
+        }
+    };
+    const marionetterTimeline: MarionetterTimeline = { tracks, execute };
+    return marionetterTimeline;
 }
 
-type MarionetterLightControlTrack = {
-    type: "LightControlTrack";
-    assignProperty: (light: Light) => void;
-}
+/**
+ *
+ * @param animationClips
+ */
+function createMarionetterClips(animationClips: MarionetterAnimationClipInfoKinds[]): MarionetterAnimationClipKinds[] {
+    const clips = [] as MarionetterAnimationClipKinds[];
 
-function createmarionetterLightControlTrackBinder(lightControlClip: MarionetterLightControlClipInfo, time: number): MarionetterLightControlTrack {
-    let hasPropertyColorR: boolean = false;
-    let hasPropertyColorG: boolean = false;
-    let hasPropertyColorB: boolean = false;
-    let hasPropertyColorA: boolean = false;
-    let hasPropertyIntensity: boolean = false;
-    // let hasPropertyBounceIntensity: boolean = false;
-    // let hasPropertyRange: boolean = false;
-    
-    const color = new Color();
-    let intensity = 0;
-    // let bounceIntensity = 0;
-    // let range = 0;
-    
-    const { start, bindings } = lightControlClip;
-
-    // TODO: typeがあった方がよい. ex) animation clip, light control clip
-    bindings.forEach(({ propertyName, keyframes }) => {
-        const value = curveUtilityEvaluateCurve(time - start, keyframes);
-        
-        switch (propertyName) {
-            case PROPERTY_COLOR_R:
-                hasPropertyColorR = true;
-                color.r = value;
+    for (let i = 0; i < animationClips.length; i++) {
+        const animationClip = animationClips[i];
+        switch (animationClip.type) {
+            case MarionetterAnimationClipInfoType.AnimationClip:
+                clips.push(createMarionetterAnimationClip(animationClip as MarionetterAnimationClipInfo));
                 break;
-            case PROPERTY_COLOR_G:
-                hasPropertyColorG = true;
-                color.g = value;
-                break;
-            case PROPERTY_COLOR_B:
-                hasPropertyColorB = true;
-                color.b = value;
-                break;
-            case PROPERTY_COLOR_A:
-                hasPropertyColorA = true;
-                color.a = value;
-                break;
-            case PROPERTY_INTENSITY:
-                hasPropertyIntensity = true;
-                intensity = value;
-                break;
-            // case PROPERTY_BOUNCE_INTENSITY:
-            //     hasPropertyBounceIntensity = true;
-            //     bounceIntensity = value;
-            //     break;
-            // case PROPERTY_RANGE:
-            //     hasPropertyRange = true;
-            //     range = value;
-            //     break;
-        }
-    });
-    
-    const assignProperty = (obj: Light) => {
-        if(hasPropertyColorR) {
-            obj.color.r = color.r;
-        }
-        if(hasPropertyColorG) {
-            obj.color.g = color.g;
-        }
-        if(hasPropertyColorB) {
-            obj.color.b = color.b;
-        }
-        if(hasPropertyColorA) {
-            obj.color.a = color.a;
-        }
-        if(hasPropertyIntensity) {
-            obj.intensity = intensity;
-        }
-        // if(hasPropertyBounceIntensity) {
-        //     obj.bounceIntensity = bounceIntensity;
-        // }
-        // for spot light
-        // if(hasPropertyRange) {
-        //     obj.range = range;
-        // }
-    }
-    
-    return {
-        type: "LightControlTrack",
-        assignProperty
-    }
-}
-
-type MarionetterAnimationTrack = {
-    type: "AnimationTrack";
-    assignProperty: (actor: Actor) => void;
-}
-
-function createMarionetterAnimationTrackBinder(animationClip: MarionetterAnimationClipInfo, time: number): MarionetterAnimationTrack {
-    let hasLocalPosition: boolean = false;
-    let hasLocalRotationEuler: boolean = false;
-    let hasLocalScale: boolean = false;
-    const localPosition: Vector3 = Vector3.zero;
-    const localRotationEuler: Vector3 = Vector3.zero;
-    const localScale: Vector3 = Vector3.one;
-
-    const { start, bindings } = animationClip;
-
-    // TODO: typeがあった方がよい. ex) animation clip, light control clip
-    bindings.forEach(({ propertyName, keyframes }) => {
-        const value = curveUtilityEvaluateCurve(time - start, keyframes);
-
-        switch (propertyName) {
-            case PROPERTY_LOCAL_POSITION_X:
-                hasLocalPosition = true;
-                localPosition.x = value;
-                break;
-            case PROPERTY_LOCAL_POSITION_Y:
-                hasLocalPosition = true;
-                localPosition.y = value;
-                break;
-            case PROPERTY_LOCAL_POSITION_Z:
-                hasLocalPosition = true;
-                localPosition.z = value;
-                break;
-            case PROPERTY_LOCAL_EULER_ANGLES_RAW_X:
-                hasLocalRotationEuler = true;
-                localRotationEuler.x = value;
-                break;
-            case PROPERTY_LOCAL_EULER_ANGLES_RAW_Y:
-                hasLocalRotationEuler = true;
-                localRotationEuler.y = value;
-                break;
-            case PROPERTY_LOCAL_EULER_ANGLES_RAW_Z:
-                hasLocalRotationEuler = true;
-                localRotationEuler.z = value;
-                break;
-            case PROPERTY_LOCAL_SCALE_X:
-                hasLocalScale = true;
-                localScale.x = value;
-                break;
-            case PROPERTY_LOCAL_SCALE_Y:
-                hasLocalScale = true;
-                localScale.y = value;
-                break;
-            case PROPERTY_LOCAL_SCALE_Z:
-                hasLocalScale = true;
-                localScale.z = value;
+            case MarionetterAnimationClipInfoType.LightControlClip:
+                clips.push(createMarionetterLightControlClip(animationClip as MarionetterLightControlClipInfo));
                 break;
             default:
-                throw new Error(`invalid property: ${propertyName}`);
+                throw new Error(`invalid animation clip type`);
         }
-        // }
-    });
-    // }
+    }
 
-    const assignProperty = (obj: Actor) => {
+    return clips;
+}
+
+/**
+ *
+ * @param animationClip
+ */
+function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipInfo): MarionetterAnimationClip {
+    // let obj: Actor | null;
+    // const bind = (targetObj: Actor) => {
+    //     obj = targetObj;
+    // };
+    const execute = (actor: Actor, time: number) => {
+        let hasLocalPosition: boolean = false;
+        let hasLocalRotationEuler: boolean = false;
+        let hasLocalScale: boolean = false;
+        const localPosition: Vector3 = Vector3.zero;
+        const localRotationEuler: Vector3 = Vector3.zero;
+        const localScale: Vector3 = Vector3.one;
+
+        const { start, bindings } = animationClip;
+
+        // TODO: typeがあった方がよい. ex) animation clip, light control clip
+        bindings.forEach(({ propertyName, keyframes }) => {
+            const value = curveUtilityEvaluateCurve(time - start, keyframes);
+
+            switch (propertyName) {
+                case PROPERTY_LOCAL_POSITION_X:
+                    hasLocalPosition = true;
+                    localPosition.x = value;
+                    break;
+                case PROPERTY_LOCAL_POSITION_Y:
+                    hasLocalPosition = true;
+                    localPosition.y = value;
+                    break;
+                case PROPERTY_LOCAL_POSITION_Z:
+                    hasLocalPosition = true;
+                    localPosition.z = value;
+                    break;
+                case PROPERTY_LOCAL_EULER_ANGLES_RAW_X:
+                    hasLocalRotationEuler = true;
+                    localRotationEuler.x = value;
+                    break;
+                case PROPERTY_LOCAL_EULER_ANGLES_RAW_Y:
+                    hasLocalRotationEuler = true;
+                    localRotationEuler.y = value;
+                    break;
+                case PROPERTY_LOCAL_EULER_ANGLES_RAW_Z:
+                    hasLocalRotationEuler = true;
+                    localRotationEuler.z = value;
+                    break;
+                case PROPERTY_LOCAL_SCALE_X:
+                    hasLocalScale = true;
+                    localScale.x = value;
+                    break;
+                case PROPERTY_LOCAL_SCALE_Y:
+                    hasLocalScale = true;
+                    localScale.y = value;
+                    break;
+                case PROPERTY_LOCAL_SCALE_Z:
+                    hasLocalScale = true;
+                    localScale.z = value;
+                    break;
+                default:
+                    throw new Error(`invalid property: ${propertyName}`);
+            }
+            // }
+        });
+        // }
+
         // Debug.Log("==========");
         // Debug.Log(LocalPosition);
         // Debug.Log(LocalRotationEuler);
         // Debug.Log(LocalScale);
         if (hasLocalPosition) {
-            obj.transform.position.copy(localPosition);
+            actor.transform.position.copy(localPosition);
         }
 
         if (hasLocalRotationEuler) {
-            obj.transform.rotation.setV(localRotationEuler);
+            actor.transform.rotation.setV(localRotationEuler);
             // obj.transform.rotation.copy(
             //     (localRotationEuler.x / 180) * Math.PI,
             //     (localRotationEuler.y / 180) * Math.PI,
@@ -310,14 +298,112 @@ function createMarionetterAnimationTrackBinder(animationClip: MarionetterAnimati
         }
 
         if (hasLocalScale) {
-            obj.transform.scale.copy(localScale);
+            actor.transform.scale.copy(localScale);
             // obj.scale.copy(localScale);
         }
     };
 
     return {
-        type: "AnimationTrack",
-        assignProperty,
+        type: 'AnimationClip',
+        clipInfo: animationClip,
+        // bind,
+        execute,
+    };
+}
+
+/**
+ *
+ * @param lightControlClip
+ */
+function createMarionetterLightControlClip(
+    lightControlClip: MarionetterLightControlClipInfo
+): MarionetterLightControlClip {
+    // let obj: Light | null;
+    // const bind = (targetObj: Light) => {
+    //     obj = targetObj;
+    // };
+    const execute = (actor: Actor, time: number) => {
+        const light = actor as Light;
+        let hasPropertyColorR: boolean = false;
+        let hasPropertyColorG: boolean = false;
+        let hasPropertyColorB: boolean = false;
+        let hasPropertyColorA: boolean = false;
+        let hasPropertyIntensity: boolean = false;
+        // let hasPropertyBounceIntensity: boolean = false;
+        // let hasPropertyRange: boolean = false;
+
+        const color = new Color();
+        let intensity = 0;
+        // let bounceIntensity = 0;
+        // let range = 0;
+
+        const { start, bindings } = lightControlClip;
+
+        // TODO: typeがあった方がよい. ex) animation clip, light control clip
+        bindings.forEach(({ propertyName, keyframes }) => {
+            const value = curveUtilityEvaluateCurve(time - start, keyframes);
+
+            switch (propertyName) {
+                case PROPERTY_COLOR_R:
+                    hasPropertyColorR = true;
+                    color.r = value;
+                    break;
+                case PROPERTY_COLOR_G:
+                    hasPropertyColorG = true;
+                    color.g = value;
+                    break;
+                case PROPERTY_COLOR_B:
+                    hasPropertyColorB = true;
+                    color.b = value;
+                    break;
+                case PROPERTY_COLOR_A:
+                    hasPropertyColorA = true;
+                    color.a = value;
+                    break;
+                case PROPERTY_INTENSITY:
+                    hasPropertyIntensity = true;
+                    intensity = value;
+                    break;
+                // case PROPERTY_BOUNCE_INTENSITY:
+                //     hasPropertyBounceIntensity = true;
+                //     bounceIntensity = value;
+                //     break;
+                // case PROPERTY_RANGE:
+                //     hasPropertyRange = true;
+                //     range = value;
+                //     break;
+            }
+        });
+
+        if (hasPropertyColorR) {
+            light.color.r = color.r;
+        }
+        if (hasPropertyColorG) {
+            light.color.g = color.g;
+        }
+        if (hasPropertyColorB) {
+            light.color.b = color.b;
+        }
+        if (hasPropertyColorA) {
+            light.color.a = color.a;
+        }
+        if (hasPropertyIntensity) {
+            light.intensity = intensity;
+        }
+        // if(hasPropertyBounceIntensity) {
+        //     obj.bounceIntensity = bounceIntensity;
+        // }
+        // for spot light
+        // if(hasPropertyRange) {
+        //     obj.range = range;
+        // }
+    };
+
+    return {
+        type: 'LightControlClip',
+        clipInfo: lightControlClip,
+        // bind,
+        execute,
     };
 }
 
@@ -408,7 +494,7 @@ function createMarionetterAnimationTrackBinder(animationClip: MarionetterAnimati
 //     });
 //     // }
 //
-//     const assignProperty = (obj: Actor) => {
+//     const execute = (obj: Actor) => {
 //         // Debug.Log("==========");
 //         // Debug.Log(LocalPosition);
 //         // Debug.Log(LocalRotationEuler);
@@ -434,6 +520,6 @@ function createMarionetterAnimationTrackBinder(animationClip: MarionetterAnimati
 //     };
 //
 //     return {
-//         assignProperty,
+//         execute,
 //     };
 // }

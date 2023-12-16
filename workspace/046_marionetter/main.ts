@@ -50,9 +50,9 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import {
-    createMarionetterTrackBinder,
+    buildMarionetterTimeline,
     MarionetterPlayableDirectorComponentInfo,
-    MarionetterScene,
+    MarionetterScene, MarionetterTimeline,
 } from '@/Marionetter/createTrackBinder.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
@@ -168,6 +168,7 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
+    name: "DirectionalLight",
     intensity: 1.2,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
@@ -261,6 +262,7 @@ const appendTrackCube = () => {
     const geometry = new BoxGeometry({ gpu });
     const material = new GBufferMaterial({});
     const mesh = new Mesh({
+        name: "CubeConnector",
         geometry,
         material,
         castShadow: true,
@@ -328,17 +330,16 @@ function createFloorPlaneMesh() {
     return floorPlaneMesh;
 }
 
-let playableDirector: MarionetterPlayableDirectorComponentInfo | null = null;
+let marionetterTimeline: MarionetterTimeline | null;
 
-const fetchAndParseScene = async () => {
-    await wait(10);
+const fetchAndParseScene = () => {
     const sceneJson = sceneJsonUrl as unknown as MarionetterScene;
     console.log('scene json', sceneJson);
-    playableDirector = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
+    const playableDirectorComponentInfo = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
+    marionetterTimeline = buildMarionetterTimeline(captureScene, playableDirectorComponentInfo);
 };
 
 const main = async () => {
-    await fetchAndParseScene();
 
     createSound();
     // createMarionetter();
@@ -349,6 +350,8 @@ const main = async () => {
     floorPlaneMesh = createFloorPlaneMesh();
 
     captureScene.add(floorPlaneMesh);
+
+    fetchAndParseScene();
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
@@ -390,17 +393,18 @@ const main = async () => {
     // };
 
     engine.onRender = (time) => {
-        if (playableDirector !== null && centralCube !== null) {
-            const tracks = playableDirector.tracks;
-            const t = time % playableDirector.duration;
-            const centralCubeTrackBinder = createMarionetterTrackBinder(tracks[0].animationClips, t);
-            if(centralCubeTrackBinder?.type === "AnimationTrack") {
-                centralCubeTrackBinder.assignProperty(centralCube);
-            }
-            const lightTrackBinder = createMarionetterTrackBinder(tracks[1].animationClips, t);
-            if(lightTrackBinder?.type === "LightControlTrack") {
-                lightTrackBinder.assignProperty(directionalLight);
-            }
+        if (marionetterTimeline !== null && centralCube !== null) {
+            marionetterTimeline.execute(time);
+            // const tracks = playableDirector.tracks;
+            // const t = time % playableDirector.duration;
+            // const centralCubeTrackBinder = createMarionetterTrackBinder(tracks[0].animationClips, t);
+            // if(centralCubeTrackBinder?.type === "AnimationTrack") {
+            //     centralCubeTrackBinder.assignProperty(centralCube);
+            // }
+            // const lightTrackBinder = createMarionetterTrackBinder(tracks[1].animationClips, t);
+            // if(lightTrackBinder?.type === "LightControlTrack") {
+            //     lightTrackBinder.assignProperty(directionalLight);
+            // }
         }
 
         renderer.render(captureScene, captureSceneCamera, { time });

@@ -1,4 +1,4 @@
-﻿import { Actor } from '@/PaleGL/actors/Actor';
+﻿import {Actor, ActorArgs} from '@/PaleGL/actors/Actor';
 import {ActorTypes, LightType} from '@/PaleGL/constants';
 import { Color } from '@/PaleGL/math/Color';
 // import {Camera} from "./Camera";
@@ -8,7 +8,7 @@ import { PerspectiveCamera } from './PerspectiveCamera';
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
-export type LightArgs = {
+export type LightArgs = ActorArgs & {
     intensity: number;
     color: Color;
 };
@@ -31,8 +31,8 @@ export class Light extends Actor implements ILight {
         return !!this.shadowCamera;
     }
 
-    constructor({ intensity, color, lightType }: LightArgs & { lightType: LightType }) {
-        super({ type: ActorTypes.Light });
+    constructor({ name, intensity, color, lightType }: LightArgs & { lightType: LightType }) {
+        super({ name, type: ActorTypes.Light });
         this.intensity = intensity;
         this.color = color;
         this.lightType = lightType;
