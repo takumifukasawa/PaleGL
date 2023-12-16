@@ -133,15 +133,20 @@ type MarionetterTimelineTrack = {
 
 type MarionetterAnimationClipKinds = MarionetterAnimationClip | MarionetterLightControlClip;
 
+const enum MarionetterAnimationClipType {
+    AnimationClip = 0,
+    LightControlClip = 1,
+}
+
 type MarionetterAnimationClip = {
-    type: 'AnimationClip';
+    type: MarionetterAnimationClipType.AnimationClip;
     clipInfo: MarionetterAnimationClipInfo;
     // bind: (actor: Actor) => void;
     execute: (actor: Actor, time: number) => void;
 };
 
 type MarionetterLightControlClip = {
-    type: 'LightControlClip';
+    type: MarionetterAnimationClipType.LightControlClip;
     clipInfo: MarionetterLightControlClipInfo;
     // bind: (light: Light) => void;
     execute: (actor: Actor, time: number) => void;
@@ -161,6 +166,9 @@ export function buildMarionetterTimeline(
         const transform = scene.find(targetName);
         const targetActor = transform ? transform.actor : null;
         const clips = createMarionetterClips(animationClips);
+        if(!targetActor) {
+            console.warn("target actor is not found");
+        }
         const execute = (time: number) => {
             for (let j = 0; j < clips.length; j++) {
                 if (targetActor != null) {
@@ -304,7 +312,7 @@ function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipI
     };
 
     return {
-        type: 'AnimationClip',
+        type: MarionetterAnimationClipType.AnimationClip,
         clipInfo: animationClip,
         // bind,
         execute,
@@ -400,7 +408,7 @@ function createMarionetterLightControlClip(
     };
 
     return {
-        type: 'LightControlClip',
+        type: MarionetterAnimationClipType.LightControlClip,
         clipInfo: lightControlClip,
         // bind,
         execute,

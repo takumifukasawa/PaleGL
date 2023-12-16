@@ -53,7 +53,7 @@ import {
     buildMarionetterTimeline,
     MarionetterPlayableDirectorComponentInfo,
     MarionetterScene, MarionetterTimeline,
-} from '@/Marionetter/createTrackBinder.ts';
+} from '@/Marionetter/timeline.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
