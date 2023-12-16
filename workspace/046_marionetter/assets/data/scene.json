@@ -26,6 +26,7 @@
           "duration": 1.999999999999,
           "tracks": [
             {
+              "targetName": "CubeConnector",
               "animationClips": [
                 {
                   "offsetPosition": {
@@ -38,6 +39,7 @@
                     "y": 0.0,
                     "z": 0.0
                   },
+                  "type": 0,
                   "start": 0.0,
                   "duration": 2.0,
                   "bindings": [
@@ -265,8 +267,10 @@
               ]
             },
             {
+              "targetName": "Directional Light",
               "animationClips": [
                 {
+                  "type": 1,
                   "start": 0.0,
                   "duration": 2.0,
                   "bindings": [
@@ -514,18 +518,18 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 2.38023639,
+          "y": 4.0,
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.0,
-          "y": -40.4795647,
-          "z": 44.52564
+          "x": -30.0000038,
+          "y": -30.0000019,
+          "z": 30.0000019
         },
         "localScale": {
-          "x": 1.22552419,
-          "y": 1.0,
-          "z": 1.0
+          "x": 1.0,
+          "y": 2.0,
+          "z": 3.0
         }
       },
       "components": [],
@@ -597,7 +601,7 @@
       "components": [
         {
           "lightType": "Directional",
-          "color": "821A7DFF",
+          "color": "17E1C8129FF",
           "type": 1
         }
       ],

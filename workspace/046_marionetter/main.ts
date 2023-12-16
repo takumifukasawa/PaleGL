@@ -50,7 +50,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import {
-    createMarionetterAnimationTrackBinder,
+    createMarionetterTrackBinder,
     MarionetterPlayableDirectorComponentInfo,
     MarionetterScene,
 } from '@/Marionetter/createTrackBinder.ts';
@@ -333,6 +333,7 @@ let playableDirector: MarionetterPlayableDirectorComponentInfo | null = null;
 const fetchAndParseScene = async () => {
     await wait(10);
     const sceneJson = sceneJsonUrl as unknown as MarionetterScene;
+    console.log('scene json', sceneJson);
     playableDirector = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
 };
 
@@ -389,15 +390,19 @@ const main = async () => {
     // };
 
     engine.onRender = (time) => {
-
-        if(playableDirector !== null && centralCube !== null) {
+        if (playableDirector !== null && centralCube !== null) {
             const tracks = playableDirector.tracks;
             const t = time % playableDirector.duration;
-            // const trackBinder = createMarionetterAnimationTrackBinder(tracks[0].animationClips, t, 30);
-            const trackBinder = createMarionetterAnimationTrackBinder(tracks[0].animationClips, t);
-            trackBinder?.assignProperty(centralCube);
+            const centralCubeTrackBinder = createMarionetterTrackBinder(tracks[0].animationClips, t);
+            if(centralCubeTrackBinder?.type === "AnimationTrack") {
+                centralCubeTrackBinder.assignProperty(centralCube);
+            }
+            const lightTrackBinder = createMarionetterTrackBinder(tracks[1].animationClips, t);
+            if(lightTrackBinder?.type === "LightControlTrack") {
+                lightTrackBinder.assignProperty(directionalLight);
+            }
         }
-        
+
         renderer.render(captureScene, captureSceneCamera, { time });
     };
 

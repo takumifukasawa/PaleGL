@@ -36,12 +36,24 @@
     get rgbArray() {
         return [this.r, this.g, this.b];
     }
+    
+    set r(value) {
+        this.elements[0] = value;
+    }
+    
+    set g(value) {
+        this.elements[1] = value;
+    }
+    
+    set b(value) {
+        this.elements[2] = value;
+    }
 
     set a(value) {
         this.elements[3] = value;
     }
 
-    constructor(r: number, g: number, b: number, a: number = 1) {
+    constructor(r: number = 0, g: number = 0, b : number = 0, a: number = 1) {
         this.set(r, g, b, a);
     }
 
