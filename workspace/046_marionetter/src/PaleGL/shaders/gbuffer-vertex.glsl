@@ -82,9 +82,9 @@ mat4 getRotationZMat(float rad) {
 mat4 getTranslationMat(vec3 p) {
     return mat4(
         // 行オーダー
-        // 1., 0., 0., aInstancePosition.x,
-        // 0., 1., 0., aInstancePosition.y,
-        // 0., 0., 1., aInstancePosition.z,
+        // 1., 0., 0., p.x,
+        // 0., 1., 0., p.y,
+        // 0., 0., 1., p.z,
         // 0., 0., 0., 1
         // 列オーダー
         1., 0., 0., 0.,
@@ -127,6 +127,7 @@ void main() {
     
     #pragma LOCAL_POSITION_POST_PROCESS
 
+    // TODO: instance matrix を踏まえた変換
     #include ./partial/normal-map-vertex-calc.glsl;
 
     // assign common varyings 
