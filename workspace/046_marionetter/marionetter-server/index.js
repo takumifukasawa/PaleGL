@@ -64,7 +64,6 @@ const exportScene = (json) => {
 
 wsServer.on('connection', (ws) => {
     console.log('server: connected');
-    ws.send('server -> client: connected');
 
     ws.on('error', (e) => {
         console.error(e);

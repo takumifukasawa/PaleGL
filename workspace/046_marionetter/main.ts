@@ -54,6 +54,7 @@ import {
     MarionetterPlayableDirectorComponentInfo,
     MarionetterScene, MarionetterTimeline,
 } from '@/Marionetter/timeline.ts';
+import {createMarionetter, Marionetter} from "@/Marionetter/createMarionetter.ts";
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
@@ -106,7 +107,7 @@ let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let glslSound: GLSLSound;
-// let marionetter: Marionetter;
+const marionetter: Marionetter = createMarionetter();
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -251,10 +252,9 @@ const createSound = () => {
     });
 };
 
-// const createMarionetter = () => {
-//     marionetter = new Marionetter(8080);
-//     console.log("marionetter", marionetter);
-// };
+const initMarionetter = () => {
+    marionetter.connect();
+};
 
 let centralCube: Mesh | null = null;
 
@@ -342,7 +342,7 @@ const fetchAndParseScene = () => {
 const main = async () => {
 
     createSound();
-    // createMarionetter();
+    initMarionetter();
     appendTrackCube();
 
     await wait(0);
@@ -394,7 +394,7 @@ const main = async () => {
 
     engine.onRender = (time) => {
         if (marionetterTimeline !== null && centralCube !== null) {
-            marionetterTimeline.execute(time);
+            marionetterTimeline.execute(marionetter.getCurrentTime());
             // const tracks = playableDirector.tracks;
             // const t = time % playableDirector.duration;
             // const centralCubeTrackBinder = createMarionetterTrackBinder(tracks[0].animationClips, t);

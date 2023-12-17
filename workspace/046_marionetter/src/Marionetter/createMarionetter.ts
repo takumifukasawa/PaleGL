@@ -20,37 +20,44 @@ export function tryParseJsonString<T>(str: string) {
     return json;
 }
 
-export class Marionetter {
-    currentTime: number = 0;
+export type Marionetter = {
+    connect: () => void;
+    getCurrentTime: () => number;
+};
 
-    constructor(port: number) {
-        const url = `ws://localhost:${port}`;
-        const socket = new WebSocket(url);
+export function createMarionetter(port: number = 8080, showLog: boolean = false): Marionetter {
+    let currentTime: number = 0;
+
+    const url = `ws://localhost:${port}`;
+    let socket: WebSocket | null = null;
+
+    const getCurrentTime = () => {
+        return currentTime;
+    };
+
+    const connect = () => {
+        socket = new WebSocket(url);
         socket.addEventListener('open', () => {
             console.log(`[Marionetter] on open: ${url}`);
             const authData = {
                 type: 'auth',
                 clientType: 'browser',
             };
-            socket.send(JSON.stringify(authData));
+            socket?.send(JSON.stringify(authData));
         });
+
         socket.addEventListener('close', () => {
             console.log(`[Marionetter] on close: ${url}`);
         });
-        window.addEventListener('beforeunload', () => {
-            console.log(`[Marionetter] beforeunload: ${url}`);
-            if (socket.readyState === WebSocket.CONNECTING) {
-                socket.close();
-            }
-        });
+
         socket.addEventListener('message', (event) => {
             if (!event.data) {
                 return;
             }
 
-            if (typeof event.data === 'string') {
-                return;
-            }
+            // if (typeof event.data === 'string') {
+            //     return;
+            // }
 
             const json = tryParseJsonString<MarionetterReceiveData>(event.data as string);
 
@@ -60,13 +67,26 @@ export class Marionetter {
 
             switch (json.type) {
                 case MarionetterReceiveDataType.SeekTimeline:
-                    this.currentTime = json.currentTime;
-                    console.log(`[Marionetter] seekTimeline: ${this.currentTime}`);
+                    currentTime = json.currentTime;
+                    if (showLog) {
+                        console.log(`[Marionetter] seekTimeline: ${currentTime}`);
+                    }
                     break;
                 case MarionetterReceiveDataType.ExportScene:
-                    console.log(`[Marionetter] exportScene`);
+                    if (showLog) {
+                        console.log(`[Marionetter] exportScene`);
+                    }
                     break;
             }
         });
-    }
+
+        window.addEventListener('beforeunload', () => {
+            console.log(`[Marionetter] beforeunload: ${url}`);
+            if (socket?.readyState === WebSocket.CONNECTING) {
+                socket.close();
+            }
+        });
+    };
+
+    return { connect, getCurrentTime };
 }
