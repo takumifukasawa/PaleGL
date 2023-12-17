@@ -1,12 +1,13 @@
 const MarionetterReceiveDataType = {
     SeekTimeline: 'seekTimeline',
     ExportScene: 'exportScene',
+    ExportHotReloadScene: 'exportHotReloadScene',
 } as const;
 
 type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
 
 type MarionetterReceiveData = {
-    type: 'seekTimeline' | 'exportScene';
+    type: MarionetterReceiveDataType;
     currentTime: number;
 };
 
@@ -23,10 +24,15 @@ export function tryParseJsonString<T>(str: string) {
 export type Marionetter = {
     connect: () => void;
     getCurrentTime: () => number;
+    setHotReloadCallback: (callback: () => void) => void;
 };
 
-export function createMarionetter(port: number = 8080, showLog: boolean = false): Marionetter {
+
+type MarionetterArgs = { port?: number, showLog?: boolean };
+
+export function createMarionetter({ port = 8080, showLog = false}: MarionetterArgs = {}): Marionetter {
     let currentTime: number = 0;
+    let onHotReloadCallback: (() => void) | null = null;
 
     const url = `ws://localhost:${port}`;
     let socket: WebSocket | null = null;
@@ -77,6 +83,15 @@ export function createMarionetter(port: number = 8080, showLog: boolean = false)
                         console.log(`[Marionetter] exportScene`);
                     }
                     break;
+                case MarionetterReceiveDataType.ExportHotReloadScene:
+                    if (showLog) {
+                        console.log(`[Marionetter] hotReloadScene`);
+                    }
+                    onHotReloadCallback?.();
+                    break;
+                default:
+                    console.warn('invalid type', json.type);
+                    break;
             }
         });
 
@@ -88,5 +103,9 @@ export function createMarionetter(port: number = 8080, showLog: boolean = false)
         });
     };
 
-    return { connect, getCurrentTime };
+    const setHotReloadCallback = (callback: () => void) => {
+        onHotReloadCallback = callback;
+    };
+
+    return { connect, getCurrentTime, setHotReloadCallback };
 }

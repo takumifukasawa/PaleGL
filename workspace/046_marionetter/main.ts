@@ -107,7 +107,7 @@ let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let glslSound: GLSLSound;
-const marionetter: Marionetter = createMarionetter();
+const marionetter: Marionetter = createMarionetter({ showLog: false});
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -332,15 +332,26 @@ function createFloorPlaneMesh() {
 
 let marionetterTimeline: MarionetterTimeline | null;
 
-const fetchAndParseScene = () => {
-    const sceneJson = sceneJsonUrl as unknown as MarionetterScene;
-    console.log('scene json', sceneJson);
+const parseScene = (sceneJson: MarionetterScene) => {
     const playableDirectorComponentInfo = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
     marionetterTimeline = buildMarionetterTimeline(captureScene, playableDirectorComponentInfo);
-};
+}
+
+// TODO: この処理はビルド時には捨てたい
+const initHotReloadAndParseScene = () => {
+    const hotReloadScene = () => {
+        void fetch("./assets/data/scene-hot-reload.json").then(async (res) => {
+            const sceneJson = await res.json() as unknown as MarionetterScene;
+            parseScene(sceneJson);
+        });
+    }
+    marionetter.setHotReloadCallback(() => {
+        hotReloadScene();
+    });
+    hotReloadScene()
+}
 
 const main = async () => {
-
     createSound();
     initMarionetter();
     appendTrackCube();
@@ -351,7 +362,8 @@ const main = async () => {
 
     captureScene.add(floorPlaneMesh);
 
-    fetchAndParseScene();
+    parseScene(sceneJsonUrl as unknown as MarionetterScene);
+    initHotReloadAndParseScene();
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {

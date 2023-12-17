@@ -13,18 +13,24 @@ const messageType = {
     auth: 'auth',
     seekTimeline: 'seekTimeline',
     exportScene: 'exportScene',
+    exportHotReloadScene: 'exportHotReloadScene',
 };
 
 const clientType = {
     browser: 'browser',
 };
 
-let wsBrowserClient;
-
 const wsServer = new WebSocketServer({ port: PORT });
+
+let wsBrowserClient;
 
 console.log('begin websocket server...');
 
+/**
+ * 
+ * @param ws
+ * @param json
+ */
 const auth = (ws, json) => {
     // is browser
     if (!!json.clientType && json.clientType === clientType.browser) {
@@ -33,6 +39,10 @@ const auth = (ws, json) => {
     }
 };
 
+/**
+ * 
+ * @param json
+ */
 const seekTimeline = (json) => {
     if (!wsBrowserClient) {
         return;
@@ -48,6 +58,10 @@ const seekTimeline = (json) => {
     wsBrowserClient.send(JSON.stringify(newData));
 };
 
+/**
+ * 
+ * @param json
+ */
 const exportScene = (json) => {
     if (!wsBrowserClient) {
         return;
@@ -55,6 +69,24 @@ const exportScene = (json) => {
     // console.log(json);
     const newData = {
         type: messageType.exportScene,
+    };
+    if (logEnabled) {
+        console.log(`send to browser data: ${newData}`);
+    }
+    wsBrowserClient.send(JSON.stringify(newData));
+};
+
+/**
+ * 
+ * @param json
+ */
+const exportHotReloadScene = (json) => {
+    if (!wsBrowserClient) {
+        return;
+    }
+    // console.log(json);
+    const newData = {
+        type: messageType.exportHotReloadScene,
     };
     if (logEnabled) {
         console.log(`send to browser data: ${newData}`);
@@ -98,6 +130,9 @@ wsServer.on('connection', (ws) => {
                 break;
             case messageType.exportScene:
                 exportScene(json);
+                break;
+            case messageType.exportHotReloadScene:
+                exportHotReloadScene(json);
                 break;
             default:
                 console.error(`invalid message type: ${json.type}`);
