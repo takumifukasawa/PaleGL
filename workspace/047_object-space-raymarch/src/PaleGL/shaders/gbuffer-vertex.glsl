@@ -127,12 +127,11 @@ void main() {
     
     #pragma LOCAL_POSITION_POST_PROCESS
 
-    // TODO: instance matrix を踏まえた変換
-    #include ./partial/normal-map-vertex-calc.glsl;
-
     // assign common varyings 
     vUv = aUv;
 
+    mat4 worldMatrix = uWorldMatrix;
+    
 #ifdef USE_INSTANCING
     mat4 instanceTranslation = getTranslationMat(aInstancePosition);
     mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
@@ -151,14 +150,16 @@ void main() {
 
     #pragma INSTANCE_TRANSFORM_PRE_PROCESS
 
-    localPosition = instanceTranslation * instanceRotation * instanceScaling * localPosition;
+    worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 #endif
 
-    vec4 worldPosition = uWorldMatrix * localPosition;
+    vec4 worldPosition = worldMatrix * localPosition;
 
     #pragma WORLD_POSITION_POST_PROCESS
  
     vWorldPosition = worldPosition.xyz;
+
+    #include ./partial/normal-map-vertex-calc.glsl;
 
     #include ./partial/receive-shadow-uv-calc.glsl
     
