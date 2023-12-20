@@ -1,12 +1,8 @@
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
-// import {loadImg} from "@/PaleGL/loaders/loadImg";
-import { /*loadObj,*/ parseObj } from '@/PaleGL/loaders/loadObj';
+import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-// import {CubeMap} from "@/PaleGL/core/CubeMap";
-// import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry";
-// import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry";
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
