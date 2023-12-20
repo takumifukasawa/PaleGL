@@ -13,6 +13,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
+import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
 
@@ -66,75 +67,29 @@ f 1/3/3 5/11/6 7/13/4
 f 6/12/8 2/6/2 4/10/5
 `;
 
-const skyboxVertexShader: string = `#version 300 es
-
-precision mediump float;
-
-layout (location = 0) in vec3 ${AttributeNames.Position};
-layout (location = 1) in vec2 ${AttributeNames.Uv};
-layout (location = 2) in vec3 ${AttributeNames.Normal};
-
-uniform mat4 ${UniformNames.WorldMatrix};
-uniform mat4 ${UniformNames.ViewMatrix};
-uniform mat4 ${UniformNames.ProjectionMatrix};
-uniform mat4 ${UniformNames.NormalMatrix};
-
-out vec2 vUv;
-out vec3 vNormal;
-out vec3 vWorldPosition;
-
-void main() {
-    vUv = aUv;
-    vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;
-    vec4 worldPosition = ${UniformNames.WorldMatrix} * vec4(aPosition, 1);
-    vWorldPosition = worldPosition.xyz;
-    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * worldPosition;
-}
-`;
-
-// const skyboxFragmentShader = `#version 300 es
-//
+// const skyboxVertexShader: string = `#version 300 es
+// 
 // precision mediump float;
-//
-// in vec2 vUv;
-// in vec3 vNormal;
-// in vec3 vWorldPosition;
-//
-// uniform samplerCube uCubeTexture;
-// uniform vec3 uViewPosition;
-// uniform mat4 uViewDirectionProjectionInverse;
-// uniform float uRotationOffset;
-//
-// // out vec4 outColor;
-// layout (location = 0) out vec4 outBaseColor;
-// layout (location = 1) out vec4 outNormalColor;
-//
-// // mat2 rotate(float r) {
-// //     float c = cos(r);
-// //     float s = sin(r);
-// //     return mat2(c, s, -s, c);
-// // }
-//
-// #include ./partial/fragment-env-map-functions.glsl
-//
+// 
+// layout (location = 0) in vec3 ${AttributeNames.Position};
+// layout (location = 1) in vec2 ${AttributeNames.Uv};
+// layout (location = 2) in vec3 ${AttributeNames.Normal};
+// 
+// uniform mat4 ${UniformNames.WorldMatrix};
+// uniform mat4 ${UniformNames.ViewMatrix};
+// uniform mat4 ${UniformNames.ProjectionMatrix};
+// uniform mat4 ${UniformNames.NormalMatrix};
+// 
+// out vec2 vUv;
+// out vec3 vNormal;
+// out vec3 vWorldPosition;
+// 
 // void main() {
-//     // pattern_1: inverse normal
-//     vec3 N = normalize(vNormal);
-//     vec3 reflectDir = -N;
-//
-//     // pattern_2: world position dir
-//     // skyboxの中心 = カメラの中心なので、こちらでもよい
-//     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
-//
-//     // reflectDir.x *= -1.;
-//     // reflectDir.xz *= rotate(3.14 + uRotationOffset);
-//     // vec4 textureColor = texture(uCubeTexture, reflectDir);
-//
-//     vec3 envMapColor = calcEnvMap(uCubeTexture, reflectDir, uRotationOffset);
-//
-//     // outColor = textureColor;
-//     outBaseColor = vec4(envMapColor, 1.);
-//     outNormalColor = vec4(0., 0., 0., 1.);
+//     vUv = aUv;
+//     vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;
+//     vec4 worldPosition = ${UniformNames.WorldMatrix} * vec4(aPosition, 1);
+//     vWorldPosition = worldPosition.xyz;
+//     gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * worldPosition;
 // }
 // `;
 
