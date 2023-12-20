@@ -785,8 +785,10 @@ export class Renderer {
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
             depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
             depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            
             this.renderMesh(actor.geometry, depthMaterial);
 
             if (this.stats) {

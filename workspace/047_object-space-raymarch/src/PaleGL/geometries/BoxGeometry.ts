@@ -138,7 +138,6 @@ export class BoxGeometry extends Geometry {
             gpu,
             attributes: [
                 // -----------------------------
-                //
                 //   6 ---- 4
                 //  /|     /|
                 // 0 ---- 2 |
