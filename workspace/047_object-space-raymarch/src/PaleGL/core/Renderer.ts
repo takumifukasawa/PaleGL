@@ -408,6 +408,12 @@ export class Renderer {
         this.depthPrePass(depthPrePassRenderMeshInfos, camera);
 
         // ------------------------------------------------------------------------------
+        // g-buffer opaque pass
+        // ------------------------------------------------------------------------------
+
+        this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
+
+        // ------------------------------------------------------------------------------
         // shadow pass
         // ------------------------------------------------------------------------------
 
@@ -423,17 +429,6 @@ export class Renderer {
             this.shadowPass(castShadowLightActors, castShadowRenderMeshInfos);
         }
 
-        // ------------------------------------------------------------------------------
-        // g-buffer opaque pass
-        // ------------------------------------------------------------------------------
-
-        // TODO: camera...はなくていいかも
-        // camera.setRenderTarget(this._gBufferRenderTargets);
-        // this.setRenderTarget(this._gBufferRenderTargets.write);
-
-        // this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors, true);
-        this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
-        
         // ------------------------------------------------------------------------------
         // ambient occlusion pass
         // ------------------------------------------------------------------------------

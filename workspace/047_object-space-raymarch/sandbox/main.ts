@@ -88,7 +88,7 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { BoxGeometry} from '@/PaleGL/geometries/BoxGeometry.ts';
+import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
@@ -101,7 +101,7 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import {ObjectSpaceRaymarchMaterial} from "@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts";
+import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1236,7 +1236,7 @@ const main = async () => {
         sphereMesh.transform.setTranslation(new Vector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     };
-    
+
     //
     // local raymarch mesh
     //
@@ -1244,20 +1244,21 @@ const main = async () => {
     const objectSpaceRaymarchMesh = new Mesh({
         geometry: new BoxGeometry({ gpu }),
         material: new ObjectSpaceRaymarchMaterial(),
+        castShadow: true
     });
     objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1, 0);
-    
+
     //
     // instancing mesh
     //
-    
+
     skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
 
     //
     // floor mesh
     //
-    
+
     const floorGeometry = new PlaneGeometry({
         gpu,
         calculateTangent: true,
@@ -1300,7 +1301,7 @@ const main = async () => {
         meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(3, 3));
         meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(3, 3));
     };
-    
+
     //
     // particle mesh
     //
