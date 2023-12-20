@@ -1,41 +1,5 @@
-// import { MaterialArgs, Uniforms } from '@/PaleGL/materials/Material';
-// import { VertexShaderModifier } from '@/PaleGL/constants';
-// import { Vector2 } from '@/PaleGL/math/Vector2';
-// import { Color } from '@/PaleGL/math/Color';
-// import { Texture } from '@/PaleGL/core/Texture';
-//
-// import { GBufferMaterial, ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
-//
-// export type UnlitMaterialArgs = {
-//     diffuseColor?: Color;
-//     diffuseMap?: Texture;
-//     diffuseMapUvScale?: Vector2;
-//     diffuseMapUvOffset?: Vector2;
-//     emissiveColor?: Color;
-//     vertexShaderModifier?: VertexShaderModifier;
-//     uniforms?: Uniforms;
-// } & MaterialArgs;
-//
-// // NOTE:
-// // GBufferのLitのシェーダー使ってるけど普通にunlit専用のシェーダーがある方が本当はきれい. 容量の問題
-//
-// export class UnlitMaterial extends GBufferMaterial {
-//     // // params
-//     // diffuseColor;
-//     // specularAmount;
-//
-//     constructor({ ...options }: UnlitMaterialArgs = {}) {
-//         // TODO: できるだけconstructorの直後に持っていきたい
-//         super({
-//             ...options,
-//             name: 'UnlitMaterial',
-//             shadingModelId: ShadingModelIds.Unlit,
-//         });
-//     }
-// }
-
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import { ShadingModelIds, DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -46,7 +10,6 @@ import { Texture } from '@/PaleGL/core/Texture';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
-import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type UnlitMaterialArgs = {

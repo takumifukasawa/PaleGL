@@ -781,7 +781,11 @@ export class Renderer {
             if (!depthMaterial) {
                 throw '[Renderer.depthPrePass] invalid depth material';
             }
-
+            
+            if(actor.mainMaterial.skipDepthPrePass) {
+                return;
+            }
+            
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
             depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
@@ -825,17 +829,6 @@ export class Renderer {
 
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
-
-                // // TODO: material 側でやった方がよい？
-                // if (targetMaterial.uniforms[UniformNames.WorldMatrix]) {
-                //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
-                // }
-                // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
-                //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = lightActor.shadowCamera.viewMatrix;
-                // }
-                // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
-                //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = lightActor.shadowCamera.projectionMatrix;
-                // }
 
                 // TODO: material 側でやった方がよい？
                 if (!targetMaterial) {
@@ -907,45 +900,9 @@ export class Renderer {
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             lightActors.forEach((light) => {
-                // const targetMaterial = this._deferredShadingPass.material;
                 light.applyUniformsValues(targetMaterial);
-
-                // if (targetMaterial.uniforms[UniformNames.DirectionalLight]) {
-                //     targetMaterial.updateUniform(UniformNames.DirectionalLight, {
-                //         direction: {
-                //             type: UniformTypes.Vector3,
-                //             value: light.transform.position,
-                //         },
-                //         intensity: {
-                //             type: UniformTypes.Float,
-                //             value: light.intensity,
-                //         },
-                //         color: {
-                //             type: UniformTypes.Color,
-                //             value: light.color,
-                //         },
-                //     });
-                // }
-
-                // if (
-                //     targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-                //     targetMaterial.receiveShadow &&
-                //     light.castShadow &&
-                //     light.shadowCamera &&
-                //     light.shadowMap
-                // ) {
-                //     // clip coord (-1 ~ 1) to uv (0 ~ 1)
-                //     const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-                //     const textureProjectionMatrix = Matrix4.multiplyMatrices(
-                //         textureMatrix,
-                //         light.shadowCamera.projectionMatrix.clone(),
-                //         light.shadowCamera.viewMatrix.clone()
-                //     );
-                //     targetMaterial.updateUniform(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-                //     targetMaterial.updateUniform(UniformNames.ShadowMapProjectionMatrix, textureProjectionMatrix);
-                // }
             });
-
+            
             this.renderMesh(actor.geometry, targetMaterial);
 
             if (this.stats) {

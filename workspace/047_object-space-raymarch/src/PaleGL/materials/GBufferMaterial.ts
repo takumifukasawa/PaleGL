@@ -1,26 +1,15 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import {DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier} from '@/PaleGL/constants';
+import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
-// import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
-
-export const ShadingModelIds = {
-    Lit: 1,
-    Unlit: 2,
-    Skybox: 3,
-};
-
-export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
 
 export type GBufferMaterialArgs = {
     diffuseColor?: Color;
@@ -127,15 +116,6 @@ export class GBufferMaterial extends Material {
                 name: 'uEmissiveColor',
                 type: UniformTypes.Color,
                 value: emissiveColor || Color.black,
-            },
-            {
-                name: UniformNames.DirectionalLight,
-                type: UniformTypes.Struct,
-                value: {
-                    direction: Vector3.zero,
-                    intensity: 0,
-                    color: new Vector4(0, 0, 0, 0),
-                },
             },
             {
                 name: UniformNames.ShadingModelId,

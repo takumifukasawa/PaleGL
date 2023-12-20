@@ -1,5 +1,12 @@
 import { Mesh } from '@/PaleGL/actors/Mesh';
-import { UniformTypes, PrimitiveTypes, ActorTypes, AttributeNames, UniformNames } from '@/PaleGL/constants';
+import {
+    UniformTypes,
+    PrimitiveTypes,
+    ActorTypes,
+    AttributeNames,
+    UniformNames,
+    ShadingModelIds,
+} from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
@@ -11,7 +18,6 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
-import { ShadingModelIds } from '@/PaleGL/materials/GBufferMaterial.ts';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -64,22 +70,22 @@ f 6/12/8 2/6/2 4/10/5
 `;
 
 // const skyboxVertexShader: string = `#version 300 es
-// 
+//
 // precision mediump float;
-// 
+//
 // layout (location = 0) in vec3 ${AttributeNames.Position};
 // layout (location = 1) in vec2 ${AttributeNames.Uv};
 // layout (location = 2) in vec3 ${AttributeNames.Normal};
-// 
+//
 // uniform mat4 ${UniformNames.WorldMatrix};
 // uniform mat4 ${UniformNames.ViewMatrix};
 // uniform mat4 ${UniformNames.ProjectionMatrix};
 // uniform mat4 ${UniformNames.NormalMatrix};
-// 
+//
 // out vec2 vUv;
 // out vec3 vNormal;
 // out vec3 vWorldPosition;
-// 
+//
 // void main() {
 //     vUv = aUv;
 //     vNormal = (${UniformNames.NormalMatrix} * vec4(aNormal, 1)).xyz;

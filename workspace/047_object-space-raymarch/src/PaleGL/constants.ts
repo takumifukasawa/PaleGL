@@ -16,7 +16,17 @@ export const PrimitiveTypes = {
 
 export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
 
+export const ShadingModelIds = {
+    Lit: 1,
+    Unlit: 2,
+    Skybox: 3,
+};
+
+export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
+
 export const DepthFuncTypes = {
+    // Lequal: "Lequal",
+    // Equal: "Equal",
     Lequal: 0,
     Equal: 1,
 } as const;

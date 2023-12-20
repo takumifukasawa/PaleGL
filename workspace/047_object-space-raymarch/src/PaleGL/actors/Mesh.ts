@@ -1,5 +1,5 @@
-﻿import {Actor, ActorArgs} from '@/PaleGL/actors/Actor';
-import {ActorType, ActorTypes, DepthFuncTypes} from '@/PaleGL/constants';
+﻿import { Actor, ActorArgs } from '@/PaleGL/actors/Actor';
+import { ActorType, ActorTypes, DepthFuncTypes } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { defaultDepthFragmentShader } from '@/PaleGL/shaders/buildShader';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
@@ -100,7 +100,9 @@ export class Mesh extends Actor {
                 faceSide: this.mainMaterial.faceSide,
                 depthTest: true,
                 depthWrite: true,
-                depthFuncType: DepthFuncTypes.Lequal
+                depthFuncType: DepthFuncTypes.Lequal,
+                skipDepthPrePass: !!this.mainMaterial.skipDepthPrePass,
+                // depthFuncType: this.mainMaterial.depthFuncType
             });
         }
 

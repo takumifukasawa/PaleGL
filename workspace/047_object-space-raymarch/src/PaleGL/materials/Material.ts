@@ -59,6 +59,7 @@ export type MaterialArgs = {
     depthTest?: boolean | null;
     depthWrite?: boolean | null;
     depthFuncType?: DepthFuncType;
+    skipDepthPrePass?: boolean;
     alphaTest?: number | null;
     faceSide?: FaceSide;
     receiveShadow?: boolean;
@@ -89,31 +90,6 @@ export type MaterialArgs = {
     showLog?: boolean;
 };
 
-// export type UniformStructValue = {
-//     [key: string]: UniformTypeValuePair;
-// };
-//
-// // TODO: fix type
-// export type UniformValue =
-//     | number
-//     | number[]
-//     | Vector2
-//     | Vector2[]
-//     | Vector3
-//     | Vector3[]
-//     | Vector4
-//     | Vector4[]
-//     | Matrix4
-//     | Matrix4[]
-//     | Texture
-//     | CubeMap
-//     | Color
-//     | Color[]
-//     | Float32Array
-//     | DirectionalLightStruct
-//     | UniformStructValue
-//     | null;
-
 export type VertexShaderGenerator = ({
     attributeDescriptors,
     isSkinning,
@@ -138,21 +114,6 @@ export type FragmentShaderGenerator = ({
 
 export type DepthFragmentShaderGenerator = () => string;
 
-// type UniformTypeValuePair = {
-//     type: UniformType;
-//     value: UniformValue;
-// };
-//
-// export interface Uniforms {
-//     [name: string]: UniformTypeValuePair;
-// }
-
-// -------------------------------------------------------------------
-// TODO:
-// - rawVertex, rawFragment を渡せるように？
-// - vertexShaderGenerator, fragmentShaderGenerator を剥がす
-// -------------------------------------------------------------------
-
 export class Material {
     name: string = '';
 
@@ -165,6 +126,7 @@ export class Material {
     depthTest: boolean | null;
     depthWrite: boolean | null;
     depthFuncType: DepthFuncType;
+    skipDepthPrePass: boolean | null;
     alphaTest: number | null;
     // culling;
     faceSide: FaceSide;
@@ -270,6 +232,7 @@ export class Material {
         primitiveType,
         depthTest = true,
         depthWrite = true,
+        skipDepthPrePass = false,
         depthFuncType = DepthFuncTypes.Lequal,
         alphaTest = null,
         faceSide = FaceSide.Front,
@@ -344,6 +307,7 @@ export class Material {
         this.depthTest = !!depthTest;
         this.depthWrite = !!depthWrite;
         this.depthFuncType = depthFuncType;
+        this.skipDepthPrePass = !!skipDepthPrePass;
 
         this.alphaTest = typeof alphaTest === 'number' ? alphaTest : null;
 
