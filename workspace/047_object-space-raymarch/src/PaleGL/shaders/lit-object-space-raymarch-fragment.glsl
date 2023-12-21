@@ -4,6 +4,7 @@ precision mediump float;
 
 #pragma DEFINES
 
+#include ./partial/raymarch-utilities.glsl
 #include ./partial/raymarch-distance-functions.glsl
 #include ./partial/alpha-test-functions.glsl
 
@@ -111,10 +112,11 @@ void main() {
     float distance = 0.;
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
-    float minDistance = .001;
-    for(int i = 0; i < 64; i++) {
+    float minDistance = .0001;
+    for(int i = 0; i < 128; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        distance = sphere(currentRayPosition - vec3(0., 1., 0.), 1.);
+        vec3 p = opRepeat(currentRayPosition, 2.);
+        distance = dfSphere(p, .2);
         accLen += distance;
         if(distance < minDistance) {
             break;
