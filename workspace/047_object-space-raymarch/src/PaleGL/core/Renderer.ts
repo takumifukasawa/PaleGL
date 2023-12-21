@@ -832,6 +832,7 @@ export class Renderer {
 
                 // 先頭でガードしてるので shadow camera はあるはず。
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
                 this.renderMesh(actor.geometry, targetMaterial);

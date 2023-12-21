@@ -4,6 +4,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litObjectSpaceRaymarchFrag from '@/PaleGL/shaders/lit-object-space-raymarch-fragment.glsl';
+import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
@@ -53,6 +54,7 @@ export class ObjectSpaceRaymarchMaterial extends Material {
     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
         this.vertexShader = raymarchVert;
         this.fragmentShader = litObjectSpaceRaymarchFrag;
+        this.depthFragmentShader = gBufferObjectSpaceRaymarchDepthFrag;
         super.start({ gpu, attributeDescriptors });
     }
 }
