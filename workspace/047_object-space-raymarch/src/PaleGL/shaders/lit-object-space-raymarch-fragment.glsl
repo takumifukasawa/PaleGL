@@ -4,6 +4,9 @@ precision mediump float;
 
 #pragma DEFINES
 
+#include ./partial/raymarch-distance-functions.glsl
+#include ./partial/alpha-test-functions.glsl
+
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
@@ -72,19 +75,8 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 }
 #endif
 
-#ifdef USE_ALPHA_TEST
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-#endif
 
 #include ./partial/gbuffer-layout.glsl
-
-float sphere(vec3 p, float radius) {
-    return length(p) - radius;
-}
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
@@ -143,9 +135,7 @@ void main() {
     
     resultColor = surface.diffuseColor;
     
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
+#include ./partial/alpha-test-calc.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
 
