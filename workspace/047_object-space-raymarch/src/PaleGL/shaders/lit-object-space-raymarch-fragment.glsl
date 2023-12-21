@@ -4,8 +4,11 @@ precision mediump float;
 
 #pragma DEFINES
 
-#include ./partial/raymarch-utilities.glsl
+// raymarch
 #include ./partial/raymarch-distance-functions.glsl
+#include ./custom/object-space-raymarch-test-scene.glsl
+#include ./partial/raymarch-utility-functions.glsl
+
 #include ./partial/alpha-test-functions.glsl
 
 uniform vec4 uDiffuseColor;
@@ -78,8 +81,6 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 
 #include ./partial/gbuffer-layout.glsl
 
-#include ./custom/object-space-raymarch-test-scene.glsl
-
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
     
@@ -103,7 +104,7 @@ void main() {
     // surface.specularAmount = uSpecularAmount;
    
     vec3 emissiveColor = uEmissiveColor.rgb;
-    
+   
     //
     // NOTE: raymarch block
     //
@@ -130,16 +131,20 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    Surface surface;
-    surface.worldPosition = vWorldPosition;
-    surface.worldNormal = worldNormal;
-    surface.diffuseColor = diffuseColor;
+    // Surface surface;
+    // surface.worldPosition = vWorldPosition;
+    // surface.worldNormal = worldNormal;
+    // surface.diffuseColor = diffuseColor;
     
-    resultColor = surface.diffuseColor;
+    resultColor = diffuseColor;
     
 #include ./partial/alpha-test-calc.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
+    
+    if(distance > 0.) {
+        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition);
+    }
 
     // correct
     // outGBufferA = vec4(resultColor.rgb, 1.);

@@ -4,8 +4,11 @@ precision mediump float;
 
 #pragma DEFINES
 
-#include ./partial/raymarch-utilities.glsl
+// raymarch
 #include ./partial/raymarch-distance-functions.glsl
+#include ./custom/object-space-raymarch-test-scene.glsl
+#include ./partial/raymarch-utility-functions.glsl
+
 #include ./partial/alpha-test-functions.glsl
 
 uniform vec4 uColor;
@@ -23,8 +26,6 @@ in vec3 vWorldPosition;
 #ifdef USE_VERTEX_COLOR
 in vec4 vVertexColor;
 #endif
-
-#include ./custom/object-space-raymarch-test-scene.glsl
 
 out vec4 outColor;
 
