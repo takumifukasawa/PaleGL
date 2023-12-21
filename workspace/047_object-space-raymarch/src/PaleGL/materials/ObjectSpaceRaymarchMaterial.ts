@@ -1,27 +1,30 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
-import { GPU } from '@/PaleGL/core/GPU';
+import {
+    DepthFuncTypes,
+    ShadingModelIds,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import litObjectSpaceRaymarchFrag from '@/PaleGL/shaders/lit-object-space-raymarch-fragment.glsl';
-import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ObjectSpaceRaymarchMaterialArgs = {
-    vertexShaderModifier?: VertexShaderModifier;
-    uniforms?: UniformsData;
     shadingModelId?: ShadingModelIds;
-} & MaterialArgs;
+} & MaterialArgs & {
+    fragmentShader: string;
+    depthFragmentShader: string;
+};
 
 export class ObjectSpaceRaymarchMaterial extends Material {
     constructor({
         // TODO: 外部化
-        vertexShaderModifier = {},
+        fragmentShader,
+        depthFragmentShader,
         shadingModelId = ShadingModelIds.Lit,
         uniforms = [],
         ...options
-    }: ObjectSpaceRaymarchMaterialArgs = {}) {
+    }: ObjectSpaceRaymarchMaterialArgs) {
         const baseUniforms: UniformsData = [
             {
                 name: UniformNames.ShadingModelId,
@@ -36,7 +39,9 @@ export class ObjectSpaceRaymarchMaterial extends Material {
         super({
             ...options,
             name: 'ObjectSpaceRaymarchMaterial',
-            vertexShaderModifier,
+            vertexShader: raymarchVert,
+            fragmentShader,
+            depthFragmentShader,
             uniforms: mergedUniforms,
             // NOTE: GBufferMaterialの設定
             // useNormalMap: !!normalMap,
@@ -49,12 +54,5 @@ export class ObjectSpaceRaymarchMaterial extends Material {
             depthFuncType: DepthFuncTypes.Lequal,
             skipDepthPrePass: true,
         });
-    }
-
-    start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
-        this.vertexShader = raymarchVert;
-        this.fragmentShader = litObjectSpaceRaymarchFrag;
-        this.depthFragmentShader = gBufferObjectSpaceRaymarchDepthFrag;
-        super.start({ gpu, attributeDescriptors });
     }
 }

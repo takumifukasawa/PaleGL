@@ -231,7 +231,7 @@ export const buildFragmentShader = (
         const defines = buildShaderDefines(defineOptions);
         return defines.join('\n');
     });
-    
+   
     // replace shader block
     Object.values(FragmentShaderModifierPragmas).forEach((value) => {
         const pragma = value as FragmentShaderModifierPragmas;

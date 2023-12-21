@@ -63,6 +63,10 @@ import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass'
 import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
 import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 
+// shaders
+import litObjectSpaceRaymarchFrag from '@/PaleGL/shaders/lit-object-space-raymarch-fragment.glsl';
+import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-object-space-raymarch-depth-fragment.glsl';
+
 // others
 import {
     UniformTypes,
@@ -1243,8 +1247,11 @@ const main = async () => {
 
     const objectSpaceRaymarchMesh = new Mesh({
         geometry: new BoxGeometry({ gpu }),
-        material: new ObjectSpaceRaymarchMaterial(),
-        castShadow: true
+        material: new ObjectSpaceRaymarchMaterial({
+            fragmentShader: litObjectSpaceRaymarchFrag,
+            depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
+        }),
+        castShadow: true,
     });
     objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1, 0);

@@ -76,8 +76,9 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 }
 #endif
 
-
 #include ./partial/gbuffer-layout.glsl
+
+#include ./custom/object-space-raymarch-test-scene.glsl
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
@@ -113,10 +114,9 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 128; i++) {
+    for(int i = 0; i < 64; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        vec3 p = opRepeat(currentRayPosition, 2.);
-        distance = dfSphere(p, .2);
+        distance = dfScene(currentRayPosition);
         accLen += distance;
         if(distance < minDistance) {
             break;

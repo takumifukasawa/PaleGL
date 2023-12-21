@@ -24,6 +24,8 @@ in vec3 vWorldPosition;
 in vec4 vVertexColor;
 #endif
 
+#include ./custom/object-space-raymarch-test-scene.glsl
+
 out vec4 outColor;
 
 void main() {
@@ -39,8 +41,6 @@ void main() {
     diffuseColor = uColor * diffuseMapColor;
 #endif   
 
-
-
     //
     // NOTE: raymarch block
     //
@@ -51,10 +51,9 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 128; i++) {
+    for(int i = 0; i < 64; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        vec3 p = opRepeat(currentRayPosition, 2.);
-        distance = dfSphere(p, .2);
+        distance = dfScene(currentRayPosition);
         accLen += distance;
         if(distance < minDistance) {
             break;

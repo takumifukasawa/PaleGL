@@ -31,29 +31,6 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
     };
 };
 
-// DEPRECATED
-// // ref: https://github.com/vitejs/vite/issues/6555
-// export const minifyBundles: () => Plugin = () => {
-//     return {
-//         name: 'minifyBundles',
-//         async generateBundle(_: NormalizedOutputOptions, bundle: OutputBundle) {
-//             for (let key in bundle) {
-//                 if (bundle[key].type == 'chunk' && key.endsWith('.js')) {
-//                     const chunk = (bundle[key] as OutputChunk);
-//                     const minifyCode = await minify(chunk.code, {
-//                         mangle: {
-//                             properties: true
-//                         },
-//                         toplevel: true,
-//                     });
-//                     chunk.code = minifyCode.code!;
-//                 }
-//             }
-//             // return bundle;
-//         },
-//     };
-// };
-
 // ref:
 // https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
@@ -91,6 +68,7 @@ export default defineConfig(({ mode }) => {
                 minify: isMinifyShader,
                 minifierOptions: {
                     preserveExternals: true,
+                    // noRenamingList: ["main,dfScene"] // object space raymarch の scene 探索用関数は rename しない
                     // preserveAllGlobals: true,
                     // noRenaming: true
                 },

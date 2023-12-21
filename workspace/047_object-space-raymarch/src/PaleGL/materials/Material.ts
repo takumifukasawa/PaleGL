@@ -29,7 +29,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
-export type MaterialArgs = {
+export type  MaterialArgs= {
     // required
 
     // gpu: GPU,
@@ -228,6 +228,7 @@ export class Material {
         depthFragmentShaderGenerator,
 
         vertexShaderModifier,
+        fragmentShaderModifier,
 
         primitiveType,
         depthTest = true,
@@ -298,6 +299,9 @@ export class Material {
 
         if (vertexShaderModifier) {
             this._vertexShaderModifier = vertexShaderModifier;
+        }
+        if(fragmentShaderModifier) {
+            this._fragmentShaderModifier = fragmentShaderModifier;
         }
 
         this.primitiveType = primitiveType || PrimitiveTypes.Triangles;
