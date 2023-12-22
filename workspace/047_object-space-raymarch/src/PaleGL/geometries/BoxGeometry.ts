@@ -124,6 +124,14 @@ export class BoxGeometry extends Geometry {
         const boxPosition_5 = [0.5, -0.5, -0.5];
         const boxPosition_6 = [-0.5, 0.5, -0.5];
         const boxPosition_7 = [-0.5, -0.5, -0.5];
+        // const boxPosition_0 = [-1, 1, 1];
+        // const boxPosition_1 = [-1, -1, 1];
+        // const boxPosition_2 = [1, 1, 1];
+        // const boxPosition_3 = [1, -1, 1];
+        // const boxPosition_4 = [1, 1, -1];
+        // const boxPosition_5 = [1, -1, -1];
+        // const boxPosition_6 = [-1, 1, -1];
+        // const boxPosition_7 = [-1, -1, -1];
 
         const normals = [
             [0, 0, 1], // front

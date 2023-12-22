@@ -783,6 +783,7 @@ export class Renderer {
             
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
+            depthMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
             depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
             depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
             depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
@@ -831,6 +832,7 @@ export class Renderer {
                 }
 
                 // 先頭でガードしてるので shadow camera はあるはず。
+                targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
@@ -883,6 +885,7 @@ export class Renderer {
             const targetMaterial = actor.materials[materialIndex];
 
             // TODO: material 側でやった方がよい？
+            targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
             targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
             targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);

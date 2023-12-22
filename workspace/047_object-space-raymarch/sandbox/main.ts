@@ -181,6 +181,7 @@ let sphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 let glslSound: GLSLSound;
+let objectSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -1245,16 +1246,27 @@ const main = async () => {
     // local raymarch mesh
     //
 
-    const objectSpaceRaymarchMesh = new Mesh({
+    objectSpaceRaymarchMesh = new Mesh({
         geometry: new BoxGeometry({ gpu }),
         material: new ObjectSpaceRaymarchMaterial({
             fragmentShader: litObjectSpaceRaymarchFrag,
             depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
+            uniforms: [
+            ]
         }),
         castShadow: true,
     });
     objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1, 0);
+    objectSpaceRaymarchMesh.onUpdate = () => {
+        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", objectSpaceRaymarchMesh.transform.scale);
+        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue("uBoundsScale", objectSpaceRaymarchMesh.transform.scale);
+        // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
+    };
+    // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
+    //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
+    // }
+    
 
     //
     // instancing mesh
@@ -1675,6 +1687,114 @@ function initDebugger() {
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
+    
+    //
+    // object space raymarch
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', true);
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'pos x',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.position.x,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.position.x = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'pos y',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.position.y,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.position.y = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'pos z',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.position.z,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.position.z = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'scale x',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.scale.x,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.scale.x = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'scale y',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.scale.y,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.scale.y = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'scale z',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.001,
+        initialValue: objectSpaceRaymarchMesh.transform.scale.z,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.scale.z = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'rotation x',
+        minValue: 0,
+        maxValue: 360,
+        stepValue: 0.01,
+        initialValue: objectSpaceRaymarchMesh.transform.rotation.x,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.rotation.x = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'rotation y',
+        minValue: 0,
+        maxValue: 360,
+        stepValue: 0.01,
+        initialValue: objectSpaceRaymarchMesh.transform.rotation.y,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.rotation.y = value;
+        },
+    });
+
+    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+        label: 'rotation z',
+        minValue: 0,
+        maxValue: 360,
+        stepValue: 0.01,
+        initialValue: objectSpaceRaymarchMesh.transform.rotation.z,
+        onChange: (value) => {
+            objectSpaceRaymarchMesh.transform.rotation.z = value;
+        },
+    });
+
 
     //
     // directional light
@@ -1834,7 +1954,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft');
+    const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft', false);
 
     lightShaftDebuggerGroup.addToggleDebugger({
         label: 'light shaft pass enabled',

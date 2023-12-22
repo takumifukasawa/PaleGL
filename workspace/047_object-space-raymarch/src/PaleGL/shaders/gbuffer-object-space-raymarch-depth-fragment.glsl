@@ -15,6 +15,9 @@ uniform vec4 uColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
 uniform vec3 uViewPosition;
+uniform mat4 uWorldMatrix;
+uniform mat4 uInverseWorldMatrix;
+uniform vec3 uBoundsScale;
 
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;
@@ -52,15 +55,21 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 64; i++) {
+    for(int i = 0; i < 128; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        distance = dfScene(currentRayPosition);
+        // distance = dfScene(currentRayPosition);
+        distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
-        if(distance < minDistance) {
+        // if(distance < minDistance) {
+        // if(!isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix), uBoundsScale) || distance < minDistance) {
+        if(
+            !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
+            distance <= minDistance
+        ) {
             break;
         }
     }
-    if(distance >= minDistance) {
+    if(distance > minDistance) {
         discard;
     }
 

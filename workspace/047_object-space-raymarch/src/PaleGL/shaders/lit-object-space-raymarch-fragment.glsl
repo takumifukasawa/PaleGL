@@ -29,6 +29,9 @@ uniform int uShadingModelId;
 #include ./partial/normal-map-fragment-uniforms.glsl
 
 uniform vec3 uViewPosition;
+uniform mat4 uWorldMatrix;
+uniform mat4 uInverseWorldMatrix;
+uniform vec3 uBoundsScale;
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 
@@ -115,15 +118,20 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 64; i++) {
+    for(int i = 0; i < 128; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        distance = dfScene(currentRayPosition);
+        // distance = dfScene(currentRayPosition);
+        distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
-        if(distance < minDistance) {
+        // if(distance <= minDistance) {
+        if(
+            !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
+            distance <= minDistance
+        ) {
             break;
         }
     }
-    if(distance >= minDistance) {
+    if(distance > minDistance) {
         discard;
     }
 
@@ -143,7 +151,7 @@ void main() {
     resultColor.rgb = gamma(resultColor.rgb);
     
     if(distance > 0.) {
-        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition);
+        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, inverse(uWorldMatrix), uBoundsScale);
     }
 
     // correct

@@ -24,6 +24,21 @@ export class Rotator {
     }
 
     // degree
+    set x(v: number) {
+        this.elements[0] = v;
+    }
+
+    // degree
+    set y(v: number) {
+        this.elements[1] = v;
+    }
+
+    // degree
+    set z(v: number) {
+        this.elements[2] = v;
+    }
+
+    // degree
     get roll() {
         return this.elements[2];
     }

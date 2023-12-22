@@ -358,6 +358,11 @@ export class Material {
         // - skinning回りもここで入れたい？
         const commonUniforms: UniformsData = [
             {
+                name: UniformNames.InverseWorldMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
                 name: UniformNames.WorldMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,

@@ -13,6 +13,7 @@ export class Transform {
     actor: Actor;
     parent: Transform | null = null;
     children: Actor[] = [];
+    #inverseWorldMatrix: Matrix4 = Matrix4.identity;
     #worldMatrix: Matrix4 = Matrix4.identity;
     #localMatrix: Matrix4 = Matrix4.identity;
     position: Vector3 = Vector3.zero;
@@ -26,6 +27,10 @@ export class Transform {
 
     get hasChild() {
         return this.childCount > 0;
+    }
+
+    get inverseWorldMatrix() {
+        return this.#inverseWorldMatrix;
     }
 
     get worldMatrix() {
@@ -89,6 +94,7 @@ export class Transform {
         this.#worldMatrix = this.parent
             ? Matrix4.multiplyMatrices(this.parent.worldMatrix, this.#localMatrix)
             : this.#localMatrix;
+        this.#inverseWorldMatrix = this.#worldMatrix.clone().invert();
     }
 
     setScaling(s: Vector3) {

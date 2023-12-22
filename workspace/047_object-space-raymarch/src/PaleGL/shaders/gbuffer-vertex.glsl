@@ -1,5 +1,7 @@
 #version 300 es
 
+precision mediump float;
+
 #pragma DEFINES
 
 #pragma ATTRIBUTES
