@@ -224,9 +224,8 @@ wrapperElement?.appendChild(instanceNumView);
 const captureScene = new Scene();
 // const compositeScene = new Scene();
 
-const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
-// const pixelRatio = Math.min(window.devicePixelRatio, 1);
-// const pixelRatio = ;
+// const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+const pixelRatio = Math.min(window.devicePixelRatio, 1);
 
 const renderer = new Renderer({
     gpu,

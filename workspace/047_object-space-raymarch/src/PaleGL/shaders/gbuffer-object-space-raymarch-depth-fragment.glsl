@@ -1,6 +1,6 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 
@@ -55,13 +55,10 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 128; i++) {
+    for(int i = 0; i < 64; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        // distance = dfScene(currentRayPosition);
         distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
-        // if(distance < minDistance) {
-        // if(!isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix), uBoundsScale) || distance < minDistance) {
         if(
             !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
             distance <= minDistance

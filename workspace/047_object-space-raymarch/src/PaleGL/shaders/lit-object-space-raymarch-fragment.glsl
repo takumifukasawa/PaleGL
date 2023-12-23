@@ -1,6 +1,6 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 
@@ -118,12 +118,10 @@ void main() {
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 128; i++) {
+    for(int i = 0; i < 64; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        // distance = dfScene(currentRayPosition);
         distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
-        // if(distance <= minDistance) {
         if(
             !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
             distance <= minDistance
@@ -151,13 +149,10 @@ void main() {
     resultColor.rgb = gamma(resultColor.rgb);
     
     if(distance > 0.) {
-        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, inverse(uWorldMatrix), uBoundsScale);
+        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
     }
 
     // correct
-    // outGBufferA = vec4(resultColor.rgb, 1.);
-    // outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
-    // outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(uMetallic, uRoughness);

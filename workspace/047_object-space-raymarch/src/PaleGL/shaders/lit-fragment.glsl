@@ -45,10 +45,6 @@ in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
-
-// layout (location = 0) out vec4 outGBufferA;
-// layout (location = 1) out vec4 outGBufferB;
-// layout (location = 2) out vec4 outGBufferC;
 // layout (location = 3) out vec4 outGBufferD;
 
 #include ./partial/gbuffer-functions.glsl
@@ -117,10 +113,6 @@ void main() {
 
     resultColor.rgb = gamma(resultColor.rgb);
 
-    // correct
-    // outGBufferA = vec4(resultColor.rgb, 1.);
-    // outGBufferB = vec4(worldNormal * .5 + .5, 1.); 
-    // outGBufferC = vec4(uMetallic, uRoughness, 0., 1.);
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(uMetallic, uRoughness);
