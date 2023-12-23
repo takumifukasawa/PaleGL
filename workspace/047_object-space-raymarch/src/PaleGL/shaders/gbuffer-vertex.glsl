@@ -118,7 +118,6 @@ mat4 getLookAtMat(vec3 lookAt, vec3 p) {
     );
 }
 
-#define MINIFY
 void main() {
 
     #pragma BEGIN_MAIN

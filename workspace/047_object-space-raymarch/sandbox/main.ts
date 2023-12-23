@@ -92,7 +92,6 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import {Shader} from "@/PaleGL/core/Shader.ts";
@@ -105,7 +104,7 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
+import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1245,27 +1244,33 @@ const main = async () => {
     // local raymarch mesh
     //
 
-    objectSpaceRaymarchMesh = new Mesh({
-        geometry: new BoxGeometry({ gpu }),
-        material: new ObjectSpaceRaymarchMaterial({
-            fragmentShader: litObjectSpaceRaymarchFrag,
-            depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-            uniforms: [
-            ]
-        }),
+    objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
+        gpu,
+        fragmentShader: litObjectSpaceRaymarchFrag,
+        depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
         castShadow: true,
     });
+    // objectSpaceRaymarchMesh = new Mesh({
+    //     geometry: new BoxGeometry({ gpu }),
+    //     material: new ObjectSpaceRaymarchMaterial({
+    //         fragmentShader: litObjectSpaceRaymarchFrag,
+    //         depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
+    //     }),
+    //     castShadow: true,
+    // });
     objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1, 0);
     objectSpaceRaymarchMesh.onUpdate = () => {
-        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", objectSpaceRaymarchMesh.transform.scale);
-        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue("uBoundsScale", objectSpaceRaymarchMesh.transform.scale);
+        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uBoundsScale', objectSpaceRaymarchMesh.transform.scale);
+        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+            'uBoundsScale',
+            objectSpaceRaymarchMesh.transform.scale
+        );
         // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
     };
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
-    
 
     //
     // instancing mesh
@@ -1686,7 +1691,7 @@ function initDebugger() {
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
-    
+
     //
     // object space raymarch
     //
@@ -1793,7 +1798,6 @@ function initDebugger() {
             objectSpaceRaymarchMesh.transform.rotation.z = value;
         },
     });
-
 
     //
     // directional light
