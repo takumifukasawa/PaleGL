@@ -11,6 +11,8 @@ precision highp float;
 
 #include ./partial/raymarch-utility-functions.glsl
 
+#include ./partial/depth-functions.glsl
+
 #include ./partial/alpha-test-functions.glsl
 
 uniform vec4 uDiffuseColor;
@@ -30,10 +32,15 @@ uniform int uShadingModelId;
 
 #include ./partial/normal-map-fragment-uniforms.glsl
 
-uniform vec3 uViewPosition;
 uniform mat4 uWorldMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseWorldMatrix;
+uniform vec3 uViewPosition;
 uniform vec3 uBoundsScale;
+uniform sampler2D uDepthTexture;
+uniform float uNearClip;
+uniform float uFarClip;
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 
@@ -125,24 +132,28 @@ void main() {
         distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
         if(
-        !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
-        distance <= minDistance
+            !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
+            distance <= minDistance
         ) {
             break;
         }
     }
+    
     if(distance > minDistance) {
         discard;
     }
 
+    // 既存の深度値と比較して、奥にある場合は破棄する
+    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float currentDepth = viewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
+    if(currentDepth >= sceneDepth) {
+        discard;
+    }
+ 
     //
     // NOTE: end raymarch block
     //
-
-    // Surface surface;
-    // surface.worldPosition = vWorldPosition;
-    // surface.worldNormal = worldNormal;
-    // surface.diffuseColor = diffuseColor;
 
     resultColor = diffuseColor;
 
@@ -154,7 +165,6 @@ void main() {
         worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
     }
 
-    // correct
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(uMetallic, uRoughness);

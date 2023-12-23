@@ -27,8 +27,23 @@ export class ObjectSpaceRaymarchMaterial extends Material {
                 type: UniformTypes.Vector3,
                 value: Vector3.one,
             },
+            {
+                name: UniformNames.DepthTexture,
+                type: UniformTypes.Texture,
+                value: null
+            },
+            {
+                name: UniformNames.CameraNear,
+                type: UniformTypes.Float,
+                value: 0
+            },
+            {
+                name: UniformNames.CameraFar,
+                type: UniformTypes.Float,
+                value: 0,
+            }
         ];
-        const baseUniforms: UniformsData = [
+        const shadingUniforms: UniformsData = [
             {
                 name: UniformNames.ShadingModelId,
                 type: UniformTypes.Int, // float,intどちらでもいい
@@ -36,7 +51,7 @@ export class ObjectSpaceRaymarchMaterial extends Material {
             },
         ];
 
-        const mergedUniforms: UniformsData = [...commonUniforms, ...baseUniforms, ...(uniforms ? uniforms : [])];
+        const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];
 
         // TODO: できるだけconstructorの直後に持っていきたい
         super({

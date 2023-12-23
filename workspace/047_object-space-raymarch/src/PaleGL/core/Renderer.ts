@@ -411,6 +411,8 @@ export class Renderer {
         // g-buffer opaque pass
         // ------------------------------------------------------------------------------
 
+        this.copyDepthTexture();
+
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
@@ -487,7 +489,7 @@ export class Renderer {
             lightActors,
         });
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
-        
+
         // ------------------------------------------------------------------------------
         // ssr pass
         // ------------------------------------------------------------------------------
@@ -583,14 +585,16 @@ export class Renderer {
         // pattern2: depth prepass
         this._afterDeferredShadingRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
-        this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
-        RenderTarget.blitDepth({
-            gpu: this.gpu,
-            sourceRenderTarget: this._copyDepthSourceRenderTarget,
-            destRenderTarget: this._copyDepthDestRenderTarget,
-            width: this.realWidth,
-            height: this.realHeight,
-        });
+        this.copyDepthTexture();
+        // this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
+        // RenderTarget.blitDepth({
+        //     gpu: this.gpu,
+        //     sourceRenderTarget: this._copyDepthSourceRenderTarget,
+        //     destRenderTarget: this._copyDepthDestRenderTarget,
+        //     width: this.realWidth,
+        //     height: this.realHeight,
+        // });
+
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
             renderMeshInfo.actor.material.uniforms.setValue(
@@ -776,11 +780,11 @@ export class Renderer {
             if (!depthMaterial) {
                 throw '[Renderer.depthPrePass] invalid depth material';
             }
-            
-            if(actor.mainMaterial.skipDepthPrePass) {
+
+            if (actor.mainMaterial.skipDepthPrePass) {
                 return;
             }
-            
+
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
             depthMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
@@ -788,12 +792,23 @@ export class Renderer {
             depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
             depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            
+
             this.renderMesh(actor.geometry, depthMaterial);
 
             if (this.stats) {
                 this.stats.addPassInfo('depth pre pass', actor.name, actor.geometry);
             }
+        });
+    }
+
+    private copyDepthTexture() {
+        this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
+        RenderTarget.blitDepth({
+            gpu: this.gpu,
+            sourceRenderTarget: this._copyDepthSourceRenderTarget,
+            destRenderTarget: this._copyDepthDestRenderTarget,
+            width: this.realWidth,
+            height: this.realHeight,
         });
     }
 
@@ -834,9 +849,15 @@ export class Renderer {
                 // 先頭でガードしてるので shadow camera はあるはず。
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
+                targetMaterial.uniforms.setValue(
+                    UniformNames.ViewPosition,
+                    lightActor.shadowCamera!.transform.worldMatrix.position
+                );
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
+                targetMaterial.uniforms.setValue(
+                    UniformNames.ProjectionMatrix,
+                    lightActor.shadowCamera!.projectionMatrix
+                );
                 this.renderMesh(actor.geometry, targetMaterial);
 
                 if (this.stats) {
@@ -895,13 +916,18 @@ export class Renderer {
             );
             targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture!);
+            targetMaterial.uniforms.setValue(UniformNames.CameraNear, camera.near);
+            targetMaterial.uniforms.setValue(UniformNames.CameraFar, camera.far);
+
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             lightActors.forEach((light) => {
                 light.applyUniformsValues(targetMaterial);
             });
-            
+
             this.renderMesh(actor.geometry, targetMaterial);
 
             if (this.stats) {
@@ -921,7 +947,7 @@ export class Renderer {
     private transparentPass(
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
-        lightActors: Light[],
+        lightActors: Light[]
         // clear: boolean
     ) {
         // console.log("--------- transparent pass ---------");

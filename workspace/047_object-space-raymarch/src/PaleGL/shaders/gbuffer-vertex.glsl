@@ -158,7 +158,7 @@ void main() {
     vec4 worldPosition = worldMatrix * localPosition;
 
     #pragma WORLD_POSITION_POST_PROCESS
- 
+
     vWorldPosition = worldPosition.xyz;
 
     #include ./partial/normal-map-vertex-calc.glsl;
