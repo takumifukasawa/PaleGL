@@ -17,6 +17,17 @@ vec3 getNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale) {
     return normalize(n);
 }
 
+vec3 getNormalDfScene(vec3 p) {
+const float eps = .0001;
+    vec3 n = vec3(
+        dfScene(p + vec3(eps, 0, 0)) - dfScene(p + vec3(-eps, 0, 0)),
+        dfScene(p + vec3(0, eps, 0)) - dfScene(p + vec3(0, -eps, 0)),
+        dfScene(p + vec3(0, 0, eps)) - dfScene(p + vec3(0, 0, -eps))
+    );
+    return normalize(n);
+    
+}
+
 bool isDfInnerBox(vec3 p, vec3 scale) {
     // 0 だとマッハバンドっぽい境目が出るのでちょっと余裕を持たせる
     const float eps = .0001;

@@ -65,7 +65,9 @@ import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 
 // shaders
 import litObjectSpaceRaymarchFrag from '@/PaleGL/shaders/lit-object-space-raymarch-fragment.glsl';
-import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-object-space-raymarch-depth-fragment.glsl';
+import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-screen-space-raymarch-depth-fragment.glsl';
+import litScreenSpaceRaymarchFrag from '@/PaleGL/shaders/lit-screen-space-raymarch-fragment.glsl';
+import gBufferScreenSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-screen-space-raymarch-depth-fragment.glsl';
 
 // others
 import {
@@ -105,6 +107,7 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
+import {ScreenSpaceRaymarchMesh} from "@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts";
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -181,6 +184,7 @@ let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 let glslSound: GLSLSound;
 let objectSpaceRaymarchMesh: Mesh;
+let screenSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -1271,6 +1275,18 @@ const main = async () => {
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
+    
+    //
+    // screen space raymarch mesh
+    //
+    
+    screenSpaceRaymarchMesh = new ScreenSpaceRaymarchMesh({
+        gpu,
+        fragmentShader: litScreenSpaceRaymarchFrag,
+        depthFragmentShader: gBufferScreenSpaceRaymarchDepthFrag
+    });
+    screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
+    screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
 
     //
     // instancing mesh
@@ -1572,9 +1588,10 @@ void main() {
     captureScene.add(sphereMesh);
     captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);
-    captureScene.add(objectSpaceRaymarchMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
+    captureScene.add(objectSpaceRaymarchMesh);
+    captureScene.add(screenSpaceRaymarchMesh);
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
