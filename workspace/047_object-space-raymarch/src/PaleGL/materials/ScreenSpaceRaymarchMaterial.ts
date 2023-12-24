@@ -1,7 +1,7 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
 import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants';
-// import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
-import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
+// import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する

@@ -131,10 +131,6 @@ export class OrthographicCamera extends Camera {
             const wp = localPositions[key].multiplyMatrix4(this.transform.worldMatrix);
             worldPositions[key] = wp;
         }
-        // Object.keys(localPositions).forEach((key) => {
-        //     const wp = localPositions[key].multiplyMatrix4(this.transform.worldMatrix);
-        //     worldPositions[key] = wp;
-        // });
         return worldPositions;
     }
     

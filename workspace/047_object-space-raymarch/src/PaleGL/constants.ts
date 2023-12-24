@@ -43,10 +43,10 @@ export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
 
 export const RenderQueueType = {
     // TransformFeedback: 'TransformFeedback',
-    Skybox: "s",
-    Opaque: "o",
-    AlphaTest: "a",
-    Transparent: "t",
+    Skybox: 's',
+    Opaque: 'o',
+    AlphaTest: 'a',
+    Transparent: 't',
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
@@ -235,9 +235,7 @@ export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
 // TODO: Texture -> Map にしたい？
 // TODO: objectじゃなくて単体のconst_stringにするべき
 export const UniformNames = {
-    // position
-    ViewPosition: 'uViewPosition',
-    // matrices
+    // transforms
     WorldMatrix: 'uWorldMatrix',
     ViewMatrix: 'uViewMatrix',
     ProjectionMatrix: 'uProjectionMatrix',
@@ -249,6 +247,8 @@ export const UniformNames = {
     InverseProjectionMatrix: 'uInverseProjectionMatrix',
     TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
     ViewDirectionProjectionInverse: 'uViewDirectionProjectionInverse',
+    ViewPosition: 'uViewPosition',
+    ViewDirection: 'uViewDirection',
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',

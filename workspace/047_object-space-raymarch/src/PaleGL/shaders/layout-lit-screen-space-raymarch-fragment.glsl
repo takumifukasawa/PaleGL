@@ -29,6 +29,11 @@ uniform vec3 uViewPosition;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
+uniform float uFov;
+uniform float uAspect;
+uniform vec3 uViewDirection;
+uniform float uTargetWidth;
+uniform float uTargetHeight;
 
 #include ./partial/camera-struct.glsl
 
@@ -38,6 +43,20 @@ in vec3 vWorldPosition;
 #include ./partial/gbuffer-functions.glsl
 
 #include ./partial/gbuffer-layout.glsl
+
+// // aspect ... w / h
+// vec3 getPerspectiveCameraDir(vec2 uv, vec3 forward, float fov, float aspect) {
+//     vec2 st = uv * 2. - 1.;
+//     float fovRad = fov * 3.141592 / 180.;
+//     float hh = tan(fovRad * .5);
+//     float hw = hh * aspect;
+//     vec3 dummyUp = vec3(0., 1., 0.);
+//     vec3 nf = forward;
+//     vec3 right = normalize(cross(nf, dummyUp));
+//     vec3 up = normalize(cross(right, nf));
+//     vec3 dir = normalize(right * hw * st.x + up * hh * st.y + forward);
+//     return dir;
+// }
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
@@ -50,17 +69,17 @@ void main() {
     //
 
     vec3 rayOrigin = uViewPosition;
-    // vec3 rayDirection = vec3(0., 0., -1.);
-    vec3 rayDirection = normalize(vWorldPosition - uViewPosition);
+    vec3 rayDirection = getPerspectiveCameraRayDir(vUv, uViewDirection, uFov, uAspect);
+
     float distance = 0.;
-    float accLen = 0.;
+    float accLen = uNearClip;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = .0001;
-    for(int i = 0; i < 128; i++) {
+    for(int i = 0; i < 64; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
         distance = dfScene(currentRayPosition);
         accLen += distance;
-        if(distance <= minDistance) {
+        if(accLen > uFarClip || distance <= minDistance) {
             break;
         }
     }
@@ -75,13 +94,13 @@ void main() {
     float currentDepth = viewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
 
     if(currentDepth >= sceneDepth) {
-        // discard;
+        discard;
     }
- 
+    
     //
     // NOTE: end raymarch block
     //
-
+    
     resultColor.rgb = gamma(resultColor.rgb);
 
     if(distance > 0.) {

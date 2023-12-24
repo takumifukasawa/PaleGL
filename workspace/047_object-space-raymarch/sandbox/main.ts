@@ -107,7 +107,7 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
-import {ScreenSpaceRaymarchMesh} from "@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts";
+import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1275,18 +1275,42 @@ const main = async () => {
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
-    
+
     //
     // screen space raymarch mesh
     //
-    
+
     screenSpaceRaymarchMesh = new ScreenSpaceRaymarchMesh({
         gpu,
         fragmentShader: litScreenSpaceRaymarchFrag,
-        depthFragmentShader: gBufferScreenSpaceRaymarchDepthFrag
+        depthFragmentShader: gBufferScreenSpaceRaymarchDepthFrag,
     });
     screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
+    screenSpaceRaymarchMesh.onUpdate = () => {
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            UniformNames.ViewDirection,
+            captureSceneCamera.getWorldForward()
+        );
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            UniformNames.TargetWidth,
+            width
+        );
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            UniformNames.TargetHeight,
+            height
+        );
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            "uAspect",
+            captureSceneCamera.aspect
+        );
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            "uFov",
+            captureSceneCamera.fov
+        )
+        // console.log(screenSpaceRaymarchMesh.transform.worldForward)
+        // console.log(captureSceneCamera.getWorldForward().elements)
+    };
 
     //
     // instancing mesh

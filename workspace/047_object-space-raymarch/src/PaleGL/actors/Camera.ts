@@ -300,6 +300,15 @@ export class Camera extends Actor {
     }
 
     /**
+     * 
+     */
+    getWorldForward() {
+        // forwardはカメラの背面を向いている
+        return this.transform.worldForward.clone().negate();
+        // return this.transform.worldForward.clone().negate().normalize();
+    }
+
+    /**
      *
      * @param renderer
      * @param scene
