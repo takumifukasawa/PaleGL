@@ -1308,9 +1308,8 @@ const main = async () => {
             "uFov",
             captureSceneCamera.fov
         )
-        // console.log(screenSpaceRaymarchMesh.transform.worldForward)
-        // console.log(captureSceneCamera.getWorldForward().elements)
     };
+    // screenSpaceRaymarchMesh.enabled = false;
 
     //
     // instancing mesh

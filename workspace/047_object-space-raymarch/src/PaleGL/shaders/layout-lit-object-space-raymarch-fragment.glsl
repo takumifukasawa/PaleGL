@@ -143,12 +143,22 @@ void main() {
         discard;
     }
 
+    // currentRayPosition = rayOrigin + rayDirection * accLen;
+
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     float currentDepth = viewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
     if(currentDepth >= sceneDepth) {
         discard;
+    }
+
+    vec4 rayClipPosition = uProjectionMatrix * uViewMatrix * vec4(currentRayPosition, 1.);
+    float newDepth = (rayClipPosition.z / rayClipPosition.w) * .5 + .5;
+    gl_FragDepth = newDepth;
+
+    if(distance > 0.) {
+        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
     }
  
     //
@@ -160,10 +170,6 @@ void main() {
     #include ./partial/alpha-test-calc.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
-
-    if(distance > 0.) {
-        worldNormal = getNormalObjectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
-    }
 
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);

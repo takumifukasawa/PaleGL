@@ -85,14 +85,6 @@ export class Renderer {
             height: 1,
             name: 'g-buffer render target',
         });
-        // this._ambientOcclusionRenderTarget = new RenderTarget({
-        //     gpu,
-        //     type: RenderTargetTypes.RGBA,
-        //     width: 1,
-        //     height: 1,
-        //     name: 'ambient occlusion render target',
-        // });
-        // console.log(this._gBufferRenderTarget)
         this._afterDeferredShadingRenderTarget = new RenderTarget({
             gpu,
             type: RenderTargetTypes.Empty,
@@ -108,7 +100,6 @@ export class Renderer {
             height: 1,
             name: 'copy depth source render target',
         });
-        // console.log(this._copyDepthSourceRenderTarget)
         this._copyDepthDestRenderTarget = new RenderTarget({
             gpu,
             type: RenderTargetTypes.Depth,
@@ -411,8 +402,6 @@ export class Renderer {
         // g-buffer opaque pass
         // ------------------------------------------------------------------------------
 
-        this.copyDepthTexture();
-
         this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
@@ -575,9 +564,6 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         // TODO: 直前のパスを明示的に指定する必要があるのはめんどうなのでうまいこと管理したい
-        // this._afterDeferredShadingRenderTarget.setTexture(this._deferredShadingPass.renderTarget.texture!);
-        // this._afterDeferredShadingRenderTarget.setTexture(this._gBufferRenderTargets.baseColorTexture);
-        // this._afterDeferredShadingRenderTarget.setTexture(this._lightShaftPass.renderTarget.texture!);
         this._afterDeferredShadingRenderTarget.setTexture(this._fogPass.renderTarget.read.texture!);
 
         // pattern1: g-buffer depth
@@ -586,14 +572,6 @@ export class Renderer {
         this._afterDeferredShadingRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         this.copyDepthTexture();
-        // this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
-        // RenderTarget.blitDepth({
-        //     gpu: this.gpu,
-        //     sourceRenderTarget: this._copyDepthSourceRenderTarget,
-        //     destRenderTarget: this._copyDepthDestRenderTarget,
-        //     width: this.realWidth,
-        //     height: this.realHeight,
-        // });
 
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
@@ -603,10 +581,8 @@ export class Renderer {
             );
         });
 
-        // TODO: colorだけクリアするべきのはず？
         this.setRenderTarget(this._afterDeferredShadingRenderTarget.write);
 
-        // this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors, false);
         this.transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors);
 
         // ------------------------------------------------------------------------------
@@ -801,6 +777,10 @@ export class Renderer {
         });
     }
 
+    /**
+     * 
+     * @private
+     */
     private copyDepthTexture() {
         this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
         RenderTarget.blitDepth({
@@ -887,13 +867,12 @@ export class Renderer {
         this._gBufferRenderTargets.setDepthTexture(this._depthPrePassRenderTarget.depthTexture!);
 
         this.setRenderTarget(this._gBufferRenderTargets.write, true);
-        // this.clearDepth(0, 0, 0, 1);
-        // this.clearColor(0, 0, 0, 1);
 
         // TODO: depth prepass しない場合は必要
         // if (clear) {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
+        
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -904,6 +883,14 @@ export class Renderer {
             }
 
             const targetMaterial = actor.materials[materialIndex];
+
+            // prepassしてないmaterialの場合はdepthをcopy.
+            // prepassしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
+            if(targetMaterial.skipDepthPrePass) {
+                this.setRenderTarget(null, false, false);
+                this.copyDepthTexture();
+                this.setRenderTarget(this._gBufferRenderTargets.write, false, false);
+            }
 
             // TODO: material 側でやった方がよい？
             targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
