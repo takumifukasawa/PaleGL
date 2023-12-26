@@ -49,11 +49,9 @@ float median(vec3 msdf) {
 }
 
 void main() {
-    // vec4 resultColor = vec4(0, 0, 0, 1);
     vec4 resultColor = uEmissiveColor;
 
     vec2 uv = vUv;
-    // uv = uv * uFontTiling.xy;
     uv = uv * uFontTiling.xy + uFontTiling.zw;
 
     vec3 worldNormal = normalize(vNormal);
@@ -61,19 +59,16 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
-    resultColor.rgb = vec3(1.);
+    resultColor.rgb = vec3(1); // TODO: debug
     resultColor.a = alpha;
     
-    // if(resultColor.a < .5) {
-    //     discard;
-    // }
-    
-    resultColor.rgb = vec3(alpha);
     if(alpha < .5) {
         discard;
     }
 
-    #include ./partial/alpha-test-calc.glsl
+#ifdef USE_ALPHA_TEST
+    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+#endif
 
     resultColor.rgb = gamma(resultColor.rgb);
     

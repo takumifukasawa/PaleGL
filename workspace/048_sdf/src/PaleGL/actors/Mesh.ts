@@ -104,6 +104,7 @@ export class Mesh extends Actor {
                 depthTest: true,
                 depthWrite: true,
                 depthFuncType: DepthFuncTypes.Lequal,
+                alphaTest: this.mainMaterial.alphaTest,
                 skipDepthPrePass: !!this.mainMaterial.skipDepthPrePass,
                 // depthFuncType: this.mainMaterial.depthFuncType
             });

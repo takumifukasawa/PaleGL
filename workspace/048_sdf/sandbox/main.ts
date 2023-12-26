@@ -110,7 +110,7 @@ import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
-import {TextMesh} from "@/PaleGL/actors/TextMesh.ts";
+import { TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1295,34 +1295,29 @@ const main = async () => {
             UniformNames.ViewDirection,
             captureSceneCamera.getWorldForward()
         );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.TargetWidth,
-            width
-        );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.TargetHeight,
-            height
-        );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            "uAspect",
-            captureSceneCamera.aspect
-        );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            "uFov",
-            captureSceneCamera.fov
-        )
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
+        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
     };
     screenSpaceRaymarchMesh.enabled = false;
-   
+
     //
     // text mesh
     //
-   
-    const fontAtlasImg = await loadImg(fontAtlasImgUrl); 
-    const fontAtlasTexture = new Texture({ gpu, img: fontAtlasImg, flipY: false });
+
+    const fontAtlasImg = await loadImg(fontAtlasImgUrl);
+    const fontAtlasTexture = new Texture({
+        gpu,
+        img: fontAtlasImg,
+        flipY: false,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
+    });
     const textMesh = new TextMesh({ gpu, atlasTexture: fontAtlasTexture, atlasJson: fontAtlasJson });
     captureScene.add(textMesh);
     textMesh.transform.position = new Vector3(2, 2, 0);
+    textMesh.transform.scale = new Vector3(5, 5, 5);
 
     //
     // instancing mesh

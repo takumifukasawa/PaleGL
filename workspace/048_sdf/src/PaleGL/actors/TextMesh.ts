@@ -1,5 +1,5 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import {ActorTypes, PrimitiveTypes, ShadingModelIds, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
+import { ActorTypes, PrimitiveTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
@@ -8,7 +8,7 @@ import { Material } from '@/PaleGL/materials/Material.ts';
 import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 // import fontAtlas from '@/PaleGL/fonts/NotoSans-Bold/atlas.png';
 // import fontJson from '@/PaleGL/fonts/NotoSans-Bold/NotoSans-Bold.json';
 
@@ -31,7 +31,7 @@ export class TextMesh extends Mesh {
         const sh = 19 / h;
         const sx = 86 / w;
         const sy = 20 / h;
-        
+
         const mergedUniforms: UniformsData = [
             {
                 name: UniformNames.FontMap,
@@ -42,7 +42,7 @@ export class TextMesh extends Mesh {
                 name: UniformNames.FontTiling,
                 type: UniformTypes.Vector4,
                 // value: Vector4.one
-                value: new Vector4(sw, sh, sx, sy) // TODO: dummy
+                value: new Vector4(sw, sh, sx, sy), // TODO: dummy
             },
             {
                 name: UniformNames.ShadingModelId,
@@ -63,6 +63,7 @@ export class TextMesh extends Mesh {
             // receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
         });
+        console.log(material)
 
         console.log(atlasTexture, atlasJson);
 
