@@ -26,13 +26,7 @@ in vec3 vWorldPosition;
 
 #include ./partial/gbuffer-functions.glsl
 
-#ifdef USE_ALPHA_TEST
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-#endif
+#include ./partial/alpha-test-functions.glsl
 
 #include ./partial/gbuffer-layout.glsl
 
@@ -63,10 +57,10 @@ void main() {
 #endif
     
     resultColor.rgb = gamma(resultColor.rgb);
-
-    // correct
+    vec3 emissiveColor = gamma(uEmissiveColor.rgb);
+    
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(uEmissiveColor.rgb);
+    outGBufferD = EncodeGBufferD(emissiveColor);
 }

@@ -284,6 +284,9 @@ export const UniformNames = {
     CubeTexture: 'uCubeTexture',
     // light
     DirectionalLight: 'uDirectionalLight',
+    // font
+    FontMap: 'uFontMap',
+    FontTiling: 'uFontTiling',
     // skybox
     Skybox: 'uSkybox',
     RotationOffset: 'uRotationOffset', // TODO: 名前変えたい

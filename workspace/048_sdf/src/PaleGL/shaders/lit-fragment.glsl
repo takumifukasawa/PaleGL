@@ -68,13 +68,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 }
 #endif
 
-#ifdef USE_ALPHA_TEST
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-#endif
+#include ./partial/alpha-test-functions.glsl
 
 #include ./partial/gbuffer-layout.glsl
 

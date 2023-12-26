@@ -8,6 +8,8 @@ import CubeMapNegativeYImgUrl from '../assets/images/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../assets/images/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../assets/images/nz.jpg?url';
 import gltfSphereModelUrl from '../assets/models/sphere-32x32.gltf?url';
+import fontAtlasImgUrl from '../assets/fonts/NotoSans-Bold/atlas.png?url';
+import fontAtlasJson from '../assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 // import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
@@ -108,6 +110,7 @@ import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
+import {TextMesh} from "@/PaleGL/actors/TextMesh.ts";
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1309,7 +1312,17 @@ const main = async () => {
             captureSceneCamera.fov
         )
     };
-    // screenSpaceRaymarchMesh.enabled = false;
+    screenSpaceRaymarchMesh.enabled = false;
+   
+    //
+    // text mesh
+    //
+   
+    const fontAtlasImg = await loadImg(fontAtlasImgUrl); 
+    const fontAtlasTexture = new Texture({ gpu, img: fontAtlasImg, flipY: false });
+    const textMesh = new TextMesh({ gpu, atlasTexture: fontAtlasTexture, atlasJson: fontAtlasJson });
+    captureScene.add(textMesh);
+    textMesh.transform.position = new Vector3(2, 2, 0);
 
     //
     // instancing mesh

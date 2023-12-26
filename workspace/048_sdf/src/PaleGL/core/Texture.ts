@@ -56,7 +56,7 @@ export class Texture extends GLObject {
         magFilter = TextureFilterTypes.Nearest,
         wrapS = TextureWrapTypes.ClampToEdge,
         wrapT = TextureWrapTypes.ClampToEdge,
-        flipY = false,
+        flipY,
     }: TextureArgs) {
         super();
 
@@ -70,9 +70,10 @@ export class Texture extends GLObject {
         this.magFilter = magFilter;
         this.wrapS = wrapS;
         this.wrapT = wrapT;
-        this.flipY = flipY;
         this.width = width;
         this.height = height;
+        // imgを持つが特に指定がない場合はflipする
+        this.flipY = (this.img && flipY === undefined) ? true : !!flipY;
 
         if (this.img === null) {
             // this.img = createWhite1x1();
@@ -173,7 +174,8 @@ export class Texture extends GLObject {
         // storei
         //
 
-        if (!!this.img || flipY) {
+        // if (!!this.img || this.flipY) {
+        if (this.flipY) {
             // uv座標そのものは左下からなのでglもそれに合わせるためにflip
             // html image coord -> gl texture coord
             // (0, 0) - (1, 0)     (0, 1) - (1, 1)

@@ -3,7 +3,11 @@ import { AttributeNames } from '@/PaleGL/constants';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 
-export function createPlaneGeometryRawData({ calculateTangent = false, calculateBinormal = false } = {}) {
+export function createPlaneGeometryRawData({
+    calculateTangent = false,
+    calculateBinormal = false,
+    flipUvY = false,
+} = {}) {
     // -----------------------------
     // 0 ---- 2
     // |    / |
@@ -13,23 +17,47 @@ export function createPlaneGeometryRawData({ calculateTangent = false, calculate
     // 1 ---- 3
     // -----------------------------
 
-    const normalsRaw = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
-    
-    const positions = new Float32Array([-1, 1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0]);
-    const uvs =  new Float32Array([0, 1, 0, 0, 1, 1, 1, 0]);
-    const normals =  new Float32Array(normalsRaw);
+    // prettier-ignore
+    const normalsRaw = [
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1
+    ];
+
+    // prettier-ignore
+    const positions = new Float32Array([
+        -1, 1, 0,
+        -1, -1, 0,
+        1, 1, 0,
+        1, -1, 0
+    ]);
+
+    // prettier-ignore
+    const uvs = new Float32Array(flipUvY ?
+        [
+            0, 0,
+            0, 1,
+            1, 0,
+            1, 1,
+        ] : [
+            0, 1,
+            0, 0,
+            1, 1,
+            1, 0,
+        ]);
+
+    const normals = new Float32Array(normalsRaw);
 
     let tangents: Float32Array = new Float32Array();
     let binormals: Float32Array = new Float32Array();
-   
-    if(calculateTangent || calculateBinormal) {
+
+    if (calculateTangent || calculateBinormal) {
         const tbs = Geometry.createTangentsAndBinormals(normalsRaw);
-        if(calculateTangent)
-        {
+        if (calculateTangent) {
             tangents = new Float32Array(tbs.tangents);
         }
-        if(calculateBinormal)
-        {
+        if (calculateBinormal) {
             binormals = new Float32Array(tbs.binormals);
         }
     }
@@ -45,8 +73,7 @@ export function createPlaneGeometryRawData({ calculateTangent = false, calculate
     };
 }
 
-
-export function createPlaneGeometryData({ calculateTangent = false, calculateBinormal = false } = {}) {
+export function createPlaneGeometryData({ calculateTangent = false, calculateBinormal = false, flipUvY = false } = {}) {
     // -----------------------------
     // 0 ---- 2
     // |    / |
@@ -56,8 +83,8 @@ export function createPlaneGeometryData({ calculateTangent = false, calculateBin
     // 1 ---- 3
     // -----------------------------
 
-    const rawData = createPlaneGeometryRawData({ calculateTangent, calculateBinormal });
-    
+    const rawData = createPlaneGeometryRawData({ calculateTangent, calculateBinormal, flipUvY });
+
     // const normals = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
     //const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
 
@@ -116,14 +143,17 @@ export class PlaneGeometry extends Geometry {
         gpu,
         calculateTangent = false,
         calculateBinormal = false,
+        flipUvY = false,
     }: {
         gpu: GPU;
         calculateTangent?: boolean;
         calculateBinormal?: boolean;
+        flipUvY?: boolean;
     }) {
         const { attributes, indices, drawCount } = createPlaneGeometryData({
             calculateTangent,
             calculateBinormal,
+            flipUvY
         });
 
         super({
