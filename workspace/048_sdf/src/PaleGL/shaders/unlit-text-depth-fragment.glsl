@@ -52,9 +52,9 @@ void main() {
     float alpha = sdf2alpha(sdf);
     resultColor.a = alpha;
 
-    #ifdef USE_ALPHA_TEST
+#ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-    #endif
+#endif
 
     outColor = vec4(1., 1., 1., 1.);
 }

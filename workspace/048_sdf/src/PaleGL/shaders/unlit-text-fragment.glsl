@@ -4,10 +4,8 @@ precision mediump float;
 
 #pragma DEFINES
 
-uniform vec4 uBaseColor;
-uniform vec4 uEmissiveColor;
+uniform vec4 uColor;
 uniform int uShadingModelId;
-
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
 
@@ -49,7 +47,7 @@ float median(vec3 msdf) {
 }
 
 void main() {
-    vec4 resultColor = uEmissiveColor;
+    vec4 resultColor = uColor;
 
     vec2 uv = vUv;
     uv = uv * uFontTiling.xy + uFontTiling.zw;
@@ -59,12 +57,7 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
-    resultColor.rgb = vec3(1); // TODO: debug
     resultColor.a = alpha;
-    
-    if(alpha < .5) {
-        discard;
-    }
 
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);

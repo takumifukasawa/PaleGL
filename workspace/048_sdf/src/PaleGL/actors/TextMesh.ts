@@ -9,6 +9,7 @@ import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {Color} from "@/PaleGL/math/Color.ts";
 // import fontAtlas from '@/PaleGL/fonts/NotoSans-Bold/atlas.png';
 // import fontJson from '@/PaleGL/fonts/NotoSans-Bold/NotoSans-Bold.json';
 
@@ -20,9 +21,8 @@ type TextRaymarchMeshArgs = {
     atlasJson: unknown;
 } & MeshOptionsArgs;
 
+// TODO: なぜかcastshadowがきかない
 export class TextMesh extends Mesh {
-    name: string;
-
     constructor({ gpu, name = '', atlasTexture, atlasJson, uniforms = [] }: TextRaymarchMeshArgs) {
         const w = 256;
         const h = 128;
@@ -49,6 +49,11 @@ export class TextMesh extends Mesh {
                 type: UniformTypes.Int,
                 value: ShadingModelIds.Unlit,
             },
+            {
+                name: "uColor",
+                type: UniformTypes.Color,
+                value: Color.white,
+            },
             ...uniforms,
         ];
 
@@ -63,16 +68,9 @@ export class TextMesh extends Mesh {
             // receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
         });
-        console.log(material)
 
         console.log(atlasTexture, atlasJson);
 
-        // const img =
-        // const texture = new Texture({});
-
-        super({ geometry, material, actorType: ActorTypes.Mesh });
-
-        this.name = name;
-        this.castShadow = false;
+        super({ name, geometry, material, actorType: ActorTypes.Mesh });
     }
 }
