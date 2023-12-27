@@ -2,13 +2,15 @@
 import { AttributeNames } from '@/PaleGL/constants';
 import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 type PlaneGeometryRawDataOptions = {
-    calculateTangent?: boolean,
-    calculateBinormal?: boolean,
-    flipUvY?: boolean,
-    width?: number,
-    height?: number
+    calculateTangent?: boolean;
+    calculateBinormal?: boolean;
+    flipUvY?: boolean;
+    width?: number;
+    height?: number;
+    offset?: Vector3;
 };
 
 export function createPlaneGeometryRawData({
@@ -16,7 +18,8 @@ export function createPlaneGeometryRawData({
     calculateBinormal,
     flipUvY,
     width = 2,
-    height = 2
+    height = 2,
+    offset = Vector3.zero,
 }: PlaneGeometryRawDataOptions) {
     // -----------------------------
     // 0 ---- 2
@@ -34,16 +37,16 @@ export function createPlaneGeometryRawData({
         0, 0, 1,
         0, 0, 1
     ];
-   
+
     const hw = width / 2;
     const hh = height / 2;
-    
+
     // prettier-ignore
     const positions = new Float32Array([
-        -hw, hh, 0,
-        -hw, -hh, 0,
-        hw, hh, 0,
-        hw, -hh, 0
+        -hw + offset.x, hh + offset.y, 0 + offset.z,
+        -hw + offset.x, -hh + offset.y, 0 + offset.z,
+        hw + offset.x, hh + offset.y, 0 + offset.z,
+        hw + offset.x, -hh + offset.y, 0 + offset.z
     ]);
 
     // prettier-ignore
@@ -75,13 +78,19 @@ export function createPlaneGeometryRawData({
         }
     }
 
+    // prettier-ignore
+    const indices = [
+        0, 1, 2,
+        2, 1, 3
+    ];
+
     return {
         positions,
         uvs,
         normals,
         tangents,
         binormals,
-        indices: [0, 1, 2, 2, 1, 3],
+        indices,
         drawCount: 6,
     };
 }

@@ -18,8 +18,7 @@ import { Texture } from '@/PaleGL/core/Texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
-// import fontAtlas from '@/PaleGL/fonts/NotoSans-Bold/atlas.png';
-// import fontJson from '@/PaleGL/fonts/NotoSans-Bold/NotoSans-Bold.json';
+// import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 type FontAtlasData = {
     pages: string[];
@@ -27,10 +26,14 @@ type FontAtlasData = {
         char: string;
         width: number;
         height: number;
+        xoffset: number;
+        yoffset: number;
         x: number;
         y: number;
     }[];
     common: {
+        lineHeight: number;
+        base: number;
         scaleW: number;
         scaleH: number;
     };
@@ -91,19 +94,24 @@ export class TextMesh extends Actor {
                 atlasInfo: {
                     width: fontAtlas.common.scaleW,
                     height: fontAtlas.common.scaleH,
+                    lineHeight: fontAtlas.common.lineHeight,
+                    base: fontAtlas.common.base,
                 },
                 charInfo: {
+                    char,
                     x: charInfo.x,
                     y: charInfo.y,
                     width: charInfo.width,
                     height: charInfo.height,
+                    xOffset: charInfo.xoffset,
+                    yOffset: charInfo.yoffset,
                 },
                 castShadow,
             });
             this.addChild(mesh);
             this.charMeshes.push(mesh);
 
-            accWidth += mesh.charWidth;
+            accWidth += (mesh.charWidth + mesh.charOffsetX);
             // accHeight += mesh.charHeight;
         }
 
@@ -115,8 +123,9 @@ export class TextMesh extends Actor {
 
         for (let i = 0; i < this.charMeshes.length; i++) {
             const mesh = this.charMeshes[i];
-            originX += mesh.charWidth / 2;
+            originX += mesh.charWidth / 2 + mesh.charOffsetX;
             mesh.transform.position.x = originX;
+            mesh.transform.position.y = mesh.charOffsetY;
             originX += mesh.charWidth / 2 + characterSpacing;
         }
     }
@@ -130,10 +139,15 @@ type CharMeshArgs = {
     atlasInfo: {
         width: number;
         height: number;
+        lineHeight: number;
+        base: number;
     };
     charInfo: {
+        char: string;
         x: number;
         y: number;
+        xOffset: number;
+        yOffset: number;
         width: number;
         height: number;
     };
@@ -143,6 +157,9 @@ type CharMeshArgs = {
 class CharMesh extends Mesh {
     charWidth: number;
     charHeight: number;
+    charOffsetX: number;
+    charOffsetY: number;
+    char: string;
 
     constructor({ gpu, name = '', fontTexture, atlasInfo, charInfo, castShadow, uniforms = [] }: CharMeshArgs) {
         const w = atlasInfo.width;
@@ -151,7 +168,6 @@ class CharMesh extends Mesh {
         const sh = charInfo.height / h;
         const sx = charInfo.x / w;
         const sy = charInfo.y / h;
-        const aspect = charInfo.width / charInfo.height;
 
         const baseUniforms: UniformsData = [
             {
@@ -184,15 +200,24 @@ class CharMesh extends Mesh {
 
         const depthUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
-        const planeHeight = 2;
-        const planeWidth = planeHeight * aspect;
+        const maxWidth = 2;
+        const maxHeight = 2;
+        const pixelSizeW = maxWidth / atlasInfo.lineHeight;
+        const pixelSizeH = maxHeight / atlasInfo.lineHeight;
+        const planeHeight = charInfo.height * pixelSizeH;
+        const planeWidth =  charInfo.width * pixelSizeW;
+        const topPadding = (maxHeight - planeHeight) * .5;
+        // 上下: 上に揃えてからoffsetYする. yOffsetは左上が原点なので反転
+        const offsetY = topPadding - charInfo.yOffset * pixelSizeH;
+        // 左右: widthの時点で幅調整がかかっているので、xOffsetのみでよい
+        const offsetX = charInfo.xOffset * pixelSizeW; 
 
-        // NOTE: geometryは親から渡して使いまわしてもよい
         const geometry = new PlaneGeometry({
             gpu,
             flipUvY: true,
             width: planeWidth,
             height: planeHeight,
+            // offset: new Vector3(offsetX, offsetY, 0),
         });
         const material = new Material({
             vertexShader: gBufferVert,
@@ -212,6 +237,12 @@ class CharMesh extends Mesh {
 
         this.charWidth = planeWidth;
         this.charHeight = planeHeight;
+        this.charOffsetX = offsetX;
+        this.charOffsetY = offsetY;
+        this.char = charInfo.char;
+
+        // for debug
+        // console.log(this.char, planeWidth, planeHeight, offsetX, offsetY);
     }
 
     // start({ gpu }: {gpu: GPU}) {

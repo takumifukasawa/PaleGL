@@ -93,7 +93,9 @@ void main() {
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
 
-    #include ./partial/alpha-test-calc.glsl
+#ifdef USE_ALPHA_TEST
+    checkAlphaTest(alpha, uAlphaTestThreshold);
+#endif
 
     outColor = vec4(1., 1., 1., 1.);
 }

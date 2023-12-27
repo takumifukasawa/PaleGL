@@ -1320,7 +1320,7 @@ const main = async () => {
         fontAtlas: fontAtlasJson,
         castShadow: true,
         align: TextAlignType.Center,
-        characterSpacing: -0.2
+        // characterSpacing: -0.2
     });
     captureScene.add(textMesh1);
     textMesh1.transform.position = new Vector3(0, 1, 6);
@@ -1334,7 +1334,7 @@ const main = async () => {
         fontAtlas: fontAtlasJson,
         castShadow: true,
         align: TextAlignType.Center,
-        characterSpacing: -0.2
+        characterSpacing: -0.16
     });
     captureScene.add(textMesh2);
     textMesh2.transform.position = new Vector3(0, .01, 8);
@@ -1347,8 +1347,8 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Center,
-        characterSpacing: -0.2
+        align: TextAlignType.Left,
+        characterSpacing: 0.2
     });
     captureScene.add(textMesh3);
     textMesh3.transform.position = new Vector3(0, .01, 9);
