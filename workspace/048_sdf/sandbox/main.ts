@@ -1300,7 +1300,6 @@ const main = async () => {
         screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
         screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
     };
-    screenSpaceRaymarchMesh.enabled = false;
 
     //
     // text mesh
@@ -1324,7 +1323,7 @@ const main = async () => {
         characterSpacing: -0.2
     });
     captureScene.add(textMesh1);
-    textMesh1.transform.position = new Vector3(0, 4, 0);
+    textMesh1.transform.position = new Vector3(0, 1, 6);
     textMesh1.transform.rotation.setRotationX(-90);
     textMesh1.transform.scale = Vector3.fill(0.4);
 

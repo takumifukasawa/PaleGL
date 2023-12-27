@@ -1,5 +1,12 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { ActorTypes, PrimitiveTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    ActorTypes,
+    DepthFuncTypes,
+    PrimitiveTypes,
+    ShadingModelIds,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
 import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
@@ -194,8 +201,11 @@ class CharMesh extends Mesh {
             uniforms: mergedUniforms,
             depthUniforms,
             alphaTest: 0.5,
+            depthTest: true,
+            depthWrite: false,
             // receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
+            depthFuncType: DepthFuncTypes.Equal,
         });
 
         super({ name, geometry, material, actorType: ActorTypes.Mesh, castShadow });

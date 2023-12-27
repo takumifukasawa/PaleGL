@@ -13,6 +13,8 @@ precision highp float;
 
 #include ./partial/depth-functions.glsl
 
+#include ./partial/alpha-test-functions.glsl
+
 uniform float uMetallic;
 uniform float uRoughness;
 uniform int uShadingModelId;
@@ -35,7 +37,7 @@ uniform vec3 uViewDirection;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
-#include ./partial/camera-struct.glsl
+#include ./partial/alpha-test-fragment-uniforms.glsl
 
 in vec2 vUv;
 in vec3 vWorldPosition;
@@ -109,7 +111,11 @@ void main() {
     //
     // NOTE: end raymarch block
     //
-    
+
+#ifdef USE_ALPHA_TEST
+    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+#endif
+
     resultColor.rgb = gamma(resultColor.rgb);
 
     outGBufferA = EncodeGBufferA(resultColor.rgb);

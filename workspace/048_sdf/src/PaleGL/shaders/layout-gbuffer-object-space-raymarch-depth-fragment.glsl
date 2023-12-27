@@ -87,11 +87,9 @@ void main() {
         discard;
     }
 
-
     //
     // NOTE: end raymarch block
     //
-
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
 

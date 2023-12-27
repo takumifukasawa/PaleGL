@@ -149,10 +149,6 @@ export class GBufferMaterial extends Material {
         super({
             ...options,
             name: 'GBufferMaterial',
-            // vertexShaderGenerator,
-            // vertexShader,
-            // fragmentShaderGenerator,
-            // depthFragmentShaderGenerator,
             vertexShaderModifier,
             uniforms: mergedUniforms,
             depthUniforms,
@@ -160,7 +156,6 @@ export class GBufferMaterial extends Material {
             depthTest: true,
             depthWrite: false,
             depthFuncType: DepthFuncTypes.Equal,
-            // showLog: true
         });
     }
 

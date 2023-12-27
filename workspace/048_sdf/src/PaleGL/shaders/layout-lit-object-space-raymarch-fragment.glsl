@@ -167,7 +167,9 @@ void main() {
 
     resultColor = diffuseColor;
 
-    #include ./partial/alpha-test-calc.glsl
+#ifdef USE_ALPHA_TEST
+    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+#endif
 
     resultColor.rgb = gamma(resultColor.rgb);
 

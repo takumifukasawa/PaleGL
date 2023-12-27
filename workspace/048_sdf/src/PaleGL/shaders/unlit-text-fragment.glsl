@@ -59,6 +59,7 @@ void main() {
     float alpha = sdf2alpha(sdf);
     resultColor.a = alpha;
 
+// depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 #endif

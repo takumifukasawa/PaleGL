@@ -1,5 +1,5 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { ActorTypes, PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { PrimitiveTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
@@ -16,8 +16,6 @@ type ScreenSpaceRaymarchMeshArgs = {
 };
 
 export class ScreenSpaceRaymarchMesh extends Mesh {
-    name: string;
-
     constructor({ gpu, name = '', fragmentShader, depthFragmentShader, uniforms = [] }: ScreenSpaceRaymarchMeshArgs) {
         const mergedUniforms: UniformsData = [
             {
@@ -48,9 +46,6 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
             primitiveType: PrimitiveTypes.Triangles,
         });
 
-        super({ geometry, material, actorType: ActorTypes.Mesh });
-
-        this.name = name;
-        this.castShadow = false;
+        super({ name, geometry, material });
     }
 }
