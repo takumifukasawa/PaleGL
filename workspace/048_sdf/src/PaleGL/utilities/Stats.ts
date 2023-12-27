@@ -1,8 +1,13 @@
-import {AttributeNames} from '@/PaleGL/constants';
-import {Geometry} from '@/PaleGL/geometries/Geometry';
-import {FPSCounter} from "@/PaleGL/utilities/FPSCounter.ts";
+import { AttributeNames } from '@/PaleGL/constants';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { FPSCounter } from '@/PaleGL/utilities/FPSCounter.ts';
 
 type PassInfo = { passLabel: string; vertexCount: number };
+
+type StatsArgs = {
+    wrapperElement?: HTMLElement;
+    showPassDetails?: boolean;
+};
 
 export class Stats {
     domElement;
@@ -12,16 +17,18 @@ export class Stats {
     drawCallCountView;
     drawVertexCount = 0;
     drawCallCount = 0;
-    
+    showPassDetails = false;
+
     fpsCounter: FPSCounter;
     fpsCounterView;
 
     /**
-     * 
+     *
      * @param args
      */
-    constructor(args: { wrapperElement?: HTMLElement } = {}) {
-        const {wrapperElement} = args;
+    constructor(args: StatsArgs = {}) {
+        const { wrapperElement } = args;
+
         this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
 position: absolute;
@@ -52,7 +59,9 @@ white-space: break-spaces;
         this.domElement.appendChild(this.drawCallCountView);
 
         (wrapperElement || document.body).appendChild(this.domElement);
-        
+
+        this.showPassDetails = !!args.showPassDetails;
+
         this.fpsCounter = new FPSCounter();
     }
 
@@ -61,7 +70,7 @@ white-space: break-spaces;
     // ------------------------------------------------------------
 
     /**
-     * 
+     *
      */
     clear() {
         this.passes = [];
@@ -70,7 +79,7 @@ white-space: break-spaces;
     }
 
     /**
-     * 
+     *
      * @param groupLabel
      * @param passLabel
      * @param geometry
@@ -83,7 +92,7 @@ white-space: break-spaces;
         }
         const vertexCount = positionAttribute.data.length / 3;
         if (passIndex < 0) {
-            this.addPassGroup(groupLabel, {passLabel: passLabel, vertexCount});
+            this.addPassGroup(groupLabel, { passLabel: passLabel, vertexCount });
             return;
         }
         this.passes[passIndex].passInfos.push({
@@ -93,7 +102,7 @@ white-space: break-spaces;
     }
 
     /**
-     * 
+     *
      * @param geometry
      */
     addDrawVertexCount(geometry: Geometry) {
@@ -105,14 +114,14 @@ white-space: break-spaces;
     }
 
     /**
-     * 
+     *
      */
     incrementDrawCall() {
         this.drawCallCount++;
     }
 
     /**
-     * 
+     *
      * @param time
      */
     update(time: number) {
@@ -121,33 +130,41 @@ white-space: break-spaces;
     }
 
     /**
-     * 
+     *
      */
     updateView() {
         this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
-        
+
         const passesStrings = [];
-        passesStrings.push("-------------")
+        passesStrings.push('-------------');
         for (let i = 0; i < this.passes.length; i++) {
-            passesStrings.push(this.passes[i].groupLabel);
+            let totalDrawCalls = 0;
+            let totalVertexCount = 0;
+            const queue: string[] = [];
             for (let j = 0; j < this.passes[i].passInfos.length; j++) {
                 const passInfo = this.passes[i].passInfos[j];
-                const str = `${passInfo.passLabel} - vertex count: ${passInfo.vertexCount}`;
-                passesStrings.push(str);
+                if (this.showPassDetails) {
+                    const str = `${passInfo.passLabel} - vertex count: ${passInfo.vertexCount}`;
+                    queue.push(str);
+                }
+                totalDrawCalls++;
+                totalVertexCount += passInfo.vertexCount;
             }
+            queue.unshift(`[${this.passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`);
+            passesStrings.push(...queue);
         }
-        passesStrings.push("-------------")
-        this.passInfoView.textContent = passesStrings.join("\n");
+        passesStrings.push('-------------');
+        this.passInfoView.textContent = passesStrings.join('\n');
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
     }
-    
+
     // ------------------------------------------------------------
-    // private 
+    // private
     // ------------------------------------------------------------
 
     /**
-     * 
+     *
      * @param groupLabel
      * @param passInfo
      * @private
@@ -158,5 +175,4 @@ white-space: break-spaces;
             passInfos: [passInfo],
         });
     }
-
 }
