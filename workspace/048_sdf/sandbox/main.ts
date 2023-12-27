@@ -1320,10 +1320,12 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Center
+        align: TextAlignType.Center,
+        characterSpacing: -0.2
     });
     captureScene.add(textMesh1);
-    textMesh1.transform.position = new Vector3(0, 6, 10);
+    textMesh1.transform.position = new Vector3(0, 4, 0);
+    textMesh1.transform.rotation.setRotationX(-90);
     textMesh1.transform.scale = Vector3.fill(0.4);
 
     const textMesh2 = new TextMesh({
@@ -1332,10 +1334,12 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Center
+        align: TextAlignType.Center,
+        characterSpacing: -0.2
     });
     captureScene.add(textMesh2);
-    textMesh2.transform.position = new Vector3(0, 5, 10);
+    textMesh2.transform.position = new Vector3(0, .01, 8);
+    textMesh2.transform.rotation.setRotationX(-90);
     textMesh2.transform.scale = Vector3.fill(0.4);
 
     const textMesh3 = new TextMesh({
@@ -1344,10 +1348,12 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Center
+        align: TextAlignType.Center,
+        characterSpacing: -0.2
     });
     captureScene.add(textMesh3);
-    textMesh3.transform.position = new Vector3(0, 4, 10);
+    textMesh3.transform.position = new Vector3(0, .01, 9);
+    textMesh3.transform.rotation.setRotationX(-90);
     textMesh3.transform.scale = Vector3.fill(0.4);
 
     //

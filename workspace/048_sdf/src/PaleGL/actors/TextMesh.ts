@@ -36,6 +36,7 @@ type TextMeshArgs = {
     fontAtlas: FontAtlasData;
     fontTexture: Texture;
     align?: TextAlignType;
+    characterSpacing?: number;
     castShadow?: boolean;
 };
 
@@ -46,11 +47,23 @@ export const TextAlignType = {
 
 export type TextAlignType = (typeof TextAlignType)[keyof typeof TextAlignType];
 
+/**
+ * TODO: できれば文字のmeshはまとめて1つのgeometryにしたい
+ */
 export class TextMesh extends Actor {
     align: TextAlignType = TextAlignType.Left;
     charMeshes: CharMesh[] = [];
 
-    constructor({ gpu, name, text, fontTexture, fontAtlas, align = TextAlignType.Left, castShadow }: TextMeshArgs) {
+    constructor({
+        gpu,
+        name,
+        text,
+        fontTexture,
+        fontAtlas,
+        align = TextAlignType.Left,
+        characterSpacing = 0,
+        castShadow,
+    }: TextMeshArgs) {
         super({ name });
         const charArray = text.split('');
 
@@ -89,7 +102,7 @@ export class TextMesh extends Actor {
 
         switch (align) {
             case TextAlignType.Center:
-                originX -= accWidth / 2;
+                originX -= accWidth / 2 + (characterSpacing * (charArray.length - 1)) / 2;
                 break;
         }
 
@@ -97,7 +110,7 @@ export class TextMesh extends Actor {
             const mesh = this.charMeshes[i];
             originX += mesh.charWidth / 2;
             mesh.transform.position.x = originX;
-            originX += mesh.charWidth / 2;
+            originX += mesh.charWidth / 2 + characterSpacing;
         }
     }
 }
@@ -124,17 +137,21 @@ class CharMesh extends Mesh {
     charWidth: number;
     charHeight: number;
 
-    constructor({ gpu, name = '', fontTexture, atlasInfo, charInfo, uniforms = [] }: CharMeshArgs) {
+    constructor({ gpu, name = '', fontTexture, atlasInfo, charInfo, castShadow, uniforms = [] }: CharMeshArgs) {
         const w = atlasInfo.width;
         const h = atlasInfo.height;
-        // test char 'R'
         const sw = charInfo.width / w;
         const sh = charInfo.height / h;
         const sx = charInfo.x / w;
         const sy = charInfo.y / h;
         const aspect = charInfo.width / charInfo.height;
 
-        const mergedUniforms: UniformsData = [
+        const baseUniforms: UniformsData = [
+            {
+                name: 'uColor',
+                type: UniformTypes.Color,
+                value: Color.white,
+            },
             {
                 name: UniformNames.FontMap,
                 type: UniformTypes.Texture,
@@ -146,18 +163,19 @@ class CharMesh extends Mesh {
                 // value: Vector4.one
                 value: new Vector4(sw, sh, sx, sy), // TODO: dummy
             },
+        ];
+
+        const mergedUniforms: UniformsData = [
             {
                 name: UniformNames.ShadingModelId,
                 type: UniformTypes.Int,
                 value: ShadingModelIds.Unlit,
             },
-            {
-                name: 'uColor',
-                type: UniformTypes.Color,
-                value: Color.white,
-            },
+            ...baseUniforms,
             ...uniforms,
         ];
+
+        const depthUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
         const planeHeight = 2;
         const planeWidth = planeHeight * aspect;
@@ -174,14 +192,20 @@ class CharMesh extends Mesh {
             fragmentShader: unlitTextFrag,
             depthFragmentShader: unlitTextDepthFrag,
             uniforms: mergedUniforms,
+            depthUniforms,
             alphaTest: 0.5,
             // receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
         });
 
-        super({ name, geometry, material, actorType: ActorTypes.Mesh });
+        super({ name, geometry, material, actorType: ActorTypes.Mesh, castShadow });
 
         this.charWidth = planeWidth;
         this.charHeight = planeHeight;
     }
+
+    // start({ gpu }: {gpu: GPU}) {
+    //     super.start({ gpu});
+    //     console.log(this.depthMaterial)
+    // }
 }

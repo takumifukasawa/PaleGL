@@ -817,7 +817,7 @@ export class Renderer {
             if (castShadowRenderMeshInfos.length < 1) {
                 return;
             }
-
+            
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
