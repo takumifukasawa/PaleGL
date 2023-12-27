@@ -9,34 +9,100 @@ import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
-import {Color} from "@/PaleGL/math/Color.ts";
+import { Color } from '@/PaleGL/math/Color.ts';
+import { Actor } from '@/PaleGL/actors/Actor.ts';
 // import fontAtlas from '@/PaleGL/fonts/NotoSans-Bold/atlas.png';
 // import fontJson from '@/PaleGL/fonts/NotoSans-Bold/NotoSans-Bold.json';
 
-type TextRaymarchMeshArgs = {
+type FontAtlasData = {
+    pages: string[];
+    chars: {
+        char: string;
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+    }[];
+    common: {
+        scaleW: number;
+        scaleH: number;
+    };
+};
+
+type TextMeshArgs = {
+    gpu: GPU;
+    name?: string;
+    text: string;
+    fontAtlas: FontAtlasData;
+    fontTexture: Texture;
+    castShadow?: boolean;
+};
+
+export class TextMesh extends Actor {
+    constructor({ gpu, name, text, fontTexture, fontAtlas, castShadow }: TextMeshArgs) {
+        super({ name });
+        const charArray = text.split('');
+        for (let i = 0; i < charArray.length; i++) {
+            const char = charArray[i];
+            const charInfo = fontAtlas.chars.find((charData) => charData.char === char);
+            if (!charInfo) {
+                continue;
+            }
+            const mesh = new CharMesh({
+                gpu,
+                name: `char-${i}`,
+                fontTexture: fontTexture,
+                atlasInfo: {
+                    width: fontAtlas.common.scaleW,
+                    height: fontAtlas.common.scaleH,
+                },
+                charInfo: {
+                    x: charInfo.x,
+                    y: charInfo.y,
+                    width: charInfo.width,
+                    height: charInfo.height,
+                },
+                castShadow,
+            });
+            this.addChild(mesh);
+        }
+    }
+}
+
+type CharMeshArgs = {
     gpu: GPU;
     name?: string;
     uniforms?: UniformsData;
-    atlasTexture: Texture;
-    atlasJson: unknown;
+    fontTexture: Texture;
+    atlasInfo: {
+        width: number;
+        height: number;
+    };
+    charInfo: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
 } & MeshOptionsArgs;
 
 // TODO: なぜかcastshadowがきかない
-export class TextMesh extends Mesh {
-    constructor({ gpu, name = '', atlasTexture, atlasJson, uniforms = [] }: TextRaymarchMeshArgs) {
-        const w = 256;
-        const h = 128;
+class CharMesh extends Mesh {
+    constructor({ gpu, name = '', fontTexture, atlasInfo, charInfo, uniforms = [] }: CharMeshArgs) {
+        const w = atlasInfo.width;
+        const h = atlasInfo.height;
         // test char 'R'
-        const sw = 16 / w;
-        const sh = 19 / h;
-        const sx = 86 / w;
-        const sy = 20 / h;
+        const sw = charInfo.width / w;
+        const sh = charInfo.height / h;
+        const sx = charInfo.x / w;
+        const sy = charInfo.y / h;
+        const aspect = charInfo.width / charInfo.height;
 
         const mergedUniforms: UniformsData = [
             {
                 name: UniformNames.FontMap,
                 type: UniformTypes.Texture,
-                value: atlasTexture,
+                value: fontTexture,
             },
             {
                 name: UniformNames.FontTiling,
@@ -50,15 +116,24 @@ export class TextMesh extends Mesh {
                 value: ShadingModelIds.Unlit,
             },
             {
-                name: "uColor",
+                name: 'uColor',
                 type: UniformTypes.Color,
                 value: Color.white,
             },
             ...uniforms,
         ];
-
+       
+        const planeHeight = 2;
+        const planeWidth = planeHeight * aspect;
+        
         // NOTE: geometryは親から渡して使いまわしてもよい
-        const geometry = new PlaneGeometry({ gpu, flipUvY: true });
+        const geometry = new PlaneGeometry({
+            gpu,
+            flipUvY: true,
+            width: planeWidth,
+            height: planeHeight,
+        });
+        console.log(geometry)
         const material = new Material({
             vertexShader: gBufferVert,
             fragmentShader: unlitTextFrag,
@@ -68,8 +143,6 @@ export class TextMesh extends Mesh {
             // receiveShadow: !!receiveShadow,
             primitiveType: PrimitiveTypes.Triangles,
         });
-
-        console.log(atlasTexture, atlasJson);
 
         super({ name, geometry, material, actorType: ActorTypes.Mesh });
     }

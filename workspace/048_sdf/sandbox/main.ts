@@ -1314,10 +1314,16 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
-    const textMesh = new TextMesh({ gpu, atlasTexture: fontAtlasTexture, atlasJson: fontAtlasJson, castShadow: true });
+    const textMesh = new TextMesh({
+        gpu,
+        text: 'R',
+        fontTexture: fontAtlasTexture,
+        fontAtlas: fontAtlasJson,
+        castShadow: true,
+    });
     captureScene.add(textMesh);
-    textMesh.transform.position = new Vector3(0, 8, 0);
-    textMesh.transform.scale = new Vector3(8, 8, 8);
+    textMesh.transform.position = new Vector3(0, 4, 0);
+    textMesh.transform.scale = new Vector3(2, 2, 2);
 
     //
     // instancing mesh

@@ -79,6 +79,7 @@ export const ActorTypes = {
     Light: 3,
     Skybox: 4,
     Camera: 5,
+    TextMesh: 6
 } as const;
 
 export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
