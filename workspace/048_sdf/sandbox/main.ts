@@ -110,7 +110,7 @@ import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
-import { TextMesh } from '@/PaleGL/actors/TextMesh.ts';
+import {TextAlignType, TextMesh} from '@/PaleGL/actors/TextMesh.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1314,16 +1314,41 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
-    const textMesh = new TextMesh({
+    const textMesh1 = new TextMesh({
         gpu,
-        text: 'R',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
+        align: TextAlignType.Center
     });
-    captureScene.add(textMesh);
-    textMesh.transform.position = new Vector3(0, 4, 0);
-    textMesh.transform.scale = new Vector3(2, 2, 2);
+    captureScene.add(textMesh1);
+    textMesh1.transform.position = new Vector3(0, 6, 10);
+    textMesh1.transform.scale = Vector3.fill(0.4);
+
+    const textMesh2 = new TextMesh({
+        gpu,
+        text: 'abcdefghijklmnopqrstuvwxyz',
+        fontTexture: fontAtlasTexture,
+        fontAtlas: fontAtlasJson,
+        castShadow: true,
+        align: TextAlignType.Center
+    });
+    captureScene.add(textMesh2);
+    textMesh2.transform.position = new Vector3(0, 5, 10);
+    textMesh2.transform.scale = Vector3.fill(0.4);
+
+    const textMesh3 = new TextMesh({
+        gpu,
+        text: '0123456789',
+        fontTexture: fontAtlasTexture,
+        fontAtlas: fontAtlasJson,
+        castShadow: true,
+        align: TextAlignType.Center
+    });
+    captureScene.add(textMesh3);
+    textMesh3.transform.position = new Vector3(0, 4, 10);
+    textMesh3.transform.scale = Vector3.fill(0.4);
 
     //
     // instancing mesh

@@ -35,13 +35,29 @@ type TextMeshArgs = {
     text: string;
     fontAtlas: FontAtlasData;
     fontTexture: Texture;
+    align?: TextAlignType;
     castShadow?: boolean;
 };
 
+export const TextAlignType = {
+    Left: 0,
+    Center: 1,
+} as const;
+
+export type TextAlignType = (typeof TextAlignType)[keyof typeof TextAlignType];
+
 export class TextMesh extends Actor {
-    constructor({ gpu, name, text, fontTexture, fontAtlas, castShadow }: TextMeshArgs) {
+    align: TextAlignType = TextAlignType.Left;
+    charMeshes: CharMesh[] = [];
+
+    constructor({ gpu, name, text, fontTexture, fontAtlas, align = TextAlignType.Left, castShadow }: TextMeshArgs) {
         super({ name });
         const charArray = text.split('');
+
+        let originX = 0;
+        let accWidth = 0;
+        // let accHeight = 0;
+
         for (let i = 0; i < charArray.length; i++) {
             const char = charArray[i];
             const charInfo = fontAtlas.chars.find((charData) => charData.char === char);
@@ -50,7 +66,7 @@ export class TextMesh extends Actor {
             }
             const mesh = new CharMesh({
                 gpu,
-                name: `char-${i}`,
+                name: `char-${char}`,
                 fontTexture: fontTexture,
                 atlasInfo: {
                     width: fontAtlas.common.scaleW,
@@ -65,6 +81,23 @@ export class TextMesh extends Actor {
                 castShadow,
             });
             this.addChild(mesh);
+            this.charMeshes.push(mesh);
+
+            accWidth += mesh.charWidth;
+            // accHeight += mesh.charHeight;
+        }
+
+        switch (align) {
+            case TextAlignType.Center:
+                originX -= accWidth / 2;
+                break;
+        }
+
+        for (let i = 0; i < this.charMeshes.length; i++) {
+            const mesh = this.charMeshes[i];
+            originX += mesh.charWidth / 2;
+            mesh.transform.position.x = originX;
+            originX += mesh.charWidth / 2;
         }
     }
 }
@@ -88,6 +121,9 @@ type CharMeshArgs = {
 
 // TODO: なぜかcastshadowがきかない
 class CharMesh extends Mesh {
+    charWidth: number;
+    charHeight: number;
+
     constructor({ gpu, name = '', fontTexture, atlasInfo, charInfo, uniforms = [] }: CharMeshArgs) {
         const w = atlasInfo.width;
         const h = atlasInfo.height;
@@ -122,10 +158,10 @@ class CharMesh extends Mesh {
             },
             ...uniforms,
         ];
-       
+
         const planeHeight = 2;
         const planeWidth = planeHeight * aspect;
-        
+
         // NOTE: geometryは親から渡して使いまわしてもよい
         const geometry = new PlaneGeometry({
             gpu,
@@ -133,7 +169,6 @@ class CharMesh extends Mesh {
             width: planeWidth,
             height: planeHeight,
         });
-        console.log(geometry)
         const material = new Material({
             vertexShader: gBufferVert,
             fragmentShader: unlitTextFrag,
@@ -145,5 +180,8 @@ class CharMesh extends Mesh {
         });
 
         super({ name, geometry, material, actorType: ActorTypes.Mesh });
+
+        this.charWidth = planeWidth;
+        this.charHeight = planeHeight;
     }
 }

@@ -60,9 +60,10 @@ void main() {
     resultColor.a = alpha;
 
 #ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+    // checkAlphaTest(resultColor.a, uAlphaTestThreshold);
 #endif
 
+    resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);
     resultColor.rgb = gamma(resultColor.rgb);
     
     outGBufferA = EncodeGBufferA(vec3(0.));
