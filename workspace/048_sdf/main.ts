@@ -370,6 +370,8 @@ const main = async () => {
     captureScene.add(floorPlaneMesh);
 
     // parseScene(sceneJsonUrl as unknown as MarionetterScene);
+    console.log("====== main ======")
+    console.log(sceneJsonUrl)
     buildScene(sceneJsonUrl as unknown as MarionetterScene);
     initHotReloadAndParseScene();
 

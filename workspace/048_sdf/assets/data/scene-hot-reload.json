@@ -27,7 +27,7 @@
           "tracks": [
             {
               "targetName": "Cube_TestTransform",
-              "animationClips": [
+              "clips": [
                 {
                   "offsetPosition": {
                     "x": 0.0,
@@ -268,7 +268,7 @@
             },
             {
               "targetName": "DirectionalLight",
-              "animationClips": [
+              "clips": [
                 {
                   "type": 1,
                   "start": 0.0,
@@ -465,7 +465,7 @@
             },
             {
               "targetName": "Cube_TestMaterial",
-              "animationClips": [
+              "clips": [
                 {
                   "offsetPosition": {
                     "x": 0.0,
@@ -555,7 +555,7 @@
             },
             {
               "targetName": "MainCamera",
-              "animationClips": [
+              "clips": [
                 {
                   "offsetPosition": {
                     "x": 0.0,
@@ -594,7 +594,7 @@
             },
             {
               "targetName": "Plane",
-              "animationClips": []
+              "clips": []
             }
           ],
           "type": 0
@@ -629,18 +629,18 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 2.091335,
+          "y": 4.0,
           "z": 0.0
         },
         "localRotation": {
-          "x": 8.53773656E-07,
-          "y": -36.5762978,
-          "z": 53.5738144
+          "x": -30.0000038,
+          "y": -30.0000019,
+          "z": 30.0000019
         },
         "localScale": {
-          "x": 1.40059257,
-          "y": 1.0,
-          "z": 1.0
+          "x": 1.0,
+          "y": 2.0,
+          "z": 3.0
         }
       },
       "components": [
@@ -708,8 +708,8 @@
       "components": [
         {
           "lightType": "Directional",
-          "intensity": 0.962665,
-          "color": "13A411F4FF",
+          "intensity": 1.0,
+          "color": "17E1C8129FF",
           "type": 1
         }
       ],
@@ -738,7 +738,7 @@
         {
           "cameraType": "Perspective",
           "isMain": true,
-          "fov": 73.88238,
+          "fov": 60.0,
           "type": 2
         }
       ],
