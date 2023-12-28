@@ -121,11 +121,9 @@ export function buildMarionetterActors(gpu: GPU, scene: MarionetterScene): Actor
                 obj.transform.localScale.y,
                 obj.transform.localScale.z
             );
-            actor.transform.rotation.setV(new Vector3(
-                obj.transform.localRotation.x,
-                obj.transform.localRotation.y,
-                obj.transform.localRotation.z
-            ));
+            actor.transform.rotation.setV(
+                new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
+            );
             actor.transform.position = new Vector3(
                 obj.transform.localPosition.x,
                 obj.transform.localPosition.y,
@@ -162,8 +160,15 @@ type MarionetterTransformInfo = {
 // track
 //
 
+const enum MarionetterTrackInfoType {
+    AnimationTrac = 0,
+    LightControlTrack = 1,
+    ActivationControlTrack = 2,
+}
+
 type MarionetterTrackInfo = {
     targetName: string; // shorthand: tn
+    type: MarionetterTrackInfoType; // shorthand: t
     clips: MarionetterClipInfoKinds[]; // shorthand: cs
 };
 
@@ -172,21 +177,26 @@ type MarionetterClipInfoKinds = MarionetterAnimationClipInfo | MarionetterLightC
 const enum MarionetterClipInfoType {
     AnimationClip = 0,
     LightControlClip = 1,
+    ActivationControlClip = 2,
 }
 
 type MarionetterClipInfoBase = {
     type: MarionetterClipInfoType; // shorthand: t
     start: number; // shorthand: s
     duration: number; // shorthand: d
-    bindings: MarionetterClipBinding[]; // shorthand: b
 };
 
 type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
     offsetPosition: { x: number; y: number; z: number }; // shorthand: op
     offsetRotation: { x: number; y: number; z: number }; // shorthand: or
+    bindings: MarionetterClipBinding[]; // shorthand: b
 };
 
-type MarionetterLightControlClipInfo = MarionetterClipInfoBase; // TODO: 追加が必要なはず
+type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
+    bindings: MarionetterClipBinding[]; // shorthand: b
+};
+
+type MarionetterActivationControlClipInfo = MarionetterClipInfoBase;
 
 type MarionetterClipBinding = {
     propertyName: string; // short hand: n
@@ -270,25 +280,30 @@ type MarionetterTimelineTrack = {
     execute: (time: number) => void;
 };
 
-type MarionetterClipKinds = MarionetterAnimationClip | MarionetterLightControlClip;
+type MarionetterClipKinds = MarionetterAnimationClip | MarionetterLightControlClip | MarionetterActivationControlClip;
 
 const enum MarionetterAnimationClipType {
     AnimationClip = 0,
     LightControlClip = 1,
+    ActivationControlClip = 2,
 }
 
 type MarionetterAnimationClip = {
     type: MarionetterAnimationClipType.AnimationClip;
     clipInfo: MarionetterAnimationClipInfo;
-    // bind: (actor: Actor) => void;
     execute: (actor: Actor, time: number) => void;
 };
 
 type MarionetterLightControlClip = {
     type: MarionetterAnimationClipType.LightControlClip;
     clipInfo: MarionetterLightControlClipInfo;
-    // bind: (light: Light) => void;
     execute: (actor: Actor, time: number) => void;
+};
+
+type MarionetterActivationControlClip = {
+    type: MarionetterAnimationClipType.ActivationControlClip;
+    clipInfo: MarionetterActivationControlClipInfo;
+    execute: () => void;
 };
 
 /**
@@ -300,18 +315,37 @@ export function buildMarionetterTimeline(
     marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrack[] = [];
+
+    // build track
     for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
-        const { targetName, clips } = marionetterPlayableDirectorComponentInfo.tracks[i];
+        const track = marionetterPlayableDirectorComponentInfo.tracks[i];
+        const { targetName, clips } = track;
         const transform = scene.find(targetName);
         const targetActor = transform ? transform.actor : null;
         const marionetterClips = createMarionetterClips(clips);
         if (!targetActor) {
             console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
         }
+
+        // exec track
+        // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
         const execute = (time: number) => {
-            for (let j = 0; j < clips.length; j++) {
+            if (track.type === MarionetterTrackInfoType.ActivationControlTrack) {
                 if (targetActor != null) {
-                    marionetterClips[j].execute(targetActor, time);
+                    const clipAtTime = marionetterClips.find(
+                        (clip) => clip.clipInfo.start < time && time < clip.clipInfo.start + clip.clipInfo.duration
+                    );
+                    if (clipAtTime) {
+                        targetActor.enabled = true;
+                    } else {
+                        targetActor.enabled = false;
+                    }
+                }
+            } else {
+                if (targetActor != null) {
+                    for (let j = 0; j < marionetterClips.length; j++) {
+                        marionetterClips[j].execute(targetActor, time);
+                    }
                 }
             }
         };
@@ -321,6 +355,8 @@ export function buildMarionetterTimeline(
             execute,
         });
     }
+
+    // exec timeline
     const execute = (time: number) => {
         // pattern1: use frame
         // const spf = 1 / fps;
@@ -331,7 +367,7 @@ export function buildMarionetterTimeline(
             tracks[i].execute(frameTime);
         }
     };
-    
+
     return { tracks, execute };
 }
 
@@ -350,6 +386,11 @@ function createMarionetterClips(clips: MarionetterClipInfoKinds[]): MarionetterC
                 break;
             case MarionetterClipInfoType.LightControlClip:
                 marionetterClips.push(createMarionetterLightControlClip(clip as MarionetterLightControlClipInfo));
+                break;
+            case MarionetterClipInfoType.ActivationControlClip:
+                marionetterClips.push(
+                    createMarionetterActivationControlClip(clip as MarionetterActivationControlClipInfo)
+                );
                 break;
             default:
                 throw new Error(`[createMarionetterClips] invalid animation clip type`);
@@ -545,5 +586,28 @@ function createMarionetterLightControlClip(
         clipInfo: lightControlClip,
         // bind,
         execute,
+    };
+}
+
+/**
+ *
+ * @param lightControlClip
+ */
+function createMarionetterActivationControlClip(
+    activationControlClip: MarionetterActivationControlClipInfo
+): MarionetterActivationControlClip {
+    // let obj: Light | null;
+    // const bind = (targetObj: Light) => {
+    //     obj = targetObj;
+    // };
+    // const execute = (actor: Actor, time: number) => {
+    //     // const { start, duration} = activationControlClip;
+    //     // console.log(start, duration, actor, time)
+    // };
+
+    return {
+        type: MarionetterAnimationClipType.ActivationControlClip,
+        clipInfo: activationControlClip,
+        execute: () => {},
     };
 }

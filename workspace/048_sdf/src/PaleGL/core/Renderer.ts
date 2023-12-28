@@ -748,7 +748,7 @@ export class Renderer {
         // console.log("--------- depth pre pass ---------");
 
         this.setRenderTarget(this._depthPrePassRenderTarget, false, true);
-        this.gpu.clearDepth(0, 0, 0, 1);
+        // this.gpu.clearDepth(0, 0, 0, 1);
 
         depthPrePassRenderMeshInfos.forEach(({ actor }) => {
             const depthMaterial = actor.depthMaterial;

@@ -26,6 +26,7 @@
           "duration": 1.999999999999,
           "tracks": [
             {
+              "type": 0,
               "targetName": "Cube_TestTransform",
               "clips": [
                 {
@@ -39,9 +40,6 @@
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "type": 0,
-                  "start": 0.0,
-                  "duration": 2.0,
                   "bindings": [
                     {
                       "propertyName": "localEulerAnglesRaw.x",
@@ -262,17 +260,18 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0
                 }
               ]
             },
             {
+              "type": 1,
               "targetName": "DirectionalLight",
               "clips": [
                 {
-                  "type": 1,
-                  "start": 0.0,
-                  "duration": 2.0,
                   "bindings": [
                     {
                       "propertyName": "color.r",
@@ -459,11 +458,15 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "type": 1,
+                  "start": 0.0,
+                  "duration": 2.0
                 }
               ]
             },
             {
+              "type": 0,
               "targetName": "Cube_TestMaterial",
               "clips": [
                 {
@@ -477,9 +480,6 @@
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "type": 0,
-                  "start": 0.0,
-                  "duration": 2.0,
                   "bindings": [
                     {
                       "propertyName": "material._BaseColor.r",
@@ -549,11 +549,15 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0
                 }
               ]
             },
             {
+              "type": 0,
               "targetName": "MainCamera",
               "clips": [
                 {
@@ -567,9 +571,6 @@
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "type": 0,
-                  "start": 0.0,
-                  "duration": 2.0,
                   "bindings": [
                     {
                       "propertyName": "field of view",
@@ -588,13 +589,33 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0
                 }
               ]
             },
             {
+              "type": 2,
               "targetName": "Plane",
-              "clips": []
+              "clips": [
+                {
+                  "type": 2,
+                  "start": 0.0,
+                  "duration": 0.55
+                },
+                {
+                  "type": 2,
+                  "start": 0.733333349,
+                  "duration": 0.55
+                },
+                {
+                  "type": 2,
+                  "start": 1.45,
+                  "duration": 0.55
+                }
+              ]
             }
           ],
           "type": 0
@@ -629,18 +650,18 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 4.0,
+          "y": 3.40785527,
           "z": 0.0
         },
         "localRotation": {
-          "x": -30.0000038,
-          "y": -30.0000019,
-          "z": 30.0000019
+          "x": 0.0,
+          "y": -44.9999962,
+          "z": 65.592926
         },
         "localScale": {
-          "x": 1.0,
-          "y": 2.0,
-          "z": 3.0
+          "x": 1.0032593,
+          "y": 1.0,
+          "z": 1.0
         }
       },
       "components": [
@@ -708,8 +729,8 @@
       "components": [
         {
           "lightType": "Directional",
-          "intensity": 1.0,
-          "color": "17E1C8129FF",
+          "intensity": 0.9613505,
+          "color": "17EB1147FF",
           "type": 1
         }
       ],
@@ -738,7 +759,7 @@
         {
           "cameraType": "Perspective",
           "isMain": true,
-          "fov": 60.0,
+          "fov": 54.96257,
           "type": 2
         }
       ],
@@ -780,9 +801,9 @@
           "z": 0.0
         },
         "localScale": {
-          "x": 10.0,
-          "y": 10.0,
-          "z": 10.0
+          "x": 20.0,
+          "y": 20.0,
+          "z": 20.0
         }
       },
       "components": [

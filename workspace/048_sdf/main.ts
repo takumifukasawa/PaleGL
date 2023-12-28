@@ -1,6 +1,5 @@
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
-import { Mesh } from '@/PaleGL/actors/Mesh';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
 
 // core
@@ -45,8 +44,6 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
-import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
 import {
     buildMarionetterActors,
@@ -106,7 +103,6 @@ document.head.appendChild(styleElement);
 
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
-let floorPlaneMesh: Mesh;
 let glslSound: GLSLSound;
 let marionetterTimeline: MarionetterTimeline | null = null;
 
@@ -171,65 +167,6 @@ const createSound = () => {
 const initMarionetter = () => {
     marionetter.connect();
 };
-
-function createFloorPlaneMesh() {
-    const floorGeometry = new PlaneGeometry({
-        gpu,
-        calculateTangent: true,
-        calculateBinormal: true,
-    });
-
-    // const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    // const floorDiffuseMap = new Texture({
-    //     gpu,
-    //     img: floorDiffuseImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-
-    // const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    // const floorNormalMap = new Texture({
-    //     gpu,
-    //     img: floorNormalImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-
-    floorPlaneMesh = new Mesh({
-        geometry: floorGeometry,
-        // material: new PhongMaterial({
-        //     // gpu,
-        //     // diffuseMap: floorDiffuseMap,
-        //     // normalMap: floorNormalMap,
-        //     envMap: cubeMap,
-        //     diffuseColor: new Color(0, 0, 0, 1),
-        //     receiveShadow: true,
-        //     specularAmount: 0.4,
-        //     ambientAmount: 0.2,
-        // }),
-        material: new GBufferMaterial({
-            // diffuseMap: floorDiffuseMap,
-            // normalMap: floorNormalMap,
-            diffuseColor: new Color(0.4, 0.4, 0.5, 1),
-            receiveShadow: true,
-            metallic: 0.5,
-            roughness: 0.5,
-        }),
-        castShadow: false,
-    });
-    floorPlaneMesh.onStart = ({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(10));
-        actor.transform.setRotationX(-90);
-    };
-
-    return floorPlaneMesh;
-}
 
 const buildScene = (sceneJson: MarionetterScene) => {
     const actors = buildMarionetterActors(gpu, sceneJson);
@@ -365,10 +302,6 @@ const main = async () => {
 
     await wait(0);
 
-    floorPlaneMesh = createFloorPlaneMesh();
-
-    captureScene.add(floorPlaneMesh);
-
     // parseScene(sceneJsonUrl as unknown as MarionetterScene);
     console.log("====== main ======")
     console.log(sceneJsonUrl)
@@ -488,6 +421,27 @@ function initDebugger({
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
+
+    bufferVisualizerPass.beforeRender = () => {
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uDirectionalLightShadowMap',
+            directionalLight.shadowMap!.read.depthTexture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uAmbientOcclusionTexture',
+            renderer.ambientOcclusionPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uDeferredShadingTexture',
+            renderer.deferredShadingPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uLightShaftTexture',
+            renderer.lightShaftPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+    };
+
 
     //
     // directional light
