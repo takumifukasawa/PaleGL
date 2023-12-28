@@ -77,9 +77,9 @@
                         },
                         {
                           "time": 0.55,
-                          "value": 47.1087646,
-                          "inTangent": 56.8809166,
-                          "outTangent": 56.8809166
+                          "value": 48.21432,
+                          "inTangent": -4.642325,
+                          "outTangent": -4.642325
                         },
                         {
                           "time": 1.33333337,
@@ -462,6 +462,44 @@
                   ]
                 }
               ]
+            },
+            {
+              "targetName": "Cube_Test",
+              "animationClips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0,
+                  "bindings": [
+                    {
+                      "propertyName": "material._BaseColor.r",
+                      "keyframes": []
+                    },
+                    {
+                      "propertyName": "material._BaseColor.g",
+                      "keyframes": []
+                    },
+                    {
+                      "propertyName": "material._BaseColor.b",
+                      "keyframes": []
+                    },
+                    {
+                      "propertyName": "material._BaseColor.a",
+                      "keyframes": []
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "type": 0
@@ -518,16 +556,16 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 1.90632248,
+          "y": 2.98331642,
           "z": 0.0
         },
         "localRotation": {
           "x": 0.0,
-          "y": -18.9231243,
-          "z": 48.0553246
+          "y": -44.4733734,
+          "z": 62.0238762
         },
         "localScale": {
-          "x": 1.95140731,
+          "x": 1.028,
           "y": 1.0,
           "z": 1.0
         }
@@ -557,7 +595,7 @@
       "components": [
         {
           "lightType": "Directional",
-          "color": "1030420EFF",
+          "color": "16E8F180FF",
           "type": 1
         }
       ],

@@ -61,7 +61,7 @@ export class Camera extends Actor {
     visibleFrustum: boolean = false;
     #visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
-    mainCamera: boolean = false;
+    // mainCamera: boolean = false;
 
     get cameraForward() {
         // 見た目のforwardと逆になる値で正しい
@@ -112,15 +112,17 @@ export class Camera extends Actor {
 
     // constructor({clearColor, postProcess}: { clearColor: Vector4, postProcess: PostProcess } = {}) {
     constructor({
+        name,
         cameraType,
         clearColor,
         postProcess,
     }: {
+        name?: string;
         cameraType: CameraType;
         clearColor?: Vector4;
         postProcess?: PostProcess;
     }) {
-        super({ type: ActorTypes.Camera });
+        super({ name, type: ActorTypes.Camera });
         this.cameraType = cameraType;
         this.clearColor = clearColor || new Vector4(0, 0, 0, 1);
         this.#postProcess = postProcess || null;

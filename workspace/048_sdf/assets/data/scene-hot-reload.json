@@ -26,7 +26,7 @@
           "duration": 1.999999999999,
           "tracks": [
             {
-              "targetName": "CubeConnector",
+              "targetName": "Cube_TestTransform",
               "animationClips": [
                 {
                   "offsetPosition": {
@@ -77,9 +77,9 @@
                         },
                         {
                           "time": 0.55,
-                          "value": 47.1087646,
-                          "inTangent": 56.8809166,
-                          "outTangent": 56.8809166
+                          "value": 48.21432,
+                          "inTangent": -4.642325,
+                          "outTangent": -4.642325
                         },
                         {
                           "time": 1.33333337,
@@ -462,6 +462,139 @@
                   ]
                 }
               ]
+            },
+            {
+              "targetName": "Cube_TestMaterial",
+              "animationClips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0,
+                  "bindings": [
+                    {
+                      "propertyName": "material._BaseColor.r",
+                      "keyframes": [
+                        {
+                          "time": 0.5666668,
+                          "value": 0.466666579,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.74999976,
+                          "value": 0.8301887,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "material._BaseColor.g",
+                      "keyframes": [
+                        {
+                          "time": 0.5666668,
+                          "value": 0.7735609,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.74999976,
+                          "value": 0.4660021,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "material._BaseColor.b",
+                      "keyframes": [
+                        {
+                          "time": 0.5666668,
+                          "value": 0.831372559,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.74999976,
+                          "value": 0.4660021,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "material._BaseColor.a",
+                      "keyframes": [
+                        {
+                          "time": 0.5666668,
+                          "value": 1.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.74999976,
+                          "value": 1.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "targetName": "MainCamera",
+              "animationClips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "type": 0,
+                  "start": 0.0,
+                  "duration": 2.0,
+                  "bindings": [
+                    {
+                      "propertyName": "field of view",
+                      "keyframes": [
+                        {
+                          "time": 0.6333333,
+                          "value": 80.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.15,
+                          "value": 50.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "targetName": "Plane",
+              "animationClips": []
             }
           ],
           "type": 0
@@ -492,12 +625,43 @@
       "children": []
     },
     {
-      "name": "----------------",
+      "name": "Cube_TestTransform",
       "transform": {
         "localPosition": {
           "x": 0.0,
+          "y": 2.091335,
+          "z": 0.0
+        },
+        "localRotation": {
+          "x": 8.53773656E-07,
+          "y": -36.5762978,
+          "z": 53.5738144
+        },
+        "localScale": {
+          "x": 1.40059257,
           "y": 1.0,
-          "z": 10.0
+          "z": 1.0
+        }
+      },
+      "components": [
+        {
+          "materialName": "New Material",
+          "type": 3
+        },
+        {
+          "meshName": "Cube",
+          "type": 4
+        }
+      ],
+      "children": []
+    },
+    {
+      "name": "Cube_TestMaterial",
+      "transform": {
+        "localPosition": {
+          "x": 2.12,
+          "y": 0.0,
+          "z": 0.0
         },
         "localRotation": {
           "x": 0.0,
@@ -510,29 +674,16 @@
           "z": 1.0
         }
       },
-      "components": [],
-      "children": []
-    },
-    {
-      "name": "CubeConnector",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 1.90632248,
-          "z": 0.0
+      "components": [
+        {
+          "materialName": "Lit",
+          "type": 3
         },
-        "localRotation": {
-          "x": 0.0,
-          "y": -18.9231243,
-          "z": 48.0553246
-        },
-        "localScale": {
-          "x": 1.95140731,
-          "y": 1.0,
-          "z": 1.0
+        {
+          "meshName": "Cube",
+          "type": 4
         }
-      },
-      "components": [],
+      ],
       "children": []
     },
     {
@@ -557,36 +708,15 @@
       "components": [
         {
           "lightType": "Directional",
-          "color": "1030420EFF",
+          "intensity": 0.962665,
+          "color": "13A411F4FF",
           "type": 1
         }
       ],
       "children": []
     },
     {
-      "name": "---------------- (1)",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 1.0,
-          "z": 10.0
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": []
-    },
-    {
-      "name": "Main Camera",
+      "name": "MainCamera",
       "transform": {
         "localPosition": {
           "x": 1.84,
@@ -604,7 +734,14 @@
           "z": 1.0
         }
       },
-      "components": [],
+      "components": [
+        {
+          "cameraType": "Perspective",
+          "isMain": true,
+          "fov": 73.88238,
+          "type": 2
+        }
+      ],
       "children": []
     },
     {
@@ -630,185 +767,6 @@
       "children": []
     },
     {
-      "name": "Cube",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": []
-    },
-    {
-      "name": "Cube (1)",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": []
-    },
-    {
-      "name": "GameObject (2)",
-      "transform": {
-        "localPosition": {
-          "x": 4.214157,
-          "y": 2.19844,
-          "z": -3.616618
-        },
-        "localRotation": {
-          "x": -13.1830006,
-          "y": -344.117,
-          "z": 342.456
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": [
-        {
-          "name": "Cube (2)",
-          "transform": {
-            "localPosition": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localRotation": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localScale": {
-              "x": 0.7,
-              "y": 0.7,
-              "z": 0.7
-            }
-          },
-          "components": [],
-          "children": []
-        }
-      ]
-    },
-    {
-      "name": "GameObject (1)",
-      "transform": {
-        "localPosition": {
-          "x": 2.15743256,
-          "y": 3.05625916,
-          "z": -0.129338741
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": -341.454,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": [
-        {
-          "name": "Cube (3)",
-          "transform": {
-            "localPosition": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localRotation": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localScale": {
-              "x": 0.7,
-              "y": 0.7,
-              "z": 0.7
-            }
-          },
-          "components": [],
-          "children": []
-        }
-      ]
-    },
-    {
-      "name": "GameObject (3)",
-      "transform": {
-        "localPosition": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        }
-      },
-      "components": [],
-      "children": [
-        {
-          "name": "Cube (3)",
-          "transform": {
-            "localPosition": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localRotation": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "localScale": {
-              "x": 0.7,
-              "y": 0.7,
-              "z": 0.7
-            }
-          },
-          "components": [],
-          "children": []
-        }
-      ]
-    },
-    {
       "name": "Plane",
       "transform": {
         "localPosition": {
@@ -817,39 +775,26 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.0,
+          "x": -90.0,
           "y": 0.0,
           "z": 0.0
         },
         "localScale": {
-          "x": 2.0,
-          "y": 2.0,
-          "z": 2.0
+          "x": 10.0,
+          "y": 10.0,
+          "z": 10.0
         }
       },
-      "components": [],
-      "children": []
-    },
-    {
-      "name": "Cube_Test",
-      "transform": {
-        "localPosition": {
-          "x": 2.12,
-          "y": 0.0,
-          "z": 0.0
+      "components": [
+        {
+          "materialName": "LitGray",
+          "type": 3
         },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "localScale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
+        {
+          "meshName": "Quad",
+          "type": 4
         }
-      },
-      "components": [],
+      ],
       "children": []
     }
   ]

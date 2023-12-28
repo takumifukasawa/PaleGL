@@ -10,7 +10,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { Scene } from '@/PaleGL/core/Scene';
 // import { Texture } from '@/PaleGL/core/Texture';
-import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
+// import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
 // loaders
 
@@ -48,13 +48,14 @@ import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { wait } from '@/utilities/wait.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 import {
+    buildMarionetterActors,
     buildMarionetterTimeline,
     MarionetterPlayableDirectorComponentInfo,
-    MarionetterScene, MarionetterTimeline,
+    MarionetterScene,
+    MarionetterTimeline,
 } from '@/Marionetter/timeline.ts';
-import {createMarionetter, Marionetter} from "@/Marionetter/createMarionetter.ts";
+import { createMarionetter, Marionetter } from '@/Marionetter/createMarionetter.ts';
 // import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
 // import {Texture} from "@/PaleGL/core/Texture.ts";
 
@@ -107,7 +108,9 @@ let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let glslSound: GLSLSound;
-const marionetter: Marionetter = createMarionetter({ showLog: false});
+let marionetterTimeline: MarionetterTimeline | null = null;
+
+const marionetter: Marionetter = createMarionetter({ showLog: false });
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -142,102 +145,15 @@ const renderer = new Renderer({
 
 const engine = new Engine({ gpu, renderer });
 
-// engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
 
-// const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
-captureScene.add(captureSceneCamera);
-// captureScene.mainCamera = captureSceneCamera;
-captureSceneCamera.mainCamera = true;
+// const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
+// captureScene.add(captureSceneCamera);
+// // captureSceneCamera.mainCamera = true;
+// captureSceneCamera.name = "Main Camera";
 
-const orbitCameraController = new OrbitCameraController(captureSceneCamera);
-
-captureSceneCamera.onStart = ({ actor }) => {
-    (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
-};
-captureSceneCamera.onFixedUpdate = () => {
-    // 1: fixed position
-    // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
-
-    // 2: orbit controls
-    // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.isDown && orbitCameraController.enabled) {
-        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
-    }
-    orbitCameraController.fixedUpdate();
-};
-
-const directionalLight = new DirectionalLight({
-    name: "DirectionalLight",
-    intensity: 1.2,
-    // color: Color.fromRGB(255, 210, 200),
-    color: Color.white,
-});
-// shadows
-// TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
-if (directionalLight.shadowCamera) {
-    // directionalLight.shadowCamera.visibleFrustum = true;
-    directionalLight.castShadow = true;
-    directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 30;
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
-    directionalLight.shadowMap = new RenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-    });
-}
-
-directionalLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-8, 8, -2));
-    actor.transform.lookAt(new Vector3(0, 0, 0));
-    // const lightActor = actor as DirectionalLight;
-    // lightActor.castShadow = true;
-    // // lightActor.castShadow = false;
-    // if (lightActor.shadowCamera) {
-    //     lightActor.shadowCamera.near = 1;
-    //     lightActor.shadowCamera.far = 30;
-    //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
-    //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
-    // }
-};
-captureScene.add(directionalLight);
-
-const cameraPostProcess = new PostProcess();
-
-const fxaaPass = new FXAAPass({ gpu });
-cameraPostProcess.addPass(fxaaPass);
-
-const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
-bufferVisualizerPass.enabled = false;
-cameraPostProcess.addPass(bufferVisualizerPass);
-bufferVisualizerPass.beforeRender = () => {
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uDirectionalLightShadowMap',
-        directionalLight.shadowMap!.read.depthTexture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uAmbientOcclusionTexture',
-        renderer.ambientOcclusionPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uDeferredShadingTexture',
-        renderer.deferredShadingPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uLightShaftTexture',
-        renderer.lightShaftPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
-};
-
-cameraPostProcess.enabled = true;
-// TODO: set post process いらないかも
-captureSceneCamera.setPostProcess(cameraPostProcess);
+let captureSceneCamera: PerspectiveCamera | null;
+// let orbitCameraController: OrbitCameraController | null;
 
 /**
  *
@@ -254,21 +170,6 @@ const createSound = () => {
 
 const initMarionetter = () => {
     marionetter.connect();
-};
-
-let centralCube: Mesh | null = null;
-
-const appendTrackCube = () => {
-    const geometry = new BoxGeometry({ gpu });
-    const material = new GBufferMaterial({});
-    const mesh = new Mesh({
-        name: "CubeConnector",
-        geometry,
-        material,
-        castShadow: true,
-    });
-    captureScene.add(mesh);
-    centralCube = mesh;
 };
 
 function createFloorPlaneMesh() {
@@ -330,31 +231,137 @@ function createFloorPlaneMesh() {
     return floorPlaneMesh;
 }
 
-let marionetterTimeline: MarionetterTimeline | null;
+const buildScene = (sceneJson: MarionetterScene) => {
+    const actors = buildMarionetterActors(gpu, sceneJson);
+    for (let i = 0; i < actors.length; i++) {
+        captureScene.add(actors[i]);
+    }
+
+    captureSceneCamera = captureScene.find('MainCamera')?.actor as PerspectiveCamera;
+    const directionalLight = captureScene.find("DirectionalLight")?.actor as DirectionalLight;
+    
+    // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+
+    captureSceneCamera.onStart = ({ actor }) => {
+        (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
+    };
+    captureSceneCamera.onFixedUpdate = () => {
+        // 1: fixed position
+        // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+        // 2: orbit controls
+        // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+        // if (inputController.isDown && orbitCameraController.enabled) {
+        //     orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+        // }
+        // orbitCameraController.fixedUpdate();
+    };
+
+    // const directionalLight = new DirectionalLight({
+    //     name: 'DirectionalLight',
+    //     intensity: 1.2,
+    //     // color: Color.fromRGB(255, 210, 200),
+    //     color: Color.white,
+    // });
+    
+    // shadows
+    // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
+    if (directionalLight.shadowCamera) {
+        // directionalLight.shadowCamera.visibleFrustum = true;
+        directionalLight.castShadow = true;
+        directionalLight.shadowCamera.near = 1;
+        directionalLight.shadowCamera.far = 30;
+        (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
+        // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+        // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+        directionalLight.shadowMap = new RenderTarget({
+            gpu,
+            width: 1024,
+            height: 1024,
+            type: RenderTargetTypes.Depth,
+        });
+    }
+
+    directionalLight.onStart = ({ actor }) => {
+        actor.transform.setTranslation(new Vector3(-8, 8, -2));
+        actor.transform.lookAt(new Vector3(0, 0, 0));
+        // const lightActor = actor as DirectionalLight;
+        // lightActor.castShadow = true;
+        // // lightActor.castShadow = false;
+        // if (lightActor.shadowCamera) {
+        //     lightActor.shadowCamera.near = 1;
+        //     lightActor.shadowCamera.far = 30;
+        //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+        //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+        // }
+    };
+    captureScene.add(directionalLight);
+
+    const cameraPostProcess = new PostProcess();
+
+    const fxaaPass = new FXAAPass({ gpu });
+    cameraPostProcess.addPass(fxaaPass);
+
+    const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
+    bufferVisualizerPass.enabled = false;
+    cameraPostProcess.addPass(bufferVisualizerPass);
+    bufferVisualizerPass.beforeRender = () => {
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uDirectionalLightShadowMap',
+            directionalLight.shadowMap!.read.depthTexture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uAmbientOcclusionTexture',
+            renderer.ambientOcclusionPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uDeferredShadingTexture',
+            renderer.deferredShadingPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue(
+            'uLightShaftTexture',
+            renderer.lightShaftPass.renderTarget.read.texture
+        );
+        bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+    };
+
+    cameraPostProcess.enabled = true;
+    // TODO: set post process いらないかも
+    captureSceneCamera.setPostProcess(cameraPostProcess);
+
+    parseScene(sceneJson);
+    
+    console.log(captureScene)
+
+    initDebugger({
+        bufferVisualizerPass,
+        directionalLight,
+        fxaaPass,
+    });
+};
 
 const parseScene = (sceneJson: MarionetterScene) => {
-    const playableDirectorComponentInfo = sceneJson.objects[0].components[0] as MarionetterPlayableDirectorComponentInfo;
+    const playableDirectorComponentInfo = sceneJson.objects[0]
+        .components[0] as MarionetterPlayableDirectorComponentInfo;
     marionetterTimeline = buildMarionetterTimeline(captureScene, playableDirectorComponentInfo);
-}
+};
 
 // TODO: この処理はビルド時には捨てたい
 const initHotReloadAndParseScene = () => {
     const hotReloadScene = () => {
-        void fetch("./assets/data/scene-hot-reload.json").then(async (res) => {
-            const sceneJson = await res.json() as unknown as MarionetterScene;
+        void fetch('./assets/data/scene-hot-reload.json').then(async (res) => {
+            const sceneJson = (await res.json()) as unknown as MarionetterScene;
             parseScene(sceneJson);
         });
-    }
+    };
     marionetter.setHotReloadCallback(() => {
         hotReloadScene();
     });
-    hotReloadScene()
-}
+    hotReloadScene();
+};
 
 const main = async () => {
     createSound();
     initMarionetter();
-    appendTrackCube();
 
     await wait(0);
 
@@ -362,7 +369,8 @@ const main = async () => {
 
     captureScene.add(floorPlaneMesh);
 
-    parseScene(sceneJsonUrl as unknown as MarionetterScene);
+    // parseScene(sceneJsonUrl as unknown as MarionetterScene);
+    buildScene(sceneJsonUrl as unknown as MarionetterScene);
     initHotReloadAndParseScene();
 
     // TODO: engine側に移譲したい
@@ -377,15 +385,15 @@ const main = async () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = isSP ? 20 : 20;
-        orbitCameraController.attenuation = 0.01;
-        orbitCameraController.dampingFactor = 0.2;
-        orbitCameraController.azimuthSpeed = 100;
-        orbitCameraController.altitudeSpeed = 100;
-        orbitCameraController.deltaAzimuthPower = 2;
-        orbitCameraController.deltaAltitudePower = 2;
-        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
-        orbitCameraController.start(0, -40);
+        // orbitCameraController.distance = isSP ? 20 : 20;
+        // orbitCameraController.attenuation = 0.01;
+        // orbitCameraController.dampingFactor = 0.2;
+        // orbitCameraController.azimuthSpeed = 100;
+        // orbitCameraController.altitudeSpeed = 100;
+        // orbitCameraController.deltaAzimuthPower = 2;
+        // orbitCameraController.deltaAltitudePower = 2;
+        // orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
+        // orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
     };
 
@@ -396,7 +404,11 @@ const main = async () => {
     // }
 
     engine.onBeforeUpdate = () => {
-        if (!debuggerGUI) initDebugger();
+        // if (!debuggerGUI) initDebugger({
+        //     bufferVisualizerPass,
+        //     directionalLight,
+        //     fxaaPass,
+        // });
         inputController.update();
     };
 
@@ -405,21 +417,12 @@ const main = async () => {
     // };
 
     engine.onRender = (time) => {
-        if (marionetterTimeline !== null && centralCube !== null) {
+        if (marionetterTimeline !== null) {
             marionetterTimeline.execute(marionetter.getCurrentTime());
-            // const tracks = playableDirector.tracks;
-            // const t = time % playableDirector.duration;
-            // const centralCubeTrackBinder = createMarionetterTrackBinder(tracks[0].animationClips, t);
-            // if(centralCubeTrackBinder?.type === "AnimationTrack") {
-            //     centralCubeTrackBinder.assignProperty(centralCube);
-            // }
-            // const lightTrackBinder = createMarionetterTrackBinder(tracks[1].animationClips, t);
-            // if(lightTrackBinder?.type === "LightControlTrack") {
-            //     lightTrackBinder.assignProperty(directionalLight);
-            // }
         }
-
-        renderer.render(captureScene, captureSceneCamera, { time });
+        if (captureSceneCamera) {
+            renderer.render(captureScene, captureSceneCamera, { time });
+        }
     };
 
     const tick = (time: number) => {
@@ -432,7 +435,15 @@ const main = async () => {
     requestAnimationFrame(tick);
 };
 
-function initDebugger() {
+function initDebugger({
+    bufferVisualizerPass,
+    directionalLight,
+    fxaaPass,
+}: {
+    bufferVisualizerPass: BufferVisualizerPass;
+    directionalLight: DirectionalLight;
+    fxaaPass: FXAAPass;
+}) {
     debuggerGUI = new DebuggerGUI();
 
     //
@@ -456,13 +467,13 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    debuggerGUI.addToggleDebugger({
-        label: 'orbit controls enabled',
-        // initialValue: debuggerStates.orbitControlsEnabled,
-        // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
-        initialValue: orbitCameraController.enabled,
-        onChange: (value) => (orbitCameraController.enabled = value),
-    });
+    // debuggerGUI.addToggleDebugger({
+    //     label: 'orbit controls enabled',
+    //     // initialValue: debuggerStates.orbitControlsEnabled,
+    //     // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
+    //     initialValue: orbitCameraController.enabled,
+    //     onChange: (value) => (orbitCameraController.enabled = value),
+    // });
 
     //
     // show buffers

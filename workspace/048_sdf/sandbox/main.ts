@@ -248,7 +248,7 @@ engine.setScene(captureScene);
 const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
-captureSceneCamera.mainCamera = true;
+// captureSceneCamera.mainCamera = true;
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 

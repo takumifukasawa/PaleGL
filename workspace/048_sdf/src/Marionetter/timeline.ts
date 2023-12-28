@@ -4,6 +4,19 @@ import { Actor } from '@/PaleGL/actors/Actor.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Light } from '@/PaleGL/actors/Light.ts';
 import { Scene } from '@/PaleGL/core/Scene.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
+import { Mesh } from '@/PaleGL/actors/Mesh.ts';
+import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Material } from '@/PaleGL/materials/Material.ts';
+import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import { Geometry } from '@/PaleGL/geometries/Geometry.ts';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
+
+// --------------------------------------------------------------------
+// jsonのproperty名と紐づけ
+// --------------------------------------------------------------------
 
 // TODO: 短縮系を渡すようにしたい
 const PROPERTY_COLOR_R = 'color.r';
@@ -24,6 +37,104 @@ const PROPERTY_LOCAL_EULER_ANGLES_RAW_Z = 'localEulerAnglesRaw.z';
 const PROPERTY_LOCAL_SCALE_X = 'm_LocalScale.x';
 const PROPERTY_LOCAL_SCALE_Y = 'm_LocalScale.y';
 const PROPERTY_LOCAL_SCALE_Z = 'm_LocalScale.z';
+const PROPERTY_FIELD_OF_VIEW = 'field of view';
+
+const PRORPERTY_MATERIAL_BASE_COLOR_R = 'material._BaseColor.r';
+const PRORPERTY_MATERIAL_BASE_COLOR_G = 'material._BaseColor.g';
+const PRORPERTY_MATERIAL_BASE_COLOR_B = 'material._BaseColor.b';
+const PRORPERTY_MATERIAL_BASE_COLOR_A = 'material._BaseColor.a';
+
+// --------------------------------------------------------------------
+
+export function buildMarionetterActors(gpu: GPU, scene: MarionetterScene): Actor[] {
+    const actors: Actor[] = [];
+    scene.objects.forEach((obj) => {
+        const { name } = obj;
+        const mfComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshFilter);
+        const mrComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshRenderer);
+        const cameraComponent = obj.components.find((c) => c.type === MarionetterComponentType.Camera);
+        const lightComponent = obj.components.find((c) => c.type === MarionetterComponentType.Light);
+
+        let actor: Actor | null = null;
+
+        if (mrComponent && mfComponent) {
+            const meshFilter = mfComponent as MarionetterMeshFilterComponentInfo;
+            const meshRenderer = mrComponent as MarionetterMeshRendererComponentInfo;
+
+            let geometry: Geometry | null = null;
+            let material: Material | null = null;
+
+            // build geometry
+            switch (meshFilter.meshName) {
+                case 'Cube':
+                    geometry = new BoxGeometry({ gpu });
+                    break;
+                case 'Quad':
+                    geometry = new PlaneGeometry({ gpu });
+                    break;
+            }
+
+            // build material
+            switch (meshRenderer.materialName) {
+                case 'Lit':
+                    material = new GBufferMaterial();
+                    break;
+                default:
+                    // TODO: fallback
+                    material = new GBufferMaterial();
+                    break;
+            }
+
+            if (geometry && material) {
+                actor = new Mesh({ name, geometry, material });
+            }
+        } else if (cameraComponent) {
+            const camera = cameraComponent as MarionetterCameraComponentInfo;
+            if (camera.cameraType === 'Perspective') {
+                actor = new PerspectiveCamera(camera.fov, 1, 0.1, 1000, name);
+            } else {
+                throw `[buildMarionetterActors] invalid camera type: ${camera.cameraType}`;
+            }
+        } else if (lightComponent) {
+            // light
+            const light = lightComponent as MarionetterLightComponentInfo;
+            switch (light.lightType) {
+                case 'Directional':
+                    actor = new DirectionalLight({
+                        name,
+                        intensity: light.intensity,
+                        color: Color.fromHex(light.color),
+                    });
+                    break;
+                default:
+                    throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
+            }
+        } else {
+            // others
+            actor = new Actor({ name });
+        }
+
+        if (actor) {
+            actors.push(actor);
+            actor.transform.scale = new Vector3(
+                obj.transform.localScale.x,
+                obj.transform.localScale.y,
+                obj.transform.localScale.z
+            );
+            actor.transform.rotation.setV(new Vector3(
+                obj.transform.localRotation.x,
+                obj.transform.localRotation.y,
+                obj.transform.localRotation.z
+            ));
+            actor.transform.position = new Vector3(
+                obj.transform.localPosition.x,
+                obj.transform.localPosition.y,
+                obj.transform.localPosition.z
+            );
+        }
+    });
+    return actors;
+}
 
 //
 // scene
@@ -42,9 +153,9 @@ type MarionetterObjectInfo = {
 };
 
 type MarionetterTransformInfo = {
-    localPosition: Vector3; // shorthand: lp
-    localRotation: Vector3; // shorthand: lr
-    localScale: Vector3; // shorthand: ls
+    localPosition: { x: number; y: number; z: number }; // shorthand: lp
+    localRotation: { x: number; y: number; z: number }; // shorthand: lr
+    localScale: { x: number; y: number; z: number }; // shorthand: ls
 };
 
 //
@@ -71,8 +182,8 @@ type MarionetterAnimationClipInfoBase = {
 };
 
 type MarionetterAnimationClipInfo = MarionetterAnimationClipInfoBase & {
-    offsetPosition: Vector3; // shorthand: op
-    offsetRotation: Vector3; // shorthand: or
+    offsetPosition: { x: number; y: number; z: number }; // shorthand: op
+    offsetRotation: { x: number; y: number; z: number }; // shorthand: or
 };
 
 type MarionetterLightControlClipInfo = MarionetterAnimationClipInfoBase; // TODO: 追加が必要なはず
@@ -97,22 +208,50 @@ type MarionetterComponentInfoBase = {
     type: MarionetterComponentType; // shorthand: t
 };
 
-const enum MarionetterComponentType {
-    PlayableDirector = 0,
-    Light = 1,
-}
+// unity側に合わせる
+const MarionetterComponentType = {
+    PlayableDirector: 0,
+    Light: 1,
+    Camera: 2,
+    MeshRenderer: 3,
+    MeshFilter: 4,
+} as const;
 
-type MarionetterComponentInfoKinds = MarionetterPlayableDirectorComponentInfo | MarionetterLightComponentInfo;
+type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
+
+type MarionetterComponentInfoKinds =
+    | MarionetterPlayableDirectorComponentInfo
+    | MarionetterLightComponentInfo
+    | MarionetterCameraComponentInfo
+    | MarionetterMeshRendererComponentInfo
+    | MarionetterMeshFilterComponentInfo;
+
+// unity側に合わせてcomponent情報を追加
 
 export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
     name: string; // shorthand: n
     duration: number; // shorthand: d
-    tracks: MarionetterTrackInfo[]; // shorthand: t
+    tracks: MarionetterTrackInfo[]; // shorthand: ts
 };
 
 type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
-    lightType: string; // shorthand: l
+    lightType: 'Directional' | 'Point' | 'Spot'; // shorthand: l
+    intensity: number; // shorthand: i
     color: string; // shorthand: c, hex string
+};
+
+type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
+    cameraType: 'Perspective' | 'Orthographic'; // ct
+    isMain: boolean; // shorthand: im
+    fov: number; // shorthand: f
+};
+
+type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase & {
+    materialName: string; // shorthand: mn
+};
+
+type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & {
+    meshName: string; // shorthand: mn
 };
 
 //
@@ -166,8 +305,8 @@ export function buildMarionetterTimeline(
         const transform = scene.find(targetName);
         const targetActor = transform ? transform.actor : null;
         const clips = createMarionetterClips(animationClips);
-        if(!targetActor) {
-            console.warn("target actor is not found");
+        if (!targetActor) {
+            console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
         }
         const execute = (time: number) => {
             for (let j = 0; j < clips.length; j++) {
@@ -192,8 +331,8 @@ export function buildMarionetterTimeline(
             tracks[i].execute(frameTime);
         }
     };
-    const marionetterTimeline: MarionetterTimeline = { tracks, execute };
-    return marionetterTimeline;
+    
+    return { tracks, execute };
 }
 
 /**
@@ -213,7 +352,7 @@ function createMarionetterClips(animationClips: MarionetterAnimationClipInfoKind
                 clips.push(createMarionetterLightControlClip(animationClip as MarionetterLightControlClipInfo));
                 break;
             default:
-                throw new Error(`invalid animation clip type`);
+                throw new Error(`[createMarionetterClips] invalid animation clip type`);
         }
     }
 
@@ -225,10 +364,7 @@ function createMarionetterClips(animationClips: MarionetterAnimationClipInfoKind
  * @param animationClip
  */
 function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipInfo): MarionetterAnimationClip {
-    // let obj: Actor | null;
-    // const bind = (targetObj: Actor) => {
-    //     obj = targetObj;
-    // };
+    // actorに直接valueを割り当てる関数
     const execute = (actor: Actor, time: number) => {
         let hasLocalPosition: boolean = false;
         let hasLocalRotationEuler: boolean = false;
@@ -280,34 +416,31 @@ function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipI
                     hasLocalScale = true;
                     localScale.z = value;
                     break;
+                case PROPERTY_FIELD_OF_VIEW:
+                    (actor as PerspectiveCamera).fov = value;
+                    (actor as PerspectiveCamera).updateProjectionMatrix();
+                    break;
+                case PRORPERTY_MATERIAL_BASE_COLOR_R:
+                case PRORPERTY_MATERIAL_BASE_COLOR_G:
+                case PRORPERTY_MATERIAL_BASE_COLOR_B:
+                case PRORPERTY_MATERIAL_BASE_COLOR_A:
+                    // TODO: GBufferMaterialとの連携？
+                    break;
                 default:
-                    throw new Error(`invalid property: ${propertyName}`);
+                    throw new Error(`[createMarionetterAnimationClip] invalid property: ${propertyName}`);
             }
-            // }
         });
-        // }
 
-        // Debug.Log("==========");
-        // Debug.Log(LocalPosition);
-        // Debug.Log(LocalRotationEuler);
-        // Debug.Log(LocalScale);
         if (hasLocalPosition) {
             actor.transform.position.copy(localPosition);
         }
 
         if (hasLocalRotationEuler) {
             actor.transform.rotation.setV(localRotationEuler);
-            // obj.transform.rotation.copy(
-            //     (localRotationEuler.x / 180) * Math.PI,
-            //     (localRotationEuler.y / 180) * Math.PI,
-            //     // (10 / 180) * Math.PI,
-            //     (localRotationEuler.z / 180) * Math.PI
-            // ));
         }
 
         if (hasLocalScale) {
             actor.transform.scale.copy(localScale);
-            // obj.scale.copy(localScale);
         }
     };
 
@@ -414,120 +547,3 @@ function createMarionetterLightControlClip(
         execute,
     };
 }
-
-// /**
-//  * tmp
-//  */
-// export function createMarionetterAnimationTrackBinder(animationClips: MarionetterAnimationClipInfoKinds[], rawTime: number) {
-//     // ---------------------------------------------------------------------------
-//     // public
-//     // ---------------------------------------------------------------------------
-//
-//     let hasLocalPosition: boolean = false;
-//     let hasLocalRotationEuler: boolean = false;
-//     let hasLocalScale: boolean = false;
-//     const localPosition: Vector3 = Vector3.zero;
-//     const localRotationEuler: Vector3 = Vector3.zero;
-//     const localScale: Vector3 = Vector3.one;
-//
-//     // const spf = 1 / fps;
-//     // const frameTime = Math.floor(rawTime / spf) * spf;
-//     const frameTime = rawTime;
-//
-//     // TODO: pre-extrapolate, post-extrapolate
-//     // NOTE: 一個だけ抽出 = animation clip の blend は対応していない
-//     // const animationClip = animationClips.find((ac) => ac.start <= time && time < ac.start + ac.duration);
-//     const animationClip = animationClips.find((ac) => ac.start <= frameTime && frameTime < ac.start + ac.duration);
-//     if (!animationClip) {
-//         return;
-//     }
-//     const { start, bindings } = animationClip;
-//
-//     // TODO: typeがあった方がよい. ex) animation clip, light control clip
-//     bindings.forEach(({ propertyName, keyframes }) => {
-//         // Debug.Log(binding.type.FullName);
-//         // animated transform
-//
-//         // TODO: check transform type
-//         // if (binding.type.FullName == typeof(Transform).FullName) {
-//         // var curve = AnimationUtility.GetEditorCurve(animationClip, binding);
-//         // for debug
-//         // Debug.Log(binding.propertyName);
-//         const value = curveUtilityEvaluateCurve(frameTime - start, keyframes);
-//
-//         // // animated transform
-//         // if (binding.type.FullName == typeof(Transform).FullName)
-//         // {
-//         switch (propertyName) {
-//             case PROPERTY_LOCAL_POSITION_X:
-//                 hasLocalPosition = true;
-//                 localPosition.x = value;
-//                 break;
-//             case PROPERTY_LOCAL_POSITION_Y:
-//                 hasLocalPosition = true;
-//                 localPosition.y = value;
-//                 break;
-//             case PROPERTY_LOCAL_POSITION_Z:
-//                 hasLocalPosition = true;
-//                 localPosition.z = value;
-//                 break;
-//             case PROPERTY_LOCAL_EULER_ANGLES_RAW_X:
-//                 hasLocalRotationEuler = true;
-//                 localRotationEuler.x = value;
-//                 break;
-//             case PROPERTY_LOCAL_EULER_ANGLES_RAW_Y:
-//                 hasLocalRotationEuler = true;
-//                 localRotationEuler.y = value;
-//                 break;
-//             case PROPERTY_LOCAL_EULER_ANGLES_RAW_Z:
-//                 hasLocalRotationEuler = true;
-//                 localRotationEuler.z = value;
-//                 break;
-//             case PROPERTY_LOCAL_SCALE_X:
-//                 hasLocalScale = true;
-//                 localScale.x = value;
-//                 break;
-//             case PROPERTY_LOCAL_SCALE_Y:
-//                 hasLocalScale = true;
-//                 localScale.y = value;
-//                 break;
-//             case PROPERTY_LOCAL_SCALE_Z:
-//                 hasLocalScale = true;
-//                 localScale.z = value;
-//                 break;
-//             default:
-//                 throw new Error(`invalid property: ${propertyName}`);
-//         }
-//         // }
-//     });
-//     // }
-//
-//     const execute = (obj: Actor) => {
-//         // Debug.Log("==========");
-//         // Debug.Log(LocalPosition);
-//         // Debug.Log(LocalRotationEuler);
-//         // Debug.Log(LocalScale);
-//         if (hasLocalPosition) {
-//             obj.transform.position.copy(localPosition);
-//         }
-//
-//         if (hasLocalRotationEuler) {
-//             obj.transform.rotation.setV(localRotationEuler);
-//             // obj.transform.rotation.copy(
-//             //     (localRotationEuler.x / 180) * Math.PI,
-//             //     (localRotationEuler.y / 180) * Math.PI,
-//             //     // (10 / 180) * Math.PI,
-//             //     (localRotationEuler.z / 180) * Math.PI
-//             // ));
-//         }
-//
-//         if (hasLocalScale) {
-//             obj.transform.scale.copy(localScale);
-//             // obj.scale.copy(localScale);
-//         }
-//     };
-//
-//     return {
-//         execute,
-//     };
-// }
