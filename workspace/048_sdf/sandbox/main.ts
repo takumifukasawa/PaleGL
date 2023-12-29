@@ -337,6 +337,9 @@ const cameraPostProcess = new PostProcess();
 // cameraPostProcess.addPass(gaussianBlurPass);
 // gaussianBlurPass.enabled = true;
 
+renderer.depthOfFieldPass.focusDistance = 18.5;
+renderer.depthOfFieldPass.focusRange = 17;
+
 const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);
 

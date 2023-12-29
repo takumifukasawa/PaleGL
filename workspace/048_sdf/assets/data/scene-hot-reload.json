@@ -650,16 +650,16 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 3.40785527,
+          "y": 3.92401052,
           "z": 0.0
         },
         "localRotation": {
           "x": 0.0,
-          "y": -44.9999962,
-          "z": 65.592926
+          "y": -45.0,
+          "z": 69.72117
         },
         "localScale": {
-          "x": 1.0032593,
+          "x": 1.10400009,
           "y": 1.0,
           "z": 1.0
         }
@@ -729,8 +729,8 @@
       "components": [
         {
           "lightType": "Directional",
-          "intensity": 0.9613505,
-          "color": "17EB1147FF",
+          "intensity": 0.968398,
+          "color": "18ADCFDFF",
           "type": 1
         }
       ],
@@ -759,7 +759,7 @@
         {
           "cameraType": "Perspective",
           "isMain": true,
-          "fov": 54.96257,
+          "fov": 50.78849,
           "type": 2
         }
       ],
@@ -816,6 +816,28 @@
           "type": 4
         }
       ],
+      "children": []
+    },
+    {
+      "name": "GameObject",
+      "transform": {
+        "localPosition": {
+          "x": -0.07,
+          "y": 0.4,
+          "z": -2.39
+        },
+        "localRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "localScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
+      },
+      "components": [],
       "children": []
     }
   ]

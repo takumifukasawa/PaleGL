@@ -22,34 +22,35 @@ uniform float uBokehRadius;
 #define BOKEH_KERNEL_MEDIUM
 // #define BOKEH_KERNEL_SMALL
 
-#if defined(BOKEH_KERNEL_SMALL)
+// #if defined(BOKEH_KERNEL_SMALL)
+// 
+// // ref: https://github.com/keijiro/KinoBokeh/blob/master/Assets/Kino/Bokeh/Shader/DiskKernel.cginc
+// const int KERNEL_SAMPLE_COUNT = 16;
+// const vec2[KERNEL_SAMPLE_COUNT] kernel = vec2[](
+//     // original
+// 	vec2(0, 0),
+// 	vec2(0.54545456, 0),
+// 	vec2(0.16855472, 0.5187581),
+// 	vec2(-0.44128203, 0.3206101),
+// 	vec2(-0.44128197, -0.3206102),
+// 	vec2(0.1685548, -0.5187581),
+// 	vec2(1, 0),
+// 	vec2(0.809017, 0.58778524),
+// 	vec2(0.30901697, 0.95105654),
+// 	vec2(-0.30901703, 0.9510565),
+// 	vec2(-0.80901706, 0.5877852),
+// 	vec2(-1, 0),
+// 	vec2(-0.80901694, -0.58778536),
+// 	vec2(-0.30901664, -0.9510566),
+// 	vec2(0.30901712, -0.9510565),
+// 	vec2(0.80901694, -0.5877853)
+// );
+// 
+// #elif defined (BOKEH_KERNEL_MEDIUM)
 
-// ref: https://github.com/keijiro/KinoBokeh/blob/master/Assets/Kino/Bokeh/Shader/DiskKernel.cginc
-const int kernelSampleCount = 16;
-const vec2[kernelSampleCount] kernel = vec2[](
-    // original
-	vec2(0, 0),
-	vec2(0.54545456, 0),
-	vec2(0.16855472, 0.5187581),
-	vec2(-0.44128203, 0.3206101),
-	vec2(-0.44128197, -0.3206102),
-	vec2(0.1685548, -0.5187581),
-	vec2(1, 0),
-	vec2(0.809017, 0.58778524),
-	vec2(0.30901697, 0.95105654),
-	vec2(-0.30901703, 0.9510565),
-	vec2(-0.80901706, 0.5877852),
-	vec2(-1, 0),
-	vec2(-0.80901694, -0.58778536),
-	vec2(-0.30901664, -0.9510566),
-	vec2(0.30901712, -0.9510565),
-	vec2(0.80901694, -0.5877853)
-);
-
-#elif defined (BOKEH_KERNEL_MEDIUM)
-
-const int kernelSampleCount = 22;
-const vec2[kernelSampleCount] kernel = vec2[](
+// const int KERNEL_SAMPLE_COUNT = 22;
+#define KERNEL_SAMPLE_COUNT 22
+const vec2[22] kernel = vec2[](
 	vec2(0, 0),
 	vec2(0.53333336, 0),
 	vec2(0.3325279, 0.4169768),
@@ -74,7 +75,7 @@ const vec2[kernelSampleCount] kernel = vec2[](
 	vec2(0.90096885, -0.43388376)
 );
 
-#endif
+// #endif
 
 float weight(float coc, float radius) {
     // return coc >= radius ? 1. : 0.;
@@ -93,7 +94,7 @@ void main() {
  
     float coc = texture(uSrcTexture, vUv).a;
 
-    for(int k = 0; k < kernelSampleCount; k++) {
+    for(int k = 0; k < KERNEL_SAMPLE_COUNT; k++) {
         vec2 o = kernel[k].xy * uBokehRadius;
         float radius = length(o);
         o *= texelSize;
@@ -116,7 +117,7 @@ void main() {
     fgColor *= vec3(1.) / (fgWeight + (fgWeight == 0. ? 1. : 0.));
     
     // 前ボケと後ボケがどのように合成されたか
-    float bgfg = min(1., fgWeight * 3.141592 / float(kernelSampleCount));
+    float bgfg = min(1., fgWeight * 3.141592 / float(KERNEL_SAMPLE_COUNT));
     
     vec3 color = mix(bgColor, fgColor, bgfg);
     
