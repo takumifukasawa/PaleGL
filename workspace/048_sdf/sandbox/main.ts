@@ -1170,7 +1170,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
-const createSound = () => {
+const playSound = () => {
     if(glslSound) {
         glslSound.stop();
     }
@@ -1743,7 +1743,7 @@ function initDebugger() {
     debuggerGUI.addButtonDebugger({
         buttonLabel: 'play sound',
         onClick: () => {
-            createSound();
+            playSound();
         },
     });
 

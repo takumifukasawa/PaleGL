@@ -156,11 +156,16 @@ let captureSceneCamera: PerspectiveCamera | null;
 /**
  *
  */
-const createSound = () => {
-    if(glslSound) {
+const playSound = () => {
+    stopSound();
+    glslSound = new GLSLSound(gpu, soundVertexShader, 180);
+    glslSound.play(0);
+};
+
+const stopSound = () => {
+    if (glslSound) {
         glslSound.stop();
     }
-    glslSound  = new GLSLSound(gpu, soundVertexShader, 180);
 };
 
 const initMarionetter = () => {
@@ -296,7 +301,7 @@ const initHotReloadAndParseScene = () => {
 };
 
 const main = async () => {
-    // createSound();
+    // playSound();
 
     await wait(0);
 
@@ -312,11 +317,11 @@ const main = async () => {
             switch (e.code) {
                 case 'KeyP':
                     console.log('===== play sound =====');
-                    createSound();
+                    playSound();
                     break;
                 case 'KeyS':
                     console.log('===== stop sound =====');
-                    glslSound.stop();
+                    stopSound();
                     break;
             }
         });
@@ -434,10 +439,27 @@ function initDebugger({
     debuggerGUI.addButtonDebugger({
         buttonLabel: 'play sound',
         onClick: () => {
-            createSound()
-            // if (glslSound) {
-            //     glslSound.play();
-            // }
+            playSound();
+        },
+    });
+
+    debuggerGUI.addButtonDebugger({
+        buttonLabel: 'stop sound',
+        onClick: () => {
+            stopSound();
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'seek sound',
+        minValue: 0,
+        maxValue: 180,
+        stepValue: 0.01,
+        initialValue: 0,
+        onChange: (value) => {
+            if (glslSound) {
+                glslSound.play(value);
+            }
         },
     });
 
@@ -445,7 +467,7 @@ function initDebugger({
     // orbit controls
     //
 
-    debuggerGUI.addBorderSpacer();
+    // debuggerGUI.addBorderSpacer();
 
     // debuggerGUI.addToggleDebugger({
     //     label: 'orbit controls enabled',

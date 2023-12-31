@@ -14,11 +14,15 @@ export class GLSLSound {
     gpu: GPU;
     channelNum: number;
     audioContext: AudioContext;
-    node: AudioBufferSourceNode;
+    node: AudioBufferSourceNode | null;
+    duration: number;
+    audioBuffer: AudioBuffer;
 
     constructor(gpu: GPU, vertexShader: string, duration: number) {
         this.gpu = gpu;
         this.channelNum = 2;
+        this.duration = duration;
+        this.node = null;
         
         const audioContext = new AudioContext();
         const audioBuffer = audioContext.createBuffer(
@@ -98,18 +102,33 @@ export class GLSLSound {
             }
         }
 
-        const node = audioContext.createBufferSource();
-        node.connect(audioContext.destination);
-        node.buffer = audioBuffer;
-        node.loop = false;
-
-        this.node = node;
         this.audioContext = audioContext;
-        
-        this.node?.start(0);
+        this.audioBuffer = audioBuffer;
     }
+    
+    play(time: number) {
+        if(this.node) {
+            this.node.stop();
+            this.node = null;
+        }
+        console.log(`[GLSLSound.play] time: ${time}`);
+        const node = this.audioContext.createBufferSource();
+        node.connect(this.audioContext.destination);
+        node.buffer = this.audioBuffer;
+        node.loop = false;
+        node.start(0, time);
+        this.node = node;
+    }
+    
+    // seek(time: number) {
+    //     console.log(`[GLSLSound.seek] time: ${time}`);
+    //     // if(this.node) {
+    //     //     this.node.playbackRate.value = time / this.duration;
+    //     // }
+    // }
 
     stop() {
+        console.log('[GLSLSound.stop]');
         this.node?.stop();
         // await this.audioContext?.suspend();
     }
