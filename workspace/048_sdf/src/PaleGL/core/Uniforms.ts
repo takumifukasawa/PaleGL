@@ -48,12 +48,12 @@ export class Uniforms {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも
     data: UniformsData;
 
-    constructor(...datas: UniformsData[]) {
+    constructor(...dataArray: UniformsData[]) {
         this.data = [];
-        for(let i = 0; i < datas.length; i++) 
+        for(let i = 0; i < dataArray.length; i++) 
         {
-            for(let j = 0; j < datas[i].length; j++ ){
-                const elem = datas[i][j];
+            for(let j = 0; j < dataArray[i].length; j++ ){
+                const elem = dataArray[i][j];
                 const elemIndex = this.data.findIndex((d) => d.name === elem.name);
                 if(elemIndex < 0) {
                     this.data.push(elem);

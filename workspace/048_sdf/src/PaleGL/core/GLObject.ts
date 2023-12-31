@@ -10,4 +10,8 @@
     unbind(): void {
         throw '[GLObject.unbind] should implementation';
     }
+    
+    dispose(): void {
+        throw '[GLObject.dispose] should implementation';
+    }
 }

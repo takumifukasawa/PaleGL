@@ -1,11 +1,6 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-// import { Shader } from '@/PaleGL/core/Shader.ts';
-// import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
-// import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
-import {AttributeUsageType, UniformTypes} from '@/PaleGL/constants.ts';
-// import {Uniforms} from "@/PaleGL/materials/Material.ts";
-// import { Attribute } from '@/PaleGL/core/Attribute.ts';
+import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 
 // ------------------------------------------------------------------------------
 // ref:
@@ -15,18 +10,16 @@ import {AttributeUsageType, UniformTypes} from '@/PaleGL/constants.ts';
 
 const SAMPLES = 65536;
 
-// const enum Uniforms {uBlockTest}
-
 export class GLSLSound {
-    // bpm;
     gpu: GPU;
-    // transformFeedbackBuffer: TransformFeedbackBuffer;
-    channelNum;
+    channelNum: number;
+    audioContext: AudioContext;
+    node: AudioBufferSourceNode;
 
-    constructor({ gpu, vertexShader, duration }: { gpu: GPU; vertexShader: string; duration: number }) {
+    constructor(gpu: GPU, vertexShader: string, duration: number) {
         this.gpu = gpu;
         this.channelNum = 2;
-
+        
         const audioContext = new AudioContext();
         const audioBuffer = audioContext.createBuffer(
             this.channelNum,
@@ -35,37 +28,6 @@ export class GLSLSound {
         );
 
         const { gl } = gpu;
-
-        // const shader = new Shader({
-        //     gpu, vertexShader, fragmentShader: transformFeedbackFragmentShader, transformFeedbackVaryings: [
-        //         'vSound'
-        //     ]
-        // });
-
-        //const getUniformLocations = (gl: WebGL2RenderingContext, program: WebGLProgram, names: string[]) => {
-        //    const locations: { [name: string]: WebGLUniformLocation } = {};
-        //    names.forEach((name) => {
-        //        locations[name] = gl.getUniformLocation(program, name)!;
-        //    });
-        //    return locations;
-        //};
-
-        // console.log(Uniforms.uBlockTest)
-        // const uniforms: Uniforms = {
-        //     // [Uniforms[Uniforms.uBlockTest]]: {
-        //     //     type: UniformTypes.Float,
-        //     //     value: 0,
-        //     // },
-        //     "uBlockOffset": {
-        //         type: UniformTypes.Float,
-        //         value: 0,
-        //     },
-        //     "uSampleRate": {
-        //         type: UniformTypes.Float,
-        //         value: 0,
-        //     },
-        // };
-        // const uniformLocations = getUniformLocations(gl, shader.glObject);
 
         const data = new Float32Array(this.channelNum * SAMPLES);
 
@@ -84,15 +46,16 @@ export class GLSLSound {
             vertexShader,
             uniforms: [
                 {
-                name: "uBlockOffset",
+                    name: 'uBlockOffset',
                     type: UniformTypes.Float,
                     value: 0,
-                },{
-                    name: "uSampleRate",
+                },
+                {
+                    name: 'uSampleRate',
                     type: UniformTypes.Float,
                     value: 0,
-                }
-                ],
+                },
+            ],
             // fragmentShader: transformFeedbackFragmentShader,
             drawCount: SAMPLES,
         });
@@ -110,13 +73,13 @@ export class GLSLSound {
         console.log(`[GLSLSound] outputR length: ${outputR.length}`);
         console.log(`[GLSLSound] ----------------------------------------`);
 
-        transformFeedbackBuffer.uniforms.setValue("uSampleRate", audioContext.sampleRate);
+        transformFeedbackBuffer.uniforms.setValue('uSampleRate', audioContext.sampleRate);
 
         for (let i = 0; i < numBlocks; i++) {
             const blockOffset = (i * SAMPLES) / audioContext.sampleRate;
             // gl.uniform1f(uniformLocations['uBlockOffset'], blockOffset);
 
-            transformFeedbackBuffer.uniforms.setValue("uBlockOffset", blockOffset);
+            transformFeedbackBuffer.uniforms.setValue('uBlockOffset', blockOffset);
 
             // TODO: vao, shader の bind,unbind がたくさん発生するので最適化した方がよい
             gpu.updateTransformFeedback({
@@ -127,12 +90,7 @@ export class GLSLSound {
                 drawCount: SAMPLES,
             });
 
-            gpu.gl.getBufferSubData(
-                gl.TRANSFORM_FEEDBACK_BUFFER,
-                0,
-                data
-                // transformFeedbackBuffer.getBufferSubData(varyingName)!
-            );
+            gpu.gl.getBufferSubData(gl.TRANSFORM_FEEDBACK_BUFFER, 0, data);
 
             for (let j = 0; j < SAMPLES; j++) {
                 outputL[i * SAMPLES + j] = data[j * 2 + 0];
@@ -145,16 +103,18 @@ export class GLSLSound {
         node.buffer = audioBuffer;
         node.loop = false;
 
-        // this.audioBuffer = audioBuffer;
-        // this.audioContext = audioContext;
         this.node = node;
+        this.audioContext = audioContext;
+        
+        this.node?.start(0);
     }
 
-    // audioContext;
-    // audioBuffer;
-    node: AudioBufferSourceNode;
-
-    play() {
-        this.node.start(0);
+    stop() {
+        this.node?.stop();
+        // await this.audioContext?.suspend();
     }
+
+    // reload(vertexShader: string, duration: number) {
+    //     this.create(vertexShader, duration);
+    // }
 }

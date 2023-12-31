@@ -31,6 +31,7 @@ import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 // others
 import {
     RenderTargetTypes,
+    // TextureFilterTypes,
     // TextureFilterTypes, TextureWrapTypes,
 } from '@/PaleGL/constants';
 
@@ -53,11 +54,12 @@ import {
     MarionetterTimeline,
 } from '@/Marionetter/timeline.ts';
 import { createMarionetter, Marionetter } from '@/Marionetter/createMarionetter.ts';
-// import {loadImg} from "@/PaleGL/loaders/loadImg.ts";
-// import {Texture} from "@/PaleGL/core/Texture.ts";
-
-// import { hoge } from '@/externals/test.js';
-// console.log(hoge());
+// import glsl from 'vite-plugin-glsl';
+// import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
+// import { Texture } from '@/PaleGL/core/Texture.ts';
+// import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
+// import fontAtlasImgUrl from './assets/fonts/NotoSans-Bold/atlas.png?url';
+// import fontAtlasJson from './assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 
 const stylesText = `
 :root {
@@ -155,13 +157,10 @@ let captureSceneCamera: PerspectiveCamera | null;
  *
  */
 const createSound = () => {
-    const vertexShader = soundVertexShader;
-
-    glslSound = new GLSLSound({
-        gpu,
-        vertexShader,
-        duration: 180,
-    });
+    if(glslSound) {
+        glslSound.stop();
+    }
+    glslSound  = new GLSLSound(gpu, soundVertexShader, 180);
 };
 
 const initMarionetter = () => {
@@ -175,8 +174,8 @@ const buildScene = (sceneJson: MarionetterScene) => {
     }
 
     captureSceneCamera = captureScene.find('MainCamera')?.actor as PerspectiveCamera;
-    const directionalLight = captureScene.find("DirectionalLight")?.actor as DirectionalLight;
-    
+    const directionalLight = captureScene.find('DirectionalLight')?.actor as DirectionalLight;
+
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
     captureSceneCamera.onStart = ({ actor }) => {
@@ -199,7 +198,7 @@ const buildScene = (sceneJson: MarionetterScene) => {
     //     // color: Color.fromRGB(255, 210, 200),
     //     color: Color.white,
     // });
-    
+
     // shadows
     // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
     if (directionalLight.shadowCamera) {
@@ -266,8 +265,8 @@ const buildScene = (sceneJson: MarionetterScene) => {
     captureSceneCamera.setPostProcess(cameraPostProcess);
 
     parseScene(sceneJson);
-    
-    console.log(captureScene)
+
+    console.log(captureScene);
 
     initDebugger({
         bufferVisualizerPass,
@@ -297,16 +296,61 @@ const initHotReloadAndParseScene = () => {
 };
 
 const main = async () => {
-    createSound();
-    initMarionetter();
+    // createSound();
 
     await wait(0);
 
     // parseScene(sceneJsonUrl as unknown as MarionetterScene);
-    console.log("====== main ======")
-    console.log(sceneJsonUrl)
+    console.log('====== main ======');
+    console.log(import.meta.env);
+    console.log(sceneJsonUrl);
+
     buildScene(sceneJsonUrl as unknown as MarionetterScene);
-    initHotReloadAndParseScene();
+
+    if (import.meta.env.VITE_HOT_RELOAD === 'true') {
+        document.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case 'KeyP':
+                    console.log('===== play sound =====');
+                    createSound();
+                    break;
+                case 'KeyS':
+                    console.log('===== stop sound =====');
+                    glslSound.stop();
+                    break;
+            }
+        });
+        initMarionetter();
+        initHotReloadAndParseScene();
+    }
+
+    // post additional scene
+
+    //
+    // text mesh
+    //
+
+    // const fontAtlasImg = await loadImg(fontAtlasImgUrl);
+    // const fontAtlasTexture = new Texture({
+    //     gpu,
+    //     img: fontAtlasImg,
+    //     flipY: false,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
+    // const textMesh1 = new TextMesh({
+    //     gpu,
+    //     text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    //     fontTexture: fontAtlasTexture,
+    //     fontAtlas: fontAtlasJson,
+    //     castShadow: true,
+    //     align: TextAlignType.Center,
+    //     // characterSpacing: -0.2
+    // });
+    // captureScene.add(textMesh1);
+    // textMesh1.transform.position = new Vector3(0, 0, 0);
+    // textMesh1.transform.rotation.setRotationX(-90);
+    // textMesh1.transform.scale = Vector3.fill(0.4);
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
@@ -390,9 +434,10 @@ function initDebugger({
     debuggerGUI.addButtonDebugger({
         buttonLabel: 'play sound',
         onClick: () => {
-            if (glslSound) {
-                glslSound.play();
-            }
+            createSound()
+            // if (glslSound) {
+            //     glslSound.play();
+            // }
         },
     });
 
@@ -441,7 +486,6 @@ function initDebugger({
         );
         bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
     };
-
 
     //
     // directional light

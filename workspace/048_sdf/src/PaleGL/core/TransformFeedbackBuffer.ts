@@ -92,6 +92,9 @@ export class TransformFeedbackBuffer {
 
         this.transformFeedback = new TransformFeedback({ gpu, buffers: outputBuffers });
     }
+    
+    // dispose() {
+    // }
 
     // getBufferSubData(name: string) {
     //     return this.outputs.find(elem => elem.name === name)?.buffer;

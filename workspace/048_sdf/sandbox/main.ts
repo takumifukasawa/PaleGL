@@ -110,7 +110,7 @@ import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
-import {TextAlignType, TextMesh} from '@/PaleGL/actors/TextMesh.ts';
+import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1171,18 +1171,14 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 };
 
 const createSound = () => {
-    const vertexShader = soundVertexShader;
-
-    glslSound = new GLSLSound({
-        gpu,
-        vertexShader,
-        duration: 180,
-    });
+    if(glslSound) {
+        glslSound.stop();
+    }
+    glslSound  = new GLSLSound(gpu, soundVertexShader, 180);
 };
 
-const main = async () => {
-    createSound();
 
+const main = async () => {
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
         gpu,
@@ -1337,10 +1333,10 @@ const main = async () => {
         fontAtlas: fontAtlasJson,
         castShadow: true,
         align: TextAlignType.Center,
-        characterSpacing: -0.16
+        characterSpacing: -0.16,
     });
     captureScene.add(textMesh2);
-    textMesh2.transform.position = new Vector3(0, .01, 8);
+    textMesh2.transform.position = new Vector3(0, 2, 8);
     textMesh2.transform.rotation.setRotationX(-90);
     textMesh2.transform.scale = Vector3.fill(0.4);
 
@@ -1351,10 +1347,10 @@ const main = async () => {
         fontAtlas: fontAtlasJson,
         castShadow: true,
         align: TextAlignType.Left,
-        characterSpacing: 0.2
+        characterSpacing: 0.2,
     });
     captureScene.add(textMesh3);
-    textMesh3.transform.position = new Vector3(0, .01, 9);
+    textMesh3.transform.position = new Vector3(0, 0.01, 9);
     textMesh3.transform.rotation.setRotationX(-90);
     textMesh3.transform.scale = Vector3.fill(0.4);
 
@@ -1747,9 +1743,7 @@ function initDebugger() {
     debuggerGUI.addButtonDebugger({
         buttonLabel: 'play sound',
         onClick: () => {
-            if (glslSound) {
-                glslSound.play();
-            }
+            createSound();
         },
     });
 
