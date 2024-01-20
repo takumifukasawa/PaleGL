@@ -244,7 +244,6 @@ float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
 vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
     vec3 N = normalize(geometry.normal);
     vec3 V = normalize(geometry.viewDir);
-    // vec3 L = normalize(directLight.direction);
     vec3 L = normalize(lightDirection);
 
     float dotNL = saturate(dot(N, L));
@@ -259,7 +258,7 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
     float D = D_GGX(a, dotNH);
     float G = G_Smith_Schlick_GGX(a, dotNV, dotNL);
     vec3 F = F_Shhlick(specularColor, V, H);
-    
+  
     return (F * (G * D)) / (4. * dotNL * dotNV + EPSILON);
 }
 

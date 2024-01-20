@@ -136,8 +136,8 @@ void main() {
     float roughness = gBufferC.roughness;
     vec3 emissiveColor = gBufferD.emissiveColor;
     float shadingModelId = gBufferB.shadingModelId;
-    vec3 worldNormal = gBufferB.normal * 2. - 1.;
-  
+    vec3 worldNormal = gBufferB.normal;
+    
     // depth
     float rawDepth = texture(uDepthTexture, uv).r; 
     float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
@@ -228,6 +228,7 @@ void main() {
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
     RE_Direct(directLight, geometry, material, reflectedLight);
 
+    // TODO: ponit light なくていいかも
     // point light
     // PointLight pointLight;
     // pointLight.position = uDirectionalLight.direction * 5.;
@@ -263,8 +264,8 @@ void main() {
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
-    // getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
-    // RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+    getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
+    RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 
 // #endif
 
@@ -276,7 +277,10 @@ vec3 outgoingLight =
     reflectedLight.indirectDiffuse +
     reflectedLight.indirectSpecular;
 resultColor = vec4(outgoingLight, opacity);
-    resultColor.xyz = reflectedLight.directSpecular;
+    // debug start
+    // outColor.xyz = reflectedLight.directSpecular;
+    // return;
+    // debug end
 
 // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
 #ifdef USE_RECEIVE_SHADOW
