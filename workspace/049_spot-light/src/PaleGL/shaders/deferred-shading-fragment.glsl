@@ -283,6 +283,7 @@ resultColor = vec4(outgoingLight, opacity);
     // debug end
 
 // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
+// TODO: shadow map の枚数
 #ifdef USE_RECEIVE_SHADOW
     vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
     if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {

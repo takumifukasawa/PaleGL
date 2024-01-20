@@ -1292,8 +1292,9 @@ const main = async () => {
     testLightingMesh = await createGLTFSphereMesh(
         new GBufferMaterial({
             // receiveShadow: true,
+            diffuseColor: new Color(1, .05, .05, 1),
             metallic: 1,
-            roughness: 1
+            roughness: .3
         })
     );
     testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
@@ -1310,6 +1311,7 @@ const main = async () => {
             // primitiveType: PrimitiveTypes.Triangles,
             metallic: 0,
             roughness: 0,
+            receiveShadow: false
         }),
         castShadow: true,
     });
@@ -1714,7 +1716,7 @@ void main() {
         particleMaterial.uniforms.setValue('uTime', fixedTime);
     };
 
-    // captureScene.add(attractSphereMesh);
+    captureScene.add(attractSphereMesh);
     captureScene.add(testLightingMesh);
     captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);

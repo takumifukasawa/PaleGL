@@ -419,9 +419,10 @@ export class Material {
                   },
                   {
                       // TODO: shadow map class を作って bias 持たせた方がよい
+                      // TODO: shadow biasの値を統一して可変にしたい
                       name: UniformNames.ShadowBias,
                       type: UniformTypes.Float,
-                      value: 0.01,
+                      value: 0.03,
                   },
               ]
             : [];
