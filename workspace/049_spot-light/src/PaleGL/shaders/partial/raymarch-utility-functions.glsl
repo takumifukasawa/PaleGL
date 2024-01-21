@@ -38,10 +38,10 @@ bool isDfInnerBox(vec3 p, vec3 scale) {
 }
 
 mat3 getCameraRayCoordinate(vec3 origin, vec3 lookAt, vec3 up) {
-    vec3 forward = normalize(lookAt - origin);
-    vec3 right = cross(forward, up);
-    vec3 up = cross(right, forward);
-    return mat3(right, up, forward);
+    vec3 f = normalize(lookAt - origin);
+    vec3 r = cross(f, up);
+    vec3 u = cross(r, f);
+    return mat3(r, u, f);
 }
 
 // aspect ... w / h

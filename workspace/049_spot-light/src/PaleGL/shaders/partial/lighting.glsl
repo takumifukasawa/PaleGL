@@ -71,9 +71,9 @@ bool testLightInRange(const in float lightDistance, const in float cutoffDistanc
     return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
 }
 
-float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float decayComponent) {
-    if (decayComponent > 0.) {
-        return pow(saturate(-lightDistance / cutoffDistance + 1.), decayComponent);
+float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
+    if (attenuationComponent > 0.) {
+        return pow(saturate(-lightDistance / cutoffDistance + 1.), attenuationComponent);
     }
 
     return 1.;
@@ -95,12 +95,13 @@ void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, c
 }
 
 // point light
+// TODO: point light なくてもいいかも
 
 struct PointLight {
     vec3 position;
     vec4 color;
     float distance;
-    float decay;
+    float attenuation;
 };
 
 void getPointLightIrradiance(const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight) {
@@ -110,7 +111,7 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
     float lightDistance = length(L);
     if (testLightInRange(lightDistance, pointLight.distance)) {
         directLight.color = pointLight.color.xyz;
-        directLight.color *= punctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.decay);
+        directLight.color *= punctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.attenuation);
         directLight.visible = true;
     } else {
         directLight.color = vec3(0.);
@@ -123,9 +124,9 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
 struct SpotLight {
     vec3 position;
     vec3 direction;
-    vec3 color;
+    vec4 color;
     float distance;
-    float decay;
+    float attenuation;
     float coneCos;
     float penumbraCos;
 };
@@ -144,8 +145,8 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
         )
     )) {
         float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-        directLight.color = spotLight.color;
-        directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.decay);
+        directLight.color = spotLight.color.xyz;
+        directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
         directLight.visible = true;
     } else {
         directLight.color = vec3(0.);

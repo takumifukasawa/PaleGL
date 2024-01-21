@@ -276,7 +276,7 @@ const directionalLight = new DirectionalLight({
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
-// directionalLight.enabled = false; // NOTE: 一旦ガード
+directionalLight.enabled = false; // NOTE: 一旦ガード
 
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -1845,7 +1845,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', true);
+    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', false);
 
     objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
         label: 'pos x',
@@ -1995,6 +1995,103 @@ function initDebugger() {
         initialValue: directionalLight.transform.position.z,
         onChange: (value) => {
             directionalLight.transform.position.z = value;
+        },
+    });
+
+
+    //
+    // spot light
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'intensity',
+        minValue: 0,
+        maxValue: 100,
+        stepValue: 0.001,
+        initialValue: spotLight.intensity,
+        onChange: (value) => {
+            spotLight.intensity = value;
+        },
+    });
+    
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'distance',
+        minValue: 0,
+        maxValue: 100,
+        stepValue: 0.01,
+        initialValue: spotLight.distance,
+        onChange: (value) => {
+            spotLight.distance = value;
+        },
+    });
+    
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'attenuation',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.attenuation,
+        onChange: (value) => {
+            spotLight.attenuation = value;
+        },
+    });
+    
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'coneCos',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: spotLight.coneCos,
+        onChange: (value) => {
+            spotLight.coneCos = value;
+        },
+    });
+    
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'penumbraCos',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: spotLight.penumbraCos,
+        onChange: (value) => {
+            spotLight.penumbraCos = value;
+        },
+    })
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos x',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.x,
+        onChange: (value) => {
+            spotLight.transform.position.x = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos y',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.y,
+        onChange: (value) => {
+            spotLight.transform.position.y = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos z',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.z,
+        onChange: (value) => {
+            spotLight.transform.position.z = value;
         },
     });
 
@@ -2151,7 +2248,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const fogDebuggerGroup = debuggerGUI.addGroup('fog');
+    const fogDebuggerGroup = debuggerGUI.addGroup('fog', false);
 
     // fogDebuggerGroup.addToggleDebugger({
     //     label: 'fog pass enabled',

@@ -299,6 +299,7 @@ export const UniformNames = {
     LightIntensity: 'intensity',
     LightColor: 'color',
     // spot light
+    LightPosition: 'position',
     LightDistance: 'distance',
     LightAttenuation: 'attenuation',
     LightConeCos: 'coneCos',

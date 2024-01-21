@@ -349,18 +349,21 @@ export class GPU {
                 if (uniformData.type === UniformTypes.Struct) {
                     const uniformStructValue = uniformData.value as UniformStructValue;
                     uniformStructValue.forEach((structData) => {
+                        const uniformName = `${uniformData.name}.${structData.name}`;
                         setUniformValueInternal(
                             structData.type,
-                            `${uniformData.name}.${structData.name}`,
+                            uniformName,
                             structData.value
                         );
                     });
                 } else if (uniformData.type === UniformTypes.StructArray) {
-                    (uniformData.value as UniformStructArrayValue).forEach(uniformStructValue => {
-                        uniformStructValue.forEach((structData, i) => {
+                    (uniformData.value as UniformStructArrayValue).forEach((uniformStructValue, i) => {
+                        uniformStructValue.forEach((structData) => {
+                            const uniformName = `${uniformData.name}[${i}].${structData.name}`;
+                            // console.log(structData.type, uniformName, structData.value)
                             setUniformValueInternal(
                                 structData.type,
-                                `${uniformData.name}${i}.${structData.name}`,
+                                uniformName,
                                 structData.value
                             );
                         });

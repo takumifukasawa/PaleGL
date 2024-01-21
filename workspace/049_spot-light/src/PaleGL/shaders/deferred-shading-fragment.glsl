@@ -81,8 +81,9 @@ in vec2 vUv;
 
 // #include ./partial/directional-light-uniforms.glsl
 uniform DirectionalLight uDirectionalLight;
-uniform SpotLight uSpotLight[4];
-
+// TODO: spot light の最大数はどこかで定数管理したい
+#define MAX_SPOT_LIGHT_COUNT 4
+uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 
 #include ./partial/receive-shadow-fragment-uniforms.glsl
 
@@ -225,8 +226,8 @@ void main() {
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     directionalLight.intensity = uDirectionalLight.intensity;
-    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    RE_Direct(directLight, geometry, material, reflectedLight);
+    // getDirectionalLightIrradiance(directionalLight, geometry, directLight);
+    // RE_Direct(directLight, geometry, material, reflectedLight);
 
     // TODO: ponit light なくていいかも
     // point light
@@ -234,23 +235,22 @@ void main() {
     // pointLight.position = uDirectionalLight.direction * 5.;
     // pointLight.color = uDirectionalLight.color;
     // pointLight.distance = 100.;
-    // pointLight.decay = 1.;
+    // pointLight.attenuation = 1.;
     // getPointLightIrradiance(pointLight, geometry, directLight);
     // RE_Direct(directLight, geometry, material, reflectedLight);
     
     // spot light
-    // TODO: spot light num
-    for(int i = 0; i < 4; i++) {
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         SpotLight spotLight;
         spotLight.position = uSpotLight[i].position;
         spotLight.direction = uSpotLight[i].direction;
         spotLight.color = uSpotLight[i].color;
         spotLight.distance = uSpotLight[i].distance;
-        spotLight.decay = uSpotLight[i].decay;
+        spotLight.attenuation = uSpotLight[i].attenuation;
         spotLight.coneCos = uSpotLight[i].coneCos;
         spotLight.penumbraCos = uSpotLight[i].penumbraCos;
-        // getSpotLightIrradiance(spotLight, geometry, directLight);
-        // RE_Direct(directLight, geometry, material, reflectedLight);
+        getSpotLightIrradiance(spotLight, geometry, directLight);
+        RE_Direct(directLight, geometry, material, reflectedLight);
     }
     
 
@@ -278,8 +278,9 @@ vec3 outgoingLight =
     reflectedLight.indirectSpecular;
 resultColor = vec4(outgoingLight, opacity);
     // debug start
-    // outColor.xyz = reflectedLight.directSpecular;
-    // return;
+    // outColor.xyz = vec3(uSpotLight[0].direction);
+    outColor.xyz = vec3(uSpotLight[0].attenuation);
+    return;
     // debug end
 
 // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい

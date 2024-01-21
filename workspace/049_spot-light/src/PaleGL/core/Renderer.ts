@@ -72,6 +72,7 @@ function applyShadowUniformValues(targetMaterial: Material, light: Light) {
 }
 
 // TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
+// TODO: 渡す uniform の値、キャッシュできる気がする
 export function applyLightUniformValues(targetMaterial: Material, lightActors: LightActors) {
     if (lightActors.directionalLight) {
         targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
@@ -102,12 +103,14 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
         UniformNames.SpotLight,
         lightActors.spotLights.map((spotLight) => [
             {
+                name: UniformNames.LightPosition,
+                type: UniformTypes.Vector3,
+                value: spotLight.transform.position
+            },
+            {
                 name: UniformNames.LightDirection,
                 type: UniformTypes.Vector3,
-                // pattern1: そのまま渡す
-                // value: light.transform.position,
-                // pattern2: normalizeしてから渡す
-                value: spotLight.transform.position.clone().normalize(),
+                value: spotLight.transform.worldForward
             },
             {
                 name: UniformNames.LightIntensity,
@@ -143,46 +146,6 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
     );
 
     lightActors.spotLights.forEach((spotLight) => {
-        // targetMaterial.uniforms.setValue(UniformNames.SpotLight, [
-        //     {
-        //         name: UniformNames.LightDirection,
-        //         type: UniformTypes.Vector3,
-        //         // pattern1: そのまま渡す
-        //         // value: light.transform.position,
-        //         // pattern2: normalizeしてから渡す
-        //         value: spotLight.transform.position.clone().normalize(),
-        //     },
-        //     {
-        //         name: UniformNames.LightIntensity,
-        //         type: UniformTypes.Float,
-        //         value: spotLight.intensity,
-        //     },
-        //     {
-        //         name: UniformNames.LightColor,
-        //         type: UniformTypes.Color,
-        //         value: spotLight.color,
-        //     },
-        //     {
-        //         name: 'distance',
-        //         type: UniformTypes.Float,
-        //         value: spotLight.distance,
-        //     },
-        //     {
-        //         name: 'attenuation',
-        //         type: UniformTypes.Float,
-        //         value: spotLight.attenuation,
-        //     },
-        //     {
-        //         name: 'coneCos',
-        //         type: UniformTypes.Float,
-        //         value: spotLight.coneCos,
-        //     },
-        //     {
-        //         name: 'penumbraCos',
-        //         type: UniformTypes.Float,
-        //         value: spotLight.penumbraCos,
-        //     },
-        // ]);
         applyShadowUniformValues(targetMaterial, spotLight);
     });
 }

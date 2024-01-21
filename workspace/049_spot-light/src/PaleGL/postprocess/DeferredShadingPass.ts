@@ -87,11 +87,15 @@ export class DeferredShadingPass extends PostProcessPassBase {
             },
 
             {
-                // TODO: pass all lights
                 name: UniformNames.SpotLight,
                 type: UniformTypes.StructArray,
                 value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
                     return [
+                        {
+                            name: UniformNames.LightPosition,
+                            type: UniformTypes.Vector3,
+                            value: Vector3.zero
+                        },
                         {
                             name: UniformNames.LightDirection,
                             type: UniformTypes.Vector3,
@@ -169,6 +173,8 @@ export class DeferredShadingPass extends PostProcessPassBase {
             //     value: null,
             // },
         ];
+        
+        console.log(uniforms)
 
         super({
             gpu,
