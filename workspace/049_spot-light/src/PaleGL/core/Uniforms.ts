@@ -7,15 +7,22 @@ import {CubeMap} from "@/PaleGL/core/CubeMap.ts";
 import {Color} from "@/PaleGL/math/Color.ts";
 import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
 import {UniformTypes} from "@/PaleGL/constants.ts";
+// import {SpotLightStruct} from "@/PaleGL/actors/SpotLight.ts";
 
 type UniformTypeValuePair = {
     type: UniformTypes;
     value: UniformValue;
 }
 
+type UniformData = {
+    name: string,
+} & UniformTypeValuePair;
+
 export type UniformStructValue = UniformData[];
 //     [key: string]: UniformTypeValuePair;
 // };
+
+export type UniformStructArrayValue = UniformStructValue[];
 
 // TODO: fix type
 export type UniformValue =
@@ -35,12 +42,12 @@ export type UniformValue =
     | Color[]
     | Float32Array
     | DirectionalLightStruct
+    // | SpotLightStruct[]
     | UniformStructValue
+    | UniformStructArrayValue
+    // | UniformTypeValuePair[][]
+    // | UniformStructArrayValue
     | null;
-
-type UniformData = {
-    name: string,
-} & UniformTypeValuePair;
 
 export type UniformsData = UniformData[];
 

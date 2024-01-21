@@ -3,12 +3,12 @@
 import { Camera } from '@/PaleGL/actors/Camera';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { applyLightUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { Light } from '@/PaleGL/actors/Light.ts';
+// import { Light } from '@/PaleGL/actors/Light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
@@ -21,7 +21,7 @@ type PostProcessRenderArgs = {
     targetCamera: Camera;
     time: number;
     isCameraLastPass: boolean;
-    lightActors?: Light[];
+    lightActors?: LightActors
 };
 
 // TODO: actorを継承してもいいかもしれない
@@ -134,17 +134,21 @@ export class PostProcess {
         renderer: Renderer;
         targetCamera: Camera;
         time: number;
-        lightActors?: Light[];
+        lightActors?: LightActors;
     }) {
         pass.materials.forEach((passMaterial) => {
             //
             // light
             //
+            // if (lightActors) {
+            //     // TODO: light情報はまとめてから渡したい
+            //     lightActors.forEach((light) => {
+            //         light.applyUniformsValues(passMaterial);
+            //     });
+            // }
+            // TODO: 必要なのだけ割り当てたいが・・・
             if (lightActors) {
-                // TODO: light情報はまとめてから渡したい
-                lightActors.forEach((light) => {
-                    light.applyUniformsValues(passMaterial);
-                });
+                applyLightUniformValues(passMaterial, lightActors);
             }
 
             //
@@ -210,7 +214,7 @@ export class PostProcess {
             renderer,
             targetCamera,
             time,
-            lightActors
+            lightActors,
         });
         pass.render({
             gpu,
@@ -226,7 +230,7 @@ export class PostProcess {
     }
 
     /**
-     * 
+     *
      * @param gpu
      * @param renderer
      * @param prevRenderTarget
@@ -281,7 +285,7 @@ export class PostProcess {
             //     gBufferRenderTargets,
             //     time,
             // });
-            
+
             PostProcess.renderPass({
                 pass,
                 gpu,

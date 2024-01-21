@@ -264,8 +264,8 @@ void main() {
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
-    getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
-    RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+    // getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
+    // RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 
 // #endif
 

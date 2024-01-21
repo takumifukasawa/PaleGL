@@ -1,12 +1,13 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {MAX_SPOT_LIGHT_COUNT, RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {maton} from "@/PaleGL/utilities/maton.ts";
 
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
@@ -68,21 +69,66 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 type: UniformTypes.Struct,
                 value: [
                     {
-                        name: 'direction',
+                        name: UniformNames.LightDirection,
                         type: UniformTypes.Vector3,
                         value: Vector3.zero,
                     },
                     {
-                        name: 'intensity',
+                        name: UniformNames.LightIntensity,
                         type: UniformTypes.Float,
                         value: 0,
                     },
                     {
-                        name: 'color',
+                        name: UniformNames.LightColor,
                         type: UniformTypes.Color,
                         value: new Color(0, 0, 0, 1),
                     },
                 ],
+            },
+
+            {
+                // TODO: pass all lights
+                name: UniformNames.SpotLight,
+                type: UniformTypes.StructArray,
+                value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
+                    return [
+                        {
+                            name: UniformNames.LightDirection,
+                            type: UniformTypes.Vector3,
+                            value: Vector3.zero,
+                        },
+                        {
+                            name: UniformNames.LightIntensity,
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        {
+                            name: UniformNames.LightColor,
+                            type: UniformTypes.Color,
+                            value: new Color(0, 0, 0, 1),
+                        },
+                        {
+                            name: UniformNames.LightDistance,
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        {
+                            name: UniformNames.LightAttenuation,
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        {
+                            name: UniformNames.LightConeCos,
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                        {
+                            name: UniformNames.LightPenumbraCos,
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                    ]
+                }),
             },
 
             {

@@ -3,8 +3,8 @@ import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { Actor } from '@/PaleGL/actors/Actor';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
-import { LightTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
+import { LightTypes } from '@/PaleGL/constants.ts';
+// import { Material } from '@/PaleGL/materials/Material.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import {PerspectiveCamera} from "./PerspectiveCamera";
 // import {Vector3} from "@/PaleGL/math/Vector3";
@@ -33,28 +33,28 @@ export class DirectionalLight extends Light {
      * 
      * @param targetMaterial
      */
-    applyUniformsValues(targetMaterial: Material) {
-        targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
-            {
-                name: UniformNames.LightDirection,
-                type: UniformTypes.Vector3,
-                // pattern1: そのまま渡す
-                // value: light.transform.position,
-                // pattern2: normalizeしてから渡す
-                value: this.transform.position.clone().normalize(),
-            },
-            {
-                name: UniformNames.LightIntensity,
-                type: UniformTypes.Float,
-                value: this.intensity,
-            },
-            {
-                name: UniformNames.LightColor,
-                type: UniformTypes.Color,
-                value: this.color,
-            },
-        ]);
-        
-        this.applyShadowUniformValues(targetMaterial);
-    }
+    // applyUniformsValues(targetMaterial: Material) {
+    //     targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
+    //         {
+    //             name: UniformNames.LightDirection,
+    //             type: UniformTypes.Vector3,
+    //             // pattern1: そのまま渡す
+    //             // value: light.transform.position,
+    //             // pattern2: normalizeしてから渡す
+    //             value: this.transform.position.clone().normalize(),
+    //         },
+    //         {
+    //             name: UniformNames.LightIntensity,
+    //             type: UniformTypes.Float,
+    //             value: this.intensity,
+    //         },
+    //         {
+    //             name: UniformNames.LightColor,
+    //             type: UniformTypes.Color,
+    //             value: this.color,
+    //         },
+    //     ]);
+    //     
+    //     this.applyShadowUniformValues(targetMaterial);
+    // }
 }

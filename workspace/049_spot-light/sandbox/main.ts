@@ -340,7 +340,7 @@ spotLight.onStart = ({ actor }) => {
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
 
-// captureScene.add(spotLight);
+captureScene.add(spotLight);
 
 const cameraPostProcess = new PostProcess();
 // const scenePostProcess = renderer.scenePostProcess;

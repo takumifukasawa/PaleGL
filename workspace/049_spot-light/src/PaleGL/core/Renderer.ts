@@ -5,6 +5,7 @@
     RenderQueueType,
     RenderTargetTypes,
     UniformNames,
+    UniformTypes,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/Stats';
@@ -36,12 +37,155 @@ import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
 import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
 import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
+import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
+import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
 type RenderMeshInfoEachQueue = {
     [key in RenderQueueType]: RenderMeshInfo[];
 };
+
+export type LightActors = {
+    directionalLight: DirectionalLight | null;
+    spotLights: SpotLight[];
+};
+
+function applyShadowUniformValues(targetMaterial: Material, light: Light) {
+    // TODO: これはlightごとに共通化できる気がするかつ、分岐が甘い気がする（postprocessで使いたかったりする. getterが必要か？
+    if (
+        // targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
+        light.shadowCamera &&
+        light.shadowMap
+    ) {
+        // clip coord (-1 ~ 1) to uv (0 ~ 1)
+        const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+        light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
+            textureMatrix,
+            light.shadowCamera.projectionMatrix.clone(),
+            light.shadowCamera.viewMatrix.clone()
+        );
+        targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+        targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
+    }
+}
+
+// TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
+export function applyLightUniformValues(targetMaterial: Material, lightActors: LightActors) {
+    if (lightActors.directionalLight) {
+        targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
+            {
+                name: UniformNames.LightDirection,
+                type: UniformTypes.Vector3,
+                // pattern1: そのまま渡す
+                // value: light.transform.position,
+                // pattern2: normalizeしてから渡す
+                value: lightActors.directionalLight.transform.position.clone().normalize(),
+            },
+            {
+                name: UniformNames.LightIntensity,
+                type: UniformTypes.Float,
+                value: lightActors.directionalLight.intensity,
+            },
+            {
+                name: UniformNames.LightColor,
+                type: UniformTypes.Color,
+                value: lightActors.directionalLight.color,
+            },
+        ]);
+
+        applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
+    }
+
+    targetMaterial.uniforms.setValue(
+        UniformNames.SpotLight,
+        lightActors.spotLights.map((spotLight) => [
+            {
+                name: UniformNames.LightDirection,
+                type: UniformTypes.Vector3,
+                // pattern1: そのまま渡す
+                // value: light.transform.position,
+                // pattern2: normalizeしてから渡す
+                value: spotLight.transform.position.clone().normalize(),
+            },
+            {
+                name: UniformNames.LightIntensity,
+                type: UniformTypes.Float,
+                value: spotLight.intensity,
+            },
+            {
+                name: UniformNames.LightColor,
+                type: UniformTypes.Color,
+                value: spotLight.color,
+            },
+            {
+                name: UniformNames.LightDistance,
+                type: UniformTypes.Float,
+                value: spotLight.distance,
+            },
+            {
+                name: UniformNames.LightAttenuation,
+                type: UniformTypes.Float,
+                value: spotLight.attenuation,
+            },
+            {
+                name: UniformNames.LightConeCos,
+                type: UniformTypes.Float,
+                value: spotLight.coneCos,
+            },
+            {
+                name: UniformNames.LightPenumbraCos,
+                type: UniformTypes.Float,
+                value: spotLight.penumbraCos,
+            },
+        ])
+    );
+
+    lightActors.spotLights.forEach((spotLight) => {
+        // targetMaterial.uniforms.setValue(UniformNames.SpotLight, [
+        //     {
+        //         name: UniformNames.LightDirection,
+        //         type: UniformTypes.Vector3,
+        //         // pattern1: そのまま渡す
+        //         // value: light.transform.position,
+        //         // pattern2: normalizeしてから渡す
+        //         value: spotLight.transform.position.clone().normalize(),
+        //     },
+        //     {
+        //         name: UniformNames.LightIntensity,
+        //         type: UniformTypes.Float,
+        //         value: spotLight.intensity,
+        //     },
+        //     {
+        //         name: UniformNames.LightColor,
+        //         type: UniformTypes.Color,
+        //         value: spotLight.color,
+        //     },
+        //     {
+        //         name: 'distance',
+        //         type: UniformTypes.Float,
+        //         value: spotLight.distance,
+        //     },
+        //     {
+        //         name: 'attenuation',
+        //         type: UniformTypes.Float,
+        //         value: spotLight.attenuation,
+        //     },
+        //     {
+        //         name: 'coneCos',
+        //         type: UniformTypes.Float,
+        //         value: spotLight.coneCos,
+        //     },
+        //     {
+        //         name: 'penumbraCos',
+        //         type: UniformTypes.Float,
+        //         value: spotLight.penumbraCos,
+        //     },
+        // ]);
+        applyShadowUniformValues(targetMaterial, spotLight);
+    });
+}
 
 /**
  * 描画パイプライン的な役割
@@ -308,7 +452,11 @@ export class Renderer {
             [RenderQueueType.AlphaTest]: [],
             [RenderQueueType.Transparent]: [],
         };
-        const lightActors: Light[] = [];
+        // const lightActors: Light[] = [];
+        const lightActors: LightActors = {
+            directionalLight: null,
+            spotLights: [],
+        };
 
         // build render mesh info each queue
         scene.traverse((actor) => {
@@ -348,7 +496,17 @@ export class Renderer {
                     break;
 
                 case ActorTypes.Light:
-                    lightActors.push(actor as Light);
+                    if (actor.enabled) {
+                        const light = actor as Light;
+                        switch (light.lightType) {
+                            case LightTypes.Directional:
+                                lightActors.directionalLight = light as DirectionalLight;
+                                break;
+                            case LightTypes.Spot:
+                                lightActors.spotLights.push(light as SpotLight);
+                                break;
+                        }
+                    }
                     break;
             }
         });
@@ -408,7 +566,16 @@ export class Renderer {
         // shadow pass
         // ------------------------------------------------------------------------------
 
-        const castShadowLightActors = lightActors.filter((lightActor) => lightActor.castShadow && lightActor.enabled);
+        // cast shadow 用のライト管理は配列にしちゃう
+        const castShadowLightActors: Light[] = [];
+        if (lightActors.directionalLight) {
+            castShadowLightActors.push(lightActors.directionalLight);
+        }
+        lightActors.spotLights.forEach((light) => {
+            if (light.castShadow) {
+                castShadowLightActors.push(light);
+            }
+        });
 
         if (castShadowLightActors.length > 0) {
             const castShadowRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({ actor }) => {
@@ -455,10 +622,12 @@ export class Renderer {
         // TODO: ここでライティングのパスが必要
         // TODO: - light actor の中で lightの種類別に処理を分ける
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
-        lightActors.forEach((light) => {
-            const targetMaterial = this._deferredShadingPass.material;
-            light.applyUniformsValues(targetMaterial);
-        });
+        // lightActors.forEach((light) => {
+        //     const targetMaterial = this._deferredShadingPass.material;
+        //     applyLightUniformValues(targetMaterial, l)
+        //     light.applyUniformsValues(targetMaterial);
+        // });
+        applyLightUniformValues(this._deferredShadingPass.material, lightActors);
 
         // set ao texture
         this._deferredShadingPass.material.uniforms.setValue(
@@ -477,6 +646,7 @@ export class Renderer {
             time, // TODO: engineから渡したい
             lightActors,
         });
+        // return;
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
         // ------------------------------------------------------------------------------
@@ -516,9 +686,9 @@ export class Renderer {
         // });
 
         // TODO: directional light がない場合の対応
-        const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
-        if (directionalLight) {
-            this._lightShaftPass.setDirectionalLight(directionalLight);
+        // const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
+        if (lightActors.directionalLight) {
+            this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
             PostProcess.renderPass({
                 pass: this._lightShaftPass,
                 renderer: this,
@@ -778,7 +948,7 @@ export class Renderer {
     }
 
     /**
-     * 
+     *
      * @private
      */
     private copyDepthTexture() {
@@ -817,7 +987,7 @@ export class Renderer {
             if (castShadowRenderMeshInfos.length < 1) {
                 return;
             }
-            
+
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
@@ -858,7 +1028,7 @@ export class Renderer {
     private scenePass(
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
-        lightActors: Light[]
+        lightActors: LightActors
         // clear: boolean = true
     ) {
         // console.log("--------- scene pass ---------");
@@ -872,7 +1042,7 @@ export class Renderer {
         // if (clear) {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
-        
+
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -886,7 +1056,7 @@ export class Renderer {
 
             // prepassしてないmaterialの場合はdepthをcopy.
             // prepassしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
-            if(targetMaterial.skipDepthPrePass) {
+            if (targetMaterial.skipDepthPrePass) {
                 this.setRenderTarget(null, false, false);
                 this.copyDepthTexture();
                 this.setRenderTarget(this._gBufferRenderTargets.write, false, false);
@@ -911,9 +1081,10 @@ export class Renderer {
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
-            lightActors.forEach((light) => {
-                light.applyUniformsValues(targetMaterial);
-            });
+            // lightActors.forEach((light) => {
+            //     light.applyUniformsValues(targetMaterial);
+            // });
+            applyLightUniformValues(targetMaterial, lightActors);
 
             this.renderMesh(actor.geometry, targetMaterial);
 
@@ -934,7 +1105,7 @@ export class Renderer {
     private transparentPass(
         sortedRenderMeshInfos: RenderMeshInfo[],
         camera: Camera,
-        lightActors: Light[]
+        lightActors: LightActors
         // clear: boolean
     ) {
         // console.log("--------- transparent pass ---------");
@@ -961,9 +1132,10 @@ export class Renderer {
             // - light actor の中で lightの種類別に処理を分ける
             // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
             // - opaqueと共通処理なのでまとめたい
-            lightActors.forEach((light) => {
-                light.applyUniformsValues(targetMaterial);
-            });
+            // lightActors.forEach((light) => {
+            //     light.applyUniformsValues(targetMaterial);
+            // });
+            applyLightUniformValues(targetMaterial, lightActors);
 
             this.renderMesh(actor.geometry, targetMaterial);
 

@@ -1,8 +1,12 @@
-﻿// -----------------------------------------------------------------------------
+﻿
+export const MAX_SPOT_LIGHT_COUNT = 4;
+
+// -----------------------------------------------------------------------------
 // engine
 // TODO: const assertion の連番、自動で作ることはできない？ union型でいい感じにするしかない？
 // TODO: ビルド最適化のために一個一個exportする
 // -----------------------------------------------------------------------------
+
 
 export const PrimitiveTypes = {
     Points: 0,
@@ -225,11 +229,12 @@ export const UniformTypes = {
     Vector4: 7,
     Vector4Array: 8,
     Struct: 9,
-    Float: 10,
-    FloatArray: 11,
-    Int: 12,
-    Color: 13,
-    ColorArray: 14,
+    StructArray: 10,
+    Float: 11,
+    FloatArray: 12,
+    Int: 13,
+    Color: 14,
+    ColorArray: 15,
 } as const;
 
 export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
@@ -293,6 +298,11 @@ export const UniformNames = {
     LightDirection: 'direction',
     LightIntensity: 'intensity',
     LightColor: 'color',
+    // spot light
+    LightDistance: 'distance',
+    LightAttenuation: 'attenuation',
+    LightConeCos: 'coneCos',
+    LightPenumbraCos: 'penumbraCos',
     // font
     FontMap: 'uFontMap',
     FontTiling: 'uFontTiling',

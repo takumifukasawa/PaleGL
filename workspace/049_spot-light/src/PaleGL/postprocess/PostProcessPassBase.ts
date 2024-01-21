@@ -1,6 +1,6 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Material } from '@/PaleGL/materials/Material.ts';
-import { Renderer } from '@/PaleGL/core/Renderer.ts';
+import {LightActors, Renderer} from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
@@ -11,7 +11,7 @@ import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-verte
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { Light } from '@/PaleGL/actors/Light.ts';
+// import { Light } from '@/PaleGL/actors/Light.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type PostProcessPassRenderArgs = {
@@ -23,7 +23,7 @@ export type PostProcessPassRenderArgs = {
     gBufferRenderTargets?: GBufferRenderTargets | null;
     targetCamera: Camera;
     time: number;
-    lightActors?: Light[];
+    lightActors?: LightActors
 };
 
 // export interface IPostProcessPass {
