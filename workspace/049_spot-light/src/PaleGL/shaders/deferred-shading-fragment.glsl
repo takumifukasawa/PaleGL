@@ -240,7 +240,8 @@ void main() {
     // RE_Direct(directLight, geometry, material, reflectedLight);
     
     // spot light
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    for(int i = 0; i < 1; i++) { // TODO: fallbackしてるだけ. 存在しないライトを計算しないようにするため
         SpotLight spotLight;
         spotLight.position = uSpotLight[i].position;
         spotLight.direction = uSpotLight[i].direction;
@@ -250,7 +251,7 @@ void main() {
         spotLight.coneCos = uSpotLight[i].coneCos;
         spotLight.penumbraCos = uSpotLight[i].penumbraCos;
         getSpotLightIrradiance(spotLight, geometry, directLight);
-        RE_Direct(directLight, geometry, material, reflectedLight);
+        // RE_Direct(directLight, geometry, material, reflectedLight);
     }
     
 
@@ -279,7 +280,7 @@ vec3 outgoingLight =
 resultColor = vec4(outgoingLight, opacity);
     // debug start
     // outColor.xyz = vec3(uSpotLight[0].direction);
-    outColor.xyz = vec3(uSpotLight[0].attenuation);
+    outColor.xyz = directLight.color.xyz;
     return;
     // debug end
 

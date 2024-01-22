@@ -132,11 +132,17 @@ struct SpotLight {
 };
 
 void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {
-    vec3 L = spotLight.position - geometry.position;
-    directLight.direction = normalize(L);
+    // vec3 L = spotLight.position - geometry.position;
+    vec3 surfaceToLight = geometry.position - spotLight.position;
+    vec3 PtoL = normalize(surfaceToLight);
+    directLight.direction = PtoL;
 
-    float lightDistance = length(L);
-    float angleCos = dot(normalize(L), spotLight.direction);
+    float lightDistance = length(surfaceToLight);
+    float angleCos = dot(directLight.direction, spotLight.direction);
+    
+    // directLight.color = vec3(lightDistance / 10.);
+    // directLight.color = vec3(angleCos);
+    // return;
 
     if (all(
         bvec2(

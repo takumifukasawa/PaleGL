@@ -2007,6 +2007,14 @@ function initDebugger() {
 
     const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
 
+    spotLightDebuggerGroup.addColorDebugger({
+        label: 'color',
+        initialValue: spotLight.color.getHexCoord(),
+        onChange: (value) => {
+            spotLight.color = Color.fromHex(value);
+        },
+    });
+    
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
