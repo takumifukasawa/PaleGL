@@ -250,8 +250,9 @@ void main() {
         spotLight.attenuation = uSpotLight[i].attenuation;
         spotLight.coneCos = uSpotLight[i].coneCos;
         spotLight.penumbraCos = uSpotLight[i].penumbraCos;
+        spotLight.intensity = uSpotLight[i].intensity;
         getSpotLightIrradiance(spotLight, geometry, directLight);
-        // RE_Direct(directLight, geometry, material, reflectedLight);
+        RE_Direct(directLight, geometry, material, reflectedLight);
     }
     
 
@@ -265,8 +266,8 @@ void main() {
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
-    // getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
-    // RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+    getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
+    RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 
 // #endif
 
@@ -280,8 +281,10 @@ vec3 outgoingLight =
 resultColor = vec4(outgoingLight, opacity);
     // debug start
     // outColor.xyz = vec3(uSpotLight[0].direction);
-    outColor.xyz = directLight.color.xyz;
-    return;
+    // outColor.xyz = directLight.color.xyz;
+    // outColor.xyz = directLight.direction.xyz;
+    // outColor.xyz = reflectedLight.directDiffuse.xyz;
+    // return;
     // debug end
 
 // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい

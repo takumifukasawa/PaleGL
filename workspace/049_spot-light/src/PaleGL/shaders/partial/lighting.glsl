@@ -67,10 +67,12 @@ struct Material {
 // lights
 // -------------------------------------------------------------------------------
 
+// 光源からの光が届くかどうかを判定
 bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
     return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
 }
 
+// 光源からの減衰率計算
 float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
     if (attenuationComponent > 0.) {
         return pow(saturate(-lightDistance / cutoffDistance + 1.), attenuationComponent);
@@ -125,6 +127,7 @@ struct SpotLight {
     vec3 position;
     vec3 direction;
     vec4 color;
+    float intensity;
     float distance;
     float attenuation;
     float coneCos;
@@ -133,12 +136,15 @@ struct SpotLight {
 
 void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {
     // vec3 L = spotLight.position - geometry.position;
-    vec3 surfaceToLight = geometry.position - spotLight.position;
+    vec3 surfaceToLight = spotLight.position - geometry.position;
     vec3 PtoL = normalize(surfaceToLight);
+    vec3 LtoP = -PtoL;
     directLight.direction = PtoL;
+    directLight.intensity = spotLight.intensity;
 
     float lightDistance = length(surfaceToLight);
-    float angleCos = dot(directLight.direction, spotLight.direction);
+    // float angleCos = dot(directLight.direction, spotLight.direction);
+    float angleCos = dot(LtoP, spotLight.direction);
     
     // directLight.color = vec3(lightDistance / 10.);
     // directLight.color = vec3(angleCos);
@@ -276,7 +282,7 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
 void RE_Direct(const in IncidentLight directLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
     vec3 irradiance = dotNL * directLight.color;
-    
+   
     // punctual light
     irradiance *= PI;
     irradiance *= directLight.intensity;

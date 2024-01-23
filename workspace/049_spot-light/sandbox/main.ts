@@ -276,7 +276,7 @@ const directionalLight = new DirectionalLight({
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
-directionalLight.enabled = false; // NOTE: 一旦ガード
+// directionalLight.enabled = false; // NOTE: 一旦ガード
 
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -314,7 +314,7 @@ captureScene.add(directionalLight);
 const spotLight = new SpotLight({
     intensity: 1,
     color: Color.white,
-    distance: 10,
+    distance: 30,
     attenuation: 0.1,
     coneCos: 0.9,
     penumbraCos: 0.95,
@@ -336,7 +336,7 @@ if (spotLight.shadowCamera) {
 }
 
 spotLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-8, 8, -2));
+    actor.transform.setTranslation(new Vector3(-5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
 
@@ -1254,8 +1254,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: 0.2,
-        specularIntensity: 0.2,
+        diffuseIntensity: .2,
+        specularIntensity: .2,
         // rotationOffset: 0.8,
     });
 
@@ -1291,10 +1291,12 @@ const main = async () => {
 
     testLightingMesh = await createGLTFSphereMesh(
         new GBufferMaterial({
-            // receiveShadow: true,
-            diffuseColor: new Color(1, .05, .05, 1),
+            // diffuseColor: new Color(1, .05, .05, 1),
+            // metallic: 0,
+            // roughness: .3
+            diffuseColor: new Color(1, 1., 1., 1),
             metallic: 1,
-            roughness: .3
+            roughness: 1.
         })
     );
     testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
@@ -2018,7 +2020,7 @@ function initDebugger() {
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
-        maxValue: 100,
+        maxValue: 10,
         stepValue: 0.001,
         initialValue: spotLight.intensity,
         onChange: (value) => {

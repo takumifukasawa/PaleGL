@@ -110,7 +110,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
             {
                 name: UniformNames.LightDirection,
                 type: UniformTypes.Vector3,
-                value: spotLight.transform.worldForward
+                value: spotLight.transform.worldForward.clone()
             },
             {
                 name: UniformNames.LightIntensity,
