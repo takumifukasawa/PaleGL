@@ -59,8 +59,15 @@ function applyShadowUniformValues(targetMaterial: Material, light: Light) {
         light.shadowCamera &&
         light.shadowMap
     ) {
+        // console.log(light, light.shadowCamera, light.shadowMap)
         // clip coord (-1 ~ 1) to uv (0 ~ 1)
-        const textureMatrix = new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+        // prettier-ignore
+        const textureMatrix = new Matrix4(
+            0.5, 0, 0, 0.5,
+            0, 0.5, 0, 0.5,
+            0, 0, 0.5, 0.5,
+            0, 0, 0, 1
+        );
         light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
             textureMatrix,
             light.shadowCamera.projectionMatrix.clone(),
@@ -96,7 +103,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
             },
         ]);
 
-        applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
+        // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
     }
 
     targetMaterial.uniforms.setValue(
@@ -105,12 +112,12 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
             {
                 name: UniformNames.LightPosition,
                 type: UniformTypes.Vector3,
-                value: spotLight.transform.position
+                value: spotLight.transform.position,
             },
             {
                 name: UniformNames.LightDirection,
                 type: UniformTypes.Vector3,
-                value: spotLight.transform.worldForward.clone()
+                value: spotLight.transform.worldForward.clone(),
             },
             {
                 name: UniformNames.LightIntensity,
@@ -145,9 +152,11 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
         ])
     );
 
-    lightActors.spotLights.forEach((spotLight) => {
-        applyShadowUniformValues(targetMaterial, spotLight);
-    });
+    // TODO: 正しい個数渡す
+    // lightActors.spotLights.forEach((spotLight) => {
+    //     applyShadowUniformValues(targetMaterial, spotLight);
+    // });
+    applyShadowUniformValues(targetMaterial, lightActors.spotLights[0]);
 }
 
 /**

@@ -340,6 +340,10 @@ spotLight.onStart = ({ actor }) => {
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
 
+// spotLight.onUpdate = () => {
+//     console.log(spotLight.shadowCamera)
+// }
+
 captureScene.add(spotLight);
 
 const cameraPostProcess = new PostProcess();
@@ -386,7 +390,8 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uDirectionalLightShadowMap',
-        directionalLight.shadowMap!.read.depthTexture
+        // directionalLight.shadowMap!.read.depthTexture
+        spotLight.shadowMap!.read.depthTexture
     );
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',

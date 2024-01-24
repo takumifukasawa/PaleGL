@@ -3,6 +3,7 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
     vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
     float sceneDepth = projectionShadowColor.r;
     float depthFromLight = projectionUv.z;
+    // float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - .001), 0., 1.);
     float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
     float shadowAreaRect =
         step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
@@ -14,9 +15,12 @@ vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float
     resultColor.xyz = mix(
         surfaceColor.xyz,
         mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
+        // vec3(shadowOccluded),
+        // vec3(step(depthFromLight, sceneDepth)),
+        // shadowAreaRect
         shadowRate
     );
     resultColor.a = surfaceColor.a;
-
+    
     return resultColor;
 }

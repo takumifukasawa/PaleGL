@@ -8,6 +8,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 export class PerspectiveCamera extends Camera {
     fov: number; // degree
     aspect: number = 1; // w / h
+    fixedAspect: boolean = false;
 
     constructor(fov: number, aspect: number, near: number, far: number, name?: string) {
         super({ name, cameraType: CameraTypes.Perspective });
@@ -30,7 +31,9 @@ export class PerspectiveCamera extends Camera {
     setSize(width: number, height: number) {
         super.setSize(width, height);
         // this.aspect = width / height;
-        this.setPerspectiveSize(width / height);
+        if (!this.fixedAspect) {
+            this.setPerspectiveSize(width / height);
+        }
         // this.#updateProjectionMatrix();
     }
 
@@ -64,53 +67,33 @@ export class PerspectiveCamera extends Camera {
         const farClipRightOffset = localRight.clone().scale(farHalfWidth);
         const farClipUpOffset = localUp.clone().scale(farHalfHeight);
 
-        const nearLeftTop = Vector3.addVectors(
-            nearClipCenter,
-            nearClipRightOffset.clone().negate(),
-            nearClipUpOffset
-        );
-        const nearRightTop = Vector3.addVectors(
-            nearClipCenter,
-            nearClipRightOffset,
-            nearClipUpOffset
-        );
-        
+        const nearLeftTop = Vector3.addVectors(nearClipCenter, nearClipRightOffset.clone().negate(), nearClipUpOffset);
+        const nearRightTop = Vector3.addVectors(nearClipCenter, nearClipRightOffset, nearClipUpOffset);
+
         const nearLeftBottom = Vector3.addVectors(
             nearClipCenter,
             nearClipRightOffset.clone().negate(),
             nearClipUpOffset.clone().negate()
         );
-        
+
         const nearRightBottom = Vector3.addVectors(
             nearClipCenter,
             nearClipRightOffset,
             nearClipUpOffset.clone().negate()
         );
-        
-        const farLeftTop = Vector3.addVectors(
-            farClipCenter,
-            farClipRightOffset.clone().negate(),
-            farClipUpOffset
-        );
-        
-        const farRightTop = Vector3.addVectors(
-            farClipCenter,
-            farClipRightOffset,
-            farClipUpOffset
-        );
-        
+
+        const farLeftTop = Vector3.addVectors(farClipCenter, farClipRightOffset.clone().negate(), farClipUpOffset);
+
+        const farRightTop = Vector3.addVectors(farClipCenter, farClipRightOffset, farClipUpOffset);
+
         const farLeftBottom = Vector3.addVectors(
             farClipCenter,
             farClipRightOffset.clone().negate(),
             farClipUpOffset.clone().negate()
         );
-        
-        const farRightBottom = Vector3.addVectors(
-            farClipCenter,
-            farClipRightOffset,
-            farClipUpOffset.clone().negate()
-        );
-        
+
+        const farRightBottom = Vector3.addVectors(farClipCenter, farClipRightOffset, farClipUpOffset.clone().negate());
+
         return {
             nearLeftTop,
             nearRightTop,

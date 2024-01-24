@@ -37,6 +37,7 @@ export class SpotLight extends Light {
         super({ ...options, lightType: LightTypes.Spot });
 
         this.shadowCamera = new PerspectiveCamera(45, 1, 0.1, 20);
+        this.shadowCamera.fixedAspect = true;
         // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
         this.shadowCamera.transform.setRotationY(180);
         // TODO: なぜunknownを噛ませる必要がある？

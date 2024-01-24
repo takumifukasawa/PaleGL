@@ -405,6 +405,7 @@ export class Material {
         ];
 
         // TODO: いまやdeferred-shading-passでしか使ってないのでここでやる必要がないかも
+        // TODO: なおかつ、postprocess向けのマテリアルでも作られちゃう
         const shadowUniforms: UniformsData = this.receiveShadow
             ? [
                   {
@@ -422,7 +423,7 @@ export class Material {
                       // TODO: shadow biasの値を統一して可変にしたい
                       name: UniformNames.ShadowBias,
                       type: UniformTypes.Float,
-                      value: 0.03,
+                      value: 0.02,
                   },
               ]
             : [];
