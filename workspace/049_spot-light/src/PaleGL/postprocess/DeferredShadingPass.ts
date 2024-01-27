@@ -58,7 +58,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: Matrix4.identity,
             },
             {
-                name: "uLightViewProjectionMatrix",
+                name: UniformNames.LightViewProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
@@ -99,7 +99,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
                         value: Matrix4.identity,
                     },
                     {
-                        name: "uLightViewProjectionMatrix",
+                        name: UniformNames.LightViewProjectionMatrix,
                         type: UniformTypes.Matrix4,
                         value: Matrix4.identity,
                     },
@@ -122,7 +122,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
                             value: Matrix4.identity,
                         },
                         {
-                            name: "uLightViewProjectionMatrix",
+                            name: UniformNames.LightViewProjectionMatrix,
                             type: UniformTypes.Matrix4,
                             value: Matrix4.identity,
                         },
