@@ -291,11 +291,24 @@ resultColor = vec4(outgoingLight, opacity);
 // TODO: shadow map の枚数
 #ifdef USE_RECEIVE_SHADOW
     vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
-    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+    // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
         // TODO: blend rate は light か何かに持たせたい
-        resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
-    }
+        resultColor = applyShadow(
+            resultColor,
+            worldPosition,
+            uShadowMapProjectionMatrix,
+            uShadowMap,
+            shadowMapProjectionUv,
+            uShadowBias,
+            vec4(0., 0., 0., 1.),
+            0.5
+        );
+    // }
 #endif
+   
+    // for debug
+    outColor = resultColor;
+    return;
 
     // TODO: aoを考慮したライティング計算
     resultColor.xyz *= aoRate;

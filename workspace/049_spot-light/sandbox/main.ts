@@ -325,7 +325,7 @@ if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = 30;
+    spotLight.shadowCamera.far = 10;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,
