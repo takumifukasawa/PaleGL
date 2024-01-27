@@ -276,7 +276,7 @@ const directionalLight = new DirectionalLight({
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
-// directionalLight.enabled = false; // NOTE: 一旦ガード
+directionalLight.enabled = false; // NOTE: 一旦ガード
 
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -293,6 +293,8 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
     });
 }
 
@@ -324,20 +326,25 @@ const spotLight = new SpotLight({
 if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
-    spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = 30;
+    spotLight.shadowCamera.near = 0.01;
+    spotLight.shadowCamera.far = 10;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        minFilter: TextureFilterTypes.Linear,
+        magFilter: TextureFilterTypes.Linear,
     });
 }
 
 spotLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-5, 9, -2));
+    // // actor.transform.setTranslation(new Vector3(0.1, 8, 0));
     actor.transform.lookAt(new Vector3(0, 0, 0));
+    // actor.transform.setTranslation(new Vector3(0, 8, 0));
+    // actor.transform.setRotationX(90);
 };
 
 // spotLight.onUpdate = () => {
@@ -1259,8 +1266,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .2,
-        specularIntensity: .2,
+        diffuseIntensity: 0.2,
+        specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
 
@@ -1301,10 +1308,25 @@ const main = async () => {
             // roughness: .3
             diffuseColor: new Color(1, 1., 1., 1),
             metallic: 1,
-            roughness: 1.
+            roughness: 1.,
+            receiveShadow: true
         })
     );
-    testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
+    // testLightingMesh = new Mesh({
+    //     geometry: new BoxGeometry({ gpu }),
+    //     material: new GBufferMaterial({
+    //         // diffuseColor: new Color(1, .05, .05, 1),
+    //         // metallic: 0,
+    //         // roughness: .3
+    //         diffuseColor: new Color(1, 1, 1, 1),
+    //         metallic: 1,
+    //         roughness: 1,
+    //         receiveShadow: true,
+    //     }),
+    //     castShadow: true,
+    // });
+    // testLightingMesh.transform.scale = new Vector3(2, 2, 2);
+    testLightingMesh.transform.position = new Vector3(2.5, 2, 0);
 
     //
     // local raymarch mesh
@@ -1318,7 +1340,7 @@ const main = async () => {
             // primitiveType: PrimitiveTypes.Triangles,
             metallic: 0,
             roughness: 0,
-            receiveShadow: false
+            receiveShadow: true,
         }),
         castShadow: true,
     });
@@ -1346,6 +1368,7 @@ const main = async () => {
         );
         // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
     };
+    // objectSpaceRaymarchMesh.enabled = false;
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
@@ -2005,7 +2028,6 @@ function initDebugger() {
         },
     });
 
-
     //
     // spot light
     //
@@ -2021,7 +2043,7 @@ function initDebugger() {
             spotLight.color = Color.fromHex(value);
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2032,7 +2054,7 @@ function initDebugger() {
             spotLight.intensity = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'distance',
         minValue: 0,
@@ -2043,7 +2065,7 @@ function initDebugger() {
             spotLight.distance = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'attenuation',
         minValue: 0,
@@ -2054,7 +2076,7 @@ function initDebugger() {
             spotLight.attenuation = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'coneCos',
         minValue: 0,
@@ -2065,7 +2087,7 @@ function initDebugger() {
             spotLight.coneCos = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'penumbraCos',
         minValue: 0,
@@ -2075,7 +2097,7 @@ function initDebugger() {
         onChange: (value) => {
             spotLight.penumbraCos = value;
         },
-    })
+    });
 
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'pos x',
