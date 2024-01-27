@@ -29,7 +29,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
-export type  MaterialArgs= {
+export type MaterialArgs = {
     // required
 
     // gpu: GPU,
@@ -300,7 +300,7 @@ export class Material {
         if (vertexShaderModifier) {
             this._vertexShaderModifier = vertexShaderModifier;
         }
-        if(fragmentShaderModifier) {
+        if (fragmentShaderModifier) {
             this._fragmentShaderModifier = fragmentShaderModifier;
         }
 
@@ -419,11 +419,16 @@ export class Material {
                       value: Matrix4.identity,
                   },
                   {
+                      name: UniformNames.ShadowMapTextureMatrix,
+                      type: UniformTypes.Matrix4,
+                      value: Matrix4.identity,
+                  },
+                  {
                       // TODO: shadow map class を作って bias 持たせた方がよい
                       // TODO: shadow biasの値を統一して可変にしたい
                       name: UniformNames.ShadowBias,
                       type: UniformTypes.Float,
-                      value: 0.02,
+                      value: 0.001,
                   },
               ]
             : [];

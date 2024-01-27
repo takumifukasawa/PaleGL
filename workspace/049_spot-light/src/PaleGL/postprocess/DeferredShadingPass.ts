@@ -58,6 +58,41 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: Matrix4.identity,
             },
             {
+                name: UniformNames.ShadowMapTextureMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: "uShadowCameraViewMatrix",
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: "uShadowCameraProjectionMatrix",
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            // {
+            //     name: "uShadowMapProjectionMatrix",
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            {
+                name: "uShadowMapInverseViewProjectionMatrix",
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: "uShadowCameraNearClip",
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: "uShadowCameraFarClip",
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
                 name: 'uAmbientOcclusionTexture',
                 type: UniformTypes.Texture,
                 value: null,
@@ -173,8 +208,6 @@ export class DeferredShadingPass extends PostProcessPassBase {
             //     value: null,
             // },
         ];
-        
-        console.log(uniforms)
 
         super({
             gpu,

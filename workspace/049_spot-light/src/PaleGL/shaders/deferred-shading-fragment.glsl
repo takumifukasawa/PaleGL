@@ -88,7 +88,13 @@ uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 #include ./partial/receive-shadow-fragment-uniforms.glsl
 
 #ifdef USE_RECEIVE_SHADOW
+uniform mat4 uShadowCameraViewMatrix;
+uniform mat4 uShadowCameraProjectionMatrix;
 uniform mat4 uShadowMapProjectionMatrix;
+uniform mat4 uShadowMapInverseViewProjectionMatrix;
+uniform mat4 uShadowMapTextureMatrix;
+uniform float uShadowCameraNearClip;
+uniform float uShadowCameraFarClip;
 #endif
 
 uniform vec3 uViewPosition;
@@ -291,10 +297,32 @@ resultColor = vec4(outgoingLight, opacity);
 // TODO: shadow map の枚数
 #ifdef USE_RECEIVE_SHADOW
     vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
-    if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+    // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
+    // if(dot(surface.worldNormal, -uSpotLight[0].direction) >= 0.) {
         // TODO: blend rate は light か何かに持たせたい
-        resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
-    }
+        resultColor = applyShadow(
+            uv,
+            resultColor,
+            surface.worldPosition,
+            uSpotLight[0].position,
+            uShadowMap,
+            uShadowCameraViewMatrix,
+            uShadowCameraProjectionMatrix,
+            uShadowMapProjectionMatrix,
+            uShadowMapInverseViewProjectionMatrix,
+            shadowMapProjectionUv,
+            uShadowMapTextureMatrix,
+            uShadowBias,
+            uShadowCameraNearClip,
+            uShadowCameraFarClip,
+            vec4(0., 0., 0., 1.),
+            0.5
+        );
+    // }
+    // outColor = resultColor;
+    // outColor = resultColor;
+    // outColor.a = 1.;
+    // return;
 #endif
 
     // TODO: aoを考慮したライティング計算
