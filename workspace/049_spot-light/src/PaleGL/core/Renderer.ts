@@ -75,13 +75,14 @@ function applyShadowUniformValues(targetMaterial: Material, light: Light) {
         );
         targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
         targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
-        targetMaterial.uniforms.setValue("uShadowMapLightViewProjectionMatrix",
+        targetMaterial.uniforms.setValue(
+            'uLightViewProjectionMatrix',
             Matrix4.multiplyMatrices(
                 // textureMatrix,
                 light.shadowCamera.projectionMatrix.clone(),
                 light.shadowCamera.viewMatrix.clone()
             )
-            )
+        );
     }
 }
 

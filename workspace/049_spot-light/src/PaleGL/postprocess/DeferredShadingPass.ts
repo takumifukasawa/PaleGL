@@ -58,7 +58,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: Matrix4.identity,
             },
             {
-                name: "uShadowMapLightViewProjectionMatrix",
+                name: "uLightViewProjectionMatrix",
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
@@ -88,6 +88,21 @@ export class DeferredShadingPass extends PostProcessPassBase {
                         type: UniformTypes.Color,
                         value: new Color(0, 0, 0, 1),
                     },
+                    {
+                        name: UniformNames.ShadowMap,
+                        type: UniformTypes.Texture,
+                        value: null,
+                    },
+                    {
+                        name: UniformNames.ShadowMapProjectionMatrix,
+                        type: UniformTypes.Matrix4,
+                        value: Matrix4.identity,
+                    },
+                    {
+                        name: "uLightViewProjectionMatrix",
+                        type: UniformTypes.Matrix4,
+                        value: Matrix4.identity,
+                    },
                 ],
             },
 
@@ -96,6 +111,21 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 type: UniformTypes.StructArray,
                 value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
                     return [
+                        {
+                            name: UniformNames.ShadowMap,
+                            type: UniformTypes.Texture,
+                            value: null,
+                        },
+                        {
+                            name: UniformNames.ShadowMapProjectionMatrix,
+                            type: UniformTypes.Matrix4,
+                            value: Matrix4.identity,
+                        },
+                        {
+                            name: "uLightViewProjectionMatrix",
+                            type: UniformTypes.Matrix4,
+                            value: Matrix4.identity,
+                        },
                         {
                             name: UniformNames.LightPosition,
                             type: UniformTypes.Vector3,

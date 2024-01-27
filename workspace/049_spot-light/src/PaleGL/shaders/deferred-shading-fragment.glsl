@@ -89,7 +89,7 @@ uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 
 #ifdef USE_RECEIVE_SHADOW
 uniform mat4 uShadowMapProjectionMatrix;
-uniform mat4 uShadowMapLightViewProjectionMatrix;
+uniform mat4 uLightViewProjectionMatrix;
 #endif
 
 uniform vec3 uViewPosition;
@@ -298,7 +298,7 @@ resultColor = vec4(outgoingLight, opacity);
             resultColor,
             worldPosition,
             uShadowMapProjectionMatrix,
-            uShadowMapLightViewProjectionMatrix,
+            uLightViewProjectionMatrix,
             uShadowMap,
             shadowMapProjectionUv,
             uShadowBias,
