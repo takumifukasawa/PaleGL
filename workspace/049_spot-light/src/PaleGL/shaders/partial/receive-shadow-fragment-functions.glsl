@@ -16,7 +16,7 @@ vec4 applyShadow(
     vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
     float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
    
-    vec3 uvc = vec3(uv, depthFromWorldPos + .001);
+    vec3 uvc = vec3(uv, depthFromWorldPos + shadowBias);
     float readDepth = textureProj(shadowMap, uvc).r;
     
     float shadowAreaRect =
