@@ -222,28 +222,28 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            // gl.DEPTH_COMPONENT16,
-                            gl.DEPTH_COMPONENT32F,
+                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT32F,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            // gl.UNSIGNED_SHORT,
-                            gl.FLOAT,
+                            gl.UNSIGNED_SHORT,
+                            // gl.FLOAT,
                             this.img
                         );
                     } else {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            // gl.DEPTH_COMPONENT16,
-                            gl.DEPTH_COMPONENT32F,
+                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT32F,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            // gl.UNSIGNED_SHORT,
-                            gl.FLOAT,
+                            gl.UNSIGNED_SHORT,
+                            // gl.FLOAT,
                             null
                         );
                     }
@@ -257,11 +257,11 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            // gl.DEPTH_COMPONENT16,
-                            gl.DEPTH_COMPONENT32F,
+                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT32F,
                             gl.DEPTH_COMPONENT,
-                            // gl.UNSIGNED_SHORT,
-                            gl.FLOAT,
+                            gl.UNSIGNED_SHORT,
+                            // gl.FLOAT,
                             this.img
                         );
                         // } else {
@@ -383,28 +383,28 @@ export class Texture extends GLObject {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        // gl.DEPTH_COMPONENT16,
-                        gl.DEPTH_COMPONENT32F,
+                        gl.DEPTH_COMPONENT16,
+                        // gl.DEPTH_COMPONENT32F,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        // gl.UNSIGNED_SHORT,
-                        gl.FLOAT,
+                        gl.UNSIGNED_SHORT,
+                        // gl.FLOAT,
                         this.img
                     );
                 } else {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        // gl.DEPTH_COMPONENT16,
-                        gl.DEPTH_COMPONENT32F,
+                        gl.DEPTH_COMPONENT16,
+                        // gl.DEPTH_COMPONENT32F,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        // gl.UNSIGNED_SHORT,
-                        gl.FLOAT,
+                        gl.UNSIGNED_SHORT,
+                        // gl.FLOAT,
                         null
                     );
                 }
