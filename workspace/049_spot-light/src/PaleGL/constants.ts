@@ -1,12 +1,10 @@
-﻿
-export const MAX_SPOT_LIGHT_COUNT = 4;
+﻿export const MAX_SPOT_LIGHT_COUNT = 4;
 
 // -----------------------------------------------------------------------------
 // engine
 // TODO: const assertion の連番、自動で作ることはできない？ union型でいい感じにするしかない？
 // TODO: ビルド最適化のために一個一個exportする
 // -----------------------------------------------------------------------------
-
 
 export const PrimitiveTypes = {
     Points: 0,
@@ -156,7 +154,7 @@ export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof Texture
 
 export const TextureDepthPrecisionType = {
     Medium: 0,
-    High: 1
+    High: 1,
 } as const;
 
 export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof typeof TextureDepthPrecisionType];
@@ -242,6 +240,7 @@ export const UniformTypes = {
     Int: 13,
     Color: 14,
     ColorArray: 15,
+    TextureArray: 16,
 } as const;
 
 export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
@@ -284,10 +283,10 @@ export const UniformNames = {
     JointTextureColNum: 'uJointTextureColNum',
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
     // shadow map
-    ShadowMap: 'uShadowMap',
-    ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
-    ShadowBias: 'uShadowBias',
-    LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
+    // ShadowMap: 'uShadowMap',
+    // ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
+    // ShadowBias: 'uShadowBias',
+    // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
     // mainly post process
     SrcTexture: 'uSrcTexture',
     // time
@@ -306,6 +305,11 @@ export const UniformNames = {
     LightDirection: 'direction',
     LightIntensity: 'intensity',
     LightColor: 'color',
+    ShadowMap: 'shadowMap',
+    LightViewProjectionMatrix: 'lightViewProjectionMatrix',
+    ShadowBias: 'shadowBias',
+    DirectionalLightShadowMap: 'uDirectionalLightShadowMap',
+    SpotLightShadowMap: 'uSpotLightShadowMap',
     // spot light
     LightPosition: 'position',
     LightDistance: 'distance',

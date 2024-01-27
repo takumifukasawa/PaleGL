@@ -26,10 +26,14 @@ export class Light extends Actor implements ILight {
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
     shadowMapProjectionMatrix: Matrix4 = Matrix4.identity;
+    
+    // hasShadowMap() {
+    //     return !!this.shadowCamera && this.shadowMap;
+    // }
 
-    hasShadowCamera() {
-        return !!this.shadowCamera;
-    }
+    // hasShadowCamera() {
+    //     return !!this.shadowCamera;
+    // }
 
     constructor({ name, intensity, color, lightType }: LightArgs & { lightType: LightType }) {
         super({ name, type: ActorTypes.Light });

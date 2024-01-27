@@ -52,39 +52,39 @@ export type LightActors = {
     spotLights: SpotLight[];
 };
 
-function applyShadowUniformValues(targetMaterial: Material, light: Light) {
-    // TODO: これはlightごとに共通化できる気がするかつ、分岐が甘い気がする（postprocessで使いたかったりする. getterが必要か？
-    if (
-        // targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-        light.shadowCamera &&
-        light.shadowMap
-    ) {
-        // console.log(light, light.shadowCamera, light.shadowMap)
-        // clip coord (-1 ~ 1) to uv (0 ~ 1)
-        // prettier-ignore
-        const textureMatrix = new Matrix4(
-            0.5, 0, 0, 0.5,
-            0, 0.5, 0, 0.5,
-            0, 0, 0.5, 0.5,
-            0, 0, 0, 1
-        );
-        light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
-            textureMatrix,
-            light.shadowCamera.projectionMatrix.clone(),
-            light.shadowCamera.viewMatrix.clone()
-        );
-        targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-        targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
-        targetMaterial.uniforms.setValue(
-            'uLightViewProjectionMatrix',
-            Matrix4.multiplyMatrices(
-                // textureMatrix,
-                light.shadowCamera.projectionMatrix.clone(),
-                light.shadowCamera.viewMatrix.clone()
-            )
-        );
-    }
-}
+// function applyShadowUniformValues(targetMaterial: Material, light: Light) {
+//     // TODO: これはlightごとに共通化できる気がするかつ、分岐が甘い気がする（postprocessで使いたかったりする. getterが必要か？
+//     if (
+//         // targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
+//         light.shadowCamera &&
+//         light.shadowMap
+//     ) {
+//         // console.log(light, light.shadowCamera, light.shadowMap)
+//         // clip coord (-1 ~ 1) to uv (0 ~ 1)
+//         // prettier-ignore
+//         const textureMatrix = new Matrix4(
+//             0.5, 0, 0, 0.5,
+//             0, 0.5, 0, 0.5,
+//             0, 0, 0.5, 0.5,
+//             0, 0, 0, 1
+//         );
+//         light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
+//             textureMatrix,
+//             light.shadowCamera.projectionMatrix.clone(),
+//             light.shadowCamera.viewMatrix.clone()
+//         );
+//         targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
+//         // targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
+//         targetMaterial.uniforms.setValue(
+//             UniformNames.LightViewProjectionMatrix,
+//             Matrix4.multiplyMatrices(
+//                 // textureMatrix,
+//                 light.shadowCamera.projectionMatrix.clone(),
+//                 light.shadowCamera.viewMatrix.clone()
+//             )
+//         );
+//     }
+// }
 
 // TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
 // TODO: 渡す uniform の値、キャッシュできる気がする
@@ -109,9 +109,32 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                 type: UniformTypes.Color,
                 value: lightActors.directionalLight.color,
             },
+            ...(lightActors.directionalLight.shadowMap && lightActors.directionalLight.shadowCamera
+                ? [
+                      {
+                          name: UniformNames.ShadowMap,
+                          type: UniformTypes.Texture,
+                          value: lightActors.directionalLight.shadowMap.read.depthTexture,
+                      },
+                      {
+                          name: UniformNames.LightViewProjectionMatrix,
+                          type: UniformTypes.Matrix4,
+                          value: Matrix4.multiplyMatrices(
+                              lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
+                              lightActors.directionalLight.shadowCamera.viewMatrix.clone()
+                          ),
+                      },
+                  ]
+                : []),
         ]);
 
         // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
+        if (lightActors.directionalLight.shadowMap) {
+            targetMaterial.uniforms.setValue(
+                UniformNames.DirectionalLightShadowMap,
+                lightActors.directionalLight.shadowMap.read.depthTexture
+            );
+        }
     }
 
     targetMaterial.uniforms.setValue(
@@ -157,14 +180,36 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                 type: UniformTypes.Float,
                 value: spotLight.penumbraCos,
             },
+            ...(spotLight.shadowMap && spotLight.shadowCamera
+                ? [
+                      {
+                          name: UniformNames.ShadowMap,
+                          type: UniformTypes.Texture,
+                          value: spotLight.shadowMap.read.depthTexture,
+                      },
+                      {
+                          name: UniformNames.LightViewProjectionMatrix,
+                          type: UniformTypes.Matrix4,
+                          value: Matrix4.multiplyMatrices(
+                              spotLight.shadowCamera.projectionMatrix.clone(),
+                              spotLight.shadowCamera.viewMatrix.clone()
+                          ),
+                      },
+                  ]
+                : []),
         ])
+    );
+
+    targetMaterial.uniforms.setValue(
+        UniformNames.SpotLightShadowMap,
+        lightActors.spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap.read.depthTexture : null))
     );
 
     // TODO: 正しい個数渡す
     // lightActors.spotLights.forEach((spotLight) => {
     //     applyShadowUniformValues(targetMaterial, spotLight);
     // });
-    applyShadowUniformValues(targetMaterial, lightActors.spotLights[0]);
+    // applyShadowUniformValues(targetMaterial, lightActors.spotLights[0]);
 }
 
 /**
@@ -540,7 +585,8 @@ export class Renderer {
         // g-buffer opaque pass
         // ------------------------------------------------------------------------------
 
-        this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
+        // this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
+        this.scenePass(sortedBasePassRenderMeshInfos, camera);
 
         // ------------------------------------------------------------------------------
         // shadow pass
@@ -1007,8 +1053,8 @@ export class Renderer {
      */
     private scenePass(
         sortedRenderMeshInfos: RenderMeshInfo[],
-        camera: Camera,
-        lightActors: LightActors
+        camera: Camera
+        // lightActors: LightActors
         // clear: boolean = true
     ) {
         // console.log("--------- scene pass ---------");
@@ -1064,7 +1110,8 @@ export class Renderer {
             // lightActors.forEach((light) => {
             //     light.applyUniformsValues(targetMaterial);
             // });
-            applyLightUniformValues(targetMaterial, lightActors);
+            // TODO: g-bufferの時にはlightのuniformsを設定しなくて大丈夫になったのでいらないはず
+            // applyLightUniformValues(targetMaterial, lightActors);
 
             this.renderMesh(actor.geometry, targetMaterial);
 
@@ -1115,6 +1162,7 @@ export class Renderer {
             // lightActors.forEach((light) => {
             //     light.applyUniformsValues(targetMaterial);
             // });
+            // TODO: transparentで必要？使わないことを強制してもいい気がする
             applyLightUniformValues(targetMaterial, lightActors);
 
             this.renderMesh(actor.geometry, targetMaterial);

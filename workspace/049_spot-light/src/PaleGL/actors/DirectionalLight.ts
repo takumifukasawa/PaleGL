@@ -1,9 +1,11 @@
 ﻿import { Light, LightArgs } from '@/PaleGL/actors/Light';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { Actor } from '@/PaleGL/actors/Actor';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+// import { Vector3 } from '@/PaleGL/math/Vector3';
+// import { Vector4 } from '@/PaleGL/math/Vector4';
 import { LightTypes } from '@/PaleGL/constants.ts';
+// import {Texture} from "@/PaleGL/core/Texture.ts";
+// import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import { Material } from '@/PaleGL/materials/Material.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import {PerspectiveCamera} from "./PerspectiveCamera";
@@ -12,11 +14,13 @@ import { LightTypes } from '@/PaleGL/constants.ts';
 // import {DoubleBuffer} from "@/PaleGL/core/DoubleBuffer";
 // import {RenderTargetTypes} from "@/PaleGL/constants";
 
-export type DirectionalLightStruct = {
-    direction: Vector3;
-    intensity: number;
-    color: Vector4;
-};
+// type DirectionalLightStruct = {
+//     direction: Vector3;
+//     intensity: number;
+//     color: Vector4;
+//     shadowMap: Texture;
+//     lightViewProjectionMatrix: Matrix4;
+// };
 
 export class DirectionalLight extends Light {
     constructor(options: LightArgs) {

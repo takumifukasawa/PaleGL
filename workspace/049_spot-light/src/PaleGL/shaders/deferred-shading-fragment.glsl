@@ -84,13 +84,15 @@ uniform DirectionalLight uDirectionalLight;
 // TODO: spot light の最大数はどこかで定数管理したい
 #define MAX_SPOT_LIGHT_COUNT 4
 uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
+uniform sampler2D uDirectoinalLightShadowMap;
+uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 
 #include ./partial/receive-shadow-fragment-uniforms.glsl
 
-#ifdef USE_RECEIVE_SHADOW
-uniform mat4 uShadowMapProjectionMatrix;
-uniform mat4 uLightViewProjectionMatrix;
-#endif
+// #ifdef USE_RECEIVE_SHADOW
+// uniform mat4 uShadowMapProjectionMatrix;
+// uniform mat4 uLightViewProjectionMatrix;
+// #endif
 
 uniform vec3 uViewPosition;
 
@@ -291,16 +293,17 @@ resultColor = vec4(outgoingLight, opacity);
 // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
 // TODO: shadow map の枚数
 #ifdef USE_RECEIVE_SHADOW
-    vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
+    // vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
+    // vec4 shadowMapProjectionUv = uSpotLight[0].LightV * vec4(worldPosition, 1.);
     // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
         // TODO: blend rate は light か何かに持たせたい
         resultColor = applyShadow(
             resultColor,
             worldPosition,
-            uShadowMapProjectionMatrix,
-            uLightViewProjectionMatrix,
-            uShadowMap,
-            shadowMapProjectionUv,
+            // uShadowMapProjectionMatrix,
+            uSpotLight[0].lightViewProjectionMatrix,
+            uSpotLightShadowMap[0],
+            // shadowMapProjectionUv,
             uShadowBias,
             vec4(0., 0., 0., 1.),
             0.5

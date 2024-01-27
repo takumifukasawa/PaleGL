@@ -87,6 +87,9 @@ struct DirectionalLight {
     vec3 direction;
     float intensity;
     vec4 color;
+    // sampler2D shadowMap;
+    mat4 lightViewProjectionMatrix;
+    float shadowBias;
 };
 
 void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
@@ -132,6 +135,9 @@ struct SpotLight {
     float attenuation;
     float coneCos;
     float penumbraCos;
+    // sampler2D shadowMap;
+    mat4 lightViewProjectionMatrix;
+    float shadowBias;
 };
 
 void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {

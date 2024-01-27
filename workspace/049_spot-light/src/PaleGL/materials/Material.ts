@@ -408,23 +408,23 @@ export class Material {
         // TODO: なおかつ、postprocess向けのマテリアルでも作られちゃう
         const shadowUniforms: UniformsData = this.receiveShadow
             ? [
-                  {
-                      name: UniformNames.ShadowMap,
-                      type: UniformTypes.Texture,
-                      value: null,
-                  },
-                  {
-                      name: UniformNames.ShadowMapProjectionMatrix,
-                      type: UniformTypes.Matrix4,
-                      value: Matrix4.identity,
-                  },
-                  {
-                      // TODO: shadow map class を作って bias 持たせた方がよい
-                      // TODO: shadow biasの値を統一して可変にしたい
-                      name: UniformNames.ShadowBias,
-                      type: UniformTypes.Float,
-                      value: 0.02,
-                  },
+                  // {
+                  //     name: UniformNames.ShadowMap,
+                  //     type: UniformTypes.Texture,
+                  //     value: null,
+                  // },
+                  // {
+                  //     name: UniformNames.ShadowMapProjectionMatrix,
+                  //     type: UniformTypes.Matrix4,
+                  //     value: Matrix4.identity,
+                  // },
+                  // {
+                  //     // TODO: shadow map class を作って bias 持たせた方がよい
+                  //     // TODO: shadow biasの値を統一して可変にしたい
+                  //     name: UniformNames.ShadowBias,
+                  //     type: UniformTypes.Float,
+                  //     value: 0.02,
+                  // },
               ]
             : [];
 

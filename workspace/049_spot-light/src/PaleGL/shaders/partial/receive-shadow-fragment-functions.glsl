@@ -4,10 +4,10 @@
 vec4 applyShadow(
     vec4 surfaceColor,
     vec3 worldPosition,
-    mat4 shadowMapMatrix,
+    // mat4 shadowMapMatrix,
     mat4 shadowMapLightViewProjectionMatrix,
     sampler2D shadowMap,
-    vec4 shadowMapUv,
+    // vec4 shadowMapUv,
     float shadowBias,
     vec4 shadowColor,
     float shadowBlendRate
