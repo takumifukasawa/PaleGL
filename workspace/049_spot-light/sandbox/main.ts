@@ -81,7 +81,7 @@ import {
     AttributeNames,
     AttributeUsageType,
     UniformNames,
-    FaceSide,
+    FaceSide, TextureDepthPrecisionType,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -332,6 +332,7 @@ if (spotLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        depthPrecision: TextureDepthPrecisionType.High
     });
 }
 

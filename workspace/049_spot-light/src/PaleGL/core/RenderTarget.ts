@@ -10,7 +10,7 @@ import {
     TextureTypes,
     GLColorAttachment,
     GLFrameBufferStatus,
-    GLExtensionName,
+    GLExtensionName, TextureDepthPrecisionType,
 } from '@/PaleGL/constants';
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -28,6 +28,7 @@ export type RenderTargetOptions = {
     minFilter?: TextureFilterType;
     magFilter?: TextureFilterType;
     mipmap?: boolean;
+    depthPrecision?: TextureDepthPrecisionType
 };
 
 // TODO:
@@ -87,6 +88,7 @@ export class RenderTarget extends AbstractRenderTarget {
         minFilter = TextureFilterTypes.Linear,
         magFilter = TextureFilterTypes.Linear,
         mipmap = false,
+        depthPrecision
     }: RenderTargetOptions) {
         super();
 
@@ -213,6 +215,7 @@ export class RenderTarget extends AbstractRenderTarget {
                 // magFilter: TextureFilterTypes.Linear
                 minFilter,
                 magFilter,
+                depthPrecision
             });
             // depth as texture
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);

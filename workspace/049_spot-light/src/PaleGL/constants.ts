@@ -154,6 +154,13 @@ export const TextureFilterTypes = {
 
 export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
 
+export const TextureDepthPrecisionType = {
+    Medium: 0,
+    High: 1
+} as const;
+
+export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof typeof TextureDepthPrecisionType];
+
 // -----------------------------------------------------------------------------
 // render target types
 // -----------------------------------------------------------------------------

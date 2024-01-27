@@ -1,5 +1,6 @@
 ﻿import { GLObject } from '@/PaleGL/core/GLObject';
 import {
+    TextureDepthPrecisionType,
     TextureFilterType,
     TextureFilterTypes,
     TextureType,
@@ -23,6 +24,7 @@ export type TextureArgs = {
     wrapS?: TextureWrapType;
     wrapT?: TextureWrapType;
     flipY?: boolean;
+    depthPrecision?: TextureDepthPrecisionType 
 };
 
 // ref:
@@ -43,6 +45,7 @@ export class Texture extends GLObject {
     flipY: boolean;
     width: number | undefined;
     height: number | undefined;
+    depthPrecision: TextureDepthPrecisionType | undefined;
 
     get glObject() {
         return this.texture;
@@ -60,6 +63,7 @@ export class Texture extends GLObject {
         wrapS = TextureWrapTypes.ClampToEdge,
         wrapT = TextureWrapTypes.ClampToEdge,
         flipY,
+        depthPrecision
     }: TextureArgs) {
         super();
 
@@ -77,6 +81,8 @@ export class Texture extends GLObject {
         this.height = height;
         // imgを持つが特に指定がない場合はflipする
         this.flipY = (this.img && flipY === undefined) ? true : !!flipY;
+        
+        this.depthPrecision = (this.type === TextureTypes.Depth) && depthPrecision !== undefined ? depthPrecision : undefined;
 
         if (this.img === null) {
             // this.img = createWhite1x1();
@@ -222,28 +228,32 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
-                            // gl.DEPTH_COMPONENT32F,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.DEPTH_COMPONENT32F
+                                : gl.DEPTH_COMPONENT16,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
-                            // gl.FLOAT,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.FLOAT
+                                : gl.UNSIGNED_SHORT,
                             this.img
                         );
                     } else {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
-                            // gl.DEPTH_COMPONENT32F,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.DEPTH_COMPONENT32F
+                                : gl.DEPTH_COMPONENT16,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
-                            // gl.FLOAT,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.FLOAT
+                                : gl.UNSIGNED_SHORT,
                             null
                         );
                     }
@@ -257,11 +267,13 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
-                            // gl.DEPTH_COMPONENT32F,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.DEPTH_COMPONENT32F
+                                : gl.DEPTH_COMPONENT16,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
-                            // gl.FLOAT,
+                            this.depthPrecision === TextureDepthPrecisionType.High
+                                ? gl.FLOAT
+                                : gl.UNSIGNED_SHORT,
                             this.img
                         );
                         // } else {
@@ -383,28 +395,32 @@ export class Texture extends GLObject {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        gl.DEPTH_COMPONENT16,
-                        // gl.DEPTH_COMPONENT32F,
+                        this.depthPrecision === TextureDepthPrecisionType.High
+                            ? gl.DEPTH_COMPONENT32F
+                            : gl.DEPTH_COMPONENT16,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        gl.UNSIGNED_SHORT,
-                        // gl.FLOAT,
+                        this.depthPrecision === TextureDepthPrecisionType.High
+                            ? gl.FLOAT
+                            : gl.UNSIGNED_SHORT,
                         this.img
                     );
                 } else {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        gl.DEPTH_COMPONENT16,
-                        // gl.DEPTH_COMPONENT32F,
+                        this.depthPrecision === TextureDepthPrecisionType.High
+                            ? gl.DEPTH_COMPONENT32F
+                            : gl.DEPTH_COMPONENT16,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        gl.UNSIGNED_SHORT,
-                        // gl.FLOAT,
+                        this.depthPrecision === TextureDepthPrecisionType.High
+                            ? gl.FLOAT
+                            : gl.UNSIGNED_SHORT,
                         null
                     );
                 }
