@@ -58,6 +58,11 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: Matrix4.identity,
             },
             {
+                name: "uShadowMapLightViewProjectionMatrix",
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
                 name: 'uAmbientOcclusionTexture',
                 type: UniformTypes.Texture,
                 value: null,

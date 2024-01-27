@@ -1751,6 +1751,8 @@ void main() {
         orbitCameraController.altitudeSpeed = 100;
         orbitCameraController.deltaAzimuthPower = 2;
         orbitCameraController.deltaAltitudePower = 2;
+        orbitCameraController.maxAltitude = 70;
+        orbitCameraController.minAltitude = -70;
         orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
