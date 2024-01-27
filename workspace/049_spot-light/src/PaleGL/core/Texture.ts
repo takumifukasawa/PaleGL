@@ -25,6 +25,9 @@ export type TextureArgs = {
     flipY?: boolean;
 };
 
+// ref:
+// https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
+
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
     private texture: WebGLTexture;
@@ -219,24 +222,28 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT16,
+                            gl.DEPTH_COMPONENT32F,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
+                            // gl.UNSIGNED_SHORT,
+                            gl.FLOAT,
                             this.img
                         );
                     } else {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT16,
+                            gl.DEPTH_COMPONENT32F,
                             width,
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
+                            // gl.UNSIGNED_SHORT,
+                            gl.FLOAT,
                             null
                         );
                     }
@@ -250,9 +257,11 @@ export class Texture extends GLObject {
                         gl.texImage2D(
                             gl.TEXTURE_2D,
                             0,
-                            gl.DEPTH_COMPONENT16,
+                            // gl.DEPTH_COMPONENT16,
+                            gl.DEPTH_COMPONENT32F,
                             gl.DEPTH_COMPONENT,
-                            gl.UNSIGNED_SHORT,
+                            // gl.UNSIGNED_SHORT,
+                            gl.FLOAT,
                             this.img
                         );
                         // } else {
@@ -374,24 +383,28 @@ export class Texture extends GLObject {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        gl.DEPTH_COMPONENT16,
+                        // gl.DEPTH_COMPONENT16,
+                        gl.DEPTH_COMPONENT32F,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        gl.UNSIGNED_SHORT,
+                        // gl.UNSIGNED_SHORT,
+                        gl.FLOAT,
                         this.img
                     );
                 } else {
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        gl.DEPTH_COMPONENT16,
+                        // gl.DEPTH_COMPONENT16,
+                        gl.DEPTH_COMPONENT32F,
                         width,
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        gl.UNSIGNED_SHORT,
+                        // gl.UNSIGNED_SHORT,
+                        gl.FLOAT,
                         null
                     );
                 }
