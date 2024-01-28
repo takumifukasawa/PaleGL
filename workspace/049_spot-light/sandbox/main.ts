@@ -321,7 +321,7 @@ const spotLight = new SpotLight({
     coneCos: 0.9,
     penumbraCos: 0.95,
 });
-// spotLight.enabled = false;
+spotLight.enabled = false;
 
 if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = false;
@@ -344,10 +344,10 @@ spotLight.onStart = ({ actor }) => {
 };
 
 // spotLight.onUpdate = () => {
-//     console.log(spotLight.shadowCamera)
+//     console.log(spotLight.transform.worldForward)
 // }
 
-// captureScene.add(spotLight);
+captureScene.add(spotLight);
 
 const cameraPostProcess = new PostProcess();
 // const scenePostProcess = renderer.scenePostProcess;
@@ -1354,25 +1354,25 @@ const main = async () => {
     // });
     objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
-    objectSpaceRaymarchMesh.onUpdate = () => {
-        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.ObjectSpaceRaymarchBoundsScale,
-            objectSpaceRaymarchMesh.transform.scale
-        );
-        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-            UniformNames.ObjectSpaceRaymarchBoundsScale,
-            objectSpaceRaymarchMesh.transform.scale
-        );
-        // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-        //     "uNearClip",
-        //     directionalLight.shadowCamera!.near
-        // );
-        // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-        //     "uFarClip",
-        //     directionalLight.shadowCamera!.far
-        // );
-        // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
-    };
+    // objectSpaceRaymarchMesh.onUpdate = () => {
+    //     objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
+    //         objectSpaceRaymarchMesh.transform.scale
+    //     );
+    //     objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
+    //         objectSpaceRaymarchMesh.transform.scale
+    //     );
+    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //     //     "uNearClip",
+    //     //     directionalLight.shadowCamera!.near
+    //     // );
+    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //     //     "uFarClip",
+    //     //     directionalLight.shadowCamera!.far
+    //     // );
+    //     // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
+    // };
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
@@ -1388,16 +1388,16 @@ const main = async () => {
     });
     screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
-    screenSpaceRaymarchMesh.onUpdate = () => {
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.ViewDirection,
-            captureSceneCamera.getWorldForward()
-        );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
-    };
+    //screenSpaceRaymarchMesh.onUpdate = () => {
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+    //        UniformNames.ViewDirection,
+    //        captureSceneCamera.getWorldForward()
+    //    );
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
+    //};
 
     //
     // text mesh

@@ -1,6 +1,10 @@
 // ref:
 // https://matcha-choco010.net/2020/04/10/opengl-deferred-spot-light-shadow/
 // https://www.opengl-tutorial.org/jp/intermediate-tutorials/tutorial-16-shadow-mapping/
+
+
+
+
 vec4 applyShadow(
     vec4 surfaceColor,
     vec3 worldPosition,

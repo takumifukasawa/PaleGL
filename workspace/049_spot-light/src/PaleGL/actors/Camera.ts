@@ -7,7 +7,7 @@ import {
     AttributeNames,
     AttributeUsageType,
     BlendTypes,
-    CameraType,
+    CameraType, CameraTypes,
     PrimitiveTypes,
     UniformNames,
 } from '@/PaleGL/constants';
@@ -259,6 +259,10 @@ export class Camera extends Actor {
         this.inverseViewMatrix = this.viewMatrix.clone().invert();
         this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
         this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
+    }
+    
+    isPerspective() {
+        return this.cameraType === CameraTypes.Perspective;
     }
 
     /**

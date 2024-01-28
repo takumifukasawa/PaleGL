@@ -74,6 +74,8 @@ struct Skybox {
 vec4 applyDirectionalLightShadow(
     vec4 surfaceColor,
     vec3 worldPosition,
+    vec3 worldNormal,
+    vec3 lightDirection, // 光源自体の向き
     mat4 lightViewProjectionTextureMatrix,
     sampler2D shadowMap,
     float shadowBias,
@@ -81,12 +83,9 @@ vec4 applyDirectionalLightShadow(
     float shadowBlendRate
 ) {
     vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
-    // vec2 uv = lightPos.xy / lightPos.w;
-    // float depthFromWorldPos = lightPos.z / lightPos.w;
     vec2 uv = lightPos.xy;
     float depthFromWorldPos = lightPos.z;
 
-    // directional light
     float readDepth = texture(shadowMap, uv).r;
 
     float shadowAreaRect =
@@ -94,44 +93,20 @@ vec4 applyDirectionalLightShadow(
         step(0., uv.y) * (1. - step(1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
-    float isShadow = readDepth < lightPos.z - .01 ? 1. : 0.;
+    float NoL = max(dot(worldNormal, lightDirection), 0.);
+    float bias = .005 * tan(acos(NoL));
+    bias = clamp(bias, 0., .05);
+    
+    float isShadow = readDepth < lightPos.z - bias ? 1. : 0.;
 
     // for debug
     vec3 color = mix(
         vec3(0., 0., 1.),
         vec3(1., 0., 0.),
         isShadow
-        // 1. - step(.999, shadow)
     );
 
     return vec4(vec3(color * shadowAreaRect), 1.);
-
-    // vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
-    // vec2 uv = lightPos.xy / lightPos.w;
-    // float depthFromWorldPos = lightPos.z / lightPos.w * .5 + .5;
-
-    // // directional light
-    // float readDepth = texture(shadowMap, uv).r;
-
-    // float shadowAreaRect =
-    //     step(0., uv.x) * (1. - step(1., uv.x)) *
-    //     step(0., uv.y) * (1. - step(1., uv.y)) *
-    //     step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
-
-    // float isShadow = readDepth < lightPos.z * .5 + .5 - .01 ? 1. : 0.;
-
-    // // for debug
-    // vec3 color = mix(
-    //     vec3(0., 0., 1.),
-    //     vec3(1., 0., 0.),
-    //     isShadow
-    //     // 1. - step(.999, shadow)
-    // );
-
-    // // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
-    // // return vec4(vec3(shadow * shadowAreaRect), 1.);
-    // // return vec4(vec3(readDepth * shadowAreaRect), 1.);
-    // return vec4(vec3(color * shadowAreaRect), 1.);
 }
 
 
@@ -341,8 +316,8 @@ void main() {
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     directionalLight.intensity = uDirectionalLight.intensity;
-    // getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    // RE_Direct(directLight, geometry, material, reflectedLight);
+    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
+    RE_Direct(directLight, geometry, material, reflectedLight);
 
     // TODO: ponit light なくていいかも
     // point light
@@ -411,6 +386,8 @@ resultColor = vec4(outgoingLight, opacity);
     resultColor = applyDirectionalLightShadow(
         resultColor,
         worldPosition,
+        surface.worldNormal,
+        uDirectionalLight.direction,
         uDirectionalLight.lightViewProjectionMatrix,
         uDirectionalLightShadowMap,
         uShadowBias,

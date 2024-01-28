@@ -97,7 +97,9 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                 // pattern1: そのまま渡す
                 // value: light.transform.position,
                 // pattern2: normalizeしてから渡す
-                value: lightActors.directionalLight.transform.position.clone().normalize(),
+                // value: lightActors.directionalLight.transform.position.clone().normalize(),
+                // pattern3: normalizeし、光源の位置から降り注ぐとみなす
+                value: lightActors.directionalLight.transform.position.clone().negate().normalize()
             },
             {
                 name: UniformNames.LightIntensity,
@@ -116,7 +118,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                           type: UniformTypes.Matrix4,
                           // prettier-ignore
                           value: Matrix4.multiplyMatrices(
-                              new Matrix4(
+                            new Matrix4(
                                 0.5, 0, 0, 0.5,
                                 0, 0.5, 0, 0.5,
                                 0, 0, 0.5, 0.5,
@@ -124,7 +126,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                             ),
                             lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
                             lightActors.directionalLight.shadowCamera.viewMatrix.clone()
-                          ),
+                        ),
                       },
                   ]
                 : []),
@@ -1017,7 +1019,7 @@ export class Renderer {
             }
 
             // console.log(lightActor, castShadowLightActors, castShadowRenderMeshInfos)
-            
+
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
@@ -1043,23 +1045,34 @@ export class Renderer {
                 // targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
                 // targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
 
-
                 // TODO: material 側でやった方がよい？
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
+                targetMaterial.uniforms.setValue(
+                    UniformNames.ProjectionMatrix,
+                    lightActor.shadowCamera!.projectionMatrix
+                );
                 targetMaterial.uniforms.setValue(
                     UniformNames.NormalMatrix,
                     actor.transform.worldMatrix.clone().invert().transpose()
                 );
-                targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
-                targetMaterial.uniforms.setValue(UniformNames.ViewDirection, lightActor.shadowCamera!.transform.worldForward);
+                targetMaterial.uniforms.setValue(
+                    UniformNames.ViewPosition,
+                    lightActor.shadowCamera!.transform.worldMatrix.position
+                );
+                targetMaterial.uniforms.setValue(
+                    UniformNames.ViewDirection,
+                    lightActor.shadowCamera!.transform.worldForward
+                );
 
-                targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
+                targetMaterial.uniforms.setValue(
+                    UniformNames.DepthTexture,
+                    this._copyDepthDestRenderTarget.depthTexture
+                );
                 targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
                 targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
-               
+
                 actor.updateDepthMaterial({ camera: lightActor.shadowCamera! });
                 // targetMaterial.updateUniforms();
 
@@ -1097,7 +1110,7 @@ export class Renderer {
         // if (clear) {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
-        
+
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:

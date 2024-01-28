@@ -22,7 +22,7 @@
 
 struct IncidentLight {
     vec3 color;
-    vec3 direction;
+    vec3 direction; // 光源への方向
     bool visible;
     float intensity;
 };
@@ -84,7 +84,7 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 // directional light
 
 struct DirectionalLight {
-    vec3 direction;
+    vec3 direction; // 光源自体の向く方向
     float intensity;
     vec4 color;
     // sampler2D shadowMap;
@@ -94,7 +94,7 @@ struct DirectionalLight {
 
 void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
     directLight.color = directionalLight.color.xyz;
-    directLight.direction = directionalLight.direction;
+    directLight.direction = -directionalLight.direction; // 光源への方向にするので反転
     directLight.visible = true;
     directLight.intensity = directionalLight.intensity;
 }
@@ -128,7 +128,7 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
 
 struct SpotLight {
     vec3 position;
-    vec3 direction;
+    vec3 direction; // spotlightの向き先
     vec4 color;
     float intensity;
     float distance;
@@ -286,6 +286,7 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
 // -------------------------------------------------------------------------------
 
 void RE_Direct(const in IncidentLight directLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
+    // directionは光源への方向
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
     vec3 irradiance = dotNL * directLight.color;
    
