@@ -150,7 +150,8 @@ void main() {
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    float currentDepth = viewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
+    vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
+    float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
     if(currentDepth >= sceneDepth) {
         discard;
     }

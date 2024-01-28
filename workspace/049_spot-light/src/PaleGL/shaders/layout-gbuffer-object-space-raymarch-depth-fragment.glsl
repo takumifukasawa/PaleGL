@@ -75,10 +75,10 @@ void main() {
             break;
         }
     }
-    if(distance > minDistance) {
-        discard;
-    }
 
+    if(distance > minDistance) {
+        // discard;
+    }
 
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
@@ -86,10 +86,12 @@ void main() {
     vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
     float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
     if(currentDepth >= sceneDepth) {
-        discard;
+        // discard;
     }
-    vec4 currentRayProjectionPosition = uProjectionMatrix * currentRayViewPosition;
-    
+
+    vec4 rayClipPosition = uProjectionMatrix * uViewMatrix * vec4(currentRayPosition, 1.);
+    float newDepth = (rayClipPosition.z / rayClipPosition.w) * .5 + .5;
+    gl_FragDepth = newDepth;
 
     //
     // NOTE: end raymarch block
@@ -103,5 +105,5 @@ void main() {
 
     outColor = vec4(1., 1., 1., 1.);
     
-    gl_FragDepth = (currentRayProjectionPosition.z / currentRayProjectionPosition.w) * .5 + .5;
+    // gl_FragDepth = (currentRayProjectionPosition.z / currentRayProjectionPosition.w) * .5 + .5;
 }

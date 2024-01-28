@@ -1016,6 +1016,8 @@ export class Renderer {
                 return;
             }
 
+            // console.log(lightActor, castShadowLightActors, castShadowRenderMeshInfos)
+            
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
@@ -1036,6 +1038,10 @@ export class Renderer {
                     UniformNames.ProjectionMatrix,
                     lightActor.shadowCamera!.projectionMatrix
                 );
+                // TODO: copyの方を渡す、でいいんだっけ
+                targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
+                targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
+                targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
                 this.renderMesh(actor.geometry, targetMaterial);
 
                 if (this.stats) {
@@ -1070,7 +1076,7 @@ export class Renderer {
         // if (clear) {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
-
+        
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:

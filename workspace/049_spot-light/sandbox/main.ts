@@ -284,10 +284,10 @@ if (directionalLight.shadowCamera) {
     directionalLight.shadowCamera.visibleFrustum = true;
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 20;
+    directionalLight.shadowCamera.far = 15;
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -345,7 +345,7 @@ spotLight.onStart = ({ actor }) => {
 //     console.log(spotLight.shadowCamera)
 // }
 
-captureScene.add(spotLight);
+// captureScene.add(spotLight);
 
 const cameraPostProcess = new PostProcess();
 // const scenePostProcess = renderer.scenePostProcess;
@@ -1337,13 +1337,21 @@ const main = async () => {
     //     }),
     //     castShadow: true,
     // });
-    objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
-    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 2, 0);
+    objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
+    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
     objectSpaceRaymarchMesh.onUpdate = () => {
         objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uBoundsScale', objectSpaceRaymarchMesh.transform.scale);
         objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
             'uBoundsScale',
             objectSpaceRaymarchMesh.transform.scale
+        );
+        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+            "uNearClip",
+            directionalLight.shadowCamera!.near
+        );
+        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+            "uFarClip",
+            directionalLight.shadowCamera!.far  
         );
         // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
     };
