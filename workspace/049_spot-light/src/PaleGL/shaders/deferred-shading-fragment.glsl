@@ -65,7 +65,119 @@ struct Skybox {
 // }
 // #include ./partial/receive-shadow-fragment-functions.glsl
 // #endif
-#include ./partial/receive-shadow-fragment-functions.glsl
+// #include ./partial/receive-shadow-fragment-functions.glsl
+
+// ref:
+// https://matcha-choco010.net/2020/04/10/opengl-deferred-spot-light-shadow/
+// https://www.opengl-tutorial.org/jp/intermediate-tutorials/tutorial-16-shadow-mapping/
+
+vec4 applyDirectionalLightShadow(
+    vec4 surfaceColor,
+    vec3 worldPosition,
+    mat4 lightViewProjectionTextureMatrix,
+    sampler2D shadowMap,
+    float shadowBias,
+    vec4 shadowColor,
+    float shadowBlendRate
+) {
+    vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
+    // vec2 uv = lightPos.xy / lightPos.w;
+    // float depthFromWorldPos = lightPos.z / lightPos.w;
+    vec2 uv = lightPos.xy;
+    float depthFromWorldPos = lightPos.z;
+
+    // directional light
+    float readDepth = texture(shadowMap, uv).r;
+
+    float shadowAreaRect =
+        step(0., uv.x) * (1. - step(1., uv.x)) *
+        step(0., uv.y) * (1. - step(1., uv.y)) *
+        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+
+    float isShadow = readDepth < lightPos.z - .001 ? 1. : 0.;
+
+    // for debug
+    vec3 color = mix(
+        vec3(0., 0., 1.),
+        vec3(1., 0., 0.),
+        isShadow
+        // 1. - step(.999, shadow)
+    );
+
+    return vec4(vec3(color * shadowAreaRect), 1.);
+
+    // vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
+    // vec2 uv = lightPos.xy / lightPos.w;
+    // float depthFromWorldPos = lightPos.z / lightPos.w * .5 + .5;
+
+    // // directional light
+    // float readDepth = texture(shadowMap, uv).r;
+
+    // float shadowAreaRect =
+    //     step(0., uv.x) * (1. - step(1., uv.x)) *
+    //     step(0., uv.y) * (1. - step(1., uv.y)) *
+    //     step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+
+    // float isShadow = readDepth < lightPos.z * .5 + .5 - .01 ? 1. : 0.;
+
+    // // for debug
+    // vec3 color = mix(
+    //     vec3(0., 0., 1.),
+    //     vec3(1., 0., 0.),
+    //     isShadow
+    //     // 1. - step(.999, shadow)
+    // );
+
+    // // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
+    // // return vec4(vec3(shadow * shadowAreaRect), 1.);
+    // // return vec4(vec3(readDepth * shadowAreaRect), 1.);
+    // return vec4(vec3(color * shadowAreaRect), 1.);
+}
+
+
+vec4 applySpotLightShadow(
+    vec4 surfaceColor,
+    vec3 worldPosition,
+    // mat4 shadowMapMatrix,
+    mat4 lightViewProjectionMatrix,
+    sampler2D shadowMap,
+    // vec4 shadowMapUv,
+    float shadowBias,
+    vec4 shadowColor,
+    float shadowBlendRate
+) {
+    vec4 lightPos = lightViewProjectionMatrix * vec4(worldPosition, 1.);
+    vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
+    float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
+
+    vec3 uvc = vec3(uv, depthFromWorldPos + shadowBias);
+
+    // spot light
+    // float readDepth = textureProj(shadowMap, uvc).r;
+
+    // directional light
+    float readDepth = texture(shadowMap, uv).r;
+
+    float shadowAreaRect =
+        step(0., uv.x) * (1. - step(1., uv.x)) *
+        step(0., uv.y) * (1. - step(1., uv.y)) *
+        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+
+    float isShadow = readDepth < (lightPos.z / lightPos.w) ? 1. : 0.;
+
+    // for debug
+    vec3 color = mix(
+        vec3(0., 0., 1.),
+        vec3(1., 0., 0.),
+        isShadow
+        // 1. - step(.999, shadow)
+    );
+
+    // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
+    // return vec4(vec3(shadow * shadowAreaRect), 1.);
+    return vec4(vec3(readDepth * shadowAreaRect), 1.);
+}
+
 
 
 // -----------------------------------------------------------
@@ -296,31 +408,28 @@ resultColor = vec4(outgoingLight, opacity);
     // vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
     // vec4 shadowMapProjectionUv = uSpotLight[0].LightV * vec4(worldPosition, 1.);
     // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-    resultColor = applyShadow(
+    resultColor = applyDirectionalLightShadow(
         resultColor,
         worldPosition,
-        // uShadowMapProjectionMatrix,
         uDirectionalLight.lightViewProjectionMatrix,
         uDirectionalLightShadowMap,
-        // shadowMapProjectionUv,
         uShadowBias,
         vec4(0., 0., 0., 1.),
         0.5
     );
-
-    // TODO: blend rate は light か何かに持たせたい
-    // resultColor = applyShadow(
-    //     resultColor,
-    //     worldPosition,
-    //     // uShadowMapProjectionMatrix,
-    //     uSpotLight[0].lightViewProjectionMatrix,
-    //     uSpotLightShadowMap[0],
-    //     // shadowMapProjectionUv,
-    //     uShadowBias,
-    //     vec4(0., 0., 0., 1.),
-    //     0.5
-    // );
-    // }
+    
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+        // TODO: blend rate は light か何かに持たせたい
+        // resultColor = applySpotLightShadow(
+        //     resultColor,
+        //     worldPosition,
+        //     uSpotLight[i].lightViewProjectionMatrix,
+        //     uSpotLightShadowMap[i],
+        //     uShadowBias,
+        //     vec4(0., 0., 0., 1.),
+        //     0.5
+        // );
+    }
 #endif
    
     // for debug

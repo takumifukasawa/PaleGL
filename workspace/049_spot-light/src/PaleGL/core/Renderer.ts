@@ -114,15 +114,22 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                       {
                           name: UniformNames.LightViewProjectionMatrix,
                           type: UniformTypes.Matrix4,
+                          // prettier-ignore
                           value: Matrix4.multiplyMatrices(
-                              lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
-                              lightActors.directionalLight.shadowCamera.viewMatrix.clone()
+                              new Matrix4(
+                                0.5, 0, 0, 0.5,
+                                0, 0.5, 0, 0.5,
+                                0, 0, 0.5, 0.5,
+                                0, 0, 0, 1
+                            ),
+                            lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
+                            lightActors.directionalLight.shadowCamera.viewMatrix.clone()
                           ),
                       },
                   ]
                 : []),
         ]);
-        
+
         // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
         if (lightActors.directionalLight.shadowMap) {
             targetMaterial.uniforms.setValue(
