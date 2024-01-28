@@ -94,7 +94,7 @@ vec4 applyDirectionalLightShadow(
         step(0., uv.y) * (1. - step(1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
-    float isShadow = readDepth < lightPos.z - .001 ? 1. : 0.;
+    float isShadow = readDepth < lightPos.z - .01 ? 1. : 0.;
 
     // for debug
     vec3 color = mix(

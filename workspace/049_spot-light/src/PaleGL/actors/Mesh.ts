@@ -4,6 +4,7 @@ import { Material } from '@/PaleGL/materials/Material';
 import { defaultDepthFragmentShader } from '@/PaleGL/shaders/buildShader';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { GPU } from '@/PaleGL/core/GPU';
+import {Camera} from "@/PaleGL/actors/Camera.ts";
 
 export type MeshOptionsArgs = {
     castShadow?: boolean;
@@ -128,4 +129,10 @@ export class Mesh extends Actor {
         // this.materials.forEach(material => material.updateUniforms({ gpu }));
         // this.depthMaterial.updateUniforms({ gpu });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    updateMaterial(_args: { camera: Camera }) {}
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    updateDepthMaterial(_args: { camera: Camera }) {}
 }

@@ -29,8 +29,8 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
-export type  MaterialArgs= {
-    // required
+export type MaterialArgs = {
+    type?: MaterialTypes;
 
     // gpu: GPU,
     // TODO: required じゃなくて大丈夫??
@@ -114,8 +114,17 @@ export type FragmentShaderGenerator = ({
 
 export type DepthFragmentShaderGenerator = () => string;
 
+export const MaterialTypes = {
+    Misc: 0,
+    ObjectSpaceRaymarch: 1
+} as const;
+
+export type MaterialTypes = typeof MaterialTypes[keyof typeof MaterialTypes];
+
 export class Material {
     name: string = '';
+    
+    type: MaterialTypes = MaterialTypes.Misc
 
     shader: Shader | null = null;
     primitiveType: PrimitiveType;
@@ -216,6 +225,8 @@ export class Material {
         // gpu,
 
         name = '',
+        
+        type = MaterialTypes.Misc,
 
         vertexShader = '',
         fragmentShader = '',
@@ -265,6 +276,7 @@ export class Material {
         showLog = false, // depthUniforms = {},
     }: MaterialArgs) {
         this.name = name || '';
+        this.type = type;
 
         // 外側から任意のタイミングでcompileした方が都合が良さそう
         // this.shader = new Shader({gpu, vertexShader, fragmentShader});
@@ -300,7 +312,7 @@ export class Material {
         if (vertexShaderModifier) {
             this._vertexShaderModifier = vertexShaderModifier;
         }
-        if(fragmentShaderModifier) {
+        if (fragmentShaderModifier) {
             this._fragmentShaderModifier = fragmentShaderModifier;
         }
 
@@ -516,4 +528,9 @@ export class Material {
             fragmentShader: this.rawFragmentShader,
         });
     }
+
+    /**
+     * マテリアルごとにアップデートしたいuniformがあるとき
+     */
+    updateUniforms() {}
 }

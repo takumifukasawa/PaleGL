@@ -1054,13 +1054,16 @@ export class Renderer {
                     actor.transform.worldMatrix.clone().invert().transpose()
                 );
                 targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
+                targetMaterial.uniforms.setValue(UniformNames.ViewDirection, lightActor.shadowCamera!.transform.worldForward);
 
                 targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
                 targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
                 targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
+               
+                actor.updateDepthMaterial({ camera: lightActor.shadowCamera! });
+                // targetMaterial.updateUniforms();
 
                 this.renderMesh(actor.geometry, targetMaterial);
-
 
                 if (this.stats) {
                     this.stats.addPassInfo('shadow pass', actor.name, actor.geometry);
@@ -1138,6 +1141,8 @@ export class Renderer {
             // });
             // TODO: g-bufferの時にはlightのuniformsを設定しなくて大丈夫になったのでいらないはず
             // applyLightUniformValues(targetMaterial, lightActors);
+
+            actor.updateMaterial({ camera });
 
             this.renderMesh(actor.geometry, targetMaterial);
 

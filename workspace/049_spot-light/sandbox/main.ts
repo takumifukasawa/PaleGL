@@ -81,7 +81,8 @@ import {
     AttributeNames,
     AttributeUsageType,
     UniformNames,
-    FaceSide, TextureDepthPrecisionType,
+    FaceSide,
+    TextureDepthPrecisionType,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -108,12 +109,12 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-// import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
+import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
 import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
+// import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
+// import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -333,7 +334,7 @@ if (spotLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High
+        depthPrecision: TextureDepthPrecisionType.High,
     });
 }
 
@@ -1261,8 +1262,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .2,
-        specularIntensity: .2,
+        diffuseIntensity: 0.2,
+        specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
 
@@ -1301,9 +1302,9 @@ const main = async () => {
             // diffuseColor: new Color(1, .05, .05, 1),
             // metallic: 0,
             // roughness: .3
-            diffuseColor: new Color(1, 1., 1., 1),
+            diffuseColor: new Color(1, 1, 1, 1),
             metallic: 1,
-            roughness: 1.
+            roughness: 1,
         })
     );
     testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
@@ -1312,18 +1313,31 @@ const main = async () => {
     // local raymarch mesh
     //
 
-    objectSpaceRaymarchMesh = new Mesh({
-        geometry: new BoxGeometry({ gpu }),
-        material: new ObjectSpaceRaymarchMaterial({
+    // objectSpaceRaymarchMesh = new Mesh({
+    //     geometry: new BoxGeometry({ gpu }),
+    //     material: new ObjectSpaceRaymarchMaterial({
+    //         fragmentShader: litObjectSpaceRaymarchFrag,
+    //         depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
+    //         // primitiveType: PrimitiveTypes.Triangles,
+    //         metallic: 0,
+    //         roughness: 0,
+    //         receiveShadow: false
+    //     }),
+    //     castShadow: true,
+    // });
+
+    objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
+        gpu,
+        materialArgs: {
             fragmentShader: litObjectSpaceRaymarchFrag,
             depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-            // primitiveType: PrimitiveTypes.Triangles,
             metallic: 0,
             roughness: 0,
-            receiveShadow: false
-        }),
+            receiveShadow: false,
+        },
         castShadow: true,
     });
+
     // objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
     //     gpu,
     //     fragmentShader: litObjectSpaceRaymarchFrag,
@@ -1342,7 +1356,9 @@ const main = async () => {
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
     objectSpaceRaymarchMesh.onUpdate = () => {
         objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.ObjectSpaceRaymarchBoundsScale, objectSpaceRaymarchMesh.transform.scale);
+            UniformNames.ObjectSpaceRaymarchBoundsScale,
+            objectSpaceRaymarchMesh.transform.scale
+        );
         objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
             UniformNames.ObjectSpaceRaymarchBoundsScale,
             objectSpaceRaymarchMesh.transform.scale
@@ -1353,7 +1369,7 @@ const main = async () => {
         // );
         // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
         //     "uFarClip",
-        //     directionalLight.shadowCamera!.far  
+        //     directionalLight.shadowCamera!.far
         // );
         // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
     };
@@ -2018,7 +2034,6 @@ function initDebugger() {
         },
     });
 
-
     //
     // spot light
     //
@@ -2034,7 +2049,7 @@ function initDebugger() {
             spotLight.color = Color.fromHex(value);
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2045,7 +2060,7 @@ function initDebugger() {
             spotLight.intensity = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'distance',
         minValue: 0,
@@ -2056,7 +2071,7 @@ function initDebugger() {
             spotLight.distance = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'attenuation',
         minValue: 0,
@@ -2067,7 +2082,7 @@ function initDebugger() {
             spotLight.attenuation = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'coneCos',
         minValue: 0,
@@ -2078,7 +2093,7 @@ function initDebugger() {
             spotLight.coneCos = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'penumbraCos',
         minValue: 0,
@@ -2088,7 +2103,7 @@ function initDebugger() {
         onChange: (value) => {
             spotLight.penumbraCos = value;
         },
-    })
+    });
 
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'pos x',

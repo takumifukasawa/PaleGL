@@ -19,6 +19,7 @@ uniform vec4 uColor;
 uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform vec3 uViewPosition;
+uniform float uIsPerspective;
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -59,12 +60,10 @@ void main() {
     // NOTE: raymarch block
     //
 
-    vec3 wp = vWorldPosition;
-    wp = (uWorldMatrix * vec4(vLocalPosition, 1.)).xyz;
-    
-    vec3 rayOrigin = wp;
-    // vec3 rayDirection = normalize(wp - uViewPosition);
-    vec3 rayDirection = normalize(-uViewPosition);
+    vec3 rayOrigin = vWorldPosition;
+    vec3 rayDirection = uIsPerspective > .5
+        ? normalize(vWorldPosition - uViewPosition)
+        : normalize(-uViewPosition);
     float distance = 0.;
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
@@ -82,7 +81,7 @@ void main() {
     }
 
     if(distance > minDistance) {
-        // discard;
+        discard;
     }
 
     // 既存の深度値と比較して、奥にある場合は破棄する

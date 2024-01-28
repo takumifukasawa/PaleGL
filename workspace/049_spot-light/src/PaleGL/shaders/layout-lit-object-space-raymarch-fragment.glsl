@@ -37,6 +37,7 @@ uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseWorldMatrix;
 uniform vec3 uViewPosition;
+uniform float uIsPerspective;
 uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;
@@ -124,7 +125,9 @@ void main() {
     //
 
     vec3 rayOrigin = vWorldPosition;
-    vec3 rayDirection = normalize(vWorldPosition - uViewPosition);
+    vec3 rayDirection = uIsPerspective > .5
+        ? normalize(vWorldPosition - uViewPosition)
+        : normalize(-uViewPosition);
     float distance = 0.;
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;

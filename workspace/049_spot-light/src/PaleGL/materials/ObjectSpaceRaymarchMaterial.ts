@@ -1,4 +1,4 @@
-import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
+import {MaterialArgs, Material, MaterialTypes} from '@/PaleGL/materials/Material';
 import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
@@ -55,6 +55,11 @@ export class ObjectSpaceRaymarchMaterial extends Material {
                 type: UniformTypes.Float,
                 value: roughness || 0,
             },
+            {
+                name: "uIsPerspective",
+                type: UniformTypes.Float,
+                value: 0,
+            }
         ];
         const shadingUniforms: UniformsData = [
             {
@@ -70,6 +75,7 @@ export class ObjectSpaceRaymarchMaterial extends Material {
         super({
             ...options,
             name: 'ObjectSpaceRaymarchMaterial',
+            type: MaterialTypes.ObjectSpaceRaymarch,
             vertexShader: raymarchVert,
             fragmentShader,
             depthFragmentShader,
