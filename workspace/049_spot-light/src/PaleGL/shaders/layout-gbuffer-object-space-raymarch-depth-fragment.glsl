@@ -21,6 +21,7 @@ uniform vec2 uDiffuseMapUvScale;
 uniform vec3 uViewPosition;
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseWorldMatrix;
 uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
@@ -68,8 +69,8 @@ void main() {
         distance = objectSpaceDfScene(currentRayPosition, uInverseWorldMatrix, uBoundsScale);
         accLen += distance;
         if(
-        !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
-        distance <= minDistance
+            !isDfInnerBox(toLocal(currentRayPosition, uInverseWorldMatrix, uBoundsScale), uBoundsScale) ||
+            distance <= minDistance
         ) {
             break;
         }
@@ -82,10 +83,13 @@ void main() {
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    float currentDepth = viewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
+    vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
+    float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
     if(currentDepth >= sceneDepth) {
         discard;
     }
+    vec4 currentRayProjectionPosition = uProjectionMatrix * currentRayViewPosition;
+    
 
     //
     // NOTE: end raymarch block
@@ -98,4 +102,6 @@ void main() {
 #endif
 
     outColor = vec4(1., 1., 1., 1.);
+    
+    gl_FragDepth = (currentRayProjectionPosition.z / currentRayProjectionPosition.w) * .5 + .5;
 }
