@@ -33,6 +33,7 @@ uniform float uAlphaTestThreshold;
 #endif
 
 in vec2 vUv;
+in vec3 vLocalPosition;
 in vec3 vWorldPosition;
 
 #ifdef USE_VERTEX_COLOR
@@ -58,8 +59,12 @@ void main() {
     // NOTE: raymarch block
     //
 
-    vec3 rayOrigin = vWorldPosition;
-    vec3 rayDirection = normalize(vWorldPosition - uViewPosition);
+    vec3 wp = vWorldPosition;
+    wp = (uWorldMatrix * vec4(vLocalPosition, 1.)).xyz;
+    
+    vec3 rayOrigin = wp;
+    // vec3 rayDirection = normalize(wp - uViewPosition);
+    vec3 rayDirection = normalize(-uViewPosition);
     float distance = 0.;
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
@@ -81,13 +86,13 @@ void main() {
     }
 
     // 既存の深度値と比較して、奥にある場合は破棄する
-    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
-    float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
-    if(currentDepth >= sceneDepth) {
-        // discard;
-    }
+    // float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    // float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    // vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
+    // float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
+    // if(currentDepth >= sceneDepth) {
+    //     discard;
+    // }
 
     vec4 rayClipPosition = uProjectionMatrix * uViewMatrix * vec4(currentRayPosition, 1.);
     float newDepth = (rayClipPosition.z / rayClipPosition.w) * .5 + .5;

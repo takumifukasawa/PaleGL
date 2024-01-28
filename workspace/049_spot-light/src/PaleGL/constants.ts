@@ -322,6 +322,8 @@ export const UniformNames = {
     // skybox
     Skybox: 'uSkybox',
     RotationOffset: 'uRotationOffset', // TODO: 名前変えたい
+    // raymarch
+    ObjectSpaceRaymarchBoundsScale: "uBoundsScale"
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];

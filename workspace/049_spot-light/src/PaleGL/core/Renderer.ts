@@ -1026,23 +1026,41 @@ export class Renderer {
                     throw 'invalid target material';
                 }
 
-                // 先頭でガードしてるので shadow camera はあるはず。
+                // // 先頭でガードしてるので shadow camera はあるはず。
+                // targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
+                // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                // targetMaterial.uniforms.setValue(
+                //     UniformNames.ViewPosition,
+                //     lightActor.shadowCamera!.transform.worldMatrix.position
+                // );
+                // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
+                // targetMaterial.uniforms.setValue(
+                //     UniformNames.ProjectionMatrix,
+                //     lightActor.shadowCamera!.projectionMatrix
+                // );
+                // // TODO: copyの方を渡す、でいいんだっけ
+                // targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
+                // targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
+                // targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
+
+
+                // TODO: material 側でやった方がよい？
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                targetMaterial.uniforms.setValue(
-                    UniformNames.ViewPosition,
-                    lightActor.shadowCamera!.transform.worldMatrix.position
-                );
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
+                targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix);
                 targetMaterial.uniforms.setValue(
-                    UniformNames.ProjectionMatrix,
-                    lightActor.shadowCamera!.projectionMatrix
+                    UniformNames.NormalMatrix,
+                    actor.transform.worldMatrix.clone().invert().transpose()
                 );
-                // TODO: copyの方を渡す、でいいんだっけ
+                targetMaterial.uniforms.setValue(UniformNames.ViewPosition, lightActor.shadowCamera!.transform.worldMatrix.position);
+
                 targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
                 targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
                 targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
+
                 this.renderMesh(actor.geometry, targetMaterial);
+
 
                 if (this.stats) {
                     this.stats.addPassInfo('shadow pass', actor.name, actor.geometry);

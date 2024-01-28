@@ -12,6 +12,7 @@ precision highp float;
 
 // varyings
 out vec2 vUv;
+out vec3 vLocalPosition;
 out vec3 vWorldPosition;
 out vec3 vNormal;
 
@@ -130,6 +131,7 @@ void main() {
 
     // assign common varyings 
     vUv = aUv;
+    vLocalPosition = aPosition;
 
     mat4 worldMatrix = uWorldMatrix;
     

@@ -26,7 +26,7 @@ export class ObjectSpaceRaymarchMaterial extends Material {
     }: ObjectSpaceRaymarchMaterialArgs) {
         const commonUniforms: UniformsData = [
             {
-                name: 'uBoundsScale',
+                name: UniformNames.ObjectSpaceRaymarchBoundsScale,
                 type: UniformTypes.Vector3,
                 value: Vector3.one,
             },

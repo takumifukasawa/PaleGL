@@ -293,6 +293,7 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        // depthPrecision: TextureDepthPrecisionType.High
     });
 }
 
@@ -1340,19 +1341,20 @@ const main = async () => {
     objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
     objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
     objectSpaceRaymarchMesh.onUpdate = () => {
-        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uBoundsScale', objectSpaceRaymarchMesh.transform.scale);
+        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+            UniformNames.ObjectSpaceRaymarchBoundsScale, objectSpaceRaymarchMesh.transform.scale);
         objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-            'uBoundsScale',
+            UniformNames.ObjectSpaceRaymarchBoundsScale,
             objectSpaceRaymarchMesh.transform.scale
         );
-        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-            "uNearClip",
-            directionalLight.shadowCamera!.near
-        );
-        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-            "uFarClip",
-            directionalLight.shadowCamera!.far  
-        );
+        // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+        //     "uNearClip",
+        //     directionalLight.shadowCamera!.near
+        // );
+        // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+        //     "uFarClip",
+        //     directionalLight.shadowCamera!.far  
+        // );
         // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
     };
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
@@ -1863,7 +1865,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', false);
+    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', true);
 
     objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
         label: 'pos x',
@@ -1970,7 +1972,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
+    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', true);
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
@@ -2023,7 +2025,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
+    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', false);
 
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
