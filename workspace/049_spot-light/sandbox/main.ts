@@ -281,12 +281,12 @@ const directionalLight = new DirectionalLight({
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = false;
+    directionalLight.shadowCamera.visibleFrustum = true;
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 30;
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+    directionalLight.shadowCamera.far = 20;
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
@@ -322,7 +322,7 @@ const spotLight = new SpotLight({
 // spotLight.enabled = false;
 
 if (spotLight.shadowCamera) {
-    spotLight.shadowCamera.visibleFrustum = true;
+    spotLight.shadowCamera.visibleFrustum = false;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
     spotLight.shadowCamera.far = 10;
@@ -391,8 +391,8 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uDirectionalLightShadowMap',
-        // directionalLight.shadowMap!.read.depthTexture
-        spotLight.shadowMap!.read.depthTexture
+        directionalLight.shadowMap!.read.depthTexture
+        // spotLight.shadowMap!.read.depthTexture
     );
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',

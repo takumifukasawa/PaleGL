@@ -112,11 +112,6 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
             ...(lightActors.directionalLight.shadowMap && lightActors.directionalLight.shadowCamera
                 ? [
                       {
-                          name: UniformNames.ShadowMap,
-                          type: UniformTypes.Texture,
-                          value: lightActors.directionalLight.shadowMap.read.depthTexture,
-                      },
-                      {
                           name: UniformNames.LightViewProjectionMatrix,
                           type: UniformTypes.Matrix4,
                           value: Matrix4.multiplyMatrices(
@@ -127,7 +122,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                   ]
                 : []),
         ]);
-
+        
         // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
         if (lightActors.directionalLight.shadowMap) {
             targetMaterial.uniforms.setValue(

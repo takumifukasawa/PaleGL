@@ -5,19 +5,24 @@ vec4 applyShadow(
     vec4 surfaceColor,
     vec3 worldPosition,
     // mat4 shadowMapMatrix,
-    mat4 shadowMapLightViewProjectionMatrix,
+    mat4 lightViewProjectionMatrix,
     sampler2D shadowMap,
     // vec4 shadowMapUv,
     float shadowBias,
     vec4 shadowColor,
     float shadowBlendRate
 ) {
-    vec4 lightPos = shadowMapLightViewProjectionMatrix * vec4(worldPosition, 1.);
+    vec4 lightPos = lightViewProjectionMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
     float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
    
     vec3 uvc = vec3(uv, depthFromWorldPos + shadowBias);
-    float readDepth = textureProj(shadowMap, uvc).r;
+    
+    // spot light
+    // float readDepth = textureProj(shadowMap, uvc).r;
+    
+    // directional light
+    float readDepth = texture(shadowMap, uv).r;
     
     float shadowAreaRect =
         step(0., uv.x) * (1. - step(1., uv.x)) *
@@ -36,7 +41,7 @@ vec4 applyShadow(
     
     // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
     // return vec4(vec3(shadow * shadowAreaRect), 1.);
-    return vec4(vec3(color * shadowAreaRect), 1.);
+    return vec4(vec3(readDepth * shadowAreaRect), 1.);
 
 
     // vec4 rawShadowCoord = shadowMapMatrix * vec4(worldPosition, 1.);
