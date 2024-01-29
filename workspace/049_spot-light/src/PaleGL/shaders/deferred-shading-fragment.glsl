@@ -93,20 +93,24 @@ vec4 applyDirectionalLightShadow(
         step(0., uv.y) * (1. - step(1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
-    float NoL = max(dot(worldNormal, lightDirection), 0.);
+    float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, 0., .05);
+    bias = clamp(bias, .0001, .01);
+    
+    // return vec4(vec3(bias * shadowAreaRect * step(0., NoL)), 1.);
+    // return vec4(vec3(bias * NoL), 1.);
     
     float isShadow = readDepth < lightPos.z - bias ? 1. : 0.;
 
-    // for debug
+    // // for debug
     vec3 color = mix(
         vec3(0., 0., 1.),
         vec3(1., 0., 0.),
-        isShadow
+        isShadow * shadowAreaRect
     );
+    return vec4(color, 1.);
 
-    return vec4(vec3(color * shadowAreaRect), 1.);
+    return mix(surfaceColor, shadowColor, isShadow * shadowAreaRect * shadowBlendRate);
 }
 
 

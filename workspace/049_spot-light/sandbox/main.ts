@@ -321,13 +321,13 @@ const spotLight = new SpotLight({
     coneCos: 0.9,
     penumbraCos: 0.95,
 });
-spotLight.enabled = false;
+// spotLight.enabled = false;
 
 if (spotLight.shadowCamera) {
-    spotLight.shadowCamera.visibleFrustum = false;
+    spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = 10;
+    spotLight.shadowCamera.far = spotLight.distance;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,

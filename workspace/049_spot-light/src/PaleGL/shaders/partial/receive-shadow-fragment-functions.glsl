@@ -35,17 +35,22 @@ vec4 applyShadow(
  
     float isShadow = readDepth < (lightPos.z / lightPos.w) ? 1. : 0.;
     
-    // for debug
-    vec3 color = mix(
-        vec3(0., 0., 1.),
-        vec3(1., 0., 0.),
-        isShadow
-        // 1. - step(.999, shadow)
-    );
+    isShadow *= shadowAreaRect;
     
+    // for debug
+    // vec3 color = mix(
+    //     vec3(0., 0., 1.),
+    //     vec3(1., 0., 0.),
+    //     isShadow
+    //     // 1. - step(.999, shadow)
+    // );
+   
+    // for debug
     // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
     // return vec4(vec3(shadow * shadowAreaRect), 1.);
     return vec4(vec3(readDepth * shadowAreaRect), 1.);
+    
+    return mix(surfaceColor, shadowColor.xyz, isShadow);
 
 
     // vec4 rawShadowCoord = shadowMapMatrix * vec4(worldPosition, 1.);
