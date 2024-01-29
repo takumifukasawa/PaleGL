@@ -142,36 +142,51 @@ vec4 applySpotLightShadow(
         vec2(0.34495938, 0.29387760)
     );
 
-    // float NoL = max(dot(worldNormal, -lightDirection), 0.);
-    // float bias = .005 * tan(acos(NoL));
-    // bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    float NoL = max(dot(worldNormal, -lightDirection), 0.);
+    float bias = .005 * tan(acos(NoL));
+    bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
 
     vec4 lightPos = lightViewProjectionMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
     float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
 
     float shadowAreaRect =
-        step(0., uv.x) * (1. - step(1., uv.x)) *
-        step(0., uv.y) * (1. - step(1., uv.y)) *
-        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+        // step(0., uv.x) * (1. - step(1., uv.x)) *
+        // step(0., uv.y) * (1. - step(1., uv.y)) *
+        // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+        step(0., lightPos.x / lightPos.w) * (1. - step(1., lightPos.x / lightPos.w)) *
+        step(0., lightPos.y / lightPos.w) * (1. - step(1., lightPos.y / lightPos.w)) *
+        step(0., lightPos.z / lightPos.w) * (1. - step(1., lightPos.z / lightPos.w));
 
     float visibility = 1.;
 
-    for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[i] / 800.;
-        // spot light
-        vec3 uvc = vec3(uv + offset, depthFromWorldPos + shadowBias);
-        float readDepth = textureProj(shadowMap, uvc).r;
-        if(readDepth < (lightPos.z / lightPos.w)) {
-            visibility -= .25;
-        }
+    // PCF
+    // for(int i = 0; i < 4; i++) {
+    //     vec2 offset = poissonDisk[i] / 800.;
+    //     // spot light
+    //     // vec3 uvc = vec3(uv + offset, depthFromWorldPos + shadowBias);
+    //     vec3 uvc = vec3(uv + offset, depthFromWorldPos + .01);
+    //     float readDepth = textureProj(shadowMap, uvc).r;
+    //     if(readDepth < (lightPos.z / lightPos.w)) {
+    //         visibility -= .25;
+    //     }
+    // }
+
+    // 1 sample
+    vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
+    // float readDepth = textureProj(shadowMap, uvc).r;
+    float readDepth = texture(shadowMap, lightPos.xy / lightPos.w).r;
+    if(readDepth < (lightPos.z / lightPos.w) - bias) {
+        visibility = 0.;
     }
 
     // for debug
     vec3 color = mix(
         vec3(0., 0., 1.),
         vec3(1., 0., 0.),
+        // shadowAreaRect
         (1. - visibility) * shadowAreaRect
+        // (1. - visibility) * shadowAreaRect
     );
     return vec4(color, 1.);
 

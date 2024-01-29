@@ -294,7 +294,7 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High
+        depthPrecision: TextureDepthPrecisionType.High,
     });
 }
 
@@ -316,7 +316,7 @@ captureScene.add(directionalLight);
 const spotLight = new SpotLight({
     intensity: 1,
     color: Color.white,
-    distance: 30,
+    distance: 10,
     attenuation: 0.1,
     coneCos: 0.9,
     penumbraCos: 0.95,
@@ -327,26 +327,26 @@ if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
-    //spotLight.shadowCamera.far = spotLight.distance;
-    spotLight.shadowCamera.far = 10;
+    spotLight.shadowCamera.far = spotLight.distance;
+    // spotLight.shadowCamera.far = 10;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        // depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-
 spotLight.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(-5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
-
-// spotLight.onUpdate = () => {
-//     console.log(spotLight.transform.worldForward)
-// }
+spotLight.onUpdate = () => {
+    spotLight.shadowCamera!.far = spotLight.distance;
+    spotLight.shadowCamera!.updateProjectionMatrix();
+    // console.log(spotLight.transform.worldForward);
+};
 
 captureScene.add(spotLight);
 
@@ -394,8 +394,8 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uDirectionalLightShadowMap',
-        directionalLight.shadowMap!.read.depthTexture
-        // spotLight.shadowMap!.read.depthTexture
+        // directionalLight.shadowMap!.read.depthTexture
+        spotLight.shadowMap!.read.depthTexture
     );
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',
@@ -1882,7 +1882,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', true);
+    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', false);
 
     objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
         label: 'pos x',
@@ -1989,7 +1989,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', true);
+    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
@@ -2041,7 +2041,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', false);
+    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
 
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',

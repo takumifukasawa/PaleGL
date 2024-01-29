@@ -195,6 +195,12 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                           name: UniformNames.LightViewProjectionMatrix,
                           type: UniformTypes.Matrix4,
                           value: Matrix4.multiplyMatrices(
+                              new Matrix4(
+                                  0.5, 0, 0, 0.5,
+                                  0, 0.5, 0, 0.5,
+                                  0, 0, 0.5, 0.5,
+                                  0, 0, 0, 1
+                              ),
                               spotLight.shadowCamera.projectionMatrix.clone(),
                               spotLight.shadowCamera.viewMatrix.clone()
                           ),
