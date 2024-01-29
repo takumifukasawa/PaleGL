@@ -82,31 +82,41 @@ vec4 applyDirectionalLightShadow(
     vec4 shadowColor,
     float shadowBlendRate
 ) {
+    vec2 poissonDisk[4] = vec2[](
+        vec2(-0.94201624, -0.39906216),
+        vec2(0.94558609, -0.76890725),
+        vec2(-0.094184101, -0.92938870),
+        vec2(0.34495938, 0.29387760)
+    );
+
+    float NoL = max(dot(worldNormal, -lightDirection), 0.);
+    float bias = .005 * tan(acos(NoL));
+    bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    
     vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy;
     float depthFromWorldPos = lightPos.z;
-
-    float readDepth = texture(shadowMap, uv).r;
 
     float shadowAreaRect =
         step(0., uv.x) * (1. - step(1., uv.x)) *
         step(0., uv.y) * (1. - step(1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
-    float NoL = max(dot(worldNormal, -lightDirection), 0.);
-    float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, .0001, .01);
-    
-    // return vec4(vec3(bias * shadowAreaRect * step(0., NoL)), 1.);
-    // return vec4(vec3(bias * NoL), 1.);
-    
-    float isShadow = readDepth < lightPos.z - bias ? 1. : 0.;
+    float visibility = 1.;
 
-    // // for debug
+    for(int i = 0; i < 4; i++) {
+        vec2 offset = poissonDisk[i] / 800.;
+        float readDepth = texture(shadowMap, uv + offset).r;
+        if(readDepth < lightPos.z - bias) {
+            visibility -= .25;
+        }
+    }
+
+    // for debug
     vec3 color = mix(
         vec3(0., 0., 1.),
         vec3(1., 0., 0.),
-        isShadow * shadowAreaRect
+        (1. - visibility) * shadowAreaRect
     );
     return vec4(color, 1.);
 
@@ -117,40 +127,53 @@ vec4 applyDirectionalLightShadow(
 vec4 applySpotLightShadow(
     vec4 surfaceColor,
     vec3 worldPosition,
-    // mat4 shadowMapMatrix,
+    vec3 worldNormal,
+    vec3 lightDirection, // 光源自体の向き
     mat4 lightViewProjectionMatrix,
     sampler2D shadowMap,
-    // vec4 shadowMapUv,
     float shadowBias,
     vec4 shadowColor,
     float shadowBlendRate
 ) {
+    vec2 poissonDisk[4] = vec2[](
+        vec2(-0.94201624, -0.39906216),
+        vec2(0.94558609, -0.76890725),
+        vec2(-0.094184101, -0.92938870),
+        vec2(0.34495938, 0.29387760)
+    );
+
+    // float NoL = max(dot(worldNormal, -lightDirection), 0.);
+    // float bias = .005 * tan(acos(NoL));
+    // bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+
     vec4 lightPos = lightViewProjectionMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
     float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
-
-    vec3 uvc = vec3(uv, depthFromWorldPos + shadowBias);
-
-    // spot light
-    // float readDepth = textureProj(shadowMap, uvc).r;
-
-    // directional light
-    float readDepth = texture(shadowMap, uv).r;
 
     float shadowAreaRect =
         step(0., uv.x) * (1. - step(1., uv.x)) *
         step(0., uv.y) * (1. - step(1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
-    float isShadow = readDepth < (lightPos.z / lightPos.w) ? 1. : 0.;
+    float visibility = 1.;
+
+    for(int i = 0; i < 4; i++) {
+        vec2 offset = poissonDisk[i] / 800.;
+        // spot light
+        vec3 uvc = vec3(uv + offset, depthFromWorldPos + shadowBias);
+        float readDepth = textureProj(shadowMap, uvc).r;
+        if(readDepth < (lightPos.z / lightPos.w)) {
+            visibility -= .25;
+        }
+    }
 
     // for debug
     vec3 color = mix(
         vec3(0., 0., 1.),
         vec3(1., 0., 0.),
-        isShadow
-        // 1. - step(.999, shadow)
+        (1. - visibility) * shadowAreaRect
     );
+    return vec4(color, 1.);
 
     // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
     // return vec4(vec3(shadow * shadowAreaRect), 1.);
@@ -387,30 +410,46 @@ resultColor = vec4(outgoingLight, opacity);
     // vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
     // vec4 shadowMapProjectionUv = uSpotLight[0].LightV * vec4(worldPosition, 1.);
     // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-    resultColor = applyDirectionalLightShadow(
-        resultColor,
-        worldPosition,
-        surface.worldNormal,
-        uDirectionalLight.direction,
-        uDirectionalLight.lightViewProjectionMatrix,
-        uDirectionalLightShadowMap,
-        uShadowBias,
-        vec4(0., 0., 0., 1.),
-        0.5
-    );
+    // resultColor = applyDirectionalLightShadow(
+    //     resultColor,
+    //     worldPosition,
+    //     surface.worldNormal,
+    //     uDirectionalLight.direction,
+    //     uDirectionalLight.lightViewProjectionMatrix,
+    //     uDirectionalLightShadowMap,
+    //     uShadowBias,
+    //     vec4(0., 0., 0., 1.),
+    //     0.5
+    // );
     
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         // TODO: blend rate は light か何かに持たせたい
+        resultColor = applySpotLightShadow(
+            resultColor,
+            worldPosition,
+            surface.worldNormal,
+            uSpotLight[0].direction,
+            uSpotLight[0].lightViewProjectionMatrix,
+            uSpotLightShadowMap[0],
+            // uDirectionalLightShadowMap,
+            uShadowBias,
+            vec4(0., 0., 0., 1.),
+            0.5
+        );
+        // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
         // resultColor = applySpotLightShadow(
         //     resultColor,
         //     worldPosition,
-        //     uSpotLight[i].lightViewProjectionMatrix,
-        //     uSpotLightShadowMap[i],
+        //     surface.worldNormal,
+        //     uSpotLight[1].direction,
+        //     uSpotLight[1].lightViewProjectionMatrix,
+        //     uSpotLightShadowMap[1],
+        //     // uDirectionalLightShadowMap,
         //     uShadowBias,
         //     vec4(0., 0., 0., 1.),
         //     0.5
         // );
-    }
+    // }
 #endif
    
     // for debug

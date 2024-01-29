@@ -294,7 +294,7 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        // depthPrecision: TextureDepthPrecisionType.High
+        depthPrecision: TextureDepthPrecisionType.High
     });
 }
 
@@ -327,7 +327,8 @@ if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = spotLight.distance;
+    //spotLight.shadowCamera.far = spotLight.distance;
+    spotLight.shadowCamera.far = 10;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,
