@@ -129,7 +129,7 @@ vec4 applySpotLightShadow(
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
-    mat4 lightViewProjectionMatrix,
+    mat4 lightViewProjectionTextureMatrix,
     sampler2D shadowMap,
     float shadowBias,
     vec4 shadowColor,
@@ -146,17 +146,14 @@ vec4 applySpotLightShadow(
     float bias = .005 * tan(acos(NoL));
     bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
 
-    vec4 lightPos = lightViewProjectionMatrix * vec4(worldPosition, 1.);
-    vec2 uv = lightPos.xy / lightPos.w * vec2(.5) + vec2(.5);
-    float depthFromWorldPos = (lightPos.z / lightPos.w) * .5 + .5;
-
+    vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
+    vec2 uv = lightPos.xy / lightPos.w;
+    float depthFromWorldPos = lightPos.z / lightPos.w;
+    
     float shadowAreaRect =
-        // step(0., uv.x) * (1. - step(1., uv.x)) *
-        // step(0., uv.y) * (1. - step(1., uv.y)) *
-        // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
-        step(0., lightPos.x / lightPos.w) * (1. - step(1., lightPos.x / lightPos.w)) *
-        step(0., lightPos.y / lightPos.w) * (1. - step(1., lightPos.y / lightPos.w)) *
-        step(0., lightPos.z / lightPos.w) * (1. - step(1., lightPos.z / lightPos.w));
+        step(0., uv.x) * (1. - step(1., uv.x)) *
+        step(0., uv.y) * (1. - step(1., uv.y)) *
+        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
     float visibility = 1.;
 
@@ -173,10 +170,10 @@ vec4 applySpotLightShadow(
     // }
 
     // 1 sample
-    vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
+    // vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
     // float readDepth = textureProj(shadowMap, uvc).r;
-    float readDepth = texture(shadowMap, lightPos.xy / lightPos.w).r;
-    if(readDepth < (lightPos.z / lightPos.w) - bias) {
+    float readDepth = texture(shadowMap, uv).r;
+    if(readDepth < depthFromWorldPos - bias) {
         visibility = 0.;
     }
 
