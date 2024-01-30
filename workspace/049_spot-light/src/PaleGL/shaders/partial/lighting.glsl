@@ -285,7 +285,13 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
 // render equations
 // -------------------------------------------------------------------------------
 
-void RE_Direct(const in IncidentLight directLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
+void RE_Direct(
+    const in IncidentLight directLight,
+    const in GeometricContext geometry,
+    const in Material material,
+    inout ReflectedLight reflectedLight,
+    const in float shadow
+) {
     // directionは光源への方向
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
     vec3 irradiance = dotNL * directLight.color;
@@ -293,6 +299,7 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
     // punctual light
     irradiance *= PI;
     irradiance *= directLight.intensity;
+    irradiance *= 1. - shadow;
 
     // diffuse
     reflectedLight.directDiffuse +=
@@ -311,7 +318,13 @@ void RE_Direct(const in IncidentLight directLight, const in GeometricContext geo
 }
 
 // base: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
-void RE_DirectSkyboxFakeIBL(samplerCube cubeMap, const in IncidentSkyboxLight skyboxLight, const in GeometricContext geometry, const in Material material, inout ReflectedLight reflectedLight) {
+void RE_DirectSkyboxFakeIBL(
+    samplerCube cubeMap,
+    const in IncidentSkyboxLight skyboxLight,
+    const in GeometricContext geometry,
+    const in Material material,
+    inout ReflectedLight reflectedLight
+) {
     //
     // diffuse
     //

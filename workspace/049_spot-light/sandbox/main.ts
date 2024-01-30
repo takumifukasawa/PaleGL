@@ -339,7 +339,7 @@ if (spotLight.shadowCamera) {
     });
 }
 spotLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-5, 9, -2));
+    actor.transform.setTranslation(new Vector3(5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
 spotLight.onUpdate = () => {
@@ -394,8 +394,8 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uDirectionalLightShadowMap',
-        // directionalLight.shadowMap!.read.depthTexture
-        spotLight.shadowMap!.read.depthTexture
+        directionalLight.shadowMap!.read.depthTexture
+        // spotLight.shadowMap!.read.depthTexture
     );
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',
@@ -1991,6 +1991,12 @@ function initDebugger() {
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
 
+    directionalLightDebuggerGroup.addToggleDebugger({
+        label: 'light enabled',
+        initialValue: directionalLight.enabled,
+        onChange: (value) => (directionalLight.enabled = value),
+    });
+    
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2043,6 +2049,12 @@ function initDebugger() {
 
     const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
 
+    spotLightDebuggerGroup.addToggleDebugger({
+        label: 'light enabled',
+        initialValue: spotLight.enabled,
+        onChange: (value) => (spotLight.enabled = value),
+    });
+    
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
         initialValue: spotLight.color.getHexCoord(),
