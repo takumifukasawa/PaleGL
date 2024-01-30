@@ -144,7 +144,7 @@ vec4 applySpotLightShadow(
 
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    bias = clamp(bias, .001, .02); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
 
     vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w;
@@ -158,23 +158,14 @@ vec4 applySpotLightShadow(
     float visibility = 1.;
 
     // PCF
-    // for(int i = 0; i < 4; i++) {
-    //     vec2 offset = poissonDisk[i] / 800.;
-    //     // spot light
-    //     // vec3 uvc = vec3(uv + offset, depthFromWorldPos + shadowBias);
-    //     vec3 uvc = vec3(uv + offset, depthFromWorldPos + .01);
-    //     float readDepth = textureProj(shadowMap, uvc).r;
-    //     if(readDepth < (lightPos.z / lightPos.w)) {
-    //         visibility -= .25;
-    //     }
-    // }
-
-    // 1 sample
     // vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
     // float readDepth = textureProj(shadowMap, uvc).r;
-    float readDepth = texture(shadowMap, uv).r;
-    if(readDepth < depthFromWorldPos - bias) {
-        visibility = 0.;
+    for(int i = 0; i < 4; i++) {
+        vec2 offset = poissonDisk[i] / 800.;
+        float readDepth = texture(shadowMap, uv + offset).r;
+        if(readDepth < depthFromWorldPos - bias) {
+            visibility -= .25;
+        }
     }
 
     // for debug

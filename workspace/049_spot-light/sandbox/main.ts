@@ -316,7 +316,7 @@ captureScene.add(directionalLight);
 const spotLight = new SpotLight({
     intensity: 1,
     color: Color.white,
-    distance: 10,
+    distance: 20,
     attenuation: 0.1,
     coneCos: 0.9,
     penumbraCos: 0.95,
