@@ -73,7 +73,11 @@ void main() {
         shadowCoord.xy = shadowCoord.xy * .5 + .5;
         float shadowZ = shadowPos.z / shadowPos.w;
         float shadowDepth = texture(uSpotLightShadowMap[0], shadowCoord).r;
-        if(shadowDepth > shadowZ) {
+        float isShadowArea = 
+            0. < shadowCoord.x && shadowCoord.x < 1. &&
+            0. < shadowCoord.y && shadowCoord.y < 1. &&
+            0. < shadowZ && shadowZ < 1. ? 1. : 0.;
+        if(isShadowArea < .5 || shadowDepth >= .999 || shadowDepth > shadowZ) {
             fog -= (1. / 64.);
         }
         // if(shadowDepth > 1. - shadowZ) {
