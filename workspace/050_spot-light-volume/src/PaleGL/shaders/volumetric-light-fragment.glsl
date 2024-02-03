@@ -26,24 +26,41 @@ uniform mat4 uInverseViewProjectionMatrix;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform float uBlendRate;
+uniform float uTime;
 
 uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
-uniform float uRayStep;
 uniform float uDensityMultiplier;
+uniform float uRayStep;
+uniform float uRayJitterSizeX;
+uniform float uRayJitterSizeY;
 
 #include ./partial/depth-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
 
+// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float noise(vec2 seed)
+{
+    return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main() {
     vec2 uv = vUv;
+
+    float jitter = noise(uv + uTime) * 2. - 1.;
+
+    vec2 jitterOffset = vec2(
+        jitter * uRayJitterSizeX,
+        jitter * uRayJitterSizeY
+    );
+
     // outColor = vec4(vUv, 1., 1.);
     // outColor = texture(uGBufferATexture, vUv);
     GBufferA gBufferA = DecodeGBufferA(texture(uGBufferATexture, uv));
     // float rawDepth = texture(uSpotLightShadowMap[0], uv).r;
     float rawDepth = texture(uDepthTexture, uv).r;
-   
+
     // geometry
     vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
@@ -53,7 +70,7 @@ void main() {
     vec3 viewDirInWorld = (uInverseViewMatrix * vec4(viewDir, 0.)).xyz;
     // float viewDirInWorldLength = length(viewDirInWorld);
     
-    vec3 rayOrigin = uViewPosition;
+    vec3 rayOrigin = uViewPosition + vec3(jitterOffset, 0.);
     vec3 rayDir = normalize(viewDirInWorld);
 
     vec3 rayPos = vec3(0.);
@@ -81,7 +98,9 @@ void main() {
         // if(isShadowArea < .5 || shadowDepth >= .999 || shadowDepth > shadowZ) {
         if(isShadowArea > .5 && shadowZ < shadowDepth) {
             // fog -= (1. / 64.);
-            transmittance += (1. / 64.);
+            // transmittance += (1. / 64.);
+            float density = uDensityMultiplier;
+            transmittance += exp(-density);
         }
         
         // if(shadowDepth > 1. - shadowZ) {

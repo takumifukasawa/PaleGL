@@ -9,7 +9,9 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 export class VolumetricLightPass extends PostProcessPassBase {
     rayStep: number = 0.5;
     blendRate: number = 1;
-    densityMultiplier: number = 0.1;
+    densityMultiplier: number = 4;
+    rayJitterSizeX: number = 0.2;
+    rayJitterSizeY: number = 0.2;
 
     #spotLights: SpotLight[] = [];
 
@@ -64,6 +66,16 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 },
                 {
                     name: "uDensityMultiplier",
+                    type: UniformTypes.Float,
+                    value: 0
+                },
+                {
+                    name: "uRayJitterSizeX",
+                    type: UniformTypes.Float,
+                    value: 0
+                },
+                {
+                    name: "uRayJitterSizeY",
                     type: UniformTypes.Float,
                     value: 0
                 },
@@ -123,6 +135,9 @@ export class VolumetricLightPass extends PostProcessPassBase {
         
         this.material.uniforms.setValue("uRayStep", this.rayStep);
         this.material.uniforms.setValue("uDensityMultiplier", this.densityMultiplier);
+        this.material.uniforms.setValue("uRayJitterSizeX", this.rayJitterSizeX);
+        this.material.uniforms.setValue("uRayJitterSizeY", this.rayJitterSizeY);
+        
         
         super.render(options);
     }

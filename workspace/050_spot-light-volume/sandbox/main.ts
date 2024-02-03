@@ -2320,10 +2320,30 @@ function initDebugger() {
         label: 'density multiplier',
         initialValue: renderer.volumetricLightPass.densityMultiplier,
         minValue: 0.001,
-        maxValue: 1,
+        maxValue: 10,
         stepValue: 0.001,
         onChange: (value) => {
             renderer.volumetricLightPass.densityMultiplier = value;
+        },
+    });
+    volumetricLightDebuggerGroup.addSliderDebugger({
+        label: 'jitter size x',
+        initialValue: renderer.volumetricLightPass.rayJitterSizeX,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            renderer.volumetricLightPass.rayJitterSizeX = value;
+        },
+    });
+    volumetricLightDebuggerGroup.addSliderDebugger({
+        label: 'jitter size y',
+        initialValue: renderer.volumetricLightPass.rayJitterSizeY,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            renderer.volumetricLightPass.rayJitterSizeY = value;
         },
     });
 
