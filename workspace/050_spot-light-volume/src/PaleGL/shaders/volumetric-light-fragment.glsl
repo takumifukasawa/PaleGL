@@ -65,7 +65,7 @@ void main() {
     
     // outColor = texture(uSpotLightShadowMap[0], vUv);
     // return;
-    
+
     for(int i = 0; i < 64; i++) {
         vec3 rayPos = rayOrigin + rayDir * rayStep;
         vec4 shadowPos = uSpotLight[0].lightViewProjectionMatrix * vec4(rayPos, 1.);
@@ -77,9 +77,13 @@ void main() {
             0. < shadowCoord.x && shadowCoord.x < 1. &&
             0. < shadowCoord.y && shadowCoord.y < 1. &&
             0. < shadowZ && shadowZ < 1. ? 1. : 0.;
-        if(isShadowArea < .5 || shadowDepth >= .999 || shadowDepth > shadowZ) {
-            fog -= (1. / 64.);
+        
+        // if(isShadowArea < .5 || shadowDepth >= .999 || shadowDepth > shadowZ) {
+        if(isShadowArea > .5 && shadowZ < shadowDepth) {
+            // fog -= (1. / 64.);
+            transmittance += (1. / 64.);
         }
+        
         // if(shadowDepth > 1. - shadowZ) {
         //     // float density = uDensityMultiplier;
         //     float density = .01;
@@ -93,11 +97,8 @@ void main() {
     }
     
     transmittance = clamp(transmittance, 0., 1.);
-    fog = clamp(fog, 0., 1.);
+    // fog = clamp(fog, 0., 1.);
    
     outColor = vec4(vec3(transmittance), 1.);
-    outColor = vec4(vec3(fog), 1.);
-
-    // outColor = vec4(viewDirInWorld, 1.);
-    // outColor = vec4(mix(texture(uGBufferATexture, uv).xyz, viewDirInWorld.xyz, .1), 1.);
+    // outColor = vec4(vec3(fog), 1.);
 }
