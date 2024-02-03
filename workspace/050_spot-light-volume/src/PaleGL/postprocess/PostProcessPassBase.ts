@@ -1,6 +1,6 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Material } from '@/PaleGL/materials/Material.ts';
-import {LightActors, Renderer} from '@/PaleGL/core/Renderer.ts';
+import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
@@ -23,7 +23,7 @@ export type PostProcessPassRenderArgs = {
     gBufferRenderTargets?: GBufferRenderTargets | null;
     targetCamera: Camera;
     time: number;
-    lightActors?: LightActors
+    lightActors?: LightActors;
 };
 
 // export interface IPostProcessPass {

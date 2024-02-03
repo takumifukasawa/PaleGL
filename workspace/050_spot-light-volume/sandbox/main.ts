@@ -1996,7 +1996,7 @@ function initDebugger() {
         initialValue: directionalLight.enabled,
         onChange: (value) => (directionalLight.enabled = value),
     });
-    
+
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2047,14 +2047,14 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
+    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', false);
 
     spotLightDebuggerGroup.addToggleDebugger({
         label: 'light enabled',
         initialValue: spotLight.enabled,
         onChange: (value) => (spotLight.enabled = value),
     });
-    
+
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
         initialValue: spotLight.color.getHexCoord(),
@@ -2299,7 +2299,36 @@ function initDebugger() {
     });
 
     //
-    // light shaft
+    // light volume pass
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const volumetricLightDebuggerGroup = debuggerGUI.addGroup('volumetric light', true);
+
+    volumetricLightDebuggerGroup.addSliderDebugger({
+        label: 'ray step',
+        initialValue: renderer.volumetricLightPass.rayStep,
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            renderer.volumetricLightPass.rayStep = value;
+        },
+    });
+    volumetricLightDebuggerGroup.addSliderDebugger({
+        label: 'density multiplier',
+        initialValue: renderer.volumetricLightPass.densityMultiplier,
+        minValue: 0.001,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            renderer.volumetricLightPass.densityMultiplier = value;
+        },
+    });
+
+    //
+    // fog
     //
 
     debuggerGUI.addBorderSpacer();

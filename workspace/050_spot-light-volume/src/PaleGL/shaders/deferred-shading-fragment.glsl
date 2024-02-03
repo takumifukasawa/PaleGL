@@ -472,8 +472,8 @@ resultColor = vec4(outgoingLight, opacity);
 
   
     // for debug
-    outColor = resultColor;
-    return;
+    // outColor = resultColor;
+    // return;
 
     // TODO: aoを考慮したライティング計算
     resultColor.xyz *= aoRate;

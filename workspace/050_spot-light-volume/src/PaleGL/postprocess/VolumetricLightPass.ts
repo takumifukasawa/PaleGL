@@ -7,7 +7,9 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 
 export class VolumetricLightPass extends PostProcessPassBase {
+    rayStep: number = 0.5;
     blendRate: number = 1;
+    densityMultiplier: number = 0.1;
 
     #spotLights: SpotLight[] = [];
 
@@ -30,13 +32,18 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 //     type: UniformTypes.Float,
                 //     value: 1,
                 // },
+                // {
+                //     name: UniformNames.InverseProjectionMatrix,
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
                 {
                     name: 'uSpotLight',
                     type: UniformTypes.StructArray,
                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
                         return [
                             {
-                                name: 'lightViewProjectionMatrix',
+                                name: UniformNames.LightViewProjectionMatrix,
                                 type: UniformTypes.Matrix4,
                                 value: Matrix4.identity,
                             },
@@ -48,6 +55,17 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     name: UniformNames.SpotLightShadowMap,
                     type: UniformTypes.TextureArray,
                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
+                },
+
+                {
+                    name: "uRayStep",
+                    type: UniformTypes.Float,
+                    value: 0
+                },
+                {
+                    name: "uDensityMultiplier",
+                    type: UniformTypes.Float,
+                    value: 0
                 },
 
                 {
@@ -102,7 +120,10 @@ export class VolumetricLightPass extends PostProcessPassBase {
             UniformNames.SpotLightShadowMap,
             this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.depthTexture : null))
         );
-
+        
+        this.material.uniforms.setValue("uRayStep", this.rayStep);
+        this.material.uniforms.setValue("uDensityMultiplier", this.densityMultiplier);
+        
         super.render(options);
     }
 
