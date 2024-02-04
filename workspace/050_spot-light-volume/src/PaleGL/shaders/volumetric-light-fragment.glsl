@@ -116,7 +116,7 @@ void main() {
         vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
         vec3 shadowUv = shadowCoord * .5 + .5;
         float shadowZ = shadowPos.z / shadowPos.w;
-        float shadowDepth = texture(spotLightShadowMap, shadowUv.x).r;
+        float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
         float isShadowArea = 
             step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
             step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
@@ -128,30 +128,25 @@ void main() {
         float lightDistance = length(rayToLight);
         float angleCos = dot(normalize(LtoP), spotLight.direction);
         
-        if(
-            angleCos > spotLight.coneCos &&
-            testLightInRange(lightDistance, spotLight.distance) &&
-            isShadowArea > .5
-        ) {
+        // if(shadowDepth > shadowZ && isShadowArea > .5) {
+        //     transmittance += (1. / 64.);
+        // }
+        
+        
+        if(all(
+            bvec3(
+                angleCos > spotLight.coneCos,
+                testLightInRange(lightDistance, spotLight.distance),
+                shadowDepth > shadowZ
+            // isShadowArea > .5
+            )
+        )) {
             float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
             float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
             transmittance += (1. / 64.) * attenuation * spotEffect;
+            // transmittance += exp(-density);
         }
-        
-        // if(all(
-        //     bvec3(
-        //         angleCos > spotLight.coneCos,
-        //         testLightInRange(lightDistance, spotLight.distance),
-        //         isShadowArea > .5
-        //     )
-        // )) {
-        // } else {
-        //     float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-        //     float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-        //     transmittance += (1. / 64.) * attenuation;
-        //     // transmittance += (1. / 64.) * spotEffect * attenuation;
-        // }
-       
+      
         // for debug: 視錐台範囲
         // if(isShadowArea > .5) {
         //     // fog -= (1. / 64.);
