@@ -45,3 +45,11 @@ export function lerp(a: number, b: number, t: number) {
 export function randomRange(a: number, b: number) {
     return lerp(a, b, Math.random());
 }
+
+export function rad2Deg(rad: number) {
+    return rad * (180 / Math.PI);
+}
+
+export function deg2Rad(deg: number) {
+    return deg * (Math.PI / 180);
+}

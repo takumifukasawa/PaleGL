@@ -329,7 +329,7 @@ if (spotLight.shadowCamera) {
     spotLight.shadowCamera.near = 1;
     spotLight.shadowCamera.far = spotLight.distance;
     // spotLight.shadowCamera.far = 10;
-    (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
+    (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
     spotLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,

@@ -1,11 +1,12 @@
 ﻿import { Light, LightArgs } from '@/PaleGL/actors/Light';
-import { Actor } from '@/PaleGL/actors/Actor';
+import { Actor, ActorUpdateArgs } from '@/PaleGL/actors/Actor';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 import { LightTypes } from '@/PaleGL/constants.ts';
 // import { Material } from '@/PaleGL/materials/Material.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
+import {rad2Deg} from "@/PaleGL/utilities/mathUtilities.ts";
 // import {PerspectiveCamera} from "./PerspectiveCamera";
 // import {Vector3} from "@/PaleGL/math/Vector3";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
@@ -32,7 +33,7 @@ export class SpotLight extends Light {
     attenuation: number;
     coneCos: number;
     penumbraCos: number;
-    
+
     constructor(options: SpotLightArgs) {
         super({ ...options, lightType: LightTypes.Spot });
 
@@ -42,7 +43,7 @@ export class SpotLight extends Light {
         this.shadowCamera.transform.setRotationY(180);
         // TODO: なぜunknownを噛ませる必要がある？
         this.addChild(this.shadowCamera as unknown as Actor);
-        
+
         this.distance = options.distance;
         this.attenuation = options.attenuation;
         this.coneCos = options.coneCos;
@@ -97,4 +98,11 @@ export class SpotLight extends Light {
 
     //     this.applyShadowUniformValues(targetMaterial);
     // }
+
+    update(args: ActorUpdateArgs) {
+        super.update(args);
+        // coneCosは直径、fovは半径なので2倍
+        (this.shadowCamera as PerspectiveCamera).fov = rad2Deg(Math.acos(this.coneCos)) * 2;
+        this.shadowCamera?.updateProjectionMatrix();
+    }
 }

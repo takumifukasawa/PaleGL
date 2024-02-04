@@ -7,9 +7,40 @@ precision highp float;
 // TODO: spot light の最大数はどこかで定数管理したい
 #define MAX_SPOT_LIGHT_COUNT 4
 
+#include ./partial/common.glsl
+// #include ./partial/lighting.glsl
+
+// 
+// TODO: このblock、lighting用の構造体とある程度共通化できそう？
 struct SpotLight {
+    vec3 position;
+    vec3 direction; // spotlightの向き先
+    // vec4 color;
+    float intensity;
+    float distance;
+    float attenuation;
+    float coneCos;
+    float penumbraCos;
     mat4 lightViewProjectionMatrix;
+    // float shadowBias;
 };
+
+// 光源からの光が届くかどうかを判定
+bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
+    return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
+}
+
+// 光源からの減衰率計算
+float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
+    if (attenuationComponent > 0.) {
+        return pow(saturate(-lightDistance / cutoffDistance + 1.), attenuationComponent);
+    }
+
+    return 1.;
+}
+
+// TODO: ここまで
+
 
 in vec2 vUv;
 
@@ -38,12 +69,6 @@ uniform float uRayJitterSizeY;
 #include ./partial/depth-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
-
-// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
-float noise(vec2 seed)
-{
-    return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
-}
 
 void main() {
     vec2 uv = vUv;
@@ -82,27 +107,56 @@ void main() {
     
     // outColor = texture(uSpotLightShadowMap[0], vUv);
     // return;
-
+    
     for(int i = 0; i < 64; i++) {
+        SpotLight spotLight = uSpotLight[0];
+        sampler2D spotLightShadowMap = uSpotLightShadowMap[0];
         vec3 rayPos = rayOrigin + rayDir * rayStep;
-        vec4 shadowPos = uSpotLight[0].lightViewProjectionMatrix * vec4(rayPos, 1.);
-        vec2 shadowCoord = shadowPos.xy / shadowPos.w;
-        shadowCoord.xy = shadowCoord.xy * .5 + .5;
+        vec4 shadowPos = spotLight.lightViewProjectionMatrix * vec4(rayPos, 1.);
+        vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
+        vec3 shadowUv = shadowCoord * .5 + .5;
         float shadowZ = shadowPos.z / shadowPos.w;
-        float shadowDepth = texture(uSpotLightShadowMap[0], shadowCoord).r;
+        float shadowDepth = texture(spotLightShadowMap, shadowUv.x).r;
         float isShadowArea = 
-            0. < shadowCoord.x && shadowCoord.x < 1. &&
-            0. < shadowCoord.y && shadowCoord.y < 1. &&
-            0. < shadowZ && shadowZ < 1. ? 1. : 0.;
+            step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
+            step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
+            step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
+
+        vec3 rayToLight = spotLight.position - rayPos;
+        vec3 PtoL = normalize(rayToLight);
+        vec3 LtoP = -PtoL;
+        float lightDistance = length(rayToLight);
+        float angleCos = dot(normalize(LtoP), spotLight.direction);
         
-        // if(isShadowArea < .5 || shadowDepth >= .999 || shadowDepth > shadowZ) {
-        if(isShadowArea > .5 && shadowZ < shadowDepth) {
-            // fog -= (1. / 64.);
-            // transmittance += (1. / 64.);
-            float density = uDensityMultiplier;
-            transmittance += exp(-density);
+        // if(angleCos > spotLight.coneCos) {
+        if(angleCos > spotLight.coneCos && isShadowArea > .5) {
+        // if(angleCos > spotLight.coneCos) {
+        // if(testLightInRange(lightDistance, spotLight.distance)) {
+            transmittance += (1. / 64.);
         }
         
+        if(all(
+            bvec2(
+                angleCos > spotLight.coneCos,
+                testLightInRange(lightDistance, spotLight.distance)
+            )
+        )) {
+        } else {
+            float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
+            float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+            // transmittance += (1. / 64.) * attenuation;
+            // transmittance += (1. / 64.) * spotEffect * attenuation;
+        }
+       
+        // for debug: 視錐台範囲
+        // if(isShadowArea > .5) {
+        //     // fog -= (1. / 64.);
+        //     // transmittance += (1. / 64.);
+        //     float density = uDensityMultiplier;
+        //     transmittance += exp(-density);
+        // }
+
+        // TODO: これを使いたい
         // if(shadowDepth > 1. - shadowZ) {
         //     // float density = uDensityMultiplier;
         //     float density = .01;
@@ -115,7 +169,7 @@ void main() {
         rayStep += uRayStep;
     }
     
-    transmittance = clamp(transmittance, 0., 1.);
+    transmittance = saturate(transmittance);
     // fog = clamp(fog, 0., 1.);
    
     outColor = vec4(vec3(transmittance), 1.);

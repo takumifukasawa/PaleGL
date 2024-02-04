@@ -8,6 +8,7 @@ precision mediump float;
 // struct
 // -----------------------------------------------------------
 
+#include ./partial/common.glsl
 #include ./partial/lighting.glsl
 
 // #include ./partial/directional-light-struct.glsl
