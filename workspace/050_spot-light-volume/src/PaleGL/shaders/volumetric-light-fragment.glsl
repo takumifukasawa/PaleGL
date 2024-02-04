@@ -128,25 +128,29 @@ void main() {
         float lightDistance = length(rayToLight);
         float angleCos = dot(normalize(LtoP), spotLight.direction);
         
-        // if(angleCos > spotLight.coneCos) {
-        if(angleCos > spotLight.coneCos && isShadowArea > .5) {
-        // if(angleCos > spotLight.coneCos) {
-        // if(testLightInRange(lightDistance, spotLight.distance)) {
-            transmittance += (1. / 64.);
-        }
-        
-        if(all(
-            bvec2(
-                angleCos > spotLight.coneCos,
-                testLightInRange(lightDistance, spotLight.distance)
-            )
-        )) {
-        } else {
+        if(
+            angleCos > spotLight.coneCos &&
+            testLightInRange(lightDistance, spotLight.distance) &&
+            isShadowArea > .5
+        ) {
             float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
             float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-            // transmittance += (1. / 64.) * attenuation;
-            // transmittance += (1. / 64.) * spotEffect * attenuation;
+            transmittance += (1. / 64.) * attenuation * spotEffect;
         }
+        
+        // if(all(
+        //     bvec3(
+        //         angleCos > spotLight.coneCos,
+        //         testLightInRange(lightDistance, spotLight.distance),
+        //         isShadowArea > .5
+        //     )
+        // )) {
+        // } else {
+        //     float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
+        //     float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+        //     transmittance += (1. / 64.) * attenuation;
+        //     // transmittance += (1. / 64.) * spotEffect * attenuation;
+        // }
        
         // for debug: 視錐台範囲
         // if(isShadowArea > .5) {
