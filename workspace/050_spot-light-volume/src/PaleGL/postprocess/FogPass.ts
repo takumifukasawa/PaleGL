@@ -7,6 +7,7 @@ import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constant
 
 export class FogPass extends PostProcessPassBase {
     private static lightShaftTextureUniformName = 'uLightShaftTexture';
+    private static volumetricLightTextureUniformName = 'uVolumetricLightTexture';
 
     fogStrength: number = 0;
     fogDensity = 0.01;
@@ -34,6 +35,11 @@ export class FogPass extends PostProcessPassBase {
                 },
                 {
                     name: FogPass.lightShaftTextureUniformName,
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                {
+                    name: FogPass.volumetricLightTextureUniformName,
                     type: UniformTypes.Texture,
                     value: null,
                 },
@@ -67,8 +73,14 @@ export class FogPass extends PostProcessPassBase {
         this.fogEndHeight = fogEndHeight;
     }
 
+    // TODO: mapの割り当て、renderなりupdateなりで一緒にやった方がいい気がする. 
+    
     setLightShaftMap(rt: RenderTarget) {
         this.material.uniforms.setValue(FogPass.lightShaftTextureUniformName, rt.read.texture);
+    }
+    
+    setVolumetricLightMap(rt: RenderTarget) {
+        this.material.uniforms.setValue(FogPass.volumetricLightTextureUniformName, rt.read.texture);
     }
 
     render(options: PostProcessPassRenderArgs) {

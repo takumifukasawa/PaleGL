@@ -15,6 +15,7 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
+uniform sampler2D uVolumetricLightTexture;
 uniform float uBlendRate;
 uniform sampler2D uDepthTexture;
 uniform mat4 uInverseViewProjectionMatrix;
@@ -73,6 +74,7 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, uv);
     vec4 destColor = sceneColor;
     vec4 lightShaftColor = texture(uLightShaftTexture, uv);
+    vec4 volumetricLightColor = texture(uVolumetricLightTexture, uv);
     // 高ければ高いほど遮蔽されてる
     float occlusion = saturate(lightShaftColor.x);
 
@@ -100,6 +102,7 @@ void main() {
     // TODO: fog->occlusionの方が正しい？
     vec4 applyOcclusionColor = sceneColor * (1. - occlusion);
     outColor = vec4(mix(applyOcclusionColor.xyz, fogColor.xyz, fogRate), 1.);
+    outColor += vec4(volumetricLightColor.xyz, 0.); // TODO: 単純に足す、で良い？
     
     // for debug
     // outColor = sceneColor;

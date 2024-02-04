@@ -755,12 +755,12 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: this._deferredShadingPass.renderTarget,
-            isLastPass: true,
+            isLastPass: false,
             time, // TODO: engineから渡したい
             // lightActors,
         });
         
-        return;
+        // return;
 
         // ------------------------------------------------------------------------------
         // height fog pass
@@ -775,6 +775,7 @@ export class Renderer {
         // });
 
         this._fogPass.setLightShaftMap(this._lightShaftPass.renderTarget);
+        this._fogPass.setVolumetricLightMap(this._volumetricLightPass.renderTarget);
 
         PostProcess.renderPass({
             pass: this._fogPass,
@@ -788,6 +789,8 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
+        
+        // return;
 
         // ------------------------------------------------------------------------------
         // transparent pass

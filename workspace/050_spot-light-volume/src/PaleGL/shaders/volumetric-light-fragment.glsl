@@ -102,11 +102,7 @@ void main() {
     float distane = 0.;
     float rayStep = 0.;
     
-    float transmittance = 0.;
-    float fog = 1.;
-    
-    // outColor = texture(uSpotLightShadowMap[0], vUv);
-    // return;
+    float transmittance = 0.; // fogの透過度
     
     for(int i = 0; i < 64; i++) {
         SpotLight spotLight = uSpotLight[0];
@@ -128,49 +124,23 @@ void main() {
         float lightDistance = length(rayToLight);
         float angleCos = dot(normalize(LtoP), spotLight.direction);
         
-        // if(shadowDepth > shadowZ && isShadowArea > .5) {
-        //     transmittance += (1. / 64.);
-        // }
-        
-        
         if(all(
             bvec3(
                 angleCos > spotLight.coneCos,
                 testLightInRange(lightDistance, spotLight.distance),
-                shadowDepth > shadowZ
-            // isShadowArea > .5
+                shadowDepth > shadowZ // 深度がray.zよりも近い場合は光の影響を受けているとみなす
             )
         )) {
             float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
             float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-            transmittance += (1. / 64.) * attenuation * spotEffect;
-            // transmittance += exp(-density);
+            transmittance += (1. / 64.) * attenuation * spotEffect; // cheap decay
+            // transmittance += exp(-density); // TODO: 指数減衰使いたい
         }
       
-        // for debug: 視錐台範囲
-        // if(isShadowArea > .5) {
-        //     // fog -= (1. / 64.);
-        //     // transmittance += (1. / 64.);
-        //     float density = uDensityMultiplier;
-        //     transmittance += exp(-density);
-        // }
-
-        // TODO: これを使いたい
-        // if(shadowDepth > 1. - shadowZ) {
-        //     // float density = uDensityMultiplier;
-        //     float density = .01;
-        //     transmittance += exp(-density);
-        //     
-        //     // if(transmittance < .01) {
-        //     //     break;
-        //     // }
-        // }
         rayStep += uRayStep;
     }
     
     transmittance = saturate(transmittance);
-    // fog = clamp(fog, 0., 1.);
    
     outColor = vec4(vec3(transmittance), 1.);
-    // outColor = vec4(vec3(fog), 1.);
 }
