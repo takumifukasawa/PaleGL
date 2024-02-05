@@ -34,46 +34,14 @@ struct Skybox {
 // functions
 // -----------------------------------------------------------
 
-// #include ./partial/pseudo-hdr.glsl       
-        
 // #pragma DEPTH_FUNCTIONS
 #include ./partial/depth-functions.glsl
-
-// #include ./partial/env-map-fragment-functions.glsl
-
-// #ifdef USE_RECEIVE_SHADOW
-// vec4 applyShadow(vec4 surfaceColor, sampler2D shadowMap, vec4 shadowMapUv, float shadowBias, vec4 shadowColor, float shadowBlendRate) {
-//     vec3 projectionUv = shadowMapUv.xyz / shadowMapUv.w;
-//     vec4 projectionShadowColor = texture(shadowMap, projectionUv.xy);
-//     float sceneDepth = projectionShadowColor.r;
-//     float depthFromLight = projectionUv.z;
-//     float shadowOccluded = clamp(step(0., depthFromLight - sceneDepth - shadowBias), 0., 1.);
-//     float shadowAreaRect =
-//     step(0., projectionUv.x) * (1. - step(1., projectionUv.x)) *
-//     step(0., projectionUv.y) * (1. - step(1., projectionUv.y)) *
-//     step(0., projectionUv.z) * (1. - step(1., projectionUv.z));
-//     float shadowRate = shadowOccluded * shadowAreaRect;
-//     
-//     vec4 resultColor = vec4(1.);
-//     resultColor.xyz = mix(
-//         surfaceColor.xyz,
-//         mix(surfaceColor.xyz, shadowColor.xyz, shadowBlendRate),
-//         shadowRate
-//     );
-//     resultColor.a = surfaceColor.a;
-//     
-//     return resultColor;
-// }
-// #include ./partial/receive-shadow-fragment-functions.glsl
-// #endif
-// #include ./partial/receive-shadow-fragment-functions.glsl
 
 // ref:
 // https://matcha-choco010.net/2020/04/10/opengl-deferred-spot-light-shadow/
 // https://www.opengl-tutorial.org/jp/intermediate-tutorials/tutorial-16-shadow-mapping/
 
 float calcDirectionalLightShadowAttenuation(
-    // vec4 surfaceColor,
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
@@ -128,7 +96,6 @@ float calcDirectionalLightShadowAttenuation(
 }
 
 float calcSpotLightShadowAttenuation(
-    // vec4 surfaceColor,
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
@@ -370,15 +337,15 @@ void main() {
     //
 
     shadow = calcDirectionalLightShadowAttenuation(
-    // resultColor,
-    worldPosition,
-    surface.worldNormal,
-    uDirectionalLight.direction,
-    uDirectionalLight.lightViewProjectionMatrix,
-    uDirectionalLightShadowMap,
-    uShadowBias,
-    vec4(0., 0., 0., 1.),
-    0.5
+        // resultColor,
+        worldPosition,
+        surface.worldNormal,
+        uDirectionalLight.direction,
+        uDirectionalLight.lightViewProjectionMatrix,
+        uDirectionalLightShadowMap,
+        uShadowBias,
+        vec4(0., 0., 0., 1.),
+        0.5
     );
 
     // directional light
@@ -394,17 +361,17 @@ void main() {
     // spot light
     //
 
+/*    
+    
     // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     // TODO: blend rate は light か何かに持たせたい
     // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
     shadow = calcSpotLightShadowAttenuation(
-        // resultColor,
         worldPosition,
         surface.worldNormal,
         uSpotLight[0].direction,
         uSpotLight[0].lightViewProjectionMatrix,
         uSpotLightShadowMap[0],
-        // uDirectionalLightShadowMap,
         uShadowBias,
         vec4(0., 0., 0., 1.),
         0.5
@@ -438,7 +405,37 @@ void main() {
         getSpotLightIrradiance(spotLight, geometry, directLight);
         RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     }
+    */
+
+    SpotLight spotLight;
     
+    // TODO: blend rate は light か何かに持たせたい
+    // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
+    
+    #pragma UNROLL_START
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+        shadow = calcSpotLightShadowAttenuation(
+            worldPosition,
+            surface.worldNormal,
+            spotLight.direction,
+            spotLight.lightViewProjectionMatrix,
+            uSpotLightShadowMap[UNROLL_i], // constantな必要がある
+            uShadowBias,
+            vec4(0., 0., 0., 1.),
+            .5
+        );
+        spotLight.position = uSpotLight[UNROLL_i].position;
+        spotLight.direction = uSpotLight[UNROLL_i].direction;
+        spotLight.color = uSpotLight[UNROLL_i].color;
+        spotLight.distance = uSpotLight[UNROLL_i].distance;
+        spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
+        spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
+        spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
+        spotLight.intensity = uSpotLight[UNROLL_i].intensity;
+        getSpotLightIrradiance(spotLight, geometry, directLight);
+        RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    }
+    #pragma UNROLL_END
 
     // ambient light
 // TODO: IBL for pbr

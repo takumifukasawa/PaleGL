@@ -680,11 +680,11 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
-            isLastPass: false,
+            isLastPass: true,
             time, // TODO: engineから渡したい
             lightActors,
         });
-        // return;
+        return;
         // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
 
         // ------------------------------------------------------------------------------

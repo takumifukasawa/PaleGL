@@ -31,11 +31,13 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
     };
 };
 
+
+
 /**
  *
  * #pragma BLOCK_***_START ~~ #pragma BLOCK_***_END を block として、その中身を挿入する
  */
-export const transformGlslLayout: () => Plugin = () => {
+const transformGlslLayout: () => Plugin = () => {
     return {
         name: 'transform-glsl-layout',
         enforce: 'pre',
@@ -87,6 +89,55 @@ export const transformGlslLayout: () => Plugin = () => {
     };
 };
 
+
+
+/**
+ *
+ * #pragma UNROLL_START ~~ #pragma UNROLL_END を block として、その中身を挿入する
+ */
+const transformGlslUnroll: () => Plugin = () => {
+    return {
+        name: 'transform-glsl-unroll',
+        enforce: 'pre',
+        async transform(src: string, id: string) {
+            const fileRegex = /\.glsl$/;
+            if (fileRegex.test(id)) {
+                const originalSrc = src;
+                const unrollSrcRegex = /#pragma UNROLL_START([\s\S]*?)#pragma UNROLL_END/g;
+                const unrollSrcMatches = [...src.matchAll(unrollSrcRegex)];
+                // blockを抜き出す
+                for (let i = 0; i < unrollSrcMatches.length; i++) {
+                    // #pragmaの囲い自体を消す
+                    const [unrollMatchContent, unrollContent] = unrollSrcMatches[i];
+                    src = src.replaceAll(unrollMatchContent, unrollContent);
+
+                    // forのブロックを中身だけに置き換え
+                    // 簡易的なfor文検出regexp
+                    const forRegex = new RegExp('for.*?{(.+?)\}', 'g');
+                    const [forMatchContent, forContent] = [...unrollContent.matchAll(forRegex)][0];
+                    src = src.replaceAll(forMatchContent, forContent);
+                   
+                    // ループのindexを置き換え. UNROLL_i を i に置き換える
+                    const indexRegex = new RegExp(`UNROLL_i`, 'g');
+                    src = src.replaceAll(indexRegex, i.toString());
+                }
+                if(unrollSrcMatches.length > 0) {
+                    console.log("=========");
+                    console.log("------ id ------");
+                    console.log(id)
+                    console.log("------ original ------");
+                    console.log(originalSrc)
+                    console.log("------ replaced ------");
+                    console.log(src)
+                    console.log("=========");
+                    return src;
+                }
+            }
+            return src;
+        },
+    };
+}
+
 // ref:
 // https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
@@ -121,6 +172,7 @@ export default defineConfig(({ mode }) => {
                 compress: false,
             }),
             transformGlslLayout(),
+            transformGlslUnroll(),
             shaderMinifierPlugin({
                 minify: isMinifyShader,
                 minifierOptions: {
