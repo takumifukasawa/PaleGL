@@ -1,5 +1,6 @@
+import * as path from 'path';
 import { resolve } from 'path';
-import { defineConfig, Plugin, loadEnv } from 'vite';
+import { defineConfig, loadEnv, Plugin } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -8,7 +9,6 @@ import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
 import { rimraf } from 'rimraf';
-import * as path from 'path';
 // import { minify } from 'terser';
 import { shaderMinifierPlugin } from './vite-shader-minifier-plugin';
 import { createDirectoryAsync } from './node-libs/file-io';
@@ -108,30 +108,39 @@ const transformGlslUnroll: () => Plugin = () => {
                 // blockを抜き出す
                 for (let i = 0; i < unrollSrcMatches.length; i++) {
                     // #pragmaの囲い自体を消す
-                    const [unrollMatchContent, unrollContent] = unrollSrcMatches[i];
-                    src = src.replaceAll(unrollMatchContent, unrollContent);
-
+                    const [needsUnrollBlockContent, needsUnrollContent] = unrollSrcMatches[i];
+                    // const [, needsUnrollContent] = unrollSrcMatches[i];
+                    // src = src.replaceAll(needsUnrollBlockContent, needsUnrollContent);
+                    
                     // forのブロックを中身だけに置き換え
-                    // 簡易的なfor文検出regexp
-                    const forRegex = new RegExp('for.*?{(.+?)\}', 'g');
-                    const [forMatchContent, forContent] = [...unrollContent.matchAll(forRegex)][0];
-                    src = src.replaceAll(forMatchContent, forContent);
-                   
-                    // ループのindexを置き換え. UNROLL_i を i に置き換える
-                    const indexRegex = new RegExp(`UNROLL_i`, 'g');
-                    src = src.replaceAll(indexRegex, i.toString());
+                    const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?\{(.*?)\}', 'g');
+                    let [,forLoopNumStr,forContent] = [...needsUnrollContent.matchAll(forRegex)][0];
+                    // TODO: defineな値の場合はさらに引っ張ってくる
+                    
+                    let unrolledStr = "";
+                    for (let j = 0; j < parseInt(forLoopNumStr); j++) {
+                        // ループのindexを置き換え. UNROLL_i を i に置き換える
+                        const indexRegex = new RegExp(`UNROLL_i`, 'g');
+                        unrolledStr += forContent.replaceAll(indexRegex, j.toString());
+                    }
+                    
+                    console.log(forLoopNumStr)
+
+                    // src = src.replace(needsUnrollBlockContent, unrolledStr);
+                    src = src.replaceAll(needsUnrollBlockContent, unrolledStr);
                 }
                 if(unrollSrcMatches.length > 0) {
                     console.log("=========");
                     console.log("------ id ------");
                     console.log(id)
-                    console.log("------ original ------");
-                    console.log(originalSrc)
-                    console.log("------ replaced ------");
-                    console.log(src)
-                    console.log("=========");
-                    return src;
+                    console.log(unrollSrcMatches.length)
+                    // console.log("------ original ------");
+                    // console.log(originalSrc)
+                    // console.log("------ replaced ------");
+                    // console.log(src)
+                    // console.log("=========");
                 }
+                return src;
             }
             return src;
         },

@@ -411,9 +411,11 @@ void main() {
     
     // TODO: blend rate は light か何かに持たせたい
     // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
+
+    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     
     #pragma UNROLL_START
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    for(int i = 0; i < 4; i++) {
         shadow = calcSpotLightShadowAttenuation(
             worldPosition,
             surface.worldNormal,
