@@ -409,6 +409,10 @@ bufferVisualizerPass.beforeRender = () => {
         'uLightShaftTexture',
         renderer.lightShaftPass.renderTarget.read.texture
     );
+    bufferVisualizerPass.material.uniforms.setValue(
+        'uVolumetricLightTexture',
+        renderer.volumetricLightPass.renderTarget.read.texture
+    );
     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
 };
 
