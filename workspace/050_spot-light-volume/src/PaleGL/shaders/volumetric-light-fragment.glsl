@@ -125,10 +125,11 @@ void main() {
         float angleCos = dot(normalize(LtoP), spotLight.direction);
         
         if(all(
-            bvec3(
+            bvec4(
                 angleCos > spotLight.coneCos,
                 testLightInRange(lightDistance, spotLight.distance),
-                shadowDepth > shadowZ // 深度がray.zよりも近い場合は光の影響を受けているとみなす
+                shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
+                shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
             )
         )) {
             float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);

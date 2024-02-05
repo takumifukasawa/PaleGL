@@ -1495,7 +1495,8 @@ const main = async () => {
             roughness: 0.5,
             // ambientAmount: 0.2,
         }),
-        castShadow: false,
+        // castShadow: false,
+        castShadow: true,
     });
     floorPlaneMesh.onStart = ({ actor }) => {
         const meshActor = actor as Mesh;
