@@ -336,6 +336,12 @@ void main() {
     // directional light
     //
 
+    DirectionalLight directionalLight;
+    directionalLight.direction = uDirectionalLight.direction;
+    directionalLight.color = uDirectionalLight.color;
+    directionalLight.intensity = uDirectionalLight.intensity;
+    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
+
     shadow = calcDirectionalLightShadowAttenuation(
         // resultColor,
         worldPosition,
@@ -348,13 +354,6 @@ void main() {
         0.5
     );
 
-    // directional light
-    // TODO: directional light num
-    DirectionalLight directionalLight;
-    directionalLight.direction = uDirectionalLight.direction;
-    directionalLight.color = uDirectionalLight.color;
-    directionalLight.intensity = uDirectionalLight.intensity;
-    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
 
     //
@@ -412,30 +411,34 @@ void main() {
     // TODO: blend rate は light か何かに持たせたい
     // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
 
-    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-    
     #pragma UNROLL_START
-    for(int i = 0; i < 4; i++) {
-        shadow = calcSpotLightShadowAttenuation(
-            worldPosition,
-            surface.worldNormal,
-            spotLight.direction,
-            spotLight.lightViewProjectionMatrix,
-            uSpotLightShadowMap[UNROLL_i], // constantな必要がある
-            uShadowBias,
-            vec4(0., 0., 0., 1.),
-            .5
-        );
-        spotLight.position = uSpotLight[UNROLL_i].position;
-        spotLight.direction = uSpotLight[UNROLL_i].direction;
-        spotLight.color = uSpotLight[UNROLL_i].color;
-        spotLight.distance = uSpotLight[UNROLL_i].distance;
-        spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
-        spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
-        spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
-        spotLight.intensity = uSpotLight[UNROLL_i].intensity;
-        getSpotLightIrradiance(spotLight, geometry, directLight);
-        RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+        if(uSpotLight[UNROLL_i].intensity > 0.) {
+            spotLight.position = uSpotLight[UNROLL_i].position;
+            spotLight.direction = uSpotLight[UNROLL_i].direction;
+            spotLight.color = uSpotLight[UNROLL_i].color;
+            spotLight.distance = uSpotLight[UNROLL_i].distance;
+            spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
+            spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
+            spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
+            spotLight.intensity = uSpotLight[UNROLL_i].intensity;
+            spotLight.lightViewProjectionMatrix = uSpotLight[UNROLL_i].lightViewProjectionMatrix;
+            
+            getSpotLightIrradiance(spotLight, geometry, directLight);
+
+            shadow = calcSpotLightShadowAttenuation(
+                worldPosition,
+                surface.worldNormal,
+                spotLight.direction,
+                spotLight.lightViewProjectionMatrix,
+                uSpotLightShadowMap[UNROLL_i], // constantな必要がある
+                uShadowBias,
+                vec4(0., 0., 0., 1.),
+                .5
+            );
+            
+            RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+        }
     }
     #pragma UNROLL_END
 

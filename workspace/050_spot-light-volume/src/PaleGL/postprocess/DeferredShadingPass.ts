@@ -211,8 +211,6 @@ export class DeferredShadingPass extends PostProcessPassBase {
             // },
         ];
 
-        console.log(uniforms);
-
         super({
             gpu,
             name: 'DeferredShadingPass',
@@ -223,7 +221,6 @@ export class DeferredShadingPass extends PostProcessPassBase {
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
-        console.log(deferredShadingFragmentShader)
     }
 
     updateSkyboxUniforms(skybox: Skybox) {

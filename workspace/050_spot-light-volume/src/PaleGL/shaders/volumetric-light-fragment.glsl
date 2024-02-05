@@ -5,7 +5,7 @@ precision highp float;
 #pragma DEFINES
 
 // TODO: spot light の最大数はどこかで定数管理したい
-#define MAX_SPOT_LIGHT_COUNT 4
+#define MAX_SPOT_LIGHT_COUNT 1
 
 #include ./partial/common.glsl
 // #include ./partial/lighting.glsl
@@ -82,7 +82,8 @@ void main() {
 
     // outColor = vec4(vUv, 1., 1.);
     // outColor = texture(uGBufferATexture, vUv);
-    GBufferA gBufferA = DecodeGBufferA(texture(uGBufferATexture, uv));
+    // GBufferA gBufferA = DecodeGBufferA(texture(uGBufferATexture, uv));
+    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
     // float rawDepth = texture(uSpotLightShadowMap[0], uv).r;
     float rawDepth = texture(uDepthTexture, uv).r;
 
@@ -106,13 +107,13 @@ void main() {
     
     for(int i = 0; i < 64; i++) {
         SpotLight spotLight = uSpotLight[0];
-        sampler2D spotLightShadowMap = uSpotLightShadowMap[0];
+        // sampler2D spotLightShadowMap = ;
         vec3 rayPos = rayOrigin + rayDir * rayStep;
         vec4 shadowPos = spotLight.lightViewProjectionMatrix * vec4(rayPos, 1.);
         vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
         vec3 shadowUv = shadowCoord * .5 + .5;
         float shadowZ = shadowPos.z / shadowPos.w;
-        float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
+        float shadowDepth = texture(uSpotLightShadowMap[0], shadowUv.xy).r;
         float isShadowArea = 
             step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
             step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *

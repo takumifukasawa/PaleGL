@@ -31,8 +31,6 @@ export const deleteTmpCachesPlugin: () => Plugin = () => {
     };
 };
 
-
-
 /**
  *
  * #pragma BLOCK_***_START ~~ #pragma BLOCK_***_END を block として、その中身を挿入する
@@ -46,7 +44,7 @@ const transformGlslLayout: () => Plugin = () => {
             if (fileRegex.test(id)) {
                 const blockSrcRegex = /#pragma BLOCK_([A-Z_]*?)_START([\s\S]*?)#pragma BLOCK_[A-Z_]*?_END/g;
                 const blockSrcMatches = [...src.matchAll(blockSrcRegex)];
-                
+
                 // for debug
                 // const originalSrc = src;
                 // console.log(`[transform-glsl-layout] target - id: ${id}`);
@@ -54,11 +52,11 @@ const transformGlslLayout: () => Plugin = () => {
                 // console.log(originalSrc)
                 // console.log("---------------------------------")
                 // console.log(blockSrcMatches)
-                
+
                 for (let i = 0; i < blockSrcMatches.length; i++) {
                     const [matchContent, blockName, blockContent] = blockSrcMatches[i];
                     const blockDestRegex = new RegExp(`#pragma BLOCK_${blockName}`, 'g');
-                        
+
                     // for debug
                     // console.log("---------------------------------")
                     // console.log("matchContent: ", matchContent);
@@ -68,28 +66,26 @@ const transformGlslLayout: () => Plugin = () => {
                     // console.log([...src.matchAll(blockDestRegex)]);
                     // console.log("---------------------------------")
                     // console.log("match block content: ", src.match(new RegExp(blockContent, 'g')));
-              
+
                     // blockの囲い含めすべて消す
-                    src = src.replaceAll(matchContent, "");
+                    src = src.replaceAll(matchContent, '');
                     // 消した後、block内の記述を挿入（置き換え）
                     src = src.replaceAll(blockDestRegex, blockContent);
                 }
-                
+
                 // for debug
                 // console.log("---------------------------------")
                 // console.log("original src: ------------------------------")
                 // console.log(originalSrc)
                 // console.log("result: ------------------------------")
                 // console.log(src)
-                
+
                 return src;
             }
             return src;
         },
     };
 };
-
-
 
 /**
  *
@@ -102,7 +98,6 @@ const transformGlslUnroll: () => Plugin = () => {
         async transform(src: string, id: string) {
             const fileRegex = /\.glsl$/;
             if (fileRegex.test(id)) {
-                const originalSrc = src;
                 const unrollSrcRegex = /#pragma UNROLL_START([\s\S]*?)#pragma UNROLL_END/g;
                 const unrollSrcMatches = [...src.matchAll(unrollSrcRegex)];
                 // blockを抜き出す
@@ -111,41 +106,52 @@ const transformGlslUnroll: () => Plugin = () => {
                     const [needsUnrollBlockContent, needsUnrollContent] = unrollSrcMatches[i];
                     // const [, needsUnrollContent] = unrollSrcMatches[i];
                     // src = src.replaceAll(needsUnrollBlockContent, needsUnrollContent);
-                    
+
                     // forのブロックを中身だけに置き換え
-                    const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?\{(.*?)\}', 'g');
-                    let [,forLoopNumStr,forContent] = [...needsUnrollContent.matchAll(forRegex)][0];
-                    // TODO: defineな値の場合はさらに引っ張ってくる
-                    
-                    let unrolledStr = "";
-                    for (let j = 0; j < parseInt(forLoopNumStr); j++) {
+                    // const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*?)}', 'g');
+                    const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*)}', 'g');
+                    const forMatches = [...needsUnrollContent.matchAll(forRegex)];
+                    if (forMatches.length < 1) {
+                        console.error(`[transform-glsl-unroll] specify unroll but for loop not found: ${id}`);
+                        continue;
+                    }
+
+                    // unrollの中はfor文が一つだけという前提
+                    let [, forLoopNumStr, forContent] = forMatches[0];
+
+                    // 固定値の場合はそのまま使い、#define で定義されている場合はdefineの値をシェーダー内から拾ってくる
+                    let loopCount = parseInt(forLoopNumStr);
+                    if (isNaN(loopCount)) {
+                        const defineRegex = new RegExp(`#define\\s+?${forLoopNumStr}\\s+?(\\d+)`, 'g');
+                        const defineMatches = [...src.matchAll(defineRegex)];
+                        if (defineMatches.length > 0) {
+                            loopCount = parseInt(defineMatches[0][1]);
+                            // for debug
+                            // console.log(`[transform-glsl-unroll] loop count is defined: ${forLoopNumStr} = ${loopCount}`);
+                        } else {
+                            console.error(`[transform-glsl-unroll] loop count is not defined: ${forLoopNumStr}`);
+                        }
+                    } else {
+                        // for debug
+                        // console.log(`[transform-glsl-unroll] loop count is specified: ${forLoopNumStr} = ${loopCount}`);
+                    }
+
+                    let unrolledStr = '';
+                    for (let j = 0; j < loopCount; j++) {
                         // ループのindexを置き換え. UNROLL_i を i に置き換える
                         const indexRegex = new RegExp(`UNROLL_i`, 'g');
                         unrolledStr += forContent.replaceAll(indexRegex, j.toString());
                     }
-                    
-                    console.log(forLoopNumStr)
 
-                    // src = src.replace(needsUnrollBlockContent, unrolledStr);
                     src = src.replaceAll(needsUnrollBlockContent, unrolledStr);
                 }
-                if(unrollSrcMatches.length > 0) {
-                    console.log("=========");
-                    console.log("------ id ------");
-                    console.log(id)
-                    console.log(unrollSrcMatches.length)
-                    // console.log("------ original ------");
-                    // console.log(originalSrc)
-                    // console.log("------ replaced ------");
-                    // console.log(src)
-                    // console.log("=========");
-                }
+
                 return src;
             }
             return src;
         },
     };
-}
+};
 
 // ref:
 // https://ja.vitejs.dev/config/
