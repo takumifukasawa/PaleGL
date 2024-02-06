@@ -211,6 +211,33 @@ uniform Skybox uSkybox;
         
 layout (location = 0) out vec4 outColor;
 
+// void spotLightTerm(SpotLight spotLight) {
+//     spotLight.position = uSpotLight[UNROLL_i].position;
+//     spotLight.direction = uSpotLight[UNROLL_i].direction;
+//     spotLight.color = uSpotLight[UNROLL_i].color;
+//     spotLight.distance = uSpotLight[UNROLL_i].distance;
+//     spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
+//     spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
+//     spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
+//     spotLight.intensity = uSpotLight[UNROLL_i].intensity;
+//     spotLight.lightViewProjectionMatrix = uSpotLight[UNROLL_i].lightViewProjectionMatrix;
+// 
+//     getSpotLightIrradiance(spotLight, geometry, directLight);
+// 
+//     shadow = calcSpotLightShadowAttenuation(
+//     worldPosition,
+//     surface.worldNormal,
+//     spotLight.direction,
+//     spotLight.lightViewProjectionMatrix,
+//     uSpotLightShadowMap[UNROLL_i], // constantな必要がある
+//     uShadowBias,
+//     vec4(0., 0., 0., 1.),
+//     .5
+//     );
+// 
+//     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+// }
+
 void main() {
     float eps = .0001;
 
@@ -409,36 +436,20 @@ void main() {
     SpotLight spotLight;
     
     // TODO: blend rate は light か何かに持たせたい
-    // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
-
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-        if(uSpotLight[UNROLL_i].intensity > 0.) {
-            spotLight.position = uSpotLight[UNROLL_i].position;
-            spotLight.direction = uSpotLight[UNROLL_i].direction;
-            spotLight.color = uSpotLight[UNROLL_i].color;
-            spotLight.distance = uSpotLight[UNROLL_i].distance;
-            spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
-            spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
-            spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
-            spotLight.intensity = uSpotLight[UNROLL_i].intensity;
-            spotLight.lightViewProjectionMatrix = uSpotLight[UNROLL_i].lightViewProjectionMatrix;
-            
-            getSpotLightIrradiance(spotLight, geometry, directLight);
-
-            shadow = calcSpotLightShadowAttenuation(
-                worldPosition,
-                surface.worldNormal,
-                spotLight.direction,
-                spotLight.lightViewProjectionMatrix,
-                uSpotLightShadowMap[UNROLL_i], // constantな必要がある
-                uShadowBias,
-                vec4(0., 0., 0., 1.),
-                .5
-            );
-            
-            RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-        }
+        getSpotLightIrradiance(uSpotLight[UNROLL_i], geometry, directLight);
+        shadow = calcSpotLightShadowAttenuation(
+            worldPosition,
+            surface.worldNormal,
+            uSpotLight[UNROLL_i].direction,
+            uSpotLight[UNROLL_i].lightViewProjectionMatrix,
+            uSpotLightShadowMap[UNROLL_i], // constantな必要がある
+            uShadowBias,
+            vec4(0., 0., 0., 1.),
+            .5
+        );
+        RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     }
     #pragma UNROLL_END
 
