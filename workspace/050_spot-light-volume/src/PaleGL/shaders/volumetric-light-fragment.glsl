@@ -3,9 +3,11 @@
 precision highp float;
 
 #pragma DEFINES
+#include ./defines-light.glsl
+#define MARCH_COUNT 64
 
 // TODO: spot light の最大数はどこかで定数管理したい
-#define MAX_SPOT_LIGHT_COUNT 1
+// #define MAX_SPOT_LIGHT_COUNT 1
 
 #include ./partial/common.glsl
 // #include ./partial/lighting.glsl
@@ -70,6 +72,50 @@ uniform float uRayJitterSizeY;
 
 #include ./partial/gbuffer-functions.glsl
 
+void calcTransmittance(
+    SpotLight spotLight,
+    sampler2D spotLightShadowMap,
+    vec3 rayOrigin,
+    vec3 rayDir,
+    inout float rayStep,
+    inout float transmittance
+) {
+    // SpotLight spotLight = uSpotLight[0];
+    vec3 rayPos = rayOrigin + rayDir * rayStep;
+    vec4 shadowPos = spotLight.lightViewProjectionMatrix * vec4(rayPos, 1.);
+    vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
+    vec3 shadowUv = shadowCoord * .5 + .5;
+    float shadowZ = shadowPos.z / shadowPos.w;
+    // float shadowDepth = texture(uSpotLightShadowMap[0], shadowUv.xy).r;
+    float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
+    float isShadowArea =
+    step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
+    step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
+    step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
+
+    vec3 rayToLight = spotLight.position - rayPos;
+    vec3 PtoL = normalize(rayToLight);
+    vec3 LtoP = -PtoL;
+    float lightDistance = length(rayToLight);
+    float angleCos = dot(normalize(LtoP), spotLight.direction);
+
+    if(all(
+        bvec4(
+            angleCos > spotLight.coneCos,
+            testLightInRange(lightDistance, spotLight.distance),
+            shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
+            shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
+        )
+    )) {
+        float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
+        float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+        transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
+        // transmittance += exp(-density); // TODO: 指数減衰使いたい
+    }
+
+    rayStep += uRayStep;
+}
+
 void main() {
     vec2 uv = vUv;
 
@@ -104,43 +150,21 @@ void main() {
     float rayStep = 0.;
     
     float transmittance = 0.; // fogの透過度
-    
-    for(int i = 0; i < 64; i++) {
-        SpotLight spotLight = uSpotLight[0];
-        // sampler2D spotLightShadowMap = ;
-        vec3 rayPos = rayOrigin + rayDir * rayStep;
-        vec4 shadowPos = spotLight.lightViewProjectionMatrix * vec4(rayPos, 1.);
-        vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
-        vec3 shadowUv = shadowCoord * .5 + .5;
-        float shadowZ = shadowPos.z / shadowPos.w;
-        float shadowDepth = texture(uSpotLightShadowMap[0], shadowUv.xy).r;
-        float isShadowArea = 
-            step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
-            step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
-            step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
-
-        vec3 rayToLight = spotLight.position - rayPos;
-        vec3 PtoL = normalize(rayToLight);
-        vec3 LtoP = -PtoL;
-        float lightDistance = length(rayToLight);
-        float angleCos = dot(normalize(LtoP), spotLight.direction);
-        
-        if(all(
-            bvec4(
-                angleCos > spotLight.coneCos,
-                testLightInRange(lightDistance, spotLight.distance),
-                shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
-                shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
-            )
-        )) {
-            float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-            float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-            transmittance += (1. / 64.) * attenuation * spotEffect; // cheap decay
-            // transmittance += exp(-density); // TODO: 指数減衰使いたい
+   
+    #pragma UNROLL_START
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+        for(int j = 0; j < MARCH_COUNT; j++) {
+            calcTransmittance(
+                uSpotLight[UNROLL_i],
+                uSpotLightShadowMap[UNROLL_i],
+                rayOrigin,
+                rayDir,
+                rayStep,
+                transmittance
+            );
         }
-      
-        rayStep += uRayStep;
     }
+    #pragma UNROLL_END
     
     transmittance = saturate(transmittance);
    

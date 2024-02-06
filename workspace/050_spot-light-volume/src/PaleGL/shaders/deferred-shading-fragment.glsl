@@ -3,6 +3,7 @@
 precision mediump float;
 
 #pragma DEFINES
+#include ./defines-light.glsl
 
 // -----------------------------------------------------------
 // struct
