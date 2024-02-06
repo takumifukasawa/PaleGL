@@ -1,5 +1,5 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { MAX_SPOT_LIGHT_COUNT, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
@@ -221,6 +221,8 @@ export class DeferredShadingPass extends PostProcessPassBase {
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
+        
+        // console.log(deferredShadingFragmentShader)
     }
 
     updateSkyboxUniforms(skybox: Skybox) {
@@ -251,5 +253,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: skybox.cubeMap.maxLodLevel,
             },
         ]);
+    }
+    
+    render(args: PostProcessPassRenderArgs) {
+        super.render(args)
+        // console.log(this.material.uniforms)
     }
 }

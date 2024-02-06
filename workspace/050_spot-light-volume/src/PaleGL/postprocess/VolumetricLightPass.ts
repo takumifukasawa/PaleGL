@@ -5,7 +5,8 @@ import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postpro
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import {Vector3} from "@/PaleGL/math/Vector3.ts";
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Color } from '@/PaleGL/math/Color.ts';
 
 export class VolumetricLightPass extends PostProcessPassBase {
     rayStep: number = 0.5;
@@ -47,6 +48,16 @@ export class VolumetricLightPass extends PostProcessPassBase {
                         // TODO: spot light の uniform構造体、関数でまとめて作成して共通化したい
                         return [
                             {
+                                name: UniformNames.LightColor,
+                                type: UniformTypes.Color,
+                                value: Color.black,
+                            },
+                            {
+                                name: UniformNames.LightIntensity,
+                                type: UniformTypes.Float,
+                                value: 0,
+                            },
+                            {
                                 name: UniformNames.LightViewProjectionMatrix,
                                 type: UniformTypes.Matrix4,
                                 value: Matrix4.identity,
@@ -54,32 +65,32 @@ export class VolumetricLightPass extends PostProcessPassBase {
                             {
                                 name: UniformNames.LightPosition,
                                 type: UniformTypes.Vector3,
-                                value: Vector3.zero
+                                value: Vector3.zero,
                             },
                             {
                                 name: UniformNames.LightDirection,
                                 type: UniformTypes.Vector3,
-                                value: Vector3.zero
+                                value: Vector3.zero,
                             },
                             {
                                 name: UniformNames.LightDistance,
                                 type: UniformTypes.Float,
-                                value: 0
+                                value: 0,
                             },
                             {
                                 name: UniformNames.LightAttenuation,
                                 type: UniformTypes.Float,
-                                value: 0
+                                value: 0,
                             },
                             {
                                 name: UniformNames.LightConeCos,
                                 type: UniformTypes.Float,
-                                value: 0
+                                value: 0,
                             },
                             {
                                 name: UniformNames.LightPenumbraCos,
                                 type: UniformTypes.Float,
-                                value: 0
+                                value: 0,
                             },
                         ];
                     }),
@@ -92,24 +103,24 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 },
 
                 {
-                    name: "uRayStep",
+                    name: 'uRayStep',
                     type: UniformTypes.Float,
-                    value: 0
+                    value: 0,
                 },
                 {
-                    name: "uDensityMultiplier",
+                    name: 'uDensityMultiplier',
                     type: UniformTypes.Float,
-                    value: 0
+                    value: 0,
                 },
                 {
-                    name: "uRayJitterSizeX",
+                    name: 'uRayJitterSizeX',
                     type: UniformTypes.Float,
-                    value: 0
+                    value: 0,
                 },
                 {
-                    name: "uRayJitterSizeY",
+                    name: 'uRayJitterSizeY',
                     type: UniformTypes.Float,
-                    value: 0
+                    value: 0,
                 },
 
                 {
@@ -130,6 +141,8 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 },
             ],
         });
+        
+        // console.log(fragmentShader)
     }
 
     /**
@@ -155,6 +168,16 @@ export class VolumetricLightPass extends PostProcessPassBase {
             this.#spotLights.map((spotLight) => [
                 // TODO: spot light の uniform構造体、関数でまとめて更新したい
                 {
+                    name: UniformNames.LightColor,
+                    type: UniformTypes.Color,
+                    value: spotLight.color,
+                },
+                {
+                    name: UniformNames.LightIntensity,
+                    type: UniformTypes.Float,
+                    value: spotLight.intensity,
+                },
+                {
                     name: UniformNames.LightViewProjectionMatrix,
                     type: UniformTypes.Matrix4,
                     value: spotLight.shadowCamera!.viewProjectionMatrix, // TODO: ある前提なのは本当はよくない
@@ -162,12 +185,12 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 {
                     name: UniformNames.LightPosition,
                     type: UniformTypes.Vector3,
-                        value: spotLight.transform.position
+                    value: spotLight.transform.position,
                 },
                 {
                     name: UniformNames.LightDirection,
                     type: UniformTypes.Vector3,
-                    value: spotLight.transform.worldForward.clone()
+                    value: spotLight.transform.worldForward.clone(),
                 },
                 {
                     name: UniformNames.LightDistance,
@@ -195,12 +218,13 @@ export class VolumetricLightPass extends PostProcessPassBase {
             UniformNames.SpotLightShadowMap,
             this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.depthTexture : null))
         );
-        
-        this.material.uniforms.setValue("uRayStep", this.rayStep);
-        this.material.uniforms.setValue("uDensityMultiplier", this.densityMultiplier);
-        this.material.uniforms.setValue("uRayJitterSizeX", this.rayJitterSizeX);
-        this.material.uniforms.setValue("uRayJitterSizeY", this.rayJitterSizeY);
-        
+        console.log(this.material.uniforms)
+
+        this.material.uniforms.setValue('uRayStep', this.rayStep);
+        this.material.uniforms.setValue('uDensityMultiplier', this.densityMultiplier);
+        this.material.uniforms.setValue('uRayJitterSizeX', this.rayJitterSizeX);
+        this.material.uniforms.setValue('uRayJitterSizeY', this.rayJitterSizeY);
+
         super.render(options);
     }
 

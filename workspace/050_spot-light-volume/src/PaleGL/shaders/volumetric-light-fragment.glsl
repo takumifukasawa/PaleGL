@@ -17,7 +17,7 @@ precision highp float;
 struct SpotLight {
     vec3 position;
     vec3 direction; // spotlightの向き先
-    // vec4 color;
+    vec4 color;
     float intensity;
     float distance;
     float attenuation;
@@ -77,8 +77,8 @@ void calcTransmittance(
     sampler2D spotLightShadowMap,
     vec3 rayOrigin,
     vec3 rayDir,
-    inout float rayStep,
-    inout float transmittance
+    out float rayStep,
+    out float transmittance
 ) {
     // SpotLight spotLight = uSpotLight[0];
     vec3 rayPos = rayOrigin + rayDir * rayStep;
@@ -89,9 +89,9 @@ void calcTransmittance(
     // float shadowDepth = texture(uSpotLightShadowMap[0], shadowUv.xy).r;
     float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
     float isShadowArea =
-    step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
-    step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
-    step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
+        step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
+        step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
+        step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
 
     vec3 rayToLight = spotLight.position - rayPos;
     vec3 PtoL = normalize(rayToLight);
@@ -146,13 +146,16 @@ void main() {
     vec3 rayDir = normalize(viewDirInWorld);
 
     vec3 rayPos = vec3(0.);
-    float distane = 0.;
+    // float distane = 0.;
     float rayStep = 0.;
-    
+
+    vec4 accColor = vec4(vec3(0.), 1.);
     float transmittance = 0.; // fogの透過度
    
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+        rayStep = 0.;
+        transmittance = 0.;
         for(int j = 0; j < MARCH_COUNT; j++) {
             calcTransmittance(
                 uSpotLight[UNROLL_i],
@@ -163,10 +166,15 @@ void main() {
                 transmittance
             );
         }
+        // TODO: intensityそのままかけるのよくない気がする
+        transmittance = saturate(transmittance * uSpotLight[UNROLL_i].intensity);
+        accColor.xyz += transmittance * saturate(uSpotLight[UNROLL_i].color.xyz);
     }
     #pragma UNROLL_END
     
-    transmittance = saturate(transmittance);
+    // transmittance = saturate(transmittance);
+    accColor = saturate(accColor);
    
-    outColor = vec4(vec3(transmittance), 1.);
+    // outColor = vec4(vec3(transmittance), 1.);
+    outColor = accColor;
 }

@@ -124,6 +124,118 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 // console.log(phongVert);
 // console.log('----------------');
 
+
+const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
+    debuggerGUI.addBorderSpacer();
+
+    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, true);
+
+    spotLightDebuggerGroup.addToggleDebugger({
+        label: 'light enabled',
+        initialValue: spotLight.enabled,
+        onChange: (value) => (spotLight.enabled = value),
+    });
+
+    spotLightDebuggerGroup.addColorDebugger({
+        label: 'color',
+        initialValue: spotLight.color.getHexCoord(),
+        onChange: (value) => {
+            spotLight.color = Color.fromHex(value);
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'intensity',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.intensity,
+        onChange: (value) => {
+            spotLight.intensity = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'distance',
+        minValue: 0,
+        maxValue: 100,
+        stepValue: 0.01,
+        initialValue: spotLight.distance,
+        onChange: (value) => {
+            spotLight.distance = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'attenuation',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.attenuation,
+        onChange: (value) => {
+            spotLight.attenuation = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'coneCos',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: spotLight.coneCos,
+        onChange: (value) => {
+            spotLight.coneCos = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'penumbraCos',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: spotLight.penumbraCos,
+        onChange: (value) => {
+            spotLight.penumbraCos = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos x',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.x,
+        onChange: (value) => {
+            spotLight.transform.position.x = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos y',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.y,
+        onChange: (value) => {
+            spotLight.transform.position.y = value;
+        },
+    });
+
+    spotLightDebuggerGroup.addSliderDebugger({
+        label: 'pos z',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: spotLight.transform.position.z,
+        onChange: (value) => {
+            spotLight.transform.position.z = value;
+        },
+    });
+
+}
+
+
+
 const stylesText = `
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -273,7 +385,8 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
-    intensity: 1.2,
+    // intensity: 1.2,
+    intensity: 0,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
@@ -313,7 +426,7 @@ directionalLight.onStart = ({ actor }) => {
 };
 captureScene.add(directionalLight);
 
-const spotLight = new SpotLight({
+const spotLight1 = new SpotLight({
     intensity: 1,
     color: Color.white,
     distance: 20,
@@ -323,14 +436,14 @@ const spotLight = new SpotLight({
 });
 // spotLight.enabled = false;
 
-if (spotLight.shadowCamera) {
-    spotLight.shadowCamera.visibleFrustum = true;
-    spotLight.castShadow = true;
-    spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = spotLight.distance;
+if (spotLight1.shadowCamera) {
+    spotLight1.shadowCamera.visibleFrustum = true;
+    spotLight1.castShadow = true;
+    spotLight1.shadowCamera.near = 1;
+    spotLight1.shadowCamera.far = spotLight1.distance;
     // spotLight.shadowCamera.far = 10;
-    (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
-    spotLight.shadowMap = new RenderTarget({
+    (spotLight1.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
+    spotLight1.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
         height: 1024,
@@ -338,17 +451,45 @@ if (spotLight.shadowCamera) {
         // depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight.onStart = ({ actor }) => {
+spotLight1.onStart = ({ actor }) => {
     actor.transform.setTranslation(new Vector3(5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
-spotLight.onUpdate = () => {
-    spotLight.shadowCamera!.far = spotLight.distance;
-    spotLight.shadowCamera!.updateProjectionMatrix();
-    // console.log(spotLight.transform.worldForward);
+
+captureScene.add(spotLight1);
+
+const spotLight2 = new SpotLight({
+    intensity: 1,
+    color: Color.white,
+    distance: 20,
+    attenuation: 0.1,
+    coneCos: 0.9,
+    penumbraCos: 0.95,
+});
+// spotLight.enabled = false;
+
+if (spotLight2.shadowCamera) {
+    spotLight2.shadowCamera.visibleFrustum = true;
+    spotLight2.castShadow = true;
+    spotLight2.shadowCamera.near = 1;
+    spotLight2.shadowCamera.far = spotLight2.distance;
+    // spotLight.shadowCamera.far = 10;
+    (spotLight2.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
+    spotLight2.shadowMap = new RenderTarget({
+        gpu,
+        width: 1024,
+        height: 1024,
+        type: RenderTargetTypes.Depth,
+        // depthPrecision: TextureDepthPrecisionType.High,
+    });
+}
+spotLight2.onStart = ({ actor }) => {
+    actor.transform.setTranslation(new Vector3(-5, 9, -2));
+    actor.transform.lookAt(new Vector3(0, 0, 0));
 };
 
-captureScene.add(spotLight);
+captureScene.add(spotLight2);
+
 
 const cameraPostProcess = new PostProcess();
 // const scenePostProcess = renderer.scenePostProcess;
@@ -2050,111 +2191,8 @@ function initDebugger() {
     // spot light
     //
 
-    debuggerGUI.addBorderSpacer();
-
-    const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', false);
-
-    spotLightDebuggerGroup.addToggleDebugger({
-        label: 'light enabled',
-        initialValue: spotLight.enabled,
-        onChange: (value) => (spotLight.enabled = value),
-    });
-
-    spotLightDebuggerGroup.addColorDebugger({
-        label: 'color',
-        initialValue: spotLight.color.getHexCoord(),
-        onChange: (value) => {
-            spotLight.color = Color.fromHex(value);
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'intensity',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: spotLight.intensity,
-        onChange: (value) => {
-            spotLight.intensity = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'distance',
-        minValue: 0,
-        maxValue: 100,
-        stepValue: 0.01,
-        initialValue: spotLight.distance,
-        onChange: (value) => {
-            spotLight.distance = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'attenuation',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: spotLight.attenuation,
-        onChange: (value) => {
-            spotLight.attenuation = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'coneCos',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: spotLight.coneCos,
-        onChange: (value) => {
-            spotLight.coneCos = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'penumbraCos',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: spotLight.penumbraCos,
-        onChange: (value) => {
-            spotLight.penumbraCos = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'pos x',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: spotLight.transform.position.x,
-        onChange: (value) => {
-            spotLight.transform.position.x = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'pos y',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: spotLight.transform.position.y,
-        onChange: (value) => {
-            spotLight.transform.position.y = value;
-        },
-    });
-
-    spotLightDebuggerGroup.addSliderDebugger({
-        label: 'pos z',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: spotLight.transform.position.z,
-        onChange: (value) => {
-            spotLight.transform.position.z = value;
-        },
-    });
+    createSpotLightDebugger(spotLight1, 'spot light 1');
+    createSpotLightDebugger(spotLight2, 'spot light 2');
 
     //
     // ssao
@@ -2309,7 +2347,7 @@ function initDebugger() {
 
     debuggerGUI.addBorderSpacer();
 
-    const volumetricLightDebuggerGroup = debuggerGUI.addGroup('volumetric light', true);
+    const volumetricLightDebuggerGroup = debuggerGUI.addGroup('volumetric light', false);
 
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'ray step',

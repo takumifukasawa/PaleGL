@@ -103,6 +103,7 @@ export class SpotLight extends Light {
         super.update(args);
         // coneCosは直径、fovは半径なので2倍
         (this.shadowCamera as PerspectiveCamera).fov = rad2Deg(Math.acos(this.coneCos)) * 2;
+        (this.shadowCamera as PerspectiveCamera).far = this.distance;
         this.shadowCamera?.updateProjectionMatrix();
     }
 }

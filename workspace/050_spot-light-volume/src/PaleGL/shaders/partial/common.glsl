@@ -1,5 +1,5 @@
 
-#define saturate(x) min(1., max(0., x))
+#define saturate(a) clamp(a, 0., 1.)
 
 // #define PI 3.14159265359
 // #define PI2 6.28318530718
