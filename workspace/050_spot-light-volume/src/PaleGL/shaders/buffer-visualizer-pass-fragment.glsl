@@ -2,6 +2,8 @@
 
 precision highp float;
 
+#include ./defines-light.glsl
+
 in vec2 vUv;
 
 out vec4 outColor;
@@ -12,6 +14,7 @@ uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
 uniform sampler2D uGBufferDTexture;
 uniform sampler2D uDirectionalLightShadowMap;
+uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uAmbientOcclusionTexture;
 uniform sampler2D uDeferredShadingTexture;
 uniform sampler2D uLightShaftTexture;
@@ -46,12 +49,18 @@ void main() {
     vec2 depthUV = vUv * tiling + vec2(0., -2.);
     vec2 worldPositionUV = vUv * tiling + vec2(-1., -2.);
     vec2 directionalLightShadowMapUV = vUv * tiling + vec2(-2., -2.);
-    vec2 aoUV = vUv * tiling + vec2(-3., -2.);
+    vec2 spotLight1ShadowMapUV = vUv * tiling * vec2(2.) + vec2(-6., -5.);
+    vec2 spotLight2ShadowMapUV = vUv * tiling * vec2(2.) + vec2(-7., -5.);
+    vec2 spotLight3ShadowMapUV = vUv * tiling * vec2(2.) + vec2(-6., -4.);
+    vec2 spotLight4ShadowMapUV = vUv * tiling * vec2(2.) + vec2(-7., -4.);
     // row: 2
-    vec2 deferredShadingUV = vUv * tiling + vec2(0., -1.);
-    vec2 lightShaftUV = vUv * tiling + vec2(-1., -1.);
-    vec2 volumetricLightUV = vUv * tiling + vec2(-2., -1.);
-    vec2 fogUV = vUv * tiling + vec2(-3., -1.);
+    vec2 aoUV = vUv * tiling + vec2(0., -1.);
+    vec2 deferredShadingUV = vUv * tiling + vec2(-1., -1.);
+    vec2 lightShaftUV = vUv * tiling + vec2(-2., -1.);
+    vec2 volumetricLightUV = vUv * tiling + vec2(-3., -1.);
+    // row: 3
+    vec2 fogUV = vUv * tiling + vec2(0., 0.);
+    
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUV);
@@ -75,6 +84,10 @@ void main() {
     );
 
     vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUV) * isArea(directionalLightShadowMapUV);
+    vec4 spotLight1ShadowMapColor = texture(uSpotLightShadowMap[0], spotLight1ShadowMapUV) * isArea(spotLight1ShadowMapUV);
+    vec4 spotLight2ShadowMapColor = texture(uSpotLightShadowMap[1], spotLight2ShadowMapUV) * isArea(spotLight2ShadowMapUV);
+    vec4 spotLight3ShadowMapColor = texture(uSpotLightShadowMap[2], spotLight3ShadowMapUV) * isArea(spotLight3ShadowMapUV);
+    vec4 spotLight4ShadowMapColor = texture(uSpotLightShadowMap[3], spotLight4ShadowMapUV) * isArea(spotLight4ShadowMapUV);
     vec4 aoColor = texture(uAmbientOcclusionTexture, aoUV) * isArea(aoUV);
     vec4 deferredShadingColor = texture(uDeferredShadingTexture, deferredShadingUV);
     vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUV);
@@ -99,6 +112,10 @@ void main() {
         // gBufferC +
         sceneDepth +
         directionalShadowMapColor +
+        spotLight1ShadowMapColor +
+        spotLight2ShadowMapColor +
+        spotLight3ShadowMapColor +
+        spotLight4ShadowMapColor +
         vec4(worldPosition, 1.) * isArea(worldPositionUV) +
         aoColor +
         vec4(deferredShadingColor.rgb, 1.) * isArea(deferredShadingUV) +

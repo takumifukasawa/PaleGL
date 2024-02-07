@@ -56,6 +56,11 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     value: null,
                 },
                 {
+                    name: 'uSpotLightShadowMap',
+                    type: UniformTypes.TextureArray,
+                    value: []
+                },
+                {
                     name: 'uAmbientOcclusionTexture',
                     type: UniformTypes.Texture,
                     value: null,

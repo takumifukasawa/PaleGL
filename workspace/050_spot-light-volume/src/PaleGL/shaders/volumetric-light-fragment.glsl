@@ -151,7 +151,8 @@ void main() {
 
     vec4 accColor = vec4(vec3(0.), 1.);
     float transmittance = 0.; // fogの透過度
-   
+  
+    // TODO: marchの中でspot light ごとの情報まとめられる
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         rayStep = 0.;

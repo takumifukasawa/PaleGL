@@ -84,8 +84,11 @@ export class Uniforms {
      * @param name
      * @param newValue
      */
-    setValue(name: string, newValue: UniformValue) {
+    setValue(name: string, newValue: UniformValue, log: boolean = false) {
         const data = this.find(name);
+        if(log) {
+            console.log(name, newValue, data);
+        }
         // | UniformStructValue
         // | UniformStructArrayValue
         if (data) {

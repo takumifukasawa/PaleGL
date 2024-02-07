@@ -47,6 +47,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
                         // TODO: spot light の uniform構造体、関数でまとめて作成して共通化したい
                         return [
+                            // TODO: spot light の uniform構造体、関数でまとめて更新したい
                             {
                                 name: UniformNames.LightColor,
                                 type: UniformTypes.Color,
@@ -60,7 +61,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
                             {
                                 name: UniformNames.LightViewProjectionMatrix,
                                 type: UniformTypes.Matrix4,
-                                value: Matrix4.identity,
+                                value: Matrix4.identity, // TODO: ある前提なのは本当はよくない
                             },
                             {
                                 name: UniformNames.LightPosition,
@@ -141,8 +142,8 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 },
             ],
         });
-        
-        // console.log(fragmentShader)
+
+        console.log(fragmentShader);
     }
 
     /**
@@ -213,12 +214,13 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     value: spotLight.penumbraCos,
                 },
             ])
+            // true
         );
+
         this.material.uniforms.setValue(
             UniformNames.SpotLightShadowMap,
             this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.depthTexture : null))
         );
-        console.log(this.material.uniforms)
 
         this.material.uniforms.setValue('uRayStep', this.rayStep);
         this.material.uniforms.setValue('uDensityMultiplier', this.densityMultiplier);

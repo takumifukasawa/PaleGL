@@ -319,12 +319,22 @@ export class GPU {
                     activeTextureIndex++;
                     break;
                 case UniformTypes.TextureArray:
+                    // (value as Texture[]).forEach((texture) => {
+                    //     gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                    //     gl.bindTexture(gl.TEXTURE_2D, texture ? texture.glObject : this.dummyTexture.glObject);
+                    //     gl.uniform1i(location, activeTextureIndex);
+                    //     activeTextureIndex++;
+                    // });
+
+                    const textureArrayIndices: number[] = [];
                     (value as Texture[]).forEach((texture) => {
+                        textureArrayIndices.push(activeTextureIndex);
                         gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
                         gl.bindTexture(gl.TEXTURE_2D, texture ? texture.glObject : this.dummyTexture.glObject);
-                        gl.uniform1i(location, activeTextureIndex);
                         activeTextureIndex++;
                     });
+                    gl.uniform1iv(location, textureArrayIndices);
+
                     break;
                 case UniformTypes.CubeMap:
                     // TODO: valueのguardなくて大丈夫なはず

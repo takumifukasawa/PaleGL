@@ -448,7 +448,7 @@ if (spotLight1.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        // depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TextureDepthPrecisionType.High,
     });
 }
 spotLight1.onStart = ({ actor }) => {
@@ -480,7 +480,7 @@ if (spotLight2.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        // depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TextureDepthPrecisionType.High,
     });
 }
 spotLight2.onStart = ({ actor }) => {
@@ -538,6 +538,16 @@ bufferVisualizerPass.beforeRender = () => {
         directionalLight.shadowMap!.read.depthTexture
         // spotLight.shadowMap!.read.depthTexture
     );
+    bufferVisualizerPass.material.uniforms.setValue(
+        'uSpotLightShadowMap',
+        [
+            spotLight1.shadowMap!.read.depthTexture,
+            spotLight2.shadowMap!.read.depthTexture,
+            null,
+            null
+        ]
+    );
+    // console.log(bufferVisualizerPass.material.uniforms);
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',
         renderer.ambientOcclusionPass.renderTarget.read.texture
