@@ -142,8 +142,6 @@ export class VolumetricLightPass extends PostProcessPassBase {
                 },
             ],
         });
-
-        console.log(fragmentShader);
     }
 
     /**

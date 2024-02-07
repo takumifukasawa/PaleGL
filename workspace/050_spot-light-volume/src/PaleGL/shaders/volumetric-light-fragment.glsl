@@ -54,7 +54,9 @@ uniform vec3 uViewPosition;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform mat4 uTransposeInverseViewMatrix;
+uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uViewProjectionMatrix;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
@@ -72,7 +74,7 @@ uniform float uRayJitterSizeY;
 
 #include ./partial/gbuffer-functions.glsl
 
-void calcTransmittance(
+float calcTransmittance(
     SpotLight spotLight,
     sampler2D spotLightShadowMap,
     vec3 rayOrigin,
@@ -109,12 +111,17 @@ void calcTransmittance(
     )) {
         float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
         float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-        transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
+        // transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
+        transmittance += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
         // transmittance += exp(-density); // TODO: 指数減衰使いたい
     }
 
     rayStep += uRayStep;
+    
+    return 0.;
 }
+
+void f() {}
 
 void main() {
     vec2 uv = vUv;
@@ -141,7 +148,8 @@ void main() {
     
     vec3 viewDirInWorld = (uInverseViewMatrix * vec4(viewDir, 0.)).xyz;
     // float viewDirInWorldLength = length(viewDirInWorld);
-    
+   
+    // ワールド座標系でカメラの位置からレイを飛ばす
     vec3 rayOrigin = uViewPosition + vec3(jitterOffset, 0.);
     vec3 rayDir = normalize(viewDirInWorld);
 
@@ -152,23 +160,30 @@ void main() {
     vec4 accColor = vec4(vec3(0.), 1.);
     float transmittance = 0.; // fogの透過度
 
-    vec3[MAX_SPOT_LIGHT_COUNT] rayPosArray;
+    // vec3[MAX_SPOT_LIGHT_COUNT] rayPosArray;
     float[MAX_SPOT_LIGHT_COUNT] rayStepArray;
-    vec4[MAX_SPOT_LIGHT_COUNT] accColorArray;
+    // vec4[MAX_SPOT_LIGHT_COUNT] accColorArray;
     float[MAX_SPOT_LIGHT_COUNT] transmittanceArray;
+
+    vec3 rayPosInWorld;
+    vec4 rayPosInView;
+    float viewZFromDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
     
-    // TODO: marchの中でspot light ごとの情報まとめられる
     for(int i = 0; i < MARCH_COUNT; i++) {
         #pragma UNROLL_START
         for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
-            calcTransmittance(
-                uSpotLight[UNROLL_j],
-                uSpotLightShadowMap[UNROLL_j],
-                rayOrigin,
-                rayDir,
-                rayStepArray[UNROLL_j],
-                transmittanceArray[UNROLL_j]
-            );
+            rayPosInWorld = rayOrigin + rayDir * rayStepArray[UNROLL_j];
+            rayPosInView = uViewMatrix * vec4(rayPosInWorld, 1.);
+            if(abs(rayPosInView.z) < viewZFromDepth) {
+                calcTransmittance(
+                    uSpotLight[UNROLL_j],
+                    uSpotLightShadowMap[UNROLL_j],
+                    rayOrigin,
+                    rayDir,
+                    rayStepArray[UNROLL_j],
+                    transmittanceArray[UNROLL_j]
+                );
+            }
         }
         #pragma UNROLL_END
     }
@@ -176,8 +191,10 @@ void main() {
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         // TODO: intensityそのままかけるのよくない気がする
-        transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
-        accColor.xyz += transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
+        // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
+        accColor.xyz +=
+            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
+            transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
     }
     #pragma UNROLL_END
    
