@@ -145,35 +145,44 @@ void main() {
     vec3 rayOrigin = uViewPosition + vec3(jitterOffset, 0.);
     vec3 rayDir = normalize(viewDirInWorld);
 
-    vec3 rayPos = vec3(0.);
+    // vec3 rayPos = vec3(0.);
     // float distane = 0.;
     float rayStep = 0.;
 
     vec4 accColor = vec4(vec3(0.), 1.);
     float transmittance = 0.; // fogの透過度
-  
+
+    vec3[MAX_SPOT_LIGHT_COUNT] rayPosArray;
+    float[MAX_SPOT_LIGHT_COUNT] rayStepArray;
+    vec4[MAX_SPOT_LIGHT_COUNT] accColorArray;
+    float[MAX_SPOT_LIGHT_COUNT] transmittanceArray;
+    
     // TODO: marchの中でspot light ごとの情報まとめられる
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-        rayStep = 0.;
-        transmittance = 0.;
-        for(int j = 0; j < MARCH_COUNT; j++) {
+    for(int i = 0; i < MARCH_COUNT; i++) {
+        #pragma UNROLL_START
+        for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
             calcTransmittance(
-                uSpotLight[UNROLL_i],
-                uSpotLightShadowMap[UNROLL_i],
+                uSpotLight[UNROLL_j],
+                uSpotLightShadowMap[UNROLL_j],
                 rayOrigin,
                 rayDir,
-                rayStep,
-                transmittance
+                rayStepArray[UNROLL_j],
+                transmittanceArray[UNROLL_j]
             );
         }
+        #pragma UNROLL_END
+    }
+
+    #pragma UNROLL_START
+    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         // TODO: intensityそのままかけるのよくない気がする
-        transmittance = saturate(transmittance * uSpotLight[UNROLL_i].intensity);
-        accColor.xyz += transmittance * saturate(uSpotLight[UNROLL_i].color.xyz);
+        transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
+        accColor.xyz += transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
     }
     #pragma UNROLL_END
-    
+   
     // transmittance = saturate(transmittance);
+    // TODO: rgba255でclampしちゃって大丈夫？光の漏れは考慮しない？
     accColor = saturate(accColor);
    
     // outColor = vec4(vec3(transmittance), 1.);

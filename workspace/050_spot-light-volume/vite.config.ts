@@ -90,6 +90,11 @@ const transformGlslLayout: () => Plugin = () => {
 /**
  *
  * #pragma UNROLL_START ~~ #pragma UNROLL_END を block として、その中身を挿入する
+ * # 仕様
+ * - 固定値 or definesを探す
+ * - indexは0始まり
+ * - unrollの中はfor文章一つという前提
+ * - 2重ループは非対応。ただし、内側のループに対してのunrollは有効
  */
 const transformGlslUnroll: () => Plugin = () => {
     return {
@@ -109,15 +114,16 @@ const transformGlslUnroll: () => Plugin = () => {
 
                     // forのブロックを中身だけに置き換え
                     // const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*?)}', 'g');
-                    const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*)}', 'g');
+                    const forRegex = new RegExp('for.*?\\(int\\s([a-zA-Z0-9]+?).+?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*)}', 'g');
                     const forMatches = [...needsUnrollContent.matchAll(forRegex)];
                     if (forMatches.length < 1) {
                         console.error(`[transform-glsl-unroll] specify unroll but for loop not found: ${id}`);
                         continue;
                     }
-
+                    
                     // unrollの中はfor文が一つだけという前提
-                    let [, forLoopNumStr, forContent] = forMatches[0];
+                    let [, forIterateName, forLoopNumStr, forContent] = forMatches[0];
+                    // console.log(forIterateName, forLoopNumStr, forContent)
 
                     // 固定値の場合はそのまま使い、#define で定義されている場合はdefineの値をシェーダー内から拾ってくる
                     let loopCount = parseInt(forLoopNumStr);
@@ -139,7 +145,7 @@ const transformGlslUnroll: () => Plugin = () => {
                     let unrolledStr = '';
                     for (let j = 0; j < loopCount; j++) {
                         // ループのindexを置き換え. UNROLL_i を i に置き換える
-                        const indexRegex = new RegExp(`UNROLL_i`, 'g');
+                        const indexRegex = new RegExp(`UNROLL_${forIterateName}`, 'g');
                         unrolledStr += forContent.replaceAll(indexRegex, j.toString());
                     }
 
