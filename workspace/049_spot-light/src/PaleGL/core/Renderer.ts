@@ -68,37 +68,13 @@ function applyShadowUniformValues(targetMaterial: Material, light: Light) {
             0, 0, 0.5, 0.5,
             0, 0, 0, 1
         );
-        light.shadowCamera.updateProjectionMatrix()
-        
         light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
             textureMatrix,
             light.shadowCamera.projectionMatrix.clone(),
             light.shadowCamera.viewMatrix.clone()
         );
-        const shadowMapInverseViewProjectionMatrix = Matrix4.multiplyMatrices(
-            light.shadowCamera.projectionMatrix.clone(),
-            light.shadowCamera.viewMatrix.clone()
-        ).invert();
-        // console.log("=================")
-        // light.shadowCamera.transform.worldMatrix.log()
-        // light.shadowCamera.transform.worldMatrix.clone().invert().log()
-        // light.shadowCamera.viewMatrix.log();
         targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
         targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
-        targetMaterial.uniforms.setValue(UniformNames.ShadowMapTextureMatrix, textureMatrix);
-        targetMaterial.uniforms.setValue("uShadowCameraViewMatrix", light.shadowCamera.viewMatrix);
-        targetMaterial.uniforms.setValue("uShadowCameraProjectionMatrix", light.shadowCamera.projectionMatrix);
-        // targetMaterial.uniforms.setValue("uShadowMapProjectionMatrix", light.shadowCamera.projectionMatrix);
-        targetMaterial.uniforms.setValue("uShadowMapInverseViewProjectionMatrix", shadowMapInverseViewProjectionMatrix);
-        // targetMaterial.uniforms.setValue("uShadowMapInverseViewProjectionMatrix", light.shadowCamera.projectionMatrix.clone().invert());
-        targetMaterial.uniforms.setValue(
-            "uShadowCameraNearClip",
-            light.shadowCamera.near
-        );
-        targetMaterial.uniforms.setValue(
-            "uShadowCameraFarClip",
-            light.shadowCamera.far
-        );
     }
 }
 
@@ -113,8 +89,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
                 // pattern1: そのまま渡す
                 // value: light.transform.position,
                 // pattern2: normalizeしてから渡す
-                // value: lightActors.directionalLight.transform.position.clone().normalize(),
-                value: lightActors.directionalLight.transform.worldPosition.clone().normalize(),
+                value: lightActors.directionalLight.transform.position.clone().normalize(),
             },
             {
                 name: UniformNames.LightIntensity,
@@ -137,7 +112,7 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
             {
                 name: UniformNames.LightPosition,
                 type: UniformTypes.Vector3,
-                value: spotLight.transform.worldPosition,
+                value: spotLight.transform.position,
             },
             {
                 name: UniformNames.LightDirection,
@@ -966,8 +941,8 @@ export class Renderer {
      * @private
      */
     private shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
-        console.log("--------- shadow pass ---------");
-        
+        // console.log("--------- shadow pass ---------");
+
         castShadowLightActors.forEach((lightActor) => {
             if (!lightActor.shadowMap) {
                 throw 'invalid shadow pass';
@@ -977,7 +952,6 @@ export class Renderer {
                 throw 'invalid shadow camera';
                 // return;
             }
-            
             this.setRenderTarget(lightActor.shadowMap.write, false, true);
             // this.clear(0, 0, 0, 1);
             // this.gpu.clearDepth(0, 0, 0, 1);
@@ -993,7 +967,7 @@ export class Renderer {
                 if (!targetMaterial) {
                     throw 'invalid target material';
                 }
-                
+
                 // 先頭でガードしてるので shadow camera はあるはず。
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
