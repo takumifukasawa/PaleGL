@@ -24,7 +24,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { createCubeMap } from '@/PaleGL/loaders/loadCubeMap.ts';
-import {Uniforms, UniformStructArrayValue, UniformStructValue, UniformValue} from '@/PaleGL/core/Uniforms.ts';
+import { Uniforms, UniformStructArrayValue, UniformStructValue, UniformValue } from '@/PaleGL/core/Uniforms.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
@@ -314,14 +314,17 @@ export class GPU {
                     break;
                 case UniformTypes.Texture:
                     gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
-                    // if (value != null) {
-                    //     gl.bindTexture(gl.TEXTURE_2D, (value as Texture).glObject);
-                    // } else {
-                    //     gl.bindTexture(gl.TEXTURE_2D, this.dummyTexture.glObject);
-                    // }
                     gl.bindTexture(gl.TEXTURE_2D, value ? (value as Texture).glObject : this.dummyTexture.glObject);
                     gl.uniform1i(location, activeTextureIndex);
                     activeTextureIndex++;
+                    break;
+                case UniformTypes.TextureArray:
+                    (value as Texture[]).forEach((texture) => {
+                        gl.activeTexture(gl.TEXTURE0 + activeTextureIndex);
+                        gl.bindTexture(gl.TEXTURE_2D, texture ? texture.glObject : this.dummyTexture.glObject);
+                        gl.uniform1i(location, activeTextureIndex);
+                        activeTextureIndex++;
+                    });
                     break;
                 case UniformTypes.CubeMap:
                     // TODO: valueのguardなくて大丈夫なはず
@@ -350,24 +353,16 @@ export class GPU {
                     const uniformStructValue = uniformData.value as UniformStructValue;
                     uniformStructValue.forEach((structData) => {
                         const uniformName = `${uniformData.name}.${structData.name}`;
-                        setUniformValueInternal(
-                            structData.type,
-                            uniformName,
-                            structData.value
-                        );
+                        setUniformValueInternal(structData.type, uniformName, structData.value);
                     });
                 } else if (uniformData.type === UniformTypes.StructArray) {
                     (uniformData.value as UniformStructArrayValue).forEach((uniformStructValue, i) => {
                         uniformStructValue.forEach((structData) => {
                             const uniformName = `${uniformData.name}[${i}].${structData.name}`;
                             // console.log(structData.type, uniformName, structData.value)
-                            setUniformValueInternal(
-                                structData.type,
-                                uniformName,
-                                structData.value
-                            );
+                            setUniformValueInternal(structData.type, uniformName, structData.value);
                         });
-                    })
+                    });
                 } else {
                     setUniformValueInternal(uniformData.type, uniformData.name, uniformData.value);
                 }

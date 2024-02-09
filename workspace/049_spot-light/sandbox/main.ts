@@ -82,6 +82,7 @@ import {
     AttributeUsageType,
     UniformNames,
     FaceSide,
+    TextureDepthPrecisionType,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -108,12 +109,12 @@ import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 // import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-// import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
+import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
 import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
+// import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
+// import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -281,18 +282,19 @@ const directionalLight = new DirectionalLight({
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = false;
+    directionalLight.shadowCamera.visibleFrustum = true;
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 30;
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
+    directionalLight.shadowCamera.far = 15;
+    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        depthPrecision: TextureDepthPrecisionType.High,
     });
 }
 
@@ -314,7 +316,7 @@ captureScene.add(directionalLight);
 const spotLight = new SpotLight({
     intensity: 1,
     color: Color.white,
-    distance: 30,
+    distance: 20,
     attenuation: 0.1,
     coneCos: 0.9,
     penumbraCos: 0.95,
@@ -325,24 +327,26 @@ if (spotLight.shadowCamera) {
     spotLight.shadowCamera.visibleFrustum = true;
     spotLight.castShadow = true;
     spotLight.shadowCamera.near = 1;
-    spotLight.shadowCamera.far = 30;
+    spotLight.shadowCamera.far = spotLight.distance;
+    // spotLight.shadowCamera.far = 10;
     (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1);
     spotLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
+        // depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-
 spotLight.onStart = ({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-5, 9, -2));
+    actor.transform.setTranslation(new Vector3(5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 };
-
-// spotLight.onUpdate = () => {
-//     console.log(spotLight.shadowCamera)
-// }
+spotLight.onUpdate = () => {
+    spotLight.shadowCamera!.far = spotLight.distance;
+    spotLight.shadowCamera!.updateProjectionMatrix();
+    // console.log(spotLight.transform.worldForward);
+};
 
 captureScene.add(spotLight);
 
@@ -390,8 +394,8 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uDirectionalLightShadowMap',
-        // directionalLight.shadowMap!.read.depthTexture
-        spotLight.shadowMap!.read.depthTexture
+        directionalLight.shadowMap!.read.depthTexture
+        // spotLight.shadowMap!.read.depthTexture
     );
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',
@@ -1259,8 +1263,8 @@ const main = async () => {
     const skyboxMesh = new Skybox({
         gpu,
         cubeMap,
-        diffuseIntensity: .2,
-        specularIntensity: .2,
+        diffuseIntensity: 0.2,
+        specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
 
@@ -1299,9 +1303,9 @@ const main = async () => {
             // diffuseColor: new Color(1, .05, .05, 1),
             // metallic: 0,
             // roughness: .3
-            diffuseColor: new Color(1, 1., 1., 1),
+            diffuseColor: new Color(1, 1, 1, 1),
             metallic: 1,
-            roughness: 1.
+            roughness: 1,
         })
     );
     testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
@@ -1310,18 +1314,31 @@ const main = async () => {
     // local raymarch mesh
     //
 
-    objectSpaceRaymarchMesh = new Mesh({
-        geometry: new BoxGeometry({ gpu }),
-        material: new ObjectSpaceRaymarchMaterial({
+    // objectSpaceRaymarchMesh = new Mesh({
+    //     geometry: new BoxGeometry({ gpu }),
+    //     material: new ObjectSpaceRaymarchMaterial({
+    //         fragmentShader: litObjectSpaceRaymarchFrag,
+    //         depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
+    //         // primitiveType: PrimitiveTypes.Triangles,
+    //         metallic: 0,
+    //         roughness: 0,
+    //         receiveShadow: false
+    //     }),
+    //     castShadow: true,
+    // });
+
+    objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
+        gpu,
+        materialArgs: {
             fragmentShader: litObjectSpaceRaymarchFrag,
             depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-            // primitiveType: PrimitiveTypes.Triangles,
             metallic: 0,
             roughness: 0,
-            receiveShadow: false
-        }),
+            receiveShadow: false,
+        },
         castShadow: true,
     });
+
     // objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
     //     gpu,
     //     fragmentShader: litObjectSpaceRaymarchFrag,
@@ -1336,16 +1353,27 @@ const main = async () => {
     //     }),
     //     castShadow: true,
     // });
-    objectSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
-    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 2, 0);
-    objectSpaceRaymarchMesh.onUpdate = () => {
-        objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uBoundsScale', objectSpaceRaymarchMesh.transform.scale);
-        objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-            'uBoundsScale',
-            objectSpaceRaymarchMesh.transform.scale
-        );
-        // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
-    };
+    objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
+    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
+    // objectSpaceRaymarchMesh.onUpdate = () => {
+    //     objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
+    //         objectSpaceRaymarchMesh.transform.scale
+    //     );
+    //     objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
+    //         objectSpaceRaymarchMesh.transform.scale
+    //     );
+    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //     //     "uNearClip",
+    //     //     directionalLight.shadowCamera!.near
+    //     // );
+    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
+    //     //     "uFarClip",
+    //     //     directionalLight.shadowCamera!.far
+    //     // );
+    //     // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
+    // };
     // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
     //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
     // }
@@ -1361,16 +1389,16 @@ const main = async () => {
     });
     screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
     screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
-    screenSpaceRaymarchMesh.onUpdate = () => {
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-            UniformNames.ViewDirection,
-            captureSceneCamera.getWorldForward()
-        );
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
-        screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
-    };
+    //screenSpaceRaymarchMesh.onUpdate = () => {
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
+    //        UniformNames.ViewDirection,
+    //        captureSceneCamera.getWorldForward()
+    //    );
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
+    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
+    //};
 
     //
     // text mesh
@@ -1751,6 +1779,8 @@ void main() {
         orbitCameraController.altitudeSpeed = 100;
         orbitCameraController.deltaAzimuthPower = 2;
         orbitCameraController.deltaAltitudePower = 2;
+        orbitCameraController.maxAltitude = 70;
+        orbitCameraController.minAltitude = -70;
         orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
@@ -1961,6 +1991,12 @@ function initDebugger() {
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
 
+    directionalLightDebuggerGroup.addToggleDebugger({
+        label: 'light enabled',
+        initialValue: directionalLight.enabled,
+        onChange: (value) => (directionalLight.enabled = value),
+    });
+    
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2005,7 +2041,6 @@ function initDebugger() {
         },
     });
 
-
     //
     // spot light
     //
@@ -2014,6 +2049,12 @@ function initDebugger() {
 
     const spotLightDebuggerGroup = debuggerGUI.addGroup('spot light', true);
 
+    spotLightDebuggerGroup.addToggleDebugger({
+        label: 'light enabled',
+        initialValue: spotLight.enabled,
+        onChange: (value) => (spotLight.enabled = value),
+    });
+    
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
         initialValue: spotLight.color.getHexCoord(),
@@ -2021,7 +2062,7 @@ function initDebugger() {
             spotLight.color = Color.fromHex(value);
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
         minValue: 0,
@@ -2032,7 +2073,7 @@ function initDebugger() {
             spotLight.intensity = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'distance',
         minValue: 0,
@@ -2043,7 +2084,7 @@ function initDebugger() {
             spotLight.distance = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'attenuation',
         minValue: 0,
@@ -2054,7 +2095,7 @@ function initDebugger() {
             spotLight.attenuation = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'coneCos',
         minValue: 0,
@@ -2065,7 +2106,7 @@ function initDebugger() {
             spotLight.coneCos = value;
         },
     });
-    
+
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'penumbraCos',
         minValue: 0,
@@ -2075,7 +2116,7 @@ function initDebugger() {
         onChange: (value) => {
             spotLight.penumbraCos = value;
         },
-    })
+    });
 
     spotLightDebuggerGroup.addSliderDebugger({
         label: 'pos x',
