@@ -41,6 +41,9 @@ import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { Shader } from '@/PaleGL/core/Shader.ts';
+import uniformBufferObjectVertexShader from '@/PaleGL/shaders/uniform-buffer-object-vertex.glsl';
+import uniformBufferObjectFragmentShader from '@/PaleGL/shaders/uniform-buffer-object-fragment.glsl';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -302,6 +305,19 @@ export class Renderer {
 
         this._toneMappingPass = new ToneMappingPass({ gpu });
         this._scenePostProcess.addPass(this._toneMappingPass);
+
+        // ubo
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+        const uniformBufferObjectShader = new Shader({
+            gpu,
+            vertexShader: uniformBufferObjectVertexShader,
+            fragmentShader: uniformBufferObjectFragmentShader,
+        });
+        this.gpu.createUniformBufferObject(uniformBufferObjectShader, 'Transformations', [
+            'uWorldMatrix',
+            'uViewMatrix',
+            'uProjectionMatrix',
+        ]);
     }
 
     // --------------------------------------------------------------
@@ -347,7 +363,7 @@ export class Renderer {
     get lightShaftPass() {
         return this._lightShaftPass;
     }
-    
+
     get volumetricLightPass() {
         return this._volumetricLightPass;
     }
@@ -739,7 +755,7 @@ export class Renderer {
                 // lightActors,
             });
         } else {
-            throw "invalid directional light.";
+            throw 'invalid directional light.';
         }
 
         // ------------------------------------------------------------------------------
@@ -759,7 +775,7 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
-        
+
         // return;
 
         // ------------------------------------------------------------------------------
@@ -789,7 +805,7 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
-        
+
         // return;
 
         // ------------------------------------------------------------------------------

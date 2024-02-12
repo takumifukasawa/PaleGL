@@ -1,12 +1,10 @@
-﻿import {GLObject} from '@/PaleGL/core/GLObject';
-import {GPU} from '@/PaleGL/core/GPU';
+﻿import { GLObject } from '@/PaleGL/core/GLObject';
+import { GPU } from '@/PaleGL/core/GPU';
+import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
-type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[]; };
+type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
 
-function createShader(
-    gl: WebGL2RenderingContext,
-    type: number,
-    src: string) {
+function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
     // create vertex shader
     const shader = gl.createShader(type);
     if (!shader) {
@@ -28,17 +26,18 @@ function createShader(
 export class Shader extends GLObject {
     private program: WebGLProgram | null;
     private gpu: GPU;
+    private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
 
     get glObject(): WebGLProgram {
         return this.program!;
     }
 
-    constructor({gpu, vertexShader, fragmentShader, transformFeedbackVaryings}: ShaderParams) {
+    constructor({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings }: ShaderParams) {
         super();
-        
+
         this.gpu = gpu;
 
-        const {gl} = gpu;
+        const { gl } = gpu;
         const program = gl.createProgram();
 
         if (!program) {
@@ -56,7 +55,7 @@ export class Shader extends GLObject {
         // fragment shader
         //
 
-        const fs = createShader(gl, gl.FRAGMENT_SHADER, fragmentShader)
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, fragmentShader);
         gl.attachShader(program, fs);
 
         //
@@ -91,10 +90,19 @@ export class Shader extends GLObject {
 
         this.program = program;
     }
-    
+
     dispose() {
         this.gpu.gl.deleteShader(this.program);
         this.program = null;
+    }
+
+    addUniformBufferObject(uniformBufferObject: UniformBufferObject) {
+        const blockIndex = this.gpu.gl.getUniformBlockIndex(this.program!, uniformBufferObject.blockName);
+        this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, uniformBufferObject.bindingPoint);
+        this.uniformBufferObjects.push({
+            uniformBufferObject,
+            blockIndex,
+        });
     }
 
     static buildErrorInfo(infoLog: string, shaderSource: string, header: string) {
@@ -107,11 +115,11 @@ ${infoLog}
 ---
             
 ${shaderSource
-            .split('\n')
-            .map((line, i) => {
-                return `${i + 1}: ${line}`;
-            })
-            .join('\n')}       
+    .split('\n')
+    .map((line, i) => {
+        return `${i + 1}: ${line}`;
+    })
+    .join('\n')}       
 `;
     }
 }
