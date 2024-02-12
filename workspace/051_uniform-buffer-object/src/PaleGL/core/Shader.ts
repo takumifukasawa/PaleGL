@@ -93,6 +93,10 @@ export class Shader extends GLObject {
         this.gpu.gl.deleteShader(this.program);
         this.program = null;
     }
+    
+    bindUniformBlock(blockIndex: number, bindingPoint: number) {
+        this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, bindingPoint);
+    }
 
     static buildErrorInfo(infoLog: string, shaderSource: string, header: string) {
         return `${header}

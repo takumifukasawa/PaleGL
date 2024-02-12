@@ -544,19 +544,14 @@ export class Material {
     private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
 
     addUniformBufferObject(uniformBufferObject: UniformBufferObject, blockIndex: number) {
+        if(!this.shader) {
+            return;
+        }
         this.uniformBufferObjects.push({
             uniformBufferObject,
             blockIndex,
         });
-        // if(!this.shader) {
-        //     return;
-        // }
-        // const blockIndex = gpu.gl.getUniformBlockIndex(this.shader.glObject, uniformBufferObject.blockName);
-        // gpu.gl.uniformBlockBinding(this.shader.glObject, blockIndex, uniformBufferObject.bindingPoint);
-        // this.uniformBufferObjects.push({
-        //     uniformBufferObject,
-        //     blockIndex,
-        // });
+        this.shader.bindUniformBlock(blockIndex, uniformBufferObject.bindingPoint);
     }
 
     boundUniformBufferObjects: boolean = false;

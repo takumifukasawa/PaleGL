@@ -133,7 +133,6 @@ void main() {
     #pragma BEGIN_MAIN
 
     vec4 localPosition = vec4(aPosition, 1.);
-    localPosition.x += Hoge;
 
     #include ./partial/skinning-vertex-calc.glsl;
     
@@ -167,6 +166,7 @@ void main() {
 #endif
 
     vec4 worldPosition = worldMatrix * localPosition;
+    worldPosition.x += Hoge;
 
     #pragma WORLD_POSITION_POST_PROCESS
 

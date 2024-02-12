@@ -585,6 +585,7 @@ export class GPU {
             blockSize,
             this.uboBindingPoint
         );
+        this.uboBindingPoint++;
         return uniformBufferObject;
     }
 }
