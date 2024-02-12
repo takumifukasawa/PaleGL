@@ -183,9 +183,9 @@ const buildScene = (sceneJson: MarionetterScene) => {
 
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
-    captureSceneCamera.onStart = ({ actor }) => {
+    captureSceneCamera.subscribeOnStart(({ actor }) => {
         (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
-    };
+    });
     captureSceneCamera.onFixedUpdate = () => {
         // 1: fixed position
         // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
@@ -222,7 +222,7 @@ const buildScene = (sceneJson: MarionetterScene) => {
         });
     }
 
-    directionalLight.onStart = ({ actor }) => {
+    directionalLight.subscribeOnStart(({ actor }) => {
         actor.transform.setTranslation(new Vector3(-8, 8, -2));
         actor.transform.lookAt(new Vector3(0, 0, 0));
         // const lightActor = actor as DirectionalLight;
@@ -234,7 +234,7 @@ const buildScene = (sceneJson: MarionetterScene) => {
         //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
         //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
         // }
-    };
+    });
     captureScene.add(directionalLight);
 
     const cameraPostProcess = new PostProcess();

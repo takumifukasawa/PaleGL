@@ -5,6 +5,8 @@ import { Stats } from '@/PaleGL/utilities/Stats';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/Scene';
 import { Renderer } from '@/PaleGL/core/Renderer';
+import {Mesh} from "@/PaleGL/actors/Mesh.ts";
+// import {Mesh} from "@/PaleGL/actors/Mesh.ts";
 
 // type EngineOnBeforeStartCallbackArgs = void;
 
@@ -151,7 +153,9 @@ export class Engine {
         // - scene 側でやった方がよい？
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
-        this.#scene?.traverse((actor) => {actor.updateTransform()});
+        this.#scene?.traverse((actor) => {
+            actor.updateTransform();
+        });
         // this.#scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.updateTransform());
         // });
@@ -170,12 +174,20 @@ export class Engine {
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
                     actor.beforeRender({ gpu: this.#gpu });
+                    // TODO: これrenderer側に移したい
+                    const mesh = actor as Mesh;
+                    mesh.materials.forEach((material) => {
+                        if(!material.boundUniformBufferObjects) {
+                            material.boundUniformBufferObjects =true;
+                            this.renderer.registerUniformBufferObjectToMaterial(material);
+                        }
+                    });
                     break;
                 default:
                     break;
             }
         });
-        
+
         // this.#scenes.forEach((scene) => {
         //     scene.traverse((actor) => {
         //         actor.update({ gpu: this.#gpu, time, deltaTime });
@@ -191,7 +203,9 @@ export class Engine {
         //     });
         // });
 
-        this.#scene?.traverse((actor) => {actor.updateTransform()});
+        this.#scene?.traverse((actor) => {
+            actor.updateTransform();
+        });
         this.render(time, deltaTime);
     }
 

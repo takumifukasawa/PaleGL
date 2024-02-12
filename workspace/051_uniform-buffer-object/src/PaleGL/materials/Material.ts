@@ -28,6 +28,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
 
 export type MaterialArgs = {
     type?: MaterialTypes;
@@ -43,6 +44,7 @@ export type MaterialArgs = {
     // optional
 
     uniforms?: UniformsData;
+    uniformBlockNames?: string[];
 
     name?: string;
 
@@ -132,6 +134,8 @@ export class Material {
     renderQueue: RenderQueue;
     uniforms: Uniforms;
     depthUniforms: Uniforms;
+    uniformBlockNames: string[] = [];
+    isAddedUniformBlock: boolean = false;
     depthTest: boolean | null;
     depthWrite: boolean | null;
     depthFuncType: DepthFuncType;
@@ -271,6 +275,7 @@ export class Material {
 
         queue,
         uniforms = [],
+        uniformBlockNames = [],
         depthUniforms = [], // uniforms = {},
 
         showLog = false, // depthUniforms = {},
@@ -445,6 +450,8 @@ export class Material {
         this.uniforms = new Uniforms(commonUniforms, shadowUniforms, uniforms);
 
         this.depthUniforms = new Uniforms(commonUniforms, depthUniforms);
+        
+        this.uniformBlockNames = uniformBlockNames;
 
         this.showLog = showLog;
     }
@@ -533,4 +540,25 @@ export class Material {
      * マテリアルごとにアップデートしたいuniformがあるとき
      */
     updateUniforms() {}
+
+    private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
+
+    addUniformBufferObject(uniformBufferObject: UniformBufferObject, blockIndex: number) {
+        this.uniformBufferObjects.push({
+            uniformBufferObject,
+            blockIndex,
+        });
+        // if(!this.shader) {
+        //     return;
+        // }
+        // const blockIndex = gpu.gl.getUniformBlockIndex(this.shader.glObject, uniformBufferObject.blockName);
+        // gpu.gl.uniformBlockBinding(this.shader.glObject, blockIndex, uniformBufferObject.bindingPoint);
+        // this.uniformBufferObjects.push({
+        //     uniformBufferObject,
+        //     blockIndex,
+        // });
+    }
+
+    boundUniformBufferObjects: boolean = false;
+
 }

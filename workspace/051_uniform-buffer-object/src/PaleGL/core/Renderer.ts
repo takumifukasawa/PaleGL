@@ -44,6 +44,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import uniformBufferObjectVertexShader from '@/PaleGL/shaders/uniform-buffer-object-vertex.glsl';
 import uniformBufferObjectFragmentShader from '@/PaleGL/shaders/uniform-buffer-object-fragment.glsl';
+import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -307,17 +308,42 @@ export class Renderer {
         this._scenePostProcess.addPass(this._toneMappingPass);
 
         // ubo
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
         const uniformBufferObjectShader = new Shader({
             gpu,
             vertexShader: uniformBufferObjectVertexShader,
             fragmentShader: uniformBufferObjectFragmentShader,
         });
-        this.gpu.createUniformBufferObject(uniformBufferObjectShader, 'Transformations', [
-            'uWorldMatrix',
-            'uViewMatrix',
-            'uProjectionMatrix',
-        ]);
+        this.globalUniformBufferObjects.push(
+            this.gpu.createUniformBufferObject(uniformBufferObjectShader, 'Transformations', [
+                'Hoge',
+                // 'uWorldMatrix',
+                // 'uViewMatrix',
+                // 'uProjectionMatrix',
+            ])
+        );
+    }
+
+    globalUniformBufferObjects: UniformBufferObject[] = [];
+
+    registerUniformBufferObjectToMaterial(material: Material) {
+        if (!material.shader) {
+            return;
+        }
+        material.uniformBlockNames.forEach((blockName) => {
+            const blockIndex = this.gpu.gl.getUniformBlockIndex(material.shader!.glObject, blockName);
+            const targetUniformBufferObject = this.globalUniformBufferObjects.find(
+                (ubo) => ubo.blockName === blockName
+            );
+            if (!targetUniformBufferObject) {
+                return;
+            }
+            this.gpu.gl.uniformBlockBinding(
+                material.shader!.glObject,
+                blockIndex,
+                targetUniformBufferObject.bindingPoint
+            );
+            material.addUniformBufferObject(targetUniformBufferObject, blockIndex);
+        });
     }
 
     // --------------------------------------------------------------

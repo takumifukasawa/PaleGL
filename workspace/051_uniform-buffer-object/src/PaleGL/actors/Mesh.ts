@@ -124,11 +124,11 @@ export class Mesh extends Actor {
         // console.log("depth raw vertex", this.depthMaterial.rawVertexShader)
     }
 
-    beforeRender({ gpu }: { gpu: GPU }) {
-        super.beforeRender({ gpu });
-        // this.materials.forEach(material => material.updateUniforms({ gpu }));
-        // this.depthMaterial.updateUniforms({ gpu });
-    }
+    // beforeRender({ gpu }: { gpu: GPU }) {
+    //     super.beforeRender({ gpu });
+    //     // this.materials.forEach(material => material.updateUniforms({ gpu }));
+    //     // this.depthMaterial.updateUniforms({ gpu });
+    // }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     updateMaterial(_args: { camera: Camera }) {}

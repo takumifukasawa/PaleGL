@@ -25,7 +25,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { createCubeMap } from '@/PaleGL/loaders/loadCubeMap.ts';
 import { Uniforms, UniformStructArrayValue, UniformStructValue, UniformValue } from '@/PaleGL/core/Uniforms.ts';
-import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
+import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
@@ -109,8 +109,11 @@ export class GPU {
      *
      * @param uniforms
      */
-    setUniforms(uniforms: Uniforms) {
+    setUniforms(uniforms: Uniforms, h: string = '') {
         this.uniforms = uniforms;
+        if (h) {
+            console.log(h)
+        }
     }
 
     /**
@@ -564,24 +567,14 @@ export class GPU {
 
     createUniformBufferObject(shader: Shader, blockName: string, variableNames: string[]) {
         const gl = this.gl;
-        const blockIndex = gl.getUniformBlockIndex(
-            shader.glObject,
-            blockName
-        );
+        const blockIndex = gl.getUniformBlockIndex(shader.glObject, blockName);
         const blockSize = gl.getActiveUniformBlockParameter(
             shader.glObject,
             blockIndex,
             gl.UNIFORM_BLOCK_DATA_SIZE
         ) as number;
-        const indices = gl.getUniformIndices(
-            shader.glObject,
-            variableNames
-        ) as number[];
-        const offsets = gl.getActiveUniforms(
-            shader.glObject,
-            indices,
-            gl.UNIFORM_OFFSET
-        ) as number[];
+        const indices = gl.getUniformIndices(shader.glObject, variableNames) as number[];
+        const offsets = gl.getActiveUniforms(shader.glObject, indices, gl.UNIFORM_OFFSET) as number[];
         const uniformBufferObject = new UniformBufferObject(
             this,
             blockName,

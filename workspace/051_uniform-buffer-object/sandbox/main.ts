@@ -369,9 +369,9 @@ captureScene.add(captureSceneCamera);
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
-captureSceneCamera.onStart = ({ actor }) => {
+captureSceneCamera.subscribeOnStart(({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
-};
+});
 captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
@@ -411,7 +411,7 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.onStart = ({ actor }) => {
+directionalLight.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
     // const lightActor = actor as DirectionalLight;
@@ -423,7 +423,7 @@ directionalLight.onStart = ({ actor }) => {
     //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
     //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
     // }
-};
+});
 captureScene.add(directionalLight);
 
 const spotLight1 = new SpotLight({
@@ -451,10 +451,10 @@ if (spotLight1.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight1.onStart = ({ actor }) => {
+spotLight1.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-};
+});
 
 captureScene.add(spotLight1);
 
@@ -483,10 +483,10 @@ if (spotLight2.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight2.onStart = ({ actor }) => {
+spotLight2.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(-5, 9, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-};
+});
 
 captureScene.add(spotLight2);
 
@@ -1186,11 +1186,11 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
-    skinningMesh.onStart = () => {
+    skinningMesh.subscribeOnStart(() => {
         // CPU skinning
         // gltfActor.animator.play('Fly', true);
         // gltfActor.animator.animationClips[0].speed = 0.2;
-    };
+    });
     // skinningMesh.onUpdate = ({ deltaTime }) => {
     //     // skinningMesh.animator.update(deltaTime);
     //     // gltfActor.animator.update(deltaTime);
@@ -1433,10 +1433,10 @@ const main = async () => {
             // receiveShadow: true,
         })
     );
-    attractSphereMesh.onStart = ({ actor }) => {
+    attractSphereMesh.subscribeOnStart(({ actor }) => {
         actor.transform.setScaling(Vector3.fill(0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
-    };
+    });
     attractSphereMesh.onFixedUpdate = () => {
         const w = 10;
         const d = 10;
@@ -1653,7 +1653,7 @@ const main = async () => {
         // castShadow: false,
         castShadow: true,
     });
-    floorPlaneMesh.onStart = ({ actor }) => {
+    floorPlaneMesh.subscribeOnStart(({ actor }) => {
         const meshActor = actor as Mesh;
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
@@ -1661,7 +1661,7 @@ const main = async () => {
         // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
         meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(3, 3));
         meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(3, 3));
-    };
+    });
 
     //
     // particle mesh

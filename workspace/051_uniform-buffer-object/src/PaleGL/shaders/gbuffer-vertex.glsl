@@ -10,6 +10,8 @@ precision highp float;
 
 #include ./partial/skinning-vertex-functions.glsl
 
+
+
 // varyings
 out vec2 vUv;
 out vec3 vLocalPosition;
@@ -19,6 +21,13 @@ out vec3 vNormal;
 #include ./partial/normal-map-vertex-varyings.glsl
 #include ./partial/receive-shadow-vertex-varyings.glsl
 #include ./partial/vertex-color-vertex-varyings.glsl
+
+layout (std140) uniform Transformations {
+    // mat4 uWorldMatrix;
+    // mat4 uViewMatrix;
+    // mat4 uProjectionMatrix;
+    float Hoge;
+};
 
 uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
@@ -124,6 +133,7 @@ void main() {
     #pragma BEGIN_MAIN
 
     vec4 localPosition = vec4(aPosition, 1.);
+    localPosition.x += Hoge;
 
     #include ./partial/skinning-vertex-calc.glsl;
     

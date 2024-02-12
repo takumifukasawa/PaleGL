@@ -23,7 +23,7 @@ export class Actor {
     isStarted: boolean = false;
     animator: Animator; // TODO: いよいよcomponentっぽくしたくなってきた
     // lifecycle callback
-    private _onStart: OnStartCallback | null = null;
+    private _onStart: OnStartCallback[] = [];
     private _onFixedUpdate: OnFixedUpdateCallback | null = null;
     private _onUpdate: OnUpdateCallback | null = null;
     private _enabled: boolean = true;
@@ -36,14 +36,16 @@ export class Actor {
         return this._enabled;
     }
 
-    set onStart(value: OnStartCallback) {
-        this._onStart = value;
+    subscribeOnStart(value: OnStartCallback) {
+        this._onStart.push(value)
     }
 
+    // TODO: onStartと同じで配列方式にする
     set onFixedUpdate(value: OnFixedUpdateCallback) {
         this._onFixedUpdate = value;
     }
 
+    // TODO: onStartと同じで配列方式にする
     set onUpdate(value: OnUpdateCallback) {
         this._onUpdate = value;
     }
@@ -88,9 +90,12 @@ export class Actor {
 
     // start({gpu}: { gpu: GPU } = {}) {
     start({ gpu }: ActorStartArgs) {
-        if (this._onStart) {
-            this._onStart({ actor: this, gpu });
-        }
+        // if (this._onStart) {
+        //     this._onStart({ actor: this, gpu });
+        // }
+        this._onStart.forEach((cb) => {
+            cb({ actor: this, gpu });
+        });
     }
 
     // fixedUpdate({gpu, fixedTime, fixedDeltaTime}: { gpu: GPU, fixedTime: number, fixedDeltaTime: number } = {}) {

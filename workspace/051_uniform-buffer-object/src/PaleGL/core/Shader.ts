@@ -1,6 +1,5 @@
 ﻿import { GLObject } from '@/PaleGL/core/GLObject';
 import { GPU } from '@/PaleGL/core/GPU';
-import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
 
@@ -26,7 +25,6 @@ function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
 export class Shader extends GLObject {
     private program: WebGLProgram | null;
     private gpu: GPU;
-    private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
 
     get glObject(): WebGLProgram {
         return this.program!;
@@ -94,15 +92,6 @@ export class Shader extends GLObject {
     dispose() {
         this.gpu.gl.deleteShader(this.program);
         this.program = null;
-    }
-
-    addUniformBufferObject(uniformBufferObject: UniformBufferObject) {
-        const blockIndex = this.gpu.gl.getUniformBlockIndex(this.program!, uniformBufferObject.blockName);
-        this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, uniformBufferObject.bindingPoint);
-        this.uniformBufferObjects.push({
-            uniformBufferObject,
-            blockIndex,
-        });
     }
 
     static buildErrorInfo(infoLog: string, shaderSource: string, header: string) {
