@@ -93,10 +93,20 @@ export class Shader extends GLObject {
         this.gpu.gl.deleteShader(this.program);
         this.program = null;
     }
+  
+    // uniformBlockInfos:{
+    //     bindingPoint: number;
+    //     blockIndex: number;
+    //     blockSize: number;
+    // }[] = [];
+    // 
+    // addUniformBlock(bindingPoint: number, blockIndex: number, blockSize: number) {
+    //     this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, bindingPoint);
+    // }
     
-    bindUniformBlock(blockIndex: number, bindingPoint: number) {
-        this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, bindingPoint);
-    }
+    // bindUniformBlock(blockIndex: number, bindingPoint: number) {
+    //     this.gpu.gl.uniformBlockBinding(this.program!, blockIndex, bindingPoint);
+    // }
 
     static buildErrorInfo(infoLog: string, shaderSource: string, header: string) {
         return `${header}

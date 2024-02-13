@@ -7,6 +7,7 @@ import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 // import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
 import { UniformTypes } from '@/PaleGL/constants.ts';
+import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 // import {SpotLightStruct} from "@/PaleGL/actors/SpotLight.ts";
 
 type UniformTypeValuePair = {
@@ -57,6 +58,10 @@ export type UniformsData = UniformData[];
 export class Uniforms {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも
     data: UniformsData;
+    uniformBlocks: {
+        blockIndex: number;
+        uniformBufferObject: UniformBufferObject;
+    }[] = [];
 
     constructor(...dataArray: UniformsData[]) {
         this.data = [];
@@ -86,7 +91,7 @@ export class Uniforms {
      */
     setValue(name: string, newValue: UniformValue, log: boolean = false) {
         const data = this.find(name);
-        if(log) {
+        if (log) {
             console.log(name, newValue, data);
         }
         // | UniformStructValue
@@ -117,4 +122,12 @@ export class Uniforms {
     }
 
     setValues() {}
+    
+    addUniformBlock(uniformBufferObject: UniformBufferObject, blockIndex: number) {
+        // const blockIndex = uniformBufferObject.gpu.gl.getUniformBlockIndex(
+        //     this.shader.glObject,
+        //     uniformBufferObject.blockName
+        // );
+        this.uniformBlocks.push({ blockIndex, uniformBufferObject });
+    }
 }

@@ -325,24 +325,47 @@ export class Renderer {
 
     globalUniformBufferObjects: UniformBufferObject[] = [];
 
-    registerUniformBufferObjectToMaterial(material: Material) {
-        if (!material.shader) {
-            return;
-        }
-        material.uniformBlockNames.forEach((blockName) => {
-            const blockIndex = this.gpu.gl.getUniformBlockIndex(material.shader!.glObject, blockName);
-            const targetUniformBufferObject = this.globalUniformBufferObjects.find(
-                (ubo) => ubo.blockName === blockName
-            );
-            if (!targetUniformBufferObject) {
-                return;
+    // registerUniformBufferObjectToMaterial(material: Material) {
+    //     if (!material.shader) {
+    //         return;
+    //     }
+    //     material.uniformBlockNames.forEach((blockName) => {
+    //         const targetUniformBufferObject = this.globalUniformBufferObjects.find(
+    //             (ubo) => ubo.blockName === blockName
+    //         );
+    //         if (!targetUniformBufferObject) {
+    //             return;
+    //         }
+    //         const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
+    //             targetUniformBufferObject,
+    //             material.shader!,
+    //             blockName,
+    //         );
+    //         // material.addUniformBufferObject(targetUniformBufferObject, blockIndex);
+    //         material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
+    //     });
+    // }
+    
+    checkNeedsBindUniformBufferObjectToMaterial(mesh: Mesh) {
+        mesh.materials.forEach((material) => {
+            if (!material.boundUniformBufferObjects) {
+                material.boundUniformBufferObjects = true;
+                material.uniformBlockNames.forEach((blockName) => {
+                    const targetUniformBufferObject = this.globalUniformBufferObjects.find(
+                        (ubo) => ubo.blockName === blockName
+                    );
+                    if (!targetUniformBufferObject) {
+                        return;
+                    }
+                    const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
+                        targetUniformBufferObject,
+                        material.shader!,
+                        blockName,
+                    );
+                    // material.addUniformBufferObject(targetUniformBufferObject, blockIndex);
+                    material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
+                });
             }
-            this.gpu.gl.uniformBlockBinding(
-                material.shader!.glObject,
-                blockIndex,
-                targetUniformBufferObject.bindingPoint
-            );
-            material.addUniformBufferObject(targetUniformBufferObject, blockIndex);
         });
     }
 

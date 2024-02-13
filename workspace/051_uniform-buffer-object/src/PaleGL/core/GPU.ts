@@ -383,6 +383,10 @@ export class GPU {
                 }
             });
         }
+    
+        // this.gl.bindBufferRange(
+        //    gl.UNIFORM_BUFFER,
+        // )
     }
 
     updateTransformFeedback({
@@ -587,5 +591,15 @@ export class GPU {
         );
         this.uboBindingPoint++;
         return uniformBufferObject;
+    }
+    
+   bindUniformBlockAndGetBlockIndex(uniformBufferObject: UniformBufferObject, shader: Shader, blockName: string): number {
+        const blockIndex = this.gl.getUniformBlockIndex(shader.glObject, blockName);
+        this.gl.uniformBlockBinding(
+            shader.glObject,
+            blockIndex,
+            uniformBufferObject.bindingPoint
+        );
+        return blockIndex;
     }
 }

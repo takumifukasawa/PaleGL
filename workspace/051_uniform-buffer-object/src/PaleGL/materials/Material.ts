@@ -28,7 +28,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import { Uniforms, UniformsData } from '@/PaleGL/core/Uniforms.ts';
-import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
+// import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
 
 export type MaterialArgs = {
     type?: MaterialTypes;
@@ -541,19 +541,22 @@ export class Material {
      */
     updateUniforms() {}
 
-    private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
+    // private uniformBufferObjects: { uniformBufferObject: UniformBufferObject; blockIndex: number }[] = [];
 
-    addUniformBufferObject(uniformBufferObject: UniformBufferObject, blockIndex: number) {
-        if(!this.shader) {
-            return;
-        }
-        this.uniformBufferObjects.push({
-            uniformBufferObject,
-            blockIndex,
-        });
-        this.shader.bindUniformBlock(blockIndex, uniformBufferObject.bindingPoint);
-    }
+    // addUniformBufferObject(uniformBufferObject: UniformBufferObject, blockIndex: number) {
+    //     if(!this.shader) {
+    //         return;
+    //     }
+    //     this.uniforms.addUniformBlock(uniformBufferObject, blockIndex)
+    //     // this.uniformBufferObjects.push({
+    //     //     uniformBufferObject,
+    //     //     blockIndex,
+    //     // });
+    //     // this.shader.bindUniformBlock(
+    //     //     blockIndex,
+    //     //     uniformBufferObject.bindingPoint
+    //     // );
+    // }
 
     boundUniformBufferObjects: boolean = false;
-
 }

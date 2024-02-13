@@ -5,7 +5,7 @@ import { Stats } from '@/PaleGL/utilities/Stats';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/Scene';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import {Mesh} from "@/PaleGL/actors/Mesh.ts";
+import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 // import {Mesh} from "@/PaleGL/actors/Mesh.ts";
 
 // type EngineOnBeforeStartCallbackArgs = void;
@@ -176,12 +176,13 @@ export class Engine {
                     actor.beforeRender({ gpu: this.#gpu });
                     // TODO: これrenderer側に移したい. engineが知る必要ないから
                     const mesh = actor as Mesh;
-                    mesh.materials.forEach((material) => {
-                        if(!material.boundUniformBufferObjects) {
-                            material.boundUniformBufferObjects =true;
-                            this.renderer.registerUniformBufferObjectToMaterial(material);
-                        }
-                    });
+                    this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh);
+                    // mesh.materials.forEach((material) => {
+                    //     if (!material.boundUniformBufferObjects) {
+                    //         material.boundUniformBufferObjects = true;
+                    //         this.renderer.registerUniformBufferObjectToMaterial(material);
+                    //     }
+                    // });
                     break;
                 default:
                     break;
