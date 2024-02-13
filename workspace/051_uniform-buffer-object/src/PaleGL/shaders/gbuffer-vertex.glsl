@@ -25,8 +25,8 @@ out vec3 vNormal;
 #include ./partial/uniform-block-transformations.glsl
 
 // uniform mat4 uWorldMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
+// uniform mat4 uViewMatrix;
+// uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 uniform float uTime;
 
@@ -161,7 +161,6 @@ void main() {
 #endif
 
     vec4 worldPosition = worldMatrix * localPosition;
-    worldPosition.x += Hoge;
 
     #pragma WORLD_POSITION_POST_PROCESS
 
