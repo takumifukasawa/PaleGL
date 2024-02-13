@@ -166,7 +166,7 @@ export class GBufferMaterial extends Material {
 
         super.start({ gpu, attributeDescriptors });
 
-        // console.log(this.rawVertexShader)
+        // console.log(gBufferVert)
         // console.log(this.rawFragmentShader)
     }
 }

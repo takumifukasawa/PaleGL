@@ -62,4 +62,10 @@ export class UniformBufferObject extends GLObject {
         const { gl } = this.gpu;
         gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
+    
+    updateBufferData(data: Float32Array | Uint16Array) {
+        this.bind();
+        this.gpu.gl.bufferSubData(this.gpu.gl.UNIFORM_BUFFER, 0, data, 0);
+        this.unbind();
+    }  
 }

@@ -120,7 +120,7 @@ export class Uniforms {
             }
         }
     }
-
+    
     setValues() {}
     
     addUniformBlock(uniformBufferObject: UniformBufferObject, blockIndex: number) {

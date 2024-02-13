@@ -20,7 +20,11 @@ uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform vec3 uViewPosition;
 uniform float uIsPerspective;
-uniform mat4 uWorldMatrix;
+
+
+#include ./partial/uniform-block-transformations.glsl
+
+// uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseWorldMatrix;

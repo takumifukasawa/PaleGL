@@ -174,7 +174,6 @@ export class Engine {
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
                     actor.beforeRender({ gpu: this.#gpu });
-                    // TODO: これrenderer側に移したい. engineが知る必要ないから
                     const mesh = actor as Mesh;
                     this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh);
                     // mesh.materials.forEach((material) => {

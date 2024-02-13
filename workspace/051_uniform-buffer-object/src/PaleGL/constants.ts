@@ -328,6 +328,12 @@ export const UniformNames = {
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
+export const UniformBlockNames = {
+    Transformations: "Transformations",
+} as const;
+
+export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];
+
 // export const PostProcessUniformNames = {
 //     TargetWidth: 'uTargetWidth',
 //     TargetHeight: 'uTargetHeight',

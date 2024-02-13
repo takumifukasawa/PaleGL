@@ -22,14 +22,9 @@ out vec3 vNormal;
 #include ./partial/receive-shadow-vertex-varyings.glsl
 #include ./partial/vertex-color-vertex-varyings.glsl
 
-layout (std140) uniform Transformations {
-    // mat4 uWorldMatrix;
-    // mat4 uViewMatrix;
-    // mat4 uProjectionMatrix;
-    float Hoge;
-};
+#include ./partial/uniform-block-transformations.glsl
 
-uniform mat4 uWorldMatrix;
+// uniform mat4 uWorldMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;

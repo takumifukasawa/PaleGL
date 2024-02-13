@@ -109,11 +109,8 @@ export class GPU {
      *
      * @param uniforms
      */
-    setUniforms(uniforms: Uniforms, h: string = '') {
+    setUniforms(uniforms: Uniforms) {
         this.uniforms = uniforms;
-        if (h) {
-            console.log(h)
-        }
     }
 
     /**
@@ -382,11 +379,18 @@ export class GPU {
                     setUniformValueInternal(uniformData.type, uniformData.name, uniformData.value);
                 }
             });
+            
+            // uniform block
+            this.uniforms.uniformBlocks.forEach(({ uniformBufferObject, blockIndex} ) => {
+                this.gl.bindBufferRange(
+                    gl.UNIFORM_BUFFER,
+                    blockIndex,
+                    uniformBufferObject.glObject,
+                    0,
+                    uniformBufferObject.blockSize
+                );
+            });
         }
-    
-        // this.gl.bindBufferRange(
-        //    gl.UNIFORM_BUFFER,
-        // )
     }
 
     updateTransformFeedback({

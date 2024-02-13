@@ -379,11 +379,11 @@ export class Material {
                 type: UniformTypes.Matrix4,
                 value: Matrix4.identity,
             },
-            {
-                name: UniformNames.WorldMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
+            // {
+            //     name: UniformNames.WorldMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
             {
                 name: UniformNames.ViewMatrix,
                 type: UniformTypes.Matrix4,

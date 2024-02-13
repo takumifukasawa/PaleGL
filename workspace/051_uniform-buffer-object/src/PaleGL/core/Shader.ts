@@ -83,6 +83,7 @@ export class Shader extends GLObject {
         // check program info log
         const programInfo = gl.getProgramInfoLog(program);
         if (!!programInfo && programInfo.length > 0) {
+            console.error("hogehoge", vertexShader, fragmentShader)
             throw programInfo;
         }
 

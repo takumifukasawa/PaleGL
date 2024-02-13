@@ -202,11 +202,9 @@ export class Camera extends Actor {
                     vertexShader: `#version 300 es
                     
                     layout (location = 0) in vec3 ${AttributeNames.Position};
+
+                    #pragma TRANSFORM_VERTEX_UNIFORMS
                    
-                    uniform mat4 ${UniformNames.WorldMatrix};
-                    uniform mat4 ${UniformNames.ViewMatrix};
-                    uniform mat4 ${UniformNames.ProjectionMatrix};
-                    
                     void main() {
                         gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                     }
