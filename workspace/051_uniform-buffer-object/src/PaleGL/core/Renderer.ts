@@ -550,13 +550,6 @@ export class Renderer {
         // uniform block object
         // ------------------------------------------------------------------------------
 
-        // const testData = this.globalUniformBufferObjects.find(
-        //     (ubo) => ubo.blockName === UniformBlockNames.Transformations
-        // );
-        // if (testData) {
-        //     testData.updateBufferData(new Float32Array([5]));
-        // }
-
         // ------------------------------------------------------------------------------
         // setup render mesh infos
         // TODO: depth sort
@@ -1078,7 +1071,7 @@ export class Renderer {
 
             depthMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
             // depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(actor.transform.worldMatrix.elements);
+            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
             depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
             depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
@@ -1162,7 +1155,7 @@ export class Renderer {
                 // TODO: material 側でやった方がよい？
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
                 // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(actor.transform.worldMatrix.elements);
+                this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
                 targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
                 targetMaterial.uniforms.setValue(
                     UniformNames.ProjectionMatrix,
@@ -1249,7 +1242,7 @@ export class Renderer {
             // TODO: material 側でやった方がよい？
             targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
             // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(actor.transform.worldMatrix.elements);
+            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
             targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
             targetMaterial.uniforms.setValue(
@@ -1308,7 +1301,7 @@ export class Renderer {
             const targetMaterial = actor.materials[materialIndex];
 
             // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(actor.transform.worldMatrix.elements);
+            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
             targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
             targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
             targetMaterial.uniforms.setValue(
