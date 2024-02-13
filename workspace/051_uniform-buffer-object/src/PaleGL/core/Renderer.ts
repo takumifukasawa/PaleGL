@@ -314,6 +314,7 @@ export class Renderer {
             vertexShader: globalUniformBufferObjectVertexShader,
             fragmentShader: globalUniformBufferObjectFragmentShader,
         });
+        // blockとvariableから列挙
         this.globalUniformBufferObjects.push(
             this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.Transformations, [
                 UniformNames.WorldMatrix,
