@@ -1,6 +1,6 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 #include ./defines-light.glsl
@@ -185,6 +185,7 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 // uniform mat4 uLightViewProjectionMatrix;
 // #endif
 
+// #include ./partial/uniform-block-camera.glsl
 uniform vec3 uViewPosition;
 
 // TODO

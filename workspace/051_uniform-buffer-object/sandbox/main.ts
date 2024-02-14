@@ -1422,6 +1422,7 @@ const main = async () => {
         specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
+    // skyboxMesh.enabled = false;
 
     //
     // attract mesh

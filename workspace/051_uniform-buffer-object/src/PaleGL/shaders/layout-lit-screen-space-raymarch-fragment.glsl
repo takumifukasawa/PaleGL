@@ -24,18 +24,19 @@ uniform int uShadingModelId;
 #include ./partial/tone-mapping.glsl
 
 #include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
 
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 // uniform mat4 uProjectionMatrix;
 // uniform mat4 uInverseWorldMatrix;
-uniform vec3 uViewPosition;
+// uniform vec3 uViewPosition;
+// uniform vec3 uViewDirection;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 uniform float uFov;
 uniform float uAspect;
-uniform vec3 uViewDirection;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 

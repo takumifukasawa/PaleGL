@@ -121,7 +121,7 @@ float calcTransmittance(
     return 0.;
 }
 
-void f() {}
+// void f() {}
 
 void main() {
     vec2 uv = vUv;

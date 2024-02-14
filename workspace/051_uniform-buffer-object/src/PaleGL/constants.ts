@@ -329,7 +329,8 @@ export const UniformNames = {
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
 export const UniformBlockNames = {
-    Transformations: "Transformations",
+    Transformations: "ubTransformations",
+    Camera: "ubCamera",
 } as const;
 
 export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];

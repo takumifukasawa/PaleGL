@@ -1,6 +1,6 @@
 ﻿#version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 
@@ -8,8 +8,11 @@ in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
+#include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
+
 uniform samplerCube uCubeTexture;
-uniform vec3 uViewPosition;
+// uniform vec3 uViewPosition;
 uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 uniform int uShadingModelId;

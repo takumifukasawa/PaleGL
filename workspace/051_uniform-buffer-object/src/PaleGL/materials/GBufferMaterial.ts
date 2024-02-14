@@ -164,7 +164,8 @@ export class GBufferMaterial extends Material {
             depthWrite: false,
             depthFuncType: DepthFuncTypes.Equal,
             uniformBlockNames: [
-                UniformBlockNames.Transformations
+                UniformBlockNames.Transformations,
+                // UniformBlockNames.Camera
             ]
         });
     }

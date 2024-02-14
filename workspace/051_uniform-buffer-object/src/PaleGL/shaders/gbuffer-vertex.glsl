@@ -23,6 +23,7 @@ out vec3 vNormal;
 #include ./partial/vertex-color-vertex-varyings.glsl
 
 #include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
 
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;

@@ -1,6 +1,6 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
 #pragma DEFINES
 
@@ -21,7 +21,7 @@ uniform int uShadingModelId;
 
 #include ./partial/normal-map-fragment-uniforms.glsl
 
-uniform vec3 uViewPosition;
+#include ./partial/uniform-block-camera.glsl
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 

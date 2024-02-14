@@ -7,6 +7,7 @@
 #pragma ATTRIBUTES
 
 #include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
 
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;

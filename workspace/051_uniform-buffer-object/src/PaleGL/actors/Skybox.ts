@@ -5,7 +5,7 @@ import {
     ActorTypes,
     AttributeNames,
     UniformNames,
-    ShadingModelIds,
+    ShadingModelIds, UniformBlockNames,
 } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
@@ -164,6 +164,10 @@ export class Skybox extends Mesh {
                     value: ShadingModelIds.Skybox,
                 },
             ],
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                // UniformBlockNames.Camera
+            ]
         });
 
         super({ geometry, material, actorType: ActorTypes.Skybox });

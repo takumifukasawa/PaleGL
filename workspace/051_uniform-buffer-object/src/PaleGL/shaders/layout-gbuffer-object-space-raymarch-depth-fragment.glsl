@@ -15,14 +15,14 @@ precision highp float;
 
 #include ./partial/alpha-test-functions.glsl
 
+#include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
+
 uniform vec4 uColor;
 uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
-uniform vec3 uViewPosition;
+// uniform vec3 uViewPosition;
 uniform float uIsPerspective;
-
-
-#include ./partial/uniform-block-transformations.glsl
 
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;

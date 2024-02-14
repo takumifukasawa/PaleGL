@@ -13,10 +13,10 @@ precision highp float;
 
 #include ./partial/depth-functions.glsl
 
-uniform vec3 uViewPosition;
-
 #include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
 
+// uniform vec3 uViewPosition;
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 uniform sampler2D uDepthTexture;
