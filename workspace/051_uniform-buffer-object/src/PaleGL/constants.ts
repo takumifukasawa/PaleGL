@@ -323,14 +323,14 @@ export const UniformNames = {
     Skybox: 'uSkybox',
     RotationOffset: 'uRotationOffset', // TODO: 名前変えたい
     // raymarch
-    ObjectSpaceRaymarchBoundsScale: "uBoundsScale"
+    ObjectSpaceRaymarchBoundsScale: 'uBoundsScale',
 } as const;
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
 export const UniformBlockNames = {
-    Transformations: "ubTransformations",
-    Camera: "ubCamera",
+    Transformations: 'ubTransformations',
+    Camera: 'ubCamera',
 } as const;
 
 export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];
@@ -388,6 +388,7 @@ export const ShaderPartialPragmas = {
     DEPTH_FUNCTIONS: 'DEPTH_FUNCTIONS',
     ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
     TRANSFORM_VERTEX_UNIFORMS: 'TRANSFORM_VERTEX_UNIFORMS',
+    CAMERA_UNIFORMS: 'CAMERA_UNIFORMS',
     PSEUDO_HDR: 'PSEUDO_HDR',
 } as const;
 

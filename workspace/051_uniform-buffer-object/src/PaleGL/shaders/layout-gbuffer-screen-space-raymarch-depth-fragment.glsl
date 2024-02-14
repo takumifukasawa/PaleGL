@@ -20,8 +20,8 @@ precision highp float;
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 uniform sampler2D uDepthTexture;
-uniform float uNearClip;
-uniform float uFarClip;
+// uniform float uNearClip;
+// uniform float uFarClip;
 
 in vec2 vUv;
 

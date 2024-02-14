@@ -337,6 +337,8 @@ export class Renderer {
                 [
                     UniformNames.ViewPosition,
                     UniformNames.ViewDirection,
+                    UniformNames.CameraNear,
+                    UniformNames.CameraFar,
                 ]
             )
         );
@@ -1069,13 +1071,13 @@ export class Renderer {
      * @param value
      * @private
      */
-    private setUniformBlockValue(blockName: string, uniformName: string, value: Vector2 | Vector3 | Vector4 | Matrix4) {
+    private setUniformBlockValue(blockName: string, uniformName: string, value: Vector2 | Vector3 | Vector4 | Matrix4 | number) {
         const targetUbo = this.globalUniformBufferObjects.find((ubo) => ubo.blockName === blockName);
         if (!targetUbo) {
             console.error('ubo not found');
             return;
         }
-        targetUbo?.updateBufferData(uniformName, value.elements);
+        targetUbo?.updateBufferData(uniformName, typeof(value) === 'number' ? value : value.elements);
     }
 
     /**
@@ -1266,8 +1268,8 @@ export class Renderer {
                     UniformNames.DepthTexture,
                     this._copyDepthDestRenderTarget.depthTexture
                 );
-                targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
-                targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
+                // targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
+                // targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
 
                 actor.updateDepthMaterial({ camera: lightActor.shadowCamera! });
                 // targetMaterial.updateUniforms();
@@ -1367,8 +1369,8 @@ export class Renderer {
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture!);
-            targetMaterial.uniforms.setValue(UniformNames.CameraNear, camera.near);
-            targetMaterial.uniforms.setValue(UniformNames.CameraFar, camera.far);
+            // targetMaterial.uniforms.setValue(UniformNames.CameraNear, camera.near);
+            // targetMaterial.uniforms.setValue(UniformNames.CameraFar, camera.far);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
@@ -1416,16 +1418,23 @@ export class Renderer {
         );
         this.setUniformBlockValue(
             UniformBlockNames.Camera,
-            // UniformBlockNames.Transformations,
             UniformNames.ViewPosition,
             camera.transform.worldMatrix.position
         );
         this.setUniformBlockValue(
             UniformBlockNames.Camera,
-            // UniformBlockNames.Transformations,
             UniformNames.ViewDirection,
-            // camera.transform.worldForward
             camera.getWorldForward()
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Camera,
+            UniformNames.CameraNear,
+            camera.near
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Camera,
+            UniformNames.CameraFar,
+            camera.far
         );
     }
 

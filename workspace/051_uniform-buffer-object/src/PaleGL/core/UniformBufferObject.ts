@@ -63,7 +63,7 @@ export class UniformBufferObject extends GLObject {
         gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
     
-    updateBufferData(variableName: string, data: Float32Array | Uint16Array) {
+    updateBufferData(variableName: string, data: Float32Array | Uint16Array | number) {
         const info = this.variableInfo.find((v) => v.name === variableName);
         if(!info) {
             throw new Error(`variableName ${variableName} not found`);
@@ -72,7 +72,7 @@ export class UniformBufferObject extends GLObject {
         // console.log("updateBufferData", info, data);
         // }
         this.bind();
-        this.gpu.gl.bufferSubData(this.gpu.gl.UNIFORM_BUFFER, info.offset, data, 0);
+        this.gpu.gl.bufferSubData(this.gpu.gl.UNIFORM_BUFFER, info.offset, typeof(data) === "number" ? new Float32Array(data) : data, 0);
         this.unbind();
     }  
 }

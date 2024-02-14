@@ -17,7 +17,8 @@ import {
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
-import transformVertexUniforms from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
+import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
+import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
 export type ShaderDefines = {
@@ -38,7 +39,8 @@ const insertShaderPairs: {
 } = {
     [ShaderPartialPragmas.DEPTH_FUNCTIONS]: depthFunctions,
     [ShaderPartialPragmas.ENGINE_UNIFORMS]: engineUniforms,
-    [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: transformVertexUniforms,
+    [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
+    [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
     [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR
 };
 

@@ -43,8 +43,8 @@ uniform int uShadingModelId;
 uniform float uIsPerspective;
 uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
-uniform float uNearClip;
-uniform float uFarClip;
+// uniform float uNearClip;
+// uniform float uFarClip;
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 

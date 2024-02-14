@@ -30,8 +30,8 @@ uniform float uIsPerspective;
 // uniform mat4 uInverseWorldMatrix;
 uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
-uniform float uNearClip;
-uniform float uFarClip;
+// uniform float uNearClip;
+// uniform float uFarClip;
 
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;

@@ -17,7 +17,7 @@ import {
     RenderQueueType,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+// import { Vector3 } from '@/PaleGL/math/Vector3';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/shaders/buildShader';
 import { GPU } from '@/PaleGL/core/GPU';
 // import { Texture } from '@/PaleGL/core/Texture';
@@ -394,17 +394,17 @@ export class Material {
             //     type: UniformTypes.Matrix4,
             //     value: Matrix4.identity,
             // },
-            {
-                name: UniformNames.NormalMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                // TODO: viewmatrixから引っ張ってきてもよい
-                name: UniformNames.ViewPosition,
-                type: UniformTypes.Vector3,
-                value: Vector3.zero,
-            },
+            // {
+            //     name: UniformNames.NormalMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     // TODO: viewmatrixから引っ張ってきてもよい
+            //     name: UniformNames.ViewPosition,
+            //     type: UniformTypes.Vector3,
+            //     value: Vector3.zero,
+            // },
             {
                 name: UniformNames.Time,
                 type: UniformTypes.Float,
