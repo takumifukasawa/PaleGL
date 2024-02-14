@@ -68,6 +68,9 @@ export class UniformBufferObject extends GLObject {
         if(!info) {
             throw new Error(`variableName ${variableName} not found`);
         }
+        // if(info.name === "uViewPosition" || info.name === "uViewDirection") {
+        // console.log("updateBufferData", info, data);
+        // }
         this.bind();
         this.gpu.gl.bufferSubData(this.gpu.gl.UNIFORM_BUFFER, info.offset, data, 0);
         this.unbind();

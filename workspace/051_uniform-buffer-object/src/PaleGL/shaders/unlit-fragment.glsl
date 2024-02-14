@@ -12,6 +12,7 @@ uniform int uShadingModelId;
 
 #include ./partial/tone-mapping.glsl
 
+#include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 // uniform vec3 uViewPosition;
 

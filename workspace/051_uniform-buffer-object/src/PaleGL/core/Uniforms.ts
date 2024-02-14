@@ -126,7 +126,7 @@ export class Uniforms {
     addUniformBlock(uniformBufferObject: UniformBufferObject, blockIndex: number) {
         // const blockIndex = uniformBufferObject.gpu.gl.getUniformBlockIndex(
         //     this.shader.glObject,
-        //     uniformBufferObject.blockName
+        // //     uniformBufferObject.blockName
         // );
         this.uniformBlocks.push({ blockIndex, uniformBufferObject });
     }

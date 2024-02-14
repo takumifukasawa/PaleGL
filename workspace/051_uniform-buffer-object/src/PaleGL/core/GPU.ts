@@ -603,6 +603,7 @@ export class GPU {
     
    bindUniformBlockAndGetBlockIndex(uniformBufferObject: UniformBufferObject, shader: Shader, blockName: string): number {
         const blockIndex = this.gl.getUniformBlockIndex(shader.glObject, blockName);
+        console.log("bindUniformBlockAndGetBlockIndex", blockName, blockIndex, uniformBufferObject.bindingPoint)
         this.gl.uniformBlockBinding(
             shader.glObject,
             blockIndex,

@@ -136,6 +136,7 @@ export class Skybox extends Mesh {
 
         const material = new Material({
             // gpu,
+            name: "Skybox",
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
@@ -166,7 +167,7 @@ export class Skybox extends Mesh {
             ],
             uniformBlockNames: [
                 UniformBlockNames.Transformations,
-                // UniformBlockNames.Camera
+                UniformBlockNames.Camera
             ]
         });
 

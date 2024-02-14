@@ -326,20 +326,20 @@ export class Renderer {
                 UniformNames.ProjectionMatrix,
                 UniformNames.NormalMatrix,
                 UniformNames.InverseWorldMatrix,
-                UniformNames.ViewPosition,
-                UniformNames.ViewDirection,
+                // UniformNames.ViewPosition,
+                // UniformNames.ViewDirection,
             ])
         );
-        // this.globalUniformBufferObjects.push(
-        //     this.gpu.createUniformBufferObject(
-        //         uniformBufferObjectShader,
-        //         UniformBlockNames.Camera,
-        //         [
-        //             UniformNames.ViewPosition,
-        //             UniformNames.ViewDirection,
-        //         ]
-        //     )
-        // );
+        this.globalUniformBufferObjects.push(
+            this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.Camera,
+                [
+                    UniformNames.ViewPosition,
+                    UniformNames.ViewDirection,
+                ]
+            )
+        );
         // for debug
         console.log(this.globalUniformBufferObjects)
     }
@@ -378,12 +378,12 @@ export class Renderer {
                     if (!targetUniformBufferObject) {
                         return;
                     }
-                    console.log(material.name, material.uniformBlockNames, targetUniformBufferObject.blockName);
                     const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
                         targetUniformBufferObject,
                         material.shader!,
                         blockName
                     );
+                    console.log("addUniformBlock", material.name, material.uniformBlockNames, targetUniformBufferObject.blockName, blockIndex);
                     material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
                 });
             }
@@ -1415,14 +1415,14 @@ export class Renderer {
             camera.projectionMatrix
         );
         this.setUniformBlockValue(
-            // UniformBlockNames.Camera,
-            UniformBlockNames.Transformations,
+            UniformBlockNames.Camera,
+            // UniformBlockNames.Transformations,
             UniformNames.ViewPosition,
             camera.transform.worldMatrix.position
         );
         this.setUniformBlockValue(
-            // UniformBlockNames.Camera,
-            UniformBlockNames.Transformations,
+            UniformBlockNames.Camera,
+            // UniformBlockNames.Transformations,
             UniformNames.ViewDirection,
             // camera.transform.worldForward
             camera.getWorldForward()

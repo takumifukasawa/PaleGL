@@ -1,5 +1,5 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
@@ -67,6 +67,10 @@ export class ScreenSpaceRaymarchMaterial extends Material {
             depthWrite: true,
             depthFuncType: DepthFuncTypes.Lequal,
             skipDepthPrePass: true,
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
+            ]
         });
     }
 }

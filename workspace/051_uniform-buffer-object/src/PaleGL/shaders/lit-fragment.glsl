@@ -21,6 +21,7 @@ uniform int uShadingModelId;
 
 #include ./partial/normal-map-fragment-uniforms.glsl
 
+#include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 
 #include ./partial/alpha-test-fragment-uniforms.glsl

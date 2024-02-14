@@ -1,5 +1,12 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import { ShadingModelIds, DepthFuncTypes, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import {
+    ShadingModelIds,
+    DepthFuncTypes,
+    UniformNames,
+    UniformTypes,
+    VertexShaderModifier,
+    UniformBlockNames
+} from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 // import {buildVertexShader} from "@/PaleGL/shaders/buildShader.js";
@@ -100,6 +107,10 @@ export class UnlitMaterial extends Material {
             depthTest: true,
             depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき
             depthFuncType: DepthFuncTypes.Equal, // TODO: これはGBufferの場合
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
+            ]
         });
     }
 

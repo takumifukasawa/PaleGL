@@ -63,7 +63,7 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
 
         const { camera } = args;
 
-        this.mainMaterial.uniforms.setValue(UniformNames.ViewDirection, camera.getWorldForward());
+        // this.mainMaterial.uniforms.setValue(UniformNames.ViewDirection, camera.getWorldForward());
         // this.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
         // this.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
 

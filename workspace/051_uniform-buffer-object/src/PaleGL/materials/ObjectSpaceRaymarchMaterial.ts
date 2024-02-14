@@ -1,5 +1,5 @@
 import {MaterialArgs, Material, MaterialTypes} from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -91,6 +91,10 @@ export class ObjectSpaceRaymarchMaterial extends Material {
             depthWrite: true,
             depthFuncType: DepthFuncTypes.Lequal,
             skipDepthPrePass: true,
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
+            ]
         });
     }
 }

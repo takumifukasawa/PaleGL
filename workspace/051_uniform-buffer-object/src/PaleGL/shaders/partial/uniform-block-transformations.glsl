@@ -6,6 +6,6 @@ layout (std140) uniform ubTransformations {
     mat4 uProjectionMatrix;
     mat4 uNormalMatrix;
     mat4 uInverseWorldMatrix;
-    vec3 uViewPosition;
-    vec3 uViewDirection;
+    // vec3 uViewPosition;
+    // vec3 uViewDirection;
 };
