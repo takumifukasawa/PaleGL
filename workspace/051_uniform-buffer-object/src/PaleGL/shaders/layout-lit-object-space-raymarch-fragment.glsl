@@ -37,7 +37,7 @@ uniform int uShadingModelId;
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 // uniform mat4 uProjectionMatrix;
-uniform mat4 uInverseWorldMatrix;
+// uniform mat4 uInverseWorldMatrix;
 uniform vec3 uViewPosition;
 uniform float uIsPerspective;
 uniform vec3 uBoundsScale;

@@ -27,7 +27,7 @@ uniform float uIsPerspective;
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 // uniform mat4 uProjectionMatrix;
-uniform mat4 uInverseWorldMatrix;
+// uniform mat4 uInverseWorldMatrix;
 uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
 uniform float uNearClip;

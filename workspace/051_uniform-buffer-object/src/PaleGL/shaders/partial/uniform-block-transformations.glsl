@@ -10,4 +10,5 @@ layout (std140) uniform Transformations {
     mat4 uViewMatrix;
     mat4 uProjectionMatrix;
     mat4 uNormalMatrix;
+    mat4 uInverseWorldMatrix;
 };
