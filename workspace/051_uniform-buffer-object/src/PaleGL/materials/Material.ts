@@ -384,16 +384,16 @@ export class Material {
             //     type: UniformTypes.Matrix4,
             //     value: Matrix4.identity,
             // },
-            {
-                name: UniformNames.ViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.ProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
+            // {
+            //     name: UniformNames.ViewMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     name: UniformNames.ProjectionMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
             {
                 name: UniformNames.NormalMatrix,
                 type: UniformTypes.Matrix4,

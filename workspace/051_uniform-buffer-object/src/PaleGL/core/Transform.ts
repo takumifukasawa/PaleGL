@@ -20,6 +20,7 @@ export class Transform {
     rotation: Rotator = Rotator.zero; // degree vector
     scale: Vector3 = Vector3.one;
     lookAtTarget: Vector3 | null = null; // world v
+    #normalMatrix: Matrix4 = Matrix4.identity;
 
     get childCount() {
         return this.children.length;
@@ -35,6 +36,10 @@ export class Transform {
 
     get worldMatrix() {
         return this.#worldMatrix;
+    }
+    
+    get normalMatrix() {
+        return this.#normalMatrix;
     }
 
     get localMatrix() {
@@ -95,6 +100,8 @@ export class Transform {
             ? Matrix4.multiplyMatrices(this.parent.worldMatrix, this.#localMatrix)
             : this.#localMatrix;
         this.#inverseWorldMatrix = this.#worldMatrix.clone().invert();
+
+        this.#normalMatrix = this.#worldMatrix.clone().invert().transpose();
     }
 
     setScaling(s: Vector3) {

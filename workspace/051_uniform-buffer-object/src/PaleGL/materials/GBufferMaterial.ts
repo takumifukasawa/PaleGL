@@ -1,5 +1,12 @@
 import { MaterialArgs, Material } from '@/PaleGL/materials/Material';
-import { DepthFuncTypes, ShadingModelIds, UniformNames, UniformTypes, VertexShaderModifier } from '@/PaleGL/constants';
+import {
+    DepthFuncTypes,
+    ShadingModelIds,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+    VertexShaderModifier
+} from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
@@ -156,6 +163,9 @@ export class GBufferMaterial extends Material {
             depthTest: true,
             depthWrite: false,
             depthFuncType: DepthFuncTypes.Equal,
+            uniformBlockNames: [
+                UniformBlockNames.Transformations
+            ]
         });
     }
 

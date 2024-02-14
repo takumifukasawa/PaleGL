@@ -27,7 +27,7 @@ out vec3 vNormal;
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 // uniform mat4 uProjectionMatrix;
-uniform mat4 uNormalMatrix;
+// uniform mat4 uNormalMatrix;
 uniform float uTime;
 
 #pragma APPEND_UNIFORMS

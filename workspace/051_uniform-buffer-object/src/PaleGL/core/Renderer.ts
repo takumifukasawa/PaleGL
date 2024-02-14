@@ -46,6 +46,9 @@ import { Shader } from '@/PaleGL/core/Shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -320,6 +323,7 @@ export class Renderer {
                 UniformNames.WorldMatrix,
                 UniformNames.ViewMatrix,
                 UniformNames.ProjectionMatrix,
+                UniformNames.NormalMatrix,
             ])
         );
     }
@@ -363,7 +367,6 @@ export class Renderer {
                         material.shader!,
                         blockName
                     );
-                    // material.addUniformBufferObject(targetUniformBufferObject, blockIndex);
                     material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
                 });
             }
@@ -1044,6 +1047,36 @@ export class Renderer {
 
     /**
      *
+     * @param blockName
+     * @param uniformName
+     * @param value
+     * @private
+     */
+    private setUniformBlockValue(blockName: string, uniformName: string, value: Vector2 | Vector3 | Vector4 | Matrix4) {
+        const targetUbo = this.globalUniformBufferObjects.find((ubo) => ubo.blockName === blockName);
+        if (!targetUbo) {
+            console.error('ubo not found');
+            return;
+        }
+        targetUbo.updateBufferData(uniformName, value.elements);
+    }
+
+    /**
+     *
+     * @param actor
+     * @param camera
+     */
+    // updateUniformBlockTransformations(actor: Actor, camera: Camera) {
+    //     this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.WorldMatrix, actor.transform.worldMatrix);
+    //     this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+    //     this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ProjectionMatrix, camera.projectionMatrix);
+    //     // this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.NormalMatrix, actor.transform.inverseWorldMatrix);
+    //     // this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewPosition, camera.transform.worldMatrix.position);
+    //     // depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
+    // }
+
+    /**
+     *
      * @param depthPrePassRenderMeshInfos
      * @param camera
      * @private
@@ -1053,6 +1086,13 @@ export class Renderer {
 
         this.setRenderTarget(this._depthPrePassRenderTarget, false, true);
         // this.gpu.clearDepth(0, 0, 0, 1);
+
+        this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.ProjectionMatrix,
+            camera.projectionMatrix
+        );
 
         depthPrePassRenderMeshInfos.forEach(({ actor }) => {
             const depthMaterial = actor.depthMaterial;
@@ -1067,13 +1107,22 @@ export class Renderer {
 
             // console.log(depthMaterial.name, depthMaterial.depthTest, depthMaterial.depthWrite, depthMaterial.depthFuncType)
 
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.WorldMatrix,
+                actor.transform.worldMatrix
+            );
             depthMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-            // depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
             depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
-            // depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
-            depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+
+            // depthMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
+            // // depthMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
+            // depthMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
+            // // depthMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
+            // // depthMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
 
             this.renderMesh(actor.geometry, depthMaterial);
 
@@ -1126,6 +1175,17 @@ export class Renderer {
 
             // console.log(lightActor, castShadowLightActors, castShadowRenderMeshInfos)
 
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.ViewMatrix,
+                lightActor.shadowCamera.viewMatrix
+            );
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.ProjectionMatrix,
+                lightActor.shadowCamera.projectionMatrix
+            );
+
             castShadowRenderMeshInfos.forEach(({ actor }) => {
                 const targetMaterial = actor.depthMaterial;
 
@@ -1134,38 +1194,34 @@ export class Renderer {
                     throw 'invalid target material';
                 }
 
-                // // 先頭でガードしてるので shadow camera はあるはず。
-                // targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-                // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.ViewPosition,
-                //     lightActor.shadowCamera!.transform.worldMatrix.position
-                // );
-                // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.ProjectionMatrix,
-                //     lightActor.shadowCamera!.projectionMatrix
-                // );
-                // // TODO: copyの方を渡す、でいいんだっけ
-                // targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture);
-                // targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
-                // targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
-
                 // TODO: material 側でやった方がよい？
                 targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-                // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
-                // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix.elements);
+                // // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
+                // // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
+                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix.elements);
+                // this.updateUniformBlockTransformations(actor, lightActor.shadowCamera!);
+                this.setUniformBlockValue(
+                    UniformBlockNames.Transformations,
+                    UniformNames.WorldMatrix,
+                    actor.transform.worldMatrix
+                );
                 // targetMaterial.uniforms.setValue(
                 //     UniformNames.ProjectionMatrix,
                 //     lightActor.shadowCamera!.projectionMatrix
                 // );
-                this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix.elements);
-                targetMaterial.uniforms.setValue(
+                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix.elements);
+
+                this.setUniformBlockValue(
+                    UniformBlockNames.Transformations,
                     UniformNames.NormalMatrix,
-                    actor.transform.worldMatrix.clone().invert().transpose()
+                    actor.transform.normalMatrix
                 );
+
+                // targetMaterial.uniforms.setValue(
+                //     UniformNames.NormalMatrix,
+                //     actor.transform.worldMatrix.clone().invert().transpose()
+                // );
                 targetMaterial.uniforms.setValue(
                     UniformNames.ViewPosition,
                     lightActor.shadowCamera!.transform.worldMatrix.position
@@ -1220,6 +1276,13 @@ export class Renderer {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
 
+        this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.ProjectionMatrix,
+            camera.projectionMatrix
+        );
+
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -1239,19 +1302,29 @@ export class Renderer {
                 this.setRenderTarget(this._gBufferRenderTargets.write, false, false);
             }
 
-            
             // TODO: material 側でやった方がよい？
             targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-            // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
-            // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
-            // targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
-            targetMaterial.uniforms.setValue(
-                UniformNames.NormalMatrix,
-                actor.transform.worldMatrix.clone().invert().transpose()
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.WorldMatrix,
+                actor.transform.worldMatrix
             );
+            // // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
+            // // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
+            // // targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
+            // targetMaterial.uniforms.setValue(
+            //     UniformNames.NormalMatrix,
+            //     actor.transform.worldMatrix.clone().invert().transpose()
+            // );
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.NormalMatrix,
+                actor.transform.normalMatrix
+            );
+            
             targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
@@ -1300,19 +1373,37 @@ export class Renderer {
         //     this.gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
 
+        this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.ProjectionMatrix,
+            camera.projectionMatrix
+        );
+
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             const targetMaterial = actor.materials[materialIndex];
 
-            // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
-            // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
-            // targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
-            targetMaterial.uniforms.setValue(
-                UniformNames.NormalMatrix,
-                actor.transform.worldMatrix.clone().invert().transpose()
+            // // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
+            // // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
+            // // targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
+            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
+            // this.updateUniformBlockTransformations(actor, camera);
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.WorldMatrix,
+                actor.transform.worldMatrix
             );
+            this.setUniformBlockValue(
+                UniformBlockNames.Transformations,
+                UniformNames.NormalMatrix,
+                actor.transform.normalMatrix
+            );
+            // targetMaterial.uniforms.setValue(
+            //     UniformNames.NormalMatrix,
+            //     actor.transform.worldMatrix.clone().invert().transpose()
+            // );
             targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // TODO:
