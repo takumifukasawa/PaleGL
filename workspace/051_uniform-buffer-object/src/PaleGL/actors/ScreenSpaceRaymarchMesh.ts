@@ -26,16 +26,16 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
                 type: UniformTypes.Vector3,
                 value: Vector3.zero,
             },
-            {
-                name: 'uAspect',
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: 'uFov',
-                type: UniformTypes.Float,
-                value: 0,
-            },
+            // {
+            //     name: 'uAspect',
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
+            // {
+            //     name: 'uFov',
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
             ...uniforms,
             ...PostProcessPassBase.commonUniforms,
         ];

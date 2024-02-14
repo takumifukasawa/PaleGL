@@ -3,4 +3,6 @@ layout (std140) uniform ubCamera {
     vec3 uViewDirection;
     float uNearClip;
     float uFarClip;
+    float uAspect;
+    float uFov;
 };

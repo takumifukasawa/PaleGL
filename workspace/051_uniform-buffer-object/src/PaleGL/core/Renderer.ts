@@ -50,6 +50,7 @@ import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
+import {PerspectiveCamera} from "@/PaleGL/actors/PerspectiveCamera.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -339,6 +340,8 @@ export class Renderer {
                     UniformNames.ViewDirection,
                     UniformNames.CameraNear,
                     UniformNames.CameraFar,
+                    UniformNames.CameraAspect,
+                    UniformNames.CameraFov
                 ]
             )
         );
@@ -1072,12 +1075,15 @@ export class Renderer {
      * @private
      */
     private setUniformBlockValue(blockName: string, uniformName: string, value: Vector2 | Vector3 | Vector4 | Matrix4 | number) {
+        // if(typeof(value) === 'number') {
+        //     console.log(blockName, uniformName, value);
+        // }
         const targetUbo = this.globalUniformBufferObjects.find((ubo) => ubo.blockName === blockName);
         if (!targetUbo) {
             console.error('ubo not found');
             return;
         }
-        targetUbo?.updateBufferData(uniformName, typeof(value) === 'number' ? value : value.elements);
+        targetUbo?.updateBufferData(uniformName, typeof(value) === 'number' ? new Float32Array([value]) : value.elements);
     }
 
     /**
@@ -1435,6 +1441,16 @@ export class Renderer {
             UniformBlockNames.Camera,
             UniformNames.CameraFar,
             camera.far
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Camera,
+            UniformNames.CameraAspect,
+            camera.isPerspective() ? (camera as PerspectiveCamera).aspect : (camera as OrthographicCamera).aspect
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Camera,
+            UniformNames.CameraFov,
+            camera.isPerspective() ? (camera as PerspectiveCamera).fov : 0
         );
     }
 

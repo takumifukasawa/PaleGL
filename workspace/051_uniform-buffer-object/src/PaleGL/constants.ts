@@ -262,6 +262,8 @@ export const UniformNames = {
     ViewDirectionProjectionInverse: 'uViewDirectionProjectionInverse',
     ViewPosition: 'uViewPosition',
     ViewDirection: 'uViewDirection',
+    CameraAspect: "uAspect",
+    CameraFov: "uFov",
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',

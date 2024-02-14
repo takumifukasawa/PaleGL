@@ -10,6 +10,7 @@ export class OrthographicCamera extends Camera {
     top: number = 0;
     near: number = 0;
     far: number = 0;
+    aspect: number = 1;
 
     constructor(left: number, right: number, bottom: number, top: number, near: number, far: number) {
         super({ cameraType: CameraTypes.Orthographic });
@@ -40,6 +41,8 @@ export class OrthographicCamera extends Camera {
         if (width !== null && height !== null) {
             this.setSize(width, height);
         }
+        
+        this.aspect = (right - left) / (top - bottom);
     }
 
     setSize(width: number, height: number) {

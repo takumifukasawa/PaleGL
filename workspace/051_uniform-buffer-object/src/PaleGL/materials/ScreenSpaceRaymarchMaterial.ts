@@ -27,16 +27,16 @@ export class ScreenSpaceRaymarchMaterial extends Material {
                 type: UniformTypes.Texture,
                 value: null
             },
-            {
-                name: UniformNames.CameraNear,
-                type: UniformTypes.Float,
-                value: 0
-            },
-            {
-                name: UniformNames.CameraFar,
-                type: UniformTypes.Float,
-                value: 0,
-            }
+            // {
+            //     name: UniformNames.CameraNear,
+            //     type: UniformTypes.Float,
+            //     value: 0
+            // },
+            // {
+            //     name: UniformNames.CameraFar,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // }
         ];
         const shadingUniforms: UniformsData = [
             {

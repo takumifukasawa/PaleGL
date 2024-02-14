@@ -35,8 +35,8 @@ uniform int uShadingModelId;
 uniform sampler2D uDepthTexture;
 // uniform float uNearClip;
 // uniform float uFarClip;
-uniform float uFov;
-uniform float uAspect;
+// uniform float uFov;
+// uniform float uAspect;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
