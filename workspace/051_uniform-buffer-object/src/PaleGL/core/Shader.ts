@@ -25,7 +25,7 @@ function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
 export class Shader extends GLObject {
     private program: WebGLProgram | null;
     private gpu: GPU;
-
+  
     get glObject(): WebGLProgram {
         return this.program!;
     }

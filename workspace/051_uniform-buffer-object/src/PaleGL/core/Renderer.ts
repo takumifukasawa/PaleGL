@@ -50,7 +50,7 @@ import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
-import {PerspectiveCamera} from "@/PaleGL/actors/PerspectiveCamera.ts";
+import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -332,21 +332,17 @@ export class Renderer {
             ])
         );
         this.globalUniformBufferObjects.push(
-            this.gpu.createUniformBufferObject(
-                uniformBufferObjectShader,
-                UniformBlockNames.Camera,
-                [
-                    UniformNames.ViewPosition,
-                    UniformNames.ViewDirection,
-                    UniformNames.CameraNear,
-                    UniformNames.CameraFar,
-                    UniformNames.CameraAspect,
-                    UniformNames.CameraFov
-                ]
-            )
+            this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.Camera, [
+                UniformNames.ViewPosition,
+                UniformNames.ViewDirection,
+                UniformNames.CameraNear,
+                UniformNames.CameraFar,
+                UniformNames.CameraAspect,
+                UniformNames.CameraFov,
+            ])
         );
         // for debug
-        console.log(this.globalUniformBufferObjects)
+        console.log(this.globalUniformBufferObjects);
     }
 
     globalUniformBufferObjects: UniformBufferObject[] = [];
@@ -372,27 +368,35 @@ export class Renderer {
     //     });
     // }
 
-    checkNeedsBindUniformBufferObjectToMaterial(mesh: Mesh) {
-        mesh.materials.forEach((material) => {
-            if (!material.boundUniformBufferObjects) {
-                material.boundUniformBufferObjects = true;
-                material.uniformBlockNames.forEach((blockName) => {
-                    const targetUniformBufferObject = this.globalUniformBufferObjects.find(
-                        (ubo) => ubo.blockName === blockName
-                    );
-                    if (!targetUniformBufferObject) {
-                        return;
-                    }
-                    const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
-                        targetUniformBufferObject,
-                        material.shader!,
-                        blockName
-                    );
-                    console.log("addUniformBlock", material.name, material.uniformBlockNames, targetUniformBufferObject.blockName, blockIndex);
-                    material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
-                });
+    // TODO: materialのstartの中でやりたい
+    checkNeedsBindUniformBufferObjectToMaterial(material: Material) {
+        // mesh.materials.forEach((material) => {
+        if (material.boundUniformBufferObjects) {
+            return;
+        }
+        material.boundUniformBufferObjects = true;
+        material.uniformBlockNames.forEach((blockName) => {
+            const targetUniformBufferObject = this.globalUniformBufferObjects.find(
+                (ubo) => ubo.blockName === blockName
+            );
+            if (!targetUniformBufferObject) {
+                return;
             }
+            const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
+                targetUniformBufferObject,
+                material.shader!,
+                blockName
+            );
+            console.log(
+                material.name,
+                'addUniformBlock',
+                material.uniformBlockNames,
+                targetUniformBufferObject.blockName,
+                blockIndex
+            );
+            material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
         });
+        // });
     }
 
     // --------------------------------------------------------------
@@ -1074,7 +1078,11 @@ export class Renderer {
      * @param value
      * @private
      */
-    private setUniformBlockValue(blockName: string, uniformName: string, value: Vector2 | Vector3 | Vector4 | Matrix4 | number) {
+    private setUniformBlockValue(
+        blockName: string,
+        uniformName: string,
+        value: Vector2 | Vector3 | Vector4 | Matrix4 | number
+    ) {
         // if(typeof(value) === 'number') {
         //     console.log(blockName, uniformName, value);
         // }
@@ -1083,7 +1091,10 @@ export class Renderer {
             console.error('ubo not found');
             return;
         }
-        targetUbo?.updateBufferData(uniformName, typeof(value) === 'number' ? new Float32Array([value]) : value.elements);
+        targetUbo?.updateBufferData(
+            uniformName,
+            typeof value === 'number' ? new Float32Array([value]) : value.elements
+        );
     }
 
     /**
@@ -1427,21 +1438,9 @@ export class Renderer {
             UniformNames.ViewPosition,
             camera.transform.worldMatrix.position
         );
-        this.setUniformBlockValue(
-            UniformBlockNames.Camera,
-            UniformNames.ViewDirection,
-            camera.getWorldForward()
-        );
-        this.setUniformBlockValue(
-            UniformBlockNames.Camera,
-            UniformNames.CameraNear,
-            camera.near
-        );
-        this.setUniformBlockValue(
-            UniformBlockNames.Camera,
-            UniformNames.CameraFar,
-            camera.far
-        );
+        this.setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, camera.getWorldForward());
+        this.setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
+        this.setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraFar, camera.far);
         this.setUniformBlockValue(
             UniformBlockNames.Camera,
             UniformNames.CameraAspect,

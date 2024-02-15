@@ -14,10 +14,13 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+// #include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
+
 uniform sampler2D uSrcTexture;
 uniform sampler2D uDepthTexture;
-uniform float uNearClip;
-uniform float uFarClip;
+// uniform float uNearClip;
+// uniform float uFarClip;
 uniform float uFocusDistance;
 uniform float uFocusRange;
 uniform float uBokehRadius;

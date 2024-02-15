@@ -155,11 +155,12 @@ export class PostProcess {
             // basic
             //
 
-            passMaterial.uniforms.setValue(UniformNames.CameraNear, targetCamera.near);
-            passMaterial.uniforms.setValue(UniformNames.CameraFar, targetCamera.far);
+            // passMaterial.uniforms.setValue(UniformNames.CameraNear, targetCamera.near);
+            // passMaterial.uniforms.setValue(UniformNames.CameraFar, targetCamera.far);
+            // passMaterial.uniforms.setValue(UniformNames.ViewPosition, targetCamera.transform.position);
+            // passMaterial.uniforms.setValue(UniformNames.ViewMatrix, targetCamera.viewMatrix);
+            // passMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
             passMaterial.uniforms.setValue(UniformNames.Time, time);
-            passMaterial.uniforms.setValue(UniformNames.ViewPosition, targetCamera.transform.position);
-            passMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
             passMaterial.uniforms.setValue(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
             passMaterial.uniforms.setValue(
                 UniformNames.InverseViewProjectionMatrix,
@@ -167,9 +168,6 @@ export class PostProcess {
             );
             passMaterial.uniforms.setValue(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
             passMaterial.uniforms.setValue(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
-            // console.log(targetCamera.inverseViewProjectionMatrix)
-            // console.log(targetCamera.inverseProjectionMatrix)
-            passMaterial.uniforms.setValue(UniformNames.ViewMatrix, targetCamera.viewMatrix);
             passMaterial.uniforms.setValue(
                 UniformNames.TransposeInverseViewMatrix,
                 targetCamera.viewMatrix.clone().invert().transpose()
@@ -216,6 +214,13 @@ export class PostProcess {
             time,
             lightActors,
         });
+
+        //
+        // camera
+        //
+
+        renderer.updateCameraUniforms(targetCamera);
+
         pass.render({
             gpu,
             renderer,

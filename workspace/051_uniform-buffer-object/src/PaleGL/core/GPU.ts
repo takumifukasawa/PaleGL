@@ -385,15 +385,16 @@ export class GPU {
             // if(this.uniforms.uniformBlocks.length > 0) {
             //     console.log(this.uniforms.uniformBlocks)
             // }
-            this.uniforms.uniformBlocks.forEach(({ uniformBufferObject, blockIndex} ) => {
-                this.gl.bindBufferRange(
-                    gl.UNIFORM_BUFFER,
-                    blockIndex,
-                    uniformBufferObject.glObject,
-                    0,
-                    uniformBufferObject.blockSize
-                );
-            });
+            // NOTE: なくていいかも
+            // this.uniforms.uniformBlocks.forEach(({ uniformBufferObject} ) => {
+            //     this.gl.bindBufferRange(
+            //         gl.UNIFORM_BUFFER,
+            //         uniformBufferObject.bindingPoint,
+            //         uniformBufferObject.glObject,
+            //         0,
+            //         uniformBufferObject.blockSize
+            //     );
+            // });
         }
     }
 

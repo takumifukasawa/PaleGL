@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material } from '@/PaleGL/materials/Material';
@@ -70,6 +70,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
 
         // TODO: RHalf format
         this.circleOfConfusionPass = new FragmentPass({
+            name: "circleOfConfusionPass",
             gpu,
             fragmentShader: dofCircleOfConfusionFragmentShader,
             uniforms: [
@@ -104,6 +105,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
                     value: Vector4.zero,
                 },
                 ...PostProcessPassBase.commonUniforms,
+            ],
+            uniformBlockNames: [
+                // UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
             ],
             // TODO: r11f_g11f_b10fだとunsignedなのでr16fにする
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -307,7 +312,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.geometry.start();
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
-
+        
         //
         // 0: render coc pass
         //

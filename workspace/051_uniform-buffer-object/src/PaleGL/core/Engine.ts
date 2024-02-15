@@ -175,7 +175,9 @@ export class Engine {
                 case ActorTypes.SkinnedMesh:
                     actor.beforeRender({ gpu: this.#gpu });
                     const mesh = actor as Mesh;
-                    this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh);
+                    mesh.materials.forEach(mat => {
+                        this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mat);
+                    });
                     // mesh.materials.forEach((material) => {
                     //     if (!material.boundUniformBufferObjects) {
                     //         material.boundUniformBufferObjects = true;
