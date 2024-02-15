@@ -8,15 +8,19 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/uniform-block-transformations.glsl
+// uniform mat4 uProjectionMatrix;
+
+#include ./partial/uniform-block-camera.glsl
+// uniform float uNearClip;
+// uniform float uFarClip;
+
 // uniform sampler2D uSrcTexture;
 // uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
 // uniform sampler2D uNormalTexture;
 uniform sampler2D uGBufferBTexture;
-uniform float uNearClip;
-uniform float uFarClip;
 uniform mat4 uTransposeInverseViewMatrix;
-uniform mat4 uProjectionMatrix;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform mat4 uInverseProjectionMatrix;
 uniform float[6] uSamplingRotations;

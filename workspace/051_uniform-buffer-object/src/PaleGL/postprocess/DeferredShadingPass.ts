@@ -1,6 +1,12 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { MAX_SPOT_LIGHT_COUNT, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    MAX_SPOT_LIGHT_COUNT,
+    RenderTargetTypes,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
@@ -12,8 +18,8 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
-        // uniforms,
-    } // name,
+        // name,
+    } // uniforms,
     : {
         gpu: GPU;
         // fragmentShader: string;
@@ -165,7 +171,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 type: UniformTypes.Texture,
                 value: null,
             },
-           
+
             {
                 name: UniformNames.SpotLightShadowMap,
                 type: UniformTypes.TextureArray,
@@ -219,9 +225,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
             // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniformBlockNames: [UniformBlockNames.Camera],
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
-        
+
         // console.log(deferredShadingFragmentShader)
     }
 
@@ -254,9 +261,9 @@ export class DeferredShadingPass extends PostProcessPassBase {
             },
         ]);
     }
-    
+
     render(args: PostProcessPassRenderArgs) {
-        super.render(args)
+        super.render(args);
         // console.log(this.material.uniforms)
     }
 }

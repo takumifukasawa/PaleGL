@@ -1,4 +1,4 @@
-﻿import { MAX_SPOT_LIGHT_COUNT, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {MAX_SPOT_LIGHT_COUNT, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
@@ -141,6 +141,10 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     value: 1,
                 },
             ],
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
+            ]
         });
     }
 

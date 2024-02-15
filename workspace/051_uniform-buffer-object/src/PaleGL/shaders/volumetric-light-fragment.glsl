@@ -48,14 +48,18 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/uniform-block-transformations.glsl
+// uniform mat4 uViewMatrix;
+// uniform mat4 uProjectionMatrix;
+
+#include ./partial/uniform-block-camera.glsl
+// uniform vec3 uViewPosition;
+// uniform float uNearClip;
+// uniform float uFarClip;
+
 uniform sampler2D uDepthTexture; // camera depth
 uniform sampler2D uGBufferATexture;
-uniform vec3 uViewPosition;
-uniform float uNearClip;
-uniform float uFarClip;
 uniform mat4 uTransposeInverseViewMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
 uniform mat4 uViewProjectionMatrix;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform mat4 uInverseViewMatrix;

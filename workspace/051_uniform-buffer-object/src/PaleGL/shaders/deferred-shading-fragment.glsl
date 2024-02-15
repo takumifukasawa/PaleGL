@@ -185,8 +185,13 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 // uniform mat4 uLightViewProjectionMatrix;
 // #endif
 
+#include ./partial/uniform-block-camera.glsl
+
+// uniform vec3 uViewPosition;
+// uniform float uNearClip;
+// uniform float uFarClip;
+
 // #include ./partial/uniform-block-camera.glsl
-uniform vec3 uViewPosition;
 
 // TODO
 // uniform sampler2D uAOTexture; 
@@ -198,9 +203,6 @@ uniform sampler2D uDepthTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 // uniform sampler2D uShadowMap;
 // uniform samplerCube uEnvMap;
-
-uniform float uNearClip;
-uniform float uFarClip;
 
 uniform float uTime;
 

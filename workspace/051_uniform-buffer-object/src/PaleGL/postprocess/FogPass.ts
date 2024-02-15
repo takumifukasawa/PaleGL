@@ -3,7 +3,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
 
 export class FogPass extends PostProcessPassBase {
     private static lightShaftTextureUniformName = 'uLightShaftTexture';
@@ -65,6 +65,9 @@ export class FogPass extends PostProcessPassBase {
                 },
                 // ...PostProcessPassBase.commonUniforms,
             ],
+            uniformBlockNames: [
+                UniformBlockNames.Camera
+            ]
         });
 
         this.fogStrength = fogStrength;

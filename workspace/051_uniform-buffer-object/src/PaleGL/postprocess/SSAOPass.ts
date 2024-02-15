@@ -1,4 +1,4 @@
-﻿import { UniformNames, TextureTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants';
+﻿import {UniformNames, TextureTypes, TextureWrapTypes, UniformTypes, UniformBlockNames} from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
@@ -213,6 +213,10 @@ export class SSAOPass extends PostProcessPassBase {
                     value: 1,
                 },
             ],
+            uniformBlockNames: [
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera
+            ]
         });
 
         this.samplingTexture = samplingTexture;
