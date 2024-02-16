@@ -327,8 +327,11 @@ export class Renderer {
                 UniformNames.ProjectionMatrix,
                 UniformNames.NormalMatrix,
                 UniformNames.InverseWorldMatrix,
-                // UniformNames.ViewPosition,
-                // UniformNames.ViewDirection,
+                UniformNames.ViewProjectionMatrix,
+                UniformNames.InverseViewMatrix,
+                UniformNames.InverseProjectionMatrix,
+                UniformNames.InverseViewProjectionMatrix,
+                UniformNames.TransposeInverseViewMatrix
             ])
         );
         this.globalUniformBufferObjects.push(
@@ -1450,6 +1453,44 @@ export class Renderer {
             UniformBlockNames.Camera,
             UniformNames.CameraFov,
             camera.isPerspective() ? (camera as PerspectiveCamera).fov : 0
+        );
+
+        // passMaterial.uniforms.setValue(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
+        // passMaterial.uniforms.setValue(
+        //     UniformNames.InverseViewProjectionMatrix,
+        //     targetCamera.inverseViewProjectionMatrix
+        // );
+        // passMaterial.uniforms.setValue(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
+        // passMaterial.uniforms.setValue(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
+        // passMaterial.uniforms.setValue(
+        //     UniformNames.TransposeInverseViewMatrix,
+        //     targetCamera.viewMatrix.clone().invert().transpose()
+        // );
+
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.ViewProjectionMatrix,
+            camera.viewProjectionMatrix
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.InverseViewMatrix,
+            camera.inverseViewMatrix
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.InverseProjectionMatrix,
+            camera.inverseProjectionMatrix
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.InverseViewProjectionMatrix,
+            camera.inverseViewProjectionMatrix
+        );
+        this.setUniformBlockValue(
+            UniformBlockNames.Transformations,
+            UniformNames.TransposeInverseViewMatrix,
+            camera.viewMatrix.clone().invert().transpose()
         );
     }
 

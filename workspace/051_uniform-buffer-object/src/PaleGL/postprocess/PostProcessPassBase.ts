@@ -17,7 +17,7 @@ import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
@@ -204,31 +204,31 @@ export class PostProcessPassBase implements IPostProcessPass {
             //     type: UniformTypes.Matrix4,
             //     value: Matrix4.identity,
             // },
-            {
-                name: UniformNames.ViewProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseViewProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.TransposeInverseViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
+            // {
+            //     name: UniformNames.ViewProjectionMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     name: UniformNames.InverseViewMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     name: UniformNames.InverseProjectionMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     name: UniformNames.InverseViewProjectionMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
+            // {
+            //     name: UniformNames.TransposeInverseViewMatrix,
+            //     type: UniformTypes.Matrix4,
+            //     value: Matrix4.identity,
+            // },
         ];
         // passMaterial.updateUniform(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
         // passMaterial.updateUniform(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);

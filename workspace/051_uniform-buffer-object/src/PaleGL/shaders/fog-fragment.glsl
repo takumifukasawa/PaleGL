@@ -13,6 +13,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 // uniform float uNearClip;
 // uniform float uFarClip;
@@ -23,8 +24,8 @@ uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
 uniform float uBlendRate;
 uniform sampler2D uDepthTexture;
-uniform mat4 uInverseViewProjectionMatrix;
-uniform mat4 uInverseProjectionMatrix;
+// uniform mat4 uInverseViewProjectionMatrix;
+// uniform mat4 uInverseProjectionMatrix;
 uniform float uFogStrength;
 uniform float uFogDensity;
 uniform float uFogDensityAttenuation;

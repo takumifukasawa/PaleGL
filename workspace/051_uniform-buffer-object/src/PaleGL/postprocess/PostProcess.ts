@@ -160,7 +160,7 @@ export class PostProcess {
             // passMaterial.uniforms.setValue(UniformNames.ViewPosition, targetCamera.transform.position);
             // passMaterial.uniforms.setValue(UniformNames.ViewMatrix, targetCamera.viewMatrix);
             // passMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, targetCamera.projectionMatrix);
-            passMaterial.uniforms.setValue(UniformNames.Time, time);
+            
             passMaterial.uniforms.setValue(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
             passMaterial.uniforms.setValue(
                 UniformNames.InverseViewProjectionMatrix,
@@ -172,6 +172,9 @@ export class PostProcess {
                 UniformNames.TransposeInverseViewMatrix,
                 targetCamera.viewMatrix.clone().invert().transpose()
             );
+            
+            passMaterial.uniforms.setValue(UniformNames.Time, time);
+            
             // g-buffers
             passMaterial.uniforms.setValue(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.gBufferATexture);
             passMaterial.uniforms.setValue(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.gBufferBTexture);

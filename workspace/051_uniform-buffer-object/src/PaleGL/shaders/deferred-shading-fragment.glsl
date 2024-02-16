@@ -185,6 +185,7 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 // uniform mat4 uLightViewProjectionMatrix;
 // #endif
 
+#include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 
 // uniform vec3 uViewPosition;
@@ -206,7 +207,7 @@ uniform sampler2D uAmbientOcclusionTexture;
 
 uniform float uTime;
 
-uniform mat4 uInverseViewProjectionMatrix;
+// uniform mat4 uInverseViewProjectionMatrix;
        
 // TODO: loop
 uniform Skybox uSkybox;

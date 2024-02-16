@@ -59,11 +59,11 @@ out vec4 outColor;
 
 uniform sampler2D uDepthTexture; // camera depth
 uniform sampler2D uGBufferATexture;
-uniform mat4 uTransposeInverseViewMatrix;
-uniform mat4 uViewProjectionMatrix;
-uniform mat4 uInverseViewProjectionMatrix;
-uniform mat4 uInverseViewMatrix;
-uniform mat4 uInverseProjectionMatrix;
+// uniform mat4 uTransposeInverseViewMatrix;
+// uniform mat4 uViewProjectionMatrix;
+// uniform mat4 uInverseViewProjectionMatrix;
+// uniform mat4 uInverseViewMatrix;
+// uniform mat4 uInverseProjectionMatrix;
 uniform float uBlendRate;
 uniform float uTime;
 

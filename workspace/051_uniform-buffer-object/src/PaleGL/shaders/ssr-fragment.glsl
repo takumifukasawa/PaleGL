@@ -22,9 +22,9 @@ uniform sampler2D uSrcTexture;
 uniform sampler2D uDepthTexture;
 // uniform sampler2D uNormalTexture;
 uniform sampler2D uGBufferBTexture;
-uniform mat4 uTransposeInverseViewMatrix;
-uniform mat4 uInverseProjectionMatrix;
-uniform mat4 uInverseViewProjectionMatrix;
+// uniform mat4 uTransposeInverseViewMatrix;
+// uniform mat4 uInverseProjectionMatrix;
+// uniform mat4 uInverseViewProjectionMatrix;
 uniform float uBlendRate;
 
 uniform float uRayDepthBias;
