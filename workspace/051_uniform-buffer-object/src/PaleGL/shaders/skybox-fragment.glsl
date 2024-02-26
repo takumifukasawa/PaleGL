@@ -13,7 +13,7 @@ in vec3 vWorldPosition;
 
 uniform samplerCube uCubeTexture;
 // uniform vec3 uViewPosition;
-uniform mat4 uViewDirectionProjectionInverse;
+// uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 uniform int uShadingModelId;
 

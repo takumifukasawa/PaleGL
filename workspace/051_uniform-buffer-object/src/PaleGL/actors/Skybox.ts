@@ -10,7 +10,7 @@ import {
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+// import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Attribute } from '@/PaleGL/core/Attribute';
@@ -149,11 +149,11 @@ export class Skybox extends Mesh {
                     type: UniformTypes.CubeMap,
                     value: cubeMap,
                 },
-                {
-                    name: UniformNames.ViewDirectionProjectionInverse,
-                    type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
-                },
+                // {
+                //     name: UniformNames.ViewDirectionProjectionInverse,
+                //     type: UniformTypes.Matrix4,
+                //     value: Matrix4.identity,
+                // },
                 {
                     name: UniformNames.RotationOffset,
                     type: UniformTypes.Float,
