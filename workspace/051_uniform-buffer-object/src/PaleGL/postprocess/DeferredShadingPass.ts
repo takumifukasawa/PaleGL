@@ -148,15 +148,15 @@ export class DeferredShadingPass extends PostProcessPassBase {
                             value: 0,
                         },
                         {
-                            name: UniformNames.ShadowMap,
-                            type: UniformTypes.Texture,
-                            value: null,
-                        },
-                        {
                             name: UniformNames.LightViewProjectionMatrix,
                             type: UniformTypes.Matrix4,
                             value: Matrix4.identity,
                         },
+                        // {
+                        //     name: UniformNames.ShadowMap,
+                        //     type: UniformTypes.Texture,
+                        //     value: null,
+                        // },
                         {
                             name: UniformNames.ShadowBias,
                             type: UniformTypes.Float,
@@ -225,7 +225,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
             // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            uniformBlockNames: [UniformBlockNames.Camera],
+            uniformBlockNames: [UniformBlockNames.Camera, UniformBlockNames.SpotLight],
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
 

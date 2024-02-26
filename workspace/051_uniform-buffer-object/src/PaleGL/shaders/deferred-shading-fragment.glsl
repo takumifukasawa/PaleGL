@@ -187,6 +187,7 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
+#include ./partial/uniform-block-spot-light.glsl
 
 // uniform vec3 uViewPosition;
 // uniform float uNearClip;

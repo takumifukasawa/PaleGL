@@ -262,8 +262,8 @@ export const UniformNames = {
     ViewDirectionProjectionInverse: 'uViewDirectionProjectionInverse',
     ViewPosition: 'uViewPosition',
     ViewDirection: 'uViewDirection',
-    CameraAspect: "uAspect",
-    CameraFov: "uFov",
+    CameraAspect: 'uAspect',
+    CameraFov: 'uFov',
     // g-buffer
     GBufferATexture: 'uGBufferATexture',
     GBufferBTexture: 'uGBufferBTexture',
@@ -333,6 +333,7 @@ export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 export const UniformBlockNames = {
     Transformations: 'ubTransformations',
     Camera: 'ubCamera',
+    SpotLight: 'ubSpotLight',
 } as const;
 
 export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];

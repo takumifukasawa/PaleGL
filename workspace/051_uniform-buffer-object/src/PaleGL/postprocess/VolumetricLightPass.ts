@@ -1,4 +1,4 @@
-﻿import {MAX_SPOT_LIGHT_COUNT, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { MAX_SPOT_LIGHT_COUNT, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
@@ -49,21 +49,6 @@ export class VolumetricLightPass extends PostProcessPassBase {
                         return [
                             // TODO: spot light の uniform構造体、関数でまとめて更新したい
                             {
-                                name: UniformNames.LightColor,
-                                type: UniformTypes.Color,
-                                value: Color.black,
-                            },
-                            {
-                                name: UniformNames.LightIntensity,
-                                type: UniformTypes.Float,
-                                value: 0,
-                            },
-                            {
-                                name: UniformNames.LightViewProjectionMatrix,
-                                type: UniformTypes.Matrix4,
-                                value: Matrix4.identity, // TODO: ある前提なのは本当はよくない
-                            },
-                            {
                                 name: UniformNames.LightPosition,
                                 type: UniformTypes.Vector3,
                                 value: Vector3.zero,
@@ -72,6 +57,16 @@ export class VolumetricLightPass extends PostProcessPassBase {
                                 name: UniformNames.LightDirection,
                                 type: UniformTypes.Vector3,
                                 value: Vector3.zero,
+                            },
+                            {
+                                name: UniformNames.LightIntensity,
+                                type: UniformTypes.Float,
+                                value: 0,
+                            },
+                            {
+                                name: UniformNames.LightColor,
+                                type: UniformTypes.Color,
+                                value: Color.black,
                             },
                             {
                                 name: UniformNames.LightDistance,
@@ -92,6 +87,16 @@ export class VolumetricLightPass extends PostProcessPassBase {
                                 name: UniformNames.LightPenumbraCos,
                                 type: UniformTypes.Float,
                                 value: 0,
+                            },
+                            {
+                                name: UniformNames.LightViewProjectionMatrix,
+                                type: UniformTypes.Matrix4,
+                                value: Matrix4.identity, // TODO: ある前提なのは本当はよくない
+                            },
+                            {
+                                name: UniformNames.ShadowBias,
+                                type: UniformTypes.Float,
+                                value: 0.001,
                             },
                         ];
                     }),
@@ -141,10 +146,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     value: 1,
                 },
             ],
-            uniformBlockNames: [
-                UniformBlockNames.Transformations,
-                UniformBlockNames.Camera
-            ]
+            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera, UniformBlockNames.SpotLight],
         });
     }
 

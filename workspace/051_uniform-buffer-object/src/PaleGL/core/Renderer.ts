@@ -51,6 +51,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
+import { Color } from '@/PaleGL/math/Color.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -331,7 +332,7 @@ export class Renderer {
                 UniformNames.InverseViewMatrix,
                 UniformNames.InverseProjectionMatrix,
                 UniformNames.InverseViewProjectionMatrix,
-                UniformNames.TransposeInverseViewMatrix
+                UniformNames.TransposeInverseViewMatrix,
             ])
         );
         this.globalUniformBufferObjects.push(
@@ -344,8 +345,15 @@ export class Renderer {
                 UniformNames.CameraFov,
             ])
         );
+        this.globalUniformBufferObjects.push(
+            this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.SpotLight, [
+                'uSpotLightColor',
+            ])
+        );
         // for debug
+        console.log('===== global uniform buffer objects =====');
         console.log(this.globalUniformBufferObjects);
+        console.log('=========================================');
     }
 
     globalUniformBufferObjects: UniformBufferObject[] = [];
@@ -767,6 +775,7 @@ export class Renderer {
         //     applyLightUniformValues(targetMaterial, l)
         //     light.applyUniformsValues(targetMaterial);
         // });
+
         applyLightUniformValues(this._deferredShadingPass.material, lightActors);
 
         // set ao texture
@@ -847,6 +856,10 @@ export class Renderer {
         // ------------------------------------------------------------------------------
         // volumetric light pass
         // ------------------------------------------------------------------------------
+
+        if(lightActors.spotLights.length > 0) {
+            this.updateSpotLightUniforms(lightActors.spotLights[0]);
+        }
 
         this._volumetricLightPass.setSpotLights(lightActors.spotLights);
         // TODO: spot light ないときの対応
@@ -1084,14 +1097,14 @@ export class Renderer {
     private setUniformBlockValue(
         blockName: string,
         uniformName: string,
-        value: Vector2 | Vector3 | Vector4 | Matrix4 | number
+        value: Vector2 | Vector3 | Vector4 | Matrix4 | number | Color
     ) {
         // if(typeof(value) === 'number') {
         //     console.log(blockName, uniformName, value);
         // }
         const targetUbo = this.globalUniformBufferObjects.find((ubo) => ubo.blockName === blockName);
         if (!targetUbo) {
-            console.error('ubo not found');
+            console.error(`[Renderer.setUniformBlockValue] invalid uniform block object: ${blockName}`);
             return;
         }
         targetUbo?.updateBufferData(
@@ -1492,6 +1505,10 @@ export class Renderer {
             UniformNames.TransposeInverseViewMatrix,
             camera.viewMatrix.clone().invert().transpose()
         );
+    }
+
+    updateSpotLightUniforms(light: SpotLight) {
+        this.setUniformBlockValue(UniformBlockNames.SpotLight, 'uSpotLightColor', Color.white);
     }
 
     /**
