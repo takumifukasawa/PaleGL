@@ -17,7 +17,8 @@ precision highp float;
 struct SpotLight {
     vec3 position;
     vec3 direction; // spotlightの向き先
-    vec4 color;
+    // vec4 color;
+    vec4 uSpotLightColor;
     float intensity;
     float distance;
     float attenuation;
@@ -193,7 +194,7 @@ void main() {
         // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
         accColor.xyz +=
             saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
-            transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
+            transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
     }
     #pragma UNROLL_END
    

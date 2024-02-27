@@ -6,7 +6,7 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+// import { Color } from '@/PaleGL/math/Color.ts';
 
 export class VolumetricLightPass extends PostProcessPassBase {
     rayStep: number = 0.5;
@@ -63,11 +63,11 @@ export class VolumetricLightPass extends PostProcessPassBase {
                                 type: UniformTypes.Float,
                                 value: 0,
                             },
-                            {
-                                name: UniformNames.LightColor,
-                                type: UniformTypes.Color,
-                                value: Color.black,
-                            },
+                            // {
+                            //     name: UniformNames.LightColor,
+                            //     type: UniformTypes.Color,
+                            //     value: Color.black,
+                            // },
                             {
                                 name: UniformNames.LightDistance,
                                 type: UniformTypes.Float,
@@ -172,11 +172,11 @@ export class VolumetricLightPass extends PostProcessPassBase {
             'uSpotLight',
             this.#spotLights.map((spotLight) => [
                 // TODO: spot light の uniform構造体、関数でまとめて更新したい
-                {
-                    name: UniformNames.LightColor,
-                    type: UniformTypes.Color,
-                    value: spotLight.color,
-                },
+                // {
+                //     name: UniformNames.LightColor,
+                //     type: UniformTypes.Color,
+                //     value: spotLight.color,
+                // },
                 {
                     name: UniformNames.LightIntensity,
                     type: UniformTypes.Float,

@@ -857,9 +857,7 @@ export class Renderer {
         // volumetric light pass
         // ------------------------------------------------------------------------------
 
-        if(lightActors.spotLights.length > 0) {
-            this.updateSpotLightUniforms(lightActors.spotLights[0]);
-        }
+        this.updateSpotLightsUniforms(lightActors.spotLights);
 
         this._volumetricLightPass.setSpotLights(lightActors.spotLights);
         // TODO: spot light ないときの対応
@@ -1097,7 +1095,7 @@ export class Renderer {
     private setUniformBlockValue(
         blockName: string,
         uniformName: string,
-        value: Vector2 | Vector3 | Vector4 | Matrix4 | number | Color
+        value: Vector2 | Vector3 | Vector4 | Matrix4 | number | Color | Color[]
     ) {
         // if(typeof(value) === 'number') {
         //     console.log(blockName, uniformName, value);
@@ -1107,10 +1105,19 @@ export class Renderer {
             console.error(`[Renderer.setUniformBlockValue] invalid uniform block object: ${blockName}`);
             return;
         }
-        targetUbo?.updateBufferData(
-            uniformName,
-            typeof value === 'number' ? new Float32Array([value]) : value.elements
-        );
+        if (Array.isArray(value)) {
+            const data: number[] = [];
+            value.forEach(v => data.push(...v.elements));
+            targetUbo?.updateBufferData(
+                uniformName,
+                new Float32Array(data)
+            );
+        } else {
+            targetUbo?.updateBufferData(
+                uniformName,
+                typeof value === 'number' ? new Float32Array([value]) : value.elements
+            );
+        }
     }
 
     /**
@@ -1507,8 +1514,9 @@ export class Renderer {
         );
     }
 
-    updateSpotLightUniforms(light: SpotLight) {
-        this.setUniformBlockValue(UniformBlockNames.SpotLight, 'uSpotLightColor', Color.white);
+    updateSpotLightsUniforms(spotLights: SpotLight[]) {
+        const colors = spotLights.map((spotLight) => spotLight.color);
+        this.setUniformBlockValue(UniformBlockNames.SpotLight, 'uSpotLightColor', colors);
     }
 
     /**

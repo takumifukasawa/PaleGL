@@ -9,5 +9,5 @@ layout (std140) uniform ubSpotLight {
     // float uSpotLightPenumbraCos;
     // mat4 uSpotLightLightViewProjectionMatrix;
     // float uSpotLightShadowBias;
-    vec4 uSpotLightColor;
+    vec4 uSpotLightColor[4];
 };
