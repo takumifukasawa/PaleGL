@@ -173,7 +173,7 @@ in vec2 vUv;
 // #include ./partial/directional-light-uniforms.glsl
 uniform DirectionalLight uDirectionalLight;
 // TODO: spot light の最大数はどこかで定数管理したい
-#define MAX_SPOT_LIGHT_COUNT 4
+// #define MAX_SPOT_LIGHT_COUNT 4
 uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];

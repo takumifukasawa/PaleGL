@@ -347,7 +347,8 @@ export class Renderer {
         );
         this.globalUniformBufferObjects.push(
             this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.SpotLight, [
-                'uSpotLightColor',
+                UniformNames.SpotLightIntensity,
+                UniformNames.SpotLightColor,
             ])
         );
         // for debug
@@ -1095,7 +1096,7 @@ export class Renderer {
     private setUniformBlockValue(
         blockName: string,
         uniformName: string,
-        value: Vector2 | Vector3 | Vector4 | Matrix4 | number | Color | Color[]
+        value: number | Vector2 | Vector3 | Vector4 | Matrix4 | Color | number[] | Color[]
     ) {
         // if(typeof(value) === 'number') {
         //     console.log(blockName, uniformName, value);
@@ -1107,11 +1108,17 @@ export class Renderer {
         }
         if (Array.isArray(value)) {
             const data: number[] = [];
-            value.forEach(v => data.push(...v.elements));
-            targetUbo?.updateBufferData(
-                uniformName,
-                new Float32Array(data)
-            );
+            value.forEach((v) => {
+                if (typeof v === 'number') {
+                    data.push(v);
+                    data.push(0);
+                    data.push(0);
+                    data.push(0);
+                } else {
+                    data.push(...v.elements);
+                }
+            });
+            targetUbo?.updateBufferData(uniformName, new Float32Array(data));
         } else {
             targetUbo?.updateBufferData(
                 uniformName,
@@ -1516,7 +1523,9 @@ export class Renderer {
 
     updateSpotLightsUniforms(spotLights: SpotLight[]) {
         const colors = spotLights.map((spotLight) => spotLight.color);
-        this.setUniformBlockValue(UniformBlockNames.SpotLight, 'uSpotLightColor', colors);
+        const intencities = spotLights.map((spotLight) => spotLight.intensity);
+        this.setUniformBlockValue(UniformBlockNames.SpotLight, UniformNames.SpotLightColor, colors);
+        this.setUniformBlockValue(UniformBlockNames.SpotLight, UniformNames.SpotLightIntensity, intencities);
     }
 
     /**

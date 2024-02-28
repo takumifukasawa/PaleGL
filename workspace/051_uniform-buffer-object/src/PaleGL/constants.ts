@@ -318,6 +318,8 @@ export const UniformNames = {
     LightAttenuation: 'attenuation',
     LightConeCos: 'coneCos',
     LightPenumbraCos: 'penumbraCos',
+    SpotLightColor: 'uSpotLightColor',
+    SpotLightIntensity: 'uSpotLightIntensity',
     // font
     FontMap: 'uFontMap',
     FontTiling: 'uFontTiling',

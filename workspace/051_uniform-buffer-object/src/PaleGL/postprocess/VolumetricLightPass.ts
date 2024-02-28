@@ -23,6 +23,8 @@ export class VolumetricLightPass extends PostProcessPassBase {
      */
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = volumetricLightFragmentShader;
+        
+        console.log(fragmentShader)
 
         super({
             gpu,

@@ -44,7 +44,6 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 
 // TODO: ここまで
 
-
 in vec2 vUv;
 
 out vec4 outColor;
@@ -190,10 +189,12 @@ void main() {
 
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    // for(int i = 0; i < 2; i++) {
         // TODO: intensityそのままかけるのよくない気がする
         // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
         accColor.xyz +=
-            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
+            saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
+            // saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
             transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
     }
     #pragma UNROLL_END

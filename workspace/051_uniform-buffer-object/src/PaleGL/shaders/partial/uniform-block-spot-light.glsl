@@ -1,3 +1,4 @@
+
 layout (std140) uniform ubSpotLight {
     // vec3 uSpotLightPosition;
     // vec3 uSpotLightDirection; // spotlightの向き先
@@ -9,5 +10,6 @@ layout (std140) uniform ubSpotLight {
     // float uSpotLightPenumbraCos;
     // mat4 uSpotLightLightViewProjectionMatrix;
     // float uSpotLightShadowBias;
-    vec4 uSpotLightColor[4];
+    float uSpotLightIntensity[MAX_SPOT_LIGHT_COUNT];
+    vec4 uSpotLightColor[MAX_SPOT_LIGHT_COUNT];
 };
