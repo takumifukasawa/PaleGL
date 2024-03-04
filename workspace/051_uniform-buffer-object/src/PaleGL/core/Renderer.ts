@@ -46,12 +46,18 @@ import { Shader } from '@/PaleGL/core/Shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
+import {
+    UniformBufferObjectBlockData,
+    UniformBufferObjectValue,
+    UniformStructArrayValue,
+    UniformStructValue
+} from '@/PaleGL/core/Uniforms.ts';
+import {Vector2} from "@/PaleGL/math/Vector2.ts";
+import {Vector4} from "@/PaleGL/math/Vector4.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -320,44 +326,130 @@ export class Renderer {
             vertexShader: globalUniformBufferObjectVertexShader,
             fragmentShader: globalUniformBufferObjectFragmentShader,
         });
-        // blockとvariableから列挙
-        this.globalUniformBufferObjects.push(
-            this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.Transformations, [
-                UniformNames.WorldMatrix,
-                UniformNames.ViewMatrix,
-                UniformNames.ProjectionMatrix,
-                UniformNames.NormalMatrix,
-                UniformNames.InverseWorldMatrix,
-                UniformNames.ViewProjectionMatrix,
-                UniformNames.InverseViewMatrix,
-                UniformNames.InverseProjectionMatrix,
-                UniformNames.InverseViewProjectionMatrix,
-                UniformNames.TransposeInverseViewMatrix,
-            ])
-        );
-        this.globalUniformBufferObjects.push(
-            this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.Camera, [
-                UniformNames.ViewPosition,
-                UniformNames.ViewDirection,
-                UniformNames.CameraNear,
-                UniformNames.CameraFar,
-                UniformNames.CameraAspect,
-                UniformNames.CameraFov,
-            ])
-        );
-        this.globalUniformBufferObjects.push(
-            this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.SpotLight, [
-                UniformNames.SpotLightIntensity,
-                UniformNames.SpotLightColor,
-            ])
-        );
+
+        const tranformationsUniformBlockData = [
+            {
+                name: UniformNames.WorldMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.ViewMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.ProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.NormalMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.InverseWorldMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.ViewProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.InverseViewMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.InverseProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.InverseViewProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+            {
+                name: UniformNames.TransposeInverseViewMatrix,
+                type: UniformTypes.Matrix4,
+                value: Matrix4.identity,
+            },
+        ];
+        this.globalUniformBufferObjects.push({
+            uniformBufferObject: this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.Transformations,
+                tranformationsUniformBlockData
+            ),
+            data: tranformationsUniformBlockData,
+        });
+
+        const cameraUniformBufferData = [
+            {
+                name: UniformNames.ViewPosition,
+                type: UniformTypes.Vector3,
+                value: Vector3.zero,
+            },
+            {
+                name: UniformNames.ViewDirection,
+                type: UniformTypes.Vector3,
+                value: Vector3.zero,
+            },
+            {
+                name: UniformNames.CameraNear,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: UniformNames.CameraFar,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: UniformNames.CameraAspect,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: UniformNames.CameraFov,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+        ];
+        this.globalUniformBufferObjects.push({
+            uniformBufferObject: this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.Camera,
+                cameraUniformBufferData
+            ),
+            data: cameraUniformBufferData,
+        });
+       
+        const spotLightUniformBufferData = [
+            {
+                name: UniformNames.SpotLightIntensity,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: UniformNames.SpotLightColor,
+                type: UniformTypes.Color,
+                value: Color.black,
+            },
+        ];
+        this.globalUniformBufferObjects.push({
+            uniformBufferObject: this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.SpotLight, spotLightUniformBufferData),
+            data: spotLightUniformBufferData
+        });
         // for debug
         console.log('===== global uniform buffer objects =====');
         console.log(this.globalUniformBufferObjects);
         console.log('=========================================');
     }
-
-    globalUniformBufferObjects: UniformBufferObject[] = [];
 
     // registerUniformBufferObjectToMaterial(material: Material) {
     //     if (!material.shader) {
@@ -388,25 +480,26 @@ export class Renderer {
         }
         material.boundUniformBufferObjects = true;
         material.uniformBlockNames.forEach((blockName) => {
-            const targetUniformBufferObject = this.globalUniformBufferObjects.find(
-                (ubo) => ubo.blockName === blockName
+            const targetGlobalUniformBufferObject = this.globalUniformBufferObjects.find(
+                ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
             );
-            if (!targetUniformBufferObject) {
+            if (!targetGlobalUniformBufferObject) {
                 return;
             }
             const blockIndex = this.gpu.bindUniformBlockAndGetBlockIndex(
-                targetUniformBufferObject,
+                targetGlobalUniformBufferObject.uniformBufferObject,
                 material.shader!,
                 blockName
             );
-            console.log(
-                material.name,
-                'addUniformBlock',
-                material.uniformBlockNames,
-                targetUniformBufferObject.blockName,
-                blockIndex
-            );
-            material.uniforms.addUniformBlock(targetUniformBufferObject, blockIndex);
+            // for debug
+            // console.log(
+            //     material.name,
+            //     'addUniformBlock',
+            //     material.uniformBlockNames,
+            //     targetUniformBufferObject.blockName,
+            //     blockIndex
+            // );
+            material.uniforms.addUniformBlock(blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
         });
         // });
     }
@@ -417,6 +510,7 @@ export class Renderer {
 
     canvas;
     pixelRatio;
+    globalUniformBufferObjects: { uniformBufferObject: UniformBufferObject; data: UniformBufferObjectBlockData }[] = [];
 
     get depthPrePassRenderTarget() {
         return this._depthPrePassRenderTarget;
@@ -1093,37 +1187,62 @@ export class Renderer {
      * @param value
      * @private
      */
-    private setUniformBlockValue(
-        blockName: string,
-        uniformName: string,
-        value: number | Vector2 | Vector3 | Vector4 | Matrix4 | Color | number[] | Color[]
-    ) {
+    private setUniformBlockValue(blockName: string, uniformName: string, value: UniformBufferObjectValue) {
+        // const setUniformValueInternal = (type: UniformTypes, name: string, v: UniformValue) => {};
+
+        // const a: UniformValue;
+
+        // const targetUniformBufferObject = this.globalUniformBufferObjects.find((globalUniformBufferObject) => {
+        //     return globalUniformBufferObject.blockName === blockName;
+        // });
+
+        // if (targetUniformBufferObject) {
+        // }
+
         // if(typeof(value) === 'number') {
         //     console.log(blockName, uniformName, value);
         // }
-        const targetUbo = this.globalUniformBufferObjects.find((ubo) => ubo.blockName === blockName);
+
+        const targetUbo = this.globalUniformBufferObjects.find(
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
+        );
         if (!targetUbo) {
             console.error(`[Renderer.setUniformBlockValue] invalid uniform block object: ${blockName}`);
             return;
         }
-        if (Array.isArray(value)) {
-            const data: number[] = [];
-            value.forEach((v) => {
-                if (typeof v === 'number') {
-                    data.push(v);
-                    data.push(0);
-                    data.push(0);
-                    data.push(0);
+
+        const targetBlock = targetUbo.data.find((block) => block.name === uniformName);
+
+        if (!targetBlock) {
+            console.error(`[Renderer.setUniformBlockValue] invalid uniform block data: ${uniformName}`);
+            return;
+        }
+
+        switch (targetBlock.type) {
+            case UniformTypes.Struct:
+            case UniformTypes.StructArray:
+                break;
+            default:
+                if (Array.isArray(value)) {
+                    const data: number[] = [];
+                    value.forEach((v) => {
+                        if (typeof v === 'number') {
+                            data.push(v);
+                            data.push(0);
+                            data.push(0);
+                            data.push(0);
+                        } else {
+                            data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+                        }
+                    });
+                    targetUbo.uniformBufferObject.updateBufferData(uniformName, new Float32Array(data));
                 } else {
-                    data.push(...v.elements);
+                    targetUbo.uniformBufferObject.updateBufferData(
+                        uniformName,
+                        typeof value === 'number' ? new Float32Array([value]) : value.elements
+                    );
                 }
-            });
-            targetUbo?.updateBufferData(uniformName, new Float32Array(data));
-        } else {
-            targetUbo?.updateBufferData(
-                uniformName,
-                typeof value === 'number' ? new Float32Array([value]) : value.elements
-            );
+                break;
         }
     }
 

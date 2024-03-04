@@ -24,7 +24,13 @@ import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { createCubeMap } from '@/PaleGL/loaders/loadCubeMap.ts';
-import { Uniforms, UniformStructArrayValue, UniformStructValue, UniformValue } from '@/PaleGL/core/Uniforms.ts';
+import {
+    UniformBufferObjectBlockData,
+    Uniforms,
+    UniformStructArrayValue,
+    UniformStructValue,
+    UniformValue
+} from '@/PaleGL/core/Uniforms.ts';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
@@ -578,7 +584,8 @@ export class GPU {
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     }
 
-    createUniformBufferObject(shader: Shader, blockName: string, variableNames: string[]) {
+    createUniformBufferObject(shader: Shader, blockName: string, uniformBufferObjectBlockData: UniformBufferObjectBlockData) {
+        const variableNames: string[] = uniformBufferObjectBlockData.map((data) => data.name);
         const gl = this.gl;
         const blockIndex = gl.getUniformBlockIndex(shader.glObject, blockName);
         const blockSize = gl.getActiveUniformBlockParameter(

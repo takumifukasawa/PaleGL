@@ -5,10 +5,12 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-// import {DirectionalLightStruct} from "@/PaleGL/actors/DirectionalLight.ts";
 import { UniformTypes } from '@/PaleGL/constants.ts';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
-// import {SpotLightStruct} from "@/PaleGL/actors/SpotLight.ts";
+
+//
+// uniform values
+//
 
 type UniformTypeValuePair = {
     type: UniformTypes;
@@ -20,8 +22,6 @@ type UniformData = {
 } & UniformTypeValuePair;
 
 export type UniformStructValue = UniformData[];
-//     [key: string]: UniformTypeValuePair;
-// };
 
 export type UniformStructArrayValue = UniformStructValue[];
 
@@ -43,24 +43,60 @@ export type UniformValue =
     | Color
     | Color[]
     | Float32Array
-    // | DirectionalLightStruct
-    // | SpotLightStruct[]
     | UniformStructValue
     | UniformStructArrayValue
-    // | UniformTypeValuePair[][]
-    // | UniformStructArrayValue
     | null
     | null[]
     | (Texture | null)[];
 
 export type UniformsData = UniformData[];
 
+//
+// uniform buffer object values
+//
+
+type UniformBufferObjectTypeValuePair = {
+    type: UniformTypes;
+    value: UniformValue;
+};
+
+type UniformBufferObjectData = {
+    name: string;
+} & UniformBufferObjectTypeValuePair;
+
+export type UniformBufferObjectStructValue = UniformBufferObjectData[];
+
+export type UniformBufferObjectStructArrayValue = UniformBufferObjectStructValue[];
+
+export type UniformBufferObjectValue =
+    | number
+    | number[]
+    | Vector2
+    | Vector2[]
+    | Vector3
+    | Vector3[]
+    | Vector4
+    | Vector4[]
+    | Matrix4
+    | Matrix4[]
+    | Color
+    | Color[]
+    | Float32Array
+    | UniformStructValue
+    | UniformStructArrayValue;
+
+export type UniformBufferObjectBlockData = UniformBufferObjectData[];
+
+/**
+ * 
+ */
 export class Uniforms {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも
     data: UniformsData;
     uniformBlocks: {
         blockIndex: number;
         uniformBufferObject: UniformBufferObject;
+        data: UniformBufferObjectBlockData
     }[] = [];
 
     constructor(...dataArray: UniformsData[]) {
@@ -120,14 +156,14 @@ export class Uniforms {
             }
         }
     }
-    
+
     setValues() {}
-    
-    addUniformBlock(uniformBufferObject: UniformBufferObject, blockIndex: number) {
+
+    addUniformBlock(blockIndex: number, uniformBufferObject: UniformBufferObject, data: UniformBufferObjectBlockData) {
         // const blockIndex = uniformBufferObject.gpu.gl.getUniformBlockIndex(
         //     this.shader.glObject,
         // //     uniformBufferObject.blockName
         // );
-        this.uniformBlocks.push({ blockIndex, uniformBufferObject });
+        this.uniformBlocks.push({ blockIndex, uniformBufferObject, data });
     }
 }

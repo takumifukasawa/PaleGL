@@ -18,7 +18,7 @@ struct SpotLight {
     vec3 position;
     vec3 direction; // spotlightの向き先
     // vec4 color;
-    vec4 uSpotLightColor;
+    // vec4 uSpotLightColor;
     float intensity;
     float distance;
     float attenuation;
