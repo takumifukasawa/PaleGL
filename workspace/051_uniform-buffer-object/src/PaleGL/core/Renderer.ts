@@ -54,10 +54,10 @@ import {
     UniformBufferObjectBlockData,
     UniformBufferObjectValue,
     UniformStructArrayValue,
-    UniformStructValue
+    UniformStructValue,
 } from '@/PaleGL/core/Uniforms.ts';
-import {Vector2} from "@/PaleGL/math/Vector2.ts";
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -428,7 +428,7 @@ export class Renderer {
             ),
             data: cameraUniformBufferData,
         });
-       
+
         const spotLightUniformBufferData = [
             {
                 name: UniformNames.SpotLightIntensity,
@@ -442,8 +442,12 @@ export class Renderer {
             },
         ];
         this.globalUniformBufferObjects.push({
-            uniformBufferObject: this.gpu.createUniformBufferObject(uniformBufferObjectShader, UniformBlockNames.SpotLight, spotLightUniformBufferData),
-            data: spotLightUniformBufferData
+            uniformBufferObject: this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.SpotLight,
+                spotLightUniformBufferData
+            ),
+            data: spotLightUniformBufferData,
         });
         // for debug
         console.log('===== global uniform buffer objects =====');
@@ -1179,15 +1183,20 @@ export class Renderer {
             materialIndex,
         };
     }
+    
+    setUniformBlockData() {
+    }
 
     /**
-     *
+     * uniform block の変数を更新
      * @param blockName
      * @param uniformName
      * @param value
      * @private
      */
     private setUniformBlockValue(blockName: string, uniformName: string, value: UniformBufferObjectValue) {
+    // private setUniformBlockData(blockName: string, uniformBufferObjectBlockData: UniformBufferObjectBlockData) {
+    // private updateUniformBlock(blockName: string) {
         // const setUniformValueInternal = (type: UniformTypes, name: string, v: UniformValue) => {};
 
         // const a: UniformValue;
@@ -1203,47 +1212,64 @@ export class Renderer {
         //     console.log(blockName, uniformName, value);
         // }
 
-        const targetUbo = this.globalUniformBufferObjects.find(
+        const targetGlobalUniformBufferObject = this.globalUniformBufferObjects.find(
             ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
         );
-        if (!targetUbo) {
-            console.error(`[Renderer.setUniformBlockValue] invalid uniform block object: ${blockName}`);
+        if (!targetGlobalUniformBufferObject) {
+            console.error(`[Renderer.setUniformBlockData] invalid uniform block object: ${blockName}`);
             return;
         }
 
-        const targetBlock = targetUbo.data.find((block) => block.name === uniformName);
+        // const targetBlock = targetUbo.data.find((block) => block.name === uniformName);
 
-        if (!targetBlock) {
-            console.error(`[Renderer.setUniformBlockValue] invalid uniform block data: ${uniformName}`);
+        // if (!targetBlock) {
+        //     console.error(`[Renderer.setUniformBlockData] invalid uniform block data: ${uniformName}`);
+        //     return;
+        // }
+
+        const targetUbo = targetGlobalUniformBufferObject.uniformBufferObject;
+        
+        const targetUniformData = targetGlobalUniformBufferObject.data.find(d => {
+            return d.name === uniformName;
+        });
+        
+        if(!targetUniformData) {
+            console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
             return;
         }
 
-        switch (targetBlock.type) {
-            case UniformTypes.Struct:
-            case UniformTypes.StructArray:
-                break;
-            default:
-                if (Array.isArray(value)) {
-                    const data: number[] = [];
-                    value.forEach((v) => {
-                        if (typeof v === 'number') {
-                            data.push(v);
-                            data.push(0);
-                            data.push(0);
-                            data.push(0);
-                        } else {
-                            data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
-                        }
-                    });
-                    targetUbo.uniformBufferObject.updateBufferData(uniformName, new Float32Array(data));
-                } else {
-                    targetUbo.uniformBufferObject.updateBufferData(
-                        uniformName,
-                        typeof value === 'number' ? new Float32Array([value]) : value.elements
-                    );
-                }
-                break;
-        }
+        // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
+            // const uniformName = targetBlock.name;
+            // const value = targetBlock.value;
+            // switch (targetBlock.type) {
+        switch(targetUniformData.type) {
+                // TODO: update struct
+                case UniformTypes.Struct:
+                case UniformTypes.StructArray:
+                    break;
+                default:
+                    if (Array.isArray(value)) {
+                        const data: number[] = [];
+                        value.forEach((v) => {
+                            if (typeof v === 'number') {
+                                data.push(v);
+                                data.push(0);
+                                data.push(0);
+                                data.push(0);
+                            } else {
+                                data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+                            }
+                        });
+                        targetUbo.updateBufferData(uniformName, new Float32Array(data));
+                    } else {
+                        targetUbo.updateBufferData(
+                            uniformName,
+                            typeof value === 'number' ? new Float32Array([value]) : value.elements
+                        );
+                    }
+                    break;
+            }
+        // });
     }
 
     /**

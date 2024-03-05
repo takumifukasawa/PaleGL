@@ -96,7 +96,8 @@ export class Uniforms {
     uniformBlocks: {
         blockIndex: number;
         uniformBufferObject: UniformBufferObject;
-        data: UniformBufferObjectBlockData
+        data: UniformBufferObjectBlockData;
+        elements: Float32Array
     }[] = [];
 
     constructor(...dataArray: UniformsData[]) {
