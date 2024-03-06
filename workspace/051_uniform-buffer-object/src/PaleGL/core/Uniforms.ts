@@ -70,6 +70,7 @@ export type UniformBufferObjectStructValue = UniformBufferObjectData[];
 export type UniformBufferObjectStructArrayValue = UniformBufferObjectStructValue[];
 
 export type UniformBufferObjectValue =
+    | boolean
     | number
     | number[]
     | Vector2

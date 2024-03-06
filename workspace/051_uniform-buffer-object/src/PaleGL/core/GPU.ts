@@ -29,7 +29,7 @@ import {
     Uniforms,
     UniformStructArrayValue,
     UniformStructValue,
-    UniformValue
+    UniformValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
@@ -385,7 +385,7 @@ export class GPU {
                     setUniformValueInternal(uniformData.type, uniformData.name, uniformData.value);
                 }
             });
-            
+
             // uniform block
             // for debug
             // if(this.uniforms.uniformBlocks.length > 0) {
@@ -584,17 +584,48 @@ export class GPU {
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     }
 
-    createUniformBufferObject(shader: Shader, blockName: string, uniformBufferObjectBlockData: UniformBufferObjectBlockData) {
-        const variableNames: string[] = uniformBufferObjectBlockData.map((data) => data.name);
+    createUniformBufferObject(
+        shader: Shader,
+        blockName: string,
+        uniformBufferObjectBlockData: UniformBufferObjectBlockData
+    ) {
+        // const variableNames: string[] = uniformBufferObjectBlockData.map((data) => data.name);
+        const variableNames: string[] = [];
+        uniformBufferObjectBlockData.forEach((data) => {
+            switch(data.type){
+                case UniformTypes.Struct:
+                    (data.value as UniformStructValue).forEach((structElement) => {
+                        variableNames.push(`${data.name}.${structElement.name}`);
+                    });
+                    break;
+                case UniformTypes.StructArray:
+                    (data.value as UniformStructArrayValue).forEach((structValue, i) => {
+                        structValue.forEach((structElement) => {
+                            variableNames.push(`${data.name}[${i}].${structElement.name}`);
+                        });
+                    });
+                    break;
+                default:
+                    variableNames.push(data.name);
+                    break;
+            }
+        });
+        
         const gl = this.gl;
         const blockIndex = gl.getUniformBlockIndex(shader.glObject, blockName);
+        console.log('createUniformBufferObject: variableNames', variableNames);
+        console.log('createUniformBufferObject: blockName', blockName);
+        console.log('createUniformBufferObject: blockIndex', blockIndex);
         const blockSize = gl.getActiveUniformBlockParameter(
             shader.glObject,
             blockIndex,
             gl.UNIFORM_BLOCK_DATA_SIZE
         ) as number;
+        console.log('createUniformBufferObject: blockSize', blockSize);
         const indices = gl.getUniformIndices(shader.glObject, variableNames) as number[];
+        console.log('createUniformBufferObject: indices', indices);
         const offsets = gl.getActiveUniforms(shader.glObject, indices, gl.UNIFORM_OFFSET) as number[];
+        console.log('createUniformBufferObject: offsets', offsets);
         const uniformBufferObject = new UniformBufferObject(
             this,
             blockName,
@@ -605,18 +636,19 @@ export class GPU {
             blockSize,
             this.uboBindingPoint
         );
+
         this.uboBindingPoint++;
         return uniformBufferObject;
     }
-    
-   bindUniformBlockAndGetBlockIndex(uniformBufferObject: UniformBufferObject, shader: Shader, blockName: string): number {
+
+    bindUniformBlockAndGetBlockIndex(
+        uniformBufferObject: UniformBufferObject,
+        shader: Shader,
+        blockName: string
+    ): number {
         const blockIndex = this.gl.getUniformBlockIndex(shader.glObject, blockName);
-        console.log("bindUniformBlockAndGetBlockIndex", blockName, blockIndex, uniformBufferObject.bindingPoint)
-        this.gl.uniformBlockBinding(
-            shader.glObject,
-            blockIndex,
-            uniformBufferObject.bindingPoint
-        );
+        console.log('bindUniformBlockAndGetBlockIndex', blockName, blockIndex, uniformBufferObject.bindingPoint);
+        this.gl.uniformBlockBinding(shader.glObject, blockIndex, uniformBufferObject.bindingPoint);
         return blockIndex;
     }
 }

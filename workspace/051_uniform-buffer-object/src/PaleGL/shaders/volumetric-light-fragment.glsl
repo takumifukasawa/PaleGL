@@ -193,9 +193,10 @@ void main() {
         // TODO: intensityそのままかけるのよくない気がする
         // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
         accColor.xyz +=
-            saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
-            // saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
-            transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
+            saturate(transmittanceArray[UNROLL_i] * uSpotLightBlock[UNROLL_i].intensity) *
+            transmittanceArray[UNROLL_i] * saturate(uSpotLightBlock[UNROLL_i].color.xyz);
+            // saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
+            // transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
     }
     #pragma UNROLL_END
    
