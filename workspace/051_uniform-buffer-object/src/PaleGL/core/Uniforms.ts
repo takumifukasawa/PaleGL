@@ -42,6 +42,7 @@ export type UniformValue =
     | CubeMap
     | Color
     | Color[]
+    | boolean
     | Float32Array
     | UniformStructValue
     | UniformStructArrayValue
@@ -97,7 +98,7 @@ export class Uniforms {
         blockIndex: number;
         uniformBufferObject: UniformBufferObject;
         data: UniformBufferObjectBlockData;
-        elements: Float32Array
+        // elements: Float32Array
     }[] = [];
 
     constructor(...dataArray: UniformsData[]) {

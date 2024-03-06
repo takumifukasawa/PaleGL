@@ -53,7 +53,6 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import {
     UniformBufferObjectBlockData,
     UniformBufferObjectValue,
-    UniformStructArrayValue,
     UniformStructValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -1237,6 +1236,30 @@ export class Renderer {
             console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
             return;
         }
+        
+        const getStructValue = (value: UniformStructValue) => {
+            const data: number[] = [];
+            value.forEach(v => {
+                switch(v.type) {
+                    case UniformTypes.Float:
+                    case UniformTypes.Int:
+                        data.push(v.value as number);
+                        data.push(0);
+                        data.push(0);
+                        data.push(0);
+                        break;
+                    case UniformTypes.Bool:
+                        data.push((v.value as boolean) ? 1 : 0);
+                        data.push(0);
+                        data.push(0);
+                        data.push(0);
+                        break;
+                    default:
+                        data.push(...(v.value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+                }
+            });
+            return data;
+        }
 
         // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
             // const uniformName = targetBlock.name;
@@ -1246,6 +1269,23 @@ export class Renderer {
                 // TODO: update struct
                 case UniformTypes.Struct:
                 case UniformTypes.StructArray:
+                    if(Array.isArray(value))
+                    {
+                        const data: number[] = [];
+                        value.forEach((v) => {
+                            data.push(...getStructValue(v as UniformStructValue));
+                        });
+                        targetUbo.updateBufferData(
+                            uniformName,
+                            new Float32Array(data)
+                        );
+                    } else {
+                        const data = getStructValue(value as unknown as UniformStructValue);
+                        targetUbo.updateBufferData(
+                            uniformName,
+                            new Float32Array(data)
+                        );
+                    }
                     break;
                 default:
                     if (Array.isArray(value)) {
@@ -1264,7 +1304,7 @@ export class Renderer {
                     } else {
                         targetUbo.updateBufferData(
                             uniformName,
-                            typeof value === 'number' ? new Float32Array([value]) : value.elements
+                            typeof value === 'number' ? new Float32Array([value]) : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements
                         );
                     }
                     break;

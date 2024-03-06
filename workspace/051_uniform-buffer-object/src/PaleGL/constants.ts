@@ -241,6 +241,7 @@ export const UniformTypes = {
     Color: 14,
     ColorArray: 15,
     TextureArray: 16,
+    Bool: 17
 } as const;
 
 export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
