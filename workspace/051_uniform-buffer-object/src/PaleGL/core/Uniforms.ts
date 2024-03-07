@@ -58,7 +58,7 @@ export type UniformsData = UniformData[];
 
 type UniformBufferObjectTypeValuePair = {
     type: UniformTypes;
-    value: UniformValue;
+    value: UniformBufferObjectValue;
 };
 
 type UniformBufferObjectData = {
@@ -69,20 +69,27 @@ export type UniformBufferObjectStructValue = UniformBufferObjectData[];
 
 export type UniformBufferObjectStructArrayValue = UniformBufferObjectStructValue[];
 
-export type UniformBufferObjectValue =
+
+export type UniformBufferObjectElementValueNeedsPadding =
     | boolean
-    | number
-    | number[]
+    | number;
+
+export type UniformBufferObjectElementValueNoNeedsPadding =
     | Vector2
-    | Vector2[]
     | Vector3
-    | Vector3[]
     | Vector4
-    | Vector4[]
     | Matrix4
-    | Matrix4[]
-    | Color
-    | Color[]
+    | Color;
+
+export type UniformBufferObjectElementValue = UniformBufferObjectElementValueNeedsPadding | UniformBufferObjectElementValueNoNeedsPadding;
+
+export type UniformBufferObjectElementValueArray = UniformBufferObjectElementValue[];
+
+// export type UniformBufferObjectStructValue = UniformBufferObjectElementValue[];
+
+export type UniformBufferObjectValue =
+    | UniformBufferObjectElementValue
+    | UniformBufferObjectElementValueArray
     | Float32Array
     | UniformStructValue
     | UniformStructArrayValue;
@@ -90,7 +97,7 @@ export type UniformBufferObjectValue =
 export type UniformBufferObjectBlockData = UniformBufferObjectData[];
 
 /**
- * 
+ *
  */
 export class Uniforms {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも

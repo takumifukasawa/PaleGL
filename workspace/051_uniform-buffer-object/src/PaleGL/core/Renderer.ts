@@ -52,7 +52,10 @@ import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {
     UniformBufferObjectBlockData,
+    UniformBufferObjectElementValueArray,
+    UniformBufferObjectElementValueNoNeedsPadding,
     UniformBufferObjectStructArrayValue,
+    UniformBufferObjectStructValue,
     UniformBufferObjectValue,
     UniformStructValue
 } from '@/PaleGL/core/Uniforms.ts';
@@ -1751,27 +1754,25 @@ export class Renderer {
                 return;
             }
 
-            const getStructValue = (targetValue: UniformStructValue) => {
+            const getStructElementValue = (type: UniformTypes, value: UniformBufferObjectValue) => {
                 const data: number[] = [];
-                targetValue.forEach((v) => {
-                    switch (v.type) {
+                    switch (type) {
                         case UniformTypes.Float:
                         case UniformTypes.Int:
-                            data.push(v.value as number);
+                            data.push(value as number);
                             data.push(0);
                             data.push(0);
                             data.push(0);
                             break;
                         case UniformTypes.Bool:
-                            data.push((v.value as boolean) ? 1 : 0);
+                            data.push((value as boolean) ? 1 : 0);
                             data.push(0);
                             data.push(0);
                             data.push(0);
                             break;
                         default:
-                            data.push(...(v.value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+                            data.push(...(value as UniformBufferObjectElementValueNoNeedsPadding).elements);
                     }
-                });
                 return data;
             };
 
@@ -1779,34 +1780,41 @@ export class Renderer {
             // const uniformName = targetBlock.name;
             // const value = targetBlock.value;
             // switch (targetBlock.type) {
-            let data: number[] = [];
             switch (targetUniformData.type) {
                 // TODO: update struct
                 case UniformTypes.Struct:
-                    data = getStructValue(value as unknown as UniformStructValue);
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
+                    (value as unknown as UniformBufferObjectStructValue).forEach(v => {
+                        const data: number[] = getStructElementValue(v.type, v.value);
+                        targetUbo.updateBufferData(uniformName, new Float32Array(data));
+                    });
                     break;
                 case UniformTypes.StructArray:
-                    (value as UniformBufferObjectStructArrayValue).forEach((v) => {
-                        data.push(...getStructValue(v as unknown as UniformStructValue));
-                        // v.forEach(vv => {
-                        //     data.push(...getStructValue(vv as unknown as UniformStructValue));
-                        // });
+                    (value as UniformBufferObjectStructArrayValue).forEach((v, i) => {
+                        v.forEach((vv) => {
+                            const structElementName = `${uniformName}[${i}].${vv.name}`;
+                            const data: number[] = getStructElementValue(vv.type, vv.value);
+                            // for debug
+                            // console.log(structElementName, value, data, v);
+                            targetUbo.updateBufferData(structElementName, new Float32Array(data));
+                        });
                     });
-                    console.log(value, data);
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
                     break;
                 default:
                     if (Array.isArray(value)) {
                         const data: number[] = [];
-                        value.forEach((v) => {
+                        (value as UniformBufferObjectElementValueArray).forEach((v) => {
                             if (typeof v === 'number') {
                                 data.push(v);
                                 data.push(0);
                                 data.push(0);
                                 data.push(0);
+                            } else if(typeof v === 'boolean') {
+                                data.push(v ? 1 : 0);
+                                data.push(0);
+                                data.push(0);
+                                data.push(0);
                             } else {
-                                data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+                                data.push(...(v as UniformBufferObjectElementValueNoNeedsPadding).elements);
                             }
                         });
                         targetUbo.updateBufferData(uniformName, new Float32Array(data));
