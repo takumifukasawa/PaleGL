@@ -205,9 +205,9 @@ void main() {
     accColor = saturate(accColor);
     
     // accColor.rgb = vec3(
-    //     uSpotLight[0].lightViewProjectionMatrix[3][0],
-    //     uSpotLight[0].lightViewProjectionMatrix[3][1],
-    //     uSpotLight[0].lightViewProjectionMatrix[3][2]
+    //     uSpotLight[0].lightViewProjectionMatrix[0][3],
+    //     uSpotLight[0].lightViewProjectionMatrix[1][3],
+    //     uSpotLight[0].lightViewProjectionMatrix[2][3]
     // );
    
     // outColor = vec4(vec3(transmittance), 1.);

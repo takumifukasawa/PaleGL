@@ -1,6 +1,6 @@
 ﻿import { Light, LightArgs } from '@/PaleGL/actors/Light';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-import { Actor } from '@/PaleGL/actors/Actor';
+import {Actor, ActorUpdateArgs} from '@/PaleGL/actors/Actor';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 // import { Vector4 } from '@/PaleGL/math/Vector4';
 import { LightTypes } from '@/PaleGL/constants.ts';
@@ -32,8 +32,13 @@ export class DirectionalLight extends Light {
         // TODO: なぜunknownを噛ませる必要がある？
         this.addChild(this.shadowCamera as unknown as Actor);
     }
+    
+    update(args: ActorUpdateArgs) {
+        super.update(args);
+        this.updateShadowCamera();
+    }
 
-    /**
+        /**
      * 
      * @param targetMaterial
      */

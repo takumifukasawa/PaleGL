@@ -7,7 +7,7 @@ import { LightTypes } from '@/PaleGL/constants.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
 import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import {PerspectiveCamera} from "./PerspectiveCamera";
 // import {Vector3} from "@/PaleGL/math/Vector3";
 // import {RenderTarget} from "@/PaleGL/core/RenderTarget";
@@ -106,22 +106,25 @@ export class SpotLight extends Light {
         if (this.shadowCamera) {
             (this.shadowCamera as PerspectiveCamera).fov = rad2Deg(Math.acos(this.coneCos)) * 2;
             (this.shadowCamera as PerspectiveCamera).far = this.distance;
-            this.shadowCamera?.updateProjectionMatrix();
+            
+            this.shadowCamera.updateProjectionMatrix();
+            
+            this.updateShadowCamera();
 
-            // console.log(light, light.shadowCamera, light.shadowMap)
-            // clip coord (-1 ~ 1) to uv (0 ~ 1)
-            // prettier-ignore
-            const textureMatrix = new Matrix4(
-                0.5, 0, 0, 0.5,
-                0, 0.5, 0, 0.5,
-                0, 0, 0.5, 0.5,
-                0, 0, 0, 1
-            );
-            this.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
-                textureMatrix,
-                this.shadowCamera?.projectionMatrix.clone(),
-                this.shadowCamera?.viewMatrix.clone()
-            );
+            // // console.log(light, light.shadowCamera, light.shadowMap)
+            // // clip coord (-1 ~ 1) to uv (0 ~ 1)
+            // // prettier-ignore
+            // const textureMatrix = new Matrix4(
+            //     0.5, 0, 0, 0.5,
+            //     0, 0.5, 0, 0.5,
+            //     0, 0, 0.5, 0.5,
+            //     0, 0, 0, 1
+            // );
+            // this.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
+            //     textureMatrix,
+            //     this.shadowCamera?.projectionMatrix.clone(),
+            //     this.shadowCamera?.viewMatrix.clone()
+            // );
         }
     }
 }

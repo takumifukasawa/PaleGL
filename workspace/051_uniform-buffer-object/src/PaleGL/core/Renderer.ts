@@ -1855,7 +1855,6 @@ export class Renderer {
                             const structElementName = `${uniformName}[${i}].${vv.name}`;
                             const data: number[] = getStructElementValue(vv.type, vv.value);
                             // for debug
-                            // console.log(structElementName, value, data, v);
                             targetUbo.updateBufferData(structElementName, new Float32Array(data));
                         });
                     });

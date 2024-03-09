@@ -26,7 +26,7 @@ export class Light extends Actor implements ILight {
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
     shadowMapProjectionMatrix: Matrix4 = Matrix4.identity;
-    
+
     // hasShadowMap() {
     //     return !!this.shadowCamera && this.shadowMap;
     // }
@@ -58,6 +58,30 @@ export class Light extends Actor implements ILight {
         throw 'should implementation';
     }
 
+    updateShadowCamera() {
+        // coneCosは直径、fovは半径なので2倍
+        if (!this.shadowCamera) {
+            return;
+        }
+
+        // this.shadowCamera.updateProjectionMatrix();
+
+        // console.log(light, light.shadowCamera, light.shadowMap)
+        // clip coord (-1 ~ 1) to uv (0 ~ 1)
+        // prettier-ignore
+        const textureMatrix = new Matrix4(
+            0.5, 0, 0, 0.5,
+            0, 0.5, 0, 0.5,
+            0, 0, 0.5, 0.5,
+            0, 0, 0, 1
+        );
+        this.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
+            textureMatrix,
+            this.shadowCamera.projectionMatrix.clone(),
+            this.shadowCamera.viewMatrix.clone()
+        );
+    }
+
     // /**
     //  *
     //  * @param _targetMaterial
@@ -68,7 +92,7 @@ export class Light extends Actor implements ILight {
     // }
 
     // /**
-    //  * 
+    //  *
     //  * @param targetMaterial
     //  */
     // applyShadowUniformValues(targetMaterial: Material) {
