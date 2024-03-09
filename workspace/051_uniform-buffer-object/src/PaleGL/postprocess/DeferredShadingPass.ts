@@ -7,19 +7,19 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+// import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+// import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
-        // name,
-    } // uniforms,
+        // uniforms,
+    } // name,
     : {
         gpu: GPU;
         // fragmentShader: string;
@@ -59,112 +59,112 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: null,
             },
 
-            {
-                // TODO: pass all lights
-                name: UniformNames.DirectionalLight,
-                type: UniformTypes.Struct,
-                value: [
-                    {
-                        name: UniformNames.LightDirection,
-                        type: UniformTypes.Vector3,
-                        value: Vector3.zero,
-                    },
-                    {
-                        name: UniformNames.LightIntensity,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightColor,
-                        type: UniformTypes.Color,
-                        value: new Color(0, 0, 0, 1),
-                    },
-                    {
-                        name: UniformNames.ShadowMap,
-                        type: UniformTypes.Texture,
-                        value: null,
-                    },
-                    {
-                        name: UniformNames.LightViewProjectionMatrix,
-                        type: UniformTypes.Matrix4,
-                        value: Matrix4.identity,
-                    },
-                    {
-                        name: UniformNames.ShadowBias,
-                        type: UniformTypes.Float,
-                        value: 0.001,
-                    },
-                ],
-            },
+            // {
+            //     // TODO: pass all lights
+            //     name: UniformNames.DirectionalLight,
+            //     type: UniformTypes.Struct,
+            //     value: [
+            //         {
+            //             name: UniformNames.LightDirection,
+            //             type: UniformTypes.Vector3,
+            //             value: Vector3.zero,
+            //         },
+            //         {
+            //             name: UniformNames.LightIntensity,
+            //             type: UniformTypes.Float,
+            //             value: 0,
+            //         },
+            //         {
+            //             name: UniformNames.LightColor,
+            //             type: UniformTypes.Color,
+            //             value: new Color(0, 0, 0, 1),
+            //         },
+            //         {
+            //             name: UniformNames.ShadowMap,
+            //             type: UniformTypes.Texture,
+            //             value: null,
+            //         },
+            //         {
+            //             name: UniformNames.LightViewProjectionMatrix,
+            //             type: UniformTypes.Matrix4,
+            //             value: Matrix4.identity,
+            //         },
+            //         {
+            //             name: UniformNames.ShadowBias,
+            //             type: UniformTypes.Float,
+            //             value: 0.001,
+            //         },
+            //     ],
+            // },
 
-            {
-                name: UniformNames.SpotLight,
-                type: UniformTypes.StructArray,
-                value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
-                    return [
-                        // {
-                        //     name: UniformNames.ShadowMap,
-                        //     type: UniformTypes.Texture,
-                        //     value: null,
-                        // },
-                        {
-                            name: UniformNames.LightPosition,
-                            type: UniformTypes.Vector3,
-                            value: Vector3.zero,
-                        },
-                        {
-                            name: UniformNames.LightDirection,
-                            type: UniformTypes.Vector3,
-                            value: Vector3.zero,
-                        },
-                        {
-                            name: UniformNames.LightIntensity,
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        {
-                            name: UniformNames.LightColor,
-                            type: UniformTypes.Color,
-                            value: new Color(0, 0, 0, 1),
-                        },
-                        {
-                            name: UniformNames.LightDistance,
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        {
-                            name: UniformNames.LightAttenuation,
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        {
-                            name: UniformNames.LightConeCos,
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        {
-                            name: UniformNames.LightPenumbraCos,
-                            type: UniformTypes.Float,
-                            value: 0,
-                        },
-                        {
-                            name: UniformNames.LightViewProjectionMatrix,
-                            type: UniformTypes.Matrix4,
-                            value: Matrix4.identity,
-                        },
-                        // {
-                        //     name: UniformNames.ShadowMap,
-                        //     type: UniformTypes.Texture,
-                        //     value: null,
-                        // },
-                        {
-                            name: UniformNames.ShadowBias,
-                            type: UniformTypes.Float,
-                            value: 0.001,
-                        },
-                    ];
-                }),
-            },
+            // {
+            //     name: UniformNames.SpotLight,
+            //     type: UniformTypes.StructArray,
+            //     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
+            //         return [
+            //             // {
+            //             //     name: UniformNames.ShadowMap,
+            //             //     type: UniformTypes.Texture,
+            //             //     value: null,
+            //             // },
+            //             {
+            //                 name: UniformNames.LightPosition,
+            //                 type: UniformTypes.Vector3,
+            //                 value: Vector3.zero,
+            //             },
+            //             {
+            //                 name: UniformNames.LightDirection,
+            //                 type: UniformTypes.Vector3,
+            //                 value: Vector3.zero,
+            //             },
+            //             {
+            //                 name: UniformNames.LightIntensity,
+            //                 type: UniformTypes.Float,
+            //                 value: 0,
+            //             },
+            //             {
+            //                 name: UniformNames.LightColor,
+            //                 type: UniformTypes.Color,
+            //                 value: new Color(0, 0, 0, 1),
+            //             },
+            //             {
+            //                 name: UniformNames.LightDistance,
+            //                 type: UniformTypes.Float,
+            //                 value: 0,
+            //             },
+            //             {
+            //                 name: UniformNames.LightAttenuation,
+            //                 type: UniformTypes.Float,
+            //                 value: 0,
+            //             },
+            //             {
+            //                 name: UniformNames.LightConeCos,
+            //                 type: UniformTypes.Float,
+            //                 value: 0,
+            //             },
+            //             {
+            //                 name: UniformNames.LightPenumbraCos,
+            //                 type: UniformTypes.Float,
+            //                 value: 0,
+            //             },
+            //             {
+            //                 name: UniformNames.LightViewProjectionMatrix,
+            //                 type: UniformTypes.Matrix4,
+            //                 value: Matrix4.identity,
+            //             },
+            //             // {
+            //             //     name: UniformNames.ShadowMap,
+            //             //     type: UniformTypes.Texture,
+            //             //     value: null,
+            //             // },
+            //             {
+            //                 name: UniformNames.ShadowBias,
+            //                 type: UniformTypes.Float,
+            //                 value: 0.001,
+            //             },
+            //         ];
+            //     }),
+            // },
 
             {
                 name: UniformNames.DirectionalLightShadowMap,
@@ -225,7 +225,11 @@ export class DeferredShadingPass extends PostProcessPassBase {
             // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-            uniformBlockNames: [UniformBlockNames.Camera, UniformBlockNames.SpotLight],
+            uniformBlockNames: [
+                UniformBlockNames.Camera,
+                UniformBlockNames.DirectionalLight,
+                UniformBlockNames.SpotLight,
+            ],
             // renderTargetType: RenderTargetTypes.RGBA16F,
         });
 

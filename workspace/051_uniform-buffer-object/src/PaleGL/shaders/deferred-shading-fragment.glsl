@@ -11,6 +11,7 @@ precision highp float;
 
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
+#include ./partial/uniform-block-directional-light.glsl
 #include ./partial/uniform-block-spot-light.glsl
 
 // -----------------------------------------------------------
@@ -179,7 +180,7 @@ in vec2 vUv;
 // -----------------------------------------------------------
 
 // #include ./partial/directional-light-uniforms.glsl
-uniform DirectionalLight uDirectionalLight;
+// uniform DirectionalLight uDirectionalLight;
 // TODO: spot light の最大数はどこかで定数管理したい
 // #define MAX_SPOT_LIGHT_COUNT 4
 // uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];

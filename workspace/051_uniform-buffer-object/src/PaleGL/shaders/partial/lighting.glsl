@@ -83,14 +83,14 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 
 // directional light
 
-struct DirectionalLight {
-    vec3 direction; // 光源自体の向く方向
-    float intensity;
-    vec4 color;
-    // sampler2D shadowMap;
-    mat4 lightViewProjectionMatrix;
-    // float shadowBias;
-};
+// struct DirectionalLight {
+//     vec3 direction; // 光源自体の向く方向
+//     float intensity;
+//     vec4 color;
+//     // sampler2D shadowMap;
+//     mat4 lightViewProjectionMatrix;
+//     // float shadowBias;
+// };
 
 void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
     directLight.color = directionalLight.color.xyz;
