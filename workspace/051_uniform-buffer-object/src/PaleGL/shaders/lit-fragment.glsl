@@ -4,6 +4,11 @@ precision highp float;
 
 #pragma DEFINES
 
+#include ./defines-light.glsl
+
+#include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
+
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
@@ -20,9 +25,6 @@ uniform int uShadingModelId;
 #include ./partial/tone-mapping.glsl
 
 #include ./partial/normal-map-fragment-uniforms.glsl
-
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 

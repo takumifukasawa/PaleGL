@@ -89,7 +89,7 @@ struct DirectionalLight {
     vec4 color;
     // sampler2D shadowMap;
     mat4 lightViewProjectionMatrix;
-    float shadowBias;
+    // float shadowBias;
 };
 
 void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
@@ -126,19 +126,19 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
 
 // spot light
 
-struct SpotLight {
-    vec3 position;
-    vec3 direction; // spotlightの向き先
-    vec4 color;
-    float intensity;
-    float distance;
-    float attenuation;
-    float coneCos;
-    float penumbraCos;
-    // sampler2D shadowMap;
-    mat4 lightViewProjectionMatrix;
-    float shadowBias;
-};
+// struct SpotLight {
+//     vec3 position;
+//     vec3 direction; // spotlightの向き先
+//     vec4 color;
+//     float intensity;
+//     float distance;
+//     float attenuation;
+//     float coneCos;
+//     float penumbraCos;
+//     // sampler2D shadowMap;
+//     mat4 lightViewProjectionMatrix;
+//     // float shadowBias;
+// };
 
 void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {
     // vec3 L = spotLight.position - geometry.position;

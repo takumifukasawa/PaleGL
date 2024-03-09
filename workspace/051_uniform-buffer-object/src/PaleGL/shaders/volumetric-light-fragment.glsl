@@ -14,19 +14,19 @@ precision highp float;
 
 // 
 // TODO: このblock、lighting用の構造体とある程度共通化できそう？
-struct SpotLight {
-    vec3 position;
-    vec3 direction; // spotlightの向き先
-    // vec4 color;
-    // vec4 uSpotLightColor;
-    float intensity;
-    float distance;
-    float attenuation;
-    float coneCos;
-    float penumbraCos;
-    mat4 lightViewProjectionMatrix;
-    // float shadowBias;
-};
+// struct SpotLight {
+//     vec3 position;
+//     vec3 direction; // spotlightの向き先
+//     // vec4 color;
+//     // vec4 uSpotLightColor;
+//     float intensity;
+//     float distance;
+//     float attenuation;
+//     float coneCos;
+//     float penumbraCos;
+//     mat4 lightViewProjectionMatrix;
+//     // float shadowBias;
+// };
 
 // 光源からの光が届くかどうかを判定
 bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
@@ -62,7 +62,7 @@ uniform sampler2D uGBufferATexture;
 uniform float uBlendRate;
 uniform float uTime;
 
-uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
+// uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 uniform float uDensityMultiplier;
 uniform float uRayStep;
@@ -193,8 +193,8 @@ void main() {
         // TODO: intensityそのままかけるのよくない気がする
         // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
         accColor.xyz +=
-            saturate(transmittanceArray[UNROLL_i] * uSpotLightBlock[UNROLL_i].intensity) *
-            transmittanceArray[UNROLL_i] * saturate(uSpotLightBlock[UNROLL_i].color.xyz);
+            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
+            transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
             // saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
             // transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
     }
@@ -203,6 +203,12 @@ void main() {
     // transmittance = saturate(transmittance);
     // TODO: rgba255でclampしちゃって大丈夫？光の漏れは考慮しない？
     accColor = saturate(accColor);
+    
+    // accColor.rgb = vec3(
+    //     uSpotLight[0].lightViewProjectionMatrix[3][0],
+    //     uSpotLight[0].lightViewProjectionMatrix[3][1],
+    //     uSpotLight[0].lightViewProjectionMatrix[3][2]
+    // );
    
     // outColor = vec4(vec3(transmittance), 1.);
     outColor = accColor;

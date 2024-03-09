@@ -1,7 +1,7 @@
 ﻿import {
     ActorTypes,
     BlendTypes,
-    LightTypes,
+    LightTypes, MAX_SPOT_LIGHT_COUNT,
     RenderQueueType,
     RenderTargetTypes,
     UniformBlockNames,
@@ -163,69 +163,69 @@ export function applyLightUniformValues(targetMaterial: Material, lightActors: L
         }
     }
 
-    targetMaterial.uniforms.setValue(
-        UniformNames.SpotLight,
-        lightActors.spotLights.map((spotLight) => [
-            {
-                name: UniformNames.LightPosition,
-                type: UniformTypes.Vector3,
-                value: spotLight.transform.position,
-            },
-            {
-                name: UniformNames.LightDirection,
-                type: UniformTypes.Vector3,
-                value: spotLight.transform.worldForward.clone(),
-            },
-            {
-                name: UniformNames.LightIntensity,
-                type: UniformTypes.Float,
-                value: spotLight.intensity,
-            },
-            {
-                name: UniformNames.LightColor,
-                type: UniformTypes.Color,
-                value: spotLight.color,
-            },
-            {
-                name: UniformNames.LightDistance,
-                type: UniformTypes.Float,
-                value: spotLight.distance,
-            },
-            {
-                name: UniformNames.LightAttenuation,
-                type: UniformTypes.Float,
-                value: spotLight.attenuation,
-            },
-            {
-                name: UniformNames.LightConeCos,
-                type: UniformTypes.Float,
-                value: spotLight.coneCos,
-            },
-            {
-                name: UniformNames.LightPenumbraCos,
-                type: UniformTypes.Float,
-                value: spotLight.penumbraCos,
-            },
-            ...(spotLight.shadowMap && spotLight.shadowCamera
-                ? [
-                      {
-                          name: UniformNames.ShadowMap,
-                          type: UniformTypes.Texture,
-                          value: spotLight.shadowMap.read.depthTexture,
-                      },
-                      {
-                          name: UniformNames.LightViewProjectionMatrix,
-                          type: UniformTypes.Matrix4,
-                          value: Matrix4.multiplyMatrices(
-                              new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1),
-                              spotLight.shadowCamera.projectionMatrix.clone(),
-                              spotLight.shadowCamera.viewMatrix.clone()
-                          ),
-                      },
-                  ]
-                : []),
-        ])
-    );
+    // targetMaterial.uniforms.setValue(
+    //     UniformNames.SpotLight,
+    //     lightActors.spotLights.map((spotLight) => [
+    //         {
+    //             name: UniformNames.LightPosition,
+    //             type: UniformTypes.Vector3,
+    //             value: spotLight.transform.position,
+    //         },
+    //         {
+    //             name: UniformNames.LightDirection,
+    //             type: UniformTypes.Vector3,
+    //             value: spotLight.transform.worldForward.clone(),
+    //         },
+    //         {
+    //             name: UniformNames.LightIntensity,
+    //             type: UniformTypes.Float,
+    //             value: spotLight.intensity,
+    //         },
+    //         {
+    //             name: UniformNames.LightColor,
+    //             type: UniformTypes.Color,
+    //             value: spotLight.color,
+    //         },
+    //         {
+    //             name: UniformNames.LightDistance,
+    //             type: UniformTypes.Float,
+    //             value: spotLight.distance,
+    //         },
+    //         {
+    //             name: UniformNames.LightAttenuation,
+    //             type: UniformTypes.Float,
+    //             value: spotLight.attenuation,
+    //         },
+    //         {
+    //             name: UniformNames.LightConeCos,
+    //             type: UniformTypes.Float,
+    //             value: spotLight.coneCos,
+    //         },
+    //         {
+    //             name: UniformNames.LightPenumbraCos,
+    //             type: UniformTypes.Float,
+    //             value: spotLight.penumbraCos,
+    //         },
+    //         ...(spotLight.shadowMap && spotLight.shadowCamera
+    //             ? [
+    //                   {
+    //                       name: UniformNames.ShadowMap,
+    //                       type: UniformTypes.Texture,
+    //                       value: spotLight.shadowMap.read.depthTexture,
+    //                   },
+    //                   {
+    //                       name: UniformNames.LightViewProjectionMatrix,
+    //                       type: UniformTypes.Matrix4,
+    //                       value: Matrix4.multiplyMatrices(
+    //                           new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1),
+    //                           spotLight.shadowCamera.projectionMatrix.clone(),
+    //                           spotLight.shadowCamera.viewMatrix.clone()
+    //                       ),
+    //                   },
+    //               ]
+    //             : []),
+    //     ])
+    // );
 
     targetMaterial.uniforms.setValue(
         UniformNames.SpotLightShadowMap,
@@ -435,18 +435,53 @@ export class Renderer {
 
         const spotLightUniformBufferData = [
             {
-                name: 'uSpotLightBlock',
+                name: UniformNames.SpotLight,
                 type: UniformTypes.StructArray,
-                value: maton.range(4).map(() => [
+                value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => [
                     {
-                        name: 'intensity',
+                        name: UniformNames.LightColor,
+                        type: UniformTypes.Color,
+                        value: Color.black,
+                    },
+                    {
+                        name: UniformNames.LightPosition,
+                        type: UniformTypes.Vector3,
+                        value: Vector3.zero
+                    },
+                    {
+                        name: UniformNames.LightDirection,
+                        type: UniformTypes.Vector3,
+                        value: Vector3.zero
+                    },
+                    {
+                        name: UniformNames.LightIntensity,
                         type: UniformTypes.Float,
                         value: 0,
                     },
                     {
-                        name: 'color',
-                        type: UniformTypes.Color,
-                        value: Color.black,
+                        name: UniformNames.LightDistance,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightAttenuation,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightConeCos,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightPenumbraCos,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightViewProjectionMatrix,
+                        type: UniformTypes.Matrix4,
+                        value: Matrix4.identity
                     },
                 ]),
             },
@@ -811,6 +846,12 @@ export class Renderer {
         );
 
         // ------------------------------------------------------------------------------
+        // update common uniforms
+        // ------------------------------------------------------------------------------
+
+        this.updateSpotLightsUniforms(lightActors.spotLights);
+
+        // ------------------------------------------------------------------------------
         // depth pre-pass
         // ------------------------------------------------------------------------------
 
@@ -976,7 +1017,6 @@ export class Renderer {
         // volumetric light pass
         // ------------------------------------------------------------------------------
 
-        this.updateSpotLightsUniforms(lightActors.spotLights);
 
         this._volumetricLightPass.setSpotLights(lightActors.spotLights);
         // TODO: spot light ないときの対応
@@ -1721,6 +1761,10 @@ export class Renderer {
         );
     }
 
+    /**
+     * 
+     * @param spotLights
+     */
     updateSpotLightsUniforms(spotLights: SpotLight[]) {
         //const colors = spotLights.map((spotLight) => spotLight.color);
         //const intencities = spotLights.map((spotLight) => spotLight.intensity);
@@ -1770,8 +1814,25 @@ export class Renderer {
                             data.push(0);
                             data.push(0);
                             break;
+                        case UniformTypes.Vector2:
+                            data.push(...(value as Vector2).elements);
+                            data.push(0);
+                            break;
+                        case UniformTypes.Vector3:
+                            data.push(...(value as Vector3).elements);
+                            data.push(0);
+                            break;
+                        case UniformTypes.Vector4:
+                            data.push(...(value as Vector4).elements);
+                            break;
+                        case UniformTypes.Matrix4:
+                            data.push(...(value as Matrix4).elements);
+                            break;
+                        case UniformTypes.Color:
+                            data.push(...(value as Color).elements);
+                            break;
                         default:
-                            data.push(...(value as UniformBufferObjectElementValueNoNeedsPadding).elements);
+                            throw "invalid uniform type";
                     }
                 return data;
             };
@@ -1831,19 +1892,54 @@ export class Renderer {
         };
 
         update(
-            'ubSpotLight',
-            'uSpotLightBlock',
+            UniformBlockNames.SpotLight,
+            UniformNames.SpotLight,
             spotLights.map((spotLight) => {
                 return [
                     {
-                        name: 'intensity',
+                        name: UniformNames.LightColor,
+                        type: UniformTypes.Color,
+                        value: spotLight.color
+                    },
+                    {
+                        name: UniformNames.LightPosition,
+                        type: UniformTypes.Vector3,
+                        value: spotLight.transform.position
+                    },
+                    {
+                        name: UniformNames.LightDirection,
+                        type: UniformTypes.Vector3,
+                        value: spotLight.transform.worldForward.clone(),
+                    },
+                    {
+                        name: UniformNames.LightIntensity,
                         type: UniformTypes.Float,
                         value: spotLight.intensity,
                     },
                     {
-                        name: 'color',
-                        type: UniformTypes.Color,
-                        value: spotLight.color,
+                        name: UniformNames.LightDistance,
+                        type: UniformTypes.Float,
+                        value: spotLight.distance,
+                    },
+                    {
+                        name: UniformNames.LightAttenuation,
+                        type: UniformTypes.Float,
+                        value: spotLight.attenuation,
+                    },
+                    {
+                        name: UniformNames.LightConeCos,
+                        type: UniformTypes.Float,
+                        value: spotLight.coneCos,
+                    },
+                    {
+                        name: UniformNames.LightPenumbraCos,
+                        type: UniformTypes.Float,
+                        value: spotLight.penumbraCos,
+                    },
+                    {
+                        name: UniformNames.LightViewProjectionMatrix,
+                        type: UniformTypes.Matrix4,
+                        value: spotLight.shadowMapProjectionMatrix
                     },
                 ];
             })
