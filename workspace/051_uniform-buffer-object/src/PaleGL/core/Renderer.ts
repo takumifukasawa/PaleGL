@@ -58,7 +58,7 @@ import {
     UniformBufferObjectStructArrayValue,
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
-    UniformStructValue,
+    // UniformStructValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
@@ -1286,7 +1286,7 @@ export class Renderer {
         };
     }
 
-    setUniformBlockData() {}
+    // setUniformBlockData() {}
 
     /**
      * uniform block の変数を更新
@@ -1338,75 +1338,77 @@ export class Renderer {
             console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
             return;
         }
+        
+        targetUbo.updateUniformValue(uniformName, targetUniformData.type, value);
+        
+        // const getStructValue = (value: UniformStructValue) => {
+        //     const data: number[] = [];
+        //     value.forEach((v) => {
+        //         switch (v.type) {
+        //             case UniformTypes.Float:
+        //             case UniformTypes.Int:
+        //                 data.push(v.value as number);
+        //                 data.push(0);
+        //                 data.push(0);
+        //                 data.push(0);
+        //                 break;
+        //             case UniformTypes.Bool:
+        //                 data.push((v.value as boolean) ? 1 : 0);
+        //                 data.push(0);
+        //                 data.push(0);
+        //                 data.push(0);
+        //                 break;
+        //             default:
+        //                 data.push(...(v.value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+        //         }
+        //     });
+        //     return data;
+        // };
 
-        const getStructValue = (value: UniformStructValue) => {
-            const data: number[] = [];
-            value.forEach((v) => {
-                switch (v.type) {
-                    case UniformTypes.Float:
-                    case UniformTypes.Int:
-                        data.push(v.value as number);
-                        data.push(0);
-                        data.push(0);
-                        data.push(0);
-                        break;
-                    case UniformTypes.Bool:
-                        data.push((v.value as boolean) ? 1 : 0);
-                        data.push(0);
-                        data.push(0);
-                        data.push(0);
-                        break;
-                    default:
-                        data.push(...(v.value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
-                }
-            });
-            return data;
-        };
-
-        // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
-        // const uniformName = targetBlock.name;
-        // const value = targetBlock.value;
-        // switch (targetBlock.type) {
-        switch (targetUniformData.type) {
-            // TODO: update struct
-            case UniformTypes.Struct:
-            case UniformTypes.StructArray:
-                if (Array.isArray(value)) {
-                    const data: number[] = [];
-                    value.forEach((v) => {
-                        data.push(...getStructValue(v as UniformStructValue));
-                    });
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
-                } else {
-                    const data = getStructValue(value as unknown as UniformStructValue);
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
-                }
-                break;
-            default:
-                if (Array.isArray(value)) {
-                    const data: number[] = [];
-                    value.forEach((v) => {
-                        if (typeof v === 'number') {
-                            data.push(v);
-                            data.push(0);
-                            data.push(0);
-                            data.push(0);
-                        } else {
-                            data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
-                        }
-                    });
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
-                } else {
-                    targetUbo.updateBufferData(
-                        uniformName,
-                        typeof value === 'number'
-                            ? new Float32Array([value])
-                            : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements
-                    );
-                }
-                break;
-        }
-        // });
+        // // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
+        // // const uniformName = targetBlock.name;
+        // // const value = targetBlock.value;
+        // // switch (targetBlock.type) {
+        // switch (targetUniformData.type) {
+        //     // TODO: update struct
+        //     case UniformTypes.Struct:
+        //     case UniformTypes.StructArray:
+        //         if (Array.isArray(value)) {
+        //             const data: number[] = [];
+        //             value.forEach((v) => {
+        //                 data.push(...getStructValue(v as UniformStructValue));
+        //             });
+        //             targetUbo.updateBufferData(uniformName, new Float32Array(data));
+        //         } else {
+        //             const data = getStructValue(value as unknown as UniformStructValue);
+        //             targetUbo.updateBufferData(uniformName, new Float32Array(data));
+        //         }
+        //         break;
+        //     default:
+        //         if (Array.isArray(value)) {
+        //             const data: number[] = [];
+        //             value.forEach((v) => {
+        //                 if (typeof v === 'number') {
+        //                     data.push(v);
+        //                     data.push(0);
+        //                     data.push(0);
+        //                     data.push(0);
+        //                 } else {
+        //                     data.push(...(v as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements);
+        //                 }
+        //             });
+        //             targetUbo.updateBufferData(uniformName, new Float32Array(data));
+        //         } else {
+        //             targetUbo.updateBufferData(
+        //                 uniformName,
+        //                 typeof value === 'number'
+        //                     ? new Float32Array([value])
+        //                     : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).elements
+        //             );
+        //         }
+        //         break;
+        // }
+        // // });
     }
 
     /**
