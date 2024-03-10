@@ -168,16 +168,21 @@ export default defineConfig(({ mode }) => {
 
     const isBundle = env.VITE_BUNDLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
-    const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true';
+    const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true'; // gltf loader を使うときは必ず false
+    const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
+    console.log(`isDropConsole: ${isDropConsole}`);
     console.log('===========================');
 
     return {
         base: './',
+        // resolve: {
+        //     preserveSymlinks: true
+        // },
         plugins: [
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
@@ -220,12 +225,12 @@ export default defineConfig(({ mode }) => {
             assetsInlineLimit: isBundle ? 100000000 : 0,
             rollupOptions: {
                 input: {
-                    main: isBundle
-                        ? resolve(__dirname, 'main.ts') // js一個にまとめる場合
-                        : resolve(__dirname, 'index.html'), // html含めてビルドする場合
-                    // sandbox: isBundle
-                    //     ? resolve(__dirname, 'sandbox/main.ts') // js一個にまとめる場合
-                    //     : resolve(__dirname, 'sandbox/index.html'), // html含めてビルドする場合
+                    // main: isBundle
+                    //     ? resolve(__dirname, 'main.ts') // js一個にまとめる場合
+                    //     : resolve(__dirname, 'index.html'), // html含めてビルドする場合
+                    sandbox: isBundle
+                        ? resolve(__dirname, 'sandbox/main.ts') // js一個にまとめる場合
+                        : resolve(__dirname, 'sandbox/index.html'), // html含めてビルドする場合
                 },
             },
             minify: 'terser',
@@ -243,7 +248,7 @@ export default defineConfig(({ mode }) => {
                     // }
                 },
                 compress: {
-                    drop_console: true,
+                    drop_console: isDropConsole,
                     drop_debugger: true,
                 },
             },

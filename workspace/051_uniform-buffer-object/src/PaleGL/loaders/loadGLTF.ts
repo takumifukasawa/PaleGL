@@ -166,6 +166,11 @@ type GLTFFormat = {
     }[];
 };
 
+/**
+ * gltf loader
+ * @param gpu
+ * @param path
+ */
 export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
     const response = await fetch(path);
     const gltf = (await response.json()) as GLTFFormat;
