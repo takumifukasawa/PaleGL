@@ -49,7 +49,7 @@
     "sandbox/**/*.ts",
     "demo/**/*.ts",
     "vite.config.ts",
-    "vite-shader-minifier-plugin.ts",
+    "vite-**-plugin.ts",
     "marionetter-server/**/*.ts",
     "node-libs/**/*.ts"
   ],

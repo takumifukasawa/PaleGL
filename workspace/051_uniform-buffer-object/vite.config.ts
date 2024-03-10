@@ -1,6 +1,5 @@
-import * as path from 'path';
 import { resolve } from 'path';
-import { defineConfig, loadEnv, Plugin } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -8,162 +7,35 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
-import { rimraf } from 'rimraf';
 // import { minify } from 'terser';
 import { shaderMinifierPlugin } from './vite-shader-minifier-plugin';
-import { createDirectoryAsync } from './node-libs/file-io';
-import { wait } from './node-libs/wait';
 import * as process from 'process';
+import { transformGlslUnroll } from './vite-transform-glsl-unroll-plugin.ts';
+import { transformGlslLayout } from './vite-transform-glsl-layout-plugin.ts';
+import { deleteTmpCachesPlugin } from './vite-delete-tmp-caches-plugin.ts';
+import * as fs from 'fs';
+import * as path from 'path';
+
 // import { NormalizedOutputOptions, OutputBundle, OutputChunk } from 'rollup';
 
-export const deleteTmpCachesPlugin: () => Plugin = () => {
-    return {
-        name: 'delete-tmp-caches-plugin',
-        // enforce: 'pre',
-        async buildStart() {
-            console.log('build start: delete-tmp-caches-plugin');
-            const basePath = './';
-            const tmpDirPath = path.join(basePath, 'tmp');
-            await rimraf(tmpDirPath);
-            await wait(10);
-            await createDirectoryAsync(tmpDirPath);
-        },
-    };
-};
-
-/**
- *
- * #pragma BLOCK_***_START ~~ #pragma BLOCK_***_END を block として、その中身を挿入する
- */
-const transformGlslLayout: () => Plugin = () => {
-    return {
-        name: 'transform-glsl-layout',
-        enforce: 'pre',
-        async transform(src: string, id: string) {
-            const fileRegex = /\.glsl$/;
-            if (fileRegex.test(id)) {
-                const blockSrcRegex = /#pragma BLOCK_([A-Z_]*?)_START([\s\S]*?)#pragma BLOCK_[A-Z_]*?_END/g;
-                const blockSrcMatches = [...src.matchAll(blockSrcRegex)];
-
-                // for debug
-                // const originalSrc = src;
-                // console.log(`[transform-glsl-layout] target - id: ${id}`);
-                // console.log("---------------------------------")
-                // console.log(originalSrc)
-                // console.log("---------------------------------")
-                // console.log(blockSrcMatches)
-
-                for (let i = 0; i < blockSrcMatches.length; i++) {
-                    const [matchContent, blockName, blockContent] = blockSrcMatches[i];
-                    const blockDestRegex = new RegExp(`#pragma BLOCK_${blockName}`, 'g');
-
-                    // for debug
-                    // console.log("---------------------------------")
-                    // console.log("matchContent: ", matchContent);
-                    // console.log("blockName: ", blockName);
-                    // console.log("blockContent: ", blockContent);
-                    // console.log("---------------------------------")
-                    // console.log([...src.matchAll(blockDestRegex)]);
-                    // console.log("---------------------------------")
-                    // console.log("match block content: ", src.match(new RegExp(blockContent, 'g')));
-
-                    // blockの囲い含めすべて消す
-                    src = src.replaceAll(matchContent, '');
-                    // 消した後、block内の記述を挿入（置き換え）
-                    src = src.replaceAll(blockDestRegex, blockContent);
-                }
-
-                // for debug
-                // console.log("---------------------------------")
-                // console.log("original src: ------------------------------")
-                // console.log(originalSrc)
-                // console.log("result: ------------------------------")
-                // console.log(src)
-
-                return src;
+async function getEntryPoints(dirName: string): Promise<string[]> {
+    const dirPath = path.join(__dirname, dirName);
+    return new Promise((resolve) => {
+        fs.readdir(dirPath, (err, list) => {
+            if (err) {
+                console.error(err);
+                return;
             }
-            return src;
-        },
-    };
-};
-
-/**
- *
- * #pragma UNROLL_START ~~ #pragma UNROLL_END を block として、その中身を挿入する
- * # 仕様
- * - 固定値 or definesを探す
- * - indexは0始まり
- * - unrollの中はfor文章一つという前提
- * - 2重ループは非対応。ただし、内側のループに対してのunrollは有効
- */
-const transformGlslUnroll: () => Plugin = () => {
-    return {
-        name: 'transform-glsl-unroll',
-        enforce: 'pre',
-        async transform(src: string, id: string) {
-            const fileRegex = /\.glsl$/;
-            if (fileRegex.test(id)) {
-                const unrollSrcRegex = /#pragma UNROLL_START([\s\S]*?)#pragma UNROLL_END/g;
-                const unrollSrcMatches = [...src.matchAll(unrollSrcRegex)];
-                // blockを抜き出す
-                for (let i = 0; i < unrollSrcMatches.length; i++) {
-                    // #pragmaの囲い自体を消す
-                    const [needsUnrollBlockContent, needsUnrollContent] = unrollSrcMatches[i];
-                    // const [, needsUnrollContent] = unrollSrcMatches[i];
-                    // src = src.replaceAll(needsUnrollBlockContent, needsUnrollContent);
-
-                    // forのブロックを中身だけに置き換え
-                    // const forRegex = new RegExp('for.*?\\(int.*?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*?)}', 'g');
-                    const forRegex = new RegExp('for.*?\\(int\\s([a-zA-Z0-9]+?).+?;.*?<\\s+?.*?(.*?);.*?\\).*?{(.*)}', 'g');
-                    const forMatches = [...needsUnrollContent.matchAll(forRegex)];
-                    if (forMatches.length < 1) {
-                        console.error(`[transform-glsl-unroll] specify unroll but for loop not found: ${id}`);
-                        continue;
-                    }
-                    
-                    // unrollの中はfor文が一つだけという前提
-                    let [, forIterateName, forLoopNumStr, forContent] = forMatches[0];
-                    // console.log(forIterateName, forLoopNumStr, forContent)
-
-                    // 固定値の場合はそのまま使い、#define で定義されている場合はdefineの値をシェーダー内から拾ってくる
-                    let loopCount = parseInt(forLoopNumStr);
-                    if (isNaN(loopCount)) {
-                        const defineRegex = new RegExp(`#define\\s+?${forLoopNumStr}\\s+?(\\d+)`, 'g');
-                        const defineMatches = [...src.matchAll(defineRegex)];
-                        if (defineMatches.length > 0) {
-                            loopCount = parseInt(defineMatches[0][1]);
-                            // for debug
-                            // console.log(`[transform-glsl-unroll] loop count is defined: ${forLoopNumStr} = ${loopCount}`);
-                        } else {
-                            console.error(`[transform-glsl-unroll] loop count is not defined: ${forLoopNumStr}`);
-                        }
-                    } else {
-                        // for debug
-                        // console.log(`[transform-glsl-unroll] loop count is specified: ${forLoopNumStr} = ${loopCount}`);
-                    }
-
-                    let unrolledStr = '';
-                    for (let j = 0; j < loopCount; j++) {
-                        // ループのindexを置き換え. UNROLL_i を i に置き換える
-                        const indexRegex = new RegExp(`UNROLL_${forIterateName}`, 'g');
-                        unrolledStr += forContent.replaceAll(indexRegex, j.toString());
-                    }
-
-                    src = src.replaceAll(needsUnrollBlockContent, unrolledStr);
-                }
-
-                return src;
-            }
-            return src;
-        },
-    };
-};
+            return resolve(list.map(name => `${dirName}/${name}`));
+        });
+    });
+}
 
 // ref:
 // https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
     const env = loadEnv(mode, process.cwd());
 
     const isBundle = env.VITE_BUNDLE === 'true';
@@ -176,6 +48,22 @@ export default defineConfig(({ mode }) => {
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
     console.log(`isDropConsole: ${isDropConsole}`);
+
+    const demoEntryPoints = await getEntryPoints('demo');
+
+    const entryPointNames: string[] = ['main', 'sandbox', ...demoEntryPoints];
+    const entryPoints: { [key: string]: string } = {};
+    entryPointNames.forEach((entryPointName) => {
+        const entryDir = entryPointName === 'main' ? '' : `${entryPointName}/`;
+        entryPoints[entryPointName] = isBundle
+            ? resolve(__dirname, `${entryDir}main.ts`) // js一個にまとめる場合
+            : resolve(__dirname, `${entryDir}index.html`); // html含めてビルドする場合
+    });
+    
+    console.log(`=== [entry_points] ===`)    
+    Object.keys(entryPoints).forEach(key => {
+        console.log(`${key}: ${entryPoints[key]}`);
+    });
     console.log('===========================');
 
     return {
@@ -224,28 +112,14 @@ export default defineConfig(({ mode }) => {
             // このbyte数よりも小さいアセットはbase64になる
             assetsInlineLimit: isBundle ? 100000000 : 0,
             rollupOptions: {
-                input: {
-                    // main: isBundle
-                    //     ? resolve(__dirname, 'main.ts') // js一個にまとめる場合
-                    //     : resolve(__dirname, 'index.html'), // html含めてビルドする場合
-                    sandbox: isBundle
-                        ? resolve(__dirname, 'sandbox/main.ts') // js一個にまとめる場合
-                        : resolve(__dirname, 'sandbox/index.html'), // html含めてビルドする場合
-                },
+                input: entryPoints,
             },
             minify: 'terser',
             target: 'es2022',
             terserOptions: {
-                // keep_classnames: false,
-                // keep_fnames: true,
                 mangle: {
                     toplevel: true,
                     properties: isMangleProperties, // TODO: 出し分けできてないかも
-                    // WIP
-                    // properties: {
-                    //     regex: /^_/
-                    //     // regex: /^(Hoge)$/
-                    // }
                 },
                 compress: {
                     drop_console: isDropConsole,
