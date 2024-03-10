@@ -613,19 +613,19 @@ export class GPU {
         
         const gl = this.gl;
         const blockIndex = gl.getUniformBlockIndex(shader.glObject, blockName);
-        console.log('createUniformBufferObject: variableNames', variableNames);
-        console.log('createUniformBufferObject: blockName', blockName);
-        console.log('createUniformBufferObject: blockIndex', blockIndex);
+        console.log('[GPU.createUniformBufferObject] blockName', blockName);
+        console.log('[GPU.createUniformBufferObject] variableNames', variableNames);
+        console.log('[GPU.createUniformBufferObject] blockIndex', blockIndex);
         const blockSize = gl.getActiveUniformBlockParameter(
             shader.glObject,
             blockIndex,
             gl.UNIFORM_BLOCK_DATA_SIZE
         ) as number;
-        console.log('createUniformBufferObject: blockSize', blockSize);
+        console.log('[GPU.createUniformBufferObject] blockSize', blockSize);
         const indices = gl.getUniformIndices(shader.glObject, variableNames) as number[];
-        console.log('createUniformBufferObject: indices', indices);
+        console.log('[GPU.createUniformBufferObject] indices', indices);
         const offsets = gl.getActiveUniforms(shader.glObject, indices, gl.UNIFORM_OFFSET) as number[];
-        console.log('createUniformBufferObject: offsets', offsets);
+        console.log('[GPU.createUniformBufferObject] offsets', offsets);
         const uniformBufferObject = new UniformBufferObject(
             this,
             blockName,
@@ -647,7 +647,8 @@ export class GPU {
         blockName: string
     ): number {
         const blockIndex = this.gl.getUniformBlockIndex(shader.glObject, blockName);
-        console.log('bindUniformBlockAndGetBlockIndex', blockName, blockIndex, uniformBufferObject.bindingPoint);
+        // for debug
+        // console.log('bindUniformBlockAndGetBlockIndex', blockName, blockIndex, uniformBufferObject.bindingPoint);
         this.gl.uniformBlockBinding(shader.glObject, blockIndex, uniformBufferObject.bindingPoint);
         return blockIndex;
     }

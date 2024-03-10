@@ -95,7 +95,7 @@ export class UniformBufferObject extends GLObject {
         // uboとbindingPointを関連付ける
         gl.bindBufferBase(gl.UNIFORM_BUFFER, this.bindingPoint, this.ubo);
 
-        console.log(gpu, blockName, blockSize, variableNames, indices, offsets, dataSize, bindingPoint);
+        // console.log(gpu, blockName, blockSize, variableNames, indices, offsets, dataSize, bindingPoint);
 
         this.variableInfo = variableNames.map((name, i) => {
             return {

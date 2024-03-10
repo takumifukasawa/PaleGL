@@ -48,6 +48,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 #include ./partial/uniform-block-spot-light.glsl
@@ -60,7 +61,7 @@ uniform sampler2D uGBufferATexture;
 // uniform mat4 uInverseViewMatrix;
 // uniform mat4 uInverseProjectionMatrix;
 uniform float uBlendRate;
-uniform float uTime;
+// uniform float uTime;
 
 // uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];

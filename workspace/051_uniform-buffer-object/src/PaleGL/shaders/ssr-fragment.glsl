@@ -8,14 +8,14 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
-// uniform mat4 uProjectionMatrix;
-
 #include ./partial/uniform-block-camera.glsl
+// uniform mat4 uProjectionMatrix;
 // uniform float uNearClip;
 // uniform float uFarClip;
 
-uniform float uTime;
+// uniform float uTime;
 
 uniform sampler2D uSrcTexture;
 // uniform sampler2D uBaseColorTexture;

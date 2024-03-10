@@ -83,6 +83,7 @@ import {
     UniformNames,
     FaceSide,
     TextureDepthPrecisionType,
+    UniformBlockNames,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -123,7 +124,6 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 // console.log('----- phong vert -----');
 // console.log(phongVert);
 // console.log('----------------');
-
 
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
@@ -231,10 +231,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
             spotLight.transform.position.z = value;
         },
     });
-
-}
-
-
+};
 
 const stylesText = `
 :root {
@@ -490,7 +487,6 @@ spotLight2.subscribeOnStart(({ actor }) => {
 
 captureScene.add(spotLight2);
 
-
 const cameraPostProcess = new PostProcess();
 // const scenePostProcess = renderer.scenePostProcess;
 // captureScene.scenePostProcess = scenePostProcess;
@@ -538,15 +534,12 @@ bufferVisualizerPass.beforeRender = () => {
         directionalLight.shadowMap!.read.depthTexture
         // spotLight.shadowMap!.read.depthTexture
     );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uSpotLightShadowMap',
-        [
-            spotLight1.shadowMap!.read.depthTexture,
-            spotLight2.shadowMap!.read.depthTexture,
-            null,
-            null
-        ]
-    );
+    bufferVisualizerPass.material.uniforms.setValue('uSpotLightShadowMap', [
+        spotLight1.shadowMap!.read.depthTexture,
+        spotLight2.shadowMap!.read.depthTexture,
+        null,
+        null,
+    ]);
     // console.log(bufferVisualizerPass.material.uniforms);
     bufferVisualizerPass.material.uniforms.setValue(
         'uAmbientOcclusionTexture',
@@ -1107,7 +1100,12 @@ const createInstanceUpdater = (instanceNum: number) => {
         // out mat4 vTransform;
         out vec3 vVelocity;
 
-        uniform float uTime;
+
+layout (std140) uniform ubCommon {
+    float uTime;
+};
+
+        // uniform float uTime;
         uniform vec2 uNormalizedInputPosition;
         uniform vec3 uAttractTargetPosition;
         uniform float uAttractRate;
@@ -1145,11 +1143,11 @@ const createInstanceUpdater = (instanceNum: number) => {
         // }
         // `,
         uniforms: [
-            {
-                name: UniformNames.Time,
-                type: UniformTypes.Float,
-                value: 0,
-            },
+            // {
+            //     name: UniformNames.Time,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
             {
                 name: 'uNormalizedInputPosition',
                 type: UniformTypes.Vector2,
@@ -1166,7 +1164,37 @@ const createInstanceUpdater = (instanceNum: number) => {
                 value: 0,
             },
         ],
+        uniformBlockNames: [UniformBlockNames.Common],
         drawCount: instanceNum,
+    });
+
+    // TODO: rendererかgpuでまとめたい
+    transformFeedbackDoubleBuffer.uniformBlockNames.forEach((blockName) => {
+        const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
+        );
+        if (!targetGlobalUniformBufferObject) {
+            return;
+        }
+        const blockIndex = gpu.bindUniformBlockAndGetBlockIndex(
+            targetGlobalUniformBufferObject.uniformBufferObject,
+            transformFeedbackDoubleBuffer.shader,
+            blockName
+        );
+        // console.log("hogehoge", blockName, blockIndex)
+        // for debug
+        // console.log(
+        //     material.name,
+        //     'addUniformBlock',
+        //     material.uniformBlockNames,
+        //     targetUniformBufferObject.blockName,
+        //     blockIndex
+        // );
+        transformFeedbackDoubleBuffer.uniforms.addUniformBlock(
+            blockIndex,
+            targetGlobalUniformBufferObject.uniformBufferObject,
+            []
+        );
     });
 
     return transformFeedbackDoubleBuffer;
@@ -1182,6 +1210,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
 
+    skinningMesh.name = "butterfly";
     // ルートにanimatorをattachしてるので一旦ここでassign
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
@@ -1329,10 +1358,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
 
     let attractRate = 0;
-    skinningMesh.onUpdate = ({ time, deltaTime }) => {
+    skinningMesh.onUpdate = ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
 
-        transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
+        // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
             inputController.normalizedInputPosition
@@ -1875,11 +1904,11 @@ void main() {
                 type: UniformTypes.Vector2Array,
                 value: [new Vector2(-1, 1), new Vector2(-1, -1), new Vector2(1, 1), new Vector2(1, -1)],
             },
-            {
-                name: UniformNames.Time,
-                type: UniformTypes.Float,
-                value: 0,
-            },
+            // {
+            //     name: UniformNames.Time,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
             {
                 name: UniformNames.DepthTexture,
                 type: UniformTypes.Texture,
@@ -1904,9 +1933,9 @@ void main() {
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    particleMesh.onFixedUpdate = ({ fixedTime }) => {
-        particleMaterial.uniforms.setValue('uTime', fixedTime);
-    };
+    // particleMesh.onFixedUpdate = ({ fixedTime }) => {
+    //     particleMaterial.uniforms.setValue('uTime', fixedTime);
+    // };
 
     captureScene.add(attractSphereMesh);
     captureScene.add(testLightingMesh);

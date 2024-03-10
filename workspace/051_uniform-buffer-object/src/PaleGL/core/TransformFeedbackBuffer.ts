@@ -21,7 +21,8 @@ export type TransformFeedbackBufferArgs = {
         data: Float32Array | Uint16Array;
         usageType?: AttributeUsageType
     }[];
-    uniforms?: UniformsData
+    uniforms?: UniformsData;
+    uniformBlockNames?: string[];
 };
 
 export class TransformFeedbackBuffer {
@@ -34,6 +35,7 @@ export class TransformFeedbackBuffer {
     drawCount: number;
 
     uniforms: Uniforms;
+    uniformBlockNames: string[] = [];
 
     transformFeedback: TransformFeedback;
 
@@ -51,6 +53,7 @@ export class TransformFeedbackBuffer {
         // fragmentShader,
         varyings,
         uniforms = [],
+        uniformBlockNames = []
     }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         const { gl } = gpu;
@@ -62,6 +65,7 @@ export class TransformFeedbackBuffer {
             transformFeedbackVaryings,
         });
         this.uniforms = new Uniforms(uniforms);
+        this.uniformBlockNames = uniformBlockNames;
 
         this.drawCount = drawCount;
 

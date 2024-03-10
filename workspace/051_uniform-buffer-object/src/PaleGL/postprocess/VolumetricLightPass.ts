@@ -148,7 +148,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     value: 1,
                 },
             ],
-            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera, UniformBlockNames.SpotLight],
+            uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera, UniformBlockNames.SpotLight],
         });
     }
 

@@ -178,6 +178,9 @@ export class Engine {
                     mesh.materials.forEach(mat => {
                         this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mat);
                     });
+                    if(mesh.depthMaterial) {
+                        this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh.depthMaterial);
+                    }
                     // mesh.materials.forEach((material) => {
                     //     if (!material.boundUniformBufferObjects) {
                     //         material.boundUniformBufferObjects = true;

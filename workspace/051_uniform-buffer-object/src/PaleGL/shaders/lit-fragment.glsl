@@ -6,6 +6,7 @@ precision highp float;
 
 #include ./defines-light.glsl
 
+// #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 

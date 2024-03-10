@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
@@ -145,6 +145,7 @@ export class SSRPass extends PostProcessPassBase {
             fragmentShader,
             uniforms: baseUniforms,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            uniformBlockNames: [UniformBlockNames.Common],
         });
     }
 

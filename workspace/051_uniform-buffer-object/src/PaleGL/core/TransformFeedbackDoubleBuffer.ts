@@ -5,7 +5,7 @@ import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import { TransformFeedbackBufferArgs } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
-import {Uniforms} from "@/PaleGL/core/Uniforms.ts";
+import { Uniforms } from '@/PaleGL/core/Uniforms.ts';
 
 // TODO: location, divisorをいい感じに指定したい
 
@@ -31,6 +31,7 @@ export class TransformFeedbackDoubleBuffer {
     private transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
 
     uniforms: Uniforms;
+    uniformBlockNames: string[] = [];
 
     // outputs: {
     //     buffer: WebGLBuffer;
@@ -55,7 +56,7 @@ export class TransformFeedbackDoubleBuffer {
         };
     }
 
-    constructor({ gpu, attributes, drawCount, vertexShader, varyings, uniforms =[] }: TransformFeedbackBufferArgs) {
+    constructor({ gpu, attributes, drawCount, vertexShader, varyings, uniforms = [], uniformBlockNames = [] }: TransformFeedbackBufferArgs) {
         // this.gpu = gpu;
         // const {gl} = gpu;
 
@@ -73,6 +74,7 @@ export class TransformFeedbackDoubleBuffer {
 
         this.drawCount = drawCount;
         this.uniforms = new Uniforms(uniforms);
+        this.uniformBlockNames = uniformBlockNames;
 
         attributes.forEach((attribute, i) => {
             attribute.location = i;

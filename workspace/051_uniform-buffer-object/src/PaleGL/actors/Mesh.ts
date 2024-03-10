@@ -107,6 +107,7 @@ export class Mesh extends Actor {
                 depthFuncType: DepthFuncTypes.Lequal,
                 alphaTest: this.mainMaterial.alphaTest,
                 skipDepthPrePass: !!this.mainMaterial.skipDepthPrePass,
+                uniformBlockNames: this.mainMaterial.uniformBlockNames, // TODO: 外側からも追加して渡せるほうがいいかもしれない
                 // depthFuncType: this.mainMaterial.depthFuncType
             });
         }

@@ -58,6 +58,7 @@ import {
     UniformBufferObjectStructArrayValue,
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
+    // Uniforms,
     // UniformStructValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -111,49 +112,49 @@ export type LightActors = {
 
 // TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
 // TODO: 渡す uniform の値、キャッシュできる気がする
-export function applyLightUniformValues(targetMaterial: Material, lightActors: LightActors) {
+export function applyLightShadowMapUniformValues(targetMaterial: Material, lightActors: LightActors) {
     if (lightActors.directionalLight) {
-        targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
-            {
-                name: UniformNames.LightDirection,
-                type: UniformTypes.Vector3,
-                // pattern1: そのまま渡す
-                // value: light.transform.position,
-                // pattern2: normalizeしてから渡す
-                // value: lightActors.directionalLight.transform.position.clone().normalize(),
-                // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-                value: lightActors.directionalLight.transform.position.clone().negate().normalize(),
-            },
-            {
-                name: UniformNames.LightIntensity,
-                type: UniformTypes.Float,
-                value: lightActors.directionalLight.intensity,
-            },
-            {
-                name: UniformNames.LightColor,
-                type: UniformTypes.Color,
-                value: lightActors.directionalLight.color,
-            },
-            ...(lightActors.directionalLight.shadowMap && lightActors.directionalLight.shadowCamera
-                ? [
-                      {
-                          name: UniformNames.LightViewProjectionMatrix,
-                          type: UniformTypes.Matrix4,
-                          // prettier-ignore
-                          value: Matrix4.multiplyMatrices(
-                            new Matrix4(
-                                0.5, 0, 0, 0.5,
-                                0, 0.5, 0, 0.5,
-                                0, 0, 0.5, 0.5,
-                                0, 0, 0, 1
-                            ),
-                            lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
-                            lightActors.directionalLight.shadowCamera.viewMatrix.clone()
-                        ),
-                      },
-                  ]
-                : []),
-        ]);
+        // targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
+        //     {
+        //         name: UniformNames.LightDirection,
+        //         type: UniformTypes.Vector3,
+        //         // pattern1: そのまま渡す
+        //         // value: light.transform.position,
+        //         // pattern2: normalizeしてから渡す
+        //         // value: lightActors.directionalLight.transform.position.clone().normalize(),
+        //         // pattern3: normalizeし、光源の位置から降り注ぐとみなす
+        //         value: lightActors.directionalLight.transform.position.clone().negate().normalize(),
+        //     },
+        //     {
+        //         name: UniformNames.LightIntensity,
+        //         type: UniformTypes.Float,
+        //         value: lightActors.directionalLight.intensity,
+        //     },
+        //     {
+        //         name: UniformNames.LightColor,
+        //         type: UniformTypes.Color,
+        //         value: lightActors.directionalLight.color,
+        //     },
+        //     ...(lightActors.directionalLight.shadowMap && lightActors.directionalLight.shadowCamera
+        //         ? [
+        //               {
+        //                   name: UniformNames.LightViewProjectionMatrix,
+        //                   type: UniformTypes.Matrix4,
+        //                   // prettier-ignore
+        //                   value: Matrix4.multiplyMatrices(
+        //                     new Matrix4(
+        //                         0.5, 0, 0, 0.5,
+        //                         0, 0.5, 0, 0.5,
+        //                         0, 0, 0.5, 0.5,
+        //                         0, 0, 0, 1
+        //                     ),
+        //                     lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
+        //                     lightActors.directionalLight.shadowCamera.viewMatrix.clone()
+        //                 ),
+        //               },
+        //           ]
+        //         : []),
+        // ]);
 
         // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
         if (lightActors.directionalLight.shadowMap) {
@@ -325,7 +326,10 @@ export class Renderer {
         this._toneMappingPass = new ToneMappingPass({ gpu });
         this._scenePostProcess.addPass(this._toneMappingPass);
 
-        // ubo
+        //
+        // initialize global uniform buffer objects
+        //
+
         const uniformBufferObjectShader = new Shader({
             gpu,
             vertexShader: globalUniformBufferObjectVertexShader,
@@ -542,6 +546,24 @@ export class Renderer {
             ),
             data: spotLightUniformBufferData,
         });
+
+        const commonUniformBlockData = [
+            {
+                name: UniformNames.Time,
+                type: UniformTypes.Float,
+                value: 0,
+            },
+        ];
+        // TODO: 一番最初の要素としてpushするとなぜかエラーになる
+        this.globalUniformBufferObjects.push({
+            uniformBufferObject: this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.Common,
+                commonUniformBlockData
+            ),
+            data: commonUniformBlockData,
+        });
+
         // for debug
         console.log('===== global uniform buffer objects =====');
         console.log(this.globalUniformBufferObjects);
@@ -576,6 +598,8 @@ export class Renderer {
             return;
         }
         material.boundUniformBufferObjects = true;
+        // for debug
+        // console.log("[Renderer.checkNeedsBindUniformBufferObjectToMaterial]", material.name)
         material.uniformBlockNames.forEach((blockName) => {
             const targetGlobalUniformBufferObject = this.globalUniformBufferObjects.find(
                 ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
@@ -887,6 +911,7 @@ export class Renderer {
         // update common uniforms
         // ------------------------------------------------------------------------------
 
+        this.updateCommonUniforms({ time });
         if (lightActors.directionalLight) {
             this.updateDirectionalLightUniforms(lightActors.directionalLight);
         }
@@ -975,11 +1000,11 @@ export class Renderer {
         // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
         // lightActors.forEach((light) => {
         //     const targetMaterial = this._deferredShadingPass.material;
-        //     applyLightUniformValues(targetMaterial, l)
+        //     applyLightShadowMapUniformValues(targetMaterial, l)
         //     light.applyUniformsValues(targetMaterial);
         // });
 
-        applyLightUniformValues(this._deferredShadingPass.material, lightActors);
+        applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors);
 
         // set ao texture
         this._deferredShadingPass.material.uniforms.setValue(
@@ -1338,9 +1363,9 @@ export class Renderer {
             console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
             return;
         }
-        
+
         targetUbo.updateUniformValue(uniformName, targetUniformData.type, value);
-        
+
         // const getStructValue = (value: UniformStructValue) => {
         //     const data: number[] = [];
         //     value.forEach((v) => {
@@ -1710,7 +1735,7 @@ export class Renderer {
             //     light.applyUniformsValues(targetMaterial);
             // });
             // TODO: g-bufferの時にはlightのuniformsを設定しなくて大丈夫になったのでいらないはず
-            // applyLightUniformValues(targetMaterial, lightActors);
+            // applyLightShadowMapUniformValues(targetMaterial, lightActors);
 
             actor.updateMaterial({ camera });
 
@@ -1925,32 +1950,35 @@ export class Renderer {
         }
     }
 
+    updateCommonUniforms({ time }: { time: number }) {
+        // passMaterial.uniforms.setValue(UniformNames.Time, time);
+        this.updateUniformBlockValue(UniformBlockNames.Common, UniformNames.Time, time);
+    }
+
     updateDirectionalLightUniforms(directionalLight: DirectionalLight) {
-        this.updateUniformBlockValue(UniformBlockNames.DirectionalLight, UniformNames.DirectionalLight, 
-            [
-                {
-                    name: UniformNames.LightDirection,
-                    type: UniformTypes.Vector3,
-                    // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-                    value: directionalLight.transform.position.clone().negate().normalize(),
-                },
-                {
-                    name: UniformNames.LightIntensity,
-                    type: UniformTypes.Float,
-                    value: directionalLight.intensity,
-                },
-                {
-                    name: UniformNames.LightColor,
-                    type: UniformTypes.Color,
-                    value: directionalLight.color,
-                },
-                {
-                    name: UniformNames.LightViewProjectionMatrix,
-                    type: UniformTypes.Matrix4,
-                    value: directionalLight.shadowMapProjectionMatrix,
-                },
-            ]
-        );
+        this.updateUniformBlockValue(UniformBlockNames.DirectionalLight, UniformNames.DirectionalLight, [
+            {
+                name: UniformNames.LightDirection,
+                type: UniformTypes.Vector3,
+                // pattern3: normalizeし、光源の位置から降り注ぐとみなす
+                value: directionalLight.transform.position.clone().negate().normalize(),
+            },
+            {
+                name: UniformNames.LightIntensity,
+                type: UniformTypes.Float,
+                value: directionalLight.intensity,
+            },
+            {
+                name: UniformNames.LightColor,
+                type: UniformTypes.Color,
+                value: directionalLight.color,
+            },
+            {
+                name: UniformNames.LightViewProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: directionalLight.shadowMapProjectionMatrix,
+            },
+        ]);
     }
 
     /**
@@ -2088,7 +2116,7 @@ export class Renderer {
             //     light.applyUniformsValues(targetMaterial);
             // });
             // TODO: transparentで必要？使わないことを強制してもいい気がする
-            applyLightUniformValues(targetMaterial, lightActors);
+            applyLightShadowMapUniformValues(targetMaterial, lightActors);
 
             this.renderMesh(actor.geometry, targetMaterial);
 

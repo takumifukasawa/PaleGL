@@ -8,9 +8,11 @@ precision highp float;
 
 #pragma APPEND_ATTRIBUTES
 
+#include ./partial/uniform-block-common.glsl
+#include ./partial/uniform-block-transformations.glsl
+#include ./partial/uniform-block-camera.glsl
+
 #include ./partial/skinning-vertex-functions.glsl
-
-
 
 // varyings
 out vec2 vUv;
@@ -22,14 +24,12 @@ out vec3 vNormal;
 #include ./partial/receive-shadow-vertex-varyings.glsl
 #include ./partial/vertex-color-vertex-varyings.glsl
 
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
 
 // uniform mat4 uWorldMatrix;
 // uniform mat4 uViewMatrix;
 // uniform mat4 uProjectionMatrix;
 // uniform mat4 uNormalMatrix;
-uniform float uTime;
+// uniform float uTime;
 
 #pragma APPEND_UNIFORMS
         
