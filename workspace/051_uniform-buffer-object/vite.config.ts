@@ -90,10 +90,6 @@ export default defineConfig(async (config) => {
     console.log('===========================');
 
     return {
-        base: '/demos/',
-        // resolve: {
-        //     preserveSymlinks: true
-        // },
         plugins: [
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
@@ -114,9 +110,6 @@ export default defineConfig(async (config) => {
                 minify: isMinifyShader,
                 minifierOptions: {
                     preserveExternals: true,
-                    // noRenamingList: ["main,dfScene"] // object space raymarch の scene 探索用関数は rename しない
-                    // preserveAllGlobals: true,
-                    // noRenaming: true
                 },
             }),
             checker({
@@ -125,7 +118,6 @@ export default defineConfig(async (config) => {
                     lintCommand: 'eslint --ext .ts,.js ./',
                 },
             }),
-            // minifyBundles(),
             ...(isBundle ? [viteSingleFile(), createHtmlPlugin()] : []),
         ],
         assetsInclude: ['**/*.gltf'],
@@ -156,7 +148,7 @@ export default defineConfig(async (config) => {
             terserOptions: {
                 mangle: {
                     toplevel: true,
-                    properties: isMangleProperties, // TODO: 出し分けできてないかも
+                    properties: isMangleProperties,
                 },
                 compress: {
                     drop_console: isDropConsole,

@@ -46,8 +46,8 @@
   "include": [
     "main.ts",
     "src/**/*.ts",
-    "sandbox/**/*.ts",
-    "demo/**/*.ts",
+    // "sandbox/**/*.ts",
+    "demos/**/*.ts",
     "vite.config.ts",
     "vite-**-plugin.ts",
     "marionetter-server/**/*.ts",

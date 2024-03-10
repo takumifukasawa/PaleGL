@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import { glob } from 'glob';
 import path from 'path';
 
+// TODO: 引数を受け取るなりして動的に変えられるようにしたい
 const entryName = 'main';
 const dir = path.join(process.cwd(), 'dist/assets/');
 const findPattern = path.join(dir, '*.js');
