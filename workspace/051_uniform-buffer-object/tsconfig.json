@@ -47,6 +47,7 @@
     "main.ts",
     "src/**/*.ts",
     "sandbox/**/*.ts",
+    "demo/**/*.ts",
     "vite.config.ts",
     "vite-shader-minifier-plugin.ts",
     "marionetter-server/**/*.ts",
