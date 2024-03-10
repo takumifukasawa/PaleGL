@@ -13,7 +13,7 @@ import fontAtlasJson from '../../assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 // import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
-import gltfButterflyModelUrl from '../../assets/models/butterfly-forward-thin.gltf?url';
+import gltfButterflyModelUrl from '../../assets/demos/models/butterfly-forward-thin.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
