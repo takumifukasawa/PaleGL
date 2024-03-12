@@ -1,19 +1,20 @@
-import smokeImgUrl from '../../assets/images/particle-smoke.png?url';
-import leaveDiffuseImgUrl from '../../assets/images/brown_mud_leaves_01_diff_1k.jpg?url';
-import leaveNormalImgUrl from '../../assets/images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
-import CubeMapPositiveXImgUrl from '../../assets/images/px.jpg?url';
-import CubeMapNegativeXImgUrl from '../../assets/images/nx.jpg?url';
-import CubeMapPositiveYImgUrl from '../../assets/images/py.jpg?url';
-import CubeMapNegativeYImgUrl from '../../assets/images/ny.jpg?url';
-import CubeMapPositiveZImgUrl from '../../assets/images/pz.jpg?url';
-import CubeMapNegativeZImgUrl from '../../assets/images/nz.jpg?url';
-import gltfSphereModelUrl from '../../assets/models/sphere-32x32.gltf?url';
-import fontAtlasImgUrl from '../../assets/fonts/NotoSans-Bold/atlas.png?url';
-import fontAtlasJson from '../../assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
+import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
+import leaveDiffuseImgUrl from '../../../assets/images/brown_mud_leaves_01_diff_1k.jpg?url';
+import leaveNormalImgUrl from '../../../assets/images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+import CubeMapPositiveXImgUrl from '../../../assets/images/px.jpg?url';
+import CubeMapNegativeXImgUrl from '../../../assets/images/nx.jpg?url';
+import CubeMapPositiveYImgUrl from '../../../assets/images/py.jpg?url';
+import CubeMapNegativeYImgUrl from '../../../assets/images/ny.jpg?url';
+import CubeMapPositiveZImgUrl from '../../../assets/images/pz.jpg?url';
+import CubeMapNegativeZImgUrl from '../../../assets/images/nz.jpg?url';
+import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
+import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
+import fontAtlasImgUrl from '../../../assets/fonts/NotoSans-Bold/atlas.png?url';
+import fontAtlasJson from '../../../assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 // import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
 // import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
-import gltfButterflyModelUrl from '../../assets/demos/models/butterfly-forward-thin.gltf?url';
+import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
 
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
@@ -295,6 +296,7 @@ let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let floorDiffuseMap: Texture;
 let floorNormalMap: Texture;
+let streetLightMesh: Mesh;
 let attractSphereMesh: Mesh;
 let testLightingMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
@@ -985,6 +987,12 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
+const createStreetLightMesh = async () => {
+    const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
+    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    return mesh;
+};
+
 const createGLTFSphereMesh = async (material: Material) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -1210,7 +1218,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
 
-    skinningMesh.name = "butterfly";
+    skinningMesh.name = 'butterfly';
     // ルートにanimatorをattachしてるので一旦ここでassign
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
@@ -1452,6 +1460,13 @@ const main = async () => {
         // rotationOffset: 0.8,
     });
     // skyboxMesh.enabled = false;
+
+    //
+    // street light
+    //
+
+    streetLightMesh = await createStreetLightMesh();
+    console.log(streetLightMesh);
 
     //
     // attract mesh

@@ -13,27 +13,37 @@ import * as process from 'process';
 import { transformGlslUnroll } from './vite-transform-glsl-unroll-plugin.ts';
 import { transformGlslLayout } from './vite-transform-glsl-layout-plugin.ts';
 import { deleteTmpCachesPlugin } from './vite-delete-tmp-caches-plugin.ts';
-// import * as fs from 'fs';
-// import * as path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // import { NormalizedOutputOptions, OutputBundle, OutputChunk } from 'rollup';
 
-// /**
-//  *
-//  * @param dirName
-//  */
-// async function getEntryPoints(dirName: string): Promise<string[]> {
-//     const dirPath = path.join(__dirname, dirName);
-//     return new Promise((resolve) => {
-//         fs.readdir(dirPath, (err, list) => {
-//             if (err) {
-//                 console.error(err);
-//                 return;
-//             }
-//             return resolve(list.map((name) => `${dirName}/${name}`));
-//         });
-//     });
-// }
+type EntryPointInfo = { name: string; path: string };
+
+/**
+ *
+ * @param dirName
+ */
+async function getEntryPoints(dirName: string): Promise<EntryPointInfo[]> {
+    // const dirPath = path.join(__dirname, dirName);
+    const dirPath = dirName;
+    return new Promise((resolve) => {
+        fs.readdir(dirPath, (err, list) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            const result: EntryPointInfo[] = [];
+            list.forEach((name) => {
+                result.push({
+                    name,
+                    path: path.join(dirPath, name),
+                });
+            });
+            return resolve(result);
+        });
+    });
+}
 
 // ref:
 // https://ja.vitejs.dev/config/
@@ -50,6 +60,7 @@ export default defineConfig(async (config) => {
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
     const demoProjectName = env.VITE_DEMO_PROJECT_NAME;
 
+    const isDevMode = mode === 'development';
     const isDemoMode = mode === 'demo';
 
     console.log(`=== [env] mode: ${mode} ===`);
@@ -59,36 +70,47 @@ export default defineConfig(async (config) => {
     console.log(`isDropConsole: ${isDropConsole}`);
     console.log(`demoProjectName: ${demoProjectName}`);
 
-    const subDir = isDemoMode ? `demos/${demoProjectName}/` : '';
+    // const subDir = isDemoMode ? `demos/${demoProjectName}/` : '';
 
     // const demoEntryPoints = await getEntryPoints('demos');
 
-    // const entryPointNames: string[] = [...(isDemoMode ? demoEntryPoints : ['main'])];
-    // const entryPointNames: string[] = [...['main', 'sandbox'], ...demoEntryPoints];
-    const entryPointNames: string[] = [];
+    // const entryPointInfos: string[] = [...(isDemoMode ? demoEntryPoints : ['main'])];
+    // const entryPointInfos: string[] = [...['main', 'sandbox'], ...demoEntryPoints];
+    const entryPointInfos: EntryPointInfo[] = [];
+
+    if (isDevMode) {
+        // entryPointInfos.push({
+        //     name: 'main',
+        //     path: '',
+        // });
+        const demoEntryPoints = await getEntryPoints('demos');
+        entryPointInfos.push(...demoEntryPoints);
+    }
 
     if (isDemoMode) {
-        entryPointNames.push(demoProjectName);
-    } else {
-        entryPointNames.push('main');
+        entryPointInfos.push({
+            name: demoProjectName,
+            path: `demos/${demoProjectName}`,
+        });
     }
 
     const entryPoints: { [key: string]: string } = {};
-    entryPointNames.forEach((entryPointName) => {
-        const entryDir = isDemoMode ? subDir : '';
+    entryPointInfos.forEach((entryPointInfo) => {
+        // const entryDir = isDevMode || isDemoMode ? subDir : '';
         // entryPointName === 'main' ? '' : `${entryPointName}/`;
         // console.log(entryPointName)
-        entryPoints[entryPointName] = isBundle
-            ? resolve(__dirname, `${entryDir}main.ts`) // js一個にまとめる場合
-            : resolve(__dirname, `${entryDir}index.html`); // html含めてビルドする場合
+        entryPoints[entryPointInfo.name] = isBundle
+            ? resolve(__dirname, `${entryPointInfo.path}/main.ts`) // js一個にまとめる場合
+            : resolve(__dirname, `${entryPointInfo.path}/index.html`); // html含めてビルドする場合
     });
 
     console.log(`=== [entry_points] ===`);
     Object.keys(entryPoints).forEach((key) => {
         console.log(`${key}: ${entryPoints[key]}`);
     });
-    console.log('===========================');
+    console.log('======================');
 
+    // ref: https://uga-box.hatenablog.com/entry/2022/05/03/000000
     return {
         plugins: [
             deleteTmpCachesPlugin(),
@@ -121,27 +143,43 @@ export default defineConfig(async (config) => {
             ...(isBundle ? [viteSingleFile(), createHtmlPlugin()] : []),
         ],
         assetsInclude: ['**/*.gltf'],
+        root: "./pages",
+        publicDir: resolve(__dirname, 'public'),
         build: {
             reportCompressedSize: false,
             cssCodeSplit: false,
             // このbyte数よりも小さいアセットはbase64になる
             assetsInlineLimit: isBundle ? 100000000 : 0,
+            outDir: resolve(__dirname, 'dist'),
+            emptyOutDir: true,
             rollupOptions: {
-                input: entryPoints,
-                // ref: https://stackoverflow.com/questions/71180561/vite-change-ouput-directory-of-assets
-                output: {
-                    assetFileNames: () => {
-                        return isDemoMode
-                            ? `demos/${demoProjectName}/assets/[name]-[hash][extname]`
-                            : `assets/${subDir}[name]-[hash][extname]`;
-                    },
-                    chunkFileNames: isDemoMode
-                        ? `demos/${demoProjectName}/[name]-[hash].js`
-                        : `assets/${subDir}/[name]-[hash].js`,
-                    entryFileNames: isDemoMode
-                        ? `demos/${demoProjectName}/[name]-[hash].js`
-                        : `assets/${subDir}/[name]-[hash].js`,
+                input: {
+                    // "": resolve(__dirname, "pages/index.html"),
+                    // "sandbox": resolve(__dirname, "pages/demos/sandbox/index.html"),
+                    "street-light": resolve(__dirname, "pages/demos/street-light/index.html"),
                 },
+                output: {
+                    entryFileNames: `assets/[name]/main.js`,
+                    assetFileNames: () => {
+                        return `assets/[name].[ext]`;
+                    },
+                    chunkFileNames: `assets/[name].js`,
+                }
+                // input: entryPoints,
+                // // ref: https://stackoverflow.com/questions/71180561/vite-change-ouput-directory-of-assets
+                // output: {
+                //     assetFileNames: () => {
+                //         return isDemoMode
+                //             ? `demos/${demoProjectName}/assets/[name]-[hash][extname]`
+                //             : `assets/${subDir}[name]-[hash][extname]`;
+                //     },
+                //     chunkFileNames: isDemoMode
+                //         ? `demos/${demoProjectName}/[name]-[hash].js`
+                //         : `assets/${subDir}/[name]-[hash].js`,
+                //     entryFileNames: isDemoMode
+                //         ? `demos/${demoProjectName}/[name]-[hash].js`
+                //         : `assets/${subDir}/[name]-[hash].js`,
+                // },
             },
             minify: 'terser',
             target: 'es2022',
