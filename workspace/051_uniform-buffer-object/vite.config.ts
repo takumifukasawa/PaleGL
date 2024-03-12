@@ -83,7 +83,7 @@ export default defineConfig(async (config) => {
         //     name: 'main',
         //     path: '',
         // });
-        const demoEntryPoints = await getEntryPoints('demos');
+        const demoEntryPoints = await getEntryPoints('pages/demos');
         entryPointInfos.push(...demoEntryPoints);
     }
 
@@ -110,7 +110,9 @@ export default defineConfig(async (config) => {
     });
     console.log('======================');
 
-    // ref: https://uga-box.hatenablog.com/entry/2022/05/03/000000
+    // ref:
+    // https://uga-box.hatenablog.com/entry/2022/05/03/000000
+    // https://vitejs.dev/config/
     return {
         plugins: [
             deleteTmpCachesPlugin(),
@@ -159,11 +161,17 @@ export default defineConfig(async (config) => {
                     "street-light": resolve(__dirname, "pages/demos/street-light/index.html"),
                 },
                 output: {
-                    entryFileNames: `assets/[name]/main.js`,
+                    // entryFileNames: `assets/[name]/main.js`,
+                    // assetFileNames: () => {
+                    //     return `assets/[name].[ext]`;
+                    // },
+                    // chunkFileNames: `assets/[name].js`,
+
+                    entryFileNames: `demos/assets/[name]/main.js`,
                     assetFileNames: () => {
-                        return `assets/[name].[ext]`;
+                        return `demos/assets/[name].[ext]`;
                     },
-                    chunkFileNames: `assets/[name].js`,
+                    chunkFileNames: `demos/assets/[name].js`,
                 }
                 // input: entryPoints,
                 // // ref: https://stackoverflow.com/questions/71180561/vite-change-ouput-directory-of-assets
