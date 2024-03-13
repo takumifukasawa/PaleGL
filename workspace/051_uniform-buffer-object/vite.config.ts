@@ -58,45 +58,52 @@ export default defineConfig(async (config) => {
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true'; // gltf loader を使うときは必ず false
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
-    const demoProjectName = env.VITE_DEMO_PROJECT_NAME;
+    const singleDemoProjectName = env.VITE_SINGLE_DEMO_PROJECT_NAME;
 
-    const isDevMode = mode === 'development';
-    const isDemoMode = mode === 'demo';
+    // const isDevMode = mode === 'development';
+    const isSingleDemoBuildMode = mode === 'single-demo';
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
     console.log(`isDropConsole: ${isDropConsole}`);
-    console.log(`demoProjectName: ${demoProjectName}`);
+    console.log(`singleDemoProjectName: ${singleDemoProjectName}`);
 
-    // const subDir = isDemoMode ? `demos/${demoProjectName}/` : '';
+    // const subDir = isSingleDemoBuildMode ? `demos/${singleDemoProjectName}/` : '';
 
     // const demoEntryPoints = await getEntryPoints('demos');
 
-    // const entryPointInfos: string[] = [...(isDemoMode ? demoEntryPoints : ['main'])];
+    // const entryPointInfos: string[] = [...(isSingleDemoBuildMode ? demoEntryPoints : ['main'])];
     // const entryPointInfos: string[] = [...['main', 'sandbox'], ...demoEntryPoints];
     const entryPointInfos: EntryPointInfo[] = [];
 
-    if (isDevMode) {
-        // entryPointInfos.push({
-        //     name: 'main',
-        //     path: '',
-        // });
+    // if (isDevMode) {
+    //     // entryPointInfos.push({
+    //     //     name: 'main',
+    //     //     path: '',
+    //     // });
+    //     const demoEntryPoints = await getEntryPoints('pages/demos');
+    //     entryPointInfos.push(...demoEntryPoints);
+    // }
+
+    if (isSingleDemoBuildMode) {
+        entryPointInfos.push({
+            name: singleDemoProjectName,
+            path: `pages/demos/${singleDemoProjectName}`,
+        });
+    } else {
+        entryPointInfos.push({
+            name: 'index',
+            path: 'pages',
+        });
         const demoEntryPoints = await getEntryPoints('pages/demos');
         entryPointInfos.push(...demoEntryPoints);
     }
 
-    if (isDemoMode) {
-        entryPointInfos.push({
-            name: demoProjectName,
-            path: `demos/${demoProjectName}`,
-        });
-    }
-
     const entryPoints: { [key: string]: string } = {};
     entryPointInfos.forEach((entryPointInfo) => {
-        // const entryDir = isDevMode || isDemoMode ? subDir : '';
+        // const entryDir = isDevMode || isSingleDemoBuildMode ? subDir : '';
         // entryPointName === 'main' ? '' : `${entryPointName}/`;
         // console.log(entryPointName)
         entryPoints[entryPointInfo.name] = isBundle
@@ -145,7 +152,7 @@ export default defineConfig(async (config) => {
             ...(isBundle ? [viteSingleFile(), createHtmlPlugin()] : []),
         ],
         assetsInclude: ['**/*.gltf'],
-        root: "./pages",
+        root: './pages',
         publicDir: resolve(__dirname, 'public'),
         build: {
             reportCompressedSize: false,
@@ -155,37 +162,53 @@ export default defineConfig(async (config) => {
             outDir: resolve(__dirname, 'dist'),
             emptyOutDir: true,
             rollupOptions: {
-                input: {
-                    // "": resolve(__dirname, "pages/index.html"),
-                    // "sandbox": resolve(__dirname, "pages/demos/sandbox/index.html"),
-                    "street-light": resolve(__dirname, "pages/demos/street-light/index.html"),
-                },
+                // input: {
+                //     // index: resolve(__dirname, 'pages/index.html'),
+                //     // "sandbox": resolve(__dirname, "pages/demos/sandbox/index.html"),
+                //     "street-light": resolve(__dirname, "pages/demos/street-light/index.html"),
+                // },
+                input: entryPoints,
                 output: {
+                    // entryFileNames: `assets/main.js`,
                     // entryFileNames: `assets/[name]/main.js`,
-                    // assetFileNames: () => {
-                    //     return `assets/[name].[ext]`;
-                    // },
-                    // chunkFileNames: `assets/[name].js`,
-
-                    entryFileNames: `demos/assets/[name]/main.js`,
-                    assetFileNames: () => {
-                        return `demos/assets/[name].[ext]`;
+                    entryFileNames: (args) => {
+                        if(isSingleDemoBuildMode) {
+                            return `demos/[name]/assets/main.js`;
+                        }
+                        return args.name === 'index' ? `assets/main.js` : `assets/[name]/main.js`;
                     },
-                    chunkFileNames: `demos/assets/[name].js`,
-                }
+                    assetFileNames: () => {
+                        if(isSingleDemoBuildMode) {
+                            return `demos/${singleDemoProjectName}/assets/[name].[ext]`;
+                        }
+                        return `assets/[name].[ext]`;
+                    },
+                    chunkFileNames:() => {
+                        if(isSingleDemoBuildMode) {
+                            return `demos/${singleDemoProjectName}/assets/[name].js`;
+                        }
+                        return `assets/[name].js`;
+                    } 
+
+                    // entryFileNames: `demos/street-light/assets/main.js`,
+                    // assetFileNames: () => {
+                    //     return `demos/street-light/assets/[name].[ext]`;
+                    // },
+                    // chunkFileNames: `demos/street-light/assets/[name].js`,
+                },
                 // input: entryPoints,
                 // // ref: https://stackoverflow.com/questions/71180561/vite-change-ouput-directory-of-assets
                 // output: {
                 //     assetFileNames: () => {
-                //         return isDemoMode
-                //             ? `demos/${demoProjectName}/assets/[name]-[hash][extname]`
+                //         return isSingleDemoBuildMode
+                //             ? `demos/${singleDemoProjectName}/assets/[name]-[hash][extname]`
                 //             : `assets/${subDir}[name]-[hash][extname]`;
                 //     },
-                //     chunkFileNames: isDemoMode
-                //         ? `demos/${demoProjectName}/[name]-[hash].js`
+                //     chunkFileNames: isSingleDemoBuildMode
+                //         ? `demos/${singleDemoProjectName}/[name]-[hash].js`
                 //         : `assets/${subDir}/[name]-[hash].js`,
-                //     entryFileNames: isDemoMode
-                //         ? `demos/${demoProjectName}/[name]-[hash].js`
+                //     entryFileNames: isSingleDemoBuildMode
+                //         ? `demos/${singleDemoProjectName}/[name]-[hash].js`
                 //         : `assets/${subDir}/[name]-[hash].js`,
                 // },
             },
