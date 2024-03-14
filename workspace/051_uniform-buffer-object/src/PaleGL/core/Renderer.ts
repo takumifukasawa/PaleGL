@@ -1672,7 +1672,7 @@ export class Renderer {
         //     camera.projectionMatrix
         // );
         this.updateCameraUniforms(camera);
-
+        
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:

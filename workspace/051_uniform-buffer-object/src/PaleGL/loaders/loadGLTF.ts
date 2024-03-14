@@ -1,17 +1,20 @@
-import { Actor } from '@/PaleGL/actors/Actor';
-import { Bone } from '@/PaleGL/core/Bone';
-import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { Mesh } from '@/PaleGL/actors/Mesh';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { AnimationClip } from '@/PaleGL/core/AnimationClip';
-import { AnimationKeyframeTypes } from '@/PaleGL/constants';
-import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {Actor} from '@/PaleGL/actors/Actor';
+import {Bone} from '@/PaleGL/core/Bone';
+import {SkinnedMesh} from '@/PaleGL/actors/SkinnedMesh';
+import {Geometry} from '@/PaleGL/geometries/Geometry';
+import {Mesh} from '@/PaleGL/actors/Mesh';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {Matrix4} from '@/PaleGL/math/Matrix4';
+import {AnimationClip} from '@/PaleGL/core/AnimationClip';
+import {AnimationKeyframeTypes} from '@/PaleGL/constants';
+import {AnimationKeyframes} from '@/PaleGL/core/AnimationKeyframes';
+import {Quaternion} from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
-import { Attribute } from '@/PaleGL/core/Attribute';
-import { GPU } from '@/PaleGL/core/GPU';
+import {Attribute} from '@/PaleGL/core/Attribute';
+import {GPU} from '@/PaleGL/core/GPU';
+import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
+import {Color} from "@/PaleGL/math/Color.ts";
+// import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
 
 type GLTFScene = {
     nodes: number[];
@@ -35,6 +38,7 @@ type GLTFMeshAccessor = {
         // accessor: number
         accessor: GLTFAccessor;
     } | null;
+    // material: number;
 };
 
 const GLTFMeshAttributes = {
@@ -146,12 +150,23 @@ export type GLTFAnimationChannelTargetPath =
 
 export type GLTFNodeActorKind = Bone | Actor;
 
+type GLTFMaterial = {
+    doubleSided: boolean;
+    name: string;
+    pbrMetallicRoughness: {
+        baseColorFactor: number[], // rgba
+        metallicFactor: number,
+        roughnessFactor: number,
+    }
+};
+
 type GLTFFormat = {
     accessors: GLTFAccessor[];
     animations: GLTFAnimation[];
     asset: GLTFAsset;
     bufferViews: GLTFBufferView[];
     buffers: GLTFBuffer[];
+    materials: GLTFMaterial[];
     meshes: GLTFMesh[];
     nodes: GLTFNode[];
     scene: number;
@@ -168,17 +183,18 @@ type GLTFFormat = {
 
 /**
  * gltf loader
+ * ref: https://github.com/KhronosGroup/glTF
  * @param gpu
  * @param path
  */
-export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
+export async function loadGLTF({gpu, path}: { gpu: GPU; path: string }) {
     const response = await fetch(path);
     const gltf = (await response.json()) as GLTFFormat;
 
     const rootActor = new Actor({});
 
     // for debug
-    // console.log('[loadGLTF]', gltf);
+    console.log('[loadGLTF]', gltf);
 
     const cacheNodes: GLTFNodeActorKind[] = [];
 
@@ -199,13 +215,13 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
             // NOTE: buffer = { byteLength, uri }
             const binResponse = await fetch(buffer.uri);
             const binBufferData = await binResponse.arrayBuffer();
-            return { byteLength: buffer.byteLength, binBufferData };
+            return {byteLength: buffer.byteLength, binBufferData};
         })
     );
 
     const getBufferData = (accessor: GLTFAccessor) => {
         const bufferView = gltf.bufferViews[accessor.bufferView];
-        const { binBufferData } = binBufferDataList[bufferView.buffer];
+        const {binBufferData} = binBufferDataList[bufferView.buffer];
         const slicedBuffer = binBufferData.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
         return slicedBuffer;
     };
@@ -214,7 +230,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         const node: GLTFNode = gltf.nodes[nodeIndex];
         // NOTE:
         // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
-        const bone = new Bone({ name: node.name, index: nodeIndex });
+        const bone = new Bone({name: node.name, index: nodeIndex});
         cacheNodes[nodeIndex] = bone;
 
         // use basic mul
@@ -241,13 +257,13 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
 
         const offsetMatrix = Matrix4.multiplyMatrices(
             Matrix4.translationMatrix(
-            node.translation
-                ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
-                : Vector3.zero
+                node.translation
+                    ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
+                    : Vector3.zero
             ),
             (node.rotation
-                ? (new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])).toMatrix4()
-                : Quaternion.identity().toMatrix4()
+                    ? (new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])).toMatrix4()
+                    : Quaternion.identity().toMatrix4()
             ),
             Matrix4.scalingMatrix(node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one)
         );
@@ -265,10 +281,10 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
     };
 
     const createMesh = ({
-        // nodeIndex,
-        meshIndex,
-        skinIndex = null,
-    }: {
+                            // nodeIndex,
+                            meshIndex,
+                            skinIndex = null,
+                        }: {
         /*nodeIndex: number, */ meshIndex: number;
         skinIndex: number | null;
     }) => {
@@ -286,7 +302,10 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
         // console.log(`[loadGLTF.createMesh] mesh index: ${meshIndex}, skin index: ${skinIndex}`);
 
         const mesh = gltf.meshes[meshIndex];
-
+        console.log("fugafuga", mesh)
+        
+        const materialIndices: number[] = [];
+        
         mesh.primitives.forEach((primitive: GLTFMeshPrimitives) => {
             const meshAccessors: GLTFMeshAccessor = {
                 attributes: [],
@@ -304,12 +323,17 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
                     accessor: gltf.accessors[accessorIndex],
                 });
             });
+           
+            if(Object.hasOwn(primitive, "material")) {
+                materialIndices.push(primitive.material);
+            }
+
             if (primitive.indices) {
-                meshAccessors.indices = { accessor: gltf.accessors[primitive.indices] };
+                meshAccessors.indices = {accessor: gltf.accessors[primitive.indices]};
             }
 
             meshAccessors.attributes.forEach((attributeAccessor) => {
-                const { attributeName, accessor } = attributeAccessor;
+                const {attributeName, accessor} = attributeAccessor;
                 const bufferData = getBufferData(accessor);
                 switch (attributeName) {
                     case 'POSITION':
@@ -336,7 +360,7 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
                 }
             });
             if (meshAccessors.indices) {
-                const { accessor } = meshAccessors.indices;
+                const {accessor} = meshAccessors.indices;
                 const bufferData = getBufferData(accessor);
                 indices = new Uint16Array(bufferData);
             }
@@ -397,17 +421,17 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
                 // bone があるならjointとweightもあるはず
                 ...(rootBone
                     ? [
-                          new Attribute({
-                              name: 'aBoneIndices',
-                              data: joints,
-                              size: 4,
-                          }),
-                          new Attribute({
-                              name: 'aBoneWeights',
-                              data: weights,
-                              size: 4,
-                          }),
-                      ]
+                        new Attribute({
+                            name: 'aBoneIndices',
+                            data: joints,
+                            size: 4,
+                        }),
+                        new Attribute({
+                            name: 'aBoneWeights',
+                            data: weights,
+                            size: 4,
+                        }),
+                    ]
                     : []),
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
                 new Attribute({
@@ -426,7 +450,22 @@ export async function loadGLTF({ gpu, path }: { gpu: GPU; path: string }) {
             drawCount: indices.length,
         });
 
-        return rootBone ? new SkinnedMesh({ geometry, bones: rootBone }) : new Mesh({ geometry });
+        const materials =
+            materialIndices.map(materialIndex => {
+                const targetMaterial = gltf.materials[materialIndex];
+                return new GBufferMaterial({
+                    diffuseColor: Color.fromArray(targetMaterial.pbrMetallicRoughness.baseColorFactor),
+                    metallic: targetMaterial.pbrMetallicRoughness.metallicFactor,
+                    roughness: targetMaterial.pbrMetallicRoughness.roughnessFactor,
+                });
+            });
+       
+        // for debug
+        // console.log("[loadGLTF.createMesh]", materialIndices, materials, gltf.materials)
+
+        return rootBone
+            ? new SkinnedMesh({geometry, bones: rootBone})
+            : new Mesh({geometry, materials});
     };
 
     const findNode = (nodeIndex: number, parentActor: Actor): void => {

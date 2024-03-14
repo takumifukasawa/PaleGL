@@ -115,6 +115,7 @@ import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
 import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
+import {Actor} from "@/PaleGL/actors/Actor.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
@@ -296,7 +297,7 @@ let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let floorDiffuseMap: Texture;
 let floorNormalMap: Texture;
-let streetLightMesh: Mesh;
+let streetLightActor: Actor;
 let attractSphereMesh: Mesh;
 let testLightingMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
@@ -987,10 +988,35 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const createStreetLightMesh = async () => {
+const createStreetLightActor = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
-    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
-    return mesh;
+    console.log("hogehoge",gltfActor)
+    
+    return gltfActor;
+
+    // const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    // const mesh: Mesh = gltfActor;
+
+    // const matA = new GBufferMaterial({
+    //     diffuseColor: new Color(1, 1, 1, 1),
+    //     metallic: 1,
+    //     roughness: 1,
+    // });
+    // const matB = new GBufferMaterial({
+    //     diffuseColor: new Color(1, 1, 1, 1),
+    //     metallic: 1,
+    //     roughness: 1,
+    // });
+    // const matC = new GBufferMaterial({
+    //     diffuseColor: new Color(1, 1, 1, 1),
+    //     metallic: 1,
+    //     roughness: 1,
+    // });
+    // mesh.materials[0] = matA;
+    // mesh.materials[1] = matB;
+    // mesh.materials[2] = matC;
+    
+    // return mesh;
 };
 
 const createGLTFSphereMesh = async (material: Material) => {
@@ -1465,8 +1491,8 @@ const main = async () => {
     // street light
     //
 
-    streetLightMesh = await createStreetLightMesh();
-    console.log(streetLightMesh);
+    streetLightActor = await createStreetLightActor();
+    captureScene.add(streetLightActor)
 
     //
     // attract mesh

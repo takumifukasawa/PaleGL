@@ -36,15 +36,15 @@
     get rgbArray() {
         return [this.r, this.g, this.b];
     }
-    
+
     set r(value) {
         this.elements[0] = value;
     }
-    
+
     set g(value) {
         this.elements[1] = value;
     }
-    
+
     set b(value) {
         this.elements[2] = value;
     }
@@ -53,7 +53,7 @@
         this.elements[3] = value;
     }
 
-    constructor(r: number = 0, g: number = 0, b : number = 0, a: number = 1) {
+    constructor(r: number = 0, g: number = 0, b: number = 0, a: number = 1) {
         this.set(r, g, b, a);
     }
 
@@ -94,6 +94,10 @@
 
     static fromRGB(r: number, g: number, b: number, a: number = 255) {
         return new Color(r / 255, g / 255, b / 255, a / 255);
+    }
+
+    static fromArray(data: number[]) {
+        return new Color(data[0], data[1], data[2], data[3] ? data[3] : 1);
     }
 
     // hex ... #rrggbb or rrggbb
