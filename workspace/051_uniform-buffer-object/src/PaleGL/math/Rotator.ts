@@ -4,7 +4,7 @@ import {Vector3} from "@/PaleGL/math/Vector3.ts";
 
 export class Rotator {
     // x, y, z axes
-    // 一旦そのままdegreeが入る想定
+    // そのままdegreeが入る
     elements: Float32Array = new Float32Array(3);
     rawMatrix: Matrix4 | null = null;
 

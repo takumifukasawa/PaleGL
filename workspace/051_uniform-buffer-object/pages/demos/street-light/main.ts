@@ -1,78 +1,30 @@
-import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
-import leaveDiffuseImgUrl from '../../../assets/images/brown_mud_leaves_01_diff_1k.jpg?url';
-import leaveNormalImgUrl from '../../../assets/images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
-import CubeMapPositiveXImgUrl from '../../../assets/images/px.jpg?url';
-import CubeMapNegativeXImgUrl from '../../../assets/images/nx.jpg?url';
-import CubeMapPositiveYImgUrl from '../../../assets/images/py.jpg?url';
-import CubeMapNegativeYImgUrl from '../../../assets/images/ny.jpg?url';
-import CubeMapPositiveZImgUrl from '../../../assets/images/pz.jpg?url';
-import CubeMapNegativeZImgUrl from '../../../assets/images/nz.jpg?url';
-import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
-import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
-import fontAtlasImgUrl from '../../../assets/fonts/NotoSans-Bold/atlas.png?url';
-import fontAtlasJson from '../../../assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
-// import gltfGlassModelUrl from '../models/glass-wind-poly.gltf?url';
-// import gltfButterflyModelUrl from '../models/butterfly.gltf?url';
-// import gltfButterflyModelUrl from '../models/butterfly-forward.gltf?url';
-import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
-
-// actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
 import { Skybox } from '@/PaleGL/actors/Skybox';
 import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
-
-// core
 import { Engine } from '@/PaleGL/core/Engine';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-// import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import { Scene } from '@/PaleGL/core/Scene';
+import { Rotator } from '@/PaleGL/math/Rotator';
 import { Texture } from '@/PaleGL/core/Texture';
 import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
-
-// geometries
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
-
-// loaders
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
 import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
-
-// materials
 import { Material } from '@/PaleGL/materials/Material';
-// import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
-
-// math
 import { Color } from '@/PaleGL/math/Color';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
-
-// postprocess
-// import {FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
-// import {PostProcess} from '@/PaleGL/postprocess/PostProcess';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
-// import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
-// import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
-// import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
-// import { LightShaftPass } from "@/PaleGL/postprocess/LightShaftPass";
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
-
-// inputs
 import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
 import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
-
-// shaders
-import litObjectSpaceRaymarchFrag from '@/PaleGL/shaders/lit-object-space-raymarch-fragment.glsl';
-import gBufferObjectSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-object-space-raymarch-depth-fragment.glsl';
-import litScreenSpaceRaymarchFrag from '@/PaleGL/shaders/lit-screen-space-raymarch-fragment.glsl';
-import gBufferScreenSpaceRaymarchDepthFrag from '@/PaleGL/shaders/gbuffer-screen-space-raymarch-depth-fragment.glsl';
-
-// others
 import {
     UniformTypes,
     TextureWrapTypes,
@@ -89,43 +41,31 @@ import {
 
 import { DebuggerGUI } from '@/DebuggerGUI';
 import { Camera } from '@/PaleGL/actors/Camera';
-// import {Light} from "@/PaleGL/actors/Light";
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { Attribute } from '@/PaleGL/core/Attribute';
-// import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-// import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
-// import {Shader} from "@/PaleGL/core/Shader.ts";
-// import * as buffer from 'buffer';
-// import {Light} from "@/PaleGL/actors/Light.ts";
-// import {Actor} from "@/PaleGL/actors/Actor.ts";
-
-// import testVert from '@/PaleGL/shaders/test-shader-vert.glsl';
-// import testFrag from '@/PaleGL/shaders/test-shader-frag.glsl';
-// import phongVert from '@/PaleGL/shaders/phong-vertex.glsl';
-import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
-import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
-import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
-import { TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import {Actor} from "@/PaleGL/actors/Actor.ts";
-// import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-// import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
+import { Actor } from '@/PaleGL/actors/Actor.ts';
 
-// console.log('----- vert -----');
-// console.log(testVert);
-// console.log('----- frag -----');
-// console.log(testFrag);
-// console.log('----- phong vert -----');
-// console.log(phongVert);
-// console.log('----------------');
+// assets
+import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
+import leaveDiffuseImgUrl from '../../../assets/images/brown_mud_leaves_01_diff_1k.jpg?url';
+import leaveNormalImgUrl from '../../../assets/images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
+import CubeMapPositiveXImgUrl from '../../../assets/images/px.jpg?url';
+import CubeMapNegativeXImgUrl from '../../../assets/images/nx.jpg?url';
+import CubeMapPositiveYImgUrl from '../../../assets/images/py.jpg?url';
+import CubeMapNegativeYImgUrl from '../../../assets/images/ny.jpg?url';
+import CubeMapPositiveZImgUrl from '../../../assets/images/pz.jpg?url';
+import CubeMapNegativeZImgUrl from '../../../assets/images/nz.jpg?url';
+import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
+import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
+import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
 
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
@@ -297,14 +237,11 @@ let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let floorDiffuseMap: Texture;
 let floorNormalMap: Texture;
-let streetLightActor: Actor;
+let streetLightActorLeft: Actor;
+let streetLightActorRight: Actor;
 let attractSphereMesh: Mesh;
-let testLightingMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
-let glslSound: GLSLSound;
-let objectSpaceRaymarchMesh: Mesh;
-let screenSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -395,7 +332,7 @@ const directionalLight = new DirectionalLight({
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = true;
+    directionalLight.shadowCamera.visibleFrustum = false;
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 15;
@@ -427,19 +364,19 @@ directionalLight.subscribeOnStart(({ actor }) => {
 captureScene.add(directionalLight);
 
 const spotLight1 = new SpotLight({
-    intensity: 1,
-    color: Color.white,
-    distance: 20,
-    attenuation: 0.1,
-    coneCos: 0.9,
-    penumbraCos: 0.95,
+    intensity: 1.4,
+    color: new Color(1, 1, 1),
+    distance: 15,
+    attenuation: 0.5,
+    coneCos: 0.8,
+    penumbraCos: 0.9,
 });
 // spotLight.enabled = false;
 
 if (spotLight1.shadowCamera) {
-    spotLight1.shadowCamera.visibleFrustum = true;
+    spotLight1.shadowCamera.visibleFrustum = false;
     spotLight1.castShadow = true;
-    spotLight1.shadowCamera.near = 1;
+    spotLight1.shadowCamera.near = 0.1;
     spotLight1.shadowCamera.far = spotLight1.distance;
     // spotLight.shadowCamera.far = 10;
     (spotLight1.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
@@ -452,26 +389,26 @@ if (spotLight1.shadowCamera) {
     });
 }
 spotLight1.subscribeOnStart(({ actor }) => {
-    actor.transform.setTranslation(new Vector3(5, 9, -2));
+    actor.transform.setTranslation(new Vector3(4.63, 6.9, 0));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 });
 
 captureScene.add(spotLight1);
 
 const spotLight2 = new SpotLight({
-    intensity: 1,
-    color: Color.white,
-    distance: 20,
-    attenuation: 0.1,
-    coneCos: 0.9,
-    penumbraCos: 0.95,
+    intensity: 1.4,
+    color: new Color(1, 1, 1),
+    distance: 15,
+    attenuation: 0.5,
+    coneCos: 0.8,
+    penumbraCos: 0.9,
 });
 // spotLight.enabled = false;
 
 if (spotLight2.shadowCamera) {
-    spotLight2.shadowCamera.visibleFrustum = true;
+    spotLight2.shadowCamera.visibleFrustum = false;
     spotLight2.castShadow = true;
-    spotLight2.shadowCamera.near = 1;
+    spotLight2.shadowCamera.near = 0.1;
     spotLight2.shadowCamera.far = spotLight2.distance;
     // spotLight.shadowCamera.far = 10;
     (spotLight2.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
@@ -484,7 +421,7 @@ if (spotLight2.shadowCamera) {
     });
 }
 spotLight2.subscribeOnStart(({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-5, 9, -2));
+    actor.transform.setTranslation(new Vector3(-4.63, 6.9, 0));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 });
 
@@ -990,8 +927,8 @@ const createTransformFeedbackDrivenMesh = () => {
 
 const createStreetLightActor = async () => {
     const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
-    console.log("hogehoge",gltfActor)
-    
+    console.log('hogehoge', gltfActor);
+
     return gltfActor;
 
     // const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -1015,7 +952,7 @@ const createStreetLightActor = async () => {
     // mesh.materials[0] = matA;
     // mesh.materials[1] = matB;
     // mesh.materials[2] = matC;
-    
+
     // return mesh;
 };
 
@@ -1432,13 +1369,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
-const playSound = () => {
-    if (glslSound) {
-        glslSound.stop();
-    }
-    glslSound = new GLSLSound(gpu, soundVertexShader, 180);
-};
-
 const main = async () => {
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
@@ -1491,8 +1421,20 @@ const main = async () => {
     // street light
     //
 
-    streetLightActor = await createStreetLightActor();
-    captureScene.add(streetLightActor)
+    streetLightActorLeft = await createStreetLightActor();
+    streetLightActorLeft.subscribeOnStart(() => {
+        streetLightActorLeft.transform.position = new Vector3(6, 0, 0);
+        streetLightActorLeft.transform.scale = Vector3.fill(1.8);
+    });
+    captureScene.add(streetLightActorLeft);
+
+    streetLightActorRight = await createStreetLightActor();
+    streetLightActorRight.subscribeOnStart(() => {
+        streetLightActorRight.transform.rotation = new Rotator(0, 180, 0);
+        streetLightActorRight.transform.position = new Vector3(-6, 0, 0);
+        streetLightActorRight.transform.scale = Vector3.fill(1.8);
+    });
+    captureScene.add(streetLightActorRight);
 
     //
     // attract mesh
@@ -1521,166 +1463,6 @@ const main = async () => {
     };
 
     //
-    // lighting mesh
-    //
-
-    testLightingMesh = await createGLTFSphereMesh(
-        new GBufferMaterial({
-            // diffuseColor: new Color(1, .05, .05, 1),
-            // metallic: 0,
-            // roughness: .3
-            diffuseColor: new Color(1, 1, 1, 1),
-            metallic: 1,
-            roughness: 1,
-        })
-    );
-    testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
-
-    //
-    // local raymarch mesh
-    //
-
-    // objectSpaceRaymarchMesh = new Mesh({
-    //     geometry: new BoxGeometry({ gpu }),
-    //     material: new ObjectSpaceRaymarchMaterial({
-    //         fragmentShader: litObjectSpaceRaymarchFrag,
-    //         depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-    //         // primitiveType: PrimitiveTypes.Triangles,
-    //         metallic: 0,
-    //         roughness: 0,
-    //         receiveShadow: false
-    //     }),
-    //     castShadow: true,
-    // });
-
-    objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
-        gpu,
-        materialArgs: {
-            fragmentShader: litObjectSpaceRaymarchFrag,
-            depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-            metallic: 0,
-            roughness: 0,
-            receiveShadow: false,
-        },
-        castShadow: true,
-    });
-
-    // objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
-    //     gpu,
-    //     fragmentShader: litObjectSpaceRaymarchFrag,
-    //     depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-    //     castShadow: true,
-    // });
-    // objectSpaceRaymarchMesh = new Mesh({
-    //     geometry: new BoxGeometry({ gpu }),
-    //     material: new ObjectSpaceRaymarchMaterial({
-    //         fragmentShader: litObjectSpaceRaymarchFrag,
-    //         depthFragmentShader: gBufferObjectSpaceRaymarchDepthFrag,
-    //     }),
-    //     castShadow: true,
-    // });
-    objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
-    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
-    // objectSpaceRaymarchMesh.onUpdate = () => {
-    //     objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
-    //         objectSpaceRaymarchMesh.transform.scale
-    //     );
-    //     objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-    //         UniformNames.ObjectSpaceRaymarchBoundsScale,
-    //         objectSpaceRaymarchMesh.transform.scale
-    //     );
-    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-    //     //     "uNearClip",
-    //     //     directionalLight.shadowCamera!.near
-    //     // );
-    //     // objectSpaceRaymarchMesh.depthMaterial!.uniforms.setValue(
-    //     //     "uFarClip",
-    //     //     directionalLight.shadowCamera!.far
-    //     // );
-    //     // objectSpaceRaymarchMesh.mainMaterial.uniforms.setValue("uBoundsScale", Vector3.multiplyVectors(objectSpaceRaymarchMesh.transform.scale, new Vector3(.5, .5, .5)));
-    // };
-    // objectSpaceRaymarchMesh.onUpdate = ({ time }) => {
-    //     objectSpaceRaymarchMesh.transform.rotation.setRotationY(time * 10);
-    // }
-
-    //
-    // screen space raymarch mesh
-    //
-
-    screenSpaceRaymarchMesh = new ScreenSpaceRaymarchMesh({
-        gpu,
-        fragmentShader: litScreenSpaceRaymarchFrag,
-        depthFragmentShader: gBufferScreenSpaceRaymarchDepthFrag,
-    });
-    screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
-    screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
-    //screenSpaceRaymarchMesh.onUpdate = () => {
-    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(
-    //        UniformNames.ViewDirection,
-    //        captureSceneCamera.getWorldForward()
-    //    );
-    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
-    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
-    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uAspect', captureSceneCamera.aspect);
-    //    screenSpaceRaymarchMesh.mainMaterial.uniforms.setValue('uFov', captureSceneCamera.fov);
-    //};
-
-    //
-    // text mesh
-    //
-
-    const fontAtlasImg = await loadImg(fontAtlasImgUrl);
-    const fontAtlasTexture = new Texture({
-        gpu,
-        img: fontAtlasImg,
-        flipY: false,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
-    const textMesh1 = new TextMesh({
-        gpu,
-        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        fontTexture: fontAtlasTexture,
-        fontAtlas: fontAtlasJson,
-        castShadow: true,
-        align: TextAlignType.Center,
-        // characterSpacing: -0.2
-    });
-    captureScene.add(textMesh1);
-    textMesh1.transform.position = new Vector3(0, 1, 6);
-    textMesh1.transform.rotation.setRotationX(-90);
-    textMesh1.transform.scale = Vector3.fill(0.4);
-
-    const textMesh2 = new TextMesh({
-        gpu,
-        text: 'abcdefghijklmnopqrstuvwxyz',
-        fontTexture: fontAtlasTexture,
-        fontAtlas: fontAtlasJson,
-        castShadow: true,
-        align: TextAlignType.Center,
-        characterSpacing: -0.16,
-    });
-    captureScene.add(textMesh2);
-    textMesh2.transform.position = new Vector3(0, 2, 8);
-    textMesh2.transform.rotation.setRotationX(-90);
-    textMesh2.transform.scale = Vector3.fill(0.4);
-
-    const textMesh3 = new TextMesh({
-        gpu,
-        text: '0123456789',
-        fontTexture: fontAtlasTexture,
-        fontAtlas: fontAtlasJson,
-        castShadow: true,
-        align: TextAlignType.Left,
-        characterSpacing: 0.2,
-    });
-    captureScene.add(textMesh3);
-    textMesh3.transform.position = new Vector3(0, 0.01, 9);
-    textMesh3.transform.rotation.setRotationX(-90);
-    textMesh3.transform.scale = Vector3.fill(0.4);
-
-    //
     // instancing mesh
     //
 
@@ -1697,41 +1479,22 @@ const main = async () => {
     });
     floorPlaneMesh = new Mesh({
         geometry: floorGeometry,
-        // material: new PhongMaterial({
-        //     // gpu,
-        //     // diffuseMap: floorDiffuseMap,
-        //     // normalMap: floorNormalMap,
-        //     envMap: cubeMap,
-        //     diffuseColor: new Color(0, 0, 0, 1),
-        //     receiveShadow: true,
-        //     specularAmount: 0.4,
-        //     ambientAmount: 0.2,
-        // }),
         material: new GBufferMaterial({
-            // gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
-            // envMap: cubeMap,
-            // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
-            // diffuseColor: new Color(0, 0, 0, 1),
             diffuseColor: new Color(1, 1, 1, 1),
             receiveShadow: true,
-            // specularAmount: 0.4,
             metallic: 0,
             roughness: 0.5,
-            // ambientAmount: 0.2,
         }),
-        // castShadow: false,
         castShadow: true,
     });
     floorPlaneMesh.subscribeOnStart(({ actor }) => {
         const meshActor = actor as Mesh;
-        actor.transform.setScaling(Vector3.fill(10));
+        actor.transform.setScaling(Vector3.fill(20));
         actor.transform.setRotationX(-90);
-        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
-        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
-        meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(3, 3));
-        meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(3, 3));
+        meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(6, 6));
+        meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(6, 6));
     });
 
     //
@@ -1969,23 +1732,18 @@ void main() {
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
         depthWrite: false,
+        uniformBlockNames: [UniformBlockNames.Common],
     });
     const particleMesh = new Mesh({
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    // particleMesh.onFixedUpdate = ({ fixedTime }) => {
-    //     particleMaterial.uniforms.setValue('uTime', fixedTime);
-    // };
 
     captureScene.add(attractSphereMesh);
-    captureScene.add(testLightingMesh);
     captureScene.add(skinnedMesh);
     captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
-    captureScene.add(objectSpaceRaymarchMesh);
-    captureScene.add(screenSpaceRaymarchMesh);
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
@@ -2010,15 +1768,8 @@ void main() {
         orbitCameraController.minAltitude = -70;
         orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
-        // orbitCameraController.enabled = false;
         orbitCameraController.enabled = true;
     };
-
-    // engine.onAfterStart = () => {
-    //     window.setTimeout(() => {
-    //         onWindowResize()
-    //     },1000)
-    // }
 
     engine.onBeforeUpdate = () => {
         if (!debuggerGUI) initDebugger();
@@ -2065,19 +1816,6 @@ function initDebugger() {
     });
 
     //
-    // play sound
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addButtonDebugger({
-        buttonLabel: 'play sound',
-        onClick: () => {
-            playSound();
-        },
-    });
-
-    //
     // orbit controls
     //
 
@@ -2101,113 +1839,6 @@ function initDebugger() {
         label: 'show buffers',
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => (bufferVisualizerPass.enabled = value),
-    });
-
-    //
-    // object space raymarch
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', false);
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'pos x',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.x,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.x = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'pos y',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.y,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.y = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'pos z',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.z,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.z = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'scale x',
-        minValue: 0,
-        maxValue: 5,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.x,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.x = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'scale y',
-        minValue: 0,
-        maxValue: 5,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.y,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.y = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'scale z',
-        minValue: 0,
-        maxValue: 5,
-        stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.z,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.z = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'rotation x',
-        minValue: 0,
-        maxValue: 360,
-        stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.x,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.x = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'rotation y',
-        minValue: 0,
-        maxValue: 360,
-        stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.y,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.y = value;
-        },
-    });
-
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
-        label: 'rotation z',
-        minValue: 0,
-        maxValue: 360,
-        stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.z,
-        onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.z = value;
-        },
     });
 
     //
