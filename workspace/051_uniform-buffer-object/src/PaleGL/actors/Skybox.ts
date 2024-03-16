@@ -101,6 +101,7 @@ type SkyboxArgs = {
     diffuseIntensity: number;
     specularIntensity: number;
     rotationOffset?: number;
+    renderMesh?: boolean;
 };
 
 export class Skybox extends Mesh {
@@ -108,8 +109,9 @@ export class Skybox extends Mesh {
     diffuseIntensity: number = 1;
     specularIntensity: number = 1;
     rotationOffset: number = 0;
+    renderMesh: boolean = true;
 
-    constructor({ gpu, cubeMap, diffuseIntensity, specularIntensity, rotationOffset = 0 }: SkyboxArgs) {
+    constructor({ gpu, cubeMap, diffuseIntensity, specularIntensity, rotationOffset = 0, renderMesh = true }: SkyboxArgs) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
@@ -177,6 +179,7 @@ export class Skybox extends Mesh {
         this.diffuseIntensity = diffuseIntensity;
         this.specularIntensity = specularIntensity;
         this.rotationOffset = rotationOffset;
+        this.renderMesh = renderMesh;
     }
 
     // TODO: renderer側で2回走らないようにする

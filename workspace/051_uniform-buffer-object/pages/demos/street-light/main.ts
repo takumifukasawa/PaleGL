@@ -55,17 +55,19 @@ import { Actor } from '@/PaleGL/actors/Actor.ts';
 
 // assets
 import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
-import leaveDiffuseImgUrl from '../../../assets/images/brown_mud_leaves_01_diff_1k.jpg?url';
-import leaveNormalImgUrl from '../../../assets/images/brown_mud_leaves_01_nor_gl_1k.jpg?url';
-import CubeMapPositiveXImgUrl from '../../../assets/images/px.jpg?url';
-import CubeMapNegativeXImgUrl from '../../../assets/images/nx.jpg?url';
-import CubeMapPositiveYImgUrl from '../../../assets/images/py.jpg?url';
-import CubeMapNegativeYImgUrl from '../../../assets/images/ny.jpg?url';
-import CubeMapPositiveZImgUrl from '../../../assets/images/pz.jpg?url';
-import CubeMapNegativeZImgUrl from '../../../assets/images/nz.jpg?url';
-import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
-import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
-import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
+import floorDiffuseImgUrl from '../../../assets/images/rock_tile_floor_diff_1k.jpg?url';
+import floorNormalImgUrl from '../../../assets/images/rock_tile_floor_nor_gl_1k.jpg?url';
+import CubeMapPositiveXImgUrl from '../../../assets/images/laufenurg_church/px.jpg?url';
+import CubeMapNegativeXImgUrl from '../../../assets/images/laufenurg_church/nx.jpg?url';
+import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.jpg?url';
+import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
+import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
+import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
+// import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
+// import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
+// import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
+// import gltfStreetFloorModelUrl from '../../../assets/models/street-floor.gltf?url';
+// import gltfStreetFloorModelUrl from '../../../assets/models/street-floor-separete.gltf?url';
 
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
@@ -237,6 +239,7 @@ let width: number, height: number;
 let floorPlaneMesh: Mesh;
 let floorDiffuseMap: Texture;
 let floorNormalMap: Texture;
+let streetFloorActor: Actor;
 let streetLightActorLeft: Actor;
 let streetLightActorRight: Actor;
 let attractSphereMesh: Mesh;
@@ -925,8 +928,18 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
+const assetDir = "/assets/demos/street-light/";
+
+const createStreetFloorActor = async () => {
+    // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
+    const gltfActor = await loadGLTF({gpu, dir: assetDir,  path: "street-floor-separete.gltf"});
+    console.log('street-floor', gltfActor);
+    return gltfActor;
+}
+
 const createStreetLightActor = async () => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
+    // const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
+    const gltfActor = await loadGLTF({gpu, dir: assetDir,  path: "street-light.gltf"});
     console.log('hogehoge', gltfActor);
 
     return gltfActor;
@@ -957,7 +970,8 @@ const createStreetLightActor = async () => {
 };
 
 const createGLTFSphereMesh = async (material: Material) => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
+    // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
+    const gltfActor = await loadGLTF({ gpu,dir: assetDir,  path:"sphere-32x32.gltf" });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = material;
@@ -1175,8 +1189,9 @@ layout (std140) uniform ubCommon {
  *
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
-
+    // const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
+    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: "butterfly-forward-thin.gltf" });
+    
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
@@ -1376,7 +1391,7 @@ const main = async () => {
         img: particleImg,
     });
 
-    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
+    const floorDiffuseImg = await loadImg(floorDiffuseImgUrl);
     floorDiffuseMap = new Texture({
         gpu,
         img: floorDiffuseImg,
@@ -1387,7 +1402,7 @@ const main = async () => {
         magFilter: TextureFilterTypes.Linear,
     });
 
-    const floorNormalImg = await loadImg(leaveNormalImgUrl);
+    const floorNormalImg = await loadImg(floorNormalImgUrl);
     floorNormalMap = new Texture({
         gpu,
         img: floorNormalImg,
@@ -1414,8 +1429,16 @@ const main = async () => {
         diffuseIntensity: 0.2,
         specularIntensity: 0.2,
         // rotationOffset: 0.8,
+        renderMesh: false
     });
     // skyboxMesh.enabled = false;
+
+    //
+    // street floor
+    //
+    
+    streetFloorActor = await createStreetFloorActor();
+    console.log(streetFloorActor)
 
     //
     // street light
@@ -1766,8 +1789,8 @@ void main() {
         orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.maxAltitude = 70;
         orbitCameraController.minAltitude = -70;
-        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
-        orbitCameraController.start(0, -40);
+        orbitCameraController.lookAtTarget = new Vector3(0, 1, 0);
+        orbitCameraController.start(0, -20);
         orbitCameraController.enabled = true;
     };
 

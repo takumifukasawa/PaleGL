@@ -20,14 +20,14 @@ import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type GBufferMaterialArgs = {
     diffuseColor?: Color;
-    diffuseMap?: Texture;
+    diffuseMap?: Texture | null;
     diffuseMapUvScale?: Vector2;
     diffuseMapUvOffset?: Vector2;
     // specularAmount?: number;
     metallic?: number;
     roughness?: number;
     emissiveColor?: Color;
-    normalMap?: Texture;
+    normalMap?: Texture | null;
     normalMapUvScale?: Vector2;
     normalMapUvOffset?: Vector2;
     vertexShaderModifier?: VertexShaderModifier;

@@ -888,6 +888,10 @@ export class Renderer {
             .flat()
             .filter(({ actor }) => actor.enabled);
 
+        //
+        // TODO: depth sort
+        //
+
         // skybox
         const sortedSkyboxRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
             return renderMeshInfo.queue === RenderQueueType.Skybox;
@@ -1676,6 +1680,9 @@ export class Renderer {
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
+                    if(!(actor as Skybox).renderMesh) {
+                        return;
+                    }
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
                     // TODO: engineでやるべき
                     actor.updateTransform(camera);
