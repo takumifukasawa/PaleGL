@@ -110,7 +110,7 @@ void main() {
     float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
     fogRate *= 1. - step(1. - .0001, rawDepth);
     // distance fog
-    fogRate *= calcDistanceFog(worldPositionFromDepth, uViewPosition, uDistanceFogStart, uDistanceFogPower);
+    fogRate += calcDistanceFog(worldPositionFromDepth, uViewPosition, uDistanceFogStart, uDistanceFogPower);
     // clamp
     fogRate = saturate(fogRate);
 

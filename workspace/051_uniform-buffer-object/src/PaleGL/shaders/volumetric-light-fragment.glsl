@@ -121,12 +121,11 @@ float calcTransmittance(
     return 0.;
 }
 
-// void f() {}
-
 void main() {
     vec2 uv = vUv;
 
     float jitter = noise(uv + uTime) * 2. - 1.;
+    // float jitter = noise(uv + vec2(noise(gl_FragCoord.xy))) * 2. - 1.;
 
     vec2 jitterOffset = vec2(
         jitter * uRayJitterSizeX,
@@ -194,7 +193,7 @@ void main() {
         // TODO: intensityそのままかけるのよくない気がする
         // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
         accColor.xyz +=
-            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity) *
+            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
             transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
             // saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
             // transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);

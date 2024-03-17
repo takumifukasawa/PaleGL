@@ -232,6 +232,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
         this.material.uniforms.setValue('uDensityMultiplier', this.densityMultiplier);
         this.material.uniforms.setValue('uRayJitterSizeX', this.rayJitterSizeX);
         this.material.uniforms.setValue('uRayJitterSizeY', this.rayJitterSizeY);
+        this.material.uniforms.setValue('uBlendRate', this.blendRate);
 
         super.render(options);
     }

@@ -22,6 +22,9 @@ export class OrbitCameraController {
     deltaAzimuthPower: number = 1;
     deltaAltitudePower: number = 1;
 
+    defaultAzimuth: number = 0;
+    defaultAltitude: number = 0;
+
     enabled: boolean = true;
 
     #targetCameraPosition = Vector3.zero;
@@ -35,9 +38,9 @@ export class OrbitCameraController {
         this.#camera = camera;
     }
 
-    start(defaultAzimuth = 0, defaultAltitude = 0) {
-        this.#cameraAngle.azimuth = defaultAzimuth;
-        this.#cameraAngle.altitude = defaultAltitude;
+    start(defaultAzimuth: number | null = null, defaultAltitude: number | null = null) {
+        this.#cameraAngle.azimuth = defaultAzimuth !== null ? defaultAzimuth : this.defaultAzimuth;
+        this.#cameraAngle.altitude = defaultAltitude !== null ? defaultAltitude : this.defaultAltitude;
         this.#updateCameraPosition(true);
         // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
         // this.#currentCameraPosition = this.#targetCameraPosition.clone();
@@ -67,7 +70,8 @@ export class OrbitCameraController {
 
     #updateCameraPosition(isJump = false) {
         // TODO: limit azimuth
-        this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
+        // this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
+        this.#cameraAngle.azimuth = clamp(this.#cameraAngle.azimuth, this.minAzimuth, this.maxAzimuth);
         this.#cameraAngle.altitude = clamp(this.#cameraAngle.altitude, this.minAltitude, this.maxAltitude);
 
         const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), this.#cameraAngle.altitude);

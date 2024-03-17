@@ -3,8 +3,8 @@ import { GPU } from '@/PaleGL/core/GPU';
 import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
-import {Color} from "@/PaleGL/math/Color.ts";
+import { RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { Color } from '@/PaleGL/math/Color.ts';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';
 const UNIFORM_FOG_STRENGTH = 'uFogStrength';
@@ -19,12 +19,12 @@ export class FogPass extends PostProcessPassBase {
     private static volumetricLightTextureUniformName = 'uVolumetricLightTexture';
 
     fogColor: Color = Color.white;
-    fogStrength: number = 0;
-    fogDensity = 0.01;
-    fogDensityAttenuation = 0.01;
-    fogEndHeight = 1;
-    distanceFogStart = 20;
-    distanceFogPower = 1;
+    fogStrength: number;
+    fogDensity: number;
+    fogDensityAttenuation: number;
+    fogEndHeight: number;
+    distanceFogStart: number;
+    distanceFogPower: number;
 
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = fogFragmentShader;
@@ -34,7 +34,7 @@ export class FogPass extends PostProcessPassBase {
         const fogDensityAttenuation = 0.45;
         const fogEndHeight = 1;
         const distanceFogStart = 20;
-        const distanceFogPower = 1;
+        const distanceFogPower = 0.1;
 
         super({
             gpu,
@@ -94,9 +94,7 @@ export class FogPass extends PostProcessPassBase {
                 },
                 // ...PostProcessPassBase.commonUniforms,
             ],
-            uniformBlockNames: [
-                UniformBlockNames.Camera
-            ]
+            uniformBlockNames: [UniformBlockNames.Camera],
         });
 
         this.fogColor = Color.white;
@@ -108,18 +106,17 @@ export class FogPass extends PostProcessPassBase {
         this.distanceFogPower = distanceFogPower;
     }
 
-    // TODO: mapの割り当て、renderなりupdateなりで一緒にやった方がいい気がする. 
-    
+    // TODO: mapの割り当て、renderなりupdateなりで一緒にやった方がいい気がする.
+
     setLightShaftMap(rt: RenderTarget) {
         this.material.uniforms.setValue(FogPass.lightShaftTextureUniformName, rt.read.texture);
     }
-    
+
     setVolumetricLightMap(rt: RenderTarget) {
         this.material.uniforms.setValue(FogPass.volumetricLightTextureUniformName, rt.read.texture);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        console.log(this.fogColor.getHexCoord())
         this.material.uniforms.setValue(UNIFORM_FOG_COLOR, this.fogColor);
         this.material.uniforms.setValue(UNIFORM_FOG_STRENGTH, this.fogStrength);
         this.material.uniforms.setValue(UNIFORM_FOG_DENSITY, this.fogDensity);

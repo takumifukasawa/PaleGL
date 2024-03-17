@@ -302,12 +302,27 @@ const engine = new Engine({ gpu, renderer });
 engine.setScene(captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
+const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 // captureSceneCamera.mainCamera = true;
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+orbitCameraController.distance = isSP ? 15 : 13;
+orbitCameraController.attenuation = 0.01;
+orbitCameraController.dampingFactor = 0.2;
+orbitCameraController.azimuthSpeed = 100;
+orbitCameraController.altitudeSpeed = 100;
+orbitCameraController.deltaAzimuthPower = 2;
+orbitCameraController.deltaAltitudePower = 2;
+orbitCameraController.maxAltitude = -2;
+orbitCameraController.minAltitude = -45;
+orbitCameraController.maxAzimuth = 55;
+orbitCameraController.minAzimuth = -55;
+orbitCameraController.defaultAzimuth = 10;
+orbitCameraController.defaultAltitude = -10;
+orbitCameraController.lookAtTarget = new Vector3(0, 1.5, 0);
+// orbitCameraController.enabled = true;
 
 captureSceneCamera.subscribeOnStart(({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
@@ -933,15 +948,12 @@ const assetDir = "/assets/demos/street-light/";
 const createStreetFloorActor = async () => {
     // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
     const gltfActor = await loadGLTF({gpu, dir: assetDir,  path: "street-floor-separete.gltf"});
-    console.log('street-floor', gltfActor);
     return gltfActor;
 }
 
 const createStreetLightActor = async () => {
     // const gltfActor = await loadGLTF({ gpu, path: gltfStreetLightModelUrl });
     const gltfActor = await loadGLTF({gpu, dir: assetDir,  path: "street-light.gltf"});
-    console.log('hogehoge', gltfActor);
-
     return gltfActor;
 
     // const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -1785,21 +1797,11 @@ void main() {
     engine.onBeforeStart = () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
+        
+        renderer.fogPass.fogColor = Color.black;
+        renderer.fogPass.distanceFogPower = 0.29;
 
-        orbitCameraController.distance = isSP ? 15 : 15;
-        orbitCameraController.attenuation = 0.01;
-        orbitCameraController.dampingFactor = 0.2;
-        orbitCameraController.azimuthSpeed = 100;
-        orbitCameraController.altitudeSpeed = 100;
-        orbitCameraController.deltaAzimuthPower = 2;
-        orbitCameraController.deltaAltitudePower = 2;
-        orbitCameraController.maxAltitude = -5;
-        orbitCameraController.minAltitude = -40;
-        orbitCameraController.maxAzimuth = 45;
-        orbitCameraController.minAzimuth = -45;
-        orbitCameraController.lookAtTarget = new Vector3(0, 1, 0);
-        orbitCameraController.start(10, -10);
-        orbitCameraController.enabled = true;
+        orbitCameraController.start();
     };
 
     engine.onBeforeUpdate = () => {
@@ -2132,6 +2134,16 @@ function initDebugger() {
             renderer.volumetricLightPass.rayJitterSizeY = value;
         },
     });
+    volumetricLightDebuggerGroup.addSliderDebugger({
+        label: 'blend rate',
+        initialValue: renderer.volumetricLightPass.blendRate,
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        onChange: (value) => {
+            renderer.volumetricLightPass.blendRate = value;
+        },
+    });
 
     //
     // fog
@@ -2213,8 +2225,8 @@ function initDebugger() {
     fogDebuggerGroup.addSliderDebugger({
         label: 'distance fog power',
         minValue: 0,
-        maxValue: 64,
-        stepValue: 0.01,
+        maxValue: 1,
+        stepValue: 0.001,
         initialValue: renderer.fogPass.distanceFogPower,
         onChange: (value) => {
             renderer.fogPass.distanceFogPower = value;

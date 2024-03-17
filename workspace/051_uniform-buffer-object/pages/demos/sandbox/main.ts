@@ -1210,7 +1210,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
 
-    skinningMesh.name = "butterfly";
+    skinningMesh.name = 'butterfly';
     // ルートにanimatorをattachしてるので一旦ここでassign
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
