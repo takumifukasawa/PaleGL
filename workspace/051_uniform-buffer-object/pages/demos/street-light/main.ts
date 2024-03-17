@@ -2157,6 +2157,14 @@ function initDebugger() {
     //         renderer.fogPass.fogStrength = value;
     //     },
     // });
+    
+    fogDebuggerGroup.addColorDebugger({
+        label: 'fog color',
+        initialValue: renderer.fogPass.fogColor.getHexCoord(),
+        onChange: (value) => {
+            renderer.fogPass.fogColor = Color.fromHex(value);
+        },
+    });
 
     fogDebuggerGroup.addSliderDebugger({
         label: 'density',
@@ -2190,6 +2198,28 @@ function initDebugger() {
     //         renderer.fogPass.fogEndHeight = value;
     //     },
     // });
+    
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'distance fog start',
+        minValue: 0,
+        maxValue: captureSceneCamera.far,
+        stepValue: 0.01,
+        initialValue: renderer.fogPass.distanceFogStart,
+        onChange: (value) => {
+            renderer.fogPass.distanceFogStart = value;
+        },
+    });
+    
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'distance fog power',
+        minValue: 0,
+        maxValue: 64,
+        stepValue: 0.01,
+        initialValue: renderer.fogPass.distanceFogPower,
+        onChange: (value) => {
+            renderer.fogPass.distanceFogPower = value;
+        },
+    });
 
     //
     // depth of field

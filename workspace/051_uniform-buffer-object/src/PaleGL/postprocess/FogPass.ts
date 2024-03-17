@@ -4,15 +4,27 @@ import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
+import {Color} from "@/PaleGL/math/Color.ts";
+
+const UNIFORM_FOG_COLOR = 'uFogColor';
+const UNIFORM_FOG_STRENGTH = 'uFogStrength';
+const UNIFORM_FOG_DENSITY = 'uFogDensity';
+const UNIFORM_FOG_DENSITY_ATTENUATION = 'uFogDensityAttenuation';
+const UNIFORM_FOG_END_HEIGHT = 'uFogEndHeight';
+const UNIFORM_DISTANCE_FOG_START = 'uDistanceFogStart';
+const UNIFORM_DISTANCE_FOG_POWER = 'uDistanceFogPower';
 
 export class FogPass extends PostProcessPassBase {
     private static lightShaftTextureUniformName = 'uLightShaftTexture';
     private static volumetricLightTextureUniformName = 'uVolumetricLightTexture';
 
+    fogColor: Color = Color.white;
     fogStrength: number = 0;
     fogDensity = 0.01;
     fogDensityAttenuation = 0.01;
     fogEndHeight = 1;
+    distanceFogStart = 20;
+    distanceFogPower = 1;
 
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = fogFragmentShader;
@@ -21,12 +33,19 @@ export class FogPass extends PostProcessPassBase {
         const fogDensity = 0.023;
         const fogDensityAttenuation = 0.45;
         const fogEndHeight = 1;
+        const distanceFogStart = 20;
+        const distanceFogPower = 1;
 
         super({
             gpu,
             fragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: [
+                {
+                    name: UNIFORM_FOG_COLOR,
+                    type: UniformTypes.Color,
+                    value: Color.white,
+                },
                 {
                     // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
                     name: UniformNames.DepthTexture,
@@ -44,24 +63,34 @@ export class FogPass extends PostProcessPassBase {
                     value: null,
                 },
                 {
-                    name: 'uFogStrength',
+                    name: UNIFORM_FOG_STRENGTH,
                     type: UniformTypes.Float,
                     value: fogStrength,
                 },
                 {
-                    name: 'uFogDensity',
+                    name: UNIFORM_FOG_DENSITY,
                     type: UniformTypes.Float,
                     value: fogDensity,
                 },
                 {
-                    name: 'uFogDensityAttenuation',
+                    name: UNIFORM_FOG_DENSITY_ATTENUATION,
                     type: UniformTypes.Float,
                     value: fogDensityAttenuation,
                 },
                 {
-                    name: 'uFogEndHeight',
+                    name: UNIFORM_FOG_END_HEIGHT,
                     type: UniformTypes.Float,
                     value: fogEndHeight,
+                },
+                {
+                    name: UNIFORM_DISTANCE_FOG_START,
+                    type: UniformTypes.Float,
+                    value: distanceFogStart,
+                },
+                {
+                    name: UNIFORM_DISTANCE_FOG_POWER,
+                    type: UniformTypes.Float,
+                    value: distanceFogPower,
                 },
                 // ...PostProcessPassBase.commonUniforms,
             ],
@@ -70,10 +99,13 @@ export class FogPass extends PostProcessPassBase {
             ]
         });
 
+        this.fogColor = Color.white;
         this.fogStrength = fogStrength;
         this.fogDensity = fogDensity;
         this.fogDensityAttenuation = fogDensityAttenuation;
         this.fogEndHeight = fogEndHeight;
+        this.distanceFogStart = distanceFogStart;
+        this.distanceFogPower = distanceFogPower;
     }
 
     // TODO: mapの割り当て、renderなりupdateなりで一緒にやった方がいい気がする. 
@@ -87,10 +119,14 @@ export class FogPass extends PostProcessPassBase {
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue('uFogStrength', this.fogStrength);
-        this.material.uniforms.setValue('uFogDensity', this.fogDensity);
-        this.material.uniforms.setValue('uFogDensityAttenuation', this.fogDensityAttenuation);
-        this.material.uniforms.setValue('uFogEndHeight', this.fogEndHeight);
+        console.log(this.fogColor.getHexCoord())
+        this.material.uniforms.setValue(UNIFORM_FOG_COLOR, this.fogColor);
+        this.material.uniforms.setValue(UNIFORM_FOG_STRENGTH, this.fogStrength);
+        this.material.uniforms.setValue(UNIFORM_FOG_DENSITY, this.fogDensity);
+        this.material.uniforms.setValue(UNIFORM_FOG_DENSITY_ATTENUATION, this.fogDensityAttenuation);
+        this.material.uniforms.setValue(UNIFORM_FOG_END_HEIGHT, this.fogEndHeight);
+        this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_START, this.distanceFogStart);
+        this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_POWER, this.distanceFogPower);
         super.render(options);
     }
 }

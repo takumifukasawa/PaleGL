@@ -26,15 +26,19 @@ uniform float uBlendRate;
 uniform sampler2D uDepthTexture;
 // uniform mat4 uInverseViewProjectionMatrix;
 // uniform mat4 uInverseProjectionMatrix;
+uniform vec4 uFogColor;
 uniform float uFogStrength;
 uniform float uFogDensity;
 uniform float uFogDensityAttenuation;
 uniform float uFogEndHeight;
+uniform float uDistanceFogStart;
+uniform float uDistanceFogPower;
 
 #pragma DEPTH_FUNCTIONS
 
 #define saturate(x) min(1., max(0., x))
 
+// 1に近いほどfogが強い
 float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float densityY0, float densityAttenuation) {
     vec3 v = cameraPositionInWorld - objectPositionInWorld;
     float l = length(v);
@@ -50,6 +54,7 @@ float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, f
     return 1. - ret;
 }
 
+// 1に近いほどfogが強い
 float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float fogDensity, float fogEndHeight) {
     vec3 v = cameraPositionInWorld - objectPositionInWorld;
     float t;
@@ -71,6 +76,13 @@ float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorl
     return 1. - fog;
 }
 
+// 1に近いほどfogが強い
+float calcDistanceFog(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float expStart, float expPower) {
+    float dist = length(cameraPositionInWorld - objectPositionInWorld);
+    dist = max(0., dist - expStart);
+    return max(0., 1. - exp(-dist * expPower));
+}
+
 void main() {
     vec2 uv = vUv;
     
@@ -88,18 +100,18 @@ void main() {
  
     float constantFogScale = .1;
   
-    vec3 fogColor = vec3(.8);
+    vec3 fogColor = uFogColor.xyz;
     // constant fog
     // TODO: constant fog も考慮すべき？
     // カメラから見て奥は-z
     float rate = constantFogScale * max(0., 1. - exp(-uFogStrength * -viewPositionFromDepth.z));
-    
+   
+    // height fog
     float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
-    // float fogRate = calcFogHeightUniform(worldPositionFromDepth, uViewPosition, uFogDensity, uFogEndHeight);
     fogRate *= 1. - step(1. - .0001, rawDepth);
-    // fogRate *= saturate(1. - occlusion);
-    // fogRate *= saturate(occlusion);
-    // fogRate -= saturate(occlusion);
+    // distance fog
+    fogRate *= calcDistanceFog(worldPositionFromDepth, uViewPosition, uDistanceFogStart, uDistanceFogPower);
+    // clamp
     fogRate = saturate(fogRate);
 
     // TODO: fog->occlusionの方が正しい？
