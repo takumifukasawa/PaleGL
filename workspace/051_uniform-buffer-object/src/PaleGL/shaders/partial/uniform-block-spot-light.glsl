@@ -8,7 +8,7 @@ struct SpotLight {
     float attenuation;
     float coneCos;
     float penumbraCos;
-    mat4 lightViewProjectionMatrix;
+    mat4 shadowMapProjectionMatrix;
 };
 
 layout (std140) uniform ubSpotLight {

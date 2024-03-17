@@ -24,7 +24,7 @@ precision highp float;
 //     float attenuation;
 //     float coneCos;
 //     float penumbraCos;
-//     mat4 lightViewProjectionMatrix;
+//     mat4 shadowMapProjectionMatrix;
 //     // float shadowBias;
 // };
 
@@ -82,13 +82,12 @@ float calcTransmittance(
     out float rayStep,
     out float transmittance
 ) {
-    // SpotLight spotLight = uSpotLight[0];
     vec3 rayPos = rayOrigin + rayDir * rayStep;
-    vec4 shadowPos = spotLight.lightViewProjectionMatrix * vec4(rayPos, 1.);
+    vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPos, 1.);
     vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
-    vec3 shadowUv = shadowCoord * .5 + .5;
+    // vec3 shadowUv = shadowCoord * .5 + .5;
+    vec3 shadowUv = shadowCoord;
     float shadowZ = shadowPos.z / shadowPos.w;
-    // float shadowDepth = texture(uSpotLightShadowMap[0], shadowUv.xy).r;
     float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
     float isShadowArea =
         step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
@@ -205,9 +204,9 @@ void main() {
     accColor = saturate(accColor);
     
     // accColor.rgb = vec3(
-    //     uSpotLight[0].lightViewProjectionMatrix[0][3],
-    //     uSpotLight[0].lightViewProjectionMatrix[1][3],
-    //     uSpotLight[0].lightViewProjectionMatrix[2][3]
+    //     uSpotLight[0].shadowMapProjectionMatrix[0][3],
+    //     uSpotLight[0].shadowMapProjectionMatrix[1][3],
+    //     uSpotLight[0].shadowMapProjectionMatrix[2][3]
     // );
    
     // outColor = vec4(vec3(transmittance), 1.);

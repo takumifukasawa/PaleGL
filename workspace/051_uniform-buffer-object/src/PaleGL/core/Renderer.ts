@@ -459,7 +459,7 @@ export class Renderer {
                         value: Color.black,
                     },
                     {
-                        name: UniformNames.LightViewProjectionMatrix,
+                        name: UniformNames.ShadowMapProjectionMatrix,
                         type: UniformTypes.Matrix4,
                         value: Matrix4.identity,
                     },
@@ -521,7 +521,7 @@ export class Renderer {
                         value: 0,
                     },
                     {
-                        name: UniformNames.LightViewProjectionMatrix,
+                        name: UniformNames.ShadowMapProjectionMatrix,
                         type: UniformTypes.Matrix4,
                         value: Matrix4.identity,
                     },
@@ -1981,7 +1981,8 @@ export class Renderer {
                 value: directionalLight.color,
             },
             {
-                name: UniformNames.LightViewProjectionMatrix,
+                // name: UniformNames.LightViewProjectionMatrix,
+                name: UniformNames.ShadowMapProjectionMatrix,
                 type: UniformTypes.Matrix4,
                 value: directionalLight.shadowMapProjectionMatrix,
             },
@@ -2044,9 +2045,10 @@ export class Renderer {
                         value: spotLight.penumbraCos,
                     },
                     {
-                        name: UniformNames.LightViewProjectionMatrix,
+                        name: UniformNames.ShadowMapProjectionMatrix,
                         type: UniformTypes.Matrix4,
                         value: spotLight.shadowMapProjectionMatrix,
+                        // value: spotLight.lightViewProjectionMatrix,
                     },
                 ];
             })

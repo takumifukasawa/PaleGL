@@ -55,7 +55,7 @@ float calcDirectionalLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
-    mat4 lightViewProjectionTextureMatrix,
+    mat4 shadowMapProjectionMatrix,
     sampler2D shadowMap,
     float shadowBias,
     vec4 shadowColor,
@@ -72,7 +72,7 @@ float calcDirectionalLightShadowAttenuation(
     float bias = .005 * tan(acos(NoL));
     bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
     
-    vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
+    vec4 lightPos = shadowMapProjectionMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy;
     float depthFromWorldPos = lightPos.z;
 
@@ -231,7 +231,7 @@ layout (location = 0) out vec4 outColor;
 //     spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
 //     spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
 //     spotLight.intensity = uSpotLight[UNROLL_i].intensity;
-//     spotLight.lightViewProjectionMatrix = uSpotLight[UNROLL_i].lightViewProjectionMatrix;
+//     spotLight.shadowMapProjectionMatrix = uSpotLight[UNROLL_i].shadowMapProjectionMatrix;
 // 
 //     getSpotLightIrradiance(spotLight, geometry, directLight);
 // 
@@ -239,7 +239,7 @@ layout (location = 0) out vec4 outColor;
 //     worldPosition,
 //     surface.worldNormal,
 //     spotLight.direction,
-//     spotLight.lightViewProjectionMatrix,
+//     spotLight.shadowMapProjectionMatrix,
 //     uSpotLightShadowMap[UNROLL_i], // constantな必要がある
 //     uShadowBias,
 //     vec4(0., 0., 0., 1.),
@@ -363,7 +363,7 @@ void main() {
     //     worldPosition,
     //     surface.worldNormal,
     //     uDirectionalLight.direction,
-    //     uDirectionalLight.lightViewProjectionMatrix,
+    //     uDirectionalLight.shadowMapProjectionMatrix,
     //     uDirectionalLightShadowMap,
     //     uShadowBias,
     //     vec4(0., 0., 0., 1.),
@@ -385,7 +385,7 @@ void main() {
         worldPosition,
         surface.worldNormal,
         uDirectionalLight.direction,
-        uDirectionalLight.lightViewProjectionMatrix,
+        uDirectionalLight.shadowMapProjectionMatrix,
         uDirectionalLightShadowMap,
         uShadowBias,
         vec4(0., 0., 0., 1.),
@@ -407,7 +407,7 @@ void main() {
         worldPosition,
         surface.worldNormal,
         uSpotLight[0].direction,
-        uSpotLight[0].lightViewProjectionMatrix,
+        uSpotLight[0].shadowMapProjectionMatrix,
         uSpotLightShadowMap[0],
         uShadowBias,
         vec4(0., 0., 0., 1.),
@@ -454,7 +454,7 @@ void main() {
             worldPosition,
             surface.worldNormal,
             uSpotLight[UNROLL_i].direction,
-            uSpotLight[UNROLL_i].lightViewProjectionMatrix,
+            uSpotLight[UNROLL_i].shadowMapProjectionMatrix,
             uSpotLightShadowMap[UNROLL_i], // constantな必要がある
             uShadowBias,
             vec4(0., 0., 0., 1.),

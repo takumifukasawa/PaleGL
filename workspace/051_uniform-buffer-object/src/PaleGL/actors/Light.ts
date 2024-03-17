@@ -25,6 +25,7 @@ export class Light extends Actor implements ILight {
     castShadow: boolean = false; // bool
     shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     shadowMap: RenderTarget | null = null; // TODO: shadow camera に持たせたほうが良いような気もする
+    lightViewProjectionMatrix: Matrix4 = Matrix4.identity;
     shadowMapProjectionMatrix: Matrix4 = Matrix4.identity;
 
     // hasShadowMap() {
@@ -75,10 +76,15 @@ export class Light extends Actor implements ILight {
             0, 0, 0.5, 0.5,
             0, 0, 0, 1
         );
-        this.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
-            textureMatrix,
+        this.lightViewProjectionMatrix = Matrix4.multiplyMatrices(
             this.shadowCamera.projectionMatrix.clone(),
             this.shadowCamera.viewMatrix.clone()
+        );
+        this.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
+            textureMatrix,
+            this.lightViewProjectionMatrix.clone()
+            // this.shadowCamera.projectionMatrix.clone(),
+            // this.shadowCamera.viewMatrix.clone()
         );
     }
 
