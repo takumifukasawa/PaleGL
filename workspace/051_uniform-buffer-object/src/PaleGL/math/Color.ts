@@ -61,6 +61,16 @@
         this.elements = new Float32Array([r, g, b, a]);
     }
 
+    multiplyScalar(s: number, withAlpha: boolean = false) {
+        this.elements[0] *= s;
+        this.elements[1] *= s;
+        this.elements[2] *= s;
+        if (withAlpha) {
+            this.elements[3] *= s;
+        }
+        return this;
+    }
+
     getRGB() {
         return {
             r: this.r255,

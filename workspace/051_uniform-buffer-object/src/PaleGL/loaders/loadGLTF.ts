@@ -156,6 +156,7 @@ export type GLTFNodeActorKind = Bone | Actor;
 type GLTFMaterial = {
     doubleSided: boolean;
     name: string;
+    emissiveFactor?: number[];
     pbrMetallicRoughness: {
         baseColorFactor?: number[]; // rgba
         baseColorTexture?: { index: number };
@@ -163,9 +164,17 @@ type GLTFMaterial = {
         roughnessFactor: number;
     };
     normalTexture?: { index: number };
+    extensions?: {
+        KHR_materials_emissive_strength?: {
+            emissiveStrength: number;
+        };
+    };
 };
 
+type GLTFExtensions = 'KHR_materials_emissive_strength';
+
 type GLTFFormat = {
+    extensionsUsed: GLTFExtensions[];
     accessors: GLTFAccessor[];
     animations: GLTFAnimation[];
     asset: GLTFAsset;
@@ -214,6 +223,20 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
     // for debug
     console.log('[loadGLTF]', gltfPath, gltf);
 
+    // check used extensions
+    const usedExtensions = {
+        KHR_materials_emissive_strength: false,
+    };
+    if (gltf.extensionsUsed) {
+        gltf.extensionsUsed.forEach((extension) => {
+            switch (extension) {
+                case 'KHR_materials_emissive_strength':
+                    usedExtensions.KHR_materials_emissive_strength = true;
+                    break;
+            }
+        });
+    }
+
     const preloadTextures: Texture[] = [];
 
     if (gltf.textures) {
@@ -242,8 +265,6 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
         ).then((images) => {
             images.forEach(({ img, minFilter, magFilter, wrapS, wrapT }) => {
                 const texture = new Texture({ gpu, img, minFilter, magFilter, wrapS, wrapT });
-                // const texture = new Texture({ gpu, img, minFilter, magFilter, wrapS: TextureWrapTypes.Repeat, wrapT: TextureWrapTypes.Repeat });
-                console.log('hogehoge', texture);
                 preloadTextures.push(texture);
             });
         });
@@ -514,6 +535,18 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
                 : null;
             const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : null;
 
+            let emissiveColor = Color.black;
+            // eslint-disable-next-line no-prototype-builtins
+            if (targetMaterial.hasOwnProperty('emissiveFactor')) {
+                if (usedExtensions.KHR_materials_emissive_strength) {
+                    const emissiveStrength =
+                        targetMaterial.extensions!.KHR_materials_emissive_strength!.emissiveStrength;
+                    emissiveColor = Color.fromArray(targetMaterial.emissiveFactor!).multiplyScalar(emissiveStrength);
+                } else {
+                    emissiveColor = Color.fromArray(targetMaterial.emissiveFactor!);
+                }
+            }
+
             return new GBufferMaterial({
                 diffuseMap,
                 diffuseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
@@ -522,6 +555,7 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
                 normalMap,
                 metallic: targetMaterial.pbrMetallicRoughness.metallicFactor,
                 roughness: targetMaterial.pbrMetallicRoughness.roughnessFactor,
+                emissiveColor,
             });
         });
 
