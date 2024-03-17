@@ -14,6 +14,7 @@ import { transformGlslLayout } from './vite-transform-glsl-layout-plugin.ts';
 import { deleteTmpCachesPlugin } from './vite-delete-tmp-caches-plugin.ts';
 
 type EntryPointInfo = { name: string; path: string };
+// type EntryPointInfo = { path: string };
 
 /**
  *
@@ -41,13 +42,14 @@ type EntryPointInfo = { name: string; path: string };
 // }
 
 // entryがrootの場合は`index`になる
-const ENTRY_NAME_INDEX: string = "index";
+const ENTRY_NAME_INDEX: string = 'index';
 
 // ---------------------------------------------------
 // ビルドするentryを定義
-const ENTRY_DIR = "demos";
-// const ENTRY_NAME= ENTRY_NAME_INDEX;
+// const ENTRY_NAME = ENTRY_NAME_INDEX;
 const ENTRY_NAME: string = "street-light";
+const IS_MAIN_ENTRY = ENTRY_NAME === ENTRY_NAME_INDEX;
+const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `demos/${ENTRY_NAME}`;
 // ---------------------------------------------------
 
 // ref:
@@ -64,35 +66,44 @@ export default defineConfig(async (config) => {
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true'; // gltf loader を使うときは必ず false
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
 
-    const isMainEntry = ENTRY_NAME === ENTRY_NAME_INDEX;
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
     console.log(`isDropConsole: ${isDropConsole}`);
-    console.log(`entryDir: ${ENTRY_DIR}`);
-    console.log(`entryName: ${ENTRY_NAME}`);
+    console.log(`entryPath: ${ENTRY_PATH}`);
+    console.log(`isMainEntry: ${IS_MAIN_ENTRY}`);
 
     // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
 
     entryPointInfos.push({
         name: ENTRY_NAME,
-        path: `${ENTRY_DIR}`,
+        path: ENTRY_PATH,
     });
 
     const entryPoints: { [key: string]: string } = {};
     entryPointInfos.forEach((entryPointInfo) => {
-        if(isMainEntry) {
+        if (IS_MAIN_ENTRY) {
             entryPoints[entryPointInfo.name] = isBundle
                 ? resolve(__dirname, `pages/main.ts`) // js一個にまとめる場合
                 : resolve(__dirname, `pages/index.html`); // html含めてビルドする場合
         } else {
             entryPoints[entryPointInfo.name] = isBundle
-                ? resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/main.ts`) // js一個にまとめる場合
-                : resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/index.html`); // html含めてビルドする場合
+                ? resolve(__dirname, `pages/${entryPointInfo.path}/main.ts`) // js一個にまとめる場合
+                : resolve(__dirname, `pages/${entryPointInfo.path}/index.html`); // html含めてビルドする場合
         }
+
+        // if (isMainEntry) {
+        //     entryPoints[entryPointInfo.name] = isBundle
+        //         ? resolve(__dirname, `pages/main.ts`) // js一個にまとめる場合
+        //         : resolve(__dirname, `pages/index.html`); // html含めてビルドする場合
+        // } else {
+        //     entryPoints[entryPointInfo.name] = isBundle
+        //         ? resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/main.ts`) // js一個にまとめる場合
+        //         : resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/index.html`); // html含めてビルドする場合
+        // }
     });
 
     console.log(`=== [entry_points] ===`);
@@ -157,30 +168,26 @@ export default defineConfig(async (config) => {
                     inlineDynamicImports: false,
                     entryFileNames: () => {
                         // return isMainEntry ? `assets/main.js` : `${ENTRY_DIR}/[name]/assets/main.js`;
-                        return isMainEntry ? `assets/main.js` : `${ENTRY_DIR}/${ENTRY_NAME}/assets/main.js`;
+                        return IS_MAIN_ENTRY ? `assets/main.js` : `${ENTRY_PATH}/assets/main.js`;
                         // if(isSingleDemoBuildMode) {
                         //     return `demos/[name]/assets/main.js`;
                         // }
                         // return args.name === 'index' ? `assets/main.js` : `assets/[name]/main.js`;
                     },
                     assetFileNames: () => {
-                        return isMainEntry
-                            ? `assets/[name].[ext]`
-                            : `${ENTRY_DIR}/${ENTRY_NAME}/assets/[name].[ext]`;
+                        return IS_MAIN_ENTRY ? `assets/[name].[ext]` : `${ENTRY_PATH}/assets/[name].[ext]`;
                         // if(isSingleDemoBuildMode) {
                         //     return `demos/${singleDemoProjectName}/assets/[name].[ext]`;
                         // }
                         // return `assets/[name].[ext]`;
                     },
-                    chunkFileNames:() => {
-                        return isMainEntry
-                            ? `assets/[name].js`
-                            : `${ENTRY_DIR}/${ENTRY_NAME}assets/[name].js`;
+                    chunkFileNames: () => {
+                        return IS_MAIN_ENTRY ? `assets/[name].js` : `${ENTRY_PATH}assets/[name].js`;
                         // if(isSingleDemoBuildMode) {
                         //     return `demos/${singleDemoProjectName}/assets/[name].js`;
                         // }
                         // return `assets/[name].js`;
-                    } 
+                    },
 
                     // entryFileNames: `demos/street-light/assets/main.js`,
                     // assetFileNames: () => {
