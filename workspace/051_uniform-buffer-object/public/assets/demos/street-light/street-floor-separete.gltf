@@ -15,12 +15,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Plane.002",
-			"scale":[
-				9.07545280456543,
-				9.07545280456543,
-				9.07545280456543
-			]
+			"name":"Plane.002"
 		}
 	],
 	"materials":[
@@ -47,9 +42,10 @@
 					"attributes":{
 						"POSITION":0,
 						"NORMAL":1,
-						"TEXCOORD_0":2
+						"TEXCOORD_0":2,
+						"TANGENT":3
 					},
-					"indices":3,
+					"indices":4,
 					"material":0
 				}
 			]
@@ -83,14 +79,14 @@
 			"componentType":5126,
 			"count":4,
 			"max":[
-				1,
+				10,
 				0,
-				1
+				10
 			],
 			"min":[
-				-1,
+				-10,
 				0,
-				-1
+				-10
 			],
 			"type":"VEC3"
 		},
@@ -108,6 +104,12 @@
 		},
 		{
 			"bufferView":3,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC4"
+		},
+		{
+			"bufferView":4,
 			"componentType":5123,
 			"count":6,
 			"type":"SCALAR"
@@ -134,8 +136,14 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":12,
+			"byteLength":64,
 			"byteOffset":128,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":12,
+			"byteOffset":192,
 			"target":34963
 		}
 	],
@@ -147,7 +155,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":140,
+			"byteLength":204,
 			"uri":"street-floor-separete.bin"
 		}
 	]

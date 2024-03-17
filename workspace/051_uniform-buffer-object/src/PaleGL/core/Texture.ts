@@ -1,5 +1,6 @@
 ﻿import { GLObject } from '@/PaleGL/core/GLObject';
 import {
+    GLTextureFilter,
     TextureDepthPrecisionType,
     TextureFilterType,
     TextureFilterTypes,
@@ -27,9 +28,48 @@ export type TextureArgs = {
     depthPrecision?: TextureDepthPrecisionType 
 };
 
+/**
+ * 
+ * @param glTextureFilter
+ */
+export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter) {
+    switch(glTextureFilter) {
+        case GLTextureFilter.NEAREST:
+            return TextureFilterTypes.Nearest;
+        case GLTextureFilter.LINEAR:
+            return TextureFilterTypes.Linear;
+        case GLTextureFilter.NEAREST_MIPMAP_NEAREST:
+            return TextureFilterTypes.NearestMipmapNearest;
+        case GLTextureFilter.LINEAR_MIPMAP_NEAREST:
+            return TextureFilterTypes.LinearMipmapNearest;
+        case GLTextureFilter.NEAREST_MIPMAP_LINEAR:
+            return TextureFilterTypes.NearestMipmapLinear;
+        case GLTextureFilter.LINEAR_MIPMAP_LINEAR:
+            return TextureFilterTypes.LinearMipmapLinear;
+        default:
+            throw '[resolveGLEnumTextureFilterType] invalid glTextureFilter';
+    }
+}
+
+/**
+ * 
+ * @param glTextureWrap
+ */
+export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
+    switch(glTextureWrap) {
+        case WebGLRenderingContext.CLAMP_TO_EDGE:
+            return TextureWrapTypes.ClampToEdge;
+        case WebGLRenderingContext.REPEAT:
+            return TextureWrapTypes.Repeat;
+        case WebGLRenderingContext.MIRRORED_REPEAT:
+            return TextureWrapTypes.MirroredRepeat;
+        default:
+            throw '[resolveGLEnumTextureWrapType] invalid glTextureWrap';
+    }
+}
+
 // ref:
 // https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
-
 // TODO: texStorage2Dを使う場合と出し分ける
 export class Texture extends GLObject {
     private texture: WebGLTexture;
@@ -60,8 +100,8 @@ export class Texture extends GLObject {
         mipmap = false,
         minFilter = TextureFilterTypes.Nearest,
         magFilter = TextureFilterTypes.Nearest,
-        wrapS = TextureWrapTypes.ClampToEdge,
-        wrapT = TextureWrapTypes.ClampToEdge,
+        wrapS = TextureWrapTypes.Repeat,
+        wrapT = TextureWrapTypes.Repeat,
         flipY,
         depthPrecision
     }: TextureArgs) {
@@ -127,7 +167,9 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw '[Texture.constructor] invalid min filter type';
+                        console.warn('[Texture.constructor] invalid min filter type and fallback to LINEAR');
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                        break;
                 }
                 // mag filter settings
                 switch (this.magFilter) {
@@ -138,7 +180,9 @@ export class Texture extends GLObject {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                         break;
                     default:
-                        throw '[Texture.constructor] invalid mag filter type';
+                        console.warn('[Texture.constructor] invalid mag filter type and fallback to LINEAR');
+                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                        break;
                 }
                 break;
 
@@ -169,12 +213,20 @@ export class Texture extends GLObject {
             case TextureWrapTypes.Repeat:
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
                 break;
+            default:
+                console.warn('[Texture.constructor] invalid wrapS type and fallback to REPEAT');
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                break;
         }
         switch (wrapT) {
             case TextureWrapTypes.ClampToEdge:
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 break;
             case TextureWrapTypes.Repeat:
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                break;
+            default:
+                console.warn('[Texture.constructor] invalid wrapT type and fallback to REPEAT');
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
                 break;
         }

@@ -12,7 +12,7 @@ import { Rotator } from '@/PaleGL/math/Rotator';
 import { Texture } from '@/PaleGL/core/Texture';
 import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+// import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
 import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
@@ -27,8 +27,8 @@ import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
 import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 import {
     UniformTypes,
-    TextureWrapTypes,
-    TextureFilterTypes,
+    // TextureWrapTypes,
+    // TextureFilterTypes,
     BlendTypes,
     RenderTargetTypes,
     AttributeNames,
@@ -36,7 +36,7 @@ import {
     UniformNames,
     FaceSide,
     TextureDepthPrecisionType,
-    UniformBlockNames,
+    UniformBlockNames, ActorTypes,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -55,8 +55,8 @@ import { Actor } from '@/PaleGL/actors/Actor.ts';
 
 // assets
 import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
-import floorDiffuseImgUrl from '../../../assets/images/rock_tile_floor_diff_1k.jpg?url';
-import floorNormalImgUrl from '../../../assets/images/rock_tile_floor_nor_gl_1k.jpg?url';
+// import floorDiffuseImgUrl from '../../../assets/images/rock_tile_floor_diff_1k.jpg?url';
+// import floorNormalImgUrl from '../../../assets/images/rock_tile_floor_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../../../assets/images/laufenurg_church/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../../../assets/images/laufenurg_church/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.jpg?url';
@@ -236,9 +236,9 @@ debuggerStates.instanceNum = initialInstanceNum;
 
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
-let floorPlaneMesh: Mesh;
-let floorDiffuseMap: Texture;
-let floorNormalMap: Texture;
+// let floorPlaneMesh: Mesh;
+// let floorDiffuseMap: Texture;
+// let floorNormalMap: Texture;
 let streetFloorActor: Actor;
 let streetLightActorLeft: Actor;
 let streetLightActorRight: Actor;
@@ -370,7 +370,7 @@ const spotLight1 = new SpotLight({
     intensity: 1.4,
     color: new Color(1, 1, 1),
     distance: 15,
-    attenuation: 0.5,
+    attenuation: 1.06,
     coneCos: 0.8,
     penumbraCos: 0.9,
 });
@@ -402,7 +402,7 @@ const spotLight2 = new SpotLight({
     intensity: 1.4,
     color: new Color(1, 1, 1),
     distance: 15,
-    attenuation: 0.5,
+    attenuation: 1.06,
     coneCos: 0.8,
     penumbraCos: 0.9,
 });
@@ -1391,27 +1391,27 @@ const main = async () => {
         img: particleImg,
     });
 
-    const floorDiffuseImg = await loadImg(floorDiffuseImgUrl);
-    floorDiffuseMap = new Texture({
-        gpu,
-        img: floorDiffuseImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
+    // const floorDiffuseImg = await loadImg(floorDiffuseImgUrl);
+    // floorDiffuseMap = new Texture({
+    //     gpu,
+    //     img: floorDiffuseImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
 
-    const floorNormalImg = await loadImg(floorNormalImgUrl);
-    floorNormalMap = new Texture({
-        gpu,
-        img: floorNormalImg,
-        // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
-    });
+    // const floorNormalImg = await loadImg(floorNormalImgUrl);
+    // floorNormalMap = new Texture({
+    //     gpu,
+    //     img: floorNormalImg,
+    //     // mipmap: true,
+    //     wrapS: TextureWrapTypes.Repeat,
+    //     wrapT: TextureWrapTypes.Repeat,
+    //     minFilter: TextureFilterTypes.Linear,
+    //     magFilter: TextureFilterTypes.Linear,
+    // });
 
     cubeMap = await loadCubeMap(
         gpu,
@@ -1438,7 +1438,13 @@ const main = async () => {
     //
     
     streetFloorActor = await createStreetFloorActor();
-    console.log(streetFloorActor)
+    captureScene.add(streetFloorActor);
+    streetFloorActor.transform.children.forEach(child => {
+        if(child.type === ActorTypes.Mesh) {
+            (child as Mesh).castShadow = true;
+        }
+    });
+    console.log("streetFloorActor", streetFloorActor)
 
     //
     // street light
@@ -1495,30 +1501,30 @@ const main = async () => {
     // floor mesh
     //
 
-    const floorGeometry = new PlaneGeometry({
-        gpu,
-        calculateTangent: true,
-        calculateBinormal: true,
-    });
-    floorPlaneMesh = new Mesh({
-        geometry: floorGeometry,
-        material: new GBufferMaterial({
-            diffuseMap: floorDiffuseMap,
-            normalMap: floorNormalMap,
-            diffuseColor: new Color(1, 1, 1, 1),
-            receiveShadow: true,
-            metallic: 0,
-            roughness: 0.5,
-        }),
-        castShadow: true,
-    });
-    floorPlaneMesh.subscribeOnStart(({ actor }) => {
-        const meshActor = actor as Mesh;
-        actor.transform.setScaling(Vector3.fill(20));
-        actor.transform.setRotationX(-90);
-        meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(6, 6));
-        meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(6, 6));
-    });
+    // const floorGeometry = new PlaneGeometry({
+    //     gpu,
+    //     calculateTangent: true,
+    //     calculateBinormal: true,
+    // });
+    // floorPlaneMesh = new Mesh({
+    //     geometry: floorGeometry,
+    //     material: new GBufferMaterial({
+    //         diffuseMap: floorDiffuseMap,
+    //         normalMap: floorNormalMap,
+    //         diffuseColor: new Color(1, 1, 1, 1),
+    //         receiveShadow: true,
+    //         metallic: 0,
+    //         roughness: 0.5,
+    //     }),
+    //     castShadow: true,
+    // });
+    // floorPlaneMesh.subscribeOnStart(({ actor }) => {
+    //     const meshActor = actor as Mesh;
+    //     actor.transform.setScaling(Vector3.fill(20));
+    //     actor.transform.setRotationX(-90);
+    //     meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(6, 6));
+    //     meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(6, 6));
+    // });
 
     //
     // particle mesh
@@ -1764,7 +1770,7 @@ void main() {
 
     captureScene.add(attractSphereMesh);
     captureScene.add(skinnedMesh);
-    captureScene.add(floorPlaneMesh);
+    // captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
 
@@ -1780,17 +1786,19 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = isSP ? 20 : 20;
+        orbitCameraController.distance = isSP ? 15 : 15;
         orbitCameraController.attenuation = 0.01;
         orbitCameraController.dampingFactor = 0.2;
         orbitCameraController.azimuthSpeed = 100;
         orbitCameraController.altitudeSpeed = 100;
         orbitCameraController.deltaAzimuthPower = 2;
         orbitCameraController.deltaAltitudePower = 2;
-        orbitCameraController.maxAltitude = 70;
-        orbitCameraController.minAltitude = -70;
+        orbitCameraController.maxAltitude = -5;
+        orbitCameraController.minAltitude = -40;
+        orbitCameraController.maxAzimuth = 45;
+        orbitCameraController.minAzimuth = -45;
         orbitCameraController.lookAtTarget = new Vector3(0, 1, 0);
-        orbitCameraController.start(0, -20);
+        orbitCameraController.start(10, -10);
         orbitCameraController.enabled = true;
     };
 

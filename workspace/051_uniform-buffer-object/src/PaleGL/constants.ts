@@ -137,6 +137,7 @@ export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
 export const TextureWrapTypes = {
     Repeat: 0,
     ClampToEdge: 1,
+    MirroredRepeat: 2,
 } as const;
 
 export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
@@ -447,3 +448,22 @@ export const GLFrameBufferStatus = {
 export const GLExtensionName = {
     ColorBufferFloat: 'EXT_color_buffer_float',
 } as const;
+
+export const GLTextureFilter = {
+    NEAREST: 9728,
+    LINEAR: 9729,
+    NEAREST_MIPMAP_NEAREST: 9984,
+    NEAREST_MIPMAP_LINEAR: 9986,
+    LINEAR_MIPMAP_NEAREST: 9985,
+    LINEAR_MIPMAP_LINEAR: 9987,
+} as const;
+
+export type GLTextureFilter = (typeof GLTextureFilter)[keyof typeof GLTextureFilter];
+
+export const GLTextureWrap = {
+    REPEAT: 10497,
+    CLAMP_TO_EDGE: 33071,
+    MIRRORED_REPEAT: 33648,
+} as const;
+
+export type GLTextureWrap = (typeof GLTextureWrap)[keyof typeof GLTextureWrap];

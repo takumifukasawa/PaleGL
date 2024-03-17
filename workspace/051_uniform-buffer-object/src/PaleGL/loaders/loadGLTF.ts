@@ -6,7 +6,7 @@ import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { AnimationClip } from '@/PaleGL/core/AnimationClip';
-import { AnimationKeyframeTypes } from '@/PaleGL/constants';
+import { AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
@@ -14,7 +14,7 @@ import { Attribute } from '@/PaleGL/core/Attribute';
 import { GPU } from '@/PaleGL/core/GPU';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { resolveGLEnumTextureFilterType, resolveGLEnumTextureWrapType, Texture } from '@/PaleGL/core/Texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
 
@@ -186,6 +186,12 @@ type GLTFFormat = {
     }[];
     textures: { sampler: number; source: number }[];
     images: { bufferView?: number; uri?: string; mimeType: 'image/jpeg' | 'image/png'; name: string }[];
+    samplers: {
+        minFilter?: GLTextureFilter;
+        magFilter?: GLTextureFilter;
+        wrapS?: GLTextureWrap;
+        wrapT?: GLTextureWrap;
+    }[];
 };
 
 /**
@@ -199,20 +205,45 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
         return dir + fileName;
     };
 
-    const response = await fetch(resolvePath(path));
+    const gltfPath = resolvePath(path);
+    const response = await fetch(gltfPath);
     const gltf = (await response.json()) as GLTFFormat;
 
     const rootActor = new Actor({});
 
     // for debug
-    console.log('[loadGLTF]', gltf);
+    console.log('[loadGLTF]', gltfPath, gltf);
 
     const preloadTextures: Texture[] = [];
 
-    if (gltf.images) {
-        await Promise.all(gltf.images.map(async (img) => await loadImg(resolvePath(img.uri!)))).then((images) => {
-            images.forEach((img) => {
-                const texture = new Texture({ gpu, img });
+    if (gltf.textures) {
+        await Promise.all(
+            gltf.textures.map(async ({ source, sampler }) => {
+                // TODO: 別ファイルな前提. bufferに格納されているときの出し分けをしていない
+                const imgUrl = gltf.images[source].uri!;
+                const minFilterEnum = gltf.samplers[sampler].minFilter;
+                const magFilterEnum = gltf.samplers[sampler].magFilter;
+                const wrapSEnum = gltf.samplers[sampler].wrapS;
+                const wrapTEnum = gltf.samplers[sampler].wrapT;
+                const minFilter = minFilterEnum ? resolveGLEnumTextureFilterType(minFilterEnum) : undefined;
+                const magFilter = magFilterEnum ? resolveGLEnumTextureFilterType(magFilterEnum) : undefined;
+                const wrapS = wrapSEnum ? resolveGLEnumTextureWrapType(wrapSEnum) : undefined;
+                const wrapT = wrapTEnum ? resolveGLEnumTextureWrapType(wrapTEnum) : undefined;
+                // for debug
+                // console.log(gltf.samplers, gpu.gl.REPEAT, minFilter, magFilter, wrapS, wrapT);
+                return {
+                    img: await loadImg(resolvePath(imgUrl)),
+                    minFilter,
+                    magFilter,
+                    wrapS,
+                    wrapT,
+                };
+            })
+        ).then((images) => {
+            images.forEach(({ img, minFilter, magFilter, wrapS, wrapT }) => {
+                const texture = new Texture({ gpu, img, minFilter, magFilter, wrapS, wrapT });
+                // const texture = new Texture({ gpu, img, minFilter, magFilter, wrapS: TextureWrapTypes.Repeat, wrapT: TextureWrapTypes.Repeat });
+                console.log('hogehoge', texture);
                 preloadTextures.push(texture);
             });
         });
@@ -478,9 +509,11 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
             const hasDiffuseMap = !!targetMaterial.pbrMetallicRoughness.baseColorTexture;
             const hasNormalMap = !!targetMaterial.normalTexture;
 
-            const diffuseMap = hasDiffuseMap ? preloadTextures[targetMaterial.pbrMetallicRoughness.baseColorTexture!.index] : null;
+            const diffuseMap = hasDiffuseMap
+                ? preloadTextures[targetMaterial.pbrMetallicRoughness.baseColorTexture!.index]
+                : null;
             const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : null;
-           
+
             return new GBufferMaterial({
                 diffuseMap,
                 diffuseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
