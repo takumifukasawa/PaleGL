@@ -128,7 +128,7 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, true);
+    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, false);
 
     spotLightDebuggerGroup.addToggleDebugger({
         label: 'light enabled',

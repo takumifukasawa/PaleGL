@@ -943,7 +943,7 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const assetDir = "/assets/demos/street-light/";
+const assetDir = "/demos/street-light/assets/";
 
 const createStreetFloorActor = async () => {
     // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
