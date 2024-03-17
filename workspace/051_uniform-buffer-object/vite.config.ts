@@ -7,16 +7,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
-// import { minify } from 'terser';
 import { shaderMinifierPlugin } from './vite-shader-minifier-plugin';
 import * as process from 'process';
 import { transformGlslUnroll } from './vite-transform-glsl-unroll-plugin.ts';
 import { transformGlslLayout } from './vite-transform-glsl-layout-plugin.ts';
 import { deleteTmpCachesPlugin } from './vite-delete-tmp-caches-plugin.ts';
-import * as fs from 'fs';
-import * as path from 'path';
-
-// import { NormalizedOutputOptions, OutputBundle, OutputChunk } from 'rollup';
 
 type EntryPointInfo = { name: string; path: string };
 
@@ -24,26 +19,36 @@ type EntryPointInfo = { name: string; path: string };
  *
  * @param dirName
  */
-async function getEntryPoints(dirName: string): Promise<EntryPointInfo[]> {
-    // const dirPath = path.join(__dirname, dirName);
-    const dirPath = dirName;
-    return new Promise((resolve) => {
-        fs.readdir(dirPath, (err, list) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            const result: EntryPointInfo[] = [];
-            list.forEach((name) => {
-                result.push({
-                    name,
-                    path: path.join(dirPath, name),
-                });
-            });
-            return resolve(result);
-        });
-    });
-}
+// async function getEntryPoints(dirName: string): Promise<EntryPointInfo[]> {
+//     // const dirPath = path.join(__dirname, dirName);
+//     const dirPath = dirName;
+//     return new Promise((resolve) => {
+//         fs.readdir(dirPath, (err, list) => {
+//             if (err) {
+//                 console.error(err);
+//                 return;
+//             }
+//             const result: EntryPointInfo[] = [];
+//             list.forEach((name) => {
+//                 result.push({
+//                     name,
+//                     path: path.join(dirPath, name),
+//                 });
+//             });
+//             return resolve(result);
+//         });
+//     });
+// }
+
+// entryがrootの場合は`index`になる
+const ENTRY_NAME_INDEX: string = "index";
+
+// ---------------------------------------------------
+// ビルドするentryを定義
+const ENTRY_DIR = "demos";
+// const ENTRY_NAME= ENTRY_NAME_INDEX;
+const ENTRY_NAME: string = "street-light";
+// ---------------------------------------------------
 
 // ref:
 // https://ja.vitejs.dev/config/
@@ -58,57 +63,36 @@ export default defineConfig(async (config) => {
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true'; // gltf loader を使うときは必ず false
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
-    const singleDemoProjectName = env.VITE_SINGLE_DEMO_PROJECT_NAME;
 
-    // const isDevMode = mode === 'development';
-    const isSingleDemoBuildMode = mode === 'single-demo';
+    const isMainEntry = ENTRY_NAME === ENTRY_NAME_INDEX;
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`isMangleProperties: ${isMangleProperties}`);
     console.log(`isDropConsole: ${isDropConsole}`);
-    console.log(`singleDemoProjectName: ${singleDemoProjectName}`);
+    console.log(`entryDir: ${ENTRY_DIR}`);
+    console.log(`entryName: ${ENTRY_NAME}`);
 
-    // const subDir = isSingleDemoBuildMode ? `demos/${singleDemoProjectName}/` : '';
-
-    // const demoEntryPoints = await getEntryPoints('demos');
-
-    // const entryPointInfos: string[] = [...(isSingleDemoBuildMode ? demoEntryPoints : ['main'])];
-    // const entryPointInfos: string[] = [...['main', 'sandbox'], ...demoEntryPoints];
+    // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
 
-    // if (isDevMode) {
-    //     // entryPointInfos.push({
-    //     //     name: 'main',
-    //     //     path: '',
-    //     // });
-    //     const demoEntryPoints = await getEntryPoints('pages/demos');
-    //     entryPointInfos.push(...demoEntryPoints);
-    // }
-
-    if (isSingleDemoBuildMode) {
-        entryPointInfos.push({
-            name: singleDemoProjectName,
-            path: `pages/demos/${singleDemoProjectName}`,
-        });
-    } else {
-        entryPointInfos.push({
-            name: 'index',
-            path: 'pages',
-        });
-        const demoEntryPoints = await getEntryPoints('pages/demos');
-        entryPointInfos.push(...demoEntryPoints);
-    }
+    entryPointInfos.push({
+        name: ENTRY_NAME,
+        path: `${ENTRY_DIR}`,
+    });
 
     const entryPoints: { [key: string]: string } = {};
     entryPointInfos.forEach((entryPointInfo) => {
-        // const entryDir = isDevMode || isSingleDemoBuildMode ? subDir : '';
-        // entryPointName === 'main' ? '' : `${entryPointName}/`;
-        // console.log(entryPointName)
-        entryPoints[entryPointInfo.name] = isBundle
-            ? resolve(__dirname, `${entryPointInfo.path}/main.ts`) // js一個にまとめる場合
-            : resolve(__dirname, `${entryPointInfo.path}/index.html`); // html含めてビルドする場合
+        if(isMainEntry) {
+            entryPoints[entryPointInfo.name] = isBundle
+                ? resolve(__dirname, `pages/main.ts`) // js一個にまとめる場合
+                : resolve(__dirname, `pages/index.html`); // html含めてビルドする場合
+        } else {
+            entryPoints[entryPointInfo.name] = isBundle
+                ? resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/main.ts`) // js一個にまとめる場合
+                : resolve(__dirname, `pages/${entryPointInfo.path}/${entryPointInfo.name}/index.html`); // html含めてビルドする場合
+        }
     });
 
     console.log(`=== [entry_points] ===`);
@@ -161,6 +145,7 @@ export default defineConfig(async (config) => {
             assetsInlineLimit: isBundle ? 100000000 : 0,
             outDir: resolve(__dirname, 'dist'),
             emptyOutDir: true,
+            // emptyOutDir: false,
             rollupOptions: {
                 // input: {
                 //     // index: resolve(__dirname, 'pages/index.html'),
@@ -169,25 +154,32 @@ export default defineConfig(async (config) => {
                 // },
                 input: entryPoints,
                 output: {
-                    // entryFileNames: `assets/main.js`,
-                    // entryFileNames: `assets/[name]/main.js`,
-                    entryFileNames: (args) => {
-                        if(isSingleDemoBuildMode) {
-                            return `demos/[name]/assets/main.js`;
-                        }
-                        return args.name === 'index' ? `assets/main.js` : `assets/[name]/main.js`;
+                    inlineDynamicImports: false,
+                    entryFileNames: () => {
+                        // return isMainEntry ? `assets/main.js` : `${ENTRY_DIR}/[name]/assets/main.js`;
+                        return isMainEntry ? `assets/main.js` : `${ENTRY_DIR}/${ENTRY_NAME}/assets/main.js`;
+                        // if(isSingleDemoBuildMode) {
+                        //     return `demos/[name]/assets/main.js`;
+                        // }
+                        // return args.name === 'index' ? `assets/main.js` : `assets/[name]/main.js`;
                     },
                     assetFileNames: () => {
-                        if(isSingleDemoBuildMode) {
-                            return `demos/${singleDemoProjectName}/assets/[name].[ext]`;
-                        }
-                        return `assets/[name].[ext]`;
+                        return isMainEntry
+                            ? `assets/[name].[ext]`
+                            : `${ENTRY_DIR}/${ENTRY_NAME}/assets/[name].[ext]`;
+                        // if(isSingleDemoBuildMode) {
+                        //     return `demos/${singleDemoProjectName}/assets/[name].[ext]`;
+                        // }
+                        // return `assets/[name].[ext]`;
                     },
                     chunkFileNames:() => {
-                        if(isSingleDemoBuildMode) {
-                            return `demos/${singleDemoProjectName}/assets/[name].js`;
-                        }
-                        return `assets/[name].js`;
+                        return isMainEntry
+                            ? `assets/[name].js`
+                            : `${ENTRY_DIR}/${ENTRY_NAME}assets/[name].js`;
+                        // if(isSingleDemoBuildMode) {
+                        //     return `demos/${singleDemoProjectName}/assets/[name].js`;
+                        // }
+                        // return `assets/[name].js`;
                     } 
 
                     // entryFileNames: `demos/street-light/assets/main.js`,
