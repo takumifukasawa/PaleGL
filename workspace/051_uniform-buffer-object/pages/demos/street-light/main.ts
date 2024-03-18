@@ -1485,7 +1485,7 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         new UnlitMaterial({
-            emissiveColor: new Color(2, 2, 2, 1),
+            emissiveColor: new Color(4, 4, 4, 1),
             // receiveShadow: true,
         })
     );
@@ -1500,7 +1500,7 @@ const main = async () => {
         const iy = inputController.normalizedInputPosition.y * 2 - 1;
         const x = ix * w;
         const z = iy * d;
-        const y = 5;
+        const y = 3;
         attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     };
@@ -1799,9 +1799,9 @@ void main() {
         renderer.fogPass.fogColor = Color.black;
         renderer.fogPass.distanceFogPower = 0.29;
 
-        renderer.bloomPass.bloomAmount = 0.472;
-        renderer.bloomPass.threshold = 0.33;
-        renderer.bloomPass.tone = 0.437;
+        renderer.bloomPass.bloomAmount = 0.26;
+        renderer.bloomPass.threshold = 1.534;
+        renderer.bloomPass.tone = 0.46;
 
         orbitCameraController.start();
     };
@@ -2316,7 +2316,7 @@ function initDebugger() {
     bloomDebuggerGroup.addSliderDebugger({
         label: 'bloom threshold',
         minValue: 0,
-        maxValue: 2,
+        maxValue: 5,
         stepValue: 0.001,
         initialValue: renderer.bloomPass.threshold,
         onChange: (value) => {
