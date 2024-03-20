@@ -72,6 +72,9 @@ export class BufferVisualizerPass extends PostProcessPassBase {
             {
                 name: 'uDepthOfFieldTexture',
             },
+            {
+                name: 'uBloomTexture',
+            }
         ];
 
         const uniforms: UniformsData = [
@@ -106,7 +109,7 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                 type: UniformTypes.Vector2,
                 value: new Vector2(colOffset, rowOffset),
             });
-            console.log("hogehoge", `${tile.name}UvOffset`, colOffset, rowOffset)
+            // console.log("hogehoge", `${tile.name}UvOffset`, colOffset, rowOffset)
             if (tile.type === 'Other') {
                 return;
             }
@@ -117,74 +120,7 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                 value: gpu.dummyTextureBlack,
             });
         });
-        console.log('hogehoge', uniforms);
-        // [
-        //     // {
-        //     //     name: UniformNames.GBufferATexture,
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: UniformNames.GBufferBTexture,
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: UniformNames.GBufferCTexture,
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: UniformNames.GBufferDTexture,
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: UniformNames.DepthTexture,
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uDirectionalLightShadowMap',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uSpotLightShadowMap',
-        //     //     type: UniformTypes.TextureArray,
-        //     //     value: [],
-        //     // },
-        //     // {
-        //     //     name: 'uAmbientOcclusionTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uDeferredShadingTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uLightShaftTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uVolumetricLightTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uDepthOfFieldTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        //     // {
-        //     //     name: 'uFogTexture',
-        //     //     type: UniformTypes.Texture,
-        //     //     value: null,
-        //     // },
-        // ]
+        // console.log('hogehoge', uniforms);
 
         super({
             gpu,
@@ -269,5 +205,6 @@ export class BufferVisualizerPass extends PostProcessPassBase {
         );
         this.material.uniforms.setValue('uDepthOfFieldTexture', renderer.depthOfFieldPass.renderTarget.read.texture);
         this.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+        this.material.uniforms.setValue('uBloomTexture', renderer.bloomPass.renderTarget.read.texture);
     }
 }
