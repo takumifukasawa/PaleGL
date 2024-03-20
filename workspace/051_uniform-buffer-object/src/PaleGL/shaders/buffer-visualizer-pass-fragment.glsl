@@ -62,41 +62,28 @@ int bitShift(int data, int order) {
     return data >> order;
 }
 
+vec4 calcAreaColor(vec4 color, vec2 uv, vec2 tiling, vec2 offset) {
+    return color * isArea(uv * tiling + offset);
+}
+
+vec4 calcTextureAreaColor(sampler2D tex, vec2 uv, vec2 tiling, vec2 offset) {
+    return calcAreaColor(texture(tex, uv * tiling + offset), uv, tiling, offset);
+}
+
 void main() {
-    // vec2 tiling = vec2(4.);
     vec2 tiling = uTiling;
+    
     vec2 gBufferAUv = vUv * tiling + uGBufferATextureUvOffset;
     vec2 gBufferBUv = vUv * tiling + uGBufferBTextureUvOffset;
     vec2 gBufferCUv = vUv * tiling + uGBufferCTextureUvOffset;
     vec2 gBufferDUv = vUv * tiling + uGBufferDTextureUvOffset;
-    vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
-    vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
-    vec2 directionalLightShadowMapUv = vUv * tiling + uDirectionalLightShadowMapUvOffset;
-    vec2 spotLight0ShadowMapUv = vUv * tiling + uSpotLightShadowMap0UvOffset;
-    vec2 spotLight1ShadowMapUv = vUv * tiling + uSpotLightShadowMap1UvOffset;
-    vec2 spotLight2ShadowMapUv = vUv * tiling + uSpotLightShadowMap2UvOffset;
-    vec2 spotLight3ShadowMapUv = vUv * tiling + uSpotLightShadowMap3UvOffset;
-    vec2 aoUv = vUv * tiling + uAmbientOcclusionTextureUvOffset;
-    vec2 deferredShadingUv = vUv * tiling + uDeferredShadingTextureUvOffset;
-    vec2 lightShaftUv = vUv * tiling + uLightShaftTextureUvOffset;
-    vec2 volumetricLightUv = vUv * tiling + uVolumetricLightTextureUvOffset;
-    vec2 fogUv = vUv * tiling + uFogTextureUvOffset;
-    vec2 dofUv = vUv * tiling + uDepthOfFieldTextureUvOffset;
-    vec2 bloomUv = vUv * tiling + uBloomTextureUvOffset;
-   
+  
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUv);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUv);
     GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, gBufferCUv);
     GBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, gBufferDUv);
 
-    // vec4 gBufferA = texture(uGBufferATexture, gBufferAUv) * isArea(gBufferAUv);
-    // vec4 gBufferC = texture(uGBufferCTexture, gBufferCUv) * isArea(gBufferCUv);
-
-    // vec3 baseColor = gBufferA.baseColor;
-    // vec4 normalColor = (texture(uGBufferBTexture, gBufferBUv) * 2. - 1.) * isArea(gBufferBUv);
-
     float rawDepth = texture(uDepthTexture, depthUv).x * isArea(depthUv);
-    // float sceneDepth = viewZToLinearDepth(z, uNearClip, uFarClip);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
 
     vec3 worldPosition = reconstructWorldPositionFromDepth(
@@ -105,47 +92,42 @@ void main() {
         uInverseViewProjectionMatrix
     );
 
-    vec4 directionalShadowMapColor = texture(uDirectionalLightShadowMap, directionalLightShadowMapUv);
-    vec4 spotLight0ShadowMapColor = texture(uSpotLightShadowMap0, spotLight0ShadowMapUv);
-    vec4 spotLight1ShadowMapColor = texture(uSpotLightShadowMap1, spotLight1ShadowMapUv);
-    vec4 spotLight2ShadowMapColor = texture(uSpotLightShadowMap2, spotLight2ShadowMapUv);
-    vec4 spotLight3ShadowMapColor = texture(uSpotLightShadowMap3, spotLight3ShadowMapUv);
-    vec4 aoColor = texture(uAmbientOcclusionTexture, aoUv);
-    vec4 deferredShadingColor = texture(uDeferredShadingTexture, deferredShadingUv);
-    vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUv);
-    vec4 volumetricLightColor = texture(uVolumetricLightTexture, volumetricLightUv);
-    vec4 fogColor = texture(uFogTexture, fogUv);
-    vec4 dofColor = texture(uDepthOfFieldTexture, dofUv);
-    vec4 bloomColor = texture(uBloomTexture, bloomUv);
-
-    // test bit
-    // float roughness = gBufferA.a;
-    // int packedA = int(gBufferA.a * 255.);
-    // int packedRoughnessInt = 15 & 15;
-    // float packedRoughnessFloat = float(packedRoughnessInt);
-    // // outColor = vec4(vec3(roughness), 1.);
-    // outColor = vec4(vec3(packedRoughnessFloat), 1.) * isArea(gBufferAUv);
-    // return;
+    vec4 gBufferAColor = calcAreaColor(vec4(gBufferA.baseColor, 1.), vUv, tiling, uGBufferATextureUvOffset);
+    vec4 gBufferBColor = calcAreaColor(vec4(gBufferB.normal, 1.), vUv, tiling, uGBufferBTextureUvOffset);
+    vec4 gBufferCColor = calcAreaColor(vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.), vUv, tiling, uGBufferCTextureUvOffset);
+    vec4 gBufferDColor = calcAreaColor(vec4(gBufferD.emissiveColor, 1.), vUv, tiling, uGBufferDTextureUvOffset);
+    vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
+    vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);
+    vec4 directionalShadowMapColor = calcTextureAreaColor(uDirectionalLightShadowMap, vUv, tiling, uDirectionalLightShadowMapUvOffset);
+    vec4 spotLight0ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap0, vUv, tiling, uSpotLightShadowMap0UvOffset);
+    vec4 spotLight1ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap1, vUv, tiling, uSpotLightShadowMap1UvOffset);
+    vec4 spotLight2ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap2, vUv, tiling, uSpotLightShadowMap2UvOffset);
+    // vec4 spotLight3ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap3, vUv, tiling, uSpotLightShadowMap3UvOffset);
+    vec4 aoColor = calcTextureAreaColor(uAmbientOcclusionTexture, vUv, tiling, uAmbientOcclusionTextureUvOffset);
+    vec4 deferredShadingColor = calcTextureAreaColor(uDeferredShadingTexture, vUv, tiling, uDeferredShadingTextureUvOffset);
+    vec4 lightShaftColor = calcTextureAreaColor(uLightShaftTexture, vUv, tiling, uLightShaftTextureUvOffset);
+    vec4 volumetricLightColor = calcTextureAreaColor(uVolumetricLightTexture, vUv, tiling, uVolumetricLightTextureUvOffset);
+    vec4 fogColor = calcTextureAreaColor(uFogTexture, vUv, tiling, uFogTextureUvOffset);
+    vec4 dofColor = calcTextureAreaColor(uDepthOfFieldTexture, vUv, tiling, uDepthOfFieldTextureUvOffset);
+    vec4 bloomColor = calcTextureAreaColor(uBloomTexture, vUv, tiling, uBloomTextureUvOffset);
     
     outColor =
-        vec4(gBufferA.baseColor, 1.) * isArea(gBufferAUv)
-        + vec4(gBufferB.normal, 1.) * isArea(gBufferBUv)
-        + vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.) * isArea(gBufferCUv)
-        + vec4(gBufferD.emissiveColor, 1.) * isArea(gBufferDUv) 
-        // // normalColor +
-        // // gBufferC +
-        + sceneDepth * isArea(depthUv)
-        + vec4(worldPosition, 1.) * isArea(worldPositionUv)
-        + directionalShadowMapColor * isArea(directionalLightShadowMapUv)
-        + spotLight0ShadowMapColor * isArea(spotLight0ShadowMapUv)
-        + spotLight1ShadowMapColor * isArea(spotLight1ShadowMapUv)
-        + spotLight2ShadowMapColor * isArea(spotLight2ShadowMapUv)
-        // + spotLight3ShadowMapColor * isArea(spotLight3ShadowMapUv)
-        + aoColor * isArea(aoUv)
-        + vec4(deferredShadingColor.rgb, 1.) * isArea(deferredShadingUv)
-        + vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUv)
-        + vec4(volumetricLightColor.rgb, 1.) * isArea(volumetricLightUv)
-        + vec4(fogColor.rgb, 1.) * isArea(fogUv)
-        + vec4(dofColor.rgb, 1.) * isArea(dofUv)
-        + vec4(bloomColor.rgb, 1.) * isArea(bloomUv);
+        gBufferAColor
+        + gBufferBColor
+        + gBufferCColor
+        + gBufferDColor
+        + depthColor
+        + worldPositionColor
+        + directionalShadowMapColor
+        + spotLight0ShadowMapColor
+        + spotLight1ShadowMapColor
+        + spotLight2ShadowMapColor
+        // + spotLight3ShadowMapColor
+        + aoColor
+        + deferredShadingColor
+        + lightShaftColor
+        + volumetricLightColor
+        + fogColor
+        + dofColor
+        + bloomColor;
 }
