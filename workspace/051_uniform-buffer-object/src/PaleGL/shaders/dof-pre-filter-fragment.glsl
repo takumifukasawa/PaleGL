@@ -35,16 +35,15 @@ void main() {
     float w1 = weight(s1);
     float w2 = weight(s2);
     float w3 = weight(s3);
-   
-    // 加重平均
-    // TODO: 輝度値を考慮する必要があるはず？ 
-    vec3 color = s0 * w0 + s1 * w1 + s2 * w2 + s3 * w3;
-    color /= max(w0 + w1 + w2 + s3, 0.00001);
     
-    float coc0 = texture(uCocTexture, vUv + kernel.xy).r;
-    float coc1 = texture(uCocTexture, vUv + kernel.zy).r;
-    float coc2 = texture(uCocTexture, vUv + kernel.xw).r;
-    float coc3 = texture(uCocTexture, vUv + kernel.zw).r;
+    vec3 rawCoc0 = texture(uCocTexture, vUv + kernel.xy).rgb;
+    vec3 rawCoc1 = texture(uCocTexture, vUv + kernel.zy).rgb;
+    vec3 rawCoc2 = texture(uCocTexture, vUv + kernel.xw).rgb;
+    vec3 rawCoc3 = texture(uCocTexture, vUv + kernel.zw).rgb;
+    float coc0 = rawCoc0.r;
+    float coc1 = rawCoc1.r;
+    float coc2 = rawCoc2.r;
+    float coc3 = rawCoc3.r;
     
     float coc = 0.;
     // coc = (coc0 + coc1 + coc2 + coc3) * .25;
@@ -52,9 +51,26 @@ void main() {
     float cocMax = max(max(max(coc0, coc1), coc2), coc3);
     coc = cocMax >= -cocMin ? cocMax : cocMin;
     
-    outColor = vec4(color.rgb, coc);
+    // w0 *= 1. / (cocMax + 1.);
+    // w1 *= 1. / (cocMax + 1.);
+    // w2 *= 1. / (cocMax + 1.);
+    // w3 *= 1. / (cocMax + 1.);
+
+    // 加重平均
+    // TODO: 輝度値を考慮する必要があるはず？ 
+    vec3 color = s0 * w0 + s1 * w1 + s2 * w2 + s3 * w3;
+    // default
+    // color /= max(w0 + w1 + w2 + s3, 0.00001);
+    // dot
+    color /= dot(vec4(w0, w1, w2, w3), vec4(1.));
     
+    outColor = vec4(color.rgb, coc);
+   
     // for debug
+    // if(coc < 0.) {
+    //     outColor = vec4(1., 0., 0., 1.);
+    //     return;
+    // }
     // outColor = sceneColor;
     // outColor = cocColor;
     // outColor = vec4(vec3(coc), 1.);

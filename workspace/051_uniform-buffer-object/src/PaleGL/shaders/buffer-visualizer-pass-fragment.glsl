@@ -19,6 +19,7 @@ uniform sampler2D uAmbientOcclusionTexture;
 uniform sampler2D uDeferredShadingTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
+uniform sampler2D uDepthOfFieldTexture;
 uniform sampler2D uFogTexture;
 uniform float uNearClip;
 uniform float uFarClip;
@@ -60,6 +61,7 @@ void main() {
     vec2 volumetricLightUV = vUv * tiling + vec2(-3., -1.);
     // row: 3
     vec2 fogUV = vUv * tiling + vec2(0., 0.);
+    vec2 dofUV = vUv * tiling + vec2(-1., 0.);
     
    
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUV);
@@ -93,6 +95,7 @@ void main() {
     vec4 lightShaftColor = texture(uLightShaftTexture, lightShaftUV);
     vec4 volumetricLightColor = texture(uVolumetricLightTexture, volumetricLightUV);
     vec4 fogColor = texture(uFogTexture, fogUV);
+    vec4 dofColor = texture(uDepthOfFieldTexture, dofUV);
 
     // test bit
     // float roughness = gBufferA.a;
@@ -121,5 +124,6 @@ void main() {
         vec4(deferredShadingColor.rgb, 1.) * isArea(deferredShadingUV) +
         vec4(lightShaftColor.rgb, 1.) * isArea(lightShaftUV) +
         vec4(volumetricLightColor.rgb, 1.) * isArea(volumetricLightUV) +
-        vec4(fogColor.rgb, 1.) * isArea(fogUV);
+        vec4(fogColor.rgb, 1.) * isArea(fogUV) +
+        vec4(dofColor.rgb, 1.) * isArea(dofUV);
 }

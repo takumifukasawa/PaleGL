@@ -23,7 +23,7 @@ void main() {
     vec4 dof = texture(uDofTexture, vUv);
     
     // float dofStrength = smoothstep(.1, 1., abs(coc)); 
-    float dofStrength = smoothstep(.1, 1., abs(coc)); 
+    float dofStrength = smoothstep(.1, 1., coc); 
     
     // interpolate
     float rate = dofStrength + dof.a - dofStrength * dof.a;

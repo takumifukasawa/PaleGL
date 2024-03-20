@@ -103,6 +103,7 @@ void main() {
         // 後ボケ抜き出し 
         // 後ボケが前にかぶらないように、現在ピクセルのcocと、kernel上のcoc の最大値を比較して使う 
         float bgw = weight(max(0., min(s.a, coc)), radius);
+        // float bgw = weight(max(0., s.a), radius);
         bgColor += s.rgb * bgw;
         bgWeight += bgw;
        
@@ -124,6 +125,7 @@ void main() {
     outColor = vec4(color, bgfg);
     
     // for debug
+    // outColor = vec4(fgColor, 1.);
     // outColor = srcColor;
     // outColor = vec4(vec3(coc), 1.);
     

@@ -73,7 +73,7 @@ import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.j
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, true);
+    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, false);
 
     spotLightDebuggerGroup.addToggleDebugger({
         label: 'light enabled',
@@ -516,6 +516,10 @@ bufferVisualizerPass.beforeRender = () => {
     bufferVisualizerPass.material.uniforms.setValue(
         'uVolumetricLightTexture',
         renderer.volumetricLightPass.renderTarget.read.texture
+    );
+    bufferVisualizerPass.material.uniforms.setValue(
+        "uDepthOfFieldTexture",
+        renderer.depthOfFieldPass.renderTarget.read.texture
     );
     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
 };
@@ -1798,6 +1802,10 @@ void main() {
 
         renderer.fogPass.fogColor = Color.black;
         renderer.fogPass.distanceFogPower = 0.29;
+        
+        renderer.depthOfFieldPass.focusDistance = 17.78;
+        renderer.depthOfFieldPass.focusRange = 9.8;
+        renderer.depthOfFieldPass.bokehRadius = 5.55;
 
         renderer.bloomPass.bloomAmount = 0.26;
         renderer.bloomPass.threshold = 1.534;
@@ -2269,7 +2277,7 @@ function initDebugger() {
     dofDebuggerGroup.addSliderDebugger({
         label: 'DoF focus range',
         minValue: 0.1,
-        maxValue: 20,
+        maxValue: 30,
         stepValue: 0.001,
         initialValue: renderer.depthOfFieldPass.focusRange,
         onChange: (value) => {

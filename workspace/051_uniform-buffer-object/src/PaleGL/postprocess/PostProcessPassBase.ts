@@ -7,7 +7,12 @@ import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import {
     PrimitiveTypes,
     RenderTargetType,
-    RenderTargetTypes, UniformBlockName,
+    RenderTargetTypes,
+    TextureFilterType,
+    TextureFilterTypes,
+    TextureWrapType,
+    TextureWrapTypes,
+    UniformBlockName,
     // UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -100,6 +105,10 @@ export class PostProcessPassBase implements IPostProcessPass {
         receiveShadow = false,
         name = '',
         renderTargetType = RenderTargetTypes.RGBA,
+        minFilter = TextureFilterTypes.Linear,
+        magFilter = TextureFilterTypes.Linear,
+        wrapT = TextureWrapTypes.ClampToEdge,
+        wrapS = TextureWrapTypes.ClampToEdge,
     }: {
         gpu: GPU;
         vertexShader?: string;
@@ -111,6 +120,11 @@ export class PostProcessPassBase implements IPostProcessPass {
         useEnvMap?: boolean;
         receiveShadow?: boolean;
         name?: string;
+
+        minFilter?: TextureFilterType;
+        magFilter?: TextureFilterType;
+        wrapS?: TextureWrapType;
+        wrapT?: TextureWrapType;
         renderTargetType?: RenderTargetType;
     }) {
         // super({name});
@@ -159,6 +173,10 @@ export class PostProcessPassBase implements IPostProcessPass {
             width: 1,
             height: 1,
             type: renderTargetType,
+            minFilter,
+            magFilter,
+            wrapS,
+            wrapT
         });
     }
 

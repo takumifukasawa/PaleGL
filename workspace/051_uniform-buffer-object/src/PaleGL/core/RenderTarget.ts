@@ -10,7 +10,8 @@ import {
     TextureTypes,
     GLColorAttachment,
     GLFrameBufferStatus,
-    GLExtensionName, TextureDepthPrecisionType,
+    GLExtensionName,
+    TextureDepthPrecisionType, TextureWrapTypes, TextureWrapType,
 } from '@/PaleGL/constants';
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -27,10 +28,13 @@ export type RenderTargetOptions = {
     writeDepthTexture?: boolean;
     minFilter?: TextureFilterType;
     magFilter?: TextureFilterType;
+    wrapS?: TextureWrapType;
+    wrapT?: TextureWrapType;
     mipmap?: boolean;
-    depthPrecision?: TextureDepthPrecisionType
+    depthPrecision?: TextureDepthPrecisionType;
 };
 
+// ref: https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
 // TODO:
 // depth texture を外から渡す形でもいいかも
 export class RenderTarget extends AbstractRenderTarget {
@@ -87,8 +91,10 @@ export class RenderTarget extends AbstractRenderTarget {
         writeDepthTexture = false,
         minFilter = TextureFilterTypes.Linear,
         magFilter = TextureFilterTypes.Linear,
+        wrapT = TextureWrapTypes.ClampToEdge,
+        wrapS = TextureWrapTypes.ClampToEdge,
         mipmap = false,
-        depthPrecision
+        depthPrecision,
     }: RenderTargetOptions) {
         super();
 
@@ -135,6 +141,8 @@ export class RenderTarget extends AbstractRenderTarget {
                     type: TextureTypes.RGBA,
                     minFilter,
                     magFilter,
+                    wrapS,
+                    wrapT,
                 });
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
                 break;
@@ -152,10 +160,12 @@ export class RenderTarget extends AbstractRenderTarget {
                     type: TextureTypes.RGBA16F,
                     minFilter,
                     magFilter,
+                    wrapS,
+                    wrapT,
                 });
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
                 break;
-                
+
             // R11G11B10F浮動小数点バッファ
             case RenderTargetTypes.R11F_G11F_B10F:
                 // TODO: r11g11b10 の場合はなくてもよい？
@@ -170,6 +180,8 @@ export class RenderTarget extends AbstractRenderTarget {
                     type: TextureTypes.R11F_G11F_B10F,
                     minFilter,
                     magFilter,
+                    wrapS,
+                    wrapT,
                 });
 
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
@@ -184,6 +196,8 @@ export class RenderTarget extends AbstractRenderTarget {
                     type: TextureTypes.R16F,
                     minFilter,
                     magFilter,
+                    wrapS,
+                    wrapT,
                 });
 
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture.glObject, 0);
@@ -215,7 +229,9 @@ export class RenderTarget extends AbstractRenderTarget {
                 // magFilter: TextureFilterTypes.Linear
                 minFilter,
                 magFilter,
-                depthPrecision
+                wrapS,
+                wrapT,
+                depthPrecision,
             });
             // depth as texture
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);

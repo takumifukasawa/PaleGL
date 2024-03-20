@@ -42,13 +42,4 @@ void main() {
     // }
     
     outColor = vec4(vec3(coc), 1.);
-
-    // for debug
-    // outColor = sceneColor;
-    // outColor = vec4(vec3(uBokehRadius), 1.);
-    // outColor = vec4(vec3(coc), 1.);
-    // if(coc < 0.) {
-    //     outColor = vec4(1., 0., 0., 1.) * abs(coc);
-    // }
-    
 }           

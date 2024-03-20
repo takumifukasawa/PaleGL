@@ -81,6 +81,11 @@ export class BufferVisualizerPass extends PostProcessPassBase {
                     value: null
                 },
                 {
+                    name: "uDepthOfFieldTexture",
+                    type: UniformTypes.Texture,
+                    value: null
+                },
+                {
                     name: 'uFogTexture',
                     type: UniformTypes.Texture,
                     value: null,

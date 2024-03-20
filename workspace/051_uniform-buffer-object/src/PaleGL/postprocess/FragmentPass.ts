@@ -19,6 +19,13 @@ export class FragmentPass extends PostProcessPassBase {
         name?: string;
         renderTargetType?: RenderTargetType;
     }) {
-        super({ gpu, fragmentShader, uniforms, uniformBlockNames, name, renderTargetType });
+        super({
+            gpu,
+            fragmentShader,
+            uniforms,
+            uniformBlockNames,
+            name,
+            renderTargetType,
+        });
     }
 }

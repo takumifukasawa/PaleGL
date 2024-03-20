@@ -49,6 +49,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
     materials: Material[] = [];
 
     get renderTarget() {
+        // return this.circleOfConfusionPass.renderTarget;
+        // return this.preFilterPass.renderTarget;
+        // return this.dofBokehPass.renderTarget;
+        // return this.bokehBlurPass.renderTarget;
         return this.compositePass.renderTarget;
     }
 
