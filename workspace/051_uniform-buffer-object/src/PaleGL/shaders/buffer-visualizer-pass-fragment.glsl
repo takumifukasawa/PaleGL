@@ -77,6 +77,8 @@ void main() {
     vec2 gBufferBUv = vUv * tiling + uGBufferBTextureUvOffset;
     vec2 gBufferCUv = vUv * tiling + uGBufferCTextureUvOffset;
     vec2 gBufferDUv = vUv * tiling + uGBufferDTextureUvOffset;
+    vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
+    vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
   
     GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUv);
     GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUv);
