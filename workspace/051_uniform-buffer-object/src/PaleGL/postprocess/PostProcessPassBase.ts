@@ -277,6 +277,8 @@ export class PostProcessPassBase implements IPostProcessPass {
             renderer.setRenderTarget(this._renderTarget, true);
         }
     }
+    
+    update() {}
 
     /**
      * TODO: rename "prevRenderTarget"

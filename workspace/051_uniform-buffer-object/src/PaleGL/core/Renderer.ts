@@ -1179,6 +1179,7 @@ export class Renderer {
 
         let prevRenderTarget: RenderTarget = this._afterDeferredShadingRenderTarget;
         const isCameraLastPassAndHasNotPostProcess = !camera.renderTarget && !camera.hasEnabledPostProcessPass;
+        this._scenePostProcess.update();
         this._scenePostProcess.render({
             gpu: this.gpu,
             renderer: this,
@@ -1197,7 +1198,8 @@ export class Renderer {
         prevRenderTarget = this._scenePostProcess.lastRenderTarget!;
 
         if (camera.hasEnabledPostProcessPass) {
-            camera.postProcess!.render({
+            camera.postProcess?.update();
+            camera.postProcess?.render({
                 gpu: this.gpu,
                 renderer: this,
                 prevRenderTarget,

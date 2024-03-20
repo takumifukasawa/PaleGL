@@ -292,6 +292,8 @@ export class BloomPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
+    update() {}
+    
     render({
         gpu,
         camera,

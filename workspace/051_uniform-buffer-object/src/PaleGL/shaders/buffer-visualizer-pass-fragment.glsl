@@ -104,7 +104,7 @@ void main() {
     vec4 spotLight0ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap0, vUv, tiling, uSpotLightShadowMap0UvOffset);
     vec4 spotLight1ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap1, vUv, tiling, uSpotLightShadowMap1UvOffset);
     vec4 spotLight2ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap2, vUv, tiling, uSpotLightShadowMap2UvOffset);
-    // vec4 spotLight3ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap3, vUv, tiling, uSpotLightShadowMap3UvOffset);
+    vec4 spotLight3ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap3, vUv, tiling, uSpotLightShadowMap3UvOffset);
     vec4 aoColor = calcTextureAreaColor(uAmbientOcclusionTexture, vUv, tiling, uAmbientOcclusionTextureUvOffset);
     vec4 deferredShadingColor = calcTextureAreaColor(uDeferredShadingTexture, vUv, tiling, uDeferredShadingTextureUvOffset);
     vec4 lightShaftColor = calcTextureAreaColor(uLightShaftTexture, vUv, tiling, uLightShaftTextureUvOffset);

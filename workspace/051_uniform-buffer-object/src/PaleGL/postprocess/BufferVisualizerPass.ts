@@ -131,34 +131,43 @@ export class BufferVisualizerPass extends PostProcessPassBase {
             uniforms,
         });
 
+        const styleHeader = document.createElement('style');
+        styleHeader.textContent = `
+.buffer-visualizer-pass {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(${COL_NUM}, 1fr);
+    grid-template-rows: repeat(${ROW_NUM}, 1fr);
+}
+.buffer-visualizer-pass.hidden {
+    display: none;
+}
+.buffer-visualizer-pass-tile {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    font-size: 9px;
+    line-height: 1em;
+    font-weight: bold;
+    padding: 9px;
+}
+        `
+        document.head.appendChild(styleHeader);
+        
         this.dom = document.createElement('div');
         this.dom.classList.add('buffer-visualizer-pass');
-        this.dom.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: grid;
-            grid-template-columns: repeat(${COL_NUM}, 1fr);
-            grid-template-rows: repeat(${ROW_NUM}, 1fr);
-        `;
         const frag = document.createDocumentFragment();
         tiles.forEach((tile, i) => {
             const col = i % COL_NUM;
             const row = Math.floor(i / COL_NUM);
             const label = `${tile.label || tile.name}, ${col}, ${row}`;
             const elem = document.createElement('div');
-            elem.style.cssText = `
-                display: flex;
-                justify-content: flex-start;
-                align-items: flex-end;
-                font-size: 9px;
-                line-height: 1em;
-                font-weight: bold;
-                padding: 9px;
-            `;
+            elem.classList.add('buffer-visualizer-pass-tile');
             const p = document.createElement('p');
             p.textContent = label;
             elem.appendChild(p);
@@ -167,11 +176,18 @@ export class BufferVisualizerPass extends PostProcessPassBase {
         });
         document.body.appendChild(this.dom);
     }
+    
+    update() {
+        console.log(this.enabled)
+        if(this.enabled) {
+            this.dom.classList.remove("hidden")
+        } else {
+            this.dom.classList.add("hidden")
+        }
+    }
 
     render(args: PostProcessPassRenderArgs) {
         super.render(args);
-
-        this.dom.style.visibility = this.enabled ? 'visible' : 'hidden';
 
         const { renderer, lightActors } = args;
 

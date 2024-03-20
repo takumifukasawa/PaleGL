@@ -115,6 +115,15 @@ export class PostProcess {
     }
 
     /**
+     * 
+     */
+    update() {
+        this.passes.forEach(pass => {
+            pass.update();
+        });
+    }
+
+    /**
      *
      * @param pass
      * @param renderer

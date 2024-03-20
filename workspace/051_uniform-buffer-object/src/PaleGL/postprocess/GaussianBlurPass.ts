@@ -118,6 +118,8 @@ export class GaussianBlurPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
+    update() {}
+    
     render({ gpu, camera, renderer, prevRenderTarget, isLastPass, targetCamera, gBufferRenderTargets, time }: PostProcessPassRenderArgs) {
         this.geometry.start();
         
