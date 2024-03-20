@@ -488,41 +488,41 @@ cameraPostProcess.addPass(fxaaPass);
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
 bufferVisualizerPass.enabled = false;
 cameraPostProcess.addPass(bufferVisualizerPass);
-bufferVisualizerPass.beforeRender = () => {
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uDirectionalLightShadowMap',
-        directionalLight.shadowMap!.read.depthTexture
-        // spotLight.shadowMap!.read.depthTexture
-    );
-    bufferVisualizerPass.material.uniforms.setValue('uSpotLightShadowMap', [
-        spotLight1.shadowMap!.read.depthTexture,
-        spotLight2.shadowMap!.read.depthTexture,
-        null,
-        null,
-    ]);
-    // console.log(bufferVisualizerPass.material.uniforms);
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uAmbientOcclusionTexture',
-        renderer.ambientOcclusionPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uDeferredShadingTexture',
-        renderer.deferredShadingPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uLightShaftTexture',
-        renderer.lightShaftPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        'uVolumetricLightTexture',
-        renderer.volumetricLightPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue(
-        "uDepthOfFieldTexture",
-        renderer.depthOfFieldPass.renderTarget.read.texture
-    );
-    bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
-};
+// bufferVisualizerPass.beforeRender = () => {
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         'uDirectionalLightShadowMap',
+//         directionalLight.shadowMap!.read.depthTexture
+//         // spotLight.shadowMap!.read.depthTexture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue('uSpotLightShadowMap', [
+//         spotLight1.shadowMap!.read.depthTexture,
+//         spotLight2.shadowMap!.read.depthTexture,
+//         null,
+//         null,
+//     ]);
+//     // console.log(bufferVisualizerPass.material.uniforms);
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         'uAmbientOcclusionTexture',
+//         renderer.ambientOcclusionPass.renderTarget.read.texture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         'uDeferredShadingTexture',
+//         renderer.deferredShadingPass.renderTarget.read.texture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         'uLightShaftTexture',
+//         renderer.lightShaftPass.renderTarget.read.texture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         'uVolumetricLightTexture',
+//         renderer.volumetricLightPass.renderTarget.read.texture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue(
+//         "uDepthOfFieldTexture",
+//         renderer.depthOfFieldPass.renderTarget.read.texture
+//     );
+//     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+// };
 
 cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも

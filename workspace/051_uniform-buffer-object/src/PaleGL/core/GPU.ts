@@ -66,6 +66,7 @@ export class GPU {
     private vao: VertexArrayObject | null = null;
     private uniforms: Uniforms | null = null;
     dummyTexture: Texture;
+    dummyTextureBlack: Texture;
     dummyCubeTexture: CubeMap;
     private validExtensions: string[] = [];
     private invalidExtensions: string[] = [];
@@ -80,6 +81,12 @@ export class GPU {
         this.dummyTexture = new Texture({
             gpu: this,
             img: create1x1('white'),
+            wrapS: TextureWrapTypes.Repeat,
+            wrapT: TextureWrapTypes.Repeat,
+        });
+        this.dummyTextureBlack = new Texture({
+            gpu: this,
+            img: create1x1('black'),
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
