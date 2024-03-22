@@ -245,25 +245,25 @@ const buildScene = (sceneJson: MarionetterScene) => {
     const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
     bufferVisualizerPass.enabled = false;
     cameraPostProcess.addPass(bufferVisualizerPass);
-    bufferVisualizerPass.beforeRender = () => {
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uDirectionalLightShadowMap',
-            directionalLight.shadowMap!.read.depthTexture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uAmbientOcclusionTexture',
-            renderer.ambientOcclusionPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uDeferredShadingTexture',
-            renderer.deferredShadingPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uLightShaftTexture',
-            renderer.lightShaftPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
-    };
+    // bufferVisualizerPass.beforeRender = () => {
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uDirectionalLightShadowMap',
+    //         directionalLight.shadowMap!.read.depthTexture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uAmbientOcclusionTexture',
+    //         renderer.ambientOcclusionPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uDeferredShadingTexture',
+    //         renderer.deferredShadingPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uLightShaftTexture',
+    //         renderer.lightShaftPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+    // };
 
     cameraPostProcess.enabled = true;
     // TODO: set post process いらないかも
@@ -489,25 +489,25 @@ function initDebugger({
         onChange: (value) => (bufferVisualizerPass.enabled = value),
     });
 
-    bufferVisualizerPass.beforeRender = () => {
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uDirectionalLightShadowMap',
-            directionalLight.shadowMap!.read.depthTexture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uAmbientOcclusionTexture',
-            renderer.ambientOcclusionPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uDeferredShadingTexture',
-            renderer.deferredShadingPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue(
-            'uLightShaftTexture',
-            renderer.lightShaftPass.renderTarget.read.texture
-        );
-        bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
-    };
+    // bufferVisualizerPass.beforeRender = () => {
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uDirectionalLightShadowMap',
+    //         directionalLight.shadowMap!.read.depthTexture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uAmbientOcclusionTexture',
+    //         renderer.ambientOcclusionPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uDeferredShadingTexture',
+    //         renderer.deferredShadingPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue(
+    //         'uLightShaftTexture',
+    //         renderer.lightShaftPass.renderTarget.read.texture
+    //     );
+    //     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+    // };
 
     //
     // directional light

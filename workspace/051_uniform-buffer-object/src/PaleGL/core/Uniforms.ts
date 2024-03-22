@@ -129,6 +129,20 @@ export class Uniforms {
     }
 
     /**
+     * 新しい要素を追加
+     * @param name
+     * @param type
+     * @param value
+     */
+    addValue(name: string, type: UniformTypes, value: UniformValue) {
+        this.data.push({
+            name,
+            type,
+            value
+        });
+    }
+
+    /**
      * uniformの値を上書き。
      * 対象のuniformが存在する場合にのみ上書きをする。
      * struct, struct array の場合はその中身まで探索し上書き

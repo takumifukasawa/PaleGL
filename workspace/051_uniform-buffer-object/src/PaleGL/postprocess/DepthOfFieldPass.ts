@@ -270,8 +270,6 @@ export class DepthOfFieldPass implements IPostProcessPass {
      * @param height
      */
     setSize(width: number, height: number) {
-        // this.#width = width;
-        // this.#height = height;
         this.width = width;
         this.height = height;
 
