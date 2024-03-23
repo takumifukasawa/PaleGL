@@ -1279,8 +1279,8 @@ export class Renderer {
     // --------------------------------------------------------------
 
     private gpu;
-    private realWidth: number = 1;
-    private realHeight: number = 1;
+    realWidth: number = 1;
+    realHeight: number = 1;
     private stats: Stats | null = null;
     private _scenePostProcess: PostProcess;
     // internal cmmera

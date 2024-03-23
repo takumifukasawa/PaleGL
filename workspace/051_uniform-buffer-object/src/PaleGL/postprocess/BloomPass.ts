@@ -267,8 +267,6 @@ export class BloomPass implements IPostProcessPass {
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.width = width;
-        this.height = height;
 
         this.extractBrightnessPass.setSize(width, height);
 

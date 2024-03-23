@@ -38,20 +38,6 @@ export type PostProcessPassRenderArgs = {
     lightActors?: LightActors;
 };
 
-// export interface IPostProcessPass {
-//     // gpu: GPU;
-//     name: string;
-//     enabled: boolean;
-//     width: number;
-//     height: number;
-//     renderTarget: RenderTarget;
-//     materials: Material[];
-//
-//     setSize: (width: number, height: number) => void;
-//     setRenderTarget: (renderer: Renderer, camera: Camera, isLastPass: boolean) => void;
-//     render: ({ gpu, camera, renderer, prevRenderTarget, isLastPass, time }: PostProcessRenderArgs) => void;
-// }
-
 export class PostProcessPassBase implements IPostProcessPass {
     // protected gpu: GPU;
     name: string;
@@ -262,6 +248,10 @@ export class PostProcessPassBase implements IPostProcessPass {
         this.width = width;
         this.height = height;
         this._renderTarget.setSize(width, height);
+
+        // TODO: pass base で更新しちゃって大丈夫？
+        this.material.uniforms.setValue('uTargetWidth', this.width);
+        this.material.uniforms.setValue('uTargetHeight', this.height);
     }
 
     /**

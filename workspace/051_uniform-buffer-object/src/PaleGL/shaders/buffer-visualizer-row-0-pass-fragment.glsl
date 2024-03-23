@@ -11,7 +11,7 @@ uniform float uNearClip;
 uniform float uFarClip;
 uniform mat4 uInverseViewProjectionMatrix;
 
-vec2 vUv;
+in vec2 vUv;
 
 #include ./partial/depth-functions.glsl
 
@@ -31,21 +31,24 @@ out vec4 outColor;
 
 void main() {
     vec2 tiling = uTiling;
+    // vec2 tiling = vec2(6., 1.);
 
     vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
     vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
+    // vec2 depthUv = vUv * tiling + vec2(0., 0.);
+    // vec2 worldPositionUv = vUv * tiling + vec2(-1., 0.);
 
     float rawDepth = texture(uDepthTexture, depthUv).x * isArea(depthUv);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-
+    
     vec3 worldPosition = reconstructWorldPositionFromDepth(
         worldPositionUv,
         texture(uDepthTexture, worldPositionUv).x,
         uInverseViewProjectionMatrix
     );
 
-    vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
-    vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);
+    vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, vec2(0., 0.));
+    vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, vec2(-1., 0.));
 
     outColor = depthColor + worldPositionColor;
 }

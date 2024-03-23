@@ -17,7 +17,7 @@ uniform vec2 uTexture5UvOffset;
 
 uniform vec2 uTiling;
 
-vec2 vUv;
+in vec2 vUv;
 
 out vec4 outColor;
 

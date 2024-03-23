@@ -125,7 +125,7 @@ export class GPU {
     setUniforms(uniforms: Uniforms) {
         this.uniforms = uniforms;
     }
-
+    
     /**
      *
      * @param x

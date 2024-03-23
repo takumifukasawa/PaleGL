@@ -1,5 +1,5 @@
 ﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -11,158 +11,36 @@ import { Material } from '@/PaleGL/materials/Material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
+import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
 
 const COL_NUM = 6;
 const ROW_NUM = 6;
-
-// const DIRECTIONAL_LIGHT_SHADOW_MAP_KEY = 'directionalLightShadowMap';
-// const SPOT_LIGHT_SHADOW_MAP_KEY = 'spotLightShadowMap';
-
-// const areaFuncText = `
-// float isArea(vec2 uv) {
-//     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
-// }
-// 
-// vec4 calcAreaColor(vec4 color, vec2 uv, vec2 tiling, vec2 offset) {
-//     return color * isArea(uv * tiling + offset);
-// }
-// 
-// vec4 calcTextureAreaColor(sampler2D tex, vec2 uv, vec2 tiling, vec2 offset) {
-//     return calcAreaColor(texture(tex, uv * tiling + offset), uv, tiling, offset);
-// }
-// `;
-
-// const row0FragmentShaderText = `#version 300 es
-// 
-// precision mediump float;
-// 
-// uniform vec2 uWorldPositionUvOffset;
-// uniform sampler2D uDepthTexture;
-// uniform vec2 uDepthTextureUvOffset;
-// 
-// uniform vec2 uTiling;
-// uniform float uNearClip;
-// uniform float uFarClip;
-// uniform mat4 uInverseViewProjectionMatrix;
-// 
-// vec2 vUv;
-// 
-// ${areaFuncText}
-// 
-// void main() {
-//     vec2 tiling = uTiling;
-//     
-//     vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
-//     vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
-//   
-//     float rawDepth = texture(uDepthTexture, depthUv).x * isArea(depthUv);
-//     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-// 
-//     vec3 worldPosition = reconstructWorldPositionFromDepth(
-//         worldPositionUv,
-//         texture(uDepthTexture, worldPositionUv).x,
-//         uInverseViewProjectionMatrix
-//     );
-// 
-//     vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
-//     vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);   
-//     
-//     outColor = depthColor + worldPositionColor;
-// }
-// `;
-
-// const baseFragmentShaderText = `#version 300 es
-// 
-// precision mediump float;
-// 
-// uniform sampler2D uTexture0;
-// uniform vec2 uTexture0UvOffset;
-// uniform sampler2D uTexture1;
-// uniform vec2 uTexture1UvOffset;
-// uniform sampler2D uTexture2;
-// uniform vec2 uTexture2UvOffset;
-// uniform sampler2D uTexture3;
-// uniform vec2 uTexture3UvOffset;
-// uniform sampler2D uTexture4;
-// uniform vec2 uTexture4UvOffset;
-// uniform sampler2D uTexture5;
-// uniform vec2 uTexture5UvOffset;
-// 
-// uniform vec2 uTiling;
-// 
-// vec2 vUv;
-// 
-// out vec4 outColor;
-// 
-// ${areaFuncText}
-// 
-// void main() {
-//     vec2 tiling = uTiling;
-//     vec4 color0 = calcTextureAreaColor(uTexture0, vUv, tiling, uTexture0UvOffset);
-//     vec4 color1 = calcTextureAreaColor(uTexture1, vUv, tiling, uTexture1UvOffset);
-//     vec4 color2 = calcTextureAreaColor(uTexture2, vUv, tiling, uTexture2UvOffset);
-//     vec4 color3 = calcTextureAreaColor(uTexture3, vUv, tiling, uTexture3UvOffset);
-//     vec4 color4 = calcTextureAreaColor(uTexture4, vUv, tiling, uTexture4UvOffset);
-//     vec4 color5 = calcTextureAreaColor(uTexture5, vUv, tiling, uTexture5UvOffset);
-//     gl_FragColor = color0 + color1 + color2 + color3 + color4 + color5;
-// }
-// `;
-// 
-// const compositeFragmentShaderText = `#version 300 es
-// 
-// uniform sampler2D uRow0Texture;
-// uniform sampler2D uRow1Texture;
-// uniform sampler2D uRow2Texture;
-// uniform sampler2D uRow3Texture;
-// uniform sampler2D uRow4Texture;
-// uniform sampler2D uRow5Texture;
-// 
-// vec2 vUv;
-// 
-// out vec4 outColor;
-// 
-// uniform vec2 uTiling;
-// 
-// ${areaFuncText}
-// 
-// void main() {
-//     vec2 tiling = vec2(6., 6.);
-//     vec4 color0 = calcTextureAreaColor(uRow0Texture, vUv, tiling, vec2(0., -5.));
-//     vec4 color1 = calcTextureAreaColor(uRow1Texture, vUv, tiling, vec2(0., -4.));
-//     vec4 color2 = calcTextureAreaColor(uRow2Texture, vUv, tiling, vec2(0., -3.));
-//     vec4 color3 = calcTextureAreaColor(uRow3Texture, vUv, tiling, vec2(0., -2.));
-//     vec4 color4 = calcTextureAreaColor(uRow4Texture, vUv, tiling, vec2(0., -1.));
-//     vec4 color5 = calcTextureAreaColor(uRow5Texture, vUv, tiling, vec2(0., 0.));
-//     outColor = color0 + color1 + color2 + color3 + color4 + color5;
-// }
-// `;
 
 type RowPass = {
     pass: FragmentPass;
     tiles: Map<string, { label: string; type?: 'Texture' | 'Other' }>;
 };
 
-// type TileInfo = { name: string; type?: 'Texture' | 'Other'; label?: string };
-
 export class BufferVisualizerPass implements IPostProcessPass {
     dom: HTMLDivElement;
     rowPasses: RowPass[] = [];
     compositePass: FragmentPass;
-
-    // gpu: GPU;
     name: string = 'BufferVisualizerPass';
     enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 
     materials: Material[] = [];
+    
+    private geometry: PlaneGeometry;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
 
     constructor({ gpu }: { gpu: GPU }) {
-        // const fragmentShader = bufferVisualizerPassFragmentShader;
+        // NOTE: geometryは親から渡して使いまわしてもよい
+        this.geometry = new PlaneGeometry({ gpu });
 
         // row 0
         this.rowPasses.push({
@@ -186,22 +64,22 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         value: Matrix4.identity,
                     },
                     {
-                        name: 'uTiling',
-                        type: UniformTypes.Vector2,
-                        value: new Vector2(COL_NUM, ROW_NUM),
-                    },
+                        name: "uDepthTexture",
+                        type: UniformTypes.Texture,
+                        value: null,
+                    }
                 ],
             }),
             tiles: new Map([
                 [
-                    'depth',
+                    'uDepthTexture',
                     {
                         label: 'depth',
                         type: 'Other',
                     },
                 ],
                 [
-                    'worldPosition',
+                    'uWorldPosition',
                     {
                         label: 'worldPosition',
                         type: 'Other',
@@ -343,191 +221,47 @@ export class BufferVisualizerPass implements IPostProcessPass {
             gpu,
             name: 'BufferVisualizerPass',
             fragmentShader: bufferVisualizerCompositePassFragmentShader,
-            // rawVertexShader,
-            // rawFragmentShader,
-            // uniforms,
+            uniforms: [
+                ...(this.rowPasses.map((_, i) => {
+                    return [
+                        {
+                            name: `uRow${i}Texture`,
+                            type: UniformTypes.Texture,
+                            value: null,
+                        }
+                    ]
+                }).flat()),
+                ...PostProcessPassBase.commonUniforms]
         });
 
         // initialize materials
         this.rowPasses.forEach(({ pass }) => this.materials.push(pass.material));
         this.materials.push(this.compositePass.material);
 
-        // const tiles: TileInfo[] = [
-        //     // row: 1
-        //     {
-        //         name: UniformNames.GBufferATexture,
-        //     },
-        //     {
-        //         name: UniformNames.GBufferBTexture,
-        //     },
-        //     {
-        //         name: UniformNames.GBufferCTexture,
-        //     },
-        //     {
-        //         name: UniformNames.GBufferDTexture,
-        //     },
-        //     {
-        //         name: UniformNames.DepthTexture,
-        //     },
-        //     {
-        //         name: 'uWorldPosition',
-        //         type: 'Other',
-        //     },
-        //     // row: 2
-        //     {
-        //         name: 'uDirectionalLightShadowMap',
-        //     },
-
-        //     {
-        //         name: 'uAmbientOcclusionTexture',
-        //     },
-        //     // row: 3
-        //     {
-        //         name: 'uDeferredShadingTexture',
-        //     },
-        //     {
-        //         name: 'uLightShaftTexture',
-        //     },
-        //     {
-        //         name: 'uVolumetricLightTexture',
-        //     },
-        //     {
-        //         name: 'uFogTexture',
-        //     },
-        //     {
-        //         name: 'uDepthOfFieldTexture',
-        //     },
-        //     {
-        //         name: 'uBloomTexture',
-        //     },
-        // ];
-
-        // const uniforms: UniformsData = [
-        //     {
-        //         name: 'uNearClip',
-        //         type: UniformTypes.Float,
-        //         value: 0.1,
-        //     },
-        //     {
-        //         name: 'uFarClip',
-        //         type: UniformTypes.Float,
-        //         value: 1,
-        //     },
-        //     {
-        //         name: 'uInverseViewProjectionMatrix',
-        //         type: UniformTypes.Matrix4,
-        //         value: Matrix4.identity,
-        //     },
-        //     {
-        //         name: 'uTiling',
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(COL_NUM, ROW_NUM),
-        //     },
-        // ];
-
-        this.rowPasses.forEach(({ pass, tiles }, rowIndex) => {
+        // this.rowPasses.forEach(({ pass, tiles }, rowIndex) => {
+        this.rowPasses.forEach(({ pass, tiles }) => {
             let colIndex = 0;
-            tiles.forEach((tile) => {
+            // pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
+            pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, 1));
+            for(const [uniformName, tile] of tiles) {
                 const colOffset = -colIndex;
-                const rowOffset = -ROW_NUM + 1 + rowIndex;
-                pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
+                // const rowOffset = -ROW_NUM + 1 + rowIndex;
                 pass.material.uniforms.addValue(
-                    `${tile.label}UvOffset`,
+                    `${uniformName}UvOffset`,
                     UniformTypes.Vector2,
-                    new Vector2(colOffset, rowOffset)
+                    // new Vector2(colOffset, rowOffset)
+                    new Vector2(colOffset, 0)
                 );
+                colIndex++;
                 if (tile.type === 'Other') {
-                    return;
+                    continue;
                 }
                 pass.material.uniforms.addValue(tile.label, UniformTypes.Texture, gpu.dummyTextureBlack);
-                colIndex++;
-            });
+            }
         });
-
-        // tiles.forEach((tile, i) => {
-        //     const col = i % COL_NUM;
-        //     const row = Math.floor(i / COL_NUM);
-        //     const colOffset = -col;
-        //     const rowOffset = -ROW_NUM + 1 + row;
-        //     uniforms.push({
-        //         name: `${tile.name}UvOffset`,
-        //         type: UniformTypes.Vector2,
-        //         value: new Vector2(colOffset, rowOffset),
-        //     });
-        //     // console.log("hogehoge", `${tile.name}UvOffset`, colOffset, rowOffset)
-        //     if (tile.type === 'Other') {
-        //         return;
-        //     }
-        //     uniforms.push({
-        //         name: tile.name,
-        //         type: UniformTypes.Texture,
-        //         // value: null
-        //         value: gpu.dummyTextureBlack,
-        //     });
-        // });
-        // // console.log('hogehoge', uniforms);
-
-        // this.rowPasses.push({
-        //     pass: new FragmentPass({
-        //         gpu,
-        //         fragmentShader: baseFragmentShaderText,
-        //     }),
-        //     tiles: [
-        //         {
-        //             name: 'depth',
-        //             type: 'Other',
-        //         },
-        //         {
-        //             name: 'worldPosition',
-        //             type: 'Other',
-        //         },
-        //     ],
-        // });
-
-        // const rowTileInfos: TileInfo[][] = [];
-        // let rowTileIndex = -1;
-        // tiles.forEach((tile, i) => {
-        //     const rowIndex = Math.floor(i / COL_NUM);
-        //     if (rowIndex == 0) {
-        //         rowTileIndex++;
-        //         rowTileInfos[rowTileIndex] = [];
-        //     }
-        //     rowTileInfos[rowTileIndex].push(tile);
-        // });
-
-        // rowTileInfos.forEach((tileInfos) => {
-        //     this.rowPasses.push({
-        //         pass: new FragmentPass({
-        //             gpu,
-        //             fragmentShader: baseFragmentShaderText,
-        //         }),
-        //         tiles: tileInfos,
-        //     });
-        // });
-
-        // this.rowPasses.forEach(({ tiles, pass }) => {
-        //     tiles.forEach((tile, j) => {
-        //         const col = j % COL_NUM;
-        //         const row = Math.floor(j / COL_NUM);
-        //         const colOffset = -col;
-        //         const rowOffset = -ROW_NUM + 1 + row;
-        //         pass.material.uniforms.push({
-        //             name: `${tile.name}UvOffset`,
-        //             type: UniformTypes.Vector2,
-        //             value: new Vector2(colOffset, rowOffset),
-        //         });
-        //         if (tile.type === 'Other') {
-        //             return;
-        //         }
-        //         pass.material.uniforms.push({
-        //             name: tile.name,
-        //             type: UniformTypes.Texture,
-        //             // value: null
-        //             value: gpu.dummyTextureBlack,
-        //         });
-        //     });
-        // });
-
+        
+        this.compositePass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
+        
         const styleHeader = document.createElement('style');
         styleHeader.textContent = `
 .buffer-visualizer-pass {
@@ -561,8 +295,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
         const frag = document.createDocumentFragment();
         this.rowPasses.forEach(({ tiles }, rowIndex) => {
             let colIndex = 0;
-            tiles.forEach((_, label) => {
-                const newLabel = `${label || ''}, ${colIndex}, ${rowIndex}`;
+            for(const [, tile] of tiles) {
+                const newLabel = `${tile.label || ''}, ${colIndex}, ${rowIndex}`;
                 const elem = document.createElement('div');
                 elem.classList.add('buffer-visualizer-pass-tile');
                 const p = document.createElement('p');
@@ -571,26 +305,21 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 frag.appendChild(elem);
                 this.dom.appendChild(frag);
                 colIndex++;
-            });
+            }
         });
         document.body.appendChild(this.dom);
 
-        this.dom.classList.add('hidden');
+        this.hideDom();
     }
 
-    /**
-     *
-     * @param width
-     * @param height
-     */
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
 
         this.rowPasses.forEach(({ pass }) => {
-            pass.setSize(width, height / ROW_NUM);
+            pass.setSize(this.width, this.height / ROW_NUM);
         });
-        this.compositePass.setSize(width, height);
+        this.compositePass.setSize(this.width, this.height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
@@ -599,23 +328,29 @@ export class BufferVisualizerPass implements IPostProcessPass {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
-    /**
-     *
-     */
     update() {
         if (this.enabled) {
-            this.dom.classList.remove('hidden');
+            this.showDom();
         } else {
-            this.dom.classList.add('hidden');
+            this.hideDom();
         }
     }
+    
+    showDom() {
+        this.dom.classList.remove('hidden');
+    }
+    
+    hideDom() {
+        this.dom.classList.add('hidden');
+    }
 
-    /**
-     *
-     * @param args
-     */
     render(args: PostProcessPassRenderArgs) {
-        const { renderer, lightActors } = args;
+        const { gpu, renderer, lightActors } = args;
+        
+        const tmpRealWidth = renderer.realWidth;
+        const tmpRealHeight = renderer.realHeight;
+        
+        this.geometry.start();
 
         this.rowPasses.forEach(({ pass, tiles }) => {
             if (lightActors?.directionalLight) {
@@ -630,7 +365,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 lightActors.spotLights.forEach((spotLight, i) => {
                     const uniformName = `${UniformNames.SpotLightShadowMap}${i}`;
                     if (tiles.has(uniformName)) {
-                        // const { label } = tiles.get(uniformName);
                         if (spotLight.shadowMap) {
                             pass.material.uniforms.setValue(uniformName, spotLight.shadowMap.read.depthTexture);
                         }
@@ -682,11 +416,21 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }
         });
         
+        this.rowPasses[0].pass.material.uniforms.setValue(
+            "uInverseViewProjectionMatrix",
+            args.targetCamera.inverseViewProjectionMatrix
+        );
+        // console.log(this.rowPasses[0])
+       
+        gpu.setSize(0, 0, this.width, this.height / ROW_NUM);
+        
         this.rowPasses.forEach(({ pass }, i) => {
             pass.render({ ...args, isLastPass: false });
             this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
         });
+
+        gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
         
-        this.compositePass.render(args);
+        this.compositePass.render({...args, isLastPass: true});
     }
 }
