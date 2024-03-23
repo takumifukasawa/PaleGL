@@ -44,6 +44,23 @@ export class BloomPass implements IPostProcessPass {
     private renderTargetBlurMip64_Horizontal: RenderTarget;
     private renderTargetBlurMip64_Vertical: RenderTarget;
 
+    get renderTargetBlurMip4() {
+        return this.renderTargetBlurMip4_Vertical;
+    }
+    get renderTargetBlurMip8() {
+        return this.renderTargetBlurMip8_Vertical;
+    }
+    get renderTargetBlurMip16() {
+        return this.renderTargetBlurMip16_Vertical;
+    }
+    get renderTargetBlurMip32() {
+        return this.renderTargetBlurMip32_Vertical;
+    }
+    get renderTargetBlurMip64() {
+        return this.renderTargetBlurMip64_Vertical;
+    }
+
+
     // tmp
     // private horizontalBlurPass: FragmentPass;
     // private verticalBlurPass: FragmentPass;

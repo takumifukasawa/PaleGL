@@ -2,6 +2,9 @@
 
 precision mediump float;
 
+#include ./partial/common.glsl
+
+uniform vec2 uTiling;
 uniform sampler2D uRow0Texture;
 uniform sampler2D uRow1Texture;
 uniform sampler2D uRow2Texture;
@@ -12,20 +15,6 @@ uniform sampler2D uRow5Texture;
 in vec2 vUv;
 
 out vec4 outColor;
-
-uniform vec2 uTiling;
-
-float isArea(vec2 uv) {
-    return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
-}
-
-vec4 calcAreaColor(vec4 color, vec2 uv, vec2 tiling, vec2 offset) {
-    return color * isArea(uv * tiling + offset);
-}
-
-vec4 calcTextureAreaColor(sampler2D tex, vec2 uv, vec2 tiling, vec2 offset) {
-    return calcAreaColor(texture(tex, uv * tiling + offset), uv, tiling, offset);
-}
 
 void main() {
     vec2 tiling = vec2(1., 6.);

@@ -30,6 +30,11 @@ const LIGHT_SHAFT_TEXTURE_KEY = 'lightShaftTexture';
 const VOLUMETRIC_LIGHT_TEXTURE_KEY = 'volumetricLightTexture';
 const FOG_TEXTURE_KEY = 'fogTexture';
 const DEPTH_OF_FIELD_TEXTURE_KEY = 'depthOfFieldTexture';
+const BLOOM_BLUR_MIP4_TEXTURE_KEY = 'bloomBlurMip4Texture';
+const BLOOM_BLUR_MIP8_TEXTURE_KEY = 'bloomBlurMip8Texture';
+const BLOOM_BLUR_MIP16_TEXTURE_KEY = 'bloomBlurMip16Texture';
+const BLOOM_BLUR_MIP32_TEXTURE_KEY = 'bloomBlurMip32Texture';
+const BLOOM_BLUR_MIP64_TEXTURE_KEY = 'bloomBlurMip64Texture';
 const BLOOM_TEXTURE_KEY = 'bloomTexture';
 
 type RowPass = {
@@ -220,7 +225,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false
+                srcTextureEnabled: false,
             }),
             tiles: new Map([
                 [
@@ -243,6 +248,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     {
                         // uniformName: 'uFogTexture',
                         type: 'Texture',
+                        label: 'combine fog',
                     },
                 ],
                 [
@@ -250,13 +256,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     {
                         // uniformName: 'uDepthOfFieldTexture',
                         type: 'Texture',
-                    },
-                ],
-                [
-                    BLOOM_TEXTURE_KEY,
-                    {
-                        // uniformName: 'uBloomTexture',
-                        type: 'Texture',
+                        label: 'dof',
                     },
                 ],
             ]),
@@ -266,20 +266,64 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false
+                srcTextureEnabled: false,
             }),
-            tiles: new Map([])
+            tiles: new Map([
+                [
+                    BLOOM_BLUR_MIP4_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'bloom blur mip4',
+                    },
+                ],
+                [
+                    BLOOM_BLUR_MIP8_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'bloom blur mip8',
+                    },
+                ],
+                [
+                    BLOOM_BLUR_MIP16_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'bloom blur mip16',
+                    },
+                ],
+                [
+                    BLOOM_BLUR_MIP32_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'bloom blur mip32',
+                    },
+                ],
+                [
+                    BLOOM_BLUR_MIP64_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'bloom blur mip64',
+                    },
+                ],
+                [
+                    BLOOM_TEXTURE_KEY,
+                    {
+                        // uniformName: 'uBloomTexture',
+                        type: 'Texture',
+                        label: 'bloom',
+                    },
+                ],
+            ]),
         });
         // row 5
         this.rowPasses.push({
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false
+                srcTextureEnabled: false,
             }),
-            tiles: new Map([])
+            tiles: new Map([]),
         });
-        
+
         this.compositePass = new FragmentPass({
             gpu,
             name: 'BufferVisualizerPass',
@@ -570,6 +614,41 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 );
             }
 
+            if (tiles.has(BLOOM_BLUR_MIP4_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(BLOOM_BLUR_MIP4_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.bloomPass.renderTargetBlurMip4.read.texture
+                );
+            }
+
+            if (tiles.has(BLOOM_BLUR_MIP8_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(BLOOM_BLUR_MIP8_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.bloomPass.renderTargetBlurMip8.read.texture
+                );
+            }
+
+            if (tiles.has(BLOOM_BLUR_MIP16_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(BLOOM_BLUR_MIP16_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.bloomPass.renderTargetBlurMip16.read.texture
+                );
+            }
+
+            if (tiles.has(BLOOM_BLUR_MIP32_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(BLOOM_BLUR_MIP32_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.bloomPass.renderTargetBlurMip32.read.texture
+                );
+            }
+
+            if (tiles.has(BLOOM_BLUR_MIP64_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(BLOOM_BLUR_MIP64_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.bloomPass.renderTargetBlurMip64.read.texture
+                );
+            }
+
             if (tiles.has(BLOOM_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     // 'uBloomTexture',
@@ -587,7 +666,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         gpu.setSize(0, 0, this.width, this.height / ROW_NUM);
 
         this.rowPasses.forEach(({ pass, tiles }, i) => {
-            if(tiles.size > 0) {
+            if (tiles.size > 0) {
                 pass.render({ ...args, isLastPass: false });
                 this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
             }
