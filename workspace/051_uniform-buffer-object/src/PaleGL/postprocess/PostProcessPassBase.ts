@@ -95,6 +95,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         magFilter = TextureFilterTypes.Linear,
         wrapT = TextureWrapTypes.ClampToEdge,
         wrapS = TextureWrapTypes.ClampToEdge,
+        srcTextureEnabled = true,
     }: {
         gpu: GPU;
         vertexShader?: string;
@@ -112,6 +113,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         wrapS?: TextureWrapType;
         wrapT?: TextureWrapType;
         renderTargetType?: RenderTargetType;
+        srcTextureEnabled?: boolean;
     }) {
         // super({name});
         this.name = name;
@@ -131,11 +133,15 @@ export class PostProcessPassBase implements IPostProcessPass {
             uniforms: [
                 ...uniforms,
                 ...PostProcessPassBase.commonUniforms,
-                {
-                    name: UniformNames.SrcTexture,
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
+                ...(srcTextureEnabled
+                    ? [
+                          {
+                              name: UniformNames.SrcTexture,
+                              type: UniformTypes.Texture,
+                              value: null,
+                          },
+                      ]
+                    : []),
             ],
             uniformBlockNames,
             useEnvMap: !!useEnvMap,
@@ -162,7 +168,7 @@ export class PostProcessPassBase implements IPostProcessPass {
             minFilter,
             magFilter,
             wrapS,
-            wrapT
+            wrapT,
         });
     }
 
@@ -267,7 +273,7 @@ export class PostProcessPassBase implements IPostProcessPass {
             renderer.setRenderTarget(this._renderTarget, true);
         }
     }
-    
+
     update() {}
 
     /**

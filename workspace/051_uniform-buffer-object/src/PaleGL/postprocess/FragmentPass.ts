@@ -11,6 +11,7 @@ export class FragmentPass extends PostProcessPassBase {
         uniformBlockNames = [],
         name,
         renderTargetType,
+        srcTextureEnabled,
     }: {
         gpu: GPU;
         fragmentShader: string;
@@ -18,6 +19,7 @@ export class FragmentPass extends PostProcessPassBase {
         uniformBlockNames?: UniformBlockName[];
         name?: string;
         renderTargetType?: RenderTargetType;
+        srcTextureEnabled?: boolean;
     }) {
         super({
             gpu,
@@ -26,6 +28,7 @@ export class FragmentPass extends PostProcessPassBase {
             uniformBlockNames,
             name,
             renderTargetType,
+            srcTextureEnabled
         });
     }
 }

@@ -1,4 +1,4 @@
-﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { UniformTypes } from '@/PaleGL/constants';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -101,7 +101,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     DEPTH_TEXTURE_KEY,
                     {
                         label: 'depth',
-                        uniformPrefix: UniformNames.DepthTexture,
                         type: 'Texture',
                     },
                 ],
@@ -221,9 +220,11 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false
             }),
             tiles: new Map([
                 [
+                    // DIRECTIONAL_LIGHT_SHADOW_MAP_KEY,
                     LIGHT_SHAFT_TEXTURE_KEY,
                     {
                         // uniformName: 'uLightShaftTexture'
@@ -260,7 +261,25 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 ],
             ]),
         });
-
+        // row 4
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false
+            }),
+            tiles: new Map([])
+        });
+        // row 5
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false
+            }),
+            tiles: new Map([])
+        });
+        
         this.compositePass = new FragmentPass({
             gpu,
             name: 'BufferVisualizerPass',
@@ -306,10 +325,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 }
                 tiles.get(key)!.uniformNameUvOffset = uniformNameUvOffset;
 
-                console.log(pass, tiles.get(key));
-
                 if (i === 0) {
-                    // pass.material.uniforms.addValue(`${uniformName}`, UniformTypes.Texture, gpu.dummyTextureBlack);
                     pass.material.uniforms.addValue(
                         uniformNameUvOffset,
                         UniformTypes.Vector2,
@@ -323,25 +339,13 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         );
                     }
                 } else {
-                    // tile.overrideUniformName = `uTexture${colIndex}`;
-                    // pass.material.uniforms.addValue(
-                    //     `${tile.overrideUniformName}`,
-                    //     UniformTypes.Texture,
-                    //     gpu.dummyTextureBlack
-                    // );
-                    // tile.overrideUniformName = `uTexture${colIndex}`;
                     pass.material.uniforms.addValue(
                         uniformNameUvOffset,
-                        // `${tile.overrideUniformName}UvOffset`,
                         UniformTypes.Vector2,
                         new Vector2(colOffset, 0)
                     );
-                    pass.material.uniforms.addValue(
-                        uniformNameTexture,
-                        // tile.overrideUniformName,
-                        UniformTypes.Texture,
-                        gpu.dummyTextureBlack
-                    );
+                    // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
+                    pass.material.uniforms.addValue(uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
                 }
 
                 colIndex++;
@@ -392,7 +396,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             const rowContent = document.createElement('div');
             rowContent.classList.add('buffer-visualizer-pass-row');
             for (const [key, tile] of tiles) {
-                const newLabel = `${tile.label || key}, ${colIndex}, ${rowIndex}`;
+                const newLabel = `[${colIndex}, ${rowIndex}] ${tile.label || key}`;
                 const elem = document.createElement('div');
                 elem.classList.add('buffer-visualizer-pass-tile');
                 const p = document.createElement('p');
@@ -481,6 +485,38 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 );
             }
 
+            if (tiles.has(GBUFFER_A_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    // 'uGBufferATexture',
+                    tiles.get(GBUFFER_A_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.gBufferRenderTargets.gBufferATexture
+                );
+            }
+
+            if (tiles.has(GBUFFER_B_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    // 'uGBufferBTexture',
+                    tiles.get(GBUFFER_B_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.gBufferRenderTargets.gBufferBTexture
+                );
+            }
+
+            if (tiles.has(GBUFFER_C_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    // 'uGBufferCTexture',
+                    tiles.get(GBUFFER_C_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.gBufferRenderTargets.gBufferCTexture
+                );
+            }
+
+            if (tiles.has(GBUFFER_D_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    // 'uGBufferDTexture',
+                    tiles.get(GBUFFER_D_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.gBufferRenderTargets.gBufferDTexture
+                );
+            }
+
             if (tiles.has(AMBIENT_OCCLUSION_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     // 'uAmbientOcclusionTexture',
@@ -498,6 +534,11 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }
 
             if (tiles.has(LIGHT_SHAFT_TEXTURE_KEY)) {
+                // console.log(
+                //     tiles.has(LIGHT_SHAFT_TEXTURE_KEY),
+                //     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
+                //     renderer.lightShaftPass.renderTarget.read.texture
+                // )
                 pass.material.uniforms.setValue(
                     // 'uLightShaftTexture',
                     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
@@ -545,15 +586,18 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
         gpu.setSize(0, 0, this.width, this.height / ROW_NUM);
 
-        this.rowPasses.forEach(({ pass }, i) => {
-            pass.render({ ...args, isLastPass: false });
-            this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
+        this.rowPasses.forEach(({ pass, tiles }, i) => {
+            if(tiles.size > 0) {
+                pass.render({ ...args, isLastPass: false });
+                this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
+            }
         });
 
         gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
 
         this.compositePass.render({ ...args });
 
+        // for debug
         // console.log(this.rowPasses)
     }
 }

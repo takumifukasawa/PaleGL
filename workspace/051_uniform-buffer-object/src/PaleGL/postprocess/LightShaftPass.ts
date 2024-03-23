@@ -52,7 +52,6 @@ export class LightShaftPass implements IPostProcessPass {
     #radialBlurRayStepStrengthUniformName: string = 'uRadialBlurRayStepStrength';
 
     get renderTarget() {
-        // TODO: composite pass の方にちゃんと書き換えましょう
         // return this.lightShaftDownSamplePass.renderTarget;
         return this.compositePass.renderTarget;
     }
