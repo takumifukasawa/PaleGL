@@ -27,7 +27,7 @@ void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv) * uTone;
     vec4 extractColor = texture(uExtractTexture, vUv) * uTone;
 
-    vec4 blurColor = (blur4Color + blur8Color + blur16Color + blur32Color + blur64Color) * uBloomAmount;
+    vec4 blurColor = ((blur4Color + blur8Color + blur16Color + blur32Color + blur64Color) * .2) * uBloomAmount;
 
     outColor = sceneColor + blurColor;
 

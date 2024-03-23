@@ -26,6 +26,7 @@ const DIRECTIONAL_LIGHT_SHADOW_MAP_KEY = 'directionalLightShadowMap';
 const SPOT_LIGHT_SHADOW_MAP_KEY = 'spotLightShadowMap';
 const AMBIENT_OCCLUSION_TEXTURE_KEY = 'ambientOcclusionTexture';
 const DEFERRED_SHADING_TEXTURE_KEY = 'deferredShadingTexture';
+const SSR_TEXTURE_KEY = 'ssrTexture';
 const LIGHT_SHAFT_TEXTURE_KEY = 'lightShaftTexture';
 const VOLUMETRIC_LIGHT_TEXTURE_KEY = 'volumetricLightTexture';
 const FOG_TEXTURE_KEY = 'fogTexture';
@@ -116,15 +117,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         uniformPrefix: 'uWorldPosition',
                     },
                 ],
-            ]),
-        });
-        // row 1
-        this.rowPasses.push({
-            pass: new FragmentPass({
-                gpu,
-                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-            }),
-            tiles: new Map([
                 [
                     GBUFFER_A_TEXTURE_KEY,
                     {
@@ -153,13 +145,22 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         type: 'Texture',
                     },
                 ],
-                [
-                    DEPTH_TEXTURE_KEY,
-                    {
-                        // uniformName: UniformNames.DepthTexture
-                        type: 'Texture',
-                    },
-                ],
+            ]),
+        });
+        // row 1
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+            }),
+            tiles: new Map([
+                // [
+                //     DEPTH_TEXTURE_KEY,
+                //     {
+                //         // uniformName: UniformNames.DepthTexture
+                //         type: 'Texture',
+                //     },
+                // ],
                 [
                     DIRECTIONAL_LIGHT_SHADOW_MAP_KEY,
                     {
@@ -167,15 +168,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         type: 'Texture',
                     },
                 ],
-            ]),
-        });
-        // row 2
-        this.rowPasses.push({
-            pass: new FragmentPass({
-                gpu,
-                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-            }),
-            tiles: new Map([
+
                 [
                     `${SPOT_LIGHT_SHADOW_MAP_KEY}0`,
                     {
@@ -204,6 +197,15 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         type: 'Texture',
                     },
                 ],
+            ]),
+        });
+        // row 2
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+            }),
+            tiles: new Map([
                 [
                     AMBIENT_OCCLUSION_TEXTURE_KEY,
                     {
@@ -218,16 +220,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         type: 'Texture',
                     },
                 ],
-            ]),
-        });
-        // row 3
-        this.rowPasses.push({
-            pass: new FragmentPass({
-                gpu,
-                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false,
-            }),
-            tiles: new Map([
+                [SSR_TEXTURE_KEY, { type: 'Texture', label: 'combine ssr' }],
                 [
                     // DIRECTIONAL_LIGHT_SHADOW_MAP_KEY,
                     LIGHT_SHAFT_TEXTURE_KEY,
@@ -243,6 +236,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         type: 'Texture',
                     },
                 ],
+
                 [
                     FOG_TEXTURE_KEY,
                     {
@@ -251,6 +245,16 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         label: 'combine fog',
                     },
                 ],
+            ]),
+        });
+        // row 3
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false,
+            }),
+            tiles: new Map([
                 [
                     DEPTH_OF_FIELD_TEXTURE_KEY,
                     {
@@ -574,6 +578,14 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     // 'uDeferredShadingTexture',
                     tiles.get(DEFERRED_SHADING_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.deferredShadingPass.renderTarget.read.texture
+                );
+            }
+
+            if (tiles.has(SSR_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    // 'uSsrTexture',
+                    tiles.get(SSR_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.ssrPass.renderTarget.read.texture
                 );
             }
 
