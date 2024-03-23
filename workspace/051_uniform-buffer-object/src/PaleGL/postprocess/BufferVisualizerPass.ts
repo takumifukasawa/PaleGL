@@ -1,5 +1,5 @@
 ﻿import { UniformNames, UniformTypes } from '@/PaleGL/constants';
-import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postprocess/PostProcessPassBase';
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -11,14 +11,15 @@ import { Material } from '@/PaleGL/materials/Material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
-import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 const COL_NUM = 6;
 const ROW_NUM = 6;
 
 type RowPass = {
     pass: FragmentPass;
-    tiles: Map<string, { label: string; type?: 'Texture' | 'Other' }>;
+    tiles: Map<string, { label: string; type?: 'Texture' | 'Other'; overrideUniformName?: string }>;
 };
 
 export class BufferVisualizerPass implements IPostProcessPass {
@@ -31,7 +32,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
     height: number = 1;
 
     materials: Material[] = [];
-    
+
     private geometry: PlaneGeometry;
 
     get renderTarget() {
@@ -64,10 +65,10 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         value: Matrix4.identity,
                     },
                     {
-                        name: "uDepthTexture",
+                        name: 'uDepthTexture',
                         type: UniformTypes.Texture,
                         value: null,
-                    }
+                    },
                 ],
             }),
             tiles: new Map([
@@ -222,16 +223,20 @@ export class BufferVisualizerPass implements IPostProcessPass {
             name: 'BufferVisualizerPass',
             fragmentShader: bufferVisualizerCompositePassFragmentShader,
             uniforms: [
-                ...(this.rowPasses.map((_, i) => {
-                    return [
-                        {
-                            name: `uRow${i}Texture`,
-                            type: UniformTypes.Texture,
-                            value: null,
-                        }
-                    ]
-                }).flat()),
-                ...PostProcessPassBase.commonUniforms]
+                ...maton
+                    .range(ROW_NUM)
+                    .map((_, i) => {
+                        return [
+                            {
+                                name: `uRow${i}Texture`,
+                                type: UniformTypes.Texture,
+                                value: gpu.dummyTextureBlack,
+                            },
+                        ];
+                    })
+                    .flat(),
+                ...PostProcessPassBase.commonUniforms,
+            ],
         });
 
         // initialize materials
@@ -239,29 +244,54 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.materials.push(this.compositePass.material);
 
         // this.rowPasses.forEach(({ pass, tiles }, rowIndex) => {
-        this.rowPasses.forEach(({ pass, tiles }) => {
+        this.rowPasses.forEach(({ pass, tiles }, i) => {
             let colIndex = 0;
             // pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
             pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, 1));
-            for(const [uniformName, tile] of tiles) {
+            for (const [uniformName, tile] of tiles) {
                 const colOffset = -colIndex;
-                // const rowOffset = -ROW_NUM + 1 + rowIndex;
-                pass.material.uniforms.addValue(
-                    `${uniformName}UvOffset`,
-                    UniformTypes.Vector2,
-                    // new Vector2(colOffset, rowOffset)
-                    new Vector2(colOffset, 0)
-                );
-                colIndex++;
-                if (tile.type === 'Other') {
-                    continue;
+                if (i === 0) {
+                    // pass.material.uniforms.addValue(`${uniformName}`, UniformTypes.Texture, gpu.dummyTextureBlack);
+                    pass.material.uniforms.addValue(
+                        `${uniformName}UvOffset`,
+                        UniformTypes.Vector2,
+                        new Vector2(colOffset, 0)
+                    );
+                    colIndex++;
+                    if (tile.type === 'Other') {
+                        continue;
+                    }
+                    pass.material.uniforms.addValue(
+                        uniformName,
+                        UniformTypes.Texture,
+                        gpu.dummyTextureBlack
+                    );
+                } else {
+                    // tile.overrideUniformName = `uTexture${colIndex}`;
+                    // pass.material.uniforms.addValue(
+                    //     `${tile.overrideUniformName}`,
+                    //     UniformTypes.Texture,
+                    //     gpu.dummyTextureBlack
+                    // );
+                    tile.overrideUniformName = `uTexture${colIndex}`;
+                    pass.material.uniforms.addValue(
+                        `${tile.overrideUniformName}UvOffset`,
+                        UniformTypes.Vector2,
+                        new Vector2(colOffset, 0)
+                    );
+                    pass.material.uniforms.addValue(
+                        tile.overrideUniformName,
+                        UniformTypes.Texture,
+                        gpu.dummyTextureBlack
+                    );
+                    colIndex++;
                 }
-                pass.material.uniforms.addValue(tile.label, UniformTypes.Texture, gpu.dummyTextureBlack);
             }
         });
-        
-        this.compositePass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
-        
+        console.log(this.rowPasses);
+
+        this.compositePass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(1, ROW_NUM));
+
         const styleHeader = document.createElement('style');
         styleHeader.textContent = `
 .buffer-visualizer-pass {
@@ -272,7 +302,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
     height: 100%;
     pointer-events: none;
     display: grid;
-    grid-template-columns: repeat(${COL_NUM}, 1fr);
     grid-template-rows: repeat(${ROW_NUM}, 1fr);
 }
 .buffer-visualizer-pass.hidden {
@@ -287,6 +316,12 @@ export class BufferVisualizerPass implements IPostProcessPass {
     font-weight: bold;
     padding: 9px;
 }
+
+.buffer-visualizer-pass-row {
+    // display: flex;
+    display: grid;
+    grid-template-columns: repeat(${COL_NUM}, 1fr);
+}
         `;
         document.head.appendChild(styleHeader);
 
@@ -295,18 +330,21 @@ export class BufferVisualizerPass implements IPostProcessPass {
         const frag = document.createDocumentFragment();
         this.rowPasses.forEach(({ tiles }, rowIndex) => {
             let colIndex = 0;
-            for(const [, tile] of tiles) {
+            const rowContent = document.createElement('div');
+            rowContent.classList.add('buffer-visualizer-pass-row');
+            for (const [, tile] of tiles) {
                 const newLabel = `${tile.label || ''}, ${colIndex}, ${rowIndex}`;
                 const elem = document.createElement('div');
                 elem.classList.add('buffer-visualizer-pass-tile');
                 const p = document.createElement('p');
                 p.textContent = newLabel;
                 elem.appendChild(p);
-                frag.appendChild(elem);
-                this.dom.appendChild(frag);
+                rowContent.appendChild(elem);
                 colIndex++;
             }
+            frag.appendChild(rowContent);
         });
+        this.dom.appendChild(frag);
         document.body.appendChild(this.dom);
 
         this.hideDom();
@@ -335,28 +373,29 @@ export class BufferVisualizerPass implements IPostProcessPass {
             this.hideDom();
         }
     }
-    
+
     showDom() {
         this.dom.classList.remove('hidden');
     }
-    
+
     hideDom() {
         this.dom.classList.add('hidden');
     }
 
     render(args: PostProcessPassRenderArgs) {
         const { gpu, renderer, lightActors } = args;
-        
+
         const tmpRealWidth = renderer.realWidth;
         const tmpRealHeight = renderer.realHeight;
-        
+
         this.geometry.start();
 
         this.rowPasses.forEach(({ pass, tiles }) => {
             if (lightActors?.directionalLight) {
                 if (tiles.has(UniformNames.DirectionalLightShadowMap)) {
                     pass.material.uniforms.setValue(
-                        'uDirectionalLightShadowMap',
+                        tiles.get(UniformNames.DirectionalLightShadowMap)!.overrideUniformName!,
+                        // 'uDirectionalLightShadowMap',
                         lightActors.directionalLight.shadowMap!.read.depthTexture
                     );
                 }
@@ -366,7 +405,10 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     const uniformName = `${UniformNames.SpotLightShadowMap}${i}`;
                     if (tiles.has(uniformName)) {
                         if (spotLight.shadowMap) {
-                            pass.material.uniforms.setValue(uniformName, spotLight.shadowMap.read.depthTexture);
+                            pass.material.uniforms.setValue(
+                                tiles.get(uniformName)!.overrideUniformName!,
+                                spotLight.shadowMap.read.depthTexture
+                            );
                         }
                     }
                 });
@@ -374,63 +416,75 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has('uAmbientOcclusionTexture')) {
                 pass.material.uniforms.setValue(
-                    'uAmbientOcclusionTexture',
+                    // 'uAmbientOcclusionTexture',
+                    tiles.get('uAmbientOcclusionTexture')!.overrideUniformName!,
                     renderer.ambientOcclusionPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has('uDeferredShadingTexture')) {
                 pass.material.uniforms.setValue(
-                    'uDeferredShadingTexture',
+                    // 'uDeferredShadingTexture',
+                    tiles.get('uDeferredShadingTexture')!.overrideUniformName!,
                     renderer.deferredShadingPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has('uLightShaftTexture')) {
                 pass.material.uniforms.setValue(
-                    'uLightShaftTexture',
+                    // 'uLightShaftTexture',
+                    tiles.get('uLightShaftTexture')!.overrideUniformName!,
                     renderer.lightShaftPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has('uVolumetricLightTexture')) {
                 pass.material.uniforms.setValue(
-                    'uVolumetricLightTexture',
+                    // 'uVolumetricLightTexture',
+                    tiles.get('uVolumetricLightTexture')!.overrideUniformName!,
                     renderer.volumetricLightPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has('uDepthOfFieldTexture')) {
                 pass.material.uniforms.setValue(
-                    'uDepthOfFieldTexture',
+                    // 'uDepthOfFieldTexture',
+                    tiles.get('uDepthOfFieldTexture')!.overrideUniformName!,
                     renderer.depthOfFieldPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has('uFogTexture')) {
-                pass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
+                pass.material.uniforms.setValue(
+                    // 'uFogTexture',
+                    tiles.get('uFogTexture')!.overrideUniformName!,
+                    renderer.fogPass.renderTarget.read.texture
+                );
             }
 
             if (tiles.has('uBloomTexture')) {
-                pass.material.uniforms.setValue('uBloomTexture', renderer.bloomPass.renderTarget.read.texture);
+                pass.material.uniforms.setValue(
+                    // 'uBloomTexture',
+                    tiles.get('uBloomTexture')!.overrideUniformName!,
+                    renderer.bloomPass.renderTarget.read.texture
+                );
             }
         });
-        
+
         this.rowPasses[0].pass.material.uniforms.setValue(
-            "uInverseViewProjectionMatrix",
+            'uInverseViewProjectionMatrix',
             args.targetCamera.inverseViewProjectionMatrix
         );
-        // console.log(this.rowPasses[0])
-       
+
         gpu.setSize(0, 0, this.width, this.height / ROW_NUM);
-        
+
         this.rowPasses.forEach(({ pass }, i) => {
             pass.render({ ...args, isLastPass: false });
             this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
         });
 
         gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
-        
-        this.compositePass.render({...args, isLastPass: true});
+
+        this.compositePass.render({ ...args });
     }
 }
