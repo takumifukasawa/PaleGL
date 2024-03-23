@@ -67,7 +67,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     {
                         name: 'uDepthTexture',
                         type: UniformTypes.Texture,
-                        value: null,
+                        value: gpu.dummyTextureBlack,
                     },
                 ],
             }),
@@ -76,7 +76,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     'uDepthTexture',
                     {
                         label: 'depth',
-                        type: 'Other',
+                        // type: 'Other',
                     },
                 ],
                 [
@@ -120,7 +120,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     },
                 ],
                 [
-                    UniformNames.DepthTexture,
+                    'uDepthTexture',
+                    // UniformNames.DepthTexture,
                     {
                         label: 'depthTexture',
                     },
@@ -261,11 +262,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     if (tile.type === 'Other') {
                         continue;
                     }
-                    pass.material.uniforms.addValue(
-                        uniformName,
-                        UniformTypes.Texture,
-                        gpu.dummyTextureBlack
-                    );
+                    pass.material.uniforms.addValue(uniformName, UniformTypes.Texture, gpu.dummyTextureBlack);
                 } else {
                     // tile.overrideUniformName = `uTexture${colIndex}`;
                     // pass.material.uniforms.addValue(
@@ -390,7 +387,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
         this.geometry.start();
 
-        this.rowPasses.forEach(({ pass, tiles }) => {
+        this.rowPasses.forEach(({ pass, tiles }, i) => {
             if (lightActors?.directionalLight) {
                 if (tiles.has(UniformNames.DirectionalLightShadowMap)) {
                     pass.material.uniforms.setValue(
@@ -412,6 +409,16 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         }
                     }
                 });
+            }
+
+            if (tiles.has('uDepthTexture')) {
+                console.log(i, pass, i === 0 ? 'uDepthTexture' : tiles.get('uDepthTexture')!.overrideUniformName!, renderer.depthPrePassRenderTarget.depthTexture)
+                pass.material.uniforms.setValue(
+                    // 'uAmbientOcclusionTexture',
+                    i === 0 ? 'uDepthTexture' : tiles.get('uDepthTexture')!.overrideUniformName!,
+                    // renderer.depthPrePassRenderTarget.read.texture
+                    renderer.depthPrePassRenderTarget.depthTexture
+                );
             }
 
             if (tiles.has('uAmbientOcclusionTexture')) {
