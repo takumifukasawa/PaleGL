@@ -66,7 +66,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
     private geometry: PlaneGeometry;
 
-    fullViewTextureEnabled: boolean = true;
+    fullViewTextureEnabled: boolean = false;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
@@ -702,8 +702,11 @@ export class BufferVisualizerPass implements IPostProcessPass {
             'uFullViewTexture',
             // this.compositePass.renderTarget.read.texture
             renderer.gBufferRenderTargets.gBufferBTexture
+            // renderer.ssrPass.renderTarget.read.texture
         );
         this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', this.fullViewTextureEnabled ? 1 : 0);
+        // for debug
+        // this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', 1);
 
         gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
 

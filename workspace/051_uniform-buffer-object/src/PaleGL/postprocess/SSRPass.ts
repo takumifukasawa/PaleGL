@@ -46,6 +46,8 @@ export class SSRPass extends PostProcessPassBase {
     reflectionScreenEdgeFadeFactorMinY = 0.444;
     reflectionScreenEdgeFadeFactorMaxY = 1;
 
+    reflectionRoughnessPower = 0.5;
+
     reflectionAdditionalRate = 0.355;
 
     blendRate: number = 1;
@@ -59,7 +61,17 @@ export class SSRPass extends PostProcessPassBase {
 
         const baseUniforms: UniformsData = [
             {
+                name: UniformNames.GBufferATexture,
+                type: UniformTypes.Texture,
+                value: null,
+            },
+            {
                 name: UniformNames.GBufferBTexture,
+                type: UniformTypes.Texture,
+                value: null,
+            },
+            {
+                name: UniformNames.GBufferCTexture,
                 type: UniformTypes.Texture,
                 value: null,
             },
@@ -134,6 +146,11 @@ export class SSRPass extends PostProcessPassBase {
                 value: 0,
             },
             {
+                name: 'uReflectionRoughnessPower',
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
                 name: 'uBlendRate',
                 type: UniformTypes.Float,
                 value: 1,
@@ -180,6 +197,7 @@ export class SSRPass extends PostProcessPassBase {
         this.material.uniforms.setValue('uReflectionScreenEdgeFadeFactorMaxY', this.reflectionScreenEdgeFadeFactorMaxY);
 
         this.material.uniforms.setValue('uReflectionAdditionalRate', this.reflectionAdditionalRate);
+        this.material.uniforms.setValue('uReflectionRoughnessPower', this.reflectionRoughnessPower);
         this.material.uniforms.setValue('uBlendRate', this.blendRate);
 
         super.render(options);

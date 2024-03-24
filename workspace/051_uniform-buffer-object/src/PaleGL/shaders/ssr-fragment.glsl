@@ -8,23 +8,19 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/common.glsl
+
 #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
-// uniform mat4 uProjectionMatrix;
-// uniform float uNearClip;
-// uniform float uFarClip;
 
-// uniform float uTime;
+#include ./partial/gbuffer-functions.glsl
 
 uniform sampler2D uSrcTexture;
-// uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
-// uniform sampler2D uNormalTexture;
+uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
-// uniform mat4 uTransposeInverseViewMatrix;
-// uniform mat4 uInverseProjectionMatrix;
-// uniform mat4 uInverseViewProjectionMatrix;
+uniform sampler2D uGBufferCTexture;
 uniform float uBlendRate;
 
 uniform float uRayDepthBias;
@@ -43,16 +39,12 @@ uniform float uReflectionScreenEdgeFadeFactorMaxX;
 uniform float uReflectionScreenEdgeFadeFactorMinY;
 uniform float uReflectionScreenEdgeFadeFactorMaxY;
 
+uniform float uReflectionRoughnessPower;
+
 uniform float uReflectionAdditionalRate;
 
 // #pragma DEPTH_FUNCTIONS
 #include ./partial/depth-functions.glsl
-
-// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
-float noise(vec2 seed)
-{
-    return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
-}
 
 void main() {
     float eps = .001;
@@ -63,24 +55,33 @@ void main() {
     //
 
     vec2 uv = vUv;
+   
+    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
+    GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
 
-    vec3 worldNormal = normalize(texture(uGBufferBTexture, uv).xyz * 2. - 1.);
+    vec3 worldNormal = gBufferB.normal;
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
-    // TODO: PBRな場合はroughnessを考慮
-
     vec4 baseColor = texture(uSrcTexture, uv);
-    vec4 cachedBaseColor = baseColor;
+    vec4 reflectionColor = vec4(0., 0., 0., 1.);
 
     vec3 viewPosition = reconstructViewPositionFromDepth(
         vUv,
         texture(uDepthTexture, uv).r,
         uInverseProjectionMatrix
     );
+   
+    // TODO: noiseを計算せずにテクスチャで渡すなりした方がいいはず
+    vec3 randomDir = normalize(vec3(
+        noise(uv + .1),
+        noise(uv + .2),
+        noise(uv + .3)
+    ) * 2. - 1.);
 
     vec3 incidentViewDir = normalize(viewPosition);
     vec3 reflectViewDir = reflect(incidentViewDir, viewNormal);
-    vec3 rayViewDir = reflectViewDir;
+    vec3 rayViewDir = reflectViewDir + randomDir * gBufferC.roughness * uReflectionRoughnessPower;
 
     vec3 rayViewOrigin = viewPosition;
 
@@ -175,15 +176,23 @@ void main() {
         fadeFactor = distanceFadeRate * screenEdgeFadeFactorX * screenEdgeFadeFactorY;
     
         // pattern1: add reflection
-        baseColor += texture(uSrcTexture, rayUV) * fadeFactor * uReflectionAdditionalRate;
+        vec4 surfaceCoefficient = vec4(
+            mix(
+                vec3(.04),
+                gBufferA.baseColor * gBufferC.metallic,
+                gBufferC.metallic
+            ),
+            1.
+        );
+        reflectionColor += texture(uSrcTexture, rayUV) * surfaceCoefficient * fadeFactor * uReflectionAdditionalRate;
         
         // pattern2: [wip] blend reflection
         // baseColor += texture(uSrcTexture, rayUV);
     }
 
-    vec4 color = mix(cachedBaseColor, baseColor, uBlendRate);
+    vec4 color = mix(baseColor, baseColor + reflectionColor, uBlendRate);
     outColor = color;
     
     // for debug
-    // outColor = cachedBaseColor;
+    // outColor = reflectionColor;
 }

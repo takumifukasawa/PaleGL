@@ -13,19 +13,15 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
-// uniform float uNearClip;
-// uniform float uFarClip;
-// uniform vec3 uViewPosition;
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
 uniform float uBlendRate;
 uniform sampler2D uDepthTexture;
-// uniform mat4 uInverseViewProjectionMatrix;
-// uniform mat4 uInverseProjectionMatrix;
 uniform vec4 uFogColor;
 uniform float uFogStrength;
 uniform float uFogDensity;
@@ -34,9 +30,7 @@ uniform float uFogEndHeight;
 uniform float uDistanceFogStart;
 uniform float uDistanceFogPower;
 
-#pragma DEPTH_FUNCTIONS
-
-#define saturate(x) min(1., max(0., x))
+#include ./partial/depth-functions.glsl
 
 // 1に近いほどfogが強い
 float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float densityY0, float densityAttenuation) {

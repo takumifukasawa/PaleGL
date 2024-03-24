@@ -65,7 +65,7 @@ GBufferA DecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {
 GBufferB DecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
     vec4 color = texture(gBufferBTexture, uv);
     GBufferB gBufferB;
-    gBufferB.normal = color.rgb * 2. - 1.;
+    gBufferB.normal = normalize(color.rgb * 2. - 1.);
     gBufferB.shadingModelId = color.a * SHADING_MODEL_NUM;
     return gBufferB;
 }

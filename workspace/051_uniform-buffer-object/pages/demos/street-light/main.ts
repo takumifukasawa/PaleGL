@@ -317,7 +317,7 @@ orbitCameraController.azimuthSpeed = 100;
 orbitCameraController.altitudeSpeed = 100;
 orbitCameraController.deltaAzimuthPower = 2;
 orbitCameraController.deltaAltitudePower = 2;
-orbitCameraController.maxAltitude = 10;
+orbitCameraController.maxAltitude = 5;
 orbitCameraController.minAltitude = -45;
 orbitCameraController.maxAzimuth = 55;
 orbitCameraController.minAzimuth = -55;
@@ -1549,7 +1549,7 @@ const main = async () => {
     // particle mesh
     //
 
-    const particleNum = 50;
+    const particleNum = 32;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -1560,9 +1560,9 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const x = Math.random() * 16 - 10;
+                            const x = Math.random() * 4 - 4;
                             const y = Math.random() * 0.5;
-                            const z = Math.random() * 16 - 8;
+                            const z = Math.random() * 3 + 1.2;
                             return [x, y, z, x, y, z, x, y, z, x, y, z];
                         })
                         .flat()
@@ -1600,7 +1600,7 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const s = Math.random() * 5.25 + 0.75;
+                            const s = Math.random() * 6.25 + 1.75;
                             return [s, s, s, s];
                         })
                         .flat()
@@ -1718,7 +1718,7 @@ void main() {
     
     vec4 fadeColor = texture(
         uParticleMap,
-        vUv + vec2(mod(uTime * .12 + float(vParticleId) * .1, 1.), 0.)
+        vUv + vec2(mod(uTime * .06 + float(vParticleId) * .1, 1.), 0.)
     );
     alpha *= fadeColor.x * 2.;
     
@@ -2438,6 +2438,17 @@ function initDebugger() {
             renderer.ssrPass.reflectionRayJitterSizeY = value;
         },
     });
+    
+    ssrDebuggerGroup.addSliderDebugger({
+        label: 'roughness power',
+        minValue: 0,
+        maxValue: 5,
+        stepValue: 0.01,
+        initialValue: renderer.ssrPass.reflectionRoughnessPower,
+        onChange: (value) => {
+            renderer.ssrPass.reflectionRoughnessPower = value;
+        },
+    })
 
     ssrDebuggerGroup.addSliderDebugger({
         label: 'fade min distance',

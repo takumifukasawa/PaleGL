@@ -345,7 +345,8 @@ void RE_DirectSkyboxFakeIBL(
     // specular
     //
 
-    // float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
+    // 鏡面反射: roughnes を考慮
+    // TODO: metallicも考慮すべき？
     float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
     vec3 envSpecularColor = textureLod(
         cubeMap,
@@ -361,7 +362,6 @@ void RE_DirectSkyboxFakeIBL(
     // result
     //
       
-    // 鏡面反射: metalness,roughnes を考慮
     reflectedLight.directSpecular += mix(
         envSpecularColor * skyboxLight.specularIntensity * material.specularColor,
         envSpecularColor * skyboxLight.specularIntensity,
