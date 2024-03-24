@@ -69,11 +69,9 @@ float calcDirectionalLightShadowAttenuation(
     vec4 shadowColor,
     float shadowBlendRate
 ) {
-
-
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, .01, .05); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    bias = clamp(bias, .1, .5); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
     
     vec4 lightPos = shadowMapProjectionMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy;
@@ -126,7 +124,7 @@ float calcSpotLightShadowAttenuation(
 ) {
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, .001, .02); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    bias = clamp(bias, .1, .2); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
 
     vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w;
@@ -149,7 +147,7 @@ float calcSpotLightShadowAttenuation(
     // vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
     // float readDepth = textureProj(shadowMap, uvc).r;
     for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[i] / 800.;
+        vec2 offset = poissonDisk[i] / 100.;
         float readDepth = texture(shadowMap, uv + offset).r;
         if(readDepth < depthFromWorldPos - bias) {
             visibility -= .25;
@@ -229,33 +227,6 @@ uniform Skybox uSkybox;
 #include ./partial/gbuffer-functions.glsl
         
 layout (location = 0) out vec4 outColor;
-
-// void spotLightTerm(SpotLight spotLight) {
-//     spotLight.position = uSpotLight[UNROLL_i].position;
-//     spotLight.direction = uSpotLight[UNROLL_i].direction;
-//     spotLight.color = uSpotLight[UNROLL_i].color;
-//     spotLight.distance = uSpotLight[UNROLL_i].distance;
-//     spotLight.attenuation = uSpotLight[UNROLL_i].attenuation;
-//     spotLight.coneCos = uSpotLight[UNROLL_i].coneCos;
-//     spotLight.penumbraCos = uSpotLight[UNROLL_i].penumbraCos;
-//     spotLight.intensity = uSpotLight[UNROLL_i].intensity;
-//     spotLight.shadowMapProjectionMatrix = uSpotLight[UNROLL_i].shadowMapProjectionMatrix;
-// 
-//     getSpotLightIrradiance(spotLight, geometry, directLight);
-// 
-//     shadow = calcSpotLightShadowAttenuation(
-//     worldPosition,
-//     surface.worldNormal,
-//     spotLight.direction,
-//     spotLight.shadowMapProjectionMatrix,
-//     uSpotLightShadowMap[UNROLL_i], // constantな必要がある
-//     uShadowBias,
-//     vec4(0., 0., 0., 1.),
-//     .5
-//     );
-// 
-//     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-// }
 
 void main() {
     float eps = .0001;
@@ -363,33 +334,13 @@ void main() {
     // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
     // TODO: shadow map の枚数
     // #ifdef USE_RECEIVE_SHADOW
-    // vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
-    // vec4 shadowMapProjectionUv = uSpotLight[0].LightV * vec4(worldPosition, 1.);
-    // if(dot(surface.worldNormal, uDirectionalLight.direction) > 0.) {
-    // resultColor = calcDirectionalLightShadowAttenuation(
-    //     resultColor,
-    //     worldPosition,
-    //     surface.worldNormal,
-    //     uDirectionalLight.direction,
-    //     uDirectionalLight.shadowMapProjectionMatrix,
-    //     uDirectionalLightShadowMap,
-    //     uShadowBias,
-    //     vec4(0., 0., 0., 1.),
-    //     0.5
-    // );
-
-    //
-    // directional light
-    //
 
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     directionalLight.intensity = uDirectionalLight.intensity;
     getDirectionalLightIrradiance(directionalLight, geometry, directLight);
-
     shadow = calcDirectionalLightShadowAttenuation(
-        // resultColor,
         worldPosition,
         surface.worldNormal,
         uDirectionalLight.direction,
@@ -399,58 +350,11 @@ void main() {
         vec4(0., 0., 0., 1.),
         0.5
     );
-
     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
 
     //
     // spot light
     //
-
-/*    
-    
-    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-    // TODO: blend rate は light か何かに持たせたい
-    // TODO: ループ数分書くのは面倒なので[unroll]で展開したい. もしくは愚直に列挙
-    shadow = calcSpotLightShadowAttenuation(
-        worldPosition,
-        surface.worldNormal,
-        uSpotLight[0].direction,
-        uSpotLight[0].shadowMapProjectionMatrix,
-        uSpotLightShadowMap[0],
-        uShadowBias,
-        vec4(0., 0., 0., 1.),
-        0.5
-    );
-    // }
-
-// #endif
-
-    // TODO: ponit light なくていいかも
-    // point light
-    // PointLight pointLight;
-    // pointLight.position = uDirectionalLight.direction * 5.;
-    // pointLight.color = uDirectionalLight.color;
-    // pointLight.distance = 100.;
-    // pointLight.attenuation = 1.;
-    // getPointLightIrradiance(pointLight, geometry, directLight);
-    // RE_Direct(directLight, geometry, material, reflectedLight);
-    
-    // spot light
-    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-    for(int i = 0; i < 1; i++) { // TODO: fallbackしてるだけ. 存在しないライトを計算しないようにするため
-        SpotLight spotLight;
-        spotLight.position = uSpotLight[i].position;
-        spotLight.direction = uSpotLight[i].direction;
-        spotLight.color = uSpotLight[i].color;
-        spotLight.distance = uSpotLight[i].distance;
-        spotLight.attenuation = uSpotLight[i].attenuation;
-        spotLight.coneCos = uSpotLight[i].coneCos;
-        spotLight.penumbraCos = uSpotLight[i].penumbraCos;
-        spotLight.intensity = uSpotLight[i].intensity;
-        getSpotLightIrradiance(spotLight, geometry, directLight);
-        RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-    }
-    */
 
     SpotLight spotLight;
     
@@ -500,13 +404,9 @@ resultColor = vec4(outgoingLight, opacity);
     // outColor.xyz = directLight.color.xyz;
     // outColor.xyz = directLight.direction.xyz;
     // outColor.xyz = reflectedLight.directDiffuse.xyz;
-    // return;
-    // debug end
-
-  
-    // for debug
     // outColor = resultColor;
     // return;
+    
 
     // TODO: aoを考慮したライティング計算
     resultColor.xyz *= aoRate;
@@ -523,6 +423,7 @@ resultColor = vec4(outgoingLight, opacity);
     // outColor = vec4(outgoingLight, 1.);
     // outColor = vec4(worldNormal, 1.);
     // outColor = vec4(depth, 1., 1., 1.);
+    // outColor = vec4(vec3(shadow), 1.);
 
     // // TODO: use encode func
     // // surface

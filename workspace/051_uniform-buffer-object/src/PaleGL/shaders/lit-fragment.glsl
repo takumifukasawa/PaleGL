@@ -90,8 +90,8 @@ void main() {
     worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
 #else
     worldNormal = normalize(vNormal);
-#endif  
-    
+#endif
+
 #ifdef USE_VERTEX_COLOR
     diffuseColor *= vVertexColor;
 #endif

@@ -299,7 +299,7 @@ void RE_Direct(
     // punctual light
     irradiance *= PI;
     irradiance *= directLight.intensity;
-    irradiance *= 1. - shadow;
+    // irradiance *= 1. - shadow;
 
     // diffuse
     reflectedLight.directDiffuse +=
@@ -345,6 +345,7 @@ void RE_DirectSkyboxFakeIBL(
     // specular
     //
 
+    // float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
     float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
     vec3 envSpecularColor = textureLod(
         cubeMap,
@@ -366,4 +367,8 @@ void RE_DirectSkyboxFakeIBL(
         envSpecularColor * skyboxLight.specularIntensity,
         fresnel
     );
+    
+    // for debug
+    // reflectedLight.directSpecular.xyz = envSpecularColor;
+    // reflectedLight.directSpecular.xyz = vec3(fresnel);
 }

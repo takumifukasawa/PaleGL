@@ -66,6 +66,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
     private geometry: PlaneGeometry;
 
+    fullViewTextureEnabled: boolean = true;
+
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
@@ -710,6 +712,4 @@ export class BufferVisualizerPass implements IPostProcessPass {
         // for debug
         // console.log(this.rowPasses)
     }
-
-    fullViewTextureEnabled: boolean = true;
 }

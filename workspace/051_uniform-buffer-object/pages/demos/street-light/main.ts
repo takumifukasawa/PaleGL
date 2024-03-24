@@ -317,7 +317,7 @@ orbitCameraController.azimuthSpeed = 100;
 orbitCameraController.altitudeSpeed = 100;
 orbitCameraController.deltaAzimuthPower = 2;
 orbitCameraController.deltaAltitudePower = 2;
-orbitCameraController.maxAltitude = -2;
+orbitCameraController.maxAltitude = 10;
 orbitCameraController.minAltitude = -45;
 orbitCameraController.maxAzimuth = 55;
 orbitCameraController.minAzimuth = -55;
@@ -1207,8 +1207,8 @@ layout (std140) uniform ubCommon {
  *
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
-    // const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
-    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'butterfly-forward-thin.gltf' });
+    // const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'butterfly-forward-thin.gltf' });
+    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'butterfly-forward-thin-2.gltf' });
 
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
@@ -1252,9 +1252,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // instanceInfo.position.push(p);
         instanceInfo.position.push([0, 0, 0]);
 
-        // const baseScale = 0.04;
-        // const randomScaleRange = 0.08;
-        const baseScale = 2;
+        const baseScale = 0.2;
         const randomScaleRange = 0.6;
         const s = Math.random() * randomScaleRange + baseScale;
         // instanceInfo.scale.push([s, s * 2, s]);
@@ -1491,15 +1489,17 @@ const main = async () => {
         new UnlitMaterial({
             emissiveColor: new Color(4, 4, 4, 1),
             // receiveShadow: true,
-        })
+        }),
+        // new GBufferMaterial({
+        // })
     );
     attractSphereMesh.subscribeOnStart(({ actor }) => {
         actor.transform.setScaling(Vector3.fill(0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
     attractSphereMesh.onFixedUpdate = () => {
-        const w = 10;
-        const d = 10;
+        const w = 5;
+        const d = 2;
         const ix = inputController.normalizedInputPosition.x * 2 - 1;
         const iy = inputController.normalizedInputPosition.y * 2 - 1;
         const x = ix * w;
@@ -1813,6 +1813,9 @@ void main() {
         window.addEventListener('resize', onWindowResize);
 
         renderer.fogPass.fogColor = Color.black;
+        renderer.fogPass.fogDensity = 0.023;
+        renderer.fogPass.fogDensityAttenuation = 0.065;
+        renderer.fogPass.distanceFogStart = 18;
         renderer.fogPass.distanceFogPower = 0.29;
         
         renderer.depthOfFieldPass.focusDistance = 17.78;

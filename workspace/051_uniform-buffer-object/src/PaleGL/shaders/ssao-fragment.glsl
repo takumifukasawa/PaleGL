@@ -9,20 +9,10 @@ in vec2 vUv;
 out vec4 outColor;
 
 #include ./partial/uniform-block-transformations.glsl
-// uniform mat4 uProjectionMatrix;
-
 #include ./partial/uniform-block-camera.glsl
-// uniform float uNearClip;
-// uniform float uFarClip;
 
-// uniform sampler2D uSrcTexture;
-// uniform sampler2D uBaseColorTexture;
 uniform sampler2D uDepthTexture;
-// uniform sampler2D uNormalTexture;
 uniform sampler2D uGBufferBTexture;
-// uniform mat4 uTransposeInverseViewMatrix;
-// uniform mat4 uInverseViewProjectionMatrix;
-// uniform mat4 uInverseProjectionMatrix;
 uniform float[6] uSamplingRotations;
 uniform float[6] uSamplingDistances;
 uniform mat4 uSamplingTableMatrix;
@@ -36,17 +26,11 @@ uniform float uOcclusionPower;
 uniform float uOcclusionStrength;
 uniform float uBlendRate;
 
-// #pragma DEPTH_FUNCTIONS
 #include ./partial/depth-functions.glsl
-
 
 mat2 getRotationMatrix(float rad) {
     float c = cos(rad);
     float s = sin(rad);
-    // [
-    //    c, s,
-    //   -s, c
-    // ]
     return mat2(
         c, -s,
         s, c
@@ -193,7 +177,8 @@ void main() {
 
     // for debug
     // color = vec4(vec3(aoRate), 1.);
-    // // outColor = vec4(vec3(sceneDepth), 1.);
+    // outColor = vec4(vec3(sceneDepth), 1.);
     // outColor = vec4(worldNormal, 1.);
     // outColor = vec4(viewPosition, 1.);
+    // outColor = baseColor;
 }
