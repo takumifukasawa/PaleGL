@@ -111,7 +111,20 @@ void main() {
     // TODO: fog->occlusionの方が正しい？
     vec4 applyOcclusionColor = sceneColor * (1. - occlusion);
     outColor = vec4(mix(applyOcclusionColor.xyz, fogColor.xyz, fogRate), 1.);
-    outColor += vec4(volumetricLightColor.xyz, 0.); // TODO: 単純に足す、で良い？
+    
+    // volumetric fog
+    // TODO: 加算ではなく混ぜる方が正しいはず(手前にvolumetric, 奥にemissiveがある場合、volumetricの方が強いはず)
+    // patter1: add
+    outColor += vec4(volumetricLightColor.xyz, 0.); 
+    // pattern2: mix
+    // outColor = vec4(mix(
+    //     outColor.xyz,
+    //     // vec3(1.),
+    //     volumetricLightColor.xyz,
+    //     // length(volumetricLightColor.xyz)
+    //     volumetricLightColor.xyz
+    // ), 1.);
+    
     
     // for debug
     // outColor = sceneColor;

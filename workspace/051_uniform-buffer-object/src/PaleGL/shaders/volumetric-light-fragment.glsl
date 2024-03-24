@@ -200,7 +200,7 @@ void main() {
     #pragma UNROLL_END
    
     // transmittance = saturate(transmittance);
-    // TODO: rgba255でclampしちゃって大丈夫？光の漏れは考慮しない？
+    // TODO: rgba255でclampしちゃって大丈夫？光の強さは考慮しない？
     accColor = saturate(accColor);
     
     // accColor.rgb = vec3(

@@ -1252,8 +1252,8 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // instanceInfo.position.push(p);
         instanceInfo.position.push([0, 0, 0]);
 
-        const baseScale = 0.2;
-        const randomScaleRange = 0.6;
+        const baseScale = 0.25;
+        const randomScaleRange = 0.25;
         const s = Math.random() * randomScaleRange + baseScale;
         // instanceInfo.scale.push([s, s * 2, s]);
         instanceInfo.scale.push([s, s, s]);
@@ -1263,9 +1263,9 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         instanceInfo.velocity.push([0, 0, 0]);
 
         const c = Color.fromRGB(
-            Math.floor(Math.random() * 200 + 30),
-            Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30)
+            Math.floor(Math.random() * 180 + 20),
+            Math.floor(Math.random() * 20 + 20),
+            Math.floor(Math.random() * 180 + 20)
         );
         instanceInfo.color.push([...c.elements]);
     });
@@ -1549,7 +1549,7 @@ const main = async () => {
     // particle mesh
     //
 
-    const particleNum = 32;
+    const particleNum = 48;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -1560,9 +1560,9 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const x = Math.random() * 4 - 4;
+                            const x = Math.random() * 6 - 4;
                             const y = Math.random() * 0.5;
-                            const z = Math.random() * 3 + 1.2;
+                            const z = Math.random() * 5.4 - 1.4;
                             return [x, y, z, x, y, z, x, y, z, x, y, z];
                         })
                         .flat()

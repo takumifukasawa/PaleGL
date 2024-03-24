@@ -12,8 +12,8 @@ export class VolumetricLightPass extends PostProcessPassBase {
     rayStep: number = 0.5;
     blendRate: number = 1;
     densityMultiplier: number = 4;
-    rayJitterSizeX: number = 0.2;
-    rayJitterSizeY: number = 0.2;
+    rayJitterSizeX: number = 0.1;
+    rayJitterSizeY: number = 0.1;
 
     #spotLights: SpotLight[] = [];
 
