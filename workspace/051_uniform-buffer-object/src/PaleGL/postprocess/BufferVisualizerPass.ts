@@ -152,7 +152,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false
+                srcTextureEnabled: false,
             }),
             tiles: new Map([
                 // [
@@ -205,7 +205,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
-                srcTextureEnabled: false
+                srcTextureEnabled: false,
             }),
             tiles: new Map([
                 [
@@ -334,7 +334,18 @@ export class BufferVisualizerPass implements IPostProcessPass {
             gpu,
             name: 'BufferVisualizerPass',
             fragmentShader: bufferVisualizerCompositePassFragmentShader,
+            srcTextureEnabled: false,
             uniforms: [
+                {
+                    name: 'uFullViewTexture',
+                    type: UniformTypes.Texture,
+                    value: gpu.dummyTextureBlack,
+                },
+                {
+                    name: 'uFullViewTextureEnabled',
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
                 ...maton
                     .range(ROW_NUM)
                     .map((_, i) => {
@@ -685,6 +696,12 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.texture);
             }
         });
+        this.compositePass.material.uniforms.setValue(
+            'uFullViewTexture',
+            // this.compositePass.renderTarget.read.texture
+            renderer.gBufferRenderTargets.gBufferBTexture
+        );
+        this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', this.fullViewTextureEnabled ? 1 : 0);
 
         gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
 
@@ -693,4 +710,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
         // for debug
         // console.log(this.rowPasses)
     }
+
+    fullViewTextureEnabled: boolean = true;
 }
