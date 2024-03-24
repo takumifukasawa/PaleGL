@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';

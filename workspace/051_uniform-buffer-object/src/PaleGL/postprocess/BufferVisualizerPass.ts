@@ -152,6 +152,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false
             }),
             tiles: new Map([
                 // [
@@ -204,6 +205,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             pass: new FragmentPass({
                 gpu,
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false
             }),
             tiles: new Map([
                 [

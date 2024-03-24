@@ -343,7 +343,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
 const directionalLight = new DirectionalLight({
     // intensity: 1.2,
-    intensity: 0,
+    intensity: 0.1,
     // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
@@ -1548,7 +1548,7 @@ const main = async () => {
     // particle mesh
     //
 
-    const particleNum = 100;
+    const particleNum = 50;
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
@@ -1599,7 +1599,7 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const s = Math.random() * 3.5 + 0.5;
+                            const s = Math.random() * 5.25 + 0.75;
                             return [s, s, s, s];
                         })
                         .flat()
@@ -1646,15 +1646,21 @@ out vec4 vVertexColor;
 out vec4 vViewPosition;
 out vec4 vClipPosition;
 
-#pragma TRANSFORM_VERTEX_UNIFORMS
+out float vParticleId;
+
 #pragma ENGINE_UNIFORMS
+#pragma TRANSFORM_VERTEX_UNIFORMS
 
 uniform vec2[4] uBillboardPositionConverters;
 
 void main() {
     int particleId = int(mod(float(gl_VertexID), 4.));
+    float fParticleId = float(particleId);
+    vParticleId = fParticleId;
+
     float t = 3.;
-    float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+    float rateOffset = mod(fParticleId, 4.) * .1;
+    float r = mod((((uTime + rateOffset) / t) + aBillboardRateOffset), 1.);
 
     vec4 localPosition = vec4(aPosition, 1.);
 
@@ -1665,7 +1671,7 @@ void main() {
     vUv = aUv; 
     vVertexColor = aColor;
     vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-
+    
     vec4 worldPosition = uWorldMatrix * localPosition;
   
     vWorldPosition = worldPosition.xyz;
@@ -1686,6 +1692,7 @@ void main() {
 
 precision highp float;
 
+in float vParticleId;
 in vec2 vUv;
 in vec4 vVertexColor;
 in vec4 vViewPosition;
@@ -1700,14 +1707,19 @@ uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 
+#pragma ENGINE_UNIFORMS
 #pragma DEPTH_FUNCTIONS
 
 void main() {
-    // int particleId = int(mod(float(gl_VertexID), 4.));
-
     vec4 texColor = texture(uParticleMap, vUv);
     vec3 baseColor = vVertexColor.xyz;
     float alpha = texColor.x * vVertexColor.a;
+    
+    vec4 fadeColor = texture(
+        uParticleMap,
+        vUv + vec2(mod(uTime * .12 + float(vParticleId) * .1, 1.), 0.)
+    );
+    alpha *= fadeColor.x * 2.;
     
     // calc soft fade
     
@@ -1721,7 +1733,7 @@ void main() {
     // outColor = vec4(vec3(currentDepth), 1.);
     
     float diffDepth = abs(sceneDepth) - abs(currentDepth);
-    float softFade = smoothstep(0., .01, diffDepth);
+    float softFade = smoothstep(0., .02, diffDepth);
     // for debug
     // outColor = vec4(vec3(softFade), 1.);
     
