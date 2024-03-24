@@ -1499,7 +1499,8 @@ const main = async () => {
     });
     attractSphereMesh.onFixedUpdate = () => {
         const w = 5;
-        const d = 2;
+        // const d = 2;
+        const d = 5;
         const ix = inputController.normalizedInputPosition.x * 2 - 1;
         const iy = inputController.normalizedInputPosition.y * 2 - 1;
         const x = ix * w;

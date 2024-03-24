@@ -4,7 +4,7 @@
     LightTypes,
     MAX_SPOT_LIGHT_COUNT,
     RenderQueueType,
-    RenderTargetTypes,
+    RenderTargetTypes, TextureDepthPrecisionType,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -275,7 +275,8 @@ export class Renderer {
             type: RenderTargetTypes.Depth,
             width: 1,
             height: 1,
-            name: 'depth prepass render target',
+            name: 'depth pre-pass render target',
+            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
         this._gBufferRenderTargets = new GBufferRenderTargets({
             gpu,
