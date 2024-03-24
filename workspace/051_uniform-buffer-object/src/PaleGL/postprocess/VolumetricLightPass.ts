@@ -128,7 +128,6 @@ export class VolumetricLightPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: 0,
                 },
-
                 {
                     name: UniformNames.GBufferATexture,
                     type: UniformTypes.Texture,

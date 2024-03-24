@@ -128,7 +128,7 @@ void main() {
 
     vec2 jitterOffset = vec2(
         jitter * uRayJitterSizeX,
-        jitter * uRayJitterSizeY
+        jitter * uRayJitterSizeY * uViewport.z
     );
 
     // outColor = vec4(vUv, 1., 1.);

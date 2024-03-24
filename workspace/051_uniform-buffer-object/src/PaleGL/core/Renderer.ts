@@ -553,6 +553,11 @@ export class Renderer {
                 type: UniformTypes.Float,
                 value: 0,
             },
+            {
+                name: UniformNames.Viewport,
+                type: UniformTypes.Vector4,
+                value: Vector4.zero,
+            },
         ];
         // TODO: 一番最初の要素としてpushするとなぜかエラーになる
         this.globalUniformBufferObjects.push({
@@ -1678,11 +1683,11 @@ export class Renderer {
         //     camera.projectionMatrix
         // );
         this.updateCameraUniforms(camera);
-        
+
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    if(!(actor as Skybox).renderMesh) {
+                    if (!(actor as Skybox).renderMesh) {
                         return;
                     }
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
@@ -1962,6 +1967,11 @@ export class Renderer {
     updateCommonUniforms({ time }: { time: number }) {
         // passMaterial.uniforms.setValue(UniformNames.Time, time);
         this.updateUniformBlockValue(UniformBlockNames.Common, UniformNames.Time, time);
+        this.updateUniformBlockValue(
+            UniformBlockNames.Common,
+            UniformNames.Viewport,
+            new Vector4(this.realWidth, this.realHeight, this.realWidth / this.realHeight, 0)
+        );
     }
 
     updateDirectionalLightUniforms(directionalLight: DirectionalLight) {

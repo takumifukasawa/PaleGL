@@ -134,14 +134,14 @@ float calcSpotLightShadowAttenuation(
     
     float shadowAreaSmooth = .25;
     float shadowAreaRect =
-    // // 1: step
-    // step(0., uv.x) * (1. - step(1., uv.x)) *
-    // step(0., uv.y) * (1. - step(1., uv.y)) *
-    // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
-    // 2: smoothstep
-    smoothstep(0., shadowAreaSmooth, uv.x) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.x)) *
-    smoothstep(0., shadowAreaSmooth, uv.y) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.y)) *
-    step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+        // // 1: step
+        // step(0., uv.x) * (1. - step(1., uv.x)) *
+        // step(0., uv.y) * (1. - step(1., uv.y)) *
+        // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+        // 2: smoothstep
+        smoothstep(0., shadowAreaSmooth, uv.x) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.x)) *
+        smoothstep(0., shadowAreaSmooth, uv.y) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.y)) *
+        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
     float visibility = 1.;
 

@@ -295,6 +295,8 @@ export const UniformNames = {
     SrcTexture: 'uSrcTexture',
     // time
     Time: 'uTime',
+    // viewport
+    Viewport: 'uViewport',
     // usualy post process
     TargetWidth: 'uTargetWidth',
     TargetHeight: 'uTargetHeight',
