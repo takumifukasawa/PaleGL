@@ -1254,7 +1254,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
         // const baseScale = 0.04;
         // const randomScaleRange = 0.08;
-        const baseScale = 0.2;
+        const baseScale = 2;
         const randomScaleRange = 0.6;
         const s = Math.random() * randomScaleRange + baseScale;
         // instanceInfo.scale.push([s, s * 2, s]);

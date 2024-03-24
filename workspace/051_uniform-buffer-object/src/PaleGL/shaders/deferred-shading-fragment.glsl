@@ -51,6 +51,14 @@ struct Skybox {
 // https://matcha-choco010.net/2020/04/10/opengl-deferred-spot-light-shadow/
 // https://www.opengl-tutorial.org/jp/intermediate-tutorials/tutorial-16-shadow-mapping/
 
+
+const vec2 poissonDisk[4] = vec2[](
+    vec2(-0.94201624, -0.39906216),
+    vec2(0.94558609, -0.76890725),
+    vec2(-0.094184101, -0.92938870),
+    vec2(0.34495938, 0.29387760)
+);
+
 float calcDirectionalLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
@@ -61,12 +69,7 @@ float calcDirectionalLightShadowAttenuation(
     vec4 shadowColor,
     float shadowBlendRate
 ) {
-    vec2 poissonDisk[4] = vec2[](
-        vec2(-0.94201624, -0.39906216),
-        vec2(0.94558609, -0.76890725),
-        vec2(-0.094184101, -0.92938870),
-        vec2(0.34495938, 0.29387760)
-    );
+
 
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
@@ -76,9 +79,15 @@ float calcDirectionalLightShadowAttenuation(
     vec2 uv = lightPos.xy;
     float depthFromWorldPos = lightPos.z;
 
+    float shadowAreaSmooth = .25;
     float shadowAreaRect =
-        step(0., uv.x) * (1. - step(1., uv.x)) *
-        step(0., uv.y) * (1. - step(1., uv.y)) *
+        // // 1: step
+        // step(0., uv.x) * (1. - step(1., uv.x)) *
+        // step(0., uv.y) * (1. - step(1., uv.y)) *
+        // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+        // 2: smoothstep
+        smoothstep(0., shadowAreaSmooth, uv.x) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.x)) *
+        smoothstep(0., shadowAreaSmooth, uv.y) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.y)) *
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
     float visibility = 1.;
@@ -115,13 +124,6 @@ float calcSpotLightShadowAttenuation(
     vec4 shadowColor,
     float shadowBlendRate
 ) {
-    vec2 poissonDisk[4] = vec2[](
-        vec2(-0.94201624, -0.39906216),
-        vec2(0.94558609, -0.76890725),
-        vec2(-0.094184101, -0.92938870),
-        vec2(0.34495938, 0.29387760)
-    );
-
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
     bias = clamp(bias, .001, .02); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
@@ -130,10 +132,16 @@ float calcSpotLightShadowAttenuation(
     vec2 uv = lightPos.xy / lightPos.w;
     float depthFromWorldPos = lightPos.z / lightPos.w;
     
+    float shadowAreaSmooth = .25;
     float shadowAreaRect =
-        step(0., uv.x) * (1. - step(1., uv.x)) *
-        step(0., uv.y) * (1. - step(1., uv.y)) *
-        step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+    // // 1: step
+    // step(0., uv.x) * (1. - step(1., uv.x)) *
+    // step(0., uv.y) * (1. - step(1., uv.y)) *
+    // step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
+    // 2: smoothstep
+    smoothstep(0., shadowAreaSmooth, uv.x) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.x)) *
+    smoothstep(0., shadowAreaSmooth, uv.y) * (1. - smoothstep(1. - shadowAreaSmooth, 1., uv.y)) *
+    step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
     float visibility = 1.;
 
