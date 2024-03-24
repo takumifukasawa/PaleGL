@@ -298,6 +298,7 @@ export class Renderer {
             width: 1,
             height: 1,
             name: 'copy depth source render target',
+            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
         this._copyDepthDestRenderTarget = new RenderTarget({
             gpu,
@@ -305,6 +306,7 @@ export class Renderer {
             width: 1,
             height: 1,
             name: 'copy depth dest render target',
+            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
 
         this._ambientOcclusionPass = new SSAOPass({ gpu });
