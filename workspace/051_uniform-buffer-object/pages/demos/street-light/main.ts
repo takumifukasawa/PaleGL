@@ -64,6 +64,8 @@ import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.j
 import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
+import { Ray } from '@/PaleGL/math/Ray.ts';
+import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 // import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
 // import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
 // import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
@@ -304,7 +306,7 @@ const engine = new Engine({ gpu, renderer });
 engine.setScene(captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 50);
+const captureSceneCamera = new PerspectiveCamera(50, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 // captureSceneCamera.mainCamera = true;
@@ -323,7 +325,7 @@ orbitCameraController.maxAzimuth = 55;
 orbitCameraController.minAzimuth = -55;
 orbitCameraController.defaultAzimuth = 10;
 orbitCameraController.defaultAltitude = -10;
-orbitCameraController.lookAtTarget = new Vector3(0, 2, 0);
+orbitCameraController.lookAtTarget = new Vector3(0, 3, 0);
 // orbitCameraController.enabled = true;
 
 captureSceneCamera.subscribeOnStart(({ actor }) => {
@@ -1487,11 +1489,9 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         new UnlitMaterial({
-            emissiveColor: new Color(4, 4, 4, 1),
+            emissiveColor: new Color(3, 3, 3, 1),
             // receiveShadow: true,
-        }),
-        // new GBufferMaterial({
-        // })
+        })
     );
     attractSphereMesh.subscribeOnStart(({ actor }) => {
         actor.transform.setScaling(Vector3.fill(0.5));
@@ -1507,7 +1507,13 @@ const main = async () => {
         const z = iy * d;
         const y = 3;
         attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
-        // console.log(inputController.normalizedInputPosition.x);
+
+        // const cameraRay = new Ray(captureSceneCamera.transform.position, captureSceneCamera.cameraForward);
+        // const floorPlane = new Plane(Vector3.zero, Vector3.up);
+        // const intersect = intersectRayWithPlane(cameraRay, floorPlane);
+        // if(intersect) {
+        //     attractSphereMesh.transform.setTranslation(intersect);
+        // }
     };
 
     //
@@ -1818,7 +1824,7 @@ void main() {
         renderer.fogPass.fogDensityAttenuation = 0.065;
         renderer.fogPass.distanceFogStart = 18;
         renderer.fogPass.distanceFogPower = 0.29;
-        
+
         renderer.depthOfFieldPass.focusDistance = 17.78;
         renderer.depthOfFieldPass.focusRange = 9.8;
         renderer.depthOfFieldPass.bokehRadius = 5.55;
@@ -2438,7 +2444,7 @@ function initDebugger() {
             renderer.ssrPass.reflectionRayJitterSizeY = value;
         },
     });
-    
+
     ssrDebuggerGroup.addSliderDebugger({
         label: 'roughness power',
         minValue: 0,
@@ -2448,7 +2454,7 @@ function initDebugger() {
         onChange: (value) => {
             renderer.ssrPass.reflectionRoughnessPower = value;
         },
-    })
+    });
 
     ssrDebuggerGroup.addSliderDebugger({
         label: 'fade min distance',

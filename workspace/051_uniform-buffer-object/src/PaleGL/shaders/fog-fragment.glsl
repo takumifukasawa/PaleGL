@@ -114,17 +114,16 @@ void main() {
     
     // volumetric fog
     // TODO: 加算ではなく混ぜる方が正しいはず(手前にvolumetric, 奥にemissiveがある場合、volumetricの方が強いはず)
+    // TODO: しかし、どう混ぜるかという問題がある。手前と奥をどう判断するか
     // patter1: add
-    outColor += vec4(volumetricLightColor.xyz, 0.); 
+    outColor += vec4(volumetricLightColor.xyz, 0.);
     // pattern2: mix
     // outColor = vec4(mix(
     //     outColor.xyz,
-    //     // vec3(1.),
     //     volumetricLightColor.xyz,
-    //     // length(volumetricLightColor.xyz)
-    //     volumetricLightColor.xyz
+    //     saturate(volumetricLightColor.a)
     // ), 1.);
-    
+
     
     // for debug
     // outColor = sceneColor;

@@ -64,6 +64,27 @@ export class Vector3 {
         this.z += s;
         return this;
     }
+    
+    addVector(v: Vector3) {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+        return this;
+    }
+    
+    sub(s: number) {
+        this.x -= s;
+        this.y -= s;
+        this.z -= s;
+        return this;
+    }
+    
+    subVector(v: Vector3) {
+        this.x -= v.x;
+        this.y -= v.y;
+        this.z -= v.z;
+        return this;
+    }
 
     negate() {
         this.x *= -1;
@@ -76,6 +97,13 @@ export class Vector3 {
         this.x *= s;
         this.y *= s;
         this.z *= s;
+        return this;
+    }
+    
+    scaleVector(v: Vector3) {
+        this.x *= v.x;
+        this.y *= v.y;
+        this.z *= v.z;
         return this;
     }
 
@@ -110,6 +138,14 @@ export class Vector3 {
         const eps = 0.0000001;
         const flag = Math.abs(this.x - v.x) < eps && Math.abs(this.y - v.y) < eps && Math.abs(this.z - v.z) < eps;
         return flag;
+    }
+    
+    dot(v: Vector3) {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+    
+    static dot(v1: Vector3, v2: Vector3) {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
     static get zero() {

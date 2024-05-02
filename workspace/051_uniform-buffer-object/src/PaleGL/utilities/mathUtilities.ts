@@ -24,32 +24,65 @@
 //
 // ------------------------------------------------------
 
-// ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+/**
+ * ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
+ * @param sigma
+ * @param x
+ */
 export function gaussCoefficient(sigma: number, x: number) {
     const sigma2 = sigma * sigma;
     return Math.exp(-(x * x) / (2 * sigma2));
 }
 
+/**
+ * 
+ * @param x
+ * @param min
+ * @param max
+ */
 export function clamp(x: number, min: number, max: number) {
     return Math.min(max, Math.max(x, min));
 }
 
+/**
+ * 
+ * @param x
+ */
 export function saturate(x: number) {
     return clamp(x, 0, 1);
 }
 
+/**
+ * 
+ * @param a
+ * @param b
+ * @param t
+ */
 export function lerp(a: number, b: number, t: number) {
     return a + (b - a) * t;
 }
 
+/**
+ * 
+ * @param a
+ * @param b
+ */
 export function randomRange(a: number, b: number) {
     return lerp(a, b, Math.random());
 }
 
+/**
+ * 
+ * @param rad
+ */
 export function rad2Deg(rad: number) {
     return rad * (180 / Math.PI);
 }
 
+/**
+ * 
+ * @param deg
+ */
 export function deg2Rad(deg: number) {
     return deg * (Math.PI / 180);
 }

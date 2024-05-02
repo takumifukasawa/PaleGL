@@ -53,6 +53,7 @@ out vec4 outColor;
 #include ./partial/uniform-block-camera.glsl
 #include ./partial/uniform-block-spot-light.glsl
 
+uniform sampler2D uSrcTexture;
 uniform sampler2D uDepthTexture; // camera depth
 uniform sampler2D uGBufferATexture;
 // uniform mat4 uTransposeInverseViewMatrix;
@@ -74,13 +75,17 @@ uniform float uRayJitterSizeY;
 
 #include ./partial/gbuffer-functions.glsl
 
+// voidでもいいが手動unrollの関係でバグるのでfloatで返す
 float calcTransmittance(
     SpotLight spotLight,
     sampler2D spotLightShadowMap,
+    out float rayStep,
+    out float fogColor,
+    out float fogRate,
     vec3 rayOrigin,
     vec3 rayDir,
-    out float rayStep,
-    out float transmittance
+    vec4 rayPosInView,
+    float viewZFromDepth
 ) {
     vec3 rayPos = rayOrigin + rayDir * rayStep;
     vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPos, 1.);
@@ -100,20 +105,32 @@ float calcTransmittance(
     float lightDistance = length(rayToLight);
     float angleCos = dot(normalize(LtoP), spotLight.direction);
 
-    if(all(
-        bvec4(
-            angleCos > spotLight.coneCos,
-            testLightInRange(lightDistance, spotLight.distance),
-            shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
-            shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
-        )
-    )) {
-        float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-        float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-        // transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
-        transmittance += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-        // transmittance += exp(-density); // TODO: 指数減衰使いたい
+    float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
+    float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+    
+    if(abs(rayPosInView.z) < viewZFromDepth) {
+        if(all(
+            bvec4(
+                angleCos > spotLight.coneCos,
+                testLightInRange(lightDistance, spotLight.distance),
+                shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
+                shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
+            )
+        )) {
+            // transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
+            // transmittance += (1. / 32.) * attenuation * spotEffect * isShadowArea; // cheap decay
+            // transmittance += exp(-density); // TODO: 指数減衰使いたい
+            // transmittance += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+            
+            fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+            // fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
+        }
+    // } else {
+    //     fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
     }
+    // fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
+    // fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+    fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea;
 
     rayStep += uRayStep;
     
@@ -161,7 +178,8 @@ void main() {
     // vec3[MAX_SPOT_LIGHT_COUNT] rayPosArray;
     float[MAX_SPOT_LIGHT_COUNT] rayStepArray;
     // vec4[MAX_SPOT_LIGHT_COUNT] accColorArray;
-    float[MAX_SPOT_LIGHT_COUNT] transmittanceArray;
+    float[MAX_SPOT_LIGHT_COUNT] fogColorArray;
+    float[MAX_SPOT_LIGHT_COUNT] fogRateArray;
 
     vec3 rayPosInWorld;
     vec4 rayPosInView;
@@ -172,43 +190,53 @@ void main() {
         for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
             rayPosInWorld = rayOrigin + rayDir * rayStepArray[UNROLL_j];
             rayPosInView = uViewMatrix * vec4(rayPosInWorld, 1.);
-            if(abs(rayPosInView.z) < viewZFromDepth) {
-                calcTransmittance(
-                    uSpotLight[UNROLL_j],
-                    uSpotLightShadowMap[UNROLL_j],
-                    rayOrigin,
-                    rayDir,
-                    rayStepArray[UNROLL_j],
-                    transmittanceArray[UNROLL_j]
-                );
-            }
+            // if(abs(rayPosInView.z) < viewZFromDepth) {
+            calcTransmittance(
+                uSpotLight[UNROLL_j],
+                uSpotLightShadowMap[UNROLL_j],
+                rayStepArray[UNROLL_j],
+                fogColorArray[UNROLL_j],
+                fogRateArray[UNROLL_j],
+                rayOrigin,
+                rayDir,
+                rayPosInView,
+                viewZFromDepth
+            );
+            // }
         }
         #pragma UNROLL_END
     }
-
+    
+    vec4 fogColor = vec4(0.);
+    float fogRate = 0.;
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     // for(int i = 0; i < 2; i++) {
         // TODO: intensityそのままかけるのよくない気がする
-        // transmittanceArray[UNROLL_i] = saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity);
-        accColor.xyz +=
-            saturate(transmittanceArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
-            transmittanceArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
-            // saturate(transmittanceArray[UNROLL_i] * uSpotLightIntensity[UNROLL_i]) *
-            // transmittanceArray[UNROLL_i] * saturate(uSpotLightColor[UNROLL_i].xyz);
+        // // accColor.xyz +=
+        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
+        //     // fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
+        // accColor +=
+        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
+        //     fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate *
+        //     fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color);
+       
+        float currentFogRate = fogRateArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate;
+        fogRate += currentFogRate;
+
+        vec4 currentFogColor = currentFogRate * uSpotLight[UNROLL_i].color;
+        fogColor += currentFogColor;
     }
     #pragma UNROLL_END
-   
-    // transmittance = saturate(transmittance);
-    // TODO: rgba255でclampしちゃって大丈夫？光の強さは考慮しない？
-    accColor = saturate(accColor);
-    
-    // accColor.rgb = vec3(
-    //     uSpotLight[0].shadowMapProjectionMatrix[0][3],
-    //     uSpotLight[0].shadowMapProjectionMatrix[1][3],
-    //     uSpotLight[0].shadowMapProjectionMatrix[2][3]
-    // );
-   
-    // outColor = vec4(vec3(transmittance), 1.);
+
+    // accColor.a = saturate(fogRate); // TODO: saturateするべき？
+    // accColor.a = saturate(fogRate); // TODO: saturateするべき？
+    accColor.a = fogRate; // TODO: saturateするべき？
+    // accColor.xyz = saturate(vec3(fogRate)); // for debug
+    accColor.rgb = fogColor.xyz;
+
     outColor = accColor;
+    
+    // for debug
+    // outColor = texture(uSrcTexture, vUv);
 }
