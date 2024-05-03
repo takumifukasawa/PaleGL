@@ -7,7 +7,8 @@ import {
     AttributeNames,
     AttributeUsageType,
     BlendTypes,
-    CameraType, CameraTypes,
+    CameraType,
+    CameraTypes,
     PrimitiveTypes,
     UniformNames,
 } from '@/PaleGL/constants';
@@ -23,6 +24,8 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { GPU } from '@/PaleGL/core/GPU';
 // import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
+import { Ray } from '@/PaleGL/math/Ray.ts';
+import {Vector2} from "@/PaleGL/math/Vector2.ts";
 // import { Transform } from '@/PaleGL/core/Transform.ts';
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
@@ -61,6 +64,7 @@ export class Camera extends Actor {
     visibleFrustum: boolean = false;
     #visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
+
     // mainCamera: boolean = false;
 
     get cameraForward() {
@@ -258,7 +262,7 @@ export class Camera extends Actor {
         this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
         this.inverseViewProjectionMatrix = this.viewProjectionMatrix.clone().invert();
     }
-    
+
     isPerspective() {
         return this.cameraType === CameraTypes.Perspective;
     }
@@ -268,7 +272,11 @@ export class Camera extends Actor {
      * @param transform
      */
     transformScreenPoint(p: Vector3) {
-        const matInProjection = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix, Matrix4.translationMatrix(p));
+        const matInProjection = Matrix4.multiplyMatrices(
+            this.projectionMatrix,
+            this.viewMatrix,
+            Matrix4.translationMatrix(p)
+        );
         const clipPosition = matInProjection.position;
         const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
         return new Vector3(clipPosition.x / w, clipPosition.y / w, clipPosition.z / w);
@@ -304,7 +312,7 @@ export class Camera extends Actor {
     }
 
     /**
-     * 
+     *
      */
     getWorldForward() {
         // forwardはカメラの背面を向いている
@@ -313,13 +321,43 @@ export class Camera extends Actor {
     }
 
     /**
-     *
-     * @param renderer
-     * @param scene
-     * @param useShadowPass
-     * @param clearScene
+     * 
+     * @param viewportPoint
      */
-    // render(renderer: Renderer) {
-    //     renderer.render();
+    viewpointToRay(viewportPoint: Vector2) {
+        const clipPos = new Vector4(
+            viewportPoint.x * 2 - 1,
+            viewportPoint.y * 2 - 1,
+            1,
+            1
+        );
+        const worldPos = clipPos.multiplyMatrix4(this.inverseViewProjectionMatrix);
+        worldPos.x = worldPos.x / worldPos.w;
+        worldPos.y = worldPos.y / worldPos.w;
+        worldPos.z = worldPos.z / worldPos.w;
+        const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
+        const rayOrigin = this.transform.worldPosition;
+        const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
+        return new Ray(rayOrigin, rayDirection);
+    }
+
+    // /**
+    //  *
+    //  * @param r
+    //  * @param t
+    //  */
+    // getWorldForwardInFrustum(r: number, t: number) {
+    //     throw `[Camera.cameraForwardInFrustum] should implementation: param: ${r}, ${t}`;
     // }
+
+    // /**
+    //  *
+    //  * @param renderer
+    //  * @param scene
+    //  * @param useShadowPass
+    //  * @param clearScene
+    //  */
+    // // render(renderer: Renderer) {
+    // //     renderer.render();
+    // // }
 }

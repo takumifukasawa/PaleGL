@@ -22,12 +22,21 @@ export class PerspectiveCamera extends Camera {
         // TODO: set width
     }
 
+    /**
+     * 
+     * @param aspect
+     */
     setPerspectiveSize(aspect: number) {
         this.aspect = aspect;
         this.updateProjectionMatrix();
         // this.setSize(width, height);
     }
 
+    /**
+     * 
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         super.setSize(width, height);
         // this.aspect = width / height;
@@ -37,6 +46,9 @@ export class PerspectiveCamera extends Camera {
         // this.#updateProjectionMatrix();
     }
 
+    /**
+     * 
+     */
     updateProjectionMatrix() {
         this.projectionMatrix = Matrix4.getPerspectiveMatrix(
             (this.fov * Math.PI) / 180,
@@ -46,6 +58,9 @@ export class PerspectiveCamera extends Camera {
         );
     }
 
+    /**
+     * 
+     */
     getFrustumLocalPositions(): FrustumVectors {
         const localForward = Vector3.back;
         const localRight = Vector3.right;
@@ -105,4 +120,26 @@ export class PerspectiveCamera extends Camera {
             farRightBottom,
         };
     }
+
+    // /**
+    //  * TODO: なにかがバグってる
+    //  * @param horizontal
+    //  * @param vertical
+    //  */
+    // getWorldForwardInFrustum(horizontal: number, vertical: number) {
+    //     const frustum = this.getFrustumLocalPositions();
+    //     const frustumWorldFarLeftTop = frustum.farLeftTop.multiplyMatrix4(this.transform.worldMatrix);
+    //     const frustumWorldRightTop = frustum.farRightTop.multiplyMatrix4(this.transform.worldMatrix);
+    //     const frustumWorldLeftBottom = frustum.farLeftBottom.multiplyMatrix4(this.transform.worldMatrix);
+    //     const frustumWorldRightBottom = frustum.farRightBottom.multiplyMatrix4(this.transform.worldMatrix);
+    //     const leftTopDir = Vector3.subVectors(frustumWorldFarLeftTop, frustum.nearLeftTop).normalize();
+    //     const rightTopDir = Vector3.subVectors(frustumWorldRightTop, frustum.nearRightTop).normalize();
+    //     const leftBottomDir = Vector3.subVectors(frustumWorldLeftBottom, frustum.nearLeftBottom).normalize();
+    //     const rightBottomDir = Vector3.subVectors(frustumWorldRightBottom, frustum.nearRightBottom).normalize();
+    //     const topDir = Vector3.lerpVectors(leftTopDir, rightTopDir, horizontal).normalize();
+    //     const bottomDir = Vector3.lerpVectors(leftBottomDir, rightBottomDir, horizontal).normalize();
+    //     const localDir =  Vector3.lerpVectors(topDir, bottomDir, vertical).normalize();
+    //     const worldDir = localDir.multiplyMatrix4(this.transform.worldMatrix).normalize();
+    //     return worldDir.negate();
+    // }
 }
