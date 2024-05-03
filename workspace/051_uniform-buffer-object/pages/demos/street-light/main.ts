@@ -64,7 +64,7 @@ import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.j
 import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
-import { Ray } from '@/PaleGL/math/Ray.ts';
+// import { Ray } from '@/PaleGL/math/Ray.ts';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 // import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
 // import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
@@ -1498,29 +1498,32 @@ const main = async () => {
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
     attractSphereMesh.onFixedUpdate = () => {
-        const w = 5;
-        // const d = 2;
-        const d = 5;
-        const ix = inputController.normalizedInputPosition.x * 2 - 1;
-        const iy = inputController.normalizedInputPosition.y * 2 - 1;
-        const x = ix * w;
-        const z = iy * d;
-        const y = 3;
-        attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
+        //const w = 5;
+        //// const d = 2;
+        //const d = 5;
+        //const ix = inputController.normalizedInputPosition.x * 2 - 1;
+        //const iy = inputController.normalizedInputPosition.y * 2 - 1;
+        //const x = ix * w;
+        //const z = iy * d;
+        //const y = 3;
+        //attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
 
-        // const cameraRay = new Ray(captureSceneCamera.transform.position, captureSceneCamera.cameraForward);
-        // const floorPlane = new Plane(Vector3.zero, Vector3.up);
-        // const intersect = intersectRayWithPlane(cameraRay, floorPlane);
-        // if(intersect) {
-        //     attractSphereMesh.transform.setTranslation(intersect);
-        // }
-        // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
-        // console.log(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y);
         const ray = captureSceneCamera.viewpointToRay(new Vector2(
             inputController.normalizedInputPosition.x,
             1 - inputController.normalizedInputPosition.y
         ));
-        // ray.dir.log()
+        const plane = new Plane(Vector3.zero, Vector3.up);
+        const intersectOnPlane = intersectRayWithPlane(ray, plane);
+        if(intersectOnPlane) {
+            const p = new Vector3(
+                intersectOnPlane.x,
+                0.5,
+                intersectOnPlane.z
+            );
+            attractSphereMesh.transform.setTranslation(p);
+        }
+        // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
+        // console.log(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y);
     };
 
     //
