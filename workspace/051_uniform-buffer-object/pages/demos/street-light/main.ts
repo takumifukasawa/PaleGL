@@ -1515,7 +1515,12 @@ const main = async () => {
         //     attractSphereMesh.transform.setTranslation(intersect);
         // }
         // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
-        const ray = captureSceneCamera.viewpointToRay(new Vector2(0.5, 0.5));
+        // console.log(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y);
+        const ray = captureSceneCamera.viewpointToRay(new Vector2(
+            inputController.normalizedInputPosition.x,
+            1 - inputController.normalizedInputPosition.y
+        ));
+        // ray.dir.log()
     };
 
     //
