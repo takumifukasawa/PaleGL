@@ -2543,17 +2543,22 @@ function initDebugger() {
         },
     });
 
-    // debuggerGUI.addSliderDebugger({
-    //     label: 'ssr blend rate',
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: renderer.ssrPass.blendRate,
-    //     onChange: (value) => {
-    //         renderer.ssrPass.blendRate = value;
-    //     },
-    // });
-
+    //
+    // chromatic aberration
+    //
+    
+    debuggerGUI.addBorderSpacer();
+    
+    const chromaticAberrationDebuggerGroup = debuggerGUI.addGroup('chromatic aberration', false);
+    chromaticAberrationDebuggerGroup.addSliderDebugger({
+        label: 'scale',
+        minValue: 0,
+        maxValue: 0.1,
+        stepValue: 0.001,
+        initialValue: renderer.chromaticAberrationPass.chromaticAberrationScale,
+        onChange: (value) => (renderer.chromaticAberrationPass.chromaticAberrationScale = value),
+    });
+    
     //
     // fxaa
     //

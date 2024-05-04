@@ -702,8 +702,9 @@ export class Renderer {
     //     return this._toneMappingPass.renderTarget;
     // }
     
-    // get chromaticAberrationRenderTarget() {
-    // }
+    get chromaticAberrationPass() {
+        return this._chromaticAberrationPass;
+    }
     
     /**
      *
