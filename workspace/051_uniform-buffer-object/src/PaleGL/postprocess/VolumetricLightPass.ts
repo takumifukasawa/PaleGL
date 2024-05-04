@@ -22,12 +22,15 @@ export class VolumetricLightPass extends PostProcessPassBase {
     rayJitterSizeY: number = 0.1;
 
     #spotLights: SpotLight[] = [];
+    
+    ratio: number;
 
     /**
      *
      * @param gpu
+     * @param ratio
      */
-    constructor({ gpu }: { gpu: GPU }) {
+    constructor({ gpu, ratio = 0.5 }: { gpu: GPU, ratio?: number }) {
         const fragmentShader = volumetricLightFragmentShader;
         
         super({
@@ -79,6 +82,8 @@ export class VolumetricLightPass extends PostProcessPassBase {
             // renderTargetType: RenderTargetTypes.RGBA
             renderTargetType: RenderTargetTypes.RGBA16F
         });
+        
+        this.ratio = ratio;
     }
 
     /**
@@ -87,9 +92,11 @@ export class VolumetricLightPass extends PostProcessPassBase {
      * @param height
      */
     setSize(width: number, height: number) {
-        super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        this.width = Math.floor(width * this.ratio);
+        this.height = Math.floor(height * this.ratio);
+        super.setSize(this.width, this.height);
+        this.material.uniforms.setValue(UniformNames.TargetWidth, this.width);
+        this.material.uniforms.setValue(UniformNames.TargetHeight, this.height);
     }
 
     /**

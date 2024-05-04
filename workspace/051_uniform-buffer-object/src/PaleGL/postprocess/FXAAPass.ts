@@ -1,4 +1,4 @@
-﻿import { UniformTypes } from '@/PaleGL/constants';
+﻿import {UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
@@ -54,7 +54,7 @@ export class FXAAPass extends PostProcessPassBase {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.uniforms.setValue('uTargetWidth', width);
-        this.material.uniforms.setValue('uTargetHeight', height);
+        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
+        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
     }
 }

@@ -14,13 +14,6 @@ import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-rad
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-// import { RadialBlurPass } from '@/PaleGL/postprocess/RadialBlurPass.ts';
-// import {Matrix4} from '@/PaleGL/math/Matrix4.ts';
-// import {Vector3} from '@/PaleGL/math/Vector3.ts';
-// import {Vector4} from '@/PaleGL/math/Vector4.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-// import {GaussianBlurPass} from '@/PaleGL/postprocess/GaussianBlurPass.ts';
-// import {RadialBlurPass} from '@/PaleGL/postprocess/RadialBlurPass.ts';
 
 //
 // ref:
@@ -50,6 +43,8 @@ export class LightShaftPass implements IPostProcessPass {
     #radialBlurPassScaleBaseUniformName: string = 'uRadialBlurPassScaleBase';
     #radialBlurPassIndexUniformName: string = 'uRadialBlurPassIndex';
     #radialBlurRayStepStrengthUniformName: string = 'uRadialBlurRayStepStrength';
+    
+    ratio: number = 1;
 
     get renderTarget() {
         // return this.lightShaftDownSamplePass.renderTarget;
@@ -59,11 +54,13 @@ export class LightShaftPass implements IPostProcessPass {
     /**
      *
      * @param gpu
+     * @param ratio
      */
-    constructor({ gpu }: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number }) {
+    constructor({ gpu, ratio = 0.5 }: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number, ratio?: number}) {
         // super();
 
         // this.gpu = gpu;
+        this.ratio = ratio;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
@@ -226,14 +223,14 @@ export class LightShaftPass implements IPostProcessPass {
      * @param height
      */
     setSize(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+        this.width = width * this.ratio;
+        this.height = height * this.ratio;
 
-        this.lightShaftDownSamplePass.setSize(width / 2, height / 2);
-        this.blur1Pass.setSize(width / 2, height / 2);
-        this.blur2Pass.setSize(width / 2, height / 2);
-        this.blur3Pass.setSize(width / 2, height / 2);
-        this.compositePass.setSize(width, height);
+        this.lightShaftDownSamplePass.setSize(this.width, this.height);
+        this.blur1Pass.setSize(this.width, this.height);
+        this.blur2Pass.setSize(this.width, this.height);
+        this.blur3Pass.setSize(this.width, this.height);
+        this.compositePass.setSize(this.width, this.height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
