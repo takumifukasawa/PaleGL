@@ -1508,18 +1508,13 @@ const main = async () => {
         //const y = 3;
         //attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
 
-        const ray = captureSceneCamera.viewpointToRay(new Vector2(
-            inputController.normalizedInputPosition.x,
-            1 - inputController.normalizedInputPosition.y
-        ));
+        const ray = captureSceneCamera.viewpointToRay(
+            new Vector2(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y)
+        );
         const plane = new Plane(Vector3.zero, Vector3.up);
         const intersectOnPlane = intersectRayWithPlane(ray, plane);
-        if(intersectOnPlane) {
-            const p = new Vector3(
-                intersectOnPlane.x,
-                0.5,
-                intersectOnPlane.z
-            );
+        if (intersectOnPlane) {
+            const p = new Vector3(intersectOnPlane.x, 0.5, intersectOnPlane.z);
             attractSphereMesh.transform.setTranslation(p);
         }
         // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
@@ -2546,9 +2541,9 @@ function initDebugger() {
     //
     // chromatic aberration
     //
-    
+
     debuggerGUI.addBorderSpacer();
-    
+
     const chromaticAberrationDebuggerGroup = debuggerGUI.addGroup('chromatic aberration', false);
     chromaticAberrationDebuggerGroup.addSliderDebugger({
         label: 'scale',
@@ -2558,7 +2553,39 @@ function initDebugger() {
         initialValue: renderer.chromaticAberrationPass.chromaticAberrationScale,
         onChange: (value) => (renderer.chromaticAberrationPass.chromaticAberrationScale = value),
     });
-    
+
+    //
+    // vignette
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const vignetteDebuggerGroup = debuggerGUI.addGroup('vignette', false);
+    vignetteDebuggerGroup.addSliderDebugger({
+        label: 'radius',
+        minValue: 0,
+        maxValue: 3,
+        stepValue: 0.001,
+        initialValue: renderer.vignettePass.vignetteRadius,
+        onChange: (value) => (renderer.vignettePass.vignetteRadius = value),
+    });
+    vignetteDebuggerGroup.addSliderDebugger({
+        label: 'power',
+        minValue: 0.01,
+        maxValue: 8,
+        stepValue: 0.001,
+        initialValue: renderer.vignettePass.vignettePower,
+        onChange: (value) => (renderer.vignettePass.vignettePower = value),
+    });
+    vignetteDebuggerGroup.addSliderDebugger({
+        label: 'blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.vignettePass.blendRate,
+        onChange: (value) => (renderer.vignettePass.blendRate = value),
+    });
+
     //
     // fxaa
     //

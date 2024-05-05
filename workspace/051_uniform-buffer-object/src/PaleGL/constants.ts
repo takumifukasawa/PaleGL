@@ -242,7 +242,7 @@ export const UniformTypes = {
     Color: 14,
     ColorArray: 15,
     TextureArray: 16,
-    Bool: 17
+    Bool: 17,
 } as const;
 
 export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
@@ -300,6 +300,7 @@ export const UniformNames = {
     // usualy post process
     TargetWidth: 'uTargetWidth',
     TargetHeight: 'uTargetHeight',
+    Aspect: 'uAspect',
     // camera
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',
@@ -313,7 +314,7 @@ export const UniformNames = {
     LightColor: 'color',
     ShadowMap: 'shadowMap',
     // LightViewProjectionMatrix: 'lightViewProjectionMatrix',
-    ShadowMapProjectionMatrix: "shadowMapProjectionMatrix",
+    ShadowMapProjectionMatrix: 'shadowMapProjectionMatrix',
     ShadowBias: 'shadowBias',
     DirectionalLightShadowMap: 'uDirectionalLightShadowMap',
     SpotLightShadowMap: 'uSpotLightShadowMap',

@@ -23,11 +23,11 @@ const vec3 chromaticAberrationFilter[ARRAY_NUM] = vec3[](
 
 void main() {
     vec2 uv = vUv;
-    vec2 centerUv = vUv * 2. - 1.;
+    vec2 centerUv = vUv * 2. - 1.; // -1 ~ 1
     outColor = vec4(0.);
     for(int i = 0; i < ARRAY_NUM; i++) {
         vec2 tempUv = centerUv * (1. - uChromaticAberrationScale * (float(i) + 1.) / float(ARRAY_NUM));
-        tempUv = (tempUv + 1.) * .5;
+        tempUv = (tempUv + 1.) * .5; // 0 ~ 1
         vec3 mask = chromaticAberrationFilter[i];
         vec4 color = texture(uSrcTexture, tempUv);
         outColor += vec4(color.rgb * mask, 1.);

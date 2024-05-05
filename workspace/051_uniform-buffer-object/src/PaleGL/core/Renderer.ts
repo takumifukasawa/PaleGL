@@ -65,6 +65,7 @@ import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {ChromaticAberrationPass} from "@/PaleGL/postprocess/ChromaticAberrationPass.ts";
+import {VignettePass} from "@/PaleGL/postprocess/VignettePass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -332,6 +333,9 @@ export class Renderer {
         
         this._chromaticAberrationPass = new ChromaticAberrationPass({ gpu });
         this._scenePostProcess.addPass(this._chromaticAberrationPass);
+        
+        this._vignettePass = new VignettePass({ gpu });
+        this._scenePostProcess.addPass(this._vignettePass);
 
         //
         // initialize global uniform buffer objects
@@ -706,6 +710,10 @@ export class Renderer {
         return this._chromaticAberrationPass;
     }
     
+    get vignettePass() {
+        return this._vignettePass;
+    }
+    
     /**
      *
      * @param stats
@@ -744,6 +752,7 @@ export class Renderer {
         this._bloomPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
         this._chromaticAberrationPass.setSize(realWidth, realHeight);
+        this._vignettePass.setSize(realWidth, realHeight);
     }
 
     /**
@@ -1320,6 +1329,7 @@ export class Renderer {
     private _bloomPass: BloomPass;
     private _toneMappingPass: ToneMappingPass;
     private _chromaticAberrationPass: ChromaticAberrationPass;
+    private _vignettePass: VignettePass;
 
     /**
      *
