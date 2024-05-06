@@ -66,6 +66,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {ChromaticAberrationPass} from "@/PaleGL/postprocess/ChromaticAberrationPass.ts";
 import {VignettePass} from "@/PaleGL/postprocess/VignettePass.ts";
+import {StreakPass} from "@/PaleGL/postprocess/StreakPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -325,17 +326,20 @@ export class Renderer {
         this._bloomPass = new BloomPass({
             gpu,
         });
-        // this._bloomPass.enabled = false;
+        this._bloomPass.enabled = false;
         this._scenePostProcess.addPass(this._bloomPass);
 
+        this._streakPass = new StreakPass({ gpu });
+        this._scenePostProcess.addPass(this._streakPass);
+
         this._toneMappingPass = new ToneMappingPass({ gpu });
-        this._scenePostProcess.addPass(this._toneMappingPass);
+        // this._scenePostProcess.addPass(this._toneMappingPass);
         
         this._chromaticAberrationPass = new ChromaticAberrationPass({ gpu });
-        this._scenePostProcess.addPass(this._chromaticAberrationPass);
+        // this._scenePostProcess.addPass(this._chromaticAberrationPass);
         
         this._vignettePass = new VignettePass({ gpu });
-        this._scenePostProcess.addPass(this._vignettePass);
+        // this._scenePostProcess.addPass(this._vignettePass);
 
         //
         // initialize global uniform buffer objects
@@ -701,6 +705,10 @@ export class Renderer {
     get bloomPass() {
         return this._bloomPass;
     }
+    
+    get streakPass() {
+        return this._streakPass;
+    }
 
     // get toneMappingRenderTarget() {
     //     return this._toneMappingPass.renderTarget;
@@ -750,10 +758,14 @@ export class Renderer {
         this._fogPass.setSize(realWidth, realHeight);
         this._depthOfFieldPass.setSize(realWidth, realHeight);
         this._bloomPass.setSize(realWidth, realHeight);
+        this._streakPass.setSize(realWidth, realHeight);
         this._toneMappingPass.setSize(realWidth, realHeight);
         this._chromaticAberrationPass.setSize(realWidth, realHeight);
         this._vignettePass.setSize(realWidth, realHeight);
     }
+    
+    renderTarget: CameraRenderTargetType | null = null;
+    clearColorDirtyFlag = false;
 
     /**
      *
@@ -764,14 +776,19 @@ export class Renderer {
     // TODO: 本当はclearcolorの色も渡せるとよい
     setRenderTarget(renderTarget: CameraRenderTargetType, clearColor: boolean = false, clearDepth: boolean = false) {
         if (renderTarget) {
+            this.renderTarget = renderTarget;
             this.gpu.setFramebuffer(renderTarget.framebuffer);
             this.gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
         } else {
+            this.renderTarget = null;
             this.gpu.setFramebuffer(null);
             this.gpu.setSize(0, 0, this.realWidth, this.realHeight);
         }
         if (clearColor) {
             this.gpu.clearColor(0, 0, 0, 0);
+            this.clearColorDirtyFlag = true;
+        } else {
+            this.clearColorDirtyFlag = false;
         }
         if (clearDepth) {
             this.gpu.clearDepth(1, 1, 1, 1);
@@ -1327,6 +1344,8 @@ export class Renderer {
     private _fogPass: FogPass;
     private _depthOfFieldPass: DepthOfFieldPass;
     private _bloomPass: BloomPass;
+    private _streakPass: StreakPass;
+    
     private _toneMappingPass: ToneMappingPass;
     private _chromaticAberrationPass: ChromaticAberrationPass;
     private _vignettePass: VignettePass;

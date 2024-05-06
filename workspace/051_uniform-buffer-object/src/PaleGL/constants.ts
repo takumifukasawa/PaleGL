@@ -301,6 +301,7 @@ export const UniformNames = {
     TargetWidth: 'uTargetWidth',
     TargetHeight: 'uTargetHeight',
     Aspect: 'uAspect',
+    TexelSize: 'uTexelSize',
     // camera
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',

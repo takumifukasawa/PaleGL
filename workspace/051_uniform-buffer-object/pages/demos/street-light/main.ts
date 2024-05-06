@@ -485,6 +485,7 @@ renderer.depthOfFieldPass.focusDistance = 18.5;
 renderer.depthOfFieldPass.focusRange = 17;
 
 const fxaaPass = new FXAAPass({ gpu });
+fxaaPass.enabled = false;
 cameraPostProcess.addPass(fxaaPass);
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
@@ -2368,6 +2369,25 @@ function initDebugger() {
         onChange: (value) => {
             renderer.bloomPass.tone = value;
         },
+    });
+
+    //
+    // streak debuggers
+    //
+    
+    debuggerGUI.addBorderSpacer();
+    
+    const streakDebuggerGroup = debuggerGUI.addGroup('streak', false);
+    
+    streakDebuggerGroup.addSliderDebugger({
+        label: "threshold",
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: renderer.streakPass.threshold,
+        onChange: (value) => {
+            renderer.streakPass.threshold = value;
+        }
     });
 
     //
