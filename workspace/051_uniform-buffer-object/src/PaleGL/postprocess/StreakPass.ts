@@ -15,10 +15,12 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 // import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
 import streakPrefilterFragmentShader from '@/PaleGL/shaders/streak-prefilter-fragment.glsl';
 import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-fragment.glsl';
+import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
 import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+// import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import {maton} from "@/PaleGL/utilities/maton.ts";
 
 // const BLUR_PIXEL_NUM = 7;
 
@@ -49,7 +51,7 @@ export class StreakPass implements IPostProcessPass {
     // private renderTargetBlurMip64_Horizontal: RenderTarget;
     // private renderTargetBlurMip64_Vertical: RenderTarget;
 
-    private renderTargetDownSampleMip2: RenderTarget;
+    // private renderTargetDownSampleMip2: RenderTarget;
 
     // get renderTargetBlurMip4() {
     //     return this.renderTargetBlurMip4_Vertical;
@@ -77,10 +79,11 @@ export class StreakPass implements IPostProcessPass {
     // private downSampleMip8Pass: FragmentPass;
     // private downSampleMip16Pass: FragmentPass;
     // private downSampleMip32Pass: FragmentPass;
-    private downSamplePasses: {pass: FragmentPass, downScale: number}[] = [];
     private prefilterPass: FragmentPass;
+    private downSamplePasses: { pass: FragmentPass; downScale: number }[] = [];
+    private upSamplePasses: { pass: FragmentPass, downSamplePass: FragmentPass }[] = [];
     private compositePass: FragmentPass;
-    private downSampleMaterial: Material;
+    // private downSampleMaterial: Material;
 
     private geometry: PlaneGeometry;
     // horizontalBlurMaterial: Material;
@@ -143,7 +146,7 @@ export class StreakPass implements IPostProcessPass {
         });
         this.materials.push(...this.prefilterPass.materials);
 
-        this.downSamplePasses = [2,4,8,16,32].map(downScale => {
+        this.downSamplePasses = [2, 4, 8, 16, 32].map((downScale) => {
             const pass = new FragmentPass({
                 name: `DownSampleMip${downScale}Pass`,
                 gpu,
@@ -166,7 +169,31 @@ export class StreakPass implements IPostProcessPass {
             return {
                 pass,
                 downScale,
-            }
+            };
+        });
+        this.downSamplePasses.forEach(({ pass }) => {
+            this.materials.push(...pass.materials);
+        });
+        
+        this.upSamplePasses = maton.range(5).map((_, index) => {
+            const pass = new FragmentPass({
+                name: `UpSampleMip${index}Pass`,
+                gpu,
+                fragmentShader: streakUpSampleFragmentShader,
+                uniforms: [
+                    {
+                        name: 'uDownSampleTexture',
+                        type: UniformTypes.Texture,
+                        value: null,
+                    },
+                    ...PostProcessPassBase.commonUniforms,
+                ],
+            });
+            this.materials.push(...pass.materials);
+            return {
+                pass,
+                downSamplePass: this.downSamplePasses[index].pass
+            };
         });
 
         // tmp
@@ -221,10 +248,10 @@ export class StreakPass implements IPostProcessPass {
         //     type: RenderTargetTypes.R11F_G11F_B10F,
         //     // type: RenderTargetTypes.RGBA
         // });
-        this.renderTargetDownSampleMip2 = new RenderTarget({
-            gpu,
-            type: RenderTargetTypes.R11F_G11F_B10F,
-        });
+        // this.renderTargetDownSampleMip2 = new RenderTarget({
+        //     gpu,
+        //     type: RenderTargetTypes.R11F_G11F_B10F,
+        // });
 
         // const copyPass = new CopyPass({ gpu });
         // this.#passes.push(copyPass);
@@ -296,24 +323,24 @@ export class StreakPass implements IPostProcessPass {
         // });
         // this.materials.push(this.verticalBlurMaterial);
 
-        this.downSampleMaterial = new Material({
-            vertexShader: PostProcessPassBase.baseVertexShader,
-            fragmentShader: streakDownSampleFragmentShader,
-            uniforms: [
-                {
-                    name: UniformNames.SrcTexture,
-                    type: UniformTypes.Texture,
-                    value: null,
-                },
-                {
-                    name: UniformNames.TexelSize,
-                    type: UniformTypes.Vector2,
-                    value: Vector2.zero,
-                },
-                ...PostProcessPassBase.commonUniforms,
-            ],
-        });
-        this.materials.push(this.downSampleMaterial);
+        // this.downSampleMaterial = new Material({
+        //     vertexShader: PostProcessPassBase.baseVertexShader,
+        //     fragmentShader: streakDownSampleFragmentShader,
+        //     uniforms: [
+        //         {
+        //             name: UniformNames.SrcTexture,
+        //             type: UniformTypes.Texture,
+        //             value: null,
+        //         },
+        //         {
+        //             name: UniformNames.TexelSize,
+        //             type: UniformTypes.Vector2,
+        //             value: Vector2.zero,
+        //         },
+        //         ...PostProcessPassBase.commonUniforms,
+        //     ],
+        // });
+        // this.materials.push(this.downSampleMaterial);
 
         this.compositePass = new FragmentPass({
             gpu,
@@ -350,8 +377,11 @@ export class StreakPass implements IPostProcessPass {
 
         this.halfHeight = Math.floor(this.height / 2);
         this.prefilterPass.setSize(this.width, this.halfHeight);
+        // this.renderTargetDownSampleMip2.setSize(this.width, this.halfHeight);
 
-        this.renderTargetDownSampleMip2.setSize(this.width, this.halfHeight);
+        //
+        // down sample pass のリサイズはrender時にやる
+        //
 
         this.compositePass.setSize(this.width, this.height);
     }
@@ -409,17 +439,34 @@ export class StreakPass implements IPostProcessPass {
         //     // renderer.renderMesh(this.geometry, this.downSampleMaterial);
         //     // renderer.setRenderTarget(tmpRenderTarget, tmpClearColorDirtyFlag);
         // };
-       
-        this.downSamplePasses.forEach(({pass, downScale}) => {
-            pass.setSize(this.width / downScale, this.halfHeight);
-            pass.material.uniforms.setValue(
-                'uPrefilterTexture',
-                this.prefilterPass.renderTarget.texture
-            );
+
+        this.downSamplePasses.forEach(({ pass, downScale }) => {
+            const width = Math.floor(this.width / downScale);
+            pass.setSize(width, this.halfHeight);
+            pass.material.uniforms.setValue('uPrefilterTexture', this.prefilterPass.renderTarget.texture);
             pass.material.uniforms.setValue(
                 UniformNames.TexelSize,
-                new Vector2(1 / (this.width / downScale), 1 / this.halfHeight)
+                new Vector2(1 / width, 1 / this.halfHeight)
             );
+            pass.render({
+                gpu,
+                camera,
+                renderer,
+                prevRenderTarget: null,
+                isLastPass: false,
+                targetCamera,
+                gBufferRenderTargets,
+                time,
+            });
+        });
+        
+        //
+        // up sample
+        //
+
+        this.upSamplePasses.forEach(({ pass, downSamplePass }) => {
+            pass.setSize(downSamplePass.width, downSamplePass.height);
+            pass.material.uniforms.setValue('uDownSampleTexture', downSamplePass.renderTarget.texture);
             pass.render({
                 gpu,
                 camera,
@@ -439,7 +486,8 @@ export class StreakPass implements IPostProcessPass {
         // this.compositePass.material.uniforms.setValue('uPrefilterTexture', this.prefilterPass.renderTarget.texture);
         this.compositePass.material.uniforms.setValue(
             'uPrefilterTexture',
-            this.downSamplePasses[0].pass.renderTarget.texture
+            // this.downSamplePasses[0].pass.renderTarget.texture
+            this.upSamplePasses[0].pass.renderTarget.texture
         );
         this.compositePass.render({
             gpu,
