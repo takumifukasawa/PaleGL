@@ -8,7 +8,7 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uPrefilterTexture;
+uniform sampler2D uPrevTexture;
 uniform vec2 uTexelSize;
 
 void main() {
@@ -24,12 +24,12 @@ void main() {
     float u4 = uv.x + dx * 3.;
     float u5 = uv.x + dx * 5.;
     
-    vec4 c0 = texture(uPrefilterTexture, vec2(u0, uv.y));
-    vec4 c1 = texture(uPrefilterTexture, vec2(u1, uv.y));
-    vec4 c2 = texture(uPrefilterTexture, vec2(u2, uv.y));
-    vec4 c3 = texture(uPrefilterTexture, vec2(u3, uv.y));
-    vec4 c4 = texture(uPrefilterTexture, vec2(u4, uv.y));
-    vec4 c5 = texture(uPrefilterTexture, vec2(u5, uv.y));
+    vec4 c0 = texture(uPrevTexture, vec2(u0, uv.y));
+    vec4 c1 = texture(uPrevTexture, vec2(u1, uv.y));
+    vec4 c2 = texture(uPrevTexture, vec2(u2, uv.y));
+    vec4 c3 = texture(uPrevTexture, vec2(u3, uv.y));
+    vec4 c4 = texture(uPrevTexture, vec2(u4, uv.y));
+    vec4 c5 = texture(uPrevTexture, vec2(u5, uv.y));
     
     vec4 c = (c0 + c1 + c2 + c3 + c4 + c5) / 6.0;
     

@@ -2374,20 +2374,47 @@ function initDebugger() {
     //
     // streak debuggers
     //
-    
+
     debuggerGUI.addBorderSpacer();
-    
+
     const streakDebuggerGroup = debuggerGUI.addGroup('streak', false);
-    
+
     streakDebuggerGroup.addSliderDebugger({
-        label: "threshold",
+        label: 'threshold',
         minValue: 0,
         maxValue: 4,
         stepValue: 0.001,
         initialValue: renderer.streakPass.threshold,
         onChange: (value) => {
             renderer.streakPass.threshold = value;
-        }
+        },
+    });
+    streakDebuggerGroup.addSliderDebugger({
+        label: 'stretch',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.streakPass.stretch,
+        onChange: (value) => {
+            renderer.streakPass.stretch = value;
+        },
+    });
+    streakDebuggerGroup.addColorDebugger({
+        label: 'color',
+        initialValue: renderer.streakPass.color.getHexCoord(),
+        onChange: (value) => {
+            renderer.streakPass.color = Color.fromHex(value);
+        },
+    });
+    streakDebuggerGroup.addSliderDebugger({
+        label: 'intensity',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.streakPass.intensity,
+        onChange: (value) => {
+            renderer.streakPass.intensity = value;
+        },
     });
 
     //

@@ -8,10 +8,17 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-uniform sampler2D uPrefilterTexture;
+uniform vec4 uColor;
+uniform float uIntensity;
+uniform sampler2D uSrcTexture;
+uniform sampler2D uStreakTexture;
 
 void main() {
     vec2 uv = vUv;
-    vec4 prefilterColor = texture(uPrefilterTexture, uv);
-    outColor = prefilterColor;
+    vec3 c0 = texture(uStreakTexture, uv).xyz * .25;
+    vec3 c1 = texture(uStreakTexture, uv).xyz * .5;
+    vec3 c2 = texture(uStreakTexture, uv).xyz * .25;
+    vec3 c3 = texture(uSrcTexture, uv).xyz;
+    vec3 cf = (c0 + c1 + c2) * uColor.xyz * uIntensity * 5.;
+    outColor = vec4(cf + c3, 1.);
 }
