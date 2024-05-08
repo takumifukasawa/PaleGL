@@ -21,6 +21,8 @@ void main() {
     vec3 c3 = texture(uDownSampleTexture, uv).xyz;
  
     vec3 c = mix(c3, c0 + c1 + c2, uStretch);
-    
     outColor = vec4(c.xyz, 1.);
+    
+    // for debug
+    // outColor = texture(uPrevTexture, uv);
 }

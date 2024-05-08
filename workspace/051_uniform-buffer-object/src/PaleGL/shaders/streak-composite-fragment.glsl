@@ -20,5 +20,9 @@ void main() {
     vec3 c2 = texture(uStreakTexture, uv).xyz * .25;
     vec3 c3 = texture(uSrcTexture, uv).xyz;
     vec3 cf = (c0 + c1 + c2) * uColor.xyz * uIntensity * 5.;
+    
     outColor = vec4(cf + c3, 1.);
+    
+    // for debug
+    // outColor = texture(uStreakTexture, uv);
 }

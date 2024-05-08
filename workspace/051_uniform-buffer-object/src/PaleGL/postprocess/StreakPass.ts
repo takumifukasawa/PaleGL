@@ -21,7 +21,7 @@ import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postpro
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {Color} from "@/PaleGL/math/Color.ts";
+import { Color } from '@/PaleGL/math/Color.ts';
 
 // const BLUR_PIXEL_NUM = 7;
 
@@ -34,12 +34,12 @@ export class StreakPass implements IPostProcessPass {
     enabled: boolean = true;
     width: number = 1;
     height: number = 1;
-   
+
     // parameters
-    threshold: number;
-    stretch: number;
+    threshold: number = 0.9;
+    stretch: number = 0.5;
     color: Color = Color.white;
-    intensity: number;
+    intensity: number = 0.6;
 
     materials: Material[] = [];
 
@@ -88,7 +88,7 @@ export class StreakPass implements IPostProcessPass {
     // private downSampleMip32Pass: FragmentPass;
     private prefilterPass: FragmentPass;
     private downSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downScale: number }[] = [];
-    private upSamplePasses: { pass: FragmentPass; prevPass: FragmentPass, downSamplePass: FragmentPass }[] = [];
+    private upSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass }[] = [];
     private compositePass: FragmentPass;
     // private downSampleMaterial: Material;
 
@@ -107,16 +107,16 @@ export class StreakPass implements IPostProcessPass {
 
     constructor({
         gpu,
-        threshold = 0.9,
-        stretch = 0,
-        intensity = 0.2,
-        // tone = 1,
-        // bloomAmount = 1,
+        threshold,
+        stretch,
+        intensity,
+        color, // bloomAmount = 1,
     }: {
         gpu: GPU;
         threshold?: number;
         stretch?: number;
         intensity?: number;
+        color?: Color;
         // tone?: number;
         // bloomAmount?: number;
     }) {
@@ -124,9 +124,10 @@ export class StreakPass implements IPostProcessPass {
 
         // this.gpu = gpu;
 
-        this.threshold = threshold;
-        this.stretch = stretch;
-        this.intensity = intensity;
+        this.threshold = threshold !== undefined ? threshold : this.threshold;
+        this.color = color !== undefined ? color : this.color;
+        this.stretch = stretch !== undefined ? stretch : this.stretch;
+        this.intensity = intensity !== undefined ? intensity : this.intensity;
         // this.tone = tone;
         // this.bloomAmount = bloomAmount;
 
@@ -222,7 +223,8 @@ export class StreakPass implements IPostProcessPass {
                     index === 0
                         ? this.downSamplePasses[this.downSamplePasses.length - 1].pass
                         : upSamplePassInfos[index - 1].pass,
-                downSamplePass: this.downSamplePasses[index].pass,
+                // downSamplePass: this.downSamplePasses[index].pass,
+                downSamplePass: this.downSamplePasses[this.downSamplePasses.length - 1 - index].pass,
             };
         });
 
@@ -394,7 +396,7 @@ export class StreakPass implements IPostProcessPass {
                 {
                     name: 'uIntensity',
                     type: UniformTypes.Float,
-                    value: this.intensity
+                    value: this.intensity,
                 },
                 ...PostProcessPassBase.commonUniforms,
             ],
@@ -511,7 +513,7 @@ export class StreakPass implements IPostProcessPass {
             pass.setSize(downSamplePass.width, downSamplePass.height);
             pass.material.uniforms.setValue('uPrevTexture', prevPass.renderTarget.texture);
             pass.material.uniforms.setValue('uDownSampleTexture', downSamplePass.renderTarget.texture);
-            pass.material.uniforms.setValue("uStretch", this.stretch);
+            pass.material.uniforms.setValue('uStretch', this.stretch);
             pass.render({
                 gpu,
                 camera,
@@ -532,9 +534,11 @@ export class StreakPass implements IPostProcessPass {
         // this.compositePass.material.uniforms.setValue("uSrcTexture", )
         this.compositePass.material.uniforms.setValue(
             'uStreakTexture',
-            // this.downSamplePasses[2].pass.renderTarget.texture
-            // this.upSamplePasses[3].pass.renderTarget.texture
+            // correct
             this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.texture
+            // for debug
+            // this.downSamplePasses[2].pass.renderTarget.texture
+            // this.upSamplePasses[2].pass.renderTarget.texture
         );
         this.compositePass.material.uniforms.setValue('uColor', this.color);
         this.compositePass.material.uniforms.setValue('uIntensity', this.intensity);
