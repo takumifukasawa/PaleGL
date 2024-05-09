@@ -2390,6 +2390,27 @@ function initDebugger() {
         },
     });
     streakDebuggerGroup.addSliderDebugger({
+        label: 'vertical scale',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: renderer.streakPass.verticalScale,
+        onChange: (value) => {
+            renderer.streakPass.verticalScale = value;
+        },
+    });
+    streakDebuggerGroup.addSliderDebugger({
+        label: 'horizontal scale',
+        minValue: 0,
+        maxValue: 2,
+        stepValue: 0.001,
+        initialValue: renderer.streakPass.horizontalScale,
+        onChange: (value) => {
+            renderer.streakPass.horizontalScale = value;
+        },
+    });
+
+    streakDebuggerGroup.addSliderDebugger({
         label: 'stretch',
         minValue: 0,
         maxValue: 1,

@@ -326,20 +326,20 @@ export class Renderer {
         this._bloomPass = new BloomPass({
             gpu,
         });
-        this._bloomPass.enabled = false;
+        // this._bloomPass.enabled = false;
         this._scenePostProcess.addPass(this._bloomPass);
 
         this._streakPass = new StreakPass({ gpu });
         this._scenePostProcess.addPass(this._streakPass);
 
         this._toneMappingPass = new ToneMappingPass({ gpu });
-        // this._scenePostProcess.addPass(this._toneMappingPass);
+        this._scenePostProcess.addPass(this._toneMappingPass);
         
         this._chromaticAberrationPass = new ChromaticAberrationPass({ gpu });
-        // this._scenePostProcess.addPass(this._chromaticAberrationPass);
+        this._scenePostProcess.addPass(this._chromaticAberrationPass);
         
         this._vignettePass = new VignettePass({ gpu });
-        // this._scenePostProcess.addPass(this._vignettePass);
+        this._scenePostProcess.addPass(this._vignettePass);
 
         //
         // initialize global uniform buffer objects

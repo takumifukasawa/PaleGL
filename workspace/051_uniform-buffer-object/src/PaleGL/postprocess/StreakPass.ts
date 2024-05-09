@@ -40,6 +40,8 @@ export class StreakPass implements IPostProcessPass {
     stretch: number = 0.5;
     color: Color = Color.white;
     intensity: number = 0.6;
+    verticalScale: number = 1.5;
+    horizontalScale: number = 1.25;
 
     materials: Material[] = [];
 
@@ -110,13 +112,17 @@ export class StreakPass implements IPostProcessPass {
         threshold,
         stretch,
         intensity,
-        color, // bloomAmount = 1,
+        color,
+        verticalScale,
+        horizontalScale
     }: {
         gpu: GPU;
         threshold?: number;
         stretch?: number;
         intensity?: number;
         color?: Color;
+        verticalScale?: number;
+        horizontalScale?: number;
         // tone?: number;
         // bloomAmount?: number;
     }) {
@@ -128,6 +134,8 @@ export class StreakPass implements IPostProcessPass {
         this.color = color !== undefined ? color : this.color;
         this.stretch = stretch !== undefined ? stretch : this.stretch;
         this.intensity = intensity !== undefined ? intensity : this.intensity;
+        this.verticalScale = verticalScale !== undefined ? verticalScale : this.verticalScale;
+        this.horizontalScale = horizontalScale !== undefined ? horizontalScale : this.horizontalScale;
         // this.tone = tone;
         // this.bloomAmount = bloomAmount;
 
@@ -153,6 +161,11 @@ export class StreakPass implements IPostProcessPass {
                     type: UniformTypes.Float,
                     value: this.threshold,
                 },
+                {
+                    name: 'uVerticalScale',
+                    type: UniformTypes.Float,
+                    value: this.verticalScale,
+                },
                 ...PostProcessPassBase.commonUniforms,
             ],
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -166,14 +179,19 @@ export class StreakPass implements IPostProcessPass {
                 fragmentShader: streakDownSampleFragmentShader,
                 uniforms: [
                     {
+                        name: UniformNames.TexelSize,
+                        type: UniformTypes.Vector2,
+                        value: Vector2.zero,
+                    },
+                    {
                         name: 'uPrevTexture',
                         type: UniformTypes.Texture,
                         value: null,
                     },
                     {
-                        name: UniformNames.TexelSize,
-                        type: UniformTypes.Vector2,
-                        value: Vector2.zero,
+                        name: "uHorizontalScale",
+                        type: UniformTypes.Float,
+                        value: this.horizontalScale,
                     },
                     ...PostProcessPassBase.commonUniforms,
                 ],
@@ -460,8 +478,9 @@ export class StreakPass implements IPostProcessPass {
         // prefilter
         //
 
-        this.prefilterPass.material.uniforms.setValue('uThreshold', this.threshold);
         this.prefilterPass.material.uniforms.setValue('uTexelSize', new Vector2(1 / this.width, 1 / this.height));
+        this.prefilterPass.material.uniforms.setValue('uThreshold', this.threshold);
+        this.prefilterPass.material.uniforms.setValue('uVerticalScale', this.verticalScale);
         this.prefilterPass.render({
             gpu,
             camera,
@@ -491,8 +510,9 @@ export class StreakPass implements IPostProcessPass {
             const width = Math.floor(this.width / downScale);
             pass.setSize(width, this.halfHeight);
             // pass.material.uniforms.setValue('uPrefilterTexture', this.prefilterPass.renderTarget.texture);
-            pass.material.uniforms.setValue('uPrevTexture', prevPass.renderTarget.texture);
             pass.material.uniforms.setValue(UniformNames.TexelSize, new Vector2(1 / width, 1 / this.halfHeight));
+            pass.material.uniforms.setValue('uPrevTexture', prevPass.renderTarget.texture);
+            pass.material.uniforms.setValue('uHorizontalScale', this.horizontalScale);
             pass.render({
                 gpu,
                 camera,
@@ -537,7 +557,7 @@ export class StreakPass implements IPostProcessPass {
             // correct
             this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.texture
             // for debug
-            // this.downSamplePasses[2].pass.renderTarget.texture
+            // this.prefilterPass.renderTarget.texture
             // this.upSamplePasses[2].pass.renderTarget.texture
         );
         this.compositePass.material.uniforms.setValue('uColor', this.color);
