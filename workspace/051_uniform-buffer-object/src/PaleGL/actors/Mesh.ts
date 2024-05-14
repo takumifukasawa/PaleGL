@@ -1,4 +1,4 @@
-﻿import { Actor, ActorArgs } from '@/PaleGL/actors/Actor';
+﻿import{ Actor, ActorArgs } from '@/PaleGL/actors/Actor';
 import { ActorType, ActorTypes, DepthFuncTypes } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { defaultDepthFragmentShader } from '@/PaleGL/shaders/buildShader';

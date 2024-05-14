@@ -54,8 +54,9 @@ out vec4 outColor;
 #include ./partial/uniform-block-spot-light.glsl
 
 uniform sampler2D uSrcTexture;
-uniform sampler2D uDepthTexture; // camera depth
 uniform sampler2D uGBufferATexture;
+uniform sampler2D uDepthTexture; // camera depth
+uniform sampler2D uVolumetricDepthTexture;
 // uniform mat4 uTransposeInverseViewMatrix;
 // uniform mat4 uViewProjectionMatrix;
 // uniform mat4 uInverseViewProjectionMatrix;
@@ -79,18 +80,14 @@ uniform float uRayJitterSizeY;
 float calcTransmittance(
     SpotLight spotLight,
     sampler2D spotLightShadowMap,
-    out float rayStep,
+    vec3 rayPosInWorld,
+    vec3 rayPosInView,
+    float viewZFromDepth,
     out float fogColor,
-    out float fogRate,
-    vec3 rayOrigin,
-    vec3 rayDir,
-    vec4 rayPosInView,
-    float viewZFromDepth
+    out float fogRate
 ) {
-    vec3 rayPos = rayOrigin + rayDir * rayStep;
-    vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPos, 1.);
+    vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
     vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
-    // vec3 shadowUv = shadowCoord * .5 + .5;
     vec3 shadowUv = shadowCoord;
     float shadowZ = shadowPos.z / shadowPos.w;
     float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
@@ -99,7 +96,7 @@ float calcTransmittance(
         step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
         step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
 
-    vec3 rayToLight = spotLight.position - rayPos;
+    vec3 rayToLight = spotLight.position - rayPosInWorld;
     vec3 PtoL = normalize(rayToLight);
     vec3 LtoP = -PtoL;
     float lightDistance = length(rayToLight);
@@ -117,22 +114,26 @@ float calcTransmittance(
                 shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
             )
         )) {
-            // transmittance += (1. / float(MARCH_COUNT)) * attenuation * spotEffect; // cheap decay
-            // transmittance += (1. / 32.) * attenuation * spotEffect * isShadowArea; // cheap decay
-            // transmittance += exp(-density); // TODO: 指数減衰使いたい
-            // transmittance += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-            
+            // TODO: マジックナンバーなのをやめたい 
+            // TODO: 指数減衰使いたい
             fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-            // fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
+            // transmittance += exp(-density); // TODO: 指数減衰使いたい
         }
-    // } else {
-    //     fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
     }
-    // fogRate += (1. / 16.) * attenuation * spotEffect * isShadowArea;
-    // fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-    fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea;
 
-    rayStep += uRayStep;
+    // TODO: マジックナンバーなのをやめたい 
+    // fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea;
+    fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
+    
+    // for debug
+    // fogRate = spotLight.direction.x;
+    // fogRate += spotEffect;
+    fogRate += attenuation;
+    // fogRate += isShadowArea; 
+    // fogRate += rayStep;
+
+    // tmp
+    // rayStep += uRayStep;
     
     return 0.;
 }
@@ -155,18 +156,40 @@ void main() {
     // float rawDepth = texture(uSpotLightShadowMap[0], uv).r;
     float rawDepth = texture(uDepthTexture, uv).r;
 
-    // geometry
-    vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    // pattern_1: geometry from gbuffer
+    // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    // pattern_22: geometry from frustum
+    float rawDepthFrustum = texture(uVolumetricDepthTexture, vUv).r;
+    float sceneDepthFrustum = perspectiveDepthToLinearDepth(rawDepthFrustum, uNearClip, uFarClip);
+    vec3 worldPositionFrustum = reconstructWorldPositionFromDepth(
+        vUv,
+        texture(uVolumetricDepthTexture, vUv).x,
+        uInverseViewProjectionMatrix
+    );
+    vec3 worldPosition = worldPositionFrustum;
 
-    vec3 vpos = vec3(uv * 2. - 1., 1.);
-    vec3 viewDir = (uInverseProjectionMatrix * vpos.xyzz * uFarClip).xyz;
-    
-    vec3 viewDirInWorld = (uInverseViewMatrix * vec4(viewDir, 0.)).xyz;
-    // float viewDirInWorldLength = length(viewDirInWorld);
-   
-    // ワールド座標系でカメラの位置からレイを飛ばす
-    vec3 rayOrigin = uViewPosition + vec3(jitterOffset, 0.);
-    vec3 rayDir = normalize(viewDirInWorld);
+    // mask by frustum depth 
+    // if(step(1. - 1e-6, sceneDepthFrustum) > .5) {
+    //     outColor = vec4(0., 0., 0., 1.);
+    //     return;
+    // }
+
+    //
+    // pattern_1: ワールド座標系でカメラの位置からレイを飛ばす
+    //
+    // vec3 rayOrigin = uViewPosition + vec3(jitterOffset, 0.);
+    // vec3 rayDir = normalize(viewDirInWorld);
+    // vec3 vpos = vec3(uv * 2. - 1., 1.);
+    // vec3 viewDir = (uInverseProjectionMatrix * vpos.xyzz * uFarClip).xyz;
+    // vec3 viewDirInWorld = (uInverseViewMatrix * vec4(viewDir, 0.)).xyz;
+    // // float viewDirInWorldLength = length(viewDirInWorld);
+    //
+    // pattern_2: frustumの位置からレイを飛ばす
+    //
+    vec3 rayOrigin = worldPosition + vec3(jitterOffset, 0.);
+    // vec3 rayDir = normalize(worldPosition - uViewPosition);
+    vec3 rayDir = normalize(rayOrigin - uViewPosition);
+    // rayDir = uViewDirection;
 
     // vec3 rayPos = vec3(0.);
     // float distane = 0.;
@@ -176,39 +199,46 @@ void main() {
     float transmittance = 0.; // fogの透過度
 
     // vec3[MAX_SPOT_LIGHT_COUNT] rayPosArray;
-    float[MAX_SPOT_LIGHT_COUNT] rayStepArray;
+    // float[MAX_SPOT_LIGHT_COUNT] rayStepArray;
     // vec4[MAX_SPOT_LIGHT_COUNT] accColorArray;
     float[MAX_SPOT_LIGHT_COUNT] fogColorArray;
     float[MAX_SPOT_LIGHT_COUNT] fogRateArray;
 
     vec3 rayPosInWorld;
-    vec4 rayPosInView;
+    vec3 rayPosInView;
     float viewZFromDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
-    
+ 
+    // float rayStep = 0.;
+  
     for(int i = 0; i < MARCH_COUNT; i++) {
+        rayStep = uRayStep * float(i);
+        rayPosInWorld = rayOrigin + rayDir * rayStep;
+        rayPosInView = (uViewMatrix * vec4(rayPosInWorld, 1.)).xyz;
         #pragma UNROLL_START
         for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
-            rayPosInWorld = rayOrigin + rayDir * rayStepArray[UNROLL_j];
-            rayPosInView = uViewMatrix * vec4(rayPosInWorld, 1.);
-            // if(abs(rayPosInView.z) < viewZFromDepth) {
             calcTransmittance(
                 uSpotLight[UNROLL_j],
                 uSpotLightShadowMap[UNROLL_j],
-                rayStepArray[UNROLL_j],
-                fogColorArray[UNROLL_j],
-                fogRateArray[UNROLL_j],
-                rayOrigin,
-                rayDir,
+                rayPosInWorld,
                 rayPosInView,
-                viewZFromDepth
+                viewZFromDepth,
+                fogColorArray[UNROLL_j],
+                fogRateArray[UNROLL_j]
             );
-            // }
         }
         #pragma UNROLL_END
     }
+   
+    // for debug 
+    // outColor = vec4(vec3(fogRateArray[0]), 1.);
+    // return;
     
     vec4 fogColor = vec4(0.);
     float fogRate = 0.;
+  
+    vec4 currentFogColor = vec4(0.); 
+    float currentFogRate = 0.; 
+    
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     // for(int i = 0; i < 2; i++) {
@@ -221,10 +251,10 @@ void main() {
         //     fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate *
         //     fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color);
        
-        float currentFogRate = fogRateArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate;
+        currentFogRate = fogRateArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate;
         fogRate += currentFogRate;
 
-        vec4 currentFogColor = currentFogRate * uSpotLight[UNROLL_i].color;
+        currentFogColor = currentFogRate * uSpotLight[UNROLL_i].color;
         fogColor += currentFogColor;
     }
     #pragma UNROLL_END
@@ -239,4 +269,6 @@ void main() {
     
     // for debug
     // outColor = texture(uSrcTexture, vUv);
+    // outColor = vec4(vec3(rayOrigin), 1.);
+    // outColor = vec4(worldPositionFrustum.xyz, 1.);
 }

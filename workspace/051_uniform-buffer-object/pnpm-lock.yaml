@@ -17,11 +17,17 @@ dependencies:
   terser:
     specifier: ^5.19.2
     version: 5.19.2
+  ws:
+    specifier: ^8.14.2
+    version: 8.17.0
 
 devDependencies:
   '@types/node':
     specifier: ^20.4.2
     version: 20.4.2
+  '@types/ws':
+    specifier: ^8.5.10
+    version: 8.5.10
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.0.0
     version: 6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.44.0)(typescript@5.0.2)
@@ -503,6 +509,12 @@ packages:
 
   /@types/semver@7.5.0:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
+    dev: true
+
+  /@types/ws@8.5.10:
+    resolution: {integrity: sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==}
+    dependencies:
+      '@types/node': 20.4.2
     dev: true
 
   /@typescript-eslint/eslint-plugin@6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.44.0)(typescript@5.0.2):
@@ -3056,6 +3068,19 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
+
+  /ws@8.17.0:
+    resolution: {integrity: sha512-uJq6108EgZMAl20KagGkzCKfMEjxmKvZHG7Tlq0Z6nOky7YF7aq4mOx6xK8TJ/i1LeK4Qus7INktacctDgY8Ow==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
 
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}

@@ -25,7 +25,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 // import {AbstractRenderTarget} from "@/PaleGL/core/AbstractRenderTarget";
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
 import { Ray } from '@/PaleGL/math/Ray.ts';
-import {Vector2} from "@/PaleGL/math/Vector2.ts";
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import { Transform } from '@/PaleGL/core/Transform.ts';
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
 // import {Renderer} from "@/PaleGL/core/Renderer.ts";
@@ -62,7 +62,7 @@ export class Camera extends Actor {
     near: number = 1;
     far: number = 10;
     visibleFrustum: boolean = false;
-    #visibleFrustumMesh: Mesh | null = null;
+    visibleFrustumMesh: Mesh | null = null;
     cameraType: CameraType;
 
     // mainCamera: boolean = false;
@@ -179,8 +179,8 @@ export class Camera extends Actor {
     update({ gpu, time, deltaTime }: { gpu: GPU; time: number; deltaTime: number }) {
         super.update({ gpu, time, deltaTime });
 
-        if (this.visibleFrustum && !this.#visibleFrustumMesh) {
-            this.#visibleFrustumMesh = new Mesh({
+        if (this.visibleFrustum && !this.visibleFrustumMesh) {
+            this.visibleFrustumMesh = new Mesh({
                 geometry: new Geometry({
                     gpu,
                     attributes: [
@@ -191,14 +191,51 @@ export class Camera extends Actor {
                             usageType: AttributeUsageType.DynamicDraw,
                         }),
                     ],
-                    drawCount: 2 * 12,
+                    // index list
+                    // 0: nearLeftTop
+                    // 1: nearLeftBottom
+                    // 2: nearRightTop
+                    // 3: nearRightBottom
+                    // 4: farLeftTop
+                    // 5: farLeftBottom
+                    // 6: farRightTop
+                    // 7: farRightBottom
+                    //
+                    // pattern1: only line
+                    //
+                    // drawCount: 2 * 12,
+                    // indices: [
+                    //     // near clip
+                    //     0, 1, 1, 3, 3, 2, 2, 0,
+                    //     // far clip
+                    //     4, 5, 5, 7, 7, 6, 6, 4,
+                    //     // bridge
+                    //     0, 4, 1, 5, 2, 6, 3, 7,
+                    // ],
+                    //
+                    // pattern2: like face
+                    //
+                    drawCount: 3 * 2 * 6,
+                    // prettier-ignore
                     indices: [
+                        // far
+                        6, 7, 4,
+                        4, 7, 5,
                         // near clip
-                        0, 1, 1, 3, 3, 2, 2, 0,
-                        // far clip
-                        4, 5, 5, 7, 7, 6, 6, 4,
-                        // bridge
-                        0, 4, 1, 5, 2, 6, 3, 7,
+                        0, 1, 2,
+                        2, 1, 3,
+                        // left
+                        0, 4, 5,
+                        5, 1, 0,
+                        // top
+                        0, 2, 4,
+                        2, 6, 4,
+                        // right
+                        2, 3, 6,
+                        6, 3, 7,
+                        // bottom
+                        1, 5, 7,
+                        7, 1, 3,
                     ],
                 }),
                 material: new Material({
@@ -225,15 +262,16 @@ export class Camera extends Actor {
                     `,
                     primitiveType: PrimitiveTypes.Lines,
                     blendType: BlendTypes.Transparent,
+                    // faceSide: FaceSide.Double,
                     depthWrite: false,
                 }),
             });
-            this.addChild(this.#visibleFrustumMesh as Actor);
+            this.addChild(this.visibleFrustumMesh as Actor);
         }
 
-        if (this.#visibleFrustumMesh) {
+        if (this.visibleFrustumMesh) {
             const frustumPositions = this.getFrustumLocalPositions();
-            this.#visibleFrustumMesh.geometry.updateAttribute(
+            this.visibleFrustumMesh.geometry.updateAttribute(
                 AttributeNames.Position,
                 new Float32Array([
                     // near clip
@@ -321,16 +359,11 @@ export class Camera extends Actor {
     }
 
     /**
-     * 
+     *
      * @param viewportPoint
      */
     viewpointToRay(viewportPoint: Vector2) {
-        const clipPos = new Vector4(
-            viewportPoint.x * 2 - 1,
-            viewportPoint.y * 2 - 1,
-            1,
-            1
-        );
+        const clipPos = new Vector4(viewportPoint.x * 2 - 1, viewportPoint.y * 2 - 1, 1, 1);
         const worldPos = clipPos.multiplyMatrix4(this.inverseViewProjectionMatrix);
         worldPos.x = worldPos.x / worldPos.w;
         worldPos.y = worldPos.y / worldPos.w;
