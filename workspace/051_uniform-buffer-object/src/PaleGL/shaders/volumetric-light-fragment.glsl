@@ -88,11 +88,11 @@ vec2 calcTransmittance(
 ) {
     vec2 result = vec2(0.);
     
-    vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
-    vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
-    vec3 shadowUv = shadowCoord;
-    float shadowZ = shadowPos.z / shadowPos.w;
-    float shadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
+    vec4 rayPosInProjectionTexture = spotLight.shadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
+    vec3 projectionCoord = rayPosInProjectionTexture.xyz / rayPosInProjectionTexture.w;
+    vec3 shadowUv = projectionCoord;
+    float rayDepthInProjection = rayPosInProjectionTexture.z / rayPosInProjectionTexture.w;
+    float spotLightShadowDepth = texture(spotLightShadowMap, shadowUv.xy).r;
     float isShadowArea =
         step(0., shadowUv.x) * (1. - step(1., shadowUv.x)) *
         step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
@@ -109,11 +109,12 @@ vec2 calcTransmittance(
    
     if(abs(rayPosInView.z) < viewZFromDepth) {
         if(all(
-            bvec4(
+            bvec3(
                 angleCos > spotLight.coneCos,
                 testLightInRange(lightDistance, spotLight.distance),
-                shadowDepth > shadowZ, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
-                shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
+                spotLightShadowDepth > rayDepthInProjection // 深度がray.zよりも近い場合は光の影響を受けているとみなす
+                // NOTE: spot effect でマスクしてるのでこれなくていいかも
+                // spotLightShadowDepth > (1. - 1e-6) // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
             )
         )) {
             // tmp
@@ -121,14 +122,18 @@ vec2 calcTransmittance(
             // TODO: マジックナンバーなのをやめたい 
             // TODO: 指数減衰使いたい
             // fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-            result.x = (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+            // result.x = (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+
+            // TODO: 指数減衰使いたい
+            result.y = (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
         }
     }
 
     // TODO: マジックナンバーなのをやめたい 
     // fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea;
     // fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
-    result.y = (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
+    // result.y = (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
+    // result.y = (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
     
     // for debug
     // fogRate = spotLight.direction.x;
