@@ -299,7 +299,7 @@ void RE_Direct(
     // punctual light
     irradiance *= PI;
     irradiance *= directLight.intensity;
-    // irradiance *= 1. - shadow;
+    irradiance *= (1. - shadow);
 
     // diffuse
     reflectedLight.directDiffuse +=

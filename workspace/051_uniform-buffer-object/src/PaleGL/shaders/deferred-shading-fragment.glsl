@@ -124,7 +124,7 @@ float calcSpotLightShadowAttenuation(
 ) {
     float NoL = max(dot(worldNormal, -lightDirection), 0.);
     float bias = .005 * tan(acos(NoL));
-    bias = clamp(bias, .1, .2); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
+    bias = clamp(bias, .01, .02); // 大きくすればするほどアクネは少なくなるが、影の領域が少なくなる
 
     vec4 lightPos = lightViewProjectionTextureMatrix * vec4(worldPosition, 1.);
     vec2 uv = lightPos.xy / lightPos.w;
@@ -155,14 +155,15 @@ float calcSpotLightShadowAttenuation(
     }
 
     // for debug
-    vec3 color = mix(
-        vec3(0., 0., 1.),
-        vec3(1., 0., 0.),
-        // shadowAreaRect
-        (1. - visibility) * shadowAreaRect
-        // (1. - visibility) * shadowAreaRect
-    );
-    // return vec4(color, 1.);
+    // vec3 color = mix(
+    //     vec3(0., 0., 1.),
+    //     vec3(1., 0., 0.),
+    //     // shadowAreaRect
+    //     (1. - visibility) * shadowAreaRect
+    //     // (1. - visibility) * shadowAreaRect
+    // );
+    // // return vec4(color, 1.);
+    // return shadowAreaRect;
 
     // // return vec4(vec3(uv.xy, 1.) * shadowAreaRect, 1.);
     // // return vec4(vec3(shadow * shadowAreaRect), 1.);
@@ -350,8 +351,8 @@ void main() {
         vec4(0., 0., 0., 1.),
         0.5
     );
-    RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-
+    // RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    
     //
     // spot light
     //
@@ -375,7 +376,7 @@ void main() {
         RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     }
     #pragma UNROLL_END
-
+    
     // ambient light
 // TODO: IBL for pbr
 // #ifdef USE_ENV_MAP
