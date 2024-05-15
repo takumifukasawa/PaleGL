@@ -77,15 +77,17 @@ uniform float uRayJitterSizeY;
 #include ./partial/gbuffer-functions.glsl
 
 // voidでもいいが手動unrollの関係でバグるのでfloatで返す
-float calcTransmittance(
+vec2 calcTransmittance(
     SpotLight spotLight,
     sampler2D spotLightShadowMap,
     vec3 rayPosInWorld,
     vec3 rayPosInView,
-    float viewZFromDepth,
-    out float fogColor,
-    out float fogRate
+    float viewZFromDepth
+    // out float fogColor,
+    // out float fogRate
 ) {
+    vec2 result = vec2(0.);
+    
     vec4 shadowPos = spotLight.shadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
     vec3 shadowCoord = shadowPos.xyz / shadowPos.w;
     vec3 shadowUv = shadowCoord;
@@ -104,7 +106,7 @@ float calcTransmittance(
 
     float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
     float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
-    
+   
     if(abs(rayPosInView.z) < viewZFromDepth) {
         if(all(
             bvec4(
@@ -114,28 +116,31 @@ float calcTransmittance(
                 shadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
             )
         )) {
+            // tmp
+            // transmittance += exp(-density); // TODO: 指数減衰使いたい
             // TODO: マジックナンバーなのをやめたい 
             // TODO: 指数減衰使いたい
-            fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
-            // transmittance += exp(-density); // TODO: 指数減衰使いたい
+            // fogColor += (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
+            result.x = (1. / 16.) * attenuation * spotEffect * isShadowArea; // cheap decay
         }
     }
 
     // TODO: マジックナンバーなのをやめたい 
     // fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea;
-    fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
+    // fogRate += (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
+    result.y = (1. / 64.) * attenuation * spotEffect * isShadowArea * uDensityMultiplier;
     
     // for debug
     // fogRate = spotLight.direction.x;
     // fogRate += spotEffect;
-    fogRate += attenuation;
+    // fogRate += attenuation;
     // fogRate += isShadowArea; 
     // fogRate += rayStep;
 
     // tmp
     // rayStep += uRayStep;
     
-    return 0.;
+    return result;
 }
 
 void main() {
@@ -207,6 +212,7 @@ void main() {
     vec3 rayPosInWorld;
     vec3 rayPosInView;
     float viewZFromDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
+    vec2 transmittanceResult = vec2(0.);
  
     // float rayStep = 0.;
   
@@ -216,15 +222,17 @@ void main() {
         rayPosInView = (uViewMatrix * vec4(rayPosInWorld, 1.)).xyz;
         #pragma UNROLL_START
         for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
-            calcTransmittance(
+            transmittanceResult = calcTransmittance(
                 uSpotLight[UNROLL_j],
                 uSpotLightShadowMap[UNROLL_j],
                 rayPosInWorld,
                 rayPosInView,
-                viewZFromDepth,
-                fogColorArray[UNROLL_j],
-                fogRateArray[UNROLL_j]
+                viewZFromDepth
+                // fogColorArray[UNROLL_j],
+                // fogRateArray[UNROLL_j]
             );
+            fogColorArray[UNROLL_j] += transmittanceResult.x;
+            fogRateArray[UNROLL_j] += transmittanceResult.y;
         }
         #pragma UNROLL_END
     }

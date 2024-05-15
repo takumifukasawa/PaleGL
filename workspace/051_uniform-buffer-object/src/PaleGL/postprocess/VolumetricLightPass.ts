@@ -26,7 +26,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
 export class VolumetricLightPass extends PostProcessPassBase {
     rayStep: number = 0.5;
     blendRate: number = 1;
-    densityMultiplier: number = 4;
+    densityMultiplier: number = 1;
     rayJitterSizeX: number = 0.1;
     rayJitterSizeY: number = 0.1;
 
@@ -37,6 +37,9 @@ export class VolumetricLightPass extends PostProcessPassBase {
     spotLightFrustumMaterial: Material;
 
     renderTargetSpotLightFrustum: RenderTarget;
+    
+    rawWidth: number = 1;
+    rawHeight: number = 1;
 
     /**
      *
@@ -185,12 +188,15 @@ uniform mat4 uProjectionMatrix;
      * @param height
      */
     setSize(width: number, height: number) {
+        this.rawWidth = width;
+        this.rawHeight = height;
         this.width = Math.floor(width * this.ratio);
         this.height = Math.floor(height * this.ratio);
 
         super.setSize(this.width, this.height);
 
-        this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
+        // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
+        this.renderTargetSpotLightFrustum.setSize(this.rawWidth, this.rawHeight);
 
         this.material.uniforms.setValue(UniformNames.TargetWidth, this.width);
         this.material.uniforms.setValue(UniformNames.TargetHeight, this.height);

@@ -49,7 +49,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
+import {clamp, saturate} from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
@@ -1515,7 +1515,9 @@ const main = async () => {
         const plane = new Plane(Vector3.zero, Vector3.up);
         const intersectOnPlane = intersectRayWithPlane(ray, plane);
         if (intersectOnPlane) {
-            const p = new Vector3(intersectOnPlane.x, 3, intersectOnPlane.z);
+            const x = clamp(intersectOnPlane.x, -5, 5);
+            const z = clamp(intersectOnPlane.z, -5, 5);
+            const p = new Vector3(x, 3, z);
             attractSphereMesh.transform.setTranslation(p);
         }
         // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
