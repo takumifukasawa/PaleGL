@@ -112,11 +112,18 @@ export class GLSLSound {
             this.node = null;
         }
         console.log(`[GLSLSound.play] time: ${time}`);
+
         const node = this.audioContext.createBufferSource();
-        node.connect(this.audioContext.destination);
+        const gainNode = this.audioContext.createGain();
+        
+        gainNode.connect(this.audioContext.destination);
+        gainNode.gain.value = 1;
+
+        node.connect(gainNode);
         node.buffer = this.audioBuffer;
         node.loop = false;
         node.start(0, time);
+
         this.node = node;
     }
     

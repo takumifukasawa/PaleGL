@@ -25,6 +25,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
 import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
+import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import {
     UniformTypes,
     // TextureWrapTypes,
@@ -49,7 +50,7 @@ import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {clamp, saturate} from '@/PaleGL/utilities/mathUtilities.ts';
+import { clamp, saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
@@ -66,6 +67,8 @@ import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.j
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 // import { Ray } from '@/PaleGL/math/Ray.ts';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
+import soundVertexShader from "@/PaleGL/shaders/sound-vertex-street-light.glsl";
+// import soundVertexShader from "@/PaleGL/shaders/sound-vertex.glsl";
 // import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
 // import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
 // import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
@@ -249,6 +252,7 @@ let attractSphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 // let renderEnabled: boolean = true;
+let glslSound: GLSLSound;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -1403,6 +1407,14 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
+const playSound = () => {
+    if (glslSound) {
+        glslSound.stop();
+    }
+    glslSound = new GLSLSound(gpu, soundVertexShader, 180);
+    glslSound.play(0);
+};
+
 const main = async () => {
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
@@ -1893,6 +1905,19 @@ function initDebugger() {
     //     initialValue: renderEnabled,
     //     onChange: (value) => (renderEnabled = value),
     // });
+    
+    //
+    // play sound
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addButtonDebugger({
+        buttonLabel: 'play sound',
+        onClick: () => {
+            playSound();
+        },
+    });
 
     //
     // orbit controls
