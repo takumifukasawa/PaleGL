@@ -1373,10 +1373,17 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
-            inputController.normalizedInputPosition
+             inputController.normalizedInputPosition
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.position);
+        transformFeedbackDoubleBuffer.uniforms.setValue(
+            'uAttractTargetPosition',
+            Vector3.addVectors(
+                attractSphereMesh.transform.position,
+                new Vector3(0, 1, 0)
+            )
+        );
+        
 
         attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
@@ -1475,6 +1482,8 @@ const main = async () => {
             (child as Mesh).castShadow = true;
         }
     });
+    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue("uMetallic", 0.5);
+    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue("uRoughness", 1);
     console.log('streetFloorActor', streetFloorActor);
 
     //
@@ -1529,7 +1538,7 @@ const main = async () => {
         if (intersectOnPlane) {
             const x = clamp(intersectOnPlane.x, -5, 5);
             const z = clamp(intersectOnPlane.z, -5, 5);
-            const p = new Vector3(x, 3, z);
+            const p = new Vector3(x, 1, z);
             attractSphereMesh.transform.setTranslation(p);
         }
         // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
