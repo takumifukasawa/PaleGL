@@ -179,7 +179,7 @@ export class Camera extends Actor {
     update({ gpu, time, deltaTime }: { gpu: GPU; time: number; deltaTime: number }) {
         super.update({ gpu, time, deltaTime });
 
-        if (this.visibleFrustum && !this.visibleFrustumMesh) {
+        if (!this.visibleFrustumMesh) {
             this.visibleFrustumMesh = new Mesh({
                 geometry: new Geometry({
                     gpu,
@@ -286,6 +286,7 @@ export class Camera extends Actor {
                     ...frustumPositions.farRightBottom.elements,
                 ])
             );
+            this.visibleFrustumMesh.enabled = this.visibleFrustum;
         }
     }
 

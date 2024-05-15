@@ -396,7 +396,7 @@ const spotLight1 = new SpotLight({
 // spotLight.enabled = false;
 
 if (spotLight1.shadowCamera) {
-    spotLight1.shadowCamera.visibleFrustum = true;
+    spotLight1.shadowCamera.visibleFrustum = false;
     spotLight1.castShadow = true;
     spotLight1.shadowCamera.near = 0.1;
     spotLight1.shadowCamera.far = spotLight1.distance;
@@ -428,7 +428,7 @@ const spotLight2 = new SpotLight({
 // spotLight.enabled = false;
 
 if (spotLight2.shadowCamera) {
-    spotLight2.shadowCamera.visibleFrustum = true;
+    spotLight2.shadowCamera.visibleFrustum = false;
     spotLight2.castShadow = true;
     spotLight2.shadowCamera.near = 0.1;
     spotLight2.shadowCamera.far = spotLight2.distance;
