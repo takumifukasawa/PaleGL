@@ -15,6 +15,8 @@ export class GLSLSound {
     channelNum: number;
     audioContext: AudioContext;
     node: AudioBufferSourceNode | null;
+    gainNode: GainNode | null;
+    volume: number;
     duration: number;
     audioBuffer: AudioBuffer;
 
@@ -23,7 +25,9 @@ export class GLSLSound {
         this.channelNum = 2;
         this.duration = duration;
         this.node = null;
-        
+        this.gainNode = null;
+        this.volume = 1;
+
         const audioContext = new AudioContext();
         const audioBuffer = audioContext.createBuffer(
             this.channelNum,
@@ -105,9 +109,13 @@ export class GLSLSound {
         this.audioContext = audioContext;
         this.audioBuffer = audioBuffer;
     }
-    
+
     play(time: number) {
-        if(this.node) {
+        if (this.gainNode) {
+            this.gainNode.disconnect();
+            this.gainNode = null;
+        }
+        if (this.node) {
             this.node.stop();
             this.node = null;
         }
@@ -115,9 +123,9 @@ export class GLSLSound {
 
         const node = this.audioContext.createBufferSource();
         const gainNode = this.audioContext.createGain();
-        
+
         gainNode.connect(this.audioContext.destination);
-        gainNode.gain.value = 1;
+        gainNode.gain.value = this.volume;
 
         node.connect(gainNode);
         node.buffer = this.audioBuffer;
@@ -125,8 +133,16 @@ export class GLSLSound {
         node.start(0, time);
 
         this.node = node;
+        this.gainNode = gainNode;
     }
-    
+
+    setVolume(value: number) {
+        this.volume = value;
+        if (this.gainNode) {
+            this.gainNode.gain.value = this.volume;
+        }
+    }
+
     // seek(time: number) {
     //     console.log(`[GLSLSound.seek] time: ${time}`);
     //     // if(this.node) {

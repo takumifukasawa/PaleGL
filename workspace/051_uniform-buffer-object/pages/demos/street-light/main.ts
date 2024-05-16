@@ -75,6 +75,23 @@ import soundVertexShader from "@/PaleGL/shaders/sound-vertex-street-light.glsl";
 // import gltfStreetFloorModelUrl from '../../../assets/models/street-floor.gltf?url';
 // import gltfStreetFloorModelUrl from '../../../assets/models/street-floor-separete.gltf?url';
 
+
+// -------------------
+// constants
+// -------------------
+
+const DURATION = 180; // sec
+const BPM = 115;
+const MAX_MEASURE = 24;
+
+// -------------------
+// states
+// -------------------
+
+let seekTime = 0;
+
+//--------------------
+
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
 
@@ -1414,12 +1431,13 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
+
 const playSound = () => {
     if (glslSound) {
         glslSound.stop();
     }
-    glslSound = new GLSLSound(gpu, soundVertexShader, 180);
-    glslSound.play(0);
+    glslSound = new GLSLSound(gpu, soundVertexShader, DURATION);
+    glslSound.play(60 * 4 * seekTime / BPM);
 };
 
 const main = async () => {
@@ -1920,6 +1938,30 @@ function initDebugger() {
     //
 
     debuggerGUI.addBorderSpacer();
+
+    debuggerGUI.addSliderDebugger({
+        label: 'volume',
+        minValue: 0,
+        maxValue: 2,
+        stepValue: 0.01,
+        initialValue: 1,
+        onChange: (value) => {
+            if (glslSound) {
+                glslSound.setVolume(value);
+            }
+        },
+    });
+
+    debuggerGUI.addSliderDebugger({
+        label: 'seek',
+        minValue: 0,
+        maxValue: MAX_MEASURE,
+        stepValue: 1,
+        initialValue: 0,
+        onChange: (value) => {
+            seekTime = value;
+        },
+    });
 
     debuggerGUI.addButtonDebugger({
         buttonLabel: 'play sound',
