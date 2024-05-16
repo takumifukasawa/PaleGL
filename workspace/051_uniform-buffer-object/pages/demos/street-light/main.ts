@@ -83,6 +83,8 @@ import soundVertexShader from "@/PaleGL/shaders/sound-vertex-street-light.glsl";
 const DURATION = 180; // sec
 const BPM = 115;
 const MAX_MEASURE = 24;
+const MAX_INSTANCE_NUM = 4096;
+const INITIAL_INSTANCE_NUM = 64;
 
 // -------------------
 // states
@@ -250,12 +252,12 @@ const debuggerStates: {
     // orbitControlsEnabled: true,
 };
 
-const searchParams = new URLSearchParams(location.search);
-const instanceNumStr = searchParams.get('instance-num');
-const initialInstanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
-console.log(`instance num: ${initialInstanceNum}`);
+// const searchParams = new URLSearchParams(location.search);
+// const instanceNumStr = searchParams.get('instance-num');
+// const initialInstanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
+// console.log(`instance num: ${initialInstanceNum}`);
 
-debuggerStates.instanceNum = initialInstanceNum;
+debuggerStates.instanceNum = INITIAL_INSTANCE_NUM;
 
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
@@ -292,22 +294,22 @@ if (!gl) {
 
 const gpu = new GPU({ gl });
 
-const instanceNumView = document.createElement('p');
-instanceNumView.textContent = `instance num: ${initialInstanceNum}`;
-instanceNumView.style.cssText = `
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-margin: auto;
-padding: 0.2em 0.5em;
-font-size: 9px;
-color: white;
-font-weight: bold;
-text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
-text-align: center;
-`;
-wrapperElement?.appendChild(instanceNumView);
+// const instanceNumView = document.createElement('p');
+// instanceNumView.textContent = `instance num: ${initialInstanceNum}`;
+// instanceNumView.style.cssText = `
+// position: absolute;
+// top: 0;
+// left: 0;
+// right: 0;
+// margin: auto;
+// padding: 0.2em 0.5em;
+// font-size: 9px;
+// color: white;
+// font-weight: bold;
+// text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
+// text-align: center;
+// `;
+// wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = new Scene();
 // const compositeScene = new Scene();
@@ -1239,6 +1241,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // console.log(gltfActor, skinningMesh);
 
     skinningMesh.name = 'butterfly';
+    
     // ルートにanimatorをattachしてるので一旦ここでassign
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
@@ -1381,8 +1384,8 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         faceSide: FaceSide.Double,
     });
 
-    const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
-
+    const transformFeedbackDoubleBuffer = createInstanceUpdater(MAX_INSTANCE_NUM);
+    
     let attractRate = 0;
     skinningMesh.onUpdate = ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
@@ -1423,6 +1426,8 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             AttributeNames.InstanceVelocity,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
         );
+        
+        skinnedMesh.geometry.instanceCount = debuggerStates.instanceNum;
     };
 
     // skinningMesh.debugBoneView = true;
@@ -1567,7 +1572,7 @@ const main = async () => {
     // instancing mesh
     //
 
-    skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
+    skinnedMesh = await createGLTFSkinnedMesh(MAX_INSTANCE_NUM);
 
     //
     // floor mesh
@@ -1911,21 +1916,21 @@ function initDebugger() {
     debuggerGUI.addSliderDebugger({
         label: 'instance num',
         minValue: 1,
-        maxValue: 1024,
-        initialValue: debuggerStates.instanceNum,
+        maxValue: MAX_INSTANCE_NUM,
+        initialValue: INITIAL_INSTANCE_NUM,
         stepValue: 1,
         onChange: (value) => {
             debuggerStates.instanceNum = value;
         },
     });
 
-    debuggerGUI.addButtonDebugger({
-        buttonLabel: 'reload',
-        onClick: () => {
-            const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
-            location.replace(url);
-        },
-    });
+    // debuggerGUI.addButtonDebugger({
+    //     buttonLabel: 'reload',
+    //     onClick: () => {
+    //         const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
+    //         location.replace(url);
+    //     },
+    // });
 
     // debuggerGUI.addToggleDebugger({
     //     label: 'render enabled',
