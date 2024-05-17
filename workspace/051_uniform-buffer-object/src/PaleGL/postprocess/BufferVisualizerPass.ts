@@ -493,11 +493,11 @@ export class BufferVisualizerPass implements IPostProcessPass {
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
     update() {
-        if (this.enabled) {
-            this.showDom();
-        } else {
-            this.hideDom();
-        }
+        // if (this.enabled) {
+        //     this.showDom();
+        // } else {
+        //     this.hideDom();
+        // }
     }
 
     showDom() {

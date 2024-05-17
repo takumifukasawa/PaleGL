@@ -49,7 +49,7 @@ const ENTRY_NAME_INDEX: string = 'index';
 // const ENTRY_NAME = ENTRY_NAME_INDEX;
 const ENTRY_NAME: string = "street-light";
 const IS_MAIN_ENTRY = ENTRY_NAME === ENTRY_NAME_INDEX;
-const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `demos/${ENTRY_NAME}`;
+const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `labs/${ENTRY_NAME}`;
 // ---------------------------------------------------
 
 // ref:

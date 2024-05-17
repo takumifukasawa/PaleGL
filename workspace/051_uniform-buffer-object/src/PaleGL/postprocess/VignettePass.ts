@@ -6,9 +6,9 @@ import {PostProcessPassBase, PostProcessPassRenderArgs} from '@/PaleGL/postproce
 // ref:
 
 const UNIFORM_NAME_VIGNETTE_RADIUS = 'uVignetteRadius';
-const UNIFORM_VALUE_VIGNETTE_RADIUS = 2;
+const UNIFORM_VALUE_VIGNETTE_RADIUS = 2.5;
 const UNIFORM_NAME_VIGNETTE_POWER = 'uVignettePower';
-const UNIFORM_VALUE_VIGNETTE_POWER = 1;
+const UNIFORM_VALUE_VIGNETTE_POWER = 1.4;
 const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
 const UNIFORM_VALUE_BLEND_RATE = 1;
 

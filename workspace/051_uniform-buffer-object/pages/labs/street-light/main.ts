@@ -975,7 +975,7 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const assetDir = '/demos/street-light/assets/';
+const assetDir = '/labs/street-light/assets/';
 
 const createStreetFloorActor = async () => {
     // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
@@ -1998,7 +1998,14 @@ function initDebugger() {
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
         initialValue: bufferVisualizerPass.enabled,
-        onChange: (value) => (bufferVisualizerPass.enabled = value),
+        onChange: (value) => {
+            bufferVisualizerPass.enabled = value;
+            if(value) {
+                bufferVisualizerPass.showDom();
+            } else {
+                bufferVisualizerPass.hideDom();
+            }
+        },
     });
 
     //

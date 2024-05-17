@@ -351,7 +351,7 @@ void main() {
         vec4(0., 0., 0., 1.),
         0.5
     );
-    // RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     
     //
     // spot light
