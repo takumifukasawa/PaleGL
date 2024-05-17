@@ -25,7 +25,6 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
 import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
-import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import {
     UniformTypes,
     // TextureWrapTypes,
@@ -57,40 +56,21 @@ import { Actor } from '@/PaleGL/actors/Actor.ts';
 
 // assets
 import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
-// import floorDiffuseImgUrl from '../../../assets/images/rock_tile_floor_diff_1k.jpg?url';
-// import floorNormalImgUrl from '../../../assets/images/rock_tile_floor_nor_gl_1k.jpg?url';
 import CubeMapPositiveXImgUrl from '../../../assets/images/laufenurg_church/px.jpg?url';
 import CubeMapNegativeXImgUrl from '../../../assets/images/laufenurg_church/nx.jpg?url';
 import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.jpg?url';
 import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
-// import { Ray } from '@/PaleGL/math/Ray.ts';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
-import soundVertexShader from "@/PaleGL/shaders/sound-vertex-street-light.glsl";
-// import soundVertexShader from "@/PaleGL/shaders/sound-vertex.glsl";
-// import gltfSphereModelUrl from '../../../assets/models/sphere-32x32.gltf?url';
-// import gltfStreetLightModelUrl from '../../../assets/models/street-light.gltf?url';
-// import gltfButterflyModelUrl from '../../../assets/models/butterfly-forward-thin.gltf?url';
-// import gltfStreetFloorModelUrl from '../../../assets/models/street-floor.gltf?url';
-// import gltfStreetFloorModelUrl from '../../../assets/models/street-floor-separete.gltf?url';
 
 
 // -------------------
 // constants
 // -------------------
 
-const DURATION = 180; // sec
-const BPM = 115;
-const MAX_MEASURE = 24;
-const MAX_INSTANCE_NUM = 4096;
+const MAX_INSTANCE_NUM = 2048;
 const INITIAL_INSTANCE_NUM = 64;
-
-// -------------------
-// states
-// -------------------
-
-let seekTime = 0;
 
 //--------------------
 
@@ -271,7 +251,6 @@ let attractSphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
 // let renderEnabled: boolean = true;
-let glslSound: GLSLSound;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -1436,15 +1415,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     return skinningMesh;
 };
 
-
-const playSound = () => {
-    if (glslSound) {
-        glslSound.stop();
-    }
-    glslSound = new GLSLSound(gpu, soundVertexShader, DURATION);
-    glslSound.play(60 * 4 * seekTime / BPM);
-};
-
 const main = async () => {
     const particleImg = await loadImg(smokeImgUrl);
     const particleMap = new Texture({
@@ -1921,57 +1891,6 @@ function initDebugger() {
         stepValue: 1,
         onChange: (value) => {
             debuggerStates.instanceNum = value;
-        },
-    });
-
-    // debuggerGUI.addButtonDebugger({
-    //     buttonLabel: 'reload',
-    //     onClick: () => {
-    //         const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
-    //         location.replace(url);
-    //     },
-    // });
-
-    // debuggerGUI.addToggleDebugger({
-    //     label: 'render enabled',
-    //     initialValue: renderEnabled,
-    //     onChange: (value) => (renderEnabled = value),
-    // });
-    
-    //
-    // play sound
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    debuggerGUI.addSliderDebugger({
-        label: 'volume',
-        minValue: 0,
-        maxValue: 2,
-        stepValue: 0.01,
-        initialValue: 1,
-        onChange: (value) => {
-            if (glslSound) {
-                glslSound.setVolume(value);
-            }
-        },
-    });
-
-    debuggerGUI.addSliderDebugger({
-        label: 'seek',
-        minValue: 0,
-        maxValue: MAX_MEASURE,
-        stepValue: 1,
-        initialValue: 0,
-        onChange: (value) => {
-            seekTime = value;
-        },
-    });
-
-    debuggerGUI.addButtonDebugger({
-        buttonLabel: 'play sound',
-        onClick: () => {
-            playSound();
         },
     });
 
