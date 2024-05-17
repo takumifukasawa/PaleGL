@@ -79,11 +79,12 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
 
     const spotLightDebuggerGroup = debuggerGUI.addGroup(label, false);
 
-    spotLightDebuggerGroup.addToggleDebugger({
-        label: 'light enabled',
-        initialValue: spotLight.enabled,
-        onChange: (value) => (spotLight.enabled = value),
-    });
+    // tmp
+    // spotLightDebuggerGroup.addToggleDebugger({
+    //     label: 'light enabled',
+    //     initialValue: spotLight.enabled,
+    //     onChange: (value) => (spotLight.enabled = value),
+    // });
 
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
@@ -487,7 +488,7 @@ renderer.depthOfFieldPass.focusDistance = 18.5;
 renderer.depthOfFieldPass.focusRange = 17;
 
 const fxaaPass = new FXAAPass({ gpu });
-fxaaPass.enabled = false;
+// fxaaPass.enabled = false;
 cameraPostProcess.addPass(fxaaPass);
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
@@ -1935,11 +1936,11 @@ function initDebugger() {
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
 
-    directionalLightDebuggerGroup.addToggleDebugger({
-        label: 'light enabled',
-        initialValue: directionalLight.enabled,
-        onChange: (value) => (directionalLight.enabled = value),
-    });
+    // directionalLightDebuggerGroup.addToggleDebugger({
+    //     label: 'light enabled',
+    //     initialValue: directionalLight.enabled,
+    //     onChange: (value) => (directionalLight.enabled = value),
+    // });
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
@@ -2100,11 +2101,11 @@ function initDebugger() {
 
     const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft', false);
 
-    lightShaftDebuggerGroup.addToggleDebugger({
-        label: 'light shaft pass enabled',
-        initialValue: renderer.lightShaftPass.enabled,
-        onChange: (value) => (renderer.lightShaftPass.enabled = value),
-    });
+    // lightShaftDebuggerGroup.addToggleDebugger({
+    //     label: 'light shaft pass enabled',
+    //     initialValue: renderer.lightShaftPass.enabled,
+    //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
+    // });
 
     lightShaftDebuggerGroup.addSliderDebugger({
         label: 'blend rate',
@@ -2294,11 +2295,11 @@ function initDebugger() {
 
     const dofDebuggerGroup = debuggerGUI.addGroup('depth of field', false);
 
-    dofDebuggerGroup.addToggleDebugger({
-        label: 'DoF pass enabled',
-        initialValue: renderer.depthOfFieldPass.enabled,
-        onChange: (value) => (renderer.depthOfFieldPass.enabled = value),
-    });
+    // dofDebuggerGroup.addToggleDebugger({
+    //     label: 'DoF pass enabled',
+    //     initialValue: renderer.depthOfFieldPass.enabled,
+    //     onChange: (value) => (renderer.depthOfFieldPass.enabled = value),
+    // });
 
     dofDebuggerGroup.addSliderDebugger({
         label: 'DoF focus distance',
@@ -2341,11 +2342,11 @@ function initDebugger() {
 
     const bloomDebuggerGroup = debuggerGUI.addGroup('bloom', false);
 
-    bloomDebuggerGroup.addToggleDebugger({
-        label: 'Bloom pass enabled',
-        initialValue: renderer.bloomPass.enabled,
-        onChange: (value) => (renderer.bloomPass.enabled = value),
-    });
+    // bloomDebuggerGroup.addToggleDebugger({
+    //     label: 'Bloom pass enabled',
+    //     initialValue: renderer.bloomPass.enabled,
+    //     onChange: (value) => (renderer.bloomPass.enabled = value),
+    // });
 
     bloomDebuggerGroup.addSliderDebugger({
         label: 'bloom amount',
@@ -2455,11 +2456,11 @@ function initDebugger() {
 
     const ssrDebuggerGroup = debuggerGUI.addGroup('ssr', false);
 
-    ssrDebuggerGroup.addToggleDebugger({
-        label: 'ssr pass enabled',
-        initialValue: renderer.ssrPass.enabled,
-        onChange: (value) => (renderer.ssrPass.enabled = value),
-    });
+    // ssrDebuggerGroup.addToggleDebugger({
+    //     label: 'ssr pass enabled',
+    //     initialValue: renderer.ssrPass.enabled,
+    //     onChange: (value) => (renderer.ssrPass.enabled = value),
+    // });
 
     ssrDebuggerGroup.addSliderDebugger({
         label: 'depth bias',
