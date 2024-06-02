@@ -63,6 +63,7 @@ import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.j
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
+import {captureCanvas} from "@/PaleGL/utilities/captureCanvas.ts";
 
 // -------------------
 // constants
@@ -259,8 +260,9 @@ wrapperElement.setAttribute('id', 'wrapper');
 // const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
+captureCanvas(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', { antialias: false });
+const gl = canvasElement.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
 
 if (!gl) {
     throw 'invalid gl';
@@ -1520,8 +1522,8 @@ const main = async () => {
         const plane = new Plane(Vector3.zero, Vector3.up);
         const intersectOnPlane = intersectRayWithPlane(ray, plane);
         if (intersectOnPlane) {
-            const x = clamp(intersectOnPlane.x, -5, 5);
-            const z = clamp(intersectOnPlane.z, -5, 5);
+            const x = clamp(intersectOnPlane.x, -1, 1);
+            const z = clamp(intersectOnPlane.z, -1, 1);
             const p = new Vector3(x, 1, z);
             attractSphereMesh.transform.setTranslation(p);
         }
