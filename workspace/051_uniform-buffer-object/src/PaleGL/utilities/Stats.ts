@@ -7,6 +7,7 @@ type PassInfo = { passLabel: string; vertexCount: number };
 type StatsArgs = {
     wrapperElement?: HTMLElement;
     showPassDetails?: boolean;
+    showStats?: boolean;
 };
 
 export class Stats {
@@ -18,6 +19,7 @@ export class Stats {
     drawVertexCount = 0;
     drawCallCount = 0;
     showPassDetails = false;
+    showStats: boolean = false;
 
     fpsCounter: FPSCounter;
     fpsCounterView;
@@ -27,7 +29,9 @@ export class Stats {
      * @param args
      */
     constructor(args: StatsArgs = {}) {
-        const { wrapperElement } = args;
+        const { wrapperElement, showStats } = args;
+
+        this.showStats = !!showStats;
 
         this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
@@ -133,6 +137,12 @@ white-space: break-spaces;
      *
      */
     updateView() {
+        if (this.showStats) {
+            this.show();
+        } else {
+            this.hide();
+        }
+
         this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
 
         const passesStrings = [];
@@ -150,13 +160,23 @@ white-space: break-spaces;
                 totalDrawCalls++;
                 totalVertexCount += passInfo.vertexCount;
             }
-            queue.unshift(`[${this.passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`);
+            queue.unshift(
+                `[${this.passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`
+            );
             passesStrings.push(...queue);
         }
         passesStrings.push('-------------');
         this.passInfoView.textContent = passesStrings.join('\n');
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
+    }
+
+    show() {
+        this.domElement.style.display = 'block';
+    }
+
+    hide() {
+        this.domElement.style.display = 'none';
     }
 
     // ------------------------------------------------------------

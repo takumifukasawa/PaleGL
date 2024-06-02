@@ -345,6 +345,7 @@ export class BloomPass implements IPostProcessPass {
         const renderBlur = (
             horizontalRenderTarget: RenderTarget,
             verticalRenderTarget: RenderTarget,
+            beforeRenderTarget: RenderTarget,
             downSize: number
         ) => {
             const w = this.width / downSize;
@@ -354,7 +355,8 @@ export class BloomPass implements IPostProcessPass {
             // renderer.clearColor(0, 0, 0, 1);
             this.horizontalBlurMaterial.uniforms.setValue(
                 UniformNames.SrcTexture,
-                this.extractBrightnessPass.renderTarget.texture
+                // this.extractBrightnessPass.renderTarget.texture
+                beforeRenderTarget.texture
             );
             this.horizontalBlurMaterial.uniforms.setValue('uTargetWidth', w);
             this.horizontalBlurMaterial.uniforms.setValue('uTargetHeight', w);
@@ -369,15 +371,39 @@ export class BloomPass implements IPostProcessPass {
         };
 
         // 1 / 4
-        renderBlur(this.renderTargetBlurMip4_Horizontal, this.renderTargetBlurMip4_Vertical, 4);
+        renderBlur(
+            this.renderTargetBlurMip4_Horizontal,
+            this.renderTargetBlurMip4_Vertical, 
+            this.extractBrightnessPass.renderTarget,
+            4);
         // 1 / 8
-        renderBlur(this.renderTargetBlurMip8_Horizontal, this.renderTargetBlurMip8_Vertical, 8);
+        renderBlur(
+            this.renderTargetBlurMip8_Horizontal,
+            this.renderTargetBlurMip8_Vertical,
+            this.renderTargetBlurMip4_Vertical,
+            8
+        );
         // 1 / 16
-        renderBlur(this.renderTargetBlurMip16_Horizontal, this.renderTargetBlurMip16_Vertical, 16);
+        renderBlur(
+            this.renderTargetBlurMip16_Horizontal,
+            this.renderTargetBlurMip16_Vertical,
+            this.renderTargetBlurMip8_Vertical,
+            16
+        );
         // 1 / 32
-        renderBlur(this.renderTargetBlurMip32_Horizontal, this.renderTargetBlurMip32_Vertical, 32);
+        renderBlur(
+            this.renderTargetBlurMip32_Horizontal,
+            this.renderTargetBlurMip32_Vertical,
+            this.renderTargetBlurMip16_Vertical,
+            32
+        );
         // 1 / 64
-        renderBlur(this.renderTargetBlurMip64_Horizontal, this.renderTargetBlurMip64_Vertical, 64);
+        renderBlur(
+            this.renderTargetBlurMip64_Horizontal,
+            this.renderTargetBlurMip64_Vertical,
+            this.renderTargetBlurMip32_Vertical,
+            64
+        );
 
         if (prevRenderTarget) {
             this.compositePass.material.uniforms.setValue(UniformNames.SrcTexture, prevRenderTarget.texture);

@@ -82,17 +82,19 @@ export class Engine {
         onBeforeFixedUpdate,
         onBeforeUpdate,
         onRender,
+        showStats
     }: {
         gpu: GPU;
         renderer: Renderer;
         onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback;
         onBeforeUpdate?: EngineOnBeforeUpdateCallback;
         onRender?: EngineOnRenderCallback;
+        showStats?: boolean;
     }) {
         this.#gpu = gpu;
         this.#renderer = renderer;
 
-        this.#stats = new Stats();
+        this.#stats = new Stats({ showStats });
         this.#renderer.setStats(this.#stats);
 
         // TODO: 外からfps変えられるようにしたい

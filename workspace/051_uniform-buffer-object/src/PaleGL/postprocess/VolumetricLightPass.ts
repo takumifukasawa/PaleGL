@@ -210,7 +210,9 @@ uniform mat4 uProjectionMatrix;
 
         const { gpu, renderer } = options;
 
-        if (!this.spotLightFrustumMaterial.isCompiledShader) {
+        if (
+            !this.spotLightFrustumMaterial.isCompiledShader
+            && this.#spotLights.length > 0) {
             this.spotLightFrustumMaterial.start({
                 gpu,
                 attributeDescriptors:

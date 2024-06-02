@@ -64,7 +64,6 @@ import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.j
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 
-
 // -------------------
 // constants
 // -------------------
@@ -233,11 +232,6 @@ const debuggerStates: {
     // orbitControlsEnabled: true,
 };
 
-// const searchParams = new URLSearchParams(location.search);
-// const instanceNumStr = searchParams.get('instance-num');
-// const initialInstanceNum = instanceNumStr ? Number.parseInt(instanceNumStr, 10) : 50;
-// console.log(`instance num: ${initialInstanceNum}`);
-
 debuggerStates.instanceNum = INITIAL_INSTANCE_NUM;
 
 let debuggerGUI: DebuggerGUI;
@@ -303,7 +297,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({ gpu, renderer });
+const engine = new Engine({ gpu, renderer, showStats: false });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -1221,7 +1215,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // console.log(gltfActor, skinningMesh);
 
     skinningMesh.name = 'butterfly';
-    
+
     // ルートにanimatorをattachしてるので一旦ここでassign
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
@@ -1365,7 +1359,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     });
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(MAX_INSTANCE_NUM);
-    
+
     let attractRate = 0;
     skinningMesh.onUpdate = ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
@@ -1373,17 +1367,13 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
-             inputController.normalizedInputPosition
+            inputController.normalizedInputPosition
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uAttractTargetPosition',
-            Vector3.addVectors(
-                attractSphereMesh.transform.position,
-                new Vector3(0, 1, 0)
-            )
+            Vector3.addVectors(attractSphereMesh.transform.position, new Vector3(0, 1, 0))
         );
-        
 
         attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
@@ -1406,7 +1396,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             AttributeNames.InstanceVelocity,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
         );
-        
+
         skinnedMesh.geometry.instanceCount = debuggerStates.instanceNum;
     };
 
@@ -1476,8 +1466,8 @@ const main = async () => {
             (child as Mesh).castShadow = true;
         }
     });
-    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue("uMetallic", 0.5);
-    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue("uRoughness", 1);
+    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uMetallic', 0.5);
+    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uRoughness', 1);
     console.log('streetFloorActor', streetFloorActor);
 
     //
@@ -1920,7 +1910,7 @@ function initDebugger() {
         initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => {
             bufferVisualizerPass.enabled = value;
-            if(value) {
+            if (value) {
                 bufferVisualizerPass.showDom();
             } else {
                 bufferVisualizerPass.hideDom();
@@ -2002,11 +1992,11 @@ function initDebugger() {
 
     const ssaoDebuggerGroup = debuggerGUI.addGroup('ssao', false);
 
-    ssaoDebuggerGroup.addToggleDebugger({
-        label: 'ssao pass enabled',
-        initialValue: renderer.ambientOcclusionPass.enabled,
-        onChange: (value) => (renderer.ambientOcclusionPass.enabled = value),
-    });
+    // ssaoDebuggerGroup.addToggleDebugger({
+    //     label: 'ssao pass enabled',
+    //     initialValue: renderer.ambientOcclusionPass.enabled,
+    //     onChange: (value) => (renderer.ambientOcclusionPass.enabled = value),
+    // });
 
     ssaoDebuggerGroup.addSliderDebugger({
         label: 'ssao occlusion sample length',
