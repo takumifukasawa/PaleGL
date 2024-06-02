@@ -63,7 +63,7 @@ import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.j
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
-import {captureCanvas} from "@/PaleGL/utilities/captureCanvas.ts";
+// import {captureCanvas} from "@/PaleGL/utilities/captureCanvas.ts";
 
 // -------------------
 // constants
@@ -260,7 +260,7 @@ wrapperElement.setAttribute('id', 'wrapper');
 // const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
-captureCanvas(canvasElement);
+// captureCanvas(canvasElement);
 
 const gl = canvasElement.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
 
