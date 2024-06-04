@@ -1,29 +1,29 @@
-import {DirectionalLight} from '@/PaleGL/actors/DirectionalLight';
-import {Mesh} from '@/PaleGL/actors/Mesh';
-import {PerspectiveCamera} from '@/PaleGL/actors/PerspectiveCamera';
-import {Skybox} from '@/PaleGL/actors/Skybox';
-import {SkinnedMesh} from '@/PaleGL/actors/SkinnedMesh';
-import {Engine} from '@/PaleGL/core/Engine';
-import {Renderer} from '@/PaleGL/core/Renderer';
-import {GPU} from '@/PaleGL/core/GPU';
-import {RenderTarget} from '@/PaleGL/core/RenderTarget';
-import {Scene} from '@/PaleGL/core/Scene';
-import {Rotator} from '@/PaleGL/math/Rotator';
-import {Texture} from '@/PaleGL/core/Texture';
-import {OrbitCameraController} from '@/PaleGL/core/OrbitCameraController';
-import {Geometry} from '@/PaleGL/geometries/Geometry';
-import {loadCubeMap} from '@/PaleGL/loaders/loadCubeMap';
-import {loadGLTF} from '@/PaleGL/loaders/loadGLTF';
-import {loadImg} from '@/PaleGL/loaders/loadImg';
-import {Material} from '@/PaleGL/materials/Material';
-import {Color} from '@/PaleGL/math/Color';
-import {Vector2} from '@/PaleGL/math/Vector2';
-import {Vector3} from '@/PaleGL/math/Vector3';
-import {Vector4} from '@/PaleGL/math/Vector4';
-import {FXAAPass} from '@/PaleGL/postprocess/FXAAPass';
-import {BufferVisualizerPass} from '@/PaleGL/postprocess/BufferVisualizerPass';
-import {TouchInputController} from '@/PaleGL/inputs/TouchInputController';
-import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
+import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
+import { Mesh } from '@/PaleGL/actors/Mesh';
+import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
+import { Skybox } from '@/PaleGL/actors/Skybox';
+import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
+import { Engine } from '@/PaleGL/core/Engine';
+import { Renderer } from '@/PaleGL/core/Renderer';
+import { GPU } from '@/PaleGL/core/GPU';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { Scene } from '@/PaleGL/core/Scene';
+import { Rotator } from '@/PaleGL/math/Rotator';
+import { Texture } from '@/PaleGL/core/Texture';
+import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
+import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
+import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
+import { loadImg } from '@/PaleGL/loaders/loadImg';
+import { Material } from '@/PaleGL/materials/Material';
+import { Color } from '@/PaleGL/math/Color';
+import { Vector2 } from '@/PaleGL/math/Vector2';
+import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Vector4 } from '@/PaleGL/math/Vector4';
+import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
+import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
+import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
+import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 import {
     UniformTypes,
     BlendTypes,
@@ -37,19 +37,19 @@ import {
     ActorTypes,
 } from '@/PaleGL/constants';
 
-import {DebuggerGUI} from '@/DebuggerGUI';
-import {Camera} from '@/PaleGL/actors/Camera';
-import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
-import {Attribute} from '@/PaleGL/core/Attribute';
-import {CubeMap} from '@/PaleGL/core/CubeMap.ts';
-import {GBufferMaterial} from '@/PaleGL/materials/GBufferMaterial.ts';
-import {PostProcess} from '@/PaleGL/postprocess/PostProcess.ts';
-import {TransformFeedbackDoubleBuffer} from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
-import {maton} from '@/PaleGL/utilities/maton.ts';
-import {clamp, saturate} from '@/PaleGL/utilities/mathUtilities.ts';
-import {UnlitMaterial} from '@/PaleGL/materials/UnlitMaterial.ts';
-import {SpotLight} from '@/PaleGL/actors/SpotLight.ts';
-import {Actor} from '@/PaleGL/actors/Actor.ts';
+import { DebuggerGUI } from '@/DebuggerGUI';
+import { Camera } from '@/PaleGL/actors/Camera';
+import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
+import { Attribute } from '@/PaleGL/core/Attribute';
+import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
+import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
+import { clamp, saturate } from '@/PaleGL/utilities/mathUtilities.ts';
+import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
+import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
+import { Actor } from '@/PaleGL/actors/Actor.ts';
 
 // assets
 import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
@@ -59,7 +59,7 @@ import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.j
 import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
-import {intersectRayWithPlane, Plane} from '@/PaleGL/math/Plane.ts';
+import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 
 // -------------------
 // constants
@@ -244,13 +244,13 @@ wrapperElement.setAttribute('id', 'wrapper');
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', {antialias: false, preserveDrawingBuffer: true});
+const gl = canvasElement.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
 
 if (!gl) {
     throw 'invalid gl';
 }
 
-const gpu = new GPU({gl});
+const gpu = new GPU({ gl });
 
 const captureScene = new Scene();
 
@@ -262,7 +262,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({gpu, renderer, showStats: false});
+const engine = new Engine({ gpu, renderer, showStats: true });
 
 engine.setScene(captureScene);
 
@@ -285,7 +285,7 @@ orbitCameraController.defaultAzimuth = 10;
 orbitCameraController.defaultAltitude = -10;
 orbitCameraController.lookAtTarget = new Vector3(0, 3, 0);
 
-captureSceneCamera.subscribeOnStart(({actor}) => {
+captureSceneCamera.subscribeOnStart(({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 });
 captureSceneCamera.onFixedUpdate = () => {
@@ -322,7 +322,7 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.subscribeOnStart(({actor}) => {
+directionalLight.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
 });
@@ -351,7 +351,7 @@ if (spotLight1.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight1.subscribeOnStart(({actor}) => {
+spotLight1.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(3.4, 8.1, 0));
     actor.transform.lookAt(new Vector3(2, 0, 0));
 });
@@ -381,7 +381,7 @@ if (spotLight2.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight2.subscribeOnStart(({actor}) => {
+spotLight2.subscribeOnStart(({ actor }) => {
     actor.transform.setTranslation(new Vector3(-3.4, 8.1, 0));
     actor.transform.lookAt(new Vector3(-2, 0, 0));
 });
@@ -393,10 +393,10 @@ const cameraPostProcess = new PostProcess();
 renderer.depthOfFieldPass.focusDistance = 18.5;
 renderer.depthOfFieldPass.focusRange = 17;
 
-const fxaaPass = new FXAAPass({gpu});
+const fxaaPass = new FXAAPass({ gpu });
 cameraPostProcess.addPass(fxaaPass);
 
-const bufferVisualizerPass = new BufferVisualizerPass({gpu});
+const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
 bufferVisualizerPass.enabled = false;
 cameraPostProcess.addPass(bufferVisualizerPass);
 
@@ -406,13 +406,13 @@ captureSceneCamera.setPostProcess(cameraPostProcess);
 
 const createStreetFloorActor = async () => {
     // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
-    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'street-floor-separete.gltf'});
+    const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'street-floor-separete.gltf' });
     return gltfActor;
 };
 
 const createStreetLightActor = async () => {
     // const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR,  path: "street-light.gltf"});
-    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'street-light-full.gltf'});
+    const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'street-light-full.gltf' });
     return gltfActor;
 
     // const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -442,7 +442,7 @@ const createStreetLightActor = async () => {
 
 const createGLTFSphereMesh = async (material: Material) => {
     // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'sphere-32x32.gltf'});
+    const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'sphere-32x32.gltf' });
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = material;
@@ -627,7 +627,7 @@ layout (std140) uniform ubCommon {
     // TODO: rendererかgpuでまとめたい
     transformFeedbackDoubleBuffer.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-            ({uniformBufferObject}) => uniformBufferObject.blockName === blockName
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
         );
         if (!targetGlobalUniformBufferObject) {
             return;
@@ -660,7 +660,7 @@ layout (std140) uniform ubCommon {
  *
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
-    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'butterfly-forward-thin-2.gltf'});
+    const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'butterfly-forward-thin-2.gltf' });
 
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
@@ -787,7 +787,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createInstanceUpdater(MAX_INSTANCE_NUM);
 
     let attractRate = 0;
-    skinningMesh.onUpdate = ({deltaTime}) => {
+    skinningMesh.onUpdate = ({ deltaTime }) => {
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
             inputController.normalizedInputPosition
@@ -892,7 +892,7 @@ const main = async () => {
             emissiveColor: new Color(3, 3, 3, 1),
         })
     );
-    attractSphereMesh.subscribeOnStart(({actor}) => {
+    attractSphereMesh.subscribeOnStart(({ actor }) => {
         actor.transform.setScaling(Vector3.fill(0.5));
     });
     attractSphereMesh.onFixedUpdate = () => {
@@ -1199,7 +1199,7 @@ void main() {
     };
 
     engine.onRender = (time) => {
-        renderer.render(captureScene, captureSceneCamera, {time});
+        renderer.render(captureScene, captureSceneCamera, { time });
     };
 
     const tick = (time: number) => {

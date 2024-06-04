@@ -8,18 +8,23 @@ type StatsArgs = {
     wrapperElement?: HTMLElement;
     showPassDetails?: boolean;
     showStats?: boolean;
+    showFPS?: boolean;
+    showPipeline?: boolean;
 };
 
 export class Stats {
     domElement;
     passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
+    pipelineWrapper;
     passInfoView;
     drawVertexCountView;
     drawCallCountView;
     drawVertexCount = 0;
     drawCallCount = 0;
     showPassDetails = false;
-    showStats: boolean = false;
+    showStats: boolean = true;
+    showFPS: boolean = true;
+    showPipeline: boolean = true;
 
     fpsCounter: FPSCounter;
     fpsCounterView;
@@ -29,9 +34,11 @@ export class Stats {
      * @param args
      */
     constructor(args: StatsArgs = {}) {
-        const { wrapperElement, showStats } = args;
+        const { wrapperElement, showStats = true, showPipeline = true, showPassDetails = true } = args;
 
         this.showStats = !!showStats;
+        this.showPipeline = !!showPipeline;
+        this.showPassDetails = !!showPassDetails;
 
         this.domElement = document.createElement('div');
         this.domElement.style.cssText = `
@@ -49,18 +56,22 @@ white-space: break-spaces;
         // fps counter
         this.fpsCounterView = document.createElement('p');
         this.domElement.appendChild(this.fpsCounterView);
-
+       
+        // pipe line wrapper
+        this.pipelineWrapper = document.createElement('div');
+        this.domElement.appendChild(this.pipelineWrapper);
+        
         // pass info
         this.passInfoView = document.createElement('p');
-        this.domElement.appendChild(this.passInfoView);
+        this.pipelineWrapper.appendChild(this.passInfoView);
 
         // total vertex count
         this.drawVertexCountView = document.createElement('p');
-        this.domElement.appendChild(this.drawVertexCountView);
+        this.pipelineWrapper.appendChild(this.drawVertexCountView);
 
         // total draw call count
         this.drawCallCountView = document.createElement('p');
-        this.domElement.appendChild(this.drawCallCountView);
+        this.pipelineWrapper.appendChild(this.drawCallCountView);
 
         (wrapperElement || document.body).appendChild(this.domElement);
 
@@ -137,11 +148,9 @@ white-space: break-spaces;
      *
      */
     updateView() {
-        if (this.showStats) {
-            this.show();
-        } else {
-            this.hide();
-        }
+        this.domElement.style.display = this.showStats ? 'block' : 'none';
+        this.fpsCounterView.style.display = this.showFPS ? 'block' : 'none';
+        this.pipelineWrapper.style.display = this.showPipeline ? 'block' : 'none';
 
         this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
 
@@ -169,14 +178,6 @@ white-space: break-spaces;
         this.passInfoView.textContent = passesStrings.join('\n');
         this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
         this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
-    }
-
-    show() {
-        this.domElement.style.display = 'block';
-    }
-
-    hide() {
-        this.domElement.style.display = 'none';
     }
 
     // ------------------------------------------------------------

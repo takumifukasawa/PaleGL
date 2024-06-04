@@ -82,7 +82,7 @@ export class Engine {
         onBeforeFixedUpdate,
         onBeforeUpdate,
         onRender,
-        showStats
+        showStats = false
     }: {
         gpu: GPU;
         renderer: Renderer;
@@ -94,7 +94,7 @@ export class Engine {
         this.#gpu = gpu;
         this.#renderer = renderer;
 
-        this.#stats = new Stats({ showStats });
+        this.#stats = new Stats({ showStats, showPipeline: false }); // 一旦手動で
         this.#renderer.setStats(this.#stats);
 
         // TODO: 外からfps変えられるようにしたい
