@@ -1,34 +1,31 @@
-import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
-import { Mesh } from '@/PaleGL/actors/Mesh';
-import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
-import { Skybox } from '@/PaleGL/actors/Skybox';
-import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
-import { Engine } from '@/PaleGL/core/Engine';
-import { Renderer } from '@/PaleGL/core/Renderer';
-import { GPU } from '@/PaleGL/core/GPU';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { Scene } from '@/PaleGL/core/Scene';
-import { Rotator } from '@/PaleGL/math/Rotator';
-import { Texture } from '@/PaleGL/core/Texture';
-import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
-// import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
-import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
-import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
-import { loadImg } from '@/PaleGL/loaders/loadImg';
-import { Material } from '@/PaleGL/materials/Material';
-import { Color } from '@/PaleGL/math/Color';
-import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
-import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
-import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
-import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
-import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
+import {DirectionalLight} from '@/PaleGL/actors/DirectionalLight';
+import {Mesh} from '@/PaleGL/actors/Mesh';
+import {PerspectiveCamera} from '@/PaleGL/actors/PerspectiveCamera';
+import {Skybox} from '@/PaleGL/actors/Skybox';
+import {SkinnedMesh} from '@/PaleGL/actors/SkinnedMesh';
+import {Engine} from '@/PaleGL/core/Engine';
+import {Renderer} from '@/PaleGL/core/Renderer';
+import {GPU} from '@/PaleGL/core/GPU';
+import {RenderTarget} from '@/PaleGL/core/RenderTarget';
+import {Scene} from '@/PaleGL/core/Scene';
+import {Rotator} from '@/PaleGL/math/Rotator';
+import {Texture} from '@/PaleGL/core/Texture';
+import {OrbitCameraController} from '@/PaleGL/core/OrbitCameraController';
+import {Geometry} from '@/PaleGL/geometries/Geometry';
+import {loadCubeMap} from '@/PaleGL/loaders/loadCubeMap';
+import {loadGLTF} from '@/PaleGL/loaders/loadGLTF';
+import {loadImg} from '@/PaleGL/loaders/loadImg';
+import {Material} from '@/PaleGL/materials/Material';
+import {Color} from '@/PaleGL/math/Color';
+import {Vector2} from '@/PaleGL/math/Vector2';
+import {Vector3} from '@/PaleGL/math/Vector3';
+import {Vector4} from '@/PaleGL/math/Vector4';
+import {FXAAPass} from '@/PaleGL/postprocess/FXAAPass';
+import {BufferVisualizerPass} from '@/PaleGL/postprocess/BufferVisualizerPass';
+import {TouchInputController} from '@/PaleGL/inputs/TouchInputController';
+import {MouseInputController} from '@/PaleGL/inputs/MouseInputController';
 import {
     UniformTypes,
-    // TextureWrapTypes,
-    // TextureFilterTypes,
     BlendTypes,
     RenderTargetTypes,
     AttributeNames,
@@ -40,19 +37,19 @@ import {
     ActorTypes,
 } from '@/PaleGL/constants';
 
-import { DebuggerGUI } from '@/DebuggerGUI';
-import { Camera } from '@/PaleGL/actors/Camera';
-import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-import { Attribute } from '@/PaleGL/core/Attribute';
-import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
-import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
-import { clamp, saturate } from '@/PaleGL/utilities/mathUtilities.ts';
-import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
-import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import { Actor } from '@/PaleGL/actors/Actor.ts';
+import {DebuggerGUI} from '@/DebuggerGUI';
+import {Camera} from '@/PaleGL/actors/Camera';
+import {OrthographicCamera} from '@/PaleGL/actors/OrthographicCamera';
+import {Attribute} from '@/PaleGL/core/Attribute';
+import {CubeMap} from '@/PaleGL/core/CubeMap.ts';
+import {GBufferMaterial} from '@/PaleGL/materials/GBufferMaterial.ts';
+import {PostProcess} from '@/PaleGL/postprocess/PostProcess.ts';
+import {TransformFeedbackDoubleBuffer} from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
+import {maton} from '@/PaleGL/utilities/maton.ts';
+import {clamp, saturate} from '@/PaleGL/utilities/mathUtilities.ts';
+import {UnlitMaterial} from '@/PaleGL/materials/UnlitMaterial.ts';
+import {SpotLight} from '@/PaleGL/actors/SpotLight.ts';
+import {Actor} from '@/PaleGL/actors/Actor.ts';
 
 // assets
 import smokeImgUrl from '../../../assets/images/particle-smoke.png?url';
@@ -62,8 +59,7 @@ import CubeMapPositiveYImgUrl from '../../../assets/images/laufenurg_church/py.j
 import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.jpg?url';
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
-import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
-// import {captureCanvas} from "@/PaleGL/utilities/captureCanvas.ts";
+import {intersectRayWithPlane, Plane} from '@/PaleGL/math/Plane.ts';
 
 // -------------------
 // constants
@@ -72,19 +68,14 @@ import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 const MAX_INSTANCE_NUM = 2048;
 const INITIAL_INSTANCE_NUM = 64;
 
+const ASSET_DIR = '/labs/street-light/assets/';
+
 //--------------------
 
 const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     debuggerGUI.addBorderSpacer();
 
     const spotLightDebuggerGroup = debuggerGUI.addGroup(label, false);
-
-    // tmp
-    // spotLightDebuggerGroup.addToggleDebugger({
-    //     label: 'light enabled',
-    //     initialValue: spotLight.enabled,
-    //     onChange: (value) => (spotLight.enabled = value),
-    // });
 
     spotLightDebuggerGroup.addColorDebugger({
         label: 'color',
@@ -227,70 +218,42 @@ document.head.appendChild(styleElement);
 
 const debuggerStates: {
     instanceNum: number;
-    // orbitControlsEnabled: boolean;
 } = {
     instanceNum: 0,
-    // orbitControlsEnabled: true,
 };
 
 debuggerStates.instanceNum = INITIAL_INSTANCE_NUM;
 
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
-// let floorPlaneMesh: Mesh;
-// let floorDiffuseMap: Texture;
-// let floorNormalMap: Texture;
 let streetFloorActor: Actor;
 let streetLightActorLeft: Actor;
 let streetLightActorRight: Actor;
 let attractSphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
-// let renderEnabled: boolean = true;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
 inputController.start();
 
-// const wrapperElement = document.getElementById("wrapper")!;
 const wrapperElement = document.createElement('div');
 document.body.appendChild(wrapperElement);
 wrapperElement.setAttribute('id', 'wrapper');
 
-// const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 const canvasElement = document.createElement('canvas')!;
 wrapperElement.appendChild(canvasElement);
-// captureCanvas(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
+const gl = canvasElement.getContext('webgl2', {antialias: false, preserveDrawingBuffer: true});
 
 if (!gl) {
     throw 'invalid gl';
 }
 
-const gpu = new GPU({ gl });
-
-// const instanceNumView = document.createElement('p');
-// instanceNumView.textContent = `instance num: ${initialInstanceNum}`;
-// instanceNumView.style.cssText = `
-// position: absolute;
-// top: 0;
-// left: 0;
-// right: 0;
-// margin: auto;
-// padding: 0.2em 0.5em;
-// font-size: 9px;
-// color: white;
-// font-weight: bold;
-// text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
-// text-align: center;
-// `;
-// wrapperElement?.appendChild(instanceNumView);
+const gpu = new GPU({gl});
 
 const captureScene = new Scene();
-// const compositeScene = new Scene();
 
-// const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
 const pixelRatio = Math.min(window.devicePixelRatio, 1);
 
 const renderer = new Renderer({
@@ -299,16 +262,12 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({ gpu, renderer, showStats: false });
+const engine = new Engine({gpu, renderer, showStats: false});
 
-// engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
 
-// const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = new PerspectiveCamera(50, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
-// captureScene.mainCamera = captureSceneCamera;
-// captureSceneCamera.mainCamera = true;
 
 const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 orbitCameraController.distance = isSP ? 15 : 15;
@@ -325,9 +284,8 @@ orbitCameraController.minAzimuth = -55;
 orbitCameraController.defaultAzimuth = 10;
 orbitCameraController.defaultAltitude = -10;
 orbitCameraController.lookAtTarget = new Vector3(0, 3, 0);
-// orbitCameraController.enabled = true;
 
-captureSceneCamera.subscribeOnStart(({ actor }) => {
+captureSceneCamera.subscribeOnStart(({actor}) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
 });
 captureSceneCamera.onFixedUpdate = () => {
@@ -343,12 +301,9 @@ captureSceneCamera.onFixedUpdate = () => {
 };
 
 const directionalLight = new DirectionalLight({
-    // intensity: 1.2,
     intensity: 0.1,
-    // color: Color.fromRGB(255, 210, 200),
     color: Color.white,
 });
-// directionalLight.enabled = false; // NOTE: 一旦ガード
 
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
@@ -357,8 +312,6 @@ if (directionalLight.shadowCamera) {
     directionalLight.castShadow = true;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 15;
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
     (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
@@ -369,18 +322,9 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.subscribeOnStart(({ actor }) => {
+directionalLight.subscribeOnStart(({actor}) => {
     actor.transform.setTranslation(new Vector3(-8, 8, -2));
     actor.transform.lookAt(new Vector3(0, 0, 0));
-    // const lightActor = actor as DirectionalLight;
-    // lightActor.castShadow = true;
-    // // lightActor.castShadow = false;
-    // if (lightActor.shadowCamera) {
-    //     lightActor.shadowCamera.near = 1;
-    //     lightActor.shadowCamera.far = 30;
-    //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
-    //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
-    // }
 });
 captureScene.add(directionalLight);
 
@@ -392,14 +336,12 @@ const spotLight1 = new SpotLight({
     coneCos: 0.8,
     penumbraCos: 0.9,
 });
-// spotLight.enabled = false;
 
 if (spotLight1.shadowCamera) {
     spotLight1.shadowCamera.visibleFrustum = false;
     spotLight1.castShadow = true;
     spotLight1.shadowCamera.near = 0.1;
     spotLight1.shadowCamera.far = spotLight1.distance;
-    // spotLight.shadowCamera.far = 10;
     (spotLight1.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
     spotLight1.shadowMap = new RenderTarget({
         gpu,
@@ -409,7 +351,7 @@ if (spotLight1.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight1.subscribeOnStart(({ actor }) => {
+spotLight1.subscribeOnStart(({actor}) => {
     actor.transform.setTranslation(new Vector3(3.4, 8.1, 0));
     actor.transform.lookAt(new Vector3(2, 0, 0));
 });
@@ -424,14 +366,12 @@ const spotLight2 = new SpotLight({
     coneCos: 0.8,
     penumbraCos: 0.9,
 });
-// spotLight.enabled = false;
 
 if (spotLight2.shadowCamera) {
     spotLight2.shadowCamera.visibleFrustum = false;
     spotLight2.castShadow = true;
     spotLight2.shadowCamera.near = 0.1;
     spotLight2.shadowCamera.far = spotLight2.distance;
-    // spotLight.shadowCamera.far = 10;
     (spotLight2.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
     spotLight2.shadowMap = new RenderTarget({
         gpu,
@@ -441,7 +381,7 @@ if (spotLight2.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight2.subscribeOnStart(({ actor }) => {
+spotLight2.subscribeOnStart(({actor}) => {
     actor.transform.setTranslation(new Vector3(-3.4, 8.1, 0));
     actor.transform.lookAt(new Vector3(-2, 0, 0));
 });
@@ -449,519 +389,30 @@ spotLight2.subscribeOnStart(({ actor }) => {
 captureScene.add(spotLight2);
 
 const cameraPostProcess = new PostProcess();
-// const scenePostProcess = renderer.scenePostProcess;
-// captureScene.scenePostProcess = scenePostProcess;
-
-// const bloomPass = new BloomPass({
-//     gpu,
-//     threshold: 0.9,
-//     bloomAmount: 0.8,
-// });
-// bloomPass.enabled = true;
-// scenePostProcess.addPass(bloomPass);
-
-// const ssaoPass = new SSAOPass({ gpu });
-// ssaoPass.enabled = false;
-// scenePostProcess.addPass(ssaoPass);
-
-// const renderer.ssrPass = new SSRPass({ gpu });
-// renderer.ssrPass.enabled = false;
-// cameraPostProcess.addPass(renderer.ssrPass);
-
-// const lightShaftPass = new LightShaftPass({ gpu });
-// cameraPostProcess.addPass(lightShaftPass);
-// lightShaftPass.blendRate = 0.7;
-// lightShaftPass.rayStep = 0.35;
-// lightShaftPass.attenuationBase = 64;
-// lightShaftPass.attenuationPower = 4;
-// lightShaftPass.enabled = true;
-
-// const gaussianBlurPass = new GaussianBlurPass({ gpu });
-// cameraPostProcess.addPass(gaussianBlurPass);
-// gaussianBlurPass.enabled = true;
 
 renderer.depthOfFieldPass.focusDistance = 18.5;
 renderer.depthOfFieldPass.focusRange = 17;
 
-const fxaaPass = new FXAAPass({ gpu });
-// fxaaPass.enabled = false;
+const fxaaPass = new FXAAPass({gpu});
 cameraPostProcess.addPass(fxaaPass);
 
-const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
+const bufferVisualizerPass = new BufferVisualizerPass({gpu});
 bufferVisualizerPass.enabled = false;
 cameraPostProcess.addPass(bufferVisualizerPass);
-// bufferVisualizerPass.beforeRender = () => {
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         'uDirectionalLightShadowMap',
-//         directionalLight.shadowMap!.read.depthTexture
-//         // spotLight.shadowMap!.read.depthTexture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue('uSpotLightShadowMap', [
-//         spotLight1.shadowMap!.read.depthTexture,
-//         spotLight2.shadowMap!.read.depthTexture,
-//         null,
-//         null,
-//     ]);
-//     // console.log(bufferVisualizerPass.material.uniforms);
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         'uAmbientOcclusionTexture',
-//         renderer.ambientOcclusionPass.renderTarget.read.texture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         'uDeferredShadingTexture',
-//         renderer.deferredShadingPass.renderTarget.read.texture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         'uLightShaftTexture',
-//         renderer.lightShaftPass.renderTarget.read.texture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         'uVolumetricLightTexture',
-//         renderer.volumetricLightPass.renderTarget.read.texture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue(
-//         "uDepthOfFieldTexture",
-//         renderer.depthOfFieldPass.renderTarget.read.texture
-//     );
-//     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
-// };
 
 cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも
 captureSceneCamera.setPostProcess(cameraPostProcess);
 
-/*
-const debugTransformFeedback = () => {
-    const transformFeedbackBuffer = new TransformFeedbackBuffer({
-        gpu,
-        attributes: [
-            new Attribute({
-                name: 'aArg1',
-                data: new Float32Array([1, 2, 3, 4, 5, 6]),
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            new Attribute({
-                name: 'aArg2',
-                data: new Float32Array([7, 8, 9, 10, 11, 12]),
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-        ],
-        varyings: [
-            {
-                name: 'vArg1',
-                data: new Float32Array([0, 0, 0, 0, 0, 0]),
-                // size: 3,
-            },
-            {
-                name: 'vArg2',
-                data: new Float32Array([0, 0, 0, 0, 0, 0]),
-                // size: 3,
-            },
-        ],
-        vertexShader: `#version 300 es
-
-        precision highp float;
-
-        layout(location = 0) in vec3 aArg1;
-        layout(location = 1) in vec3 aArg2;
-
-        out vec3 vArg1;
-        out vec3 vArg2;
-
-        void main() {
-            vArg1 = aArg1 * 2.;
-            vArg2 = aArg2 * 3.;
-        }
-        `,
-        fragmentShader: `#version 300 es
-
-        precision highp float;
-
-        void main() {
-        }
-        `,
-        drawCount: 2,
-    });
-    gpu.updateTransformFeedback({
-        shader: transformFeedbackBuffer.shader,
-        uniforms: transformFeedbackBuffer.uniforms,
-        vertexArrayObject: transformFeedbackBuffer.vertexArrayObject,
-        transformFeedback: transformFeedbackBuffer.transformFeedback,
-        drawCount: transformFeedbackBuffer.drawCount,
-    });
-    transformFeedbackBuffer.outputs.forEach(({ buffer }) => {
-        const results = new Float32Array(6);
-        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.getBufferSubData(gl.ARRAY_BUFFER, 0, results);
-        gpu.gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        console.log(results);
-    });
-};
-
-const createTransformFeedbackDrivenMesh = () => {
-    //
-    // debugs
-    //
-    debugTransformFeedback();
-
-    //
-    // begin create mesh
-    //
-
-    const planeNum = 512;
-
-    const initialPosition = new Float32Array(
-        maton
-            .range(planeNum)
-            .map(() => {
-                return [
-                    // i,
-                    // 0,
-                    // 0,
-                    Math.random() * 4 - 2,
-                    Math.random() * 4 + 2,
-                    Math.random() * 4 - 2,
-                ];
-            })
-            .flat()
-    );
-    // const initialTransform = new Float32Array(
-    //     maton
-    //         .range(planeNum)
-    //         .map(() => {
-    //             // prettier-ignore
-    //             return [
-    //                 1, 0, 0, 0,
-    //                 0, 1, 0, 0,
-    //                 0, 0, 1, 0,
-    //                 0, 0, 0, 1
-    //                 // (Math.random() * 1 - .5) * .5,
-    //                 // (Math.random() * 1 + .5) * .5,
-    //                 // (Math.random() * 1 - .5) * .5,
-    //             ];
-    //         })
-    //         .flat()
-    // );
-    const initialVelocity = new Float32Array(
-        maton
-            .range(planeNum)
-            .map(() => {
-                return [
-                    0, 0, 0,
-                    // (Math.random() * 1 - .5) * .5,
-                    // (Math.random() * 1 + .5) * .5,
-                    // (Math.random() * 1 - .5) * .5,
-                ];
-            })
-            .flat()
-    );
-    const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
-        gpu,
-        attributes: [
-            new Attribute({
-                name: 'aPosition',
-                data: initialPosition,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            new Attribute({
-                name: 'aVelocity',
-                data: initialVelocity,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            // new Attribute({
-            //     name: 'aTransform',
-            //     data: initialTransform,
-            //     size: 16,
-            //     usageType: AttributeUsageType.DynamicDraw,
-            // }),
-        ],
-        varyings: [
-            {
-                name: 'vPosition',
-                data: new Float32Array(initialPosition),
-            },
-            {
-                name: 'vVelocity',
-                data: new Float32Array(initialVelocity),
-            },
-            // {
-            //     name: 'vTransform',
-            //     data: new Float32Array(initialTransform),
-            // },
-        ],
-        vertexShader: `#version 300 es
-
-        precision highp float;
-
-        // TODO: ここ動的に構築してもいい
-        layout(location = 0) in vec3 aPosition;
-        layout(location = 1) in vec3 aVelocity;
-        // layout(location = 2) in mat4 aTransform;
-
-        out vec3 vPosition;
-        // out mat4 vTransform;
-        out vec3 vVelocity;
-
-        uniform float uTime;
-        uniform vec2 uNormalizedInputPosition;
-        uniform vec3 uAttractTargetPosition;
-        uniform float uAttractRate;
-
-        // https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
-        float noise(vec2 seed)
-        {
-            return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
-        }
-        
-        void main() {
-            vPosition = aPosition + aVelocity;
-            // vPosition = aPosition;
-            // vTransform = aTransform;
-            vec3 target = uAttractTargetPosition;
-            vec2 seed = vec2(float(gl_VertexID), float(gl_VertexID));
-            target += vec3(
-                cos(noise(seed) * 2. + uTime * 6. + float(gl_VertexID) * 16.) * 2.,
-                sin(noise(seed) * 4. + uTime * 3. + float(gl_VertexID) * 8.) * 2.,
-                sin(noise(seed) * 6. + uTime * 4. + float(gl_VertexID) * 4.) * 2.
-            );
-            vec3 v = target - vPosition;
-            vec3 dir = normalize(v);
-            vVelocity = mix(
-                aVelocity,
-                dir * (.2 + uAttractRate * .2),
-                .02 + sin(float(gl_VertexID)) * .01
-                // .04 + uAttractRate * .0
-            );
-        }
-        `,
-        fragmentShader: `#version 300 es
-
-        precision highp float;
-
-        void main() {
-        }
-        `,
-        uniforms: {
-            [UniformNames.Time]: {
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            uNormalizedInputPosition: {
-                type: UniformTypes.Vector2,
-                value: Vector2.zero,
-            },
-            uAttractTargetPosition: {
-                type: UniformTypes.Vector3,
-                value: Vector3.zero,
-            },
-            uAttractRate: {
-                type: UniformTypes.Float,
-                value: 0,
-            },
-        },
-        drawCount: planeNum,
-    });
-
-    const boxGeometryData = createBoxGeometryData();
-
-    const instancePosition = maton
-        .range(planeNum, true)
-        .map(() => {
-            // return [i, 0, 0]
-            return [0, 0, 0];
-        })
-        .flat();
-    const instanceScale = maton
-        .range(planeNum, true)
-        .map(() => {
-            return [
-                // 1, 1, 1
-                // 0.7, 0.7, 0.7,
-                Math.random() * 0.4 + 0.2,
-                Math.random() * 0.4 + 0.2,
-                Math.random() * 0.4 + 0.2,
-            ];
-        })
-        .flat();
-    const instanceRotation = maton
-        .range(planeNum, true)
-        .map(() => {
-            // return [i, 0, 0]
-            return [0, 0, 0];
-        })
-        .flat();
-    const instanceVelocity = maton
-        .range(planeNum, true)
-        .map(() => {
-            // return [i, 0, 0]
-            return [0, 0, 0];
-        })
-        .flat();
-    // const accPositions = maton.range(3 * planeNum).map(() => {
-    //     return 0;
-    // });
-    // const velocities = maton.range(3 * planeNum).map(() => {
-    //     return 0;
-    // });
-    const instanceColor = maton
-        .range(planeNum)
-        .map(() => {
-            const c = Color.fromRGB(
-                Math.floor(Math.random() * 240 + 15),
-                Math.floor(Math.random() * 10 + 245),
-                Math.floor(Math.random() * 245 + 10)
-            );
-            return [...c.elements];
-        })
-        .flat();
-
-    const geometry = new Geometry({
-        gpu,
-        attributes: [
-            ...boxGeometryData.attributes,
-            // new Attribute({
-            //     name: AttributeNames.Position,
-            //     data: planeGeometryRawData.positions,
-            //     size: 3,
-            // }),
-            // new Attribute({
-            //     name: AttributeNames.Normal,
-            //     data: planeGeometryRawData.no,
-            //     size: 3,
-            // }),
-            // new Attribute({
-            //     name: AttributeNames.Uv,
-            //     data: new Float32Array(uvs),
-            //     size: 2,
-            // }),
-            // new Attribute({
-            //     name: 'aAccPosition',
-            //     data: new Float32Array(accPositions),
-            //     size: 3,
-            //     divisor: 1,
-            // }),
-            // new Attribute({
-            //     name: 'aVelocity',
-            //     data: new Float32Array(velocities),
-            //     size: 3,
-            //     divisor: 1,
-            // }),
-            new Attribute({
-                name: AttributeNames.InstancePosition,
-                data: new Float32Array(instancePosition),
-                size: 3,
-                divisor: 1,
-            }),
-            new Attribute({
-                name: AttributeNames.InstanceScale,
-                data: new Float32Array(instanceScale),
-                size: 3,
-                divisor: 1,
-            }),
-            new Attribute({
-                name: AttributeNames.InstanceRotation,
-                data: new Float32Array(instanceRotation),
-                size: 3,
-                divisor: 1,
-            }),
-            new Attribute({
-                name: AttributeNames.InstanceVertexColor,
-                data: new Float32Array(instanceColor),
-                size: 4,
-                divisor: 1,
-            }),
-            new Attribute({
-                name: AttributeNames.InstanceVelocity,
-                data: new Float32Array(instanceVelocity),
-                size: 3,
-                divisor: 1,
-            }),
-        ],
-        indices: boxGeometryData.indices,
-        drawCount: boxGeometryData.drawCount,
-        instanceCount: planeNum,
-    });
-    const material = new GBufferMaterial({
-        isInstancing: true,
-        useVertexColor: true,
-        vertexShaderModifier: {
-            [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
-                instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
-            `,
-            // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
-            // [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
-            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
-            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
-        },
-    });
-    const mesh = new Mesh({
-        geometry,
-        material,
-        castShadow: true,
-    });
-    // mesh.transform.setScaling(new Vector3(1, 1, 1));
-    let attractRate = 0;
-    mesh.onUpdate = ({ time, deltaTime }) => {
-        // mesh.material.uniforms.uTime.value = time;
-
-        transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
-        transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
-        // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = attractSphereMesh.transform.position;
-
-        attractRate += 2 * (inputController.isDown ? 1 : -1) * deltaTime;
-        attractRate = saturate(attractRate);
-        transformFeedbackDoubleBuffer.uniforms.uAttractRate.value = attractRate;
-        gpu.updateTransformFeedback({
-            shader: transformFeedbackDoubleBuffer.shader,
-            uniforms: transformFeedbackDoubleBuffer.uniforms,
-            vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
-            transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
-            drawCount: transformFeedbackDoubleBuffer.drawCount,
-        });
-        transformFeedbackDoubleBuffer.swap();
-        // };
-        // mesh.onUpdate = () => {
-        geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstancePosition,
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
-        );
-        geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstanceVelocity,
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
-        );
-        // geometry.vertexArrayObject.replaceBuffer(
-        //     'aAccPosition',
-        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
-        // );
-        // geometry.vertexArrayObject.replaceBuffer(
-        //     'aVelocity',
-        //     transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
-        // );
-    };
-   
-    mesh.enabled = false;
-    
-    // mesh.transform.setTranslation(new Vector3(0, 2, 0));
-    return mesh;
-};
-*/
-
-const assetDir = '/labs/street-light/assets/';
-
 const createStreetFloorActor = async () => {
     // const gltfActor = await loadGLTF({gpu, path: gltfStreetFloorModelUrl});
-    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'street-floor-separete.gltf' });
+    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'street-floor-separete.gltf'});
     return gltfActor;
 };
 
 const createStreetLightActor = async () => {
-    // const gltfActor = await loadGLTF({gpu, dir: assetDir,  path: "street-light.gltf"});
-    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'street-light-full.gltf' });
+    // const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR,  path: "street-light.gltf"});
+    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'street-light-full.gltf'});
     return gltfActor;
 
     // const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
@@ -991,7 +442,7 @@ const createStreetLightActor = async () => {
 
 const createGLTFSphereMesh = async (material: Material) => {
     // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'sphere-32x32.gltf' });
+    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'sphere-32x32.gltf'});
     const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = material;
@@ -1176,7 +627,7 @@ layout (std140) uniform ubCommon {
     // TODO: rendererかgpuでまとめたい
     transformFeedbackDoubleBuffer.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
+            ({uniformBufferObject}) => uniformBufferObject.blockName === blockName
         );
         if (!targetGlobalUniformBufferObject) {
             return;
@@ -1209,12 +660,10 @@ layout (std140) uniform ubCommon {
  *
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
-    // const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'butterfly-forward-thin.gltf' });
-    const gltfActor = await loadGLTF({ gpu, dir: assetDir, path: 'butterfly-forward-thin-2.gltf' });
+    const gltfActor = await loadGLTF({gpu, dir: ASSET_DIR, path: 'butterfly-forward-thin-2.gltf'});
 
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
-    // console.log(gltfActor, skinningMesh);
 
     skinningMesh.name = 'butterfly';
 
@@ -1222,15 +671,12 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator;
     skinningMesh.setAnimationClips(gltfActor.animator.animationClips);
-    skinningMesh.subscribeOnStart(() => {
-        // CPU skinning
-        // gltfActor.animator.play('Fly', true);
-        // gltfActor.animator.animationClips[0].speed = 0.2;
-    });
-    // skinningMesh.onUpdate = ({ deltaTime }) => {
-    //     // skinningMesh.animator.update(deltaTime);
-    //     // gltfActor.animator.update(deltaTime);
-    // };
+    // tmp
+    // skinningMesh.subscribeOnStart(() => {
+    //     // CPU skinning
+    //     // gltfActor.animator.play('Fly', true);
+    //     // gltfActor.animator.animationClips[0].speed = 0.2;
+    // });
 
     const instanceInfo: {
         position: number[][];
@@ -1246,19 +692,11 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         color: [],
     };
     maton.range(instanceNum).forEach(() => {
-        // const posRangeX = 20;
-        // const posRangeZ = 20;
-        // const px = (Math.random() * 2 - 1) * posRangeX;
-        // const py = 0.5 + Math.random() * 2.;
-        // const pz = (Math.random() * 2 - 1) * posRangeZ;
-        // const p = [px, py, pz];
-        // instanceInfo.position.push(p);
         instanceInfo.position.push([0, 0, 0]);
 
         const baseScale = 0.25;
         const randomScaleRange = 0.25;
         const s = Math.random() * randomScaleRange + baseScale;
-        // instanceInfo.scale.push([s, s * 2, s]);
         instanceInfo.scale.push([s, s, s]);
 
         instanceInfo.rotation.push([0, 0, 0]);
@@ -1334,21 +772,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
 
-    // skinningMesh.material = new PhongMaterial({
-    //     // gpu,
-    //     specularAmount: 0.5,
-    //     receiveShadow: true,
-    //     isSkinning: true,
-    //     gpuSkinning: true,
-    //     isInstancing: true,
-    //     useVertexColor: true,
-    //     envMap: cubeMap,
-    //     ambientAmount: 0.2,
-    // });
     skinningMesh.material = new GBufferMaterial({
-        // gpu,
-        // specularAmount: 0.5,
-        // diffuseColor: Color.white(),
         metallic: 0,
         roughness: 1,
         receiveShadow: true,
@@ -1363,15 +787,11 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createInstanceUpdater(MAX_INSTANCE_NUM);
 
     let attractRate = 0;
-    skinningMesh.onUpdate = ({ deltaTime }) => {
-        // mesh.material.uniforms.uTime.value = time;
-
-        // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
+    skinningMesh.onUpdate = ({deltaTime}) => {
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
             inputController.normalizedInputPosition
         );
-        // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uAttractTargetPosition',
             Vector3.addVectors(attractSphereMesh.transform.position, new Vector3(0, 1, 0))
@@ -1388,8 +808,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             drawCount: transformFeedbackDoubleBuffer.drawCount,
         });
         transformFeedbackDoubleBuffer.swap();
-        // };
-        // mesh.onUpdate = () => {
+
         skinnedMesh.geometry.vertexArrayObject.replaceBuffer(
             AttributeNames.InstancePosition,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
@@ -1402,9 +821,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         skinnedMesh.geometry.instanceCount = debuggerStates.instanceNum;
     };
 
-    // skinningMesh.debugBoneView = true;
-    // skinningMesh.enabled = false;
-
     return skinningMesh;
 };
 
@@ -1414,28 +830,6 @@ const main = async () => {
         gpu,
         img: particleImg,
     });
-
-    // const floorDiffuseImg = await loadImg(floorDiffuseImgUrl);
-    // floorDiffuseMap = new Texture({
-    //     gpu,
-    //     img: floorDiffuseImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-
-    // const floorNormalImg = await loadImg(floorNormalImgUrl);
-    // floorNormalMap = new Texture({
-    //     gpu,
-    //     img: floorNormalImg,
-    //     // mipmap: true,
-    //     wrapS: TextureWrapTypes.Repeat,
-    //     wrapT: TextureWrapTypes.Repeat,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
 
     cubeMap = await loadCubeMap(
         gpu,
@@ -1452,10 +846,8 @@ const main = async () => {
         cubeMap,
         diffuseIntensity: 0.2,
         specularIntensity: 0.2,
-        // rotationOffset: 0.8,
         renderMesh: false,
     });
-    // skyboxMesh.enabled = false;
 
     //
     // street floor
@@ -1498,37 +890,23 @@ const main = async () => {
     attractSphereMesh = await createGLTFSphereMesh(
         new UnlitMaterial({
             emissiveColor: new Color(3, 3, 3, 1),
-            // receiveShadow: true,
         })
     );
-    attractSphereMesh.subscribeOnStart(({ actor }) => {
+    attractSphereMesh.subscribeOnStart(({actor}) => {
         actor.transform.setScaling(Vector3.fill(0.5));
-        // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
     attractSphereMesh.onFixedUpdate = () => {
-        //const w = 5;
-        //// const d = 2;
-        //const d = 5;
-        //const ix = inputController.normalizedInputPosition.x * 2 - 1;
-        //const iy = inputController.normalizedInputPosition.y * 2 - 1;
-        //const x = ix * w;
-        //const z = iy * d;
-        //const y = 3;
-        //attractSphereMesh.transform.setTranslation(new Vector3(x, y, z));
-
         const ray = captureSceneCamera.viewpointToRay(
             new Vector2(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y)
         );
         const plane = new Plane(Vector3.zero, Vector3.up);
         const intersectOnPlane = intersectRayWithPlane(ray, plane);
         if (intersectOnPlane) {
-            const x = clamp(intersectOnPlane.x, -1, 1);
-            const z = clamp(intersectOnPlane.z, -1, 1);
+            const x = clamp(intersectOnPlane.x, -5, 5);
+            const z = clamp(intersectOnPlane.z, -5, 5);
             const p = new Vector3(x, 1, z);
             attractSphereMesh.transform.setTranslation(p);
         }
-        // captureSceneCamera.getWorldForwardInFrustum(0.5, 0.5).log();
-        // console.log(inputController.normalizedInputPosition.x, 1 - inputController.normalizedInputPosition.y);
     };
 
     //
@@ -1536,35 +914,6 @@ const main = async () => {
     //
 
     skinnedMesh = await createGLTFSkinnedMesh(MAX_INSTANCE_NUM);
-
-    //
-    // floor mesh
-    //
-
-    // const floorGeometry = new PlaneGeometry({
-    //     gpu,
-    //     calculateTangent: true,
-    //     calculateBinormal: true,
-    // });
-    // floorPlaneMesh = new Mesh({
-    //     geometry: floorGeometry,
-    //     material: new GBufferMaterial({
-    //         diffuseMap: floorDiffuseMap,
-    //         normalMap: floorNormalMap,
-    //         diffuseColor: new Color(1, 1, 1, 1),
-    //         receiveShadow: true,
-    //         metallic: 0,
-    //         roughness: 0.5,
-    //     }),
-    //     castShadow: true,
-    // });
-    // floorPlaneMesh.subscribeOnStart(({ actor }) => {
-    //     const meshActor = actor as Mesh;
-    //     actor.transform.setScaling(Vector3.fill(20));
-    //     actor.transform.setRotationX(-90);
-    //     meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(6, 6));
-    //     meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(6, 6));
-    // });
 
     //
     // particle mesh
@@ -1785,11 +1134,6 @@ void main() {
                 type: UniformTypes.Vector2Array,
                 value: [new Vector2(-1, 1), new Vector2(-1, -1), new Vector2(1, 1), new Vector2(1, -1)],
             },
-            // {
-            //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
-            //     value: 0,
-            // },
             {
                 name: UniformNames.DepthTexture,
                 type: UniformTypes.Texture,
@@ -1806,7 +1150,6 @@ void main() {
                 value: captureSceneCamera.far,
             },
         ],
-        // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
         depthWrite: false,
         uniformBlockNames: [UniformBlockNames.Common],
@@ -1818,7 +1161,6 @@ void main() {
 
     captureScene.add(attractSphereMesh);
     captureScene.add(skinnedMesh);
-    // captureScene.add(floorPlaneMesh);
     captureScene.add(skyboxMesh);
     captureScene.add(particleMesh);
 
@@ -1856,12 +1198,8 @@ void main() {
         inputController.update();
     };
 
-    engine.onBeforeFixedUpdate = () => {
-        // inputController.fixedUpdate();
-    };
-
     engine.onRender = (time) => {
-        renderer.render(captureScene, captureSceneCamera, { time });
+        renderer.render(captureScene, captureSceneCamera, {time});
     };
 
     const tick = (time: number) => {
@@ -1895,8 +1233,6 @@ function initDebugger() {
 
     debuggerGUI.addToggleDebugger({
         label: 'orbit controls enabled',
-        // initialValue: debuggerStates.orbitControlsEnabled,
-        // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
         initialValue: orbitCameraController.enabled,
         onChange: (value) => (orbitCameraController.enabled = value),
     });
@@ -1927,12 +1263,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
-
-    // directionalLightDebuggerGroup.addToggleDebugger({
-    //     label: 'light enabled',
-    //     initialValue: directionalLight.enabled,
-    //     onChange: (value) => (directionalLight.enabled = value),
-    // });
 
     directionalLightDebuggerGroup.addSliderDebugger({
         label: 'intensity',
@@ -1993,12 +1323,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const ssaoDebuggerGroup = debuggerGUI.addGroup('ssao', false);
-
-    // ssaoDebuggerGroup.addToggleDebugger({
-    //     label: 'ssao pass enabled',
-    //     initialValue: renderer.ambientOcclusionPass.enabled,
-    //     onChange: (value) => (renderer.ambientOcclusionPass.enabled = value),
-    // });
 
     ssaoDebuggerGroup.addSliderDebugger({
         label: 'ssao occlusion sample length',
@@ -2092,12 +1416,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft', false);
-
-    // lightShaftDebuggerGroup.addToggleDebugger({
-    //     label: 'light shaft pass enabled',
-    //     initialValue: renderer.lightShaftPass.enabled,
-    //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
-    // });
 
     lightShaftDebuggerGroup.addSliderDebugger({
         label: 'blend rate',
@@ -2199,23 +1517,6 @@ function initDebugger() {
 
     const fogDebuggerGroup = debuggerGUI.addGroup('fog', false);
 
-    // fogDebuggerGroup.addToggleDebugger({
-    //     label: 'fog pass enabled',
-    //     initialValue: renderer.lightShaftPass.enabled,
-    //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
-    // });
-
-    // fogDebuggerGroup.addSliderDebugger({
-    //     label: 'strength',
-    //     minValue: 0,
-    //     maxValue: 0.2,
-    //     stepValue: 0.0001,
-    //     initialValue: renderer.fogPass.fogStrength,
-    //     onChange: (value) => {
-    //         renderer.fogPass.fogStrength = value;
-    //     },
-    // });
-
     fogDebuggerGroup.addColorDebugger({
         label: 'fog color',
         initialValue: renderer.fogPass.fogColor.getHexCoord(),
@@ -2246,17 +1547,6 @@ function initDebugger() {
         },
     });
 
-    // fogDebuggerGroup.addSliderDebugger({
-    //     label: 'fog end height',
-    //     minValue: -5,
-    //     maxValue: 5,
-    //     stepValue: 0.0001,
-    //     initialValue: renderer.fogPass.fogEndHeight,
-    //     onChange: (value) => {
-    //         renderer.fogPass.fogEndHeight = value;
-    //     },
-    // });
-
     fogDebuggerGroup.addSliderDebugger({
         label: 'distance fog start',
         minValue: 0,
@@ -2286,12 +1576,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const dofDebuggerGroup = debuggerGUI.addGroup('depth of field', false);
-
-    // dofDebuggerGroup.addToggleDebugger({
-    //     label: 'DoF pass enabled',
-    //     initialValue: renderer.depthOfFieldPass.enabled,
-    //     onChange: (value) => (renderer.depthOfFieldPass.enabled = value),
-    // });
 
     dofDebuggerGroup.addSliderDebugger({
         label: 'DoF focus distance',
@@ -2333,12 +1617,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const bloomDebuggerGroup = debuggerGUI.addGroup('bloom', false);
-
-    // bloomDebuggerGroup.addToggleDebugger({
-    //     label: 'Bloom pass enabled',
-    //     initialValue: renderer.bloomPass.enabled,
-    //     onChange: (value) => (renderer.bloomPass.enabled = value),
-    // });
 
     bloomDebuggerGroup.addSliderDebugger({
         label: 'bloom amount',
@@ -2447,12 +1725,6 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const ssrDebuggerGroup = debuggerGUI.addGroup('ssr', false);
-
-    // ssrDebuggerGroup.addToggleDebugger({
-    //     label: 'ssr pass enabled',
-    //     initialValue: renderer.ssrPass.enabled,
-    //     onChange: (value) => (renderer.ssrPass.enabled = value),
-    // });
 
     ssrDebuggerGroup.addSliderDebugger({
         label: 'depth bias',
