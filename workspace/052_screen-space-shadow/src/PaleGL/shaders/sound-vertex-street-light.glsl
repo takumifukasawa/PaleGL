@@ -7,8 +7,6 @@ uniform float uSampleRate;
 
 out vec2 vSound;
 
-#define CLAMP1(x) max(1., min(1., c))
-
 #define BPM 110.
 #define PI 3.1415
 #define TAU 6.2831
@@ -270,9 +268,9 @@ float timeToBeat(float time) {
     return time / 60. * BPM;
 }
 
-// float beatToTime(float beat) {
-//     return beat / BPM * 60.;
-// }
+float beatToTime(float beat) {
+    return beat / BPM * 60.;
+}
 
 #define BEAT_TO_TIME(beat) beat / BPM * 60.
 
@@ -625,18 +623,15 @@ vec2 epiano(float note, float t)
     return (glass*pan + body) * 0.05 * smoothstep(0.,0.001,t);
 }
 
-//
-//
-//
 
-// #define N(a) a, 1.
-// #define L(a, b) a, b
-// #define E(a) 0., 1.
-// #define B(a, b) 0., b
+// ------------------------------------------------------------------------------------
+// SEQUENCER_BEGIN
+// ------------------------------------------------------------------------------------
 
+// オリジナルのシーケンサー. vite経由だとなぜかminifyがエラーになる。手動cliだとうまくいく
 // notes ... [note_number, len, note_number, len, ...]
 // measureCount ... 小節数. 4拍で1小節とする
-// TODO: little-endian, big-endian 考慮
+// TODO: little-endian, big-endian 考慮する必要がある？
 // ref: https://github.com/equinor/glsl-float-to-rgba/blob/master/README.md
 // #define SEQUENCER(rawBeat, time, beatTempo, totalBeatCount, notes, noteCount, toneFunc) \
 //     float tempoScale = beatTempo / 4.; /* 4拍が基本 */ \
@@ -683,7 +678,7 @@ vec2 epiano(float note, float t)
 //         return vec2(0.); \
 //     } \
 //     float fLocalBeatIndexInNote = fLocalBeatIndex - float(accRawBeatPrevLength); \
-//     float localTime = beatToTime(mod(fLocalBeatIndexInNote, float(currentNoteLength)) / tempoScale); \
+//     float localTime = BEAT_TO_TIME(mod(fLocalBeatIndexInNote, float(currentNoteLength)) / tempoScale); \
 //     /* ぶつ切りにならないようなfallback */ \
 //     float fallbackAmp = 1. - smoothstep(.90, .99, fLocalBeatIndexInNote / float(currentNoteLength)); \
 //     fallbackAmp = 1.; /* fallbackしない場合 */\
@@ -698,7 +693,12 @@ vec2 epiano(float note, float t)
 //     float gainAcc = 1.5; /* 同時に音を鳴らす際の音量を上げる調整値. 引数で渡すようにしてもよい */ \
 //     res /= max(1., acc - gainAcc); \
 
-#define SEQUENCER(rawBeat,time,beatTempo,totalBeatCount,notes,noteCount,toneFunc)float tempoScale=beatTempo/4.;float fLocalBeatIndex=mod(rawBeat*tempoScale,float(totalBeatCount));int accRawBeatPrevLength=0;int accRawBeatLength=0;int targetNoteIndex=-1;for(int i=0;i<noteCount;i++){if(i==0){int rawNoteLength=notes[i*2+1];if(0.<fLocalBeatIndex&&fLocalBeatIndex<float(rawNoteLength)){targetNoteIndex=0;accRawBeatLength+=rawNoteLength;break;}accRawBeatLength+=rawNoteLength;}else{int rawNoteLength=notes[(i-1)*2+1];int nextRawNoteNumber=notes[i*2];int nextRawNoteLength=notes[i*2+1];if( float(accRawBeatLength)<fLocalBeatIndex&&fLocalBeatIndex<(float(accRawBeatLength)+float(nextRawNoteLength))){targetNoteIndex=i;accRawBeatPrevLength=accRawBeatLength;accRawBeatLength+=nextRawNoteLength;break;}accRawBeatPrevLength=accRawBeatLength;accRawBeatLength+=nextRawNoteLength;}}int currentNoteNumber=notes[targetNoteIndex*2];int currentNoteLength=notes[targetNoteIndex*2+1];int[4]noteNumbers=int[4]( (int(currentNoteNumber)&255),((int(currentNoteNumber)>>8)&255),((int(currentNoteNumber)>>16)&255),((int(currentNoteNumber)>>24)&255));if(targetNoteIndex==-1){return vec2(0.);}float fLocalBeatIndexInNote=fLocalBeatIndex-float(accRawBeatPrevLength);float localTime=BEAT_TO_TIME(mod(fLocalBeatIndexInNote,float(currentNoteLength))/tempoScale);float fallbackAmp=1.-smoothstep(.90,.99,fLocalBeatIndexInNote/float(currentNoteLength));fallbackAmp=1.;vec2 res=vec2(0.);float acc=0.;for(int i=0;i<4;i++){float fNoteNumber=float(noteNumbers[i]);float isNoteOn=(fNoteNumber>0.?1.:0.);res+=vec2(toneFunc(fNoteNumber,localTime))*isNoteOn*fallbackAmp;acc+=isNoteOn;}float gainAcc=1.5;res/=max(1.,acc-gainAcc);
+// なぜかvite経由だとminifyがうまくいかないので手動cliでminifyを走らせたコードを貼り付ける
+// #define SEQUENCER(rawBeat,time,beatTempo,totalBeatCount,notes,noteCount,toneFunc)float tempoScale=beatTempo/4.;float fLocalBeatIndex=mod(rawBeat*tempoScale,float(totalBeatCount));int accRawBeatPrevLength=0;int accRawBeatLength=0;int targetNoteIndex=-1;for(int i=0;i<noteCount;i++){if(i==0){int rawNoteLength=notes[i*2+1];if(0.<fLocalBeatIndex&&fLocalBeatIndex<float(rawNoteLength)){targetNoteIndex=0;accRawBeatLength+=rawNoteLength;break;}accRawBeatLength+=rawNoteLength;}else{int rawNoteLength=notes[(i-1)*2+1];int nextRawNoteNumber=notes[i*2];int nextRawNoteLength=notes[i*2+1];if( float(accRawBeatLength)<fLocalBeatIndex&&fLocalBeatIndex<(float(accRawBeatLength)+float(nextRawNoteLength))){targetNoteIndex=i;accRawBeatPrevLength=accRawBeatLength;accRawBeatLength+=nextRawNoteLength;break;}accRawBeatPrevLength=accRawBeatLength;accRawBeatLength+=nextRawNoteLength;}}int currentNoteNumber=notes[targetNoteIndex*2];int currentNoteLength=notes[targetNoteIndex*2+1];int[4]noteNumbers=int[4]( (int(currentNoteNumber)&255),((int(currentNoteNumber)>>8)&255),((int(currentNoteNumber)>>16)&255),((int(currentNoteNumber)>>24)&255));if(targetNoteIndex==-1){return vec2(0.);}float fLocalBeatIndexInNote=fLocalBeatIndex-float(accRawBeatPrevLength);float localTime=BEAT_TO_TIME(mod(fLocalBeatIndexInNote,float(currentNoteLength))/tempoScale);float fallbackAmp=1.-smoothstep(.90,.99,fLocalBeatIndexInNote/float(currentNoteLength));fallbackAmp=1.;vec2 res=vec2(0.);float acc=0.;for(int i=0;i<4;i++){float fNoteNumber=float(noteNumbers[i]);float isNoteOn=(fNoteNumber>0.?1.:0.);res+=vec2(toneFunc(fNoteNumber,localTime))*isNoteOn*fallbackAmp;acc+=isNoteOn;}float gainAcc=1.5;res/=max(1.,acc-gainAcc);
+
+// ------------------------------------------------------------------------------------
+// SEQUENCER_END
+// ------------------------------------------------------------------------------------
 
 vec2 epianoSeqBase(float rawBeat, float time) {
     // int[] notes = int[](
@@ -1152,19 +1152,23 @@ vec2 mainSound(float time) {
 
 void main() {
     float time = uBlockOffset + float(gl_VertexID) / uSampleRate;
+    
+    // minify時にエラーを出させないためのハック
     vec2 c = vec2(1.);
     c =
-         // beatToTime(0.)
-         epiano(time, time)
-         * snareFill(time, time)
-         * base(time, time)
-         * snareFill(time, time)
-         * arp(time, time)
-         * hihat1(time, time)
-         * bass(time, time)
-    ;
+        1.
+        // * beatToTime(time)
+        * snareFill(time, time)
+        * base(time, time)
+        * snareFill(time, time)
+        * arp(time, time)
+        * hihat1(time, time)
+        * bass(time, time)
+        * epiano(time, time)
+    * vec2(1.);
     c.x = 1.;
     c.y = 1.;
+
     vSound = mainSound(time) * c;
     // vSound = vec2(1.);
 }

@@ -831,7 +831,6 @@ const playSound = () => {
     if (glslSound) {
         glslSound.stop();
     }
-    console.log(soundVertexShader)
     glslSound = new GLSLSound(gpu, soundVertexShader, 180);
     glslSound.play(0);
 };
