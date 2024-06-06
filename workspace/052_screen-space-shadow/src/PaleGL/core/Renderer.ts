@@ -4,7 +4,8 @@
     LightTypes,
     MAX_SPOT_LIGHT_COUNT,
     RenderQueueType,
-    RenderTargetTypes, TextureDepthPrecisionType,
+    RenderTargetTypes,
+    TextureDepthPrecisionType,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -64,9 +65,10 @@ import {
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {ChromaticAberrationPass} from "@/PaleGL/postprocess/ChromaticAberrationPass.ts";
-import {VignettePass} from "@/PaleGL/postprocess/VignettePass.ts";
-import {StreakPass} from "@/PaleGL/postprocess/StreakPass.ts";
+import { ChromaticAberrationPass } from '@/PaleGL/postprocess/ChromaticAberrationPass.ts';
+import { VignettePass } from '@/PaleGL/postprocess/VignettePass.ts';
+import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
+import { FXAAPass} from "@/PaleGL/postprocess/FXAAPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -261,7 +263,7 @@ export class Renderer {
     // --------------------------------------------------------------
     // constructor
     // --------------------------------------------------------------
-    
+
     /**
      *
      * @param gpu
@@ -279,7 +281,7 @@ export class Renderer {
             width: 1,
             height: 1,
             name: 'depth pre-pass render target',
-            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+            depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
         this._gBufferRenderTargets = new GBufferRenderTargets({
             gpu,
@@ -301,7 +303,7 @@ export class Renderer {
             width: 1,
             height: 1,
             name: 'copy depth source render target',
-            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+            depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
         this._copyDepthDestRenderTarget = new RenderTarget({
             gpu,
@@ -309,7 +311,7 @@ export class Renderer {
             width: 1,
             height: 1,
             name: 'copy depth dest render target',
-            depthPrecision: TextureDepthPrecisionType.High // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+            depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
 
         this._ambientOcclusionPass = new SSAOPass({ gpu });
@@ -334,12 +336,15 @@ export class Renderer {
 
         this._toneMappingPass = new ToneMappingPass({ gpu });
         this._scenePostProcess.addPass(this._toneMappingPass);
-        
+
         this._chromaticAberrationPass = new ChromaticAberrationPass({ gpu });
         this._scenePostProcess.addPass(this._chromaticAberrationPass);
-        
+
         this._vignettePass = new VignettePass({ gpu });
         this._scenePostProcess.addPass(this._vignettePass);
+
+        this._fxaaPass = new FXAAPass({ gpu });
+        this._scenePostProcess.addPass(this._fxaaPass);
 
         //
         // initialize global uniform buffer objects
@@ -705,23 +710,23 @@ export class Renderer {
     get bloomPass() {
         return this._bloomPass;
     }
-    
+
     get streakPass() {
         return this._streakPass;
     }
 
-    // get toneMappingRenderTarget() {
-    //     return this._toneMappingPass.renderTarget;
-    // }
-    
     get chromaticAberrationPass() {
         return this._chromaticAberrationPass;
     }
-    
+
     get vignettePass() {
         return this._vignettePass;
     }
     
+    get fxaaPass() {
+        return this._fxaaPass;
+    }
+
     /**
      *
      * @param stats
@@ -762,8 +767,9 @@ export class Renderer {
         this._toneMappingPass.setSize(realWidth, realHeight);
         this._chromaticAberrationPass.setSize(realWidth, realHeight);
         this._vignettePass.setSize(realWidth, realHeight);
+        this._fxaaPass.setSize(realWidth, realHeight);
     }
-    
+
     renderTarget: CameraRenderTargetType | null = null;
     clearColorDirtyFlag = false;
 
@@ -1145,7 +1151,7 @@ export class Renderer {
             time, // TODO: engineから渡したい
             // lightActors,
         });
-        
+
         // return;
 
         // ------------------------------------------------------------------------------
@@ -1345,10 +1351,11 @@ export class Renderer {
     private _depthOfFieldPass: DepthOfFieldPass;
     private _bloomPass: BloomPass;
     private _streakPass: StreakPass;
-    
+
     private _toneMappingPass: ToneMappingPass;
     private _chromaticAberrationPass: ChromaticAberrationPass;
     private _vignettePass: VignettePass;
+    private _fxaaPass: FXAAPass;
 
     /**
      *

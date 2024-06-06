@@ -47,7 +47,7 @@ const ENTRY_NAME_INDEX: string = 'index';
 // ---------------------------------------------------
 // ビルドするentryを定義
 // const ENTRY_NAME = ENTRY_NAME_INDEX;
-const ENTRY_NAME: string = "street-light";
+const ENTRY_NAME: string = "screen-space-shadow";
 const IS_MAIN_ENTRY = ENTRY_NAME === ENTRY_NAME_INDEX;
 const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `labs/${ENTRY_NAME}`;
 // ---------------------------------------------------
