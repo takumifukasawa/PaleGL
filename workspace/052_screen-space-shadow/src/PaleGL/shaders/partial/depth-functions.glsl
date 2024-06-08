@@ -25,6 +25,20 @@ float perspectiveDepthToEyeDepth(float rawDepth, float near, float far) {
 
 // end ref
 
+float ndcZToRawDepth(float ndcZ) {
+    return ndcZ * .5 + .5;
+}
+
+float ndcZToLinearDepth(float ndcZ, float near, float far) {
+    float rawDepth = ndcZToRawDepth(ndcZ);
+    return perspectiveDepthToLinearDepth(rawDepth, near, far);
+}
+
+float clipPositionToLinearDepth(vec4 clipPosition, float near, float far) {
+    float z = clipPosition.z / clipPosition.w; // -1 ~ 1
+    return ndcZToLinearDepth(z, near, far);
+}
+
 // 深度値からワールド座標を復元
 vec3 reconstructWorldPositionFromDepth(vec2 screenUV, float rawDepth, mat4 inverseViewProjectionMatrix) {
     // depth[0~1] -> clipZ[-1~1]

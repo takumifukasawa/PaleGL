@@ -50,7 +50,7 @@ void main() {
         uInverseViewProjectionMatrix
     );
     
-    const int MARCH_COUNT = 32;
+    const int MARCH_COUNT = 24;
     
     // 1: light to P
     vec3 rayOrigin = lightPos;
@@ -102,60 +102,21 @@ void main() {
     for(int i = 0; i < MARCH_COUNT; i++) {
         // rayの深度を計算
         float currentStepLength = stepLength * float(i);
-        // float currentStepLength = stepLength * float(MARCH_COUNT);
         vec3 currentRay = rayOrigin + rayDir * currentStepLength;
-        // vec3 currentRay = worldPosition;
-        vec3 currentRayInView = (uViewMatrix * vec4(currentRay, 1.)).xyz;
-        float currentViewAbsZInRay = -currentRayInView.z;
-        vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
-        currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
+        vec4 currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
         currentRayInClip /= currentRayInClip.w;
-        float currentRayRawDepth = currentRayInClip.z * .5 + .5;
-        float currentRayDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
-        
+        float currentRayRawDepth = ndcZToRawDepth(currentRayInClip.z);
+
         // rayのピクセルの深度をdepth_textureから取得
         vec2 rayUv = currentRayInClip.xy * .5 + .5;
         float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
-        // float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
-        float currentDepthInPixel = perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip);
-        vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
-            rayUv,
-            currentRawDepthInPixel,
-            uInverseProjectionMatrix
-        );
-        float currentViewAbsZInPixel = -currentViewPositionInPixel.z;
-        
-        // // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
+
+        // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
         if(currentRayRawDepth > currentRawDepthInPixel + .001) {
             occlusion += sharpness;
-            // occlusion = 1.;
         }
-        
-        // debugValue = vec3(step(.5, currentRayDepth));
-        // debugValue = vec3(step(.5, viewZToLinearDepth(currentRayInView.z, uNearClip, uFarClip)));
-        // debugValue = vec3(step(.5, perspectiveDepthToLinearDepth(clipPosition.z * .5 + .5, uNearClip, uFarClip)));
-        // debugValue = vec3(step(.5, perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip)));
-        // debugValue = vec3(step(.5, currentDepthInPixel));
-        
-        // // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
-        // if(currentViewAbsZInRay > currentViewAbsZInPixel) {
-        //     occlusion += sharpness;
-        //     // occlusion = 1.;
-        // }
-        
-        // debugValue = vec3(currentViewAbsZInRay / 20.);
-        // debugValue = vec3(currentViewAbsZInPixel / 20.);
-        //debugValue = vec3(rayUv, 1.);
-        // debugValue = vec3(currentRayInView);
-        
-        // break;
     }
     // #pragma UNROLL_END
-    // 
-    // outColor = vec4(worldNormal, 1.);
-    // outColor = vec4(vec3(sceneDepth), 1.);
-    // outColor = vec4(rayDir, 1.);
+
     outColor = vec4(vec3(occlusion), 1.);
-    // outColor = vec4(worldPosition, 1.);
-    // outColor = vec4(debugValue, 1.);
 }
