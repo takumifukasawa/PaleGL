@@ -61,6 +61,7 @@ import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.j
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
+import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry.ts";
 
 // -------------------
 // constants
@@ -234,6 +235,9 @@ let attractSphereMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let glslSound: GLSLSound;
 let cubeMap: CubeMap;
+let boxMeshActor01: Actor;
+let boxMeshActor02: Actor;
+let boxMeshActor03: Actor;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? new TouchInputController() : new MouseInputController();
@@ -891,6 +895,41 @@ const main = async () => {
     captureScene.add(streetLightActorRight);
 
     //
+    // box
+    //
+    
+    boxMeshActor01 = new Mesh({
+        geometry: new BoxGeometry({gpu}),
+        material: new GBufferMaterial({
+            diffuseColor: new Color(1, 1, 1, 1),
+            metallic: 0,
+            roughness: 1,
+        }),
+    });
+    boxMeshActor01.transform.position = new Vector3(0, 1, -3);
+    
+    boxMeshActor02 = new Mesh({
+        geometry: new BoxGeometry({gpu}),
+        material: new GBufferMaterial({
+            diffuseColor: new Color(1, 1, 1, 1),
+            metallic: 0,
+            roughness: 1,
+        }),
+    });
+    boxMeshActor02.transform.position = new Vector3(-2, 1, -1);
+
+    boxMeshActor03 = new Mesh({
+        geometry: new BoxGeometry({gpu}),
+        material: new GBufferMaterial({
+            diffuseColor: new Color(1, 1, 1, 1),
+            metallic: 0,
+            roughness: 1,
+        }),
+    });
+    boxMeshActor03.transform.position = new Vector3(2, 1, -1);
+
+    
+    //
     // attract mesh
     //
 
@@ -1166,6 +1205,9 @@ void main() {
         material: particleMaterial,
     });
 
+    captureScene.add(boxMeshActor01);
+    captureScene.add(boxMeshActor02);
+    captureScene.add(boxMeshActor03);
     captureScene.add(attractSphereMesh);
     captureScene.add(skinnedMesh);
     captureScene.add(skyboxMesh);

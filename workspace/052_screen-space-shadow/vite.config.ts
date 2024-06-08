@@ -136,7 +136,7 @@ export default defineConfig(async (config) => {
                 minify: isMinifyShader,
                 minifierOptions: {
                     preserveExternals: true,
-                    noRenaming: true
+                    // noRenaming: true
                     // noRenamingList: ['epiano'],
                 },
             }),

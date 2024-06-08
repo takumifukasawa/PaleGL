@@ -66,7 +66,7 @@ void main() {
     
     float occlusion = 0.;
 
-    // for debug
+    // // for debug
     // // rayの深度を計算
     // // vec3 currentStep = step * float(0);
     // // currentStep = diff;
@@ -74,40 +74,72 @@ void main() {
     // vec3 currentRay = rayOrigin + rayDir * currentStepLength;
     // // vec3 currentRay = rayOrigin + currentStep;
     // vec4 currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
-    // currentRayInClip /= currentRayInClip.w;
+    // currentRayInClip.xyz /= currentRayInClip.w;
+    // vec3 currentRayInView = (uViewMatrix * vec4(currentRay, 1.)).xyz;
+    // float absCurrentRayZInClip = currentRayInView.z;
     // float currentRayRawDepth = currentRayInClip.z;
     // float currentRayDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
     // vec2 rayUv = currentRayInClip.xy * .5 + .5;
     // float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
+    // vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
+    //     rayUv,
+    //     currentRawDepthInPixel,
+    //     uInverseProjectionMatrix
+    // );
+    // float absCurrentViewPositionZInPixel = -currentViewPositionInPixel.z;
     // outColor = vec4(vec3(perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip)), 1.);
     // outColor = vec4(vec3(perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip)), 1.);
     // // outColor = vec4(vec2(rayUv), 1., 1.);
+    // // outColor = vec4(currentRayInView, 1.);
+    // outColor = vec4(vec3(-absCurrentRayZInClip / 20.), 1.);
     // return;
 
     // tmp
+    
+    vec3 debugValue = vec3(0.);
   
     // #pragma UNROLL_START
     for(int i = 0; i < MARCH_COUNT; i++) {
         // rayの深度を計算
+        // float currentStepLength = stepLength * float(MARCH_COUNT);
         float currentStepLength = stepLength * float(i);
         vec3 currentRay = rayOrigin + rayDir * currentStepLength;
-        vec4 currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
+        vec3 currentRayInView = (uViewMatrix * vec4(currentRay, 1.)).xyz;
+        float currentViewAbsZInRay = -currentRayInView.z;
+        vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
         currentRayInClip /= currentRayInClip.w;
-        float currentRayRawDepth = currentRayInClip.z;
-        float currentRayDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
+        // float currentRayRawDepth = currentRayInClip.z;
+        // float currentRayDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
         
         // rayのピクセルの深度をdepth_textureから取得
-        // float currentDepthInPixel = texture(uDepthTexture, currentRayInClip.xy * .5 + .5).x;
         vec2 rayUv = currentRayInClip.xy * .5 + .5;
         float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
         // float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
-        float currentDepthInPixel = perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip);
+        // float currentDepthInPixel = perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip);
+        vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
+            rayUv,
+            currentRawDepthInPixel,
+            uInverseProjectionMatrix
+        );
+        float currentViewAbsZInPixel = -currentViewPositionInPixel.z;
         
-        // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
-        if(currentRayDepth > currentDepthInPixel) {
+        // // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
+        // if(currentRayDepth > currentDepthInPixel) {
+        //     occlusion += sharpness;
+        //     // occlusion = 1.;
+        // }
+        // // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
+        if(currentViewAbsZInRay > currentViewAbsZInPixel) {
             occlusion += sharpness;
             // occlusion = 1.;
         }
+        
+        // debugValue = vec3(currentViewAbsZInRay / 20.);
+        // debugValue = vec3(currentViewAbsZInPixel / 20.);
+        //debugValue = vec3(rayUv, 1.);
+        // debugValue = vec3(currentRayInView);
+        
+        // break;
     }
     // #pragma UNROLL_END
     // 
@@ -116,4 +148,5 @@ void main() {
     // outColor = vec4(rayDir, 1.);
     // outColor = vec4(worldPosition, 1.);
     outColor = vec4(vec3(occlusion), 1.);
+    // outColor = vec4(debugValue, 1.);
 }
