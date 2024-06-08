@@ -8,11 +8,16 @@ in vec2 vUv;
 
 out vec4 outColor;
 
+#include ./partial/noise.glsl
+
+#include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
 
 uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferBTexture;
+uniform vec3 uJitterSize;
+uniform float uStrength;
 uniform float uBlendRate;
 
 #include ./partial/depth-functions.glsl
@@ -26,8 +31,9 @@ void main() {
 
     vec2 uv = vUv;
     
-    vec3 lightPos = vec3(0., .5, -1.);
-    
+    vec3 lightPos = vec3(0., .5, 0.);
+
+
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
@@ -39,11 +45,6 @@ void main() {
     vec3 worldNormal = normalize(texture(uGBufferBTexture, uv).xyz * 2. - 1.);
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
-    // vec3 viewPosition = reconstructViewPositionFromDepth(
-    //     uv,
-    //     texture(uDepthTexture, uv).x,
-    //     uInverseProjectionMatrix
-    // );
     vec3 worldPosition = reconstructWorldPositionFromDepth(
         uv,
         texture(uDepthTexture, uv).x,
@@ -51,51 +52,24 @@ void main() {
     );
     
     const int MARCH_COUNT = 24;
-    
-    // 1: light to P
-    vec3 rayOrigin = lightPos;
+
+    vec3 jitterOffset = normalize(vec3(
+        noise(uv + uTime + .1),
+        noise(uv + uTime + .2),
+        0.
+        // noise(uv + uTime + .3)
+    ) * 2. - 1.);
+
+    vec3 rayOrigin = lightPos + jitterOffset * uJitterSize;
     vec3 diff = worldPosition - lightPos;
-    // 2: P to light
-    // vec3 rayOrigin = worldPosition;
-    // vec3 diff = lightPos - worldPosition;
     
     vec3 rayDir = normalize(diff);
     // vec3 step = diff / float(MARCH_COUNT);
     float stepLength = length(diff) / float(MARCH_COUNT);
-    float sharpness = 2. / float(MARCH_COUNT);
+    float sharpness = .5 / float(MARCH_COUNT);
     
     float occlusion = 0.;
 
-    // // for debug
-    // // rayの深度を計算
-    // // vec3 currentStep = step * float(0);
-    // // currentStep = diff;
-    // float currentStepLength = stepLength * float(MARCH_COUNT);
-    // vec3 currentRay = rayOrigin + rayDir * currentStepLength;
-    // // vec3 currentRay = rayOrigin + currentStep;
-    // vec4 currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
-    // currentRayInClip.xyz /= currentRayInClip.w;
-    // vec3 currentRayInView = (uViewMatrix * vec4(currentRay, 1.)).xyz;
-    // float absCurrentRayZInClip = currentRayInView.z;
-    // float currentRayRawDepth = currentRayInClip.z;
-    // float currentRayDepth = perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip);
-    // vec2 rayUv = currentRayInClip.xy * .5 + .5;
-    // float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
-    // vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
-    //     rayUv,
-    //     currentRawDepthInPixel,
-    //     uInverseProjectionMatrix
-    // );
-    // float absCurrentViewPositionZInPixel = -currentViewPositionInPixel.z;
-    // outColor = vec4(vec3(perspectiveDepthToLinearDepth(currentRayRawDepth, uNearClip, uFarClip)), 1.);
-    // outColor = vec4(vec3(perspectiveDepthToLinearDepth(currentRawDepthInPixel, uNearClip, uFarClip)), 1.);
-    // // outColor = vec4(vec2(rayUv), 1., 1.);
-    // // outColor = vec4(currentRayInView, 1.);
-    // outColor = vec4(vec3(-absCurrentRayZInClip / 20.), 1.);
-    // return;
-
-    // tmp
-    
     vec3 debugValue = vec3(0.);
   
     // #pragma UNROLL_START
@@ -109,7 +83,8 @@ void main() {
 
         // rayのピクセルの深度をdepth_textureから取得
         vec2 rayUv = currentRayInClip.xy * .5 + .5;
-        float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
+        // float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
+        float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
 
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
         if(currentRayRawDepth > currentRawDepthInPixel + .001) {
@@ -117,6 +92,8 @@ void main() {
         }
     }
     // #pragma UNROLL_END
+    
+    occlusion *= uStrength;
 
     outColor = vec4(vec3(occlusion), 1.);
 }

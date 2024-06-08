@@ -906,7 +906,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor01.transform.position = new Vector3(0, 1, -3);
+    boxMeshActor01.transform.position = new Vector3(0, 1, -2);
     
     boxMeshActor02 = new Mesh({
         geometry: new BoxGeometry({gpu}),
@@ -916,7 +916,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor02.transform.position = new Vector3(-2, 1, -1);
+    boxMeshActor02.transform.position = new Vector3(-2, 1, 0);
 
     boxMeshActor03 = new Mesh({
         geometry: new BoxGeometry({gpu}),
@@ -926,7 +926,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor03.transform.position = new Vector3(2, 1, -1);
+    boxMeshActor03.transform.position = new Vector3(2, 1, 0);
 
     
     //
@@ -1378,8 +1378,59 @@ function initDebugger() {
     createSpotLightDebugger(spotLight2, 'spot light 2');
 
     //
+    // sss
+    //
+
+    debuggerGUI.addBorderSpacer();
+
+    const sssDebuggerGroup = debuggerGUI.addGroup('sss', false);
+
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss jitter size x',
+        minValue: 0,
+        maxValue: 0.5,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.jitterSize.x,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.jitterSize.x = value;
+        },
+    });
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss jitter size y',
+        minValue: 0,
+        maxValue: 0.5,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.jitterSize.y,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.jitterSize.y = value;
+        },
+    });
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss jitter size z',
+        minValue: 0,
+        maxValue: 0.5,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.jitterSize.z,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.jitterSize.z = value;
+        },
+    });
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss strength',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.strength,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.strength = value;
+        },
+    });
+
+    //
     // ssao
-    // TODO: ssao pass の参照を renderer に変える
     //
 
     debuggerGUI.addBorderSpacer();
