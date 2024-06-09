@@ -116,8 +116,11 @@ export class UniformBufferObject extends GLObject {
         gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
 
-    updateBufferData(variableName: string, data: Float32Array | Uint16Array) {
+    updateBufferData(variableName: string, data: Float32Array | Uint16Array, showLog: boolean = false) {
         const info = this.variableInfo.find((v) => v.name === variableName);
+        if(showLog) {
+            // console.log("updateBufferData", info);
+        }
         if (!info) {
             throw new Error(`variableName ${variableName} not found`);
         }
@@ -130,10 +133,6 @@ export class UniformBufferObject extends GLObject {
     }
 
     updateUniformValue(uniformName: string, uniformType: UniformTypes, value: UniformBufferObjectValue) {
-        // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
-        // const uniformName = targetBlock.name;
-        // const value = targetBlock.value;
-        // switch (targetBlock.type) {
         switch (uniformType) {
             // TODO: update struct
             case UniformTypes.Struct:

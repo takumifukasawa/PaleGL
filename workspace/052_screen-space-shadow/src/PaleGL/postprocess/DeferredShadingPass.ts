@@ -54,117 +54,15 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 value: null,
             },
             {
+                name: 'uScreenSpaceShadowTexture',
+                type: UniformTypes.Texture,
+                value: null,
+            },
+            {
                 name: 'uAmbientOcclusionTexture',
                 type: UniformTypes.Texture,
                 value: null,
             },
-
-            // {
-            //     // TODO: pass all lights
-            //     name: UniformNames.DirectionalLight,
-            //     type: UniformTypes.Struct,
-            //     value: [
-            //         {
-            //             name: UniformNames.LightDirection,
-            //             type: UniformTypes.Vector3,
-            //             value: Vector3.zero,
-            //         },
-            //         {
-            //             name: UniformNames.LightIntensity,
-            //             type: UniformTypes.Float,
-            //             value: 0,
-            //         },
-            //         {
-            //             name: UniformNames.LightColor,
-            //             type: UniformTypes.Color,
-            //             value: new Color(0, 0, 0, 1),
-            //         },
-            //         {
-            //             name: UniformNames.ShadowMap,
-            //             type: UniformTypes.Texture,
-            //             value: null,
-            //         },
-            //         {
-            //             name: UniformNames.LightViewProjectionMatrix,
-            //             type: UniformTypes.Matrix4,
-            //             value: Matrix4.identity,
-            //         },
-            //         {
-            //             name: UniformNames.ShadowBias,
-            //             type: UniformTypes.Float,
-            //             value: 0.001,
-            //         },
-            //     ],
-            // },
-
-            // {
-            //     name: UniformNames.SpotLight,
-            //     type: UniformTypes.StructArray,
-            //     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => {
-            //         return [
-            //             // {
-            //             //     name: UniformNames.ShadowMap,
-            //             //     type: UniformTypes.Texture,
-            //             //     value: null,
-            //             // },
-            //             {
-            //                 name: UniformNames.LightPosition,
-            //                 type: UniformTypes.Vector3,
-            //                 value: Vector3.zero,
-            //             },
-            //             {
-            //                 name: UniformNames.LightDirection,
-            //                 type: UniformTypes.Vector3,
-            //                 value: Vector3.zero,
-            //             },
-            //             {
-            //                 name: UniformNames.LightIntensity,
-            //                 type: UniformTypes.Float,
-            //                 value: 0,
-            //             },
-            //             {
-            //                 name: UniformNames.LightColor,
-            //                 type: UniformTypes.Color,
-            //                 value: new Color(0, 0, 0, 1),
-            //             },
-            //             {
-            //                 name: UniformNames.LightDistance,
-            //                 type: UniformTypes.Float,
-            //                 value: 0,
-            //             },
-            //             {
-            //                 name: UniformNames.LightAttenuation,
-            //                 type: UniformTypes.Float,
-            //                 value: 0,
-            //             },
-            //             {
-            //                 name: UniformNames.LightConeCos,
-            //                 type: UniformTypes.Float,
-            //                 value: 0,
-            //             },
-            //             {
-            //                 name: UniformNames.LightPenumbraCos,
-            //                 type: UniformTypes.Float,
-            //                 value: 0,
-            //             },
-            //             {
-            //                 name: UniformNames.LightViewProjectionMatrix,
-            //                 type: UniformTypes.Matrix4,
-            //                 value: Matrix4.identity,
-            //             },
-            //             // {
-            //             //     name: UniformNames.ShadowMap,
-            //             //     type: UniformTypes.Texture,
-            //             //     value: null,
-            //             // },
-            //             {
-            //                 name: UniformNames.ShadowBias,
-            //                 type: UniformTypes.Float,
-            //                 value: 0.001,
-            //             },
-            //         ];
-            //     }),
-            // },
 
             {
                 name: UniformNames.DirectionalLightShadowMap,
@@ -209,12 +107,6 @@ export class DeferredShadingPass extends PostProcessPassBase {
                     },
                 ],
             },
-
-            // // TODO: pass skybox env
-            // uEnvMap: {
-            //     type: UniformTypes.CubeMap,
-            //     value: null,
-            // },
         ];
 
         super({
@@ -229,13 +121,16 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 UniformBlockNames.Camera,
                 UniformBlockNames.DirectionalLight,
                 UniformBlockNames.SpotLight,
+                UniformBlockNames.PointLight
             ],
-            // renderTargetType: RenderTargetTypes.RGBA16F,
         });
-
-        // console.log(deferredShadingFragmentShader)
+        console.log(deferredShadingFragmentShader)
     }
 
+    /**
+     * 
+     * @param skybox
+     */
     updateSkyboxUniforms(skybox: Skybox) {
         this.material.uniforms.setValue(UniformNames.Skybox, [
             {
@@ -266,6 +161,10 @@ export class DeferredShadingPass extends PostProcessPassBase {
         ]);
     }
 
+    /**
+     * 
+     * @param args
+     */
     render(args: PostProcessPassRenderArgs) {
         super.render(args);
         // console.log(this.material.uniforms)

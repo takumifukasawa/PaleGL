@@ -15,7 +15,6 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
-
 // -------------------------------------------------------------------------------
 // struct
 // -------------------------------------------------------------------------------
@@ -81,16 +80,9 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
     return 1.;
 }
 
+//
 // directional light
-
-// struct DirectionalLight {
-//     vec3 direction; // 光源自体の向く方向
-//     float intensity;
-//     vec4 color;
-//     // sampler2D shadowMap;
-//     mat4 lightViewProjectionMatrix;
-//     // float shadowBias;
-// };
+//
 
 void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
     directLight.color = directionalLight.color.xyz;
@@ -99,46 +91,9 @@ void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, c
     directLight.intensity = directionalLight.intensity;
 }
 
-// point light
-// TODO: point light なくてもいいかも
-
-struct PointLight {
-    vec3 position;
-    vec4 color;
-    float distance;
-    float attenuation;
-};
-
-void getPointLightIrradiance(const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight) {
-    vec3 L = pointLight.position - geometry.position;
-    directLight.direction = normalize(L);
-
-    float lightDistance = length(L);
-    if (testLightInRange(lightDistance, pointLight.distance)) {
-        directLight.color = pointLight.color.xyz;
-        directLight.color *= punctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.attenuation);
-        directLight.visible = true;
-    } else {
-        directLight.color = vec3(0.);
-        directLight.visible = false;
-    }
-}
-
+//
 // spot light
-
-// struct SpotLight {
-//     vec3 position;
-//     vec3 direction; // spotlightの向き先
-//     vec4 color;
-//     float intensity;
-//     float distance;
-//     float attenuation;
-//     float coneCos;
-//     float penumbraCos;
-//     // sampler2D shadowMap;
-//     mat4 lightViewProjectionMatrix;
-//     // float shadowBias;
-// };
+//
 
 void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {
     // vec3 L = spotLight.position - geometry.position;
@@ -170,6 +125,36 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
         directLight.color = vec3(0.);
         directLight.visible = false;
     }
+}
+
+//
+// point light
+//
+
+void getPointLightIrradiance(const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight) {
+    vec3 surfaceToLight = pointLight.position - geometry.position;
+    float lightDistance = length(surfaceToLight);
+    vec3 L = normalize(surfaceToLight);
+
+    directLight.direction = L;
+    directLight.intensity = pointLight.intensity;
+    
+    if (testLightInRange(lightDistance, pointLight.distance)) {
+        directLight.color = pointLight.color.xyz;
+        directLight.color *= punctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.attenuation);
+        directLight.visible = true;
+    } else {
+        directLight.color = vec3(0.);
+        directLight.visible = false;
+    }
+    
+    // directLight.color = vec3(testLightInRange(lightDistance, pointLight.distance) ? 1. : 0.);
+   
+    // for debug
+    // directLight.color = vec3(1.);
+    // directLight.visible = true;
+    // directLight.color = vec3(lightDistance);
+    // directLight.color = pointLight.position;
 }
 
 // -------------------------------------------------------------------------------
@@ -209,18 +194,6 @@ void getSkyboxLightIrradiance(const in SkyboxLight skyboxLight, const in Geometr
     directLight.specularIntensity = skyboxLight.specularIntensity;
     directLight.maxLodLevel = skyboxLight.maxLodLevel;
 }
-
-// -------------------------------------------------------------------------------
-// lights uniforms
-// -------------------------------------------------------------------------------
-
-// #define LIGHT_MAX 4
-// uniform DirectionalLight directionalLights[LIGHT_MAX];
-// uniform PointLight pointLights[LIGHT_MAX];
-// uniform SpotLight spotLights[LIGHT_MAX];
-// uniform int numDirectionalLights;
-// uniform int numPointLights;
-// uniform int numSpotLights;
 
 // -------------------------------------------------------------------------------
 // brdfs

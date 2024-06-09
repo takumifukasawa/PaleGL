@@ -1,7 +1,7 @@
 ﻿import { Light, LightArgs } from '@/PaleGL/actors/Light';
 import { Actor, ActorUpdateArgs } from '@/PaleGL/actors/Actor';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+// import { Vector3 } from '@/PaleGL/math/Vector3';
+// import { Vector4 } from '@/PaleGL/math/Vector4';
 import { LightTypes } from '@/PaleGL/constants.ts';
 // import { Material } from '@/PaleGL/materials/Material.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -23,11 +23,11 @@ type SpotLightParams = {
 
 type SpotLightArgs = LightArgs & SpotLightParams;
 
-export type SpotLightStruct = {
-    direction: Vector3;
-    intensity: number;
-    color: Vector4;
-} & SpotLightParams;
+// export type SpotLightStruct = {
+//     direction: Vector3;
+//     intensity: number;
+//     color: Vector4;
+// } & SpotLightParams;
 
 export class SpotLight extends Light {
     distance: number;

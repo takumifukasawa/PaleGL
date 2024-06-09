@@ -4,15 +4,32 @@ precision highp float;
 
 #pragma DEFINES
 
+#include ./defines-light.glsl
+
+// -----------------------------------------------------------
+
 in vec2 vUv;
 
 out vec4 outColor;
 
+// -----------------------------------------------------------
+// utils
+// -----------------------------------------------------------
+
 #include ./partial/noise.glsl
+
+#include ./partial/depth-functions.glsl
+
+// -----------------------------------------------------------
+// uniform block
+// -----------------------------------------------------------
 
 #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
+#include ./partial/uniform-block-spot-light.glsl
+
+// -----------------------------------------------------------
 
 uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferBTexture;
@@ -21,8 +38,6 @@ uniform vec3 uJitterSize;
 uniform float uSharpness;
 uniform float uLengthMultiplier;
 uniform float uStrength;
-
-#include ./partial/depth-functions.glsl
 
 void main() {
     vec2 uv = vUv;

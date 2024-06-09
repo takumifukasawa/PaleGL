@@ -62,6 +62,7 @@ import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.j
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry.ts";
+import {PointLight} from "@/PaleGL/actors/PointLight.ts";
 
 // -------------------
 // constants
@@ -176,7 +177,88 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     });
 };
 
-const stylesText = `
+const createPointLightDebugger = (pointLight: PointLight, label: string) => {
+    debuggerGUI.addBorderSpacer();
+
+    const pointLightDebuggerGroup = debuggerGUI.addGroup(label, false);
+
+    pointLightDebuggerGroup.addColorDebugger({
+        label: 'color',
+        initialValue: pointLight.color.getHexCoord(),
+        onChange: (value) => {
+            pointLight.color = Color.fromHex(value);
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'intensity',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: pointLight.intensity,
+        onChange: (value) => {
+            pointLight.intensity = value;
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'distance',
+        minValue: 0,
+        maxValue: 100,
+        stepValue: 0.01,
+        initialValue: pointLight.distance,
+        onChange: (value) => {
+            pointLight.distance = value;
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'attenuation',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: pointLight.attenuation,
+        onChange: (value) => {
+            pointLight.attenuation = value;
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'pos x',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: pointLight.transform.position.x,
+        onChange: (value) => {
+            pointLight.transform.position.x = value;
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'pos y',
+        minValue: 0,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: pointLight.transform.position.y,
+        onChange: (value) => {
+            pointLight.transform.position.y = value;
+        },
+    });
+
+    pointLightDebuggerGroup.addSliderDebugger({
+        label: 'pos z',
+        minValue: -10,
+        maxValue: 10,
+        stepValue: 0.001,
+        initialValue: pointLight.transform.position.z,
+        onChange: (value) => {
+            pointLight.transform.position.z = value;
+        },
+    });
+}
+
+
+    const stylesText = `
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -393,6 +475,16 @@ spotLight2.subscribeOnStart(({ actor }) => {
 });
 
 captureScene.add(spotLight2);
+
+const pointLight1 = new PointLight({
+    intensity: 6,
+    color: new Color(1, 1, 1),
+    distance: 15,
+    attenuation: 1,
+});
+pointLight1.transform.position = new Vector3(0, .5, 0);
+
+captureScene.add(pointLight1);
 
 const cameraPostProcess = new PostProcess();
 
@@ -906,7 +998,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor01.transform.position = new Vector3(0, 1, -2);
+    boxMeshActor01.transform.position = new Vector3(0, .5, -2);
     
     boxMeshActor02 = new Mesh({
         geometry: new BoxGeometry({gpu}),
@@ -916,7 +1008,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor02.transform.position = new Vector3(-2, 1, 0);
+    boxMeshActor02.transform.position = new Vector3(-2, .5, 0);
 
     boxMeshActor03 = new Mesh({
         geometry: new BoxGeometry({gpu}),
@@ -926,7 +1018,7 @@ const main = async () => {
             roughness: 1,
         }),
     });
-    boxMeshActor03.transform.position = new Vector3(2, 1, 0);
+    boxMeshActor03.transform.position = new Vector3(2, .5, 0);
 
     
     //
@@ -1376,7 +1468,13 @@ function initDebugger() {
 
     createSpotLightDebugger(spotLight1, 'spot light 1');
     createSpotLightDebugger(spotLight2, 'spot light 2');
-
+    
+    //
+    // point light
+    // 
+    
+    createPointLightDebugger(pointLight1, 'point light 1');
+    
     //
     // sss
     //

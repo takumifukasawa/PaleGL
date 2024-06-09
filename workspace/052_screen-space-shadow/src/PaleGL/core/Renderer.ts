@@ -2,6 +2,7 @@
     ActorTypes,
     BlendTypes,
     LightTypes,
+    MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
     RenderQueueType,
     RenderTargetTypes,
@@ -68,8 +69,9 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { ChromaticAberrationPass } from '@/PaleGL/postprocess/ChromaticAberrationPass.ts';
 import { VignettePass } from '@/PaleGL/postprocess/VignettePass.ts';
 import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
-import { FXAAPass} from "@/PaleGL/postprocess/FXAAPass.ts";
-import {ScreenSpaceShadowPass} from "@/PaleGL/postprocess/ScreenSpaceShadowPass.ts";
+import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
+import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
+import { PointLight } from '@/PaleGL/actors/PointLight.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -80,6 +82,7 @@ type RenderMeshInfoEachQueue = {
 export type LightActors = {
     directionalLight: DirectionalLight | null;
     spotLights: SpotLight[];
+    pointLights: PointLight[];
 };
 
 // function applyShadowUniformValues(targetMaterial: Material, light: Light) {
@@ -120,49 +123,6 @@ export type LightActors = {
 // TODO: 渡す uniform の値、キャッシュできる気がする
 export function applyLightShadowMapUniformValues(targetMaterial: Material, lightActors: LightActors) {
     if (lightActors.directionalLight) {
-        // targetMaterial.uniforms.setValue(UniformNames.DirectionalLight, [
-        //     {
-        //         name: UniformNames.LightDirection,
-        //         type: UniformTypes.Vector3,
-        //         // pattern1: そのまま渡す
-        //         // value: light.transform.position,
-        //         // pattern2: normalizeしてから渡す
-        //         // value: lightActors.directionalLight.transform.position.clone().normalize(),
-        //         // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-        //         value: lightActors.directionalLight.transform.position.clone().negate().normalize(),
-        //     },
-        //     {
-        //         name: UniformNames.LightIntensity,
-        //         type: UniformTypes.Float,
-        //         value: lightActors.directionalLight.intensity,
-        //     },
-        //     {
-        //         name: UniformNames.LightColor,
-        //         type: UniformTypes.Color,
-        //         value: lightActors.directionalLight.color,
-        //     },
-        //     ...(lightActors.directionalLight.shadowMap && lightActors.directionalLight.shadowCamera
-        //         ? [
-        //               {
-        //                   name: UniformNames.LightViewProjectionMatrix,
-        //                   type: UniformTypes.Matrix4,
-        //                   // prettier-ignore
-        //                   value: Matrix4.multiplyMatrices(
-        //                     new Matrix4(
-        //                         0.5, 0, 0, 0.5,
-        //                         0, 0.5, 0, 0.5,
-        //                         0, 0, 0.5, 0.5,
-        //                         0, 0, 0, 1
-        //                     ),
-        //                     lightActors.directionalLight.shadowCamera.projectionMatrix.clone(),
-        //                     lightActors.directionalLight.shadowCamera.viewMatrix.clone()
-        //                 ),
-        //               },
-        //           ]
-        //         : []),
-        // ]);
-
-        // applyShadowUniformValues(targetMaterial, lightActors.directionalLight);
         if (lightActors.directionalLight.shadowMap) {
             targetMaterial.uniforms.setValue(
                 UniformNames.DirectionalLightShadowMap,
@@ -171,80 +131,10 @@ export function applyLightShadowMapUniformValues(targetMaterial: Material, light
         }
     }
 
-    // targetMaterial.uniforms.setValue(
-    //     UniformNames.SpotLight,
-    //     lightActors.spotLights.map((spotLight) => [
-    //         {
-    //             name: UniformNames.LightPosition,
-    //             type: UniformTypes.Vector3,
-    //             value: spotLight.transform.position,
-    //         },
-    //         {
-    //             name: UniformNames.LightDirection,
-    //             type: UniformTypes.Vector3,
-    //             value: spotLight.transform.worldForward.clone(),
-    //         },
-    //         {
-    //             name: UniformNames.LightIntensity,
-    //             type: UniformTypes.Float,
-    //             value: spotLight.intensity,
-    //         },
-    //         {
-    //             name: UniformNames.LightColor,
-    //             type: UniformTypes.Color,
-    //             value: spotLight.color,
-    //         },
-    //         {
-    //             name: UniformNames.LightDistance,
-    //             type: UniformTypes.Float,
-    //             value: spotLight.distance,
-    //         },
-    //         {
-    //             name: UniformNames.LightAttenuation,
-    //             type: UniformTypes.Float,
-    //             value: spotLight.attenuation,
-    //         },
-    //         {
-    //             name: UniformNames.LightConeCos,
-    //             type: UniformTypes.Float,
-    //             value: spotLight.coneCos,
-    //         },
-    //         {
-    //             name: UniformNames.LightPenumbraCos,
-    //             type: UniformTypes.Float,
-    //             value: spotLight.penumbraCos,
-    //         },
-    //         ...(spotLight.shadowMap && spotLight.shadowCamera
-    //             ? [
-    //                   {
-    //                       name: UniformNames.ShadowMap,
-    //                       type: UniformTypes.Texture,
-    //                       value: spotLight.shadowMap.read.depthTexture,
-    //                   },
-    //                   {
-    //                       name: UniformNames.LightViewProjectionMatrix,
-    //                       type: UniformTypes.Matrix4,
-    //                       value: Matrix4.multiplyMatrices(
-    //                           new Matrix4(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1),
-    //                           spotLight.shadowCamera.projectionMatrix.clone(),
-    //                           spotLight.shadowCamera.viewMatrix.clone()
-    //                       ),
-    //                   },
-    //               ]
-    //             : []),
-    //     ])
-    // );
-
     targetMaterial.uniforms.setValue(
         UniformNames.SpotLightShadowMap,
         lightActors.spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap.read.depthTexture : null))
     );
-
-    // TODO: 正しい個数渡す
-    // lightActors.spotLights.forEach((spotLight) => {
-    //     applyShadowUniformValues(targetMaterial, spotLight);
-    // });
-    // applyShadowUniformValues(targetMaterial, lightActors.spotLights[0]);
 }
 
 /**
@@ -549,16 +439,6 @@ export class Renderer {
                     },
                 ]),
             },
-            // {
-            //     name: UniformNames.SpotLightIntensity,
-            //     type: UniformTypes.Float,
-            //     value: 0,
-            // },
-            // {
-            //     name: UniformNames.SpotLightColor,
-            //     type: UniformTypes.Color,
-            //     value: Color.black,
-            // },
         ];
         this.globalUniformBufferObjects.push({
             uniformBufferObject: this.gpu.createUniformBufferObject(
@@ -567,6 +447,48 @@ export class Renderer {
                 spotLightUniformBufferData
             ),
             data: spotLightUniformBufferData,
+        });
+
+        const pointLightUniformBufferData = [
+            {
+                name: UniformNames.PointLight,
+                type: UniformTypes.StructArray,
+                value: maton.range(MAX_POINT_LIGHT_COUNT).map(() => [
+                    {
+                        name: UniformNames.LightColor,
+                        type: UniformTypes.Color,
+                        value: Color.black,
+                    },
+                    {
+                        name: UniformNames.LightPosition,
+                        type: UniformTypes.Vector3,
+                        value: Vector3.zero,
+                    },
+                    {
+                        name: UniformNames.LightIntensity,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightDistance,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                    {
+                        name: UniformNames.LightAttenuation,
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
+                ]),
+            },
+        ];
+        this.globalUniformBufferObjects.push({
+            uniformBufferObject: this.gpu.createUniformBufferObject(
+                uniformBufferObjectShader,
+                UniformBlockNames.PointLight,
+                pointLightUniformBufferData
+            ),
+            data: pointLightUniformBufferData,
         });
 
         const commonUniformBlockData = [
@@ -680,7 +602,7 @@ export class Renderer {
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
-    
+
     get screenSpaceShadowPass() {
         return this._screenSpaceShadowPass;
     }
@@ -728,7 +650,7 @@ export class Renderer {
     get vignettePass() {
         return this._vignettePass;
     }
-    
+
     get fxaaPass() {
         return this._fxaaPass;
     }
@@ -871,10 +793,10 @@ export class Renderer {
             [RenderQueueType.AlphaTest]: [],
             [RenderQueueType.Transparent]: [],
         };
-        // const lightActors: Light[] = [];
         const lightActors: LightActors = {
             directionalLight: null,
             spotLights: [],
+            pointLights: [],
         };
 
         // build render mesh info each queue
@@ -924,6 +846,9 @@ export class Renderer {
                             case LightTypes.Spot:
                                 lightActors.spotLights.push(light as SpotLight);
                                 break;
+                            case LightTypes.Point:
+                                lightActors.pointLights.push(light as PointLight);
+                                break;
                         }
                     }
                     break;
@@ -972,11 +897,17 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         this.updateCommonUniforms({ time });
+        // TODO: このままだと directional-light がなくなったときも directional-light が残ることになる
         if (lightActors.directionalLight) {
             this.updateDirectionalLightUniforms(lightActors.directionalLight);
         }
+        // TODO: このままだと spot-light がなくなったときも spot-light が残ることになる
         if (lightActors.spotLights.length > 0) {
             this.updateSpotLightsUniforms(lightActors.spotLights);
+        }
+        // TODO: このままだと point-light がなくなったときも point-light が残ることになる
+        if (lightActors.pointLights.length > 0) {
+            this.updatePointLightsUniforms(lightActors.pointLights);
         }
 
         // ------------------------------------------------------------------------------
@@ -995,7 +926,6 @@ export class Renderer {
         // g-buffer opaque pass
         // ------------------------------------------------------------------------------
 
-        // this.scenePass(sortedBasePassRenderMeshInfos, camera, lightActors);
         this.scenePass(sortedBasePassRenderMeshInfos, camera);
 
         // ------------------------------------------------------------------------------
@@ -1034,11 +964,10 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
-            isLastPass: true,
+            isLastPass: false,
             time, // TODO: engineから渡したい
             // lightActors,
         });
-        return;
 
         // ------------------------------------------------------------------------------
         // ambient occlusion pass
@@ -1056,8 +985,6 @@ export class Renderer {
             // lightActors,
         });
 
-        // return;
-
         // ------------------------------------------------------------------------------
         // deferred lighting pass
         // ------------------------------------------------------------------------------
@@ -1066,22 +993,16 @@ export class Renderer {
         // TODO: skyboxは一個だけ想定のいいはず
         sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
             const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-            // const cubeMap: CubeMap = skyboxActor.cubeMap;
-            // this._deferredShadingPass.material.updateUniform('uEnvMap', cubeMap);
             this._deferredShadingPass.updateSkyboxUniforms(skyboxActor);
         });
 
-        // update lights to deferred lighting pass
-        // TODO: ここでライティングのパスが必要
-        // TODO: - light actor の中で lightの種類別に処理を分ける
-        // TODO: - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
-        // lightActors.forEach((light) => {
-        //     const targetMaterial = this._deferredShadingPass.material;
-        //     applyLightShadowMapUniformValues(targetMaterial, l)
-        //     light.applyUniformsValues(targetMaterial);
-        // });
-
         applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors);
+
+        // set sss texture
+        this._deferredShadingPass.material.uniforms.setValue(
+            'uScreenSpaceShadowTexture',
+            this._screenSpaceShadowPass.renderTarget.read.texture
+        );
 
         // set ao texture
         this._deferredShadingPass.material.uniforms.setValue(
@@ -1096,12 +1017,12 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
-            isLastPass: false,
+            isLastPass: true,
             time, // TODO: engineから渡したい
             lightActors,
         });
-        // return;
-        // console.log(this._deferredShadingPass.material.getUniform(UniformNames.InverseProjectionMatrix))
+
+        return;
 
         // ------------------------------------------------------------------------------
         // ssr pass
@@ -1640,18 +1561,6 @@ export class Renderer {
                 return;
             }
 
-            // console.log(lightActor, castShadowLightActors, castShadowRenderMeshInfos)
-
-            // this.setUniformBlockValue(
-            //     UniformBlockNames.Transformations,
-            //     UniformNames.ViewMatrix,
-            //     lightActor.shadowCamera.viewMatrix
-            // );
-            // this.setUniformBlockValue(
-            //     UniformBlockNames.Transformations,
-            //     UniformNames.ProjectionMatrix,
-            //     lightActor.shadowCamera.projectionMatrix
-            // );
             this.updateCameraUniforms(lightActor.shadowCamera);
 
             castShadowRenderMeshInfos.forEach(({ actor }) => {
@@ -1663,57 +1572,14 @@ export class Renderer {
                 }
 
                 // TODO: material 側でやった方がよい？
-                // targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-                // // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
-                // // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix);
-                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, lightActor.shadowCamera!.viewMatrix.elements);
-                // this.updateUniformBlockTransformations(actor, lightActor.shadowCamera!);
-                // this.setUniformBlockValue(
-                //     UniformBlockNames.Transformations,
-                //     UniformNames.WorldMatrix,
-                //     actor.transform.worldMatrix
-                // );
-                // this.setUniformBlockValue(
-                //     UniformBlockNames.Transformations,
-                //     UniformNames.InverseWorldMatrix,
-                //     actor.transform.inverseWorldMatrix
-                // );
                 this.updateActorTransformUniforms(actor);
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.ProjectionMatrix,
-                //     lightActor.shadowCamera!.projectionMatrix
-                // );
-                // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, lightActor.shadowCamera!.projectionMatrix.elements);
-
-                // this.setUniformBlockValue(
-                //     UniformBlockNames.Transformations,
-                //     UniformNames.NormalMatrix,
-                //     actor.transform.normalMatrix
-                // );
-
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.NormalMatrix,
-                //     actor.transform.worldMatrix.clone().invert().transpose()
-                // );
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.ViewPosition,
-                //     lightActor.shadowCamera!.transform.worldMatrix.position
-                // );
-                // targetMaterial.uniforms.setValue(
-                //     UniformNames.ViewDirection,
-                //     lightActor.shadowCamera!.transform.worldForward
-                // );
 
                 targetMaterial.uniforms.setValue(
                     UniformNames.DepthTexture,
                     this._copyDepthDestRenderTarget.depthTexture
                 );
-                // targetMaterial.uniforms.setValue(UniformNames.CameraNear, lightActor.shadowCamera!.near);
-                // targetMaterial.uniforms.setValue(UniformNames.CameraFar, lightActor.shadowCamera!.far);
 
                 actor.updateDepthMaterial({ camera: lightActor.shadowCamera! });
-                // targetMaterial.updateUniforms();
 
                 this.renderMesh(actor.geometry, targetMaterial);
 
@@ -1728,8 +1594,6 @@ export class Renderer {
      *
      * @param sortedRenderMeshInfos
      * @param camera
-     * @param lightActors
-     * @param clear
      * @private
      */
     private scenePass(
@@ -1750,12 +1614,6 @@ export class Renderer {
         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
         // }
 
-        // this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
-        // this.setUniformBlockValue(
-        //     UniformBlockNames.Transformations,
-        //     UniformNames.ProjectionMatrix,
-        //     camera.projectionMatrix
-        // );
         this.updateCameraUniforms(camera);
 
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
@@ -1772,8 +1630,8 @@ export class Renderer {
 
             const targetMaterial = actor.materials[materialIndex];
 
-            // prepassしてないmaterialの場合はdepthをcopy.
-            // prepassしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
+            // pr-epassしてないmaterialの場合はdepthをcopy.
+            // pr-epassしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
             if (targetMaterial.skipDepthPrePass) {
                 this.setRenderTarget(null, false, false);
                 this.copyDepthTexture();
@@ -1781,40 +1639,10 @@ export class Renderer {
             }
 
             // TODO: material 側でやった方がよい？
-            // targetMaterial.uniforms.setValue(UniformNames.InverseWorldMatrix, actor.transform.inverseWorldMatrix);
-            // this.setUniformBlockValue(
-            //     UniformBlockNames.Transformations,
-            //     UniformNames.WorldMatrix,
-            //     actor.transform.worldMatrix
-            // );
-            // this.setUniformBlockValue(
-            //     UniformBlockNames.Transformations,
-            //     UniformNames.InverseWorldMatrix,
-            //     actor.transform.inverseWorldMatrix
-            // );
             this.updateActorTransformUniforms(actor);
-            // // targetMaterial.uniforms.setValue(UniformNames.WorldMatrix, actor.transform.worldMatrix);
-            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.WorldMatrix, actor.transform.worldMatrix.elements);
-            // // targetMaterial.uniforms.setValue(UniformNames.ViewMatrix, camera.viewMatrix);
-            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ViewMatrix, camera.viewMatrix.elements);
-            // // targetMaterial.uniforms.setValue(UniformNames.ProjectionMatrix, camera.projectionMatrix);
-            // this.globalUniformBufferObjects.find((ubo) => ubo.blockName === UniformBlockNames.Transformations)?.updateBufferData(UniformNames.ProjectionMatrix, camera.projectionMatrix.elements);
-            // targetMaterial.uniforms.setValue(
-            //     UniformNames.NormalMatrix,
-            //     actor.transform.worldMatrix.clone().invert().transpose()
-            // );
-            // this.setUniformBlockValue(
-            //     UniformBlockNames.Transformations,
-            //     UniformNames.NormalMatrix,
-            //     actor.transform.normalMatrix
-            // );
-
-            // targetMaterial.uniforms.setValue(UniformNames.ViewPosition, camera.transform.worldMatrix.position);
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.depthTexture!);
-            // targetMaterial.uniforms.setValue(UniformNames.CameraNear, camera.near);
-            // targetMaterial.uniforms.setValue(UniformNames.CameraFar, camera.far);
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
@@ -1835,6 +1663,10 @@ export class Renderer {
         });
     }
 
+    /**
+     *
+     * @param actor
+     */
     updateActorTransformUniforms(actor: Actor) {
         this.setUniformBlockValue(
             UniformBlockNames.Transformations,
@@ -1853,6 +1685,10 @@ export class Renderer {
         );
     }
 
+    /**
+     *
+     * @param camera
+     */
     updateCameraUniforms(camera: Camera) {
         this.setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
         this.setUniformBlockValue(
@@ -1918,7 +1754,18 @@ export class Renderer {
         );
     }
 
-    updateUniformBlockValue(blockName: string, uniformName: string, value: UniformBufferObjectValue) {
+    /**
+     *
+     * @param blockName
+     * @param uniformName
+     * @param value
+     */
+    updateUniformBlockValue(
+        blockName: string,
+        uniformName: string,
+        value: UniformBufferObjectValue,
+        showLog: boolean = false
+    ) {
         const targetGlobalUniformBufferObject = this.globalUniformBufferObjects.find(
             ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
         );
@@ -1984,10 +1831,6 @@ export class Renderer {
             return data;
         };
 
-        // targetGlobalUniformBufferObject.data.forEach((targetBlock) => {
-        // const uniformName = targetBlock.name;
-        // const value = targetBlock.value;
-        // switch (targetBlock.type) {
         switch (targetUniformData.type) {
             // TODO: update struct
             case UniformTypes.Struct:
@@ -2002,8 +1845,10 @@ export class Renderer {
                     v.forEach((vv) => {
                         const structElementName = `${uniformName}[${i}].${vv.name}`;
                         const data: number[] = getStructElementValue(vv.type, vv.value);
-                        // for debug
-                        targetUbo.updateBufferData(structElementName, new Float32Array(data));
+                        if (showLog) {
+                            // console.log(structElementName, data);
+                        }
+                        targetUbo.updateBufferData(structElementName, new Float32Array(data), showLog);
                     });
                 });
                 break;
@@ -2038,6 +1883,10 @@ export class Renderer {
         }
     }
 
+    /**
+     *
+     * @param time
+     */
     updateCommonUniforms({ time }: { time: number }) {
         // passMaterial.uniforms.setValue(UniformNames.Time, time);
         this.updateUniformBlockValue(UniformBlockNames.Common, UniformNames.Time, time);
@@ -2048,6 +1897,10 @@ export class Renderer {
         );
     }
 
+    /**
+     *
+     * @param directionalLight
+     */
     updateDirectionalLightUniforms(directionalLight: DirectionalLight) {
         this.updateUniformBlockValue(UniformBlockNames.DirectionalLight, UniformNames.DirectionalLight, [
             {
@@ -2080,11 +1933,6 @@ export class Renderer {
      * @param spotLights
      */
     updateSpotLightsUniforms(spotLights: SpotLight[]) {
-        //const colors = spotLights.map((spotLight) => spotLight.color);
-        //const intencities = spotLights.map((spotLight) => spotLight.intensity);
-        // this.setUniformBlockValue(UniformBlockNames.SpotLight, UniformNames.SpotLightColor, colors);
-        // this.setUniformBlockValue(UniformBlockNames.SpotLight, UniformNames.SpotLightIntensity, intencities);
-
         this.updateUniformBlockValue(
             UniformBlockNames.SpotLight,
             UniformNames.SpotLight,
@@ -2134,7 +1982,6 @@ export class Renderer {
                         name: UniformNames.ShadowMapProjectionMatrix,
                         type: UniformTypes.Matrix4,
                         value: spotLight.shadowMapProjectionMatrix,
-                        // value: spotLight.lightViewProjectionMatrix,
                     },
                 ];
             })
@@ -2143,10 +1990,50 @@ export class Renderer {
 
     /**
      *
+     * @param pointLights
+     */
+    updatePointLightsUniforms(pointLights: PointLight[]) {
+        this.updateUniformBlockValue(
+            UniformBlockNames.PointLight,
+            UniformNames.PointLight,
+            pointLights.map((pointLight) => {
+                return [
+                    {
+                        name: UniformNames.LightColor,
+                        type: UniformTypes.Color,
+                        value: pointLight.color,
+                    },
+                    {
+                        name: UniformNames.LightPosition,
+                        type: UniformTypes.Vector3,
+                        value: pointLight.transform.position,
+                    },
+                    {
+                        name: UniformNames.LightIntensity,
+                        type: UniformTypes.Float,
+                        value: pointLight.intensity,
+                    },
+                    {
+                        name: UniformNames.LightDistance,
+                        type: UniformTypes.Float,
+                        value: pointLight.distance,
+                    },
+                    {
+                        name: UniformNames.LightAttenuation,
+                        type: UniformTypes.Float,
+                        value: pointLight.attenuation,
+                    },
+                ];
+            }),
+            true
+        );
+    }
+
+    /**
+     *
      * @param sortedRenderMeshInfos
      * @param camera
      * @param lightActors
-     * @param clear
      * @private
      */
     private transparentPass(

@@ -13,6 +13,7 @@ precision highp float;
 #include ./partial/uniform-block-camera.glsl
 #include ./partial/uniform-block-directional-light.glsl
 #include ./partial/uniform-block-spot-light.glsl
+#include ./partial/uniform-block-point-light.glsl
 
 // -----------------------------------------------------------
 // struct
@@ -59,6 +60,8 @@ const vec2 poissonDisk[4] = vec2[](
     vec2(0.34495938, 0.29387760)
 );
 
+const int SHADOW_FETCH_COUNT = 4;
+
 float calcDirectionalLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
@@ -90,13 +93,16 @@ float calcDirectionalLightShadowAttenuation(
 
     float visibility = 1.;
 
-    for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[i] / 800.;
-        float readDepth = texture(shadowMap, uv + offset).r;
+    #pragma UNROLL_START
+    for(int i = 0; i < SHADOW_FETCH_COUNT; i++) {
+        vec2 offset = poissonDisk[UNROLL_i] / 800.;
+        // float readDepth = texture(shadowMap, uv + offset).r;
+        float readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         if(readDepth < lightPos.z - bias) {
             visibility -= .25;
         }
     }
+    #pragma UNROLL_END
 
     // for debug
     // vec3 color = mix(
@@ -105,7 +111,6 @@ float calcDirectionalLightShadowAttenuation(
     //     (1. - visibility) * shadowAreaRect
     // );
     // return vec4(color, 1.);
-
     // return mix(surfaceColor, shadowColor, isShadow * shadowAreaRect * shadowBlendRate);
 
     float shadow = (1. - visibility) * shadowAreaRect * shadowBlendRate;
@@ -146,13 +151,16 @@ float calcSpotLightShadowAttenuation(
     // PCF
     // vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
     // float readDepth = textureProj(shadowMap, uvc).r;
-    for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[i] / 100.;
-        float readDepth = texture(shadowMap, uv + offset).r;
+    #pragma UNROLL_START
+    for(int i = 0; i < SHADOW_FETCH_COUNT; i++) {
+        vec2 offset = poissonDisk[UNROLL_i] / 100.;
+        // float readDepth = texture(shadowMap, uv + offset).r;
+        float readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         if(readDepth < depthFromWorldPos - bias) {
             visibility -= .25;
         }
     }
+    #pragma UNROLL_END
 
     // for debug
     // vec3 color = mix(
@@ -173,8 +181,6 @@ float calcSpotLightShadowAttenuation(
     return clamp(shadow, 0., 1.);
 }
 
-
-
 // -----------------------------------------------------------
 // varyings
 // -----------------------------------------------------------
@@ -186,37 +192,18 @@ in vec2 vUv;
 // uniforms
 // -----------------------------------------------------------
 
-// #include ./partial/directional-light-uniforms.glsl
-// uniform DirectionalLight uDirectionalLight;
-// TODO: spot light の最大数はどこかで定数管理したい
-// #define MAX_SPOT_LIGHT_COUNT 4
-// uniform SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 
 #include ./partial/receive-shadow-fragment-uniforms.glsl
 
-// #ifdef USE_RECEIVE_SHADOW
-// uniform mat4 uShadowMapProjectionMatrix;
-// uniform mat4 uLightViewProjectionMatrix;
-// #endif
-
-// uniform vec3 uViewPosition;
-// uniform float uNearClip;
-// uniform float uFarClip;
-
-// #include ./partial/uniform-block-camera.glsl
-
-// TODO
-// uniform sampler2D uAOTexture; 
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
 uniform sampler2D uGBufferDTexture;
 uniform sampler2D uDepthTexture;
+uniform sampler2D uScreenSpaceShadowTexture;
 uniform sampler2D uAmbientOcclusionTexture;
-// uniform sampler2D uShadowMap;
-// uniform samplerCube uEnvMap;
 
 uniform float uTime;
 
@@ -336,6 +323,11 @@ void main() {
     // TODO: shadow map の枚数
     // #ifdef USE_RECEIVE_SHADOW
 
+    //
+    // directional light
+    //
+
+    /*
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
@@ -352,13 +344,14 @@ void main() {
         0.5
     );
     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    */
     
     //
     // spot light
     //
 
+    /*
     SpotLight spotLight;
-    
     // TODO: blend rate は light か何かに持たせたい
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
@@ -376,12 +369,34 @@ void main() {
         RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     }
     #pragma UNROLL_END
-    
+    */
+ 
+    //
+    // point light
+    //
+
+    PointLight pointLight;
+
+    // TODO: blend rate は light か何かに持たせたい
+    // getPointLightIrradiance(uPointLight[i], geometry, directLight);
+    #pragma UNROLL_START
+    for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
+        getPointLightIrradiance(uPointLight[UNROLL_i], geometry, directLight);
+        RE_Direct(directLight, geometry, material, reflectedLight, 0.); // 影は計算しない
+    }
+    #pragma UNROLL_END
+
+    // getPointLightIrradiance(uPointLight[0], geometry, directLight);
+    outColor = vec4(reflectedLight.directDiffuse, 1.);
+    return;
+  
+ 
+    //
     // ambient light
-// TODO: IBL for pbr
+    //
+
 // #ifdef USE_ENV_MAP
     SkyboxLight skyboxLight;
-    // skyboxLight.cubeMap = uSkybox.cubeMap;
     skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
     skyboxLight.specularIntensity = uSkybox.specularIntensity;
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
@@ -389,10 +404,12 @@ void main() {
     IncidentSkyboxLight directSkyboxLight;
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
     RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
-
+  
 // #endif
 
+//
 // calc render equations
+//
 
 vec3 outgoingLight =
     reflectedLight.directDiffuse +
@@ -400,6 +417,7 @@ vec3 outgoingLight =
     reflectedLight.indirectDiffuse +
     reflectedLight.indirectSpecular;
 resultColor = vec4(outgoingLight, opacity);
+
     // debug start
     // outColor.xyz = vec3(uSpotLight[0].direction);
     // outColor.xyz = directLight.color.xyz;
@@ -417,15 +435,6 @@ resultColor = vec4(outgoingLight, opacity);
     
     outColor = resultColor;
 
-    // 疑似HDRの場合
-    // outColor = encodePseudoHDR(resultColor.xyz);
-
-    // for debug
-    // outColor = vec4(outgoingLight, 1.);
-    // outColor = vec4(worldNormal, 1.);
-    // outColor = vec4(depth, 1., 1., 1.);
-    // outColor = vec4(vec3(shadow), 1.);
-
     // // TODO: use encode func
     // // surface
     // vec3 baseColor = gBufferA.baseColor;
@@ -437,5 +446,6 @@ resultColor = vec4(outgoingLight, opacity);
     // float rawDepth = texture(uDepthTexture, uv).r;
     // float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
-
+    // vec4 sss = texture(uScreenSpaceShadowTexture, uv);
+    // outColor = sss;
 }
