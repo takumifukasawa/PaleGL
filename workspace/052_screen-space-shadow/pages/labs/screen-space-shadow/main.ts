@@ -993,7 +993,7 @@ const main = async () => {
     boxMeshActor01 = new Mesh({
         geometry: new BoxGeometry({gpu}),
         material: new GBufferMaterial({
-            diffuseColor: new Color(1, 1, 1, 1),
+            diffuseColor: new Color(1, 0, 0, 1),
             metallic: 0,
             roughness: 1,
         }),
@@ -1003,9 +1003,9 @@ const main = async () => {
     boxMeshActor02 = new Mesh({
         geometry: new BoxGeometry({gpu}),
         material: new GBufferMaterial({
-            diffuseColor: new Color(1, 1, 1, 1),
-            metallic: 0,
-            roughness: 1,
+            diffuseColor: new Color(0, 1, 0, 1),
+            metallic: 1,
+            roughness: 0,
         }),
     });
     boxMeshActor02.transform.position = new Vector3(-2, .5, 0);
@@ -1013,7 +1013,7 @@ const main = async () => {
     boxMeshActor03 = new Mesh({
         geometry: new BoxGeometry({gpu}),
         material: new GBufferMaterial({
-            diffuseColor: new Color(1, 1, 1, 1),
+            diffuseColor: new Color(0, 0, 1, 1),
             metallic: 0,
             roughness: 1,
         }),
@@ -1524,17 +1524,6 @@ function initDebugger() {
         initialValue: renderer.screenSpaceShadowPass.jitterSize.z,
         onChange: (value) => {
             renderer.screenSpaceShadowPass.jitterSize.z = value;
-        },
-    });
-    
-    sssDebuggerGroup.addSliderDebugger({
-        label: 'sss length multiplier',
-        minValue: 0,
-        maxValue: 2,
-        stepValue: 0.001,
-        initialValue: renderer.screenSpaceShadowPass.lengthMultiplier,
-        onChange: (value) => {
-            renderer.screenSpaceShadowPass.lengthMultiplier = value;
         },
     });
     

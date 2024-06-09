@@ -9,9 +9,10 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
  */
 export class ScreenSpaceShadowPass extends PostProcessPassBase {
     bias: number = 0;
-    jitterSize: Vector3 = new Vector3(0.2, 0.2, 0.2);
-    sharpness: number = 0.3;
-    lengthMultiplier: number = 1;
+    // jitterSize: Vector3 = new Vector3(0.2, 0.2, 0.2);
+    jitterSize: Vector3 = new Vector3(0.025, 0.025, 0.025);
+    // sharpness: number = 0.3;
+    sharpness: number = 2;
     strength: number = 1;
 
     /**
@@ -61,11 +62,6 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                     value: 0,
                 },
                 {
-                    name: 'uLengthMultiplier',
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                {
                     name: 'uStrength',
                     type: UniformTypes.Float,
                     value: 0,
@@ -95,7 +91,6 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
         this.material.uniforms.setValue('uBias', this.bias);
         this.material.uniforms.setValue('uJitterSize', this.jitterSize);
         this.material.uniforms.setValue('uSharpness', this.sharpness);
-        this.material.uniforms.setValue('uLengthMultiplier', this.lengthMultiplier);
         this.material.uniforms.setValue('uStrength', this.strength);
         super.render(options);
     }

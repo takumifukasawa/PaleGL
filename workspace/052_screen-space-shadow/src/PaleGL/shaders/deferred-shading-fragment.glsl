@@ -276,6 +276,7 @@ void main() {
     // return;
 
     float aoRate = texture(uAmbientOcclusionTexture, uv).r;
+    float sssRate = texture(uScreenSpaceShadowTexture, uv).x;
 
     // for debug
     // outColor = vec4(worldPosition, 1.);
@@ -327,7 +328,6 @@ void main() {
     // directional light
     //
 
-    /*
     DirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
@@ -344,15 +344,13 @@ void main() {
         0.5
     );
     RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-    */
     
     //
     // spot light
     //
 
-    /*
     SpotLight spotLight;
-    // TODO: blend rate は light か何かに持たせたい
+    // TODO: shadow blend rate は light か何かに持たせたい
     #pragma UNROLL_START
     for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
         getSpotLightIrradiance(uSpotLight[UNROLL_i], geometry, directLight);
@@ -369,34 +367,24 @@ void main() {
         RE_Direct(directLight, geometry, material, reflectedLight, shadow);
     }
     #pragma UNROLL_END
-    */
  
     //
     // point light
     //
-    vec4 sss = texture(uScreenSpaceShadowTexture, uv);
-    outColor = vec4(vec3(sss), 1.);
-    return;
 
     PointLight pointLight;
 
-    float sss = texture(uScreenSpaceShadowTexture, uv).x;
     #pragma UNROLL_START
     for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
         getPointLightIrradiance(uPointLight[UNROLL_i], geometry, directLight);
-        // RE_Direct(directLight, geometry, material, reflectedLight, 0.); 
-        RE_Direct(directLight, geometry, material, reflectedLight, sss);
+        RE_Direct(directLight, geometry, material, reflectedLight, sssRate);
     }
     #pragma UNROLL_END
-    
-    outColor = vec4(vec3(sss), 1.);
-    return;
 
     //
     // ambient light
     //
 
-    /*
 // #ifdef USE_ENV_MAP
     SkyboxLight skyboxLight;
     skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
@@ -406,13 +394,11 @@ void main() {
     IncidentSkyboxLight directSkyboxLight;
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
     RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
-  */
-  
 // #endif
 
-//
-// calc render equations
-//
+    //
+    // calc render equations
+    //
 
 vec3 outgoingLight =
     reflectedLight.directDiffuse +
@@ -440,6 +426,6 @@ resultColor = vec4(outgoingLight, opacity);
     // float rawDepth = texture(uDepthTexture, uv).r;
     // float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
-    // vec4 sss = texture(uScreenSpaceShadowTexture, uv);
-    // outColor = sss;
+    // vec4 sssRate = texture(uScreenSpaceShadowTexture, uv);
+    // outColor = sssRate;
 }

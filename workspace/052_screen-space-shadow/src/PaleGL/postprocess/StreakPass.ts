@@ -88,10 +88,10 @@ export class StreakPass implements IPostProcessPass {
     // private downSampleMip8Pass: FragmentPass;
     // private downSampleMip16Pass: FragmentPass;
     // private downSampleMip32Pass: FragmentPass;
-    private prefilterPass: FragmentPass;
-    private downSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downScale: number }[] = [];
-    private upSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass }[] = [];
-    private compositePass: FragmentPass;
+    prefilterPass: FragmentPass;
+    downSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downScale: number }[] = [];
+    upSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass }[] = [];
+    compositePass: FragmentPass;
     // private downSampleMaterial: Material;
 
     private geometry: PlaneGeometry;

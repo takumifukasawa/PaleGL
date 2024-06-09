@@ -37,7 +37,6 @@ uniform sampler2D uGBufferBTexture;
 uniform float uBias;
 uniform vec3 uJitterSize;
 uniform float uSharpness;
-uniform float uLengthMultiplier;
 uniform float uStrength;
 
 const int MARCH_COUNT = 24;
@@ -46,7 +45,7 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
     vec3 rawLightPos = pointLight.position;
     vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.position, 1.)).xyz;
 
-    // TODO: jitterはclipでやるべきかも
+    // TODO: jitterはviewかclipでやるべきかも
     //
     // 1: world space jitter
     //
@@ -73,7 +72,7 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
     vec3 diffInView = viewPosition - rayOriginInView;
 
     vec3 rayDirInView = normalize(diffInView);
-    float stepLength = length(diffInView) * uLengthMultiplier / float(MARCH_COUNT);
+    float stepLength = length(diffInView) / float(MARCH_COUNT);
     float sharpness = uSharpness / float(MARCH_COUNT);
 
     // float occlusion = 0.;
@@ -142,11 +141,12 @@ void main() {
         uInverseProjectionMatrix
     );
 
+    float jitterSpeed = 1.;
     vec3 jitterOffset = normalize(vec3(
-        noise(uv + uTime + .1),
-        noise(uv + uTime + .2),
+        noise(uv + uTime * jitterSpeed + .1),
+        noise(uv + uTime * jitterSpeed + .2),
         // 0.
-        noise(uv + uTime + .3)
+        noise(uv + uTime * jitterSpeed + .3)
     ) * 2. - 1.);
 
     float occlusion = 0.;

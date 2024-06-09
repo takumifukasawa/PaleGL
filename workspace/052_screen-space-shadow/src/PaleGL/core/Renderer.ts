@@ -1017,12 +1017,10 @@ export class Renderer {
             gpu: this.gpu,
             camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
             prevRenderTarget: null,
-            isLastPass: true,
+            isLastPass: false,
             time, // TODO: engineから渡したい
             lightActors,
         });
-
-        return;
 
         // ------------------------------------------------------------------------------
         // ssr pass
@@ -1063,7 +1061,7 @@ export class Renderer {
         // TODO: directional light がない場合の対応
         // const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
         if (lightActors.directionalLight) {
-            // this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
+            this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
             PostProcess.renderPass({
                 pass: this._lightShaftPass,
                 renderer: this,
@@ -1161,7 +1159,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         if (onBeforePostProcess) {
-            // onBeforePostProcess();
+            onBeforePostProcess();
         }
 
         if (!this._scenePostProcess.hasEnabledPass) {

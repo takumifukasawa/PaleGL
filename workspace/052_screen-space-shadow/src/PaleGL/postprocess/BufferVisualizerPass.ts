@@ -14,8 +14,12 @@ import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
-const COL_NUM = 6;
-const ROW_NUM = 6;
+// ------------------------------------------------------------------------------
+// constants
+// ------------------------------------------------------------------------------
+
+const COL_NUM = 7;
+const ROW_NUM = 7;
 
 const DEPTH_TEXTURE_KEY = 'depthTexture';
 const GBUFFER_A_TEXTURE_KEY = 'gBufferATexture';
@@ -24,6 +28,7 @@ const GBUFFER_C_TEXTURE_KEY = 'gBufferCTexture';
 const GBUFFER_D_TEXTURE_KEY = 'gBufferDTexture';
 const DIRECTIONAL_LIGHT_SHADOW_MAP_KEY = 'directionalLightShadowMap';
 const SPOT_LIGHT_SHADOW_MAP_KEY = 'spotLightShadowMap';
+const SCREEN_SPACE_SHADOW_TEXTURE_KEY = 'screenSpaceShadowTexture';
 const AMBIENT_OCCLUSION_TEXTURE_KEY = 'ambientOcclusionTexture';
 const DEFERRED_SHADING_TEXTURE_KEY = 'deferredShadingTexture';
 const SSR_TEXTURE_KEY = 'ssrTexture';
@@ -37,6 +42,20 @@ const BLOOM_BLUR_MIP16_TEXTURE_KEY = 'bloomBlurMip16Texture';
 const BLOOM_BLUR_MIP32_TEXTURE_KEY = 'bloomBlurMip32Texture';
 const BLOOM_BLUR_MIP64_TEXTURE_KEY = 'bloomBlurMip64Texture';
 const BLOOM_TEXTURE_KEY = 'bloomTexture';
+const STREAK_PREFILTER_TEXTURE_KEY = 'streakPrefilterTexture';
+const STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY = 'streakDownSampleMip2Texture';
+const STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY = 'streakDownSampleMip4Texture';
+const STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY = 'streakDownSampleMip8Texture';
+const STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY = 'streakDownSampleMip16Texture';
+const STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY = 'streakDownSampleMip32Texture';
+const STREAK_UP_SAMPLE_0_TEXTURE_KEY = 'streakUpSample0Texture';
+const STREAK_UP_SAMPLE_1_TEXTURE_KEY = 'streakUpSample1Texture';
+const STREAK_UP_SAMPLE_2_TEXTURE_KEY = 'streakUpSample2Texture';
+const STREAK_UP_SAMPLE_3_TEXTURE_KEY = 'streakUpSample3Texture';
+const STREAK_UP_SAMPLE_4_TEXTURE_KEY = 'streakUpSample4Texture';
+const STREAK_TEXTURE_KEY = 'streakTexture';
+
+// ------------------------------------------------------------------------------
 
 type RowPass = {
     pass: FragmentPass;
@@ -122,28 +141,24 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 [
                     GBUFFER_A_TEXTURE_KEY,
                     {
-                        // uniformName: UniformNames.GBufferATexture,
                         type: 'Texture',
                     },
                 ],
                 [
                     GBUFFER_B_TEXTURE_KEY,
                     {
-                        // uniformName: UniformNames.GBufferBTexture,
                         type: 'Texture',
                     },
                 ],
                 [
                     GBUFFER_D_TEXTURE_KEY,
                     {
-                        // uniformName: UniformNames.GBufferCTexture,
                         type: 'Texture',
                     },
                 ],
                 [
                     GBUFFER_C_TEXTURE_KEY,
                     {
-                        // uniformName: UniformNames.GBufferDTexture
                         type: 'Texture',
                     },
                 ],
@@ -157,17 +172,9 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 srcTextureEnabled: false,
             }),
             tiles: new Map([
-                // [
-                //     DEPTH_TEXTURE_KEY,
-                //     {
-                //         // uniformName: UniformNames.DepthTexture
-                //         type: 'Texture',
-                //     },
-                // ],
                 [
                     DIRECTIONAL_LIGHT_SHADOW_MAP_KEY,
                     {
-                        // uniformName: UniformNames.DirectionalLightShadowMap,
                         type: 'Texture',
                     },
                 ],
@@ -175,28 +182,24 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 [
                     `${SPOT_LIGHT_SHADOW_MAP_KEY}0`,
                     {
-                        // uniformName: `${UniformNames.SpotLightShadowMap}0`
                         type: 'Texture',
                     },
                 ],
                 [
                     `${SPOT_LIGHT_SHADOW_MAP_KEY}1`,
                     {
-                        // uniformName: `${UniformNames.SpotLightShadowMap}1`
                         type: 'Texture',
                     },
                 ],
                 [
                     `${SPOT_LIGHT_SHADOW_MAP_KEY}2`,
                     {
-                        // uniformName: `${UniformNames.SpotLightShadowMap}2`
                         type: 'Texture',
                     },
                 ],
                 [
                     `${SPOT_LIGHT_SHADOW_MAP_KEY}3`,
                     {
-                        // uniformName: `${UniformNames.SpotLightShadowMap}3`
                         type: 'Texture',
                     },
                 ],
@@ -211,42 +214,28 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }),
             tiles: new Map([
                 [
+                    SCREEN_SPACE_SHADOW_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
                     AMBIENT_OCCLUSION_TEXTURE_KEY,
                     {
-                        // uniformName: "uAmbientOcclusionTexture"
                         type: 'Texture',
                     },
                 ],
                 [
                     DEFERRED_SHADING_TEXTURE_KEY,
                     {
-                        // uniformName: 'uDeferredShadingTexture'
-                        type: 'Texture',
-                    },
-                ],
-                [SSR_TEXTURE_KEY, { type: 'Texture', label: 'combine ssr' }],
-                [
-                    // DIRECTIONAL_LIGHT_SHADOW_MAP_KEY,
-                    LIGHT_SHAFT_TEXTURE_KEY,
-                    {
-                        // uniformName: 'uLightShaftTexture'
                         type: 'Texture',
                     },
                 ],
                 [
-                    VOLUMETRIC_LIGHT_TEXTURE_KEY,
+                    SSR_TEXTURE_KEY,
                     {
-                        // uniformName: 'uVolumetricLightTexture',
                         type: 'Texture',
-                    },
-                ],
-
-                [
-                    FOG_TEXTURE_KEY,
-                    {
-                        // uniformName: 'uFogTexture',
-                        type: 'Texture',
-                        label: 'combine fog',
+                        label: 'combine ssr',
                     },
                 ],
             ]),
@@ -260,9 +249,27 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }),
             tiles: new Map([
                 [
+                    LIGHT_SHAFT_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    VOLUMETRIC_LIGHT_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    FOG_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                        label: 'combine fog',
+                    },
+                ],
+                [
                     DEPTH_OF_FIELD_TEXTURE_KEY,
                     {
-                        // uniformName: 'uDepthOfFieldTexture',
                         type: 'Texture',
                         label: 'dof',
                     },
@@ -315,7 +322,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 [
                     BLOOM_TEXTURE_KEY,
                     {
-                        // uniformName: 'uBloomTexture',
                         type: 'Texture',
                         label: 'bloom',
                     },
@@ -329,7 +335,91 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 fragmentShader: bufferVisualizerRowBasePassFragmentShader,
                 srcTextureEnabled: false,
             }),
-            tiles: new Map([]),
+            tiles: new Map([
+                [
+                    STREAK_PREFILTER_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+            ]),
+        });
+        // row 6
+        this.rowPasses.push({
+            pass: new FragmentPass({
+                gpu,
+                fragmentShader: bufferVisualizerRowBasePassFragmentShader,
+                srcTextureEnabled: false,
+            }),
+            tiles: new Map([
+                [
+                    STREAK_UP_SAMPLE_0_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_UP_SAMPLE_1_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_UP_SAMPLE_2_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_UP_SAMPLE_3_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_UP_SAMPLE_4_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ],
+                [
+                    STREAK_TEXTURE_KEY,
+                    {
+                        type: 'Texture',
+                    },
+                ]
+                
+            ]),
         });
 
         this.compositePass = new FragmentPass({
@@ -454,6 +544,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.dom = document.createElement('div');
         this.dom.classList.add('buffer-visualizer-pass');
         const frag = document.createDocumentFragment();
+        console.log(this.rowPasses)
         this.rowPasses.forEach(({ tiles }, rowIndex) => {
             let colIndex = 0;
             const rowContent = document.createElement('div');
@@ -541,7 +632,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }
 
             if (tiles.has(DEPTH_TEXTURE_KEY)) {
-                // console.log(pass, tiles.get(DEPTH_TEXTURE_KEY)!.uniformNameTexture!);
                 pass.material.uniforms.setValue(
                     tiles.get(DEPTH_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.depthPrePassRenderTarget.depthTexture
@@ -550,7 +640,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(GBUFFER_A_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uGBufferATexture',
                     tiles.get(GBUFFER_A_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.gBufferATexture
                 );
@@ -558,7 +647,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(GBUFFER_B_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uGBufferBTexture',
                     tiles.get(GBUFFER_B_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.gBufferBTexture
                 );
@@ -566,7 +654,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(GBUFFER_C_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uGBufferCTexture',
                     tiles.get(GBUFFER_C_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.gBufferCTexture
                 );
@@ -574,15 +661,20 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(GBUFFER_D_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uGBufferDTexture',
                     tiles.get(GBUFFER_D_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.gBufferDTexture
+                );
+            }
+            
+            if(tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(SCREEN_SPACE_SHADOW_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.screenSpaceShadowPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has(AMBIENT_OCCLUSION_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uAmbientOcclusionTexture',
                     tiles.get(AMBIENT_OCCLUSION_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.ambientOcclusionPass.renderTarget.read.texture
                 );
@@ -590,7 +682,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(DEFERRED_SHADING_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uDeferredShadingTexture',
                     tiles.get(DEFERRED_SHADING_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.deferredShadingPass.renderTarget.read.texture
                 );
@@ -598,20 +689,13 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(SSR_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uSsrTexture',
                     tiles.get(SSR_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.ssrPass.renderTarget.read.texture
                 );
             }
 
             if (tiles.has(LIGHT_SHAFT_TEXTURE_KEY)) {
-                // console.log(
-                //     tiles.has(LIGHT_SHAFT_TEXTURE_KEY),
-                //     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
-                //     renderer.lightShaftPass.renderTarget.read.texture
-                // )
                 pass.material.uniforms.setValue(
-                    // 'uLightShaftTexture',
                     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.lightShaftPass.renderTarget.read.texture
                 );
@@ -619,7 +703,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(VOLUMETRIC_LIGHT_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uVolumetricLightTexture',
                     tiles.get(VOLUMETRIC_LIGHT_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.volumetricLightPass.renderTarget.read.texture
                 );
@@ -627,7 +710,6 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(DEPTH_OF_FIELD_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uDepthOfFieldTexture',
                     tiles.get(DEPTH_OF_FIELD_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.depthOfFieldPass.renderTarget.read.texture
                 );
@@ -635,11 +717,96 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
             if (tiles.has(FOG_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
-                    // 'uFogTexture',
                     tiles.get(FOG_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.fogPass.renderTarget.read.texture
                 );
             }
+            
+            if (tiles.has(STREAK_PREFILTER_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_PREFILTER_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.prefilterPass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.downSamplePasses[0].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.downSamplePasses[1].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.downSamplePasses[2].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.downSamplePasses[3].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.downSamplePasses[4].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_UP_SAMPLE_0_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_UP_SAMPLE_0_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.upSamplePasses[0].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_UP_SAMPLE_1_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_UP_SAMPLE_1_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.upSamplePasses[1].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_UP_SAMPLE_2_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_UP_SAMPLE_2_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.upSamplePasses[2].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_UP_SAMPLE_3_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_UP_SAMPLE_3_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.upSamplePasses[3].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_UP_SAMPLE_4_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_UP_SAMPLE_4_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.upSamplePasses[4].pass.renderTarget.read.texture
+                );
+            }
+            
+            if (tiles.has(STREAK_TEXTURE_KEY)) {
+                pass.material.uniforms.setValue(
+                    tiles.get(STREAK_TEXTURE_KEY)!.uniformNameTexture!,
+                    renderer.streakPass.renderTarget.read.texture
+                );
+            }
+            
+            
 
             if (tiles.has(BLOOM_BLUR_MIP4_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
