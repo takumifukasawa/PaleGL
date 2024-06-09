@@ -377,24 +377,23 @@ void main() {
 
     PointLight pointLight;
 
-    // TODO: blend rate は light か何かに持たせたい
-    // getPointLightIrradiance(uPointLight[i], geometry, directLight);
+    float sss = texture(uScreenSpaceShadowTexture, uv).x;
     #pragma UNROLL_START
     for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
         getPointLightIrradiance(uPointLight[UNROLL_i], geometry, directLight);
-        RE_Direct(directLight, geometry, material, reflectedLight, 0.); // 影は計算しない
+        // RE_Direct(directLight, geometry, material, reflectedLight, 0.); 
+        RE_Direct(directLight, geometry, material, reflectedLight, sss);
     }
     #pragma UNROLL_END
-
-    // getPointLightIrradiance(uPointLight[0], geometry, directLight);
-    outColor = vec4(reflectedLight.directDiffuse, 1.);
+    
+    outColor = vec4(vec3(sss), 1.);
     return;
-  
- 
+
     //
     // ambient light
     //
 
+    /*
 // #ifdef USE_ENV_MAP
     SkyboxLight skyboxLight;
     skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
@@ -404,6 +403,7 @@ void main() {
     IncidentSkyboxLight directSkyboxLight;
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
     RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+  */
   
 // #endif
 
@@ -418,16 +418,7 @@ vec3 outgoingLight =
     reflectedLight.indirectSpecular;
 resultColor = vec4(outgoingLight, opacity);
 
-    // debug start
-    // outColor.xyz = vec3(uSpotLight[0].direction);
-    // outColor.xyz = directLight.color.xyz;
-    // outColor.xyz = directLight.direction.xyz;
-    // outColor.xyz = reflectedLight.directDiffuse.xyz;
-    // outColor = resultColor;
-    // return;
-    
-
-    // TODO: aoを考慮したライティング計算
+    // 遮蔽はそのまま色にかけてしまう
     resultColor.xyz *= aoRate;
   
     // 自己発光も足す。1より溢れている場合はbloomで光が滲む感じになる
@@ -435,7 +426,7 @@ resultColor = vec4(outgoingLight, opacity);
     
     outColor = resultColor;
 
-    // // TODO: use encode func
+    // for debug
     // // surface
     // vec3 baseColor = gBufferA.baseColor;
     // float metallic = gBufferC.metallic;

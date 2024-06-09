@@ -124,7 +124,6 @@ export class DeferredShadingPass extends PostProcessPassBase {
                 UniformBlockNames.PointLight
             ],
         });
-        console.log(deferredShadingFragmentShader)
     }
 
     /**

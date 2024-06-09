@@ -2,14 +2,14 @@
 import { GPU } from '@/PaleGL/core/GPU';
 import screenSpaceShadowFragmentShader from '@/PaleGL/shaders/screen-space-shadow-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import {Vector3} from "@/PaleGL/math/Vector3.ts";
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 /**
  *
  */
 export class ScreenSpaceShadowPass extends PostProcessPassBase {
     bias: number = 0.001;
-    jitterSize: Vector3 = new Vector3(.1, .1, .1);
+    jitterSize: Vector3 = new Vector3(0.1, 0.1, 0.1);
     sharpness: number = 0.5;
     lengthMultiplier: number = 1;
     strength: number = 1;
@@ -53,7 +53,7 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                 {
                     name: 'uJitterSize',
                     type: UniformTypes.Vector3,
-                    value: Vector3.zero
+                    value: Vector3.zero,
                 },
                 {
                     name: 'uSharpness',
@@ -71,7 +71,8 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                     value: 0,
                 },
             ],
-            uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+            uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera, UniformBlockNames.PointLight],
+            // renderTargetType: RenderTargetTypes.R16F,
         });
     }
 

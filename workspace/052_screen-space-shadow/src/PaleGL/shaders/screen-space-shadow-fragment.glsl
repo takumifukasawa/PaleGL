@@ -16,6 +16,7 @@ out vec4 outColor;
 // utils
 // -----------------------------------------------------------
 
+#include ./partial/common.glsl
 #include ./partial/noise.glsl
 
 #include ./partial/depth-functions.glsl
@@ -27,7 +28,7 @@ out vec4 outColor;
 #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
 #include ./partial/uniform-block-camera.glsl
-#include ./partial/uniform-block-spot-light.glsl
+#include ./partial/uniform-block-point-light.glsl
 
 // -----------------------------------------------------------
 
@@ -39,36 +40,10 @@ uniform float uSharpness;
 uniform float uLengthMultiplier;
 uniform float uStrength;
 
-void main() {
-    vec2 uv = vUv;
-    
-    vec3 rawLightPos = vec3(0., .5, 0.);
+const int MARCH_COUNT = 24;
 
-    float rawDepth = texture(uDepthTexture, uv).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    
-    if(sceneDepth > .9999) {
-        outColor = vec4(0., 0., 0., 1.);
-        return;
-    }
-    
-    vec3 worldNormal = normalize(texture(uGBufferBTexture, uv).xyz * 2. - 1.);
-    vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
-    
-    vec3 worldPosition = reconstructWorldPositionFromDepth(
-        uv,
-        texture(uDepthTexture, uv).x,
-        uInverseViewProjectionMatrix
-    );
-    
-    const int MARCH_COUNT = 24;
-
-    vec3 jitterOffset = normalize(vec3(
-        noise(uv + uTime + .1),
-        noise(uv + uTime + .2),
-        0.
-        // noise(uv + uTime + .3)
-    ) * 2. - 1.);
+void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 jitterOffset, out float occlusion) {
+    vec3 rawLightPos = pointLight.position;
 
     // TODO: jitterはclipでやるべきかも
     //
@@ -89,15 +64,15 @@ void main() {
     // vec3 lightPos = rawLightPosJittered;
 
     vec3 diff = worldPosition - lightPos;
-    
+
     vec3 rayDir = normalize(diff);
     float stepLength = length(diff) * uLengthMultiplier / float(MARCH_COUNT);
     float sharpness = uSharpness / float(MARCH_COUNT);
-    
-    float occlusion = 0.;
+
+    // float occlusion = 0.;
 
     vec3 debugValue = vec3(0.);
-  
+
     // #pragma UNROLL_START
     for(int i = 0; i < MARCH_COUNT; i++) {
         // rayの深度を計算
@@ -115,11 +90,44 @@ void main() {
         // TODO: 深度じゃなくてview座標系で調整した方がいいような気もする
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
         if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
-            occlusion += sharpness;
+            occlusion += sharpness * saturate(pointLight.intensity);
         }
     }
-    // #pragma UNROLL_END
+    // #pragma unroll_end
     
+    // return occlusion;
+}
+
+void main() {
+    vec2 uv = vUv;
+
+    float rawDepth = texture(uDepthTexture, uv).x;
+    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    
+    if(sceneDepth > .9999) {
+        outColor = vec4(0., 0., 0., 1.);
+        return;
+    }
+    
+    vec3 worldPosition = reconstructWorldPositionFromDepth(
+        uv,
+        texture(uDepthTexture, uv).x,
+        uInverseViewProjectionMatrix
+    );
+
+    vec3 jitterOffset = normalize(vec3(
+        noise(uv + uTime + .1),
+        noise(uv + uTime + .2),
+        0.
+        // noise(uv + uTime + .3)
+    ) * 2. - 1.);
+
+    float occlusion = 0.;
+    
+    for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
+        calcOcclusion(uPointLight[i], worldPosition, jitterOffset, occlusion);
+    }
+
     occlusion *= uStrength;
 
     outColor = vec4(vec3(occlusion), 1.);
