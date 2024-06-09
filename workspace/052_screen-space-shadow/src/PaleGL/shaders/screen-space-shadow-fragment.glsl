@@ -85,7 +85,6 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
         // rayの深度を計算
         float currentStepLength = stepLength * float(i);
         vec3 currentRayInView = rayOriginInView + rayDirInView * currentStepLength;
-        // vec4 currentRayInView = uViewMatrix * vec4(currentRay, 1.);
         vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
         currentRayInClip /= currentRayInClip.w;
         float currentRayRawDepth = ndcZToRawDepth(currentRayInClip.z);
@@ -100,12 +99,17 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
             uInverseProjectionMatrix
         );
 
-        // TODO: 深度じゃなくてview座標系で調整した方がいいような気もする
+        //
+        // 1: 深度で比較
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
+        //
         // if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
         //     occlusion += sharpness * saturate(pointLight.intensity);
         // }
 
+        //
+        // 2: view z で比較
+        //
         if(abs(currentRayInView.z) > abs(currentViewPositionInPixel.z)) {
             occlusion += sharpness * saturate(pointLight.intensity);
         }
