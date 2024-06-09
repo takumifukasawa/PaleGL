@@ -1,4 +1,5 @@
 ﻿export const MAX_SPOT_LIGHT_COUNT = 4;
+export const MAX_POINT_LIGHT_COUNT = 4;
 
 // -----------------------------------------------------------------------------
 // engine
@@ -71,6 +72,7 @@ export type RenderbufferType = (typeof RenderbufferTypes)[keyof typeof Renderbuf
 export const LightTypes = {
     Directional: 0,
     Spot: 1,
+    Point: 2,
 } as const;
 
 export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
@@ -310,6 +312,7 @@ export const UniformNames = {
     // light
     DirectionalLight: 'uDirectionalLight',
     SpotLight: 'uSpotLight',
+    PointLight: 'uPointLight',
     LightDirection: 'direction',
     LightIntensity: 'intensity',
     LightColor: 'color',
@@ -345,6 +348,7 @@ export const UniformBlockNames = {
     Camera: 'ubCamera',
     DirectionalLight: 'ubDirectionalLight',
     SpotLight: 'ubSpotLight',
+    PointLight: 'ubPointLight',
 } as const;
 
 export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];

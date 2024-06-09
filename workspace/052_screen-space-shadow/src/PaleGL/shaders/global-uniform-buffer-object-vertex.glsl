@@ -7,6 +7,7 @@
 #include ./partial/uniform-block-camera.glsl
 #include ./partial/uniform-block-directional-light.glsl
 #include ./partial/uniform-block-spot-light.glsl
+#include ./partial/uniform-block-point-light.glsl
 
 void main() {
 }
