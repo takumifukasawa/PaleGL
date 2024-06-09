@@ -16,28 +16,23 @@ out vec4 outColor;
 
 uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferBTexture;
+uniform float uBias;
 uniform vec3 uJitterSize;
+uniform float uSharpness;
+uniform float uLengthMultiplier;
 uniform float uStrength;
-uniform float uBlendRate;
 
 #include ./partial/depth-functions.glsl
 
 void main() {
-
-    float occludedAcc = 0.;
-    int samplingCount = 6;
-
-    float eps = .0001;
-
     vec2 uv = vUv;
     
-    vec3 lightPos = vec3(0., .5, 0.);
-
+    vec3 rawLightPos = vec3(0., .5, 0.);
 
     float rawDepth = texture(uDepthTexture, uv).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
-    if(sceneDepth > .999) {
+    if(sceneDepth > .9999) {
         outColor = vec4(0., 0., 0., 1.);
         return;
     }
@@ -60,13 +55,29 @@ void main() {
         // noise(uv + uTime + .3)
     ) * 2. - 1.);
 
-    vec3 rayOrigin = lightPos + jitterOffset * uJitterSize;
+    // TODO: jitterはclipでやるべきかも
+    //
+    // 1: world space jitter
+    //
+    vec3 rayOrigin = rawLightPos + jitterOffset * uJitterSize;
+    vec3 lightPos = rawLightPos;
+    //
+    // 2: clip space jitter
+    //
+    // vec4 rawLightPosInClip = uProjectionMatrix * uViewMatrix * vec4(rawLightPos, 1.);
+    // rawLightPosInClip /= rawLightPosInClip.w;
+    // rawLightPosInClip.xyz += jitterOffset * uJitterSize;
+    // vec4 rawLightPosOffseted = uInverseViewProjectionMatrix * rawLightPosInClip;
+    // rawLightPosOffseted /= rawLightPosOffseted.w;
+    // vec3 rawLightPosJittered = rawLightPosOffseted.xyz;
+    // vec3 rayOrigin = rawLightPosJittered;
+    // vec3 lightPos = rawLightPosJittered;
+
     vec3 diff = worldPosition - lightPos;
     
     vec3 rayDir = normalize(diff);
-    // vec3 step = diff / float(MARCH_COUNT);
-    float stepLength = length(diff) / float(MARCH_COUNT);
-    float sharpness = .5 / float(MARCH_COUNT);
+    float stepLength = length(diff) * uLengthMultiplier / float(MARCH_COUNT);
+    float sharpness = uSharpness / float(MARCH_COUNT);
     
     float occlusion = 0.;
 
@@ -86,8 +97,9 @@ void main() {
         // float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
         float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
 
+        // TODO: 深度じゃなくてview座標系で調整した方がいいような気もする
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
-        if(currentRayRawDepth > currentRawDepthInPixel + .001) {
+        if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
             occlusion += sharpness;
         }
     }

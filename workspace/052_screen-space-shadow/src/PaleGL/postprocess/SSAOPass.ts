@@ -1,4 +1,4 @@
-﻿import {UniformNames, TextureTypes, TextureWrapTypes, UniformTypes, UniformBlockNames} from '@/PaleGL/constants';
+﻿import { UniformNames, TextureTypes, TextureWrapTypes, UniformTypes, UniformBlockNames } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
@@ -81,6 +81,9 @@ const createSamplingTables: (gpu: GPU) => {
     };
 };
 
+/**
+ * 
+ */
 export class SSAOPass extends PostProcessPassBase {
     occlusionSampleLength: number = 0.121;
     occlusionBias: number = 0.0001;
@@ -213,10 +216,7 @@ export class SSAOPass extends PostProcessPassBase {
                     value: 1,
                 },
             ],
-            uniformBlockNames: [
-                UniformBlockNames.Transformations,
-                UniformBlockNames.Camera
-            ]
+            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
         });
 
         this.samplingTexture = samplingTexture;
@@ -249,7 +249,7 @@ export class SSAOPass extends PostProcessPassBase {
         this.material.uniforms.setValue('uOcclusionStrength', this.occlusionStrength);
         this.material.uniforms.setValue('uBlendRate', this.blendRate);
         this.material.uniforms.setValue('uSamplingTexture', this.samplingTexture);
-        
+
         super.render(options);
     }
 }

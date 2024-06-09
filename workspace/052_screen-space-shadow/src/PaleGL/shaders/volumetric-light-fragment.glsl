@@ -11,6 +11,7 @@ precision highp float;
 // #define MAX_SPOT_LIGHT_COUNT 1
 
 #include ./partial/common.glsl
+#include ./partial/noise.glsl
 // #include ./partial/lighting.glsl
 
 // 

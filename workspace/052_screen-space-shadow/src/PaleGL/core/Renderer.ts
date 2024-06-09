@@ -69,6 +69,7 @@ import { ChromaticAberrationPass } from '@/PaleGL/postprocess/ChromaticAberratio
 import { VignettePass } from '@/PaleGL/postprocess/VignettePass.ts';
 import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass} from "@/PaleGL/postprocess/FXAAPass.ts";
+import {ScreenSpaceShadowPass} from "@/PaleGL/postprocess/ScreenSpaceShadowPass.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -314,6 +315,7 @@ export class Renderer {
             depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
 
+        this._screenSpaceShadowPass = new ScreenSpaceShadowPass({ gpu });
         this._ambientOcclusionPass = new SSAOPass({ gpu });
         this._deferredShadingPass = new DeferredShadingPass({ gpu });
         this._ssrPass = new SSRPass({ gpu });
@@ -678,6 +680,10 @@ export class Renderer {
     // get deferredShadingPass() {
     //     return this._deferredShadingPass;
     // }
+    
+    get screenSpaceShadowPass() {
+        return this._screenSpaceShadowPass;
+    }
 
     get ambientOcclusionPass() {
         return this._ambientOcclusionPass;
@@ -755,6 +761,7 @@ export class Renderer {
         this._copyDepthSourceRenderTarget.setSize(realWidth, realHeight);
         this._copyDepthDestRenderTarget.setSize(realWidth, realHeight);
         // passes
+        this._screenSpaceShadowPass.setSize(realWidth, realHeight);
         this._ambientOcclusionPass.setSize(realWidth, realHeight);
         this._deferredShadingPass.setSize(realWidth, realHeight);
         this._ssrPass.setSize(realWidth, realHeight);
@@ -1017,6 +1024,23 @@ export class Renderer {
         }
 
         // ------------------------------------------------------------------------------
+        // screen space shadow pass
+        // ------------------------------------------------------------------------------
+
+        PostProcess.renderPass({
+            pass: this._screenSpaceShadowPass,
+            renderer: this,
+            targetCamera: camera,
+            gpu: this.gpu,
+            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: null,
+            isLastPass: true,
+            time, // TODO: engineから渡したい
+            // lightActors,
+        });
+        return;
+
+        // ------------------------------------------------------------------------------
         // ambient occlusion pass
         // ------------------------------------------------------------------------------
 
@@ -1118,7 +1142,7 @@ export class Renderer {
         // TODO: directional light がない場合の対応
         // const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
         if (lightActors.directionalLight) {
-            this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
+            // this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
             PostProcess.renderPass({
                 pass: this._lightShaftPass,
                 renderer: this,
@@ -1216,7 +1240,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         if (onBeforePostProcess) {
-            onBeforePostProcess();
+            // onBeforePostProcess();
         }
 
         if (!this._scenePostProcess.hasEnabledPass) {
@@ -1342,6 +1366,7 @@ export class Renderer {
     private _copyDepthSourceRenderTarget: RenderTarget;
     private _copyDepthDestRenderTarget: RenderTarget;
     // pass
+    private _screenSpaceShadowPass: ScreenSpaceShadowPass;
     private _ambientOcclusionPass: SSAOPass;
     private _deferredShadingPass: DeferredShadingPass;
     private _ssrPass: SSRPass;

@@ -8,12 +8,6 @@
 // #define LOG2 1.442695
 // #define EPSILON 1e-6
 
-// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
-float noise(vec2 seed)
-{
-    return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
 float isArea(vec2 uv) {
     return step(0., uv.x) * (1. - step(1., uv.x)) * step(0., uv.y) * (1. - step(1., uv.y));
 }

@@ -1384,7 +1384,18 @@ function initDebugger() {
     debuggerGUI.addBorderSpacer();
 
     const sssDebuggerGroup = debuggerGUI.addGroup('sss', false);
-
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss bias',
+        minValue: 0,
+        maxValue: 0.01,
+        stepValue: 0.0001,
+        initialValue: renderer.screenSpaceShadowPass.bias,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.bias = value;
+        },
+    });
+    
     sssDebuggerGroup.addSliderDebugger({
         label: 'sss jitter size x',
         minValue: 0,
@@ -1417,6 +1428,29 @@ function initDebugger() {
             renderer.screenSpaceShadowPass.jitterSize.z = value;
         },
     });
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss length multiplier',
+        minValue: 0,
+        maxValue: 2,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.lengthMultiplier,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.lengthMultiplier = value;
+        },
+    });
+    
+    sssDebuggerGroup.addSliderDebugger({
+        label: 'sss sharpness',
+        minValue: 0,
+        maxValue: 4,
+        stepValue: 0.001,
+        initialValue: renderer.screenSpaceShadowPass.sharpness,
+        onChange: (value) => {
+            renderer.screenSpaceShadowPass.sharpness = value;
+        },
+    });
+    
     
     sssDebuggerGroup.addSliderDebugger({
         label: 'sss strength',

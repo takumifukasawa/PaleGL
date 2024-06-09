@@ -8,8 +8,10 @@ import {Vector3} from "@/PaleGL/math/Vector3.ts";
  *
  */
 export class ScreenSpaceShadowPass extends PostProcessPassBase {
-    blendRate: number = 1;
+    bias: number = 0.001;
     jitterSize: Vector3 = new Vector3(.1, .1, .1);
+    sharpness: number = 0.5;
+    lengthMultiplier: number = 1;
     strength: number = 1;
 
     /**
@@ -44,19 +46,29 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                 //     value: 0,
                 // },
                 {
+                    name: 'uBias',
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
                     name: 'uJitterSize',
                     type: UniformTypes.Vector3,
                     value: Vector3.zero
                 },
                 {
-                    name: 'uStrength',
+                    name: 'uSharpness',
                     type: UniformTypes.Float,
                     value: 0,
                 },
                 {
-                    name: 'uBlendRate',
+                    name: 'uLengthMultiplier',
                     type: UniformTypes.Float,
-                    value: 1,
+                    value: 0,
+                },
+                {
+                    name: 'uStrength',
+                    type: UniformTypes.Float,
+                    value: 0,
                 },
             ],
             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
@@ -79,9 +91,11 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
+        this.material.uniforms.setValue('uBias', this.bias);
         this.material.uniforms.setValue('uJitterSize', this.jitterSize);
+        this.material.uniforms.setValue('uSharpness', this.sharpness);
+        this.material.uniforms.setValue('uLengthMultiplier', this.lengthMultiplier);
         this.material.uniforms.setValue('uStrength', this.strength);
-        this.material.uniforms.setValue('uBlendRate', this.blendRate);
         super.render(options);
     }
 }

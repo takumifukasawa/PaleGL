@@ -9,6 +9,7 @@ in vec2 vUv;
 out vec4 outColor;
 
 #include ./partial/common.glsl
+#include ./partial/noise.glsl
 
 #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
