@@ -374,6 +374,9 @@ void main() {
     //
     // point light
     //
+    vec4 sss = texture(uScreenSpaceShadowTexture, uv);
+    outColor = vec4(vec3(sss), 1.);
+    return;
 
     PointLight pointLight;
 

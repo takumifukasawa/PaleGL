@@ -42,15 +42,17 @@ uniform float uStrength;
 
 const int MARCH_COUNT = 24;
 
-void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 jitterOffset, out float occlusion) {
+void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
     vec3 rawLightPos = pointLight.position;
+    vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.position, 1.)).xyz;
 
     // TODO: jitterはclipでやるべきかも
     //
     // 1: world space jitter
     //
-    vec3 rayOrigin = rawLightPos + jitterOffset * uJitterSize;
-    vec3 lightPos = rawLightPos;
+    // vec3 rayOrigin = rawLightPos + jitterOffset * uJitterSize * 0.;
+    // vec3 lightPos = rawLightPos;
+    // vec3 diff = worldPosition - lightPos;
     //
     // 2: clip space jitter
     //
@@ -62,11 +64,16 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 jitterOffset,
     // vec3 rawLightPosJittered = rawLightPosOffseted.xyz;
     // vec3 rayOrigin = rawLightPosJittered;
     // vec3 lightPos = rawLightPosJittered;
+    // vec3 diff = worldPosition - lightPos;
+    //
+    // 3: view space jitter
+    //
+    vec3 rayOriginInView = rawLightPosInView + jitterOffset * uJitterSize;
+    vec3 lightPosInView = rawLightPosInView;
+    vec3 diffInView = viewPosition - rayOriginInView;
 
-    vec3 diff = worldPosition - lightPos;
-
-    vec3 rayDir = normalize(diff);
-    float stepLength = length(diff) * uLengthMultiplier / float(MARCH_COUNT);
+    vec3 rayDirInView = normalize(diffInView);
+    float stepLength = length(diffInView) * uLengthMultiplier / float(MARCH_COUNT);
     float sharpness = uSharpness / float(MARCH_COUNT);
 
     // float occlusion = 0.;
@@ -77,8 +84,9 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 jitterOffset,
     for(int i = 0; i < MARCH_COUNT; i++) {
         // rayの深度を計算
         float currentStepLength = stepLength * float(i);
-        vec3 currentRay = rayOrigin + rayDir * currentStepLength;
-        vec4 currentRayInClip = uProjectionMatrix * uViewMatrix * vec4(currentRay, 1.);
+        vec3 currentRayInView = rayOriginInView + rayDirInView * currentStepLength;
+        // vec4 currentRayInView = uViewMatrix * vec4(currentRay, 1.);
+        vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
         currentRayInClip /= currentRayInClip.w;
         float currentRayRawDepth = ndcZToRawDepth(currentRayInClip.z);
 
@@ -86,10 +94,19 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 jitterOffset,
         vec2 rayUv = currentRayInClip.xy * .5 + .5;
         // float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
         float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
+        vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
+            rayUv,
+            currentRawDepthInPixel,
+            uInverseProjectionMatrix
+        );
 
         // TODO: 深度じゃなくてview座標系で調整した方がいいような気もする
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
-        if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
+        // if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
+        //     occlusion += sharpness * saturate(pointLight.intensity);
+        // }
+
+        if(abs(currentRayInView.z) > abs(currentViewPositionInPixel.z)) {
             occlusion += sharpness * saturate(pointLight.intensity);
         }
     }
@@ -114,21 +131,30 @@ void main() {
         texture(uDepthTexture, uv).x,
         uInverseViewProjectionMatrix
     );
+    vec3 viewPosition = (uViewMatrix * vec4(worldPosition, 1.)).xyz;
+    viewPosition = reconstructViewPositionFromDepth(
+        uv,
+        texture(uDepthTexture, uv).x,
+        uInverseProjectionMatrix
+    );
 
     vec3 jitterOffset = normalize(vec3(
         noise(uv + uTime + .1),
         noise(uv + uTime + .2),
-        0.
-        // noise(uv + uTime + .3)
+        // 0.
+        noise(uv + uTime + .3)
     ) * 2. - 1.);
 
     float occlusion = 0.;
     
     for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-        calcOcclusion(uPointLight[i], worldPosition, jitterOffset, occlusion);
+        calcOcclusion(uPointLight[i], worldPosition, viewPosition, jitterOffset, occlusion);
     }
 
     occlusion *= uStrength;
 
     outColor = vec4(vec3(occlusion), 1.);
+    
+    // for debug
+    // outColor = vec4(vec3(viewPosition), 1.);
 }

@@ -8,7 +8,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
  *
  */
 export class ScreenSpaceShadowPass extends PostProcessPassBase {
-    bias: number = 0.001;
+    bias: number = 0;
     jitterSize: Vector3 = new Vector3(0.1, 0.1, 0.1);
     sharpness: number = 0.5;
     lengthMultiplier: number = 1;
