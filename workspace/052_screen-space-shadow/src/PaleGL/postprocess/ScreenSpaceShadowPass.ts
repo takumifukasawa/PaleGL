@@ -15,11 +15,14 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
     sharpness: number = 2;
     strength: number = 1;
 
+    ratio: number = 0.5;
+
     /**
      *
      * @param gpu
+     * @param ratio
      */
-    constructor({ gpu }: { gpu: GPU }) {
+    constructor({ gpu, ratio }: { gpu: GPU; ratio?: number }) {
         const fragmentShader = screenSpaceShadowFragmentShader;
 
         super({
@@ -36,16 +39,6 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                     type: UniformTypes.Texture,
                     value: null,
                 },
-                // {
-                //     name: 'uJitterSizeX',
-                //     type: UniformTypes.Float,
-                //     value: 0,
-                // },
-                // {
-                //     name: 'uJitterSizeY',
-                //     type: UniformTypes.Float,
-                //     value: 0,
-                // },
                 {
                     name: 'uBias',
                     type: UniformTypes.Float,
@@ -67,9 +60,18 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
                     value: 0,
                 },
             ],
-            uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera, UniformBlockNames.PointLight],
+            uniformBlockNames: [
+                UniformBlockNames.Common,
+                UniformBlockNames.Transformations,
+                UniformBlockNames.Camera,
+                UniformBlockNames.PointLight,
+            ],
             // renderTargetType: RenderTargetTypes.R16F,
         });
+
+        if (ratio) {
+            this.ratio = ratio;
+        }
     }
 
     /**
@@ -78,9 +80,9 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      * @param height
      */
     setSize(width: number, height: number) {
-        super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        super.setSize(width * this.ratio, height * this.ratio);
+        // this.material.uniforms.setValue(UniformNames.TargetWidth, width);
+        // this.material.uniforms.setValue(UniformNames.TargetHeight, height);
     }
 
     /**

@@ -1542,7 +1542,7 @@ function initDebugger() {
     sssDebuggerGroup.addSliderDebugger({
         label: 'sss strength',
         minValue: 0,
-        maxValue: 1,
+        maxValue: 4,
         stepValue: 0.001,
         initialValue: renderer.screenSpaceShadowPass.strength,
         onChange: (value) => {
