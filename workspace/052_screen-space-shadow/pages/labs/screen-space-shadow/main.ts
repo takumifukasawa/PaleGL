@@ -483,8 +483,7 @@ const pointLight1 = new PointLight({
     attenuation: 1,
 });
 pointLight1.transform.position = new Vector3(0, .5, 0);
-
-captureScene.add(pointLight1);
+// captureScene.add(pointLight1);
 
 const cameraPostProcess = new PostProcess();
 
@@ -1042,10 +1041,12 @@ const main = async () => {
         if (intersectOnPlane) {
             const x = clamp(intersectOnPlane.x, -5, 5);
             const z = clamp(intersectOnPlane.z, -5, 5);
-            const p = new Vector3(x, 1, z);
+            const p = new Vector3(x, .5, z);
             attractSphereMesh.transform.setTranslation(p);
         }
     };
+    
+    attractSphereMesh.addChild(pointLight1);
 
     //
     // instancing mesh
