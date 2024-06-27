@@ -150,10 +150,13 @@ void main() {
     ) * 2. - 1.);
 
     float occlusion = 0.;
-    
-    for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-        calcOcclusion(uPointLight[i], worldPosition, viewPosition, jitterOffset, occlusion);
+   
+    // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
+    #pragma UNROLL_START 
+    for(int i = 0; i < 1; i++) {
+        calcOcclusion(uPointLight[UNROLL_i], worldPosition, viewPosition, jitterOffset, occlusion);
     }
+    #pragma UNROLL_END
 
     occlusion *= uStrength;
 
