@@ -22,18 +22,9 @@ import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
-// import {PostProcessPassBase} from "@/PaleGL/postprocess/PostProcessPassBase";
-// import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-// import {Skybox} from "@/PaleGL/actors/Skybox";
-// import {GBufferRenderTargets} from "@/PaleGL/core/GBufferRenderTargets";
-// import {RenderTarget} from "@/PaleGL/core/RenderTarget";
-// import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
-// import { Vector3 } from '@/PaleGL/math/Vector3';
-// import { Color } from '@/PaleGL/math/Color';
 import { Skybox } from '@/PaleGL/actors/Skybox';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
-// import { CubeMap } from '@/PaleGL/core/CubeMap';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
@@ -60,8 +51,6 @@ import {
     UniformBufferObjectStructArrayValue,
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
-    // Uniforms,
-    // UniformStructValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
@@ -72,6 +61,7 @@ import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/PointLight.ts';
+import { createEngineTextures, EngineTextures } from '@/PaleGL/core/createEngineTextures.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -85,42 +75,13 @@ export type LightActors = {
     pointLights: PointLight[];
 };
 
-// function applyShadowUniformValues(targetMaterial: Material, light: Light) {
-//     // TODO: これはlightごとに共通化できる気がするかつ、分岐が甘い気がする（postprocessで使いたかったりする. getterが必要か？
-//     if (
-//         // targetMaterial.uniforms[UniformNames.ShadowMapProjectionMatrix] &&
-//         light.shadowCamera &&
-//         light.shadowMap
-//     ) {
-//         // console.log(light, light.shadowCamera, light.shadowMap)
-//         // clip coord (-1 ~ 1) to uv (0 ~ 1)
-//         // prettier-ignore
-//         const textureMatrix = new Matrix4(
-//             0.5, 0, 0, 0.5,
-//             0, 0.5, 0, 0.5,
-//             0, 0, 0.5, 0.5,
-//             0, 0, 0, 1
-//         );
-//         light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(
-//             textureMatrix,
-//             light.shadowCamera.projectionMatrix.clone(),
-//             light.shadowCamera.viewMatrix.clone()
-//         );
-//         targetMaterial.uniforms.setValue(UniformNames.ShadowMap, light.shadowMap.read.depthTexture);
-//         // targetMaterial.uniforms.setValue(UniformNames.ShadowMapProjectionMatrix, light.shadowMapProjectionMatrix);
-//         targetMaterial.uniforms.setValue(
-//             UniformNames.LightViewProjectionMatrix,
-//             Matrix4.multiplyMatrices(
-//                 // textureMatrix,
-//                 light.shadowCamera.projectionMatrix.clone(),
-//                 light.shadowCamera.viewMatrix.clone()
-//             )
-//         );
-//     }
-// }
-
-// TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
-// TODO: 渡す uniform の値、キャッシュできる気がする
+/**
+ *
+ * @param targetMaterial
+ * @param lightActors
+ * TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
+ * TODO: 渡す uniform の値、キャッシュできる気がする
+ */
 export function applyLightShadowMapUniformValues(targetMaterial: Material, lightActors: LightActors) {
     if (lightActors.directionalLight) {
         if (lightActors.directionalLight.shadowMap) {
@@ -517,6 +478,12 @@ export class Renderer {
         console.log('===== global uniform buffer objects =====');
         console.log(this.globalUniformBufferObjects);
         console.log('=========================================');
+
+        //
+        // engine textures
+        //
+
+        this._engineTextures = createEngineTextures({ gpu, renderer: this });
     }
 
     // registerUniformBufferObjectToMaterial(material: Material) {
@@ -653,6 +620,10 @@ export class Renderer {
 
     get fxaaPass() {
         return this._fxaaPass;
+    }
+
+    get engineTextures() {
+        return this._engineTextures;
     }
 
     /**
@@ -1300,6 +1271,8 @@ export class Renderer {
     private _chromaticAberrationPass: ChromaticAberrationPass;
     private _vignettePass: VignettePass;
     private _fxaaPass: FXAAPass;
+
+    private _engineTextures: EngineTextures;
 
     /**
      *

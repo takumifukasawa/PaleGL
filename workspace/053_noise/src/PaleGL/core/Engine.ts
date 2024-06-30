@@ -82,7 +82,7 @@ export class Engine {
         onBeforeFixedUpdate,
         onBeforeUpdate,
         onRender,
-        showStats = false
+        showStats = false,
     }: {
         gpu: GPU;
         renderer: Renderer;
@@ -177,10 +177,10 @@ export class Engine {
                 case ActorTypes.SkinnedMesh:
                     actor.beforeRender({ gpu: this.#gpu });
                     const mesh = actor as Mesh;
-                    mesh.materials.forEach(mat => {
+                    mesh.materials.forEach((mat) => {
                         this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mat);
                     });
-                    if(mesh.depthMaterial) {
+                    if (mesh.depthMaterial) {
                         this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh.depthMaterial);
                     }
                     // mesh.materials.forEach((material) => {

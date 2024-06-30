@@ -151,13 +151,13 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     },
                 ],
                 [
-                    GBUFFER_D_TEXTURE_KEY,
+                    GBUFFER_C_TEXTURE_KEY,
                     {
                         type: 'Texture',
                     },
                 ],
                 [
-                    GBUFFER_C_TEXTURE_KEY,
+                    GBUFFER_D_TEXTURE_KEY,
                     {
                         type: 'Texture',
                     },

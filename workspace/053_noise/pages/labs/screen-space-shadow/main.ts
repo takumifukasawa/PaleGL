@@ -63,6 +63,8 @@ import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.j
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry.ts";
 import {PointLight} from "@/PaleGL/actors/PointLight.ts";
+import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
+import {EngineTexturesTypes} from "@/PaleGL/core/createEngineTextures.ts";
 
 // -------------------
 // constants
@@ -951,6 +953,19 @@ const main = async () => {
         specularIntensity: 0.2,
         renderMesh: false,
     });
+    
+    // debug plane
+    
+    const debugPlaneActor = new Mesh({
+        geometry: new PlaneGeometry({gpu}),
+        material: new UnlitMaterial({
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            diffuseMap: renderer.engineTextures[EngineTexturesTypes.RANDOM_NOISE]
+        })
+    });
+    debugPlaneActor.transform.position = new Vector3(0, 4, 0);
+    debugPlaneActor.transform.scale = new Vector3(2, 2, 2);
+    captureScene.add(debugPlaneActor);
 
     //
     // street floor
@@ -965,7 +980,6 @@ const main = async () => {
     });
     (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uMetallic', 0.5);
     (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uRoughness', 1);
-    console.log('streetFloorActor', streetFloorActor);
 
     //
     // street light

@@ -60,9 +60,10 @@ void main() {
     
     resultColor.rgb = gamma(resultColor.rgb);
     vec3 emissiveColor = gamma(uEmissiveColor.rgb);
-    
+
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(emissiveColor);
+    // outGBufferD = EncodeGBufferD(emissiveColor);
+    outGBufferD = EncodeGBufferD(diffuseMapColor.xyz);
 }
