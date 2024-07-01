@@ -959,8 +959,10 @@ const main = async () => {
     const debugPlaneActor = new Mesh({
         geometry: new PlaneGeometry({gpu}),
         material: new UnlitMaterial({
+            // diffuseMap: renderer.sharedTextures.get(SharedTexturesTypes.RANDOM_NOISE)!.texture
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            diffuseMap: renderer.sharedTextures.get(SharedTexturesTypes.RANDOM_NOISE)?.texture
+            // diffuseMap: renderer.sharedTextures.get(SharedTexturesTypes.PERLIN_NOISE)!.texture
+            diffuseMap: renderer.sharedTextures[SharedTexturesTypes.PERLIN_NOISE].texture
         })
     });
     debugPlaneActor.transform.position = new Vector3(0, 4, 0);
