@@ -6,6 +6,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/Scene';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
+import {createSharedTextures, SharedTextures} from "@/PaleGL/core/createSharedTextures.ts";
 // import {Mesh} from "@/PaleGL/actors/Mesh.ts";
 
 // type EngineOnBeforeStartCallbackArgs = void;
@@ -52,8 +53,14 @@ export class Engine {
     #onBeforeUpdate: EngineOnBeforeUpdateCallback | null = null;
     private _onRender: EngineOnRenderCallback | null = null;
 
+    private _sharedTextures: SharedTextures;
+
     get renderer() {
         return this.#renderer;
+    }
+    
+    get sharedTextures() {
+        return this._sharedTextures;
     }
 
     set onBeforeStart(cb: EngineOnBeforeStartCallback) {
@@ -104,6 +111,8 @@ export class Engine {
         this.#onBeforeFixedUpdate = onBeforeFixedUpdate || null;
         this.#onBeforeUpdate = onBeforeUpdate || null;
         this._onRender = onRender || null;
+
+        this._sharedTextures = createSharedTextures({ gpu, renderer });
     }
 
     setScene(scene: Scene) {

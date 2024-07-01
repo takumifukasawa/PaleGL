@@ -959,7 +959,7 @@ const main = async () => {
     const debugPlaneActor = new Mesh({
         geometry: new PlaneGeometry({gpu}),
         material: new UnlitMaterial({
-            diffuseMap: renderer.sharedTextures[SharedTexturesTypes.SIMPLEX_NOISE].texture
+            diffuseMap: engine.sharedTextures[SharedTexturesTypes.SIMPLEX_NOISE].texture
         })
     });
     debugPlaneActor.transform.position = new Vector3(0, 4, 0);
