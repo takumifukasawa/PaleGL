@@ -16,13 +16,15 @@ export const SharedTexturesTypes = {
 
 export type SharedTexturesType = (typeof SharedTexturesTypes)[keyof typeof SharedTexturesTypes];
 
-export type SharedTextures = {
-    key: SharedTexturesType;
-    // tmpRenderTarget: RenderTarget;
-    // renderTarget: RenderTarget;
-    texture: Texture;
-    update: () => void | null;
-}[];
+// export type SharedTextures = {
+//     key: SharedTexturesType;
+//     // tmpRenderTarget: RenderTarget;
+//     // renderTarget: RenderTarget;
+//     texture: Texture;
+//     update: () => void | null;
+// }[];
+
+export type SharedTextures = Map<SharedTexturesType, {texture: Texture,update: () => void }>;
 
 const sharedTextureInfos = [
     {
@@ -92,7 +94,9 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
 
     const planeGeometryAttributeDescriptors = planeGeometry.getAttributeDescriptors();
 
-    const sharedTextures: SharedTextures = sharedTextureInfos.map(
+    const sharedTextures: Map<SharedTexturesType, {texture: Texture,update: () => void }> = new Map();
+
+    sharedTextureInfos.forEach(
         ({
             key,
             width,
@@ -130,11 +134,14 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
 
             renderMaterial(ppRenderTarget, ppMaterial);
 
-            return {
+            sharedTextures.set(
                 key,
-                texture: ppRenderTarget.texture!,
-                update: () => {},
-            };
+                {
+                    texture: ppRenderTarget.texture!,
+                    update: () => {
+                    },
+                }
+            );
         }
     );
 

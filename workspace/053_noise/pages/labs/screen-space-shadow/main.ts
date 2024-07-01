@@ -960,7 +960,7 @@ const main = async () => {
         geometry: new PlaneGeometry({gpu}),
         material: new UnlitMaterial({
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            diffuseMap: renderer.sharedTextures[SharedTexturesTypes.RANDOM_NOISE]
+            diffuseMap: renderer.sharedTextures.get(SharedTexturesTypes.RANDOM_NOISE)?.texture
         })
     });
     debugPlaneActor.transform.position = new Vector3(0, 4, 0);
