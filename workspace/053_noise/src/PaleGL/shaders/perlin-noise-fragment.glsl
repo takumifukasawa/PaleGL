@@ -2,9 +2,10 @@
 
 precision highp float;
 
-#pragma EFFECT_TEXTURE_HEADER
+#include ./partial/effect-texture-header.glsl
 
 uniform float uTiling;
+uniform float uIsImproved;
 
 float perlinNoise(vec2 p, float isImproved) {
     vec2 i = floor(p);
@@ -56,7 +57,7 @@ void main() {
     vec2 gridSize = uGridSize;
     vec2 uv = vUv;
 
-    float result = perlinNoise(uv * gridSize + uTime, 0.);
+    float result = perlinNoise(uv * gridSize + uTime, uIsImproved);
 
     outColor = vec4(vec3(result), 1.);
 }

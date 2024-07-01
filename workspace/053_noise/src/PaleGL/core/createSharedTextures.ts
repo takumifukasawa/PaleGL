@@ -10,11 +10,14 @@ import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
+import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export const SharedTexturesTypes = {
     RANDOM_NOISE: 0,
     PERLIN_NOISE: 1,
+    IMPROVE_NOISE: 2,
+    SIMPLEX_NOISE: 3,
 } as const;
 
 export type SharedTexturesType = (typeof SharedTexturesTypes)[keyof typeof SharedTexturesTypes];
@@ -28,7 +31,6 @@ type SharedTextureInfo = {
     height: number;
     effectFragmentShader: string;
     effectUniforms: UniformsData;
-    postprocessFragmentShader: string;
     tilingEnabled: boolean;
     edgeMaskMix: number;
     remapMin: number;
@@ -53,7 +55,6 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 value: new Vector2(512, 512),
             },
         ],
-        postprocessFragmentShader: effectTexturePostProcessFragment,
         tilingEnabled: true,
         edgeMaskMix: 1,
         remapMin: 0,
@@ -75,8 +76,61 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 type: UniformTypes.Vector2,
                 value: new Vector2(4, 4),
             },
+            {
+                name: 'uIsImproved',
+                type: UniformTypes.Float,
+                value: 0,
+            },
         ],
-        postprocessFragmentShader: effectTexturePostProcessFragment,
+        tilingEnabled: true,
+        edgeMaskMix: 1,
+        remapMin: 0,
+        remapMax: 1,
+    },
+    {
+        key: SharedTexturesTypes.IMPROVE_NOISE,
+        width: 512,
+        height: 512,
+        effectFragmentShader: perlinNoiseFragment,
+        effectUniforms: [
+            {
+                name: 'uTime',
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: 'uGridSize',
+                type: UniformTypes.Vector2,
+                value: new Vector2(4, 4),
+            },
+            {
+                name: 'uIsImproved',
+                type: UniformTypes.Float,
+                value: 1,
+            },
+        ],
+        tilingEnabled: true,
+        edgeMaskMix: 1,
+        remapMin: 0,
+        remapMax: 1,
+    },
+    {
+        key: SharedTexturesTypes.SIMPLEX_NOISE,
+        width: 512,
+        height: 512,
+        effectFragmentShader: simplexNoiseFragment,
+        effectUniforms: [
+            {
+                name: 'uTime',
+                type: UniformTypes.Float,
+                value: 0,
+            },
+            {
+                name: 'uGridSize',
+                type: UniformTypes.Vector2,
+                value: new Vector2(4, 4),
+            },
+        ],
         tilingEnabled: true,
         edgeMaskMix: 1,
         remapMin: 0,
@@ -115,7 +169,6 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
             height,
             effectFragmentShader,
             effectUniforms,
-            postprocessFragmentShader,
             tilingEnabled,
             edgeMaskMix,
             remapMin,
@@ -130,7 +183,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         });
         const ppMaterial = new Material({
             vertexShader: PostProcessPassBase.baseVertexShader,
-            fragmentShader: postprocessFragmentShader,
+            fragmentShader: effectTexturePostProcessFragment,
             uniforms: [
                 {
                     name: 'uSrcTexture',

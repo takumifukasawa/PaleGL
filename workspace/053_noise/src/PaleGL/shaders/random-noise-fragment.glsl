@@ -2,7 +2,7 @@
 
 precision highp float;
 
-#pragma EFFECT_TEXTURE_HEADER
+#include ./partial/effect-texture-header.glsl
 
 uniform float uTiling;
 
