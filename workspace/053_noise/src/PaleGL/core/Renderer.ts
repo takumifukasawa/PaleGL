@@ -61,7 +61,7 @@ import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/PointLight.ts';
-import { createEngineTextures, EngineTextures } from '@/PaleGL/core/createEngineTextures.ts';
+import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -483,7 +483,7 @@ export class Renderer {
         // engine textures
         //
 
-        this._engineTextures = createEngineTextures({ gpu, renderer: this });
+        this._sharedTextures = createSharedTextures({ gpu, renderer: this });
     }
 
     // registerUniformBufferObjectToMaterial(material: Material) {
@@ -622,8 +622,8 @@ export class Renderer {
         return this._fxaaPass;
     }
 
-    get engineTextures() {
-        return this._engineTextures;
+    get sharedTextures() {
+        return this._sharedTextures;
     }
 
     /**
@@ -1272,7 +1272,7 @@ export class Renderer {
     private _vignettePass: VignettePass;
     private _fxaaPass: FXAAPass;
 
-    private _engineTextures: EngineTextures;
+    private _sharedTextures: SharedTextures;
 
     /**
      *

@@ -64,7 +64,7 @@ import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
 import {BoxGeometry} from "@/PaleGL/geometries/BoxGeometry.ts";
 import {PointLight} from "@/PaleGL/actors/PointLight.ts";
 import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
-import {EngineTexturesTypes} from "@/PaleGL/core/createEngineTextures.ts";
+import {SharedTexturesTypes} from "@/PaleGL/core/createSharedTextures.ts";
 
 // -------------------
 // constants
@@ -960,7 +960,7 @@ const main = async () => {
         geometry: new PlaneGeometry({gpu}),
         material: new UnlitMaterial({
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            diffuseMap: renderer.engineTextures[EngineTexturesTypes.RANDOM_NOISE]
+            diffuseMap: renderer.sharedTextures[SharedTexturesTypes.RANDOM_NOISE]
         })
     });
     debugPlaneActor.transform.position = new Vector3(0, 4, 0);
