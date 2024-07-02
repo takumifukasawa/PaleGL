@@ -117,6 +117,9 @@ export default defineConfig(async (config) => {
     // https://vitejs.dev/config/
     return {
         plugins: [
+            checker({
+                overlay: false
+            }),
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
             checker({ typescript: true }),
