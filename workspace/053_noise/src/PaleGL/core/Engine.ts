@@ -6,10 +6,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/Scene';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-import {createSharedTextures, SharedTextures} from "@/PaleGL/core/createSharedTextures.ts";
-// import {Mesh} from "@/PaleGL/actors/Mesh.ts";
-
-// type EngineOnBeforeStartCallbackArgs = void;
+import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -23,17 +20,11 @@ type EngineOnBeforeUpdateCallbackArgs = {
     deltaTime: number;
 };
 
-// export type EngineOnUpdateCallbackArgs = {
-//     time: number,
-//     deltaTime: number
-// };
-
 export type EngineOnBeforeStartCallback = () => void;
 export type EngineOnStartCallback = (args: EngineOnStartCallbackArgs) => void;
 export type EngineOnAfterStartCallback = () => void;
 export type EngineOnBeforeFixedUpdateCallback = (args: EngineOnBeforeFixedUpdateCallbackArgs) => void;
 export type EngineOnBeforeUpdateCallback = (args: EngineOnBeforeUpdateCallbackArgs) => void;
-// export type EngineOnUpdateCallback = (args: EngineOnUpdateCallbackArgs) => void;
 
 export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
@@ -58,7 +49,7 @@ export class Engine {
     get renderer() {
         return this.#renderer;
     }
-    
+
     get sharedTextures() {
         return this._sharedTextures;
     }
@@ -83,6 +74,15 @@ export class Engine {
         this._onRender = cb;
     }
 
+    /**
+     * 
+     * @param gpu
+     * @param renderer
+     * @param onBeforeFixedUpdate
+     * @param onBeforeUpdate
+     * @param onRender
+     * @param showStats
+     */
     constructor({
         gpu,
         renderer,
@@ -115,15 +115,18 @@ export class Engine {
         this._sharedTextures = createSharedTextures({ gpu, renderer });
     }
 
+    /**
+     * 
+     * @param scene
+     */
     setScene(scene: Scene) {
         this.#scene = scene;
         // this.#scenes.push(scene);
     }
 
-    // setScenes(scenes: Scene[]) {
-    //     this.#scenes = scenes;
-    // }
-
+    /**
+     * 
+     */
     start() {
         if (this.#onBeforeStart) {
             this.#onBeforeStart();
@@ -136,6 +139,11 @@ export class Engine {
         }
     }
 
+    /**
+     * 
+     * @param width
+     * @param height
+     */
     setSize(width: number, height: number) {
         const rw = width * this.renderer.pixelRatio;
         const rh = height * this.renderer.pixelRatio;
@@ -149,6 +157,11 @@ export class Engine {
         this.#renderer.setSize(rw, rh);
     }
 
+    /**
+     * 
+     * @param fixedTime
+     * @param fixedDeltaTime
+     */
     fixedUpdate(fixedTime: number, fixedDeltaTime: number) {
         if (this.#onBeforeFixedUpdate) {
             this.#onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
@@ -172,6 +185,11 @@ export class Engine {
         // });
     }
 
+    /**
+     * 
+     * @param time
+     * @param deltaTime
+     */
     update(time: number, deltaTime: number) {
         if (this.#onBeforeUpdate) {
             this.#onBeforeUpdate({ time, deltaTime });
@@ -222,15 +240,24 @@ export class Engine {
         this.#scene?.traverse((actor) => {
             actor.updateTransform();
         });
+
         this.render(time, deltaTime);
     }
 
+    /**
+     * 
+     * @param time[sec]
+     * @param deltaTime[sec]
+     */
     render(time: number, deltaTime: number) {
         this.#stats.clear();
-        // this.#renderer.render(this.#scene, this.#scene.mainCamera);
-        // this.#scenes.forEach(scene => {
-        //     this.#renderer.render(scene, scene.mainCamera);
-        // });
+
+        // update and render shared textures
+        Object.values(this._sharedTextures).forEach((obj) => {
+            obj.update(time);
+            obj.render();
+        });
+
         if (this._onRender) {
             this._onRender(time, deltaTime);
         }
@@ -241,7 +268,10 @@ export class Engine {
         this.#stats.update(time);
     }
 
-    // time [sec]
+    /**
+     * 
+     * @param time[sec]
+     */
     run(time: number) {
         this.#fixedUpdateFrameTimer.exec(time / 1000);
         this.#updateFrameTimer.exec(time / 1000);

@@ -22,8 +22,14 @@ export const SharedTexturesTypes = {
 
 export type SharedTexturesType = (typeof SharedTexturesTypes)[keyof typeof SharedTexturesTypes];
 
-// export type SharedTextures = Map<SharedTexturesType, { texture: Texture; update: () => void }>;
-export type SharedTextures = { [key in SharedTexturesType]: { texture: Texture; update: () => void } };
+export type SharedTextures = {
+    [key in SharedTexturesType]: {
+        texture: Texture;
+        needsUpdate: boolean;
+        update: (time: number) => void;
+        render: () => void;
+    };
+};
 
 type SharedTextureInfo = {
     key: SharedTexturesType;
@@ -35,6 +41,7 @@ type SharedTextureInfo = {
     edgeMaskMix: number;
     remapMin: number;
     remapMax: number;
+    update?: (time: number, effectMaterial: Material) => void;
 };
 
 const sharedTextureInfos: SharedTextureInfo[] = [
@@ -135,6 +142,9 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         edgeMaskMix: 1,
         remapMin: 0,
         remapMax: 1,
+        // update: (time, effectMaterial) => {
+        //     effectMaterial.uniforms.setValue("uTime", time);
+        // }
     },
 ];
 
@@ -173,6 +183,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
             edgeMaskMix,
             remapMin,
             remapMax,
+            update,
         } = current;
         const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height });
         const ppRenderTarget = createEffectRenderTarget({ gpu, width, height });
@@ -214,21 +225,35 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         });
 
         tmpMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
-        renderMaterial(tmpRenderTarget, tmpMaterial);
-
         ppMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
         ppMaterial.uniforms.setValue('uSrcTexture', tmpRenderTarget.texture);
 
-        renderMaterial(ppRenderTarget, ppMaterial);
-
-        // sharedTextures.set(key, {
-        //     texture: ppRenderTarget.texture!,
-        //     update: () => {},
-        // });
-        acc[key] = {
-            texture: ppRenderTarget.texture!,
-            update: () => {},
+        const render = () => {
+            renderMaterial(tmpRenderTarget, tmpMaterial);
+            renderMaterial(ppRenderTarget, ppMaterial);
         };
+
+        render();
+
+        acc[key] = (() => {
+            let needsUpdate: boolean = false;
+            return  {
+                texture: ppRenderTarget.texture!,
+                needsUpdate: false,
+                update: (time: number) => {
+                    needsUpdate = false;
+                    if(update) {
+                        update(time, tmpMaterial);
+                        needsUpdate = true;
+                    }
+                },
+                render: () => {
+                    if(needsUpdate) {
+                        render();
+                    }
+                }
+            };
+        })();
 
         return acc;
     }, {} as SharedTextures);
