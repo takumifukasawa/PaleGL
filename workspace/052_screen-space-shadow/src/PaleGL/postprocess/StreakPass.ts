@@ -41,7 +41,7 @@ export class StreakPass implements IPostProcessPass {
     color: Color = Color.white;
     intensity: number = 0.6;
     verticalScale: number = 1.5;
-    horizontalScale: number = 1.25;
+    horizontalScale: number = 1.5;
 
     materials: Material[] = [];
 

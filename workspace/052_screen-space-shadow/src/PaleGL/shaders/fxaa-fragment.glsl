@@ -62,6 +62,7 @@ float rgbToLuma(vec3 rgb) {
 
 vec4 sampleTexture(sampler2D tex, vec2 coord) {
     return texture(tex, coord);
+    // return textureLod(tex, coord, 0.);
 }
 
 vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY) {
@@ -406,5 +407,7 @@ void main() {
     }
 
     outColor = sampleTexture(uSrcTexture, uv);
-    // outColor = sampleTexture(${UniformNames.SrcTexture}, vUv);
+    
+    // for debug
+    // outColor = vec4(vec3(edgeBlend), 1.);
 }

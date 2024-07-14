@@ -13,7 +13,7 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
     jitterSize: Vector3 = new Vector3(0.025, 0.025, 0.025);
     // sharpness: number = 0.3;
     sharpness: number = 2;
-    strength: number = 1;
+    strength: number = 2;
 
     ratio: number = 0.5;
 
