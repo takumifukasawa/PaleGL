@@ -145,7 +145,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         // update: (time, effectMaterial) => {
         //     effectMaterial.uniforms.setValue("uTime", time);
         // }
-,
+    },
 ];
 
 export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Renderer }): SharedTextures {
@@ -237,21 +237,21 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
 
         acc[key] = (() => {
             let needsUpdate: boolean = false;
-            return  {
+            return {
                 texture: ppRenderTarget.texture!,
                 needsUpdate: false,
                 update: (time: number) => {
                     needsUpdate = false;
-                    if(update) {
+                    if (update) {
                         update(time, tmpMaterial);
                         needsUpdate = true;
                     }
                 },
                 render: () => {
-                    if(needsUpdate) {
+                    if (needsUpdate) {
                         render();
                     }
-                }
+                },
             };
         })();
 
