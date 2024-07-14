@@ -135,7 +135,9 @@ void main() {
         step(.5, uTilingEnabled)
     );
     
-    outColor.xyz = mix(vec3(uRemapMin), vec3(uRemapMax), outColor.xyz);
+    vec3 c = clamp((outColor.xyz - vec3(uRemapMin)) / (uRemapMax - uRemapMin), 0., 1.);
+
+    outColor.xyz = c;
   
     // for debug
     // outColor =

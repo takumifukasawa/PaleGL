@@ -145,7 +145,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         // update: (time, effectMaterial) => {
         //     effectMaterial.uniforms.setValue("uTime", time);
         // }
-    },
+,
 ];
 
 export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Renderer }): SharedTextures {
