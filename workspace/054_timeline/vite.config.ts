@@ -45,9 +45,9 @@ type EntryPointInfo = { name: string; path: string };
 const ENTRY_NAME_INDEX: string = 'index';
 
 // ---------------------------------------------------
-// ビルドするentryを定義
-// const ENTRY_NAME = ENTRY_NAME_INDEX;
-const ENTRY_NAME: string = "screen-space-shadow";
+// ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
+const ENTRY_NAME = ENTRY_NAME_INDEX;
+// const ENTRY_NAME: string = "screen-space-shadow";
 const IS_MAIN_ENTRY = ENTRY_NAME === ENTRY_NAME_INDEX;
 const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `labs/${ENTRY_NAME}`;
 // ---------------------------------------------------
@@ -60,12 +60,14 @@ export default defineConfig(async (config) => {
     const { mode } = config;
 
     const env = loadEnv(mode, process.cwd());
+   
+    // NOTE: 本来はなくてもいいはず
+    Object.assign(process.env, env);
 
     const isBundle = env.VITE_BUNDLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isMangleProperties = env.VITE_MANGLE_PROPERTIES === 'true'; // gltf loader を使うときは必ず false
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
-
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isBundle: ${isBundle}`);
@@ -118,7 +120,7 @@ export default defineConfig(async (config) => {
     return {
         plugins: [
             checker({
-                overlay: false
+                overlay: false,
             }),
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
