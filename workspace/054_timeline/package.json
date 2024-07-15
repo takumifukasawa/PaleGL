@@ -11,6 +11,7 @@
     "build:demo": "tsc && vite build --force --mode demo",
     "preview": "vite preview",
     "serve:dist": "cd dist && python3 -m http.server 8000",
+    "serve:marionetter": "node ./marionetter-server/index.js",
     "lint": "eslint --ext .ts,.tsx src",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
