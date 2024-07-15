@@ -24,7 +24,7 @@ const wsServer = new WebSocketServer({ port: PORT });
 
 let wsBrowserClient;
 
-console.log('begin websocket server...');
+console.log(`begin websocket server... port: ${PORT}`);
 
 /**
  * 

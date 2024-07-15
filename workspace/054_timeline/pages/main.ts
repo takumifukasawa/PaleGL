@@ -289,6 +289,7 @@ const parseScene = (sceneJson: MarionetterScene) => {
 // TODO: この処理はビルド時には捨てたい
 const initHotReloadAndParseScene = () => {
     const hotReloadScene = () => {
+        console.log('hot reload scene...')
         void fetch('./assets/data/scene-hot-reload.json').then(async (res) => {
             const sceneJson = (await res.json()) as unknown as MarionetterScene;
             parseScene(sceneJson);
