@@ -348,6 +348,9 @@ export class GPU {
                         gl.bindTexture(gl.TEXTURE_2D, texture ? texture.glObject : this.dummyTexture.glObject);
                         activeTextureIndex++;
                     });
+                    if(textureArrayIndices.length < 1) {
+                        console.error('[GPU.setUniformValues] invalid texture array');
+                    }
                     gl.uniform1iv(location, textureArrayIndices);
 
                     break;

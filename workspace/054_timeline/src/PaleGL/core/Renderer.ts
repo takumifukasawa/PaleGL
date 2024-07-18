@@ -61,6 +61,7 @@ import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/PointLight.ts';
+import { Texture } from '@/PaleGL/core/Texture.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -75,25 +76,34 @@ export type LightActors = {
 };
 
 /**
- *
- * @param targetMaterial
- * @param lightActors
  * TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
  * TODO: 渡す uniform の値、キャッシュできる気がする
+ * TODO: directional light がないとき、spot lightがないときの対応
+ * @param targetMaterial
+ * @param lightActors
+ * @param fallbackTexture
  */
-export function applyLightShadowMapUniformValues(targetMaterial: Material, lightActors: LightActors) {
-    if (lightActors.directionalLight) {
-        if (lightActors.directionalLight.shadowMap) {
-            targetMaterial.uniforms.setValue(
-                UniformNames.DirectionalLightShadowMap,
-                lightActors.directionalLight.shadowMap.read.depthTexture
-            );
-        }
-    }
+export function applyLightShadowMapUniformValues(
+    targetMaterial: Material,
+    lightActors: LightActors,
+    fallbackTexture: Texture
+) {
+    // directional light
+    targetMaterial.uniforms.setValue(
+        UniformNames.DirectionalLightShadowMap,
+        lightActors.directionalLight && lightActors.directionalLight.shadowMap
+            ? lightActors.directionalLight.shadowMap.read.depthTexture
+            : fallbackTexture
+    );
 
+    // spotlights
+    const spotLightShadowMaps = maton.range(MAX_SPOT_LIGHT_COUNT).map((i) => {
+        const spotLight = lightActors.spotLights[i];
+        return spotLight && spotLight.shadowMap ? spotLight.shadowMap.read.depthTexture : fallbackTexture;
+    });
     targetMaterial.uniforms.setValue(
         UniformNames.SpotLightShadowMap,
-        lightActors.spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap.read.depthTexture : null))
+        spotLightShadowMaps
     );
 }
 
@@ -956,7 +966,7 @@ export class Renderer {
             this._deferredShadingPass.updateSkyboxUniforms(skyboxActor);
         });
 
-        applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors);
+        applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors, this.gpu.dummyTextureBlack);
 
         // set sss texture
         this._deferredShadingPass.material.uniforms.setValue(
@@ -1018,8 +1028,6 @@ export class Renderer {
         //     );
         // });
 
-        // TODO: directional light がない場合の対応
-        // const directionalLight = lightActors.find((light) => light.lightType === LightTypes.Directional) || null;
         if (lightActors.directionalLight) {
             this._lightShaftPass.setDirectionalLight(lightActors.directionalLight);
             PostProcess.renderPass({
@@ -1031,10 +1039,9 @@ export class Renderer {
                 prevRenderTarget: this._deferredShadingPass.renderTarget,
                 isLastPass: false,
                 time, // TODO: engineから渡したい
-                // lightActors,
             });
         } else {
-            throw 'invalid directional light.';
+            // TODO: directional light ないときの対応。黒く塗りたい
         }
 
         // ------------------------------------------------------------------------------
@@ -1042,18 +1049,21 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         this._volumetricLightPass.setSpotLights(lightActors.spotLights);
-        // TODO: spot light ないときの対応
-        PostProcess.renderPass({
-            pass: this._volumetricLightPass,
-            renderer: this,
-            targetCamera: camera,
-            gpu: this.gpu,
-            camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: this._deferredShadingPass.renderTarget,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-            // lightActors,
-        });
+        if (lightActors.spotLights.length > 0) {
+            PostProcess.renderPass({
+                pass: this._volumetricLightPass,
+                renderer: this,
+                targetCamera: camera,
+                gpu: this.gpu,
+                camera: this._scenePostProcess.postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+                prevRenderTarget: this._deferredShadingPass.renderTarget,
+                isLastPass: false,
+                time, // TODO: engineから渡したい
+                // lightActors,
+            });
+        } else {
+            // TODO: spot light ないときの対応。黒く塗りたい
+        }
 
         // return;
 
@@ -2056,7 +2066,7 @@ export class Renderer {
             //     light.applyUniformsValues(targetMaterial);
             // });
             // TODO: transparentで必要？使わないことを強制してもいい気がする
-            applyLightShadowMapUniformValues(targetMaterial, lightActors);
+            applyLightShadowMapUniformValues(targetMaterial, lightActors, this.gpu.dummyTextureBlack);
 
             this.renderMesh(actor.geometry, targetMaterial);
 

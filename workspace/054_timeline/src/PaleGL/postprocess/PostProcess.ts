@@ -8,6 +8,7 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {Texture} from "@/PaleGL/core/Texture.ts";
 // import { Light } from '@/PaleGL/actors/Light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
@@ -138,12 +139,14 @@ export class PostProcess {
         targetCamera,
         // time,
         lightActors,
+        fallbackTextureBlack
     }: {
         pass: IPostProcessPass;
         renderer: Renderer;
         targetCamera: Camera;
         // time: number;
         lightActors?: LightActors;
+        fallbackTextureBlack: Texture
     }) {
         pass.materials.forEach((passMaterial) => {
             //
@@ -157,7 +160,7 @@ export class PostProcess {
             // }
             // TODO: 必要なのだけ割り当てたいが・・・
             if (lightActors) {
-                applyLightShadowMapUniformValues(passMaterial, lightActors);
+                applyLightShadowMapUniformValues(passMaterial, lightActors, fallbackTextureBlack);
             }
 
             //
@@ -225,6 +228,7 @@ export class PostProcess {
             targetCamera,
             // time,
             lightActors,
+            fallbackTextureBlack: gpu.dummyTextureBlack
         });
 
         //
