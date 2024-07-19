@@ -325,8 +325,7 @@ export function buildMarionetterTimeline(
     for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
         const track = marionetterPlayableDirectorComponentInfo.tracks[i];
         const { targetName, clips } = track;
-        const transform = scene.find(targetName);
-        const targetActor = transform ? transform.actor : null;
+        const targetActor = scene.find(targetName);
         const marionetterClips = createMarionetterClips(clips);
         if (!targetActor) {
             console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);

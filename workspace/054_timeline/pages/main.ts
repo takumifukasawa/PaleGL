@@ -178,9 +178,9 @@ const buildScene = (sceneJson: MarionetterScene) => {
         captureScene.add(actors[i]);
     }
 
-    captureSceneCamera = captureScene.find('MainCamera')?.actor as PerspectiveCamera;
-    const directionalLight = captureScene.find('DirectionalLight')?.actor as DirectionalLight;
-    const plane = captureScene.find('Plane')?.actor as Mesh;
+    captureSceneCamera = captureScene.find('MainCamera') as PerspectiveCamera;
+    const directionalLight = captureScene.find('DirectionalLight') as DirectionalLight;
+    const plane = captureScene.find('Plane') as Mesh;
     console.log("hogehoge", plane)
 
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);

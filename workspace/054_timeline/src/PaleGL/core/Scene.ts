@@ -1,5 +1,5 @@
 ﻿import { Actor } from '@/PaleGL/actors/Actor';
-import { Transform } from '@/PaleGL/core/Transform';
+// import { Transform } from '@/PaleGL/core/Transform';
 // import {Camera} from "@/PaleGL/actors/Camera.ts";
 // import {PostProcess} from "@/PaleGL/postprocess/PostProcess.ts";
 // import {Skybox} from "@/PaleGL/actors/Skybox.ts";
@@ -7,7 +7,7 @@ import { Transform } from '@/PaleGL/core/Transform';
 type TraverseFunc = (actor: Actor) => void;
 
 export class Scene {
-    children: Transform[] = []; // transform hierarchy
+    children: Actor[] = []; // transform hierarchy
     // mainCamera: Camera | null = null; // TODO: findしたい
     // postProcess: PostProcess | null = null // TODO: cameraにもたせてもいいかも
     // skybox: Skybox | null = null; // TODO: findしたい
@@ -18,17 +18,17 @@ export class Scene {
     // }
 
     add(actor: Actor) {
-        this.children.push(actor.transform);
+        this.children.push(actor);
     }
 
     traverse(execFunc: TraverseFunc) {
         for (let i = 0; i < this.children.length; i++) {
-            this.#recursiveTraverseActor(this.children[i].actor, execFunc);
+            this.#recursiveTraverseActor(this.children[i], execFunc);
         }
     }
 
     find(name: string) {
-        return this.children.find((child) => child.actor.name === name);
+        return this.children.find((child) => child.name === name);
     }
 
     #recursiveTraverseActor(actor: Actor, execFunc: TraverseFunc) {
