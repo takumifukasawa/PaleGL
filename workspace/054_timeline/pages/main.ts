@@ -21,7 +21,6 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
 // postprocess
-import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 
 // inputs
@@ -54,6 +53,7 @@ import {
     MarionetterTimeline,
 } from '@/Marionetter/timeline.ts';
 import { createMarionetter, Marionetter } from '@/Marionetter/createMarionetter.ts';
+import {Mesh} from "@/PaleGL/actors/Mesh.ts";
 // import glsl from 'vite-plugin-glsl';
 // import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 // import { Texture } from '@/PaleGL/core/Texture.ts';
@@ -180,6 +180,8 @@ const buildScene = (sceneJson: MarionetterScene) => {
 
     captureSceneCamera = captureScene.find('MainCamera')?.actor as PerspectiveCamera;
     const directionalLight = captureScene.find('DirectionalLight')?.actor as DirectionalLight;
+    const plane = captureScene.find('Plane')?.actor as Mesh;
+    console.log("hogehoge", plane)
 
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
@@ -235,12 +237,9 @@ const buildScene = (sceneJson: MarionetterScene) => {
         //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
         // }
     });
-    captureScene.add(directionalLight);
+    // captureScene.add(directionalLight);
 
     const cameraPostProcess = new PostProcess();
-
-    const fxaaPass = new FXAAPass({ gpu });
-    cameraPostProcess.addPass(fxaaPass);
 
     const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
     bufferVisualizerPass.enabled = false;
@@ -276,7 +275,6 @@ const buildScene = (sceneJson: MarionetterScene) => {
     initDebugger({
         bufferVisualizerPass,
         directionalLight,
-        fxaaPass,
     });
 };
 
@@ -312,6 +310,10 @@ const main = async () => {
     console.log(sceneJsonUrl);
 
     buildScene(sceneJsonUrl as unknown as MarionetterScene);
+    
+    renderer.fogPass.blendRate = 0;
+    
+    console.log(captureScene)
 
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         document.addEventListener('keydown', (e) => {
@@ -330,34 +332,6 @@ const main = async () => {
         initHotReloadAndParseScene();
     }
 
-    // post additional scene
-
-    //
-    // text mesh
-    //
-
-    // const fontAtlasImg = await loadImg(fontAtlasImgUrl);
-    // const fontAtlasTexture = new Texture({
-    //     gpu,
-    //     img: fontAtlasImg,
-    //     flipY: false,
-    //     minFilter: TextureFilterTypes.Linear,
-    //     magFilter: TextureFilterTypes.Linear,
-    // });
-    // const textMesh1 = new TextMesh({
-    //     gpu,
-    //     text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    //     fontTexture: fontAtlasTexture,
-    //     fontAtlas: fontAtlasJson,
-    //     castShadow: true,
-    //     align: TextAlignType.Center,
-    //     // characterSpacing: -0.2
-    // });
-    // captureScene.add(textMesh1);
-    // textMesh1.transform.position = new Vector3(0, 0, 0);
-    // textMesh1.transform.rotation.setRotationX(-90);
-    // textMesh1.transform.scale = Vector3.fill(0.4);
-
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
         width = wrapperElement.offsetWidth;
@@ -369,37 +343,11 @@ const main = async () => {
     engine.onBeforeStart = () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
-
-        // orbitCameraController.distance = isSP ? 20 : 20;
-        // orbitCameraController.attenuation = 0.01;
-        // orbitCameraController.dampingFactor = 0.2;
-        // orbitCameraController.azimuthSpeed = 100;
-        // orbitCameraController.altitudeSpeed = 100;
-        // orbitCameraController.deltaAzimuthPower = 2;
-        // orbitCameraController.deltaAltitudePower = 2;
-        // orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
-        // orbitCameraController.start(0, -40);
-        // orbitCameraController.enabled = false;
     };
-
-    // engine.onAfterStart = () => {
-    //     window.setTimeout(() => {
-    //         onWindowResize()
-    //     },1000)
-    // }
 
     engine.onBeforeUpdate = () => {
-        // if (!debuggerGUI) initDebugger({
-        //     bufferVisualizerPass,
-        //     directionalLight,
-        //     fxaaPass,
-        // });
         inputController.update();
     };
-
-    // engine.onBeforeFixedUpdate = () => {
-    //     // inputController.fixedUpdate();
-    // };
 
     engine.onRender = (time) => {
         if (marionetterTimeline !== null) {
@@ -423,11 +371,9 @@ const main = async () => {
 function initDebugger({
     bufferVisualizerPass,
     directionalLight,
-    fxaaPass,
 }: {
     bufferVisualizerPass: BufferVisualizerPass;
     directionalLight: DirectionalLight;
-    fxaaPass: FXAAPass;
 }) {
     debuggerGUI = new DebuggerGUI();
 
@@ -1016,31 +962,6 @@ function initDebugger({
         onChange: (value) => {
             renderer.ssrPass.reflectionAdditionalRate = value;
         },
-    });
-
-    // debuggerGUI.addSliderDebugger({
-    //     label: 'ssr blend rate',
-    //     minValue: 0,
-    //     maxValue: 1,
-    //     stepValue: 0.001,
-    //     initialValue: renderer.ssrPass.blendRate,
-    //     onChange: (value) => {
-    //         renderer.ssrPass.blendRate = value;
-    //     },
-    // });
-
-    //
-    // fxaa
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    const fxaaDebuggerGroup = debuggerGUI.addGroup('fxaa', false);
-
-    fxaaDebuggerGroup.addToggleDebugger({
-        label: 'fxaa pass enabled',
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => (fxaaPass.enabled = value),
     });
 
     //

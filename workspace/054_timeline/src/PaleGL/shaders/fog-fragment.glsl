@@ -20,7 +20,6 @@ out vec4 outColor;
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
-uniform float uBlendRate;
 uniform sampler2D uDepthTexture;
 uniform vec4 uFogColor;
 uniform float uFogStrength;
@@ -29,6 +28,7 @@ uniform float uFogDensityAttenuation;
 uniform float uFogEndHeight;
 uniform float uDistanceFogStart;
 uniform float uDistanceFogPower;
+uniform float uBlendRate;
 
 #include ./partial/depth-functions.glsl
 
@@ -117,6 +117,9 @@ void main() {
     // TODO: しかし、どう混ぜるかという問題がある。手前と奥をどう判断するか
     // patter1: add
     outColor += vec4(volumetricLightColor.xyz, 0.);
+    
+    outColor = vec4(mix(sceneColor.xyz, outColor.xyz, uBlendRate), 1.);
+    
     // pattern2: mix
     // outColor = vec4(mix(
     //     outColor.xyz,

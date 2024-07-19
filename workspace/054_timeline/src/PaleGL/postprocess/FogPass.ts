@@ -25,6 +25,7 @@ export class FogPass extends PostProcessPassBase {
     fogEndHeight: number;
     distanceFogStart: number;
     distanceFogPower: number;
+    blendRate: number = 1;
 
     constructor({ gpu }: { gpu: GPU }) {
         const fragmentShader = fogFragmentShader;
@@ -92,6 +93,11 @@ export class FogPass extends PostProcessPassBase {
                     type: UniformTypes.Float,
                     value: distanceFogPower,
                 },
+                {
+                    name: "uBlendRate",
+                    type: UniformTypes.Float,
+                    value: 1,
+                }
                 // ...PostProcessPassBase.commonUniforms,
             ],
             uniformBlockNames: [UniformBlockNames.Camera],
@@ -124,6 +130,7 @@ export class FogPass extends PostProcessPassBase {
         this.material.uniforms.setValue(UNIFORM_FOG_END_HEIGHT, this.fogEndHeight);
         this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_START, this.distanceFogStart);
         this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_POWER, this.distanceFogPower);
+        this.material.uniforms.setValue("uBlendRate", this.blendRate);
         super.render(options);
     }
 }

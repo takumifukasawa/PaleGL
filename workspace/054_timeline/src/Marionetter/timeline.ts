@@ -16,9 +16,9 @@ import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
 
 // --------------------------------------------------------------------
 // jsonのproperty名と紐づけ
+// TODO: 短縮系を渡すようにしたい
 // --------------------------------------------------------------------
 
-// TODO: 短縮系を渡すようにしたい
 const PROPERTY_COLOR_R = 'color.r';
 const PROPERTY_COLOR_G = 'color.g';
 const PROPERTY_COLOR_B = 'color.b';
@@ -27,7 +27,6 @@ const PROPERTY_INTENSITY = 'intensity';
 // const PROPERTY_BOUNCE_INTENSITY = 'bounceIntensity';
 // const PROPERTY_RANGE = 'range';
 
-// TODO: 短縮系を渡すようにしたい
 const PROPERTY_LOCAL_POSITION_X = 'm_LocalPosition.x';
 const PROPERTY_LOCAL_POSITION_Y = 'm_LocalPosition.y';
 const PROPERTY_LOCAL_POSITION_Z = 'm_LocalPosition.z';
@@ -39,10 +38,12 @@ const PROPERTY_LOCAL_SCALE_Y = 'm_LocalScale.y';
 const PROPERTY_LOCAL_SCALE_Z = 'm_LocalScale.z';
 const PROPERTY_FIELD_OF_VIEW = 'field of view';
 
-const PRORPERTY_MATERIAL_BASE_COLOR_R = 'material._BaseColor.r';
-const PRORPERTY_MATERIAL_BASE_COLOR_G = 'material._BaseColor.g';
-const PRORPERTY_MATERIAL_BASE_COLOR_B = 'material._BaseColor.b';
-const PRORPERTY_MATERIAL_BASE_COLOR_A = 'material._BaseColor.a';
+const PROPERTY_MATERIAL_BASE_COLOR_R = 'material._BaseColor.r';
+const PROPERTY_MATERIAL_BASE_COLOR_G = 'material._BaseColor.g';
+const PROPERTY_MATERIAL_BASE_COLOR_B = 'material._BaseColor.b';
+const PROPERTY_MATERIAL_BASE_COLOR_A = 'material._BaseColor.a';
+
+const PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE = 'depthOfFieldFocusDistance';
 
 // --------------------------------------------------------------------
 
@@ -161,9 +162,10 @@ type MarionetterTransformInfo = {
 //
 
 const enum MarionetterTrackInfoType {
-    AnimationTrac = 0,
-    LightControlTrack = 1,
-    ActivationControlTrack = 2,
+    None,
+    AnimationTrack = 1,
+    LightControlTrack = 2,
+    ActivationControlTrack = 3,
 }
 
 type MarionetterTrackInfo = {
@@ -174,10 +176,12 @@ type MarionetterTrackInfo = {
 
 type MarionetterClipInfoKinds = MarionetterAnimationClipInfo | MarionetterLightControlClipInfo;
 
+// NOTE: unity側に合わせる
 const enum MarionetterClipInfoType {
-    AnimationClip = 0,
-    LightControlClip = 1,
-    ActivationControlClip = 2,
+    None = 0,
+    AnimationClip = 1,
+    LightControlClip = 2,
+    ActivationControlClip = 3,
 }
 
 type MarionetterClipInfoBase = {
@@ -220,11 +224,12 @@ type MarionetterComponentInfoBase = {
 
 // unity側に合わせる
 const MarionetterComponentType = {
-    PlayableDirector: 0,
-    Light: 1,
-    Camera: 2,
-    MeshRenderer: 3,
-    MeshFilter: 4,
+    None: 0,
+    PlayableDirector: 1,
+    Light: 2,
+    Camera: 3,
+    MeshRenderer: 4,
+    MeshFilter: 5,
 } as const;
 
 type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
@@ -461,13 +466,17 @@ function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipI
                     (actor as PerspectiveCamera).fov = value;
                     (actor as PerspectiveCamera).updateProjectionMatrix();
                     break;
-                case PRORPERTY_MATERIAL_BASE_COLOR_R:
-                case PRORPERTY_MATERIAL_BASE_COLOR_G:
-                case PRORPERTY_MATERIAL_BASE_COLOR_B:
-                case PRORPERTY_MATERIAL_BASE_COLOR_A:
+                case PROPERTY_MATERIAL_BASE_COLOR_R:
+                case PROPERTY_MATERIAL_BASE_COLOR_G:
+                case PROPERTY_MATERIAL_BASE_COLOR_B:
+                case PROPERTY_MATERIAL_BASE_COLOR_A:
                     // TODO: GBufferMaterialとの連携？
                     break;
+                case PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE:
+                    // TODO: post process 連携
+                    break;
                 default:
+                    // propertyが紐づいていない場合はエラーにする
                     throw new Error(`[createMarionetterAnimationClip] invalid property: ${propertyName}`);
             }
         });
