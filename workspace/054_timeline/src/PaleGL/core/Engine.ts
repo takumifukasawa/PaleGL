@@ -20,11 +20,17 @@ type EngineOnBeforeUpdateCallbackArgs = {
     deltaTime: number;
 };
 
+type EngineOnLastUpdateCallbackArgs = {
+    time: number;
+    deltaTime: number;
+};
+
 export type EngineOnBeforeStartCallback = () => void;
 export type EngineOnStartCallback = (args: EngineOnStartCallbackArgs) => void;
 export type EngineOnAfterStartCallback = () => void;
 export type EngineOnBeforeFixedUpdateCallback = (args: EngineOnBeforeFixedUpdateCallbackArgs) => void;
 export type EngineOnBeforeUpdateCallback = (args: EngineOnBeforeUpdateCallbackArgs) => void;
+export type EngineOnLastUpdateCallback = (args: EngineOnLastUpdateCallbackArgs) => void;
 
 export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
@@ -42,6 +48,7 @@ export class Engine {
     #onAfterStart: EngineOnAfterStartCallback | null = null;
     #onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null = null;
     #onBeforeUpdate: EngineOnBeforeUpdateCallback | null = null;
+    #onLastUpdate: EngineOnLastUpdateCallback | null = null;
     private _onRender: EngineOnRenderCallback | null = null;
 
     private _sharedTextures: SharedTextures;
@@ -75,7 +82,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param gpu
      * @param renderer
      * @param onBeforeFixedUpdate
@@ -116,7 +123,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param scene
      */
     setScene(scene: Scene) {
@@ -125,7 +132,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      */
     start() {
         if (this.#onBeforeStart) {
@@ -140,7 +147,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
      */
@@ -158,7 +165,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param fixedTime
      * @param fixedDeltaTime
      */
@@ -186,14 +193,22 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param time
      * @param deltaTime
      */
     update(time: number, deltaTime: number) {
+        //
+        // before render
+        //
+        
         if (this.#onBeforeUpdate) {
             this.#onBeforeUpdate({ time, deltaTime });
         }
+        
+        //
+        // update and before render
+        //
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
         this.#scene?.traverse((actor) => {
@@ -210,42 +225,49 @@ export class Engine {
                     if (mesh.depthMaterial) {
                         this.renderer.checkNeedsBindUniformBufferObjectToMaterial(mesh.depthMaterial);
                     }
-                    // mesh.materials.forEach((material) => {
-                    //     if (!material.boundUniformBufferObjects) {
-                    //         material.boundUniformBufferObjects = true;
-                    //         this.renderer.registerUniformBufferObjectToMaterial(material);
-                    //     }
-                    // });
                     break;
                 default:
                     break;
             }
         });
+        
+        //
+        // last update
+        //
 
-        // this.#scenes.forEach((scene) => {
-        //     scene.traverse((actor) => {
-        //         actor.update({ gpu: this.#gpu, time, deltaTime });
-        //         switch (actor.type) {
-        //             case ActorTypes.Skybox:
-        //             case ActorTypes.Mesh:
-        //             case ActorTypes.SkinnedMesh:
-        //                 actor.beforeRender({ gpu: this.#gpu });
-        //                 break;
-        //             default:
-        //                 break;
-        //         }
-        //     });
-        // });
+        if (this.#onLastUpdate) {
+            this.#onLastUpdate({ time, deltaTime });
+        }
+        this.#scene?.traverse((actor) => {
+            actor.lastUpdate({ gpu: this.#gpu, time, deltaTime });
+        });
+        
+        //
+        // update transform
+        //
 
         this.#scene?.traverse((actor) => {
             actor.updateTransform();
         });
+        
+        //
+        // render
+        //
 
         this.render(time, deltaTime);
     }
 
     /**
-     * 
+     *
+     * @param time
+     * @param deltaTime
+     */
+    lastUpdate(time: number, deltaTime: number) {
+        this.#scene?.traverse((actor) => actor.lastUpdate({ gpu: this.#gpu, time, deltaTime }));
+    }
+
+    /**
+     *
      * @param time[sec]
      * @param deltaTime[sec]
      */
@@ -269,7 +291,7 @@ export class Engine {
     }
 
     /**
-     * 
+     *
      * @param time[sec]
      */
     run(time: number) {

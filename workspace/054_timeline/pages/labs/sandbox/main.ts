@@ -987,7 +987,7 @@ const createTransformFeedbackDrivenMesh = () => {
 
 const createGLTFSphereMesh = async (material: Material) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    const mesh: Mesh = gltfActor.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = material;
 
@@ -1207,7 +1207,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
 
     // skinned mesh のはずなので cast
-    const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
+    const skinningMesh: SkinnedMesh = gltfActor.children[0].children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
 
     skinningMesh.name = 'butterfly';

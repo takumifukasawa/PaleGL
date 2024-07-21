@@ -8,10 +8,12 @@ import { Camera } from '@/PaleGL/actors/Camera';
 type OnStartCallback = (args: { actor: Actor; gpu: GPU }) => void;
 type OnFixedUpdateCallback = (args: { actor: Actor; gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
 type OnUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; deltaTime: number }) => void;
+type OnLastUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; deltaTime: number }) => void;;
 
 export type ActorStartArgs = { gpu: GPU };
 export type ActorFixedUpdateArgs = { gpu: GPU; fixedTime: number; fixedDeltaTime: number };
 export type ActorUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
+export type ActorLastUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
 
 export type ActorArgs = { name?: string; type?: ActorType };
 
@@ -22,11 +24,22 @@ export class Actor {
     uuid: number;
     isStarted: boolean = false;
     animator: Animator; // TODO: いよいよcomponentっぽくしたくなってきた
+    parent: Actor | null = null;
+    children: Actor[] = [];
     // lifecycle callback
     private _onStart: OnStartCallback[] = [];
     private _onFixedUpdate: OnFixedUpdateCallback | null = null;
     private _onUpdate: OnUpdateCallback | null = null;
+    private _onLastUpdate: OnLastUpdateCallback | null = null;
     private _enabled: boolean = true;
+    
+    get childCount() {
+        return this.children.length;
+    }
+
+    get hasChild() {
+        return this.childCount > 0;
+    }
 
     set enabled(value: boolean) {
         this._enabled = value;
@@ -37,7 +50,7 @@ export class Actor {
     }
 
     subscribeOnStart(value: OnStartCallback) {
-        this._onStart.push(value)
+        this._onStart.push(value);
     }
 
     // TODO: onStartと同じで配列方式にする
@@ -49,6 +62,10 @@ export class Actor {
     set onUpdate(value: OnUpdateCallback) {
         this._onUpdate = value;
     }
+    
+    set onLastUpdate(value: OnLastUpdateCallback) {
+        this._onLastUpdate = value;
+    }
 
     constructor({ name = '', type = ActorTypes.Null }: ActorArgs = {}) {
         this.name = name;
@@ -59,9 +76,10 @@ export class Actor {
     }
 
     addChild(child: Actor) {
-        this.transform.addChild(child);
-        // this.transform.addChild(child.transform); // NOTE: こっちが正しいはず？
-        child.transform.parent = this.transform;
+        this.children.push(child);
+        // this.transform.addChild(child);
+        // // this.transform.addChild(child.transform); // NOTE: こっちが正しいはず？
+        child.parent = this;
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -114,6 +132,13 @@ export class Actor {
         this.#tryStart({ gpu });
         if (this._onUpdate) {
             this._onUpdate({ actor: this, gpu, time, deltaTime });
+        }
+    }
+
+    lastUpdate({ gpu, time, deltaTime }: ActorLastUpdateArgs) {
+        this.#tryStart({ gpu });
+        if(this._onLastUpdate) {
+            this._onLastUpdate({ actor: this, gpu, time, deltaTime });
         }
     }
 

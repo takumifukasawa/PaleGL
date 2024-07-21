@@ -13,6 +13,15 @@ type PlaneGeometryRawDataOptions = {
     offset?: Vector3;
 };
 
+/**
+ * NOTE: +z方向を向いている板ポリ
+ * @param calculateTangent
+ * @param calculateBinormal
+ * @param flipUvY
+ * @param width
+ * @param height
+ * @param offset
+ */
 export function createPlaneGeometryRawData({
     calculateTangent,
     calculateBinormal,

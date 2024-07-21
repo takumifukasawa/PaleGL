@@ -5,319 +5,56 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Light } from '@/PaleGL/actors/Light.ts';
 import { Scene } from '@/PaleGL/core/Scene.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera.ts';
-import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
-import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
-import { Geometry } from '@/PaleGL/geometries/Geometry.ts';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
-import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
-
-// --------------------------------------------------------------------
-// jsonのproperty名と紐づけ
-// TODO: 短縮系を渡すようにしたい
-// --------------------------------------------------------------------
-
-const PROPERTY_COLOR_R = 'color.r';
-const PROPERTY_COLOR_G = 'color.g';
-const PROPERTY_COLOR_B = 'color.b';
-const PROPERTY_COLOR_A = 'color.a';
-const PROPERTY_INTENSITY = 'intensity';
-// const PROPERTY_BOUNCE_INTENSITY = 'bounceIntensity';
-// const PROPERTY_RANGE = 'range';
-
-const PROPERTY_LOCAL_POSITION_X = 'm_LocalPosition.x';
-const PROPERTY_LOCAL_POSITION_Y = 'm_LocalPosition.y';
-const PROPERTY_LOCAL_POSITION_Z = 'm_LocalPosition.z';
-const PROPERTY_LOCAL_EULER_ANGLES_RAW_X = 'localEulerAnglesRaw.x';
-const PROPERTY_LOCAL_EULER_ANGLES_RAW_Y = 'localEulerAnglesRaw.y';
-const PROPERTY_LOCAL_EULER_ANGLES_RAW_Z = 'localEulerAnglesRaw.z';
-const PROPERTY_LOCAL_SCALE_X = 'm_LocalScale.x';
-const PROPERTY_LOCAL_SCALE_Y = 'm_LocalScale.y';
-const PROPERTY_LOCAL_SCALE_Z = 'm_LocalScale.z';
-const PROPERTY_FIELD_OF_VIEW = 'field of view';
-
-const PROPERTY_MATERIAL_BASE_COLOR_R = 'material._BaseColor.r';
-const PROPERTY_MATERIAL_BASE_COLOR_G = 'material._BaseColor.g';
-const PROPERTY_MATERIAL_BASE_COLOR_B = 'material._BaseColor.b';
-const PROPERTY_MATERIAL_BASE_COLOR_A = 'material._BaseColor.a';
-
-const PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE = 'depthOfFieldFocusDistance';
-
-// --------------------------------------------------------------------
-
-export function buildMarionetterActors(gpu: GPU, scene: MarionetterScene): Actor[] {
-    const actors: Actor[] = [];
-    scene.objects.forEach((obj) => {
-        const { name } = obj;
-        const mfComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshFilter);
-        const mrComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshRenderer);
-        const cameraComponent = obj.components.find((c) => c.type === MarionetterComponentType.Camera);
-        const lightComponent = obj.components.find((c) => c.type === MarionetterComponentType.Light);
-
-        let actor: Actor | null = null;
-
-        if (mrComponent && mfComponent) {
-            const meshFilter = mfComponent as MarionetterMeshFilterComponentInfo;
-            const meshRenderer = mrComponent as MarionetterMeshRendererComponentInfo;
-
-            let geometry: Geometry | null = null;
-            let material: Material | null = null;
-
-            // build geometry
-            switch (meshFilter.meshName) {
-                case 'Cube':
-                    geometry = new BoxGeometry({ gpu });
-                    break;
-                case 'Quad':
-                    geometry = new PlaneGeometry({ gpu });
-                    break;
-            }
-
-            // build material
-            switch (meshRenderer.materialName) {
-                case 'Lit':
-                    material = new GBufferMaterial();
-                    break;
-                default:
-                    // TODO: fallback
-                    material = new GBufferMaterial();
-                    break;
-            }
-
-            if (geometry && material) {
-                actor = new Mesh({ name, geometry, material });
-            }
-        } else if (cameraComponent) {
-            const camera = cameraComponent as MarionetterCameraComponentInfo;
-            if (camera.cameraType === 'Perspective') {
-                actor = new PerspectiveCamera(camera.fov, 1, 0.1, 1000, name);
-            } else {
-                throw `[buildMarionetterActors] invalid camera type: ${camera.cameraType}`;
-            }
-        } else if (lightComponent) {
-            // light
-            const light = lightComponent as MarionetterLightComponentInfo;
-            switch (light.lightType) {
-                case 'Directional':
-                    actor = new DirectionalLight({
-                        name,
-                        intensity: light.intensity,
-                        color: Color.fromHex(light.color),
-                    });
-                    break;
-                default:
-                    throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
-            }
-        } else {
-            // others
-            actor = new Actor({ name });
-        }
-
-        if (actor) {
-            actors.push(actor);
-            actor.transform.scale = new Vector3(
-                obj.transform.localScale.x,
-                obj.transform.localScale.y,
-                obj.transform.localScale.z
-            );
-            actor.transform.rotation.setV(
-                new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
-            );
-            actor.transform.position = new Vector3(
-                obj.transform.localPosition.x,
-                obj.transform.localPosition.y,
-                obj.transform.localPosition.z
-            );
-        }
-    });
-    return actors;
-}
-
-//
-// scene
-//
-
-export type MarionetterScene = {
-    name: string; // shorthand: n
-    objects: MarionetterObjectInfo[]; // shorthand: o
-};
-
-type MarionetterObjectInfo = {
-    name: string; // shorthand: n
-    transform: MarionetterTransformInfo; // shorthand: t
-    components: MarionetterComponentInfoKinds[]; // shorthand: c
-    children: MarionetterObjectInfo[]; // shorthand: o
-};
-
-type MarionetterTransformInfo = {
-    localPosition: { x: number; y: number; z: number }; // shorthand: lp
-    localRotation: { x: number; y: number; z: number }; // shorthand: lr
-    localScale: { x: number; y: number; z: number }; // shorthand: ls
-};
-
-//
-// track
-//
-
-const enum MarionetterTrackInfoType {
-    None,
-    AnimationTrack = 1,
-    LightControlTrack = 2,
-    ActivationControlTrack = 3,
-}
-
-type MarionetterTrackInfo = {
-    targetName: string; // shorthand: tn
-    type: MarionetterTrackInfoType; // shorthand: t
-    clips: MarionetterClipInfoKinds[]; // shorthand: cs
-};
-
-type MarionetterClipInfoKinds = MarionetterAnimationClipInfo | MarionetterLightControlClipInfo;
-
-// NOTE: unity側に合わせる
-const enum MarionetterClipInfoType {
-    None = 0,
-    AnimationClip = 1,
-    LightControlClip = 2,
-    ActivationControlClip = 3,
-}
-
-type MarionetterClipInfoBase = {
-    type: MarionetterClipInfoType; // shorthand: t
-    start: number; // shorthand: s
-    duration: number; // shorthand: d
-};
-
-type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
-    offsetPosition: { x: number; y: number; z: number }; // shorthand: op
-    offsetRotation: { x: number; y: number; z: number }; // shorthand: or
-    bindings: MarionetterClipBinding[]; // shorthand: b
-};
-
-type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
-    bindings: MarionetterClipBinding[]; // shorthand: b
-};
-
-type MarionetterActivationControlClipInfo = MarionetterClipInfoBase;
-
-type MarionetterClipBinding = {
-    propertyName: string; // short hand: n
-    keyframes: MarionetterAnimationClipKeyframe[];
-};
-
-type MarionetterAnimationClipKeyframe = {
-    time: number; // shorthand: t
-    value: number; // shorthand: v
-    inTangent: number; // shorthand: i
-    outTangent: number; // shorthand: o
-};
-
-//
-// components
-//
-
-type MarionetterComponentInfoBase = {
-    type: MarionetterComponentType; // shorthand: t
-};
-
-// unity側に合わせる
-const MarionetterComponentType = {
-    None: 0,
-    PlayableDirector: 1,
-    Light: 2,
-    Camera: 3,
-    MeshRenderer: 4,
-    MeshFilter: 5,
-} as const;
-
-type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
-
-type MarionetterComponentInfoKinds =
-    | MarionetterPlayableDirectorComponentInfo
-    | MarionetterLightComponentInfo
-    | MarionetterCameraComponentInfo
-    | MarionetterMeshRendererComponentInfo
-    | MarionetterMeshFilterComponentInfo;
-
-// unity側に合わせてcomponent情報を追加
-
-export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
-    name: string; // shorthand: n
-    duration: number; // shorthand: d
-    tracks: MarionetterTrackInfo[]; // shorthand: ts
-};
-
-type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
-    lightType: 'Directional' | 'Point' | 'Spot'; // shorthand: l
-    intensity: number; // shorthand: i
-    color: string; // shorthand: c, hex string
-};
-
-type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
-    cameraType: 'Perspective' | 'Orthographic'; // ct
-    isMain: boolean; // shorthand: im
-    fov: number; // shorthand: f
-};
-
-type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase & {
-    materialName: string; // shorthand: mn
-};
-
-type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & {
-    meshName: string; // shorthand: mn
-};
-
-//
-// timeline
-//
-
-export type MarionetterTimeline = {
-    tracks: MarionetterTimelineTrack[];
-    execute: (time: number) => void;
-};
-
-type MarionetterTimelineTrack = {
-    targetName: string;
-    // targetObj: Actor | null;
-    clips: MarionetterClipKinds[];
-    execute: (time: number) => void;
-};
-
-type MarionetterClipKinds = MarionetterAnimationClip | MarionetterLightControlClip | MarionetterActivationControlClip;
-
-const enum MarionetterAnimationClipType {
-    AnimationClip = 0,
-    LightControlClip = 1,
-    ActivationControlClip = 2,
-}
-
-type MarionetterAnimationClip = {
-    type: MarionetterAnimationClipType.AnimationClip;
-    clipInfo: MarionetterAnimationClipInfo;
-    execute: (actor: Actor, time: number) => void;
-};
-
-type MarionetterLightControlClip = {
-    type: MarionetterAnimationClipType.LightControlClip;
-    clipInfo: MarionetterLightControlClipInfo;
-    execute: (actor: Actor, time: number) => void;
-};
-
-type MarionetterActivationControlClip = {
-    type: MarionetterAnimationClipType.ActivationControlClip;
-    clipInfo: MarionetterActivationControlClipInfo;
-    execute: () => void;
-};
+import {
+    MarionetterActivationControlClip,
+    MarionetterActivationControlClipInfo,
+    MarionetterAnimationClip,
+    MarionetterAnimationClipInfo,
+    MarionetterAnimationClipType,
+    MarionetterClipInfoKinds,
+    MarionetterClipInfoType,
+    MarionetterClipKinds,
+    MarionetterLightControlClip,
+    MarionetterLightControlClipInfo,
+    MarionetterPlayableDirectorComponentInfo,
+    MarionetterTimeline,
+    MarionetterTimelineTrack,
+    MarionetterTrackInfoType,
+} from '@/Marionetter/types';
+import {
+    PROPERTY_COLOR_A,
+    PROPERTY_COLOR_B,
+    PROPERTY_COLOR_G,
+    PROPERTY_COLOR_R,
+    PROPERTY_FIELD_OF_VIEW,
+    PROPERTY_INTENSITY,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_X,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_Y,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_Z,
+    PROPERTY_LOCAL_POSITION_X,
+    PROPERTY_LOCAL_POSITION_Y,
+    PROPERTY_LOCAL_POSITION_Z,
+    PROPERTY_LOCAL_SCALE_X,
+    PROPERTY_LOCAL_SCALE_Y,
+    PROPERTY_LOCAL_SCALE_Z,
+    PROPERTY_MATERIAL_BASE_COLOR_A,
+    PROPERTY_MATERIAL_BASE_COLOR_B,
+    PROPERTY_MATERIAL_BASE_COLOR_G,
+    PROPERTY_MATERIAL_BASE_COLOR_R,
+    PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE,
+} from '@/Marionetter/constants.ts';
+import { Rotator } from '@/PaleGL/math/Rotator.ts';
+import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
+import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
 /**
  *
  * @param marionetterPlayableDirectorComponentInfo
  */
 export function buildMarionetterTimeline(
-    scene: Scene,
-    marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo
+    actors: Actor[],
+    marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo,
+    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrack[] = [];
 
@@ -325,8 +62,8 @@ export function buildMarionetterTimeline(
     for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
         const track = marionetterPlayableDirectorComponentInfo.tracks[i];
         const { targetName, clips } = track;
-        const targetActor = scene.find(targetName);
-        const marionetterClips = createMarionetterClips(clips);
+        const targetActor = Scene.find(actors, targetName); // TODO: sceneを介すさなくてもいい気がする
+        const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
         if (!targetActor) {
             console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
         }
@@ -379,14 +116,22 @@ export function buildMarionetterTimeline(
  *
  * @param clips
  */
-function createMarionetterClips(clips: MarionetterClipInfoKinds[]): MarionetterClipKinds[] {
+function createMarionetterClips(
+    clips: MarionetterClipInfoKinds[],
+    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
+): MarionetterClipKinds[] {
     const marionetterClips = [] as MarionetterClipKinds[];
 
     for (let i = 0; i < clips.length; i++) {
         const clip = clips[i];
         switch (clip.type) {
             case MarionetterClipInfoType.AnimationClip:
-                marionetterClips.push(createMarionetterAnimationClip(clip as MarionetterAnimationClipInfo));
+                marionetterClips.push(
+                    createMarionetterAnimationClip(
+                        clip as MarionetterAnimationClipInfo,
+                        needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                    )
+                );
                 break;
             case MarionetterClipInfoType.LightControlClip:
                 marionetterClips.push(createMarionetterLightControlClip(clip as MarionetterLightControlClipInfo));
@@ -408,14 +153,17 @@ function createMarionetterClips(clips: MarionetterClipInfoKinds[]): MarionetterC
  *
  * @param animationClip
  */
-function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipInfo): MarionetterAnimationClip {
+function createMarionetterAnimationClip(
+    animationClip: MarionetterAnimationClipInfo,
+    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
+): MarionetterAnimationClip {
     // actorに直接valueを割り当てる関数
     const execute = (actor: Actor, time: number) => {
         let hasLocalPosition: boolean = false;
         let hasLocalRotationEuler: boolean = false;
         let hasLocalScale: boolean = false;
         const localPosition: Vector3 = Vector3.zero;
-        const localRotationEuler: Vector3 = Vector3.zero;
+        const localRotationEulerDegree: Vector3 = Vector3.zero;
         const localScale: Vector3 = Vector3.one;
 
         const { start, bindings } = animationClip;
@@ -439,17 +187,18 @@ function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipI
                     break;
                 case PROPERTY_LOCAL_EULER_ANGLES_RAW_X:
                     hasLocalRotationEuler = true;
-                    localRotationEuler.x = value;
+                    localRotationEulerDegree.x = value;
                     break;
                 case PROPERTY_LOCAL_EULER_ANGLES_RAW_Y:
                     hasLocalRotationEuler = true;
-                    localRotationEuler.y = value;
+                    localRotationEulerDegree.y = value;
                     break;
                 case PROPERTY_LOCAL_EULER_ANGLES_RAW_Z:
                     hasLocalRotationEuler = true;
-                    localRotationEuler.z = value;
+                    localRotationEulerDegree.z = value;
                     break;
                 case PROPERTY_LOCAL_SCALE_X:
+                    console.log(actor.name, localRotationEulerDegree.x, time - start, keyframes, value);
                     hasLocalScale = true;
                     localScale.x = value;
                     break;
@@ -485,7 +234,18 @@ function createMarionetterAnimationClip(animationClip: MarionetterAnimationClipI
         }
 
         if (hasLocalRotationEuler) {
-            actor.transform.rotation.setV(localRotationEuler);
+            actor.transform.rotation = Rotator.fromQuaternion(
+                resolveInvertRotationLeftHandAxisToRightHandAxis(
+                    Quaternion.fromEulerDegrees(
+                        localRotationEulerDegree.x,
+                        localRotationEulerDegree.y,
+                        localRotationEulerDegree.z
+                    ),
+                    actor,
+                    needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                )
+            );
+            // actor.transform.rotation.setV(localRotationEulerDegree);
         }
 
         if (hasLocalScale) {

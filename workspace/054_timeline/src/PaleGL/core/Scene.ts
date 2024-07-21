@@ -30,12 +30,16 @@ export class Scene {
     find(name: string) {
         return this.children.find((child) => child.name === name);
     }
+    
+    static find(actors: Actor[], name: string) {
+        return actors.find((child) => child.name === name);
+    }
 
     #recursiveTraverseActor(actor: Actor, execFunc: TraverseFunc) {
         execFunc(actor);
-        if (actor.transform.hasChild) {
-            for (let i = 0; i < actor.transform.children.length; i++) {
-                this.#recursiveTraverseActor(actor.transform.children[i], execFunc);
+        if (actor.hasChild) {
+            for (let i = 0; i < actor.children.length; i++) {
+                this.#recursiveTraverseActor(actor.children[i], execFunc);
                 // this.#recursiveTraverseActor(actor.transform.children[i].actor, execFunc)
             }
         }

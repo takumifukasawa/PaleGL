@@ -30,6 +30,7 @@ import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
 // others
 import {
     RenderTargetTypes,
+    TextureDepthPrecisionType,
     // TextureFilterTypes,
     // TextureFilterTypes, TextureWrapTypes,
 } from '@/PaleGL/constants';
@@ -45,15 +46,17 @@ import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
 import { GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { wait } from '@/utilities/wait.ts';
+import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
+// import { Mesh } from '@/PaleGL/actors/Mesh.ts';
+import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import {
-    buildMarionetterActors,
-    buildMarionetterTimeline,
-    MarionetterPlayableDirectorComponentInfo,
+    Marionetter,
+    // MarionetterPlayableDirectorComponentInfo,
     MarionetterScene,
     MarionetterTimeline,
-} from '@/Marionetter/timeline.ts';
-import { createMarionetter, Marionetter } from '@/Marionetter/createMarionetter.ts';
-import {Mesh} from "@/PaleGL/actors/Mesh.ts";
+} from '@/Marionetter/types';
+import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
+// import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 // import glsl from 'vite-plugin-glsl';
 // import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 // import { Texture } from '@/PaleGL/core/Texture.ts';
@@ -173,15 +176,17 @@ const initMarionetter = () => {
 };
 
 const buildScene = (sceneJson: MarionetterScene) => {
-    const actors = buildMarionetterActors(gpu, sceneJson);
+    const res = buildMarionetterScene(gpu, sceneJson, true);
+    const { actors} = res;
+    marionetterTimeline = res.marionetterTimeline;
+    
     for (let i = 0; i < actors.length; i++) {
         captureScene.add(actors[i]);
     }
 
     captureSceneCamera = captureScene.find('MainCamera') as PerspectiveCamera;
     const directionalLight = captureScene.find('DirectionalLight') as DirectionalLight;
-    const plane = captureScene.find('Plane') as Mesh;
-    console.log("hogehoge", plane)
+    // const plane = captureScene.find('Plane') as Mesh;
 
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
@@ -199,6 +204,36 @@ const buildScene = (sceneJson: MarionetterScene) => {
         // orbitCameraController.fixedUpdate();
     };
 
+    const spotLight = captureScene.find('SpotLight') as SpotLight;
+    if (spotLight && spotLight.shadowCamera) {
+        spotLight.shadowCamera.visibleFrustum = true;
+        spotLight.castShadow = true;
+        spotLight.shadowCamera.near = 0.1;
+        spotLight.shadowCamera.far = spotLight.distance;
+        (spotLight.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
+        spotLight.shadowMap = new RenderTarget({
+            gpu,
+            width: 1024,
+            height: 1024,
+            type: RenderTargetTypes.Depth,
+            depthPrecision: TextureDepthPrecisionType.High,
+        });
+        // spotLight.transform.rotation = Rotator.fromRadian(0, 0, 0);
+    }
+    // spotLight.transform.rotation = spotLight.transform.rotation.invert();
+    // spotLight.lastUpdate = () => {
+    //     spotLight.transform.rotation = spotLight.transform.rotation.invert();
+    //     // spotLight.transform.rotation = spotLight.transform.rotation;
+    // };
+    //spotLight.transform.position = new Vector3(0, 3, 0);
+    //spotLight.transform.lookAt(new Vector3(0, 0, 0));
+    //spotLight.transform.rotation = Rotator.fromRadian(-90, 0, 0);
+    //console.log("rrr", spotLight.transform.rotation)
+
+    // const plane = captureScene.find('Plane') as Mesh;
+    // plane.transform.rotation = Rotator.fromDegree(0, 0, 0);
+    // plane.material = new UnlitMaterial({emissiveColor: Color.fromRGB(255, 255, 255)});
+
     // const directionalLight = new DirectionalLight({
     //     name: 'DirectionalLight',
     //     intensity: 1.2,
@@ -208,7 +243,7 @@ const buildScene = (sceneJson: MarionetterScene) => {
 
     // shadows
     // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
-    if (directionalLight.shadowCamera) {
+    if (directionalLight && directionalLight.shadowCamera) {
         // directionalLight.shadowCamera.visibleFrustum = true;
         directionalLight.castShadow = true;
         directionalLight.shadowCamera.near = 1;
@@ -222,22 +257,22 @@ const buildScene = (sceneJson: MarionetterScene) => {
             height: 1024,
             type: RenderTargetTypes.Depth,
         });
-    }
 
-    directionalLight.subscribeOnStart(({ actor }) => {
-        actor.transform.setTranslation(new Vector3(-8, 8, -2));
-        actor.transform.lookAt(new Vector3(0, 0, 0));
-        // const lightActor = actor as DirectionalLight;
-        // lightActor.castShadow = true;
-        // // lightActor.castShadow = false;
-        // if (lightActor.shadowCamera) {
-        //     lightActor.shadowCamera.near = 1;
-        //     lightActor.shadowCamera.far = 30;
-        //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
-        //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
-        // }
-    });
-    // captureScene.add(directionalLight);
+        directionalLight.subscribeOnStart(({ actor }) => {
+            actor.transform.setTranslation(new Vector3(-8, 8, -2));
+            actor.transform.lookAt(new Vector3(0, 0, 0));
+            // const lightActor = actor as DirectionalLight;
+            // lightActor.castShadow = true;
+            // // lightActor.castShadow = false;
+            // if (lightActor.shadowCamera) {
+            //     lightActor.shadowCamera.near = 1;
+            //     lightActor.shadowCamera.far = 30;
+            //     (lightActor.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -10, 10, -10, 10);
+            //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
+            // }
+        });
+        // captureScene.add(directionalLight);
+    }
 
     const cameraPostProcess = new PostProcess();
 
@@ -268,29 +303,30 @@ const buildScene = (sceneJson: MarionetterScene) => {
     // TODO: set post process いらないかも
     captureSceneCamera.setPostProcess(cameraPostProcess);
 
-    parseScene(sceneJson);
+    // parseScene(sceneJson);
 
-    console.log(captureScene);
+    console.log('scene', actors);
 
     initDebugger({
         bufferVisualizerPass,
-        directionalLight,
     });
 };
 
-const parseScene = (sceneJson: MarionetterScene) => {
-    const playableDirectorComponentInfo = sceneJson.objects[0]
-        .components[0] as MarionetterPlayableDirectorComponentInfo;
-    marionetterTimeline = buildMarionetterTimeline(captureScene, playableDirectorComponentInfo);
-};
+// const parseScene = (sceneJson: MarionetterScene) => {
+//     const playableDirectorComponentInfo = sceneJson.objects[0]
+//         .components[0] as MarionetterPlayableDirectorComponentInfo;
+//     marionetterTimeline = buildMarionetterTimeline(captureScene, playableDirectorComponentInfo);
+// };
 
 // TODO: この処理はビルド時には捨てたい
 const initHotReloadAndParseScene = () => {
     const hotReloadScene = () => {
-        console.log('hot reload scene...')
+        console.log('hot reload scene...');
         void fetch('./assets/data/scene-hot-reload.json').then(async (res) => {
             const sceneJson = (await res.json()) as unknown as MarionetterScene;
-            parseScene(sceneJson);
+            // TODO: reload hot timeline
+            console.log(sceneJson);
+            // parseScene(sceneJson);
         });
     };
     marionetter.setHotReloadCallback(() => {
@@ -310,10 +346,8 @@ const main = async () => {
     console.log(sceneJsonUrl);
 
     buildScene(sceneJsonUrl as unknown as MarionetterScene);
-    
+
     renderer.fogPass.blendRate = 0;
-    
-    console.log(captureScene)
 
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         document.addEventListener('keydown', (e) => {
@@ -368,13 +402,7 @@ const main = async () => {
     requestAnimationFrame(tick);
 };
 
-function initDebugger({
-    bufferVisualizerPass,
-    directionalLight,
-}: {
-    bufferVisualizerPass: BufferVisualizerPass;
-    directionalLight: DirectionalLight;
-}) {
+function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVisualizerPass }) {
     debuggerGUI = new DebuggerGUI();
 
     //
@@ -455,58 +483,6 @@ function initDebugger({
     //     );
     //     bufferVisualizerPass.material.uniforms.setValue('uFogTexture', renderer.fogPass.renderTarget.read.texture);
     // };
-
-    //
-    // directional light
-    //
-
-    debuggerGUI.addBorderSpacer();
-
-    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
-
-    directionalLightDebuggerGroup.addSliderDebugger({
-        label: 'intensity',
-        minValue: 0,
-        maxValue: 4,
-        stepValue: 0.001,
-        initialValue: directionalLight.intensity,
-        onChange: (value) => {
-            directionalLight.intensity = value;
-        },
-    });
-
-    directionalLightDebuggerGroup.addSliderDebugger({
-        label: 'pos x',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: directionalLight.transform.position.x,
-        onChange: (value) => {
-            directionalLight.transform.position.x = value;
-        },
-    });
-
-    directionalLightDebuggerGroup.addSliderDebugger({
-        label: 'pos y',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: directionalLight.transform.position.y,
-        onChange: (value) => {
-            directionalLight.transform.position.y = value;
-        },
-    });
-
-    directionalLightDebuggerGroup.addSliderDebugger({
-        label: 'pos z',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: directionalLight.transform.position.z,
-        onChange: (value) => {
-            directionalLight.transform.position.z = value;
-        },
-    });
 
     //
     // ssao

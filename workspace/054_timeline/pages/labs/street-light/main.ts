@@ -446,7 +446,7 @@ const createStreetLightActor = async () => {
 const createGLTFSphereMesh = async (material: Material) => {
     // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'sphere-32x32.gltf' });
-    const mesh: Mesh = gltfActor.transform.children[0] as Mesh;
+    const mesh: Mesh = gltfActor.children[0] as Mesh;
     mesh.castShadow = true;
     mesh.material = material;
 
@@ -666,7 +666,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const gltfActor = await loadGLTF({ gpu, dir: ASSET_DIR, path: 'butterfly-forward-thin-2.gltf' });
 
     // skinned mesh のはずなので cast
-    const skinningMesh: SkinnedMesh = gltfActor.transform.children[0].transform.children[0] as SkinnedMesh;
+    const skinningMesh: SkinnedMesh = gltfActor.children[0].children[0] as SkinnedMesh;
 
     skinningMesh.name = 'butterfly';
 
@@ -866,14 +866,13 @@ const main = async () => {
 
     streetFloorActor = await createStreetFloorActor();
     captureScene.add(streetFloorActor);
-    streetFloorActor.transform.children.forEach((child) => {
+    streetFloorActor.children.forEach((child) => {
         if (child.type === ActorTypes.Mesh) {
             (child as Mesh).castShadow = true;
         }
     });
-    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uMetallic', 0.5);
-    (streetFloorActor?.transform.children[0] as Mesh).materials[0].uniforms.setValue('uRoughness', 1);
-    console.log('streetFloorActor', streetFloorActor);
+    (streetFloorActor?.children[0] as Mesh).materials[0].uniforms.setValue('uMetallic', 0.5);
+    (streetFloorActor?.children[0] as Mesh).materials[0].uniforms.setValue('uRoughness', 1);
 
     //
     // street light

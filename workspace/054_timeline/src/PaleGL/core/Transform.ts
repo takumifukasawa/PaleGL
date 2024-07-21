@@ -11,8 +11,8 @@ import { Actor } from '@/PaleGL/actors/Actor';
 // - dirtyNeedsUpdate flag
 export class Transform {
     actor: Actor;
-    parent: Transform | null = null;
-    children: Actor[] = [];
+    // parent: Transform | null = null;
+    // children: Actor[] = [];
     #inverseWorldMatrix: Matrix4 = Matrix4.identity;
     #worldMatrix: Matrix4 = Matrix4.identity;
     #localMatrix: Matrix4 = Matrix4.identity;
@@ -22,13 +22,13 @@ export class Transform {
     lookAtTarget: Vector3 | null = null; // world v
     #normalMatrix: Matrix4 = Matrix4.identity;
 
-    get childCount() {
-        return this.children.length;
-    }
+    // get childCount() {
+    //     return this.children.length;
+    // }
 
-    get hasChild() {
-        return this.childCount > 0;
-    }
+    // get hasChild() {
+    //     return this.childCount > 0;
+    // }
 
     get inverseWorldMatrix() {
         return this.#inverseWorldMatrix;
@@ -69,9 +69,9 @@ export class Transform {
     // addChild(child: Transform) {
     //     this.children.push(child);
     // }
-    addChild(child: Actor) {
-        this.children.push(child);
-    }
+    // addChild(child: Actor) {
+    //     this.children.push(child);
+    // }
 
     // TODO: 引数でworldMatrixとdirty_flagを渡すべきな気がする
     updateMatrix() {
@@ -87,7 +87,7 @@ export class Transform {
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
         } else {
             const translationMatrix = Matrix4.translationMatrix(this.position);
-            const rotationAxes = this.rotation.getAxes();
+            const rotationAxes = this.rotation.getAxesDegrees();
             const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
             const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
             const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
@@ -96,8 +96,8 @@ export class Transform {
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
         }
-        this.#worldMatrix = this.parent
-            ? Matrix4.multiplyMatrices(this.parent.worldMatrix, this.#localMatrix)
+        this.#worldMatrix = this.actor.parent
+            ? Matrix4.multiplyMatrices(this.actor.parent.transform.worldMatrix, this.#localMatrix)
             : this.#localMatrix;
         this.#inverseWorldMatrix = this.#worldMatrix.clone().invert();
 

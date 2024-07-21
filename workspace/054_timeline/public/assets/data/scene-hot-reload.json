@@ -12,7 +12,8 @@
         "localRotation": {
           "x": 0.0,
           "y": 0.0,
-          "z": 0.0
+          "z": 0.0,
+          "w": -1.0
         },
         "localScale": {
           "x": 1.0,
@@ -27,7 +28,7 @@
           "tracks": [
             {
               "type": 1,
-              "targetName": "MainCamera",
+              "targetName": "Plane",
               "clips": [
                 {
                   "offsetPosition": {
@@ -42,17 +43,63 @@
                   },
                   "bindings": [
                     {
-                      "propertyName": "field of view",
+                      "propertyName": "localEulerAnglesRaw.x",
                       "keyframes": [
                         {
-                          "time": 0.6333333,
-                          "value": 80.0,
+                          "time": 0.0166666675,
+                          "value": -60.0,
                           "inTangent": 0.0,
                           "outTangent": 0.0
                         },
                         {
-                          "time": 1.15,
-                          "value": 50.0,
+                          "time": 0.766666651,
+                          "value": -30.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.y",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.85,
+                          "value": 3.3182025,
+                          "inTangent": -8.607199,
+                          "outTangent": -8.607199
+                        },
+                        {
+                          "time": 1.26666665,
+                          "value": 10.9024515,
+                          "inTangent": -15.65111,
+                          "outTangent": -15.65111
+                        },
+                        {
+                          "time": 1.56666672,
+                          "value": 14.534831,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.z",
+                      "keyframes": [
+                        {
+                          "time": 0.6666667,
+                          "value": -10.1956043,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 1.4,
+                          "value": -20.9053345,
                           "inTangent": 0.0,
                           "outTangent": 0.0
                         }
@@ -62,27 +109,6 @@
                   "type": 1,
                   "start": 0.0,
                   "duration": 2.0
-                }
-              ]
-            },
-            {
-              "type": 3,
-              "targetName": "Plane",
-              "clips": [
-                {
-                  "type": 3,
-                  "start": 0.0,
-                  "duration": 0.55
-                },
-                {
-                  "type": 3,
-                  "start": 0.733333349,
-                  "duration": 0.55
-                },
-                {
-                  "type": 3,
-                  "start": 1.45,
-                  "duration": 0.55
                 }
               ]
             }
@@ -101,9 +127,10 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": -50.0,
-          "y": -330.0,
-          "z": 0.0
+          "x": 0.408217877,
+          "y": -0.234569684,
+          "z": -0.109381631,
+          "w": -0.8754261
         },
         "localScale": {
           "x": 1.0,
@@ -115,7 +142,7 @@
         {
           "lightType": "Directional",
           "intensity": 1.0,
-          "color": "17E1C8129FF",
+          "color": "FFFFFFFF",
           "type": 2
         }
       ],
@@ -125,14 +152,15 @@
       "name": "MainCamera",
       "transform": {
         "localPosition": {
-          "x": 1.84,
+          "x": 0.0,
           "y": 1.0,
-          "z": 7.32
+          "z": 15.52
         },
         "localRotation": {
           "x": 0.0,
           "y": 0.0,
-          "z": 0.0
+          "z": 0.0,
+          "w": -1.0
         },
         "localScale": {
           "x": 1.0,
@@ -159,19 +187,27 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": -90.0,
-          "y": 0.0,
-          "z": 0.0
+          "x": 0.3776155,
+          "y": 0.0283742025,
+          "z": 0.0800823644,
+          "w": -0.9220566
         },
         "localScale": {
-          "x": 20.0,
-          "y": 20.0,
-          "z": 20.0
+          "x": 6.0,
+          "y": 6.0,
+          "z": 6.0
         }
       },
       "components": [
         {
-          "materialName": "LitGray",
+          "materialName": "Plane",
+          "material": {
+            "color": "FFFFFFFF",
+            "metallic": 0.0,
+            "roughness": 0.0,
+            "name": "Plane",
+            "type": 1
+          },
           "type": 4
         },
         {
@@ -180,6 +216,141 @@
         }
       ],
       "children": []
+    },
+    {
+      "name": "SpotLight",
+      "transform": {
+        "localPosition": {
+          "x": -7.453066E-07,
+          "y": 3.84,
+          "z": 1.79965511E-07
+        },
+        "localRotation": {
+          "x": 0.139923155,
+          "y": 0.6076664,
+          "z": 0.596404433,
+          "w": -0.505435348
+        },
+        "localScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
+      },
+      "components": [
+        {
+          "range": 8.310608,
+          "innerSpotAngle": 33.8989449,
+          "spotAngle": 76.37132,
+          "lightType": "Spot",
+          "intensity": 49.88,
+          "color": "FFFFFFFF",
+          "type": 2
+        }
+      ],
+      "children": []
+    },
+    {
+      "name": "GameObject",
+      "transform": {
+        "localPosition": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "localRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": -1.0
+        },
+        "localScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
+      },
+      "components": [],
+      "children": [
+        {
+          "name": "Cube (1)",
+          "transform": {
+            "localPosition": {
+              "x": 0.65,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "localRotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": -1.0
+            },
+            "localScale": {
+              "x": 0.4,
+              "y": 0.4,
+              "z": 0.4
+            }
+          },
+          "components": [
+            {
+              "materialName": "Lit",
+              "material": {
+                "color": "808080FF",
+                "metallic": 0.0,
+                "roughness": 0.5,
+                "name": "Lit",
+                "type": 1
+              },
+              "type": 4
+            },
+            {
+              "meshName": "Cube",
+              "type": 5
+            }
+          ],
+          "children": []
+        },
+        {
+          "name": "Cube",
+          "transform": {
+            "localPosition": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "localRotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": -1.0
+            },
+            "localScale": {
+              "x": 1.0,
+              "y": 0.2,
+              "z": 0.2
+            }
+          },
+          "components": [
+            {
+              "materialName": "Lit",
+              "material": {
+                "color": "808080FF",
+                "metallic": 0.0,
+                "roughness": 0.5,
+                "name": "Lit",
+                "type": 1
+              },
+              "type": 4
+            },
+            {
+              "meshName": "Cube",
+              "type": 5
+            }
+          ],
+          "children": []
+        }
+      ]
     }
   ]
 }

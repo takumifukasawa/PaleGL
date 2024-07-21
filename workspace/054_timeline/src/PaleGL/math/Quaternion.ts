@@ -31,41 +31,8 @@ export class Quaternion {
     // ref:
     // - https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
     // - https://github.com/infusion/Quaternion.js/blob/master/quaternion.js
+    // - https://qiita.com/aa_debdeb/items/3d02e28fb9ebfa357eaf
     toEulerRadian() {
-        // tmp
-        // const x = this.x;
-        // const y = this.y;
-        // const z = this.z;
-        // const w = this.w;
-        // const t = 2 * (w * y - z * x);
-        // return {
-        //     // X-axis rotation
-        //     x: Math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y)),
-        //     // Y-axis rotation
-        //     y: t >= 1 ? Math.PI / 2 : t <= -1 ? -Math.PI / 2 : Math.asin(t),
-        //     // Z-axis rotation
-        //     z: Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)),
-        // };
-
-        // tmp2
-        // const sinr_cosp = 2 * (this.w * this.x + this.y * this.z);
-        // const cosr_cosp = 1 - 2 * (this.x * this.x + this.y * this.y);
-        // const roll = Math.atan2(sinr_cosp, cosr_cosp);
-        //
-        // const sinp = Math.sqrt(2 * (this.w * this.y - this.x * this.z));
-        // const cosp =  Math.sqrt(1 - 2 * (this.w * this.y + this.x * this.z));
-        // const pitch = Math.atan2(sinp, cosp) - Math.PI / 2;
-        //
-        // const siny_cosp = 2 * (this.w * this.z + this.x * this.y);
-        // const cosy_cosp = 1 - 2 * (this.y * this.y + this.z * this.z);
-        // const yaw = Math.atan2(siny_cosp, cosy_cosp);
-        //
-        // return {
-        //     x: roll,
-        //     y: pitch,
-        //     z: yaw,
-        // };
-
         const x = this.x;
         const y = this.y;
         const z = this.z;
@@ -73,6 +40,7 @@ export class Quaternion {
         const wx = w * x;
         const wy = w * y;
         const wz = w * z;
+        const ww = w * w;
         const xx = x * x;
         const xy = x * y;
         const xz = x * z;
@@ -80,19 +48,25 @@ export class Quaternion {
         const yz = y * z;
         const zz = z * z;
 
+        const isOtherWise = Math.cos(x) === 0;
+
         const asin = (t: number) => {
             // prettier-ignore
             return t >= 1 ? Math.PI / 2 : (t <= -1 ? -Math.PI / 2 : Math.asin(t));
         };
 
         return {
-            x: -Math.atan2(2 * (xy - wz), 1 - 2 * (xx + zz)),
-            y: asin(2 * (yz + wx)), // default
-            z: -Math.atan2(2 * (xz - wy), 1 - 2 * (xx + yy)),
+            // x: -Math.atan2(2 * (xy - wz), 1 - 2 * (xx + zz)),
+            // y: asin(2 * (yz + wx)), // default
+            // z: -Math.atan2(2 * (xz - wy), 1 - 2 * (xx + yy)),
+            x: asin(2 * yz + 2 * wx),
+            y: !isOtherWise ? Math.atan2(-(2 * xz - 2 * wy), 2 * ww + 2 * zz - 1) : 0,
+            z: !isOtherWise
+                ? Math.atan2(-(2 * xy - 2 * wz), 2 * ww + 2 * yy - 1)
+                : Math.atan2(2 * xy + 2 * wz, 2 * ww + 2 * xx - 1),
         };
     }
 
-    // degree
     toEulerDegree() {
         const rad = this.toEulerRadian();
         return {
@@ -100,6 +74,26 @@ export class Quaternion {
             y: (rad.y * 180) / Math.PI,
             z: (rad.z * 180) / Math.PI,
         };
+    }
+
+    static fromEulerRadians(x: number, y: number, z: number) {
+        const cxh = Math.cos(x / 2);
+        const sxh = Math.sin(x / 2);
+        const cyh = Math.cos(y / 2);
+        const syh = Math.sin(y / 2);
+        const czh = Math.cos(z / 2);
+        const szh = Math.sin(z / 2);
+
+        const qx = -cxh * syh * szh + sxh * cyh * czh;
+        const qy = cxh * syh * czh + sxh * cyh * szh;
+        const qz = sxh * syh * czh + cxh * cyh * szh;
+        const qw = -sxh * syh * szh + cxh * cyh * czh;
+
+        return new Quaternion(qx, qy, qz, qw);
+    }
+
+    static fromEulerDegrees(x: number, y: number, z: number) {
+        return Quaternion.fromEulerRadians((x * Math.PI) / 180, (y * Math.PI) / 180, (z * Math.PI) / 180);
     }
 
     toMatrix4() {
@@ -125,6 +119,10 @@ export class Quaternion {
             2 * (xz - wy), 2 * (yz + wx), 1 - 2 * (xx + yy), 0,
             0, 0, 0, 1
         );
+    }
+
+    invertAxis() {
+        return new Quaternion(-this.x, -this.y, -this.z, this.w);
     }
 
     static identity() {

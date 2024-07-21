@@ -1,35 +1,11 @@
-const MarionetterReceiveDataType = {
-    SeekTimeline: 'seekTimeline',
-    ExportScene: 'exportScene',
-    ExportHotReloadScene: 'exportHotReloadScene',
-} as const;
+import {tryParseJsonString} from "@/Marionetter/buildMarionetterScene.ts";
+import {Marionetter, MarionetterArgs, MarionetterReceiveData, MarionetterReceiveDataType} from "@/Marionetter/types";
 
-type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
-
-type MarionetterReceiveData = {
-    type: MarionetterReceiveDataType;
-    currentTime: number;
-};
-
-export function tryParseJsonString<T>(str: string) {
-    let json: T | null = null;
-    try {
-        json = JSON.parse(str) as T;
-    } catch (e) {
-        throw new Error('Failed to parse JSON string');
-    }
-    return json;
-}
-
-export type Marionetter = {
-    connect: () => void;
-    getCurrentTime: () => number;
-    setHotReloadCallback: (callback: () => void) => void;
-};
-
-
-type MarionetterArgs = { port?: number, showLog?: boolean };
-
+/**
+ * 
+ * @param port
+ * @param showLog
+ */
 export function createMarionetter({ port = 8080, showLog = false}: MarionetterArgs = {}): Marionetter {
     let currentTime: number = 0;
     let onHotReloadCallback: (() => void) | null = null;
