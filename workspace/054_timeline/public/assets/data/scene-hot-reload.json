@@ -111,6 +111,95 @@
                   "duration": 2.0
                 }
               ]
+            },
+            {
+              "type": 1,
+              "targetName": "SpotLight",
+              "clips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "bindings": [
+                    {
+                      "propertyName": "localEulerAnglesRaw.x",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": -58.014,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.y",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": -49.437,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.z",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 48.267,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.x",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.y",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 4.64,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.z",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ],
+                  "type": 1,
+                  "start": 0.0,
+                  "duration": 2.0
+                }
+              ]
             }
           ],
           "type": 1
@@ -187,10 +276,10 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.3776155,
-          "y": 0.0283742025,
-          "z": 0.0800823644,
-          "w": -0.9220566
+          "x": 0.498022228,
+          "y": 0.0444280766,
+          "z": 0.07695168,
+          "w": -0.8625998
         },
         "localScale": {
           "x": 6.0,
@@ -221,15 +310,15 @@
       "name": "SpotLight",
       "transform": {
         "localPosition": {
-          "x": -7.453066E-07,
-          "y": 3.84,
-          "z": 1.79965511E-07
+          "x": 0.0,
+          "y": 4.64,
+          "z": 0.0
         },
         "localRotation": {
-          "x": 0.139923155,
-          "y": 0.6076664,
-          "z": 0.596404433,
-          "w": -0.505435348
+          "x": 0.551506162,
+          "y": 0.153648466,
+          "z": -0.1397623,
+          "w": -0.807898343
         },
         "localScale": {
           "x": 1.0,
@@ -241,7 +330,7 @@
         {
           "range": 8.310608,
           "innerSpotAngle": 33.8989449,
-          "spotAngle": 76.37132,
+          "spotAngle": 45.1697235,
           "lightType": "Spot",
           "intensity": 49.88,
           "color": "FFFFFFFF",
