@@ -24,184 +24,8 @@
       "components": [
         {
           "name": "MainTimeline",
-          "duration": 1.999999999999,
-          "tracks": [
-            {
-              "type": 1,
-              "targetName": "Plane",
-              "clips": [
-                {
-                  "offsetPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "offsetRotation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "bindings": [
-                    {
-                      "propertyName": "localEulerAnglesRaw.x",
-                      "keyframes": [
-                        {
-                          "time": 0.0166666675,
-                          "value": -60.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.766666651,
-                          "value": -30.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.y",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 0.85,
-                          "value": 3.3182025,
-                          "inTangent": -8.607199,
-                          "outTangent": -8.607199
-                        },
-                        {
-                          "time": 1.26666665,
-                          "value": 10.9024515,
-                          "inTangent": -15.65111,
-                          "outTangent": -15.65111
-                        },
-                        {
-                          "time": 1.56666672,
-                          "value": 14.534831,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.z",
-                      "keyframes": [
-                        {
-                          "time": 0.6666667,
-                          "value": -10.1956043,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        },
-                        {
-                          "time": 1.4,
-                          "value": -20.9053345,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    }
-                  ],
-                  "type": 1,
-                  "start": 0.0,
-                  "duration": 2.0
-                }
-              ]
-            },
-            {
-              "type": 1,
-              "targetName": "SpotLight",
-              "clips": [
-                {
-                  "offsetPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "offsetRotation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                  },
-                  "bindings": [
-                    {
-                      "propertyName": "localEulerAnglesRaw.x",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": -58.014,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.y",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": -49.437,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "localEulerAnglesRaw.z",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 48.267,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.x",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.y",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 4.64,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    },
-                    {
-                      "propertyName": "m_LocalPosition.z",
-                      "keyframes": [
-                        {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
-                        }
-                      ]
-                    }
-                  ],
-                  "type": 1,
-                  "start": 0.0,
-                  "duration": 2.0
-                }
-              ]
-            }
-          ],
+          "duration": 0.0,
+          "tracks": [],
           "type": 1
         }
       ],
@@ -276,10 +100,10 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.498022228,
-          "y": 0.0444280766,
-          "z": 0.07695168,
-          "w": -0.8625998
+          "x": 0.67946887,
+          "y": -0.08294426,
+          "z": 0.202946216,
+          "w": -0.7001822
         },
         "localScale": {
           "x": 6.0,
@@ -311,14 +135,14 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 4.64,
+          "y": 3.84,
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.551506162,
-          "y": 0.153648466,
-          "z": -0.1397623,
-          "w": -0.807898343
+          "x": 0.7071068,
+          "y": 0.0,
+          "z": 0.0,
+          "w": -0.7071068
         },
         "localScale": {
           "x": 1.0,
@@ -343,20 +167,20 @@
       "name": "GameObject",
       "transform": {
         "localPosition": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
+          "x": 0.182901055,
+          "y": 0.8045874,
+          "z": 0.0515195727
         },
         "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0,
-          "w": -1.0
+          "x": 0.610343933,
+          "y": 0.4770167,
+          "z": -0.0767381,
+          "w": 0.6277313
         },
         "localScale": {
           "x": 1.0,
           "y": 1.0,
-          "z": 1.0
+          "z": 2.1353
         }
       },
       "components": [],
@@ -418,6 +242,84 @@
               "x": 1.0,
               "y": 0.2,
               "z": 0.2
+            }
+          },
+          "components": [
+            {
+              "materialName": "Lit",
+              "material": {
+                "color": "808080FF",
+                "metallic": 0.0,
+                "roughness": 0.5,
+                "name": "Lit",
+                "type": 1
+              },
+              "type": 4
+            },
+            {
+              "meshName": "Cube",
+              "type": 5
+            }
+          ],
+          "children": []
+        },
+        {
+          "name": "Cube",
+          "transform": {
+            "localPosition": {
+              "x": 0.69,
+              "y": 0.0,
+              "z": -0.358
+            },
+            "localRotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": -1.0
+            },
+            "localScale": {
+              "x": 0.08402,
+              "y": 0.099351,
+              "z": 0.396934569
+            }
+          },
+          "components": [
+            {
+              "materialName": "Lit",
+              "material": {
+                "color": "808080FF",
+                "metallic": 0.0,
+                "roughness": 0.5,
+                "name": "Lit",
+                "type": 1
+              },
+              "type": 4
+            },
+            {
+              "meshName": "Cube",
+              "type": 5
+            }
+          ],
+          "children": []
+        },
+        {
+          "name": "Cube (2)",
+          "transform": {
+            "localPosition": {
+              "x": 0.69,
+              "y": 0.559,
+              "z": -0.018
+            },
+            "localRotation": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "w": -1.0
+            },
+            "localScale": {
+              "x": 0.08402,
+              "y": 0.8225347,
+              "z": 0.05105364
             }
           },
           "components": [

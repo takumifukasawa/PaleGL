@@ -87,12 +87,13 @@ export class Transform {
             this.#localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
         } else {
             const translationMatrix = Matrix4.translationMatrix(this.position);
-            const rotationAxes = this.rotation.getAxesDegrees();
-            const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
-            const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
-            const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
-            // roll(Z), pitch(X), yaw(Y)
-            const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
+            // // roll(Z), pitch(X), yaw(Y)
+            // const rotationAxes = this.rotation.getAxesDegrees();
+            // const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
+            // const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
+            // const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
+            // const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
+            const rotationMatrix = this.rotation.quaternion.toRotationMatrix();
             const scalingMatrix = Matrix4.scalingMatrix(this.scale);
             this.#localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
         }

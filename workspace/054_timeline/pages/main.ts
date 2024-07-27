@@ -56,6 +56,7 @@ import {
     MarionetterTimeline,
 } from '@/Marionetter/types';
 import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
+import {OrbitCameraController} from "@/PaleGL/core/OrbitCameraController.ts";
 // import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 // import glsl from 'vite-plugin-glsl';
 // import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
@@ -188,6 +189,24 @@ const buildScene = (sceneJson: MarionetterScene) => {
     const directionalLight = captureScene.find('DirectionalLight') as DirectionalLight;
     // const plane = captureScene.find('Plane') as Mesh;
 
+    const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+    orbitCameraController.distance = isSP ? 15 : 15;
+    orbitCameraController.attenuation = 0.01;
+    orbitCameraController.dampingFactor = 0.2;
+    orbitCameraController.azimuthSpeed = 100;
+    orbitCameraController.altitudeSpeed = 100;
+    orbitCameraController.deltaAzimuthPower = 2;
+    orbitCameraController.deltaAltitudePower = 2;
+    orbitCameraController.maxAltitude = 5;
+    orbitCameraController.minAltitude = -45;
+    orbitCameraController.maxAzimuth = 55;
+    orbitCameraController.minAzimuth = -55;
+    orbitCameraController.defaultAzimuth = 10;
+    orbitCameraController.defaultAltitude = -10;
+    orbitCameraController.lookAtTarget = new Vector3(0, 3, 0);
+    orbitCameraController.start();
+    orbitCameraController.enabled = true;
+    
     // const orbitCameraController = new OrbitCameraController(captureSceneCamera);
 
     captureSceneCamera.subscribeOnStart(({ actor }) => {
@@ -201,7 +220,10 @@ const buildScene = (sceneJson: MarionetterScene) => {
         // if (inputController.isDown && orbitCameraController.enabled) {
         //     orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
         // }
-        // orbitCameraController.fixedUpdate();
+        if (inputController.isDown && orbitCameraController.enabled) {
+            orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+        }
+        orbitCameraController.fixedUpdate();
     };
 
     const spotLight = captureScene.find('SpotLight') as SpotLight;

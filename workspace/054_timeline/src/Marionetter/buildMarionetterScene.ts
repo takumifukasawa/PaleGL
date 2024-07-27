@@ -53,7 +53,7 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     if (actor.type == ActorTypes.Light) {
         const light = actor as Light;
         if (light.lightType === LightTypes.Spot) {
-            return new Quaternion(q.x, q.y, -q.z, -q.w);
+            return new Quaternion(q.x, q.y, q.z, q.w);
         }
     }
 

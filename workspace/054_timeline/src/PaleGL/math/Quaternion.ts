@@ -27,6 +27,50 @@ export class Quaternion {
         this.elements = new Float32Array([x, y, z, w]);
         return this;
     }
+  
+    // ref:
+    // https://zenn.dev/mebiusbox/books/132b654aa02124/viewer/2966c7
+    toRotationMatrix() {
+        const xy2 = this.x * this.y * 2;
+        const xz2 = this.x * this.z * 2;
+        const xw2 = this.x * this.w * 2;
+        const yz2 = this.y * this.z * 2;
+        const yw2 = this.y * this.w * 2;
+        const zw2 = this.z * this.w * 2;
+        // const ww2 = this.w * this.w * 2;
+        
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        const w = this.w;
+        
+        const m00 = w * w + x * x - y * y - z * z;
+        const m01 = xy2 - zw2;
+        const m02 = xz2 + yw2;
+        const m03 = 0;
+        
+        const m10 = xy2 + zw2;
+        const m11 = w * w - x * x + y * y - z * z;
+        const m12 = yz2 - xw2;
+        const m13 = 0;
+        
+        const m20 = xz2 - yw2;
+        const m21 = yz2 + xw2;
+        const m22 = w * w - x * x - y * y + z * z;
+        const m23 = 0;
+        
+        const m30 = 0;
+        const m31 = 0;
+        const m32 = 0;
+        const m33 = 1;
+        
+        return new Matrix4(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        );
+    }
 
     // ref:
     // - https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
@@ -49,6 +93,10 @@ export class Quaternion {
         const zz = z * z;
 
         const isOtherWise = Math.cos(x) === 0;
+       
+        // TODO: fallback
+        // const sx = 2 * x * z + 2 * x * w;
+        // const unlocked = Math.abs(sx) < .9999;
 
         const asin = (t: number) => {
             // prettier-ignore
