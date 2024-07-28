@@ -230,10 +230,11 @@ function createMarionetterAnimationClip(
             }
         });
 
-        if (hasLocalPosition) {
-            actor.transform.position.copy(localPosition);
-        }
 
+        if (hasLocalScale) {
+            actor.transform.scale.copy(localScale);
+        }
+       
         if (hasLocalRotationEuler) {
             // actor.transform.rotation = Rotator.fromQuaternion(
             //     resolveInvertRotationLeftHandAxisToRightHandAxis(
@@ -261,6 +262,7 @@ function createMarionetterAnimationClip(
             //const z = sz * cx * cy - cz * sx * sy;
             //const rq = new Quaternion(x, y, z, w);
 
+            // TODO: 本当はc#側でxyを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
             const rm = Matrix4.multiplyMatrices(
                 Matrix4.rotationYMatrix(-localRotationEulerDegree.y * Math.PI / 180),
                 Matrix4.rotationXMatrix(-localRotationEulerDegree.x * Math.PI / 180),
@@ -283,9 +285,12 @@ function createMarionetterAnimationClip(
             actor.transform.rotation = new Rotator(q);
         }
 
-        if (hasLocalScale) {
-            actor.transform.scale.copy(localScale);
+
+        if (hasLocalPosition) {
+            // localPosition.z *= -1;
+            actor.transform.position.copy(localPosition);
         }
+
     };
 
     return {
