@@ -27,36 +27,68 @@ export class Quaternion {
         this.elements = new Float32Array([x, y, z, w]);
         return this;
     }
+    
+    copy(q: Quaternion) {
+        this.elements = new Float32Array(q.elements);
+        return this;
+    }
   
     // ref:
     // https://zenn.dev/mebiusbox/books/132b654aa02124/viewer/2966c7
     toRotationMatrix() {
-        const xy2 = this.x * this.y * 2;
-        const xz2 = this.x * this.z * 2;
-        const xw2 = this.x * this.w * 2;
-        const yz2 = this.y * this.z * 2;
-        const yw2 = this.y * this.w * 2;
-        const zw2 = this.z * this.w * 2;
-        // const ww2 = this.w * this.w * 2;
-        
         const x = this.x;
         const y = this.y;
         const z = this.z;
         const w = this.w;
         
-        const m00 = w * w + x * x - y * y - z * z;
-        const m01 = xy2 - zw2;
-        const m02 = xz2 + yw2;
+        // const xy2 = this.x * this.y * 2;
+        // const xz2 = this.x * this.z * 2;
+        // const xw2 = this.x * this.w * 2;
+        // const yz2 = this.y * this.z * 2;
+        // const yw2 = this.y * this.w * 2;
+        // const zw2 = this.z * this.w * 2;
+        // // const ww2 = this.w * this.w * 2;
+        // 
+        // const m00 = w * w + x * x - y * y - z * z;
+        // const m01 = xy2 - zw2;
+        // const m02 = xz2 + yw2;
+        // const m03 = 0;
+        // 
+        // const m10 = xy2 + zw2;
+        // const m11 = w * w - x * x + y * y - z * z;
+        // const m12 = yz2 - xw2;
+        // const m13 = 0;
+        // 
+        // const m20 = xz2 - yw2;
+        // const m21 = yz2 + xw2;
+        // const m22 = w * w - x * x - y * y + z * z;
+        // const m23 = 0;
+        // 
+        // const m30 = 0;
+        // const m31 = 0;
+        // const m32 = 0;
+        // const m33 = 1;
+        // 
+        // return new Matrix4(
+        //     m00, m01, m02, m03,
+        //     m10, m11, m12, m13,
+        //     m20, m21, m22, m23,
+        //     m30, m31, m32, m33
+        // );
+        
+        const m00 = 2 * w * w + 2 * x * x - 1;
+        const m01 = 2 * x * y - 2 * z * w;
+        const m02 = 2 * x * z + 2 * y * w;
         const m03 = 0;
         
-        const m10 = xy2 + zw2;
-        const m11 = w * w - x * x + y * y - z * z;
-        const m12 = yz2 - xw2;
+        const m10 = 2 * x * y + 2 * z * w;
+        const m11 = 2 * w * w + 2 * y * y - 1;
+        const m12 = 2 * y * z - 2 * x * w;
         const m13 = 0;
         
-        const m20 = xz2 - yw2;
-        const m21 = yz2 + xw2;
-        const m22 = w * w - x * x - y * y + z * z;
+        const m20 = 2 * x * z - 2 * y * w;
+        const m21 = 2 * y * z + 2 * x * w;
+        const m22 = 2 * w * w + 2 * z * z - 1;
         const m23 = 0;
         
         const m30 = 0;
@@ -70,6 +102,48 @@ export class Quaternion {
             m20, m21, m22, m23,
             m30, m31, m32, m33
         );
+        
+    }
+    
+    static rotationMatrixToQuaternion(mat: Matrix4) {
+        const m00 = mat.m00;
+        const m11 = mat.m11;
+        const m22 = mat.m22;
+        
+        const trace = m00 + m11 + m22;
+        
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let w = 0;
+        
+        if (trace > 0) {
+            const s = Math.sqrt(trace + 1.0) * 2;
+            w = 0.25 * s;
+            x = (mat.m21 - mat.m12) / s;
+            y = (mat.m02 - mat.m20) / s;
+            z = (mat.m10 - mat.m01) / s;
+        } else if (m00 > m11 && m00 > m22) {
+            const s = Math.sqrt(1.0 + m00 - m11 - m22) * 2;
+            w = (mat.m21 - mat.m12) / s;
+            x = 0.25 * s;
+            y = (mat.m01 + mat.m10) / s;
+            z = (mat.m02 + mat.m20) / s;
+        } else if (m11 > m22) {
+            const s = Math.sqrt(1.0 + m11 - m00 - m22) * 2;
+            w = (mat.m02 - mat.m20) / s;
+            x = (mat.m01 + mat.m10) / s;
+            y = 0.25 * s;
+            z = (mat.m12 + mat.m21) / s;
+        } else {
+            const s = Math.sqrt(1.0 + m22 - m00 - m11) * 2;
+            w = (mat.m10 - mat.m01) / s;
+            x = (mat.m02 + mat.m20) / s;
+            y = (mat.m12 + mat.m21) / s;
+            z = 0.25 * s;
+        }
+        
+        return new Quaternion(x, y, z, w);
     }
 
     // ref:
@@ -124,18 +198,26 @@ export class Quaternion {
         };
     }
 
+    // zxy
     static fromEulerRadians(x: number, y: number, z: number) {
-        const cxh = Math.cos(x / 2);
-        const sxh = Math.sin(x / 2);
-        const cyh = Math.cos(y / 2);
-        const syh = Math.sin(y / 2);
-        const czh = Math.cos(z / 2);
-        const szh = Math.sin(z / 2);
+        const cx = Math.cos(x / 2);
+        const sx = Math.sin(x / 2);
+        const cy = Math.cos(y / 2);
+        const sy = Math.sin(y / 2);
+        const cz = Math.cos(z / 2);
+        const sz = Math.sin(z / 2);
 
-        const qx = -cxh * syh * szh + sxh * cyh * czh;
-        const qy = cxh * syh * czh + sxh * cyh * szh;
-        const qz = sxh * syh * czh + cxh * cyh * szh;
-        const qw = -sxh * syh * szh + cxh * cyh * czh;
+        // right hand zxy
+        // const qx = -cx * sy * sz + sx * cy * cz;
+        // const qy = cx * sy * cz + sx * cy * sz;
+        // const qz = sx * sy * cz + cx * cy * sz;
+        // const qw = -sx * sy * sz + cx * cy * cz;
+
+        // left hand zxy   
+        const qw = cx * cy * cz - sx * sy * sz;
+        const qx = sx * cy * cz + cx * sy * sz;
+        const qy = cx * sy * cz - sx * cy * sz;
+        const qz = cx * cy * sz + sx * sy * cz;
 
         return new Quaternion(qx, qy, qz, qw);
     }

@@ -45,7 +45,8 @@ import {
 } from '@/Marionetter/constants.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
-import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
+import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+// import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
 /**
  *
@@ -53,8 +54,8 @@ import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/
  */
 export function buildMarionetterTimeline(
     actors: Actor[],
-    marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo,
-    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
+    marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo
+    // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrack[] = [];
 
@@ -63,7 +64,8 @@ export function buildMarionetterTimeline(
         const track = marionetterPlayableDirectorComponentInfo.tracks[i];
         const { targetName, clips } = track;
         const targetActor = Scene.find(actors, targetName); // TODO: sceneを介すさなくてもいい気がする
-        const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+        //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+        const marionetterClips = createMarionetterClips(clips);
         if (!targetActor) {
             console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
         }
@@ -117,8 +119,8 @@ export function buildMarionetterTimeline(
  * @param clips
  */
 function createMarionetterClips(
-    clips: MarionetterClipInfoKinds[],
-    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
+    clips: MarionetterClipInfoKinds[]
+    // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterClipKinds[] {
     const marionetterClips = [] as MarionetterClipKinds[];
 
@@ -128,8 +130,8 @@ function createMarionetterClips(
             case MarionetterClipInfoType.AnimationClip:
                 marionetterClips.push(
                     createMarionetterAnimationClip(
-                        clip as MarionetterAnimationClipInfo,
-                        needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                        clip as MarionetterAnimationClipInfo
+                        // needsSomeActorsConvertLeftHandAxisToRightHandAxis
                     )
                 );
                 break;
@@ -154,8 +156,8 @@ function createMarionetterClips(
  * @param animationClip
  */
 function createMarionetterAnimationClip(
-    animationClip: MarionetterAnimationClipInfo,
-    needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
+    animationClip: MarionetterAnimationClipInfo
+    // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterAnimationClip {
     // actorに直接valueを割り当てる関数
     const execute = (actor: Actor, time: number) => {
@@ -198,7 +200,6 @@ function createMarionetterAnimationClip(
                     localRotationEulerDegree.z = value;
                     break;
                 case PROPERTY_LOCAL_SCALE_X:
-                    console.log(actor.name, localRotationEulerDegree.x, time - start, keyframes, value);
                     hasLocalScale = true;
                     localScale.x = value;
                     break;
@@ -234,18 +235,52 @@ function createMarionetterAnimationClip(
         }
 
         if (hasLocalRotationEuler) {
-            actor.transform.rotation = Rotator.fromQuaternion(
-                resolveInvertRotationLeftHandAxisToRightHandAxis(
-                    Quaternion.fromEulerDegrees(
-                        localRotationEulerDegree.x,
-                        localRotationEulerDegree.y,
-                        localRotationEulerDegree.z
-                    ),
-                    actor,
-                    needsSomeActorsConvertLeftHandAxisToRightHandAxis
-                )
+            // actor.transform.rotation = Rotator.fromQuaternion(
+            //     resolveInvertRotationLeftHandAxisToRightHandAxis(
+            //         Quaternion.fromEulerDegrees(
+            //             localRotationEulerDegree.x,
+            //             localRotationEulerDegree.y,
+            //             localRotationEulerDegree.z
+            //         ),
+            //         actor,
+            //         true
+            //         // needsSomeActorsConvertLeftHandAxisToRightHandAxis
+            //     )
+            // );
+           
+            //const cx = Math.cos(localRotationEulerDegree.x * Math.PI / 180); 
+            //const sx = Math.sin(localRotationEulerDegree.x * Math.PI / 180);
+            //const cy = Math.cos(localRotationEulerDegree.y * Math.PI / 180);
+            //const sy = Math.sin(localRotationEulerDegree.y * Math.PI / 180);
+            //const cz = Math.cos(localRotationEulerDegree.z * Math.PI / 180);
+            //const sz = Math.sin(localRotationEulerDegree.z * Math.PI / 180);
+
+            //const w = cz * cx * cy + sz * sx * sy;
+            //const x = cz * sx * cy - sz * cx * sy;
+            //const y = cz * cx * sy + sz * sx * cy;
+            //const z = sz * cx * cy - cz * sx * sy;
+            //const rq = new Quaternion(x, y, z, w);
+
+            const rm = Matrix4.multiplyMatrices(
+                Matrix4.rotationYMatrix(-localRotationEulerDegree.y * Math.PI / 180),
+                Matrix4.rotationXMatrix(-localRotationEulerDegree.x * Math.PI / 180),
+                Matrix4.rotationZMatrix(localRotationEulerDegree.z * Math.PI / 180)
             );
-            // actor.transform.rotation.setV(localRotationEulerDegree);
+            const rq = Quaternion.rotationMatrixToQuaternion(rm);
+            const q = rq;
+            
+            // const rq = Quaternion.fromEulerDegrees(
+            //    localRotationEulerDegree.x,
+            //    localRotationEulerDegree.y,
+            //    localRotationEulerDegree.z
+            // );
+            // const q = new Quaternion(rq.x, rq.y, -rq.z, -rq.w);
+            // const q = Quaternion.fromEulerDegrees(
+            //     -localRotationEulerDegree.x,
+            //     -localRotationEulerDegree.y,
+            //     localRotationEulerDegree.z
+            //     );
+            actor.transform.rotation = new Rotator(q);
         }
 
         if (hasLocalScale) {

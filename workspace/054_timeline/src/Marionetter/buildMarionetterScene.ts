@@ -53,7 +53,7 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     if (actor.type == ActorTypes.Light) {
         const light = actor as Light;
         if (light.lightType === LightTypes.Spot) {
-            return new Quaternion(q.x, q.y, q.z, q.w);
+            // return new Quaternion(q.x, q.y, -q.z, -q.w);
         }
     }
 
@@ -68,8 +68,8 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
  */
 export function buildMarionetterScene(
     gpu: GPU,
-    scene: MarionetterScene,
-    needsSomeActorsConvertLeftHandAxisToRightHandAxis: boolean = false
+    scene: MarionetterScene
+    // needsSomeActorsConvertLeftHandAxisToRightHandAxis: boolean = false
 ): { actors: Actor[]; marionetterTimeline: MarionetterTimeline | null } {
     const actors: Actor[] = [];
 
@@ -246,7 +246,8 @@ export function buildMarionetterScene(
     
     for(let i = 0; i < scene.objects.length; i++) {
         const obj = scene.objects[i];
-        recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+        // recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+        recursiveBuildActor(obj, null);
         // actors.push(actor);
     }
 
@@ -267,8 +268,8 @@ export function buildMarionetterScene(
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(
                 actors,
-                timelineComponent as MarionetterPlayableDirectorComponentInfo,
-                needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                timelineComponent as MarionetterPlayableDirectorComponentInfo
+                // needsSomeActorsConvertLeftHandAxisToRightHandAxis
             );
         }
     });
