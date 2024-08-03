@@ -1,6 +1,10 @@
 ﻿export const MAX_SPOT_LIGHT_COUNT = 4;
 export const MAX_POINT_LIGHT_COUNT = 4;
 
+export const DEG_TO_RAD = Math.PI / 180;
+
+export const RAD_TO_DEG = 180 / Math.PI;
+
 // -----------------------------------------------------------------------------
 // engine
 // TODO: const assertion の連番、自動で作ることはできない？ union型でいい感じにするしかない？
