@@ -46,6 +46,7 @@ import {
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
 import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+import {DEG_TO_RAD} from "@/PaleGL/constants.ts";
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
 /**
@@ -234,54 +235,16 @@ function createMarionetterAnimationClip(
         if (hasLocalScale) {
             actor.transform.scale.copy(localScale);
         }
-       
+
+        // TODO: なぜか一回行列に落とさないとうまく動かない. まわりくどいかつ余計な計算が走るが
         if (hasLocalRotationEuler) {
-            // actor.transform.rotation = Rotator.fromQuaternion(
-            //     resolveInvertRotationLeftHandAxisToRightHandAxis(
-            //         Quaternion.fromEulerDegrees(
-            //             localRotationEulerDegree.x,
-            //             localRotationEulerDegree.y,
-            //             localRotationEulerDegree.z
-            //         ),
-            //         actor,
-            //         true
-            //         // needsSomeActorsConvertLeftHandAxisToRightHandAxis
-            //     )
-            // );
-           
-            //const cx = Math.cos(localRotationEulerDegree.x * Math.PI / 180); 
-            //const sx = Math.sin(localRotationEulerDegree.x * Math.PI / 180);
-            //const cy = Math.cos(localRotationEulerDegree.y * Math.PI / 180);
-            //const sy = Math.sin(localRotationEulerDegree.y * Math.PI / 180);
-            //const cz = Math.cos(localRotationEulerDegree.z * Math.PI / 180);
-            //const sz = Math.sin(localRotationEulerDegree.z * Math.PI / 180);
-
-            //const w = cz * cx * cy + sz * sx * sy;
-            //const x = cz * sx * cy - sz * cx * sy;
-            //const y = cz * cx * sy + sz * sx * cy;
-            //const z = sz * cx * cy - cz * sx * sy;
-            //const rq = new Quaternion(x, y, z, w);
-
-            // TODO: 本当はc#側でxyを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
             const rm = Matrix4.multiplyMatrices(
-                Matrix4.rotationYMatrix(-localRotationEulerDegree.y * Math.PI / 180),
-                Matrix4.rotationXMatrix(-localRotationEulerDegree.x * Math.PI / 180),
-                Matrix4.rotationZMatrix(localRotationEulerDegree.z * Math.PI / 180)
+                // TODO: 本当はc#側でxyを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
+                Matrix4.rotationYMatrix(-localRotationEulerDegree.y * DEG_TO_RAD),
+                Matrix4.rotationXMatrix(-localRotationEulerDegree.x * DEG_TO_RAD),
+                Matrix4.rotationZMatrix(localRotationEulerDegree.z * DEG_TO_RAD)
             );
-            const rq = Quaternion.rotationMatrixToQuaternion(rm);
-            const q = rq;
-            
-            // const rq = Quaternion.fromEulerDegrees(
-            //    localRotationEulerDegree.x,
-            //    localRotationEulerDegree.y,
-            //    localRotationEulerDegree.z
-            // );
-            // const q = new Quaternion(rq.x, rq.y, -rq.z, -rq.w);
-            // const q = Quaternion.fromEulerDegrees(
-            //     -localRotationEulerDegree.x,
-            //     -localRotationEulerDegree.y,
-            //     localRotationEulerDegree.z
-            //     );
+            const q = Quaternion.rotationMatrixToQuaternion(rm);
             actor.transform.rotation = new Rotator(q);
         }
 

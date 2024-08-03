@@ -53,7 +53,20 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     if (actor.type == ActorTypes.Light) {
         const light = actor as Light;
         if (light.lightType === LightTypes.Spot) {
-            // return new Quaternion(q.x, q.y, -q.z, -q.w);
+            // NOTE: なぜか逆にしないといけない
+            const x1 = q.x;
+            const y1 = q.y;
+            const z1 = q.z;
+            const w1 = q.w;
+            const x2 = 1;
+            const y2 = 0;
+            const z2 = 0;
+            const w2 = 0;
+            const w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
+            const x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
+            const y = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
+            const z = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
+            return new Quaternion(x, y, z, w);
         }
     }
 
@@ -69,14 +82,13 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 export function buildMarionetterScene(
     gpu: GPU,
     scene: MarionetterScene
-    // needsSomeActorsConvertLeftHandAxisToRightHandAxis: boolean = false
 ): { actors: Actor[]; marionetterTimeline: MarionetterTimeline | null } {
     const actors: Actor[] = [];
 
     function recursiveBuildActor(
         obj: MarionetterObjectInfo,
         parentActor: Actor | null = null,
-        needsSomeActorsConvertLeftHandAxisToRightHandAxis: boolean = false
+        needsFlip: boolean = false
     ) {
         const { name } = obj;
         const mfComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshFilter);
@@ -209,7 +221,7 @@ export function buildMarionetterScene(
                         obj.transform.localRotation.w
                     ),
                     actor,
-                    needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                    needsFlip
                 )
             );
             actor.transform.position = new Vector3(
@@ -230,6 +242,7 @@ export function buildMarionetterScene(
                 recursiveBuildActor(
                     obj.children[i],
                     actor,
+                    needsFlip
                 );
             }
             
@@ -247,7 +260,7 @@ export function buildMarionetterScene(
     for(let i = 0; i < scene.objects.length; i++) {
         const obj = scene.objects[i];
         // recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
-        recursiveBuildActor(obj, null);
+        recursiveBuildActor(obj, null, true);
         // actors.push(actor);
     }
 
