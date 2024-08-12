@@ -1,4 +1,4 @@
-﻿import {RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
@@ -13,9 +13,40 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    PostProcessParametersBase,
+    PostProcessPassBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
 const BLUR_PIXEL_NUM = 7;
+
+type BloomParametersBase = {
+    threshold: number;
+    tone: number;
+    bloomAmount: number;
+};
+
+export type BloomParameters = PostProcessParametersBase & BloomParametersBase;
+
+export function generateDefaultBloomParameters({
+    enabled,
+    threshold,
+    tone,
+    bloomAmount,
+}: {
+    enabled?: boolean;
+    threshold?: number;
+    tone?: number;
+    bloomAmount?: number;
+} = {}): BloomParameters {
+    return {
+        enabled: enabled || true,
+        threshold: threshold || 1.534,
+        tone: tone || 0.46,
+        bloomAmount: bloomAmount || 0.26,
+    };
+}
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
@@ -47,19 +78,22 @@ export class BloomPass implements IPostProcessPass {
     get renderTargetBlurMip4() {
         return this.renderTargetBlurMip4_Vertical;
     }
+
     get renderTargetBlurMip8() {
         return this.renderTargetBlurMip8_Vertical;
     }
+
     get renderTargetBlurMip16() {
         return this.renderTargetBlurMip16_Vertical;
     }
+
     get renderTargetBlurMip32() {
         return this.renderTargetBlurMip32_Vertical;
     }
+
     get renderTargetBlurMip64() {
         return this.renderTargetBlurMip64_Vertical;
     }
-
 
     // tmp
     // private horizontalBlurPass: FragmentPass;
@@ -72,9 +106,9 @@ export class BloomPass implements IPostProcessPass {
     horizontalBlurMaterial: Material;
     verticalBlurMaterial: Material;
 
-    threshold: number = 0;
-    tone: number = 1;
-    bloomAmount: number = 0.8;
+    threshold: number = 1.534;
+    tone: number = 0.46;
+    bloomAmount: number = 0.26;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
@@ -175,7 +209,7 @@ export class BloomPass implements IPostProcessPass {
 
         // const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, 0.92);
-        console.log("blurWeights", blurWeights)
+        console.log('blurWeights', blurWeights);
 
         this.horizontalBlurMaterial = new Material({
             vertexShader: PostProcessPassBase.baseVertexShader,
@@ -308,7 +342,7 @@ export class BloomPass implements IPostProcessPass {
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
     update() {}
-    
+
     render({
         gpu,
         camera,
@@ -373,9 +407,10 @@ export class BloomPass implements IPostProcessPass {
         // 1 / 4
         renderBlur(
             this.renderTargetBlurMip4_Horizontal,
-            this.renderTargetBlurMip4_Vertical, 
+            this.renderTargetBlurMip4_Vertical,
             this.extractBrightnessPass.renderTarget,
-            4);
+            4
+        );
         // 1 / 8
         renderBlur(
             this.renderTargetBlurMip8_Horizontal,

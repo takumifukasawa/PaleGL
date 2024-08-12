@@ -23,7 +23,7 @@ export type Marionetter = {
     setHotReloadCallback: (callback: () => void) => void;
 };
 
-export type MarionetterArgs = { port?: number, showLog?: boolean };
+export type MarionetterArgs = { port?: number; showLog?: boolean };
 
 //
 // scene
@@ -59,12 +59,34 @@ export const enum MarionetterTrackInfoType {
     AnimationTrack = 1,
     LightControlTrack = 2,
     ActivationControlTrack = 3,
+    MarkerTrack = 4,
 }
 
-export type MarionetterTrackInfo = {
-    targetName: string; // shorthand: tn
+export type MarionetterTrackInfoBase = {
     type: MarionetterTrackInfoType; // shorthand: t
+};
+
+export type MarionetterDefaultTrackInfo = {
+    targetName: string; // shorthand: tn
     clips: MarionetterClipInfoKinds[]; // shorthand: cs
+} & MarionetterTrackInfoBase;
+
+export type MarionetterMarkerTrackInfo = {
+    signalEmitters: MarionetterSignalEmitter[]; // shorthand: ses
+} & MarionetterTrackInfoBase;
+
+export type MarionetterTrackInfoKinds = MarionetterDefaultTrackInfo | MarionetterMarkerTrackInfo;
+
+// export type MarionetterTrackInfo = {
+//     targetName: string; // shorthand: tn
+//     type: MarionetterTrackInfoType; // shorthand: t
+//     clips: MarionetterClipInfoKinds[]; // shorthand: cs
+//     signalEmitters: MarionetterSignalEmitter[]; // shorthand: ses
+// };
+
+export type MarionetterSignalEmitter = {
+    name: string;
+    time: number;
 };
 
 export type MarionetterClipInfoKinds = MarionetterAnimationClipInfo | MarionetterLightControlClipInfo;
@@ -123,6 +145,7 @@ export const MarionetterComponentType = {
     Camera: 3,
     MeshRenderer: 4,
     MeshFilter: 5,
+    Volume: 6,
 } as const;
 
 export type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
@@ -139,7 +162,7 @@ export type MarionetterComponentInfoKinds =
 export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
     name: string; // shorthand: n
     duration: number; // shorthand: d
-    tracks: MarionetterTrackInfo[]; // shorthand: ts
+    tracks: MarionetterTrackInfoKinds[]; // shorthand: ts
 };
 
 export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
@@ -159,6 +182,24 @@ export type MarionetterSpotLightComponentInfo = MarionetterLightComponentInfo & 
     spotAngle: number; // shorthand: sa
 };
 
+export type MarionetterVolumeVolumeLayerBase = {
+    layerType: 'Bloom' | 'DepthOfField'; // l
+};
+
+export type MarionetterVolumeLayerBloom = MarionetterVolumeVolumeLayerBase & {
+    intensity: number; // i
+};
+
+export type MarionetterVolumeLayerDepthOfField = MarionetterVolumeVolumeLayerBase & {
+    focusDistance: number; // f
+};
+
+export type MarionetterVolumeLayerKinds = MarionetterVolumeLayerBloom | MarionetterVolumeLayerDepthOfField;
+
+export type MarionetterVolumeComponentInfo = MarionetterComponentInfoBase & {
+    volumeLayers: MarionetterVolumeLayerKinds[];
+};
+
 export type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
     cameraType: 'Perspective' | 'Orthographic'; // ct
     isMain: boolean; // shorthand: im
@@ -173,7 +214,7 @@ export const MarionetterMaterialType = {
 export type MarionetterMaterialType = (typeof MarionetterMaterialType)[keyof typeof MarionetterMaterialType];
 
 export type MarionetterMaterialInfo = {
-    type: MarionetterMaterialType,
+    type: MarionetterMaterialType;
     name: string;
 };
 
@@ -195,23 +236,52 @@ export type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & 
 //
 
 export type MarionetterTimeline = {
-    tracks: MarionetterTimelineTrack[];
+    // tracks: MarionetterTimelineTrack[];
+    tracks: MarionetterTimelineTrackKinds[];
     execute: (time: number) => void;
 };
 
-export type MarionetterTimelineTrack = {
+// export type MarionetterTimelineTrack = {
+//     targetName: string;
+//     // targetObj: Actor | null;
+//     clips: MarionetterClipKinds[];
+//     signalEmitters: MarionetterSignalEmitter[];
+//     execute: (time: number) => void;
+// };
+
+export type MarionetterTimelineTrackBase = {
+    execute: (time: number) => void;
+};
+
+export type MarionetterTimelineDefaultTrack = {
     targetName: string;
-    // targetObj: Actor | null;
     clips: MarionetterClipKinds[];
+} & MarionetterTimelineTrackBase;
+
+export type MarionetterTimelineMarkerTrack = {
+    signalEmitters: MarionetterTimelineSignalEmitter[];
+} & MarionetterTimelineTrackBase;
+
+export type MarionetterTimelineSignalEmitter = {
+    name: string;
+    time: number;
+    triggered: boolean;
     execute: (time: number) => void;
 };
 
-export type MarionetterClipKinds = MarionetterAnimationClip | MarionetterLightControlClip | MarionetterActivationControlClip;
+export type MarionetterTimelineTrackKinds = MarionetterTimelineDefaultTrack | MarionetterTimelineMarkerTrack;
+
+export type MarionetterClipKinds =
+    | MarionetterAnimationClip
+    | MarionetterLightControlClip
+    | MarionetterActivationControlClip;
 
 export const enum MarionetterAnimationClipType {
-    AnimationClip = 0,
-    LightControlClip = 1,
-    ActivationControlClip = 2,
+    None = 0,
+    AnimationClip = 1,
+    LightControlClip = 2,
+    ActivationControlClip = 3,
+    SignalEmitter = 4,
 }
 
 export type MarionetterAnimationClip = {

@@ -25,10 +25,14 @@ import {
     MarionetterScene,
     MarionetterSpotLightComponentInfo,
     MarionetterTimeline,
+    MarionetterVolumeComponentInfo, MarionetterVolumeLayerBloom,
 } from '@/Marionetter/types';
 import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Light } from '@/PaleGL/actors/Light.ts';
+import {BloomParameters, generateDefaultBloomParameters} from "@/PaleGL/postprocess/BloomPass.ts";
+import {PostProcessParametersBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {maton} from "@/PaleGL/utilities/maton.ts";
 
 export function tryParseJsonString<T>(str: string) {
     let json: T | null = null;
@@ -73,7 +77,6 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     return q;
 }
 
-
 /**
  *
  * @param gpu
@@ -85,16 +88,37 @@ export function buildMarionetterScene(
 ): { actors: Actor[]; marionetterTimeline: MarionetterTimeline | null } {
     const actors: Actor[] = [];
 
+    function findComponent(obj: MarionetterObjectInfo, componentType: MarionetterComponentType) {
+        return obj.components.find((c) => c.type === componentType);
+    }
+
+    function buildVolume(volumeComponent: MarionetterVolumeComponentInfo) {
+        return maton(volumeComponent.volumeLayers.map((volumeLayer) => {
+            switch (volumeLayer.layerType) {
+                case 'Bloom':
+                    const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
+                    return generateDefaultBloomParameters({
+                        bloomAmount: bloomLayer.intensity
+                    });
+                // case 'DepthOfField':
+                //     return;
+                default:
+                    return null;
+            }
+        })).compact().value();
+    }
+
     function recursiveBuildActor(
         obj: MarionetterObjectInfo,
         parentActor: Actor | null = null,
         needsFlip: boolean = false
     ) {
         const { name } = obj;
-        const mfComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshFilter);
-        const mrComponent = obj.components.find((c) => c.type === MarionetterComponentType.MeshRenderer);
-        const cameraComponent = obj.components.find((c) => c.type === MarionetterComponentType.Camera);
-        const lightComponent = obj.components.find((c) => c.type === MarionetterComponentType.Light);
+        const mfComponent = findComponent(obj, MarionetterComponentType.MeshFilter);
+        const mrComponent = findComponent(obj, MarionetterComponentType.MeshRenderer);
+        const cameraComponent = findComponent(obj, MarionetterComponentType.Camera);
+        const lightComponent = findComponent(obj, MarionetterComponentType.Light);
+        const volumeComponent = findComponent(obj, MarionetterComponentType.Volume);
 
         let actor: Actor | null = null;
 
@@ -173,6 +197,8 @@ export function buildMarionetterScene(
                 default:
                     throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
             }
+        } else if (volumeComponent) {
+            actor = new Volume();
         } else {
             // others
             actor = new Actor({ name });
@@ -229,35 +255,30 @@ export function buildMarionetterScene(
                 obj.transform.localPosition.y,
                 obj.transform.localPosition.z
             );
-          
+
             // 親が存在する場合は親に追加、親がない場合はシーン直下に配置したいので配列に追加
-            if(parentActor) {
+            if (parentActor) {
                 parentActor.addChild(actor);
             } else {
                 actors.push(actor);
             }
-         
+
             // 子要素があれば再帰的に処理
-            for(let i = 0; i < obj.children.length; i++) {
-                recursiveBuildActor(
-                    obj.children[i],
-                    actor,
-                    needsFlip
-                );
+            for (let i = 0; i < obj.children.length; i++) {
+                recursiveBuildActor(obj.children[i], actor, needsFlip);
             }
-            
+
             return;
         }
 
         throw `[recursiveBuildActor] actor is null`;
     }
 
-
     //
     // parse scene
     //
-    
-    for(let i = 0; i < scene.objects.length; i++) {
+
+    for (let i = 0; i < scene.objects.length; i++) {
         const obj = scene.objects[i];
         // recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
         recursiveBuildActor(obj, null, true);

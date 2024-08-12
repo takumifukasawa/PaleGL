@@ -14,11 +14,17 @@ import {
     MarionetterClipInfoKinds,
     MarionetterClipInfoType,
     MarionetterClipKinds,
+    MarionetterDefaultTrackInfo,
     MarionetterLightControlClip,
     MarionetterLightControlClipInfo,
+    MarionetterMarkerTrackInfo,
     MarionetterPlayableDirectorComponentInfo,
+    MarionetterSignalEmitter,
     MarionetterTimeline,
-    MarionetterTimelineTrack,
+    MarionetterTimelineDefaultTrack,
+    MarionetterTimelineMarkerTrack,
+    MarionetterTimelineSignalEmitter,
+    MarionetterTimelineTrackKinds,
     MarionetterTrackInfoType,
 } from '@/Marionetter/types';
 import {
@@ -45,8 +51,9 @@ import {
 } from '@/Marionetter/constants.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
-import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
-import {DEG_TO_RAD} from "@/PaleGL/constants.ts";
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { DEG_TO_RAD } from '@/PaleGL/constants.ts';
+
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
 /**
@@ -58,49 +65,80 @@ export function buildMarionetterTimeline(
     marionetterPlayableDirectorComponentInfo: MarionetterPlayableDirectorComponentInfo
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterTimeline {
-    const tracks: MarionetterTimelineTrack[] = [];
+    const tracks: MarionetterTimelineTrackKinds[] = [];
 
-    // build track
-    for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
-        const track = marionetterPlayableDirectorComponentInfo.tracks[i];
-        const { targetName, clips } = track;
-        const targetActor = Scene.find(actors, targetName); // TODO: sceneを介すさなくてもいい気がする
-        //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
-        const marionetterClips = createMarionetterClips(clips);
-        if (!targetActor) {
-            console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
-        }
-
-        // exec track
-        // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
+    const buildSignalEmitter = (signalEmitter: MarionetterSignalEmitter): MarionetterTimelineSignalEmitter => {
+        let triggered = false;
         const execute = (time: number) => {
-            if (track.type === MarionetterTrackInfoType.ActivationControlTrack) {
-                if (targetActor != null) {
-                    const clipAtTime = marionetterClips.find(
-                        (clip) => clip.clipInfo.start < time && time < clip.clipInfo.start + clip.clipInfo.duration
-                    );
-                    if (clipAtTime) {
-                        targetActor.enabled = true;
-                    } else {
-                        targetActor.enabled = false;
-                    }
-                }
-            } else {
-                if (targetActor != null) {
-                    for (let j = 0; j < marionetterClips.length; j++) {
-                        marionetterClips[j].execute(targetActor, time);
-                    }
-                }
+            if (time > signalEmitter.time && triggered) {
+                triggered = true;
             }
         };
-        tracks.push({
-            targetName,
-            clips: marionetterClips,
+        return {
+            ...signalEmitter,
+            triggered,
             execute,
-        });
+        };
+    };
+
+    //
+    // build track
+    //
+    
+    for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
+        const track = marionetterPlayableDirectorComponentInfo.tracks[i];
+
+        if (track.type === MarionetterTrackInfoType.MarkerTrack) {
+            const { signalEmitters } = track as MarionetterMarkerTrackInfo;
+            tracks.push({
+                signalEmitters: signalEmitters.map((signalEmitter) => {
+                    return buildSignalEmitter(signalEmitter);
+                }),
+                execute: () => {},
+            } as MarionetterTimelineMarkerTrack);
+        } else {
+            const { targetName, clips } = track as MarionetterDefaultTrackInfo;
+            const targetActor = Scene.find(actors, targetName); // TODO: sceneを介すさなくてもいい気がする
+            //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+            const marionetterClips = createMarionetterClips(clips);
+            if (!targetActor) {
+                console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
+            }
+
+            // exec track
+            // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
+            const execute = (time: number) => {
+                if (track.type === MarionetterTrackInfoType.ActivationControlTrack) {
+                    if (targetActor != null) {
+                        const clipAtTime = marionetterClips.find(
+                            (clip) => clip.clipInfo.start < time && time < clip.clipInfo.start + clip.clipInfo.duration
+                        );
+                        if (clipAtTime) {
+                            targetActor.enabled = true;
+                        } else {
+                            targetActor.enabled = false;
+                        }
+                    }
+                } else {
+                    if (targetActor != null) {
+                        for (let j = 0; j < marionetterClips.length; j++) {
+                            marionetterClips[j].execute(targetActor, time);
+                        }
+                    }
+                }
+            };
+            tracks.push({
+                targetName,
+                clips: marionetterClips,
+                execute,
+            } as MarionetterTimelineDefaultTrack);
+        }
     }
 
+    //
     // exec timeline
+    //
+    
     const execute = (time: number) => {
         // pattern1: use frame
         // const spf = 1 / fps;
@@ -231,7 +269,6 @@ function createMarionetterAnimationClip(
             }
         });
 
-
         if (hasLocalScale) {
             actor.transform.scale.copy(localScale);
         }
@@ -248,12 +285,10 @@ function createMarionetterAnimationClip(
             actor.transform.rotation = new Rotator(q);
         }
 
-
         if (hasLocalPosition) {
             // localPosition.z *= -1;
             actor.transform.position.copy(localPosition);
         }
-
     };
 
     return {

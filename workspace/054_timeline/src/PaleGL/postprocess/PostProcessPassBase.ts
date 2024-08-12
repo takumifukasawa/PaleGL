@@ -26,6 +26,10 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
+export type PostProcessParametersBase = {
+    enabled: boolean;
+};
+
 export type PostProcessPassRenderArgs = {
     gpu: GPU;
     camera: Camera;
