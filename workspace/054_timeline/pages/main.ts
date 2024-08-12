@@ -177,7 +177,8 @@ const initMarionetter = () => {
 };
 
 const buildScene = (sceneJson: MarionetterScene) => {
-    const res = buildMarionetterScene(gpu, sceneJson, true);
+    // const res = buildMarionetterScene(gpu, sceneJson, false);
+    const res = buildMarionetterScene(gpu, sceneJson);
     const { actors} = res;
     marionetterTimeline = res.marionetterTimeline;
     
@@ -517,8 +518,8 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
 
     ssaoDebuggerGroup.addToggleDebugger({
         label: 'ssao pass enabled',
-        initialValue: renderer.ambientOcclusionPass.enabled,
-        onChange: (value) => (renderer.ambientOcclusionPass.enabled = value),
+        initialValue: renderer.ambientOcclusionPass.parameters.enabled,
+        onChange: (value) => (renderer.ambientOcclusionPass.parameters.enabled = value),
     });
 
     ssaoDebuggerGroup.addSliderDebugger({
@@ -625,9 +626,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.blendRate,
+        initialValue: renderer.lightShaftPass.parameters.blendRate,
         onChange: (value) => {
-            renderer.lightShaftPass.blendRate = value;
+            renderer.lightShaftPass.parameters.blendRate = value;
         },
     });
 
@@ -636,9 +637,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.passScaleBase,
+        initialValue: renderer.lightShaftPass.parameters.passScaleBase,
         onChange: (value) => {
-            renderer.lightShaftPass.passScaleBase = value;
+            renderer.lightShaftPass.parameters.passScaleBase = value;
         },
     });
 
@@ -647,9 +648,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0.001,
         maxValue: 0.05,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayStepStrength,
+        initialValue: renderer.lightShaftPass.parameters.rayStepStrength,
         onChange: (value) => {
-            renderer.lightShaftPass.rayStepStrength = value;
+            renderer.lightShaftPass.parameters.rayStepStrength = value;
         },
     });
 
@@ -768,8 +769,8 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
 
     bloomDebuggerGroup.addToggleDebugger({
         label: 'Bloom pass enabled',
-        initialValue: renderer.bloomPass.enabled,
-        onChange: (value) => (renderer.bloomPass.enabled = value),
+        initialValue: renderer.bloomPass.parameters.enabled,
+        onChange: (value) => (renderer.bloomPass.parameters.enabled = value),
     });
 
     bloomDebuggerGroup.addSliderDebugger({
@@ -777,9 +778,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0,
         maxValue: 4,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.bloomAmount,
+        initialValue: renderer.bloomPass.parameters.bloomAmount,
         onChange: (value) => {
-            renderer.bloomPass.bloomAmount = value;
+            renderer.bloomPass.parameters.bloomAmount = value;
         },
     });
 
@@ -788,9 +789,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0,
         maxValue: 2,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.threshold,
+        initialValue: renderer.bloomPass.parameters.threshold,
         onChange: (value) => {
-            renderer.bloomPass.threshold = value;
+            renderer.bloomPass.parameters.threshold = value;
         },
     });
 
@@ -799,9 +800,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.tone,
+        initialValue: renderer.bloomPass.parameters.tone,
         onChange: (value) => {
-            renderer.bloomPass.tone = value;
+            renderer.bloomPass.parameters.tone = value;
         },
     });
 
@@ -815,8 +816,8 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
 
     ssrDebuggerGroup.addToggleDebugger({
         label: 'ssr pass enabled',
-        initialValue: renderer.ssrPass.enabled,
-        onChange: (value) => (renderer.ssrPass.enabled = value),
+        initialValue: renderer.ssrPass.parameters.enabled,
+        onChange: (value) => (renderer.ssrPass.parameters.enabled = value),
     });
 
     ssrDebuggerGroup.addSliderDebugger({

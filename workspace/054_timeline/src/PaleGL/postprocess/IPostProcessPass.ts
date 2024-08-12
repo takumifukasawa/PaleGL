@@ -2,12 +2,13 @@
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
-import {PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import {PostProcessParametersBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 
 export interface IPostProcessPass {
     // gpu: GPU;
     name: string;
-    enabled: boolean;
+    // enabled: boolean;
+    parameters: PostProcessParametersBase;
     width: number;
     height: number;
     renderTarget: RenderTarget;

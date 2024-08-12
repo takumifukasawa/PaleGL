@@ -25,14 +25,14 @@ import {
     MarionetterScene,
     MarionetterSpotLightComponentInfo,
     MarionetterTimeline,
-    MarionetterVolumeComponentInfo, MarionetterVolumeLayerBloom,
+    MarionetterVolumeComponentInfo,
+    MarionetterVolumeLayerBloom,
 } from '@/Marionetter/types';
 import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Light } from '@/PaleGL/actors/Light.ts';
-import {BloomParameters, generateDefaultBloomParameters} from "@/PaleGL/postprocess/BloomPass.ts";
-import {PostProcessParametersBase} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
-import {maton} from "@/PaleGL/utilities/maton.ts";
+import { generateDefaultBloomParameters } from '@/PaleGL/postprocess/BloomPass.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 export function tryParseJsonString<T>(str: string) {
     let json: T | null = null;
@@ -77,6 +77,10 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     return q;
 }
 
+function findComponent(obj: MarionetterObjectInfo, componentType: MarionetterComponentType) {
+    return obj.components.find((c) => c.type === componentType);
+}
+
 /**
  *
  * @param gpu
@@ -88,24 +92,24 @@ export function buildMarionetterScene(
 ): { actors: Actor[]; marionetterTimeline: MarionetterTimeline | null } {
     const actors: Actor[] = [];
 
-    function findComponent(obj: MarionetterObjectInfo, componentType: MarionetterComponentType) {
-        return obj.components.find((c) => c.type === componentType);
-    }
-
     function buildVolume(volumeComponent: MarionetterVolumeComponentInfo) {
-        return maton(volumeComponent.volumeLayers.map((volumeLayer) => {
-            switch (volumeLayer.layerType) {
-                case 'Bloom':
-                    const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
-                    return generateDefaultBloomParameters({
-                        bloomAmount: bloomLayer.intensity
-                    });
-                // case 'DepthOfField':
-                //     return;
-                default:
-                    return null;
-            }
-        })).compact().value();
+        return maton(
+            volumeComponent.volumeLayers.map((volumeLayer) => {
+                switch (volumeLayer.layerType) {
+                    case 'Bloom':
+                        const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
+                        return generateDefaultBloomParameters({
+                            bloomAmount: bloomLayer.intensity,
+                        });
+                    // case 'DepthOfField':
+                    //     return;
+                    default:
+                        return null;
+                }
+            })
+        )
+            .compact()
+            .value();
     }
 
     function recursiveBuildActor(
@@ -197,8 +201,8 @@ export function buildMarionetterScene(
                 default:
                     throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
             }
-        } else if (volumeComponent) {
-            actor = new Volume();
+        // } else if (volumeComponent) {
+        //     actor = new Volume();
         } else {
             // others
             actor = new Actor({ name });

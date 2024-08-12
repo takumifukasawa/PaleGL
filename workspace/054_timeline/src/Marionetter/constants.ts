@@ -31,4 +31,10 @@ export const PROPERTY_MATERIAL_BASE_COLOR_G = 'material._BaseColor.g';
 export const PROPERTY_MATERIAL_BASE_COLOR_B = 'material._BaseColor.b';
 export const PROPERTY_MATERIAL_BASE_COLOR_A = 'material._BaseColor.a';
 
+//
+// post process
+//
+
+export const PROPERTY_POST_PROCESS_BLOOM_INTENSITY = 'bloomIntensity';
+
 export const PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE = 'depthOfFieldFocusDistance';

@@ -1,28 +1,32 @@
 ﻿import { UniformTypes } from '@/PaleGL/constants';
-import {
-    IPostProcessPass,
-} from '@/PaleGL/postprocess/IPostProcessPass';
+import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
-import {Material} from "@/PaleGL/materials/Material";
-import {PostProcessPassBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase";
-import {PlaneGeometry} from "@/PaleGL/geometries/PlaneGeometry.ts";
+import { Material } from '@/PaleGL/materials/Material';
+import {
+    PostProcessParametersBase,
+    PostProcessPassBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase';
+import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
 export class GaussianBlurPass implements IPostProcessPass {
-// export class GaussianBlurPass extends PostProcessPassBase {
+    // export class GaussianBlurPass extends PostProcessPassBase {
     // gpu: GPU;
     name: string = 'GaussianBlurPass';
     enabled: boolean = false;
     width: number = 1;
     height: number = 1;
     materials: Material[] = [];
-    
+
+    parameters: PostProcessParametersBase = { enabled: true };
+
     private geometry: PlaneGeometry;
     private horizontalBlurPass: FragmentPass;
     private verticalBlurPass: FragmentPass;
@@ -49,23 +53,27 @@ export class GaussianBlurPass implements IPostProcessPass {
             //     pixelNum: blurPixelNum,
             //     srcTextureUniformName: UniformNames.SrcTexture
             // }),
-            uniforms: [{
-                name: "uTargetWidth",
+            uniforms: [
+                {
+                    name: 'uTargetWidth',
                     type: UniformTypes.Float,
                     value: 1,
-                }, {
-                name: "uTargetHeight",
+                },
+                {
+                    name: 'uTargetHeight',
                     type: UniformTypes.Float,
                     value: 1,
-                }, {
-                name: "uBlurWeights",
+                },
+                {
+                    name: 'uBlurWeights',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
-                }, {
-                name: "uIsHorizontal",
+                },
+                {
+                    name: 'uIsHorizontal',
                     type: UniformTypes.Float,
-                    value: 1.
-                }
+                    value: 1,
+                },
             ],
         });
         this.#passes.push(this.horizontalBlurPass);
@@ -80,22 +88,26 @@ export class GaussianBlurPass implements IPostProcessPass {
             //     pixelNum: blurPixelNum,
             //     srcTextureUniformName: UniformNames.SrcTexture,
             // }),
-            uniforms: [{
-                name: "uTargetWidth",
+            uniforms: [
+                {
+                    name: 'uTargetWidth',
                     type: UniformTypes.Float,
                     value: 1,
-                }, {
-                name: "uTargetHeight",
+                },
+                {
+                    name: 'uTargetHeight',
                     type: UniformTypes.Float,
                     value: 1,
-                }, {
-                name: "uBlurWeights",
+                },
+                {
+                    name: 'uBlurWeights',
                     type: UniformTypes.FloatArray,
                     value: new Float32Array(blurWeights),
-                }, {
-                name: "uIsHorizontal",
+                },
+                {
+                    name: 'uIsHorizontal',
                     type: UniformTypes.Float,
-                    value: 0.
+                    value: 0,
                 },
             ],
         });
@@ -119,10 +131,19 @@ export class GaussianBlurPass implements IPostProcessPass {
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
     update() {}
-    
-    render({ gpu, camera, renderer, prevRenderTarget, isLastPass, targetCamera, gBufferRenderTargets, time }: PostProcessPassRenderArgs) {
+
+    render({
+        gpu,
+        camera,
+        renderer,
+        prevRenderTarget,
+        isLastPass,
+        targetCamera,
+        gBufferRenderTargets,
+        time,
+    }: PostProcessPassRenderArgs) {
         this.geometry.start();
-        
+
         this.horizontalBlurPass.render({
             gpu,
             camera,

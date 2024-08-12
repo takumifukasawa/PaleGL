@@ -21,25 +21,22 @@ import {
 
 const BLUR_PIXEL_NUM = 7;
 
-type BloomParametersBase = {
+type BloomPassParametersBase = {
     threshold: number;
     tone: number;
     bloomAmount: number;
 };
 
-export type BloomParameters = PostProcessParametersBase & BloomParametersBase;
+type BloomPassParameters = PostProcessParametersBase & BloomPassParametersBase;
+
+type BloomPassParametersArgs = Partial<BloomPassParameters>;
 
 export function generateDefaultBloomParameters({
     enabled,
     threshold,
     tone,
     bloomAmount,
-}: {
-    enabled?: boolean;
-    threshold?: number;
-    tone?: number;
-    bloomAmount?: number;
-} = {}): BloomParameters {
+}: BloomPassParametersArgs = {}): BloomPassParameters {
     return {
         enabled: enabled || true,
         threshold: threshold || 1.534,
@@ -54,13 +51,19 @@ export function generateDefaultBloomParameters({
 export class BloomPass implements IPostProcessPass {
     // gpu: GPU;
     name: string = 'BloomPass';
-    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 
     materials: Material[] = [];
 
     private extractBrightnessPass;
+    
+    parameters: BloomPassParameters;
+
+    // enabled: boolean = true;
+    // threshold: number = 1.534;
+    // tone: number = 0.46;
+    // bloomAmount: number = 0.26;
 
     // tmp
     // private renderTargetExtractBrightness: RenderTarget;
@@ -106,32 +109,28 @@ export class BloomPass implements IPostProcessPass {
     horizontalBlurMaterial: Material;
     verticalBlurMaterial: Material;
 
-    threshold: number = 1.534;
-    tone: number = 0.46;
-    bloomAmount: number = 0.26;
-
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
 
     constructor({
         gpu,
-        threshold = 0,
-        tone = 1,
-        bloomAmount = 1,
+        parameters,
+        // threshold = 0,
+        // tone = 1,
+        // bloomAmount = 1,
     }: {
         gpu: GPU;
-        threshold?: number;
-        tone?: number;
-        bloomAmount?: number;
+        parameters?: BloomPassParameters
+        // threshold?: number;
+        // tone?: number;
+        // bloomAmount?: number;
     }) {
-        // super();
+        // this.threshold = threshold;
+        // this.tone = tone;
+        // this.bloomAmount = bloomAmount;
 
-        // this.gpu = gpu;
-
-        this.threshold = threshold;
-        this.tone = tone;
-        this.bloomAmount = bloomAmount;
+        this.parameters = generateDefaultBloomParameters(parameters);
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
@@ -199,7 +198,7 @@ export class BloomPass implements IPostProcessPass {
                 {
                     name: 'uThreshold',
                     type: UniformTypes.Float,
-                    value: this.threshold,
+                    value: this.parameters.threshold,
                 },
             ],
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -295,12 +294,12 @@ export class BloomPass implements IPostProcessPass {
                 {
                     name: 'uTone',
                     type: UniformTypes.Float,
-                    value: this.tone,
+                    value: this.parameters.tone
                 },
                 {
                     name: 'uBloomAmount',
                     type: UniformTypes.Float,
-                    value: this.bloomAmount,
+                    value: this.parameters.bloomAmount
                 },
                 {
                     name: 'uExtractTexture',
@@ -365,7 +364,7 @@ export class BloomPass implements IPostProcessPass {
             this.verticalBlurMaterial.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
         }
 
-        this.extractBrightnessPass.material.uniforms.setValue('uThreshold', this.threshold);
+        this.extractBrightnessPass.material.uniforms.setValue('uThreshold', this.parameters.threshold);
         this.extractBrightnessPass.render({
             gpu,
             camera,
@@ -455,8 +454,8 @@ export class BloomPass implements IPostProcessPass {
             'uExtractTexture',
             this.extractBrightnessPass.renderTarget.texture
         );
-        this.compositePass.material.uniforms.setValue('uTone', this.tone);
-        this.compositePass.material.uniforms.setValue('uBloomAmount', this.bloomAmount);
+        this.compositePass.material.uniforms.setValue('uTone', this.parameters.tone);
+        this.compositePass.material.uniforms.setValue('uBloomAmount', this.parameters.bloomAmount);
 
         this.compositePass.render({
             gpu,

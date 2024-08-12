@@ -62,6 +62,7 @@ import CubeMapNegativeYImgUrl from '../../../assets/images/laufenurg_church/ny.j
 import CubeMapPositiveZImgUrl from '../../../assets/images/laufenurg_church/pz.jpg?url';
 import CubeMapNegativeZImgUrl from '../../../assets/images/laufenurg_church/nz.jpg?url';
 import { intersectRayWithPlane, Plane } from '@/PaleGL/math/Plane.ts';
+import {Quaternion} from "@/PaleGL/math/Quaternion.ts";
 
 // -------------------
 // constants
@@ -887,7 +888,7 @@ const main = async () => {
 
     streetLightActorRight = await createStreetLightActor();
     streetLightActorRight.subscribeOnStart(() => {
-        streetLightActorRight.transform.rotation = new Rotator(0, 180, 0);
+        streetLightActorRight.transform.rotation = new Rotator(Quaternion.fromEulerDegrees(0, 180, 0));
         streetLightActorRight.transform.position = new Vector3(-6, 0, 0);
         streetLightActorRight.transform.scale = Vector3.fill(1.8);
     });
@@ -1196,9 +1197,9 @@ void main() {
         renderer.depthOfFieldPass.focusRange = 9.8;
         renderer.depthOfFieldPass.bokehRadius = 5.55;
 
-        renderer.bloomPass.bloomAmount = 0.26;
-        renderer.bloomPass.threshold = 1.534;
-        renderer.bloomPass.tone = 0.46;
+        renderer.bloomPass.parameters.bloomAmount = 0.26;
+        renderer.bloomPass.parameters.threshold = 1.534;
+        renderer.bloomPass.parameters.tone = 0.46;
 
         orbitCameraController.start();
     };
@@ -1445,9 +1446,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.blendRate,
+        initialValue: renderer.lightShaftPass.parameters.blendRate,
         onChange: (value) => {
-            renderer.lightShaftPass.blendRate = value;
+            renderer.lightShaftPass.parameters.blendRate = value;
         },
     });
 
@@ -1456,9 +1457,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.passScaleBase,
+        initialValue: renderer.lightShaftPass.parameters.passScaleBase,
         onChange: (value) => {
-            renderer.lightShaftPass.passScaleBase = value;
+            renderer.lightShaftPass.parameters.passScaleBase = value;
         },
     });
 
@@ -1467,9 +1468,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.05,
         stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayStepStrength,
+        initialValue: renderer.lightShaftPass.parameters.rayStepStrength,
         onChange: (value) => {
-            renderer.lightShaftPass.rayStepStrength = value;
+            renderer.lightShaftPass.parameters.rayStepStrength = value;
         },
     });
 
@@ -1646,9 +1647,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 4,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.bloomAmount,
+        initialValue: renderer.bloomPass.parameters.bloomAmount,
         onChange: (value) => {
-            renderer.bloomPass.bloomAmount = value;
+            renderer.bloomPass.parameters.bloomAmount = value;
         },
     });
 
@@ -1657,9 +1658,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.threshold,
+        initialValue: renderer.bloomPass.parameters.threshold,
         onChange: (value) => {
-            renderer.bloomPass.threshold = value;
+            renderer.bloomPass.parameters.threshold = value;
         },
     });
 
@@ -1668,9 +1669,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.bloomPass.tone,
+        initialValue: renderer.bloomPass.parameters.tone,
         onChange: (value) => {
-            renderer.bloomPass.tone = value;
+            renderer.bloomPass.parameters.tone = value;
         },
     });
 
@@ -1687,9 +1688,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 4,
         stepValue: 0.001,
-        initialValue: renderer.streakPass.threshold,
+        initialValue: renderer.streakPass.parameters.threshold,
         onChange: (value) => {
-            renderer.streakPass.threshold = value;
+            renderer.streakPass.parameters.threshold = value;
         },
     });
     streakDebuggerGroup.addSliderDebugger({
@@ -1697,9 +1698,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.streakPass.verticalScale,
+        initialValue: renderer.streakPass.parameters.verticalScale,
         onChange: (value) => {
-            renderer.streakPass.verticalScale = value;
+            renderer.streakPass.parameters.verticalScale = value;
         },
     });
     streakDebuggerGroup.addSliderDebugger({
@@ -1707,9 +1708,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 2,
         stepValue: 0.001,
-        initialValue: renderer.streakPass.horizontalScale,
+        initialValue: renderer.streakPass.parameters.horizontalScale,
         onChange: (value) => {
-            renderer.streakPass.horizontalScale = value;
+            renderer.streakPass.parameters.horizontalScale = value;
         },
     });
 
@@ -1718,16 +1719,16 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.streakPass.stretch,
+        initialValue: renderer.streakPass.parameters.stretch,
         onChange: (value) => {
-            renderer.streakPass.stretch = value;
+            renderer.streakPass.parameters.stretch = value;
         },
     });
     streakDebuggerGroup.addColorDebugger({
         label: 'color',
-        initialValue: renderer.streakPass.color.getHexCoord(),
+        initialValue: renderer.streakPass.parameters.color.getHexCoord(),
         onChange: (value) => {
-            renderer.streakPass.color = Color.fromHex(value);
+            renderer.streakPass.parameters.color = Color.fromHex(value);
         },
     });
     streakDebuggerGroup.addSliderDebugger({
@@ -1735,9 +1736,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.streakPass.intensity,
+        initialValue: renderer.streakPass.parameters.intensity,
         onChange: (value) => {
-            renderer.streakPass.intensity = value;
+            renderer.streakPass.parameters.intensity = value;
         },
     });
 
@@ -1961,8 +1962,8 @@ function initDebugger() {
 
     fxaaDebuggerGroup.addToggleDebugger({
         label: 'fxaa pass enabled',
-        initialValue: fxaaPass.enabled,
-        onChange: (value) => (fxaaPass.enabled = value),
+        initialValue: fxaaPass.parameters.enabled,
+        onChange: (value) => (fxaaPass.parameters.enabled = value),
     });
 
     //

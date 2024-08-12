@@ -46,7 +46,7 @@ import {
     PROPERTY_MATERIAL_BASE_COLOR_A,
     PROPERTY_MATERIAL_BASE_COLOR_B,
     PROPERTY_MATERIAL_BASE_COLOR_G,
-    PROPERTY_MATERIAL_BASE_COLOR_R,
+    PROPERTY_MATERIAL_BASE_COLOR_R, PROPERTY_POST_PROCESS_BLOOM_INTENSITY,
     PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE,
 } from '@/Marionetter/constants.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
@@ -259,6 +259,8 @@ function createMarionetterAnimationClip(
                 case PROPERTY_MATERIAL_BASE_COLOR_B:
                 case PROPERTY_MATERIAL_BASE_COLOR_A:
                     // TODO: GBufferMaterialとの連携？
+                    break;
+                case PROPERTY_POST_PROCESS_BLOOM_INTENSITY:
                     break;
                 case PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE:
                     // TODO: post process 連携

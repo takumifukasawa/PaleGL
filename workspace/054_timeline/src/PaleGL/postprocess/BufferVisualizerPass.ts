@@ -1,5 +1,9 @@
 ﻿import { UniformTypes } from '@/PaleGL/constants';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+import {
+    PostProcessParametersBase,
+    PostProcessPassBase,
+    PostProcessPassRenderArgs
+} from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -72,6 +76,21 @@ type RowPass = {
     >;
 };
 
+type BufferVisualizerPassParametersBase = {
+    fullViewTextureEnabled: boolean;
+};
+
+type BufferVisualizerPassParameters = PostProcessParametersBase & BufferVisualizerPassParametersBase;
+
+type BufferVisualizerPassParametersArgs = Partial<BufferVisualizerPassParameters>;
+
+function generateBufferVisualizerPassParameters(args: BufferVisualizerPassParametersArgs = {}): BufferVisualizerPassParameters {
+    return {
+        enabled: args.enabled || false,
+        fullViewTextureEnabled: args.fullViewTextureEnabled || false,
+    };
+}
+
 export class BufferVisualizerPass implements IPostProcessPass {
     dom: HTMLDivElement;
     rowPasses: RowPass[] = [];
@@ -85,13 +104,16 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
     private geometry: PlaneGeometry;
 
-    fullViewTextureEnabled: boolean = false;
+    parameters: BufferVisualizerPassParameters;
+    // fullViewTextureEnabled: boolean = false;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
 
-    constructor({ gpu }: { gpu: GPU }) {
+    constructor({ gpu, parameters }: { gpu: GPU, parameters?: BufferVisualizerPassParametersArgs }) {
+        this.parameters = generateBufferVisualizerPassParameters(parameters);
+        
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
 
@@ -871,7 +893,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             renderer.gBufferRenderTargets.gBufferBTexture
             // renderer.ssrPass.renderTarget.read.texture
         );
-        this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', this.fullViewTextureEnabled ? 1 : 0);
+        this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', this.parameters.fullViewTextureEnabled ? 1 : 0);
         // for debug
         // this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', 1);
 

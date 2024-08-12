@@ -45,9 +45,11 @@ export type PostProcessPassRenderArgs = {
 export class PostProcessPassBase implements IPostProcessPass {
     // protected gpu: GPU;
     name: string;
-    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
+
+    // enabled: boolean = true;
+    parameters: PostProcessParametersBase = { enabled: true };
 
     mesh: Mesh;
     geometry: PlaneGeometry;

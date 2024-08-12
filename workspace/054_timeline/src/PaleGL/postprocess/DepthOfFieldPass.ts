@@ -1,4 +1,4 @@
-﻿import {RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material } from '@/PaleGL/materials/Material';
@@ -11,7 +11,11 @@ import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment
 import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
 import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    PostProcessParametersBase,
+    PostProcessPassBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
@@ -23,6 +27,24 @@ import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 // https://github.com/keijiro/KinoBokeh/tree/master
 //
 
+export type DepthOfFieldPassParametersBase = {
+    focusDistance: number;
+};
+
+export type DepthOfFieldPassParameters = PostProcessParametersBase & DepthOfFieldPassParametersBase;
+
+export type DepthOfFieldPassArgs = {
+    focusDistance?: number;
+    enabled?: boolean;
+};
+
+export function generateDepthOfFieldPassParameters({ enabled, focusDistance }: DepthOfFieldPassArgs = {}): DepthOfFieldPassParameters {
+    return {
+        focusDistance: focusDistance || 14,
+        enabled: enabled || true,
+    };
+}
+
 export class DepthOfFieldPass implements IPostProcessPass {
     // --------------------------------------------------------------------------------
     // public
@@ -32,6 +54,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     focusDistance: number = 14;
     focusRange: number = 10;
     bokehRadius = 4;
+    parameters: DepthOfFieldPassParameters;
 
     // wip blade bokeh
     // focalLength: number = 200;
@@ -60,7 +83,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
      *
      * @param gpu
      */
-    constructor({ gpu }: { gpu: GPU; threshold?: number; tone?: number; bloomAmount?: number }) {
+    constructor({ gpu, parameters }: { gpu: GPU; parameters?: DepthOfFieldPassParameters }) {
         // super();
 
         // this.gpu = gpu;
@@ -68,13 +91,15 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
 
+        this.parameters = generateDepthOfFieldPassParameters(parameters);
+
         //
         // circle of confusion pass
         //
 
         // TODO: RHalf format
         this.circleOfConfusionPass = new FragmentPass({
-            name: "circleOfConfusionPass",
+            name: 'circleOfConfusionPass',
             gpu,
             fragmentShader: dofCircleOfConfusionFragmentShader,
             uniforms: [
@@ -112,7 +137,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
             ],
             uniformBlockNames: [
                 // UniformBlockNames.Transformations,
-                UniformBlockNames.Camera
+                UniformBlockNames.Camera,
             ],
             // TODO: r11f_g11f_b10fだとunsignedなのでr16fにする
             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
@@ -290,7 +315,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
 
     update() {}
-    
+
     /**
      *
      * @param gpu
@@ -316,7 +341,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
         this.geometry.start();
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
-        
+
         //
         // 0: render coc pass
         //
