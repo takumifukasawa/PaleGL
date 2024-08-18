@@ -228,6 +228,33 @@ export const AttributeNames = {
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
 
 // -----------------------------------------------------------------------------
+// post process
+// -----------------------------------------------------------------------------
+
+export const PostProcessPassType = {
+    Bloom: 0,
+    DepthOfField: 1,
+    BufferVisualizer: 2,
+    ChromaticAberration: 3,
+    GaussianBlur: 4,
+    Copy: 5,
+    FXAA: 6,
+    LightShaft: 7,
+    DeferredShading: 8,
+    ScreenSpaceShadow: 9,
+    SSAO: 10,
+    SSR: 11,
+    Streak: 12,
+    ToneMapping: 13,
+    Vignette: 14,
+    VolumetricLight: 15,
+    Fragment: 16,
+    Fog: 17,
+} as const;
+
+export type PostProcessPassType = (typeof PostProcessPassType)[keyof typeof PostProcessPassType];
+
+// -----------------------------------------------------------------------------
 // uniforms
 // -----------------------------------------------------------------------------
 

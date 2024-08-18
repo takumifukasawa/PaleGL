@@ -1,4 +1,10 @@
-﻿import { RenderTargetTypes, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import {
+    PostProcessPassType,
+    RenderTargetTypes,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material } from '@/PaleGL/materials/Material';
@@ -12,8 +18,8 @@ import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
 import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
 import {
-    PostProcessParametersBase,
     PostProcessPassBase,
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -31,15 +37,16 @@ export type DepthOfFieldPassParametersBase = {
     focusDistance: number;
 };
 
-export type DepthOfFieldPassParameters = PostProcessParametersBase & DepthOfFieldPassParametersBase;
+export type DepthOfFieldPassParameters = PostProcessPassParametersBase & DepthOfFieldPassParametersBase;
 
-export type DepthOfFieldPassArgs = {
-    focusDistance?: number;
-    enabled?: boolean;
-};
+export type DepthOfFieldPassArgs = Partial<DepthOfFieldPassParameters>;
 
-export function generateDepthOfFieldPassParameters({ enabled, focusDistance }: DepthOfFieldPassArgs = {}): DepthOfFieldPassParameters {
+export function generateDepthOfFieldPassParameters({
+    enabled,
+    focusDistance,
+}: DepthOfFieldPassArgs = {}): DepthOfFieldPassParameters {
     return {
+        type: PostProcessPassType.DepthOfField,
         focusDistance: focusDistance || 14,
         enabled: enabled || true,
     };

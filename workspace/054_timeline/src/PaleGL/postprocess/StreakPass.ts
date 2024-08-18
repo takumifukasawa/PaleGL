@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
@@ -18,8 +18,8 @@ import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-
 import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
 import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
 import {
-    PostProcessParametersBase,
     PostProcessPassBase,
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
@@ -41,12 +41,13 @@ type StreakPassParametersBase = {
     horizontalScale: number;
 };
 
-type StreakPassParameters = PostProcessParametersBase & StreakPassParametersBase;
+type StreakPassParameters = PostProcessPassParametersBase & StreakPassParametersBase;
 
 type StreakPassParametersArgs = Partial<StreakPassParameters>;
 
 function generateStreakPassParameters(args: StreakPassParametersArgs = {}): StreakPassParameters {
     return {
+        type: PostProcessPassType.Streak,
         enabled: args.enabled || true,
         threshold: args.threshold || 0.9,
         stretch: args.stretch || 0.5,

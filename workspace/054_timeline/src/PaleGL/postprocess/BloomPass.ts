@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
@@ -14,8 +14,8 @@ import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
 import {
-    PostProcessParametersBase,
     PostProcessPassBase,
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
@@ -27,17 +27,18 @@ type BloomPassParametersBase = {
     bloomAmount: number;
 };
 
-type BloomPassParameters = PostProcessParametersBase & BloomPassParametersBase;
+export type BloomPassParameters = PostProcessPassParametersBase & BloomPassParametersBase;
 
 type BloomPassParametersArgs = Partial<BloomPassParameters>;
 
-export function generateDefaultBloomParameters({
+export function generateDefaultBloomPassParameters({
     enabled,
     threshold,
     tone,
     bloomAmount,
 }: BloomPassParametersArgs = {}): BloomPassParameters {
     return {
+        type: PostProcessPassType.Bloom,
         enabled: enabled || true,
         threshold: threshold || 1.534,
         tone: tone || 0.46,
@@ -57,7 +58,7 @@ export class BloomPass implements IPostProcessPass {
     materials: Material[] = [];
 
     private extractBrightnessPass;
-    
+
     parameters: BloomPassParameters;
 
     // enabled: boolean = true;
@@ -116,12 +117,12 @@ export class BloomPass implements IPostProcessPass {
     constructor({
         gpu,
         parameters,
-        // threshold = 0,
-        // tone = 1,
-        // bloomAmount = 1,
-    }: {
+    } // threshold = 0,
+    // tone = 1,
+    // bloomAmount = 1,
+    : {
         gpu: GPU;
-        parameters?: BloomPassParameters
+        parameters?: BloomPassParametersArgs;
         // threshold?: number;
         // tone?: number;
         // bloomAmount?: number;
@@ -130,7 +131,7 @@ export class BloomPass implements IPostProcessPass {
         // this.tone = tone;
         // this.bloomAmount = bloomAmount;
 
-        this.parameters = generateDefaultBloomParameters(parameters);
+        this.parameters = generateDefaultBloomPassParameters(parameters);
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
@@ -294,12 +295,12 @@ export class BloomPass implements IPostProcessPass {
                 {
                     name: 'uTone',
                     type: UniformTypes.Float,
-                    value: this.parameters.tone
+                    value: this.parameters.tone,
                 },
                 {
                     name: 'uBloomAmount',
                     type: UniformTypes.Float,
-                    value: this.parameters.bloomAmount
+                    value: this.parameters.bloomAmount,
                 },
                 {
                     name: 'uExtractTexture',
@@ -467,5 +468,9 @@ export class BloomPass implements IPostProcessPass {
             gBufferRenderTargets,
             time,
         });
+    }
+
+    applyParameter(parameter: BloomPassParameters) {
+        this.parameters = parameter;
     }
 }

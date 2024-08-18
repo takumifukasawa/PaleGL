@@ -1,8 +1,8 @@
-﻿import { UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 import {
-    PostProcessParametersBase,
     PostProcessPassBase,
-    PostProcessPassRenderArgs
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -80,12 +80,15 @@ type BufferVisualizerPassParametersBase = {
     fullViewTextureEnabled: boolean;
 };
 
-type BufferVisualizerPassParameters = PostProcessParametersBase & BufferVisualizerPassParametersBase;
+type BufferVisualizerPassParameters = PostProcessPassParametersBase & BufferVisualizerPassParametersBase;
 
 type BufferVisualizerPassParametersArgs = Partial<BufferVisualizerPassParameters>;
 
-function generateBufferVisualizerPassParameters(args: BufferVisualizerPassParametersArgs = {}): BufferVisualizerPassParameters {
+function generateBufferVisualizerPassParameters(
+    args: BufferVisualizerPassParametersArgs = {}
+): BufferVisualizerPassParameters {
     return {
+        type: PostProcessPassType.BufferVisualizer,
         enabled: args.enabled || false,
         fullViewTextureEnabled: args.fullViewTextureEnabled || false,
     };
@@ -105,15 +108,16 @@ export class BufferVisualizerPass implements IPostProcessPass {
     private geometry: PlaneGeometry;
 
     parameters: BufferVisualizerPassParameters;
+
     // fullViewTextureEnabled: boolean = false;
 
     get renderTarget() {
         return this.compositePass.renderTarget;
     }
 
-    constructor({ gpu, parameters }: { gpu: GPU, parameters?: BufferVisualizerPassParametersArgs }) {
+    constructor({ gpu, parameters }: { gpu: GPU; parameters?: BufferVisualizerPassParametersArgs }) {
         this.parameters = generateBufferVisualizerPassParameters(parameters);
-        
+
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = new PlaneGeometry({ gpu });
 
@@ -439,8 +443,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     {
                         type: 'Texture',
                     },
-                ]
-                
+                ],
             ]),
         });
 
@@ -566,7 +569,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.dom = document.createElement('div');
         this.dom.classList.add('buffer-visualizer-pass');
         const frag = document.createDocumentFragment();
-        console.log(this.rowPasses)
+        console.log(this.rowPasses);
         this.rowPasses.forEach(({ tiles }, rowIndex) => {
             let colIndex = 0;
             const rowContent = document.createElement('div');
@@ -687,8 +690,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     renderer.gBufferRenderTargets.gBufferDTexture
                 );
             }
-            
-            if(tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
+
+            if (tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(SCREEN_SPACE_SHADOW_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.screenSpaceShadowPass.renderTarget.read.texture
@@ -743,92 +746,90 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     renderer.fogPass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_PREFILTER_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_PREFILTER_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.prefilterPass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[0].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[1].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[2].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[3].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[4].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_UP_SAMPLE_0_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_UP_SAMPLE_0_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[0].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_UP_SAMPLE_1_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_UP_SAMPLE_1_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[1].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_UP_SAMPLE_2_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_UP_SAMPLE_2_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[2].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_UP_SAMPLE_3_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_UP_SAMPLE_3_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[3].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_UP_SAMPLE_4_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_UP_SAMPLE_4_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[4].pass.renderTarget.read.texture
                 );
             }
-            
+
             if (tiles.has(STREAK_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
                     tiles.get(STREAK_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.renderTarget.read.texture
                 );
             }
-            
-            
 
             if (tiles.has(BLOOM_BLUR_MIP4_TEXTURE_KEY)) {
                 pass.material.uniforms.setValue(
@@ -893,7 +894,10 @@ export class BufferVisualizerPass implements IPostProcessPass {
             renderer.gBufferRenderTargets.gBufferBTexture
             // renderer.ssrPass.renderTarget.read.texture
         );
-        this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', this.parameters.fullViewTextureEnabled ? 1 : 0);
+        this.compositePass.material.uniforms.setValue(
+            'uFullViewTextureEnabled',
+            this.parameters.fullViewTextureEnabled ? 1 : 0
+        );
         // for debug
         // this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', 1);
 

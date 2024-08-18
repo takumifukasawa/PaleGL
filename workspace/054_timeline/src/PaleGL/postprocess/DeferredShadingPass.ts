@@ -1,7 +1,11 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import {
-    MAX_SPOT_LIGHT_COUNT,
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs
+} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    MAX_SPOT_LIGHT_COUNT, PostProcessPassType,
     RenderTargetTypes,
     UniformBlockNames,
     UniformNames,
@@ -15,6 +19,12 @@ import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
+export type DeferredShadingParametersBase = PostProcessPassParametersBase;
+
+export type DeferredShadingParameters = PostProcessPassParametersBase & DeferredShadingParametersBase;
+
+export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
+
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor({
         gpu, // fragmentShader,
@@ -26,6 +36,8 @@ export class DeferredShadingPass extends PostProcessPassBase {
         // uniforms?: Uniforms;
         // name?: string;
     }) {
+        const parameters = { type: PostProcessPassType.DeferredShading };
+        
         const uniforms: UniformsData = [
             // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
             {
@@ -111,6 +123,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
 
         super({
             gpu,
+            parameters,
             name: 'DeferredShadingPass',
             fragmentShader: deferredShadingFragmentShader,
             uniforms,

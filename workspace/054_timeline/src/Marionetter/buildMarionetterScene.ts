@@ -26,13 +26,15 @@ import {
     MarionetterSpotLightComponentInfo,
     MarionetterTimeline,
     MarionetterVolumeComponentInfo,
-    MarionetterVolumeLayerBloom,
+    MarionetterVolumeLayerBloom, MarionetterVolumeLayerDepthOfField,
 } from '@/Marionetter/types';
 import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Light } from '@/PaleGL/actors/Light.ts';
-import { generateDefaultBloomParameters } from '@/PaleGL/postprocess/BloomPass.ts';
+import { generateDefaultBloomPassParameters } from '@/PaleGL/postprocess/BloomPass.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
+import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
+import {generateDepthOfFieldPassParameters} from "@/PaleGL/postprocess/DepthOfFieldPass.ts";
 
 export function tryParseJsonString<T>(str: string) {
     let json: T | null = null;
@@ -77,8 +79,32 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     return q;
 }
 
-function findComponent(obj: MarionetterObjectInfo, componentType: MarionetterComponentType) {
-    return obj.components.find((c) => c.type === componentType);
+function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
+    return (obj.components.find((c) => c.type === componentType) as T) || null;
+}
+
+function buildPostProcessVolumeActor(volumeComponent: MarionetterVolumeComponentInfo) {
+    const parameters = maton(
+        volumeComponent.volumeLayers.map((volumeLayer) => {
+            switch (volumeLayer.layerType) {
+                case 'Bloom':
+                    const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
+                    return generateDefaultBloomPassParameters({
+                        bloomAmount: bloomLayer.intensity,
+                    });
+                case 'DepthOfField':
+                    const depthOfFieldLayer = volumeLayer as MarionetterVolumeLayerDepthOfField;
+                    return generateDepthOfFieldPassParameters({
+                        focusDistance: depthOfFieldLayer.focusDistance
+                    });
+                default:
+                    return null;
+            }
+        })
+    )
+        .compact()
+        .value();
+    return new PostProcessVolume({ parameters });
 }
 
 /**
@@ -92,37 +118,32 @@ export function buildMarionetterScene(
 ): { actors: Actor[]; marionetterTimeline: MarionetterTimeline | null } {
     const actors: Actor[] = [];
 
-    function buildVolume(volumeComponent: MarionetterVolumeComponentInfo) {
-        return maton(
-            volumeComponent.volumeLayers.map((volumeLayer) => {
-                switch (volumeLayer.layerType) {
-                    case 'Bloom':
-                        const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
-                        return generateDefaultBloomParameters({
-                            bloomAmount: bloomLayer.intensity,
-                        });
-                    // case 'DepthOfField':
-                    //     return;
-                    default:
-                        return null;
-                }
-            })
-        )
-            .compact()
-            .value();
-    }
-
     function recursiveBuildActor(
         obj: MarionetterObjectInfo,
         parentActor: Actor | null = null,
         needsFlip: boolean = false
     ) {
         const { name } = obj;
-        const mfComponent = findComponent(obj, MarionetterComponentType.MeshFilter);
-        const mrComponent = findComponent(obj, MarionetterComponentType.MeshRenderer);
-        const cameraComponent = findComponent(obj, MarionetterComponentType.Camera);
-        const lightComponent = findComponent(obj, MarionetterComponentType.Light);
-        const volumeComponent = findComponent(obj, MarionetterComponentType.Volume);
+        const mfComponent = findMarionetterComponent<MarionetterMeshFilterComponentInfo>(
+            obj,
+            MarionetterComponentType.MeshFilter
+        );
+        const mrComponent = findMarionetterComponent<MarionetterMeshRendererComponentInfo>(
+            obj,
+            MarionetterComponentType.MeshRenderer
+        );
+        const cameraComponent = findMarionetterComponent<MarionetterCameraComponentInfo>(
+            obj,
+            MarionetterComponentType.Camera
+        );
+        const lightComponent = findMarionetterComponent<MarionetterLightComponentInfo>(
+            obj,
+            MarionetterComponentType.Light
+        );
+        const volumeComponent = findMarionetterComponent<MarionetterVolumeComponentInfo>(
+            obj,
+            MarionetterComponentType.Volume
+        );
 
         let actor: Actor | null = null;
 
@@ -131,8 +152,8 @@ export function buildMarionetterScene(
         //
 
         if (mrComponent && mfComponent) {
-            const meshFilter = mfComponent as MarionetterMeshFilterComponentInfo;
-            const meshRenderer = mrComponent as MarionetterMeshRendererComponentInfo;
+            const meshFilter = mfComponent;
+            const meshRenderer = mrComponent;
 
             let geometry: Geometry | null = null;
             let material: Material | null = null;
@@ -162,7 +183,7 @@ export function buildMarionetterScene(
                 actor = new Mesh({ name, geometry, material });
             }
         } else if (cameraComponent) {
-            const camera = cameraComponent as MarionetterCameraComponentInfo;
+            const camera = cameraComponent;
             if (camera.cameraType === 'Perspective') {
                 actor = new PerspectiveCamera(camera.fov, 1, 0.1, 1000, name);
             } else {
@@ -170,7 +191,7 @@ export function buildMarionetterScene(
             }
         } else if (lightComponent) {
             // light
-            const light = lightComponent as MarionetterLightComponentInfo;
+            const light = lightComponent;
             switch (light.lightType) {
                 case 'Directional':
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
@@ -201,8 +222,8 @@ export function buildMarionetterScene(
                 default:
                     throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
             }
-        // } else if (volumeComponent) {
-        //     actor = new Volume();
+        } else if (volumeComponent) {
+            actor = buildPostProcessVolumeActor(volumeComponent);
         } else {
             // others
             actor = new Actor({ name });

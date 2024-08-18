@@ -1,32 +1,63 @@
-﻿import { UniformNames, UniformTypes, UniformBlockNames } from '@/PaleGL/constants';
+﻿import { UniformNames, UniformTypes, UniformBlockNames, PostProcessPassType } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import screenSpaceShadowFragmentShader from '@/PaleGL/shaders/screen-space-shadow-fragment.glsl';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    PostProcessPassParametersBase,
+    PostProcessPassBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Override } from '@/PaleGL/palegl';
 
-/**
- *
- */
+export type ScreenSpaceShadowPassParametersBase = {
+    bias: number;
+    jitterSize: Vector3;
+    sharpness: number;
+    strength: number;
+    ratio: number;
+};
+
+export type ScreenSpaceShadowPassParameters = PostProcessPassParametersBase & ScreenSpaceShadowPassParametersBase;
+
+export type ScreenSpaceShadowPassArgs = Partial<ScreenSpaceShadowPassParameters>;
+
+export function generateScreenSpaceShadowPassParameters(params: ScreenSpaceShadowPassArgs = {}): ScreenSpaceShadowPassParameters {
+    return {
+        type: PostProcessPassType.ScreenSpaceShadow,
+        enabled: params.enabled ?? true,
+        bias: params.bias ?? 0,
+        jitterSize: params.jitterSize ?? new Vector3(0.025, 0.025, 0.025),
+        sharpness: params.sharpness ?? 2,
+        strength: params.strength ?? 1,
+        ratio: params.ratio ?? 0.5,
+    };
+}
+
 export class ScreenSpaceShadowPass extends PostProcessPassBase {
-    bias: number = 0;
-    // jitterSize: Vector3 = new Vector3(0.2, 0.2, 0.2);
-    jitterSize: Vector3 = new Vector3(0.025, 0.025, 0.025);
-    // sharpness: number = 0.3;
-    sharpness: number = 2;
-    strength: number = 1;
+    // bias: number = 0;
+    // // jitterSize: Vector3 = new Vector3(0.2, 0.2, 0.2);
+    // jitterSize: Vector3 = new Vector3(0.025, 0.025, 0.025);
+    // // sharpness: number = 0.3;
+    // sharpness: number = 2;
+    // strength: number = 1;
 
-    ratio: number = 0.5;
+    // ratio: number = 0.5;
+
+    parameters: Override<PostProcessPassParametersBase, ScreenSpaceShadowPassParameters>;
 
     /**
      *
-     * @param gpu
-     * @param ratio
+     * @param args
      */
-    constructor({ gpu, ratio }: { gpu: GPU; ratio?: number }) {
+    constructor(args: { gpu: GPU; parameters?: ScreenSpaceShadowPassParameters }) {
+        const { gpu } = args;
         const fragmentShader = screenSpaceShadowFragmentShader;
+        // { gpu, ratio, parameters }
+        const parameters = generateScreenSpaceShadowPassParameters(args.parameters ?? {});
 
         super({
             gpu,
+            parameters,
             fragmentShader,
             uniforms: [
                 {
@@ -69,9 +100,11 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
             // renderTargetType: RenderTargetTypes.R16F,
         });
 
-        if (ratio) {
-            this.ratio = ratio;
-        }
+        // if (args.ratio) {
+        //     this.ratio = ratio;
+        // }
+
+        this.parameters = parameters;
     }
 
     /**
@@ -80,7 +113,7 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      * @param height
      */
     setSize(width: number, height: number) {
-        super.setSize(width * this.ratio, height * this.ratio);
+        super.setSize(width * this.parameters.ratio, height * this.parameters.ratio);
         // this.material.uniforms.setValue(UniformNames.TargetWidth, width);
         // this.material.uniforms.setValue(UniformNames.TargetHeight, height);
     }
@@ -90,10 +123,10 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue('uBias', this.bias);
-        this.material.uniforms.setValue('uJitterSize', this.jitterSize);
-        this.material.uniforms.setValue('uSharpness', this.sharpness);
-        this.material.uniforms.setValue('uStrength', this.strength);
+        this.material.uniforms.setValue('uBias', this.parameters.bias);
+        this.material.uniforms.setValue('uJitterSize', this.parameters.jitterSize);
+        this.material.uniforms.setValue('uSharpness', this.parameters.sharpness);
+        this.material.uniforms.setValue('uStrength', this.parameters.strength);
         super.render(options);
     }
 }

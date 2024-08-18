@@ -62,6 +62,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/PointLight.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
+// import {PostProcessVolume} from "@/PaleGL/actors/PostProcessVolume.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -106,6 +107,10 @@ export function applyLightShadowMapUniformValues(
         spotLightShadowMaps
     );
 }
+
+// function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
+//     renderer.bloomPass.applyParameter(postProcessVolumeActor.)
+// }
 
 /**
  * 描画パイプライン的な役割
@@ -768,6 +773,8 @@ export class Renderer {
             spotLights: [],
             pointLights: [],
         };
+        
+        // let postProcessVolumeActor: PostProcessVolume | null = null;
 
         // build render mesh info each queue
         scene.traverse((actor) => {
@@ -822,6 +829,10 @@ export class Renderer {
                         }
                     }
                     break;
+                    
+                // case ActorTypes.PostProcessVolume:
+                //     postProcessVolumeActor = actor as PostProcessVolume;
+                //     break;
             }
         });
 

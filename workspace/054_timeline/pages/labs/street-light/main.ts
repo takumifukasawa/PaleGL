@@ -1187,11 +1187,11 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        renderer.fogPass.fogColor = Color.black;
-        renderer.fogPass.fogDensity = 0.023;
-        renderer.fogPass.fogDensityAttenuation = 0.065;
-        renderer.fogPass.distanceFogStart = 18;
-        renderer.fogPass.distanceFogPower = 0.29;
+        renderer.fogPass.parameters.fogColor = Color.black;
+        renderer.fogPass.parameters.fogDensity = 0.023;
+        renderer.fogPass.parameters.fogDensityAttenuation = 0.065;
+        renderer.fogPass.parameters.distanceFogStart = 18;
+        renderer.fogPass.parameters.distanceFogPower = 0.29;
 
         renderer.depthOfFieldPass.focusDistance = 17.78;
         renderer.depthOfFieldPass.focusRange = 9.8;
@@ -1484,52 +1484,52 @@ function initDebugger() {
 
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'ray step',
-        initialValue: renderer.volumetricLightPass.rayStep,
+        initialValue: renderer.volumetricLightPass.parameters.rayStep,
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            renderer.volumetricLightPass.rayStep = value;
+            renderer.volumetricLightPass.parameters.rayStep = value;
         },
     });
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'density multiplier',
-        initialValue: renderer.volumetricLightPass.densityMultiplier,
+        initialValue: renderer.volumetricLightPass.parameters.densityMultiplier,
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
         onChange: (value) => {
-            renderer.volumetricLightPass.densityMultiplier = value;
+            renderer.volumetricLightPass.parameters.densityMultiplier = value;
         },
     });
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'jitter size x',
-        initialValue: renderer.volumetricLightPass.rayJitterSizeX,
+        initialValue: renderer.volumetricLightPass.parameters.rayJitterSizeX,
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            renderer.volumetricLightPass.rayJitterSizeX = value;
+            renderer.volumetricLightPass.parameters.rayJitterSizeX = value;
         },
     });
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'jitter size y',
-        initialValue: renderer.volumetricLightPass.rayJitterSizeY,
+        initialValue: renderer.volumetricLightPass.parameters.rayJitterSizeY,
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            renderer.volumetricLightPass.rayJitterSizeY = value;
+            renderer.volumetricLightPass.parameters.rayJitterSizeY = value;
         },
     });
     volumetricLightDebuggerGroup.addSliderDebugger({
         label: 'blend rate',
-        initialValue: renderer.volumetricLightPass.blendRate,
+        initialValue: renderer.volumetricLightPass.parameters.blendRate,
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            renderer.volumetricLightPass.blendRate = value;
+            renderer.volumetricLightPass.parameters.blendRate = value;
         },
     });
 
@@ -1543,9 +1543,9 @@ function initDebugger() {
 
     fogDebuggerGroup.addColorDebugger({
         label: 'fog color',
-        initialValue: renderer.fogPass.fogColor.getHexCoord(),
+        initialValue: renderer.fogPass.parameters.fogColor.getHexCoord(),
         onChange: (value) => {
-            renderer.fogPass.fogColor = Color.fromHex(value);
+            renderer.fogPass.parameters.fogColor = Color.fromHex(value);
         },
     });
 
@@ -1554,9 +1554,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.0001,
-        initialValue: renderer.fogPass.fogDensity,
+        initialValue: renderer.fogPass.parameters.fogDensity,
         onChange: (value) => {
-            renderer.fogPass.fogDensity = value;
+            renderer.fogPass.parameters.fogDensity = value;
         },
     });
 
@@ -1565,9 +1565,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.0001,
-        initialValue: renderer.fogPass.fogDensityAttenuation,
+        initialValue: renderer.fogPass.parameters.fogDensityAttenuation,
         onChange: (value) => {
-            renderer.fogPass.fogDensityAttenuation = value;
+            renderer.fogPass.parameters.fogDensityAttenuation = value;
         },
     });
 
@@ -1576,9 +1576,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: captureSceneCamera.far,
         stepValue: 0.01,
-        initialValue: renderer.fogPass.distanceFogStart,
+        initialValue: renderer.fogPass.parameters.distanceFogStart,
         onChange: (value) => {
-            renderer.fogPass.distanceFogStart = value;
+            renderer.fogPass.parameters.distanceFogStart = value;
         },
     });
 
@@ -1587,9 +1587,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.fogPass.distanceFogPower,
+        initialValue: renderer.fogPass.parameters.distanceFogPower,
         onChange: (value) => {
-            renderer.fogPass.distanceFogPower = value;
+            renderer.fogPass.parameters.distanceFogPower = value;
         },
     });
 
@@ -1755,9 +1755,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayDepthBias,
+        initialValue: renderer.ssrPass.parameters.rayDepthBias,
         onChange: (value) => {
-            renderer.ssrPass.rayDepthBias = value;
+            renderer.ssrPass.parameters.rayDepthBias = value;
         },
     });
 
@@ -1766,9 +1766,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayNearestDistance,
+        initialValue: renderer.ssrPass.parameters.rayNearestDistance,
         onChange: (value) => {
-            renderer.ssrPass.rayNearestDistance = value;
+            renderer.ssrPass.parameters.rayNearestDistance = value;
         },
     });
 
@@ -1777,9 +1777,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayMaxDistance,
+        initialValue: renderer.ssrPass.parameters.rayMaxDistance,
         onChange: (value) => {
-            renderer.ssrPass.rayMaxDistance = value;
+            renderer.ssrPass.parameters.rayMaxDistance = value;
         },
     });
 
@@ -1788,9 +1788,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayThickness,
+        initialValue: renderer.ssrPass.parameters.reflectionRayThickness,
         onChange: (value) => {
-            renderer.ssrPass.reflectionRayThickness = value;
+            renderer.ssrPass.parameters.reflectionRayThickness = value;
         },
     });
 
@@ -1799,9 +1799,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayJitterSizeX,
+        initialValue: renderer.ssrPass.parameters.reflectionRayJitterSizeX,
         onChange: (value) => {
-            renderer.ssrPass.reflectionRayJitterSizeX = value;
+            renderer.ssrPass.parameters.reflectionRayJitterSizeX = value;
         },
     });
 
@@ -1810,9 +1810,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayJitterSizeY,
+        initialValue: renderer.ssrPass.parameters.reflectionRayJitterSizeY,
         onChange: (value) => {
-            renderer.ssrPass.reflectionRayJitterSizeY = value;
+            renderer.ssrPass.parameters.reflectionRayJitterSizeY = value;
         },
     });
 
@@ -1821,9 +1821,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.01,
-        initialValue: renderer.ssrPass.reflectionRoughnessPower,
+        initialValue: renderer.ssrPass.parameters.reflectionRoughnessPower,
         onChange: (value) => {
-            renderer.ssrPass.reflectionRoughnessPower = value;
+            renderer.ssrPass.parameters.reflectionRoughnessPower = value;
         },
     });
 
@@ -1832,9 +1832,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionFadeMinDistance,
+        initialValue: renderer.ssrPass.parameters.reflectionFadeMinDistance,
         onChange: (value) => {
-            renderer.ssrPass.reflectionFadeMinDistance = value;
+            renderer.ssrPass.parameters.reflectionFadeMinDistance = value;
         },
     });
 
@@ -1843,9 +1843,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionFadeMaxDistance,
+        initialValue: renderer.ssrPass.parameters.reflectionFadeMaxDistance,
         onChange: (value) => {
-            renderer.ssrPass.reflectionFadeMaxDistance = value;
+            renderer.ssrPass.parameters.reflectionFadeMaxDistance = value;
         },
     });
 
@@ -1854,9 +1854,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX,
+        initialValue: renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMinX,
         onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
+            renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMinX = value;
         },
     });
 
@@ -1865,9 +1865,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX,
+        initialValue: renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMaxX,
         onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
+            renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMaxX = value;
         },
     });
 
@@ -1876,9 +1876,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY,
+        initialValue: renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMinY,
         onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
+            renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMinY = value;
         },
     });
 
@@ -1887,9 +1887,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY,
+        initialValue: renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMaxY,
         onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
+            renderer.ssrPass.parameters.reflectionScreenEdgeFadeFactorMaxY = value;
         },
     });
 
@@ -1898,9 +1898,9 @@ function initDebugger() {
         minValue: 0.01,
         maxValue: 1,
         stepValue: 0.01,
-        initialValue: renderer.ssrPass.reflectionAdditionalRate,
+        initialValue: renderer.ssrPass.parameters.reflectionAdditionalRate,
         onChange: (value) => {
-            renderer.ssrPass.reflectionAdditionalRate = value;
+            renderer.ssrPass.parameters.reflectionAdditionalRate = value;
         },
     });
 
@@ -1932,24 +1932,24 @@ function initDebugger() {
         minValue: 0,
         maxValue: 3,
         stepValue: 0.001,
-        initialValue: renderer.vignettePass.vignetteRadius,
-        onChange: (value) => (renderer.vignettePass.vignetteRadius = value),
+        initialValue: renderer.vignettePass.parameters.vignetteRadius,
+        onChange: (value) => (renderer.vignettePass.parameters.vignetteRadius = value),
     });
     vignetteDebuggerGroup.addSliderDebugger({
         label: 'power',
         minValue: 0.01,
         maxValue: 8,
         stepValue: 0.001,
-        initialValue: renderer.vignettePass.vignettePower,
-        onChange: (value) => (renderer.vignettePass.vignettePower = value),
+        initialValue: renderer.vignettePass.parameters.vignettePower,
+        onChange: (value) => (renderer.vignettePass.parameters.vignettePower = value),
     });
     vignetteDebuggerGroup.addSliderDebugger({
         label: 'blend rate',
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: renderer.vignettePass.blendRate,
-        onChange: (value) => (renderer.vignettePass.blendRate = value),
+        initialValue: renderer.vignettePass.parameters.blendRate,
+        onChange: (value) => (renderer.vignettePass.parameters.blendRate = value),
     });
 
     //

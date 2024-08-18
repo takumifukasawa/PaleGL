@@ -1,10 +1,12 @@
 ﻿import {
     AttributeNames,
-    BlendTypes, DepthFuncTypes,
+    BlendTypes,
+    DepthFuncTypes,
     FaceSide,
-    MAX_SPOT_LIGHT_COUNT,
+    MAX_SPOT_LIGHT_COUNT, PostProcessPassType,
     PrimitiveTypes,
-    RenderTargetTypes, TextureDepthPrecisionType,
+    RenderTargetTypes,
+    TextureDepthPrecisionType,
     // TextureDepthPrecisionType,
     UniformBlockNames,
     UniformNames,
@@ -12,7 +14,10 @@
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import {
+    PostProcessPassBase, PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import spotLightFrustumVertex from '@/PaleGL/shaders/spotlight-frustum-vertex.glsl';
@@ -20,33 +25,62 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
+import { Override } from '@/PaleGL/palegl';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 // import { Color } from '@/PaleGL/math/Color.ts';
 
+export type VolumetricLightPassParametersBase = {
+    rayStep: number;
+    blendRate: number;
+    densityMultiplier: number;
+    rayJitterSizeX: number;
+    rayJitterSizeY: number;
+    ratio: number;
+};
+
+export type VolumetricLightPassParameters = PostProcessPassParametersBase & VolumetricLightPassParametersBase;
+
+export type VolumetricLightPassParametersArgs = Partial<VolumetricLightPassParameters>;
+
+export function generateVolumetricLightParameters(params: VolumetricLightPassParametersArgs = {}): VolumetricLightPassParameters {
+    return {
+        type: PostProcessPassType.VolumetricLight,
+        enabled: params.enabled ?? true,
+        rayStep: params.rayStep ?? 0.5,
+        blendRate: params.blendRate ?? 1,
+        densityMultiplier: params.densityMultiplier ?? 1,
+        rayJitterSizeX: params.rayJitterSizeX ?? 0.1,
+        rayJitterSizeY: params.rayJitterSizeY ?? 0.1,
+        ratio: params.ratio ?? 0.5,
+    };
+}
+
 export class VolumetricLightPass extends PostProcessPassBase {
-    rayStep: number = 0.5;
-    blendRate: number = 1;
-    densityMultiplier: number = 1;
-    rayJitterSizeX: number = 0.1;
-    rayJitterSizeY: number = 0.1;
+    // rayStep: number = 0.5;
+    // blendRate: number = 1;
+    // densityMultiplier: number = 1;
+    // rayJitterSizeX: number = 0.1;
+    // rayJitterSizeY: number = 0.1;
+    // ratio: number = 0.5;
+    parameters: Override<PostProcessPassParametersBase, VolumetricLightPassParameters>;
 
     #spotLights: SpotLight[] = [];
-
-    ratio: number = 0.5;
 
     spotLightFrustumMaterial: Material;
 
     renderTargetSpotLightFrustum: RenderTarget;
-    
+
     rawWidth: number = 1;
     rawHeight: number = 1;
 
     /**
      *
-     * @param gpu
-     * @param ratio
+     * @param args
      */
-    constructor({ gpu, ratio }: { gpu: GPU; ratio?: number }) {
+    constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
+        const { gpu } = args;
+        const parameters = generateVolumetricLightParameters(args.parameters ?? {});
+
         const fragmentShader = volumetricLightFragmentShader;
 
         super({
@@ -107,11 +141,13 @@ export class VolumetricLightPass extends PostProcessPassBase {
             ],
             // renderTargetType: RenderTargetTypes.RGBA
             renderTargetType: RenderTargetTypes.RGBA16F,
+            parameters,
         });
 
-        if (ratio !== undefined) {
-            this.ratio = ratio;
-        }
+        // if (ratio !== undefined) {
+        //     this.ratio = ratio;
+        // }
+        this.parameters = parameters;
 
         this.renderTargetSpotLightFrustum = new RenderTarget({
             // name: 'spot light frustum render target',
@@ -122,7 +158,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
             type: RenderTargetTypes.Depth,
             width: 1,
             height: 1,
-            depthPrecision: TextureDepthPrecisionType.High
+            depthPrecision: TextureDepthPrecisionType.High,
         });
 
         this.spotLightFrustumMaterial = new Material({
@@ -190,8 +226,8 @@ uniform mat4 uProjectionMatrix;
     setSize(width: number, height: number) {
         this.rawWidth = width;
         this.rawHeight = height;
-        this.width = Math.floor(width * this.ratio);
-        this.height = Math.floor(height * this.ratio);
+        this.width = Math.floor(width * this.parameters.ratio);
+        this.height = Math.floor(height * this.parameters.ratio);
 
         super.setSize(this.width, this.height);
 
@@ -207,12 +243,9 @@ uniform mat4 uProjectionMatrix;
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
-
         const { gpu, renderer } = options;
 
-        if (
-            !this.spotLightFrustumMaterial.isCompiledShader
-            && this.#spotLights.length > 0) {
+        if (!this.spotLightFrustumMaterial.isCompiledShader && this.#spotLights.length > 0) {
             this.spotLightFrustumMaterial.start({
                 gpu,
                 attributeDescriptors:
@@ -244,11 +277,11 @@ uniform mat4 uProjectionMatrix;
             this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.depthTexture : null))
         );
         this.material.uniforms.setValue('uVolumetricDepthTexture', this.renderTargetSpotLightFrustum.depthTexture);
-        this.material.uniforms.setValue('uRayStep', this.rayStep);
-        this.material.uniforms.setValue('uDensityMultiplier', this.densityMultiplier);
-        this.material.uniforms.setValue('uRayJitterSizeX', this.rayJitterSizeX);
-        this.material.uniforms.setValue('uRayJitterSizeY', this.rayJitterSizeY);
-        this.material.uniforms.setValue('uBlendRate', this.blendRate);
+        this.material.uniforms.setValue('uRayStep', this.parameters.rayStep);
+        this.material.uniforms.setValue('uDensityMultiplier', this.parameters.densityMultiplier);
+        this.material.uniforms.setValue('uRayJitterSizeX', this.parameters.rayJitterSizeX);
+        this.material.uniforms.setValue('uRayJitterSizeY', this.parameters.rayJitterSizeY);
+        this.material.uniforms.setValue('uBlendRate', this.parameters.blendRate);
 
         // console.log(this.material.uniforms)
 

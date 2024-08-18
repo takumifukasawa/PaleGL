@@ -1,4 +1,4 @@
-﻿import { UniformTypes } from '@/PaleGL/constants';
+﻿import {PostProcessPassType, UniformTypes} from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
@@ -8,13 +8,24 @@ import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import { Material } from '@/PaleGL/materials/Material';
 import {
-    PostProcessParametersBase,
-    PostProcessPassBase,
+    PostProcessPassBase, PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
 
 const BLUR_PIXEL_NUM = 7;
+
+
+export type GaussianBlurPassParameters = PostProcessPassParametersBase;
+
+export type GaussianBlurPassParametersArgs = Partial<GaussianBlurPassParameters>;
+
+export function generateGaussianBlurPassParameters(params: GaussianBlurPassParametersArgs = {}): GaussianBlurPassParameters {
+    return {
+        type: PostProcessPassType.GaussianBlur,
+        enabled: params.enabled ?? true,
+    };
+}
 
 export class GaussianBlurPass implements IPostProcessPass {
     // export class GaussianBlurPass extends PostProcessPassBase {
@@ -25,7 +36,8 @@ export class GaussianBlurPass implements IPostProcessPass {
     height: number = 1;
     materials: Material[] = [];
 
-    parameters: PostProcessParametersBase = { enabled: true };
+    // parameters: PostProcessParametersBase = { type: PostProcessType.GaussianBlur, enabled: true };
+    parameters: GaussianBlurPassParameters;
 
     private geometry: PlaneGeometry;
     private horizontalBlurPass: FragmentPass;
@@ -38,7 +50,10 @@ export class GaussianBlurPass implements IPostProcessPass {
     }
 
     // constructor({ gpu, blurPixelNum = 7 }: { gpu: GPU; blurPixelNum: number }) {
-    constructor({ gpu }: { gpu: GPU }) {
+    constructor(args: { gpu: GPU, parameters?: GaussianBlurPassParametersArgs }) {
+        const { gpu } = args;
+        
+        this.parameters = generateGaussianBlurPassParameters(args.parameters);
         // super();
         this.geometry = new PlaneGeometry({ gpu });
 

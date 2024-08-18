@@ -5,6 +5,7 @@ import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import {
+    PostProcessPassType,
     PrimitiveTypes,
     RenderTargetType,
     RenderTargetTypes,
@@ -26,8 +27,14 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
-export type PostProcessParametersBase = {
+export type PostProcessPassParametersBase = {
+    type: PostProcessPassType;
     enabled: boolean;
+};
+
+export type PostProcessPassParametersBaseArgs = {
+    type: PostProcessPassType;
+    enabled?: boolean;
 };
 
 export type PostProcessPassRenderArgs = {
@@ -49,7 +56,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     height: number = 1;
 
     // enabled: boolean = true;
-    parameters: PostProcessParametersBase = { enabled: true };
+    parameters: PostProcessPassParametersBase;
 
     mesh: Mesh;
     geometry: PlaneGeometry;
@@ -87,6 +94,7 @@ export class PostProcessPassBase implements IPostProcessPass {
      */
     constructor({
         gpu,
+        parameters,
         vertexShader,
         fragmentShader,
         rawVertexShader,
@@ -104,6 +112,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         srcTextureEnabled = true,
     }: {
         gpu: GPU;
+        parameters: PostProcessPassParametersBaseArgs;
         vertexShader?: string;
         fragmentShader?: string;
         rawVertexShader?: string;
@@ -123,6 +132,12 @@ export class PostProcessPassBase implements IPostProcessPass {
     }) {
         // super({name});
         this.name = name;
+
+        this.parameters = {
+            ...parameters,
+            // type: parameters.type,
+            enabled: parameters.enabled || true,
+        };
 
         const baseVertexShader = PostProcessPassBase.baseVertexShader;
         vertexShader = vertexShader || baseVertexShader;

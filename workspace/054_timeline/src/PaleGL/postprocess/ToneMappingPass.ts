@@ -1,20 +1,21 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
-import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
-import { UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/PostProcessPassBase';
+import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
+export type ToneMappingPassParameters = PostProcessPassParametersBase;
+
+export type ToneMappingPassParametersArgs = Partial<ToneMappingPassParameters>;
+
 export class ToneMappingPass extends PostProcessPassBase {
-    constructor({
-        gpu, // fragmentShader,
-        // name,
-    } // uniforms,
-    : {
-        gpu: GPU;
-        // fragmentShader: string;
-        // uniforms?: Uniforms;
-        // name?: string;
-    }) {
+    constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
+        const { gpu } = args;
+        
         const uniforms: UniformsData = [
             {
                 name: UniformNames.SrcTexture,
@@ -31,6 +32,10 @@ export class ToneMappingPass extends PostProcessPassBase {
             uniforms,
             // useEnvMap: false,
             // receiveShadow: false,
+            parameters: {
+                type: PostProcessPassType.ToneMapping,
+                ...args.parameters
+            },
         });
     }
 

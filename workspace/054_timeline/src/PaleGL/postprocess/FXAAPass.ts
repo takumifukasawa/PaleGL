@@ -1,7 +1,7 @@
-﻿import {UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import {PostProcessPassType, UniformNames, UniformTypes} from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
-import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import {PostProcessPassBase, PostProcessPassParametersBase} from '@/PaleGL/postprocess/PostProcessPassBase';
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
@@ -9,12 +9,27 @@ import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase';
 // https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
+export type FXAAPassParameters = PostProcessPassParametersBase;
+
+export type FXAAPassParametersArgs = Partial<FXAAPassParameters>;
+
+export function generateFXAAPassParameters(params: FXAAPassParametersArgs = {}): FXAAPassParameters {
+    return {
+        type: PostProcessPassType.FXAA,
+        enabled: params.enabled ?? true,
+    };
+}
+
 export class FXAAPass extends PostProcessPassBase {
-    constructor({ gpu }: { gpu: GPU }) {
+    constructor(args: { gpu: GPU, parameters?: FXAAPassParametersArgs }) {
+        const { gpu } = args;
         const fragmentShader = fxaaFragmentShader;
+        
+        const parameters = generateFXAAPassParameters(args.parameters ?? {});
 
         super({
             gpu,
+            parameters,
             fragmentShader,
             uniforms: [
                 // uTargetWidth: {

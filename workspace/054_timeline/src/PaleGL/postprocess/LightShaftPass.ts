@@ -1,4 +1,4 @@
-﻿import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
@@ -12,7 +12,7 @@ import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-comp
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
 import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
 import {
-    PostProcessParametersBase,
+    PostProcessPassParametersBase,
     PostProcessPassBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
@@ -29,12 +29,13 @@ type LightShaftPassParametersBase = {
     rayStepStrength: number;
 };
 
-type LightShaftPassParameters = PostProcessParametersBase & LightShaftPassParametersBase;
+type LightShaftPassParameters = PostProcessPassParametersBase & LightShaftPassParametersBase;
 
 type LightShaftPassParametersArgs = Partial<LightShaftPassParameters>;
 
 function generateLightShaftPassParameters(args: LightShaftPassParametersArgs = {}): LightShaftPassParameters {
     return {
+        type: PostProcessPassType.LightShaft,
         enabled: args.enabled || true,
         blendRate: args.blendRate || 0.65,
         passScaleBase: args.passScaleBase || 0.2,
