@@ -4,6 +4,7 @@
     LightTypes,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
+    PostProcessPassType,
     RenderQueueType,
     RenderTargetTypes,
     TextureDepthPrecisionType,
@@ -28,7 +29,7 @@ import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
 import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
-import { BloomPass } from '@/PaleGL/postprocess/BloomPass';
+import { BloomPass, BloomPassParameters } from '@/PaleGL/postprocess/BloomPass';
 import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
 import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
 import { VolumetricLightPass } from '@/PaleGL/postprocess/VolumetricLightPass.ts';
@@ -62,7 +63,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/PointLight.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
-// import {PostProcessVolume} from "@/PaleGL/actors/PostProcessVolume.ts";
+import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -102,15 +103,18 @@ export function applyLightShadowMapUniformValues(
         const spotLight = lightActors.spotLights[i];
         return spotLight && spotLight.shadowMap ? spotLight.shadowMap.read.depthTexture : fallbackTexture;
     });
-    targetMaterial.uniforms.setValue(
-        UniformNames.SpotLightShadowMap,
-        spotLightShadowMaps
-    );
+    targetMaterial.uniforms.setValue(UniformNames.SpotLightShadowMap, spotLightShadowMaps);
 }
 
-// function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
-//     renderer.bloomPass.applyParameter(postProcessVolumeActor.)
-// }
+/**
+ * post process volume の値を各passに適用
+ * @param renderer
+ * @param postProcessVolumeActor
+ */
+function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
+    // bloom
+    renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
+}
 
 /**
  * 描画パイプライン的な役割
@@ -773,8 +777,8 @@ export class Renderer {
             spotLights: [],
             pointLights: [],
         };
-        
-        // let postProcessVolumeActor: PostProcessVolume | null = null;
+
+        let postProcessVolumeActor: PostProcessVolume | null = null;
 
         // build render mesh info each queue
         scene.traverse((actor) => {
@@ -829,10 +833,10 @@ export class Renderer {
                         }
                     }
                     break;
-                    
-                // case ActorTypes.PostProcessVolume:
-                //     postProcessVolumeActor = actor as PostProcessVolume;
-                //     break;
+
+                case ActorTypes.PostProcessVolume:
+                    postProcessVolumeActor = actor as PostProcessVolume;
+                    break;
             }
         });
 
@@ -849,6 +853,11 @@ export class Renderer {
             })
             .flat()
             .filter(({ actor }) => actor.enabled);
+
+        // override postprocess parameters
+        if(postProcessVolumeActor) {
+            applyPostProcessVolumeParameters(this, postProcessVolumeActor);
+        }
 
         //
         // TODO: depth sort

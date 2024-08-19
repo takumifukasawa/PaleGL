@@ -28,12 +28,11 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
 export type PostProcessPassParametersBase = {
-    type: PostProcessPassType;
     enabled: boolean;
+    // update?: (parameter: PostProcessPassParametersBase) => void;
 };
 
 export type PostProcessPassParametersBaseArgs = {
-    type: PostProcessPassType;
     enabled?: boolean;
 };
 
@@ -54,6 +53,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     name: string;
     width: number = 1;
     height: number = 1;
+    type: PostProcessPassType;
 
     // enabled: boolean = true;
     parameters: PostProcessPassParametersBase;
@@ -94,6 +94,7 @@ export class PostProcessPassBase implements IPostProcessPass {
      */
     constructor({
         gpu,
+        type,
         parameters,
         vertexShader,
         fragmentShader,
@@ -112,6 +113,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         srcTextureEnabled = true,
     }: {
         gpu: GPU;
+        type: PostProcessPassType,
         parameters: PostProcessPassParametersBaseArgs;
         vertexShader?: string;
         fragmentShader?: string;
@@ -132,6 +134,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     }) {
         // super({name});
         this.name = name;
+        this.type = type;
 
         this.parameters = {
             ...parameters,

@@ -12,9 +12,17 @@ export type ToneMappingPassParameters = PostProcessPassParametersBase;
 
 export type ToneMappingPassParametersArgs = Partial<ToneMappingPassParameters>;
 
+export function generateToneMappingPassParameters(params: ToneMappingPassParametersArgs = {}): ToneMappingPassParameters {
+    return {
+        enabled: params.enabled ?? true,
+    };
+}
+
 export class ToneMappingPass extends PostProcessPassBase {
     constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
         const { gpu } = args;
+        
+        const parameters = generateToneMappingPassParameters(args.parameters);
         
         const uniforms: UniformsData = [
             {
@@ -27,15 +35,13 @@ export class ToneMappingPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.ToneMapping,
             name: 'ToneMappingPass',
             fragmentShader: toneMappingFragmentShader,
             uniforms,
             // useEnvMap: false,
             // receiveShadow: false,
-            parameters: {
-                type: PostProcessPassType.ToneMapping,
-                ...args.parameters
-            },
+            parameters
         });
     }
 

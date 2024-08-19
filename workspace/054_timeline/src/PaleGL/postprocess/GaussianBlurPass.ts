@@ -22,7 +22,6 @@ export type GaussianBlurPassParametersArgs = Partial<GaussianBlurPassParameters>
 
 export function generateGaussianBlurPassParameters(params: GaussianBlurPassParametersArgs = {}): GaussianBlurPassParameters {
     return {
-        type: PostProcessPassType.GaussianBlur,
         enabled: params.enabled ?? true,
     };
 }
@@ -31,7 +30,8 @@ export class GaussianBlurPass implements IPostProcessPass {
     // export class GaussianBlurPass extends PostProcessPassBase {
     // gpu: GPU;
     name: string = 'GaussianBlurPass';
-    enabled: boolean = false;
+    type: PostProcessPassType = PostProcessPassType.GaussianBlur;
+    
     width: number = 1;
     height: number = 1;
     materials: Material[] = [];

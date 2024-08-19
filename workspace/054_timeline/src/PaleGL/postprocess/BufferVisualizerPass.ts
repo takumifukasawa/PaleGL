@@ -88,18 +88,19 @@ function generateBufferVisualizerPassParameters(
     args: BufferVisualizerPassParametersArgs = {}
 ): BufferVisualizerPassParameters {
     return {
-        type: PostProcessPassType.BufferVisualizer,
         enabled: args.enabled || false,
         fullViewTextureEnabled: args.fullViewTextureEnabled || false,
     };
 }
 
 export class BufferVisualizerPass implements IPostProcessPass {
+    name: string = 'BufferVisualizerPass';
+    type: PostProcessPassType = PostProcessPassType.BufferVisualizer;
+    
     dom: HTMLDivElement;
     rowPasses: RowPass[] = [];
     compositePass: FragmentPass;
-    name: string = 'BufferVisualizerPass';
-    enabled: boolean = true;
+    // enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 

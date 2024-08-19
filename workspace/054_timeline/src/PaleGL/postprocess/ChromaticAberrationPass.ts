@@ -20,7 +20,6 @@ export function generateChromaticAberrationPassParameters(
     params: ChromaticAberrationPassParametersArgs = {}
 ): ChromaticAberrationPassParameters {
     return {
-        type: PostProcessPassType.ChromaticAberration,
         enabled: params.enabled ?? true,
     };
 }
@@ -37,6 +36,7 @@ export class ChromaticAberrationPass extends PostProcessPassBase {
         
         super({
             gpu,
+            type: PostProcessPassType.ChromaticAberration,
             fragmentShader,
             uniforms: [{
                 name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,

@@ -23,7 +23,6 @@ export type ScreenSpaceShadowPassArgs = Partial<ScreenSpaceShadowPassParameters>
 
 export function generateScreenSpaceShadowPassParameters(params: ScreenSpaceShadowPassArgs = {}): ScreenSpaceShadowPassParameters {
     return {
-        type: PostProcessPassType.ScreenSpaceShadow,
         enabled: params.enabled ?? true,
         bias: params.bias ?? 0,
         jitterSize: params.jitterSize ?? new Vector3(0.025, 0.025, 0.025),
@@ -57,6 +56,7 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.ScreenSpaceShadow,
             parameters,
             fragmentShader,
             uniforms: [

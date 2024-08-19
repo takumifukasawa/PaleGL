@@ -42,7 +42,6 @@ export type FogPassParametersArgs = Partial<FogPassParameters>;
 
 export function generateFogPassParameters(params: FogPassParametersArgs = {}): FogPassParameters {
     return {
-        type: PostProcessPassType.Fog,
         enabled: params.enabled ?? true,
         fogColor: params.fogColor ?? Color.white,
         fogStrength: params.fogStrength ?? 0.01,
@@ -83,6 +82,7 @@ export class FogPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.Fog,
             fragmentShader,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniforms: [
@@ -145,7 +145,7 @@ export class FogPass extends PostProcessPassBase {
                 // ...PostProcessPassBase.commonUniforms,
             ],
             uniformBlockNames: [UniformBlockNames.Camera],
-            parameters: {...parameters, type: PostProcessPassType.Fog }
+            parameters
         });
         
         this.parameters = parameters;

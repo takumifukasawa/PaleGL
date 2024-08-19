@@ -15,7 +15,6 @@ export type FXAAPassParametersArgs = Partial<FXAAPassParameters>;
 
 export function generateFXAAPassParameters(params: FXAAPassParametersArgs = {}): FXAAPassParameters {
     return {
-        type: PostProcessPassType.FXAA,
         enabled: params.enabled ?? true,
     };
 }
@@ -29,6 +28,7 @@ export class FXAAPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.FXAA,
             parameters,
             fragmentShader,
             uniforms: [

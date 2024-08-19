@@ -3,17 +3,18 @@ import { PostProcessPassBase, PostProcessPassParametersBaseArgs } from '@/PaleGL
 import { PostProcessPassType, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 
+export type FragmentPassParameters = PostProcessPassParametersBaseArgs;
+
+export type FragmentPassParametersArgs = Partial<FragmentPassParameters>;
+
+export function generateFragmentPassParameters(params: FragmentPassParametersArgs = {}): FragmentPassParameters {
+    return {
+        enabled: params.enabled ?? true,
+    };
+}
+
 export class FragmentPass extends PostProcessPassBase {
-    constructor({
-        gpu,
-        fragmentShader,
-        uniforms = [],
-        uniformBlockNames = [],
-        name,
-        renderTargetType,
-        srcTextureEnabled,
-        parameters,
-    }: {
+    constructor(args: {
         gpu: GPU;
         fragmentShader: string;
         uniforms?: UniformsData;
@@ -23,15 +24,27 @@ export class FragmentPass extends PostProcessPassBase {
         srcTextureEnabled?: boolean;
         parameters?: PostProcessPassParametersBaseArgs;
     }) {
+        const {
+            gpu,
+            fragmentShader,
+            uniforms = [],
+            uniformBlockNames = [],
+            name,
+            renderTargetType,
+            srcTextureEnabled,
+        } = args;
+
+        const parameters = generateFragmentPassParameters(args.parameters ?? {});
         super({
             gpu,
+            type: PostProcessPassType.Fragment,
             fragmentShader,
             uniforms,
             uniformBlockNames,
             name,
             renderTargetType,
             srcTextureEnabled,
-            parameters: { ...parameters, type: PostProcessPassType.Fragment },
+            parameters,
         });
     }
 }

@@ -21,22 +21,21 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 
 export type DeferredShadingParametersBase = PostProcessPassParametersBase;
 
-export type DeferredShadingParameters = PostProcessPassParametersBase & DeferredShadingParametersBase;
+export type DeferredShadingParameters = PostProcessPassParametersBase;
 
 export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
 
 export class DeferredShadingPass extends PostProcessPassBase {
-    constructor({
-        gpu, // fragmentShader,
-        // uniforms,
-    } // name,
+    constructor(args // name,
     : {
         gpu: GPU;
-        // fragmentShader: string;
-        // uniforms?: Uniforms;
-        // name?: string;
+        parameters: DeferredShadingParametersArgs
     }) {
-        const parameters = { type: PostProcessPassType.DeferredShading };
+        const {
+            gpu
+        } = args;
+        
+        const parameters = { ...(args.parameters) };
         
         const uniforms: UniformsData = [
             // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
@@ -123,6 +122,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.DeferredShading,
             parameters,
             name: 'DeferredShadingPass',
             fragmentShader: deferredShadingFragmentShader,

@@ -44,7 +44,6 @@ export type VolumetricLightPassParametersArgs = Partial<VolumetricLightPassParam
 
 export function generateVolumetricLightParameters(params: VolumetricLightPassParametersArgs = {}): VolumetricLightPassParameters {
     return {
-        type: PostProcessPassType.VolumetricLight,
         enabled: params.enabled ?? true,
         rayStep: params.rayStep ?? 0.5,
         blendRate: params.blendRate ?? 1,
@@ -85,6 +84,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.VolumetricLight,
             fragmentShader,
             uniforms: [
                 {

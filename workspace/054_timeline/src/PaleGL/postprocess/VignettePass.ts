@@ -28,7 +28,6 @@ export type VignettePassParametersArgs = Partial<VignettePassParameters>;
 
 export function generateVignetteParameters(params: VignettePassParametersArgs = {}): VignettePassParameters {
     return {
-        type: PostProcessPassType.Vignette,
         enabled: params.enabled ?? true,
         vignetteRadius: params.vignetteRadius ?? UNIFORM_VALUE_VIGNETTE_RADIUS,
         vignettePower: params.vignettePower ?? UNIFORM_VALUE_VIGNETTE_POWER,
@@ -50,6 +49,7 @@ export class VignettePass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.Vignette,
             fragmentShader,
             uniforms: [
                 {

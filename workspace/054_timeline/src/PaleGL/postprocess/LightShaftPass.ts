@@ -35,7 +35,6 @@ type LightShaftPassParametersArgs = Partial<LightShaftPassParameters>;
 
 function generateLightShaftPassParameters(args: LightShaftPassParametersArgs = {}): LightShaftPassParameters {
     return {
-        type: PostProcessPassType.LightShaft,
         enabled: args.enabled || true,
         blendRate: args.blendRate || 0.65,
         passScaleBase: args.passScaleBase || 0.2,
@@ -48,15 +47,15 @@ export class LightShaftPass implements IPostProcessPass {
     // public
     // --------------------------------------------------------------------------------
 
+    name: string = 'LightShaftPass';
+    type: PostProcessPassType = PostProcessPassType.LightShaft;
+
     // params
 
     parameters: LightShaftPassParameters;
     // blendRate: number = 0.65;
     // passScaleBase: number = 0.2;
     // rayStepStrength: number = 0.012;
-
-    name: string = 'LightShaftPass';
-    enabled: boolean = true;
     width: number = 1;
     height: number = 1;
 

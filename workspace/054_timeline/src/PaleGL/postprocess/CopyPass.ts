@@ -9,7 +9,6 @@ export type CopyPassParametersArgs = Partial<CopyPassParameters>;
 
 export function generateCopyPassParameters(params: CopyPassParametersArgs = {}): CopyPassParameters {
     return {
-        type: PostProcessPassType.Copy,
         enabled: params.enabled ?? true,
     };
 }
@@ -19,6 +18,6 @@ export class CopyPass extends PostProcessPassBase {
         const { gpu } = args;
         const fragmentShader = copyPassFragmentShader;
         const parameters = generateCopyPassParameters(args.parameters);
-        super({ gpu, fragmentShader, parameters });
+        super({ gpu, type: PostProcessPassType.Copy, fragmentShader, parameters });
     }
 }
