@@ -491,11 +491,11 @@ captureScene.add(pointLight1);
 
 const cameraPostProcess = new PostProcess();
 
-renderer.depthOfFieldPass.focusDistance = 18.5;
-renderer.depthOfFieldPass.focusRange = 17;
+renderer.depthOfFieldPass.parameters.focusDistance = 18.5;
+renderer.depthOfFieldPass.parameters.focusRange = 17;
 
 const bufferVisualizerPass = new BufferVisualizerPass({ gpu });
-bufferVisualizerPass.enabled = false;
+bufferVisualizerPass.parameters.enabled = false;
 cameraPostProcess.addPass(bufferVisualizerPass);
 
 cameraPostProcess.enabled = true;
@@ -1338,9 +1338,9 @@ void main() {
         renderer.fogPass.parameters.distanceFogStart = 18;
         renderer.fogPass.parameters.distanceFogPower = 0.29;
 
-        renderer.depthOfFieldPass.focusDistance = 17.78;
-        renderer.depthOfFieldPass.focusRange = 9.8;
-        renderer.depthOfFieldPass.bokehRadius = 5.55;
+        renderer.depthOfFieldPass.parameters.focusDistance = 17.78;
+        renderer.depthOfFieldPass.parameters.focusRange = 9.8;
+        renderer.depthOfFieldPass.parameters.bokehRadius = 5.55;
 
         renderer.bloomPass.parameters.bloomAmount = 0.26;
         renderer.bloomPass.parameters.threshold = 1.534;
@@ -1414,9 +1414,9 @@ function initDebugger() {
 
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
-        initialValue: bufferVisualizerPass.enabled,
+        initialValue: bufferVisualizerPass.parameters.enabled,
         onChange: (value) => {
-            bufferVisualizerPass.enabled = value;
+            bufferVisualizerPass.parameters.enabled = value;
             if (value) {
                 bufferVisualizerPass.showDom();
             } else {
@@ -1831,9 +1831,9 @@ function initDebugger() {
         minValue: 0.1,
         maxValue: 100,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.focusDistance,
+        initialValue: renderer.depthOfFieldPass.parameters.focusDistance,
         onChange: (value) => {
-            renderer.depthOfFieldPass.focusDistance = value;
+            renderer.depthOfFieldPass.parameters.focusDistance = value;
         },
     });
 
@@ -1842,9 +1842,9 @@ function initDebugger() {
         minValue: 0.1,
         maxValue: 30,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.focusRange,
+        initialValue: renderer.depthOfFieldPass.parameters.focusRange,
         onChange: (value) => {
-            renderer.depthOfFieldPass.focusRange = value;
+            renderer.depthOfFieldPass.parameters.focusRange = value;
         },
     });
 
@@ -1853,9 +1853,9 @@ function initDebugger() {
         minValue: 0.01,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.bokehRadius,
+        initialValue: renderer.depthOfFieldPass.parameters.bokehRadius,
         onChange: (value) => {
-            renderer.depthOfFieldPass.bokehRadius = value;
+            renderer.depthOfFieldPass.parameters.bokehRadius = value;
         },
     });
 

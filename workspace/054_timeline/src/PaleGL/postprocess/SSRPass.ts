@@ -63,7 +63,6 @@ export type SSRPassArgs = Partial<SSRPassParameters>;
 
 export function generateSSRPassParameters(params: SSRPassArgs = {}): SSRPassParameters {
     return {
-        type: PostProcessPassType.SSR,
         enabled: params.enabled ?? true,
         rayDepthBias: params.rayDepthBias ?? 0.0099,
         rayNearestDistance: params.rayNearestDistance ?? 0.13,
@@ -198,6 +197,7 @@ export class SSRPass extends PostProcessPassBase {
 
         super({
             gpu,
+            type: PostProcessPassType.SSR,
             fragmentShader,
             uniforms: baseUniforms,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,

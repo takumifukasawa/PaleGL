@@ -17,6 +17,7 @@ import {
     PostProcessPassBase,
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
+    // IPostProcessPassParameters
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 
 const BLUR_PIXEL_NUM = 7;
@@ -27,23 +28,16 @@ type BloomPassParametersBase = {
     bloomAmount: number;
 };
 
-export type BloomPassParameters = PostProcessPassParametersBase & BloomPassParametersBase;
+type BloomPassParametersProperties = 
+    PostProcessPassParametersBase &
+    BloomPassParametersBase;
+
+export type BloomPassParameters =
+    // BloomPassParametersProperties &
+    BloomPassParametersProperties
+    // Required<IPostProcessPassParameters<BloomPassParameters>>; // override
 
 type BloomPassParametersArgs = Partial<BloomPassParameters>;
-
-export function generateDefaultBloomPassParameters({
-    enabled,
-    threshold,
-    tone,
-    bloomAmount,
-}: BloomPassParametersArgs = {}): BloomPassParameters {
-    return {
-        enabled: enabled ?? true,
-        threshold: threshold ?? 1.534,
-        tone: tone ?? 0.46,
-        bloomAmount: bloomAmount ?? 0.26,
-    };
-}
 
 export function overrideBloomPassParameters(
     base: BloomPassParameters,
@@ -57,6 +51,43 @@ export function overrideBloomPassParameters(
         bloomAmount: override.bloomAmount ?? base.bloomAmount,
     };
 }
+
+export function generateDefaultBloomPassParameters({
+    enabled,
+    threshold,
+    tone,
+    bloomAmount,
+}: BloomPassParametersArgs = {}): BloomPassParameters {
+    const param = {
+        enabled: enabled ?? true,
+        threshold: threshold ?? 1.534,
+        tone: tone ?? 0.46,
+        bloomAmount: bloomAmount ?? 0.26,
+        // update: (newParam: BloomPassParameters) => {
+        //     param.enabled = newParam.enabled ?? param.enabled;
+        //     param.threshold = newParam.threshold ?? param.threshold;
+        //     param.tone = newParam.tone ?? param.tone;
+        //     param.bloomAmount = newParam.bloomAmount ?? param.bloomAmount;
+        // },
+        // updateKey: (key: keyof BloomPassParametersProperties, value: BloomPassParametersProperties[keyof BloomPassParametersProperties]) => {
+        //     param[key] = value;
+        // },
+    } as BloomPassParameters;
+    return param;
+}
+
+// export function overrideBloomPassParameters(
+//     base: BloomPassParameters,
+//     override: BloomPassParametersArgs
+// ): BloomPassParameters {
+//     return {
+//         ...base,
+//         enabled: override.enabled ?? base.enabled,
+//         threshold: override.threshold ?? base.threshold,
+//         tone: override.tone ?? base.tone,
+//         bloomAmount: override.bloomAmount ?? base.bloomAmount,
+//     };
+// }
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
@@ -486,17 +517,14 @@ export class BloomPass implements IPostProcessPass {
         });
     }
 
-    updateParameters(parameters: BloomPassParameters | null) {
-        if (!parameters) {
-            return;
-        }
+    updateParameters(parameters: BloomPassParameters) {
         this.parameters = overrideBloomPassParameters(this.parameters, parameters);
+        // this.parameters.update(parameters);
         this.assignParameters();
     }
     
     assignParameters() {
         this.extractBrightnessPass.material.uniforms.setValue('uThreshold', this.parameters.threshold);
-        
         this.compositePass.material.uniforms.setValue('uTone', this.parameters.tone);
         this.compositePass.material.uniforms.setValue('uBloomAmount', this.parameters.bloomAmount);
     }

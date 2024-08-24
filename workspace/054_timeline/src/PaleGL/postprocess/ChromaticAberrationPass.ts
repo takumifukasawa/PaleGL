@@ -1,10 +1,10 @@
-﻿import {PostProcessPassType, UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
 import {
     PostProcessPassBase,
     PostProcessPassParametersBase,
-    PostProcessPassRenderArgs
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 
 // ref:
@@ -27,26 +27,25 @@ export function generateChromaticAberrationPassParameters(
 export class ChromaticAberrationPass extends PostProcessPassBase {
     chromaticAberrationScale: number;
 
-    constructor(args : { gpu: GPU, parameters?: ChromaticAberrationPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: ChromaticAberrationPassParametersArgs }) {
         const { gpu } = args;
-        
+
         const parameters = generateChromaticAberrationPassParameters(args.parameters ?? {});
-        
+
         const fragmentShader = chromaticAberrationFragment;
-        
+
         super({
             gpu,
             type: PostProcessPassType.ChromaticAberration,
             fragmentShader,
-            uniforms: [{
-                name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-                type: UniformTypes.Float,
-                value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-            }],
-            parameters: {
-                ...parameters,
-                type: PostProcessPassType.ChromaticAberration,
-            },
+            uniforms: [
+                {
+                    name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
+                    type: UniformTypes.Float,
+                    value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
+                },
+            ],
+            parameters,
         });
 
         this.chromaticAberrationScale = UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE;
@@ -57,12 +56,9 @@ export class ChromaticAberrationPass extends PostProcessPassBase {
         this.material.uniforms.setValue(UniformNames.TargetWidth, width);
         this.material.uniforms.setValue(UniformNames.TargetHeight, height);
     }
-    
+
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(
-            UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-            this.chromaticAberrationScale
-        );
+        this.material.uniforms.setValue(UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE, this.chromaticAberrationScale);
 
         super.render(options);
     }

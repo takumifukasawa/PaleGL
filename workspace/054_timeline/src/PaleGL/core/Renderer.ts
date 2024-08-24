@@ -113,7 +113,11 @@ export function applyLightShadowMapUniformValues(
  */
 function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
     // bloom
-    renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
+    // renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
+    const bloomParameter = postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom);
+    if(bloomParameter) {
+        renderer.bloomPass.updateParameters(bloomParameter);
+    }
 }
 
 /**

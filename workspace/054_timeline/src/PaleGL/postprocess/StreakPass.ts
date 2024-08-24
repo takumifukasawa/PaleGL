@@ -47,7 +47,6 @@ type StreakPassParametersArgs = Partial<StreakPassParameters>;
 
 function generateStreakPassParameters(args: StreakPassParametersArgs = {}): StreakPassParameters {
     return {
-        type: PostProcessPassType.Streak,
         enabled: args.enabled || true,
         threshold: args.threshold || 0.9,
         stretch: args.stretch || 0.5,
@@ -61,6 +60,8 @@ function generateStreakPassParameters(args: StreakPassParametersArgs = {}): Stre
 export class StreakPass implements IPostProcessPass {
     // gpu: GPU;
     name: string = 'StreakPass';
+    type: PostProcessPassType = PostProcessPassType.Streak;
+    
     // enabled: boolean = true;
     width: number = 1;
     height: number = 1;

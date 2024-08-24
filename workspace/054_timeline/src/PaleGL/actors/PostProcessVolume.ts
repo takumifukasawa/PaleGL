@@ -1,9 +1,12 @@
 import { Volume } from '@/PaleGL/actors/Volume.ts';
 import { ActorTypes, PostProcessPassType } from '@/PaleGL/constants.ts';
-import { PostProcessPassBase, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { ActorArgs } from '@/PaleGL/actors/Actor.ts';
 
-type PostProcessVolumeParameterSet = { type: PostProcessPassType; parameter: PostProcessPassParametersBase };
+export type PostProcessVolumeParameterSet = {
+    type: PostProcessPassType;
+    parameters: PostProcessPassParametersBase;
+};
 
 type PostProcessVolumeArgs = ActorArgs & {
     parameters: PostProcessVolumeParameterSet[];
@@ -11,7 +14,7 @@ type PostProcessVolumeArgs = ActorArgs & {
 
 // TODO: 本当はpassそのものを持たせるのがよい気がするが・・・
 export class PostProcessVolume extends Volume {
-    parameters: (PostProcessVolumeParameterSet | null)[];
+    parameters: PostProcessVolumeParameterSet[] = [];
 
     // passes: IPostProcessPass[] = [];
     constructor(args: PostProcessVolumeArgs) {
@@ -22,18 +25,19 @@ export class PostProcessVolume extends Volume {
         this.parameters = args.parameters || [];
     }
 
-    findParameter<T>(type: PostProcessPassType): T | null {
-        return (this.parameters.find((value) => value?.type === type) as T) || null;
+    findParameter<T extends PostProcessPassParametersBase>(type: PostProcessPassType): T | null {
+        const result = this.parameters.find((value) => value?.type === type);
+        if (!result) {
+            return null;
+        }
+        return result.parameters as T;
     }
 
-    setParameter<T>(type: PostProcessPassType, parameter: PostProcessPassBase) {
-        
-    }
+    // setParameter<T>(type: PostProcessPassType, parameter: PostProcessPassBase) {
+    // }
 
-    // updateParameter<T>(type: PostProcessPassType): void {
-    //     const parameter = this.findParameter<T>(type);
-    //     if (parameter) {
-    //         parameter.update();
-    //     }
+    // updateParameter<T extends PostProcessPassParametersBase>(type: PostProcessPassType, newParameter: T): void {
+    //     const targetParameter = this.findParameter(type);
+    //     targetParameter?.update?.(newParameter);
     // }
 }

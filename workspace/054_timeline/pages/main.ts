@@ -483,8 +483,8 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
 
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
-        initialValue: bufferVisualizerPass.enabled,
-        onChange: (value) => (bufferVisualizerPass.enabled = value),
+        initialValue: bufferVisualizerPass.parameters.enabled,
+        onChange: (value) => (bufferVisualizerPass.parameters.enabled = value),
     });
 
     // bufferVisualizerPass.beforeRender = () => {
@@ -617,8 +617,8 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
 
     lightShaftDebuggerGroup.addToggleDebugger({
         label: 'light shaft pass enabled',
-        initialValue: renderer.lightShaftPass.enabled,
-        onChange: (value) => (renderer.lightShaftPass.enabled = value),
+        initialValue: renderer.lightShaftPass.parameters.enabled,
+        onChange: (value) => (renderer.lightShaftPass.parameters.enabled = value),
     });
 
     lightShaftDebuggerGroup.addSliderDebugger({
@@ -731,9 +731,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0.1,
         maxValue: 100,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.focusDistance,
+        initialValue: renderer.depthOfFieldPass.parameters.focusDistance,
         onChange: (value) => {
-            renderer.depthOfFieldPass.focusDistance = value;
+            renderer.depthOfFieldPass.parameters.focusDistance = value;
         },
     });
 
@@ -742,9 +742,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0.1,
         maxValue: 20,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.focusRange,
+        initialValue: renderer.depthOfFieldPass.parameters.focusRange,
         onChange: (value) => {
-            renderer.depthOfFieldPass.focusRange = value;
+            renderer.depthOfFieldPass.parameters.focusRange = value;
         },
     });
 
@@ -753,9 +753,9 @@ function initDebugger({ bufferVisualizerPass }: { bufferVisualizerPass: BufferVi
         minValue: 0.01,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: renderer.depthOfFieldPass.bokehRadius,
+        initialValue: renderer.depthOfFieldPass.parameters.bokehRadius,
         onChange: (value) => {
-            renderer.depthOfFieldPass.bokehRadius = value;
+            renderer.depthOfFieldPass.parameters.bokehRadius = value;
         },
     });
 

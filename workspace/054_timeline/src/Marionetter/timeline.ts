@@ -46,13 +46,16 @@ import {
     PROPERTY_MATERIAL_BASE_COLOR_A,
     PROPERTY_MATERIAL_BASE_COLOR_B,
     PROPERTY_MATERIAL_BASE_COLOR_G,
-    PROPERTY_MATERIAL_BASE_COLOR_R, PROPERTY_POST_PROCESS_BLOOM_INTENSITY,
+    PROPERTY_MATERIAL_BASE_COLOR_R,
+    PROPERTY_POST_PROCESS_BLOOM_INTENSITY,
     PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE,
 } from '@/Marionetter/constants.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { DEG_TO_RAD } from '@/PaleGL/constants.ts';
+import { DEG_TO_RAD, PostProcessPassType } from '@/PaleGL/constants.ts';
+import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
+import { BloomPassParameters } from '@/PaleGL/postprocess/BloomPass.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
@@ -84,10 +87,10 @@ export function buildMarionetterTimeline(
     //
     // build track
     //
-    
+
     for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
         const track = marionetterPlayableDirectorComponentInfo.tracks[i];
-
+        
         if (track.type === MarionetterTrackInfoType.MarkerTrack) {
             const { signalEmitters } = track as MarionetterMarkerTrackInfo;
             tracks.push({
@@ -138,7 +141,7 @@ export function buildMarionetterTimeline(
     //
     // exec timeline
     //
-    
+
     const execute = (time: number) => {
         // pattern1: use frame
         // const spf = 1 / fps;
@@ -261,6 +264,12 @@ function createMarionetterAnimationClip(
                     // TODO: GBufferMaterialとの連携？
                     break;
                 case PROPERTY_POST_PROCESS_BLOOM_INTENSITY:
+                    const params = (actor as PostProcessVolume).findParameter<BloomPassParameters>(
+                        PostProcessPassType.Bloom
+                    );
+                    if(params) {
+                        params.bloomAmount = value;
+                    }
                     break;
                 case PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE:
                     // TODO: post process 連携

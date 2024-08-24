@@ -24,8 +24,201 @@
       "components": [
         {
           "name": "MainTimeline",
-          "duration": 0.0,
-          "tracks": [],
+          "duration": 0.699999999999,
+          "tracks": [
+            {
+              "signalEmitters": [
+                {
+                  "name": "TEST Signal Emitter",
+                  "time": 0.13333334
+                }
+              ],
+              "type": 4
+            },
+            {
+              "clips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "bindings": [
+                    {
+                      "propertyName": "localEulerAnglesRaw.x",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 81.06097,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.y",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.216666669,
+                          "value": 127.556816,
+                          "inTangent": -756.29126,
+                          "outTangent": -756.29126
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 151.009659,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "localEulerAnglesRaw.z",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.35,
+                          "value": -4.82784653,
+                          "inTangent": 273.68158,
+                          "outTangent": 273.68158
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 118.314247,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.x",
+                      "keyframes": [
+                        {
+                          "time": 0.0166666675,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.y",
+                      "keyframes": [
+                        {
+                          "time": 0.0166666675,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 1.99,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    },
+                    {
+                      "propertyName": "m_LocalPosition.z",
+                      "keyframes": [
+                        {
+                          "time": 0.0166666675,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ],
+                  "type": 1,
+                  "start": 0.0,
+                  "duration": 0.7
+                }
+              ],
+              "targetName": "GameObject",
+              "type": 1
+            },
+            {
+              "clips": [
+                {
+                  "offsetPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "offsetRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "bindings": [
+                    {
+                      "propertyName": "bloomIntensity",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 1.41393065,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.416666657,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 2.98,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ],
+                  "type": 1,
+                  "start": 0.0,
+                  "duration": 0.7
+                }
+              ],
+              "targetName": "Global Volume",
+              "type": 1
+            }
+          ],
           "type": 1
         }
       ],
@@ -67,7 +260,7 @@
         "localPosition": {
           "x": 0.0,
           "y": 1.0,
-          "z": 15.52
+          "z": 6.97
         },
         "localRotation": {
           "x": 0.0,
@@ -92,6 +285,43 @@
       "children": []
     },
     {
+      "name": "Global Volume",
+      "transform": {
+        "localPosition": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "localRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": -1.0
+        },
+        "localScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
+      },
+      "components": [
+        {
+          "volumeLayers": [
+            {
+              "intensity": 2.54,
+              "layerType": "Bloom"
+            },
+            {
+              "focusDistance": 4.71942759,
+              "layerType": "DepthOfField"
+            }
+          ],
+          "type": 6
+        }
+      ],
+      "children": []
+    },
+    {
       "name": "Plane",
       "transform": {
         "localPosition": {
@@ -107,7 +337,7 @@
         },
         "localScale": {
           "x": 6.0,
-          "y": 6.0,
+          "y": 2.56296,
           "z": 6.0
         }
       },
@@ -139,10 +369,10 @@
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.7071068,
-          "y": 0.0,
-          "z": 0.0,
-          "w": -0.7071068
+          "x": 0.5838468,
+          "y": 0.24579294,
+          "z": 0.0872257352,
+          "w": -0.768830538
         },
         "localScale": {
           "x": 1.0,
@@ -167,20 +397,20 @@
       "name": "GameObject",
       "transform": {
         "localPosition": {
-          "x": 0.182901055,
-          "y": 0.8045874,
-          "z": 0.0515195727
+          "x": 0.0,
+          "y": 0.604180932,
+          "z": 0.0
         },
         "localRotation": {
-          "x": 0.610343933,
-          "y": 0.4770167,
-          "z": -0.0767381,
-          "w": 0.6277313
+          "x": 0.0370120443,
+          "y": 0.7482856,
+          "z": 0.2663639,
+          "w": -0.6064232
         },
         "localScale": {
           "x": 1.0,
           "y": 1.0,
-          "z": 2.1353
+          "z": 1.0
         }
       },
       "components": [],

@@ -29,7 +29,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
     constructor(args // name,
     : {
         gpu: GPU;
-        parameters: DeferredShadingParametersArgs
+        parameters?: DeferredShadingParametersArgs
     }) {
         const {
             gpu
