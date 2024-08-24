@@ -217,6 +217,42 @@
               ],
               "targetName": "Global Volume",
               "type": 1
+            },
+            {
+              "clips": [
+                {
+                  "bindings": [
+                    {
+                      "propertyName": "range",
+                      "keyframes": [
+                        {
+                          "time": 0.0,
+                          "value": 10.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.333333343,
+                          "value": 0.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        },
+                        {
+                          "time": 0.7,
+                          "value": 10.0,
+                          "inTangent": 0.0,
+                          "outTangent": 0.0
+                        }
+                      ]
+                    }
+                  ],
+                  "type": 2,
+                  "start": 0.0,
+                  "duration": 0.7
+                }
+              ],
+              "targetName": "SpotLight",
+              "type": 2
             }
           ],
           "type": 1
@@ -382,11 +418,11 @@
       },
       "components": [
         {
-          "range": 8.310608,
+          "range": 0.507137239,
           "innerSpotAngle": 33.8989449,
           "spotAngle": 45.1697235,
           "lightType": "Spot",
-          "intensity": 49.88,
+          "intensity": 1.0,
           "color": "FFFFFFFF",
           "type": 2
         }
@@ -398,14 +434,14 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 0.604180932,
+          "y": 1.10401249,
           "z": 0.0
         },
         "localRotation": {
-          "x": 0.0370120443,
-          "y": 0.7482856,
-          "z": 0.2663639,
-          "w": -0.6064232
+          "x": 0.330788821,
+          "y": 0.574423969,
+          "z": 0.2165912,
+          "w": -0.716731548
         },
         "localScale": {
           "x": 1.0,

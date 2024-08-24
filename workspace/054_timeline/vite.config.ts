@@ -46,8 +46,9 @@ const ENTRY_NAME_INDEX: string = 'index';
 
 // ---------------------------------------------------
 // ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
-const ENTRY_NAME = ENTRY_NAME_INDEX;
-// const ENTRY_NAME: string = "screen-space-shadow";
+// const ENTRY_NAME = ENTRY_NAME_INDEX;
+const ENTRY_NAME: string = "screen-space-shadow";
+
 const IS_MAIN_ENTRY = ENTRY_NAME === ENTRY_NAME_INDEX;
 const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `labs/${ENTRY_NAME}`;
 // ---------------------------------------------------

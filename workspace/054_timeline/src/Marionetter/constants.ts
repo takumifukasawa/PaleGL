@@ -11,9 +11,9 @@ export const PROPERTY_COLOR_R = 'color.r';
 export const PROPERTY_COLOR_G = 'color.g';
 export const PROPERTY_COLOR_B = 'color.b';
 export const PROPERTY_COLOR_A = 'color.a';
-export const PROPERTY_INTENSITY = 'intensity';
+export const PROPERTY_LIGHT_INTENSITY = 'intensity';
 // const PROPERTY_BOUNCE_INTENSITY = 'bounceIntensity';
-// const PROPERTY_RANGE = 'range';
+export const PROPERTY_SPOTLIGHT_RANGE = 'range';
 
 export const PROPERTY_LOCAL_POSITION_X = 'm_LocalPosition.x';
 export const PROPERTY_LOCAL_POSITION_Y = 'm_LocalPosition.y';

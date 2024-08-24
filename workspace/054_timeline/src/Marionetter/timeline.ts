@@ -33,7 +33,7 @@ import {
     PROPERTY_COLOR_G,
     PROPERTY_COLOR_R,
     PROPERTY_FIELD_OF_VIEW,
-    PROPERTY_INTENSITY,
+    PROPERTY_LIGHT_INTENSITY,
     PROPERTY_LOCAL_EULER_ANGLES_RAW_X,
     PROPERTY_LOCAL_EULER_ANGLES_RAW_Y,
     PROPERTY_LOCAL_EULER_ANGLES_RAW_Z,
@@ -49,6 +49,7 @@ import {
     PROPERTY_MATERIAL_BASE_COLOR_R,
     PROPERTY_POST_PROCESS_BLOOM_INTENSITY,
     PROPERTY_POST_PROCESS_DEPTH_OF_FIELD_FOCUS_DISTANCE,
+    PROPERTY_SPOTLIGHT_RANGE,
 } from '@/Marionetter/constants.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
@@ -56,6 +57,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { DEG_TO_RAD, PostProcessPassType } from '@/PaleGL/constants.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
 import { BloomPassParameters } from '@/PaleGL/postprocess/BloomPass.ts';
+import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
@@ -90,7 +92,7 @@ export function buildMarionetterTimeline(
 
     for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
         const track = marionetterPlayableDirectorComponentInfo.tracks[i];
-        
+
         if (track.type === MarionetterTrackInfoType.MarkerTrack) {
             const { signalEmitters } = track as MarionetterMarkerTrackInfo;
             tracks.push({
@@ -267,7 +269,7 @@ function createMarionetterAnimationClip(
                     const params = (actor as PostProcessVolume).findParameter<BloomPassParameters>(
                         PostProcessPassType.Bloom
                     );
-                    if(params) {
+                    if (params) {
                         params.bloomAmount = value;
                     }
                     break;
@@ -327,14 +329,15 @@ function createMarionetterLightControlClip(
         let hasPropertyColorG: boolean = false;
         let hasPropertyColorB: boolean = false;
         let hasPropertyColorA: boolean = false;
-        let hasPropertyIntensity: boolean = false;
+        let hasPropertyLightIntensity: boolean = false;
         // let hasPropertyBounceIntensity: boolean = false;
-        // let hasPropertyRange: boolean = false;
+        let hasPropertySpotLightRange: boolean = false;
 
         const color = new Color();
-        let intensity = 0;
+        let lightIntensity = 0;
         // let bounceIntensity = 0;
         // let range = 0;
+        let spotLightRange = 0;
 
         const { start, bindings } = lightControlClip;
 
@@ -359,9 +362,13 @@ function createMarionetterLightControlClip(
                     hasPropertyColorA = true;
                     color.a = value;
                     break;
-                case PROPERTY_INTENSITY:
-                    hasPropertyIntensity = true;
-                    intensity = value;
+                case PROPERTY_LIGHT_INTENSITY:
+                    hasPropertyLightIntensity = true;
+                    lightIntensity = value;
+                    break;
+                case PROPERTY_SPOTLIGHT_RANGE:
+                    hasPropertySpotLightRange = true;
+                    spotLightRange = value;
                     break;
                 // case PROPERTY_BOUNCE_INTENSITY:
                 //     hasPropertyBounceIntensity = true;
@@ -386,8 +393,11 @@ function createMarionetterLightControlClip(
         if (hasPropertyColorA) {
             light.color.a = color.a;
         }
-        if (hasPropertyIntensity) {
-            light.intensity = intensity;
+        if (hasPropertyLightIntensity) {
+            light.intensity = lightIntensity;
+        }
+        if (hasPropertySpotLightRange) {
+            (light as SpotLight).distance = spotLightRange;
         }
         // if(hasPropertyBounceIntensity) {
         //     obj.bounceIntensity = bounceIntensity;
