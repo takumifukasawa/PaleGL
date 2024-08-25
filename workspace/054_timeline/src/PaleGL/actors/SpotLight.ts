@@ -6,7 +6,7 @@ import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 
 type SpotLightParams = {
     distance: number;
-    attenuation: number;
+    attenuation?: number;
     coneAngle: number;
     penumbraAngle: number;
 };
@@ -42,7 +42,7 @@ export class SpotLight extends Light {
         this.addChild(this.shadowCamera as unknown as Actor);
 
         this.distance = options.distance;
-        this.attenuation = options.attenuation;
+        this.attenuation = options.attenuation ?? 1.06; // TODO: 1.06でよい？
         this.coneAngle = options.coneAngle;
         this.penumbraAngle = options.penumbraAngle;
     }
