@@ -7,10 +7,19 @@ const entryName = 'main';
 const dir = path.join(process.cwd(), 'dist/assets/');
 const findPattern = path.join(dir, '*.js');
 
+function padTime(str) {
+    return ("" + str).padStart(2, '0');
+}
+
 const pack = async (filePath) => {
-    const regex = new RegExp(`${entryName}-([a-zA-Z0-9]*)\.js$`);
+    // const regex = new RegExp(`${entryName}-([a-zA-Z0-9]*)\.js$`);
+    const regex = new RegExp(/main.js/);
+
     const match = filePath.match(regex);
-    const id = match[1];
+    // const id = match[1] 
+    const date = new Date();
+    const id = `${padTime(date.getFullYear())}${padTime(date.getMonth() + 1)}${padTime(date.getDate())}${padTime(date.getHours())}${padTime(date.getMinutes())}`;
+    
     return new Promise((resolve) => {
         const packShellPath = path.join(process.cwd(), 'libs/packer.js');
         const distPath = path.join(process.cwd(), `dist/packed-${id}.html`);
