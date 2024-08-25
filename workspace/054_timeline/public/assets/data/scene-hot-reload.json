@@ -283,7 +283,7 @@
       "components": [
         {
           "lightType": "Directional",
-          "intensity": 1.0,
+          "intensity": 0.07,
           "color": "FFFFFFFF",
           "type": 2
         }
@@ -418,11 +418,11 @@
       },
       "components": [
         {
-          "range": 2.16000032,
-          "innerSpotAngle": 33.8989449,
-          "spotAngle": 45.1697235,
+          "range": 10.0,
+          "innerSpotAngle": 20.0,
+          "spotAngle": 45.0,
           "lightType": "Spot",
-          "intensity": 1.0,
+          "intensity": 2.0,
           "color": "FFFFFFFF",
           "type": 2
         }
@@ -434,14 +434,14 @@
       "transform": {
         "localPosition": {
           "x": 0.0,
-          "y": 0.47332558,
+          "y": 0.0,
           "z": 0.0
         },
         "localRotation": {
-          "x": -0.033054214,
-          "y": 0.8382677,
-          "z": 0.2332979,
-          "w": -0.491718262
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": -1.0
         },
         "localScale": {
           "x": 1.0,

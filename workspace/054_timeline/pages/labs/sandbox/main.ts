@@ -83,7 +83,7 @@ import {
     UniformNames,
     FaceSide,
     TextureDepthPrecisionType,
-    UniformBlockNames,
+    UniformBlockNames, RAD_TO_DEG,
 } from '@/PaleGL/constants';
 
 import { DebuggerGUI } from '@/DebuggerGUI';
@@ -178,24 +178,24 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
     });
 
     spotLightDebuggerGroup.addSliderDebugger({
-        label: 'coneCos',
+        label: 'coneAngle',
         minValue: 0,
-        maxValue: 1,
+        maxValue: 180,
         stepValue: 0.001,
-        initialValue: spotLight.coneCos,
+        initialValue: spotLight.coneAngle,
         onChange: (value) => {
-            spotLight.coneCos = value;
+            spotLight.coneAngle = value;
         },
     });
 
     spotLightDebuggerGroup.addSliderDebugger({
-        label: 'penumbraCos',
+        label: 'penumbraAngle',
         minValue: 0,
-        maxValue: 1,
+        maxValue: 180,
         stepValue: 0.001,
-        initialValue: spotLight.penumbraCos,
+        initialValue: spotLight.penumbraAngle,
         onChange: (value) => {
-            spotLight.penumbraCos = value;
+            spotLight.penumbraAngle = value;
         },
     });
 
@@ -428,8 +428,8 @@ const spotLight1 = new SpotLight({
     color: Color.white,
     distance: 20,
     attenuation: 0.1,
-    coneCos: 0.9,
-    penumbraCos: 0.95,
+    coneAngle: 0.1 * RAD_TO_DEG,
+    penumbraAngle: 0.05 * RAD_TO_DEG,
 });
 // spotLight.enabled = false;
 
@@ -460,8 +460,8 @@ const spotLight2 = new SpotLight({
     color: Color.white,
     distance: 20,
     attenuation: 0.1,
-    coneCos: 0.9,
-    penumbraCos: 0.95,
+    coneAngle: 0.1 * RAD_TO_DEG,
+    penumbraAngle: 0.05 * RAD_TO_DEG,
 });
 // spotLight.enabled = false;
 

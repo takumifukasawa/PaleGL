@@ -217,7 +217,7 @@ export function buildMarionetterScene(
                 case 'Spot':
                     // TODO: デフォルト値を渡してるのはよくない
                     const spotLightInfo = light as MarionetterSpotLightComponentInfo;
-                    console.log("hogehoge", spotLightInfo)
+                    console.log('hogehoge', spotLightInfo);
                     actor = new SpotLight({
                         name,
                         // intensity: light.intensity,
@@ -230,8 +230,10 @@ export function buildMarionetterScene(
                         // color: new Color(1, 1, 1),
                         distance: spotLightInfo.range,
                         attenuation: 1.06,
-                        coneCos: 0.8,
-                        penumbraCos: 0.9,
+                        coneAngle: spotLightInfo.spotAngle,
+                        penumbraAngle: spotLightInfo.innerSpotAngle,
+                        // coneAngle: 11.464,
+                        // penumbraAngle: 5.732,
                     });
                     break;
                 default:

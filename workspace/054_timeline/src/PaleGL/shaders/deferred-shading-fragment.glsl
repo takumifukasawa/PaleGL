@@ -348,7 +348,6 @@ void main() {
     //
     // spot light
     //
-
     SpotLight spotLight;
     // TODO: shadow blend rate は light か何かに持たせたい
     #pragma UNROLL_START

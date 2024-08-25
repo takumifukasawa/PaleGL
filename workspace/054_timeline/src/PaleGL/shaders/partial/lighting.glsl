@@ -110,14 +110,18 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
     // directLight.color = vec3(lightDistance / 10.);
     // directLight.color = vec3(angleCos);
     // return;
+   
+    // TODO: 1から引かないようにしたい
+    float coneCos = spotLight.coneCos;
+    float penumbraCos = spotLight.penumbraCos;
 
     if (all(
         bvec2(
-            angleCos > spotLight.coneCos,
+            angleCos > coneCos,
             testLightInRange(lightDistance, spotLight.distance)
         )
     )) {
-        float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
+        float spotEffect = smoothstep(coneCos, penumbraCos, angleCos);
         directLight.color = spotLight.color.xyz;
         directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
         directLight.visible = true;
