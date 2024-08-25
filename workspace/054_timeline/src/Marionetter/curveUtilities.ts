@@ -49,7 +49,7 @@ function curveUtilityEvaluate(t: number, k0: CurveKeyframe, k1: CurveKeyframe) {
  * @param t
  * @param keys
  */
-export function curveUtilityEvaluateCurve(t: number, keys: CurveKeyframe[]) {
+export function curveUtilityEvaluateCurve(t: number, keys: CurveKeyframe[]): number {
     // TODO: infinite前提の場合はt自体をclampしてもよいかもしれない
 
     // const keys = curve.keys;
@@ -84,5 +84,6 @@ export function curveUtilityEvaluateCurve(t: number, keys: CurveKeyframe[]) {
     }
 
     // throw new Error(`invalid curve or time. t: ${t}, curve keyframe length: ${curve.keys.Length}`)
-    throw new Error(`invalid curve or time. t: ${t}`);
+    console.error(`invalid curve or time. t: ${t}`);
+    return 0;
 }

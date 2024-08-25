@@ -115,7 +115,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
     // bloom
     // renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
     const bloomParameter = postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom);
-    if(bloomParameter) {
+    if (bloomParameter) {
         renderer.bloomPass.updateParameters(bloomParameter);
     }
 }
@@ -816,7 +816,7 @@ export class Renderer {
                                 );
                                 return;
                             default:
-                                throw '[Renderer.render] invalid blend type';
+                                console.error('[Renderer.render] invalid blend type');
                         }
                     });
                     break;
@@ -859,7 +859,7 @@ export class Renderer {
             .filter(({ actor }) => actor.enabled);
 
         // override postprocess parameters
-        if(postProcessVolumeActor) {
+        if (postProcessVolumeActor) {
             applyPostProcessVolumeParameters(this, postProcessVolumeActor);
         }
 
@@ -1158,7 +1158,7 @@ export class Renderer {
 
         if (!this._scenePostProcess.hasEnabledPass) {
             // 何もenabledがないのはおかしい. tonemappingは最低限有効化されていないとおかしい(HDRなので)
-            throw 'invalid postprocess';
+            console.error('invalid postprocess');
         }
 
         // console.log("--------- postprocess pass ---------");
@@ -1217,7 +1217,8 @@ export class Renderer {
         this.gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
         if (!material.shader) {
-            throw 'invalid material shader';
+            console.error('invalid material shader');
+            return;
         }
         this.gpu.setShader(material.shader);
         // uniforms
@@ -1237,7 +1238,8 @@ export class Renderer {
                     depthWrite = false;
                     break;
                 default:
-                    throw 'invalid depth write';
+                    console.error('invalid depth write');
+                    return;
             }
         }
 
@@ -1472,7 +1474,8 @@ export class Renderer {
             const depthMaterial = actor.depthMaterial;
 
             if (!depthMaterial) {
-                throw '[Renderer.depthPrePass] invalid depth material';
+                console.error('[Renderer.depthPrePass] invalid depth material');
+                return;
             }
 
             if (actor.mainMaterial.skipDepthPrePass) {
@@ -1538,12 +1541,12 @@ export class Renderer {
 
         castShadowLightActors.forEach((lightActor) => {
             if (!lightActor.shadowMap) {
-                throw 'invalid shadow pass';
-                // return;
+                console.error('invalid shadow pass');
+                return;
             }
             if (!lightActor.shadowCamera) {
-                throw 'invalid shadow camera';
-                // return;
+                console.error('invalid shadow camera');
+                return;
             }
             this.setRenderTarget(lightActor.shadowMap.write, false, true);
             // this.clear(0, 0, 0, 1);
@@ -1560,7 +1563,8 @@ export class Renderer {
 
                 // TODO: material 側でやった方がよい？
                 if (!targetMaterial) {
-                    throw 'invalid target material';
+                    console.error('invalid target material');
+                    return;
                 }
 
                 // TODO: material 側でやった方がよい？
@@ -1818,7 +1822,7 @@ export class Renderer {
                     data.push(...(value as Color).elements);
                     break;
                 default:
-                    throw `invalid uniform type: ${type}`;
+                    console.error(`invalid uniform type: ${type}`);
             }
             return data;
         };

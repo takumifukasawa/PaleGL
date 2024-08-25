@@ -1,17 +1,19 @@
 ﻿export class GLObject {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     get glObject(): WebGLProgram {
-        throw '[GLObject.glObject] should implementation';
+        console.error('[GLObject.glObject] should implementation');
     }
 
     bind(): void {
-        throw '[GLObject.bind] should implementation';
+        console.error('[GLObject.bind] should implementation');
     }
 
     unbind(): void {
-        throw '[GLObject.unbind] should implementation';
+        console.error('[GLObject.unbind] should implementation');
     }
     
     dispose(): void {
-        throw '[GLObject.dispose] should implementation';
+        console.error('[GLObject.dispose] should implementation');
     }
 }

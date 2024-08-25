@@ -25,15 +25,15 @@ export type TextureArgs = {
     wrapS?: TextureWrapType;
     wrapT?: TextureWrapType;
     flipY?: boolean;
-    depthPrecision?: TextureDepthPrecisionType 
+    depthPrecision?: TextureDepthPrecisionType;
 };
 
 /**
- * 
+ *
  * @param glTextureFilter
  */
 export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter) {
-    switch(glTextureFilter) {
+    switch (glTextureFilter) {
         case GLTextureFilter.NEAREST:
             return TextureFilterTypes.Nearest;
         case GLTextureFilter.LINEAR:
@@ -47,16 +47,16 @@ export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter)
         case GLTextureFilter.LINEAR_MIPMAP_LINEAR:
             return TextureFilterTypes.LinearMipmapLinear;
         default:
-            throw '[resolveGLEnumTextureFilterType] invalid glTextureFilter';
+            console.error('[resolveGLEnumTextureFilterType] invalid glTextureFilter');
     }
 }
 
 /**
- * 
+ *
  * @param glTextureWrap
  */
 export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
-    switch(glTextureWrap) {
+    switch (glTextureWrap) {
         case WebGLRenderingContext.CLAMP_TO_EDGE:
             return TextureWrapTypes.ClampToEdge;
         case WebGLRenderingContext.REPEAT:
@@ -64,7 +64,7 @@ export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
         case WebGLRenderingContext.MIRRORED_REPEAT:
             return TextureWrapTypes.MirroredRepeat;
         default:
-            throw '[resolveGLEnumTextureWrapType] invalid glTextureWrap';
+            console.error('[resolveGLEnumTextureWrapType] invalid glTextureWrap');
     }
 }
 
@@ -103,7 +103,7 @@ export class Texture extends GLObject {
         wrapS = TextureWrapTypes.Repeat,
         wrapT = TextureWrapTypes.Repeat,
         flipY,
-        depthPrecision
+        depthPrecision,
     }: TextureArgs) {
         super();
 
@@ -120,9 +120,10 @@ export class Texture extends GLObject {
         this.width = width;
         this.height = height;
         // imgを持つが特に指定がない場合はflipする
-        this.flipY = (this.img && flipY === undefined) ? true : !!flipY;
-        
-        this.depthPrecision = (this.type === TextureTypes.Depth) && depthPrecision !== undefined ? depthPrecision : undefined;
+        this.flipY = this.img && flipY === undefined ? true : !!flipY;
+
+        this.depthPrecision =
+            this.type === TextureTypes.Depth && depthPrecision !== undefined ? depthPrecision : undefined;
 
         if (this.img === null) {
             // this.img = createWhite1x1();
@@ -132,11 +133,11 @@ export class Texture extends GLObject {
         if (!this.img && (!width || !height)) {
             console.error('[Texture.constructor] invalid width or height');
         }
- 
-        const texture = gl.createTexture();
-        if (!texture) {
-            throw '[Texture.constructor] invalid texture';
-        }
+
+        const texture = gl.createTexture()!;
+        // if (!texture) {
+        //     console.error('[Texture.constructor] invalid texture');
+        // }
         this.texture = texture;
 
         // bind texture object to gl
@@ -150,7 +151,7 @@ export class Texture extends GLObject {
         //
         // filter
         //
-        
+
         // filterable ref: https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
         switch (this.type) {
             case TextureTypes.RGBA:
@@ -199,13 +200,13 @@ export class Texture extends GLObject {
             //     break;
 
             default:
-                throw '[Texture.constructor] invalid texture type';
+                console.error('[Texture.constructor] invalid texture type');
         }
 
         //
         // wrap settings
         //
-        
+
         switch (wrapS) {
             case TextureWrapTypes.ClampToEdge:
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -251,7 +252,7 @@ export class Texture extends GLObject {
         // bind texture data
         // TODO: startみたいな関数でtextureにdataをセットした方が効率よい？
         //
-            
+
         switch (this.type) {
             case TextureTypes.RGBA:
                 if (width && height) {
@@ -287,9 +288,7 @@ export class Texture extends GLObject {
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            this.depthPrecision === TextureDepthPrecisionType.High
-                                ? gl.FLOAT
-                                : gl.UNSIGNED_SHORT,
+                            this.depthPrecision === TextureDepthPrecisionType.High ? gl.FLOAT : gl.UNSIGNED_SHORT,
                             this.img
                         );
                     } else {
@@ -303,9 +302,7 @@ export class Texture extends GLObject {
                             height,
                             0,
                             gl.DEPTH_COMPONENT,
-                            this.depthPrecision === TextureDepthPrecisionType.High
-                                ? gl.FLOAT
-                                : gl.UNSIGNED_SHORT,
+                            this.depthPrecision === TextureDepthPrecisionType.High ? gl.FLOAT : gl.UNSIGNED_SHORT,
                             null
                         );
                     }
@@ -323,9 +320,7 @@ export class Texture extends GLObject {
                                 ? gl.DEPTH_COMPONENT32F
                                 : gl.DEPTH_COMPONENT16,
                             gl.DEPTH_COMPONENT,
-                            this.depthPrecision === TextureDepthPrecisionType.High
-                                ? gl.FLOAT
-                                : gl.UNSIGNED_SHORT,
+                            this.depthPrecision === TextureDepthPrecisionType.High ? gl.FLOAT : gl.UNSIGNED_SHORT,
                             this.img
                         );
                         // } else {
@@ -373,7 +368,17 @@ export class Texture extends GLObject {
             case TextureTypes.R11F_G11F_B10F:
                 if (width && height) {
                     if (this.img) {
-                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, this.img);
+                        gl.texImage2D(
+                            gl.TEXTURE_2D,
+                            0,
+                            gl.R11F_G11F_B10F,
+                            width,
+                            height,
+                            0,
+                            gl.RGB,
+                            gl.FLOAT,
+                            this.img
+                        );
                     } else {
                         gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, null);
                     }
@@ -405,7 +410,7 @@ export class Texture extends GLObject {
                 break;
 
             default:
-                throw '[Texture.constructor] invalid type';
+                console.error('[Texture.constructor] invalid type');
         }
 
         // TODO: あった方がよい？
@@ -414,7 +419,7 @@ export class Texture extends GLObject {
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
      */
@@ -454,9 +459,7 @@ export class Texture extends GLObject {
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        this.depthPrecision === TextureDepthPrecisionType.High
-                            ? gl.FLOAT
-                            : gl.UNSIGNED_SHORT,
+                        this.depthPrecision === TextureDepthPrecisionType.High ? gl.FLOAT : gl.UNSIGNED_SHORT,
                         this.img
                     );
                 } else {
@@ -470,9 +473,7 @@ export class Texture extends GLObject {
                         height,
                         0,
                         gl.DEPTH_COMPONENT,
-                        this.depthPrecision === TextureDepthPrecisionType.High
-                            ? gl.FLOAT
-                            : gl.UNSIGNED_SHORT,
+                        this.depthPrecision === TextureDepthPrecisionType.High ? gl.FLOAT : gl.UNSIGNED_SHORT,
                         null
                     );
                 }
@@ -495,7 +496,7 @@ export class Texture extends GLObject {
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);
                 }
                 break;
-                
+
             case TextureTypes.R11F_G11F_B10F:
                 if (this.img) {
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R11F_G11F_B10F, width, height, 0, gl.RGB, gl.FLOAT, this.img);
@@ -512,16 +513,15 @@ export class Texture extends GLObject {
                 }
                 break;
 
-
             default:
-                throw '[Texture.setSize] invalid type';
+                console.error('[Texture.setSize] invalid type');
         }
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
      * @param data
@@ -550,16 +550,16 @@ export class Texture extends GLObject {
             case TextureTypes.RGBA32F:
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
                 break;
-               
+
             default:
-                throw '[Texture.update] invalid type';
+                console.error('[Texture.update] invalid type');
         }
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     /**
-     * 
+     *
      */
     generate() {
         return new Texture({

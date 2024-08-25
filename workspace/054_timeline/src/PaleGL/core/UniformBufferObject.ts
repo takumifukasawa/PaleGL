@@ -2,10 +2,11 @@ import { GLObject } from '@/PaleGL/core/GLObject';
 import { GPU } from '@/PaleGL/core/GPU';
 import { UniformTypes } from '@/PaleGL/constants.ts';
 import {
-    UniformBufferObjectElementValueArray, UniformBufferObjectElementValueNoNeedsPadding,
+    UniformBufferObjectElementValueArray,
+    UniformBufferObjectElementValueNoNeedsPadding,
     UniformBufferObjectStructArrayValue,
     UniformBufferObjectStructValue,
-    UniformBufferObjectValue
+    UniformBufferObjectValue,
 } from '@/PaleGL/core/Uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -47,7 +48,7 @@ function getStructElementValue(type: UniformTypes, value: UniformBufferObjectVal
             data.push(...(value as Color).elements);
             break;
         default:
-            throw `invalid uniform type: ${type}`;
+            console.error(`invalid uniform type: ${type}`);
     }
     return data;
 }
@@ -118,11 +119,12 @@ export class UniformBufferObject extends GLObject {
 
     updateBufferData(variableName: string, data: Float32Array | Uint16Array, showLog: boolean = false) {
         const info = this.variableInfo.find((v) => v.name === variableName);
-        if(showLog) {
+        if (showLog) {
             // console.log("updateBufferData", info);
         }
         if (!info) {
-            throw new Error(`variableName ${variableName} not found`);
+            console.error(`variableName ${variableName} not found`);
+            return;
         }
         // if(info.name === "uViewPosition" || info.name === "uViewDirection") {
         // console.log("updateBufferData", info, data);
@@ -182,5 +184,4 @@ export class UniformBufferObject extends GLObject {
                 break;
         }
     }
-
 }

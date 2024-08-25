@@ -5,11 +5,15 @@ export class AbstractRenderTarget {
         this.isSwappable = isSwappable;
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     get read(): AbstractRenderTarget {
-        throw "[AbstractRenderTarget] should implementation 'read' getter";
+        console.error("[AbstractRenderTarget] should implementation 'read' getter");
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     get write(): AbstractRenderTarget {
-        throw "[AbstractRenderTarget] should implementation 'write' getter";
+        console.error("[AbstractRenderTarget] should implementation 'write' getter");
     }
 }

@@ -39,10 +39,10 @@ export class VertexArrayObject extends GLObject {
         this.gpu = gpu;
 
         const gl = this.gpu.gl;
-        const vao = gl.createVertexArray();
-        if (!vao) {
-            throw 'invalid vao';
-        }
+        const vao = gl.createVertexArray()!;
+        // if (!vao) {
+        //     console.error('invalid vao');
+        // }
         this.vao = vao;
 
         // bind vertex array to webgl context
@@ -120,10 +120,10 @@ export class VertexArrayObject extends GLObject {
 
         const { name, data, size, location, usageType, divisor } = attribute;
         const newLocation = location !== null && location !== undefined ? location : this.vboList.length;
-        const vbo = gl.createBuffer();
-        if (!vbo) {
-            throw 'invalid vbo';
-        }
+        const vbo = gl.createBuffer()!;
+        // if (!vbo) {
+        //     throw 'invalid vbo';
+        // }
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         const usage = getAttributeUsage(gl, usageType);
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);

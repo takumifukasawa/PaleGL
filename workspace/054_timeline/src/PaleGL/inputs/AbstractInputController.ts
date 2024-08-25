@@ -33,7 +33,7 @@ export class AbstractInputController {
     get deltaNormalizedInputPosition() {
         return this.#deltaNormalizedInputPosition;
     }
-    
+
     get normalizedInputPosition() {
         return this.#normalizedInputPosition;
     }
@@ -43,7 +43,7 @@ export class AbstractInputController {
     }
 
     start() {
-        throw "[AbstractInputController] should implementation 'start' method.";
+        console.error("[AbstractInputController] should implementation 'start' method.");
     }
 
     setSize(width: number, height: number) {
@@ -52,7 +52,7 @@ export class AbstractInputController {
     }
 
     update() {
-        throw "[AbstractInputController] should implementation 'update' method.";
+        console.error("[AbstractInputController] should implementation 'update' method.");
     }
 
     // inputPosition ... v2
@@ -92,7 +92,7 @@ export class AbstractInputController {
     #updateInputPositions(inputPosition: Vector2) {
         // this.#beforeInputPosition.copy(this.#currentInputPosition);
         // this.#currentInputPosition.copy(inputPosition);
-        
+
         if (this.isUp) {
             // this.clearInputPositions();
             // NOTE: mousemoveを考慮してreturnしてない

@@ -6,7 +6,7 @@ import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { AnimationClip } from '@/PaleGL/core/AnimationClip';
-import { AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
+import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
@@ -112,7 +112,8 @@ type GLTFNode = {
 type GLTFAnimationChannel = {
     target: {
         node: number;
-        path: string; // translation, rotation, scaling ??
+        // path: string; // translation, rotation, scaling ??
+        path: GLTFAnimationChannelTargetPath;
     };
     sampler: number;
 };
@@ -431,7 +432,7 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
                         weights = new Float32Array(bufferData);
                         break;
                     default:
-                        throw '[loadGLTF.createMesh] invalid attribute name';
+                        console.error('[loadGLTF.createMesh] invalid attribute name');
                 }
             });
             if (meshAccessors.indices) {
@@ -635,10 +636,10 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
                         // elementSize = 4;
                         break;
                     default:
-                        throw 'invalid key type';
+                        console.error('invalid key type');
                 }
 
-                let animationKeyframeType;
+                let animationKeyframeType: AnimationKeyframeType = AnimationKeyframeTypes.Vector3;
                 switch (channel.target.path) {
                     case GLTFAnimationChannelTargetPath.rotation:
                         animationKeyframeType = AnimationKeyframeTypes.Quaternion;
@@ -648,7 +649,8 @@ export async function loadGLTF({ gpu, dir, path }: { gpu: GPU; dir?: string; pat
                         animationKeyframeType = AnimationKeyframeTypes.Vector3;
                         break;
                     default:
-                        throw 'invalid channel taget path';
+                        console.error('invalid channel target path');
+                        break;
                 }
 
                 const animationKeyframes = new AnimationKeyframes({

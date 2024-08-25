@@ -161,7 +161,7 @@ export class SkinnedMesh extends Mesh {
                                 animationData[i][frameIndex][boneIndex][elem.key] = elem.frameValue as Vector3;
                                 break;
                             default:
-                                throw 'invalid target path';
+                                console.error('invalid target path');
                         }
                     });
                 });

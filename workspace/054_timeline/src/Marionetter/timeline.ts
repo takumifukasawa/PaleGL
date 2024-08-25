@@ -188,7 +188,7 @@ function createMarionetterClips(
                 );
                 break;
             default:
-                throw new Error(`[createMarionetterClips] invalid animation clip type`);
+                console.error(`[createMarionetterClips] invalid animation clip type`);
         }
     }
 
@@ -217,7 +217,7 @@ function createMarionetterAnimationClip(
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach(({ propertyName, keyframes }) => {
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
-
+            
             switch (propertyName) {
                 case PROPERTY_LOCAL_POSITION_X:
                     hasLocalPosition = true;
@@ -278,7 +278,7 @@ function createMarionetterAnimationClip(
                     break;
                 default:
                     // propertyが紐づいていない場合はエラーにする
-                    throw new Error(`[createMarionetterAnimationClip] invalid property: ${propertyName}`);
+                    console.error(`[createMarionetterAnimationClip] invalid property: ${propertyName}`);
             }
         });
 
@@ -344,7 +344,7 @@ function createMarionetterLightControlClip(
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach(({ propertyName, keyframes }) => {
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
-
+            
             switch (propertyName) {
                 case PROPERTY_COLOR_R:
                     hasPropertyColorR = true;

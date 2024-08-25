@@ -35,10 +35,10 @@ import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        throw 'invalid context';
-    }
+    const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
+    // if (!ctx) {
+    //     console.error('invalid context');
+    // }
     canvas.width = 1;
     canvas.height = 1;
     ctx.fillStyle = color;
@@ -55,7 +55,8 @@ export const getAttributeUsage = (gl: WebGL2RenderingContext, usageType: Attribu
         case AttributeUsageType.DynamicCopy:
             return gl.DYNAMIC_COPY;
         default:
-            throw '[getAttributeUsage] invalid usage';
+            console.error('[getAttributeUsage] invalid usage');
+            return -1;
     }
 };
 
@@ -257,7 +258,8 @@ export class GPU {
             case PrimitiveTypes.Triangles:
                 return gl.TRIANGLES;
             default:
-                throw 'invalid primitive type';
+                console.error('invalid primitive type');
+                return -1;
         }
     }
 
@@ -271,9 +273,14 @@ export class GPU {
      */
     setUniformValues() {
         const gl = this.gl;
-
+        
         let activeTextureIndex = 0;
         // let dummyTextureIndex = 0;
+        
+        if(!this.shader) {
+            console.error('shader is not set');
+            return;
+        }
 
         const setUniformValueInternal = (type: UniformTypes, uniformName: string, value: UniformValue) => {
             // for debug
@@ -370,7 +377,7 @@ export class GPU {
                     activeTextureIndex++;
                     break;
                 default:
-                    throw `invalid uniform - name: ${uniformName}, type: ${type}`;
+                    console.error(`invalid uniform - name: ${uniformName}, type: ${type}`);
             }
         };
 
@@ -487,6 +494,15 @@ export class GPU {
     ) {
         const glPrimitiveType = this.#getGLPrimitive(primitiveType);
         const gl = this.gl;
+        
+        if(!this.shader) {
+            console.error('shader is not set');
+            return;
+        }
+        if(!this.vao) {
+            console.error('vao is not set');
+            return
+        }
 
         // culling
         switch (faceSide) {
@@ -505,7 +521,7 @@ export class GPU {
                 gl.frontFace(gl.CCW);
                 break;
             default:
-                throw 'invalid face side';
+                console.error('invalid face side');
         }
 
         // console.log(depthTest, depthWrite, depthFuncType)
@@ -526,7 +542,7 @@ export class GPU {
                     gl.depthFunc(gl.LEQUAL);
                     break;
                 default:
-                    throw 'invalid depth func type';
+                    console.error('invalid depth func type');
             }
         } else {
             gl.disable(gl.DEPTH_TEST);
@@ -553,16 +569,9 @@ export class GPU {
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                 break;
             default:
-                throw 'invalid blend type';
+                console.error('invalid blend type');
         }
-
-        if (!this.shader) {
-            throw 'shader is not set';
-        }
-        if (!this.vao) {
-            throw 'vao is not set';
-        }
-
+       
         gl.useProgram(this.shader.glObject);
 
         this.setUniformValues();

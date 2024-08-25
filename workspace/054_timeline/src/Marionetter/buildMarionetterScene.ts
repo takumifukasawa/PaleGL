@@ -42,7 +42,7 @@ export function tryParseJsonString<T>(str: string) {
     try {
         json = JSON.parse(str) as T;
     } catch (e) {
-        throw new Error('Failed to parse JSON string');
+        console.error('Failed to parse JSON string');
     }
     return json;
 }
@@ -200,7 +200,7 @@ export function buildMarionetterScene(
             if (camera.cameraType === 'Perspective') {
                 actor = new PerspectiveCamera(camera.fov, 1, 0.1, 1000, name);
             } else {
-                throw `[buildMarionetterActors] invalid camera type: ${camera.cameraType}`;
+                console.error(`[buildMarionetterActors] invalid camera type: ${camera.cameraType}`);
             }
         } else if (lightComponent) {
             // light
@@ -227,7 +227,7 @@ export function buildMarionetterScene(
                     });
                     break;
                 default:
-                    throw `[buildMarionetterActors] invalid light type: ${light.lightType}`;
+                    console.error(`[buildMarionetterActors] invalid light type: ${light.lightType}`);
             }
         } else if (volumeComponent) {
             actor = buildPostProcessVolumeActor({ name, volumeComponent });
@@ -303,7 +303,7 @@ export function buildMarionetterScene(
             return;
         }
 
-        throw `[recursiveBuildActor] actor is null`;
+        console.error(`[recursiveBuildActor] actor is null`);
     }
 
     //

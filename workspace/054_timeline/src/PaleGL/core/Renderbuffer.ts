@@ -19,10 +19,7 @@ export class Renderbuffer extends GLObject {
 
         const gl = this.#gpu.gl;
 
-        const rb = gl.createRenderbuffer();
-        if (!rb) {
-            throw 'invalid render buffer';
-        }
+        const rb = gl.createRenderbuffer()!;
         this.#renderbuffer = rb;
 
         gl.bindRenderbuffer(gl.RENDERBUFFER, this.#renderbuffer);

@@ -150,7 +150,8 @@ export class RenderTarget extends AbstractRenderTarget {
             // RGBA16F浮動小数点バッファ
             case RenderTargetTypes.RGBA16F:
                 if (!gpu.checkExtension(GLExtensionName.ColorBufferFloat)) {
-                    throw 'EXT_color_buffer_float not supported';
+                    console.error('EXT_color_buffer_float not supported');
+                    return;
                 }
                 this._texture = new Texture({
                     gpu,
@@ -170,7 +171,8 @@ export class RenderTarget extends AbstractRenderTarget {
             case RenderTargetTypes.R11F_G11F_B10F:
                 // TODO: r11g11b10 の場合はなくてもよい？
                 if (!gpu.checkExtension(GLExtensionName.ColorBufferFloat)) {
-                    throw 'EXT_color_buffer_float not supported';
+                    console.error('EXT_color_buffer_float not supported');
+                    return;
                 }
                 this._texture = new Texture({
                     gpu,

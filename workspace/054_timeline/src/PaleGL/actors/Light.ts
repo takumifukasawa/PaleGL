@@ -56,7 +56,7 @@ export class Light extends Actor implements ILight {
      *
      */
     setShadowSize() {
-        throw 'should implementation';
+        console.error('should implementation');
     }
 
     updateShadowCamera() {

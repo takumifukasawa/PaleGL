@@ -126,7 +126,8 @@ export class Geometry {
     updateAttribute(key: string, data: Float32Array) {
         const attribute = this.attributes.find(({ name }) => name === key);
         if (!attribute) {
-            throw 'invalid attribute';
+            console.error('invalid attribute');
+            return;
         }
         attribute.data = data;
         this.vertexArrayObject.updateBufferData(key, attribute.data);

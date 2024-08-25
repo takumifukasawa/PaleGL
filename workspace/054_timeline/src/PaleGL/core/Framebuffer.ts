@@ -29,10 +29,10 @@ export class Framebuffer extends GLObject {
         this.#gpu = gpu;
         const gl = this.#gpu.gl;
 
-        const fb = gl.createFramebuffer();
-        if (!fb) {
-            throw 'invalid framebuffer';
-        }
+        const fb = gl.createFramebuffer()!;
+        // if (!fb) {
+        //     console.error('invalid framebuffer');
+        // }
         this.#framebuffer = fb;
     }
 

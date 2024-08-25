@@ -5,10 +5,11 @@ type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; tr
 
 function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
     // create vertex shader
-    const shader = gl.createShader(type);
-    if (!shader) {
-        throw new Error('invalid shader');
-    }
+    const shader = gl.createShader(type)!;
+    // if (!shader) {
+    //     console.error('invalid shader');
+    //     return;
+    // }
     // set shader source (string)
     gl.shaderSource(shader, src);
     // compile shader
@@ -16,7 +17,7 @@ function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
     // check shader info log
     const info = gl.getShaderInfoLog(shader);
     if (!!info && info.length > 0) {
-        throw Shader.buildErrorInfo(info, src, '[Shader] shader has error');
+        console.error(Shader.buildErrorInfo(info, src, '[Shader] shader has error'));
     }
 
     return shader;
@@ -36,11 +37,12 @@ export class Shader extends GLObject {
         this.gpu = gpu;
 
         const { gl } = gpu;
-        const program = gl.createProgram();
+        const program = gl.createProgram()!;
 
-        if (!program) {
-            throw new Error('invalid program');
-        }
+        // if (!program) {
+        //     console.error('invalid program');
+        //     return;
+        // }
 
         //
         // vertex shader

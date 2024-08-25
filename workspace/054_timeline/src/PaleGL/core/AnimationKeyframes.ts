@@ -6,6 +6,7 @@ import {
     // GLTFAnimationKeyframeType,
     GLTFNodeActorKind,
 } from '@/PaleGL/loaders/loadGLTF';
+import {maton} from "@/PaleGL/utilities/maton.ts";
 
 export type AnimationKeyframeValue = Vector3 | Quaternion;
 
@@ -14,7 +15,7 @@ export class AnimationKeyframes {
     key;
     interpolation: GLTFAnimationSamplerInterpolation;
     private _data: Float32Array;
-    private elementSize: number;
+    private elementSize: number = -1;
     frameCount: number;
     type: AnimationKeyframeType;
     start: number;
@@ -64,7 +65,7 @@ export class AnimationKeyframes {
                 this.elementSize = 4;
                 break;
             default:
-                throw '[AnimationKeyframes.getFrameValue] invalid type';
+                console.error(`[AnimationKeyframes.getFrameValue] invalid type: ${type}`);
         }
     }
 
@@ -73,7 +74,7 @@ export class AnimationKeyframes {
      * @param frame
      */
     getFrameValue(frame: number): AnimationKeyframeValue {
-        const arr = new Array(this.elementSize).fill(0).map((_, i) => {
+        const arr = maton(new Array(this.elementSize).fill(0).map((_, i) => {
             switch (this.interpolation) {
                 case GLTFAnimationSamplerInterpolation.LINEAR:
                     return this._data[frame * this.elementSize + i];
@@ -81,9 +82,9 @@ export class AnimationKeyframes {
                     // TODO: Stepの場合って0frameだけ見て問題ない？
                     return this._data[i];
                 default:
-                    throw 'invalid interp';
+                    console.error('invalid interp');
             }
-        });
+        })).compact().value();
 
         // for debug
         // console.log("data", this.interpolation, this._data, arr)
@@ -97,7 +98,10 @@ export class AnimationKeyframes {
                 // return new Quaternion(...arr);
                 return new Quaternion(arr[0], arr[1], arr[2], arr[3]);
             default:
-                throw '[AnimationKeyframes.getFrameValue] invalid type';
+                console.error('[AnimationKeyframes.getFrameValue] invalid type');
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                return null;
         }
     }
 }

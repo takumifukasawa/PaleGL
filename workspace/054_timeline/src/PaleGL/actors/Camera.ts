@@ -270,7 +270,10 @@ export class Camera extends Actor {
         }
 
         if (this.visibleFrustumMesh) {
-            const frustumPositions = this.getFrustumLocalPositions();
+            const frustumPositions = this.getFrustumLocalPositions()
+            if(!frustumPositions) {
+                return;
+            }
             this.visibleFrustumMesh.geometry.updateAttribute(
                 AttributeNames.Position,
                 new Float32Array([
@@ -333,21 +336,23 @@ export class Camera extends Actor {
      *
      */
     updateProjectionMatrix() {
-        throw '[Camera.updateProjectionMatrix] should implementation';
+        console.error('[Camera.updateProjectionMatrix] should implementation');
     }
 
     /**
      *
      */
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     getFrustumLocalPositions(): FrustumVectors {
-        throw '[Camera.getFrustumLocalPosition] should implementation';
+        console.error('[Camera.getFrustumLocalPosition] should implementation');
     }
 
     /**
      *
      */
     getFrustumWorldPositions() {
-        throw '[Camera.getFrustumWorldPositions] should implementation';
+        console.error('[Camera.getFrustumWorldPositions] should implementation');
     }
 
     /**

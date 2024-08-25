@@ -156,7 +156,7 @@ export class AnimationClip {
                         }
                         break;
                     default:
-                        throw 'invalid animation keyframes key';
+                        console.error('invalid animation keyframes key');
                 }
             });
         }
