@@ -1,611 +1,611 @@
 {
-  "name": "SampleScene",
-  "objects": [
+  "n": "SampleScene",
+  "o": [
     {
-      "name": "TestMain",
-      "transform": {
-        "localPosition": {
+      "n": "TestMain",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0,
           "w": -1.0
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [
+      "co": [
         {
-          "name": "MainTimeline",
-          "duration": 0.699999999999,
-          "tracks": [
+          "n": "MainTimeline",
+          "d": 0.699999999999,
+          "ts": [
             {
-              "signalEmitters": [
+              "ses": [
                 {
-                  "name": "TEST Signal Emitter",
-                  "time": 0.13333334
+                  "n": "TEST Signal Emitter",
+                  "t": 0.13333334
                 }
               ],
-              "type": 4
+              "t": 4
             },
             {
-              "clips": [
+              "cs": [
                 {
-                  "offsetPosition": {
+                  "op": {
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "offsetRotation": {
+                  "or": {
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "bindings": [
+                  "b": [
                     {
-                      "propertyName": "localEulerAnglesRaw.x",
-                      "keyframes": [
+                      "n": "localEulerAnglesRaw.x",
+                      "k": [
                         {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 81.06097,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 81.06097,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     },
                     {
-                      "propertyName": "localEulerAnglesRaw.y",
-                      "keyframes": [
+                      "n": "localEulerAnglesRaw.y",
+                      "k": [
                         {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.216666669,
-                          "value": 127.556816,
-                          "inTangent": -756.29126,
-                          "outTangent": -756.29126
+                          "t": 0.216666669,
+                          "v": 127.556816,
+                          "i": -756.29126,
+                          "o": -756.29126
                         },
                         {
-                          "time": 0.7,
-                          "value": 151.009659,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 151.009659,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     },
                     {
-                      "propertyName": "localEulerAnglesRaw.z",
-                      "keyframes": [
+                      "n": "localEulerAnglesRaw.z",
+                      "k": [
                         {
-                          "time": 0.0,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.35,
-                          "value": -4.82784653,
-                          "inTangent": 273.68158,
-                          "outTangent": 273.68158
+                          "t": 0.35,
+                          "v": -4.82784653,
+                          "i": 273.68158,
+                          "o": 273.68158
                         },
                         {
-                          "time": 0.7,
-                          "value": 118.314247,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 118.314247,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     },
                     {
-                      "propertyName": "m_LocalPosition.x",
-                      "keyframes": [
+                      "n": "m_LocalPosition.x",
+                      "k": [
                         {
-                          "time": 0.0166666675,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0166666675,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     },
                     {
-                      "propertyName": "m_LocalPosition.y",
-                      "keyframes": [
+                      "n": "m_LocalPosition.y",
+                      "k": [
                         {
-                          "time": 0.0166666675,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0166666675,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 1.99,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 1.99,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     },
                     {
-                      "propertyName": "m_LocalPosition.z",
-                      "keyframes": [
+                      "n": "m_LocalPosition.z",
+                      "k": [
                         {
-                          "time": 0.0166666675,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0166666675,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     }
                   ],
-                  "type": 1,
-                  "start": 0.0,
-                  "duration": 0.7
+                  "t": 1,
+                  "s": 0.0,
+                  "d": 0.7
                 }
               ],
-              "targetName": "GameObject",
-              "type": 1
+              "tn": "GameObject",
+              "t": 1
             },
             {
-              "clips": [
+              "cs": [
                 {
-                  "offsetPosition": {
+                  "op": {
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "offsetRotation": {
+                  "or": {
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
                   },
-                  "bindings": [
+                  "b": [
                     {
-                      "propertyName": "bloomIntensity",
-                      "keyframes": [
+                      "n": "bloomIntensity",
+                      "k": [
                         {
-                          "time": 0.0,
-                          "value": 1.41393065,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0,
+                          "v": 1.41393065,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.416666657,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.416666657,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 2.98,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 2.98,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     }
                   ],
-                  "type": 1,
-                  "start": 0.0,
-                  "duration": 0.7
+                  "t": 1,
+                  "s": 0.0,
+                  "d": 0.7
                 }
               ],
-              "targetName": "Global Volume",
-              "type": 1
+              "tn": "Global Volume",
+              "t": 1
             },
             {
-              "clips": [
+              "cs": [
                 {
-                  "bindings": [
+                  "b": [
                     {
-                      "propertyName": "range",
-                      "keyframes": [
+                      "n": "range",
+                      "k": [
                         {
-                          "time": 0.0,
-                          "value": 10.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.0,
+                          "v": 10.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.333333343,
-                          "value": 0.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.333333343,
+                          "v": 0.0,
+                          "i": 0.0,
+                          "o": 0.0
                         },
                         {
-                          "time": 0.7,
-                          "value": 10.0,
-                          "inTangent": 0.0,
-                          "outTangent": 0.0
+                          "t": 0.7,
+                          "v": 10.0,
+                          "i": 0.0,
+                          "o": 0.0
                         }
                       ]
                     }
                   ],
-                  "type": 2,
-                  "start": 0.0,
-                  "duration": 0.7
+                  "t": 2,
+                  "s": 0.0,
+                  "d": 0.7
                 }
               ],
-              "targetName": "SpotLight",
-              "type": 2
+              "tn": "SpotLight",
+              "t": 2
             }
           ],
-          "type": 1
+          "t": 1
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "DirectionalLight",
-      "transform": {
-        "localPosition": {
+      "n": "DirectionalLight",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 3.0,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.408217877,
           "y": -0.234569684,
           "z": -0.109381631,
           "w": -0.8754261
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [
+      "co": [
         {
-          "lightType": "Directional",
-          "intensity": 0.07,
-          "color": "FFFFFFFF",
-          "type": 2
+          "l": "Directional",
+          "i": 0.07,
+          "c": "FFFFFFFF",
+          "t": 2
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "MainCamera",
-      "transform": {
-        "localPosition": {
+      "n": "MainCamera",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 1.0,
           "z": 6.97
         },
-        "localRotation": {
+        "lr": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0,
           "w": -1.0
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [
+      "co": [
         {
-          "cameraType": "Perspective",
-          "isMain": true,
-          "fov": 60.0,
-          "type": 3
+          "ct": "Perspective",
+          "im": true,
+          "f": 60.0,
+          "t": 3
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "Global Volume",
-      "transform": {
-        "localPosition": {
+      "n": "Global Volume",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0,
           "w": -1.0
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [
+      "co": [
         {
-          "volumeLayers": [
+          "vl": [
             {
-              "intensity": 2.54,
-              "layerType": "Bloom"
+              "i": 2.54,
+              "v": "Bloom"
             },
             {
-              "focusDistance": 4.71942759,
-              "layerType": "DepthOfField"
+              "fd": 4.71942759,
+              "v": "DepthOfField"
             }
           ],
-          "type": 6
+          "t": 6
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "Plane",
-      "transform": {
-        "localPosition": {
+      "n": "Plane",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.67946887,
           "y": -0.08294426,
           "z": 0.202946216,
           "w": -0.7001822
         },
-        "localScale": {
+        "ls": {
           "x": 6.0,
           "y": 2.56296,
           "z": 6.0
         }
       },
-      "components": [
+      "co": [
         {
-          "materialName": "Plane",
-          "material": {
-            "color": "FFFFFFFF",
-            "metallic": 0.0,
-            "roughness": 0.0,
-            "name": "Plane",
-            "type": 1
+          "mn": "Plane",
+          "m": {
+            "c": "FFFFFFFF",
+            "m": 0.0,
+            "r": 0.0,
+            "n": "Plane",
+            "t": 1
           },
-          "type": 4
+          "t": 4
         },
         {
-          "meshName": "Quad",
-          "type": 5
+          "mn": "Quad",
+          "t": 5
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "SpotLight",
-      "transform": {
-        "localPosition": {
+      "n": "SpotLight",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 3.84,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.5838468,
           "y": 0.24579294,
           "z": 0.0872257352,
           "w": -0.768830538
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [
+      "co": [
         {
-          "range": 10.0,
-          "innerSpotAngle": 20.0,
-          "spotAngle": 45.0,
-          "lightType": "Spot",
-          "intensity": 2.0,
-          "color": "FFFFFFFF",
-          "type": 2
+          "r": 8.310608,
+          "isa": 20.0,
+          "sa": 45.0,
+          "l": "Spot",
+          "i": 1.5,
+          "c": "FFFFFFFF",
+          "t": 2
         }
       ],
-      "children": []
+      "ch": []
     },
     {
-      "name": "GameObject",
-      "transform": {
-        "localPosition": {
+      "n": "GameObject",
+      "t": {
+        "lp": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
-        "localRotation": {
+        "lr": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0,
           "w": -1.0
         },
-        "localScale": {
+        "ls": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         }
       },
-      "components": [],
-      "children": [
+      "co": [],
+      "ch": [
         {
-          "name": "Cube (1)",
-          "transform": {
-            "localPosition": {
+          "n": "Cube (1)",
+          "t": {
+            "lp": {
               "x": 0.65,
               "y": 0.0,
               "z": 0.0
             },
-            "localRotation": {
+            "lr": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0,
               "w": -1.0
             },
-            "localScale": {
+            "ls": {
               "x": 0.4,
               "y": 0.4,
               "z": 0.4
             }
           },
-          "components": [
+          "co": [
             {
-              "materialName": "Lit",
-              "material": {
-                "color": "808080FF",
-                "metallic": 0.0,
-                "roughness": 0.5,
-                "name": "Lit",
-                "type": 1
+              "mn": "Lit",
+              "m": {
+                "c": "808080FF",
+                "m": 0.0,
+                "r": 0.5,
+                "n": "Lit",
+                "t": 1
               },
-              "type": 4
+              "t": 4
             },
             {
-              "meshName": "Cube",
-              "type": 5
+              "mn": "Cube",
+              "t": 5
             }
           ],
-          "children": []
+          "ch": []
         },
         {
-          "name": "Cube",
-          "transform": {
-            "localPosition": {
+          "n": "Cube",
+          "t": {
+            "lp": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0
             },
-            "localRotation": {
+            "lr": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0,
               "w": -1.0
             },
-            "localScale": {
+            "ls": {
               "x": 1.0,
               "y": 0.2,
               "z": 0.2
             }
           },
-          "components": [
+          "co": [
             {
-              "materialName": "Lit",
-              "material": {
-                "color": "808080FF",
-                "metallic": 0.0,
-                "roughness": 0.5,
-                "name": "Lit",
-                "type": 1
+              "mn": "Lit",
+              "m": {
+                "c": "808080FF",
+                "m": 0.0,
+                "r": 0.5,
+                "n": "Lit",
+                "t": 1
               },
-              "type": 4
+              "t": 4
             },
             {
-              "meshName": "Cube",
-              "type": 5
+              "mn": "Cube",
+              "t": 5
             }
           ],
-          "children": []
+          "ch": []
         },
         {
-          "name": "Cube",
-          "transform": {
-            "localPosition": {
+          "n": "Cube",
+          "t": {
+            "lp": {
               "x": 0.69,
               "y": 0.0,
               "z": -0.358
             },
-            "localRotation": {
+            "lr": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0,
               "w": -1.0
             },
-            "localScale": {
+            "ls": {
               "x": 0.08402,
               "y": 0.099351,
               "z": 0.396934569
             }
           },
-          "components": [
+          "co": [
             {
-              "materialName": "Lit",
-              "material": {
-                "color": "808080FF",
-                "metallic": 0.0,
-                "roughness": 0.5,
-                "name": "Lit",
-                "type": 1
+              "mn": "Lit",
+              "m": {
+                "c": "808080FF",
+                "m": 0.0,
+                "r": 0.5,
+                "n": "Lit",
+                "t": 1
               },
-              "type": 4
+              "t": 4
             },
             {
-              "meshName": "Cube",
-              "type": 5
+              "mn": "Cube",
+              "t": 5
             }
           ],
-          "children": []
+          "ch": []
         },
         {
-          "name": "Cube (2)",
-          "transform": {
-            "localPosition": {
+          "n": "Cube (2)",
+          "t": {
+            "lp": {
               "x": 0.69,
               "y": 0.559,
               "z": -0.018
             },
-            "localRotation": {
+            "lr": {
               "x": 0.0,
               "y": 0.0,
               "z": 0.0,
               "w": -1.0
             },
-            "localScale": {
+            "ls": {
               "x": 0.08402,
               "y": 0.8225347,
               "z": 0.05105364
             }
           },
-          "components": [
+          "co": [
             {
-              "materialName": "Lit",
-              "material": {
-                "color": "808080FF",
-                "metallic": 0.0,
-                "roughness": 0.5,
-                "name": "Lit",
-                "type": 1
+              "mn": "Lit",
+              "m": {
+                "c": "808080FF",
+                "m": 0.0,
+                "r": 0.5,
+                "n": "Lit",
+                "t": 1
               },
-              "type": 4
+              "t": 4
             },
             {
-              "meshName": "Cube",
-              "type": 5
+              "mn": "Cube",
+              "t": 5
             }
           ],
-          "children": []
+          "ch": []
         }
       ]
     }

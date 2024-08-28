@@ -81,7 +81,7 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 }
 
 function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
-    return (obj.components.find((c) => c.type === componentType) as T) || null;
+    return (obj.co.find((c) => c.t === componentType) as T) || null;
 }
 
 function buildPostProcessVolumeActor({
@@ -91,15 +91,16 @@ function buildPostProcessVolumeActor({
     name: string;
     volumeComponent: MarionetterVolumeComponentInfo;
 }) {
+    console.log(volumeComponent)
     const parameters = maton(
-        volumeComponent.volumeLayers.map((volumeLayer) => {
-            switch (volumeLayer.layerType) {
+        volumeComponent.vl.map((volumeLayer) => {
+            switch (volumeLayer.l) {
                 case 'Bloom':
                     const bloomLayer = volumeLayer as MarionetterVolumeLayerBloom;
                     return {
                         type: PostProcessPassType.Bloom,
                         parameters: generateDefaultBloomPassParameters({
-                            bloomAmount: bloomLayer.intensity,
+                            bloomAmount: bloomLayer.i,
                         }),
                     };
                 case 'DepthOfField':
@@ -107,7 +108,7 @@ function buildPostProcessVolumeActor({
                     return {
                         type: PostProcessPassType.DepthOfField,
                         parameters: generateDepthOfFieldPassParameters({
-                            focusDistance: depthOfFieldLayer.focusDistance,
+                            focusDistance: depthOfFieldLayer.f,
                         }),
                     };
                 default:
@@ -136,7 +137,7 @@ export function buildMarionetterScene(
         parentActor: Actor | null = null,
         needsFlip: boolean = false
     ) {
-        const { name } = obj;
+        const name = obj.n;
         const mfComponent = findMarionetterComponent<MarionetterMeshFilterComponentInfo>(
             obj,
             MarionetterComponentType.MeshFilter
@@ -172,7 +173,7 @@ export function buildMarionetterScene(
             let material: Material | null = null;
 
             // build geometry
-            switch (meshFilter.meshName) {
+            switch (meshFilter.mn) {
                 case 'Cube':
                     geometry = new BoxGeometry({ gpu });
                     break;
@@ -182,7 +183,7 @@ export function buildMarionetterScene(
             }
 
             // build material
-            switch (meshRenderer.materialName) {
+            switch (meshRenderer.mn) {
                 case 'Lit':
                     material = new GBufferMaterial();
                     break;
@@ -197,21 +198,21 @@ export function buildMarionetterScene(
             }
         } else if (cameraComponent) {
             const camera = cameraComponent;
-            if (camera.cameraType === 'Perspective') {
-                actor = new PerspectiveCamera(camera.fov, 1, 0.1, 1000, name);
+            if (camera.ct === 'Perspective') {
+                actor = new PerspectiveCamera(camera.f, 1, 0.1, 1000, name);
             } else {
-                console.error(`[buildMarionetterActors] invalid camera type: ${camera.cameraType}`);
+                console.error(`[buildMarionetterActors] invalid camera type: ${camera.ct}`);
             }
         } else if (lightComponent) {
             // light
             const light = lightComponent;
-            switch (light.lightType) {
+            switch (light.l) {
                 case 'Directional':
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
                     actor = new DirectionalLight({
                         name,
-                        intensity: directionalLightInfo.intensity,
-                        color: Color.fromHex(directionalLightInfo.color),
+                        intensity: directionalLightInfo.i,
+                        color: Color.fromHex(directionalLightInfo.c),
                     });
                     break;
                 case 'Spot':
@@ -219,15 +220,15 @@ export function buildMarionetterScene(
                     const spotLightInfo = light as MarionetterSpotLightComponentInfo;
                     actor = new SpotLight({
                         name,
-                        color: Color.fromHex(spotLightInfo.color),
-                        intensity: spotLightInfo.intensity,
-                        distance: spotLightInfo.range,
-                        coneAngle: spotLightInfo.spotAngle,
-                        penumbraAngle: spotLightInfo.innerSpotAngle,
+                        color: Color.fromHex(spotLightInfo.c),
+                        intensity: spotLightInfo.i,
+                        distance: spotLightInfo.r,
+                        coneAngle: spotLightInfo.sa,
+                        penumbraAngle: spotLightInfo.isa,
                     });
                     break;
                 default:
-                    console.error(`[buildMarionetterActors] invalid light type: ${light.lightType}`);
+                    console.error(`[buildMarionetterActors] invalid light type: ${light.l}`);
             }
         } else if (volumeComponent) {
             actor = buildPostProcessVolumeActor({ name, volumeComponent });
@@ -243,9 +244,9 @@ export function buildMarionetterScene(
         if (actor) {
             // actors.push(actor);
             actor.transform.scale = new Vector3(
-                obj.transform.localScale.x,
-                obj.transform.localScale.y,
-                obj.transform.localScale.z
+                obj.t.ls.x,
+                obj.t.ls.y,
+                obj.t.ls.z
             );
             // euler ver
             // actor.transform.rotation.setV(
@@ -273,19 +274,19 @@ export function buildMarionetterScene(
             actor.transform.rotation = Rotator.fromQuaternion(
                 resolveInvertRotationLeftHandAxisToRightHandAxis(
                     new Quaternion(
-                        obj.transform.localRotation.x,
-                        obj.transform.localRotation.y,
-                        obj.transform.localRotation.z,
-                        obj.transform.localRotation.w
+                        obj.t.lr.x,
+                        obj.t.lr.y,
+                        obj.t.lr.z,
+                        obj.t.lr.w
                     ),
                     actor,
                     needsFlip
                 )
             );
             actor.transform.position = new Vector3(
-                obj.transform.localPosition.x,
-                obj.transform.localPosition.y,
-                obj.transform.localPosition.z
+                obj.t.lp.x,
+                obj.t.lp.y,
+                obj.t.lp.z
             );
 
             // 親が存在する場合は親に追加、親がない場合はシーン直下に配置したいので配列に追加
@@ -296,8 +297,8 @@ export function buildMarionetterScene(
             }
 
             // 子要素があれば再帰的に処理
-            for (let i = 0; i < obj.children.length; i++) {
-                recursiveBuildActor(obj.children[i], actor, needsFlip);
+            for (let i = 0; i < obj.ch.length; i++) {
+                recursiveBuildActor(obj.ch[i] , actor, needsFlip);
             }
 
             return;
@@ -310,8 +311,8 @@ export function buildMarionetterScene(
     // parse scene
     //
 
-    for (let i = 0; i < scene.objects.length; i++) {
-        const obj = scene.objects[i];
+    for (let i = 0; i < scene.o.length; i++) {
+        const obj = scene.o[i];
         // recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
         recursiveBuildActor(obj, null, true);
         // actors.push(actor);
@@ -329,8 +330,8 @@ export function buildMarionetterScene(
 
     let marionetterTimeline: MarionetterTimeline | null = null;
 
-    scene.objects.forEach((obj) => {
-        const timelineComponent = obj.components.find((c) => c.type === MarionetterComponentType.PlayableDirector);
+    scene.o.forEach((obj) => {
+        const timelineComponent = obj.co.find((c) => c.t === MarionetterComponentType.PlayableDirector);
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(
                 actors,

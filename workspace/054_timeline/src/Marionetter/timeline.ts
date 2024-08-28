@@ -75,12 +75,14 @@ export function buildMarionetterTimeline(
     const buildSignalEmitter = (signalEmitter: MarionetterSignalEmitter): MarionetterTimelineSignalEmitter => {
         let triggered = false;
         const execute = (time: number) => {
-            if (time > signalEmitter.time && triggered) {
+            if (time > signalEmitter.t && triggered) {
                 triggered = true;
             }
         };
         return {
-            ...signalEmitter,
+            name: signalEmitter.n,
+            time: signalEmitter.t,
+            // ...signalEmitter,
             triggered,
             execute,
         };
@@ -90,11 +92,11 @@ export function buildMarionetterTimeline(
     // build track
     //
 
-    for (let i = 0; i < marionetterPlayableDirectorComponentInfo.tracks.length; i++) {
-        const track = marionetterPlayableDirectorComponentInfo.tracks[i];
+    for (let i = 0; i < marionetterPlayableDirectorComponentInfo.ts.length; i++) {
+        const track = marionetterPlayableDirectorComponentInfo.ts[i];
 
-        if (track.type === MarionetterTrackInfoType.MarkerTrack) {
-            const { signalEmitters } = track as MarionetterMarkerTrackInfo;
+        if (track.t === MarionetterTrackInfoType.MarkerTrack) {
+            const signalEmitters = (track as MarionetterMarkerTrackInfo).ses;
             tracks.push({
                 signalEmitters: signalEmitters.map((signalEmitter) => {
                     return buildSignalEmitter(signalEmitter);
@@ -102,7 +104,8 @@ export function buildMarionetterTimeline(
                 execute: () => {},
             } as MarionetterTimelineMarkerTrack);
         } else {
-            const { targetName, clips } = track as MarionetterDefaultTrackInfo;
+            const targetName = (track as MarionetterDefaultTrackInfo).tn;
+            const clips = (track as MarionetterDefaultTrackInfo).cs;
             const targetActor = Scene.find(actors, targetName); // TODO: sceneを介すさなくてもいい気がする
             //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
             const marionetterClips = createMarionetterClips(clips);
@@ -113,10 +116,10 @@ export function buildMarionetterTimeline(
             // exec track
             // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
             const execute = (time: number) => {
-                if (track.type === MarionetterTrackInfoType.ActivationControlTrack) {
+                if (track.t === MarionetterTrackInfoType.ActivationControlTrack) {
                     if (targetActor != null) {
                         const clipAtTime = marionetterClips.find(
-                            (clip) => clip.clipInfo.start < time && time < clip.clipInfo.start + clip.clipInfo.duration
+                            (clip) => clip.clipInfo.s < time && time < clip.clipInfo.s + clip.clipInfo.d
                         );
                         if (clipAtTime) {
                             targetActor.enabled = true;
@@ -149,7 +152,7 @@ export function buildMarionetterTimeline(
         // const spf = 1 / fps;
         // const frameTime = Math.floor(rawTime / spf) * spf;
         // pattern2: use raw time
-        const frameTime = time % marionetterPlayableDirectorComponentInfo.duration;
+        const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute(frameTime);
         }
@@ -170,7 +173,7 @@ function createMarionetterClips(
 
     for (let i = 0; i < clips.length; i++) {
         const clip = clips[i];
-        switch (clip.type) {
+        switch (clip.t) {
             case MarionetterClipInfoType.AnimationClip:
                 marionetterClips.push(
                     createMarionetterAnimationClip(
@@ -212,12 +215,15 @@ function createMarionetterAnimationClip(
         const localRotationEulerDegree: Vector3 = Vector3.zero;
         const localScale: Vector3 = Vector3.one;
 
-        const { start, bindings } = animationClip;
+        const start = animationClip.s;
+        const bindings = animationClip.b;
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
-        bindings.forEach(({ propertyName, keyframes }) => {
+        bindings.forEach((binding) => {
+            const propertyName = binding.n;
+            const keyframes = binding.k;
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
-            
+
             switch (propertyName) {
                 case PROPERTY_LOCAL_POSITION_X:
                     hasLocalPosition = true;
@@ -339,12 +345,16 @@ function createMarionetterLightControlClip(
         // let range = 0;
         let spotLightRange = 0;
 
-        const { start, bindings } = lightControlClip;
+        // const { start, bindings } = lightControlClip;
+        const start = lightControlClip.s;
+        const bindings = lightControlClip.b;
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
-        bindings.forEach(({ propertyName, keyframes }) => {
+        bindings.forEach((binding) => {
+            const propertyName = binding.n;
+            const keyframes = binding.k;
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
-            
+
             switch (propertyName) {
                 case PROPERTY_COLOR_R:
                     hasPropertyColorR = true;
