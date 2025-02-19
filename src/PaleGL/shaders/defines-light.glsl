@@ -1,0 +1,3 @@
+
+#define MAX_SPOT_LIGHT_COUNT 2
+#define MAX_POINT_LIGHT_COUNT 2
