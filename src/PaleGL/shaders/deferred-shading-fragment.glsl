@@ -91,11 +91,13 @@ float calcDirectionalLightShadowAttenuation(
         step(0., depthFromWorldPos) * (1. - step(1., depthFromWorldPos));
 
     float visibility = 1.;
+    float readDepth = 0.;
+    vec2 offset = vec2(0.);
 
     #pragma UNROLL_START
     for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[UNROLL_i] / 800.;
-        float readDepth = textureLod(shadowMap, uv + offset, 0.).r;
+        offset = poissonDisk[UNROLL_i] / 800.;
+        readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         // visibility -= step(readDepth, depthFromWorldPos - bias) * .25;
         if(readDepth < lightPos.z - bias) {
             visibility -= .25;
@@ -156,8 +158,8 @@ float calcSpotLightShadowAttenuation(
     // float readDepth = textureProj(shadowMap, uvc).r;
     #pragma UNROLL_START
     for(int i = 0; i < 4; i++) {
-        vec2 offset = poissonDisk[UNROLL_i] / 100.;
-        float readDepth = textureLod(shadowMap, uv + offset, 0.).r;
+        offset = poissonDisk[UNROLL_i] / 100.;
+        readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         visibility -= step(readDepth, depthFromWorldPos - bias) * .25;
         // if(readDepth < depthFromWorldPos - bias) {
         //     visibility -= .25;

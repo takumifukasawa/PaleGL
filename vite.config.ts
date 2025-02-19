@@ -9,7 +9,7 @@ import checker from 'vite-plugin-checker';
 import * as process from 'process';
 import { transformGlslUnroll } from './plugins/vite-transform-glsl-unroll-plugin.ts';
 import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin.ts';
-import { transformExtractGlslRaymarchTemplate } from './plugins/vite-extract-glsl-raymarch-template-plugin.ts';
+// import { transformExtractGlslRaymarchTemplate } from './plugins/vite-extract-glsl-raymarch-template-plugin.ts';
 import string from 'vite-plugin-string';
 
 type EntryPointInfo = { name: string; path: string };
@@ -94,9 +94,9 @@ export default defineConfig(async (config) => {
             //         aggressiveInlining: false,
             //     },
             // }),
-            transformExtractGlslRaymarchTemplate({
-                extractEnabled: true,
-            }),
+            // transformExtractGlslRaymarchTemplate({
+            //     extractEnabled: true,
+            // }),
             checker({
                 typescript: true,
                 eslint: {

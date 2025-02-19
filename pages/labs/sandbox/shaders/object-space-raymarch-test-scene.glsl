@@ -1,11 +1,9 @@
-float dfScene(vec3 pos) {
+vec2 dfScene(vec3 pos) {
     vec3 p = opRepeat(pos, 1.);
-    float distance = dfSphere(p, .5);
+    float d = dfSphere(p, .5);
     
-    // float distance = dfRoundBox(p, .25, .01);
-   
     // simple sphere
-    distance = dfSphere(pos, 1.);
+    d = dfSphere(pos, 1.);
     
-    return distance;
+    return vec2(d, 0.);
 }

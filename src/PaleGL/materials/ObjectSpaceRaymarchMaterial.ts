@@ -13,8 +13,10 @@ import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import { litObjectSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-object-space-raymarch-fragment-template.ts';
-import { gbufferObjectSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-object-space-raymarch-depth-fragment-template.ts';
+// import { litObjectSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-object-space-raymarch-fragment-template.ts';
+// import { gbufferObjectSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-object-space-raymarch-depth-fragment-template.ts';
+import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
+import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import {Vector2} from "@/PaleGL/math/Vector2.ts";
 import {Vector4} from "@/PaleGL/math/Vector4.ts";
@@ -51,12 +53,12 @@ export function createObjectSpaceRaymarchMaterial({
     depthFragmentShaderContent: string;
     materialArgs: ObjectSpaceRaymarchMaterialArgs;
 }) {
-    const fragmentShader = (fragmentShaderTemplate || litObjectSpaceRaymarchFragmentTemplate).replace(
+    const fragmentShader = (fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout).replace(
         PRAGMA_RAYMARCH_SCENE,
         fragmentShaderContent
     );
     const depthFragmentShader = (
-        depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentTemplate
+        depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout
     ).replace(PRAGMA_RAYMARCH_SCENE, depthFragmentShaderContent);
 
     const material = new ObjectSpaceRaymarchMaterial({

@@ -32,7 +32,7 @@ mat2 rot(float a) {
     return mat2(c, s, -s, c);
 }
 
-vec3 opRe(vec3 p, float s) {
+vec3 opRepeat(vec3 p, float s) {
     return p - s * round(p / s);
 }
 
@@ -81,7 +81,7 @@ float opSm( float d1, float d2, float k )
 //
 
 // radius ... 半径
-float dfSp(vec3 p, float radius) {
+float dfSphere(vec3 p, float radius) {
     return length(p) - radius;
 }
 
@@ -97,26 +97,24 @@ float dfBo(vec3 p, vec3 b)
     return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 
-float dfTo(vec3 p, vec2 t)
-{
-    vec2 q = vec2(length(p.xz)-t.x,p.y);
-    return length(q)-t.y;
-}
+// float dfTo(vec3 p, vec2 t)
+// {
+//     vec2 q = vec2(length(p.xz)-t.x,p.y);
+//     return length(q)-t.y;
+// }
 
-float dfOc( vec3 p, float s)
-{
-    p = abs(p);
-    return (p.x+p.y+p.z-s)*0.577;
-}
+// float dfOc( vec3 p, float s)
+// {
+//     p = abs(p);
+//     return (p.x+p.y+p.z-s)*0.577;
+// }
 
-float dfCo(vec3 p, vec2 c)
-{
-    vec2 q = vec2(length(p.xz), -p.y);
-    float d = length(q - c * max(dot(q, c), 0.));
-    return d * ((q.x * c.y - q.y * c.x < 0.) ? -1. : 1.);
-}
-
-
+// float dfCo(vec3 p, vec2 c)
+// {
+//     vec2 q = vec2(length(p.xz), -p.y);
+//     float d = length(q - c * max(dot(q, c), 0.));
+//     return d * ((q.x * c.y - q.y * c.x < 0.) ? -1. : 1.);
+// }
 
 // ra: 太さ
 // rb: R
