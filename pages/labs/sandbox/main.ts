@@ -1940,7 +1940,15 @@ function initDebugger() {
     debuggerGUI.addToggleDebugger({
         label: 'show buffers',
         initialValue: bufferVisualizerPass.parameters.enabled,
-        onChange: (value) => (bufferVisualizerPass.parameters.enabled = value),
+        onChange: (value) => {
+            if (value) {
+                bufferVisualizerPass.parameters.enabled = true;
+                bufferVisualizerPass.showDom();
+            } else {
+                bufferVisualizerPass.parameters.enabled = false;
+                bufferVisualizerPass.hideDom();
+            }
+        },
     });
 
     //
@@ -2325,16 +2333,26 @@ function initDebugger() {
     //     onChange: (value) => (renderer.lightShaftPass.enabled = value),
     // });
 
-    // fogDebuggerGroup.addSliderDebugger({
-    //     label: 'strength',
-    //     minValue: 0,
-    //     maxValue: 0.2,
-    //     stepValue: 0.0001,
-    //     initialValue: renderer.fogPass.fogStrength,
-    //     onChange: (value) => {
-    //         renderer.fogPass.fogStrength = value;
-    //     },
-    // });
+    // return;
+
+    fogDebuggerGroup.addColorDebugger({
+        label: 'fog color',
+        initialValue: renderer.fogPass.parameters.fogColor.getHexCoord(),
+        onChange: (value) => {
+            renderer.fogPass.parameters.fogColor = Color.fromHex(value);
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'strength',
+        minValue: 0,
+        maxValue: 0.2,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.fogStrength,
+        onChange: (value) => {
+            renderer.fogPass.parameters.fogStrength = value;
+        },
+    });
 
     fogDebuggerGroup.addSliderDebugger({
         label: 'density',
@@ -2358,16 +2376,71 @@ function initDebugger() {
         },
     });
 
-    // fogDebuggerGroup.addSliderDebugger({
-    //     label: 'fog end height',
-    //     minValue: -5,
-    //     maxValue: 5,
-    //     stepValue: 0.0001,
-    //     initialValue: renderer.fogPass.fogEndHeight,
-    //     onChange: (value) => {
-    //         renderer.fogPass.fogEndHeight = value;
-    //     },
-    // });
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'fog end height',
+        minValue: -5,
+        maxValue: 5,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.fogEndHeight,
+        onChange: (value) => {
+            renderer.fogPass.parameters.fogEndHeight = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'distance fog start',
+        minValue: 0,
+        maxValue: 300,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.distanceFogPower,
+        onChange: (value) => {
+            renderer.fogPass.parameters.distanceFogStart = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'distance fog end',
+        minValue: 0,
+        maxValue: 300,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.distanceFogEnd,
+        onChange: (value) => {
+            renderer.fogPass.parameters.distanceFogEnd = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'distance fog power',
+        minValue: 0,
+        maxValue: 0.2,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.distanceFogPower,
+        onChange: (value) => {
+            renderer.fogPass.parameters.distanceFogPower = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'sss fog rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: renderer.fogPass.parameters.sssFogRate,
+        onChange: (value) => {
+            renderer.fogPass.parameters.sssFogRate = value;
+        },
+    });
+
+    fogDebuggerGroup.addSliderDebugger({
+        label: 'blend rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.0001,
+        initialValue: renderer.fogPass.parameters.blendRate,
+        onChange: (value) => {
+            renderer.fogPass.parameters.blendRate = value;
+        },
+    });
 
     //
     // depth of field
