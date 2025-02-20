@@ -1,9 +1,5 @@
-﻿#version 300 es
-
-// ref: 
+﻿// ref: 
 // https://github.com/keijiro/KinoStreak/blob/master/Assets/Kino/Streak/Shader/Streak.cginc
-
-precision mediump float;
 
 #include ./partial/common.glsl
 

@@ -77,7 +77,7 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
 
-import soundVertexShader from '@/PaleGL/shaders/sound-vertex.glsl';
+import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
@@ -1009,8 +1009,6 @@ const createInstanceUpdater = (instanceNum: number) => {
         ],
         vertexShader: `#version 300 es
 
-        precision highp float;
-
         // TODO: ここ動的に構築してもいい
         layout(location = 0) in vec3 aPosition;
         layout(location = 1) in vec3 aVelocity;
@@ -1660,8 +1658,7 @@ const main = async () => {
     });
     const particleMaterial = new Material({
         // gpu,
-        vertexShader: `#version 300 es
-
+        vertexShader: `
 #pragma DEFINES
 
 #pragma ATTRIBUTES
@@ -1708,8 +1705,7 @@ void main() {
     
     vClipPosition = clipPosition;
 }`,
-        fragmentShader: `#version 300 es
-
+        fragmentShader: `
 #pragma DEFINES
 
 precision highp float;

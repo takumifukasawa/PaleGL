@@ -1,8 +1,4 @@
-﻿#version 300 es
-
-precision highp float;
-
-#pragma DEFINES
+﻿#pragma DEFINES
 
 in vec2 vUv;
 in vec3 vNormal;

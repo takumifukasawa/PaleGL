@@ -1,8 +1,4 @@
-﻿#version 300 es
-
-precision mediump float;
-
-#define MAX_EDGE_STEP_COUNT 9
+﻿#define MAX_EDGE_STEP_COUNT 9
 
 in vec2 vUv;
 

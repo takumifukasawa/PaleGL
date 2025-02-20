@@ -1,8 +1,4 @@
-﻿#version 300 es
-
-precision mediump float;
-
-#include ./partial/common.glsl
+﻿#include ./partial/common.glsl
 
 in vec2 vUv;
 

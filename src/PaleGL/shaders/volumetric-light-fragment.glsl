@@ -1,8 +1,4 @@
-﻿#version 300 es
-
-precision highp float;
-
-#pragma DEFINES
+﻿#pragma DEFINES
 #include ./defines-light.glsl
 #define MARCH_COUNT 64 
 #define MARCH_COUNT_F 64.

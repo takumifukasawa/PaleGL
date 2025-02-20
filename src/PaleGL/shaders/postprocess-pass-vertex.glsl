@@ -1,5 +1,3 @@
-#version 300 es
-
 #pragma DEFINES
 
 #pragma ATTRIBUTES

@@ -1,12 +1,4 @@
-﻿#version 300 es
-
-//
-// ref:
-//
-            
-precision mediump float;
-   
-const int MAX_ITERATION_NUM = 64;
+﻿const int MAX_ITERATION_NUM = 64;
 
 #include ./partial/common.glsl
 #include ./partial/depth-functions.glsl

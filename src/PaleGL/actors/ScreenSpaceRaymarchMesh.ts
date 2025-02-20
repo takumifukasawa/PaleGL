@@ -56,7 +56,7 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
         const depthFragmentShader = (
             args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
         ).replace(PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent);
-
+        
         // NOTE: geometryは親から渡して使いまわしてもよい
         const geometry = args.geometry ?? new PlaneGeometry({ gpu });
         const material = new ScreenSpaceRaymarchMaterial({

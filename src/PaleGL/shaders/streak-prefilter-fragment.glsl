@@ -1,11 +1,7 @@
-﻿#version 300 es
-
-// ref: 
+﻿// ref: 
 // https://github.com/keijiro/KinoStreak/blob/master/Assets/Kino/Streak/Shader/Streak.cginc
 // threshold以上の輝度を抽出
 // 抽出する際、縦を広めにサンプリング
-
-precision mediump float;
 
 #include ./partial/common.glsl
 

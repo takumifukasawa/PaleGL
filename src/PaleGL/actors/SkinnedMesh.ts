@@ -422,8 +422,7 @@ matrix e: ${jointData.length}`);
             }),
             material: new Material({
                 // gpu,
-                vertexShader: `#version 300 es
-                
+                vertexShader: `
                 layout (location = 0) in vec3 ${AttributeNames.Position};
                 
                 uniform mat4 ${UniformNames.WorldMatrix};
@@ -434,10 +433,7 @@ matrix e: ${jointData.length}`);
                     gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
                 }
                 `,
-                fragmentShader: `#version 300 es
-                
-                precision mediump float;
-                
+                fragmentShader: `
                 out vec4 outColor;
                 
                 void main() {
@@ -467,8 +463,7 @@ matrix e: ${jointData.length}`);
             }),
             material: new Material({
                 // gpu,
-                vertexShader: `#version 300 es
-               
+                vertexShader: `
                 layout (location = 0) in vec3 ${AttributeNames.Position};
                 
                 uniform mat4 ${UniformNames.WorldMatrix};
@@ -480,10 +475,7 @@ matrix e: ${jointData.length}`);
                     gl_PointSize = 6.;
                 }
                 `,
-                fragmentShader: `#version 300 es
-                
-                precision mediump float;
-                
+                fragmentShader: `
                 out vec4 outColor;
                 
                 void main() {

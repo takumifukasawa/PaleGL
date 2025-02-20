@@ -1,7 +1,3 @@
-#version 300 es
-
-precision mediump float;
-
 #pragma DEFINES
 
 uniform vec4 uColor;

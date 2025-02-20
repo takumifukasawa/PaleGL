@@ -1,8 +1,4 @@
-﻿#version 300 es
-
-precision mediump float;
-
-#include <common>
+﻿#include <common>
 #include <buffer_visualizer_h>
 
 #include ./partial/depth-functions.glsl

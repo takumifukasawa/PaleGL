@@ -18,7 +18,7 @@ import {
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
-import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/shaders/buildShader';
+import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 // import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
@@ -194,7 +194,7 @@ export class Material {
     get fragmentShaderModifier() {
         return this._fragmentShaderModifier;
     }
-    
+
     get primitiveType() {
         return this._primitiveType;
     }
@@ -426,7 +426,7 @@ export class Material {
         if (!this.depthFragmentShader && this._depthFragmentShaderGenerator) {
             this.depthFragmentShader = this._depthFragmentShaderGenerator();
         }
-
+        
         const shaderDefineOptions: ShaderDefines = {
             receiveShadow: !!this.receiveShadow,
             isSkinning: !!this.isSkinning,

@@ -1,7 +1,3 @@
-#version 300 es
-
-precision highp float;
-
 #include ./partial/effect-texture-header.glsl
 
 // ---------------------------------------------------------------------

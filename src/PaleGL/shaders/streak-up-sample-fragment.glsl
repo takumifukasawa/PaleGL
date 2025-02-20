@@ -1,9 +1,5 @@
-﻿#version 300 es
-
-// ref: 
+﻿// ref: 
 // https://github.com/keijiro/KinoStreak/blob/master/Assets/Kino/Streak/Shader/Streak.cginc
-
-precision mediump float;
 
 #include ./partial/common.glsl
 
@@ -28,7 +24,7 @@ void main() {
     // stretchが高いほど、前のパスで引き延ばされたテクスチャが強調される = streakが強くなる
     vec3 c = mix(c3, c0 + c1 + c2, uStretch);
     outColor = vec4(c.xyz, 1.);
-    
+
     // for debug
     // outColor = texture(uPrevTexture, uv);
 }

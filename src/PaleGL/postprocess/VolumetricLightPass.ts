@@ -151,15 +151,14 @@ export class VolumetricLightPass extends PostProcessPassBase {
         });
 
         this.spotLightFrustumMaterial = new Material({
-            vertexShader: `#version 300 es
+            vertexShader: `
 layout (location = 0) in vec3 ${AttributeNames.Position};
 uniform mat4 ${UniformNames.WorldMatrix};
 uniform mat4 ${UniformNames.ViewMatrix};
 uniform mat4 ${UniformNames.ProjectionMatrix};
 void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
 `,
-            fragmentShader: `#version 300 es
-precision mediump float;
+            fragmentShader: `
 out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             primitiveType: PrimitiveTypes.Triangles,
             blendType: BlendTypes.Opaque,

@@ -1,8 +1,4 @@
-﻿#version 300 es
-            
-precision mediump float;
-
-in vec2 vUv;
+﻿in vec2 vUv;
 
 out vec4 outColor;
 

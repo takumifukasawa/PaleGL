@@ -1,6 +1,4 @@
-﻿#version 300 es
-
-#pragma APPEND_ATTRIBUTES
+﻿#pragma APPEND_ATTRIBUTES
 
 #pragma DEFINES
 

@@ -1,8 +1,4 @@
-﻿#version 300 es
-            
-precision mediump float;
-
-//
+﻿//
 // ref:
 // https://techblog.kayac.com/unity-height-related-fog
 // https://github.com/hiryma/UnitySamples/blob/master/Fog/Assets/Shaders/Fog.cginc

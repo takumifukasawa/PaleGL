@@ -1,7 +1,3 @@
-#version 300 es
-           
-precision mediump float;
-
 #include ./partial/depth-functions.glsl
 
 in vec2 vUv;

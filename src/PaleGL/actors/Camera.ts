@@ -234,13 +234,12 @@ export class Camera extends Actor {
                 }),
                 material: new Material({
                     // gpu,
-                    vertexShader: `#version 300 es
+                    vertexShader: `
 layout (location = 0) in vec3 ${AttributeNames.Position};
 #pragma TRANSFORM_VERTEX_UNIFORMS
 void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);}
 `,
-                    fragmentShader: `#version 300 es
-precision mediump float;
+                    fragmentShader: `
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                     `,
                     primitiveType: PrimitiveTypes.Lines,

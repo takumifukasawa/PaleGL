@@ -5,7 +5,7 @@
 // - modifierを使っているときはshader_minifierを使うとバグになる。変数名が変わるので
 // -----------------------------------------------
 
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
+import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
 import {
     VertexShaderModifierPragmas,
     FragmentShaderModifierPragmas,
@@ -13,10 +13,9 @@ import {
     ShaderPragmas,
     VertexShaderModifier,
     FragmentShaderModifier,
-} from '@/PaleGL/constants';
+} from '@/PaleGL/constants.ts';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
-// import engineUniforms from '@/PaleGL/shaders/partial/engine-uniforms.glsl';
 import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
 import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
@@ -48,13 +47,14 @@ const insertShaderPairs: {
     [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR,
 };
 
+const includesDict = new Map<string, string>([
+    ['common', commonPartialContent],
+    ['buffer_visualizer_h', bufferVisualizerHeaderContent],
+]);
+
 const replaceShaderIncludes = (src: string) => {
-    const dict = new Map<string, string>([
-        ['common', commonPartialContent],
-        ['buffer_visualizer_h', bufferVisualizerHeaderContent],
-    ]);
     src = src.replaceAll(/#include\s<([a-zA-Z_]*)>/g, (_, p1: string) => {
-        return dict.get(p1) || '';
+        return includesDict.get(p1) || '';
     });
     return src;
 };
@@ -161,6 +161,35 @@ const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescriptor[]
     return attributesList;
 };
 
+// TODO: なぜか2回走ってしまっているっぽい?
+const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
+    let replacedShader = src;
+
+    // header
+    // 2回走っている関係で追加済みの場合は追加しないガードが必要
+    if (replacedShader.match(/^#version 300 es/) === null) {
+        replacedShader = "#version 300 es\nprecision highp float;\n" + replacedShader;
+    }
+
+    replacedShader = replaceShaderIncludes(replacedShader);
+
+    // replace defines
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
+        const defines = buildShaderDefines(defineOptions);
+        return defines.join('\n');
+    });
+
+    // replace partial shader
+    Object.values(ShaderPartialPragmas).forEach((value) => {
+        const pragma = value as ShaderPartialPragmas;
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+            return insertShaderPairs[pragma];
+        });
+    });
+
+    return replacedShader.trimStart();
+};
+
 /**
  *
  * @param shader
@@ -176,13 +205,7 @@ export const buildVertexShader = (
 ) => {
     let replacedShader: string = shader;
 
-    replacedShader = replaceShaderIncludes(replacedShader);
-
-    // replace defines
-    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
-        const defines = buildShaderDefines(defineOptions);
-        return defines.join('\n');
-    });
+    replacedShader = commonReplacementShader(replacedShader, defineOptions);
 
     // replace attributes
     replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
@@ -198,14 +221,6 @@ export const buildVertexShader = (
                 return '';
             }
             return vertexShaderModifier[pragma] || '';
-        });
-    });
-
-    // replace partial shader
-    Object.values(ShaderPartialPragmas).forEach((value) => {
-        const pragma = value as ShaderPartialPragmas;
-        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            return insertShaderPairs[pragma];
         });
     });
 
@@ -225,13 +240,7 @@ export const buildFragmentShader = (
 ) => {
     let replacedShader: string = shader;
 
-    replacedShader = replaceShaderIncludes(replacedShader);
-
-    // replace defines
-    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
-        const defines = buildShaderDefines(defineOptions);
-        return defines.join('\n');
-    });
+    replacedShader = commonReplacementShader(replacedShader, defineOptions);
 
     // replace shader block
     Object.values(FragmentShaderModifierPragmas).forEach((value) => {
@@ -241,14 +250,6 @@ export const buildFragmentShader = (
                 return '';
             }
             return fragmentShaderModifier[pragma] || '';
-        });
-    });
-
-    // replace partial shader
-    Object.values(ShaderPartialPragmas).forEach((value) => {
-        const pragma = value as ShaderPartialPragmas;
-        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            return insertShaderPairs[pragma];
         });
     });
 

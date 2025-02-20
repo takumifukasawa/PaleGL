@@ -1,12 +1,8 @@
-﻿#version 300 es
-
-//
+﻿//
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/depth-of-field/
 // https://github.com/keijiro/KinoBokeh/tree/master
 //
-            
-precision mediump float;
 
 in vec2 vUv;
 
