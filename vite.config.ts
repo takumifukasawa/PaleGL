@@ -79,7 +79,7 @@ export default defineConfig(async (config) => {
             }),
             gltf(),
             glsl({
-                include: ['**/*.glsl'],
+                include: ['./src/**/*.glsl', './pages/**/*.glsl'],
                 watch: true,
                 root: 'src/PaleGL',
                 defaultExtension: 'glsl',
