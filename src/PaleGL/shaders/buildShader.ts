@@ -22,6 +22,7 @@ import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
+import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 
 export type ShaderDefines = {
@@ -49,7 +50,8 @@ const insertShaderPairs: {
 
 const replaceShaderIncludes = (src: string) => {
     const dict = new Map<string, string>([
-        ['common', commonPartialContent]
+        ['common', commonPartialContent],
+        ['buffer_visualizer_h', bufferVisualizerHeaderContent],
     ]);
     src = src.replaceAll(/#include\s<([a-zA-Z_]*)>/g, (_, p1: string) => {
         return dict.get(p1) || '';

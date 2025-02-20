@@ -2,6 +2,9 @@
 
 precision highp float;
 
+#include <common>
+#include <buffer_visualizer_h>
+
 #include ./defines-light.glsl
 
 in vec2 vUv;

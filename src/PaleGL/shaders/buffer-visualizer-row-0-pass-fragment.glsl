@@ -2,7 +2,8 @@
 
 precision mediump float;
 
-#include ./partial/common.glsl
+#include <common>
+#include <buffer_visualizer_h>
 
 #include ./partial/depth-functions.glsl
 

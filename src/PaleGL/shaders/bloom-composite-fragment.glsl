@@ -2,6 +2,8 @@
             
 precision mediump float;
 
+#include <common>
+
 in vec2 vUv;
 
 out vec4 outColor;
