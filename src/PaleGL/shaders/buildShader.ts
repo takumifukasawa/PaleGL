@@ -21,7 +21,6 @@ import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.gl
 import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -39,8 +38,8 @@ export type ShaderDefines = {
 const insertShaderPairs: {
     [key in ShaderPartialPragmas]: string;
 } = {
-    [ShaderPartialPragmas.DEPTH_FUNCTIONS]: isDevelopment() ? depthFunctions : '',
-    [ShaderPartialPragmas.ENGINE_UNIFORMS]: isDevelopment() ? uniformBlockCommon : '',
+    [ShaderPartialPragmas.DEPTH_FUNCTIONS]: depthFunctions,
+    [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
     [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
     [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR,

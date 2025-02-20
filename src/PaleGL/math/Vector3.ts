@@ -1,5 +1,4 @@
 ﻿import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type RawVector3 = { x: number; y: number; z: number };
 
@@ -271,10 +270,8 @@ export class Vector3 {
     }
 
     log() {
-        if (isDevelopment()) {
-            console.log(`--------------------
+        console.log(`--------------------
 ${this.x}, ${this.y}, ${this.z}
 --------------------`);
-        }
     }
 }

@@ -11,7 +11,6 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -117,10 +116,8 @@ export class Engine {
         this._gpu = gpu;
         this._renderer = renderer;
 
-        if (isDevelopment()) {
-            this._stats = new Stats({ showStats, showPipeline: false }); // 一旦手動で
-            this._renderer.setStats(this._stats);
-        }
+        this._stats = new Stats({ showStats, showPipeline: false }); // 一旦手動で
+        this._renderer.setStats(this._stats);
 
         // TODO: 外からfps変えられるようにしたい
         this._fixedUpdateFrameTimer = new TimeAccumulator(fixedUpdateFps, this.fixedUpdate.bind(this));
@@ -295,9 +292,7 @@ export class Engine {
         // for debug
         // console.log(`[Engine.render]`);
 
-        if (isDevelopment()) {
-            this._stats?.clear();
-        }
+        this._stats?.clear();
 
         this.renderer.beforeRender(time, deltaTime);
 
@@ -314,9 +309,7 @@ export class Engine {
         // TODO: ここにrenderer.renderを書く
         // this._renderer.renderScene(this._scene!);
 
-        if (isDevelopment()) {
-            this._stats?.update(time);
-        }
+        this._stats?.update(time);
     }
 
     warmRender() {

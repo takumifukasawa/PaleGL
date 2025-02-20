@@ -21,7 +21,6 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Ray } from '@/PaleGL/math/Ray.ts';
 
@@ -174,108 +173,106 @@ export class Camera extends Actor {
         const { gpu } = args;
         super.update(args);
 
-        if (isDevelopment()) {
-            if (!this.visibleFrustumMesh) {
-                this.visibleFrustumMesh = new Mesh({
-                    geometry: new Geometry({
-                        gpu,
-                        attributes: [
-                            new Attribute({
-                                name: AttributeNames.Position,
-                                data: new Float32Array(new Array(3 * 8).fill(0)),
-                                size: 3,
-                                usageType: AttributeUsageType.DynamicDraw,
-                            }),
-                        ],
-                        // index list
-                        // 0: nearLeftTop
-                        // 1: nearLeftBottom
-                        // 2: nearRightTop
-                        // 3: nearRightBottom
-                        // 4: farLeftTop
-                        // 5: farLeftBottom
-                        // 6: farRightTop
-                        // 7: farRightBottom
-                        //
-                        // pattern1: only line
-                        //
-                        // drawCount: 2 * 12,
-                        // indices: [
-                        //     // near clip
-                        //     0, 1, 1, 3, 3, 2, 2, 0,
-                        //     // far clip
-                        //     4, 5, 5, 7, 7, 6, 6, 4,
-                        //     // bridge
-                        //     0, 4, 1, 5, 2, 6, 3, 7,
-                        // ],
-                        //
-                        // pattern2: like face
-                        //
-                        drawCount: 3 * 2 * 6,
-                        // prettier-ignore
-                        indices: [
-                            // far
-                            6, 7, 4,
-                            4, 7, 5,
-                            // near clip
-                            0, 1, 2,
-                            2, 1, 3,
-                            // left
-                            0, 4, 5,
-                            5, 1, 0,
-                            // top
-                            0, 2, 4,
-                            2, 6, 4,
-                            // right
-                            2, 3, 6,
-                            6, 3, 7,
-                            // bottom
-                            1, 5, 7,
-                            7, 1, 3,
-                        ],
-                    }),
-                    material: new Material({
-                        // gpu,
-                        vertexShader: `#version 300 es
+        if (!this.visibleFrustumMesh) {
+            this.visibleFrustumMesh = new Mesh({
+                geometry: new Geometry({
+                    gpu,
+                    attributes: [
+                        new Attribute({
+                            name: AttributeNames.Position,
+                            data: new Float32Array(new Array(3 * 8).fill(0)),
+                            size: 3,
+                            usageType: AttributeUsageType.DynamicDraw,
+                        }),
+                    ],
+                    // index list
+                    // 0: nearLeftTop
+                    // 1: nearLeftBottom
+                    // 2: nearRightTop
+                    // 3: nearRightBottom
+                    // 4: farLeftTop
+                    // 5: farLeftBottom
+                    // 6: farRightTop
+                    // 7: farRightBottom
+                    //
+                    // pattern1: only line
+                    //
+                    // drawCount: 2 * 12,
+                    // indices: [
+                    //     // near clip
+                    //     0, 1, 1, 3, 3, 2, 2, 0,
+                    //     // far clip
+                    //     4, 5, 5, 7, 7, 6, 6, 4,
+                    //     // bridge
+                    //     0, 4, 1, 5, 2, 6, 3, 7,
+                    // ],
+                    //
+                    // pattern2: like face
+                    //
+                    drawCount: 3 * 2 * 6,
+                    // prettier-ignore
+                    indices: [
+                        // far
+                        6, 7, 4,
+                        4, 7, 5,
+                        // near clip
+                        0, 1, 2,
+                        2, 1, 3,
+                        // left
+                        0, 4, 5,
+                        5, 1, 0,
+                        // top
+                        0, 2, 4,
+                        2, 6, 4,
+                        // right
+                        2, 3, 6,
+                        6, 3, 7,
+                        // bottom
+                        1, 5, 7,
+                        7, 1, 3,
+                    ],
+                }),
+                material: new Material({
+                    // gpu,
+                    vertexShader: `#version 300 es
 layout (location = 0) in vec3 ${AttributeNames.Position};
 #pragma TRANSFORM_VERTEX_UNIFORMS
 void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);}
 `,
-                        fragmentShader: `#version 300 es
+                    fragmentShader: `#version 300 es
 precision mediump float;
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                     `,
-                        primitiveType: PrimitiveTypes.Lines,
-                        blendType: BlendTypes.Transparent,
-                        // faceSide: FaceSide.Double,
-                        depthWrite: false,
-                    }),
-                });
-                this.addChild(this.visibleFrustumMesh as Actor);
-            }
+                    primitiveType: PrimitiveTypes.Lines,
+                    blendType: BlendTypes.Transparent,
+                    // faceSide: FaceSide.Double,
+                    depthWrite: false,
+                }),
+            });
+            this.addChild(this.visibleFrustumMesh as Actor);
+        }
 
-            if (this.visibleFrustumMesh) {
-                const frustumPositions = this.getFrustumLocalPositions();
-                if (!frustumPositions) {
-                    return;
-                }
-                this.visibleFrustumMesh.geometry.updateAttribute(
-                    AttributeNames.Position,
-                    new Float32Array([
-                        // near clip
-                        ...frustumPositions.nlt.e,
-                        ...frustumPositions.nlb.e,
-                        ...frustumPositions.nrt.e,
-                        ...frustumPositions.nrb.e,
-                        // far clip
-                        ...frustumPositions.flt.e,
-                        ...frustumPositions.flb.e,
-                        ...frustumPositions.frt.e,
-                        ...frustumPositions.frb.e,
-                    ])
-                );
-                this.visibleFrustumMesh.enabled = this.visibleFrustum;
+        if (this.visibleFrustumMesh) {
+            const frustumPositions = this.getFrustumLocalPositions();
+            if (!frustumPositions) {
+                return;
             }
+            this.visibleFrustumMesh.geometry.updateAttribute(
+                AttributeNames.Position,
+                new Float32Array([
+                    // near clip
+                    ...frustumPositions.nlt.e,
+                    ...frustumPositions.nlb.e,
+                    ...frustumPositions.nrt.e,
+                    ...frustumPositions.nrb.e,
+                    // far clip
+                    ...frustumPositions.flt.e,
+                    ...frustumPositions.flb.e,
+                    ...frustumPositions.frt.e,
+                    ...frustumPositions.frb.e,
+                ])
+            );
+            this.visibleFrustumMesh.enabled = this.visibleFrustum;
         }
     }
 

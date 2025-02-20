@@ -6,7 +6,6 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Component } from '@/PaleGL/core/Component.ts';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Scene } from '@/PaleGL/core/Scene.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type ActorStartArgs = { scene: Scene; gpu: GPU };
 export type ActorFixedUpdateArgs = { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number };
@@ -106,10 +105,8 @@ export class Actor {
         this.name = name;
         this.transform = new Transform(this);
         this.type = type || ActorTypes.Null;
-        this.uuid = isDevelopment() ? uuidv4() : Math.floor(Math.random() * 10000); // dummy
-        if (isDevelopment()) {
-            this.animator = new Animator();
-        }
+        this.uuid = uuidv4();
+        this.animator = new Animator();
     }
 
     addChild(child: Actor) {
@@ -165,10 +162,8 @@ export class Actor {
         this.components.forEach((component) => {
             component.fixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
         });
-        if (isDevelopment()) {
-            if (this.animator) {
-                this.animator.update(fixedDeltaTime);
-            }
+        if (this.animator) {
+            this.animator.update(fixedDeltaTime);
         }
         if (this._onFixedUpdate) {
             this._onFixedUpdate({ actor: this, gpu, scene, fixedTime, fixedDeltaTime });

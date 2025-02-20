@@ -65,7 +65,6 @@ import { PointLight } from '@/PaleGL/actors/PointLight.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
@@ -169,11 +168,11 @@ export class Renderer {
     _glitchPass: GlitchPass;
     _vignettePass: VignettePass;
     _fxaaPass: FXAAPass;
-    
+
     get realWidth() {
         return this._realWidth;
     }
-    
+
     get realHeight() {
         return this._realHeight;
     }
@@ -181,15 +180,15 @@ export class Renderer {
     get pixelRatio() {
         return this._pixelRatio;
     }
-   
+
     getStats() {
         return this._stats;
     }
-    
+
     setStats(stats: Stats) {
         this._stats = stats;
     }
-    
+
     get globalUniformBufferObjects() {
         return this._globalUniformBufferObjects;
     }
@@ -217,9 +216,11 @@ export class Renderer {
     get deferredShadingPass() {
         return this._deferredShadingPass;
     }
+
     get lightShaftPass() {
         return this._lightShaftPass;
     }
+
     get lightShaftPassTexture() {
         // dummy
         return this._gpu.dummyTextureBlack;
@@ -759,9 +760,11 @@ export class Renderer {
     flush() {
         this._gpu.flush();
     }
+
     clearColor(r: number, g: number, b: number, a: number) {
         this._gpu.clearColor(r, g, b, a);
     }
+
     clearDepth(r: number, g: number, b: number, a: number) {
         this._gpu.clearDepth(r, g, b, a);
     }
@@ -1010,7 +1013,7 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         const postProcessCamera = this._scenePostProcess.getPostProcessCamera();
-        
+
         PostProcess.renderPass({
             pass: this._screenSpaceShadowPass,
             renderer: this,
@@ -1043,14 +1046,12 @@ export class Renderer {
         // deferred lighting pass
         // ------------------------------------------------------------------------------
 
-        if (isDevelopment()) {
-            // update cubemap to deferred lighting pass
-            // TODO: skyboxは一個だけ想定のいいはず
-            sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
-                const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-                this._deferredShadingPass.updateSkyboxUniforms(skyboxActor);
-            });
-        }
+        // update cubemap to deferred lighting pass
+        // TODO: skyboxは一個だけ想定のいいはず
+        sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
+            const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
+            this._deferredShadingPass.updateSkyboxUniforms(skyboxActor);
+        });
 
         applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors, this._gpu.dummyTextureBlack);
 
@@ -1251,11 +1252,9 @@ export class Renderer {
     renderMesh(geometry: Geometry, material: Material) {
         geometry.update();
 
-        if (isDevelopment()) {
-            if (this._stats) {
-                this._stats.addDrawVertexCount(geometry);
-                this._stats.incrementDrawCall();
-            }
+        if (this._stats) {
+            this._stats.addDrawVertexCount(geometry);
+            this._stats.incrementDrawCall();
         }
 
         // vertex
@@ -1377,10 +1376,8 @@ export class Renderer {
 
                 this.renderMesh(actor.geometry, depthMaterial);
 
-                if (isDevelopment()) {
-                    if (this._stats) {
-                        this._stats.addPassInfo('depth pre pass', actor.name, actor.geometry);
-                    }
+                if (this._stats) {
+                    this._stats.addPassInfo('depth pre pass', actor.name, actor.geometry);
                 }
             });
         });
@@ -1442,10 +1439,8 @@ export class Renderer {
                     );
 
                     this.renderMesh(actor.geometry, depthMaterial);
-                    if (isDevelopment()) {
-                        if (this._stats) {
-                            this._stats.addPassInfo('shadow pass', actor.name, actor.geometry);
-                        }
+                    if (this._stats) {
+                        this._stats.addPassInfo('shadow pass', actor.name, actor.geometry);
                     }
                 });
             });
@@ -1470,10 +1465,8 @@ export class Renderer {
         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
-                    if (isDevelopment()) {
-                        if (!(actor as Skybox).renderMesh) {
-                            return;
-                        }
+                    if (!(actor as Skybox).renderMesh) {
+                        return;
                     }
                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
                     // TODO: engineでやるべき
@@ -1499,7 +1492,10 @@ export class Renderer {
             this.updateActorTransformUniforms(actor);
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            targetMaterial.uniforms.setValue(UniformNames.DepthTexture, this._copyDepthDestRenderTarget.$getDepthTexture()!);
+            targetMaterial.uniforms.setValue(
+                UniformNames.DepthTexture,
+                this._copyDepthDestRenderTarget.$getDepthTexture()
+            );
 
             // TODO:
             // - light actor の中で lightの種類別に処理を分ける
@@ -1514,10 +1510,8 @@ export class Renderer {
 
             this.renderMesh(actor.geometry, targetMaterial);
 
-            if (isDevelopment()) {
-                if (this._stats) {
-                    this._stats.addPassInfo('scene pass', actor.name, actor.geometry);
-                }
+            if (this._stats) {
+                this._stats.addPassInfo('scene pass', actor.name, actor.geometry);
             }
         });
     }
@@ -1875,10 +1869,8 @@ export class Renderer {
 
             this.renderMesh(actor.geometry, targetMaterial);
 
-            if (isDevelopment()) {
-                if (this._stats) {
-                    this._stats.addPassInfo('transparent pass', actor.name, actor.geometry);
-                }
+            if (this._stats) {
+                this._stats.addPassInfo('transparent pass', actor.name, actor.geometry);
             }
         });
     }

@@ -16,11 +16,11 @@ type EntryPointInfo = { name: string; path: string };
 
 // ---------------------------------------------------
 // ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
-// const ENTRY_NAME = ENTRY_NAME_INDEX;
-const ENTRY_NAME: string = 'sandbox';
+const ENTRY_POINTS: { [key: string]: string } = {
+    'sandbox': 'labs/sandbox',
+    // 'sandbox-2': 'labs/sandbox-2',
+};
 
-const IS_MAIN_ENTRY = false;
-const ENTRY_PATH = IS_MAIN_ENTRY ? ENTRY_NAME : `labs/${ENTRY_NAME}`;
 // ---------------------------------------------------
 
 // ref:
@@ -39,15 +39,18 @@ export default defineConfig(async (config) => {
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isDropConsole: ${isDropConsole}`);
-    console.log(`entryPath: ${ENTRY_PATH}`);
+    console.log(`entryNames: ${ENTRY_POINTS}`);
     console.log(`======================`);
 
     // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
 
-    entryPointInfos.push({
-        name: ENTRY_NAME,
-        path: ENTRY_PATH,
+    Object.keys(ENTRY_POINTS).forEach((key) => {
+        const path = ENTRY_POINTS[key];
+        entryPointInfos.push({
+            name: path,
+            path,
+        });
     });
 
     const entryPoints: { [key: string]: string } = {};
@@ -122,33 +125,33 @@ export default defineConfig(async (config) => {
                 input: entryPoints,
                 output: {
                     inlineDynamicImports: false,
-                    entryFileNames: () => {
-                        return IS_MAIN_ENTRY ? `assets/main.js` : `${ENTRY_PATH}/assets/main.js`;
+                    entryFileNames: (chunk) => {
+                        return `${chunk.name}/assets/main.js`;
                     },
-                    assetFileNames: () => {
-                        return IS_MAIN_ENTRY ? `assets/[name].[ext]` : `${ENTRY_PATH}/assets/[name].[ext]`;
+                    assetFileNames: (chunk) => {
+                        return `${chunk.name}/assets/[name].[ext]`;
                     },
                     chunkFileNames: () => {
-                        return IS_MAIN_ENTRY ? `assets/[name].js` : `${ENTRY_PATH}assets/[name].js`;
+                        return `assets/chunk-[hash].js`;
                     },
                 },
             },
             minify: 'terser',
             target: 'esnext',
-            terserOptions: {
-                mangle: {
-                    // toplevel: true,
-                    // properties: true,
-                    properties: {
-                        regex: /^(_|\$)/,
-                    },
-                },
-                compress: {
-                    drop_console: isDropConsole,
-                    drop_debugger: true,
-                    passes: 16,
-                },
-            },
+            // terserOptions: {
+            //     mangle: {
+            //         // toplevel: true,
+            //         // properties: true,
+            //         properties: {
+            //             regex: /^(_|\$)/,
+            //         },
+            //     },
+            //     compress: {
+            //         drop_console: isDropConsole,
+            //         drop_debugger: true,
+            //         passes: 16,
+            //     },
+            // },
         },
         server: {
             watch: {

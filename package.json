@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite --host --force",
     "dev:watch": "vite --watch",
-    "build:watch": "vite build --watch",
     "build:page": "tsc && vite build --mode page",
     "serve:dist": "cd dist && python3 -m http.server 8000",
     "lint": "eslint --ext .ts,.tsx src",

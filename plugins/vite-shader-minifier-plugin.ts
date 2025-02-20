@@ -118,6 +118,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 }
 
                 // vite-plugin-glslで変換された文字列からシェーダーコードを抜き出す
+                // eslint-disable-next-line no-useless-escape
                 const contentRegex = /^var\s([a-zA-Z_]*)_default\s?\=\s?\"(.*)\"/;
                 const bundledContent = src.split('\n').join(' ').match(contentRegex);
 
@@ -208,7 +209,8 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 await wait(ioInterval);
 
                 // pluginの結果を返す
-                const resultContent = `export default \`${minifiedContent}\``;
+                // eslint-disable-next-line no-useless-escape
+                const resultContent = `export default \`${minifiedContent as string}\``;
                 return {
                     code: resultContent,
                 };

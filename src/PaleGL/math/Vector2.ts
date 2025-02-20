@@ -1,6 +1,4 @@
-﻿import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
-
-export class Vector2 {
+﻿export class Vector2 {
     e: Float32Array = new Float32Array(2);
 
     get x() {
@@ -57,10 +55,8 @@ export class Vector2 {
     }
 
     log() {
-        if (isDevelopment()) {
-            console.log(`--------------------
+        console.log(`--------------------
 ${this.x}, ${this.y}
 --------------------`);
-        }
     }
 }

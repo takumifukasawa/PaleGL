@@ -1125,6 +1125,8 @@ layout (std140) uniform ubCommon {
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
+    
+    console.log("hogehoge", gltfActor)
 
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.children[0].children[0] as SkinnedMesh;

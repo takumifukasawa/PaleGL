@@ -53,8 +53,9 @@
     "node-libs/**/*.ts"
   ],
   "exclude": [
+    "demos",
     "node_modules",
     "dist",
     "bin/**/*.js",
-  ]
+  ],
 }

@@ -19,7 +19,6 @@ import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type DeferredShadingParametersBase = PostProcessPassParametersBase;
 
@@ -144,35 +143,33 @@ export class DeferredShadingPass extends PostProcessPassBase {
      * @param skybox
      */
     updateSkyboxUniforms(skybox: Skybox) {
-        if (isDevelopment()) {
-            this.material.uniforms.setValue(UniformNames.Skybox, [
-                {
-                    name: 'cubeMap',
-                    type: UniformTypes.CubeMap,
-                    value: skybox.cubeMap,
-                },
-                {
-                    name: 'diffuseIntensity',
-                    type: UniformTypes.Float,
-                    value: skybox.diffuseIntensity,
-                },
-                {
-                    name: 'specularIntensity',
-                    type: UniformTypes.Float,
-                    value: skybox.specularIntensity,
-                },
-                {
-                    name: 'rotationOffset',
-                    type: UniformTypes.Float,
-                    value: skybox.rotationOffset,
-                },
-                {
-                    name: 'maxLodLevel',
-                    type: UniformTypes.Float,
-                    value: skybox.cubeMap.maxLodLevel,
-                },
-            ]);
-        }
+        this.material.uniforms.setValue(UniformNames.Skybox, [
+            {
+                name: 'cubeMap',
+                type: UniformTypes.CubeMap,
+                value: skybox.cubeMap,
+            },
+            {
+                name: 'diffuseIntensity',
+                type: UniformTypes.Float,
+                value: skybox.diffuseIntensity,
+            },
+            {
+                name: 'specularIntensity',
+                type: UniformTypes.Float,
+                value: skybox.specularIntensity,
+            },
+            {
+                name: 'rotationOffset',
+                type: UniformTypes.Float,
+                value: skybox.rotationOffset,
+            },
+            {
+                name: 'maxLodLevel',
+                type: UniformTypes.Float,
+                value: skybox.cubeMap.maxLodLevel,
+            },
+        ]);
     }
 
     /**

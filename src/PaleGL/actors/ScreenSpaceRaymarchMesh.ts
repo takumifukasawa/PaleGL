@@ -17,8 +17,10 @@ import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { MaterialArgs } from '@/PaleGL/materials/Material.ts';
-import { gbufferScreenSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-screen-space-raymarch-depth-fragment-template.ts';
-import { litScreenSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-screen-space-raymarch-fragment-template.ts';
+// import { gbufferScreenSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-screen-space-raymarch-depth-fragment-template.ts';
+// import { litScreenSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-screen-space-raymarch-fragment-template.ts';
+import litScreenSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-screen-space-raymarch-fragment.glsl';
+import gbufferScreenSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-screen-space-raymarch-depth-fragment.glsl';
 import { Geometry } from '@/PaleGL/geometries/Geometry.ts';
 
 type ScreenSpaceRaymarchMeshArgs = {
@@ -47,12 +49,12 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
             ...PostProcessPassBase.commonUniforms,
         ];
 
-        const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentTemplate).replace(
+        const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
             PRAGMA_RAYMARCH_SCENE,
             args.fragmentShaderContent
         );
         const depthFragmentShader = (
-            args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentTemplate
+            args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
         ).replace(PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent);
 
         // NOTE: geometryは親から渡して使いまわしてもよい
