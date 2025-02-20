@@ -1,5 +1,7 @@
 ﻿#pragma DEFINES
+
 #include ./defines-light.glsl
+
 #define MARCH_COUNT 64 
 #define MARCH_COUNT_F 64.
 
@@ -168,16 +170,14 @@ void main() {
         rayStep = uRayStep * float(i);
         rayPosInWorld = rayOrigin + rayDir * rayStep;
         rayPosInView = (uViewMatrix * vec4(rayPosInWorld, 1.)).xyz;
-        #pragma UNROLL_START
-        for(int j = 0; j < MAX_SPOT_LIGHT_COUNT; j++) {
-            fogRateArray[UNROLL_j] += calcTransmittance(
-                uSpotLight[UNROLL_j],
-                uSpotLightShadowMap[UNROLL_j],
+        #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
+            fogRateArray[UNROLL_N] += calcTransmittance(
+                uSpotLight[UNROLL_N],
+                uSpotLightShadowMap[UNROLL_N],
                 rayPosInWorld,
                 rayPosInView,
                 viewZFromDepth
             );
-        }
         #pragma UNROLL_END
     }
    

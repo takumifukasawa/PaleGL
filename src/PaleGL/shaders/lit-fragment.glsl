@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-#include ./defines-light.glsl
+#include <lighting>
 
 // #include ./partial/uniform-block-common.glsl
 #include ./partial/uniform-block-transformations.glsl
@@ -31,14 +31,6 @@ uniform int uShadingModelId;
 
 #include ./partial/directional-light-struct.glsl
 #include ./partial/directional-light-uniforms.glsl
-
-struct Surface {
-    vec3 worldNormal;
-    vec3 worldPosition;
-    vec4 diffuseColor;
-    // float specularAmount;
-};
-
 #include ./partial/camera-struct.glsl
 
 in vec2 vUv;

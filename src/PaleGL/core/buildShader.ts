@@ -21,8 +21,9 @@ import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
-import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
+import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
+import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -50,6 +51,7 @@ const insertShaderPairs: {
 const includesDict = new Map<string, string>([
     ['common', commonPartialContent],
     ['buffer_visualizer_h', bufferVisualizerHeaderContent],
+    ['lighting', lightingPartialContent],
 ]);
 
 const replaceShaderIncludes = (src: string) => {
@@ -161,6 +163,54 @@ const buildVertexAttributeLayouts = (attributeDescriptors: AttributeDescriptor[]
     return attributesList;
 };
 
+const transformUnroll = (src: string) => {
+    const unrollSrcRegex = /#pragma UNROLL_START\s+([\s\S]+?)\s+#pragma UNROLL_END/g;
+    const unrollSrcMatches = [...src.matchAll(unrollSrcRegex)];
+    // console.log(unrollSrcMatches)
+    // blockを抜き出す
+    for (let i = 0; i < unrollSrcMatches.length; i++) {
+        // #pragmaの囲い自体を消す
+        const [needsUnrollBlockContent, needsUnrollContent] = unrollSrcMatches[i];
+
+        // 定数 + 中身 になっているはず
+        const loopRegex = /^([a-zA-Z0-9_]+)([\s\S]*)/g;
+        const loopMatches = [...needsUnrollContent.matchAll(loopRegex)];
+        // console.log(needsUnrollContent, loopMatches)
+        if (loopMatches.length < 1) {
+            console.error(`[transform-glsl-unroll] specify unroll but for loop not found`);
+            continue;
+        }
+
+        // unrollの中はfor文が一つだけという前提
+        const [, loopDefineNameStr, forContent] = loopMatches[0];
+
+        const numRegex = new RegExp(`#define\\s+?${loopDefineNameStr}\\s+?(\\d+)`);
+        const numMatch = src.match(numRegex);
+        let loopCount = 0;
+        if (numMatch) {
+            const loopNumStr = numMatch[1];
+            loopCount = parseInt(loopNumStr);
+            // console.log(`[transform-glsl-unroll] loop count is defined: ${forLoopNumStr} = ${loopCount}`);
+        } else {
+            // TODO: 固定値の場合はそのまま使い、#define で定義されている場合はdefineの値をシェーダー内から拾ってくる
+            // console.log(`[transform-glsl-unroll] loop count is specified: ${forLoopNumStr} = ${loopCount}`);
+        }
+
+        let unrolledStr = '';
+        for (let j = 0; j < loopCount; j++) {
+            // ループのindexを置き換え. UNROLL_i を i に置き換える
+            const indexRegex = new RegExp(`UNROLL_N`, 'g');
+            const replacedContent = forContent.replaceAll(indexRegex, j.toString());
+            unrolledStr += replacedContent;
+            // console.log(indexRegex, j, replacedContent)
+        }
+
+        src = src.replaceAll(needsUnrollBlockContent, unrolledStr);
+    }
+
+    return src;
+};
+
 // TODO: なぜか2回走ってしまっているっぽい?
 const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
     let replacedShader = src;
@@ -168,9 +218,10 @@ const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
     // header
     // 2回走っている関係で追加済みの場合は追加しないガードが必要
     if (replacedShader.match(/^#version 300 es/) === null) {
-        replacedShader = "#version 300 es\nprecision highp float;\n" + replacedShader;
+        replacedShader = '#version 300 es\nprecision highp float;\n' + replacedShader;
     }
 
+    // replace includes
     replacedShader = replaceShaderIncludes(replacedShader);
 
     // replace defines
@@ -186,8 +237,11 @@ const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
             return insertShaderPairs[pragma];
         });
     });
+    
+    // transform unroll
+    replacedShader = transformUnroll(replacedShader);
 
-    return replacedShader.trimStart();
+    return replacedShader;
 };
 
 /**
