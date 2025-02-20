@@ -1796,6 +1796,7 @@ void main() {
                 value: captureSceneCamera.far,
             },
         ],
+        uniformBlockNames: [UniformBlockNames.Common],
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
         depthWrite: false,
