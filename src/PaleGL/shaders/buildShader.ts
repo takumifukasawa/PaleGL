@@ -22,6 +22,8 @@ import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
+import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
+
 export type ShaderDefines = {
     receiveShadow: boolean;
     isSkinning: boolean;
@@ -43,6 +45,16 @@ const insertShaderPairs: {
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
     [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
     [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR,
+};
+
+const replaceShaderIncludes = (src: string) => {
+    const dict = new Map<string, string>([
+        ['common', commonPartialContent]
+    ]);
+    src = src.replaceAll(/#include\s<([a-zA-Z_]*)>/g, (_, p1: string) => {
+        return dict.get(p1) || '';
+    });
+    return src;
 };
 
 const buildShaderDefines = ({
@@ -162,6 +174,8 @@ export const buildVertexShader = (
 ) => {
     let replacedShader: string = shader;
 
+    replacedShader = replaceShaderIncludes(replacedShader);
+
     // replace defines
     replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
         const defines = buildShaderDefines(defineOptions);
@@ -208,6 +222,8 @@ export const buildFragmentShader = (
     fragmentShaderModifier: FragmentShaderModifier
 ) => {
     let replacedShader: string = shader;
+
+    replacedShader = replaceShaderIncludes(replacedShader);
 
     // replace defines
     replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
