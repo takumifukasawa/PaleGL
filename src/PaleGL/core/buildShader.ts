@@ -19,7 +19,6 @@ import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
 import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
-import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
@@ -48,7 +47,6 @@ const insertShaderPairs: {
     [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
     [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
-    [ShaderPartialPragmas.PSEUDO_HDR]: pseudoHDR,
 };
 
 const includesDict = new Map<string, string>([

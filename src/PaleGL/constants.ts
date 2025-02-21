@@ -467,7 +467,6 @@ export const ShaderPartialPragmas = {
     ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
     TRANSFORM_VERTEX_UNIFORMS: 'TRANSFORM_VERTEX_UNIFORMS',
     CAMERA_UNIFORMS: 'CAMERA_UNIFORMS',
-    PSEUDO_HDR: 'PSEUDO_HDR',
 } as const;
 
 export type ShaderPartialPragmas = (typeof ShaderPartialPragmas)[keyof typeof ShaderPartialPragmas];
