@@ -1,5 +1,6 @@
 #pragma DEFINES
-#include ./defines-light.glsl
+
+#include <lighting>
 
 // -----------------------------------------------------------
 // uniform-block
@@ -21,21 +22,6 @@
 // #include ./partial/directional-light-struct.glsl
 
 #include ./partial/camera-struct.glsl
-
-struct Surface {
-    vec3 worldNormal;
-    vec3 worldPosition;
-    vec4 diffuseColor;
-    float specularAmount;
-};
-        
-struct Skybox {
-    samplerCube cubeMap;
-    float diffuseIntensity;
-    float specularIntensity;
-    float rotationOffset;
-    float maxLodLevel;
-};
 
 // -----------------------------------------------------------
 // functions
@@ -90,16 +76,16 @@ float calcDirectionalLightShadowAttenuation(
     float readDepth = 0.;
     vec2 offset = vec2(0.);
 
-    #pragma UNROLL_START
-    for(int i = 0; i < 4; i++) {
-        offset = poissonDisk[UNROLL_i] / 800.;
+    // for(int i = 0; i < 4; i++) {
+    #pragma UNROLL_START 4
+        offset = poissonDisk[UNROLL_N] / 800.;
         readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         // visibility -= step(readDepth, depthFromWorldPos - bias) * .25;
         if(readDepth < lightPos.z - bias) {
             visibility -= .25;
         }
-    }
     #pragma UNROLL_END
+    // }
 
 
     // for debug
@@ -152,16 +138,16 @@ float calcSpotLightShadowAttenuation(
     // PCF
     // vec3 uvc = vec3(uv, depthFromWorldPos + .00001);
     // float readDepth = textureProj(shadowMap, uvc).r;
-    #pragma UNROLL_START
-    for(int i = 0; i < 4; i++) {
-        offset = poissonDisk[UNROLL_i] / 100.;
+    // for(int i = 0; i < 4; i++) {
+    #pragma UNROLL_START 4
+        offset = poissonDisk[UNROLL_N] / 100.;
         readDepth = textureLod(shadowMap, uv + offset, 0.).r;
         visibility -= step(readDepth, depthFromWorldPos - bias) * .25;
         // if(readDepth < depthFromWorldPos - bias) {
         //     visibility -= .25;
         // }
-    }
     #pragma UNROLL_END
+    // }
 
     // for debug
     // vec3 color = mix(
@@ -353,22 +339,22 @@ void main() {
     //
     SpotLight spotLight;
     // TODO: shadow blend rate は light か何かに持たせたい
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-        getSpotLightIrradiance(uSpotLight[UNROLL_i], geometry, directLight);
+    // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
+    #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
+        getSpotLightIrradiance(uSpotLight[UNROLL_N], geometry, directLight);
         shadow = calcSpotLightShadowAttenuation(
             worldPosition,
             surface.worldNormal,
-            uSpotLight[UNROLL_i].direction,
-            uSpotLight[UNROLL_i].shadowMapProjectionMatrix,
-            uSpotLightShadowMap[UNROLL_i], // constantな必要がある
+            uSpotLight[UNROLL_N].direction,
+            uSpotLight[UNROLL_N].shadowMapProjectionMatrix,
+            uSpotLightShadowMap[UNROLL_N], // constantな必要がある
             uShadowBias,
             vec4(vec3(.02), 1.), // TODO: pass color
             .65 // TODO: pass parameter
         );
         RE_Direct(directLight, geometry, material, reflectedLight, shadow);
-    }
     #pragma UNROLL_END
+    // }
  
     //
     // point light
@@ -376,12 +362,12 @@ void main() {
 
     PointLight pointLight;
 
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-       getPointLightIrradiance(uPointLight[UNROLL_i], geometry, directLight);
+    // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
+    #pragma UNROLL_START MAX_POINT_LIGHT_COUNT
+       getPointLightIrradiance(uPointLight[UNROLL_N], geometry, directLight);
        RE_Direct(directLight, geometry, material, reflectedLight, sssRate * .25); // TODO: pass parameter
-    }
     #pragma UNROLL_END
+    // }
 
     //
     // ambient light

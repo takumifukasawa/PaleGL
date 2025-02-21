@@ -293,16 +293,16 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     //     }
     // }
     // new
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_EDGE_STEP_COUNT; i++) {
+    // for(int i = 0; i < MAX_EDGE_STEP_COUNT; i++) {
+    #pragma UNROLL_START MAX_EDGE_STEP_COUNT
         if(!pAtEnd) {
-            int index = UNROLL_i + 1;
+            int index = UNROLL_N + 1;
             puv += edgeStep * vec2(edgeStepsArray[index]);
             pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
             pAtEnd = abs(pLumaDelta) >= gradientThreshold;
         }
-    }
     #pragma UNROLL_END
+    // }
 
     if(!pAtEnd) {
         puv += edgeStep * vec2(edgeGuess);
@@ -325,16 +325,16 @@ float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelS
     //     }
     // }
     // new
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_EDGE_STEP_COUNT; i++) {
+    // for(int i = 0; i < MAX_EDGE_STEP_COUNT; i++) {
+    #pragma UNROLL_START MAX_EDGE_STEP_COUNT
         if(!nAtEnd) {
-            int index = UNROLL_i + 1;
+            int index = UNROLL_N + 1;
             nuv -= edgeStep * vec2(edgeStepsArray[index]);
             nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
             nAtEnd = abs(nLumaDelta) >= gradientThreshold;
         }
-    }
     #pragma UNROLL_END
+    // }
 
     if(!nAtEnd) {
         nuv -= edgeStep * vec2(edgeGuess);

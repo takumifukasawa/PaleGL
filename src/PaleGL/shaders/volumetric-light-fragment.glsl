@@ -191,9 +191,6 @@ void main() {
     vec4 currentFogColor = vec4(0.); 
     float currentFogRate = 0.; 
     
-    #pragma UNROLL_START
-    for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
-    // for(int i = 0; i < 2; i++) {
         // TODO: intensityそのままかけるのよくない気がする
         // // accColor.xyz +=
         //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
@@ -202,19 +199,19 @@ void main() {
         //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
         //     fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate *
         //     fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color);
-       
-        currentFogRate = fogRateArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate;
+
+    #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
+        currentFogRate = fogRateArray[UNROLL_N] * uSpotLight[UNROLL_N].intensity * uBlendRate;
         fogRate += currentFogRate;
 
-        currentFogColor = currentFogRate * uSpotLight[UNROLL_i].color;
+        currentFogColor = currentFogRate * uSpotLight[UNROLL_N].color;
         fogColor += currentFogColor;
-    }
     #pragma UNROLL_END
 
     accColor.a = fogRate; // TODO: saturateするべき？
     accColor.rgb = fogColor.xyz;
    
-    accColor.a = 1.;
+    accColor.a = 1.; // TODO: いる？
     outColor = accColor;
     
     // for debug

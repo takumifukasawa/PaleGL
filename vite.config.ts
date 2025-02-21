@@ -7,7 +7,7 @@ import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
 import * as process from 'process';
-import { transformGlslUnroll } from './plugins/vite-transform-glsl-unroll-plugin.ts';
+// import { transformGlslUnroll } from './plugins/vite-transform-glsl-unroll-plugin.ts';
 import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin.ts';
 // import { transformExtractGlslRaymarchTemplate } from './plugins/vite-extract-glsl-raymarch-template-plugin.ts';
 import string from 'vite-plugin-string';
@@ -88,7 +88,7 @@ export default defineConfig(async (config) => {
                 compress: false,
             }),
             transformGlslLayout(),
-            transformGlslUnroll(),
+            // transformGlslUnroll(),
             // shaderMinifierPlugin({
             //     minify: isMinifyShader,
             //     minifierOptions: {

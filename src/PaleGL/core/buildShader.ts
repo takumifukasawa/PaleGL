@@ -190,10 +190,11 @@ const transformUnroll = (src: string) => {
         if (numMatch) {
             const loopNumStr = numMatch[1];
             loopCount = parseInt(loopNumStr);
-            // console.log(`[transform-glsl-unroll] loop count is defined: ${forLoopNumStr} = ${loopCount}`);
+            console.log(`[transform-glsl-unroll] loop count is defined: ${loopDefineNameStr} = ${loopCount}`);
         } else {
+            loopCount = parseInt(loopDefineNameStr);
             // TODO: 固定値の場合はそのまま使い、#define で定義されている場合はdefineの値をシェーダー内から拾ってくる
-            // console.log(`[transform-glsl-unroll] loop count is specified: ${forLoopNumStr} = ${loopCount}`);
+            console.log(`[transform-glsl-unroll] loop count is specified: ${loopCount}`);
         }
 
         let unrolledStr = '';

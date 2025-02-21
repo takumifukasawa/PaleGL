@@ -76,7 +76,6 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
 
     vec3 debugValue = vec3(0.);
 
-    // #pragma UNROLL_START
     for(int i = 0; i < MARCH_COUNT; i++) {
         // rayの深度を計算
         float currentStepLength = stepLength * float(i);
@@ -115,9 +114,6 @@ void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition,
             occlusion += sharpness * saturate(pointLight.intensity) * (1. - smoothstep(60., 80., dz));
         }
     }
-    // #pragma unroll_end
-    
-    // return occlusion;
 }
 
 void main() {
@@ -154,10 +150,9 @@ void main() {
     float occlusion = 0.;
    
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-    #pragma UNROLL_START 
-    for(int i = 0; i < 1; i++) {
-        calcOcclusion(uPointLight[UNROLL_i], worldPosition, viewPosition, jitterOffset, occlusion);
-    }
+    // TODO: point light count
+    #pragma UNROLL_START 1
+        calcOcclusion(uPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
     #pragma UNROLL_END
 
     occlusion *= uStrength;
