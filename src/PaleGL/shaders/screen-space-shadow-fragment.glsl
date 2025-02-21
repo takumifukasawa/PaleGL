@@ -1,7 +1,5 @@
 ﻿#pragma DEFINES
 
-#include ./defines-light.glsl
-
 // -----------------------------------------------------------
 
 in vec2 vUv;
