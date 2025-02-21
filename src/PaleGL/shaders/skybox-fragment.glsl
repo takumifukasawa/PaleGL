@@ -16,7 +16,7 @@ uniform int uShadingModelId;
 
 #include ./partial/gbuffer-functions.glsl
 
-#include ./partial/gbuffer-layout.glsl
+#include <gbuffer_o>
 
 void main() {
     // pattern_1: inverse normal. 法線が内側を向いた球体なので

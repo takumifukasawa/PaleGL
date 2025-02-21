@@ -58,7 +58,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 
 #include ./partial/alpha-test-functions.glsl
 
-#include ./partial/gbuffer-layout.glsl
+#include <gbuffer_o>
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);

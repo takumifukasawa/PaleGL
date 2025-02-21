@@ -34,7 +34,7 @@ in vec3 vWorldPosition;
 
 #include ../partial/gbuffer-functions.glsl
 
-#include ../partial/gbuffer-layout.glsl
+#include <gbuffer_o>
 
 // // aspect ... w / h
 // vec3 getPerspectiveCameraDir(vec2 uv, vec3 forward, float fov, float aspect) {

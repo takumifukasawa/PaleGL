@@ -22,7 +22,7 @@ in vec3 vWorldPosition;
 
 #include ./partial/alpha-test-functions.glsl
 
-#include ./partial/gbuffer-layout.glsl
+#include <gbuffer_o>
 
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);

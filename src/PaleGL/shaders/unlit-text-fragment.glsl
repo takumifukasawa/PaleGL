@@ -19,7 +19,7 @@ in vec3 vWorldPosition;
 
 #include ./partial/alpha-test-functions.glsl
 
-#include ./partial/gbuffer-layout.glsl
+#include <gbuffer_o>
 
 const float threshold = .5;
 const float smoothRange = .01;

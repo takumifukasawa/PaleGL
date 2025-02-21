@@ -26,6 +26,7 @@ import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.p
 import randPartialContent from '@/PaleGL/shaders/partial/rand.partial.glsl';
 import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.partial.glsl';
 import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
+import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -55,7 +56,8 @@ const includesDict = new Map<string, string>([
     ['ub', uniformBlockPartialContent],
     ['rand', randPartialContent],
     ['tone', toneMappingPartialContent],
-    ['depth', depthPartialContent]
+    ['depth', depthPartialContent],
+    ['gbuffer_o', gbufferOutPartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
