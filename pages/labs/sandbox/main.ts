@@ -1710,6 +1710,8 @@ void main() {
 
 precision highp float;
 
+#include <depth>
+
 in vec2 vUv;
 in vec4 vVertexColor;
 in vec4 vViewPosition;
@@ -1720,11 +1722,8 @@ out vec4 outColor;
 // layout (location = 1) out vec4 outNormalColor;
 
 uniform sampler2D uParticleMap;
-uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
-
-#pragma DEPTH_FUNCTIONS
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));

@@ -4,9 +4,6 @@
 
 #pragma ATTRIBUTES
 
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-
 #include <lighting>
 #include <ub>
 

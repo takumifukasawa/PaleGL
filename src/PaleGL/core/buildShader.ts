@@ -15,7 +15,6 @@ import {
     FragmentShaderModifier,
 } from '@/PaleGL/constants.ts';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
-import depthFunctions from '@/PaleGL/shaders/partial/depth-functions.glsl';
 import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
 import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
 import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
@@ -44,7 +43,6 @@ export type ShaderDefines = {
 const insertShaderPairs: {
     [key in ShaderPartialPragmas]: string;
 } = {
-    [ShaderPartialPragmas.DEPTH_FUNCTIONS]: depthFunctions,
     [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
     [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
     [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,

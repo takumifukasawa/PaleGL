@@ -463,7 +463,6 @@ export type FragmentShaderModifier = {
 };
 
 export const ShaderPartialPragmas = {
-    DEPTH_FUNCTIONS: 'DEPTH_FUNCTIONS',
     ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
     TRANSFORM_VERTEX_UNIFORMS: 'TRANSFORM_VERTEX_UNIFORMS',
     CAMERA_UNIFORMS: 'CAMERA_UNIFORMS',
