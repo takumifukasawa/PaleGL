@@ -3,6 +3,7 @@
 #include <lighting>
 #include <ub>
 #include <tone>
+#include <depth>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -20,8 +21,6 @@ in vec4 vInstanceState;
 #pragma RAYMARCH_SCENE
 
 #include ../partial/raymarch-utility-functions.glsl
-
-#include ../partial/depth-functions.glsl
 
 #include ../partial/alpha-test-functions.glsl
 
@@ -47,7 +46,6 @@ uniform int uShadingModelId;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
-uniform sampler2D uDepthTexture;
 
 #include ../partial/alpha-test-fragment-uniforms.glsl
 

@@ -1,13 +1,13 @@
 ﻿#include <common>
 #include <buffer_visualizer_h>
 #include <lighting>
+#include <depth>
 
 in vec2 vUv;
 
 out vec4 outColor;
 
 uniform vec2 uWorldPositionUvOffset;
-uniform sampler2D uDepthTexture;
 uniform vec2 uDepthTextureUvOffset;
 uniform sampler2D uGBufferATexture;
 uniform vec2 uGBufferATextureUvOffset;
@@ -46,9 +46,6 @@ uniform float uFarClip;
 uniform float uShowGBuffer;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform vec2 uTiling;
-
-// #pragma DEPTH_FUNCTIONS
-#include ./partial/depth-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
 

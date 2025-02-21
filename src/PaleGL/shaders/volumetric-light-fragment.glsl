@@ -1,11 +1,10 @@
 ﻿#pragma DEFINES
 
-// #include ./defines-light.glsl
-
 #include <common>
 #include <lighting>
 #include <ub>
 #include <rand>
+#include <depth>
 
 #define MARCH_COUNT 64
 #define MARCH_COUNT_F 64.
@@ -32,7 +31,6 @@ out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uGBufferATexture;
-uniform sampler2D uDepthTexture; // camera depth
 uniform sampler2D uVolumetricDepthTexture;
 uniform float uBlendRate;
 
@@ -40,8 +38,6 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 uniform float uDensityMultiplier;
 uniform float uRayStep;
 uniform vec3 uRayJitterSize;
-
-#include ./partial/depth-functions.glsl
 
 #include ./partial/gbuffer-functions.glsl
 

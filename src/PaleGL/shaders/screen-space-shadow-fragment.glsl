@@ -4,6 +4,7 @@
 #include <lighting>
 #include <ub>
 #include <rand>
+#include <depth>
 
 const int MARCH_COUNT = 48;
 
@@ -11,11 +12,8 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-#include ./partial/depth-functions.glsl
-
 // -----------------------------------------------------------
 
-uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferBTexture;
 uniform float uBias;
 uniform vec3 uJitterSize;

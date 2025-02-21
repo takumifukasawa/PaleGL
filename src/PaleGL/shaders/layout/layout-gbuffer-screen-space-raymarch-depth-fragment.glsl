@@ -2,20 +2,14 @@
 
 #include <lighting>
 #include <ub>
+#include <depth>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
 // raymarch
 #include ../partial/raymarch-distance-functions.glsl
 
-// #pragma BLOCK_RAYMARCH_SCENE
 #pragma RAYMARCH_SCENE
-
-// #include ./partial/raymarch-utility-functions.glsl
-
-#include ../partial/depth-functions.glsl
-
-uniform sampler2D uDepthTexture;
 
 in vec2 vUv;
 

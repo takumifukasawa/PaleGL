@@ -1,19 +1,14 @@
 #pragma DEFINES
 
-// -----------------------------------------------------------
-// uniform-block
-// -----------------------------------------------------------
-
 #include <common>
 #include <lighting>
 #include <ub>
+#include <depth>
 
 // -----------------------------------------------------------
 // functions
 // -----------------------------------------------------------
 
-// #pragma DEPTH_FUNCTIONS
-#include ./partial/depth-functions.glsl
 #include ./partial/lighting.glsl
 
 // ref:
@@ -176,7 +171,6 @@ uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
 uniform sampler2D uGBufferDTexture;
-uniform sampler2D uDepthTexture;
 uniform sampler2D uScreenSpaceShadowTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 

@@ -2,6 +2,7 @@
 
 #include <lighting>
 #include <ub>
+#include <depth>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -18,8 +19,6 @@ in vec4 vInstanceState;
 
 #include ../partial/raymarch-utility-functions.glsl
 
-#include ../partial/depth-functions.glsl
-
 #include ../partial/alpha-test-functions.glsl
 
 uniform vec4 uColor;
@@ -28,7 +27,6 @@ uniform vec2 uDiffuseMapUvScale;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
-uniform sampler2D uDepthTexture;
 
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;

@@ -4,25 +4,19 @@
 // https://github.com/keijiro/KinoBokeh/tree/master
 //
 
-#include ./partial/depth-functions.glsl
+#include <lighting>
+#include <ub>
+#include <depth>
 
 in vec2 vUv;
 
 out vec4 outColor;
 
-#include <lighting>
-#include <ub>
-// // #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-
 uniform sampler2D uSrcTexture;
-uniform sampler2D uDepthTexture;
-// uniform float uNearClip;
-// uniform float uFarClip;
+
 uniform float uFocusDistance;
 uniform float uFocusRange;
 uniform float uBokehRadius;
-// uniform mat4 uInverseProjectionMatrix;
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);

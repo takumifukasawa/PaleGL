@@ -3,6 +3,7 @@
 #include <lighting>
 #include <ub>
 #include <tone>
+#include <depth>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -14,8 +15,6 @@
 
 #include ../partial/raymarch-utility-functions.glsl
 
-#include ../partial/depth-functions.glsl
-
 #include ../partial/alpha-test-functions.glsl
 
 uniform float uMetallic;
@@ -25,7 +24,6 @@ uniform vec4 uEmissiveColor;
 
 #pragma APPEND_UNIFORMS
 
-uniform sampler2D uDepthTexture;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 

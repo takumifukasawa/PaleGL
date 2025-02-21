@@ -1,7 +1,6 @@
 ﻿#include <common>
 #include <buffer_visualizer_h>
-
-#include ./partial/depth-functions.glsl
+#include <depth>
 
 uniform vec2 uTiling;
 uniform sampler2D uTextureCol0;

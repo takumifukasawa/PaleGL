@@ -1,15 +1,13 @@
 ﻿#pragma DEFINES
 
+#include <lighting>
+#include <ub>
+#include <depth>
+
 in vec2 vUv;
 
 out vec4 outColor;
 
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-#include <lighting>
-#include <ub>
-
-uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferBTexture;
 uniform float[6] uSamplingRotations;
 uniform float[6] uSamplingDistances;
@@ -23,8 +21,6 @@ uniform vec4 uOcclusionColor;
 uniform float uOcclusionPower;
 uniform float uOcclusionStrength;
 uniform float uBlendRate;
-
-#include ./partial/depth-functions.glsl
 
 mat2 getRotationMatrix(float rad) {
     float c = cos(rad);

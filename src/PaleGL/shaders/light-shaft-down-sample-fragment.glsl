@@ -1,11 +1,10 @@
-#include ./partial/depth-functions.glsl
+#include <depth>
 
 in vec2 vUv;
 
 out vec4 outColor;
 
 uniform sampler2D uSrcTexture;
-uniform sampler2D uDepthTexture;
 uniform float uNearClip;
 uniform float uFarClip;
 

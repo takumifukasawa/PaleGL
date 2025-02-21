@@ -1,17 +1,17 @@
 ﻿#pragma DEFINES
 
+#include <lighting>
+#include <ub>
+#include <rand>
+#include <depth>
+
 in vec2 vUv;
 
 out vec4 outColor;
 
-#include <lighting>
-#include <ub>
-#include <rand>
-
 #include ./partial/gbuffer-functions.glsl
 
 uniform sampler2D uSrcTexture;
-uniform sampler2D uDepthTexture;
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
 uniform sampler2D uGBufferCTexture;
@@ -36,9 +36,6 @@ uniform float uReflectionScreenEdgeFadeFactorMaxY;
 uniform float uReflectionRoughnessPower;
 
 uniform float uReflectionAdditionalRate;
-
-// #pragma DEPTH_FUNCTIONS
-#include ./partial/depth-functions.glsl
 
 void main() {
     float eps = .001;

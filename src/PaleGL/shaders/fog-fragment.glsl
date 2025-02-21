@@ -8,6 +8,7 @@
 #include <common>
 #include <lighting>
 #include <ub>
+#include <depth>
 
 in vec2 vUv;
 
@@ -17,7 +18,6 @@ uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
 uniform sampler2D uSSSTexture;
-uniform sampler2D uDepthTexture;
 uniform sampler2D uNoiseTexture;
 uniform vec4 uFogColor;
 uniform float uFogStrength;
@@ -31,8 +31,6 @@ uniform float uSSSFogRate;
 uniform vec4 uSSSFogColor;
 uniform float uBlendRate;
 uniform float uTexelSize;
-
-#include ./partial/depth-functions.glsl
 
 // 1に近いほどfogが強い
 float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float densityY0, float densityAttenuation) {
