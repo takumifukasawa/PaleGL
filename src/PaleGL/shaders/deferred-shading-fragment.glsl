@@ -4,24 +4,9 @@
 // uniform-block
 // -----------------------------------------------------------
 
+#include <common>
 #include <lighting>
 #include <ub>
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-// #include ./partial/uniform-block-directional-light.glsl
-// #include ./partial/uniform-block-spot-light.glsl
-// #include ./partial/uniform-block-point-light.glsl
-
-// -----------------------------------------------------------
-// struct
-// -----------------------------------------------------------
-
-#include ./partial/common.glsl
-#include ./partial/lighting.glsl
-
-// #include ./partial/directional-light-struct.glsl
-
-#include ./partial/camera-struct.glsl
 
 // -----------------------------------------------------------
 // functions
@@ -29,6 +14,7 @@
 
 // #pragma DEPTH_FUNCTIONS
 #include ./partial/depth-functions.glsl
+#include ./partial/lighting.glsl
 
 // ref:
 // https://matcha-choco010.net/2020/04/10/opengl-deferred-spot-light-shadow/
@@ -283,9 +269,6 @@ void main() {
     // TODO: bufferから引っ張ってくる
     surface.specularAmount = .5;
 
-    Camera camera;
-    camera.worldPosition = uViewPosition;
-
     // phong
     // directional light
     // resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
@@ -294,7 +277,7 @@ void main() {
     GeometricContext geometry;
     geometry.position = surface.worldPosition;
     geometry.normal = surface.worldNormal;
-    geometry.viewDir = normalize(camera.worldPosition - surface.worldPosition);
+    geometry.viewDir = normalize(uViewPosition - surface.worldPosition);
     Material material;
     vec3 albedo = baseColor;
     material.baseColor = albedo;

@@ -1,8 +1,6 @@
 ﻿// ref: 
 // https://github.com/keijiro/KinoStreak/blob/master/Assets/Kino/Streak/Shader/Streak.cginc
 
-#include ./partial/common.glsl
-
 in vec2 vUv;
 
 out vec4 outColor;

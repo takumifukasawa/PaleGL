@@ -2,17 +2,13 @@
 
 // #include ./defines-light.glsl
 
-#define MARCH_COUNT 64
-#define MARCH_COUNT_F 64.
-
+#include <common>
 #include <lighting>
 #include <ub>
-//#include ./partial/uniform-block-common.glsl
-//#include ./partial/uniform-block-transformations.glsl
-//#include ./partial/uniform-block-camera.glsl
-//#include ./partial/uniform-block-spot-light.glsl
+#include <rand>
 
-#include ./partial/common.glsl
+#define MARCH_COUNT 64
+#define MARCH_COUNT_F 64.
 
 // 光源からの光が届くかどうかを判定
 bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {

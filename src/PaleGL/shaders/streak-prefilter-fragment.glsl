@@ -3,8 +3,6 @@
 // threshold以上の輝度を抽出
 // 抽出する際、縦を広めにサンプリング
 
-#include ./partial/common.glsl
-
 in vec2 vUv;
 
 out vec4 outColor;

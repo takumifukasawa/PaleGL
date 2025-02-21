@@ -4,14 +4,9 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-#include ./partial/common.glsl
-#include ./partial/noise.glsl
-
 #include <lighting>
 #include <ub>
-// #include ./partial/uniform-block-common.glsl
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
+#include <rand>
 
 #include ./partial/gbuffer-functions.glsl
 
@@ -73,9 +68,9 @@ void main() {
    
     // TODO: noiseを計算せずにテクスチャで渡すなりした方がいいはず
     vec3 randomDir = normalize(vec3(
-        noise(uv + .1),
-        noise(uv + .2),
-        noise(uv + .3)
+        rand(uv + .1),
+        rand(uv + .2),
+        rand(uv + .3)
     ) * 2. - 1.);
 
     vec3 incidentViewDir = normalize(viewPosition);
@@ -92,7 +87,7 @@ void main() {
 
     float fadeFactor = 1.;
 
-    float jitter = noise(uv + uTime) * 2. - 1.;
+    float jitter = rand(uv + uTime) * 2. - 1.;
 
     vec2 jitterOffset = vec2(
         jitter * uReflectionRayJitterSizeX,

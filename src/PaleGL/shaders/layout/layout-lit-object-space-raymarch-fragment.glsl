@@ -1,13 +1,7 @@
 #pragma DEFINES
 
-#include ../partial/common.glsl
-
 #include <lighting>
 #include <ub>
-// #include ../partial/uniform-block-common.glsl
-// #include ../partial/uniform-block-transformations.glsl
-// #include ../partial/uniform-block-camera.glsl
-// #include ../partial/uniform-block-timeline.glsl
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -58,17 +52,7 @@ uniform sampler2D uDepthTexture;
 
 #include ../partial/alpha-test-fragment-uniforms.glsl
 
-// #include ../partial/directional-light-struct.glsl
-// #include ../partial/directional-light-uniforms.glsl
-
-// struct Surface {
-//     vec3 worldNormal;
-//     vec3 worldPosition;
-//     vec4 diffuseColor;
-// // float specularAmount;
-// };
-
-#include ../partial/camera-struct.glsl
+// #include ../partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;

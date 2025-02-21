@@ -5,14 +5,13 @@
 // https://hikita12312.hatenablog.com/entry/2017/12/30/142137
 //
 
+#include <common>
+#include <lighting>
+#include <ub>
+
 in vec2 vUv;
 
 out vec4 outColor;
-
-#include ./partial/common.glsl
-
-#include <lighting>
-#include <ub>
 // #include ./partial/uniform-block-common.glsl
 // #include ./partial/uniform-block-transformations.glsl
 // #include ./partial/uniform-block-camera.glsl

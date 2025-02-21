@@ -1,29 +1,17 @@
 ﻿#pragma DEFINES
 
-// -----------------------------------------------------------
+#include <common>
+#include <lighting>
+#include <ub>
+#include <rand>
+
+const int MARCH_COUNT = 48;
 
 in vec2 vUv;
 
 out vec4 outColor;
 
-// -----------------------------------------------------------
-// utils
-// -----------------------------------------------------------
-
-#include ./partial/common.glsl
-
 #include ./partial/depth-functions.glsl
-
-// -----------------------------------------------------------
-// uniform block
-// -----------------------------------------------------------
-
-#include <lighting>
-#include <ub>
-// #include ./partial/uniform-block-common.glsl
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-// #include ./partial/uniform-block-point-light.glsl
 
 // -----------------------------------------------------------
 
@@ -34,9 +22,6 @@ uniform vec3 uJitterSize;
 uniform float uSharpness;
 uniform float uStrength;
 uniform float uRayStepMultiplier;
-
-// const int MARCH_COUNT = 24;
-const int MARCH_COUNT = 48;
 
 void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
     vec3 rawLightPos = pointLight.position;

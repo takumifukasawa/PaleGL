@@ -1,6 +1,7 @@
 // 0 - 1
 float rand(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.98, 78.23))) * 43.75);
+    // return fract(sin(dot(co.xy ,vec2(12.98, 78.23))) * 43.75);
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 vec3 hash3(vec3 p) {

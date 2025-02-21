@@ -1,13 +1,7 @@
 #pragma DEFINES
 
-#include ../partial/common.glsl
-
 #include <lighting>
 #include <ub>
-// #include ../partial/uniform-block-common.glsl
-// #include ../partial/uniform-block-transformations.glsl
-// #include ../partial/uniform-block-camera.glsl
-// #include ../partial/uniform-block-timeline.glsl
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -32,17 +26,7 @@ uniform vec4 uEmissiveColor;
 
 #include ../partial/tone-mapping.glsl
 
-// uniform mat4 uWorldMatrix;
-// uniform mat4 uViewMatrix;
-// uniform mat4 uProjectionMatrix;
-// uniform mat4 uInverseWorldMatrix;
-// uniform vec3 uViewPosition;
-// uniform vec3 uViewDirection;
 uniform sampler2D uDepthTexture;
-// uniform float uNearClip;
-// uniform float uFarClip;
-// uniform float uFov;
-// uniform float uAspect;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
 
@@ -99,8 +83,6 @@ void main() {
     if (result.x > minDistance) {
         discard;
     }
-
-    // currentRayPosition = rayOrigin + rayDirection * accLen;
 
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;

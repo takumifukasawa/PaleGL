@@ -1,6 +1,4 @@
-﻿#include ./partial/common.glsl
-
-in vec2 vUv;
+﻿in vec2 vUv;
 
 out vec4 outColor;
 

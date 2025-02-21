@@ -1,13 +1,7 @@
 #pragma DEFINES
 
-#include ../partial/common.glsl
-
 #include <lighting>
 #include <ub>
-// #include ../partial/uniform-block-common.glsl
-// #include ../partial/uniform-block-transformations.glsl
-// #include ../partial/uniform-block-camera.glsl
-// #include ../partial/uniform-block-timeline.glsl
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -21,12 +15,7 @@
 
 #include ../partial/depth-functions.glsl
 
-// uniform vec3 uViewPosition;
-// uniform mat4 uWorldMatrix;
-// uniform mat4 uViewMatrix;
 uniform sampler2D uDepthTexture;
-// uniform float uNearClip;
-// uniform float uFarClip;
 
 in vec2 vUv;
 
