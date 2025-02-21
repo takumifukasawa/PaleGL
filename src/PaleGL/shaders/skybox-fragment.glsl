@@ -6,21 +6,11 @@ in vec3 vWorldPosition;
 
 #include <lighting>
 #include <ub>
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
+#include <tone>
 
 uniform samplerCube uCubeTexture;
-// uniform vec3 uViewPosition;
-// uniform mat4 uViewDirectionProjectionInverse;
 uniform float uRotationOffset;
 uniform int uShadingModelId;
-
-// out vec4 outColor;
-// layout (location = 0) out vec4 outGBufferA;
-// layout (location = 1) out vec4 outGBufferB;
-// layout (location = 2) out vec4 outGBufferC;
-
-#include ./partial/tone-mapping.glsl
 
 #include ./partial/env-map-fragment-functions.glsl
 

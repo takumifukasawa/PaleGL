@@ -2,9 +2,7 @@
 
 #include <lighting>
 #include <ub>
-// // #include ./partial/uniform-block-common.glsl
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
+#include <tone>
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
@@ -23,15 +21,9 @@ uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 
-#include ./partial/tone-mapping.glsl
-
 #include ./partial/normal-map-fragment-uniforms.glsl
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
-
-// #include ./partial/directional-light-struct.glsl
-// #include ./partial/directional-light-uniforms.glsl
-// #include ./partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;

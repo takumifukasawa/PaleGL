@@ -2,6 +2,7 @@
 
 #include <lighting>
 #include <ub>
+#include <tone>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -23,8 +24,6 @@ uniform int uShadingModelId;
 uniform vec4 uEmissiveColor;
 
 #pragma APPEND_UNIFORMS
-
-#include ../partial/tone-mapping.glsl
 
 uniform sampler2D uDepthTexture;
 uniform float uTargetWidth;

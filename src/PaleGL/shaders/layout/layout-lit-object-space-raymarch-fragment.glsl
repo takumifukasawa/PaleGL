@@ -2,6 +2,7 @@
 
 #include <lighting>
 #include <ub>
+#include <tone>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -41,8 +42,6 @@ uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 
-#include ../partial/tone-mapping.glsl
-
 #include ../partial/normal-map-fragment-uniforms.glsl
 
 uniform float uIsPerspective;
@@ -51,8 +50,6 @@ uniform vec3 uBoundsScale;
 uniform sampler2D uDepthTexture;
 
 #include ../partial/alpha-test-fragment-uniforms.glsl
-
-// #include ../partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;

@@ -6,17 +6,11 @@ uniform vec2 uDiffuseMapUvScale;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
-#include ./partial/tone-mapping.glsl
-
 #include <lighting>
 #include <ub>
-// #include ./partial/uniform-block-transformations.glsl
-// #include ./partial/uniform-block-camera.glsl
-// uniform vec3 uViewPosition;
+#include <tone>
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
-
-#include ./partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;

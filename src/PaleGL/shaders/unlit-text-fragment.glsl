@@ -1,11 +1,11 @@
 #pragma DEFINES
 
+#include <tone>
+
 uniform vec4 uColor;
 uniform int uShadingModelId;
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
-
-#include ./partial/tone-mapping.glsl
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 
