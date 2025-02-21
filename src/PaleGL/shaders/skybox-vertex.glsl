@@ -4,13 +4,11 @@
 
 #pragma ATTRIBUTES
 
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 
-// uniform mat4 uWorldMatrix;
-// uniform mat4 uViewMatrix;
-// uniform mat4 uProjectionMatrix;
-// uniform mat4 uNormalMatrix;
+#include <lighting>
+#include <ub>
 
 #pragma APPEND_UNIFORMS
 

@@ -7,9 +7,11 @@ out vec4 outColor;
 #include ./partial/common.glsl
 #include ./partial/noise.glsl
 
-#include ./partial/uniform-block-common.glsl
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <lighting>
+#include <ub>
+// #include ./partial/uniform-block-common.glsl
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 
 #include ./partial/gbuffer-functions.glsl
 

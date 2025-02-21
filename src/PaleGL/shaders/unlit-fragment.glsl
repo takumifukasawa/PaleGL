@@ -8,8 +8,10 @@ uniform int uShadingModelId;
 
 #include ./partial/tone-mapping.glsl
 
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <lighting>
+#include <ub>
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 // uniform vec3 uViewPosition;
 
 #include ./partial/alpha-test-fragment-uniforms.glsl

@@ -20,10 +20,12 @@ out vec4 outColor;
 // uniform block
 // -----------------------------------------------------------
 
-#include ./partial/uniform-block-common.glsl
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
-#include ./partial/uniform-block-point-light.glsl
+#include <lighting>
+#include <ub>
+// #include ./partial/uniform-block-common.glsl
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
+// #include ./partial/uniform-block-point-light.glsl
 
 // -----------------------------------------------------------
 

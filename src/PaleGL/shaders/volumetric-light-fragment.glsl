@@ -1,9 +1,16 @@
 ﻿#pragma DEFINES
 
-#include ./defines-light.glsl
+// #include ./defines-light.glsl
 
-#define MARCH_COUNT 64 
+#define MARCH_COUNT 64
 #define MARCH_COUNT_F 64.
+
+#include <lighting>
+#include <ub>
+//#include ./partial/uniform-block-common.glsl
+//#include ./partial/uniform-block-transformations.glsl
+//#include ./partial/uniform-block-camera.glsl
+//#include ./partial/uniform-block-spot-light.glsl
 
 #include ./partial/common.glsl
 
@@ -26,11 +33,6 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 in vec2 vUv;
 
 out vec4 outColor;
-
-#include ./partial/uniform-block-common.glsl
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
-#include ./partial/uniform-block-spot-light.glsl
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uGBufferATexture;

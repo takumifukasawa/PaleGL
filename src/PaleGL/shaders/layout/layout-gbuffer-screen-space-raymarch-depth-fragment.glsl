@@ -2,10 +2,12 @@
 
 #include ../partial/common.glsl
 
-#include ../partial/uniform-block-common.glsl
-#include ../partial/uniform-block-transformations.glsl
-#include ../partial/uniform-block-camera.glsl
-#include ../partial/uniform-block-timeline.glsl
+#include <lighting>
+#include <ub>
+// #include ../partial/uniform-block-common.glsl
+// #include ../partial/uniform-block-transformations.glsl
+// #include ../partial/uniform-block-camera.glsl
+// #include ../partial/uniform-block-timeline.glsl
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 

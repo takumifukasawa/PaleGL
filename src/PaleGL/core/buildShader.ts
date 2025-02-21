@@ -24,6 +24,8 @@ import pseudoHDR from '@/PaleGL/shaders/partial/pseudo-hdr.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
+import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
+import randPartialContent from '@/PaleGL/shaders/partial/rand.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -52,9 +54,11 @@ const includesDict = new Map<string, string>([
     ['common', commonPartialContent],
     ['buffer_visualizer_h', bufferVisualizerHeaderContent],
     ['lighting', lightingPartialContent],
+    ['ub', uniformBlockPartialContent],
+    ['rand', randPartialContent]
 ]);
 
-const replaceShaderIncludes = (src: string) => {
+export const replaceShaderIncludes = (src: string) => {
     src = src.replaceAll(/#include\s<([a-zA-Z_]*)>/g, (_, p1: string) => {
         return includesDict.get(p1) || '';
     });

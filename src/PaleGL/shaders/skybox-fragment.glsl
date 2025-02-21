@@ -4,8 +4,10 @@ in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <lighting>
+#include <ub>
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 
 uniform samplerCube uCubeTexture;
 // uniform vec3 uViewPosition;

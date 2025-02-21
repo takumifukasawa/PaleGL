@@ -1,16 +1,16 @@
 #pragma DEFINES
 
-#include <lighting>
-
 // -----------------------------------------------------------
 // uniform-block
 // -----------------------------------------------------------
 
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
-#include ./partial/uniform-block-directional-light.glsl
-#include ./partial/uniform-block-spot-light.glsl
-#include ./partial/uniform-block-point-light.glsl
+#include <lighting>
+#include <ub>
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
+// #include ./partial/uniform-block-directional-light.glsl
+// #include ./partial/uniform-block-spot-light.glsl
+// #include ./partial/uniform-block-point-light.glsl
 
 // -----------------------------------------------------------
 // struct
@@ -194,7 +194,7 @@ uniform sampler2D uDepthTexture;
 uniform sampler2D uScreenSpaceShadowTexture;
 uniform sampler2D uAmbientOcclusionTexture;
 
-uniform float uTime;
+// uniform float uTime;
 
 // uniform mat4 uInverseViewProjectionMatrix;
        

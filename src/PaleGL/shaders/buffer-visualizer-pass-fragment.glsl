@@ -1,7 +1,6 @@
 ﻿#include <common>
 #include <buffer_visualizer_h>
-
-#include ./defines-light.glsl
+#include <lighting>
 
 in vec2 vUv;
 

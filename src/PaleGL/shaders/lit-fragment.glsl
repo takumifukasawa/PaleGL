@@ -1,10 +1,10 @@
 #pragma DEFINES
 
 #include <lighting>
-
-// #include ./partial/uniform-block-common.glsl
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <ub>
+// // #include ./partial/uniform-block-common.glsl
+// #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
@@ -29,9 +29,9 @@ uniform int uShadingModelId;
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 
-#include ./partial/directional-light-struct.glsl
-#include ./partial/directional-light-uniforms.glsl
-#include ./partial/camera-struct.glsl
+// #include ./partial/directional-light-struct.glsl
+// #include ./partial/directional-light-uniforms.glsl
+// #include ./partial/camera-struct.glsl
 
 in vec2 vUv;
 in vec3 vNormal;

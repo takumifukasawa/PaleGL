@@ -66,6 +66,7 @@ import { Texture } from '@/PaleGL/core/Texture.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import {replaceShaderIncludes} from "@/PaleGL/core/buildShader.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -352,8 +353,8 @@ export class Renderer {
 
         const uniformBufferObjectShader = new Shader({
             gpu,
-            vertexShader: globalUniformBufferObjectVertexShader,
-            fragmentShader: globalUniformBufferObjectFragmentShader,
+            vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
+            fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),
         });
 
         const transformationsUniformBlockData = [

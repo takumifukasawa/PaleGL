@@ -10,8 +10,10 @@ in vec2 vUv;
 
 out vec4 outColor;
 
-// #include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <lighting>
+#include <ub>
+// // #include ./partial/uniform-block-transformations.glsl
+// #include ./partial/uniform-block-camera.glsl
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uDepthTexture;
