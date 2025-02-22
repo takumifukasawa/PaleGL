@@ -60,12 +60,8 @@ void main() {
     vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
    
     vec3 worldNormal = vNormal;
-   
-#ifdef USE_NORMAL_MAP
-    worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
-#else
-    worldNormal = normalize(vNormal);
-#endif
+
+    #include <normal_map_f>
 
 #ifdef USE_VERTEX_COLOR
     diffuseColor *= vVertexColor;
