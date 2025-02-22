@@ -15,9 +15,9 @@ import {
     FragmentShaderModifier,
 } from '@/PaleGL/constants.ts';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
-import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
-import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
-import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
+// import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
+// import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
+// import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
 
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
@@ -52,9 +52,9 @@ export type ShaderDefines = {
 const insertShaderPairs: {
     [key in ShaderPartialPragmas]: string;
 } = {
-    [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
-    [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
-    [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
+    // [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
+    // [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
+    // [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
 };
 
 const includesDict = new Map<string, string>([

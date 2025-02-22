@@ -236,7 +236,8 @@ export class Camera extends Actor {
                     // gpu,
                     vertexShader: `
 layout (location = 0) in vec3 ${AttributeNames.Position};
-#pragma TRANSFORM_VERTEX_UNIFORMS
+#include <lighting>
+#include <ub>
 void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);}
 `,
                     fragmentShader: `

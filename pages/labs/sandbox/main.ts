@@ -1663,6 +1663,9 @@ const main = async () => {
 
 #pragma ATTRIBUTES
 
+#include <lighting>
+#include <ub>
+
 out vec2 vUv;
 out vec3 vWorldPosition;
 out vec3 vNormal;
@@ -1670,9 +1673,6 @@ out vec3 vNormal;
 out vec4 vVertexColor;
 out vec4 vViewPosition;
 out vec4 vClipPosition;
-
-#pragma TRANSFORM_VERTEX_UNIFORMS
-#pragma ENGINE_UNIFORMS
 
 uniform vec2[4] uBillboardPositionConverters;
 
@@ -1710,6 +1710,8 @@ void main() {
 
 precision highp float;
 
+#include <lighting>
+#include <ub>
 #include <depth>
 
 in vec2 vUv;
@@ -1718,12 +1720,8 @@ in vec4 vViewPosition;
 in vec4 vClipPosition;
 
 out vec4 outColor;
-// layout (location = 0) out vec4 outBaseColor;
-// layout (location = 1) out vec4 outNormalColor;
 
 uniform sampler2D uParticleMap;
-uniform float uNearClip;
-uniform float uFarClip;
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));
@@ -1795,7 +1793,7 @@ void main() {
                 value: captureSceneCamera.far,
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Common],
+        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
         // blendType: BlendTypes.Additive
         blendType: BlendTypes.Transparent,
         depthWrite: false,
