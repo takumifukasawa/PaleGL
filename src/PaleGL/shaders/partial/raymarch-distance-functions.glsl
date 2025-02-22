@@ -2,8 +2,8 @@
 // defines
 // 
 
-#define PI 3.14
-#define PI2 6.28
+// #define PI 3.14
+// #define PI2 6.28
 
 // #define OP_ID(p, r) floor((p + r * .5) / r)
 // // #define OP_RE(p, r) mod(p + r * .5, r) - r * .5
