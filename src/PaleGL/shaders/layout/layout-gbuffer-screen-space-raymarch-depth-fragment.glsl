@@ -8,9 +8,11 @@
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
 // raymarch
-#include ../partial/raymarch-distance-functions.glsl
+#include <raymarch_df>
 
 #pragma RAYMARCH_SCENE
+
+#include <raymarch_sf>
 
 in vec2 vUv;
 

@@ -16,13 +16,12 @@ in vec4 vInstanceState;
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
-// raymarch
-#include ../partial/raymarch-distance-functions.glsl
+#include <raymarch_df>
 
 // #pragma BLOCK_RAYMARCH_SCENE
 #pragma RAYMARCH_SCENE
 
-#include ../partial/raymarch-utility-functions.glsl
+#include <raymarch_sf>
 
 #include ../partial/alpha-test-functions.glsl
 

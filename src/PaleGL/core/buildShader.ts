@@ -29,6 +29,8 @@ import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
 import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
+import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-distance-functions.partial.glsl';
+import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-scene-functions.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -61,7 +63,9 @@ const includesDict = new Map<string, string>([
     ['depth', depthPartialContent],
     ['gbuffer', gbufferPartialContent],
     ['gbuffer_o', gbufferOutPartialContent],
-    ['etex', effectTexturePartialContent]
+    ['etex', effectTexturePartialContent],
+    ['raymarch_df', raymarchDistanceFunctionsPartialContent],
+    ['raymarch_sf', raymarchSceneFunctionsPartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
