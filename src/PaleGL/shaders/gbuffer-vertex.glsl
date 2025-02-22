@@ -35,11 +35,8 @@ out vec3 vTangent;
 out vec3 vBinormal;
 #endif
 
-#include ./partial/receive-shadow-vertex-varyings.glsl
-
 #pragma APPEND_UNIFORMS
         
-#include ./partial/receive-shadow-vertex-uniforms.glsl
 #include ./partial/skinning-vertex-uniforms.glsl
 
 mat4 getRotationXMat(float rad) {
@@ -248,10 +245,7 @@ void main() {
     //     normalMatrix = mat3(uNormalMatrix);
     // #endif
     // vNormal = normalMatrix * aNormal;
-    
-    
-    #include ./partial/receive-shadow-uv-calc.glsl
-    
+
 // NOTE: shader minify の時に p * v * w を直接入れないとなぜか掛ける順番がおかしくなる
 //     vec4 viewPosition = uViewMatrix * worldPosition;
 //  

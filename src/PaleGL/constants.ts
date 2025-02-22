@@ -339,8 +339,6 @@ export const UniformNames = {
     JointTextureColNum: 'uJointTextureColNum',
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
     // shadow map
-    // ShadowMap: 'uShadowMap',
-    // ShadowMapProjectionMatrix: 'uShadowMapProjectionMatrix',
     // ShadowBias: 'uShadowBias',
     // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
     // mainly post process

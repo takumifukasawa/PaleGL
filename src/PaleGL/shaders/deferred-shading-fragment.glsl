@@ -483,22 +483,21 @@ float calcSpotLightShadowAttenuation(
     float shadow = (1. - visibility) * shadowAreaRect * shadowBlendRate * faceSmooth;
     return clamp(shadow, 0., 1.);
 }
- 
+
 // -----------------------------------------------------------
-// varyings
+// receive shadow
+// -----------------------------------------------------------
+
+// #ifdef USE_RECEIVE_SHADOW
+uniform float uShadowBias;
+// #endif
+
 // -----------------------------------------------------------
 
 in vec2 vUv;
-#include ./partial/receive-shadow-fragment-varyings.glsl
-
-// -----------------------------------------------------------
-// uniforms
-// -----------------------------------------------------------
 
 uniform sampler2D uDirectionalLightShadowMap;
 uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
-
-#include ./partial/receive-shadow-fragment-uniforms.glsl
 
 uniform sampler2D uGBufferATexture;
 uniform sampler2D uGBufferBTexture;
