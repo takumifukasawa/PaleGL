@@ -9,7 +9,6 @@ import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
 import {
     VertexShaderModifierPragmas,
     FragmentShaderModifierPragmas,
-    ShaderPartialPragmas,
     ShaderPragmas,
     VertexShaderModifier,
     FragmentShaderModifier,
@@ -52,13 +51,14 @@ export type ShaderDefines = {
     useInstanceLookDirection: boolean;
 };
 
-const insertShaderPairs: {
-    [key in ShaderPartialPragmas]: string;
-} = {
-    // [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
-    // [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
-    // [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
-};
+// tmp
+// const insertShaderPairs: {
+//     [key in ShaderPartialPragmas]: string;
+// } = {
+//     // [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
+//     // [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
+//     // [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
+// };
 
 const includesDict = new Map<string, string>([
     ['common', commonPartialContent],
@@ -259,13 +259,14 @@ const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
         return defines.join('\n');
     });
 
-    // replace partial shader
-    Object.values(ShaderPartialPragmas).forEach((value) => {
-        const pragma = value as ShaderPartialPragmas;
-        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            return insertShaderPairs[pragma];
-        });
-    });
+    // tmp
+    // // replace partial shader
+    // Object.values(ShaderPartialPragmas).forEach((value) => {
+    //     const pragma = value as ShaderPartialPragmas;
+    //     replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
+    //         return insertShaderPairs[pragma];
+    //     });
+    // });
     
     // transform unroll
     replacedShader = transformUnroll(replacedShader);
