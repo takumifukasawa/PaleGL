@@ -5,6 +5,7 @@
 #include <ub>
 #include <depth>
 #include <gbuffer>
+#include <env_map>
 
 // -----------------------------------------------------------
 // lighting functions
@@ -162,8 +163,6 @@ struct SkyboxLight {
     float rotationOffset;
     float maxLodLevel;
 };
-
-#include ./partial/env-map-fragment-functions.glsl
 
 void getSkyboxLightIrradiance(const in SkyboxLight skyboxLight, const in GeometricContext geometry, out IncidentSkyboxLight directLight) {
     vec3 envDir = reflect(

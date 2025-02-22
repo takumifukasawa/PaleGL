@@ -37,6 +37,7 @@ import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vert
 import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
+import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -78,6 +79,7 @@ const includesDict = new Map<string, string>([
     ['vcolor_fh', vertexColorFragmentHeaderPartialContent],
     ['normal_map_fh', normalMapFragmentHeaderPartialContent],
     ['normal_map_f', normalMapFragmentPartialContent],
+    ['env_map', envMapPartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {

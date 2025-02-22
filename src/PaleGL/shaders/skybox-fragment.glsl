@@ -4,6 +4,7 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
+#include <env_map>
 
 in vec2 vUv;
 in vec3 vNormal;
@@ -12,8 +13,6 @@ in vec3 vWorldPosition;
 uniform samplerCube uCubeTexture;
 uniform float uRotationOffset;
 uniform int uShadingModelId;
-
-#include ./partial/env-map-fragment-functions.glsl
 
 #include <gbuffer_o>
 
