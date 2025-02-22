@@ -4,6 +4,7 @@
 #include <lighting>
 #include <ub>
 #include <depth>
+#include <alpha_test>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -14,12 +15,24 @@
 
 #include <raymarch_sf>
 
+uniform vec4 uDiffuseColor;
+uniform sampler2D uDiffuseMap;
+uniform vec2 uDiffuseMapUvScale;
+
 in vec2 vUv;
 
 out vec4 outColor;
 
 void main() {
-    vec4 diffuseColor = vec4(0.);
+    vec2 uv = vUv * uDiffuseMapUvScale;
+
+    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+
+    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
+
+    #ifdef USE_VERTEX_COLOR
+    diffuseColor *= vVertexColor;
+    #endif
 
     //
     // raymarch start
@@ -59,6 +72,9 @@ void main() {
     if(currentDepth > sceneDepth) {
         discard;
     }
+
+    float alpha = diffuseColor.a;
+    #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);
 }

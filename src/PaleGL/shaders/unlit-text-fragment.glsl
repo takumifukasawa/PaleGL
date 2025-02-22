@@ -8,15 +8,13 @@ uniform int uShadingModelId;
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
 
-#include ./partial/alpha-test-fragment-uniforms.glsl
+#include <alpha_test>
 
 in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
-
-#include ./partial/alpha-test-functions.glsl
 
 #include <gbuffer_o>
 
@@ -52,12 +50,14 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
-    resultColor.a = alpha;
 
 // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
+// #ifdef USE_ALPHA_TEST
+//     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
+// #endif
+    #include <alpha_test_f>
+    
+    resultColor.a = alpha;
 
     // for debug
     // resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);

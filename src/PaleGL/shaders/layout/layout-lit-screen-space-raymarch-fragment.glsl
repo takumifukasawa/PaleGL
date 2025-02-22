@@ -6,6 +6,7 @@
 #include <tone>
 #include <depth>
 #include <gbuffer>
+#include <alpha_test>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -16,8 +17,6 @@
 
 #include <raymarch_sf>
 
-#include ../partial/alpha-test-functions.glsl
-
 uniform float uMetallic;
 uniform float uRoughness;
 uniform int uShadingModelId;
@@ -27,8 +26,6 @@ uniform vec4 uEmissiveColor;
 
 uniform float uTargetWidth;
 uniform float uTargetHeight;
-
-#include ../partial/alpha-test-fragment-uniforms.glsl
 
 in vec2 vUv;
 in vec3 vWorldPosition;
@@ -100,9 +97,8 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    #ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-    #endif
+    float alpha = resultColor.a;
+    #include <alpha_test_f>
 
     resultColor.rgb = gamma(resultColor.rgb);
 

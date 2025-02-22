@@ -4,6 +4,7 @@
 #include <lighting>
 #include <ub>
 #include <depth>
+#include <alpha_test>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -20,18 +21,12 @@ in vec4 vInstanceState;
 
 #include <raymarch_sf>
 
-#include ../partial/alpha-test-functions.glsl
-
-uniform vec4 uColor;
+uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
-
-#ifdef USE_ALPHA_TEST
-uniform float uAlphaTestThreshold;
-#endif
 
 in vec2 vUv;
 in vec3 vLocalPosition;
@@ -50,12 +45,10 @@ void main() {
 
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
 
-    vec4 diffuseColor = vec4(0.);
+    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
 
     #ifdef USE_VERTEX_COLOR
-    diffuseColor = vVertexColor * uColor * diffuseMapColor;
-    #else
-    diffuseColor = uColor * diffuseMapColor;
+    diffuseColor *= vVertexColor;
     #endif
 
     //
@@ -111,10 +104,7 @@ void main() {
     //
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
-
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(alpha, uAlphaTestThreshold);
-#endif
+    #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);
     

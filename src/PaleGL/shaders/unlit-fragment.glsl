@@ -11,15 +11,13 @@ uniform vec2 uDiffuseMapUvScale;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
-#include ./partial/alpha-test-fragment-uniforms.glsl
+#include <alpha_test>
 
 in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
-
-#include ./partial/alpha-test-functions.glsl
 
 #include <gbuffer_o>
 
@@ -45,10 +43,9 @@ void main() {
 
     resultColor = diffuseMapColor; 
 
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
-    
+    float alpha = resultColor.a;
+    #include <alpha_test_f>
+
     resultColor.rgb = gamma(resultColor.rgb);
     vec3 emissiveColor = gamma(uEmissiveColor.rgb);
 

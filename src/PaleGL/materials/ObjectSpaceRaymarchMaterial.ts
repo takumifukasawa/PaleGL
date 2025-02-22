@@ -18,8 +18,8 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
 import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
-import {Vector2} from "@/PaleGL/math/Vector2.ts";
-import {Vector4} from "@/PaleGL/math/Vector4.ts";
+import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ObjectSpaceRaymarchMaterialArgs = {
@@ -57,9 +57,10 @@ export function createObjectSpaceRaymarchMaterial({
         PRAGMA_RAYMARCH_SCENE,
         fragmentShaderContent
     );
-    const depthFragmentShader = (
-        depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout
-    ).replace(PRAGMA_RAYMARCH_SCENE, depthFragmentShaderContent);
+    const depthFragmentShader = (depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout).replace(
+        PRAGMA_RAYMARCH_SCENE,
+        depthFragmentShaderContent
+    );
 
     const material = new ObjectSpaceRaymarchMaterial({
         fragmentShader,
@@ -80,10 +81,10 @@ export class ObjectSpaceRaymarchMaterial extends Material {
         depthFragmentShader,
         // rawFragmentShader,
         shadingModelId = ShadingModelIds.Lit,
-                    diffuseColor,
+        diffuseColor,
         diffuseMap,
-                    diffuseMapUvScale, // vec2
-                    diffuseMapUvOffset, // vec2
+        diffuseMapUvScale, // vec2
+        diffuseMapUvOffset, // vec2
         metallic,
         metallicMap,
         metallicMapTiling,
@@ -177,7 +178,7 @@ export class ObjectSpaceRaymarchMaterial extends Material {
                 type: UniformTypes.Vector4,
                 value: roughnessMapTilingValue,
             },
-            
+
             {
                 name: UniformNames.EmissiveColor,
                 type: UniformTypes.Color,
@@ -191,8 +192,8 @@ export class ObjectSpaceRaymarchMaterial extends Material {
             {
                 name: 'uUseWorld',
                 type: UniformTypes.Float,
-                value: 0
-            }
+                value: 0,
+            },
         ];
         const shadingUniforms: UniformsData = [
             {

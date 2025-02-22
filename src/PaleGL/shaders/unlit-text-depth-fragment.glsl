@@ -1,9 +1,9 @@
 #pragma DEFINES
 
+#include <alpha_test>
+
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
-
-#include ./partial/alpha-test-fragment-uniforms.glsl
 
 in vec2 vUv;
 
@@ -12,8 +12,6 @@ in vec4 vVertexColor;
 #endif
 
 out vec4 outColor;
-
-#include ./partial/alpha-test-functions.glsl
 
 const float threshold = .5;
 const float smoothRange = .01;
@@ -46,11 +44,9 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
+    
+    #include <alpha_test_f>
     resultColor.a = alpha;
-
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
 
     outColor = vec4(1., 1., 1., 1.);
 }

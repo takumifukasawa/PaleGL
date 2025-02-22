@@ -6,6 +6,7 @@
 #include <tone>
 #include <depth>
 #include <gbuffer>
+#include <alpha_test>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -22,8 +23,6 @@ in vec4 vInstanceState;
 #pragma RAYMARCH_SCENE
 
 #include <raymarch_sf>
-
-#include ../partial/alpha-test-functions.glsl
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
@@ -47,8 +46,6 @@ uniform int uShadingModelId;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
-
-#include ../partial/alpha-test-fragment-uniforms.glsl
 
 in vec2 vUv;
 in vec3 vNormal;
@@ -173,9 +170,8 @@ void main() {
 
     resultColor = diffuseColor;
 
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
+    float alpha = resultColor.a;
+    #include <alpha_test_f>
 
     resultColor.rgb = gamma(resultColor.rgb);
 

@@ -4,6 +4,7 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
+#include <alpha_test>
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
@@ -23,8 +24,6 @@ uniform int uShadingModelId;
 #pragma APPEND_UNIFORMS
 
 #include ./partial/normal-map-fragment-uniforms.glsl
-
-#include ./partial/alpha-test-fragment-uniforms.glsl
 
 in vec2 vUv;
 in vec3 vNormal;
@@ -54,8 +53,6 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
     return resultNormal;
 }
 #endif
-
-#include ./partial/alpha-test-functions.glsl
 
 #include <gbuffer_o>
 
@@ -88,9 +85,8 @@ void main() {
     
     resultColor = surface.diffuseColor;
     
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-#endif
+    float alpha = resultColor.a;
+    #include <alpha_test_f>
 
     resultColor.rgb = gamma(resultColor.rgb);
    

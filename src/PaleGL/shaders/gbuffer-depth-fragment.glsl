@@ -16,13 +16,7 @@ in vec4 vVertexColor;
 
 out vec4 outColor;
 
-#ifdef USE_ALPHA_TEST
-void checkAlphaTest(float value, float threshold) {
-    if(value < threshold) {
-        discard;
-    }
-}
-#endif
+#include <alpha_test>
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
@@ -38,10 +32,7 @@ void main() {
 #endif   
 
     float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
-
-#ifdef USE_ALPHA_TEST
-    checkAlphaTest(alpha, uAlphaTestThreshold);
-#endif    
+    #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);
 }
