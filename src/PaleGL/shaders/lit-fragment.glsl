@@ -6,6 +6,7 @@
 #include <gbuffer>
 #include <alpha_test>
 #include <vcolor_fh>
+#include <normal_map_fh>
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
@@ -24,12 +25,8 @@ uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 
-#include ./partial/normal-map-fragment-uniforms.glsl
-
 in vec2 vUv;
 in vec3 vNormal;
-
-#include ./partial/normal-map-fragment-varyings.glsl
 
 in vec3 vWorldPosition;
 

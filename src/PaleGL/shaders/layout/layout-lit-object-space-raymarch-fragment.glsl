@@ -8,6 +8,7 @@
 #include <gbuffer>
 #include <alpha_test>
 #include <vcolor_fh>
+#include <normal_map_fh>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -42,16 +43,12 @@ uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 
-#include ../partial/normal-map-fragment-uniforms.glsl
-
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
 
 in vec2 vUv;
 in vec3 vNormal;
-
-#include ../partial/normal-map-fragment-varyings.glsl
 
 in vec3 vLocalPosition;
 in mat4 vWorldMatrix;
