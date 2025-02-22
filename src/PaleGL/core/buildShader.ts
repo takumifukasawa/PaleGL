@@ -28,6 +28,7 @@ import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.par
 import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
+import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -60,6 +61,7 @@ const includesDict = new Map<string, string>([
     ['depth', depthPartialContent],
     ['gbuffer', gbufferPartialContent],
     ['gbuffer_o', gbufferOutPartialContent],
+    ['etex', effectTexturePartialContent]
 ]);
 
 export const replaceShaderIncludes = (src: string) => {

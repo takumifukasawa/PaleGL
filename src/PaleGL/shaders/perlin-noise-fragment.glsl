@@ -1,7 +1,16 @@
-#include ./partial/effect-texture-header.glsl
+#include <common>
+#include <rand>
+#include <etex>
 
 uniform float uTiling;
 uniform float uIsImproved;
+
+float smooth5(float t) {
+    float t3 = t * t * t;
+    float t4 = t * t * t * t;
+    float t5 = t * t * t * t * t;
+    return 6. * t5 - 15. * t4 + 10. * t3;
+}
 
 float perlinNoise(vec2 p, float isImproved) {
     vec2 i = floor(p);

@@ -1,4 +1,6 @@
-#include ./partial/effect-texture-header.glsl
+#include <common>
+#include <rand>
+#include <etex>
 
 uniform float uTiling;
 
@@ -23,4 +25,3 @@ void main() {
     
     outColor = vec4(vec3(result), 1.);
 }
-            

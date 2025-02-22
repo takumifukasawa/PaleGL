@@ -1,4 +1,6 @@
-#include ./partial/effect-texture-header.glsl
+#include <common>
+#include <rand>
+#include <etex>
 
 uniform float uTiling;
 
