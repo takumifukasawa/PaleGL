@@ -5,6 +5,7 @@
 #include <ub>
 #include <depth>
 #include <alpha_test>
+#include <vcolor_fh>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -33,10 +34,6 @@ in vec3 vLocalPosition;
 in mat4 vWorldMatrix;
 in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
-
-#ifdef USE_VERTEX_COLOR
-in vec4 vVertexColor;
-#endif
 
 out vec4 outColor;
 

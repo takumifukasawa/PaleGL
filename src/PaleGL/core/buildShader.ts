@@ -33,6 +33,8 @@ import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/ra
 import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-scene-functions.partial.glsl';
 import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
 import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
+import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
+import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -69,7 +71,9 @@ const includesDict = new Map<string, string>([
     ['raymarch_df', raymarchDistanceFunctionsPartialContent],
     ['raymarch_sf', raymarchSceneFunctionsPartialContent],
     ['alpha_test', alphaTestPartialContent],
-    ['alpha_test_f', alphaTestFragmentPartialContent]
+    ['alpha_test_f', alphaTestFragmentPartialContent],
+    ['vcolor_vh', vertexColorVertexHeaderPartialContent],
+    ['vcolor_fh', vertexColorFragmentHeaderPartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {

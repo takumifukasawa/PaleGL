@@ -5,6 +5,7 @@
 #include <tone>
 #include <gbuffer>
 #include <alpha_test>
+#include <vcolor_fh>
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
@@ -31,9 +32,6 @@ in vec3 vNormal;
 #include ./partial/normal-map-fragment-varyings.glsl
 
 in vec3 vWorldPosition;
-
-#include ./partial/vertex-color-fragment-varyings.glsl
-// layout (location = 3) out vec4 outGBufferD;
 
 #ifdef USE_NORMAL_MAP
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {

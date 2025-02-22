@@ -4,6 +4,7 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
+#include <vcolor_fh>
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
@@ -16,8 +17,6 @@ uniform int uShadingModelId;
 in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
-
-#include ./partial/vertex-color-fragment-varyings.glsl
 
 #include <gbuffer_o>
 

@@ -7,6 +7,7 @@
 #include <depth>
 #include <gbuffer>
 #include <alpha_test>
+#include <vcolor_fh>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -56,8 +57,6 @@ in vec3 vLocalPosition;
 in mat4 vWorldMatrix;
 in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
-
-#include ../partial/vertex-color-fragment-varyings.glsl
 
 #ifdef USE_NORMAL_MAP
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {

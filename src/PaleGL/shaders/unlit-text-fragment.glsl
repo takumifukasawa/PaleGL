@@ -2,19 +2,17 @@
 
 #include <tone>
 #include <gbuffer>
+#include <alpha_test>
+#include <vcolor_fh>
 
 uniform vec4 uColor;
 uniform int uShadingModelId;
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
 
-#include <alpha_test>
-
 in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
-
-#include ./partial/vertex-color-fragment-varyings.glsl
 
 #include <gbuffer_o>
 
@@ -51,10 +49,7 @@ void main() {
 
     float alpha = sdf2alpha(sdf);
 
-// depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-// #ifdef USE_ALPHA_TEST
-//     checkAlphaTest(resultColor.a, uAlphaTestThreshold);
-// #endif
+    // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
     #include <alpha_test_f>
     
     resultColor.a = alpha;

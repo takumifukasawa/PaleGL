@@ -6,6 +6,7 @@
 
 #include <lighting>
 #include <ub>
+#include <vcolor_vh>
 
 #include ./partial/skinning-vertex-functions.glsl
 
@@ -31,7 +32,6 @@ uniform float uEmissiveMixer;
 
 #include ./partial/normal-map-vertex-varyings.glsl
 #include ./partial/receive-shadow-vertex-varyings.glsl
-#include ./partial/vertex-color-vertex-varyings.glsl
 
 #pragma APPEND_UNIFORMS
         
