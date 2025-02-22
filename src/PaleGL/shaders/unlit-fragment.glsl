@@ -1,14 +1,15 @@
 #pragma DEFINES
 
+#include <lighting>
+#include <ub>
+#include <tone>
+#include <gbuffer>
+
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
 uniform vec2 uDiffuseMapUvScale;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
-
-#include <lighting>
-#include <ub>
-#include <tone>
 
 #include ./partial/alpha-test-fragment-uniforms.glsl
 
@@ -17,8 +18,6 @@ in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
-
-#include ./partial/gbuffer-functions.glsl
 
 #include ./partial/alpha-test-functions.glsl
 

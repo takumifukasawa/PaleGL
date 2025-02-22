@@ -2,6 +2,7 @@
 #include <buffer_visualizer_h>
 #include <lighting>
 #include <depth>
+#include <gbuffer>
 
 in vec2 vUv;
 
@@ -46,8 +47,6 @@ uniform float uFarClip;
 uniform float uShowGBuffer;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform vec2 uTiling;
-
-#include ./partial/gbuffer-functions.glsl
 
 int bitShift(int data, int order) {
     return data >> order;

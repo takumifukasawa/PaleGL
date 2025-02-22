@@ -5,6 +5,7 @@
 #include <ub>
 #include <rand>
 #include <depth>
+#include <gbuffer>
 
 #define MARCH_COUNT 64
 #define MARCH_COUNT_F 64.
@@ -38,8 +39,6 @@ uniform sampler2D uSpotLightShadowMap[MAX_SPOT_LIGHT_COUNT];
 uniform float uDensityMultiplier;
 uniform float uRayStep;
 uniform vec3 uRayJitterSize;
-
-#include ./partial/gbuffer-functions.glsl
 
 // voidでもいいが手動unrollの関係でバグるのでfloatで返す
 float calcTransmittance(

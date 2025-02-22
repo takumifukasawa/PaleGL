@@ -4,9 +4,8 @@
 
 #pragma APPEND_ATTRIBUTES
 
-#include ./partial/uniform-block-common.glsl
-#include ./partial/uniform-block-transformations.glsl
-#include ./partial/uniform-block-camera.glsl
+#include <lighting>
+#include <ub>
 
 #include ./partial/skinning-vertex-functions.glsl
 

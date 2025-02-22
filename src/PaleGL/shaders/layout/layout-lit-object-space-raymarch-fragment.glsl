@@ -4,6 +4,7 @@
 #include <ub>
 #include <tone>
 #include <depth>
+#include <gbuffer>
 
 #ifdef USE_INSTANCING
 in float vInstanceId;
@@ -60,13 +61,6 @@ in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
 
 #include ../partial/vertex-color-fragment-varyings.glsl
-
-// layout (location = 0) out vec4 outGBufferA;
-// layout (location = 1) out vec4 outGBufferB;
-// layout (location = 2) out vec4 outGBufferC;
-// layout (location = 3) out vec4 outGBufferD;
-
-#include ../partial/gbuffer-functions.glsl
 
 #ifdef USE_NORMAL_MAP
 vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {

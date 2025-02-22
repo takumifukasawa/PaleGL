@@ -21,22 +21,6 @@ struct GBufferD {
     // a
 };
 
-// vec4 InitializeEncodeGBufferA() {
-//     return vec4(vec3(0.), 1.);
-// }
-// 
-// vec4 InitializeEncodeGBufferB() {
-//     return vec4(vec3(0.), 0.);
-// }
-// 
-// vec4 InitializeEncodeGBufferC() {
-//     return vec4(vec3(0.), 0.);
-// }
-// 
-// vec4 InitializeEncodeGBufferD() {
-//     return vec4(vec3(0.), 1.);
-// }
-
 vec4 EncodeGBufferA(vec3 baseColor) {
     return vec4(baseColor, 1.);
 }

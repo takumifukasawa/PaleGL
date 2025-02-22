@@ -1,20 +1,19 @@
 ﻿#pragma DEFINES
 
-in vec2 vUv;
-in vec3 vNormal;
-in vec3 vWorldPosition;
-
 #include <lighting>
 #include <ub>
 #include <tone>
+#include <gbuffer>
+
+in vec2 vUv;
+in vec3 vNormal;
+in vec3 vWorldPosition;
 
 uniform samplerCube uCubeTexture;
 uniform float uRotationOffset;
 uniform int uShadingModelId;
 
 #include ./partial/env-map-fragment-functions.glsl
-
-#include ./partial/gbuffer-functions.glsl
 
 #include <gbuffer_o>
 

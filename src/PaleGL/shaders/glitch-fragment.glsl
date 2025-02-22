@@ -5,13 +5,10 @@ out vec4 outColor;
 #include <lighting>
 #include <ub>
 #include <rand>
-// #include ./partial/common.glsl
-// #include ./partial/uniform-block-common.glsl
 
 uniform sampler2D uSrcTexture;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
-// uniform float uAspect;
 uniform float uBlendRate;
 
 uniform float uVignetteRadius;

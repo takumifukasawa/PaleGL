@@ -1,6 +1,7 @@
 #pragma DEFINES
 
 #include <tone>
+#include <gbuffer>
 
 uniform vec4 uColor;
 uniform int uShadingModelId;
@@ -14,8 +15,6 @@ in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #include ./partial/vertex-color-fragment-varyings.glsl
-
-#include ./partial/gbuffer-functions.glsl
 
 #include ./partial/alpha-test-functions.glsl
 

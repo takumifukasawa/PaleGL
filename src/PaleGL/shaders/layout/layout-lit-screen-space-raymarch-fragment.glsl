@@ -4,6 +4,7 @@
 #include <ub>
 #include <tone>
 #include <depth>
+#include <gbuffer>
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -31,8 +32,6 @@ uniform float uTargetHeight;
 
 in vec2 vUv;
 in vec3 vWorldPosition;
-
-#include ../partial/gbuffer-functions.glsl
 
 #include <gbuffer_o>
 

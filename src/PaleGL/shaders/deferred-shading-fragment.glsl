@@ -4,6 +4,7 @@
 #include <lighting>
 #include <ub>
 #include <depth>
+#include <gbuffer>
 
 // -----------------------------------------------------------
 // functions
@@ -181,8 +182,6 @@ uniform sampler2D uAmbientOcclusionTexture;
 // TODO: loop
 uniform Skybox uSkybox;
 
-#include ./partial/gbuffer-functions.glsl
-        
 layout (location = 0) out vec4 outColor;
 
 void main() {

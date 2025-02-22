@@ -4,12 +4,11 @@
 #include <ub>
 #include <rand>
 #include <depth>
+#include <gbuffer>
 
 in vec2 vUv;
 
 out vec4 outColor;
-
-#include ./partial/gbuffer-functions.glsl
 
 uniform sampler2D uSrcTexture;
 uniform sampler2D uGBufferATexture;
