@@ -1,7 +1,7 @@
 ﻿import {createTransform, Transform} from '@/PaleGL/core/transform.ts';
 import { ActorType, ActorTypes } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
-import { Animator } from '@/PaleGL/core/Animator';
+import {Animator, createAnimator} from '@/PaleGL/core/animator.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Component } from '@/PaleGL/core/component.ts';
 import { Camera } from '@/PaleGL/actors/Camera';
@@ -106,7 +106,7 @@ export class Actor {
         this.transform = createTransform(this);
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
-        this.animator = new Animator();
+        this.animator = createAnimator();
     }
 
     addChild(child: Actor) {

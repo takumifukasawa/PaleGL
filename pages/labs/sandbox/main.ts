@@ -1129,9 +1129,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
     skinningMesh.name = 'butterfly';
     // ルートにanimatorをattachしてるので一旦ここでassign
+    // animatorは存在しているmeshのはず
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator!;
-    skinningMesh.setAnimationClips(gltfActor.animator!.animationClips);
+    skinningMesh.setAnimationClips(gltfActor.animator!.getAnimationClips());
     skinningMesh.subscribeOnStart(() => {
         // CPU skinning
         // gltfActor.animator.play('Fly', true);
