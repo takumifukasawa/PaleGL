@@ -6,7 +6,7 @@ import { Skybox } from '@/PaleGL/actors/Skybox';
 import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
 
 // core
-import { Engine } from '@/PaleGL/core/Engine';
+import {createEngine} from '@/PaleGL/core/engine.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -336,7 +336,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = new Engine({ gpu, renderer });
+const engine = createEngine({ gpu, renderer });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -1829,7 +1829,7 @@ void main() {
         engine.setSize(width, height);
     };
 
-    engine.onBeforeStart = () => {
+    engine.setOnBeforeStart(() => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
@@ -1846,7 +1846,7 @@ void main() {
         orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
         orbitCameraController.setEnabled(true);
-    };
+    });
 
     // engine.onAfterStart = () => {
     //     window.setTimeout(() => {
@@ -1854,18 +1854,18 @@ void main() {
     //     },1000)
     // }
 
-    engine.onBeforeUpdate = () => {
+    engine.setOnBeforeUpdate(() => {
         if (!debuggerGUI) initDebugger();
         inputController.update();
-    };
+    });
 
-    engine.onBeforeFixedUpdate = () => {
+    engine.setOnBeforeFixedUpdate(() => {
         // inputController.fixedUpdate();
-    };
+    });
 
-    engine.onRender = (time) => {
-        renderer.render(captureScene, captureSceneCamera, engine.sharedTextures, { time });
-    };
+    engine.setOnRender((time) => {
+        renderer.render(captureScene, captureSceneCamera, engine.getSharedTextures(), { time });
+    });
 
     const tick = (time: number) => {
         engine.run(time);
