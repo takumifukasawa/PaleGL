@@ -100,7 +100,7 @@ export class AnimationClip {
                     case 'translation':
                         const p = frameValue as Vector3;
                         if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.position = p;
+                            (animationKeyframes.target as Actor).transform.setPosition(p);
                         } else {
                             (animationKeyframes.target as Bone).position = p;
                         }
@@ -116,7 +116,7 @@ export class AnimationClip {
                         // for debug
                         // console.log("[AnimationClip.update] rotation", this.currentFrame, frameValue.elements, r.getAxes());
                         if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.rotation = r;
+                            (animationKeyframes.target as Actor).transform.setRotation(r);
                         } else {
                             (animationKeyframes.target as Bone).rotation = r;
                         }
@@ -124,7 +124,7 @@ export class AnimationClip {
                     case 'scale':
                         const s = frameValue as Vector3;
                         if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.scale = s;
+                            (animationKeyframes.target as Actor).transform.setScale(s);
                         } else {
                             (animationKeyframes.target as Bone).scale = s;
                         }

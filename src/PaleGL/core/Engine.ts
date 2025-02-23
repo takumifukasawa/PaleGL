@@ -319,14 +319,14 @@ export class Engine {
         // 描画させたいので全部中央に置いちゃう
         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
         this._scene?.traverse((actor) => {
-            const tmpP = actor.transform.position.clone();
-            const tmpR = actor.transform.rotation.clone();
+            const tmpP = actor.transform.getPosition().clone();
+            const tmpR = actor.transform.getRotation().clone();
             // TODO: mainカメラだけ抽出したい
             if (actor.type === ActorTypes.Camera) {
-                actor.transform.position = new Vector3(0, 0, 10);
-                actor.transform.rotation = Rotator.fromQuaternion(Quaternion.fromEulerDegrees(0, 180, 0));
+                actor.transform.setPosition(new Vector3(0, 0, 10));
+                actor.transform.setRotation(Rotator.fromQuaternion(Quaternion.fromEulerDegrees(0, 180, 0)));
             } else {
-                actor.transform.position = Vector3.zero;
+                actor.transform.setPosition(Vector3.zero);
             }
             tmpTransformPair.push({ actor, p: tmpP, r: tmpR });
         });
@@ -335,8 +335,8 @@ export class Engine {
         this.update(0, 0);
 
         tmpTransformPair.forEach((pair) => {
-            pair.actor.transform.position = pair.p;
-            pair.actor.transform.rotation = pair.r;
+            pair.actor.transform.setPosition(pair.p);
+            pair.actor.transform.setRotation(pair.r);
         });
     }
 

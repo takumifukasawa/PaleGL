@@ -76,7 +76,7 @@ export function createOrbitCameraController(camera?: Camera | null) {
         );
 
         if (_camera && _enabledUpdateCamera) {
-            _camera.transform.position = _currentCameraPosition;
+            _camera.transform.setPosition(_currentCameraPosition);
             _camera.transform.lookAt(_lookAtTarget);
         }
     };

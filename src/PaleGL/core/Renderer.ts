@@ -928,8 +928,8 @@ export class Renderer {
             );
         });
         sortedBasePassRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
             return al < bl ? -1 : 1;
         });
 
@@ -938,8 +938,8 @@ export class Renderer {
             (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
         );
         sortedTransparentRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
             return al > bl ? -1 : 1;
         });
 
@@ -972,8 +972,8 @@ export class Renderer {
             return actor;
         });
         depthPrePassRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
             return al < bl ? -1 : 1;
         });
         this.depthPrePass(depthPrePassRenderMeshInfos, camera);
@@ -1521,17 +1521,17 @@ export class Renderer {
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.WorldMatrix,
-            actor.transform.worldMatrix
+            actor.transform.getWorldMatrix()
         );
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.InverseWorldMatrix,
-            actor.transform.inverseWorldMatrix
+            actor.transform.getInverseWorldMatrix()
         );
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.NormalMatrix,
-            actor.transform.normalMatrix
+            actor.transform.getNormalMatrix()
         );
     }
 
@@ -1545,7 +1545,7 @@ export class Renderer {
         this.$setUniformBlockValue(
             UniformBlockNames.Camera,
             UniformNames.ViewPosition,
-            camera.transform.worldMatrix.position
+            camera.transform.getWorldMatrix().position
         );
         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, camera.getWorldForward());
         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
@@ -1726,7 +1726,7 @@ export class Renderer {
                 name: UniformNames.LightDirection,
                 type: UniformTypes.Vector3,
                 // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-                value: directionalLight.transform.position.clone().negate().normalize(),
+                value: directionalLight.transform.getPosition().clone().negate().normalize(),
             },
             {
                 name: UniformNames.LightIntensity,
@@ -1761,12 +1761,12 @@ export class Renderer {
                     {
                         name: UniformNames.LightPosition,
                         type: UniformTypes.Vector3,
-                        value: spotLight.transform.position,
+                        value: spotLight.transform.getPosition(),
                     },
                     {
                         name: UniformNames.LightDirection,
                         type: UniformTypes.Vector3,
-                        value: spotLight.transform.worldForward.clone(),
+                        value: spotLight.transform.getWorldForward().clone(),
                     },
                     {
                         name: UniformNames.LightIntensity,
@@ -1817,7 +1817,7 @@ export class Renderer {
                     {
                         name: UniformNames.LightPosition,
                         type: UniformTypes.Vector3,
-                        value: pointLight.transform.position,
+                        value: pointLight.transform.getPosition(),
                     },
                     {
                         name: UniformNames.LightIntensity,

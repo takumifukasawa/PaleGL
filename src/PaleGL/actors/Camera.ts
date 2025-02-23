@@ -65,7 +65,7 @@ export class Camera extends Actor {
         // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
         // なぜなら、projection行列でzを反転させるため
         // pattern_1
-        return this.transform.worldForward.negate();
+        return this.transform.getWorldForward().negate();
         // pattern_2
         // return new Vector3(this.viewMatrix.m20, this.viewMatrix.m21, this.viewMatrix.m22).negate().normalize();
     }
@@ -281,7 +281,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
      */
     $updateTransform() {
         super.$updateTransform();
-        this.viewMatrix = this.transform.worldMatrix.clone().invert();
+        this.viewMatrix = this.transform.getWorldMatrix().clone().invert();
         this.inverseProjectionMatrix = this.projectionMatrix.clone().invert();
         this.inverseViewMatrix = this.viewMatrix.clone().invert();
         this.viewProjectionMatrix = Matrix4.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
@@ -343,7 +343,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
      */
     getWorldForward() {
         // forwardはカメラの背面を向いている
-        return this.transform.worldForward.clone().negate();
+        return this.transform.getWorldForward().clone().negate();
     }
 
     viewpointToRay(viewportPoint: Vector2): Ray {
@@ -353,7 +353,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         worldPos.y = worldPos.y / worldPos.w;
         worldPos.z = worldPos.z / worldPos.w;
         const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
-        const rayOrigin = this.transform.worldPosition;
+        const rayOrigin = this.transform.getWorldPosition();
         const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
         return new Ray(rayOrigin, rayDirection);
     }

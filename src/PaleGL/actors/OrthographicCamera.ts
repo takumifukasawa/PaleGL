@@ -132,7 +132,7 @@ export class OrthographicCamera extends Camera {
         if (localPositions) {
             for (const d in FrustumDirection) {
                 const key = d as FrustumDirectionType;
-                const wp = localPositions[key].multiplyMatrix4(this.transform.worldMatrix);
+                const wp = localPositions[key].multiplyMatrix4(this.transform.getWorldMatrix());
                 worldPositions[key] = wp;
             }
             return worldPositions;

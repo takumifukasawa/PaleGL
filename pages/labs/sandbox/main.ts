@@ -187,9 +187,9 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.x,
+        initialValue: spotLight.transform.getPosition().x,
         onChange: (value) => {
-            spotLight.transform.position.x = value;
+            spotLight.transform.getPosition().x = value;
         },
     });
 
@@ -198,9 +198,9 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.y,
+        initialValue: spotLight.transform.getPosition().y,
         onChange: (value) => {
-            spotLight.transform.position.y = value;
+            spotLight.transform.getPosition().y = value;
         },
     });
 
@@ -209,9 +209,9 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.z,
+        initialValue: spotLight.transform.getPosition().z,
         onChange: (value) => {
-            spotLight.transform.position.z = value;
+            spotLight.transform.getPosition().z = value;
         },
     });
 };
@@ -354,7 +354,7 @@ captureSceneCamera.subscribeOnStart(({ actor }) => {
 });
 captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
-    // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+    // actor.transform.getPosition() = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
@@ -864,7 +864,7 @@ const createTransformFeedbackDrivenMesh = () => {
         transformFeedbackDoubleBuffer.uniforms.uTime.value = time;
         transformFeedbackDoubleBuffer.uniforms.uNormalizedInputPosition.value = inputController.normalizedInputPosition;
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = attractSphereMesh.transform.position;
+        transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = attractSphereMesh.transform.getPosition();
 
         attractRate += 2 * (inputController.isDown ? 1 : -1) * deltaTime;
         attractRate = saturate(attractRate);
@@ -1292,7 +1292,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             inputController.normalizedInputPosition
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.position);
+        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.getPosition());
 
         attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
@@ -1418,7 +1418,7 @@ const main = async () => {
             roughness: 1,
         })
     );
-    testLightingMesh.transform.position = new Vector3(2.5, 1, 0);
+    testLightingMesh.transform.setPosition(new Vector3(2.5, 1, 0));
 
     //
     // local raymarch mesh
@@ -1437,8 +1437,8 @@ const main = async () => {
         },
         castShadow: true,
     });
-    objectSpaceRaymarchMesh.transform.scale = new Vector3(3, 3, 3);
-    objectSpaceRaymarchMesh.transform.position = new Vector3(0, 1.5, 0);
+    objectSpaceRaymarchMesh.transform.setScale(new Vector3(3, 3, 3));
+    objectSpaceRaymarchMesh.transform.setPosition(new Vector3(0, 1.5, 0));
 
     //
     // screen space raymarch mesh
@@ -1452,8 +1452,8 @@ const main = async () => {
         depthFragmentShaderContent: litScreenSpaceRaymarchFragContent,
         materialArgs: {},
     });
-    screenSpaceRaymarchMesh.transform.scale = new Vector3(2, 2, 2);
-    screenSpaceRaymarchMesh.transform.position = new Vector3(0, 4, 0);
+    screenSpaceRaymarchMesh.transform.setScale(new Vector3(2, 2, 2));
+    screenSpaceRaymarchMesh.transform.setPosition(new Vector3(0, 4, 0));
 
     //
     // text mesh
@@ -1479,9 +1479,9 @@ const main = async () => {
         // characterSpacing: -0.2
     });
     captureScene.add(textMesh1);
-    textMesh1.transform.position = new Vector3(0, 1, 6);
-    textMesh1.transform.rotation.setRotationX(-90);
-    textMesh1.transform.scale = Vector3.fill(0.4);
+    textMesh1.transform.setPosition(new Vector3(0, 1, 6));
+    textMesh1.transform.getRotation().setRotationX(-90);
+    textMesh1.transform.setScale(Vector3.fill(0.4));
 
     const textMesh2 = new TextMesh({
         gpu,
@@ -1493,9 +1493,9 @@ const main = async () => {
         characterSpacing: -0.16,
     });
     captureScene.add(textMesh2);
-    textMesh2.transform.position = new Vector3(0, 2, 8);
-    textMesh2.transform.rotation.setRotationX(-90);
-    textMesh2.transform.scale = Vector3.fill(0.4);
+    textMesh2.transform.setPosition(new Vector3(0, 2, 8));
+    textMesh2.transform.getRotation().setRotationX(-90);
+    textMesh2.transform.setScale(Vector3.fill(0.4));
 
     const textMesh3 = new TextMesh({
         gpu,
@@ -1507,9 +1507,9 @@ const main = async () => {
         characterSpacing: 0.2,
     });
     captureScene.add(textMesh3);
-    textMesh3.transform.position = new Vector3(0, 0.01, 9);
-    textMesh3.transform.rotation.setRotationX(-90);
-    textMesh3.transform.scale = Vector3.fill(0.4);
+    textMesh3.transform.setPosition(new Vector3(0, 0.01, 9));
+    textMesh3.transform.getRotation().setRotationX(-90);
+    textMesh3.transform.setScale(Vector3.fill(0.4));
 
     //
     // instancing mesh
@@ -1957,9 +1957,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.x,
+        initialValue: objectSpaceRaymarchMesh.transform.getPosition().x,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.x = value;
+            objectSpaceRaymarchMesh.transform.getPosition().x = value;
         },
     });
 
@@ -1968,9 +1968,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.y,
+        initialValue: objectSpaceRaymarchMesh.transform.getPosition().y,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.y = value;
+            objectSpaceRaymarchMesh.transform.getPosition().y = value;
         },
     });
 
@@ -1979,9 +1979,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.z,
+        initialValue: objectSpaceRaymarchMesh.transform.getPosition().z,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.z = value;
+            objectSpaceRaymarchMesh.transform.getPosition().z = value;
         },
     });
 
@@ -1990,9 +1990,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.x,
+        initialValue: objectSpaceRaymarchMesh.transform.getScale().x,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.x = value;
+            objectSpaceRaymarchMesh.transform.getScale().x = value;
         },
     });
 
@@ -2001,9 +2001,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.y,
+        initialValue: objectSpaceRaymarchMesh.transform.getScale().y,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.y = value;
+            objectSpaceRaymarchMesh.transform.getScale().y = value;
         },
     });
 
@@ -2012,9 +2012,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.z,
+        initialValue: objectSpaceRaymarchMesh.transform.getScale().z,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.z = value;
+            objectSpaceRaymarchMesh.transform.getScale().z = value;
         },
     });
 
@@ -2023,9 +2023,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.x,
+        initialValue: objectSpaceRaymarchMesh.transform.getRotation().x,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.x = value;
+            objectSpaceRaymarchMesh.transform.getRotation().x = value;
         },
     });
 
@@ -2034,9 +2034,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.y,
+        initialValue: objectSpaceRaymarchMesh.transform.getRotation().y,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.y = value;
+            objectSpaceRaymarchMesh.transform.getRotation().y = value;
         },
     });
 
@@ -2045,9 +2045,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.z,
+        initialValue: objectSpaceRaymarchMesh.transform.getRotation().z,
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.z = value;
+            objectSpaceRaymarchMesh.transform.getRotation().z = value;
         },
     });
 
@@ -2081,9 +2081,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.x,
+        initialValue: directionalLight.transform.getPosition().x,
         onChange: (value) => {
-            directionalLight.transform.position.x = value;
+            directionalLight.transform.getPosition().x = value;
         },
     });
 
@@ -2092,9 +2092,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.y,
+        initialValue: directionalLight.transform.getPosition().y,
         onChange: (value) => {
-            directionalLight.transform.position.y = value;
+            directionalLight.transform.getPosition().y = value;
         },
     });
 
@@ -2103,9 +2103,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.z,
+        initialValue: directionalLight.transform.getPosition().z,
         onChange: (value) => {
-            directionalLight.transform.position.z = value;
+            directionalLight.transform.getPosition().z = value;
         },
     });
 

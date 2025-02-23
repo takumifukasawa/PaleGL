@@ -164,7 +164,7 @@ export class Skybox extends Mesh {
     // TODO: renderer側で2回走らないようにする
     $updateTransform(camera: Camera) {
         if (camera) {
-            this.transform.setTranslation(camera.transform.position);
+            this.transform.setTranslation(camera.transform.getPosition());
             // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
             this.transform.setScaling(Vector3.fill(camera.far / 1.733));
         }

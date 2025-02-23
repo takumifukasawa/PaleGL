@@ -79,13 +79,13 @@ export class ObjectSpaceRaymarchMesh extends Mesh {
         
         this.materials.forEach((material) => {
             // local
-            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.scale);
+            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
             // wp
             // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
         });
         this.depthMaterials.forEach((material) => {
             // local
-            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.scale);
+            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
             // wp
             // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
         });

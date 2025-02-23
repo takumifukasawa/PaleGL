@@ -1,4 +1,4 @@
-﻿import { Transform } from '@/PaleGL/core/Transform';
+﻿import {createTransform, Transform} from '@/PaleGL/core/transform.ts';
 import { ActorType, ActorTypes } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
 import { Animator } from '@/PaleGL/core/Animator';
@@ -103,7 +103,7 @@ export class Actor {
 
     constructor({ name = '', type = ActorTypes.Null }: ActorArgs = {}) {
         this.name = name;
-        this.transform = new Transform(this);
+        this.transform = createTransform(this);
         this.type = type || ActorTypes.Null;
         this.uuid = uuidv4();
         this.animator = new Animator();
@@ -141,7 +141,7 @@ export class Actor {
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     $updateTransform(camera?: Camera) {
-        this.transform.$updateMatrix();
+        this.transform.updateMatrix();
     }
 
     // -----------------------------------------------------------------

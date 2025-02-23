@@ -150,8 +150,8 @@ export class TextMesh extends Actor {
         for (let i = 0; i < this.charMeshes.length; i++) {
             const mesh = this.charMeshes[i];
             originX += mesh.charWidth / 2 + mesh.charOffsetX;
-            mesh.transform.position.x = originX;
-            mesh.transform.position.y = mesh.charOffsetY;
+            mesh.transform.getPosition().x = originX;
+            mesh.transform.getPosition().y = mesh.charOffsetY;
             originX += mesh.charWidth / 2 + characterSpacing;
         }
     }

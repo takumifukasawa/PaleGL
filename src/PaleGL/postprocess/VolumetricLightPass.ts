@@ -236,7 +236,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
                 this.spotLightFrustumMaterial.uniforms.setValue(
                     UniformNames.WorldMatrix,
-                    spotLight.shadowCamera.transform.worldMatrix
+                    spotLight.shadowCamera.transform.getWorldMatrix()
                 );
                 // TODO: この描画だけでvolumeを計算したい
                 renderer.renderMesh(spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
