@@ -33,6 +33,7 @@ export interface ShaderMinifierOptions {
     noRenaming?: boolean;
     noRenamingList?: string[];
     noSequence?: boolean;
+    noRemoveUnused?: boolean;
     smoothstep?: boolean;
     aggressiveInlining?: boolean;
 }
@@ -83,6 +84,10 @@ function buildMinifierOptionsString(options: ShaderMinifierOptions): string {
         str += '--aggressive-inlining ';
     }
 
+    if (options.noRemoveUnused) {
+        str += '--no-remove-unused ';
+    }
+
     return str;
 }
 
@@ -98,7 +103,16 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
         async transform(src: string, id: string) {
             const fileRegex = /\.glsl$/;
             if (fileRegex.test(id)) {
+                // for debug
+                // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
+                if (!minify) {
+                    // console.log('disabled minify content...: ', src);
+                    return src;
+                }
+
                 await wait(100);
+
+                console.log('================================');
 
                 const basePath = './';
                 const tmpDirPath = path.join(basePath, 'tmp');
@@ -107,15 +121,63 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // const name = path.basename(id).split('?')[0];
                 // const name = path.basename( id ).split( '.' )[ 0 ];
 
-                // minify
+                //
+                // rename list の生成
+                //
 
-                // for debug
-                // console.log(`[shaderMinifierPlugin] shader file id: ${id}`);
-                // TODO: entry point じゃないシェーダーはminifyしない？
-                if (!minify) {
-                    // console.log('disabled minify content...: ', src);
-                    return src;
+                // const noRenamingList: string[] = minifierOptions.noRenamingList || [];
+                const noRenamingList: string[] = [];
+
+                const functionPattern = /(float|vec2|vec3|vec4|mat2|mat3|mat4|void)\s*(\w+)\s*\(/gm;
+                // const functionPattern = /\s*(float|vec2|vec3|vec4|mat2|mat3|mat4|void)\s*(\w+)\s*\(/gm;
+                const structPattern = /(struct)\s*(\w+)\s*\{/gm;
+                // const structPattern = /struct\s+(\w+)\s*\{/gm;
+
+                const extractNames = (pattern: RegExp, code: string) => {
+                    const result = [...code.matchAll(pattern)];
+                    const list: string[] = [];
+                    for (let i = 0; i < result.length; i++) {
+                        const extractName = result[i][2];
+                        // console.log(result[i][2], result[i][1]);
+                        list.push(extractName);
+                    }
+                    return list;
+                };
+
+                // renameしたくない関数群を抽出
+                noRenamingList.push(...extractNames(functionPattern, src));
+
+                // renameしたくない構造体群を抽出
+                noRenamingList.push(...extractNames(structPattern, src));
+
+                // // まだrenaming_listがなかったら配列作成してから追加
+                // if (!minifierOptions.noRenamingList) {
+                //     minifierOptions.noRenamingList = [];
+                // }
+                // minifierOptions.noRenamingList.push(...noRenamingList);
+
+                const isPartial = id.indexOf('.partial.glsl') > -1;
+                if (isPartial) {
+                    // partialファイルの場合はunusedを削除しない. 必要なものを残しておきたいため
+                    minifierOptions.noRemoveUnused = true;
+                } else {
+                    // partialじゃない場合
+                    noRenamingList.push(...["main", "dfScene"]);
+                    
                 }
+
+                if (noRenamingList.length > 0) {
+                    minifierOptions.noRenamingList = [...new Set(noRenamingList)]; // unique
+                } else {
+                    // 何かしらrenameしたいものがなければnoRenamingListをundefinedにして強制off
+                    minifierOptions.noRenamingList = undefined;
+                }
+
+                console.log('hogehoge', id, minifierOptions.noRenamingList);
+
+                //
+                // minify実行
+                //
 
                 // vite-plugin-glslで変換された文字列からシェーダーコードを抜き出す
                 // eslint-disable-next-line no-useless-escape

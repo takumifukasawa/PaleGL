@@ -11,13 +11,15 @@ import * as process from 'process';
 import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin.ts';
 // import { transformExtractGlslRaymarchTemplate } from './plugins/vite-extract-glsl-raymarch-template-plugin.ts';
 import string from 'vite-plugin-string';
+import { shaderMinifierPlugin } from './plugins/vite-shader-minifier-plugin.ts';
+import { deleteTmpCachesPlugin } from './plugins/vite-delete-tmp-caches-plugin.ts';
 
 type EntryPointInfo = { name: string; path: string };
 
 // ---------------------------------------------------
 // ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
 const ENTRY_POINTS: { [key: string]: string } = {
-    'sandbox': 'labs/sandbox',
+    sandbox: 'labs/sandbox',
     // 'sandbox-2': 'labs/sandbox-2',
 };
 
@@ -72,6 +74,7 @@ export default defineConfig(async (config) => {
             checker({
                 overlay: false,
             }),
+            deleteTmpCachesPlugin(),
             tsconfigPaths(),
             checker({ typescript: true }),
             string({
@@ -89,14 +92,14 @@ export default defineConfig(async (config) => {
             }),
             transformGlslLayout(),
             // transformGlslUnroll(),
-            // shaderMinifierPlugin({
-            //     minify: isMinifyShader,
-            //     minifierOptions: {
-            //         preserveExternals: true,
-            //         noRenamingList: ['main', 'dfScene', ...viteGlslShaderMinifierCustomNoRenamingList],
-            //         aggressiveInlining: false,
-            //     },
-            // }),
+            shaderMinifierPlugin({
+                minify: true,
+                minifierOptions: {
+                    preserveExternals: true,
+                    // noRenamingList: ['main', 'dfScene'],
+                    aggressiveInlining: false,
+                },
+            }),
             // transformExtractGlslRaymarchTemplate({
             //     extractEnabled: true,
             // }),

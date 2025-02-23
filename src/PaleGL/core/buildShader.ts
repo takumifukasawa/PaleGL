@@ -83,7 +83,7 @@ const includesDict = new Map<string, string>([
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
-    src = src.replaceAll(/#include\s<([a-zA-Z_]*)>/g, (_, p1: string) => {
+    src = src.replaceAll(/#include\s?<([a-zA-Z_]*)>/g, (_, p1: string) => {
         return includesDict.get(p1) || '';
     });
     return src;
