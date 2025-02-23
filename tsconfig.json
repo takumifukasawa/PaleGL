@@ -12,6 +12,7 @@
     // "outDir": "types",
     // "declaration": true,
     // "emitDeclarationOnly": true,
+    "importHelpers": true,
 
     "skipLibCheck": true,
     "baseUrl": "./",
@@ -56,6 +57,6 @@
     "demos",
     "node_modules",
     "dist",
-    "bin/**/*.js",
+    "bin/**/*.js"
   ],
 }

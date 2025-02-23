@@ -136,9 +136,17 @@ export default defineConfig(async (config) => {
             minify: 'terser',
             target: 'esnext',
             terserOptions: {
+                // mangle: {
+                //     // toplevel: true,
+                //     // properties: true,
+                //     properties: {
+                //         regex: /^(_|\$)/,
+                //     },
+                // },
                 compress: {
                     drop_console: isDropConsole,
                     drop_debugger: true,
+                    // passes: manglePassesCount,
                 },
             },
         },
