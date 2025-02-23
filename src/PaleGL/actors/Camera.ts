@@ -16,7 +16,7 @@ import {
 import { Material } from '@/PaleGL/materials/Material';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { Mesh } from './Mesh';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
@@ -178,7 +178,7 @@ export class Camera extends Actor {
                 geometry: new Geometry({
                     gpu,
                     attributes: [
-                        new Attribute({
+                        createAttribute({
                             name: AttributeNames.Position,
                             data: new Float32Array(new Array(3 * 8).fill(0)),
                             size: 3,

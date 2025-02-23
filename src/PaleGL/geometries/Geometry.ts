@@ -1,4 +1,4 @@
-﻿import { Attribute } from '@/PaleGL/core/Attribute';
+﻿import { createAttribute, Attribute } from '@/PaleGL/core/attribute.ts';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { AttributeUsageType } from '@/PaleGL/constants';
@@ -95,7 +95,7 @@ export class Geometry {
     setAttribute(attribute: Attribute) {
         const location = attribute.location ? attribute.location : this.attributes.length;
 
-        const attr = new Attribute({
+        const attr = createAttribute({
             name: attribute.name,
             data: attribute.data,
             location,
@@ -104,7 +104,7 @@ export class Geometry {
             usageType: attribute.usageType || AttributeUsageType.StaticDraw,
             divisor: attribute.divisor,
         });
-        this.attributes.push(attr);
+        this._attributes.push(attr);
 
         // this.vertexArrayObject.setAttribute(attr, true);
         this.vertexArrayObject.setAttribute(attr);

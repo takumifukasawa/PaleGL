@@ -3,7 +3,7 @@ import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 
 const axesHelperGeometryData = `
@@ -168,12 +168,12 @@ export class AxesHelper extends Mesh {
         const geometry = new Geometry({
             gpu,
             attributes: [
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(objData.positions),
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(objData.uvs),
                     size: 2,

@@ -9,7 +9,7 @@ import {
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
+import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Texture } from '@/PaleGL/core/Texture';
 

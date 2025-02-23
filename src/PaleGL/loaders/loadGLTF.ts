@@ -10,7 +10,7 @@ import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextu
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
@@ -486,17 +486,17 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         const geometry = new Geometry({
             gpu,
             attributes: [
-                new Attribute({
+                createAttribute({
                     name: 'aPosition',
                     data: positions,
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: 'aUv',
                     data: uvFlippedY,
                     size: 2,
                 }),
-                new Attribute({
+                createAttribute({
                     name: 'aNormal',
                     data: normals,
                     size: 3,
@@ -504,12 +504,12 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 // bone があるならjointとweightもあるはず
                 ...(rootBone
                     ? [
-                          new Attribute({
+                          createAttribute({
                               name: 'aBoneIndices',
                               data: joints,
                               size: 4,
                           }),
-                          new Attribute({
+                          createAttribute({
                               name: 'aBoneWeights',
                               data: weights,
                               size: 4,
@@ -517,12 +517,12 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                       ]
                     : []),
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
-                new Attribute({
+                createAttribute({
                     name: 'aTangent',
                     data: new Float32Array(tangents),
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: 'aBinormal',
                     data: new Float32Array(binormals),
                     size: 3,

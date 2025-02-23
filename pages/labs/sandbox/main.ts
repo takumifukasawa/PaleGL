@@ -1,4 +1,3 @@
-
 // actors
 import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
 import { Mesh } from '@/PaleGL/actors/Mesh';
@@ -66,7 +65,7 @@ import {
 import { DebuggerGUI } from '@/PaleGL/utilities/DebuggerGUI.ts';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-import { Attribute } from '@/PaleGL/core/attribute.ts';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
@@ -82,8 +81,8 @@ import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh
 import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
 import { FontAtlasData, TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import {loadJson} from "@/PaleGL/loaders/loadJson.ts";
-import {createScene} from "@/PaleGL/core/scene.ts";
+import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
+import { createScene } from '@/PaleGL/core/scene.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
@@ -978,19 +977,19 @@ const createInstanceUpdater = (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
-            new Attribute({
+            createAttribute({
                 name: 'aPosition',
                 data: initialPosition,
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
-            new Attribute({
+            createAttribute({
                 name: 'aVelocity',
                 data: initialVelocity,
                 size: 3,
                 usageType: AttributeUsageType.DynamicDraw,
             }),
-            new Attribute({
+            createAttribute({
                 name: 'aSeed',
                 data: initialSeed,
                 size: 2,
@@ -1123,7 +1122,7 @@ layout (std140) uniform ubCommon {
  */
 const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfButterflyModelUrl });
-    
+
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.children[0].children[0] as SkinnedMesh;
     // console.log(gltfActor, skinningMesh);
@@ -1197,7 +1196,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstancePosition,
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
@@ -1205,7 +1204,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
@@ -1213,7 +1212,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceRotation,
             data: new Float32Array(instanceInfo.rotation.flat()),
             size: 3,
@@ -1222,7 +1221,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     );
     // aInstanceAnimationOffsetは予約語
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceAnimationOffset,
             data: new Float32Array(animationOffsetInfo),
             size: 1,
@@ -1230,7 +1229,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceVertexColor,
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
@@ -1238,7 +1237,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceEmissiveColor,
             data: new Float32Array(maton.range(instanceNum).fill(0).flat()),
             size: 4,
@@ -1247,7 +1246,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     );
 
     skinningMesh.geometry.setAttribute(
-        new Attribute({
+        createAttribute({
             name: AttributeNames.InstanceVelocity,
             data: new Float32Array(instanceInfo.velocity.flat()),
             size: 3,
@@ -1462,7 +1461,7 @@ const main = async () => {
 
     const fontAtlasImg = await loadImg(fontAtlasImgUrl);
     const fontAtlasJson = await loadJson<FontAtlasData>(fontAtlasJsonUrl);
-    
+
     const fontAtlasTexture = new Texture({
         gpu,
         img: fontAtlasImg,
@@ -1511,7 +1510,7 @@ const main = async () => {
     textMesh3.transform.position = new Vector3(0, 0.01, 9);
     textMesh3.transform.rotation.setRotationX(-90);
     textMesh3.transform.scale = Vector3.fill(0.4);
-    
+
     //
     // instancing mesh
     //
@@ -1574,7 +1573,7 @@ const main = async () => {
     const particleGeometry = new Geometry({
         gpu,
         attributes: [
-            new Attribute({
+            createAttribute({
                 name: AttributeNames.Position.toString(),
                 // dummy data
                 data: new Float32Array(
@@ -1591,7 +1590,7 @@ const main = async () => {
                 ),
                 size: 3,
             }),
-            new Attribute({
+            createAttribute({
                 name: AttributeNames.Uv.toString(),
                 data: new Float32Array(
                     maton
@@ -1601,7 +1600,7 @@ const main = async () => {
                 ),
                 size: 2,
             }),
-            new Attribute({
+            createAttribute({
                 name: AttributeNames.Color.toString(),
                 data: new Float32Array(
                     maton
@@ -1619,7 +1618,7 @@ const main = async () => {
                 ),
                 size: 4,
             }),
-            new Attribute({
+            createAttribute({
                 name: 'aBillboardSize',
                 data: new Float32Array(
                     maton
@@ -1632,7 +1631,7 @@ const main = async () => {
                 ),
                 size: 1,
             }),
-            new Attribute({
+            createAttribute({
                 name: 'aBillboardRateOffset',
                 data: new Float32Array(
                     maton
@@ -1814,12 +1813,12 @@ void main() {
     captureScene.add(particleMesh);
     captureScene.add(objectSpaceRaymarchMesh);
     captureScene.add(screenSpaceRaymarchMesh);
-    
-    console.log("====================");
+
+    console.log('====================');
     console.log(particleMesh);
     console.log(objectSpaceRaymarchMesh);
     console.log(screenSpaceRaymarchMesh);
-    console.log("====================");
+    console.log('====================');
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {

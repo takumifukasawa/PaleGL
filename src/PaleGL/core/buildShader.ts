@@ -5,7 +5,7 @@
 // - modifierを使っているときはshader_minifierを使うとバグになる。変数名が変わるので
 // -----------------------------------------------
 
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
+import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import {
     VertexShaderModifierPragmas,
     FragmentShaderModifierPragmas,

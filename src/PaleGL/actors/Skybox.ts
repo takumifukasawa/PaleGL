@@ -5,7 +5,8 @@ import {
     ActorTypes,
     AttributeNames,
     UniformNames,
-    ShadingModelIds, UniformBlockNames,
+    ShadingModelIds,
+    UniformBlockNames,
 } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
@@ -13,7 +14,7 @@ import { Geometry } from '@/PaleGL/geometries/Geometry';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
@@ -85,22 +86,29 @@ export class Skybox extends Mesh {
     rotationOffset: number = 0;
     renderMesh: boolean = true;
 
-    constructor({ gpu, cubeMap, diffuseIntensity, specularIntensity, rotationOffset = 0, renderMesh = true }: SkyboxArgs) {
+    constructor({
+        gpu,
+        cubeMap,
+        diffuseIntensity,
+        specularIntensity,
+        rotationOffset = 0,
+        renderMesh = true,
+    }: SkyboxArgs) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
         const geometry = new Geometry({
             gpu,
             attributes: [
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(skyboxObjData.positions),
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(skyboxObjData.uvs),
                     size: 2,
                 }),
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Normal,
                     data: new Float32Array(skyboxObjData.normals),
                     size: 3,
@@ -112,7 +120,7 @@ export class Skybox extends Mesh {
 
         const material = new Material({
             // gpu,
-            name: "Skybox",
+            name: 'Skybox',
             vertexShader: skyboxVertexShader,
             fragmentShader: skyboxFragmentShader,
             primitiveType: PrimitiveTypes.Triangles,
@@ -141,10 +149,7 @@ export class Skybox extends Mesh {
                     value: ShadingModelIds.Skybox,
                 },
             ],
-            uniformBlockNames: [
-                UniformBlockNames.Transformations,
-                UniformBlockNames.Camera
-            ]
+            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
         });
 
         super({ geometry, material, actorType: ActorTypes.Skybox });

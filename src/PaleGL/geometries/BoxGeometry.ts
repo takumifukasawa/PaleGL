@@ -1,6 +1,6 @@
 ﻿import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { AttributeNames } from '@/PaleGL/constants';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import {easeInOutQuad} from "@/PaleGL/utilities/easingUtilities.ts";
@@ -124,17 +124,17 @@ export function createBoxGeometryData(size: number) {
 
     // TODO: uniqでfilter
     const attributes = [
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Position,
             data: new Float32Array(rawData.positions),
             size: 3,
         }),
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Uv,
             data: new Float32Array(rawData.uvs),
             size: 2,
         }),
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Normal,
             data: new Float32Array(rawData.normals),
             size: 3,
@@ -216,12 +216,12 @@ export class BoxGeometry extends Geometry {
                 // |/     |/
                 // 1 ---- 3
                 // -----------------------------
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Position,
                     data: new Float32Array(localPositions),
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Uv,
                     data: new Float32Array(
                         new Array(6)
@@ -231,7 +231,7 @@ export class BoxGeometry extends Geometry {
                     ),
                     size: 2,
                 }),
-                new Attribute({
+                createAttribute({
                     name: AttributeNames.Normal,
                     data: new Float32Array(normals.map((normal) => new Array(4).fill(0).map(() => normal)).flat(2)),
                     size: 3,

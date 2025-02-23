@@ -4,7 +4,7 @@ import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 
 const arrowHelperGeometryData = `
@@ -170,12 +170,12 @@ export class ArrowHelper extends Mesh {
         const geometry = new Geometry({
             gpu,
             attributes: [
-                new Attribute({
+                createAttribute({
                     name: 'position',
                     data: new Float32Array(objData.positions),
                     size: 3,
                 }),
-                new Attribute({
+                createAttribute({
                     name: 'uv',
                     data: new Float32Array(objData.uvs),
                     size: 2,

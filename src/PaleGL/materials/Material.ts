@@ -21,7 +21,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 // import { Texture } from '@/PaleGL/core/Texture';
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute';
+import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
 // import { Vector2 } from '@/PaleGL/math/Vector2';
 // import { Color } from '@/PaleGL/math/Color';

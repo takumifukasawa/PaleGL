@@ -1,4 +1,4 @@
-﻿import { Attribute } from '@/PaleGL/core/Attribute';
+﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 // import { AttributeUsageType } from '@/PaleGL/constants';
 import { Shader } from '@/PaleGL/core/Shader.ts';

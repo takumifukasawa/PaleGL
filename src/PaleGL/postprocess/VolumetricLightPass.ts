@@ -22,7 +22,7 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { Material } from '@/PaleGL/materials/Material.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { AttributeDescriptor } from '@/PaleGL/core/Attribute.ts';
+import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Override } from '@/PaleGL/palegl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
 

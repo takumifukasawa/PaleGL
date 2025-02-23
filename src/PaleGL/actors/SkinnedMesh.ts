@@ -15,7 +15,7 @@ import { Material } from '@/PaleGL/materials/Material';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Rotator } from '@/PaleGL/math/Rotator';
 import { Bone } from '@/PaleGL/core/Bone';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/AnimationClip';
 import { ActorStartArgs, ActorUpdateArgs } from './Actor';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -410,7 +410,7 @@ matrix e: ${jointData.length}`);
             geometry: new Geometry({
                 gpu,
                 attributes: [
-                    new Attribute({
+                    createAttribute({
                         name: AttributeNames.Position,
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,
@@ -452,7 +452,7 @@ matrix e: ${jointData.length}`);
             geometry: new Geometry({
                 gpu,
                 attributes: [
-                    new Attribute({
+                    createAttribute({
                         name: AttributeNames.Position.toString(),
                         data: new Float32Array(new Array(this.#boneOrderedIndex.length * 3).fill(0)),
                         size: 3,

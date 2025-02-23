@@ -1,6 +1,6 @@
 ﻿import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { AttributeNames } from '@/PaleGL/constants';
-import { Attribute } from '@/PaleGL/core/Attribute';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
@@ -121,19 +121,19 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
 
     // TODO: uniqでfilter
     const attributes = [
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Position,
             // data: new Float32Array([-1, 1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0]),
             data: rawData.positions,
             size: 3,
         }),
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Uv,
             // data: new Float32Array([0, 1, 0, 0, 1, 1, 1, 0]),
             data: rawData.uvs,
             size: 2,
         }),
-        new Attribute({
+        createAttribute({
             name: AttributeNames.Normal,
             // data: new Float32Array(normals),
             data: rawData.normals,
@@ -143,7 +143,7 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
 
     if (args.calculateTangent) {
         attributes.push(
-            new Attribute({
+            createAttribute({
                 name: AttributeNames.Tangent,
                 // data: new Float32Array(tangents),
                 data: rawData.tangents,
@@ -153,7 +153,7 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
     }
     if (args.calculateBinormal) {
         attributes.push(
-            new Attribute({
+            createAttribute({
                 name: AttributeNames.Binormal,
                 // data: new Float32Array(binormals),
                 data: rawData.binormals,
