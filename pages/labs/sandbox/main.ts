@@ -12,7 +12,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import { Texture } from '@/PaleGL/core/Texture';
-import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
+import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries
 import { Geometry } from '@/PaleGL/geometries/Geometry';
@@ -347,7 +347,7 @@ captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 // captureSceneCamera.mainCamera = true;
 
-const orbitCameraController = new OrbitCameraController(captureSceneCamera);
+const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 
 captureSceneCamera.subscribeOnStart(({ actor }) => {
     (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
@@ -358,7 +358,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.isDown && orbitCameraController.enabled) {
+    if (inputController.isDown && orbitCameraController.params.enabled) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
@@ -1832,19 +1832,19 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.distance = isSP ? 20 : 20;
-        orbitCameraController.attenuation = 0.01;
-        orbitCameraController.dampingFactor = 0.2;
-        orbitCameraController.azimuthSpeed = 100;
-        orbitCameraController.altitudeSpeed = 100;
-        orbitCameraController.deltaAzimuthPower = 2;
-        orbitCameraController.deltaAltitudePower = 2;
-        orbitCameraController.maxAltitude = 70;
-        orbitCameraController.minAltitude = -70;
-        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
+        orbitCameraController.params.distance = isSP ? 20 : 20;
+        orbitCameraController.params.attenuation = 0.01;
+        orbitCameraController.params.dampingFactor = 0.2;
+        orbitCameraController.params.azimuthSpeed = 100;
+        orbitCameraController.params.altitudeSpeed = 100;
+        orbitCameraController.params.deltaAzimuthPower = 2;
+        orbitCameraController.params.deltaAltitudePower = 2;
+        orbitCameraController.params.maxAltitude = 70;
+        orbitCameraController.params.minAltitude = -70;
+        orbitCameraController.params.lookAtTarget = new Vector3(0, -2, 0);
         orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
-        orbitCameraController.enabled = true;
+        orbitCameraController.params.enabled = true;
     };
 
     // engine.onAfterStart = () => {
@@ -1920,8 +1920,8 @@ function initDebugger() {
         label: 'orbit controls enabled',
         // initialValue: debuggerStates.orbitControlsEnabled,
         // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
-        initialValue: orbitCameraController.enabled,
-        onChange: (value) => (orbitCameraController.enabled = value),
+        initialValue: orbitCameraController.params.enabled,
+        onChange: (value) => (orbitCameraController.params.enabled = value),
     });
 
     //
