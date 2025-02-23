@@ -61,7 +61,8 @@ void main() {
    
     vec3 worldNormal = vNormal;
 
-    #include <normal_map_f>
+    // #include <normal_map_f>
+    #include ./partial/normal-map-fragment.partial.glsl
 
 #ifdef USE_VERTEX_COLOR
     diffuseColor *= vVertexColor;
@@ -76,8 +77,8 @@ void main() {
     
     resultColor = surface.diffuseColor;
     
-    float alpha = resultColor.a;
-    #include <alpha_test_f>
+    // #include <alpha_test_f>
+    #include ./partial/alpha-test-fragment.partial.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
    

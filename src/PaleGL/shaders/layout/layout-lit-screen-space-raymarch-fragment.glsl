@@ -97,8 +97,8 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    float alpha = resultColor.a;
-    #include <alpha_test_f>
+    // #include <alpha_test_f>
+    #include ../partial/alpha-test-fragment.partial.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
 

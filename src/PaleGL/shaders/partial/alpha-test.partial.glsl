@@ -8,3 +8,9 @@ void checkAlphaTest(float value, float threshold) {
         discard;
     }
 }
+
+void checkAlphaTest(vec4 value, float threshold) {
+    if(value.a < threshold) {
+        discard;
+    }
+}

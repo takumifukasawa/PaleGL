@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-uniform vec4 uColor;
+uniform vec4 uColor; // TODO: diffuse color
 uniform sampler2D uDiffuseMap; 
 uniform vec2 uDiffuseMapUvScale;
 
@@ -20,7 +20,8 @@ out vec4 outColor;
 
 void main() {
     vec2 uv = vUv * uDiffuseMapUvScale;
-   
+  
+    // TODO: multiply diffuse color
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     
     vec4 diffuseColor = vec4(0.);
@@ -31,8 +32,11 @@ void main() {
     diffuseColor = uColor * diffuseMapColor;
 #endif   
 
-    float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
-    #include <alpha_test_f>
+    // TODO: base color を渡して alpha をかける
+    vec4 resultColor = diffuseColor;
+
+    // #include <alpha_test_f>
+    #include ./partial/alpha-test-fragment.partial.glsl
 
     outColor = vec4(1., 1., 1., 1.);
 }

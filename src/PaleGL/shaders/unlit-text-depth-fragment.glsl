@@ -44,9 +44,10 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
-    
-    #include <alpha_test_f>
     resultColor.a = alpha;
+    
+    // #include <alpha_test_f>
+    #include ./partial/alpha-test-fragment.partial.glsl
 
     outColor = vec4(1., 1., 1., 1.);
 }

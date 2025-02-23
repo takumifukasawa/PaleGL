@@ -48,11 +48,11 @@ void main() {
     float sdf = median(texture(uFontMap, uv).rgb);
 
     float alpha = sdf2alpha(sdf);
+    resultColor.a = alpha;
 
     // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-    #include <alpha_test_f>
-    
-    resultColor.a = alpha;
+    // #include <alpha_test_f>
+    #include ./partial/alpha-test-fragment.partial.glsl
 
     // for debug
     // resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);

@@ -42,8 +42,8 @@ void main() {
 
     resultColor = diffuseMapColor; 
 
-    float alpha = resultColor.a;
-    #include <alpha_test_f>
+    // #include <alpha_test_f>
+    #include ./partial/alpha-test-fragment.partial.glsl
 
     resultColor.rgb = gamma(resultColor.rgb);
     vec3 emissiveColor = gamma(uEmissiveColor.rgb);

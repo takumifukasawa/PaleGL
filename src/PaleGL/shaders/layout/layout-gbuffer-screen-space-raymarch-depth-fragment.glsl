@@ -73,8 +73,9 @@ void main() {
         discard;
     }
 
-    float alpha = diffuseColor.a;
-    #include <alpha_test_f>
+    vec4 resultColor = diffuseColor;
+    // #include <alpha_test_f>
+    #include ../partial/alpha-test-fragment.partial.glsl
 
     outColor = vec4(1., 1., 1., 1.);
 }
