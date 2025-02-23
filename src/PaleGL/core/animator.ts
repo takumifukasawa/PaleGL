@@ -1,4 +1,4 @@
-import { AnimationClip } from '@/PaleGL/core/AnimationClip';
+import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 
 export type Animator = ReturnType<typeof createAnimator>;
 
@@ -10,31 +10,31 @@ export function createAnimator(animationClips: AnimationClip[] = []) {
 
     const setAnimationClips = (animationClips: AnimationClip[]) => {
         _animationClips = animationClips;
-    }
+    };
 
     const play = (name: string, loop: boolean = false) => {
-        const animationClip = _animationClips.find((animationClip) => name === animationClip.name);
+        const animationClip = _animationClips.find((animationClip) => name === animationClip.getName());
         if (!animationClip) {
             return;
         }
         animationClip.play();
-        animationClip.loop = loop;
+        animationClip.setLoop(loop);
         _playingAnimationClip = animationClip;
-    }
+    };
 
     // 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
     const update = (deltaTime: number) => {
         if (!_playingAnimationClip) {
             return;
         }
-        _playingAnimationClip.loop = true;
+        _playingAnimationClip.setLoop(true);
         _playingAnimationClip.update(deltaTime);
-    }
-    
+    };
+
     return {
         getAnimationClips,
         setAnimationClips,
         play,
         update,
-    }
+    };
 }

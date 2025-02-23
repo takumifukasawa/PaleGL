@@ -2,31 +2,20 @@
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
-import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
+// import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/Bone';
 import { Actor } from '@/PaleGL/actors/Actor';
 
-// import {GLTFAnimationSamplerInterpolation} from "@/PaleGL/loaders/loadGLTF";
+// type UpdateProxyKeyframe = {
+//     target: GLTFNodeActorKind;
+//     key: GLTFAnimationChannelTargetPath;
+//     frameValue: Vector3 | Quaternion;
+// };
 
-type UpdateProxyKeyframe = {
-    target: GLTFNodeActorKind;
-    key: GLTFAnimationChannelTargetPath;
-    frameValue: Vector3 | Quaternion;
-};
+export type AnimationClip = ReturnType<typeof createAnimationClip>;
 
-export class AnimationClip {
-    name: string;
-    frameCount: number;
-    currentTime: number = 0;
-    currentFrame: number = 0;
-    loop: boolean = false;
-    isPlaying: boolean = false;
-    speed: number = 1;
-    fps: number = 30; // default
-    onUpdateProxy: ((keyframe: UpdateProxyKeyframe[]) => void) | null = null;
-    _keyframes: AnimationKeyframes[] = [];
-
-    constructor({
+export function createAnimationClip(
+    {
         name,
         keyframes,
     }: {
@@ -37,65 +26,62 @@ export class AnimationClip {
         // frameCount?: number,
         keyframes: AnimationKeyframes[];
     }) {
-        this.name = name;
-        // this.start = start;
-        // this.end = end;
-        // this.frameCount = frameCount;
-        this._keyframes = keyframes;
-
-        // TODO: add keyframes した時も計算するようにした方が便利そう
-        this.frameCount = Math.max(...keyframes.map(({ frameCount }) => frameCount));
-    }
-
-    // addAnimationKeyframes(animationKeyframe) {
-    //     this._keyframes.push(animationKeyframe);
-    // }
+    const _name: string = name;
+    const _keyframes: AnimationKeyframes[] = keyframes;
+    const _frameCount: number = Math.max(...keyframes.map(({ frameCount }) => frameCount));
+    let _currentTime: number = 0;
+    let _currentFrame: number = 0;
+    let _loop: boolean = false;
+    let _isPlaying: boolean = false;
+    const _speed: number = 1;
+    const _fps: number = 30; // default
+    // const _onUpdateProxy: ((keyframe: UpdateProxyKeyframe[]) => void) | null = null;
 
     // start at 0 frame
-    play() {
-        this.currentTime = 0;
-        this.isPlaying = true;
+    const play = () => {
+        _currentTime = 0;
+        _isPlaying = true;
     }
 
-    update(deltaTime: number) {
-        if (!this.isPlaying) {
+    const update = (deltaTime: number) => {
+        if (!_isPlaying) {
             return;
         }
 
         // spf ... [s / frame]
-        const spf = 1 / this.fps;
+        const spf = 1 / _fps;
 
-        this.currentTime += deltaTime * this.speed;
+        _currentTime += deltaTime * _speed;
 
         // TODO: durationはendと常にイコールならendを参照する形でもよい
-        const duration = spf * this.frameCount;
+        const duration = spf * _frameCount;
 
-        if (this.currentTime > duration) {
-            if (!this.loop) {
-                this.currentFrame = this.frameCount;
-                this.currentTime = duration;
+        if (_currentTime > duration) {
+            if (!_loop) {
+                _currentFrame = _frameCount;
+                _currentTime = duration;
                 return;
             }
-            this.currentTime %= duration;
+            _currentTime %= duration;
         }
 
-        this.currentFrame = Math.floor(this.currentTime / spf);
+        _currentFrame = Math.floor(_currentTime / spf);
 
-        // 代理でupdateしたい場合
-        if (this.onUpdateProxy) {
-            const keyframes = this._keyframes.map((animationKeyframes) => {
-                // console.log(this.currentFrame, animationKeyframes.getFrameValue(this.currentFrame))
-                return {
-                    target: animationKeyframes.target,
-                    key: animationKeyframes.key,
-                    frameValue: animationKeyframes.getFrameValue(this.currentFrame),
-                };
-            });
-            this.onUpdateProxy(keyframes);
-        } else {
-            this._keyframes.forEach((animationKeyframes) => {
+        // // 代理でupdateしたい場合
+        // if (_onUpdateProxy !== null) {
+        //     const keyframes = _keyframes.map((animationKeyframes) => {
+        //         // console.log(_currentFrame, animationKeyframes.getFrameValue(_currentFrame))
+        //         return {
+        //             target: animationKeyframes.target,
+        //             key: animationKeyframes.key,
+        //             frameValue: animationKeyframes.getFrameValue(_currentFrame),
+        //         };
+        //     });
+        //     _onUpdateProxy(keyframes);
+        // } else {
+            _keyframes.forEach((animationKeyframes) => {
                 // console.log("-------")
-                const frameValue = animationKeyframes.getFrameValue(this.currentFrame);
+                const frameValue = animationKeyframes.getFrameValue(_currentFrame);
                 switch (animationKeyframes.key) {
                     case 'translation':
                         const p = frameValue as Vector3;
@@ -114,7 +100,7 @@ export class AnimationClip {
                         const r = Rotator.fromMatrix4(q.toMatrix4());
 
                         // for debug
-                        // console.log("[AnimationClip.update] rotation", this.currentFrame, frameValue.elements, r.getAxes());
+                        // console.log("[AnimationClip.update] rotation", _currentFrame, frameValue.elements, r.getAxes());
                         if ((animationKeyframes.target as Actor).transform) {
                             (animationKeyframes.target as Actor).transform.setRotation(r);
                         } else {
@@ -133,12 +119,12 @@ export class AnimationClip {
                         console.error('invalid animation keyframes key');
                 }
             });
-        }
+        // }
     }
 
-    getAllKeyframesValue() {
-        return new Array(this.frameCount).fill(0).map((_, i) => {
-            const keyframes = this._keyframes.map((animationKeyframes) => {
+    const getAllKeyframesValue = () => {
+        return new Array(_frameCount).fill(0).map((_, i) => {
+            const keyframes = _keyframes.map((animationKeyframes) => {
                 return {
                     target: animationKeyframes.target,
                     key: animationKeyframes.key,
@@ -147,5 +133,16 @@ export class AnimationClip {
             });
             return keyframes;
         });
+    }
+    
+    return {
+        // setter, getter
+        getName: () => _name,
+        getFrameCount: () => _frameCount,
+        setLoop: (loop: boolean) => (_loop = loop),
+        // methods
+        play,
+        update,
+        getAllKeyframesValue,
     }
 }

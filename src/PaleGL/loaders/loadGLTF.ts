@@ -5,7 +5,7 @@ import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { AnimationClip } from '@/PaleGL/core/AnimationClip';
+import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
@@ -679,7 +679,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 return animationKeyframes;
                 // animationClip.addAnimationKeyframes(animationKeyframes);
             });
-            const animationClip = new AnimationClip({
+            const animationClip = createAnimationClip({
                 name: animation.name,
                 keyframes,
             });

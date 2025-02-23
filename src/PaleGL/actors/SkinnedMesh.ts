@@ -16,7 +16,7 @@ import { Texture } from '@/PaleGL/core/Texture';
 import { Rotator } from '@/PaleGL/math/Rotator';
 import { Bone } from '@/PaleGL/core/Bone';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AnimationClip } from '@/PaleGL/core/AnimationClip';
+import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { ActorStartArgs, ActorUpdateArgs } from './Actor';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Vector3 } from '@/PaleGL/math/Vector3';
@@ -217,7 +217,7 @@ export class SkinnedMesh extends Mesh {
             // jointMatricesAllFrames = [...jointMatricesAllFrames].flat(2);
             const jointMatricesAllFramesFlatten: Matrix4[] = [...jointMatricesAllFrames].flat(2);
 
-            const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
+            const framesDuration = this.#animationClips.reduce((acc, cur) => acc + cur.getFrameCount(), 0);
 
             const colNum = this.#jointTextureColNum;
             const boneCount = this.boneCount * framesDuration;
