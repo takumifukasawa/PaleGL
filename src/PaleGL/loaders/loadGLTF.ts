@@ -7,7 +7,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
-import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
+import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -660,7 +660,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                         break;
                 }
 
-                const animationKeyframes = new AnimationKeyframes({
+                const animationKeyframes = createAnimationKeyframes({
                     target: cacheNodes[channel.target.node],
                     key: channel.target.path,
                     interpolation: sampler.interpolation,

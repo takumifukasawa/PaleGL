@@ -1,5 +1,5 @@
 ﻿import { Rotator } from '@/PaleGL/math/Rotator';
-import { AnimationKeyframes } from '@/PaleGL/core/AnimationKeyframes';
+import { AnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
@@ -28,7 +28,7 @@ export function createAnimationClip(
     }) {
     const _name: string = name;
     const _keyframes: AnimationKeyframes[] = keyframes;
-    const _frameCount: number = Math.max(...keyframes.map(({ frameCount }) => frameCount));
+    const _frameCount: number = Math.max(...keyframes.map(keyframe => keyframe.getFrameCount()));
     let _currentTime: number = 0;
     let _currentFrame: number = 0;
     let _loop: boolean = false;
@@ -72,7 +72,7 @@ export function createAnimationClip(
         //     const keyframes = _keyframes.map((animationKeyframes) => {
         //         // console.log(_currentFrame, animationKeyframes.getFrameValue(_currentFrame))
         //         return {
-        //             target: animationKeyframes.target,
+        //             target: animationKeyframes.getTarget(),
         //             key: animationKeyframes.key,
         //             frameValue: animationKeyframes.getFrameValue(_currentFrame),
         //         };
@@ -82,13 +82,13 @@ export function createAnimationClip(
             _keyframes.forEach((animationKeyframes) => {
                 // console.log("-------")
                 const frameValue = animationKeyframes.getFrameValue(_currentFrame);
-                switch (animationKeyframes.key) {
+                switch (animationKeyframes.getKey()) {
                     case 'translation':
                         const p = frameValue as Vector3;
-                        if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.setPosition(p);
+                        if ((animationKeyframes.getTarget() as Actor).transform) {
+                            (animationKeyframes.getTarget() as Actor).transform.setPosition(p);
                         } else {
-                            (animationKeyframes.target as Bone).position = p;
+                            (animationKeyframes.getTarget() as Bone).position = p;
                         }
                         break;
                     case 'rotation':
@@ -101,18 +101,18 @@ export function createAnimationClip(
 
                         // for debug
                         // console.log("[AnimationClip.update] rotation", _currentFrame, frameValue.elements, r.getAxes());
-                        if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.setRotation(r);
+                        if ((animationKeyframes.getTarget() as Actor).transform) {
+                            (animationKeyframes.getTarget() as Actor).transform.setRotation(r);
                         } else {
-                            (animationKeyframes.target as Bone).rotation = r;
+                            (animationKeyframes.getTarget() as Bone).rotation = r;
                         }
                         break;
                     case 'scale':
                         const s = frameValue as Vector3;
-                        if ((animationKeyframes.target as Actor).transform) {
-                            (animationKeyframes.target as Actor).transform.setScale(s);
+                        if ((animationKeyframes.getTarget() as Actor).transform) {
+                            (animationKeyframes.getTarget() as Actor).transform.setScale(s);
                         } else {
-                            (animationKeyframes.target as Bone).scale = s;
+                            (animationKeyframes.getTarget() as Bone).scale = s;
                         }
                         break;
                     default:
@@ -126,8 +126,8 @@ export function createAnimationClip(
         return new Array(_frameCount).fill(0).map((_, i) => {
             const keyframes = _keyframes.map((animationKeyframes) => {
                 return {
-                    target: animationKeyframes.target,
-                    key: animationKeyframes.key,
+                    target: animationKeyframes.getTarget(),
+                    key: animationKeyframes.getKey(),
                     frameValue: animationKeyframes.getFrameValue(i),
                 };
             });
