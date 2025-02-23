@@ -112,8 +112,6 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
 
                 await wait(100);
 
-                console.log('================================');
-
                 const basePath = './';
                 const tmpDirPath = path.join(basePath, 'tmp');
 
@@ -172,8 +170,6 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     // 何かしらrenameしたいものがなければnoRenamingListをundefinedにして強制off
                     minifierOptions.noRenamingList = undefined;
                 }
-
-                console.log('hogehoge', id, minifierOptions.noRenamingList);
 
                 //
                 // minify実行
