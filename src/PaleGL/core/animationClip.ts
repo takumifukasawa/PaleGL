@@ -3,7 +3,7 @@ import { AnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
-import { Bone } from '@/PaleGL/core/Bone';
+import { Bone } from '@/PaleGL/core/bone.ts';
 import { Actor } from '@/PaleGL/actors/Actor';
 
 // type UpdateProxyKeyframe = {
@@ -88,7 +88,7 @@ export function createAnimationClip(
                         if ((animationKeyframes.getTarget() as Actor).transform) {
                             (animationKeyframes.getTarget() as Actor).transform.setPosition(p);
                         } else {
-                            (animationKeyframes.getTarget() as Bone).position = p;
+                            (animationKeyframes.getTarget() as Bone).setPosition(p);
                         }
                         break;
                     case 'rotation':
@@ -104,7 +104,7 @@ export function createAnimationClip(
                         if ((animationKeyframes.getTarget() as Actor).transform) {
                             (animationKeyframes.getTarget() as Actor).transform.setRotation(r);
                         } else {
-                            (animationKeyframes.getTarget() as Bone).rotation = r;
+                            (animationKeyframes.getTarget() as Bone).setRotation(r);
                         }
                         break;
                     case 'scale':
@@ -112,7 +112,7 @@ export function createAnimationClip(
                         if ((animationKeyframes.getTarget() as Actor).transform) {
                             (animationKeyframes.getTarget() as Actor).transform.setScale(s);
                         } else {
-                            (animationKeyframes.getTarget() as Bone).scale = s;
+                            (animationKeyframes.getTarget() as Bone).setScale(s);
                         }
                         break;
                     default:

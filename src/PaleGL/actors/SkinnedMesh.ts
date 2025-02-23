@@ -14,7 +14,7 @@ import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { Material } from '@/PaleGL/materials/Material';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Rotator } from '@/PaleGL/math/Rotator';
-import { Bone } from '@/PaleGL/core/Bone';
+import {Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone} from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { ActorStartArgs, ActorUpdateArgs } from './Actor';
@@ -85,9 +85,9 @@ export class SkinnedMesh extends Mesh {
         this.debugBoneView = !!debugBoneView;
 
         // bone index order な配列を作っておく
-        this.bones.traverse((bone) => {
+        traverseBone(this.bones, (bone) => {
             this.boneCount++;
-            this.#boneOrderedIndex[bone.index] = bone;
+            this.#boneOrderedIndex[bone.getIndex()] = bone;
         });
 
         // for debug
@@ -97,7 +97,7 @@ export class SkinnedMesh extends Mesh {
     start(args: ActorStartArgs) {
         const { gpu } = args;
 
-        this.bones.calcBoneOffsetMatrix();
+        calcBoneOffsetMatrix(this.bones);
 
         // ボーンオフセット行列を計算
         this.boneOffsetMatrices = this.getBoneOffsetMatrices();
@@ -146,7 +146,7 @@ export class SkinnedMesh extends Mesh {
                     animationData[i][frameIndex] = [];
                     dataKeyframes.forEach((elem) => {
                         // TODO: bone animation じゃない場合の対応
-                        const boneIndex = (elem.target as Bone).index;
+                        const boneIndex = (elem.target as Bone).getIndex();
                         if (!animationData[i][frameIndex][boneIndex]) {
                             animationData[i][frameIndex][boneIndex] = {
                                 // NOTE: { [elem.key]: elem.frameValue }
@@ -182,21 +182,21 @@ export class SkinnedMesh extends Mesh {
                     // boneにkeyframeごとの計算を割り当て
                     keyframeData.forEach((data) => {
                         const { translation, rotation, scale, bone } = data;
-                        const targetBone = this.#boneOrderedIndex[bone.index];
+                        const targetBone = this.#boneOrderedIndex[bone.getIndex()];
                         if (translation) {
-                            targetBone.position = translation;
+                            targetBone.setPosition(translation);
                         }
                         if (rotation) {
                             // TODO: quaternion-bug: 本当はこっちを使いたい
                             // targetBone.rotation = Rotator.fromQuaternion(rotation);
-                            targetBone.rotation = Rotator.fromMatrix4(rotation.toMatrix4());
+                            targetBone.setRotation(Rotator.fromMatrix4(rotation.toMatrix4()));
                         }
                         if (scale) {
-                            targetBone.scale = scale;
+                            targetBone.setScale(scale);
                         }
                     });
                     // boneごとのjointMatrixを再計算
-                    this.bones.calcJointMatrix();
+                    calcJointMatrix(this.bones);
 
                     // どちらも bone index order ではない
                     const boneOffsetMatrices = this.boneOffsetMatrices;
@@ -266,14 +266,14 @@ matrix e: ${jointData.length}`);
 
         const { time } = options;
 
-        this.bones.calcJointMatrix();
+        calcJointMatrix(this.bones);
 
         // if (this.debugBoneView) {
         if (this.boneLines && this.bonePoints) {
             // console.log("--------")
             const boneLinePositions: number[][] = this.#boneOrderedIndex.map((bone) => {
                 // console.log(bone.jointMatrix.position.e)
-                return [...bone.jointMatrix.position.e];
+                return [...bone.getJointMatrix().position.e];
             });
             // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
             // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
@@ -368,8 +368,8 @@ matrix e: ${jointData.length}`);
 
     getBoneOffsetMatrices(): Matrix4[] {
         const matrices: Matrix4[] = [];
-        this.bones.traverse((bone) => {
-            const m = bone.boneOffsetMatrix.clone();
+        traverseBone(this.bones, (bone) => {
+            const m = bone.getBoneOffsetMatrix().clone();
             matrices.push(m);
         });
         return matrices;
@@ -377,8 +377,8 @@ matrix e: ${jointData.length}`);
 
     getBoneJointMatrices(): Matrix4[] {
         const matrices: Matrix4[] = [];
-        this.bones.traverse((bone) => {
-            const m = bone.jointMatrix.clone();
+        traverseBone(this.bones, (bone) => {
+            const m = bone.getJointMatrix().clone();
             matrices.push(m);
         });
         return matrices;
@@ -386,8 +386,8 @@ matrix e: ${jointData.length}`);
 
     getBoneJointMatricesWithBone(): { bone: Bone; matrix: Matrix4 }[] {
         const data: { bone: Bone; matrix: Matrix4 }[] = [];
-        this.bones.traverse((bone) => {
-            const matrix = bone.jointMatrix.clone();
+        traverseBone(this.bones, (bone) => {
+            const matrix = bone.getJointMatrix().clone();
             data.push({ bone, matrix });
         });
         return data;
@@ -395,10 +395,10 @@ matrix e: ${jointData.length}`);
 
     #createSkinDebugger({ gpu }: { gpu: GPU }) {
         const checkChildNum = (bone: Bone) => {
-            if (bone.hasChild) {
-                bone.children.forEach((elem) => {
+            if (bone.hasChild()) {
+                bone.getChildren().forEach((elem) => {
                     const childBone = elem as Bone;
-                    this.#boneIndicesForLines.push(bone.index, childBone.index);
+                    this.#boneIndicesForLines.push(bone.getIndex(), childBone.getIndex());
                     checkChildNum(childBone);
                 });
             }

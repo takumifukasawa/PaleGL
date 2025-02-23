@@ -1,5 +1,5 @@
 import { Actor } from '@/PaleGL/actors/Actor';
-import { Bone } from '@/PaleGL/core/Bone';
+import {Bone, createBone} from '@/PaleGL/core/bone.ts';
 import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
 import { Geometry } from '@/PaleGL/geometries/Geometry';
 import { Mesh } from '@/PaleGL/actors/Mesh';
@@ -310,11 +310,11 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         return slicedBuffer;
     };
 
-    const createBone = (nodeIndex: number, parentBone: Bone | null = null) => {
+    const createGLTFBone = (nodeIndex: number, parentBone: Bone | null = null) => {
         const node: GLTFNode = gltf.nodes[nodeIndex];
         // NOTE:
         // - nodeのindexを入れちゃう。なので数字が0始まりじゃないかつ飛ぶ場合がある
-        const bone = new Bone({ name: node.name, index: nodeIndex });
+        const bone = createBone({ name: node.name, index: nodeIndex });
         cacheNodes[nodeIndex] = bone;
 
         // use basic mul
@@ -324,7 +324,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         //     node.scale ? Matrix4.scalingMatrix(new Vector3(...node.scale)) : Matrix4.identity
         // );
         // use trs
-        // console.log('[loadGLTF.createBone]', node.translation, node.rotation, node.scale)
+        // console.log('[loadGLTF.createGLTFBone]', node.translation, node.rotation, node.scale)
 
         // TODO: quaternion-bug: 本当はこっちを使いたい
         // const offsetMatrix = Matrix4.fromTRS(
@@ -351,13 +351,13 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             Matrix4.scalingMatrix(node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one)
         );
 
-        bone.offsetMatrix = offsetMatrix;
+        bone.setOffsetMatrix(offsetMatrix);
 
         if (parentBone) {
             parentBone.addChild(bone);
         }
         if (node.children) {
-            node.children.forEach((childNodeIndex) => createBone(childNodeIndex, bone));
+            node.children.forEach((childNodeIndex) => createGLTFBone(childNodeIndex, bone));
         }
 
         return bone;
@@ -456,7 +456,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             const skin = gltf.skins[skinIndex];
 
             // NOTE: joints の 0番目が常に root bone のはず？
-            rootBone = createBone(skin.joints[0]);
+            rootBone = createGLTFBone(skin.joints[0]);
         }
 
         // GLTF2.0は、UV座標の原点が左上にある。しかし左下を原点とした方が分かりやすい気がしているのでYを反転
