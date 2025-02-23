@@ -30,8 +30,6 @@ export function createOrbitCameraController(camera?: Camera | null) {
         _camera = camera;
     };
 
-    setCamera(camera ?? null);
-
     const start = (daz: number | null = null, dal: number | null = null) => {
         _cameraAngle.azimuth = daz !== null ? daz : _defaultAzimuth;
         _cameraAngle.altitude = dal !== null ? dal : _defaultAltitude;
