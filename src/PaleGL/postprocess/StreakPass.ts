@@ -6,7 +6,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import {CopyPass} from "./CopyPass";
 import { Material } from '@/PaleGL/materials/Material';
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -184,7 +184,7 @@ export class StreakPass implements IPostProcessPass {
         // this.bloomAmount = bloomAmount;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({ gpu });
+        this.geometry = createPlaneGeometry({ gpu });
 
         this.prefilterPass = new FragmentPass({
             gpu,

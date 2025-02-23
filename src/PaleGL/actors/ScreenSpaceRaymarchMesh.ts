@@ -7,7 +7,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import {
     ScreenSpaceRaymarchMaterial,
@@ -21,7 +21,7 @@ import { MaterialArgs } from '@/PaleGL/materials/Material.ts';
 // import { litScreenSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-screen-space-raymarch-fragment-template.ts';
 import litScreenSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-screen-space-raymarch-fragment.glsl';
 import gbufferScreenSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-screen-space-raymarch-depth-fragment.glsl';
-import { Geometry } from '@/PaleGL/geometries/Geometry.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 
 type ScreenSpaceRaymarchMeshArgs = {
     gpu: GPU;
@@ -56,9 +56,9 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
         const depthFragmentShader = (
             args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
         ).replace(PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent);
-        
+
         // NOTE: geometryは親から渡して使いまわしてもよい
-        const geometry = args.geometry ?? new PlaneGeometry({ gpu });
+        const geometry = args.geometry ?? createPlaneGeometry({ gpu });
         const material = new ScreenSpaceRaymarchMaterial({
             ...materialArgs,
             // overrides

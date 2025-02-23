@@ -11,7 +11,7 @@ import {
     PostProcessPassBase, PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -55,7 +55,7 @@ export class GaussianBlurPass implements IPostProcessPass {
         
         this.parameters = generateGaussianBlurPassParameters(args.parameters);
         // super();
-        this.geometry = new PlaneGeometry({ gpu });
+        this.geometry = createPlaneGeometry({ gpu });
 
         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 

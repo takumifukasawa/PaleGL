@@ -8,7 +8,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { Material } from '@/PaleGL/materials/Material.ts';
@@ -57,7 +57,6 @@ export type FontAtlasData = {
 //     };
 // };
 
-
 type TextMeshArgs = {
     gpu: GPU;
     name?: string;
@@ -101,16 +100,16 @@ export class TextMesh extends Actor {
         let originX = 0;
         let accWidth = 0;
         // let accHeight = 0;
-        
+
         for (let i = 0; i < charArray.length; i++) {
             const char = charArray[i];
             const charInfo = fontAtlas.chars.find((charData) => charData.char === char);
             if (!charInfo) {
                 continue;
             }
-            
+
             // TODO: 任意のスペースのサイズを指定したい
-            const additionalOffsetX = (i > 0 && charArray[i - 1] === " " ? fontAtlas.common.base * .5 : 0);
+            const additionalOffsetX = i > 0 && charArray[i - 1] === ' ' ? fontAtlas.common.base * 0.5 : 0;
 
             const mesh = new CharMesh({
                 gpu,
@@ -121,7 +120,7 @@ export class TextMesh extends Actor {
                     width: fontAtlas.common.scaleW,
                     height: fontAtlas.common.scaleH,
                     lh: fontAtlas.common.lineHeight,
-                    b: fontAtlas.common.base
+                    b: fontAtlas.common.base,
                 },
                 charInfo: {
                     char,
@@ -136,7 +135,7 @@ export class TextMesh extends Actor {
             });
             this.addChild(mesh);
             this.charMeshes.push(mesh);
-          
+
             accWidth += mesh.charWidth + mesh.charOffsetX;
             // accHeight += mesh.charHeight;
         }
@@ -239,7 +238,7 @@ class CharMesh extends Mesh {
         // 左右: widthの時点で幅調整がかかっているので、xOffsetのみでよい
         const offsetX = charInfo.xOffset * pixelSizeW;
 
-        const geometry = new PlaneGeometry({
+        const geometry = createPlaneGeometry({
             gpu,
             flipUvY: true,
             width: planeWidth,

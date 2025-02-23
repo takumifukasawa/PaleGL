@@ -7,7 +7,7 @@ import {
     ObjectSpaceRaymarchMaterial,
     ObjectSpaceRaymarchMaterialArgs,
 } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
-import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
+import {createBoxGeometry} from '@/PaleGL/geometries/boxGeometry.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { ActorUpdateArgs } from '@/PaleGL/actors/Actor.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
@@ -37,7 +37,7 @@ type ObjectSpaceRaymarchMeshArgs = {
 export class ObjectSpaceRaymarchMesh extends Mesh {
     constructor(args: ObjectSpaceRaymarchMeshArgs) {
         const { gpu, name, materialArgs, castShadow, size } = args;
-        const geometry = new BoxGeometry({ gpu, size });
+        const geometry = createBoxGeometry({ gpu, size });
 
         const materials = args.materials
             ? args.materials

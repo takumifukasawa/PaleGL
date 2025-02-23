@@ -2,7 +2,7 @@
 import { ActorType, ActorTypes, DepthFuncTypes } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import {UniformValue} from "@/PaleGL/core/Uniforms.ts";
 

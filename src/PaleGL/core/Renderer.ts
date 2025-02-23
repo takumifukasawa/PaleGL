@@ -19,7 +19,7 @@ import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/Camera';
 import { Material } from '@/PaleGL/materials/Material';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
@@ -1259,7 +1259,7 @@ export class Renderer {
         }
 
         // vertex
-        this._gpu.setVertexArrayObject(geometry.vertexArrayObject);
+        this._gpu.setVertexArrayObject(geometry.getVertexArrayObject());
         // material
         if (!material.shader) {
             console.error('invalid material shader');
@@ -1296,14 +1296,14 @@ export class Renderer {
 
         // draw
         this._gpu.draw(
-            geometry.drawCount,
+            geometry.getDrawCount(),
             material.primitiveType,
             depthTest,
             depthWrite,
             depthFuncType,
             material.blendType,
             material.faceSide,
-            geometry.instanceCount
+            geometry.getInstanceCount()
         );
     }
 

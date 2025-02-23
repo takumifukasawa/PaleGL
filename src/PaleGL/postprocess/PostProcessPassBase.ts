@@ -19,7 +19,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -142,7 +142,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         vertexShader = vertexShader || baseVertexShader;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({ gpu });
+        this.geometry = createPlaneGeometry({ gpu });
         this.material = new Material({
             // gpu,
             name,

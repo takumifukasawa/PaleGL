@@ -14,7 +14,7 @@ import {
 } from '@/PaleGL/constants';
 // import {Vector3} from "@/PaleGL/math/Vector3";
 import { Material } from '@/PaleGL/materials/Material';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Mesh } from './Mesh';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -175,7 +175,7 @@ export class Camera extends Actor {
 
         if (!this.visibleFrustumMesh) {
             this.visibleFrustumMesh = new Mesh({
-                geometry: new Geometry({
+                geometry: createGeometry({
                     gpu,
                     attributes: [
                         createAttribute({

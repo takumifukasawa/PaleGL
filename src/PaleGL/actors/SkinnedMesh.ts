@@ -10,11 +10,11 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/Material';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Rotator } from '@/PaleGL/math/Rotator';
-import {Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone} from '@/PaleGL/core/bone.ts';
+import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { ActorStartArgs, ActorUpdateArgs } from './Actor';
@@ -407,7 +407,7 @@ matrix e: ${jointData.length}`);
 
         this.boneLines = new Mesh({
             // gpu,
-            geometry: new Geometry({
+            geometry: createGeometry({
                 gpu,
                 attributes: [
                     createAttribute({
@@ -449,7 +449,7 @@ matrix e: ${jointData.length}`);
 
         this.bonePoints = new Mesh({
             // gpu,
-            geometry: new Geometry({
+            geometry: createGeometry({
                 gpu,
                 attributes: [
                     createAttribute({

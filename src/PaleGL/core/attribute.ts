@@ -42,6 +42,7 @@ export function createAttribute(args: AttributeArgs) {
     }
 
     return {
+        // TODO: setter, getter
         name,
         data,
         location,

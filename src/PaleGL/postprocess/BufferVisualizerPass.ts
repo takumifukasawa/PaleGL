@@ -15,7 +15,7 @@ import { Material } from '@/PaleGL/materials/Material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
 // ------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.parameters = generateBufferVisualizerPassParameters(parameters);
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({ gpu });
+        this.geometry = createPlaneGeometry({ gpu });
 
         // row 0
         this.rowPasses.push({

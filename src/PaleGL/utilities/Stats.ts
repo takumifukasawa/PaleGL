@@ -1,5 +1,5 @@
 import { AttributeNames } from '@/PaleGL/constants';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { FPSCounter } from '@/PaleGL/utilities/FPSCounter.ts';
 
 type PassInfo = { passLabel: string; vertexCount: number };

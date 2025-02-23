@@ -6,7 +6,7 @@ import { Skybox } from '@/PaleGL/actors/Skybox';
 import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
 
 // core
-import {createEngine} from '@/PaleGL/core/engine.ts';
+import { createEngine } from '@/PaleGL/core/engine.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -15,8 +15,8 @@ import { Texture } from '@/PaleGL/core/Texture';
 import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries
-import { Geometry } from '@/PaleGL/geometries/Geometry';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 
 // loaders
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
@@ -1193,7 +1193,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         .flat();
 
     skinningMesh.castShadow = true;
-    skinningMesh.geometry.instanceCount = instanceNum;
+    skinningMesh.geometry.setInstanceCount(instanceNum);
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     skinningMesh.geometry.setAttribute(
@@ -1293,7 +1293,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             inputController.normalizedInputPosition
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.getPosition());
+        transformFeedbackDoubleBuffer.uniforms.setValue(
+            'uAttractTargetPosition',
+            attractSphereMesh.transform.getPosition()
+        );
 
         attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
@@ -1308,14 +1311,18 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         transformFeedbackDoubleBuffer.swap();
         // };
         // mesh.onUpdate = () => {
-        skinnedMesh.geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstancePosition,
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')!
-        );
-        skinnedMesh.geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstanceVelocity,
-            transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')!
-        );
+        skinnedMesh.geometry
+            .getVertexArrayObject()
+            .replaceBuffer(
+                AttributeNames.InstancePosition,
+                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')!
+            );
+        skinnedMesh.geometry
+            .getVertexArrayObject()
+            .replaceBuffer(
+                AttributeNames.InstanceVelocity,
+                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')!
+            );
     };
 
     // skinningMesh.debugBoneView = true;
@@ -1522,7 +1529,7 @@ const main = async () => {
     // floor mesh
     //
 
-    const floorGeometry = new PlaneGeometry({
+    const floorGeometry = createPlaneGeometry({
         gpu,
         calculateTangent: true,
         calculateBinormal: true,
@@ -1571,7 +1578,7 @@ const main = async () => {
     //
 
     const particleNum = 50;
-    const particleGeometry = new Geometry({
+    const particleGeometry = createGeometry({
         gpu,
         attributes: [
             createAttribute({
@@ -1922,7 +1929,7 @@ function initDebugger() {
         // initialValue: debuggerStates.orbitControlsEnabled,
         // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
         initialValue: orbitCameraController.getEnabled(),
-        onChange: (value) => (orbitCameraController.setEnabled(value)),
+        onChange: (value) => orbitCameraController.setEnabled(value),
     });
 
     //

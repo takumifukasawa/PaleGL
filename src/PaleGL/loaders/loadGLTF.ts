@@ -1,7 +1,7 @@
 import { Actor } from '@/PaleGL/actors/Actor';
-import {Bone, createBone} from '@/PaleGL/core/bone.ts';
+import { Bone, createBone } from '@/PaleGL/core/bone.ts';
 import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
@@ -466,12 +466,12 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
 
         if (tangents) {
             // binormals = Geometry.createBinormals(normals, tangents);
-            binormals = new Float32Array(Geometry.createBinormals(Array.from(normals), Array.from(tangents)));
+            binormals = new Float32Array(createBinormals(Array.from(normals), Array.from(tangents)));
         } else {
             // const d = Geometry.createTangentsAndBinormals(normals);
             // tangents = d.tangents;
             // binormals = d.binormals;
-            const d = Geometry.createTangentsAndBinormals(Array.from(normals));
+            const d = createTangentsAndBinormals(Array.from(normals));
             tangents = new Float32Array(d.tangents);
             binormals = new Float32Array(d.binormals);
         }
@@ -483,7 +483,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // console.log(tangents, binormals)
         // console.log("======================================")
 
-        const geometry = new Geometry({
+        const geometry = createGeometry({
             gpu,
             attributes: [
                 createAttribute({

@@ -6,7 +6,7 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
 import { Material } from '@/PaleGL/materials/Material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -158,7 +158,7 @@ export class BloomPass implements IPostProcessPass {
         this.parameters = generateDefaultBloomPassParameters(parameters);
 
         // NOTE: _geometryは親から渡して使いまわしてもよい
-        this._geometry = new PlaneGeometry({ gpu });
+        this._geometry = createPlaneGeometry({ gpu });
 
         // tmp
         this._renderTargetBlurMip4_Horizontal = new RenderTarget({

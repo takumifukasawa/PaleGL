@@ -1,4 +1,4 @@
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import {
     RenderTargetTypes,
@@ -202,7 +202,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
 ];
 
 export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Renderer }): SharedTextures {
-    const planeGeometry = new PlaneGeometry({ gpu });
+    const planeGeometry = createPlaneGeometry({ gpu });
 
     const createEffectRenderTarget = ({ gpu, width, height }: { gpu: GPU; width: number; height: number }) => {
         return new RenderTarget({

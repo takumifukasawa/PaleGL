@@ -10,7 +10,7 @@ import {
 } from '@/PaleGL/constants';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { CubeMap } from '@/PaleGL/core/CubeMap';
@@ -95,7 +95,7 @@ export class Skybox extends Mesh {
         renderMesh = true,
     }: SkyboxArgs) {
         const skyboxObjData = parseObj(skyboxGeometryObjText);
-        const geometry = new Geometry({
+        const geometry = createGeometry({
             gpu,
             attributes: [
                 createAttribute({

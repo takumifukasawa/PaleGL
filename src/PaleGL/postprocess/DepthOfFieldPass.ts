@@ -8,7 +8,7 @@
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material } from '@/PaleGL/materials/Material';
-import { PlaneGeometry } from '@/PaleGL/geometries/PlaneGeometry';
+import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -98,7 +98,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // this.gpu = gpu;
 
         // NOTE: geometryは親から渡して使いまわしてもよい
-        this.geometry = new PlaneGeometry({ gpu });
+        this.geometry = createPlaneGeometry({ gpu });
 
         this.parameters = generateDepthOfFieldPassParameters(parameters);
 

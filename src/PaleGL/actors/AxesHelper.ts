@@ -1,7 +1,7 @@
 ﻿import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -165,7 +165,7 @@ f 23/56/18 22/55/18 20/53/18
 export class AxesHelper extends Mesh {
     constructor({ gpu }: { gpu: GPU }) {
         const objData = parseObj(axesHelperGeometryData);
-        const geometry = new Geometry({
+        const geometry = createGeometry({
             gpu,
             attributes: [
                 createAttribute({

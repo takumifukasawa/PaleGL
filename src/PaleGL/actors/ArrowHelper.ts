@@ -1,7 +1,7 @@
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Material } from '@/PaleGL/materials/Material';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
-import { Geometry } from '@/PaleGL/geometries/Geometry';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -167,7 +167,7 @@ f 23/56/18 22/55/18 20/53/18
 export class ArrowHelper extends Mesh {
     constructor({ gpu }: { gpu: GPU }) {
         const objData = parseObj(arrowHelperGeometryData);
-        const geometry = new Geometry({
+        const geometry = createGeometry({
             gpu,
             attributes: [
                 createAttribute({
