@@ -358,7 +358,7 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.isDown && orbitCameraController.params.enabled) {
+    if (inputController.isDown && orbitCameraController.getEnabled()) {
         orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
     }
     orbitCameraController.fixedUpdate();
@@ -1832,19 +1832,19 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.params.distance = isSP ? 20 : 20;
-        orbitCameraController.params.attenuation = 0.01;
-        orbitCameraController.params.dampingFactor = 0.2;
-        orbitCameraController.params.azimuthSpeed = 100;
-        orbitCameraController.params.altitudeSpeed = 100;
-        orbitCameraController.params.deltaAzimuthPower = 2;
-        orbitCameraController.params.deltaAltitudePower = 2;
-        orbitCameraController.params.maxAltitude = 70;
-        orbitCameraController.params.minAltitude = -70;
-        orbitCameraController.params.lookAtTarget = new Vector3(0, -2, 0);
+        orbitCameraController.setDistance(isSP ? 20 : 20);
+        orbitCameraController.setAttenuation(0.01);
+        orbitCameraController.setDampingFactor(0.2);
+        orbitCameraController.setAzimuthSpeed(100);
+        orbitCameraController.setAltitudeSpeed(100);
+        orbitCameraController.setDeltaAzimuthPower(2);
+        orbitCameraController.setDeltaAltitudePower(2);
+        orbitCameraController.setMaxAltitude(70);
+        orbitCameraController.setMinAltitude(-70);
+        orbitCameraController.setLookAtTarget(new Vector3(0, -2, 0));
         orbitCameraController.start(0, -40);
         // orbitCameraController.enabled = false;
-        orbitCameraController.params.enabled = true;
+        orbitCameraController.setEnabled(true);
     };
 
     // engine.onAfterStart = () => {
@@ -1920,8 +1920,8 @@ function initDebugger() {
         label: 'orbit controls enabled',
         // initialValue: debuggerStates.orbitControlsEnabled,
         // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
-        initialValue: orbitCameraController.params.enabled,
-        onChange: (value) => (orbitCameraController.params.enabled = value),
+        initialValue: orbitCameraController.getEnabled(),
+        onChange: (value) => (orbitCameraController.setEnabled(value)),
     });
 
     //
