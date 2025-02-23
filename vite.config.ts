@@ -7,9 +7,7 @@ import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
 import * as process from 'process';
-// import { transformGlslUnroll } from './plugins/vite-transform-glsl-unroll-plugin.ts';
 import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin.ts';
-// import { transformExtractGlslRaymarchTemplate } from './plugins/vite-extract-glsl-raymarch-template-plugin.ts';
 import string from 'vite-plugin-string';
 import { shaderMinifierPlugin } from './plugins/vite-shader-minifier-plugin.ts';
 import { deleteTmpCachesPlugin } from './plugins/vite-delete-tmp-caches-plugin.ts';
@@ -38,11 +36,12 @@ export default defineConfig(async (config) => {
     Object.assign(process.env, env);
 
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
+    const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
 
     console.log(`=== [env] mode: ${mode} ===`);
     console.log(`isDropConsole: ${isDropConsole}`);
+    console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`entryNames: ${ENTRY_POINTS}`);
-    console.log(`======================`);
 
     // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
@@ -91,18 +90,13 @@ export default defineConfig(async (config) => {
                 compress: false,
             }),
             transformGlslLayout(),
-            // transformGlslUnroll(),
             shaderMinifierPlugin({
-                minify: true,
+                minify: isMinifyShader,
                 minifierOptions: {
                     preserveExternals: true,
-                    // noRenamingList: ['main', 'dfScene'],
                     aggressiveInlining: false,
                 },
             }),
-            // transformExtractGlslRaymarchTemplate({
-            //     extractEnabled: true,
-            // }),
             checker({
                 typescript: true,
                 eslint: {
@@ -141,20 +135,12 @@ export default defineConfig(async (config) => {
             },
             minify: 'terser',
             target: 'esnext',
-            // terserOptions: {
-            //     mangle: {
-            //         // toplevel: true,
-            //         // properties: true,
-            //         properties: {
-            //             regex: /^(_|\$)/,
-            //         },
-            //     },
-            //     compress: {
-            //         drop_console: isDropConsole,
-            //         drop_debugger: true,
-            //         passes: 16,
-            //     },
-            // },
+            terserOptions: {
+                compress: {
+                    drop_console: isDropConsole,
+                    drop_debugger: true,
+                },
+            },
         },
         server: {
             watch: {
