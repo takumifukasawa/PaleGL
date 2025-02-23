@@ -16,6 +16,7 @@
     "@babel/generator": "^7.25.6",
     "@babel/parser": "^7.25.6",
     "@babel/traverse": "^7.25.6",
+    "@types/babel-traverse": "^6.25.10",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
     "@types/node": "^20.4.2",
@@ -31,6 +32,7 @@
     "prettier": "^3.0.0",
     "rimraf": "^5.0.1",
     "rollup": "^3.28.0",
+    "rollup-plugin-visualizer": "^5.14.0",
     "tempy": "^3.0.0",
     "terser": "^5.19.2",
     "typescript": "^5.0.2",
@@ -43,9 +45,5 @@
     "vite-plugin-string": "^1.2.3",
     "vite-tsconfig-paths": "^4.2.0",
     "ws": "^8.14.2"
-  },
-  "dependencies": {
-    "@types/babel-traverse": "^6.25.10",
-    "rollup-plugin-visualizer": "^5.14.0"
   }
 }
