@@ -16,16 +16,18 @@ type OnLastUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; delta
 type OnProcessPropertyBinderCallback = (key: string, value: number) => void;
 type OnPostProcessTimelineCallback = (actor: Actor, timelineTime: number) => void;
 
-export type Component = {
-    name: string;
-    start: (args: ComponentStartArgs) => void;
-    fixedUpdate: (args: ComponentFixedUpdateArgs) => void;
-    beforeUpdate: (args: ComponentBeforeUpdateArgs) => void;
-    update: (args: ComponentUpdateArgs) => void;
-    lastUpdate: (args: ComponentLastUpdateArgs) => void;
-    processPropertyBinder?: (key: string, value: number) => void;
-    postProcessTimeline?: (actor: Actor, timelineTime: number) => void;
-};
+// export type Component = {
+//     name: string;
+//     start: (args: ComponentStartArgs) => void;
+//     fixedUpdate: (args: ComponentFixedUpdateArgs) => void;
+//     beforeUpdate: (args: ComponentBeforeUpdateArgs) => void;
+//     update: (args: ComponentUpdateArgs) => void;
+//     lastUpdate: (args: ComponentLastUpdateArgs) => void;
+//     processPropertyBinder?: (key: string, value: number) => void;
+//     postProcessTimeline?: (actor: Actor, timelineTime: number) => void;
+// };
+
+export type Component = ReturnType<typeof createComponent>;
 
 export type ComponentArgs = {
     name?: string;
@@ -38,7 +40,7 @@ export type ComponentArgs = {
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
 };
 
-export function createComponent(args: ComponentArgs): Component {
+export function createComponent(args: ComponentArgs) {
     const {
         name,
         onStartCallback,
