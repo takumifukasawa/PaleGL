@@ -12,7 +12,6 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import { Scene } from '@/PaleGL/core/Scene';
 import { Texture } from '@/PaleGL/core/Texture';
 import { OrbitCameraController } from '@/PaleGL/core/OrbitCameraController';
 
@@ -84,6 +83,7 @@ import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh
 import { FontAtlasData, TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import {loadJson} from "@/PaleGL/loaders/loadJson.ts";
+import {createScene} from "@/PaleGL/core/scene.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
 
@@ -325,7 +325,7 @@ text-align: center;
 `;
 wrapperElement?.appendChild(instanceNumView);
 
-const captureScene = new Scene();
+const captureScene = createScene();
 // const compositeScene = new Scene();
 
 // const pixelRatio = Math.min(window.devicePixelRatio, 1.5);

@@ -16,7 +16,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/Stats';
 import { Light } from '@/PaleGL/actors/Light';
 import { Mesh } from '@/PaleGL/actors/Mesh';
-import { Scene } from '@/PaleGL/core/Scene';
+import { Scene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/Camera';
 import { Material } from '@/PaleGL/materials/Material';
 import { Geometry } from '@/PaleGL/geometries/Geometry';

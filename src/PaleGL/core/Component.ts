@@ -1,6 +1,6 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
-import { Scene } from '@/PaleGL/core/Scene.ts';
+import { Scene } from '@/PaleGL/core/scene.ts';
 
 export type ComponentStartArgs = { scene: Scene; actor: Actor; gpu: GPU };
 export type ComponentFixedUpdateArgs = { actor: Actor; gpu: GPU; fixedTime: number; fixedDeltaTime: number };

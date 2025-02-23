@@ -5,7 +5,7 @@ import { Animator } from '@/PaleGL/core/Animator';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Component } from '@/PaleGL/core/Component.ts';
 import { Camera } from '@/PaleGL/actors/Camera';
-import { Scene } from '@/PaleGL/core/Scene.ts';
+import { Scene } from '@/PaleGL/core/scene.ts';
 
 export type ActorStartArgs = { scene: Scene; gpu: GPU };
 export type ActorFixedUpdateArgs = { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number };

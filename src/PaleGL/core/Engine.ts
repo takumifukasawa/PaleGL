@@ -3,7 +3,7 @@ import { TimeAccumulator } from '@/PaleGL/utilities/TimeAccumulator';
 import { ActorTypes } from '@/PaleGL/constants';
 import { Stats } from '@/PaleGL/utilities/Stats';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Scene } from '@/PaleGL/core/Scene';
+import { Scene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
