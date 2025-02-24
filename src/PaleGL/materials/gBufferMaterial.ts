@@ -1,4 +1,4 @@
-import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
+import {MaterialArgs, createMaterial, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
     ShadingModelIds,
@@ -420,12 +420,12 @@ export function createGBufferMaterial({
     });
 
     const updateUniforms = () => {
-        material.getUniforms().setValue(UniformNames.RoughnessMap, _roughnessMap);
-        material.getUniforms().setValue(UniformNames.Roughness, _roughnessMap ? 1 : _roughness);
-        material.getUniforms().setValue(UniformNames.RoughnessMapTiling, _roughnessMapTiling);
-        material.getUniforms().setValue(UniformNames.MetallicMap, _metallicMap);
-        material.getUniforms().setValue(UniformNames.Metallic, _metallicMap ? 1 : _metallic);
-        material.getUniforms().setValue(UniformNames.MetallicMapTiling, _metallicMapTiling);
+        setMaterialUniformValue(material, UniformNames.RoughnessMap, _roughnessMap);
+        setMaterialUniformValue(material, UniformNames.Roughness, _roughnessMap ? 1 : _roughness);
+        setMaterialUniformValue(material, UniformNames.RoughnessMapTiling, _roughnessMapTiling);
+        setMaterialUniformValue(material, UniformNames.MetallicMap, _metallicMap);
+        setMaterialUniformValue(material, UniformNames.Metallic, _metallicMap ? 1 : _metallic);
+        setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
     };
 
     console.log('hogehoge', material, material.getName());
