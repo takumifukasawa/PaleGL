@@ -1,5 +1,5 @@
 ﻿
-export type FPSCounter = ReturnType<typeof createFPSCounter>;
+export type FpsCounter = ReturnType<typeof createFPSCounter>;
 
 export function createFPSCounter(calculateInterval = 1) {
      let _renderCount = 0;

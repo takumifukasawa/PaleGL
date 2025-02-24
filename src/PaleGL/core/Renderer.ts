@@ -13,7 +13,7 @@
     UniformTypes,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Stats } from '@/PaleGL/utilities/Stats';
+import { Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/Light';
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Scene } from '@/PaleGL/core/scene.ts';

@@ -1,6 +1,6 @@
 import { AttributeNames } from '@/PaleGL/constants';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { createFPSCounter, FPSCounter } from '@/PaleGL/utilities/FPSCounter.ts';
+import { createFPSCounter, FpsCounter } from '@/PaleGL/utilities/fpsCounter.ts';
 
 type PassInfo = { passLabel: string; vertexCount: number };
 
@@ -26,7 +26,7 @@ export function createStats(args: StatsArgs = {}) {
     const _showFPS: boolean = true;
     const _showPipeline: boolean = !!showPipeline;
 
-    const _fpsCounter: FPSCounter = createFPSCounter();
+    const _fpsCounter: FpsCounter = createFPSCounter();
 
     _domElement.style.cssText = `
 position: absolute;

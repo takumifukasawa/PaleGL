@@ -1,7 +1,6 @@
-﻿import { TimeSkipper } from '@/PaleGL/utilities/TimeSkipper';
-import { TimeAccumulator } from '@/PaleGL/utilities/TimeAccumulator';
+﻿import {createTimeSkipper} from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
-import {createStats, Stats} from '@/PaleGL/utilities/Stats';
+import {createStats, Stats} from '@/PaleGL/utilities/stats.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -11,6 +10,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/Actor.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
+import {createTimeAccumulator} from "@/PaleGL/utilities/timeAccumulator.ts";
 
 type EngineOnStartCallbackArgs = void;
 
@@ -377,8 +377,8 @@ export function createEngine(
     let _scene: Scene | null = null;
     // _scenes: Scene[] = [];
     // timers
-    const _fixedUpdateFrameTimer: TimeAccumulator = new TimeAccumulator(fixedUpdateFps, fixedUpdate);
-    const _updateFrameTimer: TimeSkipper = new TimeSkipper(updateFps, update);
+    const _fixedUpdateFrameTimer = createTimeAccumulator(fixedUpdateFps, fixedUpdate);
+    const _updateFrameTimer = createTimeSkipper(updateFps, update);
     // callbacks
     let _onBeforeStart: EngineOnBeforeStartCallback | null = null;
     let _onAfterStart: EngineOnAfterStartCallback | null = null;
@@ -395,8 +395,8 @@ export function createEngine(
             _onBeforeStart();
         }
         const t = performance.now() / 1000;
-        _fixedUpdateFrameTimer.$start(t);
-        _updateFrameTimer.$start(t);
+        _fixedUpdateFrameTimer.start(t);
+        _updateFrameTimer.start(t);
         if (_onAfterStart) {
             _onAfterStart();
         }
@@ -567,8 +567,8 @@ export function createEngine(
 
     // time[sec]
     const run = (time: number) => {
-        _fixedUpdateFrameTimer.$exec(time / 1000);
-        _updateFrameTimer.$exec(time / 1000);
+        _fixedUpdateFrameTimer.exec(time / 1000);
+        _updateFrameTimer.exec(time / 1000);
     }
 
 
