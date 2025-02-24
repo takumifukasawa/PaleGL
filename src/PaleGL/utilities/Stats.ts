@@ -1,6 +1,6 @@
 import { AttributeNames } from '@/PaleGL/constants';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { FPSCounter } from '@/PaleGL/utilities/FPSCounter.ts';
+import { createFPSCounter, FPSCounter } from '@/PaleGL/utilities/FPSCounter.ts';
 
 type PassInfo = { passLabel: string; vertexCount: number };
 
@@ -12,36 +12,23 @@ type StatsArgs = {
     showPipeline?: boolean;
 };
 
-export class Stats {
-    domElement;
-    passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
-    pipelineWrapper;
-    passInfoView;
-    drawVertexCountView;
-    drawCallCountView;
-    drawVertexCount = 0;
-    drawCallCount = 0;
-    showPassDetails = false;
-    showStats: boolean = true;
-    showFPS: boolean = true;
-    showPipeline: boolean = true;
+export type Stats = ReturnType<typeof createStats>;
 
-    fpsCounter: FPSCounter;
-    fpsCounterView;
+export function createStats(args: StatsArgs = {}) {
+    const { wrapperElement, showStats = true, showPipeline = true, showPassDetails = true } = args;
 
-    /**
-     *
-     * @param args
-     */
-    constructor(args: StatsArgs = {}) {
-        const { wrapperElement, showStats = true, showPipeline = true, showPassDetails = true } = args;
+    const _domElement = document.createElement('div');
+    let _passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
+    let _drawVertexCount = 0;
+    let _drawCallCount = 0;
+    const _showPassDetails = !!showPassDetails;
+    const _showStats: boolean = !!showStats;
+    const _showFPS: boolean = true;
+    const _showPipeline: boolean = !!showPipeline;
 
-        this.showStats = !!showStats;
-        this.showPipeline = !!showPipeline;
-        this.showPassDetails = !!showPassDetails;
+    const _fpsCounter: FPSCounter = createFPSCounter();
 
-        this.domElement = document.createElement('div');
-        this.domElement.style.cssText = `
+    _domElement.style.cssText = `
 position: absolute;
 top: 0;
 left: 0;
@@ -53,116 +40,84 @@ text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 white-space: break-spaces;
 `;
 
-        // fps counter
-        this.fpsCounterView = document.createElement('p');
-        this.domElement.appendChild(this.fpsCounterView);
-       
-        // pipe line wrapper
-        this.pipelineWrapper = document.createElement('div');
-        this.domElement.appendChild(this.pipelineWrapper);
-        
-        // pass info
-        this.passInfoView = document.createElement('p');
-        this.pipelineWrapper.appendChild(this.passInfoView);
+    // fps counter
+    const _fpsCounterView = document.createElement('p');
+    _domElement.appendChild(_fpsCounterView);
 
-        // total vertex count
-        this.drawVertexCountView = document.createElement('p');
-        this.pipelineWrapper.appendChild(this.drawVertexCountView);
+    // pipe line wrapper
+    const _pipelineWrapper = document.createElement('div');
+    _domElement.appendChild(_pipelineWrapper);
 
-        // total draw call count
-        this.drawCallCountView = document.createElement('p');
-        this.pipelineWrapper.appendChild(this.drawCallCountView);
+    // pass info
+    const _passInfoView = document.createElement('p');
+    _pipelineWrapper.appendChild(_passInfoView);
 
-        (wrapperElement || document.body).appendChild(this.domElement);
+    // total vertex count
+    const _drawVertexCountView = document.createElement('p');
+    _pipelineWrapper.appendChild(_drawVertexCountView);
 
-        this.showPassDetails = !!args.showPassDetails;
+    // total draw call count
+    const _drawCallCountView = document.createElement('p');
+    _pipelineWrapper.appendChild(_drawCallCountView);
 
-        this.fpsCounter = new FPSCounter();
-    }
+    (wrapperElement || document.body).appendChild(_domElement);
 
-    // ------------------------------------------------------------
-    // public
-    // ------------------------------------------------------------
+    const clear = () => {
+        _passes = [];
+        _drawVertexCount = 0;
+        _drawCallCount = 0;
+    };
 
-    /**
-     *
-     */
-    clear() {
-        this.passes = [];
-        this.drawVertexCount = 0;
-        this.drawCallCount = 0;
-    }
-
-    /**
-     *
-     * @param groupLabel
-     * @param passLabel
-     * @param geometry
-     */
-    addPassInfo(groupLabel: string, passLabel: string, geometry: Geometry) {
-        const passIndex = this.passes.findIndex((elem) => elem.groupLabel === groupLabel);
+    const addPassInfo = (groupLabel: string, passLabel: string, geometry: Geometry) => {
+        const passIndex = _passes.findIndex((elem) => elem.groupLabel === groupLabel);
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
         if (!positionAttribute) {
             console.error('invalid position attribute');
         }
         const vertexCount = positionAttribute!.data.length / 3;
         if (passIndex < 0) {
-            this.addPassGroup(groupLabel, { passLabel: passLabel, vertexCount });
+            _addPassGroup(groupLabel, { passLabel: passLabel, vertexCount });
             return;
         }
-        this.passes[passIndex].passInfos.push({
+        _passes[passIndex].passInfos.push({
             passLabel,
             vertexCount,
         });
-    }
+    };
 
-    /**
-     *
-     * @param geometry
-     */
-    addDrawVertexCount(geometry: Geometry) {
+    const addDrawVertexCount = (geometry: Geometry) => {
         const positionAttribute = geometry.getAttribute(AttributeNames.Position);
         if (!positionAttribute) {
             return;
         }
-        this.drawVertexCount += positionAttribute.data.length / 3;
-    }
+        _drawVertexCount += positionAttribute.data.length / 3;
+    };
 
-    /**
-     *
-     */
-    incrementDrawCall() {
-        this.drawCallCount++;
-    }
+    const incrementDrawCall = () => {
+        _drawCallCount++;
+    };
 
-    /**
-     *
-     * @param time
-     */
-    update(time: number) {
-        this.fpsCounter.calculate(time);
-        this.updateView();
-    }
+    const update = (time: number) => {
+        _fpsCounter.calculate(time);
+        _updateView();
+    };
 
-    /**
-     *
-     */
-    updateView() {
-        this.domElement.style.display = this.showStats ? 'block' : 'none';
-        this.fpsCounterView.style.display = this.showFPS ? 'block' : 'none';
-        this.pipelineWrapper.style.display = this.showPipeline ? 'block' : 'none';
+    const _updateView = () => {
+        _domElement.style.display = _showStats ? 'block' : 'none';
+        _fpsCounterView.style.display = _showFPS ? 'block' : 'none';
+        _pipelineWrapper.style.display = _showPipeline ? 'block' : 'none';
 
-        this.fpsCounterView.textContent = `FPS: ${Math.floor(this.fpsCounter.currentFPS)}`;
+        _fpsCounterView.textContent = `FPS: ${Math.floor(_fpsCounter.getCurrentFPS())}`;
 
         const passesStrings = [];
         passesStrings.push('-------------');
-        for (let i = 0; i < this.passes.length; i++) {
+        for (let i = 0; i < _passes.length; i++) {
             let totalDrawCalls = 0;
             let totalVertexCount = 0;
             const queue: string[] = [];
-            for (let j = 0; j < this.passes[i].passInfos.length; j++) {
-                const passInfo = this.passes[i].passInfos[j];
-                if (this.showPassDetails) {
+            for (let j = 0; j < _passes[i].passInfos.length; j++) {
+                const passInfo = _passes[i].passInfos[j];
+                if (_showPassDetails) {
                     const str = `${passInfo.passLabel} - vertex count: ${passInfo.vertexCount}`;
                     queue.push(str);
                 }
@@ -170,30 +125,28 @@ white-space: break-spaces;
                 totalVertexCount += passInfo.vertexCount;
             }
             queue.unshift(
-                `[${this.passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`
+                `[${_passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`
             );
             passesStrings.push(...queue);
         }
         passesStrings.push('-------------');
-        this.passInfoView.textContent = passesStrings.join('\n');
-        this.drawVertexCountView.textContent = `vertex count: ${this.drawVertexCount}`;
-        this.drawCallCountView.textContent = `draw call count: ${this.drawCallCount}`;
-    }
+        _passInfoView.textContent = passesStrings.join('\n');
+        _drawVertexCountView.textContent = `vertex count: ${_drawVertexCount}`;
+        _drawCallCountView.textContent = `draw call count: ${_drawCallCount}`;
+    };
 
-    // ------------------------------------------------------------
-    // private
-    // ------------------------------------------------------------
-
-    /**
-     *
-     * @param groupLabel
-     * @param passInfo
-     * @private
-     */
-    private addPassGroup(groupLabel: string, passInfo: PassInfo) {
-        this.passes.push({
+    const _addPassGroup = (groupLabel: string, passInfo: PassInfo) => {
+        _passes.push({
             groupLabel: groupLabel,
             passInfos: [passInfo],
         });
-    }
+    };
+
+    return {
+        addPassInfo,
+        addDrawVertexCount,
+        incrementDrawCall,
+        update,
+        clear,
+    };
 }

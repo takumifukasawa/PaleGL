@@ -1,7 +1,7 @@
 ﻿import { TimeSkipper } from '@/PaleGL/utilities/TimeSkipper';
 import { TimeAccumulator } from '@/PaleGL/utilities/TimeAccumulator';
 import { ActorTypes } from '@/PaleGL/constants';
-import { Stats } from '@/PaleGL/utilities/Stats';
+import {createStats, Stats} from '@/PaleGL/utilities/Stats';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -372,7 +372,7 @@ export function createEngine(
     }) {
     
     const _gpu: GPU = gpu;
-    const _stats: Stats | null = new Stats({ showStats, showPipeline: false });
+    const _stats: Stats | null = createStats({ showStats, showPipeline: false });
     const _renderer: Renderer = renderer;
     let _scene: Scene | null = null;
     // _scenes: Scene[] = [];
