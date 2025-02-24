@@ -1336,6 +1336,7 @@ const playSound = () => {
         glslSound.stop();
     }
     glslSound = createGLSLSound(gpu, soundVertexShader, 180);
+    glslSound.play(0);
 };
 
 const main = async () => {
