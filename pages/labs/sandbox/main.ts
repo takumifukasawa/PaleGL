@@ -24,7 +24,7 @@ import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import {createMaterial, Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
@@ -37,8 +37,8 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass';
 
 // inputs
-import { TouchInputController } from '@/PaleGL/inputs/TouchInputController';
-import { MouseInputController } from '@/PaleGL/inputs/MouseInputController';
+import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
+import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController.ts';
 
 // shaders
 import litObjectSpaceRaymarchFragContent from './shaders/object-space-raymarch-test-scene.glsl';
@@ -67,13 +67,13 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
-import {createGBufferMaterial} from '@/PaleGL/materials/gBufferMaterial.ts';
+import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
-import {createUnlitMaterial} from '@/PaleGL/materials/unlitMaterial.ts';
+import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
@@ -287,7 +287,7 @@ let objectSpaceRaymarchMesh: Mesh;
 let screenSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
-const inputController = isSP ? new TouchInputController() : new MouseInputController();
+const inputController = isSP ? createTouchInputController() : createMouseInputController();
 inputController.start();
 
 // const wrapperElement = document.getElementById("wrapper")!;
@@ -358,8 +358,8 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.isDown && orbitCameraController.getEnabled()) {
-        orbitCameraController.setDelta(inputController.deltaNormalizedInputPosition);
+    if (inputController.getIsDown() && orbitCameraController.getEnabled()) {
+        orbitCameraController.setDelta(inputController.getDeltaNormalizedInputPosition());
     }
     orbitCameraController.fixedUpdate();
 };
@@ -1290,7 +1290,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
         transformFeedbackDoubleBuffer.uniforms.setValue(
             'uNormalizedInputPosition',
-            inputController.normalizedInputPosition
+            inputController.getNormalizedInputPosition()
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
         transformFeedbackDoubleBuffer.uniforms.setValue(
@@ -1298,7 +1298,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             attractSphereMesh.transform.getPosition()
         );
 
-        attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
+        attractRate += (inputController.getIsDown() ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
         transformFeedbackDoubleBuffer.uniforms.setValue('uAttractRate', attractRate);
         gpu.updateTransformFeedback({
@@ -1404,8 +1404,8 @@ const main = async () => {
     attractSphereMesh.onFixedUpdate = () => {
         const w = 10;
         const d = 10;
-        const ix = inputController.normalizedInputPosition.x * 2 - 1;
-        const iy = inputController.normalizedInputPosition.y * 2 - 1;
+        const ix = inputController.getNormalizedInputPosition().x * 2 - 1;
+        const iy = inputController.getNormalizedInputPosition().y * 2 - 1;
         const x = ix * w;
         const z = iy * d;
         const y = 0.5;
