@@ -1,7 +1,7 @@
 ﻿import { GPU } from '@/PaleGL/core/GPU';
 import { PostProcessPassBase, PostProcessPassParametersBaseArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { PostProcessPassType, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 export type FragmentPassParameters = PostProcessPassParametersBaseArgs;
 

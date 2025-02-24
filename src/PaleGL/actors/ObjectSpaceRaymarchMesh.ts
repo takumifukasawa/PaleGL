@@ -1,7 +1,7 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
-// import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+// import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
     createObjectSpaceRaymarchMaterial,
     ObjectSpaceRaymarchMaterial,

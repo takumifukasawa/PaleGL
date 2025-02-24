@@ -25,7 +25,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 type PostProcessPassParametersTemplate = {
     enabled: boolean;

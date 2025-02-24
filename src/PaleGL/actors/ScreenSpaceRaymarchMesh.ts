@@ -8,7 +8,7 @@ import {
 } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
     createScreenSpaceRaymarchMaterial,
     ScreenSpaceRaymarchMaterialArgs,

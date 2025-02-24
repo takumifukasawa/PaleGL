@@ -6,7 +6,7 @@ import { Shader } from '@/PaleGL/core/Shader.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 import { AttributeUsageType, GL_ARRAY_BUFFER } from '@/PaleGL/constants.ts';
-import {createUniforms, Uniforms, UniformsData} from '@/PaleGL/core/Uniforms.ts';
+import {createUniforms, Uniforms, UniformsData} from '@/PaleGL/core/uniforms.ts';
 
 // TODO: location, divisorをいい感じに指定したい
 

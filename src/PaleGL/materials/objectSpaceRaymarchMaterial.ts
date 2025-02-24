@@ -10,7 +10,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 // import { litObjectSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-object-space-raymarch-fragment-template.ts';

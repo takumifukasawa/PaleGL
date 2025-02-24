@@ -6,7 +6,7 @@ import {
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 export type ToneMappingPassParameters = PostProcessPassParametersBase;
 

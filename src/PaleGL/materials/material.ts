@@ -27,7 +27,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { Color } from '@/PaleGL/math/Color';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
-import {createUniforms, Uniforms, UniformsData, UniformValue} from '@/PaleGL/core/Uniforms.ts';
+import {createUniforms, Uniforms, UniformsData, UniformValue} from '@/PaleGL/core/uniforms.ts';
 // import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
 
 export type MaterialArgs = {

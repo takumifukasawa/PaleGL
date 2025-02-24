@@ -9,7 +9,7 @@ import {
 } from '@/PaleGL/constants.ts';
 import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';

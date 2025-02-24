@@ -22,7 +22,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF';
-import { createUniforms } from '@/PaleGL/core/Uniforms.ts';
+import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;

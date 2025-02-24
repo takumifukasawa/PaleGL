@@ -2,7 +2,7 @@ import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import { DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';

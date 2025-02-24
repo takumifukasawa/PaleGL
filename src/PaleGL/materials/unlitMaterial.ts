@@ -14,7 +14,7 @@ import { Texture } from '@/PaleGL/core/Texture';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 export type UnlitMaterialArgs = {
     diffuseColor?: Color;

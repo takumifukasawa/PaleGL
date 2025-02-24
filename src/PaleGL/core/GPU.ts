@@ -58,7 +58,7 @@ import {
     UniformStructArrayValue,
     UniformStructValue,
     UniformValue,
-} from '@/PaleGL/core/Uniforms.ts';
+} from '@/PaleGL/core/uniforms.ts';
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {

@@ -4,7 +4,7 @@ import {createMaterial, Material, setMaterialUniformValue} from '@/PaleGL/materi
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
-import {UniformValue} from "@/PaleGL/core/Uniforms.ts";
+import {UniformValue} from "@/PaleGL/core/uniforms.ts";
 
 export type MeshOptionsArgs = {
     castShadow?: boolean;

@@ -18,7 +18,7 @@ import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 const gridUniformName = 'uGridSize';
 

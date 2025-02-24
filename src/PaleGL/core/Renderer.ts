@@ -52,7 +52,7 @@ import {
     UniformBufferObjectStructArrayValue,
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
-} from '@/PaleGL/core/Uniforms.ts';
+} from '@/PaleGL/core/uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';

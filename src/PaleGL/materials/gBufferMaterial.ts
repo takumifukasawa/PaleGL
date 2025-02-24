@@ -14,7 +14,7 @@ import { Texture } from '@/PaleGL/core/Texture';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
-import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 export type GBufferMaterialArgs = {
