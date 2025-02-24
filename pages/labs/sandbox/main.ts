@@ -62,7 +62,7 @@ import {
     RAD_TO_DEG,
 } from '@/PaleGL/constants';
 
-import { DebuggerGUI } from '@/PaleGL/utilities/DebuggerGUI.ts';
+import {createDebuggerGUI, DebuggerGUI} from '@/PaleGL/utilities/debuggerGUI.ts';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -1883,7 +1883,7 @@ void main() {
 };
 
 function initDebugger() {
-    debuggerGUI = new DebuggerGUI();
+    debuggerGUI = createDebuggerGUI();
 
     debuggerGUI.addSliderDebugger({
         label: 'instance num',
@@ -2708,7 +2708,7 @@ function initDebugger() {
     // add debugger ui
     //
 
-    wrapperElement.appendChild(debuggerGUI.domElement);
+    wrapperElement.appendChild(debuggerGUI.getDomElement());
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
