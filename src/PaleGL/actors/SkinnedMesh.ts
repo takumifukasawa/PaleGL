@@ -11,7 +11,7 @@ import {
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import {createMaterial, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
+import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Rotator } from '@/PaleGL/math/Rotator';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
@@ -22,7 +22,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF';
-import { Uniforms } from '@/PaleGL/core/Uniforms.ts';
+import { createUniforms } from '@/PaleGL/core/Uniforms.ts';
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;
@@ -117,16 +117,15 @@ export class SkinnedMesh extends Mesh {
         });
 
         this.materials.forEach((material) => {
-            material.setUniforms(new Uniforms(material.getUniforms().data, this.generateSkinningUniforms()));
+            material.setUniforms(createUniforms(material.getUniforms().getData(), this.generateSkinningUniforms()));
             material.setIsSkinning(true);
             material.setGpuSkinning(this.#gpuSkinning);
             material.setJointNum(this.boneCount);
         });
 
-        this.mainMaterial.setDepthUniforms(new Uniforms(
-            this.mainMaterial.getDepthUniforms().data,
-            this.generateSkinningUniforms()
-        ));
+        this.mainMaterial.setDepthUniforms(
+            createUniforms(this.mainMaterial.getDepthUniforms().getData(), this.generateSkinningUniforms())
+        );
 
         super.start(args);
 
@@ -293,7 +292,9 @@ matrix e: ${jointData.length}`);
                 setMaterialUniformValue(depthMaterial, UniformNames.Time, time);
             });
 
-            this.materials.forEach((mat) => setMaterialUniformValue(mat, UniformNames.JointTexture, this.#jointTexture));
+            this.materials.forEach((mat) =>
+                setMaterialUniformValue(mat, UniformNames.JointTexture, this.#jointTexture)
+            );
             this.depthMaterials.forEach((depthMaterial) => {
                 setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, this.#jointTexture);
             });
@@ -325,7 +326,9 @@ matrix e: ${jointData.length}`);
                 });
             }
 
-            this.materials.forEach((mat) => setMaterialUniformValue(mat, UniformNames.JointTexture, this.#jointTexture));
+            this.materials.forEach((mat) =>
+                setMaterialUniformValue(mat, UniformNames.JointTexture, this.#jointTexture)
+            );
             this.depthMaterials.forEach((depthMaterial) => {
                 setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, this.#jointTexture);
             });

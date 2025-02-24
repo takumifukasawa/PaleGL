@@ -27,7 +27,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { Color } from '@/PaleGL/math/Color';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
-import { Uniforms, UniformsData, UniformValue } from '@/PaleGL/core/Uniforms.ts';
+import {createUniforms, Uniforms, UniformsData, UniformValue} from '@/PaleGL/core/Uniforms.ts';
 // import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
 
 export type MaterialArgs = {
@@ -645,8 +645,8 @@ export function createMaterial({
             : []),
     ];
 
-    let _uniforms: Uniforms = new Uniforms(commonUniforms, uniforms);
-    let _depthUniforms: Uniforms = new Uniforms(commonUniforms, depthUniforms);
+    let _uniforms: Uniforms = createUniforms(commonUniforms, uniforms);
+    let _depthUniforms: Uniforms = createUniforms(commonUniforms, depthUniforms);
 
     const start = ({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
         // for debug

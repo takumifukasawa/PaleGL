@@ -118,7 +118,7 @@ export class Mesh extends Actor {
                     // vertexShader: this.mainMaterial.vertexShader,
                     vertexShader: material.getRawVertexShader()!, // TDOO: rawじゃだめじゃん？
                     fragmentShader: material.getDepthFragmentShader() || defaultDepthFragmentShader(),
-                    uniforms: material.getDepthUniforms().data, // TODO: deepcopyした方がよい？
+                    uniforms: material.getDepthUniforms().getData(), // TODO: deepcopyした方がよい？
                     faceSide: material.getFaceSide(),
                     depthTest: true,
                     depthWrite: true,
