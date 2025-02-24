@@ -11,7 +11,7 @@ import { Mesh, MeshOptionsArgs } from '@/PaleGL/actors/Mesh.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import { Material } from '@/PaleGL/materials/Material.ts';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
 import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
@@ -245,7 +245,7 @@ class CharMesh extends Mesh {
             height: planeHeight,
             // offset: new Vector3(offsetX, offsetY, 0),
         });
-        const material = new Material({
+        const material = createMaterial({
             vertexShader: gBufferVert,
             fragmentShader: unlitTextFrag,
             depthFragmentShader: unlitTextDepthFrag,

@@ -12,11 +12,11 @@ import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { resolveGLEnumTextureFilterType, resolveGLEnumTextureWrapType, Texture } from '@/PaleGL/core/Texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
-// import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
+// import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
     nodes: number[];
@@ -555,7 +555,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 }
             }
 
-            return new GBufferMaterial({
+            return createGBufferMaterial({
                 diffuseMap,
                 diffuseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
                     ? Color.fromArray(targetMaterial.pbrMetallicRoughness.baseColorFactor)

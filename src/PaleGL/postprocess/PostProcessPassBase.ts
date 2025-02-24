@@ -1,5 +1,5 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
@@ -19,7 +19,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/Mesh.ts';
-import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -143,7 +143,7 @@ export class PostProcessPassBase implements IPostProcessPass {
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         this.geometry = createPlaneGeometry({ gpu });
-        this.material = new Material({
+        this.material = createMaterial({
             // gpu,
             name,
             vertexShader,
@@ -151,11 +151,13 @@ export class PostProcessPassBase implements IPostProcessPass {
             rawVertexShader,
             rawFragmentShader,
             uniforms: [
-                ...([{
-                    name: UniformNames.BlendRate,
-                    type: UniformTypes.Float,
-                    value: 1,
-                }]),
+                ...[
+                    {
+                        name: UniformNames.BlendRate,
+                        type: UniformTypes.Float,
+                        value: 1,
+                    },
+                ],
                 ...uniforms,
                 ...PostProcessPassBase.commonUniforms,
                 ...(srcTextureEnabled
@@ -229,9 +231,9 @@ export class PostProcessPassBase implements IPostProcessPass {
         this._renderTarget.setSize(width, height);
 
         // TODO: pass base で更新しちゃって大丈夫？
-        this.material.uniforms.setValue(UniformNames.TargetWidth, this.width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, this.height);
-        this.material.uniforms.setValue(UniformNames.TexelSize, this.width / this.height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, this.width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, this.height);
+        setMaterialUniformValue(this.material, UniformNames.TexelSize, this.width / this.height);
     }
 
     /**
@@ -272,7 +274,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         //     renderer.checkNeedsBindUniformBufferObjectToMaterial(this.material);
         // }
         this.materials.forEach((material) => {
-            if (!material.isCompiledShader) {
+            if (!material.isCompiledShader()) {
                 material.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
                 renderer.$checkNeedsBindUniformBufferObjectToMaterial(material);
             }
@@ -281,7 +283,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         // 渡してない場合はなにもしない. src texture がいらないとみなす
         // TODO: 無理やり渡しちゃっても良い気もしなくもない
         if (prevRenderTarget) {
-            this.material.uniforms.setValue(UniformNames.SrcTexture, prevRenderTarget.$getTexture());
+            setMaterialUniformValue(this.material, UniformNames.SrcTexture, prevRenderTarget.$getTexture());
         }
 
         if (this.beforeRender) {

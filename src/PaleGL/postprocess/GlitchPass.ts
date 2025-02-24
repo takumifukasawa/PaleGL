@@ -6,6 +6,7 @@ import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 export type GlitchPassParameters = PostProcessPassParametersBase & {
     blendRate: number;
@@ -16,7 +17,7 @@ export type GlitchPassParametersArgs = Partial<GlitchPassParameters>;
 export function generateGlitchPassParameters(params: GlitchPassParametersArgs = {}): GlitchPassParameters {
     return {
         enabled: params.enabled ?? true,
-        blendRate: params.blendRate ?? 0
+        blendRate: params.blendRate ?? 0,
     };
 }
 
@@ -46,24 +47,24 @@ export class GlitchPass extends PostProcessPassBase {
                     name: UniformNames.Aspect,
                     type: UniformTypes.Float,
                     value: 1,
-                }
+                },
             ],
             uniformBlockNames: [UniformBlockNames.Common],
             parameters,
         });
-        
+
         this.parameters = parameters;
     }
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
-        this.material.uniforms.setValue(UniformNames.Aspect, width / height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.material, UniformNames.Aspect, width / height);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(UNIFORM_NAME_BLEND_RATE, this.parameters.blendRate);
+        setMaterialUniformValue(this.material, UNIFORM_NAME_BLEND_RATE, this.parameters.blendRate);
 
         super.render(options);
     }

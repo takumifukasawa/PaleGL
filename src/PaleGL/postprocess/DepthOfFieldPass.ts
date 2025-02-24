@@ -7,8 +7,8 @@
 } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
-import { Material } from '@/PaleGL/materials/Material';
-import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -306,8 +306,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
 
         this.width = w;
         this.height = h;
-        
-        const downResolution = 2.;
+
+        const downResolution = 2;
         const rw = Math.floor(w / downResolution);
         const rh = Math.floor(h / downResolution);
 
@@ -357,9 +357,9 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 0: render coc pass
         //
 
-        this.circleOfConfusionPass.material.uniforms.setValue('uFocusDistance', this.parameters.focusDistance);
-        this.circleOfConfusionPass.material.uniforms.setValue('uFocusRange', this.parameters.focusRange);
-        this.circleOfConfusionPass.material.uniforms.setValue('uBokehRadius', this.parameters.bokehRadius);
+        setMaterialUniformValue(this.circleOfConfusionPass.material, 'uFocusDistance', this.parameters.focusDistance);
+        setMaterialUniformValue(this.circleOfConfusionPass.material, 'uFocusRange', this.parameters.focusRange);
+        setMaterialUniformValue(this.circleOfConfusionPass.material, 'uBokehRadius', this.parameters.bokehRadius);
 
         this.circleOfConfusionPass.render({
             gpu,
@@ -376,9 +376,14 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 1: render prefilter pass
         //
 
-        this.preFilterPass.material.uniforms.setValue(UNIFORM_NAME_COC_TEXTURE, this.circleOfConfusionPass.renderTarget.$getTexture());
+        setMaterialUniformValue(
+            this.preFilterPass.material,
+            UNIFORM_NAME_COC_TEXTURE,
+            this.circleOfConfusionPass.renderTarget.$getTexture()
+        );
 
-        this.preFilterPass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.preFilterPass.material,
             UniformNames.TexelSize,
             new Vector2(1 / this.preFilterPass.width, 1 / this.preFilterPass.height)
         );
@@ -399,11 +404,12 @@ export class DepthOfFieldPass implements IPostProcessPass {
         //
 
         // this.dofBokehPass.material.uniforms.setValue('uCocTexture', this.circleOfConfusionPass.renderTarget.$getTexture());
-        this.dofBokehPass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.dofBokehPass.material,
             'uTexelSize',
             new Vector2(1 / this.preFilterPass.width, 1 / this.preFilterPass.height)
         );
-        this.dofBokehPass.material.uniforms.setValue('uBokehRadius', this.parameters.bokehRadius);
+        setMaterialUniformValue(this.dofBokehPass.material, 'uBokehRadius', this.parameters.bokehRadius);
 
         this.dofBokehPass.render({
             gpu,
@@ -421,12 +427,13 @@ export class DepthOfFieldPass implements IPostProcessPass {
         // 3: render bokeh blur pass
         //
 
-        this.bokehBlurPass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.bokehBlurPass.material,
             'uTexelSize',
             // new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
             new Vector2(1 / this.dofBokehPass.width, 1 / this.dofBokehPass.height)
         );
-        this.bokehBlurPass.material.uniforms.setValue('uBokehRadius', this.parameters.bokehRadius);
+        setMaterialUniformValue(this.bokehBlurPass.material, 'uBokehRadius', this.parameters.bokehRadius);
 
         this.bokehBlurPass.render({
             gpu,
@@ -445,8 +452,16 @@ export class DepthOfFieldPass implements IPostProcessPass {
         //
 
         // this.compositePass.material.uniforms.setValue('uCocTexture', this.preFilterPass.renderTarget.$getTexture());
-        this.compositePass.material.uniforms.setValue(UNIFORM_NAME_COC_TEXTURE, this.circleOfConfusionPass.renderTarget.$getTexture());
-        this.compositePass.material.uniforms.setValue(UNIFORM_NAME_DOF_TEXTURE, this.bokehBlurPass.renderTarget.$getTexture());
+        setMaterialUniformValue(
+            this.compositePass.material,
+            UNIFORM_NAME_COC_TEXTURE,
+            this.circleOfConfusionPass.renderTarget.$getTexture()
+        );
+        setMaterialUniformValue(
+            this.compositePass.material,
+            UNIFORM_NAME_DOF_TEXTURE,
+            this.bokehBlurPass.renderTarget.$getTexture()
+        );
 
         this.compositePass.render({
             gpu,

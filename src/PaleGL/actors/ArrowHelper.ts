@@ -1,5 +1,5 @@
 import { Mesh } from '@/PaleGL/actors/Mesh';
-import { Material } from '@/PaleGL/materials/Material';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
@@ -185,7 +185,7 @@ export class ArrowHelper extends Mesh {
             drawCount: objData.indices.length,
         });
         // const geometry = new ArrowGeometry({ gpu });
-        const material = new Material({
+        const material = createMaterial({
             // gpu,
             vertexShader: `
             layout (location = 0) in vec3 ${AttributeNames.Position};

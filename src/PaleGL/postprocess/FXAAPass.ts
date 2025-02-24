@@ -1,7 +1,8 @@
-﻿import {PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
-import {PostProcessPassBase, PostProcessPassParametersBase} from '@/PaleGL/postprocess/PostProcessPassBase';
+import { PostProcessPassBase, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 // ref:
 // https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
@@ -20,10 +21,10 @@ export function generateFXAAPassParameters(params: FXAAPassParametersArgs = {}):
 }
 
 export class FXAAPass extends PostProcessPassBase {
-    constructor(args: { gpu: GPU, parameters?: FXAAPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: FXAAPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = fxaaFragmentShader;
-        
+
         const parameters = generateFXAAPassParameters(args.parameters ?? {});
 
         super({
@@ -45,7 +46,7 @@ export class FXAAPass extends PostProcessPassBase {
                 // 1/16 = 0.0625 ... high quality
                 // 1/12 = 0.0833 ... upper limit
                 {
-                name: "uContrastThreshold",
+                    name: 'uContrastThreshold',
                     type: UniformTypes.Float,
                     value: 0.0625,
                 },
@@ -54,11 +55,12 @@ export class FXAAPass extends PostProcessPassBase {
                 // 1/8 = 0.125 ... high quality
                 // 1/16 = 0.0625 ... overkill
                 {
-                name: "uRelativeThreshold",
+                    name: 'uRelativeThreshold',
                     type: UniformTypes.Float,
                     value: 0.125,
-                },{
-                name:"uSubpixelBlending",
+                },
+                {
+                    name: 'uSubpixelBlending',
                     type: UniformTypes.Float,
                     value: 0.75,
                 },
@@ -70,7 +72,7 @@ export class FXAAPass extends PostProcessPassBase {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
     }
 }

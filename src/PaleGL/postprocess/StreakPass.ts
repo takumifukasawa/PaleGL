@@ -4,7 +4,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 // import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
-import { Material } from '@/PaleGL/materials/Material';
+import {Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -517,9 +517,10 @@ export class StreakPass implements IPostProcessPass {
         // prefilter
         //
 
-        this.prefilterPass.material.uniforms.setValue('uTexelSize', new Vector2(1 / this.width, 1 / this.height));
-        this.prefilterPass.material.uniforms.setValue('uThreshold', this.parameters.threshold);
-        this.prefilterPass.material.uniforms.setValue('uVerticalScale', this.parameters.verticalScale);
+        setMaterialUniformValue(this.prefilterPass.material, 'uTexelSize', new Vector2(1 / this.width, 1 / this.height));
+        setMaterialUniformValue(this.prefilterPass.material, 'uThreshold', this.parameters.threshold);
+        setMaterialUniformValue(this.prefilterPass.material, 'uVerticalScale', this.parameters.verticalScale);
+        
         this.prefilterPass.render({
             gpu,
             camera,
@@ -538,9 +539,9 @@ export class StreakPass implements IPostProcessPass {
         this.downSamplePasses.forEach(({ pass, prevPass, downScale }) => {
             const width = Math.floor(this.width / downScale);
             pass.setSize(width, this.halfHeight);
-            pass.material.uniforms.setValue(UniformNames.TexelSize, new Vector2(1 / width, 1 / this.halfHeight));
-            pass.material.uniforms.setValue(UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
-            pass.material.uniforms.setValue(UNIFORM_NAME_HORIZONTAL_SCALE, this.parameters.horizontalScale);
+            setMaterialUniformValue(pass.material, UniformNames.TexelSize, new Vector2(1 / width, 1 / this.halfHeight));
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_HORIZONTAL_SCALE, this.parameters.horizontalScale);
             pass.render({
                 gpu,
                 camera,
@@ -559,9 +560,9 @@ export class StreakPass implements IPostProcessPass {
 
         this.upSamplePasses.forEach(({ pass, prevPass, downSamplePass }) => {
             pass.setSize(downSamplePass.width, downSamplePass.height);
-            pass.material.uniforms.setValue(UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
-            pass.material.uniforms.setValue(UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, downSamplePass.renderTarget.$getTexture());
-            pass.material.uniforms.setValue(UNIFORM_NAME_STRETCH, this.parameters.stretch);
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, downSamplePass.renderTarget.$getTexture());
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_STRETCH, this.parameters.stretch);
             pass.render({
                 gpu,
                 camera,
@@ -578,16 +579,15 @@ export class StreakPass implements IPostProcessPass {
         // composite
         //
 
-        this.compositePass.material.uniforms.setValue(
-            UNIFORM_NAME_STREAK_TEXTURE,
+        setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_STREAK_TEXTURE,
             // correct
             this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.$getTexture()
             // for debug
             // this.prefilterPass.renderTarget.$getTexture()
-            // this.upSamplePasses[2].pass.renderTarget.$getTexture()
-        );
-        this.compositePass.material.uniforms.setValue(UNIFORM_NAME_COLOR, this.parameters.color);
-        this.compositePass.material.uniforms.setValue(UNIFORM_NAME_INTENSITY, this.parameters.intensity);
+            );
+        setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_COLOR, this.parameters.color);
+        setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_INTENSITY, this.parameters.intensity);
+        
         this.compositePass.render({
             gpu,
             camera,

@@ -3,16 +3,18 @@
     RenderTargetTypes,
     UniformBlockNames,
     UniformNames,
-    UniformTypes
+    UniformTypes,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {
-    PostProcessPassBase, PostProcessPassParametersBase,
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import { Override } from '@/PaleGL/palegl';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 /*
 float eps = .001;
@@ -215,44 +217,46 @@ export class SSRPass extends PostProcessPassBase {
      */
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        // this.material.uniforms.uTargetWidth.value = width;
-        // this.material.uniforms.uTargetHeight.value = height;
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue('uRayDepthBias', this.parameters.rayDepthBias);
-        this.material.uniforms.setValue('uRayNearestDistance', this.parameters.rayNearestDistance);
-        this.material.uniforms.setValue('uRayMaxDistance', this.parameters.rayMaxDistance);
-        this.material.uniforms.setValue('uReflectionRayThickness', this.parameters.reflectionRayThickness);
+        setMaterialUniformValue(this.material, 'uRayDepthBias', this.parameters.rayDepthBias);
+        setMaterialUniformValue(this.material, 'uRayNearestDistance', this.parameters.rayNearestDistance);
+        setMaterialUniformValue(this.material, 'uRayMaxDistance', this.parameters.rayMaxDistance);
+        setMaterialUniformValue(this.material, 'uReflectionRayThickness', this.parameters.reflectionRayThickness);
 
-        this.material.uniforms.setValue('uReflectionRayJitterSizeX', this.parameters.reflectionRayJitterSizeX);
-        this.material.uniforms.setValue('uReflectionRayJitterSizeY', this.parameters.reflectionRayJitterSizeY);
+        setMaterialUniformValue(this.material, 'uReflectionRayJitterSizeX', this.parameters.reflectionRayJitterSizeX);
+        setMaterialUniformValue(this.material, 'uReflectionRayJitterSizeY', this.parameters.reflectionRayJitterSizeY);
 
-        this.material.uniforms.setValue('uReflectionFadeMinDistance', this.parameters.reflectionFadeMinDistance);
-        this.material.uniforms.setValue('uReflectionFadeMaxDistance', this.parameters.reflectionFadeMaxDistance);
+        setMaterialUniformValue(this.material, 'uReflectionFadeMinDistance', this.parameters.reflectionFadeMinDistance);
+        setMaterialUniformValue(this.material, 'uReflectionFadeMaxDistance', this.parameters.reflectionFadeMaxDistance);
 
-        this.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.material,
             'uReflectionScreenEdgeFadeFactorMinX',
             this.parameters.reflectionScreenEdgeFadeFactorMinX
         );
-        this.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.material,
             'uReflectionScreenEdgeFadeFactorMaxX',
             this.parameters.reflectionScreenEdgeFadeFactorMaxX
         );
-        this.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.material,
             'uReflectionScreenEdgeFadeFactorMinY',
             this.parameters.reflectionScreenEdgeFadeFactorMinY
         );
-        this.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.material,
             'uReflectionScreenEdgeFadeFactorMaxY',
             this.parameters.reflectionScreenEdgeFadeFactorMaxY
         );
 
-        this.material.uniforms.setValue('uReflectionAdditionalRate', this.parameters.reflectionAdditionalRate);
-        this.material.uniforms.setValue('uReflectionRoughnessPower', this.parameters.reflectionRoughnessPower);
-        this.material.uniforms.setValue('uBlendRate', this.parameters.blendRate);
+        setMaterialUniformValue(this.material, 'uReflectionAdditionalRate', this.parameters.reflectionAdditionalRate);
+        setMaterialUniformValue(this.material, 'uReflectionRoughnessPower', this.parameters.reflectionRoughnessPower);
+        setMaterialUniformValue(this.material, 'uBlendRate', this.parameters.blendRate);
 
         super.render(options);
     }

@@ -13,7 +13,7 @@ import {
     UniformNames,
 } from '@/PaleGL/constants';
 // import {Vector3} from "@/PaleGL/math/Vector3";
-import { Material } from '@/PaleGL/materials/Material';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Mesh } from './Mesh';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -232,7 +232,7 @@ export class Camera extends Actor {
                         7, 1, 3,
                     ],
                 }),
-                material: new Material({
+                material: createMaterial({
                     // gpu,
                     vertexShader: `
 layout (location = 0) in vec3 ${AttributeNames.Position};

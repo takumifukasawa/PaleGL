@@ -1,4 +1,4 @@
-﻿import {PostProcessPassType, UniformTypes} from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
@@ -6,21 +6,23 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
-import { Material } from '@/PaleGL/materials/Material';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
-    PostProcessPassBase, PostProcessPassParametersBase,
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
-import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 
 const BLUR_PIXEL_NUM = 7;
-
 
 export type GaussianBlurPassParameters = PostProcessPassParametersBase;
 
 export type GaussianBlurPassParametersArgs = Partial<GaussianBlurPassParameters>;
 
-export function generateGaussianBlurPassParameters(params: GaussianBlurPassParametersArgs = {}): GaussianBlurPassParameters {
+export function generateGaussianBlurPassParameters(
+    params: GaussianBlurPassParametersArgs = {}
+): GaussianBlurPassParameters {
     return {
         enabled: params.enabled ?? true,
     };
@@ -31,7 +33,7 @@ export class GaussianBlurPass implements IPostProcessPass {
     // gpu: GPU;
     name: string = 'GaussianBlurPass';
     type: PostProcessPassType = PostProcessPassType.GaussianBlur;
-    
+
     width: number = 1;
     height: number = 1;
     materials: Material[] = [];
@@ -50,9 +52,9 @@ export class GaussianBlurPass implements IPostProcessPass {
     }
 
     // constructor({ gpu, blurPixelNum = 7 }: { gpu: GPU; blurPixelNum: number }) {
-    constructor(args: { gpu: GPU, parameters?: GaussianBlurPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: GaussianBlurPassParametersArgs }) {
         const { gpu } = args;
-        
+
         this.parameters = generateGaussianBlurPassParameters(args.parameters);
         // super();
         this.geometry = createPlaneGeometry({ gpu });
@@ -132,11 +134,11 @@ export class GaussianBlurPass implements IPostProcessPass {
 
     setSize(width: number, height: number) {
         this.horizontalBlurPass.setSize(width, height);
-        this.horizontalBlurPass.material.uniforms.setValue('uTargetWidth', width);
-        this.horizontalBlurPass.material.uniforms.setValue('uTargetHeight', height);
+        setMaterialUniformValue(this.horizontalBlurPass.material, 'uTargetWidth', width);
+        setMaterialUniformValue(this.horizontalBlurPass.material, 'uTargetHeight', height);
         this.verticalBlurPass.setSize(width, height);
-        this.verticalBlurPass.material.uniforms.setValue('uTargetWidth', width);
-        this.verticalBlurPass.material.uniforms.setValue('uTargetHeight', height);
+        setMaterialUniformValue(this.verticalBlurPass.material, 'uTargetWidth', width);
+        setMaterialUniformValue(this.verticalBlurPass.material, 'uTargetHeight', height);
     }
 
     // TODO: 空メソッド書かなくていいようにしたい
@@ -195,7 +197,7 @@ export class GaussianBlurPass implements IPostProcessPass {
         //         // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
         //         (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
         //     );
-        //     if (!pass.material.isCompiledShader) {
+        //     if (!pass.material.isCompiledShader() {
         //         pass.material.start({ gpu, attributeDescriptors: [] });
         //     }
 

@@ -20,11 +20,11 @@ import {
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Override } from '@/PaleGL/palegl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
+import {createMaterial, Material, setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
@@ -150,7 +150,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
             depthPrecision: TextureDepthPrecisionType.High,
         });
 
-        this.spotLightFrustumMaterial = new Material({
+        this.spotLightFrustumMaterial = createMaterial({
             vertexShader: `
 layout (location = 0) in vec3 ${AttributeNames.Position};
 uniform mat4 ${UniformNames.WorldMatrix};
@@ -205,8 +205,8 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         this.renderTargetSpotLightFrustum.setSize(this.rawWidth, this.rawHeight);
         // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
 
-        this.material.uniforms.setValue(UniformNames.TargetWidth, this.width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, this.height);
+        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetWidth, this.width);
+        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetHeight, this.height);
     }
 
     /**
@@ -224,34 +224,24 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             });
         }
 
-        // renderer.setRenderTarget(this.renderTargetSpotLightFrustum, false, true);
         renderer.setRenderTarget(this.renderTargetSpotLightFrustum.write, false, true);
 
-        this.spotLightFrustumMaterial.uniforms.setValue(UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
-        this.spotLightFrustumMaterial.uniforms.setValue(
-            UniformNames.ProjectionMatrix,
-            options.targetCamera.projectionMatrix
-        );
+        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
+        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
         this.#spotLights.forEach((spotLight) => {
             if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
-                this.spotLightFrustumMaterial.uniforms.setValue(
-                    UniformNames.WorldMatrix,
-                    spotLight.shadowCamera.transform.getWorldMatrix()
-                );
+                setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.getWorldMatrix());
                 // TODO: この描画だけでvolumeを計算したい
                 renderer.renderMesh(spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
             }
         });
 
-        this.material.uniforms.setValue(
-            UniformNames.SpotLightShadowMap,
-            this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.$getDepthTexture() : null))
-        );
-        this.material.uniforms.setValue(UNIFORM_VOLUME_DEPTH_TEXTURE, this.renderTargetSpotLightFrustum.$getDepthTexture());
-        this.material.uniforms.setValue(UNIFORM_NAME_RAY_STEP, this.parameters.rayStep);
-        this.material.uniforms.setValue(UNIFORM_NAME_DENSITY_MULTIPLIER, this.parameters.densityMultiplier);
-        this.material.uniforms.setValue(UNIFORM_NAME_RAY_JITTER_SIZE, this.parameters.rayJitterSize);
-        this.material.uniforms.setValue(UniformNames.BlendRate, this.parameters.blendRate);
+        setMaterialUniformValue(this.material, UniformNames.SpotLightShadowMap, this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.read.$getDepthTexture() : null)));
+        setMaterialUniformValue(this.material, UNIFORM_VOLUME_DEPTH_TEXTURE, this.renderTargetSpotLightFrustum.$getDepthTexture());
+        setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_STEP, this.parameters.rayStep);
+        setMaterialUniformValue(this.material, UNIFORM_NAME_DENSITY_MULTIPLIER, this.parameters.densityMultiplier);
+        setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_JITTER_SIZE, this.parameters.rayJitterSize);
+        setMaterialUniformValue(this.material, UniformNames.BlendRate, this.parameters.blendRate);
         
         // console.log(this.material.uniforms)
 

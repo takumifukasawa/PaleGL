@@ -19,6 +19,7 @@ import { Skybox } from '@/PaleGL/actors/Skybox.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 export type DeferredShadingParametersBase = PostProcessPassParametersBase;
 
@@ -143,7 +144,7 @@ export class DeferredShadingPass extends PostProcessPassBase {
      * @param skybox
      */
     updateSkyboxUniforms(skybox: Skybox) {
-        this.material.uniforms.setValue(UniformNames.Skybox, [
+        setMaterialUniformValue(this.material, UniformNames.Skybox, [
             {
                 name: 'cubeMap',
                 type: UniformTypes.CubeMap,

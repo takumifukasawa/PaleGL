@@ -6,11 +6,12 @@ import {
     createObjectSpaceRaymarchMaterial,
     ObjectSpaceRaymarchMaterial,
     ObjectSpaceRaymarchMaterialArgs,
-} from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
-import {createBoxGeometry} from '@/PaleGL/geometries/boxGeometry.ts';
+} from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
+import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
 import { ActorUpdateArgs } from '@/PaleGL/actors/Actor.ts';
-// import {GBufferMaterial} from "@/PaleGL/materials/GBufferMaterial.ts";
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+// import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
 
@@ -76,16 +77,16 @@ export class ObjectSpaceRaymarchMesh extends Mesh {
         // this.parent?.transform.scale.log()
         // this.transform.getWorldScale().log();
         // console.log("============")
-        
+
         this.materials.forEach((material) => {
             // local
-            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
+            setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
             // wp
             // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
         });
         this.depthMaterials.forEach((material) => {
             // local
-            material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
+            setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getScale());
             // wp
             // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
         });
@@ -94,18 +95,18 @@ export class ObjectSpaceRaymarchMesh extends Mesh {
     updateMaterial({ camera }: { camera: Camera }) {
         super.updateMaterial({ camera });
         this.materials.forEach((material) => {
-            material.uniforms.setValue(UNIFORM_NAME_PERSPECTIVE_FLAG, camera.isPerspective() ? 1 : 0);
+            setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, camera.isPerspective() ? 1 : 0);
         });
     }
 
     updateDepthMaterial({ camera }: { camera: Camera }) {
         super.updateDepthMaterial({ camera });
         this.depthMaterials.forEach((material) => {
-            material.uniforms.setValue(UNIFORM_NAME_PERSPECTIVE_FLAG, camera.isPerspective() ? 1 : 0);
+            setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, camera.isPerspective() ? 1 : 0);
         });
     }
-    
+
     setUseWorldSpace(flag: boolean) {
-        this.setUniformValueToAllMaterials("uUseWorld", flag ? 1 : 0);
+        this.setUniformValueToAllMaterials('uUseWorld', flag ? 1 : 0);
     }
 }

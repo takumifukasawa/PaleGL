@@ -6,6 +6,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Override } from '@/PaleGL/palegl';
+import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
 
 // ref:
 
@@ -94,14 +95,14 @@ export class VignettePass extends PostProcessPassBase {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.Aspect, width / height);
+        setMaterialUniformValue(this.material, UniformNames.Aspect, width / height);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(UNIFORM_NAME_VIGNETTE_RADIUS_FROM, this.parameters.vignetteRadiusFrom);
-        this.material.uniforms.setValue(UNIFORM_NAME_VIGNETTE_RADIUS_TO, this.parameters.vignetteRadiusTo);
-        this.material.uniforms.setValue(UNIFORM_NAME_VIGNETTE_POWER, this.parameters.vignettePower);
-        this.material.uniforms.setValue(UNIFORM_NAME_BLEND_RATE, this.parameters.blendRate);
+        setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_RADIUS_FROM, this.parameters.vignetteRadiusFrom);
+        setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_RADIUS_TO, this.parameters.vignetteRadiusTo);
+        setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_POWER, this.parameters.vignettePower);
+        setMaterialUniformValue(this.material,UNIFORM_NAME_BLEND_RATE, this.parameters.blendRate);
 
         super.render(options);
     }

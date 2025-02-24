@@ -11,11 +11,11 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
+import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
-import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
 // ------------------------------------------------------------------------------
@@ -499,7 +499,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.rowPasses.forEach(({ pass, tiles }, i) => {
             let colIndex = 0;
             // pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
-            pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, 1));
+            addMaterialUniformValue(pass.material, 'uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, 1));
             for (const [key, tile] of tiles) {
                 const uniformNamePrefix = tile.uniformNamePrefix || 'uTextureCol';
                 const uniformNameTexture = `${uniformNamePrefix}${colIndex}`;
@@ -516,33 +516,41 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 tiles.get(key)!.uniformNameUvOffset = uniformNameUvOffset;
 
                 if (i === 0) {
-                    pass.material.uniforms.addValue(
+                    addMaterialUniformValue(
+                        pass.material,
                         uniformNameUvOffset,
                         UniformTypes.Vector2,
                         new Vector2(colOffset, 0)
                     );
                     if (tile.type === 'Texture') {
-                        pass.material.uniforms.addValue(
+                        addMaterialUniformValue(
+                            pass.material,
                             uniformNameTexture,
                             UniformTypes.Texture,
                             gpu.dummyTextureBlack
                         );
                     }
                 } else {
-                    pass.material.uniforms.addValue(
+                    addMaterialUniformValue(
+                        pass.material,
                         uniformNameUvOffset,
                         UniformTypes.Vector2,
                         new Vector2(colOffset, 0)
                     );
                     // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
-                    pass.material.uniforms.addValue(uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
+                    addMaterialUniformValue(
+                        pass.material,
+                        uniformNameTexture,
+                        UniformTypes.Texture,
+                        gpu.dummyTextureBlack
+                    );
                 }
 
                 colIndex++;
             }
         });
 
-        this.compositePass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(1, ROW_NUM));
+        addMaterialUniformValue(this.compositePass.material, 'uTiling', UniformTypes.Vector2, new Vector2(1, ROW_NUM));
 
         const styleHeader = document.createElement('style');
         styleHeader.textContent = `
@@ -650,7 +658,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.rowPasses.forEach(({ pass, tiles }) => {
             if (lightActors?.directionalLight) {
                 if (tiles.has(DIRECTIONAL_LIGHT_SHADOW_MAP_KEY)) {
-                    pass.material.uniforms.setValue(
+                    setMaterialUniformValue(
+                        pass.material,
                         tiles.get(DIRECTIONAL_LIGHT_SHADOW_MAP_KEY)!.uniformNameTexture!,
                         // 'uDirectionalLightShadowMap',
                         lightActors.directionalLight.shadowMap!.read.$getDepthTexture()
@@ -662,7 +671,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     const key = `${SPOT_LIGHT_SHADOW_MAP_KEY}${i}`;
                     if (tiles.has(key)) {
                         if (spotLight.shadowMap) {
-                            pass.material.uniforms.setValue(
+                            setMaterialUniformValue(
+                                pass.material,
                                 tiles.get(key)!.uniformNameTexture!,
                                 spotLight.shadowMap.read.$getDepthTexture()
                             );
@@ -672,217 +682,248 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }
 
             if (tiles.has(DEPTH_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(DEPTH_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.depthPrePassRenderTarget.$getDepthTexture()
                 );
             }
 
             if (tiles.has(GBUFFER_A_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(GBUFFER_A_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.$getGBufferATexture()
                 );
             }
 
             if (tiles.has(GBUFFER_B_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(GBUFFER_B_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.$getGBufferBTexture()
                 );
             }
 
             if (tiles.has(GBUFFER_C_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(GBUFFER_C_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.$getGBufferCTexture()
                 );
             }
 
             if (tiles.has(GBUFFER_D_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(GBUFFER_D_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.gBufferRenderTargets.$getGBufferDTexture()
                 );
             }
 
             if (tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(SCREEN_SPACE_SHADOW_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.screenSpaceShadowPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(AMBIENT_OCCLUSION_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(AMBIENT_OCCLUSION_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.ambientOcclusionPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(DEFERRED_SHADING_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(DEFERRED_SHADING_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.deferredShadingPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(SSR_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(SSR_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.ssrPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(LIGHT_SHAFT_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.lightShaftPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(VOLUMETRIC_LIGHT_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(VOLUMETRIC_LIGHT_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.volumetricLightPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(DEPTH_OF_FIELD_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(DEPTH_OF_FIELD_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.depthOfFieldPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(FOG_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(FOG_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.fogPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_PREFILTER_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_PREFILTER_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.prefilterPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[0].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[1].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[2].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[3].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.downSamplePasses[4].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_UP_SAMPLE_0_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_UP_SAMPLE_0_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[0].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_UP_SAMPLE_1_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_UP_SAMPLE_1_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[1].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_UP_SAMPLE_2_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_UP_SAMPLE_2_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[2].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_UP_SAMPLE_3_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_UP_SAMPLE_3_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[3].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_UP_SAMPLE_4_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_UP_SAMPLE_4_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.upSamplePasses[4].pass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(STREAK_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(STREAK_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.streakPass.renderTarget.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_BLUR_MIP4_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(BLOOM_BLUR_MIP4_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTargetBlurMip4.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_BLUR_MIP8_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(BLOOM_BLUR_MIP8_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTargetBlurMip8.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_BLUR_MIP16_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(BLOOM_BLUR_MIP16_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTargetBlurMip16.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_BLUR_MIP32_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(BLOOM_BLUR_MIP32_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTargetBlurMip32.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_BLUR_MIP64_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     tiles.get(BLOOM_BLUR_MIP64_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTargetBlurMip64.read.$getTexture()
                 );
             }
 
             if (tiles.has(BLOOM_TEXTURE_KEY)) {
-                pass.material.uniforms.setValue(
+                setMaterialUniformValue(
+                    pass.material,
                     // 'uBloomTexture',
                     tiles.get(BLOOM_TEXTURE_KEY)!.uniformNameTexture!,
                     renderer.bloomPass.renderTarget.read.$getTexture()
@@ -890,7 +931,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
             }
         });
 
-        this.rowPasses[0].pass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.rowPasses[0].pass.material,
             'uInverseViewProjectionMatrix',
             args.targetCamera.inverseViewProjectionMatrix
         );
@@ -900,11 +942,16 @@ export class BufferVisualizerPass implements IPostProcessPass {
         this.rowPasses.forEach(({ pass, tiles }, i) => {
             if (tiles.size > 0) {
                 pass.render({ ...args, isLastPass: false });
-                this.compositePass.material.uniforms.setValue(`uRow${i}Texture`, pass.renderTarget.read.$getTexture());
+                setMaterialUniformValue(
+                    this.compositePass.material,
+                    `uRow${i}Texture`,
+                    pass.renderTarget.read.$getTexture()
+                );
             }
         });
 
-        this.compositePass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.compositePass.material,
             'uFullViewTexture',
             // renderer.depthOfFieldPass.renderTarget.read.$getTexture()
             // renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.read.$getTexture()
@@ -915,7 +962,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
             // renderer.depthOfFieldPass.preFilterPass.renderTarget.read.$getTexture()
         );
 
-        this.compositePass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this.compositePass.material,
             'uFullViewTextureEnabled',
             this.parameters.fullViewTextureEnabled ? 1 : 0
         );

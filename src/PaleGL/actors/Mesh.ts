@@ -1,6 +1,6 @@
 ﻿import { Actor, ActorArgs, ActorStartArgs } from '@/PaleGL/actors/Actor';
 import { ActorType, ActorTypes, DepthFuncTypes } from '@/PaleGL/constants';
-import { Material } from '@/PaleGL/materials/Material';
+import {createMaterial, Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
@@ -89,14 +89,21 @@ export class Mesh extends Actor {
         const { gpu } = args;
 
         this.geometry.start();
+       
+        // for debug
+        // console.log(`[Mesh.start] materials length: ${this.materials.length}`);
 
         // 未コンパイルであればコンパイルする
         this.materials.forEach((material) => {
-            if (!material.isCompiledShader) {
+            // for debug
+            // console.log(`[Mesh.start] material name: ${material.getName()}, isCompiledShader: ${material.isCompiledShader()}`);
+            if (!material.isCompiledShader()) {
                 material.start({
                     gpu,
                     attributeDescriptors: this.geometry.getAttributeDescriptors(),
                 });
+                // for debug
+                // console.log(`[Mesh.start] material`, material, material.getShader());
             }
         });
 
@@ -105,37 +112,39 @@ export class Mesh extends Actor {
                 // for debug
                 // console.log(this.material, this.materials)
                 // TODO: depth material から clone した方がいい気がする
-                this.depthMaterials[i] = new Material({
-                    name: `${material.name}/depth`,
+                this.depthMaterials[i] = createMaterial({
+                    name: `${material.getName()}/depth`,
                     // gpu,
                     // vertexShader: this.mainMaterial.vertexShader,
-                    vertexShader: material.rawVertexShader!,
-                    fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
-                    uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
-                    faceSide: material.faceSide,
+                    vertexShader: material.getRawVertexShader()!, // TDOO: rawじゃだめじゃん？
+                    fragmentShader: material.getDepthFragmentShader() || defaultDepthFragmentShader(),
+                    uniforms: material.getDepthUniforms().data, // TODO: deepcopyした方がよい？
+                    faceSide: material.getFaceSide(),
                     depthTest: true,
                     depthWrite: true,
                     depthFuncType: DepthFuncTypes.Lequal,
-                    alphaTest: material.alphaTest,
-                    skipDepthPrePass: !!material.skipDepthPrePass,
+                    alphaTest: material.getAlphaTest(),
+                    skipDepthPrePass: !!material.getSkipDepthPrePass(),
 
                     // TODO: 手動でいろいろ追加しなきゃなのが面倒
-                    isInstancing: material.isInstancing,
-                    useInstanceLookDirection: material.useInstanceLookDirection,
-                    useVertexColor: material.useVertexColor,
+                    isInstancing: material.getIsInstancing(),
+                    useInstanceLookDirection: material.getUseInstanceLookDirection(),
+                    useVertexColor: material.getUseVertexColor(),
 
-                    uniformBlockNames: material.uniformBlockNames, // TODO: 外側からも追加して渡せるほうがいいかもしれない
+                    uniformBlockNames: material.getUniformBlockNames(), // TODO: 外側からも追加して渡せるほうがいいかもしれない
                     // depthFuncType: this.mainMaterial.depthFuncType
                 });
             }
         });
 
         this.depthMaterials.forEach((material) => {
-            if (!material.isCompiledShader) {
+            if (!material.isCompiledShader()) {
                 material.start({
                     gpu,
                     attributeDescriptors: this.geometry.getAttributeDescriptors(),
                 });
+                // for debug
+                // console.log(`[Mesh.start] depth`, material, material.getShader());
             }
         });
 
@@ -163,17 +172,17 @@ export class Mesh extends Actor {
     }
     
     setUniformValueToPairMaterial(i: number, name: string, newValue: UniformValue) {
-        this.materials[i].uniforms.setValue(name, newValue);
-        this.depthMaterials[i].uniforms.setValue(name, newValue);
+        setMaterialUniformValue(this.materials[i], name,  newValue)
+        setMaterialUniformValue(this.depthMaterials[i], name, newValue)
     }
     
     setUniformValueToAllMaterials(name: string, newValue: UniformValue) {
-        this.materials.forEach((material) => material.uniforms.setValue(name, newValue));
-        this.depthMaterials.forEach((material) => material.uniforms.setValue(name, newValue));
+        this.materials.forEach((material) => setMaterialUniformValue(material, name, newValue));
+        this.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue));
     }
     
     setCanRenderMaterial(index: number, flag: boolean) {
-        this.materials[index].canRender = flag;
-        this.depthMaterials[index].canRender = flag;
+        this.materials[index].setCanRender(flag);
+        this.depthMaterials[index].setCanRender(flag);
     }
 }

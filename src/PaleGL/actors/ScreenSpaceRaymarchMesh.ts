@@ -10,13 +10,13 @@ import { Mesh } from '@/PaleGL/actors/Mesh.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/Uniforms.ts';
 import {
-    ScreenSpaceRaymarchMaterial,
+    createScreenSpaceRaymarchMaterial,
     ScreenSpaceRaymarchMaterialArgs,
-} from '@/PaleGL/materials/ScreenSpaceRaymarchMaterial.ts';
+} from '@/PaleGL/materials/screenSpaceRaymarchMaterial.ts';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Camera } from '@/PaleGL/actors/Camera.ts';
-import { MaterialArgs } from '@/PaleGL/materials/Material.ts';
+import { MaterialArgs, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { gbufferScreenSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-screen-space-raymarch-depth-fragment-template.ts';
 // import { litScreenSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-screen-space-raymarch-fragment-template.ts';
 import litScreenSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-screen-space-raymarch-fragment.glsl';
@@ -59,7 +59,7 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
 
         // NOTE: geometryは親から渡して使いまわしてもよい
         const geometry = args.geometry ?? createPlaneGeometry({ gpu });
-        const material = new ScreenSpaceRaymarchMaterial({
+        const material = createScreenSpaceRaymarchMaterial({
             ...materialArgs,
             // overrides
             fragmentShader,
@@ -75,8 +75,8 @@ export class ScreenSpaceRaymarchMesh extends Mesh {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.mainMaterial, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.mainMaterial, UniformNames.TargetHeight, height);
     }
 
     updateMaterial(args: { camera: Camera }) {

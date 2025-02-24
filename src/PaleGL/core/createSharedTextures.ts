@@ -7,7 +7,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Material } from '@/PaleGL/materials/Material.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
@@ -240,12 +240,12 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         } = current;
         const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height });
         const ppRenderTarget = createEffectRenderTarget({ gpu, width, height });
-        const tmpMaterial = new Material({
+        const tmpMaterial = createMaterial({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: effectFragmentShader,
             uniforms: effectUniforms,
         });
-        const ppMaterial = new Material({
+        const ppMaterial = createMaterial({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: effectTexturePostProcessFragment,
             uniforms: [
@@ -279,7 +279,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
 
         tmpMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
         ppMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
-        ppMaterial.uniforms.setValue(UniformNames.SrcTexture, tmpRenderTarget.$getTexture());
+        setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.$getTexture());
 
         const render = () => {
             renderMaterial(tmpRenderTarget, tmpMaterial);

@@ -16,6 +16,7 @@ import {
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/Texture.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';
 const UNIFORM_FOG_STRENGTH = 'uFogStrength';
@@ -82,7 +83,7 @@ export class FogPass extends PostProcessPassBase {
     constructor(args: { gpu: GPU; parameters?: FogPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = fogFragmentShader;
-        
+
         const parameters = generateFogPassParameters();
 
         super({
@@ -188,24 +189,24 @@ export class FogPass extends PostProcessPassBase {
         screenSpaceShadowRtTexture: Texture,
         noiseTexture: Texture
     ) {
-        this.material.uniforms.setValue(lightShaftTextureUniformName, lightShaftRtTexture);
-        this.material.uniforms.setValue(volumetricLightTextureUniformName, volumetricLightRtTexture);
-        this.material.uniforms.setValue(screenSpaceShadowTextureUniformName, screenSpaceShadowRtTexture);
-        this.material.uniforms.setValue(UNIFORM_NOISE_TEXTURE, noiseTexture);
+        setMaterialUniformValue(this.material, lightShaftTextureUniformName, lightShaftRtTexture);
+        setMaterialUniformValue(this.material, volumetricLightTextureUniformName, volumetricLightRtTexture);
+        setMaterialUniformValue(this.material, screenSpaceShadowTextureUniformName, screenSpaceShadowRtTexture);
+        setMaterialUniformValue(this.material, UNIFORM_NOISE_TEXTURE, noiseTexture);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(UNIFORM_FOG_COLOR, this.parameters.fogColor);
-        this.material.uniforms.setValue(UNIFORM_FOG_STRENGTH, this.parameters.fogStrength);
-        this.material.uniforms.setValue(UNIFORM_FOG_DENSITY, this.parameters.fogDensity);
-        this.material.uniforms.setValue(UNIFORM_FOG_DENSITY_ATTENUATION, this.parameters.fogDensityAttenuation);
-        this.material.uniforms.setValue(UNIFORM_FOG_END_HEIGHT, this.parameters.fogEndHeight);
-        this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_START, this.parameters.distanceFogStart);
-        this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_END, this.parameters.distanceFogEnd);
-        this.material.uniforms.setValue(UNIFORM_DISTANCE_FOG_POWER, this.parameters.distanceFogPower);
-        this.material.uniforms.setValue(UNIFORM_SSS_FOG_RATE, this.parameters.sssFogRate);
-        this.material.uniforms.setValue(UNIFORM_SSS_FOG_COLOR, this.parameters.sssFogColor);
-        this.material.uniforms.setValue(UniformNames.BlendRate, this.parameters.blendRate);
+        setMaterialUniformValue(this.material, UNIFORM_FOG_COLOR, this.parameters.fogColor);
+        setMaterialUniformValue(this.material, UNIFORM_FOG_STRENGTH, this.parameters.fogStrength);
+        setMaterialUniformValue(this.material, UNIFORM_FOG_DENSITY, this.parameters.fogDensity);
+        setMaterialUniformValue(this.material, UNIFORM_FOG_DENSITY_ATTENUATION, this.parameters.fogDensityAttenuation);
+        setMaterialUniformValue(this.material, UNIFORM_FOG_END_HEIGHT, this.parameters.fogEndHeight);
+        setMaterialUniformValue(this.material, UNIFORM_DISTANCE_FOG_START, this.parameters.distanceFogStart);
+        setMaterialUniformValue(this.material, UNIFORM_DISTANCE_FOG_END, this.parameters.distanceFogEnd);
+        setMaterialUniformValue(this.material, UNIFORM_DISTANCE_FOG_POWER, this.parameters.distanceFogPower);
+        setMaterialUniformValue(this.material, UNIFORM_SSS_FOG_RATE, this.parameters.sssFogRate);
+        setMaterialUniformValue(this.material, UNIFORM_SSS_FOG_COLOR, this.parameters.sssFogColor);
+        setMaterialUniformValue(this.material, UniformNames.BlendRate, this.parameters.blendRate);
         super.render(options);
     }
 }

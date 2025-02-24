@@ -24,7 +24,7 @@ import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import { Material } from '@/PaleGL/materials/Material';
+import {createMaterial, Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
@@ -67,13 +67,13 @@ import { Camera } from '@/PaleGL/actors/Camera';
 import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
-import { GBufferMaterial } from '@/PaleGL/materials/GBufferMaterial.ts';
+import {createGBufferMaterial} from '@/PaleGL/materials/gBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
-import { UnlitMaterial } from '@/PaleGL/materials/UnlitMaterial.ts';
+import {createUnlitMaterial} from '@/PaleGL/materials/unlitMaterial.ts';
 
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
@@ -84,7 +84,7 @@ import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { createScene } from '@/PaleGL/core/scene.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
-// import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/ObjectSpaceRaymarchMaterial.ts';
+// import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
 // console.log('----- vert -----');
 // console.log(testVert);
@@ -1266,7 +1266,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     //     envMap: cubeMap,
     //     ambientAmount: 0.2,
     // });
-    skinningMesh.material = new GBufferMaterial({
+    skinningMesh.material = createGBufferMaterial({
         // gpu,
         // specularAmount: 0.5,
         // diffuseColor: Color.white(),
@@ -1391,7 +1391,7 @@ const main = async () => {
     //
 
     attractSphereMesh = await createGLTFSphereMesh(
-        new UnlitMaterial({
+        createUnlitMaterial({
             emissiveColor: new Color(2, 2, 2, 1),
             // receiveShadow: true,
         })
@@ -1417,7 +1417,7 @@ const main = async () => {
     //
 
     testLightingMesh = await createGLTFSphereMesh(
-        new GBufferMaterial({
+        createGBufferMaterial({
             // diffuseColor: new Color(1, .05, .05, 1),
             // metallic: 0,
             // roughness: .3
@@ -1546,7 +1546,7 @@ const main = async () => {
         //     specularAmount: 0.4,
         //     ambientAmount: 0.2,
         // }),
-        material: new GBufferMaterial({
+        material: createGBufferMaterial({
             // gpu,
             diffuseMap: floorDiffuseMap,
             normalMap: floorNormalMap,
@@ -1567,10 +1567,8 @@ const main = async () => {
         const meshActor = actor as Mesh;
         actor.transform.setScaling(Vector3.fill(10));
         actor.transform.setRotationX(-90);
-        // actor.material.uniforms.uDiffuseMapUvScale.value = new Vector2(3, 3);
-        // actor.material.uniforms.uNormalMapUvScale.value = new Vector2(3, 3);
-        meshActor.material.uniforms.setValue('uDiffuseMapUvScale', new Vector2(3, 3));
-        meshActor.material.uniforms.setValue('uNormalMapUvScale', new Vector2(3, 3));
+        setMaterialUniformValue(meshActor.material, 'uDiffuseMapUvScale', new Vector2(3, 3));
+        setMaterialUniformValue(meshActor.material, 'uNormalMapUvScale', new Vector2(3, 3));
     });
 
     //
@@ -1663,7 +1661,7 @@ const main = async () => {
             .flat(),
         drawCount: particleNum * 6,
     });
-    const particleMaterial = new Material({
+    const particleMaterial = createMaterial({
         // gpu,
         vertexShader: `
 #pragma DEFINES

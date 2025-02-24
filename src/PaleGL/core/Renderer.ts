@@ -18,7 +18,7 @@ import { Light } from '@/PaleGL/actors/Light';
 import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/Camera';
-import { Material } from '@/PaleGL/materials/Material';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
@@ -66,7 +66,7 @@ import { Texture } from '@/PaleGL/core/Texture.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
-import {replaceShaderIncludes} from "@/PaleGL/core/buildShader.ts";
+import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -94,7 +94,8 @@ export function applyLightShadowMapUniformValues(
     fallbackTexture: Texture
 ) {
     // directional light
-    targetMaterial.uniforms.setValue(
+    setMaterialUniformValue(
+        targetMaterial,
         UniformNames.DirectionalLightShadowMap,
         lightActors.directionalLight && lightActors.directionalLight.shadowMap
             ? lightActors.directionalLight.shadowMap.read.$getDepthTexture()
@@ -106,7 +107,7 @@ export function applyLightShadowMapUniformValues(
         const spotLight = lightActors.spotLights[i];
         return spotLight && spotLight.shadowMap ? spotLight.shadowMap.read.$getDepthTexture() : fallbackTexture;
     });
-    targetMaterial.uniforms.setValue(UniformNames.SpotLightShadowMap, spotLightShadowMaps);
+    setMaterialUniformValue(targetMaterial, UniformNames.SpotLightShadowMap, spotLightShadowMaps);
 }
 
 /**
@@ -657,13 +658,13 @@ export class Renderer {
     // TODO: materialのstartの中でやりたい
     $checkNeedsBindUniformBufferObjectToMaterial(material: Material) {
         // mesh.materials.forEach((material) => {
-        if (material.boundUniformBufferObjects) {
+        if (material.getBoundUniformBufferObjects()) {
             return;
         }
-        material.boundUniformBufferObjects = true;
+        material.setBoundUniformBufferObjects(true);
         // for debug
         // console.log("[Renderer.$checkNeedsBindUniformBufferObjectToMaterial]", material.name)
-        material.uniformBlockNames.forEach((blockName) => {
+        material.getUniformBlockNames().forEach((blockName) => {
             const targetGlobalUniformBufferObject = this._globalUniformBufferObjects.find(
                 ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
             );
@@ -672,7 +673,7 @@ export class Renderer {
             }
             const blockIndex = this._gpu.bindUniformBlockAndGetBlockIndex(
                 targetGlobalUniformBufferObject.uniformBufferObject,
-                material.shader!,
+                material.getShader()!,
                 blockName
             );
             // for debug
@@ -683,7 +684,7 @@ export class Renderer {
             //     targetUniformBufferObject.blockName,
             //     blockIndex
             // );
-            material.uniforms.addUniformBlock(blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
+            material.getUniforms().addUniformBlock(blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
         });
         // });
     }
@@ -844,13 +845,13 @@ export class Renderer {
                         // if (!material.canRender) {
                         //     return;
                         // }
-                        if (material.alphaTest) {
+                        if (material.getAlphaTest()) {
                             renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
                                 this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.AlphaTest, i)
                             );
                             return;
                         }
-                        switch (material.blendType) {
+                        switch (material.getBlendType()) {
                             case BlendTypes.Opaque:
                                 renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
                                     this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Opaque, i)
@@ -893,7 +894,7 @@ export class Renderer {
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) =>
-            a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
+            a.actor.materials[a.materialIndex].getRenderQueue() - b.actor.materials[b.materialIndex].getRenderQueue();
 
         // all mesh infos
         const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
@@ -1057,13 +1058,15 @@ export class Renderer {
         applyLightShadowMapUniformValues(this._deferredShadingPass.material, lightActors, this._gpu.dummyTextureBlack);
 
         // set sss texture
-        this._deferredShadingPass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this._deferredShadingPass.material,
             'uScreenSpaceShadowTexture',
             this._screenSpaceShadowPass.renderTarget.read.$getTexture()
         );
 
         // set ao texture
-        this._deferredShadingPass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this._deferredShadingPass.material,
             'uAmbientOcclusionTexture',
             this._ambientOcclusionPass.renderTarget.read.$getTexture()
         );
@@ -1182,7 +1185,8 @@ export class Renderer {
 
         // TODO: set depth to transparent meshes
         sortedTransparentRenderMeshInfos.forEach((renderMeshInfo) => {
-            renderMeshInfo.actor.material.uniforms.setValue(
+            setMaterialUniformValue(
+                renderMeshInfo.actor.material,
                 UniformNames.DepthTexture,
                 this._copyDepthDestRenderTarget.$getDepthTexture()
             );
@@ -1257,24 +1261,28 @@ export class Renderer {
             this._stats.addDrawVertexCount(geometry);
             this._stats.incrementDrawCall();
         }
+        
+        // console.log("===========")
+        // console.log(`[Renderer.renderMesh] geometry`, geometry);
+        // console.log(`[Renderer.renderMesh] mat: ${material.getName()}`, material.getShader());
 
         // vertex
         this._gpu.setVertexArrayObject(geometry.getVertexArrayObject());
         // material
-        if (!material.shader) {
-            console.error('invalid material shader');
+        if (!material.getShader()) {
+            // console.error('invalid material shader');
             return;
         }
-        this._gpu.setShader(material.shader);
+        this._gpu.setShader(material.getShader()!); // TODO: ない場合を判定したい
         // uniforms
-        this._gpu.setUniforms(material.uniforms);
+        this._gpu.setUniforms(material.getUniforms());
 
         // setup depth write (depth mask)
         let depthWrite;
-        if (material.depthWrite !== null) {
-            depthWrite = material.depthWrite;
+        if (material.getDepthWrite() !== null) {
+            depthWrite = material.getDepthWrite();
         } else {
-            switch (material.blendType) {
+            switch (material.getBlendType()) {
                 case BlendTypes.Opaque:
                     depthWrite = true;
                     break;
@@ -1289,20 +1297,20 @@ export class Renderer {
         }
 
         // setup depth test
-        const depthTest = !!material.depthTest;
+        const depthTest = !!material.getDepthTest();
 
         // depth func type
-        const depthFuncType = material.depthFuncType;
+        const depthFuncType = material.getDepthFuncType();
 
         // draw
         this._gpu.draw(
             geometry.getDrawCount(),
-            material.primitiveType,
+            material.getPrimitiveType(),
             depthTest,
             depthWrite,
             depthFuncType,
-            material.blendType,
-            material.faceSide,
+            material.getBlendType(),
+            material.getFaceSide(),
             geometry.getInstanceCount()
         );
     }
@@ -1367,11 +1375,11 @@ export class Renderer {
                     return;
                 }
 
-                if (!depthMaterial.canRender) {
+                if (!depthMaterial.getCanRender()) {
                     return;
                 }
 
-                if (actor.materials[i].skipDepthPrePass) {
+                if (actor.materials[i].getSkipDepthPrePass()) {
                     return;
                 }
 
@@ -1430,11 +1438,12 @@ export class Renderer {
                         return;
                     }
 
-                    if (!depthMaterial.canRender) {
+                    if (!depthMaterial.getCanRender()) {
                         return;
                     }
 
-                    depthMaterial.uniforms.setValue(
+                    setMaterialUniformValue(
+                        depthMaterial,
                         UniformNames.DepthTexture,
                         this._copyDepthDestRenderTarget.$getDepthTexture()
                     );
@@ -1477,13 +1486,13 @@ export class Renderer {
 
             const targetMaterial = actor.materials[materialIndex];
 
-            if (!targetMaterial.canRender) {
+            if (!targetMaterial.getCanRender()) {
                 return;
             }
 
             // pre-passしてないmaterialの場合はdepthをcopy.
             // pre-passしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
-            if (targetMaterial.skipDepthPrePass) {
+            if (targetMaterial.getSkipDepthPrePass()) {
                 this.setRenderTarget(null, false, false);
                 this.copyDepthTexture();
                 this.setRenderTarget(this._gBufferRenderTargets.write, false, false);
@@ -1493,7 +1502,8 @@ export class Renderer {
             this.updateActorTransformUniforms(actor);
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            targetMaterial.uniforms.setValue(
+            setMaterialUniformValue(
+                targetMaterial,
                 UniformNames.DepthTexture,
                 this._copyDepthDestRenderTarget.$getDepthTexture()
             );

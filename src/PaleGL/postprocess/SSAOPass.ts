@@ -4,7 +4,7 @@
     TextureWrapTypes,
     UniformTypes,
     UniformBlockNames,
-    PostProcessPassType
+    PostProcessPassType,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
@@ -15,8 +15,9 @@ import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 import {
     PostProcessPassBase,
     PostProcessPassParametersBaseArgs,
-    PostProcessPassRenderArgs
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 export type SSAOPassParameters = PostProcessPassParametersBaseArgs;
 
@@ -103,7 +104,7 @@ const createSamplingTables: (gpu: GPU) => {
 };
 
 /**
- * 
+ *
  */
 export class SSAOPass extends PostProcessPassBase {
     occlusionSampleLength: number = 0.121;
@@ -121,12 +122,12 @@ export class SSAOPass extends PostProcessPassBase {
      *
      * @param gpu
      */
-    constructor(args: { gpu: GPU, parameters?: SSAOPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: SSAOPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = ssaoFragmentShader;
 
         const { samplingRotations, samplingDistances, samplingTexture } = createSamplingTables(gpu);
-        
+
         const parameters = generateSSAOPassParameters(args.parameters ?? {});
 
         super({
@@ -255,10 +256,8 @@ export class SSAOPass extends PostProcessPassBase {
      */
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        // this.material.uniforms.uTargetWidth.value = width;
-        // this.material.uniforms.uTargetHeight.value = height;
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
     }
 
     /**
@@ -266,15 +265,15 @@ export class SSAOPass extends PostProcessPassBase {
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue('uOcclusionSampleLength', this.occlusionSampleLength);
-        this.material.uniforms.setValue('uOcclusionBias', this.occlusionBias);
-        this.material.uniforms.setValue('uOcclusionMinDistance', this.occlusionMinDistance);
-        this.material.uniforms.setValue('uOcclusionMaxDistance', this.occlusionMaxDistance);
-        this.material.uniforms.setValue('uOcclusionColor', this.occlusionColor);
-        this.material.uniforms.setValue('uOcclusionPower', this.occlusionPower);
-        this.material.uniforms.setValue('uOcclusionStrength', this.occlusionStrength);
-        this.material.uniforms.setValue('uBlendRate', this.blendRate);
-        this.material.uniforms.setValue('uSamplingTexture', this.samplingTexture);
+        setMaterialUniformValue(this.material, 'uOcclusionSampleLength', this.occlusionSampleLength);
+        setMaterialUniformValue(this.material, 'uOcclusionBias', this.occlusionBias);
+        setMaterialUniformValue(this.material, 'uOcclusionMinDistance', this.occlusionMinDistance);
+        setMaterialUniformValue(this.material, 'uOcclusionMaxDistance', this.occlusionMaxDistance);
+        setMaterialUniformValue(this.material, 'uOcclusionColor', this.occlusionColor);
+        setMaterialUniformValue(this.material, 'uOcclusionPower', this.occlusionPower);
+        setMaterialUniformValue(this.material, 'uOcclusionStrength', this.occlusionStrength);
+        setMaterialUniformValue(this.material, 'uBlendRate', this.blendRate);
+        setMaterialUniformValue(this.material, 'uSamplingTexture', this.samplingTexture);
 
         super.render(options);
     }

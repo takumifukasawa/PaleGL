@@ -4,9 +4,9 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
-import { Material } from '@/PaleGL/materials/Material';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Camera } from '@/PaleGL/actors/Camera';
 import { Renderer } from '@/PaleGL/core/Renderer';
@@ -40,14 +40,12 @@ type BloomPassParametersBase = {
     bloomAmount: number;
 };
 
-type BloomPassParametersProperties = 
-    PostProcessPassParametersBase &
-    BloomPassParametersBase;
+type BloomPassParametersProperties = PostProcessPassParametersBase & BloomPassParametersBase;
 
 export type BloomPassParameters =
     // BloomPassParametersProperties &
-    BloomPassParametersProperties
-    // Required<IPostProcessPassParameters<BloomPassParameters>>; // override
+    BloomPassParametersProperties;
+// Required<IPostProcessPassParameters<BloomPassParameters>>; // override
 
 type BloomPassParametersArgs = Partial<BloomPassParameters>;
 
@@ -85,7 +83,7 @@ export class BloomPass implements IPostProcessPass {
     // gpu: GPU;
     name: string = 'BloomPass';
     type: PostProcessPassType = PostProcessPassType.Bloom;
-    
+
     width: number = 1;
     height: number = 1;
 
@@ -147,14 +145,7 @@ export class BloomPass implements IPostProcessPass {
         return this._compositePass.renderTarget;
     }
 
-    constructor({
-        gpu,
-        parameters,
-    } 
-    : {
-        gpu: GPU;
-        parameters?: BloomPassParametersArgs;
-    }) {
+    constructor({ gpu, parameters }: { gpu: GPU; parameters?: BloomPassParametersArgs }) {
         this.parameters = generateDefaultBloomPassParameters(parameters);
 
         // NOTE: _geometryは親から渡して使いまわしてもよい
@@ -218,7 +209,7 @@ export class BloomPass implements IPostProcessPass {
 
         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, 0.92);
 
-        this._horizontalBlurMaterial = new Material({
+        this._horizontalBlurMaterial = createMaterial({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
             uniforms: [
@@ -242,7 +233,7 @@ export class BloomPass implements IPostProcessPass {
         });
         this.materials.push(this._horizontalBlurMaterial);
 
-        this._verticalBlurMaterial = new Material({
+        this._verticalBlurMaterial = createMaterial({
             vertexShader: PostProcessPassBase.baseVertexShader,
             fragmentShader: gaussianBlurFragmentShader,
             uniforms: [
@@ -350,7 +341,7 @@ export class BloomPass implements IPostProcessPass {
 
     update() {}
 
-    $renderBlur (
+    $renderBlur(
         renderer: Renderer,
         horizontalRenderTarget: RenderTarget,
         verticalRenderTarget: RenderTarget,
@@ -361,22 +352,26 @@ export class BloomPass implements IPostProcessPass {
         const h = this.height / downSize;
 
         renderer.setRenderTarget(horizontalRenderTarget, true);
-        this._horizontalBlurMaterial.uniforms.setValue(
+        setMaterialUniformValue(
+            this._horizontalBlurMaterial,
             UniformNames.SrcTexture,
             beforeRenderTarget.$getTexture()
         );
-        this._horizontalBlurMaterial.uniforms.setValue(UniformNames.TargetWidth, w);
-        this._horizontalBlurMaterial.uniforms.setValue(UniformNames.TargetHeight, w);
+        setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetWidth, w);
+        setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetHeight, w);
         renderer.renderMesh(this._geometry, this._horizontalBlurMaterial);
 
         renderer.setRenderTarget(verticalRenderTarget, true);
         // renderer.clearColor(0, 0, 0, 1);
-        this._verticalBlurMaterial.uniforms.setValue(UniformNames.SrcTexture, horizontalRenderTarget.$getTexture());
-        this._verticalBlurMaterial.uniforms.setValue(UniformNames.TargetWidth, w);
-        this._verticalBlurMaterial.uniforms.setValue(UniformNames.TargetHeight, h);
+        setMaterialUniformValue(
+            this._verticalBlurMaterial,
+            UniformNames.SrcTexture,
+            horizontalRenderTarget.$getTexture()
+        );
+        setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetWidth, w);
+        setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetHeight, h);
         renderer.renderMesh(this._geometry, this._verticalBlurMaterial);
-    };
-
+    }
 
     render({
         gpu,
@@ -393,10 +388,10 @@ export class BloomPass implements IPostProcessPass {
         // ppの場合はいらない気がする
         // this.mesh.updateTransform();
 
-        if (!this._horizontalBlurMaterial.isCompiledShader) {
+        if (!this._horizontalBlurMaterial.isCompiledShader()) {
             this._horizontalBlurMaterial.start({ gpu, attributeDescriptors: this._geometry.getAttributeDescriptors() });
         }
-        if (!this._verticalBlurMaterial.isCompiledShader) {
+        if (!this._verticalBlurMaterial.isCompiledShader()) {
             this._verticalBlurMaterial.start({ gpu, attributeDescriptors: this._geometry.getAttributeDescriptors() });
         }
 
@@ -455,21 +450,46 @@ export class BloomPass implements IPostProcessPass {
         );
 
         if (prevRenderTarget) {
-            this._compositePass.material.uniforms.setValue(UniformNames.SrcTexture, prevRenderTarget.$getTexture());
+            setMaterialUniformValue(
+                this._compositePass.material,
+                UniformNames.SrcTexture,
+                prevRenderTarget.$getTexture()
+            );
         } else {
             console.error('invalid prev render target');
         }
         // this._compositePass.material.uniforms.setValue('uBrightnessTexture', this._extractBrightnessPass.renderTarget.$getTexture());
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLUR_4_TEXTURE, this._renderTargetBlurMip4_Vertical.$getTexture());
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLUR_8_TEXTURE, this._renderTargetBlurMip8_Vertical.$getTexture());
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLUR_16_TEXTURE, this._renderTargetBlurMip16_Vertical.$getTexture());
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLUR_32_TEXTURE, this._renderTargetBlurMip32_Vertical.$getTexture());
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLUR_64_TEXTURE, this._renderTargetBlurMip64_Vertical.$getTexture());
-        this._compositePass.material.uniforms.setValue(
+        setMaterialUniformValue(
+            this._compositePass.material,
+            UNIFORM_NAME_BLUR_4_TEXTURE,
+            this._renderTargetBlurMip4_Vertical.$getTexture()
+        );
+        setMaterialUniformValue(
+            this._compositePass.material,
+            UNIFORM_NAME_BLUR_8_TEXTURE,
+            this._renderTargetBlurMip8_Vertical.$getTexture()
+        );
+        setMaterialUniformValue(
+            this._compositePass.material,
+            UNIFORM_NAME_BLUR_16_TEXTURE,
+            this._renderTargetBlurMip16_Vertical.$getTexture()
+        );
+        setMaterialUniformValue(
+            this._compositePass.material,
+            UNIFORM_NAME_BLUR_32_TEXTURE,
+            this._renderTargetBlurMip32_Vertical.$getTexture()
+        );
+        setMaterialUniformValue(
+            this._compositePass.material,
+            UNIFORM_NAME_BLUR_64_TEXTURE,
+            this._renderTargetBlurMip64_Vertical.$getTexture()
+        );
+        setMaterialUniformValue(
+            this._compositePass.material,
             UNIFORM_NAME_EXTRACT_TEXTURE,
             this._extractBrightnessPass.renderTarget.$getTexture()
         );
-        
+
         // this._compositePass.material.uniforms.setValue('uTone', this.parameters.tone);
         // this._compositePass.material.uniforms.setValue('uBloomAmount', this.parameters.bloomAmount);
 
@@ -489,10 +509,14 @@ export class BloomPass implements IPostProcessPass {
         this.parameters = overrideBloomPassParameters(this.parameters, parameters);
         this.assignParameters();
     }
-    
+
     assignParameters() {
-        this._extractBrightnessPass.material.uniforms.setValue(UNIFORM_NAME_THRESHOLD, this.parameters.threshold);
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_TONE, this.parameters.tone);
-        this._compositePass.material.uniforms.setValue(UNIFORM_NAME_BLOOM_AMOUNT, this.parameters.bloomAmount);
+        setMaterialUniformValue(
+            this._extractBrightnessPass.material,
+            UNIFORM_NAME_THRESHOLD,
+            this.parameters.threshold
+        );
+        setMaterialUniformValue(this._compositePass.material, UNIFORM_NAME_TONE, this.parameters.tone);
+        setMaterialUniformValue(this._compositePass.material, UNIFORM_NAME_BLOOM_AMOUNT, this.parameters.bloomAmount);
     }
 }

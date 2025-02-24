@@ -8,6 +8,7 @@ import {
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Override } from '@/PaleGL/palegl';
+import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
 
 export type ScreenSpaceShadowPassParametersBase = {
     bias: number;
@@ -138,11 +139,11 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      * @param options
      */
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(UNIFORM_BIAS_NAME, this.parameters.bias);
-        this.material.uniforms.setValue(UNIFORM_JITTER_SIZE_NAME, this.parameters.jitterSize);
-        this.material.uniforms.setValue(UNIFORM_SHARPNESS_NAME, this.parameters.sharpness);
-        this.material.uniforms.setValue(UNIFORM_STRENGTH_NAME, this.parameters.strength);
-        this.material.uniforms.setValue(UNIFORM_RAY_STEP_MULTIPLIER_NAME, this.parameters.rayStepMultiplier);
+        setMaterialUniformValue(this.material, UNIFORM_BIAS_NAME, this.parameters.bias);
+        setMaterialUniformValue(this.material, UNIFORM_JITTER_SIZE_NAME, this.parameters.jitterSize);
+        setMaterialUniformValue(this.material, UNIFORM_SHARPNESS_NAME, this.parameters.sharpness);
+        setMaterialUniformValue(this.material, UNIFORM_STRENGTH_NAME, this.parameters.strength);
+        setMaterialUniformValue(this.material, UNIFORM_RAY_STEP_MULTIPLIER_NAME, this.parameters.rayStepMultiplier);
         super.render(options);
     }
 }

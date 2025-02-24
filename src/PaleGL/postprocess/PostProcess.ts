@@ -8,7 +8,8 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import {Texture} from "@/PaleGL/core/Texture.ts";
+import { Texture } from '@/PaleGL/core/Texture.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
@@ -22,7 +23,7 @@ type PostProcessRenderArgs = {
     targetCamera: Camera;
     time: number;
     isCameraLastPass: boolean;
-    lightActors?: LightActors
+    lightActors?: LightActors;
 };
 
 // TODO: actorを継承してもいいかもしれない
@@ -116,10 +117,10 @@ export class PostProcess {
     }
 
     /**
-     * 
+     *
      */
     update() {
-        this.passes.forEach(pass => {
+        this.passes.forEach((pass) => {
             pass.update();
         });
     }
@@ -139,14 +140,14 @@ export class PostProcess {
         targetCamera,
         // time,
         lightActors,
-        fallbackTextureBlack
+        fallbackTextureBlack,
     }: {
         pass: IPostProcessPass;
         renderer: Renderer;
         targetCamera: Camera;
         // time: number;
         lightActors?: LightActors;
-        fallbackTextureBlack: Texture
+        fallbackTextureBlack: Texture;
     }) {
         pass.materials.forEach((passMaterial) => {
             // TODO: 必要なのだけ割り当てたいが・・・
@@ -157,28 +158,54 @@ export class PostProcess {
             //
             // basic
             //
-            
-            passMaterial.uniforms.setValue(UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
-            passMaterial.uniforms.setValue(
+
+            setMaterialUniformValue(passMaterial, UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
+            setMaterialUniformValue(
+                passMaterial,
                 UniformNames.InverseViewProjectionMatrix,
                 targetCamera.inverseViewProjectionMatrix
             );
-            passMaterial.uniforms.setValue(UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
-            passMaterial.uniforms.setValue(UniformNames.InverseProjectionMatrix, targetCamera.inverseProjectionMatrix);
-            passMaterial.uniforms.setValue(
+            setMaterialUniformValue(passMaterial, UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.InverseProjectionMatrix,
+                targetCamera.inverseProjectionMatrix
+            );
+            setMaterialUniformValue(
+                passMaterial,
                 UniformNames.TransposeInverseViewMatrix,
                 targetCamera.viewMatrix.clone().invert().transpose()
             );
-            
+
             // passMaterial.uniforms.setValue(UniformNames.Time, time);
-            
+
             // g-buffers
-            passMaterial.uniforms.setValue(UniformNames.GBufferATexture, renderer.gBufferRenderTargets.$getGBufferATexture());
-            passMaterial.uniforms.setValue(UniformNames.GBufferBTexture, renderer.gBufferRenderTargets.$getGBufferBTexture());
-            passMaterial.uniforms.setValue(UniformNames.GBufferCTexture, renderer.gBufferRenderTargets.$getGBufferCTexture());
-            passMaterial.uniforms.setValue(UniformNames.GBufferDTexture, renderer.gBufferRenderTargets.$getGBufferDTexture());
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.GBufferATexture,
+                renderer.gBufferRenderTargets.$getGBufferATexture()
+            );
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.GBufferBTexture,
+                renderer.gBufferRenderTargets.$getGBufferBTexture()
+            );
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.GBufferCTexture,
+                renderer.gBufferRenderTargets.$getGBufferCTexture()
+            );
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.GBufferDTexture,
+                renderer.gBufferRenderTargets.$getGBufferDTexture()
+            );
             // passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
-            passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.depthPrePassRenderTarget.$getDepthTexture());
+            setMaterialUniformValue(
+                passMaterial,
+                UniformNames.DepthTexture,
+                renderer.depthPrePassRenderTarget.$getDepthTexture()
+            );
         });
     }
 
@@ -213,7 +240,7 @@ export class PostProcess {
             targetCamera,
             // time,
             lightActors,
-            fallbackTextureBlack: gpu.dummyTextureBlack
+            fallbackTextureBlack: gpu.dummyTextureBlack,
         });
 
         //

@@ -8,7 +8,7 @@ import {
     ShadingModelIds,
     UniformBlockNames,
 } from '@/PaleGL/constants';
-import { Material } from '@/PaleGL/materials/Material';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
@@ -118,7 +118,7 @@ export class Skybox extends Mesh {
             drawCount: skyboxObjData.indices.length,
         });
 
-        const material = new Material({
+        const material = createMaterial({
             // gpu,
             name: 'Skybox',
             vertexShader: skyboxVertexShader,

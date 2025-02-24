@@ -7,6 +7,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Override } from '@/PaleGL/palegl';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 const UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE = 'uScale';
 const UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE = 0.015;
@@ -68,19 +69,13 @@ export class ChromaticAberrationPass extends PostProcessPassBase {
 
     setSize(width: number, height: number) {
         super.setSize(width, height);
-        this.material.uniforms.setValue(UniformNames.TargetWidth, width);
-        this.material.uniforms.setValue(UniformNames.TargetHeight, height);
+        setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
+        setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
     }
 
     render(options: PostProcessPassRenderArgs) {
-        this.material.uniforms.setValue(
-            UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-            this.parameters.scale
-        );
-        this.material.uniforms.setValue(
-            UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
-            this.parameters.power
-        );
+        setMaterialUniformValue(this.material, UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE, this.parameters.scale);
+        setMaterialUniformValue(this.material, UNIFORM_NAME_CHROMATIC_ABERRATION_POWER, this.parameters.power);
 
         super.render(options);
     }

@@ -1,11 +1,9 @@
 ﻿import { Actor, ActorArgs } from '@/PaleGL/actors/Actor';
 import { ActorTypes, LightType } from '@/PaleGL/constants';
 import { Color } from '@/PaleGL/math/Color';
-// import {Camera} from "./Camera";
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { OrthographicCamera } from './OrthographicCamera';
 import { PerspectiveCamera } from './PerspectiveCamera';
-// import { Material } from '@/PaleGL/materials/Material.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 export type LightArgs = ActorArgs & {
