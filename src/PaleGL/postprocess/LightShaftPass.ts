@@ -5,7 +5,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Camera } from '@/PaleGL/actors/Camera';
+import { Camera, transformScreenPoint } from '@/PaleGL/actors/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
@@ -15,7 +15,7 @@ import {
     PostProcessPassBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
-import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight.ts';
+import { DirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 
 //
@@ -313,7 +313,8 @@ export class LightShaftPass implements IPostProcessPass {
         // directional light の位置をそのまま使う場合
         // const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
         // 適当に遠いところに飛ばす場合 TODO: directionを考慮。位置だけだとダメ
-        const lightPositionInClip = targetCamera.transformScreenPoint(
+        const lightPositionInClip = transformScreenPoint(
+            targetCamera,
             this.#directionalLight!.transform.getPosition().clone().scale(10000)
         );
         // 0 ~ 1

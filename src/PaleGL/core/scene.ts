@@ -1,4 +1,4 @@
-﻿import { Actor } from '@/PaleGL/actors/Actor';
+﻿import {Actor, getActorHasChild} from '@/PaleGL/actors/actor.ts';
 
 type TraverseFunc = (actor: Actor) => void;
 
@@ -21,7 +21,7 @@ export function createScene() {
     
     const _recursiveTraverseActor = (actor: Actor, execFunc: TraverseFunc) => {
         execFunc(actor);
-        if (actor.hasChild) {
+        if (getActorHasChild(actor)) {
             for (let i = 0; i < actor.children.length; i++) {
                 _recursiveTraverseActor(actor.children[i], execFunc);
             }

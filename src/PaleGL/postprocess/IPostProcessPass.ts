@@ -1,7 +1,7 @@
 ﻿import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
-import { Camera } from '@/PaleGL/actors/Camera.ts';
+import { Camera } from '@/PaleGL/actors/camera.ts';
 import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { PostProcessPassType } from '@/PaleGL/constants.ts';
 

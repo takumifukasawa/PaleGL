@@ -90,6 +90,8 @@ export const ActorTypes = {
     Camera: 5,
     TextMesh: 6,
     PostProcessVolume: 7,
+    ObjectSpaceRaymarchMesh: 8,
+    ScreenSpaceRaymarchMesh: 9,
 } as const;
 
 export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];

@@ -1,9 +1,7 @@
 // actors
-import { DirectionalLight } from '@/PaleGL/actors/DirectionalLight';
-import { Mesh } from '@/PaleGL/actors/Mesh';
-import { PerspectiveCamera } from '@/PaleGL/actors/PerspectiveCamera';
-import { Skybox } from '@/PaleGL/actors/Skybox';
-import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
+import { createMesh, getMeshMaterial, Mesh, setMeshMaterial } from '@/PaleGL/actors/mesh.ts';
+import { createPerspectiveCamera, PerspectiveCamera, setPerspectiveSize } from '@/PaleGL/actors/perspectiveCamera.ts';
+import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
 
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
@@ -62,9 +60,9 @@ import {
     RAD_TO_DEG,
 } from '@/PaleGL/constants';
 
-import {createDebuggerGUI, DebuggerGUI} from '@/PaleGL/utilities/debuggerGUI.ts';
-import { Camera } from '@/PaleGL/actors/Camera';
-import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
+import { createDebuggerGUI, DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/camera.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
@@ -77,12 +75,16 @@ import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/ObjectSpaceRaymarchMesh.ts';
-import { ScreenSpaceRaymarchMesh } from '@/PaleGL/actors/ScreenSpaceRaymarchMesh.ts';
-import { FontAtlasData, TextAlignType, TextMesh } from '@/PaleGL/actors/TextMesh.ts';
-import { SpotLight } from '@/PaleGL/actors/SpotLight.ts';
+import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/textMesh.ts';
+import { createSpotLight, SpotLight } from '@/PaleGL/actors/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { createScene } from '@/PaleGL/core/scene.ts';
+import { subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
+import { createDirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
+import { createSkybox } from '@/PaleGL/actors/skybox.ts';
+import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
+import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
+import { setOrthoSize } from '@/PaleGL/actors/orthographicCameraBehaviour.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -342,15 +344,15 @@ const engine = createEngine({ gpu, renderer });
 engine.setScene(captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
-const captureSceneCamera = new PerspectiveCamera(70, 1, 0.1, 50);
+const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);
 captureScene.add(captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 // captureSceneCamera.mainCamera = true;
 
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 
-captureSceneCamera.subscribeOnStart(({ actor }) => {
-    (actor as Camera).setClearColor(new Vector4(0, 0, 0, 1));
+subscribeActorOnStart(captureSceneCamera, () => {
+    setCameraClearColor(captureSceneCamera, new Vector4(0, 0, 0, 1));
 });
 captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
@@ -364,7 +366,7 @@ captureSceneCamera.onFixedUpdate = () => {
     orbitCameraController.fixedUpdate();
 };
 
-const directionalLight = new DirectionalLight({
+const directionalLight = createDirectionalLight({
     // intensity: 1.2,
     intensity: 0,
     // color: Color.fromRGB(255, 210, 200),
@@ -381,7 +383,7 @@ if (directionalLight.shadowCamera) {
     directionalLight.shadowCamera.far = 15;
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -7, 7, -7, 7);
+    setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
     directionalLight.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -391,9 +393,9 @@ if (directionalLight.shadowCamera) {
     });
 }
 
-directionalLight.subscribeOnStart(({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-8, 8, -2));
-    actor.transform.lookAt(new Vector3(0, 0, 0));
+subscribeActorOnStart(directionalLight, () => {
+    directionalLight.transform.setTranslation(new Vector3(-8, 8, -2));
+    directionalLight.transform.lookAt(new Vector3(0, 0, 0));
     // const lightActor = actor as DirectionalLight;
     // lightActor.castShadow = true;
     // // lightActor.castShadow = false;
@@ -406,7 +408,7 @@ directionalLight.subscribeOnStart(({ actor }) => {
 });
 captureScene.add(directionalLight);
 
-const spotLight1 = new SpotLight({
+const spotLight1 = createSpotLight({
     intensity: 1,
     color: Color.white,
     distance: 20,
@@ -422,7 +424,7 @@ if (spotLight1.shadowCamera) {
     spotLight1.shadowCamera.near = 1;
     spotLight1.shadowCamera.far = spotLight1.distance;
     // spotLight.shadowCamera.far = 10;
-    (spotLight1.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
+    setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
     spotLight1.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -431,14 +433,15 @@ if (spotLight1.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight1.subscribeOnStart(({ actor }) => {
-    actor.transform.setTranslation(new Vector3(5, 9, -2));
-    actor.transform.lookAt(new Vector3(0, 0, 0));
+
+subscribeActorOnStart(spotLight1, () => {
+    spotLight1.transform.setTranslation(new Vector3(5, 9, -2));
+    spotLight1.transform.lookAt(new Vector3(0, 0, 0));
 });
 
 captureScene.add(spotLight1);
 
-const spotLight2 = new SpotLight({
+const spotLight2 = createSpotLight({
     intensity: 1,
     color: Color.white,
     distance: 20,
@@ -454,7 +457,7 @@ if (spotLight2.shadowCamera) {
     spotLight2.shadowCamera.near = 1;
     spotLight2.shadowCamera.far = spotLight2.distance;
     // spotLight.shadowCamera.far = 10;
-    (spotLight2.shadowCamera as PerspectiveCamera).setPerspectiveSize(1); // TODO: いらないかも
+    setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
     spotLight2.shadowMap = new RenderTarget({
         gpu,
         width: 1024,
@@ -463,9 +466,9 @@ if (spotLight2.shadowCamera) {
         depthPrecision: TextureDepthPrecisionType.High,
     });
 }
-spotLight2.subscribeOnStart(({ actor }) => {
-    actor.transform.setTranslation(new Vector3(-5, 9, -2));
-    actor.transform.lookAt(new Vector3(0, 0, 0));
+subscribeActorOnStart(spotLight2, () => {
+    spotLight2.transform.setTranslation(new Vector3(-5, 9, -2));
+    spotLight2.transform.lookAt(new Vector3(0, 0, 0));
 });
 
 captureScene.add(spotLight2);
@@ -481,7 +484,7 @@ cameraPostProcess.addPass(bufferVisualizerPass);
 
 cameraPostProcess.enabled = true;
 // TODO: set post process いらないかも
-captureSceneCamera.setPostProcess(cameraPostProcess);
+setCameraPostProcess(captureSceneCamera, cameraPostProcess);
 
 /*
 const debugTransformFeedback = () => {
@@ -908,7 +911,7 @@ const createGLTFSphereMesh = async (material: Material) => {
     const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     const mesh: Mesh = gltfActor.children[0] as Mesh;
     mesh.castShadow = true;
-    mesh.material = material;
+    setMeshMaterial(mesh, material);
 
     // mesh.material = new GBufferMaterial({
     //     // gpu,
@@ -1132,16 +1135,17 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // animatorは存在しているmeshのはず
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator!;
-    skinningMesh.setAnimationClips(gltfActor.animator!.getAnimationClips());
-    skinningMesh.subscribeOnStart(() => {
-        // CPU skinning
-        // gltfActor.animator.play('Fly', true);
-        // gltfActor.animator.animationClips[0].speed = 0.2;
-    });
-    // skinningMesh.onUpdate = ({ deltaTime }) => {
-    //     // skinningMesh.animator.update(deltaTime);
-    //     // gltfActor.animator.update(deltaTime);
-    // };
+    setAnimationClips(skinningMesh, gltfActor.animator.getAnimationClips());
+
+    // subscribeActorOnStart(skinningMesh, () => {
+    //     // CPU skinning
+    //     // gltfActor.animator.play('Fly', true);
+    //     // gltfActor.animator.animationClips[0].speed = 0.2;
+    // });
+    // // skinningMesh.onUpdate = ({ deltaTime }) => {
+    // //     // skinningMesh.animator.update(deltaTime);
+    // //     // gltfActor.animator.update(deltaTime);
+    // // };
 
     const instanceInfo: {
         position: number[][];
@@ -1266,20 +1270,23 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     //     envMap: cubeMap,
     //     ambientAmount: 0.2,
     // });
-    skinningMesh.material = createGBufferMaterial({
-        // gpu,
-        // specularAmount: 0.5,
-        // diffuseColor: Color.white(),
-        metallic: 0,
-        roughness: 1,
-        receiveShadow: true,
-        isSkinning: true,
-        gpuSkinning: true,
-        isInstancing: true,
-        useInstanceLookDirection: true,
-        useVertexColor: true,
-        faceSide: FaceSide.Double,
-    });
+    setMeshMaterial(
+        skinningMesh,
+        createGBufferMaterial({
+            // gpu,
+            // specularAmount: 0.5,
+            // diffuseColor: Color.white(),
+            metallic: 0,
+            roughness: 1,
+            receiveShadow: true,
+            isSkinning: true,
+            gpuSkinning: true,
+            isInstancing: true,
+            useInstanceLookDirection: true,
+            useVertexColor: true,
+            faceSide: FaceSide.Double,
+        })
+    );
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
 
@@ -1378,7 +1385,7 @@ const main = async () => {
         CubeMapNegativeZImgUrl
     );
 
-    const skyboxMesh = new Skybox({
+    const skyboxMesh = createSkybox({
         gpu,
         cubeMap,
         diffuseIntensity: 0.2,
@@ -1397,8 +1404,8 @@ const main = async () => {
             // receiveShadow: true,
         })
     );
-    attractSphereMesh.subscribeOnStart(({ actor }) => {
-        actor.transform.setScaling(Vector3.fill(0.5));
+    subscribeActorOnStart(attractSphereMesh, () => {
+        attractSphereMesh.transform.setScaling(Vector3.fill(0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
     attractSphereMesh.onFixedUpdate = () => {
@@ -1434,7 +1441,7 @@ const main = async () => {
     //
 
     // TODO:
-    objectSpaceRaymarchMesh = new ObjectSpaceRaymarchMesh({
+    objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
         gpu,
         fragmentShaderContent: litObjectSpaceRaymarchFragContent,
         // depthFragmentShaderContent: gBufferObjectSpaceRaymarchDepthFrag,
@@ -1454,7 +1461,7 @@ const main = async () => {
     //
 
     // TODO:
-    screenSpaceRaymarchMesh = new ScreenSpaceRaymarchMesh({
+    screenSpaceRaymarchMesh = createScreenSpaceRaymarchMesh({
         gpu,
         fragmentShaderContent: litScreenSpaceRaymarchFragContent,
         // depthFragmentShaderContent: gBufferScreenSpaceRaymarchDepthFrag,
@@ -1478,7 +1485,7 @@ const main = async () => {
         minFilter: TextureFilterTypes.Linear,
         magFilter: TextureFilterTypes.Linear,
     });
-    const textMesh1 = new TextMesh({
+    const textMesh1 = createTextMesh({
         gpu,
         text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         fontTexture: fontAtlasTexture,
@@ -1492,7 +1499,7 @@ const main = async () => {
     textMesh1.transform.getRotation().setRotationX(-90);
     textMesh1.transform.setScale(Vector3.fill(0.4));
 
-    const textMesh2 = new TextMesh({
+    const textMesh2 = createTextMesh({
         gpu,
         text: 'abcdefghijklmnopqrstuvwxyz',
         fontTexture: fontAtlasTexture,
@@ -1506,7 +1513,7 @@ const main = async () => {
     textMesh2.transform.getRotation().setRotationX(-90);
     textMesh2.transform.setScale(Vector3.fill(0.4));
 
-    const textMesh3 = new TextMesh({
+    const textMesh3 = createTextMesh({
         gpu,
         text: '0123456789',
         fontTexture: fontAtlasTexture,
@@ -1535,7 +1542,7 @@ const main = async () => {
         calculateTangent: true,
         calculateBinormal: true,
     });
-    floorPlaneMesh = new Mesh({
+    floorPlaneMesh = createMesh({
         geometry: floorGeometry,
         // material: new PhongMaterial({
         //     // gpu,
@@ -1564,12 +1571,11 @@ const main = async () => {
         // castShadow: false,
         castShadow: true,
     });
-    floorPlaneMesh.subscribeOnStart(({ actor }) => {
-        const meshActor = actor as Mesh;
-        actor.transform.setScaling(Vector3.fill(10));
-        actor.transform.setRotationX(-90);
-        setMaterialUniformValue(meshActor.material, 'uDiffuseMapUvScale', new Vector2(3, 3));
-        setMaterialUniformValue(meshActor.material, 'uNormalMapUvScale', new Vector2(3, 3));
+    subscribeActorOnStart(floorPlaneMesh, () => {
+        floorPlaneMesh.transform.setScaling(Vector3.fill(10));
+        floorPlaneMesh.transform.setRotationX(-90);
+        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uDiffuseMapUvScale', new Vector2(3, 3));
+        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uNormalMapUvScale', new Vector2(3, 3));
     });
 
     //
@@ -1804,7 +1810,7 @@ void main() {
         blendType: BlendTypes.Transparent,
         depthWrite: false,
     });
-    const particleMesh = new Mesh({
+    const particleMesh = createMesh({
         geometry: particleGeometry,
         material: particleMaterial,
     });

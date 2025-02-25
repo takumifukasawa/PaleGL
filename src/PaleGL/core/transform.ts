@@ -2,8 +2,8 @@
 import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import { Rotator } from '@/PaleGL/math/Rotator.js';
-import { Actor } from '@/PaleGL/actors/Actor';
-// import { Camera } from '@/PaleGL/actors/Camera.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
+// import { Camera } from '@/PaleGL/actors/camera.ts';
 
 // TODO:
 // - 外側から各種propertyを取得するときはmatrix更新した方がいい？
@@ -194,8 +194,8 @@ import { Actor } from '@/PaleGL/actors/Actor';
 
 export type Transform = ReturnType<typeof createTransform>;
 
-export function createTransform(actor: Actor) {
-    const _actor: Actor = actor;
+export function createTransform(actor: Actor | null) {
+    let _actor: Actor | null = actor;
     let _inverseWorldMatrix: Matrix4 = Matrix4.identity;
     let _worldMatrix: Matrix4 = Matrix4.identity;
     let _localMatrix: Matrix4 = Matrix4.identity;
@@ -215,7 +215,11 @@ export function createTransform(actor: Actor) {
 
     // get hasChild() {
     //     return this.childCount > 0;
-    // }
+    //
+    
+    const setActor = (actor: Actor) => {
+        _actor = actor;
+    }
 
     const updateMatrix = () => {
         if (_lookAtTarget || _lookAtTargetActor) {
@@ -227,7 +231,7 @@ export function createTransform(actor: Actor) {
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix =
-                _actor.type === ActorTypes.Camera
+                _actor?.type === ActorTypes.Camera
                     ? Matrix4.getLookAtMatrix(_position, lookAtTarget, Vector3.up, true)
                     : Matrix4.getLookAtMatrix(_position, lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(_scale);
@@ -246,8 +250,8 @@ export function createTransform(actor: Actor) {
             const scalingMatrix = Matrix4.scalingMatrix(_scale);
             _localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
         }
-        _worldMatrix = _actor.parent
-            ? Matrix4.multiplyMatrices(_actor.parent.transform.getWorldMatrix(), _localMatrix)
+        _worldMatrix = _actor?.parent
+            ? Matrix4.multiplyMatrices(_actor?.parent.transform.getWorldMatrix(), _localMatrix)
             : _localMatrix;
         _inverseWorldMatrix = _worldMatrix.clone().invert();
 
@@ -287,6 +291,7 @@ export function createTransform(actor: Actor) {
         localPointToWorld: (p: Vector3) => p.multiplyMatrix4(_worldMatrix),
         worldToLocalPoint: (p: Vector3) => p.multiplyMatrix4(_inverseWorldMatrix),
 
+        setActor,
         updateMatrix,
     };
 }

@@ -10,7 +10,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Camera } from '@/PaleGL/actors/Camera';
+import { Camera } from '@/PaleGL/actors/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
 import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';

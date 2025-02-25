@@ -1,16 +1,24 @@
-﻿import {createTimeSkipper} from '@/PaleGL/utilities/timeSkipper.ts';
+﻿import { createTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
-import {createStats, Stats} from '@/PaleGL/utilities/stats.ts';
+import { createStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import { Mesh } from '@/PaleGL/actors/Mesh.ts';
+import { Mesh } from '@/PaleGL/actors/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Actor } from '@/PaleGL/actors/Actor.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
+import {
+    beforeRenderActor,
+    fixedUpdateActor,
+    lastUpdateActor,
+    setSizeActor,
+    updateActor,
+    updateActorTransform,
+} from '@/PaleGL/actors/actorBehaviours.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
-import {createTimeAccumulator} from "@/PaleGL/utilities/timeAccumulator.ts";
+import { createTimeAccumulator } from '@/PaleGL/utilities/timeAccumulator.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -55,35 +63,35 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //     _onLastUpdate: EngineOnLastUpdateCallback | null = null;
 //     _onRender: EngineOnRenderCallback | null = null;
 //     _sharedTextures: SharedTextures;
-// 
+//
 //     get renderer() {
 //         return _renderer;
 //     }
-// 
+//
 //     get sharedTextures() {
 //         return _sharedTexturess;
 //     }
-// 
+//
 //     set onBeforeStart(cb: EngineOnBeforeStartCallback) {
 //         _onBeforeStart = cb;
 //     }
-// 
+//
 //     set onAfterStart(cb: EngineOnAfterStartCallback) {
 //         _onAfterStart = cb;
 //     }
-// 
+//
 //     set onBeforeUpdate(cb: EngineOnBeforeUpdateCallback) {
 //         _onBeforeUpdate = cb;
 //     }
-// 
+//
 //     set onBeforeFixedUpdate(cb: EngineOnBeforeFixedUpdateCallback) {
 //         _onBeforeFixedUpdate = cb;
 //     }
-// 
+//
 //     set onRender(cb: EngineOnRenderCallback) {
 //         _onRender = cb;
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param gpu
@@ -115,21 +123,21 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //     }) {
 //         _gpu = gpu;
 //         _renderer = renderer;
-// 
+//
 //         _stats = new Stats({ showStats, showPipeline: false }); // 一旦手動で
 //         _renderer.setStats(_stats);
-// 
+//
 //         // TODO: 外からfps変えられるようにしたい
 //         _fixedUpdateFrameTimer = new TimeAccumulator(fixedUpdateFps, fixedUpdate.bind(this));
 //         _updateFrameTimer = new TimeSkipper(updateFps, update.bind(this));
-// 
+//
 //         _onBeforeFixedUpdate = onBeforeFixedUpdate || null;
 //         _onBeforeUpdate = onBeforeUpdate || null;
 //         _onRender = onRender || null;
-// 
+//
 //         _sharedTexturess = createSharedTextures({ gpu, renderer });
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param scene
@@ -138,7 +146,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         _scene = scene;
 //         // _scenes.push(scene);
 //     }
-// 
+//
 //     /**
 //      *
 //      */
@@ -153,7 +161,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //             _onAfterStart();
 //         }
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param width
@@ -173,7 +181,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         // _renderer.setSize(w, h, rw, rh);
 //         _renderer.setSize(rw, rh);
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param fixedTime
@@ -183,7 +191,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         if (_onBeforeFixedUpdate) {
 //             _onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
 //         }
-// 
+//
 //         _scene?.traverse((actor) =>
 //             actor.fixedUpdate({
 //                 gpu: _gpu,
@@ -195,7 +203,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         // _scenes.forEach((scene) => {
 //         //     scene.traverse((actor) => actor.fixedUpdate({ gpu: _gpu, fixedTime, fixedDeltaTime }));
 //         // });
-// 
+//
 //         // update all actors matrix
 //         // TODO
 //         // - scene 側でやった方がよい？
@@ -208,7 +216,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         //     scene.traverse((actor) => actor.updateTransform());
 //         // });
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param time
@@ -218,15 +226,15 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         //
 //         // before update
 //         //
-// 
+//
 //         if (_onBeforeUpdate) {
 //             _onBeforeUpdate({ time, deltaTime });
 //         }
-// 
+//
 //         //
 //         // update and before render
 //         //
-// 
+//
 //         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
 //         _scene?.traverse((actor) => {
 //             actor.update({ gpu: _gpu, scene: _scene!, time, deltaTime });
@@ -247,33 +255,33 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //                     break;
 //             }
 //         });
-// 
+//
 //         //
 //         // last update
 //         //
-// 
+//
 //         if (_onLastUpdate) {
 //             _onLastUpdate({ time, deltaTime });
 //         }
 //         _scene?.traverse((actor) => {
 //             actor.lastUpdate({ gpu: _gpu, scene: _scene!, time, deltaTime });
 //         });
-// 
+//
 //         //
 //         // update transform
 //         //
-// 
+//
 //         _scene?.traverse((actor) => {
 //             actor.$updateTransform();
 //         });
-// 
+//
 //         //
 //         // render
 //         //
-// 
+//
 //         render(time, deltaTime);
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param time
@@ -282,7 +290,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //     lastUpdate(time: number, deltaTime: number) {
 //         _scene?.traverse((actor) => actor.lastUpdate({ gpu: _gpu, scene: _scene!, time, deltaTime }));
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param time[sec]
@@ -291,31 +299,31 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //     render(time: number, deltaTime: number) {
 //         // for debug
 //         // console.log(`[Engine.render]`);
-// 
+//
 //         _stats?.clear();
-// 
+//
 //         _renderer.beforeRender(time, deltaTime);
-// 
+//
 //         // update and render shared textures
 //         Object.values(_sharedTexturess).forEach((obj) => {
 //             obj.update(time);
 //             obj.render();
 //         });
-// 
+//
 //         if (_onRender) {
 //             _onRender(time, deltaTime);
 //         }
-// 
+//
 //         // TODO: ここにrenderer.renderを書く
 //         // _renderer.renderScene(_scene!);
-// 
+//
 //         _stats?.update(time);
 //     }
-// 
+//
 //     warmRender() {
 //         // for debug
 //         // console.log(`[Engine.warmRender]`);
-// 
+//
 //         // 描画させたいので全部中央に置いちゃう
 //         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
 //         _scene?.traverse((actor) => {
@@ -330,16 +338,16 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //             }
 //             tmpTransformPair.push({ actor, p: tmpP, r: tmpR });
 //         });
-// 
+//
 //         fixedUpdate(0, 0);
 //         update(0, 0);
-// 
+//
 //         tmpTransformPair.forEach((pair) => {
 //             pair.actor.transform.setPosition(pair.p);
 //             pair.actor.transform.setRotation(pair.r);
 //         });
 //     }
-// 
+//
 //     // time[sec]
 //     run(time: number) {
 //         _fixedUpdateFrameTimer.$exec(time / 1000);
@@ -349,28 +357,26 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
 export type Engine = ReturnType<typeof createEngine>;
 
-export function createEngine(
-    {
-        gpu,
-        renderer,
-        fixedUpdateFps = 60,
-        updateFps = 60,
-        onBeforeFixedUpdate,
-        onBeforeUpdate,
-        onRender,
-        showStats = false,
-    }: {
-        gpu: GPU;
-        renderer: Renderer;
-        fixedUpdateFps?: number;
-        updateFps?: number;
-        // renderFps?: number;
-        onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback;
-        onBeforeUpdate?: EngineOnBeforeUpdateCallback;
-        onRender?: EngineOnRenderCallback;
-        showStats?: boolean;
-    }) {
-    
+export function createEngine({
+    gpu,
+    renderer,
+    fixedUpdateFps = 60,
+    updateFps = 60,
+    onBeforeFixedUpdate,
+    onBeforeUpdate,
+    onRender,
+    showStats = false,
+}: {
+    gpu: GPU;
+    renderer: Renderer;
+    fixedUpdateFps?: number;
+    updateFps?: number;
+    // renderFps?: number;
+    onBeforeFixedUpdate?: EngineOnBeforeFixedUpdateCallback;
+    onBeforeUpdate?: EngineOnBeforeUpdateCallback;
+    onRender?: EngineOnRenderCallback;
+    showStats?: boolean;
+}) {
     const _gpu: GPU = gpu;
     const _stats: Stats | null = createStats({ showStats, showPipeline: false });
     const _renderer: Renderer = renderer;
@@ -382,12 +388,12 @@ export function createEngine(
     // callbacks
     let _onBeforeStart: EngineOnBeforeStartCallback | null = null;
     let _onAfterStart: EngineOnAfterStartCallback | null = null;
-    let _onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null  = onBeforeFixedUpdate || null;
-    let _onBeforeUpdate: EngineOnBeforeUpdateCallback | null =onBeforeUpdate || null;
+    let _onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null = onBeforeFixedUpdate || null;
+    let _onBeforeUpdate: EngineOnBeforeUpdateCallback | null = onBeforeUpdate || null;
     let _onLastUpdate: EngineOnLastUpdateCallback | null = null;
     let _onRender: EngineOnRenderCallback | null = onRender || null;
     const _sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
-    
+
     _renderer.setStats(_stats);
 
     const start = () => {
@@ -400,7 +406,7 @@ export function createEngine(
         if (_onAfterStart) {
             _onAfterStart();
         }
-    }
+    };
 
     const setSize = (width: number, height: number) => {
         const rw = width * _renderer.pixelRatio;
@@ -408,22 +414,22 @@ export function createEngine(
         const w = Math.floor(rw);
         const h = Math.floor(rh);
         _scene?.traverse((actor) => {
-            actor.setSize(w, h);
+            setSizeActor(actor, w, h);
         });
         // _scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.setSize(w, h));
         // });
         // _renderer.setSize(w, h, rw, rh);
         _renderer.setSize(rw, rh);
-    }
+    };
 
-    function fixedUpdate (fixedTime: number, fixedDeltaTime: number) {
+    function fixedUpdate(fixedTime: number, fixedDeltaTime: number) {
         if (_onBeforeFixedUpdate) {
             _onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
 
         _scene?.traverse((actor) =>
-            actor.fixedUpdate({
+            fixedUpdateActor(actor, {
                 gpu: _gpu,
                 scene: _scene!,
                 fixedTime,
@@ -440,14 +446,14 @@ export function createEngine(
         // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
         // - やっぱりcomponentシステムにした方が良い気もする
         _scene?.traverse((actor) => {
-            actor.$updateTransform();
+            updateActorTransform(actor);
         });
         // _scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.updateTransform());
         // });
     }
 
-    function update (time: number, deltaTime: number) {
+    function update(time: number, deltaTime: number) {
         //
         // before update
         //
@@ -462,12 +468,12 @@ export function createEngine(
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
         _scene?.traverse((actor) => {
-            actor.update({ gpu: _gpu, scene: _scene!, time, deltaTime });
+            updateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime });
             switch (actor.type) {
                 case ActorTypes.Skybox:
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
-                    actor.beforeRender({ gpu: _gpu });
+                    beforeRenderActor(actor, { gpu: _gpu });
                     const mesh = actor as Mesh;
                     mesh.materials.forEach((mat) => {
                         _renderer.$checkNeedsBindUniformBufferObjectToMaterial(mat);
@@ -489,7 +495,7 @@ export function createEngine(
             _onLastUpdate({ time, deltaTime });
         }
         _scene?.traverse((actor) => {
-            actor.lastUpdate({ gpu: _gpu, scene: _scene!, time, deltaTime });
+            lastUpdateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime });
         });
 
         //
@@ -497,7 +503,7 @@ export function createEngine(
         //
 
         _scene?.traverse((actor) => {
-            actor.$updateTransform();
+            updateActorTransform(actor);
         });
 
         //
@@ -507,11 +513,9 @@ export function createEngine(
         render(time, deltaTime);
     }
 
-
     const lastUpdate = (time: number, deltaTime: number) => {
-        _scene?.traverse((actor) => actor.lastUpdate({ gpu: _gpu, scene: _scene!, time, deltaTime }));
-    }
-
+        _scene?.traverse((actor) => lastUpdateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime }));
+    };
 
     const render = (time: number, deltaTime: number) => {
         // for debug
@@ -535,7 +539,7 @@ export function createEngine(
         // _renderer.renderScene(_scene!);
 
         _stats?.update(time);
-    }
+    };
 
     const warmRender = () => {
         // for debug
@@ -563,19 +567,18 @@ export function createEngine(
             pair.actor.transform.setPosition(pair.p);
             pair.actor.transform.setRotation(pair.r);
         });
-    }
+    };
 
     // time[sec]
     const run = (time: number) => {
         _fixedUpdateFrameTimer.exec(time / 1000);
         _updateFrameTimer.exec(time / 1000);
-    }
-
+    };
 
     return {
         getRenderer: () => _renderer,
         getSharedTextures: () => _sharedTextures,
-        setOnBeforeStart: (cb: EngineOnBeforeStartCallback)=> (_onBeforeStart = cb),
+        setOnBeforeStart: (cb: EngineOnBeforeStartCallback) => (_onBeforeStart = cb),
         setOnAfterStart: (cb: EngineOnAfterStartCallback) => (_onAfterStart = cb),
         setOnBeforeUpdate: (cb: EngineOnBeforeUpdateCallback) => (_onBeforeUpdate = cb),
         setOnBeforeFixedUpdate: (cb: EngineOnBeforeFixedUpdateCallback) => (_onBeforeFixedUpdate = cb),
@@ -589,6 +592,6 @@ export function createEngine(
         lastUpdate,
         render,
         warmRender,
-        run
-    }
+        run,
+    };
 }

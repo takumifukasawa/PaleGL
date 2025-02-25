@@ -8,7 +8,7 @@ import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/mate
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Camera } from '@/PaleGL/actors/Camera';
+import { Camera } from '@/PaleGL/actors/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';

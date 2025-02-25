@@ -1,20 +1,20 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { Actor } from '@/PaleGL/actors/Actor.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 
-export type ComponentStartArgs = { scene: Scene; actor: Actor; gpu: GPU };
-export type ComponentFixedUpdateArgs = { actor: Actor; gpu: GPU; fixedTime: number; fixedDeltaTime: number };
-export type ComponentBeforeUpdateArgs = { actor: Actor; gpu: GPU; time: number; deltaTime: number };
-export type ComponentUpdateArgs = { actor: Actor; gpu: GPU; time: number; deltaTime: number };
-export type ComponentLastUpdateArgs = { actor: Actor; gpu: GPU; time: number; deltaTime: number };
+export type ComponentStartArgs = { scene: Scene; gpu: GPU };
+export type ComponentFixedUpdateArgs = { gpu: GPU; fixedTime: number; fixedDeltaTime: number };
+export type ComponentBeforeUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
+export type ComponentUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
+export type ComponentLastUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; actor: Actor; gpu: GPU }) => void;
-type OnFixedUpdateCallback = (args: { actor: Actor; gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnBeforeUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; deltaTime: number }) => void;
-type OnUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; deltaTime: number }) => void;
-type OnLastUpdateCallback = (args: { actor: Actor; gpu: GPU; time: number; deltaTime: number }) => void;
+type OnStartCallback = (args: { scene: Scene; gpu: GPU }) => void;
+type OnFixedUpdateCallback = (args: { gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
+type OnBeforeUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
+type OnUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
+type OnLastUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
 type OnProcessPropertyBinderCallback = (key: string, value: number) => void;
-type OnPostProcessTimelineCallback = (actor: Actor, timelineTime: number) => void;
+type OnPostProcessTimelineCallback = (timelineTime: number) => void;
 
 // export type Component = {
 //     name: string;
@@ -40,6 +40,7 @@ export type ComponentArgs = {
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
 };
 
+
 export function createComponent(args: ComponentArgs) {
     const {
         name,
@@ -51,6 +52,8 @@ export function createComponent(args: ComponentArgs) {
         onProcessPropertyBinder,
         onPostProcessTimeline,
     } = args;
+   
+    let _actor: Actor | null = null;
 
     const start = (args: ComponentStartArgs) => {
         if (onStartCallback) {
@@ -88,14 +91,16 @@ export function createComponent(args: ComponentArgs) {
         }
     };
 
-    const postProcessTimeline = (actor: Actor, timelineTime: number) => {
+    const postProcessTimeline = (timelineTime: number) => {
         if (onPostProcessTimeline) {
-            onPostProcessTimeline(actor, timelineTime);
+            onPostProcessTimeline(timelineTime);
         }
     };
     
     return {
         name: name || "",
+        getActor: () => _actor,
+        setActor: (actor: Actor) => (_actor = actor),
         start,
         fixedUpdate,
         beforeUpdate,

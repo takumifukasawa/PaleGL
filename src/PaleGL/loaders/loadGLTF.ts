@@ -1,8 +1,6 @@
-import { Actor } from '@/PaleGL/actors/Actor';
+import {Actor, addChildActor, createActor} from '@/PaleGL/actors/actor.ts';
 import { Bone, createBone } from '@/PaleGL/core/bone.ts';
-import { SkinnedMesh } from '@/PaleGL/actors/SkinnedMesh';
 import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
-import { Mesh } from '@/PaleGL/actors/Mesh';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
@@ -16,6 +14,8 @@ import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { resolveGLEnumTextureFilterType, resolveGLEnumTextureWrapType, Texture } from '@/PaleGL/core/Texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
+import {createSkinnedMesh} from "@/PaleGL/actors/skinnedMesh.ts";
+import {createMesh} from "@/PaleGL/actors/mesh.ts";
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
@@ -226,7 +226,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
     const response = await fetch(gltfPath);
     const gltf = (await response.json()) as GLTFFormat;
 
-    const rootActor = new Actor({});
+    const rootActor = createActor({});
 
     // for debug
     console.log('[loadGLTF]', gltfPath, gltf);
@@ -363,7 +363,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         return bone;
     };
 
-    const createMesh = ({
+    const createMeshInternal = ({
         // nodeIndex,
         meshIndex,
         skinIndex = null,
@@ -570,7 +570,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // for debug
         // console.log("[loadGLTF.createMesh]", materialIndices, materials, gltf.materials)
 
-        return rootBone ? new SkinnedMesh({ geometry, bones: rootBone }) : new Mesh({ geometry, materials });
+        return rootBone ? createSkinnedMesh({ geometry, bones: rootBone }) : createMesh({ geometry, materials });
     };
 
     const findNode = (nodeIndex: number, parentActor: Actor): void => {
@@ -587,7 +587,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // mesh actor
         if (hasMesh) {
             // TODO: fix multi mesh
-            const meshActor = createMesh({
+            const meshActor = createMeshInternal({
                 // nodeIndex,
                 meshIndex: targetNode.mesh!, // has mesh なのであるはず
                 // skinIndex: targetNode.hasOwnProperty('skin') ? targetNode.skin! : null, //
@@ -595,7 +595,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             });
             cacheNodes[nodeIndex] = meshActor;
 
-            parentActor.addChild(meshActor);
+            addChildActor(parentActor, meshActor);
 
             if (hasChildren) {
                 targetNode.children!.forEach((child) => findNode(child, meshActor));
@@ -609,8 +609,8 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             if (cacheNodes[nodeIndex]) {
                 targetNode.children!.forEach((child) => findNode(child, parentActor));
             } else {
-                const anchorActor = new Actor({});
-                parentActor.addChild(anchorActor);
+                const anchorActor = createActor({});
+                addChildActor(parentActor, anchorActor);
                 cacheNodes[nodeIndex] = anchorActor;
                 targetNode.children!.forEach((child) => findNode(child, anchorActor));
             }

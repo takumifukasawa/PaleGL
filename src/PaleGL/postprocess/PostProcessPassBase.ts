@@ -1,7 +1,7 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
-import { Camera } from '@/PaleGL/actors/Camera.ts';
+import { Camera } from '@/PaleGL/actors/camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import {
@@ -18,14 +18,15 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Mesh } from '@/PaleGL/actors/Mesh.ts';
+import {createMesh, Mesh} from '@/PaleGL/actors/mesh.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-// import { Light } from '@/PaleGL/actors/Light.ts';
+// import { Light } from '@/PaleGL/actors/light.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import {updateActorTransform} from "@/PaleGL/actors/actorBehaviours.ts";
 
 type PostProcessPassParametersTemplate = {
     enabled: boolean;
@@ -178,7 +179,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         this.materials.push(this.material);
 
         // TODO: mesh生成しなくていい気がする
-        this.mesh = new Mesh({
+        this.mesh = createMesh({
             geometry: this.geometry,
             material: this.material,
         });
@@ -267,7 +268,8 @@ export class PostProcessPassBase implements IPostProcessPass {
         this.setRenderTarget(renderer, targetCamera, isLastPass);
 
         // ppの場合はいらない気がする
-        this.mesh.$updateTransform();
+        updateActorTransform(this.mesh);
+        // this.mesh.$updateTransform();
 
         // if (!this.material.isCompiledShader) {
         //     this.material.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });

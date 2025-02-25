@@ -1,16 +1,14 @@
-import { Mesh } from '@/PaleGL/actors/Mesh';
+﻿import { createMesh } from '@/PaleGL/actors/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import { GPU } from '@/PaleGL/core/GPU';
 
-const arrowHelperGeometryData = `
+const axesHelperGeometryData = `
 # Blender 3.3.1
 # www.blender.org
-mtllib untitled.mtl
 o Cube
 v 2.000000 0.031250 -0.031250
 v 2.000000 -0.031250 -0.031250
@@ -164,30 +162,28 @@ f 9/28/17 18/51/17 19/52/17
 f 23/56/18 22/55/18 20/53/18
 `;
 
-export class ArrowHelper extends Mesh {
-    constructor({ gpu }: { gpu: GPU }) {
-        const objData = parseObj(arrowHelperGeometryData);
-        const geometry = createGeometry({
-            gpu,
-            attributes: [
-                createAttribute({
-                    name: 'position',
-                    data: new Float32Array(objData.positions),
-                    size: 3,
-                }),
-                createAttribute({
-                    name: 'uv',
-                    data: new Float32Array(objData.uvs),
-                    size: 2,
-                }),
-            ],
-            indices: objData.indices,
-            drawCount: objData.indices.length,
-        });
-        // const geometry = new ArrowGeometry({ gpu });
-        const material = createMaterial({
-            // gpu,
-            vertexShader: `
+export function createAxesHelper({ gpu }: { gpu: GPU }) {
+    const objData = parseObj(axesHelperGeometryData);
+    const geometry = createGeometry({
+        gpu,
+        attributes: [
+            createAttribute({
+                name: AttributeNames.Position,
+                data: new Float32Array(objData.positions),
+                size: 3,
+            }),
+            createAttribute({
+                name: AttributeNames.Uv,
+                data: new Float32Array(objData.uvs),
+                size: 2,
+            }),
+        ],
+        indices: objData.indices,
+        drawCount: objData.indices.length,
+    });
+    const material = createMaterial({
+        // gpu,
+        vertexShader: `
             layout (location = 0) in vec3 ${AttributeNames.Position};
             layout (location = 1) in vec2 ${AttributeNames.Uv};
             uniform mat4 ${UniformNames.WorldMatrix};
@@ -199,7 +195,7 @@ export class ArrowHelper extends Mesh {
                 gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
             }
             `,
-            fragmentShader: `
+        fragmentShader: `
             in vec2 vUv;
             out vec4 outColor;
             void main() {
@@ -212,15 +208,11 @@ export class ArrowHelper extends Mesh {
                 outColor = vec4(color, 1.);
             }
             `,
-        });
-        super({ geometry, material });
-    }
+    });
 
-    // setPosition(p) {
-    //     this.transform.setTranslation(p);
-    // }
+    const mesh = createMesh({ geometry, material });
 
-    setDirection(p: Vector3) {
-        this.transform.lookAt(p);
-    }
+    return {
+        ...mesh,
+    };
 }

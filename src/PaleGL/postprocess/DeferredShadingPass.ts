@@ -15,7 +15,7 @@ import {
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 // import { Color } from '@/PaleGL/math/Color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
-import { Skybox } from '@/PaleGL/actors/Skybox.ts';
+import { Skybox } from '@/PaleGL/actors/skybox.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';

@@ -4,7 +4,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/bone.ts';
-import { Actor } from '@/PaleGL/actors/Actor';
+import { Actor } from '@/PaleGL/actors/actor.ts';
 
 // type UpdateProxyKeyframe = {
 //     target: GLTFNodeActorKind;

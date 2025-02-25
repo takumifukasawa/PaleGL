@@ -25,7 +25,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
 // import { Vector2 } from '@/PaleGL/math/Vector2';
 // import { Color } from '@/PaleGL/math/Color';
-// import { DirectionalLightStruct } from '@/PaleGL/actors/DirectionalLight.ts';
+// import { DirectionalLightStruct } from '@/PaleGL/actors/directionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
 import {createUniforms, Uniforms, UniformsData, UniformValue} from '@/PaleGL/core/uniforms.ts';
 // import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";

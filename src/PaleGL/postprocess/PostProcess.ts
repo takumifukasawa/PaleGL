@@ -1,6 +1,5 @@
-﻿import { OrthographicCamera } from '@/PaleGL/actors/OrthographicCamera';
-// import {Vector3} from '@/PaleGL/math/Vector3';
-import { Camera } from '@/PaleGL/actors/Camera';
+﻿// import {Vector3} from '@/PaleGL/math/Vector3';
+import { Camera, setCameraSize } from '@/PaleGL/actors/camera.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
 import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
@@ -10,7 +9,9 @@ import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-// import { Light } from '@/PaleGL/actors/Light.ts';
+import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/orthographicCameraBehaviour';
+// import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
@@ -93,7 +94,7 @@ export class PostProcess {
         if (postProcessCamera) {
             this._postProcessCamera = postProcessCamera;
         } else {
-            this._postProcessCamera = OrthographicCamera.CreateFullQuadOrthographicCamera();
+            this._postProcessCamera = createFullQuadOrthographicCamera();
         }
     }
 
@@ -103,7 +104,7 @@ export class PostProcess {
      * @param height
      */
     setSize(width: number, height: number) {
-        this._postProcessCamera.setSize(width, height);
+        setCameraSize(this._postProcessCamera, width, height);
         // this.renderTarget.setSize(width, height);
         this.passes.forEach((pass) => pass.setSize(width, height));
     }
@@ -287,7 +288,7 @@ export class PostProcess {
         //     console.error('[PostProcess.render] scene render target is empty.');
         // }
 
-        this._postProcessCamera.$updateTransform();
+        updateActorTransform(this._postProcessCamera);
         // TODO: render target を外から渡したほうが分かりやすいかも
         // let prevRenderTarget = sceneRenderTarget || this.renderTarget;
         // let prevRenderTarget = sceneRenderTarget;
