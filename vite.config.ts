@@ -137,11 +137,13 @@ export default defineConfig(async (config) => {
             target: 'esnext',
             terserOptions: {
                 mangle: {
-                    // toplevel: true,
+                    toplevel: true,
+                    // 関数だけにする場合
                     // properties: true,
-                    properties: {
-                        regex: /^(_|\$)/,
-                    },
+                    // class使う場合
+                    // properties: {
+                    //     regex: /^(_|\$)/,
+                    // },
                 },
                 compress: {
                     drop_console: isDropConsole,
