@@ -598,12 +598,7 @@ export class GPU {
             // draw by indices
             // drawCount ... use indices count
             if (instanceCount !== null) {
-                // for (let i = 0; i < this._vao._vboList.length; i++) {
-                //     const l = this._vao._vboList[i];
-                //     console.log(l.name, l.location, l.size, l.divisor, l.usage);
-                // }
                 if (instanceCount > 0) {
-                    console.log(this._vao, this._vao._vboList, drawCount, instanceCount);
                     gl.drawElementsInstanced(glPrimitiveType, drawCount, GL_UNSIGNED_SHORT, startOffset, instanceCount);
                 }
             } else {

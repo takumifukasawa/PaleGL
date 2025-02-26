@@ -782,6 +782,7 @@ export function createMaterial({
         getFragmentShader: () => _fragmentShader,
         getDepthFragmentShader: () => _depthFragmentShader,
         getRawVertexShader: () => _rawVertexShader,
+        getRawFragmentShader: () => _rawFragmentShader,
         getShowLog: () => _showLog,
         setShowLog: (showLog: boolean) => (_showLog = showLog),
         getBoundUniformBufferObjects: () => _boundUniformBufferObjects,

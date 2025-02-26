@@ -502,6 +502,7 @@ export function createEngine({
         // update transform
         //
 
+        // TODO: fixedupdateでもやっちゃってるのよくない
         _scene?.traverse((actor) => {
             updateActorTransform(actor);
         });

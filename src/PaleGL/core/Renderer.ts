@@ -2437,7 +2437,6 @@ export class Renderer {
         }
         material.setBoundUniformBufferObjects(true);
         // for debug
-        // console.log("[Renderer.$checkNeedsBindUniformBufferObjectToMaterial]", material.name)
         material.getUniformBlockNames().forEach((blockName) => {
             const targetGlobalUniformBufferObject = this._globalUniformBufferObjects.find(
                 ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
@@ -2450,12 +2449,12 @@ export class Renderer {
                 material.getShader()!,
                 blockName
             );
-            // for debug
+            // // for debug
             // console.log(
-            //     material.name,
+            //     material.getName(),
             //     'addUniformBlock',
-            //     material.uniformBlockNames,
-            //     targetUniformBufferObject.blockName,
+            //     material.getUniformBlockNames(),
+            //     targetGlobalUniformBufferObject.data,
             //     blockIndex
             // );
             material.getUniforms().addUniformBlock(blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);

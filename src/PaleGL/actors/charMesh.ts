@@ -8,6 +8,7 @@ import {
     DepthFuncTypes,
     PrimitiveTypes,
     ShadingModelIds,
+    UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
@@ -118,6 +119,7 @@ export function createCharMesh({
         // offset: new Vector3(offsetX, offsetY, 0),
     });
     const material = createMaterial({
+        name: 'charMeshMaterial',
         vertexShader: gBufferVert,
         fragmentShader: unlitTextFrag,
         depthFragmentShader: unlitTextDepthFrag,
@@ -129,6 +131,7 @@ export function createCharMesh({
         // receiveShadow: !!receiveShadow,
         primitiveType: PrimitiveTypes.Triangles,
         depthFuncType: DepthFuncTypes.Equal,
+        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
     const mesh = createMesh({ name, geometry, material, actorType: ActorTypes.Mesh, castShadow });

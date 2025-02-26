@@ -78,10 +78,15 @@ export function createTextMesh({
     characterSpacing = 0,
     castShadow,
 }: TextMeshArgs): TextMesh {
-    const charMeshes: CharMesh[] = [];
+    // const charMeshes: CharMesh[] = [];
 
-    const actor = createActor({ name });
+    const actor = createActor({ name: name || `text-${text}`});
 
+    const textMesh: TextMesh =  {
+        ...actor,
+        charMeshes: []
+    };
+    
     const charArray = text.split('');
 
     let originX = 0;
@@ -120,8 +125,8 @@ export function createTextMesh({
             },
             castShadow,
         });
-        addChildActor(actor, mesh);
-        charMeshes.push(mesh);
+        addChildActor(textMesh, mesh);
+        textMesh.charMeshes.push(mesh);
 
         accWidth += mesh.charWidth + mesh.charOffsetX;
         // accHeight += mesh.charHeight;
@@ -133,16 +138,15 @@ export function createTextMesh({
             break;
     }
 
-    for (let i = 0; i < charMeshes.length; i++) {
-        const mesh = charMeshes[i];
+    for (let i = 0; i < textMesh.charMeshes.length; i++) {
+        const mesh = textMesh.charMeshes[i];
         originX += mesh.charWidth / 2 + mesh.charOffsetX;
         mesh.transform.getPosition().x = originX;
         mesh.transform.getPosition().y = mesh.charOffsetY;
         originX += mesh.charWidth / 2 + characterSpacing;
+        console.log("hogehoge",  mesh.name, mesh.parent)
     }
 
-    return {
-        ...actor,
-        charMeshes,
-    };
+    
+    return textMesh;
 }

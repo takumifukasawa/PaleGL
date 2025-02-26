@@ -250,10 +250,17 @@ export function createTransform(actor: Actor | null) {
             const scalingMatrix = Matrix4.scalingMatrix(_scale);
             _localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
         }
+       
+        // TODO: parentがちゃんととれてないかも
+        
         _worldMatrix = _actor?.parent
             ? Matrix4.multiplyMatrices(_actor?.parent.transform.getWorldMatrix(), _localMatrix)
             : _localMatrix;
         _inverseWorldMatrix = _worldMatrix.clone().invert();
+       
+        // if (_actor?.parent) {
+        // }
+        console.log("hogehoge", _actor?.name,_actor?.transform.getActor()?.name,_actor, _actor?.parent, _worldMatrix.e, _localMatrix.e);
 
         _normalMatrix = _worldMatrix.clone().invert().transpose();
     };
@@ -291,6 +298,7 @@ export function createTransform(actor: Actor | null) {
         localPointToWorld: (p: Vector3) => p.multiplyMatrix4(_worldMatrix),
         worldToLocalPoint: (p: Vector3) => p.multiplyMatrix4(_inverseWorldMatrix),
 
+        getActor: () => _actor,
         setActor,
         updateMatrix,
     };

@@ -1,4 +1,4 @@
-import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
+import {MaterialArgs, createMaterial, Material} from '@/PaleGL/materials/material.ts';
 import {
     ShadingModelIds,
     DepthFuncTypes,
@@ -26,7 +26,7 @@ export type UnlitMaterialArgs = {
     uniforms?: UniformsData;
 } & MaterialArgs;
 
-export type UnlitMaterial = ReturnType<typeof createUnlitMaterial>;
+export type UnlitMaterial = Material;
 
 export function createUnlitMaterial({
     diffuseColor,
@@ -107,7 +107,7 @@ export function createUnlitMaterial({
         depthFuncType: DepthFuncTypes.Equal, // TODO: これはGBufferの場合
         uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
-
+    
     return {
         ...material,
     };

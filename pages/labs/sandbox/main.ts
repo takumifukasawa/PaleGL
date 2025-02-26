@@ -330,8 +330,8 @@ wrapperElement?.appendChild(instanceNumView);
 const captureScene = createScene();
 // const compositeScene = new Scene();
 
-// const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
-const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
+const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+// const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
 
 const renderer = new Renderer({
     gpu,
@@ -339,7 +339,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer, updateFps: 1 });
+const engine = createEngine({ gpu, renderer, fixedUpdateFps: 0.5, updateFps: 0.5 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);

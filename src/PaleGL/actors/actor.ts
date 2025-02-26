@@ -19,7 +19,6 @@ type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = (key: string, value: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
 
-
 export type ActorArgs = { name?: string; type?: ActorType };
 
 // export class Actor {
@@ -383,6 +382,7 @@ export const addChildActor = (parent: Actor, child: Actor) => {
     // _transform.addChild(child);
     // // _transform.addChild(child.transform); // NOTE: こっちが正しいはず？
     // child.setParent(_actor);
+    // child.parent = parent;
     child.parent = parent;
 };
 
