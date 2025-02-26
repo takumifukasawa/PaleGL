@@ -5,23 +5,65 @@ import {
     FrustumVectors,
     GetFrustumVectorsFunc,
     UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/camera.ts';
+} from '@/PaleGL/actors/camera/camera.ts';
 import { CameraType, CameraTypes } from '@/PaleGL/constants.ts';
 import {
     getPerspectiveFrustumLocalPositions,
+    setSizePerspectiveCamera,
     updatePerspectiveCameraProjectionMatrix,
-} from '@/PaleGL/actors/perspectiveCamera.ts';
+} from '@/PaleGL/actors/camera/perspectiveCameraBehaviour.ts';
 import {
     getOrthographicFrustumLocalPositions,
+    setSizeOrthographicCamera,
     updateOrthographicCameraProjectionMatrix,
-} from '@/PaleGL/actors/orthographicCameraBehaviour';
+} from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {
+    defaultUpdateActorTransform,
+    SetSizeActorFunc,
+    UpdateActorTransformFunc,
+} from '@/PaleGL/actors/actorBehaviours.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+
+// set size behaviour ---------------------------------------------------------
+
+const setSizeCameraBehaviour: Partial<Record<CameraType, (camera: Camera, width: number, height: number) => void>> = {
+    [CameraTypes.Perspective]: setSizePerspectiveCamera,
+    [CameraTypes.Orthographic]: setSizeOrthographicCamera,
+};
+
+export const setSizeCamera: SetSizeActorFunc = (actor, width, height) => {
+    const camera = actor as Camera;
+    setSizeCameraBehaviour[camera.cameraType]?.(camera, width, height);
+};
+
+// update behaviours -------------------------------------------------------
+
+export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
+    const camera = actor as Camera;
+    defaultUpdateActorTransform(actor);
+    camera.viewMatrix = camera.transform.getWorldMatrix().clone().invert();
+    camera.inverseProjectionMatrix = camera.projectionMatrix.clone().invert();
+    camera.inverseViewMatrix = camera.viewMatrix.clone().invert();
+    camera.viewProjectionMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix, camera.viewMatrix);
+    camera.inverseViewProjectionMatrix = camera.viewProjectionMatrix.clone().invert();
+};
+
+// -------------------------------------------------------
+
 
 // update projection matrix behaviour -----------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// export const defaultUpdateProjectionMatrix = (camera: Camera) => {
+//     updateProjectionMatrix()
+// }
+
 const updateProjectionMatrixBehaviour: Partial<Record<CameraType, UpdateProjectionMatrixFunc>> = {
-    [CameraTypes.Orthographic]: updatePerspectiveCameraProjectionMatrix,
-    [CameraTypes.Perspective]: updateOrthographicCameraProjectionMatrix,
+    [CameraTypes.Orthographic]: updateOrthographicCameraProjectionMatrix,
+    [CameraTypes.Perspective]: updatePerspectiveCameraProjectionMatrix,
 };
 
 export const updateProjectionMatrix: UpdateProjectionMatrixFunc = (camera) => {

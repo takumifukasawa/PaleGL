@@ -1,11 +1,9 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { ActorTypes, UniformNames } from '@/PaleGL/constants.ts';
+import { ActorTypes } from '@/PaleGL/constants.ts';
 import {
     createMesh,
     Mesh,
     MeshOptionsArgs,
-    setUniformValueToAllMeshMaterials,
-    UpdateMeshMaterial,
 } from '@/PaleGL/actors/mesh.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
@@ -14,12 +12,7 @@ import {
     ObjectSpaceRaymarchMaterialArgs,
 } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
-import { isPerspectiveCamera } from '@/PaleGL/actors/camera.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
-
-const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
 
 type ObjectSpaceRaymarchMeshArgs = {
     name?: string;
@@ -75,44 +68,3 @@ export function createObjectSpaceRaymarchMesh(args: ObjectSpaceRaymarchMeshArgs)
 
     return { ...mesh };
 }
-
-export const updateObjectSpaceRaymarchMesh: UpdateActorFunc = (actor) => {
-    const mesh = actor as ObjectSpaceRaymarchMesh;
-
-    // for debug
-    // console.log("============")
-    // console.log(this.name)
-    // this.transform.scale.log()
-    // this.parent?.transform.scale.log()
-    // this.transform.getWorldScale().log();
-    // console.log("============")
-
-    mesh.materials.forEach((material) => {
-        // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.getScale());
-        // wp
-        // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
-    });
-    mesh.depthMaterials.forEach((material) => {
-        // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.getScale());
-        // wp
-        // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
-    });
-};
-
-export const updateObjectSpaceRaymarchMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
-    mesh.materials.forEach((material) => {
-        setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, isPerspectiveCamera(camera) ? 1 : 0);
-    });
-};
-
-export const updateObjectSpaceRaymarchDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
-    mesh.depthMaterials.forEach((material) => {
-        setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, isPerspectiveCamera(camera) ? 1 : 0);
-    });
-};
-
-export const setUseWorldSpaceToObjectSpaceRaymarchMesh = (mesh: Mesh, flag: boolean) => {
-    setUniformValueToAllMeshMaterials(mesh, 'uUseWorld', flag ? 1 : 0);
-};

@@ -2,9 +2,9 @@
 import { ActorType, ActorTypes,  } from '@/PaleGL/constants';
 import {  Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { Camera } from '@/PaleGL/actors/camera.ts';
+import { Camera } from '@/PaleGL/actors/camera/camera.ts';
 import { UniformValue } from '@/PaleGL/core/uniforms.ts';
-import { updateObjectSpaceRaymarchMeshMaterial } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
+import { updateObjectSpaceRaymarchMeshMaterial } from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
 
 export type MeshOptionsArgs = {
     castShadow?: boolean;

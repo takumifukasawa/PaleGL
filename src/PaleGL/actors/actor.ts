@@ -19,6 +19,7 @@ type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = (key: string, value: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
 
+
 export type ActorArgs = { name?: string; type?: ActorType };
 
 // export class Actor {

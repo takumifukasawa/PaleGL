@@ -4,8 +4,8 @@
     addChildActor,
     createActor,
 } from '@/PaleGL/actors/actor.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import {
     ActorTypes,
     AttributeNames,
@@ -15,27 +15,22 @@ import {
     CameraTypes,
     PrimitiveTypes,
     UniformNames,
-} from '@/PaleGL/constants';
+} from '@/PaleGL/constants.ts';
 // import {Vector3} from "@/PaleGL/math/Vector3";
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { createMesh, Mesh } from './mesh.ts';
+import { createMesh, Mesh } from 'src/PaleGL/actors/mesh.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
+import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Ray } from '@/PaleGL/math/Ray.ts';
 import {
-    SetSizeActorFunc,
     updateActor,
-    updateActorTransform,
-    UpdateActorTransformFunc
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import { getFrustumLocalPositions } from '@/PaleGL/actors/cameraBehaviours.ts';
-import { setSizePerspectiveCamera } from '@/PaleGL/actors/perspectiveCamera.ts';
-import {setSizeOrthographicCamera} from "@/PaleGL/actors/orthographicCameraBehaviour.ts";
+import { getFrustumLocalPositions } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
 
 export const FrustumDirection = {
     nlt: 'nlt',
@@ -613,30 +608,6 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         camera.visibleFrustumMesh.enabled = camera.visibleFrustum;
     }
 };
-
-// behaviours -------------------------------------------------------
-
-export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
-    const camera = actor as Camera;
-    updateActorTransform(actor);
-    camera.viewMatrix = camera.transform.getWorldMatrix().clone().invert();
-    camera.inverseProjectionMatrix = camera.projectionMatrix.clone().invert();
-    camera.inverseViewMatrix = camera.viewMatrix.clone().invert();
-    camera.viewProjectionMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix, camera.viewMatrix);
-    camera.inverseViewProjectionMatrix = camera.viewProjectionMatrix.clone().invert();
-};
-
-const setSizeCameraBehaviour: Partial<Record<CameraType, (camera: Camera, width: number, height: number) => void>> = {
-    [CameraTypes.Perspective]: setSizePerspectiveCamera,
-    [CameraTypes.Orthographic]: setSizeOrthographicCamera,
-};
-
-export const setSizeCamera: SetSizeActorFunc = (actor, width, height) => {
-    const camera = actor as Camera;
-    setSizeCameraBehaviour[camera.cameraType]?.(camera, width, height);
-};
-
-// -------------------------------------------------------
 
 export const isPerspectiveCamera = (camera: Camera) => {
     return camera.cameraType === CameraTypes.Perspective;

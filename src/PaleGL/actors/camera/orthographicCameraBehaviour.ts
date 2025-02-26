@@ -1,20 +1,17 @@
-import {setSizeActor, SetSizeActorFunc} from "@/PaleGL/actors/actorBehaviours.ts";
-import {Actor} from "@/PaleGL/actors/actor.ts";
+import { SetSizeActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     Camera,
     FrustumVectors,
     GetFrustumVectorsFunc,
     setCameraSize,
-    UpdateProjectionMatrixFunc
-} from "@/PaleGL/actors/camera.ts";
-import {updateProjectionMatrix} from "@/PaleGL/actors/cameraBehaviours.ts";
-import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
-import {Vector3} from "@/PaleGL/math/Vector3.ts";
-import {createOrthographicCamera, OrthographicCamera} from "@/PaleGL/actors/orthographicCamera.ts";
+    UpdateProjectionMatrixFunc,
+} from '@/PaleGL/actors/camera/camera.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
 
 export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width: number, height: number) => {
-    setSizeActor(actor, width, height);
-
     const camera = actor as Camera;
     setCameraSize(camera, width, height);
     // if (left && right && top && bottom) {
@@ -23,7 +20,8 @@ export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width:
     //     this.bottom = bottom;
     //     this.top = top;
     // }
-    updateProjectionMatrix(camera);
+    
+    updateOrthographicCameraProjectionMatrix(camera);
 };
 
 export const updateOrthographicCameraProjectionMatrix: UpdateProjectionMatrixFunc = (camera: Camera) => {

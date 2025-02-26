@@ -1,6 +1,7 @@
 // actors
 import { createMesh, getMeshMaterial, Mesh, setMeshMaterial } from '@/PaleGL/actors/mesh.ts';
-import { createPerspectiveCamera, PerspectiveCamera, setPerspectiveSize } from '@/PaleGL/actors/perspectiveCamera.ts';
+import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
+import { setPerspectiveSize } from '@/PaleGL/actors/camera/perspectiveCameraBehaviour.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
 
 // core
@@ -61,8 +62,8 @@ import {
 } from '@/PaleGL/constants';
 
 import { createDebuggerGUI, DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/camera.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/orthographicCamera.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/camera/camera.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
@@ -84,7 +85,7 @@ import { createDirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
-import { setOrthoSize } from '@/PaleGL/actors/orthographicCameraBehaviour.ts';
+import { setOrthoSize } from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -298,7 +299,7 @@ document.body.appendChild(wrapperElement);
 wrapperElement.setAttribute('id', 'wrapper');
 
 // const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
-const canvasElement = document.createElement('canvas')!;
+const canvasElement = document.createElement('canvas');
 wrapperElement.appendChild(canvasElement);
 
 const gl = canvasElement.getContext('webgl2', { antialias: false });
@@ -330,7 +331,7 @@ const captureScene = createScene();
 // const compositeScene = new Scene();
 
 // const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
-const pixelRatio = Math.min(window.devicePixelRatio, 1);
+const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
 
 const renderer = new Renderer({
     gpu,
@@ -338,7 +339,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer });
+const engine = createEngine({ gpu, renderer, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -1128,7 +1129,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
     // skinned mesh のはずなので cast
     const skinningMesh: SkinnedMesh = gltfActor.children[0].children[0] as SkinnedMesh;
-    // console.log(gltfActor, skinningMesh);
 
     skinningMesh.name = 'butterfly';
     // ルートにanimatorをattachしてるので一旦ここでassign
@@ -1532,6 +1532,17 @@ const main = async () => {
     //
 
     skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
+    console.log(
+        "hogehoge - butterfly",
+        skinnedMesh,
+        skinnedMesh.geometry.getAttributes(),
+        skinnedMesh.geometry.getAttributeDescriptors(),
+        skinnedMesh.geometry.getIndices(),
+        skinnedMesh.geometry.getInstanceCount(),
+        skinnedMesh.geometry.getDrawCount(),
+    );
+    // skinnedMesh.enabled = false;
+    
 
     //
     // floor mesh
@@ -1826,12 +1837,6 @@ void main() {
     captureScene.add(particleMesh);
     captureScene.add(objectSpaceRaymarchMesh);
     captureScene.add(screenSpaceRaymarchMesh);
-
-    console.log('====================');
-    console.log(particleMesh);
-    console.log(objectSpaceRaymarchMesh);
-    console.log(screenSpaceRaymarchMesh);
-    console.log('====================');
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {

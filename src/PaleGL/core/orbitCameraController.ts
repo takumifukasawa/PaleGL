@@ -1,6 +1,6 @@
 import { Vector3 } from '@/PaleGL/math/Vector3.js';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
-import { Camera } from '@/PaleGL/actors/camera.ts';
+import { Camera } from '@/PaleGL/actors/camera/camera.ts';
 
 export function createOrbitCameraController(camera?: Camera | null) {
     let _camera = camera ?? null;

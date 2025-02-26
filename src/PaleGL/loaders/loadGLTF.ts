@@ -373,7 +373,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
     }) => {
         let positions: Float32Array = new Float32Array();
         let normals: Float32Array = new Float32Array();
-        let tangents: Float32Array = new Float32Array();
+        let tangents: Float32Array | null = null;
         let binormals: Float32Array = new Float32Array();
         let uvs: Float32Array = new Float32Array();
         let indices: Uint16Array = new Uint16Array();
@@ -388,6 +388,8 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         console.log('[loadGLTG.createMesh] mesh:', mesh);
 
         const materialIndices: number[] = [];
+        
+        // console.log("======================================")
 
         mesh.primitives.forEach((primitive: GLTFMeshPrimitives) => {
             const meshAccessors: GLTFMeshAccessor = {
@@ -418,6 +420,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             meshAccessors.attributes.forEach((attributeAccessor) => {
                 const { attributeName, accessor } = attributeAccessor;
                 const bufferData = getBufferData(accessor);
+                // console.log(attributeName, bufferData)
                 switch (attributeName) {
                     case 'POSITION':
                         positions = new Float32Array(bufferData);
@@ -464,6 +467,10 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // ref: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#images
         const uvFlippedY = uvs.map((elem, i) => (i % 2 === 0 ? elem : 1 - elem));
 
+        // for debug
+        // console.log("pre", tangents, normals)
+        
+        
         if (tangents) {
             // binormals = Geometry.createBinormals(normals, tangents);
             binormals = new Float32Array(createBinormals(Array.from(normals), Array.from(tangents)));
@@ -476,12 +483,9 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             binormals = new Float32Array(d.binormals);
         }
 
-        // for debug
-        // console.log("======================================")
         // console.log("root bone", rootBone)
-        // console.log(positions, uvFlippedY, normals, joints, weights)
+        // console.log(positions, uvFlippedY, normals, joints, weights, indices)
         // console.log(tangents, binormals)
-        // console.log("======================================")
 
         const geometry = createGeometry({
             gpu,
@@ -570,7 +574,11 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // for debug
         // console.log("[loadGLTF.createMesh]", materialIndices, materials, gltf.materials)
 
-        return rootBone ? createSkinnedMesh({ geometry, bones: rootBone }) : createMesh({ geometry, materials });
+        const result = rootBone ? createSkinnedMesh({ geometry, bones: rootBone }) : createMesh({ geometry, materials });
+
+        // console.log(result, result.geometry.getIndices(), Array.from(indices))
+        
+        return result; 
     };
 
     const findNode = (nodeIndex: number, parentActor: Actor): void => {

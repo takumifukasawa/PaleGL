@@ -23,14 +23,14 @@ import {
     getCameraForward,
     hasEnabledPostProcessPass,
     isPerspectiveCamera,
-} from '@/PaleGL/actors/camera.ts';
+} from '@/PaleGL/actors/camera/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
-import { OrthographicCamera } from '@/PaleGL/actors/orthographicCamera';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/orthographicCameraBehaviour';
+import { OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
 import { Skybox } from '@/PaleGL/actors/skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
@@ -50,7 +50,7 @@ import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uni
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/perspectiveCamera.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {
     UniformBufferObjectBlockData,
@@ -3076,6 +3076,17 @@ export class Renderer {
         // depth func type
         const depthFuncType = material.getDepthFuncType();
 
+        // console.log(
+        //     geometry.getDrawCount(),
+        //     material.getPrimitiveType(),
+        //     depthTest,
+        //     depthWrite,
+        //     depthFuncType,
+        //     material.getBlendType(),
+        //     material.getFaceSide(),
+        //     geometry.getInstanceCount()
+        // )
+        
         // draw
         this._gpu.draw(
             geometry.getDrawCount(),

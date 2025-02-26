@@ -2,8 +2,8 @@
 import {ActorTypes, LightType, LightTypes} from '@/PaleGL/constants';
 import { Color } from '@/PaleGL/math/Color';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { OrthographicCamera } from './orthographicCamera.ts';
-import { PerspectiveCamera } from './perspectiveCamera.ts';
+import { OrthographicCamera } from 'src/PaleGL/actors/camera/orthographicCamera.ts';
+import { PerspectiveCamera } from 'src/PaleGL/actors/camera/perspectiveCamera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import {UpdateActorFunc} from "@/PaleGL/actors/actorBehaviours.ts";
 import {updateDirectionalLight} from "@/PaleGL/actors/directionalLight.ts";

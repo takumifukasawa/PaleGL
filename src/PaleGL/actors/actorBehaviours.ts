@@ -9,13 +9,14 @@ import {
 } from '@/PaleGL/actors/actor.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Camera, setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/camera.ts';
+import { Camera } from '@/PaleGL/actors/camera/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/light.ts';
-import { updateObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
+import { updateObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
-import { updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
-import {startMesh} from "@/PaleGL/actors/meshBehaviours.ts";
+import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
+import { startMesh } from '@/PaleGL/actors/meshBehaviours.ts';
+import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
 
 // try start actor -------------------------------------------------------
 
@@ -41,7 +42,9 @@ export const startActorBehaviourBase = (actor: Actor, { gpu, scene }: ActorStart
 };
 
 export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu, scene }: ActorStartArgs) => void>> = {
-    [ActorTypes.Mesh]: startMesh
+    [ActorTypes.Mesh]: startMesh,
+    [ActorTypes.SkinnedMesh]: startSkinnedMesh,
+    [ActorTypes.Skybox]: startMesh,
 };
 
 const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
@@ -53,7 +56,7 @@ const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
     //     cb({ gpu, scene });
     // });
 
-    startActorBehaviour[actor.type]?.(actor, { gpu, scene });
+    (startActorBehaviour[actor.type] ?? startActorBehaviourBase)(actor, { gpu, scene });
 };
 
 // set size -------------------------------------------------------
@@ -87,6 +90,8 @@ export const fixedUpdateActor = (actor: Actor, { gpu, scene, fixedTime, fixedDel
 // update -------------------------------------------------------
 
 export type UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: ActorUpdateArgs) => void;
+
+// export const defaultUpdateActorBehaviour: UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: ActorUpdateArgs) => {
 
 const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
     [ActorTypes.Light]: updateLight,

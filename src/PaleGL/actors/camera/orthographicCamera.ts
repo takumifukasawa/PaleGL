@@ -1,9 +1,9 @@
 ﻿import {
     Camera,
     createCamera,
-} from '@/PaleGL/actors/camera.ts';
-import { CameraTypes } from '@/PaleGL/constants';
-import {setOrthoSize} from "@/PaleGL/actors/orthographicCameraBehaviour.ts";
+} from '@/PaleGL/actors/camera/camera.ts';
+import { CameraTypes } from '@/PaleGL/constants.ts';
+import {setOrthoSize} from "@/PaleGL/actors/camera/orthographicCameraBehaviour.ts";
 
 // export class OrthographicCamera extends Camera {
 //     left: number = 0;

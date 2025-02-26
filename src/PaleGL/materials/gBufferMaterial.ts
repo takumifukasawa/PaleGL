@@ -428,8 +428,6 @@ export function createGBufferMaterial({
         setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
     };
 
-    console.log('hogehoge', material, material.getName());
-
     return {
         ...material,
         updateUniforms,

@@ -1,5 +1,5 @@
 ﻿import {createLight, Light, LightArgs, UpdateLightFunc, updateShadowCamera} from '@/PaleGL/actors/light.ts';
-import { createOrthographicCamera } from '@/PaleGL/actors/orthographicCamera.ts';
+import { createOrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
 import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { LightTypes } from '@/PaleGL/constants.ts';
 

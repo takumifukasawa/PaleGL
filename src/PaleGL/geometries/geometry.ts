@@ -70,13 +70,15 @@ export function createGeometry({
     const _indices: number[] | null = indices || null;
     const _drawCount: number = drawCount;
     let _instanceCount: number | null = typeof instanceCount == 'number' ? instanceCount : null;
-
+    
     // TODO: vaoの生成2回やっちゃってる? constructorとstartで
     const _vertexArrayObject: VertexArrayObject = new VertexArrayObject({
         gpu,
         attributes: [],
         indices: _indices,
     });
+
+    // console.log("hogehoge - indices", attributes, indices, drawCount, instanceCount)
 
     // fallback data
     // TODO: fix

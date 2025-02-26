@@ -581,7 +581,7 @@ export function createSkinnedMesh({ bones, debugBoneView, ...options }: SkinnedM
 
 export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     const skinnedMesh = actor as SkinnedMesh;
-
+    
     const { gpu } = args;
 
     calcBoneOffsetMatrix(skinnedMesh.bones);
