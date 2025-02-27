@@ -84,17 +84,27 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
-    SkinnedMesh: 2,
-    Light: 3,
-    Skybox: 4,
-    Camera: 5,
-    TextMesh: 6,
-    PostProcessVolume: 7,
-    ObjectSpaceRaymarchMesh: 8,
-    ScreenSpaceRaymarchMesh: 9,
+    // SkinnedMesh: 2,
+    Light: 2,
+    Skybox: 3,
+    Camera: 4,
+    // TextMesh: 5,
+    PostProcessVolume: 6,
+    // ObjectSpaceRaymarchMesh: 7,
+    // ScreenSpaceRaymarchMesh: 8,
 } as const;
 
 export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
+
+export const MeshTypes = {
+    Default: 0,
+    Skinned: 1,
+    ObjectSpaceRaymarch: 2,
+    ScreenSpaceRaymarch: 3,
+    Text: 4
+} as const;
+
+export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
 
 export const CameraTypes = {
     Perspective: 0,

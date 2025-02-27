@@ -1,5 +1,6 @@
 // actors
-import { createMesh, getMeshMaterial, Mesh, setMeshMaterial } from '@/PaleGL/actors/mesh.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/mesh.ts';
+import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
@@ -339,7 +340,7 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer, fixedUpdateFps: 0.5, updateFps: 5 });
+const engine = createEngine({ gpu, renderer });
 // const engine = createEngine({ gpu, renderer, fixedUpdateFps: 30, updateFps: 30 });
 
 // engine.setScenes([captureScene, compositeScene]);
@@ -1443,6 +1444,7 @@ const main = async () => {
 
     // TODO:
     objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
+        name: 'object-space-raymarch-mesh',
         gpu,
         fragmentShaderContent: litObjectSpaceRaymarchFragContent,
         // depthFragmentShaderContent: gBufferObjectSpaceRaymarchDepthFrag,
@@ -1454,8 +1456,9 @@ const main = async () => {
         },
         castShadow: true,
     });
-    objectSpaceRaymarchMesh.transform.setScale(new Vector3(3, 3, 3));
+    objectSpaceRaymarchMesh.transform.setScale(new Vector3(10, 10, 10));
     objectSpaceRaymarchMesh.transform.setPosition(new Vector3(0, 1.5, 0));
+    // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
 
     //
     // screen space raymarch mesh
@@ -1534,16 +1537,15 @@ const main = async () => {
 
     skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
     console.log(
-        "hogehoge - butterfly",
+        'hogehoge - butterfly',
         skinnedMesh,
         skinnedMesh.geometry.getAttributes(),
         skinnedMesh.geometry.getAttributeDescriptors(),
         skinnedMesh.geometry.getIndices(),
         skinnedMesh.geometry.getInstanceCount(),
-        skinnedMesh.geometry.getDrawCount(),
+        skinnedMesh.geometry.getDrawCount()
     );
     // skinnedMesh.enabled = false;
-    
 
     //
     // floor mesh
@@ -1833,7 +1835,7 @@ void main() {
     addActorToScene(captureScene, attractSphereMesh);
     addActorToScene(captureScene, testLightingMesh);
     addActorToScene(captureScene, skinnedMesh);
-     addActorToScene(captureScene, floorPlaneMesh);
+    addActorToScene(captureScene, floorPlaneMesh);
     addActorToScene(captureScene, skyboxMesh);
     addActorToScene(captureScene, particleMesh);
     addActorToScene(captureScene, objectSpaceRaymarchMesh);

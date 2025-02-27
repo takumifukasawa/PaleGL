@@ -12,10 +12,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { updateObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
-import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
-import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
-import { startMesh } from '@/PaleGL/actors/meshBehaviours.ts';
+import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshBehaviours.ts';
 import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 // try start actor -------------------------------------------------------
@@ -33,19 +30,21 @@ export const tryStartActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
 
 export type StartActorFunc = (actor: Actor, args: ActorStartArgs) => void;
 
-export const startActorBehaviourBase = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
+export function startActorBehaviourBase(actor: Actor, { gpu, scene }: ActorStartArgs) {
     actor.components.forEach((component) => {
         component.start({ gpu, scene });
     });
     actor.onStart.forEach((cb) => {
         cb({ gpu, scene });
     });
-};
+}
 
 export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu, scene }: ActorStartArgs) => void>> = {
     [ActorTypes.Mesh]: startMesh,
-    [ActorTypes.SkinnedMesh]: startSkinnedMesh,
+    // [ActorTypes.SkinnedMesh]: startSkinnedMesh,
     [ActorTypes.Skybox]: startMesh,
+    // [ActorTypes.ObjectSpaceRaymarchMesh]: startMesh,
+    // [ActorTypes.ScreenSpaceRaymarchMesh]: startMesh,
 };
 
 const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
@@ -66,7 +65,7 @@ export type SetSizeActorFunc = (actor: Actor, width: number, height: number) => 
 
 const setSizeActorBehaviour: Partial<Record<ActorType, SetSizeActorFunc>> = {
     [ActorTypes.Camera]: setSizeCamera,
-    [ActorTypes.ScreenSpaceRaymarchMesh]: setSizeScreenSpaceRaymarchMesh,
+    [ActorTypes.Mesh]: setSizeMesh,
 };
 
 export const setSizeActor: SetSizeActorFunc = (actor, width, height) => {
@@ -96,8 +95,7 @@ export type UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: Ac
 
 const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
     [ActorTypes.Light]: updateLight,
-    [ActorTypes.SkinnedMesh]: updateSkinnedMesh,
-    [ActorTypes.ObjectSpaceRaymarchMesh]: updateObjectSpaceRaymarchMesh,
+    [ActorTypes.Mesh]: updateMesh,
 };
 
 // update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number } = {}) {
@@ -111,6 +109,7 @@ export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTim
         actor.onUpdate({ gpu, scene, time, deltaTime });
     }
 
+    // console.log(actor.type, actor.name)
     updateActorBehaviour[actor.type]?.(actor, { gpu, scene, time, deltaTime });
 };
 

@@ -246,7 +246,7 @@ export function createSkybox({
         uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    const mesh = createMesh({ geometry, material, actorType: ActorTypes.Skybox });
+    const mesh = createMesh({ geometry, material, type: ActorTypes.Skybox });
 
     return {
         ...mesh,

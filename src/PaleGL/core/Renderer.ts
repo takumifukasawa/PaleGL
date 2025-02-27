@@ -15,7 +15,8 @@
 import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { getMeshMaterial, Mesh, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/mesh.ts';
+import {  Mesh } from '@/PaleGL/actors/mesh.ts';
+import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
     Camera,
@@ -2609,7 +2610,7 @@ export class Renderer {
                     // actor.transform.parent = cameras.transform;
                     return;
                 case ActorTypes.Mesh:
-                case ActorTypes.SkinnedMesh:
+                // case ActorTypes.SkinnedMesh:
                     if (!(actor as Mesh).renderEnabled) {
                         // skip
                         return;

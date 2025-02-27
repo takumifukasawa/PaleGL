@@ -4,8 +4,7 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/mesh.ts';
 import {
-    ActorTypes,
-    DepthFuncTypes,
+    DepthFuncTypes, MeshTypes,
     PrimitiveTypes,
     ShadingModelIds,
     UniformBlockNames,
@@ -134,7 +133,7 @@ export function createCharMesh({
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    const mesh = createMesh({ name, geometry, material, actorType: ActorTypes.Mesh, castShadow });
+    const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.Text, castShadow });
 
     const charWidth = planeWidth;
     const charHeight = planeHeight;

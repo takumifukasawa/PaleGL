@@ -472,7 +472,7 @@ export function createEngine({
             switch (actor.type) {
                 case ActorTypes.Skybox:
                 case ActorTypes.Mesh:
-                case ActorTypes.SkinnedMesh:
+                // case ActorTypes.SkinnedMesh:
                     beforeRenderActor(actor, { gpu: _gpu });
                     const mesh = actor as Mesh;
                     mesh.materials.forEach((mat) => {

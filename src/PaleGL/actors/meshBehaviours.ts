@@ -1,16 +1,26 @@
-import {startActorBehaviourBase, StartActorFunc} from "@/PaleGL/actors/actorBehaviours.ts";
-import {Actor, ActorStartArgs} from "@/PaleGL/actors/actor.ts";
-import {createMaterial} from "@/PaleGL/materials/material.ts";
-import {defaultDepthFragmentShader} from "@/PaleGL/core/buildShader.ts";
-import {DepthFuncTypes} from "@/PaleGL/constants.ts";
-import {Mesh} from "@/PaleGL/actors/mesh.ts";
+import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
+import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
+import { Mesh } from '@/PaleGL/actors/mesh.ts';
+import {
+    updateObjectSpaceRaymarchDepthMaterial,
+    updateObjectSpaceRaymarchMesh,
+    updateObjectSpaceRaymarchMeshMaterial,
+} from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { UniformValue } from '@/PaleGL/core/uniforms.ts';
+import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
+import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
 
-export const startMesh: StartActorFunc = (actor: Actor, args: ActorStartArgs) => {
+// start actor -------------------------------------------------------
+
+// export const startMesh: StartActorFunc = (actor: Actor, args: ActorStartArgs) => {
+export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
     // const {gpu} = options;
 
-    startActorBehaviourBase(actor, args);
-
-    const mesh = actor as Mesh;
+    startActorBehaviourBase(mesh, args);
 
     const { gpu } = args;
 
@@ -78,4 +88,112 @@ export const startMesh: StartActorFunc = (actor: Actor, args: ActorStartArgs) =>
     // console.log("main raw vertex", this.mainMaterial.rawVertexShader)
     // console.log("main raw fragment", this.mainMaterial.rawFragmentShader)
     // console.log("depth raw vertex", this.depthMaterial.rawVertexShader)
+}
+
+export const startMeshBehaviour: Partial<Record<MeshType, (mesh: Mesh, { gpu, scene }: ActorStartArgs) => void>> = {
+    [MeshTypes.Skinned]: startSkinnedMesh,
+};
+
+export function startMesh(actor: Actor, args: ActorStartArgs) {
+    const mesh = actor as Mesh;
+    // startMeshBehaviourBase(mesh, args);
+    (startMeshBehaviour[mesh.meshType] ?? startMeshBehaviourBase)(mesh, args);
+}
+
+// set size -------------------------------------------------------
+
+export const setSizeMeshBehaviour: Partial<Record<ActorType, (mesh: Mesh, width: number, height: number) => void>> = {
+    [MeshTypes.ScreenSpaceRaymarch]: setSizeScreenSpaceRaymarchMesh,
+};
+
+export function setSizeMesh(actor: Actor, width: number, height: number) {
+    const mesh = actor as Mesh;
+    setSizeMeshBehaviour[mesh.type]?.(mesh, width, height);
+}
+
+// update mesh ----------------------------------------------------------------
+
+export const updateMeshBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
+    // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
+    [MeshTypes.Skinned]: updateSkinnedMesh,
+    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMesh,
+};
+
+export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
+    const mesh = actor as Mesh;
+    updateMeshBehaviour[mesh.meshType]?.(actor, args);
+}
+
+// update mesh material -------------------------------------------------------
+
+// beforeRender({ gpu }: { gpu: GPU }) {
+//     super.beforeRender({ gpu });
+//     // this.materials.forEach(material => material.updateUniforms({ gpu }));
+//     // this.depthMaterial.updateUniforms({ gpu });
+// }
+
+export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera }) => void;
+
+export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
+    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMeshMaterial,
+};
+
+// update materials
+
+// TODO: render前の方がよい気がする
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const updateMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
+    mesh.materials.forEach((material) => material.updateUniforms());
+
+    updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
+};
+
+export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateMeshMaterial>> = {
+    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchDepthMaterial,
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
+    mesh.depthMaterials.forEach((material) => material.updateUniforms());
+
+    updateMeshDepthMaterialBehaviour[mesh.type]?.(mesh, { camera });
+};
+
+// -------------------------------------------------------
+
+export const getMeshMaterial = (mesh: Mesh) => {
+    if (hasMeshMaterials(mesh)) {
+        console.warn('[Mesh.material getter] materials length > 1. material is head of materials.');
+    }
+    // return this.materials[0];
+    return getMeshMainMaterial(mesh);
+};
+
+export const setMeshMaterial = (mesh: Mesh, material: Material) => {
+    mesh.materials = [material];
+};
+
+export const getMeshMainMaterial = (mesh: Mesh) => {
+    return mesh.materials[0];
+};
+
+export const hasMeshMaterials = (mesh: Mesh) => {
+    return mesh.materials.length > 1;
+};
+
+// utilites -------------------------------------------------------
+
+export const setUniformValueToMeshPairMaterial = (mesh: Mesh, i: number, name: string, newValue: UniformValue) => {
+    setMaterialUniformValue(mesh.materials[i], name, newValue);
+    setMaterialUniformValue(mesh.depthMaterials[i], name, newValue);
+};
+
+export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newValue: UniformValue) => {
+    mesh.materials.forEach((material) => setMaterialUniformValue(material, name, newValue));
+    mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue));
+};
+
+export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolean) => {
+    mesh.materials[index].setCanRender(flag);
+    mesh.depthMaterials[index].setCanRender(flag);
 };

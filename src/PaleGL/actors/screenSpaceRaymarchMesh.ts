@@ -1,13 +1,14 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import {
-    ActorTypes,
+    MeshTypes,
     PRAGMA_RAYMARCH_SCENE,
     PrimitiveTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { createMesh, getMeshMainMaterial, getMeshMaterial, Mesh } from '@/PaleGL/actors/mesh.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/mesh.ts';
+import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
@@ -72,7 +73,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         uniformBlockNames: [UniformBlockNames.Timeline],
     });
 
-    const mesh = createMesh({ name, geometry, material, type: ActorTypes.ScreenSpaceRaymarchMesh });
+    const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.ScreenSpaceRaymarch });
 
     return {
         ...mesh,
