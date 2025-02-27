@@ -358,7 +358,7 @@ export const UniformNames = {
     TargetHeight: 'uTargetHeight',
     Aspect: 'uAspect',
     TexelSize: 'uTexelSize',
-    // camera
+    // cameras
     CameraNear: 'uNearClip',
     CameraFar: 'uFarClip',
     // cubemap

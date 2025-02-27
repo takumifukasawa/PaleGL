@@ -30,7 +30,7 @@ import { Ray } from '@/PaleGL/math/Ray.ts';
 import {
     updateActor,
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import { getFrustumLocalPositions } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
+import { getFrustumLocalPositions } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 export const FrustumDirection = {
     nlt: 'nlt',

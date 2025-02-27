@@ -5,18 +5,18 @@ import {
     FrustumVectors,
     GetFrustumVectorsFunc,
     UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { CameraType, CameraTypes } from '@/PaleGL/constants.ts';
 import {
     getPerspectiveFrustumLocalPositions,
     setSizePerspectiveCamera,
     updatePerspectiveCameraProjectionMatrix,
-} from '@/PaleGL/actors/camera/perspectiveCameraBehaviour.ts';
+} from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import {
     getOrthographicFrustumLocalPositions,
     setSizeOrthographicCamera,
     updateOrthographicCameraProjectionMatrix,
-} from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
+} from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import {
     defaultUpdateActorTransform,
@@ -57,7 +57,7 @@ export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-// export const defaultUpdateProjectionMatrix = (camera: Camera) => {
+// export const defaultUpdateProjectionMatrix = (cameras: Camera) => {
 //     updateProjectionMatrix()
 // }
 

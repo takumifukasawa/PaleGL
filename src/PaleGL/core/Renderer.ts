@@ -14,7 +14,7 @@
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/stats.ts';
-import { Light } from '@/PaleGL/actors/light.ts';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { getMeshMaterial, Mesh, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/mesh.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
@@ -23,14 +23,14 @@ import {
     getCameraForward,
     hasEnabledPostProcessPass,
     isPerspectiveCamera,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
-import { OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { Skybox } from '@/PaleGL/actors/skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
@@ -41,8 +41,8 @@ import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
 import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
 import { VolumetricLightPass } from '@/PaleGL/postprocess/VolumetricLightPass.ts';
 import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
-import { DirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
-import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/spotLight.ts';
+import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
@@ -50,7 +50,7 @@ import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uni
 import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {
     UniformBufferObjectBlockData,
@@ -68,7 +68,7 @@ import { VignettePass } from '@/PaleGL/postprocess/VignettePass.ts';
 import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
-import { PointLight } from '@/PaleGL/actors/pointLight.ts';
+import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/postProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
@@ -789,15 +789,15 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //     /**
 //      *
 //      * @param scene
-//      * @param camera
+//      * @param cameras
 //      * @param time
 //      * @param deltaTime
 //      * @param onBeforePostProcess
 //      */
-//     // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
+//     // render(scene: Scene, cameras: Camera, {useShadowPass = true, clearScene = true}) {
 //     render(
 //         scene: Scene,
-//         camera: Camera,
+//         cameras: Camera,
 //         sharedTextures: SharedTextures,
 //         {
 //             time,
@@ -844,7 +844,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                         this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox)
 //                     );
 //                     // TODO: skyboxの中で処理したい
-//                     // actor.transform.parent = camera.transform;
+//                     // actor.transform.parent = cameras.transform;
 //                     return;
 //                 case ActorTypes.Mesh:
 //                 case ActorTypes.SkinnedMesh:
@@ -940,8 +940,8 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             );
 //         });
 //         sortedBasePassRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
 //             return al < bl ? -1 : 1;
 //         });
 //
@@ -950,8 +950,8 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
 //         );
 //         sortedTransparentRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
 //             return al > bl ? -1 : 1;
 //         });
 //
@@ -984,17 +984,17 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             return actor;
 //         });
 //         depthPrePassRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
 //             return al < bl ? -1 : 1;
 //         });
-//         this.depthPrePass(depthPrePassRenderMeshInfos, camera);
+//         this.depthPrePass(depthPrePassRenderMeshInfos, cameras);
 //
 //         // ------------------------------------------------------------------------------
 //         // g-buffer opaque pass
 //         // ------------------------------------------------------------------------------
 //
-//         this.scenePass(sortedBasePassRenderMeshInfos, camera);
+//         this.scenePass(sortedBasePassRenderMeshInfos, cameras);
 //
 //         // ------------------------------------------------------------------------------
 //         // shadow pass
@@ -1030,9 +1030,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         PostProcess.renderPass({
 //             pass: this._screenSpaceShadowPass,
 //             renderer: this,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             gpu: this._gpu,
-//             camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//             cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //             prevRenderTarget: null,
 //             isLastPass: false,
 //             time, // TODO: engineから渡したい
@@ -1046,9 +1046,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         PostProcess.renderPass({
 //             pass: this._ambientOcclusionPass,
 //             renderer: this,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             gpu: this._gpu,
-//             camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//             cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //             prevRenderTarget: null,
 //             isLastPass: false,
 //             time, // TODO: engineから渡したい
@@ -1085,9 +1085,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         PostProcess.renderPass({
 //             pass: this._deferredShadingPass,
 //             renderer: this,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             gpu: this._gpu,
-//             camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//             cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //             prevRenderTarget: null,
 //             isLastPass: false,
 //             time, // TODO: engineから渡したい
@@ -1101,9 +1101,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         PostProcess.renderPass({
 //             pass: this._ssrPass,
 //             renderer: this,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             gpu: this._gpu,
-//             camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//             cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //             prevRenderTarget: this._deferredShadingPass.renderTarget,
 //             isLastPass: false,
 //             time, // TODO: engineから渡したい
@@ -1119,9 +1119,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             PostProcess.renderPass({
 //                 pass: this._lightShaftPass,
 //                 renderer: this,
-//                 targetCamera: camera,
+//                 targetCamera: cameras,
 //                 gpu: this._gpu,
-//                 camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//                 cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //                 prevRenderTarget: this._deferredShadingPass.renderTarget,
 //                 isLastPass: false,
 //                 time, // TODO: engineから渡したい
@@ -1139,9 +1139,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             PostProcess.renderPass({
 //                 pass: this._volumetricLightPass,
 //                 renderer: this,
-//                 targetCamera: camera,
+//                 targetCamera: cameras,
 //                 gpu: this._gpu,
-//                 camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//                 cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //                 prevRenderTarget: this._deferredShadingPass.renderTarget,
 //                 isLastPass: false,
 //                 time, // TODO: engineから渡したい
@@ -1169,9 +1169,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         PostProcess.renderPass({
 //             pass: this._fogPass,
 //             renderer: this,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             gpu: this._gpu,
-//             camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+//             cameras: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
 //             // prevRenderTarget: this._deferredShadingPass.renderTarget,
 //             prevRenderTarget: this._ssrPass.renderTarget,
 //             isLastPass: false,
@@ -1205,7 +1205,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //
 //         this.setRenderTarget(this._afterDeferredShadingRenderTarget.write);
 //
-//         this.$transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors);
+//         this.$transparentPass(sortedTransparentRenderMeshInfos, cameras, lightActors);
 //
 //         // ------------------------------------------------------------------------------
 //         // full screen pass
@@ -1224,14 +1224,14 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         // console.log("--------- postprocess pass ---------");
 //
 //         let prevRenderTarget: RenderTarget = this._afterDeferredShadingRenderTarget;
-//         const isCameraLastPassAndHasNotPostProcess = !camera.renderTarget && !camera.hasEnabledPostProcessPass;
+//         const isCameraLastPassAndHasNotPostProcess = !cameras.renderTarget && !cameras.hasEnabledPostProcessPass;
 //         this._scenePostProcess.update();
 //         this._scenePostProcess.render({
 //             gpu: this._gpu,
 //             renderer: this,
 //             prevRenderTarget,
 //             gBufferRenderTargets: this._gBufferRenderTargets,
-//             targetCamera: camera,
+//             targetCamera: cameras,
 //             time, // TODO: engineから渡したい
 //             isCameraLastPass: isCameraLastPassAndHasNotPostProcess,
 //             // lightActors,
@@ -1243,18 +1243,18 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //
 //         prevRenderTarget = this._scenePostProcess.lastRenderTarget!;
 //
-//         if (camera.hasEnabledPostProcessPass) {
-//             camera.postProcess?.update();
-//             camera.postProcess?.render({
+//         if (cameras.hasEnabledPostProcessPass) {
+//             cameras.postProcess?.update();
+//             cameras.postProcess?.render({
 //                 gpu: this._gpu,
 //                 renderer: this,
 //                 prevRenderTarget,
 //                 // tone mapping 挟む場合
 //                 // prevRenderTarget: this._toneMappingPass.renderTarget,
 //                 gBufferRenderTargets: this._gBufferRenderTargets,
-//                 targetCamera: camera,
+//                 targetCamera: cameras,
 //                 time, // TODO: engineから渡したい
-//                 isCameraLastPass: !camera.renderTarget,
+//                 isCameraLastPass: !cameras.renderTarget,
 //                 lightActors,
 //             });
 //         }
@@ -1371,11 +1371,11 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         targetUbo.updateUniformValue(uniformName, targetUniformData.type, value);
 //     }
 //
-//     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+//     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], cameras: Camera) {
 //         // console.log("--------- depth pre pass ---------");
 //
 //         this.setRenderTarget(this._depthPrePassRenderTarget, false, true);
-//         this.updateCameraUniforms(camera);
+//         this.updateCameraUniforms(cameras);
 //
 //         depthPrePassRenderMeshInfos.forEach(({ actor }) => {
 //             this.updateActorTransformUniforms(actor);
@@ -1423,7 +1423,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                 return;
 //             }
 //             if (!lightActor.shadowCamera) {
-//                 console.error('invalid shadow camera');
+//                 console.error('invalid shadow cameras');
 //                 return;
 //             }
 //             this.setRenderTarget(lightActor.shadowMap.write, false, true);
@@ -1440,7 +1440,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                 // TODO: material 側でやった方がよい？
 //                 this.updateActorTransformUniforms(actor);
 //
-//                 actor.updateDepthMaterial({ camera: lightActor.shadowCamera! });
+//                 actor.updateDepthMaterial({ cameras: lightActor.shadowCamera! });
 //
 //                 actor.depthMaterials.forEach((depthMaterial) => {
 //                     // TODO: material 側でやった方がよい？
@@ -1468,7 +1468,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         });
 //     }
 //
-//     private scenePass(sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+//     private scenePass(sortedRenderMeshInfos: RenderMeshInfo[], cameras: Camera) {
 //         // console.log("--------- scene pass ---------");
 //
 //         // NOTE: DepthTextureはあるはず
@@ -1478,10 +1478,10 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //
 //         // TODO: depth prepass しない場合は必要
 //         // if (clear) {
-//         //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+//         //     this.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
 //         // }
 //
-//         this.updateCameraUniforms(camera);
+//         this.updateCameraUniforms(cameras);
 //
 //         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
 //             switch (actor.type) {
@@ -1491,7 +1491,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                     }
 //                     // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
 //                     // TODO: engineでやるべき
-//                     actor.$updateTransform(camera);
+//                     actor.$updateTransform(cameras);
 //                     break;
 //             }
 //
@@ -1528,7 +1528,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             // TODO: g-bufferの時にはlightのuniformsを設定しなくて大丈夫になったのでいらないはず
 //             // applyLightShadowMapUniformValues(targetMaterial, lightActors);
 //
-//             actor.updateMaterial({ camera });
+//             actor.updateMaterial({ cameras });
 //
 //             this.renderMesh(actor.geometry, targetMaterial);
 //
@@ -1556,55 +1556,55 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         );
 //     }
 //
-//     updateCameraUniforms(camera: Camera) {
-//         this.$setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+//     updateCameraUniforms(cameras: Camera) {
+//         this.$setUniformBlockValue(UniformBlockNames.Transformations, UniformNames.ViewMatrix, cameras.viewMatrix);
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.ProjectionMatrix,
-//             camera.projectionMatrix
+//             cameras.projectionMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Camera,
 //             UniformNames.ViewPosition,
-//             camera.transform.getWorldMatrix().position
+//             cameras.transform.getWorldMatrix().position
 //         );
-//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, camera.getWorldForward());
-//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
-//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraFar, camera.far);
+//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, cameras.getWorldForward());
+//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, cameras.near);
+//         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraFar, cameras.far);
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Camera,
 //             UniformNames.CameraAspect,
-//             camera.isPerspective() ? (camera as PerspectiveCamera).aspect : (camera as OrthographicCamera).aspect
+//             cameras.isPerspective() ? (cameras as PerspectiveCamera).aspect : (cameras as OrthographicCamera).aspect
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Camera,
 //             UniformNames.CameraFov,
-//             camera.isPerspective() ? (camera as PerspectiveCamera).fov : 0
+//             cameras.isPerspective() ? (cameras as PerspectiveCamera).fov : 0
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.ViewProjectionMatrix,
-//             camera.viewProjectionMatrix
+//             cameras.viewProjectionMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.InverseViewMatrix,
-//             camera.inverseViewMatrix
+//             cameras.inverseViewMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.InverseProjectionMatrix,
-//             camera.inverseProjectionMatrix
+//             cameras.inverseProjectionMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.InverseViewProjectionMatrix,
-//             camera.inverseViewProjectionMatrix
+//             cameras.inverseViewProjectionMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.TransposeInverseViewMatrix,
-//             camera.viewMatrix.clone().invert().transpose()
+//             cameras.viewMatrix.clone().invert().transpose()
 //         );
 //     }
 //
@@ -1863,7 +1863,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //
 //     $transparentPass(
 //         sortedRenderMeshInfos: RenderMeshInfo[],
-//         camera: Camera,
+//         cameras: Camera,
 //         lightActors: LightActors
 //         // clear: boolean
 //     ) {
@@ -1871,9 +1871,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //
 //         // TODO: 常にclearしない、で良い気がする
 //         // if (clear) {
-//         //     this._gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+//         //     this._gpu.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
 //         // }
-//         this.updateCameraUniforms(camera);
+//         this.updateCameraUniforms(cameras);
 //
 //         sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
 //             const targetMaterial = actor.materials[materialIndex];
@@ -2556,7 +2556,7 @@ export class Renderer {
      * @param deltaTime
      * @param onBeforePostProcess
      */
-    // render(scene: Scene, camera: Camera, {useShadowPass = true, clearScene = true}) {
+    // render(scene: Scene, cameras: Camera, {useShadowPass = true, clearScene = true}) {
     render(
         scene: Scene,
         camera: Camera,
@@ -2606,7 +2606,7 @@ export class Renderer {
                         this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox)
                     );
                     // TODO: skyboxの中で処理したい
-                    // actor.transform.parent = camera.transform;
+                    // actor.transform.parent = cameras.transform;
                     return;
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
@@ -3196,7 +3196,7 @@ export class Renderer {
                 return;
             }
             if (!lightActor.shadowCamera) {
-                console.error('invalid shadow camera');
+                console.error('invalid shadow cameras');
                 return;
             }
             this.setRenderTarget(lightActor.shadowMap.write, false, true);
@@ -3251,7 +3251,7 @@ export class Renderer {
 
         // TODO: depth prepass しない場合は必要
         // if (clear) {
-        //     this.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        //     this.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
         // }
 
         this.updateCameraUniforms(camera);
@@ -3644,7 +3644,7 @@ export class Renderer {
 
         // TODO: 常にclearしない、で良い気がする
         // if (clear) {
-        //     this._gpu.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        //     this._gpu.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
         // }
         this.updateCameraUniforms(camera);
 

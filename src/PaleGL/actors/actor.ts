@@ -133,7 +133,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //     // @ts-ignore
 //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     $updateTransform(camera?: Camera) {
+//     $updateTransform(cameras?: Camera) {
 //         _transform.updateMatrix();
 //     }
 //
@@ -257,7 +257,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 // export type Actor = ActorBase & {
 //     // parent: Actor;
 //     getTransform: () => Transform;
-//     updateTransform: (camera?: Camera) => void;
+//     updateTransform: (cameras?: Camera) => void;
 //     getChildCount: () => number;
 //     getHasChild: () => boolean;
 //     addChild: (child: Actor) => void;
@@ -266,7 +266,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 // };
 
 // export type UpdateActorFunc = (actor: Actor, args: ActorUpdateArgs) => void;
-// export type UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => void;
+// export type UpdateActorTransformFunc = (actor: Actor, cameras?: Camera) => void;
 
 export type Actor = {
     name: string;
@@ -365,7 +365,7 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
 // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // // @ts-ignore
 // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-// export const updateActorTransform: UpdateActorTransformFunc = (actor, camera) => {
+// export const updateActorTransform: UpdateActorTransformFunc = (actor, cameras) => {
 //     actor.transform.updateMatrix();
 // };
 

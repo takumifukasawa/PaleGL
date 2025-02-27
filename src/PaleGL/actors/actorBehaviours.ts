@@ -9,14 +9,14 @@ import {
 } from '@/PaleGL/actors/actor.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Camera } from '@/PaleGL/actors/camera/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
-import { updateLight } from '@/PaleGL/actors/light.ts';
+import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { updateObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
 import { startMesh } from '@/PaleGL/actors/meshBehaviours.ts';
-import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
+import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 // try start actor -------------------------------------------------------
 

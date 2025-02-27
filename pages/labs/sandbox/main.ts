@@ -1,7 +1,7 @@
 // actors
 import { createMesh, getMeshMaterial, Mesh, setMeshMaterial } from '@/PaleGL/actors/mesh.ts';
-import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
-import { setPerspectiveSize } from '@/PaleGL/actors/camera/perspectiveCameraBehaviour.ts';
+import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
 
 // core
@@ -62,8 +62,8 @@ import {
 } from '@/PaleGL/constants';
 
 import { createDebuggerGUI, DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/camera/camera.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/camera.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
@@ -77,15 +77,15 @@ import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/textMesh.ts';
-import { createSpotLight, SpotLight } from '@/PaleGL/actors/spotLight.ts';
+import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { addActorToScene, createScene } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
-import { createDirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
+import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
-import { setOrthoSize } from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
+import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -377,7 +377,7 @@ const directionalLight = createDirectionalLight({
 // directionalLight.enabled = false; // NOTE: 一旦ガード
 
 // shadows
-// TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
+// TODO: directional light は constructor で shadow cameras を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
     directionalLight.shadowCamera.visibleFrustum = true;
     directionalLight.castShadow = true;

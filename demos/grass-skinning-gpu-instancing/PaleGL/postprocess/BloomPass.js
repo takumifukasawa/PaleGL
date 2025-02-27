@@ -312,7 +312,7 @@ void main() {
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
         
         // for debug
-        // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
+        // this.#extractBrightnessPass.render({ gpu, cameras, renderer, prevRenderTarget, isLastPass });
         // return;
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {

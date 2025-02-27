@@ -2,7 +2,7 @@
 import { ActorType, ActorTypes,  } from '@/PaleGL/constants';
 import {  Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { Camera } from '@/PaleGL/actors/camera/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { UniformValue } from '@/PaleGL/core/uniforms.ts';
 import { updateObjectSpaceRaymarchMeshMaterial } from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
 

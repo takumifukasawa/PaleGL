@@ -1,4 +1,4 @@
-﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/light.ts';
+﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { LightTypes } from '@/PaleGL/constants.ts';
 
 type PointLightParams = {

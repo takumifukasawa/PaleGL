@@ -3,7 +3,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import { Camera } from '@/PaleGL/actors/camera/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -184,10 +184,10 @@ export class GaussianBlurPass implements IPostProcessPass {
         });
 
         // this.#passes.forEach((pass, i) => {
-        //     pass.setRenderTarget(renderer, camera, isLastPass && i == this.#passes.length - 1);
+        //     pass.setRenderTarget(renderer, cameras, isLastPass && i == this.#passes.length - 1);
 
         //     // TODO: pass内で好きに設定してよさそう
-        //     renderer.clear(camera.clearColor.x, camera.clearColor.y, camera.clearColor.z, camera.clearColor.w);
+        //     renderer.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
 
         //     // TODO: mesh経由する必要たぶんない
         //     pass.mesh.updateTransform();

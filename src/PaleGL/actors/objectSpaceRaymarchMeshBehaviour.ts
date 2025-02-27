@@ -1,6 +1,6 @@
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { Mesh, setUniformValueToAllMeshMaterials, UpdateMeshMaterial } from '@/PaleGL/actors/mesh.ts';
-import { isPerspectiveCamera } from '@/PaleGL/actors/camera/camera.ts';
+import { isPerspectiveCamera } from '@/PaleGL/actors/cameras/camera.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';

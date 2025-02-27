@@ -2627,7 +2627,7 @@ class Light extends Actor {
     color;
     castShadow; // bool
     shadowCamera;
-    shadowMap; // TODO: shadow camera に持たせたほうが良いような気もする
+    shadowMap; // TODO: shadow cameras に持たせたほうが良いような気もする
     
     constructor() {
         super(ActorTypes.Light);
@@ -5372,16 +5372,16 @@ class ForwardRenderer {
             //     targetMaterial.uniforms[UniformNames.WorldMatrix].value = actor.transform.worldMatrix;
             // }
             // if (targetMaterial.uniforms[UniformNames.ViewMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = camera.viewMatrix;
+            //     targetMaterial.uniforms[UniformNames.ViewMatrix].value = cameras.viewMatrix;
             // }
             // if (targetMaterial.uniforms[UniformNames.ProjectionMatrix]) {
-            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = camera.projectionMatrix;
+            //     targetMaterial.uniforms[UniformNames.ProjectionMatrix].value = cameras.projectionMatrix;
             // }
             // if (targetMaterial.uniforms[UniformNames.NormalMatrix]) {
             //     targetMaterial.uniforms[UniformNames.NormalMatrix].value = actor.transform.worldMatrix.clone().invert().transpose();
             // }
             // if (targetMaterial.uniforms[UniformNames.ViewPosition]) {
-            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = camera.transform.worldMatrix.position;
+            //     targetMaterial.uniforms[UniformNames.ViewPosition].value = cameras.transform.worldMatrix.position;
             // }
 
             // TODO: material 側でやった方がよい？
@@ -5478,7 +5478,7 @@ class ForwardRenderer {
                 case ActorTypes.Skybox:
                     renderMeshInfoEachQueue.skybox.push(this.#buildRenderMeshInfo(actor));
                     // TODO: skyboxの中で処理したい
-                    // actor.transform.parent = camera.transform;
+                    // actor.transform.parent = cameras.transform;
                     return;
                 case ActorTypes.Mesh:
                 case ActorTypes.SkinnedMesh:
@@ -5537,20 +5537,20 @@ class ForwardRenderer {
         // ------------------------------------------------------------------------------
       
         // postprocessはrendererから外した方がよさそう  
-        // if (camera.enabledPostProcess) {
-        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : camera.postProcess.renderTarget.write);
+        // if (cameras.enabledPostProcess) {
+        //     this.setRenderTarget(cameras.renderTarget ? cameras.renderTarget.write : cameras.postProcess.renderTarget.write);
         // } else {
-        //     this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
+        //     this.setRenderTarget(cameras.renderTarget ? cameras.renderTarget.write : null);
         // }
         this.setRenderTarget(camera.renderTarget ? camera.renderTarget.write : null);
 
         this.#scenePass(sortedRenderMeshInfos, camera, lightActors);
 
-        // if (camera.enabledPostProcess) {
-        //     camera.postProcess.render({
+        // if (cameras.enabledPostProcess) {
+        //     cameras.postProcess.render({
         //         gpu: this.#gpu,
         //         renderer: this,
-        //         camera
+        //         cameras
         //     });
         // }
     }
@@ -8303,7 +8303,7 @@ void main() {
         this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget });
         
         // for debug
-        // this.#extractBrightnessPass.render({ gpu, camera, renderer, prevRenderTarget, isLastPass });
+        // this.#extractBrightnessPass.render({ gpu, cameras, renderer, prevRenderTarget, isLastPass });
         // return;
         
         const renderBlur = (horizontalRenderTarget, verticalRenderTarget, downSize) => {

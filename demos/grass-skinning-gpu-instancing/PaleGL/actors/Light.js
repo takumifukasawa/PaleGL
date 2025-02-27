@@ -6,7 +6,7 @@ export class Light extends Actor {
     color;
     castShadow; // bool
     shadowCamera;
-    shadowMap; // TODO: shadow camera に持たせたほうが良いような気もする
+    shadowMap; // TODO: shadow cameras に持たせたほうが良いような気もする
     
     constructor() {
         super(ActorTypes.Light);

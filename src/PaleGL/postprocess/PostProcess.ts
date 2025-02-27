@@ -1,5 +1,5 @@
 ﻿// import {Vector3} from '@/PaleGL/math/Vector3';
-import { Camera, setCameraSize } from '@/PaleGL/actors/camera/camera.ts';
+import { Camera, setCameraSize } from '@/PaleGL/actors/cameras/camera.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
 import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
@@ -10,7 +10,7 @@ import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassB
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/camera/orthographicCameraBehaviour.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
@@ -245,7 +245,7 @@ export class PostProcess {
         });
 
         //
-        // camera
+        // cameras
         //
 
         renderer.updateCameraUniforms(targetCamera);
@@ -312,7 +312,7 @@ export class PostProcess {
             // pass.render({
             //     gpu,
             //     renderer,
-            //     camera: this._postProcessCamera,
+            //     cameras: this._postProcessCamera,
             //     prevRenderTarget,
             //     isLastPass,
             //     targetCamera,

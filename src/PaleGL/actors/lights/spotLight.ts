@@ -1,9 +1,10 @@
-﻿import { createLight, Light, LightArgs, UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/light.ts';
+﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { DEG_TO_RAD, LightTypes } from '@/PaleGL/constants.ts';
-import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
+import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
-import { updateProjectionMatrix } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
+import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 
 type SpotLightParams = {
     distance: number;
@@ -52,7 +53,7 @@ export function createSpotLight(options: SpotLightArgs): SpotLight {
     };
 }
 
-export const updateSpotLight: UpdateLightFunc = (light) => {
+export const updateSpotLight: UpdateLightFunc = (light: Light) => {
     const spotLight = light as SpotLight;
     // coneCosは直径、fovは半径なので2倍
     if (spotLight.shadowCamera) {

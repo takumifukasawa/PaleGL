@@ -6,10 +6,10 @@ import {
     GetFrustumVectorsFunc,
     setCameraSize,
     UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
+import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 
 export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width: number, height: number) => {
     const camera = actor as Camera;
@@ -86,7 +86,7 @@ export const getOrthographicFrustumLocalPositions: GetFrustumVectorsFunc = (came
     };
 };
 
-// const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera): FrustumVectors | null => {
+// const getFrustumWorldPositions: GetFrustumVectorsFunc = (cameras: Camera): FrustumVectors | null => {
 //     const worldPositions: {
 //         [key in FrustumDirectionType]: Vector3;
 //     } = {
@@ -99,11 +99,11 @@ export const getOrthographicFrustumLocalPositions: GetFrustumVectorsFunc = (came
 //         flb: Vector3.zero,
 //         frb: Vector3.zero,
 //     };
-//     const localPositions = getFrustumLocalPositions(camera);
+//     const localPositions = getFrustumLocalPositions(cameras);
 //     if (localPositions) {
 //         for (const d in FrustumDirection) {
 //             const key = d as FrustumDirectionType;
-//             const wp = localPositions[key].multiplyMatrix4(camera.transform.getWorldMatrix());
+//             const wp = localPositions[key].multiplyMatrix4(cameras.transform.getWorldMatrix());
 //             worldPositions[key] = wp;
 //         }
 //         return worldPositions;

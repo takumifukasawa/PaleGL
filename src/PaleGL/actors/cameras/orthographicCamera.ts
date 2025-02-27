@@ -1,9 +1,9 @@
 ﻿import {
     Camera,
     createCamera,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { CameraTypes } from '@/PaleGL/constants.ts';
-import {setOrthoSize} from "@/PaleGL/actors/camera/orthographicCameraBehaviour.ts";
+import {setOrthoSize} from "@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts";
 
 // export class OrthographicCamera extends Camera {
 //     left: number = 0;
@@ -144,9 +144,9 @@ import {setOrthoSize} from "@/PaleGL/actors/camera/orthographicCameraBehaviour.t
 //     }
 //
 //     static CreateFullQuadOrthographicCamera(): Camera {
-//         const camera = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
-//         camera.transform.setTranslation(new Vector3(0, 0, 1));
-//         return camera;
+//         const cameras = new OrthographicCamera(-1, 1, -1, 1, 0, 2);
+//         cameras.transform.setTranslation(new Vector3(0, 0, 1));
+//         return cameras;
 //     }
 // }
 

@@ -19,7 +19,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { SpotLight } from '@/PaleGL/actors/spotLight.ts';
+import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Override } from '@/PaleGL/palegl';

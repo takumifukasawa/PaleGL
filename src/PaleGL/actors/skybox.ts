@@ -162,11 +162,11 @@ type SkyboxArgs = {
 //     }
 //
 //     // TODO: renderer側で2回走らないようにする
-//     $updateTransform(camera: Camera) {
-//         if (camera) {
-//             this.transform.setTranslation(camera.transform.getPosition());
+//     $updateTransform(cameras: Camera) {
+//         if (cameras) {
+//             this.transform.setTranslation(cameras.transform.getPosition());
 //             // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
-//             this.transform.setScaling(Vector3.fill(camera.far / 1.733));
+//             this.transform.setScaling(Vector3.fill(cameras.far / 1.733));
 //         }
 //         super.$updateTransform();
 //     }

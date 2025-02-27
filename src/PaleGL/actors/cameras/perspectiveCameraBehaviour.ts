@@ -3,12 +3,12 @@ import {
     GetFrustumVectorsFunc,
     setCameraSize,
     UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import {  SetSizeActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/camera/perspectiveCamera.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 
 export const updatePerspectiveCameraProjectionMatrix: UpdateProjectionMatrixFunc = (camera: Camera) => {
     const perspectiveCamera = camera as PerspectiveCamera;

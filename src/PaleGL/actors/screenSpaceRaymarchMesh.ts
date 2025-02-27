@@ -85,27 +85,27 @@ export const setSizeScreenSpaceRaymarchMesh = (actor: Actor, width: number, heig
     setMaterialUniformValue(getMeshMaterial(mesh), UniformNames.TargetHeight, height);
 };
 
-// updateMaterial(args: { camera: Camera }) {
+// updateMaterial(args: { cameras: Camera }) {
 //     super.updateMaterial(args);
 // 
-//     // const { camera } = args;
+//     // const { cameras } = args;
 // 
-//     // this.mainMaterial.uniforms.setValue(UniformNames.ViewDirection, camera.getWorldForward());
+//     // this.mainMaterial.uniforms.setValue(UniformNames.ViewDirection, cameras.getWorldForward());
 //     // this.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
 //     // this.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
 // 
 //     // // TODO: orthographic対応
-//     // if (camera.isPerspective()) {
-//     //     const perspectiveCamera = camera as PerspectiveCamera;
+//     // if (cameras.isPerspective()) {
+//     //     const perspectiveCamera = cameras as PerspectiveCamera;
 //     //     this.setUniformValueToAllMaterials(UniformNames.CameraAspect, perspectiveCamera.aspect);
 //     //     this.setUniformValueToAllMaterials(UniformNames.CameraFov, perspectiveCamera.fov);
 //     // }
 // }
 // 
-// updateDepthMaterial({ camera }: { camera: Camera }) {
-//     super.updateDepthMaterial({ camera });
-//     // if (camera.isPerspective()) {
-//     //     const perspectiveCamera = camera as PerspectiveCamera;
+// updateDepthMaterial({ cameras }: { cameras: Camera }) {
+//     super.updateDepthMaterial({ cameras });
+//     // if (cameras.isPerspective()) {
+//     //     const perspectiveCamera = cameras as PerspectiveCamera;
 //     //     this.setUniformValueToAllMaterials(UniformNames.CameraAspect, perspectiveCamera.aspect);
 //     //     this.setUniformValueToAllMaterials(UniformNames.CameraFov, perspectiveCamera.fov);
 //     // }

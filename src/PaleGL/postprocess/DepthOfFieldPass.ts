@@ -10,7 +10,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Camera } from '@/PaleGL/actors/camera/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
 import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';
@@ -290,8 +290,8 @@ export class DepthOfFieldPass implements IPostProcessPass {
     //  *
     //  */
     // setup() {
-    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraNear, camera.near);
-    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraFar, camera.far);
+    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraNear, cameras.near);
+    //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraFar, cameras.far);
     //     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.DepthTexture, depthTexture);
     // }
 

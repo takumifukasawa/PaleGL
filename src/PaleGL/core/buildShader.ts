@@ -16,7 +16,7 @@ import {
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 // import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
 // import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
-// import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-camera.glsl';
+// import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-cameras.glsl';
 
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';

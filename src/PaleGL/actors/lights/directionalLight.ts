@@ -1,7 +1,8 @@
-﻿import {createLight, Light, LightArgs, UpdateLightFunc, updateShadowCamera} from '@/PaleGL/actors/light.ts';
-import { createOrthographicCamera } from '@/PaleGL/actors/camera/orthographicCamera.ts';
+﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
+import { createOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { LightTypes } from '@/PaleGL/constants.ts';
+import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 
 export type DirectionalLight = Light;
 
@@ -21,6 +22,6 @@ export function createDirectionalLight(options: LightArgs): DirectionalLight {
     };
 }
 
-export const updateDirectionalLight: UpdateLightFunc = (light) => {
+export const updateDirectionalLight: UpdateLightFunc = (light: Light) => {
     updateShadowCamera(light);
 };

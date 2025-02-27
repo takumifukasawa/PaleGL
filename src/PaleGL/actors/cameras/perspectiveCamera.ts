@@ -1,9 +1,9 @@
 ﻿import {
     Camera,
     createCamera,
-} from '@/PaleGL/actors/camera/camera.ts';
+} from '@/PaleGL/actors/cameras/camera.ts';
 import { CameraTypes } from '@/PaleGL/constants.ts';
-import { updateProjectionMatrix } from '@/PaleGL/actors/camera/cameraBehaviours.ts';
+import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 // export class PerspectiveCamera extends Camera {
 //     fov: number; // degree
@@ -130,7 +130,7 @@ export function createPerspectiveCamera(fov: number, aspect: number, near: numbe
 
     const fixedAspect: boolean = false;
 
-    // setCameraPerspectiveSize(camera, aspect);
+    // setCameraPerspectiveSize(cameras, aspect);
 
     const perspectiveCamera: PerspectiveCamera = {
         ...camera,
