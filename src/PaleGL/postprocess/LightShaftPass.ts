@@ -5,7 +5,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Camera, transformScreenPoint } from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
@@ -17,6 +17,7 @@ import {
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import {transformScreenPoint} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 
 //
 // ref:

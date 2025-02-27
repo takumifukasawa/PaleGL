@@ -1,16 +1,21 @@
-import {
-    Camera, FrustumVectors,
-    GetFrustumVectorsFunc,
-    setCameraSize,
-    UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import {  SetSizeActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
-export const updatePerspectiveCameraProjectionMatrix: UpdateProjectionMatrixFunc = (camera: Camera) => {
+export function setSizePerspectiveCamera(camera: Camera, width: number, height: number) {
+    const perspectiveCamera = camera as PerspectiveCamera;
+    setCameraSize(camera, width, height);
+    // this.aspect = width / height;
+    if (!perspectiveCamera.fixedAspect) {
+        perspectiveCamera.aspect = width / height;
+        updatePerspectiveCameraProjectionMatrix(camera);
+    }
+    // this.#updateProjectionMatrix();
+}
+
+export function updatePerspectiveCameraProjectionMatrix(camera: Camera) {
     const perspectiveCamera = camera as PerspectiveCamera;
     perspectiveCamera.projectionMatrix = Matrix4.getPerspectiveMatrix(
         (perspectiveCamera.fov * Math.PI) / 180,
@@ -18,20 +23,9 @@ export const updatePerspectiveCameraProjectionMatrix: UpdateProjectionMatrixFunc
         perspectiveCamera.near,
         perspectiveCamera.far
     );
-};
+}
 
-export const setSizePerspectiveCamera: SetSizeActorFunc = (actor: Actor, width: number, height: number) => {
-    const camera = actor as PerspectiveCamera;
-    setCameraSize(camera, width, height);
-    // this.aspect = width / height;
-    if (!camera.fixedAspect) {
-        camera.aspect = width / height;
-        updatePerspectiveCameraProjectionMatrix(camera);
-    }
-    // this.#updateProjectionMatrix();
-};
-
-export const getPerspectiveFrustumLocalPositions: GetFrustumVectorsFunc = (camera: Camera): FrustumVectors | null => {
+export function getPerspectiveFrustumLocalPositions(camera: Camera) {
     const perspectiveCamera = camera as PerspectiveCamera;
 
     const localForward = Vector3.back;
@@ -68,6 +62,7 @@ export const getPerspectiveFrustumLocalPositions: GetFrustumVectorsFunc = (camer
     const farLeftTop = Vector3.addVectors(farClipCenter, farClipRightOffset.clone().negate(), farClipUpOffset);
 
     const farRightTop = Vector3.addVectors(farClipCenter, farClipRightOffset, farClipUpOffset);
+    // farRightTop = farLeftTop;
 
     const farLeftBottom = Vector3.addVectors(
         farClipCenter,
@@ -87,7 +82,7 @@ export const getPerspectiveFrustumLocalPositions: GetFrustumVectorsFunc = (camer
         flb: farLeftBottom,
         frb: farRightBottom,
     };
-};
+}
 
 export const setPerspectiveSize = (perspectiveCamera: PerspectiveCamera, aspect: number) => {
     perspectiveCamera.aspect = aspect;

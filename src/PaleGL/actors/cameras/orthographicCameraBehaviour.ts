@@ -1,19 +1,11 @@
-import { SetSizeActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
-import {
-    Camera,
-    FrustumVectors,
-    GetFrustumVectorsFunc,
-    setCameraSize,
-    UpdateProjectionMatrixFunc,
-} from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import {setTranslation} from "@/PaleGL/core/transform.ts";
+import { setTranslation } from '@/PaleGL/core/transform.ts';
+import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
-export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width: number, height: number) => {
-    const camera = actor as Camera;
+export function setSizeOrthographicCamera(camera: Camera, width: number, height: number) {
     setCameraSize(camera, width, height);
     // if (left && right && top && bottom) {
     //     this.left = left;
@@ -21,11 +13,11 @@ export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width:
     //     this.bottom = bottom;
     //     this.top = top;
     // }
-    
-    updateOrthographicCameraProjectionMatrix(camera);
-};
 
-export const updateOrthographicCameraProjectionMatrix: UpdateProjectionMatrixFunc = (camera: Camera) => {
+    updateOrthographicCameraProjectionMatrix(camera);
+}
+
+export function updateOrthographicCameraProjectionMatrix(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
     camera.projectionMatrix = Matrix4.getOrthographicMatrix(
         orthographicCamera.left,
@@ -35,13 +27,13 @@ export const updateOrthographicCameraProjectionMatrix: UpdateProjectionMatrixFun
         orthographicCamera.near,
         orthographicCamera.far
     );
-};
+}
 
 // updateTransform() {
 //     super.updateTransform();
 // }
 
-export const getOrthographicFrustumLocalPositions: GetFrustumVectorsFunc = (camera: Camera): FrustumVectors | null => {
+export function getOrthographicFrustumLocalPositions(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
 
     const localForward = Vector3.back;
@@ -85,7 +77,7 @@ export const getOrthographicFrustumLocalPositions: GetFrustumVectorsFunc = (came
         flb: farLeftBottom,
         frb: farRightBottom,
     };
-};
+}
 
 // const getFrustumWorldPositions: GetFrustumVectorsFunc = (cameras: Camera): FrustumVectors | null => {
 //     const worldPositions: {

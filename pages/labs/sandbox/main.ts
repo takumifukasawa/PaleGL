@@ -63,7 +63,6 @@ import {
 } from '@/PaleGL/constants';
 
 import { createDebuggerGUI, DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/camera.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
@@ -87,7 +86,8 @@ import { createSkybox } from '@/PaleGL/actors/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import {setLookAtPosition, setRotationX, setScaling, setTranslation} from "@/PaleGL/core/transform.ts";
+import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1303,10 +1303,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             inputController.getNormalizedInputPosition()
         );
         // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.setValue(
-            'uAttractTargetPosition',
-            attractSphereMesh.transform.position
-        );
+        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.position);
 
         attractRate += (inputController.getIsDown() ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
@@ -1438,7 +1435,6 @@ const main = async () => {
         })
     );
     setTranslation(testLightingMesh.transform, new Vector3(2.5, 1, 0));
-    
 
     //
     // local raymarch mesh

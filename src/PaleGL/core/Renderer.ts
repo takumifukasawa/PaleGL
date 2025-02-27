@@ -21,9 +21,6 @@ import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
     Camera,
     CameraRenderTargetType,
-    getCameraForward,
-    hasEnabledPostProcessPass,
-    isPerspectiveCamera,
 } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
@@ -77,6 +74,11 @@ import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedT
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import {getWorldForward} from "@/PaleGL/core/transform.ts";
+import {
+    getCameraForward,
+    hasEnabledPostProcessPass,
+    isPerspectiveCamera
+} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 

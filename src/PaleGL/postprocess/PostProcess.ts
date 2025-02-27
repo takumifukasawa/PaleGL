@@ -1,5 +1,5 @@
 ﻿// import {Vector3} from '@/PaleGL/math/Vector3';
-import { Camera, setCameraSize } from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
 import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
@@ -11,6 +11,7 @@ import { Texture } from '@/PaleGL/core/Texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import {setCameraSize} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
