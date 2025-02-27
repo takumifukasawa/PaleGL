@@ -171,6 +171,7 @@ export const setActorLookAt = (actor: Actor, p: Vector3) => {
 export type UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => void;
 
 export const defaultUpdateActorTransform: UpdateActorTransformFunc = (actor) => {
+    console.log("hogehoge", actor.name, actor.parent, actor.children, actor.transform.getActor())
     actor.transform.updateMatrix();
 };
 

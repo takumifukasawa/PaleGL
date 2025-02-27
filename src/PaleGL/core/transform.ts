@@ -260,7 +260,7 @@ export function createTransform(actor: Actor | null) {
        
         // if (_actor?.parent) {
         // }
-        console.log("hogehoge", _actor?.name,_actor?.transform.getActor()?.name,_actor, _actor?.parent, _worldMatrix.e, _localMatrix.e);
+        console.log("hogehoge", _actor?.name, _actor, (_actor?.parent ?"has parent" : "has not parent"), _actor?.parent, _worldMatrix.e, _localMatrix.e);
 
         _normalMatrix = _worldMatrix.clone().invert().transpose();
     };
