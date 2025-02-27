@@ -28,6 +28,7 @@ const ENTRY_POINTS: { [key: string]: string } = {
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
 export default defineConfig(async (config) => {
+    
     const { mode } = config;
 
     const env = loadEnv(mode, process.cwd());
@@ -64,7 +65,7 @@ export default defineConfig(async (config) => {
         console.log(`${key}: ${entryPoints[key]}`);
     });
     console.log('======================');
-
+    
     // ref:
     // https://uga-box.hatenablog.com/entry/2022/05/03/000000
     // https://vitejs.dev/config/
@@ -152,11 +153,12 @@ export default defineConfig(async (config) => {
                 },
             },
         },
-        server: {
-            watch: {
-                usePolling: true,
-                interval: 2000,
-            },
-        },
+        // for WSL
+        // server: {
+        //     watch: {
+        //         usePolling: true,
+        //         interval: 2000,
+        //     },
+        // },
     };
 });

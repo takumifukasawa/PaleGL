@@ -16,7 +16,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import { Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/light.ts';
 import { getMeshMaterial, Mesh, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/mesh.ts';
-import { Scene } from '@/PaleGL/core/scene.ts';
+import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
     Camera,
     CameraRenderTargetType,
@@ -2599,7 +2599,7 @@ export class Renderer {
         let postProcessVolumeActor: PostProcessVolume | null = null;
 
         // build render mesh info each queue
-        scene.traverse((actor) => {
+        traverseScene(scene, (actor) => {
             switch (actor.type) {
                 case ActorTypes.Skybox:
                     renderMeshInfoEachQueue[RenderQueueType.Skybox].push(

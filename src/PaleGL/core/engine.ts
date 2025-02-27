@@ -2,7 +2,7 @@
 import { ActorTypes } from '@/PaleGL/constants';
 import { createStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Scene } from '@/PaleGL/core/scene.ts';
+import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Mesh } from '@/PaleGL/actors/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
@@ -11,8 +11,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,
     fixedUpdateActor,
-    lastUpdateActor,
-    setSizeActor,
+    lastUpdateActor, setSizeActor,
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -413,7 +412,7 @@ export function createEngine({
         const rh = height * _renderer.pixelRatio;
         const w = Math.floor(rw);
         const h = Math.floor(rh);
-        _scene?.traverse((actor) => {
+        traverseScene(_scene!, (actor) => {
             setSizeActor(actor, w, h);
         });
         // _scenes.forEach((scene) => {
@@ -428,14 +427,14 @@ export function createEngine({
             _onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
         }
 
-        _scene?.traverse((actor) =>
+        traverseScene(_scene!, (actor) => {
             fixedUpdateActor(actor, {
                 gpu: _gpu,
                 scene: _scene!,
                 fixedTime,
                 fixedDeltaTime,
-            })
-        );
+            });
+        });
         // _scenes.forEach((scene) => {
         //     scene.traverse((actor) => actor.fixedUpdate({ gpu: _gpu, fixedTime, fixedDeltaTime }));
         // });
@@ -468,7 +467,7 @@ export function createEngine({
         //
 
         // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        _scene?.traverse((actor) => {
+        traverseScene(_scene!, (actor) => {
             updateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime });
             switch (actor.type) {
                 case ActorTypes.Skybox:
@@ -495,7 +494,7 @@ export function createEngine({
         if (_onLastUpdate) {
             _onLastUpdate({ time, deltaTime });
         }
-        _scene?.traverse((actor) => {
+        traverseScene(_scene!, (actor) => {
             lastUpdateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime });
         });
 
@@ -504,7 +503,7 @@ export function createEngine({
         //
 
         // TODO: fixedupdateでもやっちゃってるのよくない
-        _scene?.traverse((actor) => {
+        traverseScene(_scene!, (actor) => {
             updateActorTransform(actor);
         });
 
@@ -516,7 +515,7 @@ export function createEngine({
     }
 
     const lastUpdate = (time: number, deltaTime: number) => {
-        _scene?.traverse((actor) => lastUpdateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime }));
+        traverseScene(_scene!, (actor) => lastUpdateActor(actor, { gpu: _gpu, scene: _scene!, time, deltaTime }));
     };
 
     const render = (time: number, deltaTime: number) => {
@@ -549,7 +548,7 @@ export function createEngine({
 
         // 描画させたいので全部中央に置いちゃう
         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
-        _scene?.traverse((actor) => {
+        traverseScene(_scene!, (actor) => {
             const tmpP = actor.transform.getPosition().clone();
             const tmpR = actor.transform.getRotation().clone();
             // TODO: mainカメラだけ抽出したい

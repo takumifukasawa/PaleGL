@@ -79,7 +79,7 @@ import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import { createScene } from '@/PaleGL/core/scene.ts';
+import { addActorToScene, createScene } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/skybox.ts';
@@ -339,14 +339,15 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer, fixedUpdateFps: 0.5, updateFps: 0.5 });
+const engine = createEngine({ gpu, renderer, fixedUpdateFps: 0.5, updateFps: 5 });
+// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 30, updateFps: 30 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);
-captureScene.add(captureSceneCamera);
+addActorToScene(captureScene, captureSceneCamera);
 // captureScene.mainCamera = captureSceneCamera;
 // captureSceneCamera.mainCamera = true;
 
@@ -407,7 +408,7 @@ subscribeActorOnStart(directionalLight, () => {
     //     lightActor.shadowMap = new RenderTarget({gpu, width: 1024, height: 1024, type: RenderTargetTypes.Depth});
     // }
 });
-captureScene.add(directionalLight);
+addActorToScene(captureScene, directionalLight);
 
 const spotLight1 = createSpotLight({
     intensity: 1,
@@ -440,7 +441,7 @@ subscribeActorOnStart(spotLight1, () => {
     spotLight1.transform.lookAt(new Vector3(0, 0, 0));
 });
 
-captureScene.add(spotLight1);
+addActorToScene(captureScene, spotLight1);
 
 const spotLight2 = createSpotLight({
     intensity: 1,
@@ -472,7 +473,7 @@ subscribeActorOnStart(spotLight2, () => {
     spotLight2.transform.lookAt(new Vector3(0, 0, 0));
 });
 
-captureScene.add(spotLight2);
+addActorToScene(captureScene, spotLight2);
 
 const cameraPostProcess = new PostProcess();
 
@@ -1494,7 +1495,7 @@ const main = async () => {
         align: TextAlignType.Center,
         // characterSpacing: -0.2
     });
-    captureScene.add(textMesh1);
+    addActorToScene(captureScene, textMesh1);
     textMesh1.transform.setPosition(new Vector3(0, 1, 6));
     textMesh1.transform.getRotation().setRotationX(-90);
     textMesh1.transform.setScale(Vector3.fill(0.4));
@@ -1508,7 +1509,7 @@ const main = async () => {
         align: TextAlignType.Center,
         characterSpacing: -0.16,
     });
-    captureScene.add(textMesh2);
+    addActorToScene(captureScene, textMesh2);
     textMesh2.transform.setPosition(new Vector3(0, 2, 8));
     textMesh2.transform.getRotation().setRotationX(-90);
     textMesh2.transform.setScale(Vector3.fill(0.4));
@@ -1522,7 +1523,7 @@ const main = async () => {
         align: TextAlignType.Left,
         characterSpacing: 0.2,
     });
-    captureScene.add(textMesh3);
+    addActorToScene(captureScene, textMesh3);
     textMesh3.transform.setPosition(new Vector3(0, 0.01, 9));
     textMesh3.transform.getRotation().setRotationX(-90);
     textMesh3.transform.setScale(Vector3.fill(0.4));
@@ -1829,14 +1830,14 @@ void main() {
     //     particleMaterial.uniforms.setValue('uTime', fixedTime);
     // };
 
-    captureScene.add(attractSphereMesh);
-    captureScene.add(testLightingMesh);
-    captureScene.add(skinnedMesh);
-    captureScene.add(floorPlaneMesh);
-    captureScene.add(skyboxMesh);
-    captureScene.add(particleMesh);
-    captureScene.add(objectSpaceRaymarchMesh);
-    captureScene.add(screenSpaceRaymarchMesh);
+    addActorToScene(captureScene, attractSphereMesh);
+    addActorToScene(captureScene, testLightingMesh);
+    addActorToScene(captureScene, skinnedMesh);
+     addActorToScene(captureScene, floorPlaneMesh);
+    addActorToScene(captureScene, skyboxMesh);
+    addActorToScene(captureScene, particleMesh);
+    addActorToScene(captureScene, objectSpaceRaymarchMesh);
+    addActorToScene(captureScene, screenSpaceRaymarchMesh);
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
