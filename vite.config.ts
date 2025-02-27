@@ -154,11 +154,11 @@ export default defineConfig(async (config) => {
             },
         },
         // for WSL
-        // server: {
-        //     watch: {
-        //         usePolling: true,
-        //         interval: 2000,
-        //     },
-        // },
+        server: {
+            watch: {
+                usePolling: true,
+                interval: 2000,
+            },
+        },
     };
 });
