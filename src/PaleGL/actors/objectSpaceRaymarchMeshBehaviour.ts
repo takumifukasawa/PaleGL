@@ -10,8 +10,6 @@ const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
 export function updateObjectSpaceRaymarchMesh(actor: Actor) {
     const mesh = actor as ObjectSpaceRaymarchMesh;
     
-    console.log("hogehoge")
-
     // // for debug
     // console.log("============")
     // mesh.transform.getScale().log()

@@ -13,7 +13,7 @@ import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshBehaviours.ts';
 import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import {updateActorTransformMatrix} from "@/PaleGL/core/transform.ts";
+import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
 
 // try start actor -------------------------------------------------------
 
