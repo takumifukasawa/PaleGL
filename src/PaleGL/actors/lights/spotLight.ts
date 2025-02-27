@@ -5,6 +5,7 @@ import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/came
 import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import {setRotationY} from "@/PaleGL/core/transform.ts";
 
 type SpotLightParams = {
     distance: number;
@@ -32,7 +33,7 @@ export function createSpotLight(options: SpotLightArgs): SpotLight {
     light.shadowCamera = createPerspectiveCamera(45, 1, 0.1, 20);
     light.shadowCamera.fixedAspect = true;
     // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
-    light.shadowCamera.transform.setRotationY(180);
+    setRotationY(light.shadowCamera.transform, 180);
     // TODO: なぜunknownを噛ませる必要がある？
 
     addChildActor(light, light.shadowCamera);

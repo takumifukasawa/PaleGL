@@ -76,6 +76,7 @@ import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import {getWorldForward} from "@/PaleGL/core/transform.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -941,8 +942,8 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             );
 //         });
 //         sortedBasePassRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.position, a.actor.transform.position).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.position, b.actor.transform.position).magnitude;
 //             return al < bl ? -1 : 1;
 //         });
 //
@@ -951,8 +952,8 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
 //         );
 //         sortedTransparentRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.position, a.actor.transform.position).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.position, b.actor.transform.position).magnitude;
 //             return al > bl ? -1 : 1;
 //         });
 //
@@ -985,8 +986,8 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //             return actor;
 //         });
 //         depthPrePassRenderMeshInfos.sort((a, b) => {
-//             const al = Vector3.subVectors(cameras.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-//             const bl = Vector3.subVectors(cameras.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+//             const al = Vector3.subVectors(cameras.transform.position, a.actor.transform.position).magnitude;
+//             const bl = Vector3.subVectors(cameras.transform.position, b.actor.transform.position).magnitude;
 //             return al < bl ? -1 : 1;
 //         });
 //         this.depthPrePass(depthPrePassRenderMeshInfos, cameras);
@@ -1543,17 +1544,17 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.WorldMatrix,
-//             actor.transform.getWorldMatrix()
+//             actor.transform.worldMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.InverseWorldMatrix,
-//             actor.transform.getInverseWorldMatrix()
+//             actor.transform.worldMatrix
 //         );
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Transformations,
 //             UniformNames.NormalMatrix,
-//             actor.transform.getNormalMatrix()
+//             actor.transform.normalMatrix
 //         );
 //     }
 //
@@ -1567,7 +1568,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         this.$setUniformBlockValue(
 //             UniformBlockNames.Camera,
 //             UniformNames.ViewPosition,
-//             cameras.transform.getWorldMatrix().position
+//             cameras.transform.worldMatrix.position
 //         );
 //         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, cameras.getWorldForward());
 //         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, cameras.near);
@@ -1748,7 +1749,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                 name: UniformNames.LightDirection,
 //                 type: UniformTypes.Vector3,
 //                 // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-//                 value: directionalLight.transform.getPosition().clone().negate().normalize(),
+//                 value: directionalLight.transform.position.clone().negate().normalize(),
 //             },
 //             {
 //                 name: UniformNames.LightIntensity,
@@ -1783,7 +1784,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                     {
 //                         name: UniformNames.LightPosition,
 //                         type: UniformTypes.Vector3,
-//                         value: spotLight.transform.getPosition(),
+//                         value: spotLight.transform.position,
 //                     },
 //                     {
 //                         name: UniformNames.LightDirection,
@@ -1839,7 +1840,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //                     {
 //                         name: UniformNames.LightPosition,
 //                         type: UniformTypes.Vector3,
-//                         value: pointLight.transform.getPosition(),
+//                         value: pointLight.transform.position,
 //                     },
 //                     {
 //                         name: UniformNames.LightIntensity,
@@ -2703,8 +2704,8 @@ export class Renderer {
             );
         });
         sortedBasePassRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
+            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
             return al < bl ? -1 : 1;
         });
 
@@ -2713,8 +2714,8 @@ export class Renderer {
             (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
         );
         sortedTransparentRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
+            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
             return al > bl ? -1 : 1;
         });
 
@@ -2747,8 +2748,8 @@ export class Renderer {
             return actor;
         });
         depthPrePassRenderMeshInfos.sort((a, b) => {
-            const al = Vector3.subVectors(camera.transform.getPosition(), a.actor.transform.getPosition()).magnitude;
-            const bl = Vector3.subVectors(camera.transform.getPosition(), b.actor.transform.getPosition()).magnitude;
+            const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
+            const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
             return al < bl ? -1 : 1;
         });
         this.depthPrePass(depthPrePassRenderMeshInfos, camera);
@@ -3316,17 +3317,17 @@ export class Renderer {
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.WorldMatrix,
-            actor.transform.getWorldMatrix()
+            actor.transform.worldMatrix
         );
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.InverseWorldMatrix,
-            actor.transform.getInverseWorldMatrix()
+            actor.transform.worldMatrix
         );
         this.$setUniformBlockValue(
             UniformBlockNames.Transformations,
             UniformNames.NormalMatrix,
-            actor.transform.getNormalMatrix()
+            actor.transform.normalMatrix
         );
     }
 
@@ -3340,7 +3341,7 @@ export class Renderer {
         this.$setUniformBlockValue(
             UniformBlockNames.Camera,
             UniformNames.ViewPosition,
-            camera.transform.getWorldMatrix().position
+            camera.transform.worldMatrix.position
         );
         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.ViewDirection, getCameraForward(camera));
         this.$setUniformBlockValue(UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
@@ -3521,7 +3522,7 @@ export class Renderer {
                 name: UniformNames.LightDirection,
                 type: UniformTypes.Vector3,
                 // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-                value: directionalLight.transform.getPosition().clone().negate().normalize(),
+                value: directionalLight.transform.position.clone().negate().normalize(),
             },
             {
                 name: UniformNames.LightIntensity,
@@ -3556,12 +3557,12 @@ export class Renderer {
                     {
                         name: UniformNames.LightPosition,
                         type: UniformTypes.Vector3,
-                        value: spotLight.transform.getPosition(),
+                        value: spotLight.transform.position,
                     },
                     {
                         name: UniformNames.LightDirection,
                         type: UniformTypes.Vector3,
-                        value: spotLight.transform.getWorldForward().clone(),
+                        value: getWorldForward(spotLight.transform).clone(),
                     },
                     {
                         name: UniformNames.LightIntensity,
@@ -3612,7 +3613,7 @@ export class Renderer {
                     {
                         name: UniformNames.LightPosition,
                         type: UniformTypes.Vector3,
-                        value: pointLight.transform.getPosition(),
+                        value: pointLight.transform.position,
                     },
                     {
                         name: UniformNames.LightIntensity,

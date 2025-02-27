@@ -5,6 +5,7 @@ import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/bone.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
+import { setRotation, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 
 // type UpdateProxyKeyframe = {
 //     target: GLTFNodeActorKind;
@@ -14,21 +15,20 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 
 export type AnimationClip = ReturnType<typeof createAnimationClip>;
 
-export function createAnimationClip(
-    {
-        name,
-        keyframes,
-    }: {
-        name: string;
-        // start?: number,
-        // end?: number,
-        // frames: number,
-        // frameCount?: number,
-        keyframes: AnimationKeyframes[];
-    }) {
+export function createAnimationClip({
+    name,
+    keyframes,
+}: {
+    name: string;
+    // start?: number,
+    // end?: number,
+    // frames: number,
+    // frameCount?: number,
+    keyframes: AnimationKeyframes[];
+}) {
     const _name: string = name;
     const _keyframes: AnimationKeyframes[] = keyframes;
-    const _frameCount: number = Math.max(...keyframes.map(keyframe => keyframe.getFrameCount()));
+    const _frameCount: number = Math.max(...keyframes.map((keyframe) => keyframe.getFrameCount()));
     let _currentTime: number = 0;
     let _currentFrame: number = 0;
     let _loop: boolean = false;
@@ -41,7 +41,7 @@ export function createAnimationClip(
     const play = () => {
         _currentTime = 0;
         _isPlaying = true;
-    }
+    };
 
     const update = (deltaTime: number) => {
         if (!_isPlaying) {
@@ -79,48 +79,48 @@ export function createAnimationClip(
         //     });
         //     _onUpdateProxy(keyframes);
         // } else {
-            _keyframes.forEach((animationKeyframes) => {
-                // console.log("-------")
-                const frameValue = animationKeyframes.getFrameValue(_currentFrame);
-                switch (animationKeyframes.getKey()) {
-                    case 'translation':
-                        const p = frameValue as Vector3;
-                        if ((animationKeyframes.getTarget() as Actor).transform) {
-                            (animationKeyframes.getTarget() as Actor).transform.setPosition(p);
-                        } else {
-                            (animationKeyframes.getTarget() as Bone).setPosition(p);
-                        }
-                        break;
-                    case 'rotation':
-                        // TODO: quaternion-bug: 本当はこっちを使いたい
-                        // const q = frameValue as Quaternion;
-                        // const r = Rotator.fromQuaternion(q);
+        _keyframes.forEach((animationKeyframes) => {
+            // console.log("-------")
+            const frameValue = animationKeyframes.getFrameValue(_currentFrame);
+            switch (animationKeyframes.getKey()) {
+                case 'translation':
+                    const p = frameValue as Vector3;
+                    if ((animationKeyframes.getTarget() as Actor).transform) {
+                        setTranslation((animationKeyframes.getTarget() as Actor).transform, p);
+                    } else {
+                        (animationKeyframes.getTarget() as Bone).setPosition(p);
+                    }
+                    break;
+                case 'rotation':
+                    // TODO: quaternion-bug: 本当はこっちを使いたい
+                    // const q = frameValue as Quaternion;
+                    // const r = Rotator.fromQuaternion(q);
 
-                        const q = frameValue as Quaternion;
-                        const r = Rotator.fromMatrix4(q.toMatrix4());
+                    const q = frameValue as Quaternion;
+                    const r = Rotator.fromMatrix4(q.toMatrix4());
 
-                        // for debug
-                        // console.log("[AnimationClip.update] rotation", _currentFrame, frameValue.elements, r.getAxes());
-                        if ((animationKeyframes.getTarget() as Actor).transform) {
-                            (animationKeyframes.getTarget() as Actor).transform.setRotation(r);
-                        } else {
-                            (animationKeyframes.getTarget() as Bone).setRotation(r);
-                        }
-                        break;
-                    case 'scale':
-                        const s = frameValue as Vector3;
-                        if ((animationKeyframes.getTarget() as Actor).transform) {
-                            (animationKeyframes.getTarget() as Actor).transform.setScale(s);
-                        } else {
-                            (animationKeyframes.getTarget() as Bone).setScale(s);
-                        }
-                        break;
-                    default:
-                        console.error('invalid animation keyframes key');
-                }
-            });
+                    // for debug
+                    // console.log("[AnimationClip.update] rotation", _currentFrame, frameValue.elements, r.getAxes());
+                    if ((animationKeyframes.getTarget() as Actor).transform) {
+                        setRotation((animationKeyframes.getTarget() as Actor).transform, r);
+                    } else {
+                        (animationKeyframes.getTarget() as Bone).setRotation(r);
+                    }
+                    break;
+                case 'scale':
+                    const s = frameValue as Vector3;
+                    if ((animationKeyframes.getTarget() as Actor).transform) {
+                        setScaling((animationKeyframes.getTarget() as Actor).transform, s);
+                    } else {
+                        (animationKeyframes.getTarget() as Bone).setScale(s);
+                    }
+                    break;
+                default:
+                    console.error('invalid animation keyframes key');
+            }
+        });
         // }
-    }
+    };
 
     const getAllKeyframesValue = () => {
         return new Array(_frameCount).fill(0).map((_, i) => {
@@ -133,8 +133,8 @@ export function createAnimationClip(
             });
             return keyframes;
         });
-    }
-    
+    };
+
     return {
         // setter, getter
         getName: () => _name,
@@ -144,5 +144,5 @@ export function createAnimationClip(
         play,
         update,
         getAllKeyframesValue,
-    }
+    };
 }

@@ -230,7 +230,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
         this.#spotLights.forEach((spotLight) => {
             if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
-                setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.getWorldMatrix());
+                setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.worldMatrix);
                 // TODO: この描画だけでvolumeを計算したい
                 renderer.renderMesh(spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
             }

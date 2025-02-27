@@ -18,6 +18,7 @@ import {
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
 import { createTimeAccumulator } from '@/PaleGL/utilities/timeAccumulator.ts';
+import {setRotation, setTranslation} from "@/PaleGL/core/transform.ts";
 
 type EngineOnStartCallbackArgs = void;
 
@@ -549,14 +550,14 @@ export function createEngine({
         // 描画させたいので全部中央に置いちゃう
         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
         traverseScene(_scene!, (actor) => {
-            const tmpP = actor.transform.getPosition().clone();
-            const tmpR = actor.transform.getRotation().clone();
+            const tmpP = actor.transform.position.clone();
+            const tmpR = actor.transform.rotation.clone();
             // TODO: mainカメラだけ抽出したい
             if (actor.type === ActorTypes.Camera) {
-                actor.transform.setPosition(new Vector3(0, 0, 10));
-                actor.transform.setRotation(Rotator.fromQuaternion(Quaternion.fromEulerDegrees(0, 180, 0)));
+                setTranslation(actor.transform, new Vector3(0, 0, 10));
+                setRotation(actor.transform, Rotator.fromQuaternion(Quaternion.fromEulerDegrees(0, 180, 0)));
             } else {
-                actor.transform.setPosition(Vector3.zero);
+                setTranslation(actor.transform, Vector3.zero);
             }
             tmpTransformPair.push({ actor, p: tmpP, r: tmpR });
         });
@@ -565,8 +566,8 @@ export function createEngine({
         update(0, 0);
 
         tmpTransformPair.forEach((pair) => {
-            pair.actor.transform.setPosition(pair.p);
-            pair.actor.transform.setRotation(pair.r);
+            setTranslation(pair.actor.transform, pair.p);
+            setRotation(pair.actor.transform, pair.r);
         });
     };
 

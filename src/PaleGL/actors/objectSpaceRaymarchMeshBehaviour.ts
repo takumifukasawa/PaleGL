@@ -19,13 +19,13 @@ export function updateObjectSpaceRaymarchMesh(actor: Actor) {
 
     mesh.materials.forEach((material) => {
         // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.getScale());
+        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.scale);
         // wp
         // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
     });
     mesh.depthMaterials.forEach((material) => {
         // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.getScale());
+        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.scale);
         // wp
         // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
     });

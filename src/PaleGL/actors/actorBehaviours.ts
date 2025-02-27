@@ -8,12 +8,12 @@ import {
     // SetSizeActorFunc,
 } from '@/PaleGL/actors/actor.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshBehaviours.ts';
 import { setSizeCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import {updateActorTransformMatrix} from "@/PaleGL/core/transform.ts";
 
 // try start actor -------------------------------------------------------
 
@@ -162,9 +162,9 @@ export const postProcessActorTimeline = (actor: Actor, timelineTime: number) => 
     });
 };
 
-export const setActorLookAt = (actor: Actor, p: Vector3) => {
-    actor.transform.lookAt(p);
-};
+// export const setActorLookAt = (actor: Actor, p: Vector3) => {
+//     setActorLookAt(actor, p);
+// };
 
 // update actor transform -------------------------------------------------------
 
@@ -173,7 +173,7 @@ export type UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => void;
 export const defaultUpdateActorTransform: UpdateActorTransformFunc = (actor) => {
     // // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted, actor.parent, actor.children, actor.transform.getActor())
     // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted)
-    actor.transform.updateMatrix(actor);
+    updateActorTransformMatrix(actor);
 };
 
 const updateActorTransformBehaviour: Partial<Record<ActorType, UpdateActorTransformFunc>> = {

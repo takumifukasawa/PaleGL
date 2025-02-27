@@ -1,6 +1,7 @@
 import { Vector3 } from '@/PaleGL/math/Vector3.js';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import {setLookAtPosition, setTranslation} from "@/PaleGL/core/transform.ts";
 
 export function createOrbitCameraController(camera?: Camera | null) {
     let _camera = camera ?? null;
@@ -76,8 +77,8 @@ export function createOrbitCameraController(camera?: Camera | null) {
         );
 
         if (_camera && _enabledUpdateCamera) {
-            _camera.transform.setPosition(_currentCameraPosition);
-            _camera.transform.lookAt(_lookAtTarget);
+            setTranslation(_camera.transform, _currentCameraPosition);
+            setLookAtPosition(_camera.transform, _lookAtTarget);
         }
     };
 

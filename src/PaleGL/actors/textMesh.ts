@@ -141,8 +141,8 @@ export function createTextMesh({
     for (let i = 0; i < textMesh.charMeshes.length; i++) {
         const mesh = textMesh.charMeshes[i];
         originX += mesh.charWidth / 2 + mesh.charOffsetX;
-        mesh.transform.getPosition().x = originX;
-        mesh.transform.getPosition().y = mesh.charOffsetY;
+        mesh.transform.position.x = originX;
+        mesh.transform.position.y = mesh.charOffsetY;
         originX += mesh.charWidth / 2 + characterSpacing;
         // console.log("hogehoge",  mesh.name, mesh.parent)
     }

@@ -3,6 +3,7 @@ import { createOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCa
 import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { LightTypes } from '@/PaleGL/constants.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import {setRotationY} from "@/PaleGL/core/transform.ts";
 
 export type DirectionalLight = Light;
 
@@ -11,7 +12,7 @@ export function createDirectionalLight(options: LightArgs): DirectionalLight {
 
     light.shadowCamera = createOrthographicCamera(-1, 1, -1, 1, 0.1, 1);
     // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
-    light.shadowCamera.transform.setRotationY(180);
+    setRotationY(light.shadowCamera.transform, 180);
 
     addChildActor(light, light.shadowCamera);
 

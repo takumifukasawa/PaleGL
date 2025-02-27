@@ -42,7 +42,7 @@ export const setSizeCamera: SetSizeActorFunc = (actor, width, height) => {
 export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
     const camera = actor as Camera;
     defaultUpdateActorTransform(actor);
-    camera.viewMatrix = camera.transform.getWorldMatrix().clone().invert();
+    camera.viewMatrix = camera.transform.worldMatrix.clone().invert();
     camera.inverseProjectionMatrix = camera.projectionMatrix.clone().invert();
     camera.inverseViewMatrix = camera.viewMatrix.clone().invert();
     camera.viewProjectionMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix, camera.viewMatrix);
@@ -100,7 +100,7 @@ export const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera):
     if (localPositions) {
         for (const d in FrustumDirection) {
             const key = d as FrustumDirectionType;
-            const wp = localPositions[key].multiplyMatrix4(camera.transform.getWorldMatrix());
+            const wp = localPositions[key].multiplyMatrix4(camera.transform.worldMatrix);
             worldPositions[key] = wp;
         }
         return worldPositions;

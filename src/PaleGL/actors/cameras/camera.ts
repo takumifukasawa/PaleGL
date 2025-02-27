@@ -31,6 +31,7 @@ import {
     updateActor,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { getFrustumLocalPositions } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import {getWorldForward} from "@/PaleGL/core/transform.ts";
 
 export const FrustumDirection = {
     nlt: 'nlt',
@@ -449,7 +450,7 @@ export const getCameraForward = (camera: Camera) => {
     // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
     // なぜなら、projection行列でzを反転させるため
     // pattern_1
-    return camera.transform.getWorldForward().negate();
+    return getWorldForward(camera.transform).negate();
     // pattern_2
     // return new Vector3(this.viewMatrix.m20, this.viewMatrix.m21, this.viewMatrix.m22).negate().normalize();
 };
@@ -644,7 +645,7 @@ export const setCameraRenderTarget = (camera: Camera, renderTarget: RenderTarget
 
 export const getCameraWorldForward = (camera: Camera) => {
     // forwardはカメラの背面を向いている
-    return camera.transform.getWorldForward().clone().negate();
+    return getWorldForward(camera.transform).clone().negate();
 };
 
 export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
@@ -654,7 +655,7 @@ export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
     worldPos.y = worldPos.y / worldPos.w;
     worldPos.z = worldPos.z / worldPos.w;
     const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
-    const rayOrigin = camera.transform.getWorldPosition();
+    const rayOrigin = getWorldForward(camera.transform);
     const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
     return new Ray(rayOrigin, rayDirection);
 };

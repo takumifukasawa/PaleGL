@@ -19,6 +19,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import {setScaling, setTranslation} from "@/PaleGL/core/transform.ts";
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -265,9 +266,9 @@ export const updateSkyboxTransform: UpdateActorTransformFunc = (actor, camera) =
     const skybox = actor as Skybox;
 
     if (camera) {
-        skybox.transform.setTranslation(camera.transform.getPosition());
+        setTranslation(skybox.transform, camera.transform.position);
         // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
-        skybox.transform.setScaling(Vector3.fill(camera.far / 1.733));
+        setScaling(skybox.transform, Vector3.fill(camera.far / 1.733));
     }
 
     defaultUpdateActorTransform(actor);

@@ -10,6 +10,7 @@ import {
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import {setTranslation} from "@/PaleGL/core/transform.ts";
 
 export const setSizeOrthographicCamera: SetSizeActorFunc = (actor: Actor, width: number, height: number) => {
     const camera = actor as Camera;
@@ -136,6 +137,6 @@ export const setOrthoSize = (
 
 export const createFullQuadOrthographicCamera = (): Camera => {
     const camera = createOrthographicCamera(-1, 1, -1, 1, 0, 2);
-    camera.transform.setTranslation(new Vector3(0, 0, 1));
+    setTranslation(camera.transform, new Vector3(0, 0, 1));
     return camera;
 };
