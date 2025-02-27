@@ -25,6 +25,7 @@ export const tryStartActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
         return;
     }
     actor.isStarted = true;
+    // console.log("hogehoge - try start actor", actor.name, actor.isStarted)
     startActor(actor, { gpu, scene });
 };
 
@@ -171,8 +172,9 @@ export const setActorLookAt = (actor: Actor, p: Vector3) => {
 export type UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => void;
 
 export const defaultUpdateActorTransform: UpdateActorTransformFunc = (actor) => {
-    console.log("hogehoge", actor.name, actor.parent, actor.children, actor.transform.getActor())
-    actor.transform.updateMatrix();
+    // // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted, actor.parent, actor.children, actor.transform.getActor())
+    // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted)
+    actor.transform.updateMatrix(actor);
 };
 
 const updateActorTransformBehaviour: Partial<Record<ActorType, UpdateActorTransformFunc>> = {

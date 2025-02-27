@@ -440,17 +440,18 @@ export function createEngine({
         //     scene.traverse((actor) => actor.fixedUpdate({ gpu: _gpu, fixedTime, fixedDeltaTime }));
         // });
 
-        // update all actors matrix
-        // TODO
-        // - scene 側でやった方がよい？
-        // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
-        // - やっぱりcomponentシステムにした方が良い気もする
-        _scene?.traverse((actor) => {
-            updateActorTransform(actor);
-        });
-        // _scenes.forEach((scene) => {
-        //     scene.traverse((actor) => actor.updateTransform());
+        // // TODO: updateだけでもいい？
+        // // update all actors matrix
+        // // TODO
+        // // - scene 側でやった方がよい？
+        // // - skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+        // // - やっぱりcomponentシステムにした方が良い気もする
+        // _scene?.traverse((actor) => {
+        //     updateActorTransform(actor);
         // });
+        // // _scenes.forEach((scene) => {
+        // //     scene.traverse((actor) => actor.updateTransform());
+        // // });
     }
 
     function update(time: number, deltaTime: number) {

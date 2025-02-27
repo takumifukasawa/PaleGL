@@ -194,8 +194,8 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 
 export type Transform = ReturnType<typeof createTransform>;
 
-export function createTransform(actor: Actor | null) {
-    let _actor: Actor | null = actor;
+export function createTransform() {
+    // let _actor: Actor | null = actor;
     let _inverseWorldMatrix: Matrix4 = Matrix4.identity;
     let _worldMatrix: Matrix4 = Matrix4.identity;
     let _localMatrix: Matrix4 = Matrix4.identity;
@@ -217,11 +217,11 @@ export function createTransform(actor: Actor | null) {
     //     return this.childCount > 0;
     //
     
-    const setActor = (actor: Actor) => {
-        _actor = actor;
-    }
+    // const setActor = (actor: Actor) => {
+    //     _actor = actor;
+    // }
 
-    const updateMatrix = () => {
+    const updateMatrix = (actor: Actor) => {
         if (_lookAtTarget || _lookAtTargetActor) {
             // どっちかはあるのでキャストしちゃう
             const lookAtTarget = (
@@ -231,7 +231,7 @@ export function createTransform(actor: Actor | null) {
             // - up vector 渡せるようにする
             // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
             const lookAtMatrix =
-                _actor?.type === ActorTypes.Camera
+                actor?.type === ActorTypes.Camera
                     ? Matrix4.getLookAtMatrix(_position, lookAtTarget, Vector3.up, true)
                     : Matrix4.getLookAtMatrix(_position, lookAtTarget);
             const scalingMatrix = Matrix4.scalingMatrix(_scale);
@@ -253,14 +253,17 @@ export function createTransform(actor: Actor | null) {
        
         // TODO: parentがちゃんととれてないかも
         
-        _worldMatrix = _actor?.parent
-            ? Matrix4.multiplyMatrices(_actor?.parent.transform.getWorldMatrix(), _localMatrix)
+        _worldMatrix = actor?.parent
+            ? Matrix4.multiplyMatrices(actor?.parent.transform.getWorldMatrix(), _localMatrix)
             : _localMatrix;
         _inverseWorldMatrix = _worldMatrix.clone().invert();
        
-        // if (_actor?.parent) {
-        // }
-        console.log("hogehoge", _actor?.name, _actor, (_actor?.parent ?"has parent" : "has not parent"), _actor?.parent, _worldMatrix.e, _localMatrix.e);
+        // // if (_actor?.parent) {
+        // // }
+        // console.log(`hogehoge - update matrix - name: ${actor?.name}, is started: ${actor?.isStarted}`);
+        // console.log(`hogehoge - update matrix - name: ${actor?.name}`, actor, actor?.parent, _worldMatrix.e, _localMatrix.e);
+        // console.log(`hogehoge - update matrix - name: ${actor?.name}`, actor?.transform.getWorldMatrix().e,  actor?.transform.getLocalMatrix().e);
+        // // console.log(`hogehoge - update matrix - name: ${_actor?.name}, is started: ${_actor?.isStarted}, actor: ${_actor}, parent: ${_actor?.parent}, ${_worldMatrix.e}, ${_localMatrix.e}`);
 
         _normalMatrix = _worldMatrix.clone().invert().transpose();
     };
@@ -298,8 +301,10 @@ export function createTransform(actor: Actor | null) {
         localPointToWorld: (p: Vector3) => p.multiplyMatrix4(_worldMatrix),
         worldToLocalPoint: (p: Vector3) => p.multiplyMatrix4(_inverseWorldMatrix),
 
-        getActor: () => _actor,
-        setActor,
+        // getActor: () => _actor,
+        // setActor,
         updateMatrix,
     };
 }
+
+

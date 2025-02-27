@@ -82,7 +82,7 @@ export function createTextMesh({
 
     const actor = createActor({ name: name || `text-${text}`});
 
-    const textMesh: TextMesh =  {
+    const textMesh: TextMesh = {
         ...actor,
         charMeshes: []
     };
@@ -144,7 +144,7 @@ export function createTextMesh({
         mesh.transform.getPosition().x = originX;
         mesh.transform.getPosition().y = mesh.charOffsetY;
         originX += mesh.charWidth / 2 + characterSpacing;
-        console.log("hogehoge",  mesh.name, mesh.parent)
+        // console.log("hogehoge",  mesh.name, mesh.parent)
     }
 
     

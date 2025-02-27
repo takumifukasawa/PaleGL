@@ -306,7 +306,7 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
     const uuid: number = uuidv4();
     const isStarted: boolean = false;
     // let _parent: Actor | null = null;
-    const transform = createTransform(null);
+    const transform = createTransform();
     const children: Actor[] = [];
     const components: Component[] = [];
     const animator: Animator = createAnimator(); // TODO: component化
@@ -357,7 +357,7 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
         // updateTransform: updateActorTransform
     };
 
-    actor.transform.setActor(actor);
+    // actor.transform.setActor(actor);
 
     return actor;
 };
