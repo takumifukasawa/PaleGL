@@ -120,14 +120,14 @@ type FrameData = {
 //         });
 //
 //         this.materials.forEach((material) => {
-//             material.setUniforms(createUniforms(material.getUniforms().getData(), this.generateSkinningUniforms()));
+//             material.setUniforms(createUniforms(material.getUniforms().data, this.generateSkinningUniforms()));
 //             material.setIsSkinning(true);
 //             material.setGpuSkinning(this.gpuSkinning);
 //             material.setJointNum(this.boneCount);
 //         });
 //
 //         this.mainMaterial.setDepthUniforms(
-//             createUniforms(this.mainMaterial.getDepthUniforms().getData(), this.generateSkinningUniforms())
+//             createUniforms(this.mainMaterial.getDepthUniforms().data, this.generateSkinningUniforms())
 //         );
 //
 //         super.start(args);
@@ -605,7 +605,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     });
 
     skinnedMesh.materials.forEach((material) => {
-        material.setUniforms(createUniforms(material.getUniforms().getData(), generateSkinningUniforms(skinnedMesh)));
+        material.setUniforms(createUniforms(material.getUniforms().data, generateSkinningUniforms(skinnedMesh)));
         material.setIsSkinning(true);
         material.setGpuSkinning(skinnedMesh.gpuSkinning);
         material.setJointNum(skinnedMesh.boneCount);
@@ -613,7 +613,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
 
     getMeshMainMaterial(skinnedMesh).setDepthUniforms(
         createUniforms(
-            getMeshMainMaterial(skinnedMesh).getDepthUniforms().getData(),
+            getMeshMainMaterial(skinnedMesh).getDepthUniforms().data,
             generateSkinningUniforms(skinnedMesh)
         )
     );

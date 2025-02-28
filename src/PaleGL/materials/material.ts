@@ -27,7 +27,14 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { Color } from '@/PaleGL/math/Color';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/directionalLight.ts';
 // import {Vector4} from "@/PaleGL/math/Vector4.ts";
-import {createUniforms, Uniforms, UniformsData, UniformValue} from '@/PaleGL/core/uniforms.ts';
+import {
+    addUniformValue,
+    createUniforms,
+    setUniformValue,
+    Uniforms,
+    UniformsData,
+    UniformValue,
+} from '@/PaleGL/core/uniforms.ts';
 // import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
 
 export type MaterialArgs = {
@@ -474,11 +481,16 @@ export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
 // }
 
 export function setMaterialUniformValue(material: Material, name: string, value: UniformValue) {
-    material.getUniforms().setValue(name, value);
+    setUniformValue(material.getUniforms(), name, value);
 }
 
 export function addMaterialUniformValue(material: Material, name: string, type: UniformTypes, value: UniformValue) {
-    material.getUniforms().addValue(name, type, value);
+    addUniformValue(
+        material.getUniforms(),
+        name,
+        type,
+        value
+    );
 }
 
 export type Material = ReturnType<typeof createMaterial>;

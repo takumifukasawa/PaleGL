@@ -413,7 +413,7 @@ export class GPU {
 
         // uniforms
         if (this._uniforms) {
-            this._uniforms.getData().forEach((uniformData) => {
+            this._uniforms.data.forEach((uniformData) => {
                 if (uniformData.type === UniformTypes.Struct) {
                     const uniformStructValue = uniformData.value as UniformStructValue;
                     uniformStructValue.forEach((structData) => {

@@ -56,6 +56,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {
+    addUniformBlock,
     UniformBufferObjectBlockData,
     UniformBufferObjectElementValueArray,
     UniformBufferObjectElementValueNoNeedsPadding,
@@ -2466,7 +2467,12 @@ export class Renderer {
             //     targetGlobalUniformBufferObject.data,
             //     blockIndex
             // );
-            material.getUniforms().addUniformBlock(blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
+            addUniformBlock(
+                material.getUniforms(),
+                blockIndex,
+                targetGlobalUniformBufferObject.uniformBufferObject,
+                []
+            );
         });
         // });
     }

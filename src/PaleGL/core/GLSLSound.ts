@@ -1,6 +1,7 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
+import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 
 // ------------------------------------------------------------------------------
 // ref:
@@ -36,7 +37,7 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
     const audioBuffer = audioContext.createBuffer(
         channelNum,
         audioContext.sampleRate * duration,
-        audioContext.sampleRate
+        audioContext.sampleRate,
     );
 
     const { gl } = gpu;
@@ -85,13 +86,21 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
     console.log(`[GLSLSound] outputR length: ${outputR.length}`);
     console.log(`[GLSLSound] ----------------------------------------`);
 
-    transformFeedbackBuffer.uniforms.setValue(UNIFORM_NAME_SAMPLE_RATE, audioContext.sampleRate);
+    setUniformValue(
+        transformFeedbackBuffer.uniforms,
+        UNIFORM_NAME_SAMPLE_RATE,
+        audioContext.sampleRate,
+    );
 
     for (let i = 0; i < numBlocks; i++) {
         const blockOffset = (i * SAMPLES) / audioContext.sampleRate;
         // gl.uniform1f(uniformLocations['uBlockOffset'], blockOffset);
 
-        transformFeedbackBuffer.uniforms.setValue(UNIFORM_NAME_BLOCK_OFFSET, blockOffset);
+        setUniformValue(
+            transformFeedbackBuffer.uniforms,
+            UNIFORM_NAME_BLOCK_OFFSET,
+            blockOffset,
+        );
 
         // TODO: vao, shader の bind,unbind がたくさん発生するので最適化した方がよい
         gpu.updateTransformFeedback({
