@@ -1,9 +1,9 @@
 // actors
-import { createMesh, Mesh } from '@/PaleGL/actors/mesh.ts';
-import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
-import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
+import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
@@ -75,19 +75,21 @@ import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 
 import soundVertexShader from './shaders/sound-vertex.glsl';
-import { createGLSLSound, GLSLSound } from '@/PaleGL/core/GLSLSound.ts';
-import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/textMesh.ts';
+import { createGLSLSound, GlslSound } from '@/PaleGL/core/glslSound.ts';
+import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { addActorToScene, createScene } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { createSkybox } from '@/PaleGL/actors/skybox.ts';
-import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/objectSpaceRaymarchMesh.ts';
-import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
+import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
+import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { getGeometryAttributeDescriptors, setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -287,7 +289,7 @@ let attractSphereMesh: Mesh;
 let testLightingMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
-let glslSound: GLSLSound;
+let glslSound: GlslSound;
 let objectSpaceRaymarchMesh: Mesh;
 let screenSpaceRaymarchMesh: Mesh;
 
@@ -332,7 +334,7 @@ wrapperElement?.appendChild(instanceNumView);
 const captureScene = createScene();
 // const compositeScene = new Scene();
 
-const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+const pixelRatio = Math.min(window.devicePixelRatio, 1);
 // const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
 
 const renderer = new Renderer({
@@ -341,8 +343,8 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer });
-// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 30, updateFps: 30 });
+// const engine = createEngine({ gpu, renderer });
+const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -954,7 +956,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                     Math.random() * range - range * 0.5,
                 ];
             })
-            .flat()
+            .flat(),
     );
 
     const initialVelocity = new Float32Array(
@@ -963,7 +965,7 @@ const createInstanceUpdater = (instanceNum: number) => {
             .map(() => {
                 return [0, 0, 0];
             })
-            .flat()
+            .flat(),
     );
 
     const initialSeed = new Float32Array(
@@ -978,7 +980,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                     // Math.floor(Math.random() * 100000)
                 ];
             })
-            .flat()
+            .flat(),
     );
 
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
@@ -1095,7 +1097,7 @@ layout (std140) uniform ubCommon {
     // TODO: rendererかgpuでまとめたい
     transformFeedbackDoubleBuffer.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName,
         );
         if (!targetGlobalUniformBufferObject) {
             return;
@@ -1103,7 +1105,7 @@ layout (std140) uniform ubCommon {
         const blockIndex = gpu.bindUniformBlockAndGetBlockIndex(
             targetGlobalUniformBufferObject.uniformBufferObject,
             transformFeedbackDoubleBuffer.shader,
-            blockName
+            blockName,
         );
         // console.log("hogehoge", blockName, blockIndex)
         // for debug
@@ -1114,7 +1116,8 @@ layout (std140) uniform ubCommon {
         //     targetUniformBufferObject.blockName,
         //     blockIndex
         // );
-        transformFeedbackDoubleBuffer.uniforms.addUniformBlock(
+        addUniformBlock(
+            transformFeedbackDoubleBuffer.uniforms,
             blockIndex,
             targetGlobalUniformBufferObject.uniformBufferObject,
             []
@@ -1188,7 +1191,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         const c = Color.fromRGB(
             Math.floor(Math.random() * 200 + 30),
             Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30)
+            Math.floor(Math.random() * 200 + 30),
         );
         instanceInfo.color.push([...c.e]);
     });
@@ -1200,66 +1203,72 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         .flat();
 
     skinningMesh.castShadow = true;
-    skinningMesh.geometry.setInstanceCount(instanceNum);
+    skinningMesh.geometry.instanceCount = instanceNum;
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstancePosition,
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
             divisor: 1,
-        })
+        }),
     );
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceScale,
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
             divisor: 1,
-        })
+        }),
     );
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceRotation,
             data: new Float32Array(instanceInfo.rotation.flat()),
             size: 3,
             divisor: 1,
-        })
+        }),
     );
     // aInstanceAnimationOffsetは予約語
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceAnimationOffset,
             data: new Float32Array(animationOffsetInfo),
             size: 1,
             divisor: 1,
-        })
+        }),
     );
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceVertexColor,
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
             divisor: 1,
-        })
+        }),
     );
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceEmissiveColor,
             data: new Float32Array(maton.range(instanceNum).fill(0).flat()),
             size: 4,
             divisor: 1,
-        })
+        }),
     );
-
-    skinningMesh.geometry.setAttribute(
+    setGeometryAttribute(
+        skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceVelocity,
             data: new Float32Array(instanceInfo.velocity.flat()),
             size: 3,
             divisor: 1,
-        })
+        }),
     );
 
     // skinningMesh.material = new PhongMaterial({
@@ -1288,7 +1297,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             useInstanceLookDirection: true,
             useVertexColor: true,
             faceSide: FaceSide.Double,
-        })
+        }),
     );
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
@@ -1298,16 +1307,23 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // mesh.material.uniforms.uTime.value = time;
 
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
-        transformFeedbackDoubleBuffer.uniforms.setValue(
+        setUniformValue(
+            transformFeedbackDoubleBuffer.uniforms,
             'uNormalizedInputPosition',
-            inputController.getNormalizedInputPosition()
+            inputController.getNormalizedInputPosition(),
         );
-        // transformFeedbackDoubleBuffer.uniforms.uAttractTargetPosition.value = new Vector3(0, 0, 0);
-        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractTargetPosition', attractSphereMesh.transform.position);
+        setUniformValue(
+            transformFeedbackDoubleBuffer.uniforms,
+            'uAttractTargetPosition',
+            attractSphereMesh.transform.position);
 
         attractRate += (inputController.getIsDown() ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
-        transformFeedbackDoubleBuffer.uniforms.setValue('uAttractRate', attractRate);
+        setUniformValue(
+            transformFeedbackDoubleBuffer.uniforms,
+            'uAttractRate',
+            attractRate,
+        );
         gpu.updateTransformFeedback({
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
@@ -1318,17 +1334,15 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         transformFeedbackDoubleBuffer.swap();
         // };
         // mesh.onUpdate = () => {
-        skinnedMesh.geometry
-            .getVertexArrayObject()
+        skinnedMesh.geometry.vertexArrayObject
             .replaceBuffer(
                 AttributeNames.InstancePosition,
-                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')!
+                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')!,
             );
-        skinnedMesh.geometry
-            .getVertexArrayObject()
+        skinnedMesh.geometry.vertexArrayObject
             .replaceBuffer(
                 AttributeNames.InstanceVelocity,
-                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')!
+                transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')!,
             );
     };
 
@@ -1382,7 +1396,7 @@ const main = async () => {
         CubeMapPositiveYImgUrl,
         CubeMapNegativeYImgUrl,
         CubeMapPositiveZImgUrl,
-        CubeMapNegativeZImgUrl
+        CubeMapNegativeZImgUrl,
     );
 
     const skyboxMesh = createSkybox({
@@ -1402,7 +1416,7 @@ const main = async () => {
         createUnlitMaterial({
             emissiveColor: new Color(2, 2, 2, 1),
             // receiveShadow: true,
-        })
+        }),
     );
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, new Vector3(0.5, 0.5, 0.5));
@@ -1432,7 +1446,7 @@ const main = async () => {
             diffuseColor: new Color(1, 1, 1, 1),
             metallic: 1,
             roughness: 1,
-        })
+        }),
     );
     setTranslation(testLightingMesh.transform, new Vector3(2.5, 1, 0));
 
@@ -1537,11 +1551,10 @@ const main = async () => {
     console.log(
         'hogehoge - butterfly',
         skinnedMesh,
-        skinnedMesh.geometry.getAttributes(),
-        skinnedMesh.geometry.getAttributeDescriptors(),
-        skinnedMesh.geometry.getIndices(),
-        skinnedMesh.geometry.getInstanceCount(),
-        skinnedMesh.geometry.getDrawCount()
+        getGeometryAttributeDescriptors(skinnedMesh.geometry),
+        skinnedMesh.geometry.indices,
+        skinnedMesh.geometry.instanceCount,
+        skinnedMesh.geometry.drawCount,
     );
     // skinnedMesh.enabled = false;
 
@@ -1611,7 +1624,7 @@ const main = async () => {
                             const z = Math.random() * 18 - 8;
                             return [x, y, z, x, y, z, x, y, z, x, y, z];
                         })
-                        .flat()
+                        .flat(),
                 ),
                 size: 3,
             }),
@@ -1621,7 +1634,7 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
-                        .flat()
+                        .flat(),
                 ),
                 size: 2,
             }),
@@ -1635,11 +1648,11 @@ const main = async () => {
                                 Math.random() * 50 + 200,
                                 Math.random() * 50 + 190,
                                 Math.random() * 50 + 180,
-                                Math.random() * 150 + 50
+                                Math.random() * 150 + 50,
                             );
                             return [...c.e, ...c.e, ...c.e, ...c.e];
                         })
-                        .flat()
+                        .flat(),
                 ),
                 size: 4,
             }),
@@ -1652,7 +1665,7 @@ const main = async () => {
                             const s = Math.random() * 3.5 + 0.5;
                             return [s, s, s, s];
                         })
-                        .flat()
+                        .flat(),
                 ),
                 size: 1,
             }),
@@ -1665,7 +1678,7 @@ const main = async () => {
                             const r = Math.random();
                             return [r, r, r, r];
                         })
-                        .flat()
+                        .flat(),
                 ),
                 size: 1,
             }),
