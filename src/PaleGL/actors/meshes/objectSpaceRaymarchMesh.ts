@@ -1,6 +1,6 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { MeshTypes } from '@/PaleGL/constants.ts';
-import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/mesh.ts';
+import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
     createObjectSpaceRaymarchMaterial,

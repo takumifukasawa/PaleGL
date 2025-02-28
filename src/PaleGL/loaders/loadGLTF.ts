@@ -14,8 +14,8 @@ import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { resolveGLEnumTextureFilterType, resolveGLEnumTextureWrapType, Texture } from '@/PaleGL/core/Texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
-import {createSkinnedMesh} from "@/PaleGL/actors/skinnedMesh.ts";
-import {createMesh} from "@/PaleGL/actors/mesh.ts";
+import {createSkinnedMesh} from "@/PaleGL/actors/meshes/skinnedMesh.ts";
+import {createMesh} from "@/PaleGL/actors/meshes/mesh.ts";
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {

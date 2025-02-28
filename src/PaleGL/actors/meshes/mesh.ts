@@ -1,5 +1,5 @@
 ﻿import { Actor, ActorArgs, createActor } from '@/PaleGL/actors/actor.ts';
-import {ActorTypes, MeshType, MeshTypes} from '@/PaleGL/constants';
+import {ActorTypes, MeshType, MeshTypes} from '@/PaleGL/constants.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 

@@ -1,24 +1,29 @@
-﻿import { createTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
+﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
-import { createStats, Stats } from '@/PaleGL/utilities/stats.ts';
+import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import { Mesh } from '@/PaleGL/actors/mesh.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,
     fixedUpdateActor,
-    lastUpdateActor, setSizeActor,
+    lastUpdateActor,
+    setSizeActor,
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
-import { createTimeAccumulator } from '@/PaleGL/utilities/timeAccumulator.ts';
-import {setRotation, setTranslation} from "@/PaleGL/core/transform.ts";
+import {
+    createTimeAccumulator,
+    execTimeAccumulator,
+    startTimeAccumulator,
+} from '@/PaleGL/utilities/timeAccumulator.ts';
+import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -401,8 +406,8 @@ export function createEngine({
             _onBeforeStart();
         }
         const t = performance.now() / 1000;
-        _fixedUpdateFrameTimer.start(t);
-        _updateFrameTimer.start(t);
+        startTimeAccumulator(_fixedUpdateFrameTimer, t);
+        startTimeSkipper(_updateFrameTimer, t);
         if (_onAfterStart) {
             _onAfterStart();
         }
@@ -473,7 +478,7 @@ export function createEngine({
             switch (actor.type) {
                 case ActorTypes.Skybox:
                 case ActorTypes.Mesh:
-                // case ActorTypes.SkinnedMesh:
+                    // case ActorTypes.SkinnedMesh:
                     beforeRenderActor(actor, { gpu: _gpu });
                     const mesh = actor as Mesh;
                     mesh.materials.forEach((mat) => {
@@ -523,7 +528,7 @@ export function createEngine({
         // for debug
         // console.log(`[Engine.render]`);
 
-        _stats?.clear();
+        clearStats(_stats);
 
         _renderer.beforeRender(time, deltaTime);
 
@@ -540,7 +545,7 @@ export function createEngine({
         // TODO: ここにrenderer.renderを書く
         // _renderer.renderScene(_scene!);
 
-        _stats?.update(time);
+        updateStats(_stats, time);
     };
 
     const warmRender = () => {
@@ -573,8 +578,8 @@ export function createEngine({
 
     // time[sec]
     const run = (time: number) => {
-        _fixedUpdateFrameTimer.exec(time / 1000);
-        _updateFrameTimer.exec(time / 1000);
+        execTimeAccumulator(_fixedUpdateFrameTimer, time / 1000);
+        execTimeSkipper(_updateFrameTimer, time / 1000);
     };
 
     return {

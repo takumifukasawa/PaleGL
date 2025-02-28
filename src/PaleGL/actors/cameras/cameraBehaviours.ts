@@ -26,15 +26,12 @@ import {
     updateOrthographicCameraProjectionMatrix,
 } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import {
-    defaultUpdateActorTransform,
-    UpdateActorTransformFunc,
-} from '@/PaleGL/actors/actorBehaviours.ts';
+import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { createMesh } from '@/PaleGL/actors/mesh.ts';
+import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
@@ -42,7 +39,8 @@ import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import { Ray } from '@/PaleGL/math/Ray.ts';
+import { createRay, Ray } from '@/PaleGL/math/ray.ts';
+import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 // mainCamera: boolean = false;
 
@@ -191,7 +189,8 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         if (!frustumPositions) {
             return;
         }
-        camera.visibleFrustumMesh.geometry.updateAttribute(
+        updateGeometryAttribute(
+            camera.visibleFrustumMesh.geometry,
             AttributeNames.Position,
             new Float32Array([
                 // near clip
@@ -257,7 +256,7 @@ export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
     const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
     const rayOrigin = getWorldForward(camera.transform);
     const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
-    return new Ray(rayOrigin, rayDirection);
+    return createRay(rayOrigin, rayDirection);
 };
 
 // set size behaviour ---------------------------------------------------------

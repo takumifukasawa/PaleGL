@@ -1,8 +1,8 @@
-﻿import { createAttribute, Attribute } from '@/PaleGL/core/attribute.ts';
+﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { AttributeUsageType } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
+import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 export function createTangentsAndBinormals(normals: number[]) {
     const tangents: number[] = [];
@@ -49,80 +49,91 @@ export type GeometryArgs = {
 
 export type Geometry = ReturnType<typeof createGeometry>;
 
-export type IGeometry = {
-    getRandomLocalPositionOnEdge: (rand1: number, rand2: number) => Vector3;
-};
+// export type IGeometry = {
+//     getRandomLocalPositionOnEdge: (rand1: number, rand2: number) => Vector3;
+// };
 
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 // TODO: vaoの生成2回走ってる
-export function createGeometry({
-    gpu,
-    attributes,
-    indices,
-    drawCount,
-    // calculateBinormal = false,
-    instanceCount = null,
-}: GeometryArgs) {
+export function createGeometry(args: GeometryArgs) {
+    const {
+        gpu,
+        // indices,
+        drawCount,
+        // // calculateBinormal = false,
+        // instanceCount = null,
+    } = args;
+
     // const _gpu: GPU = gpu;
     // vertexCount: number = 0;
-    const _attributes: Attribute[] = [];
-    const _indices: number[] | null = indices || null;
-    const _drawCount: number = drawCount;
-    let _instanceCount: number | null = typeof instanceCount == 'number' ? instanceCount : null;
-    
+    const attributes: Attribute[] = [];
+    const indices = args.indices || null;
+    // const drawCount: number = drawCount;
+    const instanceCount: number | null = typeof args.instanceCount == 'number' ? args.instanceCount : null;
+
     // TODO: vaoの生成2回やっちゃってる? constructorとstartで
-    const _vertexArrayObject: VertexArrayObject = new VertexArrayObject({
+    const vertexArrayObject: VertexArrayObject = new VertexArrayObject({
         gpu,
         attributes: [],
-        indices: _indices,
+        indices: indices,
     });
 
     // console.log("hogehoge - indices", attributes, indices, drawCount, instanceCount)
 
     // fallback data
     // TODO: fix
-    attributes.forEach((attribute, i) => {
+    args.attributes.forEach((attribute, i) => {
         attribute.location = i;
         attribute.divisor = attribute.divisor || 0;
     });
+
+    const geometry = {
+        attributes,
+        indices,
+        drawCount,
+        instanceCount,
+        vertexArrayObject,
+    };
 
     // default
     // (attributes.filter(e => Object.keys(e).length > 0)).forEach(attribute => {
     //     this.setAttribute(attribute);
     // });
-    attributes
+    args.attributes
         .filter((e) => Object.keys(e).length > 0)
         .forEach((attribute) => {
-            setAttribute(attribute);
+            setGeometryAttribute(geometry, attribute);
         });
+    
+    return geometry;
 
-    function setAttribute(attribute: Attribute) {
-        const location = attribute.location ? attribute.location : _attributes.length;
-        const divisor = attribute.divisor ? attribute.divisor : 0;
-        
-        // TODO: attrを受け取ってるのにまた生成しちゃってるのよくない
-        const attr = createAttribute({
-            name: attribute.name,
-            data: attribute.data,
-            location,
-            size: attribute.size,
-            offset: attribute.offset,
-            usageType: attribute.usageType || AttributeUsageType.StaticDraw,
-            divisor,
-        });
-        _attributes.push(attr);
+    // function setAttribute(attribute: Attribute) {
+    //     const location = attribute.location ? attribute.location : attributes.length;
+    //     const divisor = attribute.divisor ? attribute.divisor : 0;
+    //
+    //     // TODO: attrを受け取ってるのにまた生成しちゃってるのよくない
+    //     const attr = createAttribute({
+    //         name: attribute.name,
+    //         data: attribute.data,
+    //         location,
+    //         size: attribute.size,
+    //         offset: attribute.offset,
+    //         usageType: attribute.usageType || AttributeUsageType.StaticDraw,
+    //         divisor,
+    //     });
+    //     attributes.push(attr);
 
-        // _vertexArrayObject.setAttribute(attr, true);
-        _vertexArrayObject.setAttribute(attr);
-    }
+    //     // _vertexArrayObject.setAttribute(attr, true);
+    //     _vertexArrayObject.setAttribute(attr);
+    // }
 
     // const _createGeometry = ({ gpu }: { gpu: GPU }) => {
-    //     console.log('[Geometry.createGeometry]', _attributes);
+    //     console.log('[Geometry.createGeometry]', attributes);
 
     //     // fallback
     //     // TODO: fix
-    //     _attributes.forEach((attribute, i) => {
+    //     attributes.forEach((attribute, i) => {
     //         attribute.location = i;
     //         attribute.divisor = 0;
     //         console.log('force: ', attribute);
@@ -130,60 +141,57 @@ export function createGeometry({
 
     //     _vertexArrayObject = new VertexArrayObject({
     //         gpu,
-    //         attributes: _attributes,
+    //         attributes: attributes,
     //         indices: _indices,
     //     });
     // };
 
-    const start = () => {
-        // if (!_vertexArrayObject) {
-        //     _createGeometry({ gpu: _gpu });
-        // }
-    };
+    // const start = () => {
+    //     // if (!_vertexArrayObject) {
+    //     //     _createGeometry({ gpu: _gpu });
+    //     // }
+    // };
 
-    const update = () => {
-        // if (!_vertexArrayObject) {
-        //     _createGeometry({ gpu: _gpu });
-        // }
-    };
+    // const update = () => {
+    //     // if (!_vertexArrayObject) {
+    //     //     _createGeometry({ gpu: _gpu });
+    //     // }
+    // };
 
-    const updateAttribute = (key: string, data: Float32Array) => {
-        const attribute = _attributes.find(({ name }) => name === key);
-        if (!attribute) {
-            console.error('invalid attribute');
-            return;
-        }
-        attribute.data = data;
-        _vertexArrayObject.updateBufferData(key, attribute.data);
-    };
-
-    const getAttribute = (key: string) => {
-        return _attributes.find(({ name }) => name === key);
-    };
-
-    const getAttributeDescriptors = () => {
-        return _attributes.map((attribute) => attribute.getDescriptor());
-    };
+    // const updateAttribute = (key: string, data: Float32Array) => {
+    //     const attribute = attributes.find(({ name }) => name === key);
+    //     if (!attribute) {
+    //         console.error('invalid attribute');
+    //         return;
+    //     }
+    //     attribute.data = data;
+    //     _vertexArrayObject.updateBufferData(key, attribute.data);
+    // };
 
     // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // // @ts-ignore
     // // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const getRandomLocalPositionOnEdge = (rand1: number, rand2: number): Vector3 => Vector3.zero;
 
-    return {
-        getAttributes: () => _attributes,
-        getVertexArrayObject: () => _vertexArrayObject,
-        getIndices: () => _indices,
-        getDrawCount: () => _drawCount,
-        getInstanceCount: () => _instanceCount,
-        setInstanceCount: (value: number) => (_instanceCount = value),
-        // methods
-        setAttribute,
-        start,
-        update,
-        updateAttribute,
-        getAttribute,
-        getAttributeDescriptors,
-        // getRandomLocalPositionOnEdge
-    };
+    // return {
+    //     attributes,
+    //     indices,
+    //     drawCount,
+    //     instanceCount,
+    //     vertexArrayObject,
+    //     // // getAttributes: () => attributes,
+    //     // getVertexArrayObject: () => _vertexArrayObject,
+    //     // getIndices: () => _indices,
+    //     // getDrawCount: () => _drawCount,
+    //     // getInstanceCount: () => _instanceCount,
+    //     // setInstanceCount: (value: number) => (_instanceCount = value),
+    //     // // methods
+    //     // setAttribute,
+    //     // start,
+    //     // update,
+    //     // updateAttribute,
+    //     // getAttribute,
+    //     // getAttributeDescriptors,
+    //     // getRandomLocalPositionOnEdge
+    // };
 }

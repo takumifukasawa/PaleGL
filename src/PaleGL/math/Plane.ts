@@ -1,24 +1,15 @@
 import {Vector3} from '@/PaleGL/math/Vector3.ts';
-import {Ray} from "@/PaleGL/math/Ray.ts";
+import {Ray} from "@/PaleGL/math/ray.ts";
 
-/**
- * 
- */
-export class Plane {
-    point: Vector3;
-    normal: Vector3;
+export type Plane = ReturnType<typeof createPlane>;
 
-    constructor(point: Vector3, normal: Vector3) {
-        this.point = point;
-        this.normal = normal;
+export function createPlane(point: Vector3, normal: Vector3) {
+    return {
+        point,
+        normal
     }
 }
 
-/**
- *
- * @param ray
- * @param plane
- */
 export function intersectRayWithPlane(ray: Ray, plane: Plane): Vector3 | null {
     const rayOrigin = ray.origin;
     const rayDir = ray.dir;

@@ -1,11 +1,10 @@
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
-export class Ray {
-    origin: Vector3;
-    dir: Vector3;
+export type Ray = ReturnType<typeof createRay>;
 
-    constructor(origin: Vector3, dir: Vector3) {
-        this.origin = origin;
-        this.dir = dir;
-    }
+export function createRay(origin: Vector3, dir: Vector3) {
+    return {
+        origin,
+        dir,
+    };
 }

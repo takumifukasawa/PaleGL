@@ -19,6 +19,7 @@ import {
     PostProcessPassRenderArgs,
     // IPostProcessPassParameters
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -383,16 +384,16 @@ export class BloomPass implements IPostProcessPass {
         targetCamera,
         time,
     }: PostProcessPassRenderArgs) {
-        // 一回だけ呼びたい
-        this._geometry.start();
-        // ppの場合はいらない気がする
-        // this.mesh.updateTransform();
+        // // 一回だけ呼びたい
+        // this._geometry.start();
+        // // ppの場合はいらない気がする
+        // // this.mesh.updateTransform();
 
         if (!this._horizontalBlurMaterial.isCompiledShader()) {
-            this._horizontalBlurMaterial.start({ gpu, attributeDescriptors: this._geometry.getAttributeDescriptors() });
+            this._horizontalBlurMaterial.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
         }
         if (!this._verticalBlurMaterial.isCompiledShader()) {
-            this._verticalBlurMaterial.start({ gpu, attributeDescriptors: this._geometry.getAttributeDescriptors() });
+            this._verticalBlurMaterial.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
         }
 
         this.assignParameters();

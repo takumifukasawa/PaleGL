@@ -1,36 +1,40 @@
-﻿
-export type FpsCounter = ReturnType<typeof createFPSCounter>;
+﻿export type FpsCounter = {
+    renderCount: number;
+    startCountTime: number;
+    calculateInterval: number;
+    currentFPS: number;
+};
 
 export function createFPSCounter(calculateInterval = 1) {
-     let _renderCount = 0;
-     let _startCountTime = -Infinity;
-     const _calculateInterval = calculateInterval;
-     let _currentFPS = 0;
-
-    const start = (time: number) => {
-        _renderCount = 0;
-        _startCountTime = time;
-    }
-
-    const calculate = (time: number) => {
-        // first exec
-        if (_startCountTime < 0) {
-            start(time);
-            return;
-        }
-
-        _renderCount++;
-
-        const elapsedTime = time - _startCountTime;
-        if (elapsedTime > _calculateInterval) {
-            _currentFPS = _renderCount / elapsedTime;
-            start(time);
-        }
-    }
+    const renderCount = 0;
+    const startCountTime = -Infinity;
+    const currentFPS = 0;
 
     return {
-        getCurrentFPS: () => _currentFPS,
-        start,
-        calculate
-    }
+        renderCount,
+        startCountTime,
+        calculateInterval,
+        currentFPS,
+    };
 }
+
+export const startFPSCounter = (fpsCounter: FpsCounter, time: number) => {
+    fpsCounter.renderCount = 0;
+    fpsCounter.startCountTime = time;
+};
+
+export const calculateFPSCounter = (fpsCounter: FpsCounter, time: number) => {
+    // first exec
+    if (fpsCounter.startCountTime < 0) {
+        startFPSCounter(fpsCounter, time);
+        return;
+    }
+
+    fpsCounter.renderCount++;
+
+    const elapsedTime = time - fpsCounter.startCountTime;
+    if (elapsedTime > fpsCounter.calculateInterval) {
+        fpsCounter.currentFPS = fpsCounter.renderCount / elapsedTime;
+        startFPSCounter(fpsCounter, time);
+    }
+};

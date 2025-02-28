@@ -1,5 +1,5 @@
-﻿import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/mesh.ts';
-import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshBehaviours.ts';
+﻿import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
+import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     AttributeNames,
     AttributeUsageType,
@@ -9,22 +9,23 @@ import {
     TextureTypes,
     UniformNames,
     UniformTypes,
-} from '@/PaleGL/constants';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+} from '@/PaleGL/constants.ts';
+import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { Texture } from '@/PaleGL/core/Texture';
-import { Rotator } from '@/PaleGL/math/Rotator';
+import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
-import { Actor, ActorUpdateArgs, addChildActor } from './actor.ts';
-import { GPU } from '@/PaleGL/core/GPU';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
-import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF';
+import { Actor, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
+import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 import { StartActorFunc, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
+import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;
@@ -766,11 +767,13 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
         });
         // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
-        skinnedMesh.boneLines.geometry.updateAttribute(
+        updateGeometryAttribute(
+            skinnedMesh.boneLines.geometry,
             AttributeNames.Position,
             new Float32Array(boneLinePositions.flat())
         );
-        skinnedMesh.bonePoints.geometry.updateAttribute(
+        updateGeometryAttribute(
+            skinnedMesh.bonePoints.geometry,
             AttributeNames.Position,
             new Float32Array(boneLinePositions.flat())
         );

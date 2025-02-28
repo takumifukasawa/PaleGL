@@ -3,16 +3,17 @@ import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
-import { Mesh } from '@/PaleGL/actors/mesh.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     updateObjectSpaceRaymarchDepthMaterial,
     updateObjectSpaceRaymarchMesh,
     updateObjectSpaceRaymarchMeshMaterial,
-} from '@/PaleGL/actors/objectSpaceRaymarchMeshBehaviour.ts';
+} from '@/PaleGL/actors/meshes/objectSpaceRaymarchMeshBehaviour.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { UniformValue } from '@/PaleGL/core/uniforms.ts';
-import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/skinnedMesh.ts';
-import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/screenSpaceRaymarchMesh.ts';
+import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
+import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 // start actor -------------------------------------------------------
 
@@ -24,7 +25,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
 
     const { gpu } = args;
 
-    mesh.geometry.start();
+    // mesh.geometry.start();
 
     // for debug
     // console.log(`[Mesh.start] materials length: ${this.materials.length}`);
@@ -36,7 +37,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
         if (!material.isCompiledShader()) {
             material.start({
                 gpu,
-                attributeDescriptors: mesh.geometry.getAttributeDescriptors(),
+                attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
             });
             // for debug
             // console.log(`[Mesh.start] material`, material, material.getShader());
@@ -77,7 +78,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
         if (!material.isCompiledShader()) {
             material.start({
                 gpu,
-                attributeDescriptors: mesh.geometry.getAttributeDescriptors(),
+                attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
             });
             // for debug
             // console.log(`[Mesh.start] depth`, material, material.getShader());

@@ -1,10 +1,10 @@
-﻿import { createMesh } from '@/PaleGL/actors/mesh.ts';
+﻿import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import { parseObj } from '@/PaleGL/loaders/loadObj';
+import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { AttributeNames, UniformNames } from '@/PaleGL/constants';
+import { AttributeNames, UniformNames } from '@/PaleGL/constants.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 
 const axesHelperGeometryData = `
 # Blender 3.3.1

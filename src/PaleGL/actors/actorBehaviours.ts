@@ -9,9 +9,9 @@ import {
 } from '@/PaleGL/actors/actor.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import {Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { updateSkyboxTransform } from '@/PaleGL/actors/skybox.ts';
+import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshBehaviours.ts';
+import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {setSizeCamera, updateCamera, updateCameraTransform} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
 

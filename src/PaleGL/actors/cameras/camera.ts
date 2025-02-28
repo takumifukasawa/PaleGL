@@ -6,7 +6,7 @@ import {
     CameraType,
 } from '@/PaleGL/constants.ts';
 // import {Vector3} from "@/PaleGL/math/Vector3";
-import { Mesh } from 'src/PaleGL/actors/mesh.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';

@@ -18,7 +18,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import {createMesh, Mesh} from '@/PaleGL/actors/mesh.ts';
+import {createMesh, Mesh} from '@/PaleGL/actors/meshes/mesh.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
@@ -27,6 +27,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {updateActorTransform} from "@/PaleGL/actors/actorBehaviours.ts";
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 type PostProcessPassParametersTemplate = {
     enabled: boolean;
@@ -277,7 +278,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         // }
         this.materials.forEach((material) => {
             if (!material.isCompiledShader()) {
-                material.start({ gpu, attributeDescriptors: this.geometry.getAttributeDescriptors() });
+                material.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this.geometry) });
                 renderer.$checkNeedsBindUniformBufferObjectToMaterial(material);
             }
         });

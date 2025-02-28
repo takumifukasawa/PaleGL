@@ -31,15 +31,15 @@ export function createAttribute(args: AttributeArgs) {
     const offset = args.offset || 0;
     const usageType: AttributeUsageType = args.usageType || AttributeUsageType.StaticDraw;
     const divisor = args.divisor || 0;
-    
-    const getDescriptor: () => AttributeDescriptor = () => {
-        return {
-            name,
-            location,
-            size,
-            dataType: data.constructor as AttributeDataConstructor,
-        };
-    }
+
+    // const getDescriptor: () => AttributeDescriptor = () => {
+    //     return {
+    //         name,
+    //         location,
+    //         size,
+    //         dataType: data.constructor as AttributeDataConstructor,
+    //     };
+    // }
 
     return {
         // TODO: setter, getter
@@ -50,6 +50,15 @@ export function createAttribute(args: AttributeArgs) {
         offset,
         usageType,
         divisor,
-        getDescriptor
-    }
+        // getDescriptor
+    };
 }
+
+export const getAttributeDescriptor: (attribute: Attribute) => AttributeDescriptor = (attribute: Attribute) => {
+    return {
+        name: attribute.name,
+        location: attribute.location,
+        size: attribute.size,
+        dataType: attribute.data.constructor as AttributeDataConstructor,
+    };
+};

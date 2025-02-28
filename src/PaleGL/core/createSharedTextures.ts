@@ -19,6 +19,7 @@ import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 const gridUniformName = 'uGridSize';
 
@@ -223,7 +224,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         renderer.setRenderTarget(null);
     };
 
-    const planeGeometryAttributeDescriptors = planeGeometry.getAttributeDescriptors();
+    const planeGeometryAttributeDescriptors = getGeometryAttributeDescriptors(planeGeometry);
 
     const sharedTextures: SharedTextures = sharedTextureInfos.reduce((acc, current) => {
         const {

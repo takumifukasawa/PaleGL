@@ -348,10 +348,10 @@ export class DepthOfFieldPass implements IPostProcessPass {
         targetCamera,
         time,
     }: PostProcessPassRenderArgs) {
-        // 一回だけ呼びたい
-        this.geometry.start();
-        // ppの場合はいらない気がする
-        // this.mesh.updateTransform();
+        // // 一回だけ呼びたい
+        // this.geometry.start();
+        // // ppの場合はいらない気がする
+        // // this.mesh.updateTransform();
 
         //
         // 0: render coc pass
@@ -489,5 +489,5 @@ export class DepthOfFieldPass implements IPostProcessPass {
     bokehBlurPass: FragmentPass;
     compositePass: FragmentPass;
 
-    private geometry: PlaneGeometry;
+    geometry: PlaneGeometry;
 }

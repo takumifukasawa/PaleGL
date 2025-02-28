@@ -288,10 +288,10 @@ export class LightShaftPass implements IPostProcessPass {
         targetCamera,
         time,
     }: PostProcessPassRenderArgs) {
-        // 一回だけ呼びたい
-        this.geometry.start();
-        // ppの場合はいらない気がする
-        // this.mesh.updateTransform();
+        // // 一回だけ呼びたい
+        // this.geometry.start();
+        // // ppの場合はいらない気がする
+        // // this.mesh.updateTransform();
 
         // TODO: shadowmapを使った方法からの置き換え
 
@@ -432,5 +432,5 @@ export class LightShaftPass implements IPostProcessPass {
     private blur3Pass: FragmentPass;
     private compositePass: FragmentPass;
 
-    private geometry: PlaneGeometry;
+    geometry: PlaneGeometry;
 }

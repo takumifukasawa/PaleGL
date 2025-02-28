@@ -7,8 +7,8 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { createMesh, Mesh } from '@/PaleGL/actors/mesh.ts';
-import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {

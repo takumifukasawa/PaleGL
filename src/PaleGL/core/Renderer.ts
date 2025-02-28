@@ -13,10 +13,15 @@
     UniformTypes,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Stats } from '@/PaleGL/utilities/stats.ts';
+import {
+    addDrawVertexCountStats,
+    addPassInfoStats,
+    incrementDrawCallStats,
+    Stats,
+} from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
-import {  Mesh } from '@/PaleGL/actors/mesh.ts';
-import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshBehaviours.ts';
+import {  Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
     Camera,
@@ -29,7 +34,7 @@ import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { Skybox } from '@/PaleGL/actors/skybox.ts';
+import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
 import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
 import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
@@ -68,7 +73,7 @@ import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
-import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/postProcessVolume.ts';
+import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
@@ -3032,11 +3037,11 @@ export class Renderer {
      * @param material
      */
     renderMesh(geometry: Geometry, material: Material) {
-        geometry.update();
+        // geometry.update();
 
         if (this._stats) {
-            this._stats.addDrawVertexCount(geometry);
-            this._stats.incrementDrawCall();
+            addDrawVertexCountStats(this._stats, geometry);
+            incrementDrawCallStats(this._stats);
         }
 
         // console.log("===========")
@@ -3044,7 +3049,7 @@ export class Renderer {
         // console.log(`[Renderer.renderMesh] mat: ${material.getName()}`, material.getShader());
 
         // vertex
-        this._gpu.setVertexArrayObject(geometry.getVertexArrayObject());
+        this._gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
         if (!material.getShader()) {
             // console.error('invalid material shader');
@@ -3092,14 +3097,14 @@ export class Renderer {
         
         // draw
         this._gpu.draw(
-            geometry.getDrawCount(),
+            geometry.drawCount,
             material.getPrimitiveType(),
             depthTest,
             depthWrite,
             depthFuncType,
             material.getBlendType(),
             material.getFaceSide(),
-            geometry.getInstanceCount()
+            geometry.instanceCount
         );
     }
 
@@ -3174,7 +3179,7 @@ export class Renderer {
                 this.renderMesh(actor.geometry, depthMaterial);
 
                 if (this._stats) {
-                    this._stats.addPassInfo('depth pre pass', actor.name, actor.geometry);
+                    addPassInfoStats(this._stats, 'depth pre pass', actor.name, actor.geometry);
                 }
             });
         });
@@ -3238,7 +3243,7 @@ export class Renderer {
 
                     this.renderMesh(actor.geometry, depthMaterial);
                     if (this._stats) {
-                        this._stats.addPassInfo('shadow pass', actor.name, actor.geometry);
+                        addPassInfoStats(this._stats, 'shadow pass', actor.name, actor.geometry)
                     }
                 });
             });
@@ -3310,7 +3315,7 @@ export class Renderer {
             this.renderMesh(actor.geometry, targetMaterial);
 
             if (this._stats) {
-                this._stats.addPassInfo('scene pass', actor.name, actor.geometry);
+                addPassInfoStats(this._stats, 'scene pass', actor.name, actor.geometry)
             }
         });
     }
@@ -3669,7 +3674,7 @@ export class Renderer {
             this.renderMesh(actor.geometry, targetMaterial);
 
             if (this._stats) {
-                this._stats.addPassInfo('transparent pass', actor.name, actor.geometry);
+                addPassInfoStats(this._stats, 'transparent pass', actor.name, actor.geometry)
             }
         });
     }

@@ -1,11 +1,9 @@
-﻿import { createGeometry, Geometry, IGeometry } from '@/PaleGL/geometries/geometry.ts';
+﻿import { createGeometry, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { easeInOutQuad } from '@/PaleGL/utilities/easingUtilities.ts';
 
-const edgePairs = [
+export const boxGeometryEdgePairs = [
     [0, 1],
     [1, 3],
     [3, 2],
@@ -20,7 +18,7 @@ const edgePairs = [
     [4, 5],
 ];
 
-const surfacePairs = [
+export const  boxGeometrySurfacePairs = [
     // front
     [0, 1, 2, 3],
     // right
@@ -148,7 +146,7 @@ export function createBoxGeometryData(size: number) {
     };
 }
 
-export type BoxGeometry = Geometry & IGeometry & ReturnType<typeof createBoxGeometry>;
+export type BoxGeometry = Geometry & ReturnType<typeof createBoxGeometry>;
 
 export function createBoxGeometry({ gpu, size = 1 }: { gpu: GPU; size?: number }) {
     const s = size / 2;
@@ -242,7 +240,7 @@ export function createBoxGeometry({ gpu, size = 1 }: { gpu: GPU; size?: number }
     });
 
     // localPositions: number[];
-    const _cornerPositions: number[][] = [
+    const cornerPositions: number[][] = [
         boxPosition_0,
         boxPosition_1,
         boxPosition_2,
@@ -253,28 +251,8 @@ export function createBoxGeometry({ gpu, size = 1 }: { gpu: GPU; size?: number }
         boxPosition_7,
     ];
 
-    const getRandomLocalPositionOnEdge = (rand1: number, rand2: number): Vector3 => {
-        const edgePair = edgePairs[Math.floor((rand1 * edgePairs.length) % edgePairs.length)];
-        const p0 = _cornerPositions[edgePair[0]];
-        const p1 = _cornerPositions[edgePair[1]];
-        const t = 1 - easeInOutQuad(rand2 % 1);
-        return Vector3.lerpVectors(new Vector3(p0[0], p0[1], p0[2]), new Vector3(p1[0], p1[1], p1[2]), t);
-    };
-
-    const getRandomLocalPositionOnSurface = (index: number, rand2: number, rand3: number): Vector3 => {
-        const surfacePair = surfacePairs[Math.floor(index % surfacePairs.length)];
-        const p0 = _cornerPositions[surfacePair[0]];
-        const p1 = _cornerPositions[surfacePair[1]];
-        const p2 = _cornerPositions[surfacePair[2]];
-        const p3 = _cornerPositions[surfacePair[3]];
-        const v1 = Vector3.lerpVectors(new Vector3(p0[0], p0[1], p0[2]), new Vector3(p1[0], p1[1], p1[2]), rand2);
-        const v2 = Vector3.lerpVectors(new Vector3(p2[0], p2[1], p2[2]), new Vector3(p3[0], p3[1], p3[2]), rand2);
-        return Vector3.lerpVectors(v1, v2, rand3);
-    };
-
     return {
         ...geometry,
-        getRandomLocalPositionOnEdge,
-        getRandomLocalPositionOnSurface,
+        cornerPositions,
     };
 }

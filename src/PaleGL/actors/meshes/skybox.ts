@@ -1,4 +1,4 @@
-import { createMesh, Mesh } from '@/PaleGL/actors/mesh.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     UniformTypes,
     PrimitiveTypes,
@@ -7,15 +7,15 @@ import {
     UniformNames,
     ShadingModelIds,
     UniformBlockNames,
-} from '@/PaleGL/constants';
+} from '@/PaleGL/constants.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import { parseObj } from '@/PaleGL/loaders/loadObj';
+import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Vector3 } from '@/PaleGL/math/Vector3';
-import { CubeMap } from '@/PaleGL/core/CubeMap';
+import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';

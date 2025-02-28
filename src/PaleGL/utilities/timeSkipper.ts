@@ -1,27 +1,26 @@
 ﻿type Callback = (lastTime: number, deltaTime: number) => void;
 
+export type TimeSkipper = ReturnType<typeof createTimeSkipper>;
+
 export function createTimeSkipper(targetFPS: number, callback: Callback) {
-    const _targetFPS: number = targetFPS;
-    const _callback: Callback = callback;
-    let _lastTime: number = -Infinity;
-
-    const start = (time: number) => {
-        _lastTime = time;
-    }
-
-    const exec = (time: number) => {
-        const interval = 1 / _targetFPS;
-        if (time - interval >= _lastTime) {
-            const elapsedTime = time - _lastTime;
-            const n = Math.floor(elapsedTime / interval);
-            const deltaTime = interval * n;
-            _lastTime += deltaTime;
-            _callback(_lastTime, deltaTime);
-        }
-    }
-    
     return {
-        start,
-        exec,
+        targetFPS: targetFPS,
+        callback: callback,
+        lastTime: -Infinity,
     };
 }
+
+export const startTimeSkipper = (timeSkipper: TimeSkipper, time: number) => {
+    timeSkipper.lastTime = time;
+};
+
+export const execTimeSkipper = (timeSkipper: TimeSkipper, time: number) => {
+    const interval = 1 / timeSkipper.targetFPS;
+    if (time - interval >= timeSkipper.lastTime) {
+        const elapsedTime = time - timeSkipper.lastTime;
+        const n = Math.floor(elapsedTime / interval);
+        const deltaTime = interval * n;
+        timeSkipper.lastTime += deltaTime;
+        timeSkipper.callback(timeSkipper.lastTime, deltaTime);
+    }
+};

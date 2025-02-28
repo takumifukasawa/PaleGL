@@ -2,7 +2,7 @@ import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
-import { CharMesh, createCharMesh } from '@/PaleGL/actors/charMesh.ts';
+import { CharMesh, createCharMesh } from '@/PaleGL/actors/meshes/charMesh.ts';
 
 export type FontAtlasData = {
     chars: {

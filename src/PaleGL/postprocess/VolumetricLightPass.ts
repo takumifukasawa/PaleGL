@@ -21,10 +21,11 @@ import {
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Override } from '@/PaleGL/palegl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
 import {createMaterial, Material, setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
@@ -217,10 +218,12 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         const { gpu, renderer } = options;
 
         if (!this.spotLightFrustumMaterial.isCompiledShader && this.#spotLights.length > 0) {
+            // TODO: shadow map ないケースがあるはず
+            const geo = this.#spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
             this.spotLightFrustumMaterial.start({
                 gpu,
                 attributeDescriptors:
-                    this.#spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry.getAttributeDescriptors() as AttributeDescriptor[],
+                getGeometryAttributeDescriptors(geo) 
             });
         }
 

@@ -106,7 +106,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
 
     materials: Material[] = [];
 
-    private geometry: PlaneGeometry;
+    geometry: PlaneGeometry;
 
     parameters: BufferVisualizerPassParameters;
 
@@ -653,7 +653,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         const tmpRealWidth = renderer.realWidth;
         const tmpRealHeight = renderer.realHeight;
 
-        this.geometry.start();
+        // this.geometry.start();
 
         this.rowPasses.forEach(({ pass, tiles }) => {
             if (lightActors?.directionalLight) {

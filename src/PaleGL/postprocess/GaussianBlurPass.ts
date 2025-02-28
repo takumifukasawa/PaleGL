@@ -41,7 +41,7 @@ export class GaussianBlurPass implements IPostProcessPass {
     // parameters: PostProcessParametersBase = { type: PostProcessType.GaussianBlur, enabled: true };
     parameters: GaussianBlurPassParameters;
 
-    private geometry: PlaneGeometry;
+    geometry: PlaneGeometry;
     private horizontalBlurPass: FragmentPass;
     private verticalBlurPass: FragmentPass;
 
@@ -159,7 +159,7 @@ export class GaussianBlurPass implements IPostProcessPass {
         gBufferRenderTargets,
         time,
     }: PostProcessPassRenderArgs) {
-        this.geometry.start();
+        // this.geometry.start();
 
         this.horizontalBlurPass.render({
             gpu,

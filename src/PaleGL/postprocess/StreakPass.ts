@@ -134,7 +134,7 @@ export class StreakPass implements IPostProcessPass {
     compositePass: FragmentPass;
     // private downSampleMaterial: Material;
 
-    private geometry: PlaneGeometry;
+    geometry: PlaneGeometry;
     // horizontalBlurMaterial: Material;
     // verticalBlurMaterial: Material;
 
@@ -508,10 +508,10 @@ export class StreakPass implements IPostProcessPass {
         targetCamera,
         time,
     }: PostProcessPassRenderArgs) {
-        // 一回だけ呼びたい
-        this.geometry.start();
-        // ppの場合はいらない気がする
-        // this.mesh.updateTransform();
+        // // 一回だけ呼びたい
+        // this.geometry.start();
+        // // ppの場合はいらない気がする
+        // // this.mesh.updateTransform();
 
         //
         // prefilter
