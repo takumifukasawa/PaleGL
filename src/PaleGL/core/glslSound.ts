@@ -14,7 +14,7 @@ const SAMPLES = 65536;
 const UNIFORM_NAME_BLOCK_OFFSET = 'uBlockOffset';
 const UNIFORM_NAME_SAMPLE_RATE = 'uSampleRate';
 
-export type GLSLSound = {
+export type GlslSound = {
     play: (time: number) => void;
     setVolume: (value: number) => void;
     stop: () => void;
@@ -154,14 +154,14 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
     };
 
     // seek(time: number) {
-    //     console.log(`[GLSLSound.seek] time: ${time}`);
+    //     console.log(`[GlslSound.seek] time: ${time}`);
     //     // if(this.node) {
     //     //     this.node.playbackRate.value = time / this.duration;
     //     // }
     // }
 
     const stop = () => {
-        console.log('[GLSLSound.stop]');
+        console.log('[GlslSound.stop]');
         node?.stop();
         // await this.audioContext?.suspend();
     };
@@ -170,7 +170,7 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
         currentTime = audioContext.currentTime - startTime + offsetTime;
         // for debug
         // console.log(
-        //     `[GLSLSound.getCurrentTime] audio context currentTime: ${audioContext.currentTime}, current time: ${currentTime}, offset time: ${offsetTime}`
+        //     `[GlslSound.getCurrentTime] audio context currentTime: ${audioContext.currentTime}, current time: ${currentTime}, offset time: ${offsetTime}`
         // );
         return currentTime;
     };
