@@ -12,6 +12,7 @@ import {
     BlendTypes,
     CameraType,
     CameraTypes,
+    FaceSide,
     PrimitiveTypes,
     UniformNames,
 } from '@/PaleGL/constants.ts';
@@ -41,6 +42,7 @@ import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { createRay, Ray } from '@/PaleGL/math/ray.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 // mainCamera: boolean = false;
 
@@ -112,7 +114,7 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
                 attributes: [
                     createAttribute({
                         name: AttributeNames.Position,
-                        data: new Float32Array(new Array(3 * 8).fill(0)),
+                        data: new Float32Array(maton.range(3 * 8 * 6).fill(0)),
                         size: 3,
                         usageType: AttributeUsageType.DynamicDraw,
                     }),
@@ -141,27 +143,31 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
                 //
                 // pattern2: like face
                 //
-                drawCount: 3 * 2 * 6,
+                drawCount: 8 * 6,
                 // prettier-ignore
                 indices: [
-                    // far
-                    6, 7, 4,
-                    4, 7, 5,
-                    // near clip
-                    0, 1, 2,
-                    2, 1, 3,
-                    // left
-                    0, 4, 5,
-                    5, 1, 0,
-                    // top
-                    0, 2, 4,
-                    2, 6, 4,
-                    // right
-                    2, 3, 6,
-                    6, 3, 7,
-                    // bottom
-                    1, 5, 7,
-                    7, 1, 3,
+                    ...maton.range(8 * 6, true)
+                    // 0, 1, 2, 3,
+                    // 4, 5, 6, 7
+
+                    // // far
+                    // 6, 7, 4,
+                    // 5, 7, 4,
+                    // // near clip
+                    // 0, 1, 2,
+                    // 3, 1, 2,
+                    // // left
+                    // 0, 4, 5,
+                    // 0, 1, 5,
+                    // // top
+                    // 0, 2, 4,
+                    // 4, 6, 2,
+                    // // right
+                    // 2, 3, 6,
+                    // 7, 3, 6,
+                    // // bottom
+                    // 1, 5, 7,
+                    // 3, 1, 7,
                 ],
             }),
             material: createMaterial({
@@ -177,10 +183,11 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                     `,
                 primitiveType: PrimitiveTypes.Lines,
                 blendType: BlendTypes.Transparent,
-                // faceSide: FaceSide.Double,
+                faceSide: FaceSide.Double,
                 depthWrite: false,
             }),
         });
+        console.log('hogehoge', camera.visibleFrustumMesh);
         addChildActor(camera, camera.visibleFrustumMesh as Actor);
     }
 
@@ -189,20 +196,87 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         if (!frustumPositions) {
             return;
         }
+
+        // near clip
+        const nlt = frustumPositions.nlt.e; // nearLeftTop: 0
+        const nlb = frustumPositions.nlb.e; // nearLeftBottom: 1
+        const nrt = frustumPositions.nrt.e; // nearRightTop: 2
+        const nrb = frustumPositions.nrb.e; // nearRightBottom: 3
+        // far clip
+        const flt = frustumPositions.flt.e; // farLeftTop: 4
+        const flb = frustumPositions.flb.e; // farLeftBottom: 5
+        const frt = frustumPositions.frt.e; // farRightTop: 6
+        const frb = frustumPositions.frb.e; // farRightBottom: 7
+
         updateGeometryAttribute(
             camera.visibleFrustumMesh.geometry,
             AttributeNames.Position,
             new Float32Array([
-                // near clip
-                ...frustumPositions.nlt.e,
-                ...frustumPositions.nlb.e,
-                ...frustumPositions.nrt.e,
-                ...frustumPositions.nrb.e,
-                // far clip
-                ...frustumPositions.flt.e,
-                ...frustumPositions.flb.e,
-                ...frustumPositions.frt.e,
-                ...frustumPositions.frb.e,
+                // far
+                ...flt,
+                ...frt,
+                ...frt,
+                ...frb,
+                ...frb,
+                ...flb,
+                ...flb,
+                ...flt,
+                // near
+                ...nlt,
+                ...nrt,
+                ...nrt,
+                ...nrb,
+                ...nrb,
+                ...nlb,
+                ...nlb,
+                ...nlt,
+                // left
+                ...flt,
+                ...nlt,
+                ...nlt,
+                ...nlb,
+                ...nlb,
+                ...flb,
+                ...flb,
+                ...flt,
+                // top
+                ...frt,
+                ...nrt,
+                ...nrt,
+                ...nlt,
+                ...nlt,
+                ...flt,
+                ...flt,
+                ...frt,
+                // right
+                ...frb,
+                ...nrb,
+                ...nrb,
+                ...nrt,
+                ...nrt,
+                ...frt,
+                ...frt,
+                ...frb,
+                // bottom
+                ...flb,
+                ...nlb,
+                ...nlb,
+                ...nrb,
+                ...nrb,
+                ...frb,
+                ...frb,
+                ...flb,
+                // ...flb, ...frb,
+                // // near clip
+                // ...frustumPositions.nlt.e, // nearLeftTop: 0
+                // ...frustumPositions.nlb.e, // nearLeftBottom: 1
+                // ...frustumPositions.nrt.e, // nearRightTop: 2
+                // ...frustumPositions.nrb.e, // nearRightBottom: 3
+                // // far clip
+                // ...frustumPositions.flt.e, // farLeftTop: 4
+                // ...frustumPositions.flb.e, // farLeftBottom: 5
+                // ...frustumPositions.frt.e, // farRightTop: 6
+                // ...frustumPositions.frb.e, // farRightBottom: 7
             ])
         );
         camera.visibleFrustumMesh.enabled = camera.visibleFrustum;
