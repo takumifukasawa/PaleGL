@@ -60,7 +60,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 depthTest: true,
                 depthWrite: true,
                 depthFuncType: DepthFuncTypes.Lequal,
-                alphaTest: material.getAlphaTest(),
+                alphaTest: material.alphaTest,
                 skipDepthPrePass: material.skipDepthPrePass,
 
                 // TODO: 手動でいろいろ追加しなきゃなのが面倒

@@ -879,7 +879,7 @@ export function createMaterial(args: MaterialArgs) {
             // depthWrite = true,
             skipDepthPrePass = false,
             depthFuncType = DepthFuncTypes.Lequal,
-            alphaTest = null,
+            // alphaTest = null,
             faceSide = FaceSide.Front,
             receiveShadow = false,
             // blendType = BlendTypes.Opaque,
@@ -913,6 +913,7 @@ export function createMaterial(args: MaterialArgs) {
     let {
         depthTest = true,
         depthWrite = true,
+        alphaTest = null,
     } = args;
     
     // let _name: string = name;
@@ -951,7 +952,9 @@ export function createMaterial(args: MaterialArgs) {
     
     // let _depthFuncType: DepthFuncType = depthFuncType;
     // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
-    let _alphaTest: number | null = typeof alphaTest === 'number' ? alphaTest : null;
+    
+    // TODO: useAlphaTestのフラグがあった方がよい. あとからalphaTestを追加した場合に対応できる
+    alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
     // culling;
     // let _faceSide: FaceSide = faceSide || FaceSide.Front;
     let _receiveShadow: boolean = !!receiveShadow;
@@ -1012,12 +1015,12 @@ export function createMaterial(args: MaterialArgs) {
             type: UniformTypes.Float,
             value: 0,
         },
-        ...(_alphaTest
+        ...(alphaTest !== null
             ? [
                   {
                       name: 'uAlphaTestThreshold',
                       type: UniformTypes.Float,
-                      value: _alphaTest,
+                      value: alphaTest,
                   },
               ]
             : []),
@@ -1035,7 +1038,7 @@ export function createMaterial(args: MaterialArgs) {
         }
 
         const shaderDefineOptions: ShaderDefines = {
-            receiveShadow: !!_receiveShadow,
+            receiveShadow: !_receiveShadow,
             isSkinning: !!_isSkinning,
             gpuSkinning: !!_gpuSkinning,
             useNormalMap: !!_useNormalMap,
@@ -1043,7 +1046,7 @@ export function createMaterial(args: MaterialArgs) {
             useReceiveShadow: !!_receiveShadow,
             useVertexColor: !!_useVertexColor,
             isInstancing: !!_isInstancing,
-            useAlphaTest: !!_alphaTest,
+            useAlphaTest: alphaTest !== null,
             useInstanceLookDirection: !!_useInstanceLookDirection,
         };
 
@@ -1119,6 +1122,7 @@ export function createMaterial(args: MaterialArgs) {
         depthFuncType,
         faceSide,
         skipDepthPrePass,
+        alphaTest,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1144,8 +1148,8 @@ export function createMaterial(args: MaterialArgs) {
         // setDepthFuncType: (depthFuncType: DepthFuncType) => (_depthFuncType = depthFuncType),
         // getSkipDepthPrePass: () => _skipDepthPrePass,
         // setSkipDepthPrePass: (skipDepth: boolean | null) => (_skipDepthPrePass = skipDepth),
-        getAlphaTest: () => _alphaTest,
-        setAlphaTest: (alphaTest: number | null) => (_alphaTest = alphaTest),
+        // getAlphaTest: () => _alphaTest,
+        // setAlphaTest: (alphaTest: number | null) => (_alphaTest = alphaTest),
         // getFaceSide: () => _faceSide,
         // setFaceSide: (faceSide: FaceSide) => (_faceSide = faceSide),
         getReceiveShadow: () => _receiveShadow,

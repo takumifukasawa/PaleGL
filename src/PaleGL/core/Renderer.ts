@@ -2633,7 +2633,7 @@ export class Renderer {
                         // if (!material.canRender) {
                         //     return;
                         // }
-                        if (material.getAlphaTest()) {
+                        if (material.alphaTest != null) {
                             renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
                                 this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.AlphaTest, i)
                             );
