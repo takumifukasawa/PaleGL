@@ -76,10 +76,10 @@ export type MaterialArgs = {
     renderQueue?: RenderQueue;
 
     // normal map
-    useNormalMap?: boolean | null;
+    useNormalMap?: boolean;
 
     // env map
-    useEnvMap?: boolean | null;
+    useEnvMap?: boolean;
 
     // skinning
     isSkinning?: boolean | null;
@@ -960,9 +960,9 @@ export function createMaterial(args: MaterialArgs) {
     // let _receiveShadow: boolean = !!receiveShadow;
     const queue: RenderQueue | null = args.queue || null;
 
-    let _useNormalMap: boolean | null = !!useNormalMap;
+    // let _useNormalMap: boolean | null = !!useNormalMap;
 
-    let _useEnvMap: boolean | null = !!useEnvMap;
+    // let _useEnvMap: boolean | null = !!useEnvMap;
 
     // skinning
     let _isSkinning: boolean | null = !!isSkinning;
@@ -1041,8 +1041,8 @@ export function createMaterial(args: MaterialArgs) {
             receiveShadow: !!receiveShadow,
             isSkinning: !!_isSkinning,
             gpuSkinning: !!_gpuSkinning,
-            useNormalMap: !!_useNormalMap,
-            useEnvMap: !!_useEnvMap,
+            useNormalMap: !!useNormalMap,
+            useEnvMap: !!useEnvMap,
             useReceiveShadow: !!receiveShadow,
             useVertexColor: !!_useVertexColor,
             isInstancing: !!_isInstancing,
@@ -1125,6 +1125,8 @@ export function createMaterial(args: MaterialArgs) {
         alphaTest,
         receiveShadow,
         queue, 
+        useNormalMap,
+        useEnvMap,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1158,10 +1160,10 @@ export function createMaterial(args: MaterialArgs) {
         // setReceiveShadow: (receiveShadow: boolean) => (_receiveShadow = receiveShadow),
         // getQueue: () => _queue,
         // setQueue: (queue: RenderQueue) => (_queue = queue),
-        getUseNormalMap: () => _useNormalMap,
-        setUseNormalMap: (useNormalMap: boolean | null) => (_useNormalMap = useNormalMap),
-        getUseEnvMap: () => _useEnvMap,
-        setUseEnvMap: (useEnvMap: boolean | null) => (_useEnvMap = useEnvMap),
+        // getUseNormalMap: () => _useNormalMap,
+        // setUseNormalMap: (useNormalMap: boolean | null) => (_useNormalMap = useNormalMap),
+        // getUseEnvMap: () => _useEnvMap,
+        // setUseEnvMap: (useEnvMap: boolean | null) => (_useEnvMap = useEnvMap),
         getIsSkinning: () => _isSkinning,
         setIsSkinning: (isSkinning: boolean | null) => (_isSkinning = isSkinning),
         getGpuSkinning: () => _gpuSkinning,
