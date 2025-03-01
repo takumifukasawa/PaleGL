@@ -875,7 +875,7 @@ export function createMaterial(args: MaterialArgs) {
             fragmentShaderModifier,
 
             // primitiveType,
-            depthTest = true,
+            // depthTest = true,
             depthWrite = true,
             skipDepthPrePass = false,
             depthFuncType = DepthFuncTypes.Lequal,
@@ -910,6 +910,10 @@ export function createMaterial(args: MaterialArgs) {
             showLog = false, // depthUniforms = {},
     } = args;
     
+    let {
+        depthTest = true
+    } = args;
+    
     // let _name: string = name;
 
     const canRender: boolean = true;
@@ -940,7 +944,7 @@ export function createMaterial(args: MaterialArgs) {
     const uniformBlockNames: string[] = args.uniformBlockNames || [];
     
     // isAddedUniformBlock: boolean = false;
-    let _depthTest: boolean | null = !!depthTest;
+    depthTest = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
     let _depthWrite: boolean = !!depthWrite;
     let _depthFuncType: DepthFuncType = depthFuncType;
@@ -1108,6 +1112,7 @@ export function createMaterial(args: MaterialArgs) {
         blendType,
         renderQueue,
         uniformBlockNames,
+        depthTest,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1125,8 +1130,8 @@ export function createMaterial(args: MaterialArgs) {
         // getRenderQueue: () => _renderQueue,
         // setRenderQueue: (renderQueue: RenderQueue) => (_renderQueue = renderQueue),
         // setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
-        getDepthTest: () => _depthTest,
-        setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
+        // getDepthTest: () => _depthTest,
+        // setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
         getDepthWrite: () => _depthWrite,
         setDepthWrite: (depthWrite: boolean) => (_depthWrite = depthWrite),
         getDepthFuncType: () => _depthFuncType,

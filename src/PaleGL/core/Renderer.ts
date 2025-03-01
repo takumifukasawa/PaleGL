@@ -3084,9 +3084,6 @@ export class Renderer {
             }
         }
 
-        // setup depth test
-        const depthTest = !!material.getDepthTest();
-
         // depth func type
         const depthFuncType = material.getDepthFuncType();
 
@@ -3105,7 +3102,7 @@ export class Renderer {
         this._gpu.draw(
             geometry.drawCount,
             material.primitiveType,
-            depthTest,
+            !!material.depthTest,
             depthWrite,
             depthFuncType,
             material.blendType,
