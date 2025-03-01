@@ -853,76 +853,77 @@ export type Material = ReturnType<typeof createMaterial>;
 //     depthUniforms: Uniforms
 // }
 
-export function createMaterial({
-    // gpu,
+export function createMaterial(args: MaterialArgs) {
+    const {
+        // gpu,
 
-    name = '',
+        name = '',
+            // type = MaterialTypes.Misc,
 
-    type = MaterialTypes.Misc,
+            vertexShader = '',
+            fragmentShader = '',
+            depthFragmentShader,
+            rawVertexShader,
+            rawFragmentShader,
+            // rawDepthFragmentShader,
 
-    vertexShader = '',
-    fragmentShader = '',
-    depthFragmentShader,
-    rawVertexShader,
-    rawFragmentShader,
-    // rawDepthFragmentShader,
+            vertexShaderGenerator,
+            fragmentShaderGenerator,
+            depthFragmentShaderGenerator,
 
-    vertexShaderGenerator,
-    fragmentShaderGenerator,
-    depthFragmentShaderGenerator,
+            vertexShaderModifier,
+            fragmentShaderModifier,
 
-    vertexShaderModifier,
-    fragmentShaderModifier,
+            // primitiveType,
+            depthTest = true,
+            depthWrite = true,
+            skipDepthPrePass = false,
+            depthFuncType = DepthFuncTypes.Lequal,
+            alphaTest = null,
+            faceSide = FaceSide.Front,
+            receiveShadow = false,
+            // blendType = BlendTypes.Opaque,
+            // renderQueue,
 
-    primitiveType,
-    depthTest = true,
-    depthWrite = true,
-    skipDepthPrePass = false,
-    depthFuncType = DepthFuncTypes.Lequal,
-    alphaTest = null,
-    faceSide = FaceSide.Front,
-    receiveShadow = false,
-    blendType = BlendTypes.Opaque,
-    renderQueue,
+            useNormalMap = null,
 
-    useNormalMap = null,
+            // skinning
+            isSkinning = null,
+            gpuSkinning = null,
+            jointNum = null,
 
-    // skinning
-    isSkinning = null,
-    gpuSkinning = null,
-    jointNum = null,
+            // instancing
+            isInstancing = false,
+            useInstanceLookDirection = false,
 
-    // instancing
-    isInstancing = false,
-    useInstanceLookDirection = false,
+            // vertex color
+            useVertexColor = false,
 
-    // vertex color
-    useVertexColor = false,
+            // env map
+            useEnvMap = false,
 
-    // env map
-    useEnvMap = false,
+            queue,
+            uniforms = [],
+            // uniformBlockNames = [],
+            depthUniforms = [], // uniforms = {},
 
-    queue,
-    uniforms = [],
-    uniformBlockNames = [],
-    depthUniforms = [], // uniforms = {},
-
-    showLog = false, // depthUniforms = {},
-}: MaterialArgs) {
+            showLog = false, // depthUniforms = {},
+    } = args;
+    
     // let _name: string = name;
 
     const canRender: boolean = true;
 
-    type = type || MaterialTypes.Misc;
+    const type: MaterialTypes = args.type || MaterialTypes.Misc;
 
     // 外側から任意のタイミングでcompileした方が都合が良さそう
     let _shader: Shader | null = null;
 
-    primitiveType = primitiveType || PrimitiveTypes.Triangles;
-    blendType = blendType || BlendTypes.Opaque;
+    const primitiveType: PrimitiveType = args.primitiveType || PrimitiveTypes.Triangles;
+    const blendType: BlendType = args.blendType || BlendTypes.Opaque;
 
     // let _renderQueue: RenderQueue | null = renderQueue || null;
-    renderQueue = renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
+    let renderQueue = args.renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
 
     if (renderQueue) {
         switch (blendType) {
@@ -936,7 +937,8 @@ export function createMaterial({
         }
     }
 
-    let _uniformBlockNames: string[] = uniformBlockNames;
+    const uniformBlockNames: string[] = args.uniformBlockNames || [];
+    
     // isAddedUniformBlock: boolean = false;
     let _depthTest: boolean | null = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
@@ -1105,6 +1107,7 @@ export function createMaterial({
         primitiveType,
         blendType,
         renderQueue,
+        uniformBlockNames,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1121,7 +1124,7 @@ export function createMaterial({
         // setBlendType: (blendType: BlendType) => (_blendType = blendType),
         // getRenderQueue: () => _renderQueue,
         // setRenderQueue: (renderQueue: RenderQueue) => (_renderQueue = renderQueue),
-        setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
+        // setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
         getDepthTest: () => _depthTest,
         setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
         getDepthWrite: () => _depthWrite,
@@ -1169,7 +1172,7 @@ export function createMaterial({
         setUniforms: (uniforms: Uniforms) => (_uniforms = uniforms),
         getDepthUniforms: () => _depthUniforms,
         setDepthUniforms: (depthUniforms: Uniforms) => (_depthUniforms = depthUniforms),
-        getUniformBlockNames: () => _uniformBlockNames,
+        // getUniformBlockNames: () => _uniformBlockNames,
         getVertexShaderModifier: () => vertexShaderModifier,
         getFragmentShaderModifier: () => fragmentShaderModifier,
         // methods

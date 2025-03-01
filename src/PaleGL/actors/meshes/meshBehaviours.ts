@@ -68,7 +68,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 useInstanceLookDirection: material.getUseInstanceLookDirection(),
                 useVertexColor: material.getUseVertexColor(),
 
-                uniformBlockNames: material.getUniformBlockNames(), // TODO: 外側からも追加して渡せるほうがいいかもしれない
+                uniformBlockNames: material.uniformBlockNames, // TODO: 外側からも追加して渡せるほうがいいかもしれない
                 // depthFuncType: this.mainMaterial.depthFuncType
             });
         }

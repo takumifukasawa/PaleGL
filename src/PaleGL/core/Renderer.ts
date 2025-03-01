@@ -2447,7 +2447,7 @@ export class Renderer {
         }
         material.setBoundUniformBufferObjects(true);
         // for debug
-        material.getUniformBlockNames().forEach((blockName) => {
+        material.uniformBlockNames.forEach((blockName) => {
             const targetGlobalUniformBufferObject = this._globalUniformBufferObjects.find(
                 ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
             );
