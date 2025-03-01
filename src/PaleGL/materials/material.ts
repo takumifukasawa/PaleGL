@@ -65,8 +65,8 @@ export type MaterialArgs = {
     fragmentShaderModifier?: FragmentShaderModifier;
 
     primitiveType?: PrimitiveType;
-    depthTest?: boolean | null;
-    depthWrite?: boolean | null;
+    depthTest?: boolean;
+    depthWrite?: boolean;
     depthFuncType?: DepthFuncType;
     skipDepthPrePass?: boolean;
     alphaTest?: number | null;
