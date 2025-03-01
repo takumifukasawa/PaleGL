@@ -50,7 +50,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
             // console.log(this.material, this.materials)
             // TODO: depth material から clone した方がいい気がする
             mesh.depthMaterials[i] = createMaterial({
-                name: `${material.getName()}/depth`,
+                name: `${material.name}/depth`,
                 // gpu,
                 // vertexShader: this.mainMaterial.vertexShader,
                 vertexShader: material.getRawVertexShader()!, // TDOO: rawじゃだめじゃん？
