@@ -985,9 +985,9 @@ export function createMaterial(args: MaterialArgs) {
 
     // rawDepthFragmentShader: string | null = null;
 
-    let _showLog: boolean = !!showLog;
+    // let showLog: boolean = !!showLog;
 
-    let _boundUniformBufferObjects: boolean = false;
+    const boundUniformBufferObjects: boolean = false;
 
     const _vertexShaderGenerator: VertexShaderGenerator | null = vertexShaderGenerator || null;
     const _fragmentShaderGenerator: FragmentShaderGenerator | null = fragmentShaderGenerator || null;
@@ -1085,7 +1085,7 @@ export function createMaterial(args: MaterialArgs) {
         }
 
         // for debug
-        if (_showLog) {
+        if (showLog) {
             console.log('-------------------------------');
             // console.log(this.name);
             console.log(_vertexShader, shaderDefineOptions, _vertexShaderModifier, _rawVertexShader);
@@ -1133,6 +1133,8 @@ export function createMaterial(args: MaterialArgs) {
         isInstancing,
         useInstanceLookDirection,
         useVertexColor,
+        showLog,
+        boundUniformBufferObjects,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1188,11 +1190,11 @@ export function createMaterial(args: MaterialArgs) {
         getDepthFragmentShader: () => _depthFragmentShader,
         getRawVertexShader: () => _rawVertexShader,
         getRawFragmentShader: () => _rawFragmentShader,
-        getShowLog: () => _showLog,
-        setShowLog: (showLog: boolean) => (_showLog = showLog),
-        getBoundUniformBufferObjects: () => _boundUniformBufferObjects,
-        setBoundUniformBufferObjects: (boundUniformBufferObjects: boolean) =>
-            (_boundUniformBufferObjects = boundUniformBufferObjects),
+        // getShowLog: () => _showLog,
+        // setShowLog: (showLog: boolean) => (_showLog = showLog),
+        // getBoundUniformBufferObjects: () => _boundUniformBufferObjects,
+        // setBoundUniformBufferObjects: (boundUniformBufferObjects: boolean) =>
+        //     (_boundUniformBufferObjects = boundUniformBufferObjects),
         getUniforms: () => _uniforms,
         setUniforms: (uniforms: Uniforms) => (_uniforms = uniforms),
         getDepthUniforms: () => _depthUniforms,

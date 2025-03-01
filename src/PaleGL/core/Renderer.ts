@@ -2442,10 +2442,10 @@ export class Renderer {
     // TODO: materialのstartの中でやりたい
     $checkNeedsBindUniformBufferObjectToMaterial(material: Material) {
         // mesh.materials.forEach((material) => {
-        if (material.getBoundUniformBufferObjects()) {
+        if (material.boundUniformBufferObjects) {
             return;
         }
-        material.setBoundUniformBufferObjects(true);
+        material.boundUniformBufferObjects = true;
         // for debug
         material.uniformBlockNames.forEach((blockName) => {
             const targetGlobalUniformBufferObject = this._globalUniformBufferObjects.find(
