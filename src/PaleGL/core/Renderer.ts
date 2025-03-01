@@ -2456,7 +2456,7 @@ export class Renderer {
             }
             const blockIndex = this._gpu.bindUniformBlockAndGetBlockIndex(
                 targetGlobalUniformBufferObject.uniformBufferObject,
-                material.getShader()!,
+                material.shader!,
                 blockName
             );
             // // for debug
@@ -3057,11 +3057,11 @@ export class Renderer {
         // vertex
         this._gpu.setVertexArrayObject(geometry.vertexArrayObject);
         // material
-        if (!material.getShader()) {
+        if (!material.shader) {
             // console.error('invalid material shader');
             return;
         }
-        this._gpu.setShader(material.getShader()!); // TODO: ない場合を判定したい
+        this._gpu.setShader(material.shader); // TODO: ない場合を判定したい
         // uniforms
         this._gpu.setUniforms(material.uniforms);
 

@@ -23,7 +23,13 @@ import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Override } from '@/PaleGL/palegl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
-import {createMaterial, Material, setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
+import {
+    createMaterial,
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial
+} from "@/PaleGL/materials/material.ts";
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 
@@ -217,10 +223,10 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
     render(options: PostProcessPassRenderArgs) {
         const { gpu, renderer } = options;
 
-        if (!this.spotLightFrustumMaterial.isCompiledShader && this.#spotLights.length > 0) {
+        if (!isCompiledMaterialShader(this.spotLightFrustumMaterial) && this.#spotLights.length > 0) {
             // TODO: shadow map ないケースがあるはず
             const geo = this.#spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
-            this.spotLightFrustumMaterial.start({
+            startMaterial(this.spotLightFrustumMaterial, {
                 gpu,
                 attributeDescriptors:
                 getGeometryAttributeDescriptors(geo) 

@@ -7,7 +7,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {createMaterial, Material, setMaterialUniformValue, startMaterial} from '@/PaleGL/materials/material.ts';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
@@ -278,8 +278,8 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
             ],
         });
 
-        tmpMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
-        ppMaterial.start({ gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
+        startMaterial(tmpMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
+        startMaterial(ppMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
         setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.$getTexture());
 
         const render = () => {

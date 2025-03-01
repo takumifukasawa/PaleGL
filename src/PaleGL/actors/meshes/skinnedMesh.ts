@@ -607,7 +607,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     skinnedMesh.materials.forEach((material) => {
         material.uniforms = createUniforms(material.uniforms.data, generateSkinningUniforms(skinnedMesh));
         material.isSkinning = true;
-        material.gpuSkinning = skinnedMesh.gpuSkinning;
+        material.gpuSkinning = !!skinnedMesh.gpuSkinning;
         material.jointNum = skinnedMesh.boneCount;
     });
 

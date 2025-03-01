@@ -1,5 +1,10 @@
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {
+    createMaterial,
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue, startMaterial
+} from '@/PaleGL/materials/material.ts';
 import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
@@ -277,8 +282,8 @@ export class PostProcessPassBase implements IPostProcessPass {
         //     renderer.checkNeedsBindUniformBufferObjectToMaterial(this.material);
         // }
         this.materials.forEach((material) => {
-            if (!material.isCompiledShader()) {
-                material.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this.geometry) });
+            if (!isCompiledMaterialShader(material)) {
+                startMaterial(material, { gpu, attributeDescriptors: getGeometryAttributeDescriptors(this.geometry) });
                 renderer.$checkNeedsBindUniformBufferObjectToMaterial(material);
             }
         });

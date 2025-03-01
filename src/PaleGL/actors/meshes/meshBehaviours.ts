@@ -1,6 +1,12 @@
 import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {
+    createMaterial,
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial
+} from '@/PaleGL/materials/material.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
@@ -34,8 +40,8 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
     mesh.materials.forEach((material) => {
         // for debug
         // console.log(`[Mesh.start] material name: ${material.getName()}, isCompiledShader: ${material.isCompiledShader()}`);
-        if (!material.isCompiledShader()) {
-            material.start({
+        if (!isCompiledMaterialShader(material)) {
+            startMaterial(material,{
                 gpu,
                 attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
             });
@@ -53,8 +59,8 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 name: `${material.name}/depth`,
                 // gpu,
                 // vertexShader: this.mainMaterial.vertexShader,
-                vertexShader: material.getRawVertexShader()!, // TDOO: rawじゃだめじゃん？
-                fragmentShader: material.getDepthFragmentShader() || defaultDepthFragmentShader(),
+                vertexShader: material.rawVertexShader!, // TDOO: rawじゃだめじゃん？
+                fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
                 uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
                 faceSide: material.faceSide,
                 depthTest: true,
@@ -75,8 +81,8 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
     });
 
     mesh.depthMaterials.forEach((material) => {
-        if (!material.isCompiledShader()) {
-            material.start({
+        if (!isCompiledMaterialShader(material)) {
+            startMaterial(material, {
                 gpu,
                 attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
             });

@@ -4,7 +4,13 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
+import {
+    createMaterial,
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial
+} from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { GPU } from '@/PaleGL/core/GPU';
@@ -389,11 +395,11 @@ export class BloomPass implements IPostProcessPass {
         // // ppの場合はいらない気がする
         // // this.mesh.updateTransform();
 
-        if (!this._horizontalBlurMaterial.isCompiledShader()) {
-            this._horizontalBlurMaterial.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
+        if (!isCompiledMaterialShader(this._horizontalBlurMaterial)) {
+            startMaterial(this._horizontalBlurMaterial, { gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
         }
-        if (!this._verticalBlurMaterial.isCompiledShader()) {
-            this._verticalBlurMaterial.start({ gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
+        if (!isCompiledMaterialShader(this._verticalBlurMaterial)) {
+            startMaterial(this._verticalBlurMaterial, { gpu, attributeDescriptors: getGeometryAttributeDescriptors(this._geometry) });
         }
 
         this.assignParameters();
