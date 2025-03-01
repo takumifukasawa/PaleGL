@@ -605,17 +605,15 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     });
 
     skinnedMesh.materials.forEach((material) => {
-        material.setUniforms(createUniforms(material.getUniforms().data, generateSkinningUniforms(skinnedMesh)));
+        material.uniforms = createUniforms(material.uniforms.data, generateSkinningUniforms(skinnedMesh));
         material.isSkinning = true;
         material.gpuSkinning = skinnedMesh.gpuSkinning;
         material.jointNum = skinnedMesh.boneCount;
     });
 
-    getMeshMainMaterial(skinnedMesh).setDepthUniforms(
-        createUniforms(
-            getMeshMainMaterial(skinnedMesh).getDepthUniforms().data,
-            generateSkinningUniforms(skinnedMesh)
-        )
+    getMeshMainMaterial(skinnedMesh).depthUniforms = createUniforms(
+        getMeshMainMaterial(skinnedMesh).depthUniforms.data,
+        generateSkinningUniforms(skinnedMesh)
     );
 
     // いろいろ準備したあとにstart

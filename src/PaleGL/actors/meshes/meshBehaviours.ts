@@ -55,7 +55,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 // vertexShader: this.mainMaterial.vertexShader,
                 vertexShader: material.getRawVertexShader()!, // TDOO: rawじゃだめじゃん？
                 fragmentShader: material.getDepthFragmentShader() || defaultDepthFragmentShader(),
-                uniforms: material.getDepthUniforms().data, // TODO: deepcopyした方がよい？
+                uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
                 faceSide: material.faceSide,
                 depthTest: true,
                 depthWrite: true,

@@ -31,7 +31,6 @@ import {
     addUniformValue,
     createUniforms,
     setUniformValue,
-    Uniforms,
     UniformsData,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
@@ -803,11 +802,11 @@ export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
 // -------------------------------------------------------
 
 export function setMaterialUniformValue(material: Material, name: string, value: UniformValue) {
-    setUniformValue(material.getUniforms(), name, value);
+    setUniformValue(material.uniforms, name, value);
 }
 
 export function addMaterialUniformValue(material: Material, name: string, type: UniformTypes, value: UniformValue) {
-    addUniformValue(material.getUniforms(), name, type, value);
+    addUniformValue(material.uniforms, name, type, value);
 }
 
 export type Material = ReturnType<typeof createMaterial>;
@@ -903,9 +902,9 @@ export function createMaterial(args: MaterialArgs) {
             useEnvMap = false,
 
             // queue,
-            uniforms = [],
+            // uniforms = [],
             // uniformBlockNames = [],
-            depthUniforms = [], // uniforms = {},
+            // depthUniforms = [], // uniforms = {},
 
             showLog = false, // depthUniforms = {},
     } = args;
@@ -946,9 +945,9 @@ export function createMaterial(args: MaterialArgs) {
     const uniformBlockNames: string[] = args.uniformBlockNames || [];
     
     // isAddedUniformBlock: boolean = false;
-    // depthTest = !!depthTest;
+    depthTest = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
-    // depthWrite = !!depthWrite;
+    depthWrite = !!depthWrite;
     
     // let _depthFuncType: DepthFuncType = depthFuncType;
     // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
@@ -1026,8 +1025,8 @@ export function createMaterial(args: MaterialArgs) {
             : []),
     ];
 
-    let _uniforms: Uniforms = createUniforms(commonUniforms, uniforms);
-    let _depthUniforms: Uniforms = createUniforms(commonUniforms, depthUniforms);
+    const uniforms = createUniforms(commonUniforms, args.uniforms || []);
+    const depthUniforms = createUniforms(commonUniforms, args.depthUniforms || []);
 
     const start = ({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
         // for debug
@@ -1135,6 +1134,8 @@ export function createMaterial(args: MaterialArgs) {
         useVertexColor,
         showLog,
         boundUniformBufferObjects,
+        uniforms,
+        depthUniforms,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1195,10 +1196,10 @@ export function createMaterial(args: MaterialArgs) {
         // getBoundUniformBufferObjects: () => _boundUniformBufferObjects,
         // setBoundUniformBufferObjects: (boundUniformBufferObjects: boolean) =>
         //     (_boundUniformBufferObjects = boundUniformBufferObjects),
-        getUniforms: () => _uniforms,
-        setUniforms: (uniforms: Uniforms) => (_uniforms = uniforms),
-        getDepthUniforms: () => _depthUniforms,
-        setDepthUniforms: (depthUniforms: Uniforms) => (_depthUniforms = depthUniforms),
+        // getUniforms: () => _uniforms,
+        // setUniforms: (uniforms: Uniforms) => (_uniforms = uniforms),
+        // getDepthUniforms: () => _depthUniforms,
+        // setDepthUniforms: (depthUniforms: Uniforms) => (_depthUniforms = depthUniforms),
         // getUniformBlockNames: () => _uniformBlockNames,
         getVertexShaderModifier: () => vertexShaderModifier,
         getFragmentShaderModifier: () => fragmentShaderModifier,

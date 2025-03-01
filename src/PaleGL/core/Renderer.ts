@@ -2468,7 +2468,7 @@ export class Renderer {
             //     blockIndex
             // );
             addUniformBlock(
-                material.getUniforms(),
+                material.uniforms,
                 blockIndex,
                 targetGlobalUniformBufferObject.uniformBufferObject,
                 []
@@ -3063,7 +3063,7 @@ export class Renderer {
         }
         this._gpu.setShader(material.getShader()!); // TODO: ない場合を判定したい
         // uniforms
-        this._gpu.setUniforms(material.getUniforms());
+        this._gpu.setUniforms(material.uniforms);
 
         // setup depth write (depth mask)
         let depthWrite;
