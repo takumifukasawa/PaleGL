@@ -590,7 +590,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     // ボーンオフセット行列を計算
     skinnedMesh.boneOffsetMatrices = getBoneOffsetMatrices(skinnedMesh);
 
-    skinnedMesh.gpuSkinning = !!getMeshMainMaterial(skinnedMesh).getGpuSkinning();
+    skinnedMesh.gpuSkinning = !!getMeshMainMaterial(skinnedMesh).gpuSkinning;
 
     // ボーンごとの joint matrix をテクスチャに詰める
     // 1ボーンあたり4pixel（4 channel x 4 pixel = 16） 必要
@@ -606,8 +606,8 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
 
     skinnedMesh.materials.forEach((material) => {
         material.setUniforms(createUniforms(material.getUniforms().data, generateSkinningUniforms(skinnedMesh)));
-        material.setIsSkinning(true);
-        material.setGpuSkinning(skinnedMesh.gpuSkinning);
+        material.isSkinning = true;
+        material.gpuSkinning = skinnedMesh.gpuSkinning;
         material.setJointNum(skinnedMesh.boneCount);
     });
 
@@ -618,6 +618,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
         )
     );
 
+    // いろいろ準備したあとにstart
     startMeshBehaviourBase(skinnedMesh, args);
 
     if (skinnedMesh.debugBoneView) {

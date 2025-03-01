@@ -82,8 +82,8 @@ export type MaterialArgs = {
     useEnvMap?: boolean;
 
     // skinning
-    isSkinning?: boolean | null;
-    gpuSkinning?: boolean | null;
+    isSkinning?: boolean;
+    gpuSkinning?: boolean;
     jointNum?: number | null;
 
     // instancing
@@ -965,8 +965,8 @@ export function createMaterial(args: MaterialArgs) {
     // let _useEnvMap: boolean | null = !!useEnvMap;
 
     // skinning
-    let _isSkinning: boolean | null = !!isSkinning;
-    let _gpuSkinning: boolean | null = !!gpuSkinning;
+    //let _isSkinning: boolean | null = !!isSkinning;
+    //let _gpuSkinning: boolean | null = !!gpuSkinning;
     let _jointNum: number | null = typeof jointNum == 'number' ? jointNum : null;
 
     // instancing
@@ -1039,8 +1039,8 @@ export function createMaterial(args: MaterialArgs) {
 
         const shaderDefineOptions: ShaderDefines = {
             receiveShadow: !!receiveShadow,
-            isSkinning: !!_isSkinning,
-            gpuSkinning: !!_gpuSkinning,
+            isSkinning: !!isSkinning,
+            gpuSkinning: !!gpuSkinning,
             useNormalMap: !!useNormalMap,
             useEnvMap: !!useEnvMap,
             useReceiveShadow: !!receiveShadow,
@@ -1054,9 +1054,9 @@ export function createMaterial(args: MaterialArgs) {
             if (!_vertexShader && _vertexShaderGenerator) {
                 _vertexShader = _vertexShaderGenerator({
                     attributeDescriptors,
-                    isSkinning: !!_isSkinning,
+                    isSkinning: !!isSkinning,
                     jointNum: _jointNum,
-                    gpuSkinning: _gpuSkinning,
+                    gpuSkinning: gpuSkinning,
                     isInstancing: _isInstancing,
                     useInstanceLookDirection: _useInstanceLookDirection,
                 });
@@ -1127,6 +1127,8 @@ export function createMaterial(args: MaterialArgs) {
         queue, 
         useNormalMap,
         useEnvMap,
+        isSkinning,
+        gpuSkinning,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1164,10 +1166,10 @@ export function createMaterial(args: MaterialArgs) {
         // setUseNormalMap: (useNormalMap: boolean | null) => (_useNormalMap = useNormalMap),
         // getUseEnvMap: () => _useEnvMap,
         // setUseEnvMap: (useEnvMap: boolean | null) => (_useEnvMap = useEnvMap),
-        getIsSkinning: () => _isSkinning,
-        setIsSkinning: (isSkinning: boolean | null) => (_isSkinning = isSkinning),
-        getGpuSkinning: () => _gpuSkinning,
-        setGpuSkinning: (gpuSkinning: boolean | null) => (_gpuSkinning = gpuSkinning),
+        // getIsSkinning: () => _isSkinning,
+        // setIsSkinning: (isSkinning: boolean | null) => (_isSkinning = isSkinning),
+        // getGpuSkinning: () => _gpuSkinning,
+        // setGpuSkinning: (gpuSkinning: boolean | null) => (_gpuSkinning = gpuSkinning),
         getJointNum: () => _jointNum,
         setJointNum: (jointNum: number | null) => (_jointNum = jointNum),
         getIsInstancing: () => _isInstancing,
