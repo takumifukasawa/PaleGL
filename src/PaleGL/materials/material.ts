@@ -971,10 +971,10 @@ export function createMaterial(args: MaterialArgs) {
 
     // instancing
     // let _isInstancing: boolean = !!isInstancing;
-    let _useInstanceLookDirection: boolean = !!useInstanceLookDirection;
+    // let _useInstanceLookDirection: boolean = !!useInstanceLookDirection;
 
     // vertex color
-    let _useVertexColor: boolean = !!useVertexColor;
+    // let useVertexColor: boolean = !!useVertexColor;
 
     let _vertexShader: string = vertexShader || '';
     let _fragmentShader: string = fragmentShader || '';
@@ -1043,11 +1043,11 @@ export function createMaterial(args: MaterialArgs) {
             gpuSkinning: !!gpuSkinning,
             useNormalMap: !!useNormalMap,
             useEnvMap,
-            useReceiveShadow: !!receiveShadow,
+            useReceiveShadow: receiveShadow,
             useVertexColor,
             isInstancing,
             useAlphaTest: alphaTest !== null,
-            useInstanceLookDirection: !!_useInstanceLookDirection,
+            useInstanceLookDirection: useInstanceLookDirection,
         };
 
         if (!_rawVertexShader) {
@@ -1058,7 +1058,7 @@ export function createMaterial(args: MaterialArgs) {
                     jointNum,
                     gpuSkinning: gpuSkinning,
                     isInstancing,
-                    useInstanceLookDirection: _useInstanceLookDirection,
+                    useInstanceLookDirection,
                 });
             }
             const rawVertexShader = buildVertexShader(
@@ -1131,6 +1131,8 @@ export function createMaterial(args: MaterialArgs) {
         gpuSkinning,
         jointNum,
         isInstancing,
+        useInstanceLookDirection,
+        useVertexColor,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1176,13 +1178,13 @@ export function createMaterial(args: MaterialArgs) {
         // setJointNum: (jointNum: number | null) => (_jointNum = jointNum),
         // getIsInstancing: () => _isInstancing,
         // setIsInstancing: (isInstancing: boolean) => (_isInstancing = isInstancing),
-        getUseInstanceLookDirection: () => _useInstanceLookDirection,
-        setUseInstanceLookDirection: (useInstanceLookDirection: boolean) =>
-            (_useInstanceLookDirection = useInstanceLookDirection),
-        getUseVertexColor: () => _useVertexColor,
-        setUseVertexColor: (useVertexColor: boolean) => (_useVertexColor = useVertexColor),
-        getVertexShader: () => _vertexShader,
-        getFragmentShader: () => _fragmentShader,
+        // getUseInstanceLookDirection: () => _useInstanceLookDirection,
+        // setUseInstanceLookDirection: (useInstanceLookDirection: boolean) =>
+        //     (_useInstanceLookDirection = useInstanceLookDirection),
+        // getUseVertexColor: () => _useVertexColor,
+        // setUseVertexColor: (useVertexColor: boolean) => (_useVertexColor = useVertexColor),
+        // getVertexShader: () => _vertexShader,
+        // getFragmentShader: () => _fragmentShader,
         getDepthFragmentShader: () => _depthFragmentShader,
         getRawVertexShader: () => _rawVertexShader,
         getRawFragmentShader: () => _rawFragmentShader,
