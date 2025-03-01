@@ -3067,8 +3067,8 @@ export class Renderer {
 
         // setup depth write (depth mask)
         let depthWrite;
-        if (material.getDepthWrite() !== null) {
-            depthWrite = material.getDepthWrite();
+        if (material.depthWrite !== null) {
+            depthWrite = material.depthWrite;
         } else {
             switch (material.blendType) {
                 case BlendTypes.Opaque:

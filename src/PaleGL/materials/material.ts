@@ -876,7 +876,7 @@ export function createMaterial(args: MaterialArgs) {
 
             // primitiveType,
             // depthTest = true,
-            depthWrite = true,
+            // depthWrite = true,
             skipDepthPrePass = false,
             depthFuncType = DepthFuncTypes.Lequal,
             alphaTest = null,
@@ -911,7 +911,8 @@ export function createMaterial(args: MaterialArgs) {
     } = args;
     
     let {
-        depthTest = true
+        depthTest = true,
+        depthWrite = true,
     } = args;
     
     // let _name: string = name;
@@ -946,7 +947,7 @@ export function createMaterial(args: MaterialArgs) {
     // isAddedUniformBlock: boolean = false;
     depthTest = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
-    let _depthWrite: boolean = !!depthWrite;
+    depthWrite = !!depthWrite;
     let _depthFuncType: DepthFuncType = depthFuncType;
     let _skipDepthPrePass: boolean | null = !!skipDepthPrePass;
     let _alphaTest: number | null = typeof alphaTest === 'number' ? alphaTest : null;
@@ -1113,6 +1114,7 @@ export function createMaterial(args: MaterialArgs) {
         renderQueue,
         uniformBlockNames,
         depthTest,
+        depthWrite,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1132,8 +1134,8 @@ export function createMaterial(args: MaterialArgs) {
         // setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
         // getDepthTest: () => _depthTest,
         // setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
-        getDepthWrite: () => _depthWrite,
-        setDepthWrite: (depthWrite: boolean) => (_depthWrite = depthWrite),
+        // getDepthWrite: () => _depthWrite,
+        // setDepthWrite: (depthWrite: boolean) => (_depthWrite = depthWrite),
         getDepthFuncType: () => _depthFuncType,
         setDepthFuncType: (depthFuncType: DepthFuncType) => (_depthFuncType = depthFuncType),
         getSkipDepthPrePass: () => _skipDepthPrePass,
