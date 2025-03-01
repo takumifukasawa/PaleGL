@@ -3174,7 +3174,7 @@ export class Renderer {
                     return;
                 }
 
-                if (!depthMaterial.getCanRender()) {
+                if (!depthMaterial.canRender) {
                     return;
                 }
 
@@ -3237,7 +3237,7 @@ export class Renderer {
                         return;
                     }
 
-                    if (!depthMaterial.getCanRender()) {
+                    if (!depthMaterial.canRender) {
                         return;
                     }
 
@@ -3285,7 +3285,7 @@ export class Renderer {
 
             const targetMaterial = actor.materials[materialIndex];
 
-            if (!targetMaterial.getCanRender()) {
+            if (!targetMaterial.canRender) {
                 return;
             }
 

@@ -195,6 +195,6 @@ export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newV
 };
 
 export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolean) => {
-    mesh.materials[index].setCanRender(flag);
-    mesh.depthMaterials[index].setCanRender(flag);
+    mesh.materials[index].canRender = flag;
+    mesh.depthMaterials[index].canRender = flag;
 };

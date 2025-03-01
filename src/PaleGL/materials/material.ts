@@ -911,7 +911,7 @@ export function createMaterial({
 }: MaterialArgs) {
     // let _name: string = name;
 
-    let _canRender: boolean = true;
+    const canRender: boolean = true;
 
     let _type: MaterialTypes = type || MaterialTypes.Misc;
 
@@ -1100,12 +1100,13 @@ export function createMaterial({
 
     return {
         name,
+        canRender,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
         // setName: (name: string) => (_name = name),
-        getCanRender: () => _canRender,
-        setCanRender: (canRender: boolean) => (_canRender = canRender),
+        //getCanRender: () => _canRender,
+        //setCanRender: (canRender: boolean) => (_canRender = canRender),
         getType: () => _type,
         setType: (type: MaterialTypes) => (_type = type),
         getShader: () => _shader,
