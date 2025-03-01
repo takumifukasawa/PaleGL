@@ -957,7 +957,7 @@ export function createMaterial(args: MaterialArgs) {
     alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
     // culling;
     // let _faceSide: FaceSide = faceSide || FaceSide.Front;
-    let _receiveShadow: boolean = !!receiveShadow;
+    // let _receiveShadow: boolean = !!receiveShadow;
     let _queue: RenderQueue | null = queue || null;
 
     let _useNormalMap: boolean | null = !!useNormalMap;
@@ -1038,12 +1038,12 @@ export function createMaterial(args: MaterialArgs) {
         }
 
         const shaderDefineOptions: ShaderDefines = {
-            receiveShadow: !_receiveShadow,
+            receiveShadow: !!receiveShadow,
             isSkinning: !!_isSkinning,
             gpuSkinning: !!_gpuSkinning,
             useNormalMap: !!_useNormalMap,
             useEnvMap: !!_useEnvMap,
-            useReceiveShadow: !!_receiveShadow,
+            useReceiveShadow: !!receiveShadow,
             useVertexColor: !!_useVertexColor,
             isInstancing: !!_isInstancing,
             useAlphaTest: alphaTest !== null,
@@ -1123,6 +1123,7 @@ export function createMaterial(args: MaterialArgs) {
         faceSide,
         skipDepthPrePass,
         alphaTest,
+        receiveShadow,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1152,8 +1153,8 @@ export function createMaterial(args: MaterialArgs) {
         // setAlphaTest: (alphaTest: number | null) => (_alphaTest = alphaTest),
         // getFaceSide: () => _faceSide,
         // setFaceSide: (faceSide: FaceSide) => (_faceSide = faceSide),
-        getReceiveShadow: () => _receiveShadow,
-        setReceiveShadow: (receiveShadow: boolean) => (_receiveShadow = receiveShadow),
+        // getReceiveShadow: () => _receiveShadow,
+        // setReceiveShadow: (receiveShadow: boolean) => (_receiveShadow = receiveShadow),
         getQueue: () => _queue,
         setQueue: (queue: RenderQueue) => (_queue = queue),
         getUseNormalMap: () => _useNormalMap,
