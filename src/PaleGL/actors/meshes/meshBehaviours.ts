@@ -64,7 +64,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 skipDepthPrePass: material.skipDepthPrePass,
 
                 // TODO: 手動でいろいろ追加しなきゃなのが面倒
-                isInstancing: material.getIsInstancing(),
+                isInstancing: material.isInstancing,
                 useInstanceLookDirection: material.getUseInstanceLookDirection(),
                 useVertexColor: material.getUseVertexColor(),
 
