@@ -902,7 +902,7 @@ export function createMaterial(args: MaterialArgs) {
             // env map
             useEnvMap = false,
 
-            queue,
+            // queue,
             uniforms = [],
             // uniformBlockNames = [],
             depthUniforms = [], // uniforms = {},
@@ -958,7 +958,7 @@ export function createMaterial(args: MaterialArgs) {
     // culling;
     // let _faceSide: FaceSide = faceSide || FaceSide.Front;
     // let _receiveShadow: boolean = !!receiveShadow;
-    let _queue: RenderQueue | null = queue || null;
+    const queue: RenderQueue | null = args.queue || null;
 
     let _useNormalMap: boolean | null = !!useNormalMap;
 
@@ -1124,6 +1124,7 @@ export function createMaterial(args: MaterialArgs) {
         skipDepthPrePass,
         alphaTest,
         receiveShadow,
+        queue, 
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1155,8 +1156,8 @@ export function createMaterial(args: MaterialArgs) {
         // setFaceSide: (faceSide: FaceSide) => (_faceSide = faceSide),
         // getReceiveShadow: () => _receiveShadow,
         // setReceiveShadow: (receiveShadow: boolean) => (_receiveShadow = receiveShadow),
-        getQueue: () => _queue,
-        setQueue: (queue: RenderQueue) => (_queue = queue),
+        // getQueue: () => _queue,
+        // setQueue: (queue: RenderQueue) => (_queue = queue),
         getUseNormalMap: () => _useNormalMap,
         setUseNormalMap: (useNormalMap: boolean | null) => (_useNormalMap = useNormalMap),
         getUseEnvMap: () => _useEnvMap,
