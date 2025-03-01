@@ -338,7 +338,7 @@ export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | null;
 //         return this.transform.getWorldForward().clone().negate();
 //     }
 //
-//     viewpointToRay(viewportPoint: Vector2): Ray {
+//     viewpointToRay(viewportPoint: Vector2): Rayts {
 //         const clipPos = new Vector4(viewportPoint.x * 2 - 1, viewportPoint.y * 2 - 1, 1, 1);
 //         const worldPos = clipPos.multiplyMatrix4(this.inverseViewProjectionMatrix);
 //         worldPos.x = worldPos.x / worldPos.w;
@@ -347,7 +347,7 @@ export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | null;
 //         const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
 //         const rayOrigin = this.transform.getWorldPosition();
 //         const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
-//         return new Ray(rayOrigin, rayDirection);
+//         return new Rayts(rayOrigin, rayDirection);
 //     }
 // }
 
