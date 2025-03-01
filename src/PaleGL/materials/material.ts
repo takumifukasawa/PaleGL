@@ -950,7 +950,7 @@ export function createMaterial(args: MaterialArgs) {
     depthWrite = !!depthWrite;
     
     // let _depthFuncType: DepthFuncType = depthFuncType;
-    let _skipDepthPrePass: boolean | null = !!skipDepthPrePass;
+    // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
     let _alphaTest: number | null = typeof alphaTest === 'number' ? alphaTest : null;
     // culling;
     // let _faceSide: FaceSide = faceSide || FaceSide.Front;
@@ -1118,6 +1118,7 @@ export function createMaterial(args: MaterialArgs) {
         depthWrite,
         depthFuncType,
         faceSide,
+        skipDepthPrePass,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1141,8 +1142,8 @@ export function createMaterial(args: MaterialArgs) {
         // setDepthWrite: (depthWrite: boolean) => (_depthWrite = depthWrite),
         // getDepthFuncType: () => _depthFuncType,
         // setDepthFuncType: (depthFuncType: DepthFuncType) => (_depthFuncType = depthFuncType),
-        getSkipDepthPrePass: () => _skipDepthPrePass,
-        setSkipDepthPrePass: (skipDepth: boolean | null) => (_skipDepthPrePass = skipDepth),
+        // getSkipDepthPrePass: () => _skipDepthPrePass,
+        // setSkipDepthPrePass: (skipDepth: boolean | null) => (_skipDepthPrePass = skipDepth),
         getAlphaTest: () => _alphaTest,
         setAlphaTest: (alphaTest: number | null) => (_alphaTest = alphaTest),
         // getFaceSide: () => _faceSide,

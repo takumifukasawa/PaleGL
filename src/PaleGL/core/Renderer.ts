@@ -3172,7 +3172,7 @@ export class Renderer {
                     return;
                 }
 
-                if (actor.materials[i].getSkipDepthPrePass()) {
+                if (actor.materials[i].skipDepthPrePass) {
                     return;
                 }
 
@@ -3285,7 +3285,7 @@ export class Renderer {
 
             // pre-passしてないmaterialの場合はdepthをcopy.
             // pre-passしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
-            if (targetMaterial.getSkipDepthPrePass()) {
+            if (targetMaterial.skipDepthPrePass) {
                 this.setRenderTarget(null, false, false);
                 this.copyDepthTexture();
                 this.setRenderTarget(this._gBufferRenderTargets.write, false, false);

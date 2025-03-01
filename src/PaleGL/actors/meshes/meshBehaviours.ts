@@ -61,7 +61,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 depthWrite: true,
                 depthFuncType: DepthFuncTypes.Lequal,
                 alphaTest: material.getAlphaTest(),
-                skipDepthPrePass: !!material.getSkipDepthPrePass(),
+                skipDepthPrePass: material.skipDepthPrePass,
 
                 // TODO: 手動でいろいろ追加しなきゃなのが面倒
                 isInstancing: material.getIsInstancing(),
