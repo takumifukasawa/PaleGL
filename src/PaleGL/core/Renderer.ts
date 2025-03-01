@@ -2682,7 +2682,7 @@ export class Renderer {
 
         // sort by render queue
         const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) =>
-            a.actor.materials[a.materialIndex].getRenderQueue() - b.actor.materials[b.materialIndex].getRenderQueue();
+            a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
 
         // all mesh infos
         const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)

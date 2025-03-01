@@ -922,16 +922,16 @@ export function createMaterial({
     blendType = blendType || BlendTypes.Opaque;
 
     // let _renderQueue: RenderQueue | null = renderQueue || null;
-    let _renderQueue: RenderQueue = renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
+    renderQueue = renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
 
-    if (_renderQueue) {
+    if (renderQueue) {
         switch (blendType) {
             case BlendTypes.Opaque:
-                _renderQueue = RenderQueues[RenderQueueType.Opaque];
+                renderQueue = RenderQueues[RenderQueueType.Opaque];
                 break;
             case BlendTypes.Transparent:
             case BlendTypes.Additive:
-                _renderQueue = RenderQueues[RenderQueueType.Transparent];
+                renderQueue = RenderQueues[RenderQueueType.Transparent];
                 break;
         }
     }
@@ -984,8 +984,8 @@ export function createMaterial({
     const _vertexShaderModifier: VertexShaderModifier = vertexShaderModifier || {};
     const _fragmentShaderModifier: FragmentShaderModifier = fragmentShaderModifier || {};
 
-    if (!_renderQueue) {
-        console.error(`[Material.constructor] invalid render queue: ${renderQueue}`);
+    if (!renderQueue) {
+        console.error(`[Material.constructor] invalid render queue: ${renderQueue as unknown as string}`);
     }
 
     // TODO:
@@ -1104,6 +1104,7 @@ export function createMaterial({
         type, 
         primitiveType,
         blendType,
+        renderQueue,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1118,8 +1119,8 @@ export function createMaterial({
         // setPrimitiveType: (primitiveType: PrimitiveType) => (_primitiveType = primitiveType),
         // getBlendType: () => _blendType,
         // setBlendType: (blendType: BlendType) => (_blendType = blendType),
-        getRenderQueue: () => _renderQueue,
-        setRenderQueue: (renderQueue: RenderQueue) => (_renderQueue = renderQueue),
+        // getRenderQueue: () => _renderQueue,
+        // setRenderQueue: (renderQueue: RenderQueue) => (_renderQueue = renderQueue),
         setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
         getDepthTest: () => _depthTest,
         setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
