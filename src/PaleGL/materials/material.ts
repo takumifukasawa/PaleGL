@@ -890,7 +890,7 @@ export function createMaterial(args: MaterialArgs) {
             // skinning
             isSkinning = null,
             gpuSkinning = null,
-            jointNum = null,
+            // jointNum = null,
 
             // instancing
             isInstancing = false,
@@ -967,7 +967,7 @@ export function createMaterial(args: MaterialArgs) {
     // skinning
     //let _isSkinning: boolean | null = !!isSkinning;
     //let _gpuSkinning: boolean | null = !!gpuSkinning;
-    let _jointNum: number | null = typeof jointNum == 'number' ? jointNum : null;
+    const jointNum: number | null = typeof args.jointNum === 'number' ? args.jointNum : null;
 
     // instancing
     let _isInstancing: boolean = !!isInstancing;
@@ -1055,7 +1055,7 @@ export function createMaterial(args: MaterialArgs) {
                 _vertexShader = _vertexShaderGenerator({
                     attributeDescriptors,
                     isSkinning: !!isSkinning,
-                    jointNum: _jointNum,
+                    jointNum,
                     gpuSkinning: gpuSkinning,
                     isInstancing: _isInstancing,
                     useInstanceLookDirection: _useInstanceLookDirection,
@@ -1129,6 +1129,7 @@ export function createMaterial(args: MaterialArgs) {
         useEnvMap,
         isSkinning,
         gpuSkinning,
+        jointNum,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1170,8 +1171,8 @@ export function createMaterial(args: MaterialArgs) {
         // setIsSkinning: (isSkinning: boolean | null) => (_isSkinning = isSkinning),
         // getGpuSkinning: () => _gpuSkinning,
         // setGpuSkinning: (gpuSkinning: boolean | null) => (_gpuSkinning = gpuSkinning),
-        getJointNum: () => _jointNum,
-        setJointNum: (jointNum: number | null) => (_jointNum = jointNum),
+        // getJointNum: () => _jointNum,
+        // setJointNum: (jointNum: number | null) => (_jointNum = jointNum),
         getIsInstancing: () => _isInstancing,
         setIsInstancing: (isInstancing: boolean) => (_isInstancing = isInstancing),
         getUseInstanceLookDirection: () => _useInstanceLookDirection,
