@@ -946,9 +946,9 @@ export function createMaterial(args: MaterialArgs) {
     const uniformBlockNames: string[] = args.uniformBlockNames || [];
     
     // isAddedUniformBlock: boolean = false;
-    depthTest = !!depthTest;
+    // depthTest = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
-    depthWrite = !!depthWrite;
+    // depthWrite = !!depthWrite;
     
     // let _depthFuncType: DepthFuncType = depthFuncType;
     // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
