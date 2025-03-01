@@ -1,4 +1,4 @@
-import {MaterialArgs, createMaterial, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
+import {MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
     ShadingModelIds,
@@ -247,70 +247,52 @@ export type GBufferMaterialArgs = {
 export type GBufferMaterial = ReturnType<typeof createGBufferMaterial>;
 
 // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
-export function createGBufferMaterial({
-    // diffuse
-    diffuseColor,
-    diffuseMap,
-    diffuseMapUvScale, // vec2
-    diffuseMapUvOffset, // vec2
-    // normal
-    normalMap,
-    normalMapUvScale, // vec2
-    normalMapUvOffset, // vec2,
-    // params
-    // specularAmount,
-    metallic,
-    metallicMap,
-    metallicMapTiling,
-    roughness,
-    roughnessMap,
-    roughnessMapTiling,
-    // emissive
-    emissiveColor,
-    // TODO: 外部化
-    vertexShaderModifier = {},
-    shadingModelId = ShadingModelIds.Lit,
-    uniforms = [],
+export function createGBufferMaterial(args: GBufferMaterialArgs) {
+    const {
+            // TODO: 外部化
+            vertexShaderModifier = {},
+            uniforms = [],
     ...options
-}: GBufferMaterialArgs = {}) {
-    const _diffuseColor: Color = diffuseColor || Color.white;
-    const _diffuseMap: Texture | null = diffuseMap || null;
-    const _diffuseMapUvScale: Vector2 = diffuseMapUvScale || Vector2.one;
-    const _diffuseMapUvOffset: Vector2 = diffuseMapUvOffset || Vector2.zero;
-    const _roughness: number = roughness !== undefined ? roughness : 0;
-    const _roughnessMap: Texture | null = roughnessMap || null;
-    const _roughnessMapTiling: Vector4 = roughnessMapTiling || new Vector4(1, 1, 0, 0);
-    const _metallic: number = metallic || 0;
-    const _metallicMap: Texture | null = metallicMap || null;
-    const _metallicMapTiling: Vector4 = metallicMapTiling || new Vector4(1, 1, 0, 0);
-    const _normalMap: Texture | null = normalMap || null;
-    const _normalMapUvScale: Vector2 = normalMapUvScale || Vector2.one;
-    const _normalMapUvOffset: Vector2 = normalMapUvOffset || Vector2.zero;
-    const _emissiveColor: Color = emissiveColor || Color.black;
-    const _shadingModelId: ShadingModelIds = shadingModelId;
-
+    }: GBufferMaterialArgs = args;
+    
+    const diffuseColor: Color = args.diffuseColor || Color.white;
+    const diffuseMap: Texture | null = args.diffuseMap || null;
+    const diffuseMapUvScale: Vector2 = args.diffuseMapUvScale || Vector2.one;
+    const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || Vector2.zero;
+    const metallic: number = args.metallic || 0;
+    const metallicMap: Texture | null = args.metallicMap || null;
+    const metallicMapTiling: Vector4 = args.metallicMapTiling || new Vector4(1, 1, 0, 0);
+    const roughness: number = args.roughness !== undefined ? args.roughness : 0;
+    const roughnessMap: Texture | null = args.roughnessMap || null;
+    const roughnessMapTiling: Vector4 = args.roughnessMapTiling || new Vector4(1, 1, 0, 0);
+    const normalMap: Texture | null = args.normalMap || null;
+    const normalMapUvScale: Vector2 = args.normalMapUvScale || Vector2.one;
+    const normalMapUvOffset: Vector2 = args.normalMapUvOffset || Vector2.zero;
+    const emissiveColor: Color = args.emissiveColor || Color.black;
+    const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
+   
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.DiffuseColor,
             type: UniformTypes.Color,
-            value: _diffuseColor || Color.white,
+            value: diffuseColor || Color.white,
         },
         {
             name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
-            value: _diffuseMap || null,
+            value: diffuseMap || null,
         },
         {
             name: UniformNames.DiffuseMapUvScale,
             type: UniformTypes.Vector2,
             // value: Vector2.one,
-            value: _diffuseMapUvScale || Vector2.one,
+            value: diffuseMapUvScale || Vector2.one,
         },
         {
             name: UniformNames.DiffuseMapUvOffset,
             type: UniformTypes.Vector2,
             // value: Vector2.one,
-            value: _diffuseMapUvOffset || Vector2.one,
+            value: diffuseMapUvOffset || Vector2.one,
         },
         // uSpecularAmount: {
         //     type: UniformTypes.Float,
@@ -319,67 +301,67 @@ export function createGBufferMaterial({
         {
             name: UniformNames.Metallic,
             type: UniformTypes.Float,
-            value: _metallic,
+            value: metallic,
         },
         {
             name: UniformNames.MetallicMap,
             type: UniformTypes.Texture,
-            value: _metallicMap,
+            value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
             type: UniformTypes.Vector4,
-            value: _metallicMapTiling,
+            value: metallicMapTiling,
         },
         {
             name: UniformNames.Roughness,
             type: UniformTypes.Float,
-            value: _roughness,
+            value: roughness,
         },
         {
             name: UniformNames.RoughnessMap,
             type: UniformTypes.Texture,
-            value: _roughnessMap,
+            value: roughnessMap,
         },
         {
             name: UniformNames.RoughnessMapTiling,
             type: UniformTypes.Vector4,
-            value: _roughnessMapTiling,
+            value: roughnessMapTiling,
         },
         {
             name: UniformNames.MetallicMap,
             type: UniformTypes.Texture,
-            value: _metallicMap,
+            value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
             type: UniformTypes.Vector4,
-            value: _metallicMapTiling,
+            value: metallicMapTiling,
         },
         {
             name: UniformNames.NormalMap,
             type: UniformTypes.Texture,
-            value: _normalMap,
+            value: normalMap,
         },
         {
             name: UniformNames.NormalMapUvScale,
             type: UniformTypes.Vector2,
-            value: _normalMapUvScale,
+            value: normalMapUvScale,
         },
         {
             name: UniformNames.NormalMapUvOffset,
             type: UniformTypes.Vector2,
-            value: _normalMapUvOffset,
+            value: normalMapUvOffset,
         },
         {
             name: UniformNames.EmissiveColor,
             type: UniformTypes.Color,
-            value: _emissiveColor,
+            value: emissiveColor,
         },
         {
             name: UniformNames.ShadingModelId,
             type: UniformTypes.Int, // float,intどちらでもいい
-            value: _shadingModelId,
+            value: shadingModelId,
         },
     ];
 
@@ -389,17 +371,17 @@ export function createGBufferMaterial({
         {
             name: 'uDiffuseMap',
             type: UniformTypes.Texture,
-            value: _diffuseMap,
+            value: diffuseMap,
         },
         {
             name: 'uDiffuseMapUvScale',
             type: UniformTypes.Vector2,
-            value: _diffuseMapUvScale,
+            value: diffuseMapUvScale,
         },
         {
             name: 'uDiffuseMapUvOffset',
             type: UniformTypes.Vector2,
-            value: _diffuseMapUvOffset,
+            value: diffuseMapUvOffset,
         },
     ];
 
@@ -419,17 +401,31 @@ export function createGBufferMaterial({
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    const updateUniforms = () => {
-        setMaterialUniformValue(material, UniformNames.RoughnessMap, _roughnessMap);
-        setMaterialUniformValue(material, UniformNames.Roughness, _roughnessMap ? 1 : _roughness);
-        setMaterialUniformValue(material, UniformNames.RoughnessMapTiling, _roughnessMapTiling);
-        setMaterialUniformValue(material, UniformNames.MetallicMap, _metallicMap);
-        setMaterialUniformValue(material, UniformNames.Metallic, _metallicMap ? 1 : _metallic);
-        setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
-    };
+    // const updateUniforms = () => {
+    //     setMaterialUniformValue(material, UniformNames.RoughnessMap, _roughnessMap);
+    //     setMaterialUniformValue(material, UniformNames.Roughness, _roughnessMap ? 1 : _roughness);
+    //     setMaterialUniformValue(material, UniformNames.RoughnessMapTiling, _roughnessMapTiling);
+    //     setMaterialUniformValue(material, UniformNames.MetallicMap, _metallicMap);
+    //     setMaterialUniformValue(material, UniformNames.Metallic, _metallicMap ? 1 : _metallic);
+    //     setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
+    // };
 
     return {
         ...material,
-        updateUniforms,
-    };
+        diffuseColor,
+        diffuseMap,
+        diffuseMapUvScale,
+        diffuseMapUvOffset,
+        metallic,
+        metallicMap,
+        metallicMapTiling,
+        roughness,
+        roughnessMap,
+        roughnessMapTiling,
+        normalMap,
+        normalMapUvScale,
+        normalMapUvOffset,
+        emissiveColor,
+        vertexShaderModifier,
+    }
 }

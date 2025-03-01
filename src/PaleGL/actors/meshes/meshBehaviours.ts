@@ -20,6 +20,7 @@ import { UniformValue } from '@/PaleGL/core/uniforms.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import {updateMaterial} from "@/PaleGL/materials/materialBehaviours.ts";
 
 // start actor -------------------------------------------------------
 
@@ -150,7 +151,7 @@ export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMat
 // TODO: render前の方がよい気がする
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
-    mesh.materials.forEach((material) => material.updateUniforms());
+    mesh.materials.forEach((material) => updateMaterial(material));
 
     updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
 };
@@ -161,7 +162,7 @@ export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateM
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
-    mesh.depthMaterials.forEach((material) => material.updateUniforms());
+    mesh.depthMaterials.forEach((material) => updateMaterial(material));
 
     updateMeshDepthMaterialBehaviour[mesh.type]?.(mesh, { camera });
 };

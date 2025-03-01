@@ -1,5 +1,12 @@
 import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
-import { DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {
+    DepthFuncTypes,
+    MaterialTypes,
+    ShadingModelIds,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes
+} from '@/PaleGL/constants';
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -313,6 +320,7 @@ export function createScreenSpaceRaymarchMaterial({
     const material = createMaterial({
         ...options,
         name: 'ScreenSpaceRaymarchMaterial',
+        type: MaterialTypes.ScreenSpaceRaymarch,
         vertexShader: postprocessVert,
         fragmentShader,
         depthFragmentShader,

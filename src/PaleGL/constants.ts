@@ -106,6 +106,16 @@ export const MeshTypes = {
 
 export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
 
+export const MaterialTypes = {
+    Misc: 0,
+    GBuffer: 1,
+    ObjectSpaceRaymarch: 2,
+    ScreenSpaceRaymarch: 3,
+} as const;
+
+export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
+
+
 export const CameraTypes = {
     Perspective: 0,
     Orthographic: 1,

@@ -1,7 +1,7 @@
-import { MaterialArgs, MaterialTypes, createMaterial } from '@/PaleGL/materials/material.ts';
+import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
-    FaceSide,
+    FaceSide, MaterialTypes,
     PRAGMA_RAYMARCH_SCENE,
     PrimitiveTypes,
     ShadingModelIds,

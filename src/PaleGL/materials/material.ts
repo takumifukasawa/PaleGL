@@ -14,7 +14,7 @@ import {
     FragmentShaderModifier,
     DepthFuncType,
     DepthFuncTypes,
-    RenderQueueType,
+    RenderQueueType, MaterialTypes,
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
@@ -121,13 +121,6 @@ export type FragmentShaderGenerator = ({
 }) => string;
 
 export type DepthFragmentShaderGenerator = () => string;
-
-export const MaterialTypes = {
-    Misc: 0,
-    ObjectSpaceRaymarch: 1,
-} as const;
-
-export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
 
 // export class Material {
 //     name: string = '';
@@ -850,7 +843,7 @@ export type Material = {
     fragmentShaderModifier: FragmentShaderModifier,
     uniforms: Uniforms,
     depthUniforms: Uniforms,
-    updateUniforms: () => void,
+    // updateUniforms: () => void,
 }
 
 export const isCompiledMaterialShader = (material: Material) => material.shader !== null;
@@ -1113,7 +1106,7 @@ export function createMaterial(args: MaterialArgs): Material {
     /**
      * マテリアルごとにアップデートしたいuniformがあるとき
      */
-    const updateUniforms = () => {};
+    // const updateUniforms = () => {};
 
     return {
         name,
@@ -1159,7 +1152,7 @@ export function createMaterial(args: MaterialArgs): Material {
         vertexShaderModifier,
         fragmentShaderModifier,
         
-        updateUniforms,
+        // updateUniforms,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
