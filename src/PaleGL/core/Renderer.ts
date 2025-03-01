@@ -2639,7 +2639,7 @@ export class Renderer {
                             );
                             return;
                         }
-                        switch (material.getBlendType()) {
+                        switch (material.blendType) {
                             case BlendTypes.Opaque:
                                 renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
                                     this.buildRenderMeshInfo(actor as Mesh, RenderQueueType.Opaque, i)
@@ -3070,7 +3070,7 @@ export class Renderer {
         if (material.getDepthWrite() !== null) {
             depthWrite = material.getDepthWrite();
         } else {
-            switch (material.getBlendType()) {
+            switch (material.blendType) {
                 case BlendTypes.Opaque:
                     depthWrite = true;
                     break;
@@ -3104,11 +3104,11 @@ export class Renderer {
         // draw
         this._gpu.draw(
             geometry.drawCount,
-            material.getPrimitiveType(),
+            material.primitiveType,
             depthTest,
             depthWrite,
             depthFuncType,
-            material.getBlendType(),
+            material.blendType,
             material.getFaceSide(),
             geometry.instanceCount
         );

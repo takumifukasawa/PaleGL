@@ -913,19 +913,19 @@ export function createMaterial({
 
     const canRender: boolean = true;
 
-    let _type: MaterialTypes = type || MaterialTypes.Misc;
+    type = type || MaterialTypes.Misc;
 
     // 外側から任意のタイミングでcompileした方が都合が良さそう
     let _shader: Shader | null = null;
 
-    let _primitiveType: PrimitiveType = primitiveType || PrimitiveTypes.Triangles;
-    let _blendType: BlendType = blendType || BlendTypes.Opaque;
+    primitiveType = primitiveType || PrimitiveTypes.Triangles;
+    blendType = blendType || BlendTypes.Opaque;
 
     // let _renderQueue: RenderQueue | null = renderQueue || null;
     let _renderQueue: RenderQueue = renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
 
     if (_renderQueue) {
-        switch (_blendType) {
+        switch (blendType) {
             case BlendTypes.Opaque:
                 _renderQueue = RenderQueues[RenderQueueType.Opaque];
                 break;
@@ -1101,20 +1101,23 @@ export function createMaterial({
     return {
         name,
         canRender,
+        type, 
+        primitiveType,
+        blendType,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
         // setName: (name: string) => (_name = name),
         //getCanRender: () => _canRender,
         //setCanRender: (canRender: boolean) => (_canRender = canRender),
-        getType: () => _type,
-        setType: (type: MaterialTypes) => (_type = type),
+        // getType: () => _type,
+        // setType: (type: MaterialTypes) => (_type = type),
         getShader: () => _shader,
         setShader: (shader: Shader) => (_shader = shader),
-        getPrimitiveType: () => _primitiveType,
-        setPrimitiveType: (primitiveType: PrimitiveType) => (_primitiveType = primitiveType),
-        getBlendType: () => _blendType,
-        setBlendType: (blendType: BlendType) => (_blendType = blendType),
+        // getPrimitiveType: () => _primitiveType,
+        // setPrimitiveType: (primitiveType: PrimitiveType) => (_primitiveType = primitiveType),
+        // getBlendType: () => _blendType,
+        // setBlendType: (blendType: BlendType) => (_blendType = blendType),
         getRenderQueue: () => _renderQueue,
         setRenderQueue: (renderQueue: RenderQueue) => (_renderQueue = renderQueue),
         setUniformBlockNames: (uniformBlockNames: string[]) => (_uniformBlockNames = uniformBlockNames),
