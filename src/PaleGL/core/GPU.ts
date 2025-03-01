@@ -17,7 +17,8 @@
     GL_EQUAL,
     GL_FRAMEBUFFER,
     GL_FRONT,
-    GL_LEQUAL,
+    GL_LEQUAL, GL_LINE_LOOP,
+    GL_LINE_STRIP,
     GL_LINES,
     GL_ONE,
     GL_ONE_MINUS_SRC_ALPHA,
@@ -87,7 +88,6 @@ export const getAttributeUsage = (usageType: AttributeUsageType) => {
             return -1;
     }
 };
-
 
 export class GPU {
     gl: WebGL2RenderingContext;
@@ -282,6 +282,10 @@ export class GPU {
                 return GL_POINTS;
             case PrimitiveTypes.Lines:
                 return GL_LINES;
+            case PrimitiveTypes.LineLoop:
+                return GL_LINE_LOOP;
+            case PrimitiveTypes.LineStrip:
+                return GL_LINE_STRIP;
             case PrimitiveTypes.Triangles:
                 return GL_TRIANGLES;
             default:
@@ -436,12 +440,12 @@ export class GPU {
     }
 
     updateTransformFeedback({
-                                shader,
-                                uniforms,
-                                transformFeedback,
-                                vertexArrayObject,
-                                drawCount,
-                            }: {
+        shader,
+        uniforms,
+        transformFeedback,
+        vertexArrayObject,
+        drawCount,
+    }: {
         shader: Shader;
         uniforms: Uniforms;
         transformFeedback: TransformFeedback;

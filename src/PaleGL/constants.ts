@@ -585,6 +585,8 @@ export const GL_COLOR_BUFFER_BIT = 16384;
 
 export const GL_POINTS = 0;
 export const GL_LINES = 1;
+export const GL_LINE_LOOP = 2;
+export const GL_LINE_STRIP = 3;
 export const GL_TRIANGLES = 4;
 
 export const GL_RASTERIZER_DISCARD = 35977;
