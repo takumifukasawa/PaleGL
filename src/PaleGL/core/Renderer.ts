@@ -3084,9 +3084,6 @@ export class Renderer {
             }
         }
 
-        // depth func type
-        const depthFuncType = material.getDepthFuncType();
-
         // console.log(
         //     geometry.getDrawCount(),
         //     material.getPrimitiveType(),
@@ -3104,9 +3101,9 @@ export class Renderer {
             material.primitiveType,
             !!material.depthTest,
             depthWrite,
-            depthFuncType,
+            material.depthFuncType,
             material.blendType,
-            material.getFaceSide(),
+            material.faceSide,
             geometry.instanceCount
         );
     }

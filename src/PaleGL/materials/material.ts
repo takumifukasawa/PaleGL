@@ -948,11 +948,12 @@ export function createMaterial(args: MaterialArgs) {
     depthTest = !!depthTest;
     // let _depthWrite: boolean | null = !!depthWrite;
     depthWrite = !!depthWrite;
-    let _depthFuncType: DepthFuncType = depthFuncType;
+    
+    // let _depthFuncType: DepthFuncType = depthFuncType;
     let _skipDepthPrePass: boolean | null = !!skipDepthPrePass;
     let _alphaTest: number | null = typeof alphaTest === 'number' ? alphaTest : null;
     // culling;
-    let _faceSide: FaceSide = faceSide || FaceSide.Front;
+    // let _faceSide: FaceSide = faceSide || FaceSide.Front;
     let _receiveShadow: boolean = !!receiveShadow;
     let _queue: RenderQueue | null = queue || null;
 
@@ -1115,6 +1116,8 @@ export function createMaterial(args: MaterialArgs) {
         uniformBlockNames,
         depthTest,
         depthWrite,
+        depthFuncType,
+        faceSide,
         // ----------------------------------------
         // // // getter, setter
         // getName: () => _name,
@@ -1136,14 +1139,14 @@ export function createMaterial(args: MaterialArgs) {
         // setDepthTest: (depthTest: boolean | null) => (_depthTest = depthTest),
         // getDepthWrite: () => _depthWrite,
         // setDepthWrite: (depthWrite: boolean) => (_depthWrite = depthWrite),
-        getDepthFuncType: () => _depthFuncType,
-        setDepthFuncType: (depthFuncType: DepthFuncType) => (_depthFuncType = depthFuncType),
+        // getDepthFuncType: () => _depthFuncType,
+        // setDepthFuncType: (depthFuncType: DepthFuncType) => (_depthFuncType = depthFuncType),
         getSkipDepthPrePass: () => _skipDepthPrePass,
         setSkipDepthPrePass: (skipDepth: boolean | null) => (_skipDepthPrePass = skipDepth),
         getAlphaTest: () => _alphaTest,
         setAlphaTest: (alphaTest: number | null) => (_alphaTest = alphaTest),
-        getFaceSide: () => _faceSide,
-        setFaceSide: (faceSide: FaceSide) => (_faceSide = faceSide),
+        // getFaceSide: () => _faceSide,
+        // setFaceSide: (faceSide: FaceSide) => (_faceSide = faceSide),
         getReceiveShadow: () => _receiveShadow,
         setReceiveShadow: (receiveShadow: boolean) => (_receiveShadow = receiveShadow),
         getQueue: () => _queue,
