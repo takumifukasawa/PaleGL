@@ -1,9 +1,10 @@
 
-function fillFunc<T>(arr: T[], value: T): T[] {
+function fillFunc<T>(arr: T[], ...value: T[]): T[] {
     // 非破壊
     const newArr = [...arr];
     for (let i = 0; i < arr.length; i++) {
-        newArr[i] = value;
+        // newArr[arr.length] = value[i];
+        newArr.push(value[i]);
     }
     return newArr;
 
@@ -28,12 +29,16 @@ function compactFunc<T>(arr: T[]): T[] {
     return newArr.filter(Boolean);
 }
 
+// function float32ArrayFunc(arr: number[]): Float32Array {
+//     return new Float32Array(arr);
+// }
+
 type MatonWrapper<T> = {
     value: () => T[];
-    // fill: () => T[]
     fill: () => MatonWrapper<T>;
     range: (length: number) => MatonWrapper<T>;
     compact: () => MatonWrapper<Exclude<T, null | undefined>>;
+    // toFloat32Array: () => Float32Array;
 };
 
 function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
@@ -41,13 +46,15 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
 
     function fill(...args: T[]): MatonWrapper<T> {
         // TODO: tmpにassignしないとダメな気がする
-        fillFunc(tmp, args[0]);
+        // fillFunc(tmp, args[0]);
+        fillFunc(tmp, ...args);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
     }
     
     function range(length: number): MatonWrapper<T> {
+        // TODO: tmpにassignしないとダメな気がする
         rangeFunc(length);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -61,6 +68,10 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         // @ts-ignore
         return this as MatonWrapper<T>;
     }
+    
+    // function toFloat32Array(): MatonWrapper<T>  {
+    //     return float32ArrayFunc(tmp as number[]);
+    // }
 
     const value = () => {
         return tmp;
@@ -71,6 +82,7 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         fill,
         range,
         compact,
+        // toFloat32Array 
     };
 }
 
@@ -82,5 +94,6 @@ const maton = <T>(obj: T[] = []) => {
 maton.fill = fillFunc;
 maton.range = rangeFunc;
 maton.compact = compactFunc;
+// maton.toFloat32Array = float32ArrayFunc;
 
 export { maton };
