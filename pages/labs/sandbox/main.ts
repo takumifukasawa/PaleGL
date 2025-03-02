@@ -62,7 +62,13 @@ import {
     RAD_TO_DEG,
 } from '@/PaleGL/constants';
 
-import { createDebuggerGUI, DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
+import {
+    addDebuggerBorderSpacer,
+    addButtonDebugger,
+    addSliderDebugger, addToggleDebugger,
+    createDebuggerGUI,
+    DebuggerGUI, addDebugGroup, addColorDebugger
+} from '@/PaleGL/utilities/debuggerGUI.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
@@ -115,18 +121,20 @@ const fontAtlasImgUrl = './assets/fonts/NotoSans-Bold/atlas.png';
 const fontAtlasJsonUrl = './assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 const gltfButterflyModelUrl = './assets/models/butterfly-forward-thin.gltf';
 
-const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
-    debuggerGUI.addBorderSpacer();
+const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight, label: string) => {
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const spotLightDebuggerGroup = debuggerGUI.addGroup(label, false);
+    const spotLightDebuggerGroup = addDebugGroup(debuggerGUI, label, false);
 
-    spotLightDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(
+        spotLightDebuggerGroup,
+        {
         label: 'light enabled',
         initialValue: spotLight.enabled,
         onChange: (value) => (spotLight.enabled = value),
     });
 
-    spotLightDebuggerGroup.addColorDebugger({
+    addColorDebugger(spotLightDebuggerGroup,{
         label: 'color',
         initialValue: spotLight.color.getHexCoord(),
         onChange: (value) => {
@@ -134,7 +142,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'intensity',
         minValue: 0,
         maxValue: 10,
@@ -145,7 +153,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'distance',
         minValue: 0,
         maxValue: 100,
@@ -156,7 +164,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup,{
         label: 'attenuation',
         minValue: 0,
         maxValue: 10,
@@ -167,7 +175,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup,{
         label: 'coneAngle',
         minValue: 0,
         maxValue: 180,
@@ -178,7 +186,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'penumbraAngle',
         minValue: 0,
         maxValue: 180,
@@ -189,7 +197,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'pos x',
         minValue: -10,
         maxValue: 10,
@@ -200,7 +208,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'pos y',
         minValue: 0,
         maxValue: 10,
@@ -211,7 +219,7 @@ const createSpotLightDebugger = (spotLight: SpotLight, label: string) => {
         },
     });
 
-    spotLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(spotLightDebuggerGroup, {
         label: 'pos z',
         minValue: -10,
         maxValue: 10,
@@ -343,8 +351,8 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-// const engine = createEngine({ gpu, renderer });
-const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
+const engine = createEngine({ gpu, renderer });
+// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -1910,7 +1918,9 @@ void main() {
 function initDebugger() {
     debuggerGUI = createDebuggerGUI();
 
-    debuggerGUI.addSliderDebugger({
+    addSliderDebugger(
+        debuggerGUI,
+        {
         label: 'instance num',
         minValue: 1,
         maxValue: 40000,
@@ -1921,7 +1931,7 @@ function initDebugger() {
         },
     });
 
-    debuggerGUI.addButtonDebugger({
+    addButtonDebugger(debuggerGUI,{
         buttonLabel: 'reload',
         onClick: () => {
             const url = `${location.origin}${location.pathname}?instance-num=${debuggerStates.instanceNum}`;
@@ -1933,9 +1943,9 @@ function initDebugger() {
     // play sound
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    debuggerGUI.addButtonDebugger({
+    addButtonDebugger(debuggerGUI, {
         buttonLabel: 'play sound',
         onClick: () => {
             playSound();
@@ -1946,9 +1956,11 @@ function initDebugger() {
     // orbit controls
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    debuggerGUI.addToggleDebugger({
+    addToggleDebugger(
+        debuggerGUI,
+        {
         label: 'orbit controls enabled',
         // initialValue: debuggerStates.orbitControlsEnabled,
         // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
@@ -1960,9 +1972,9 @@ function initDebugger() {
     // show buffers
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    debuggerGUI.addToggleDebugger({
+    addToggleDebugger(debuggerGUI,{
         label: 'show buffers',
         initialValue: bufferVisualizerPass.parameters.enabled,
         onChange: (value) => {
@@ -1980,11 +1992,11 @@ function initDebugger() {
     // object space raymarch
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const objectSpaceRaymarchMeshDebuggerGroup = debuggerGUI.addGroup('object space raymarch', false);
+    const objectSpaceRaymarchMeshDebuggerGroup = addDebugGroup(debuggerGUI, 'object space raymarch', false);
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'pos x',
         minValue: -10,
         maxValue: 10,
@@ -1995,7 +2007,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'pos y',
         minValue: 0,
         maxValue: 10,
@@ -2006,7 +2018,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'pos z',
         minValue: -10,
         maxValue: 10,
@@ -2017,7 +2029,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'scale x',
         minValue: 0,
         maxValue: 5,
@@ -2028,7 +2040,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'scale y',
         minValue: 0,
         maxValue: 5,
@@ -2039,7 +2051,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'scale z',
         minValue: 0,
         maxValue: 5,
@@ -2050,7 +2062,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'rotation x',
         minValue: 0,
         maxValue: 360,
@@ -2061,7 +2073,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'rotation y',
         minValue: 0,
         maxValue: 360,
@@ -2072,7 +2084,7 @@ function initDebugger() {
         },
     });
 
-    objectSpaceRaymarchMeshDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup,{
         label: 'rotation z',
         minValue: 0,
         maxValue: 360,
@@ -2087,17 +2099,17 @@ function initDebugger() {
     // directional light
     //
 
-    debuggerGUI.addBorderSpacer();
+   addDebuggerBorderSpacer(debuggerGUI) ;
 
-    const directionalLightDebuggerGroup = debuggerGUI.addGroup('directional light', false);
+    const directionalLightDebuggerGroup = addDebugGroup(debuggerGUI, 'directional light', false);
 
-    directionalLightDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(directionalLightDebuggerGroup,{
         label: 'light enabled',
         initialValue: directionalLight.enabled,
         onChange: (value) => (directionalLight.enabled = value),
     });
 
-    directionalLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(directionalLightDebuggerGroup,{
         label: 'intensity',
         minValue: 0,
         maxValue: 4,
@@ -2108,7 +2120,7 @@ function initDebugger() {
         },
     });
 
-    directionalLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(directionalLightDebuggerGroup,{
         label: 'pos x',
         minValue: -10,
         maxValue: 10,
@@ -2119,7 +2131,7 @@ function initDebugger() {
         },
     });
 
-    directionalLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(directionalLightDebuggerGroup,{
         label: 'pos y',
         minValue: 0,
         maxValue: 10,
@@ -2130,7 +2142,7 @@ function initDebugger() {
         },
     });
 
-    directionalLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(directionalLightDebuggerGroup,{
         label: 'pos z',
         minValue: -10,
         maxValue: 10,
@@ -2145,25 +2157,25 @@ function initDebugger() {
     // spot light
     //
 
-    createSpotLightDebugger(spotLight1, 'spot light 1');
-    createSpotLightDebugger(spotLight2, 'spot light 2');
+    createSpotLightDebugger(debuggerGUI, spotLight1, 'spot light 1');
+    createSpotLightDebugger(debuggerGUI, spotLight2, 'spot light 2');
 
     //
     // ssao
     // TODO: ssao pass の参照を renderer に変える
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const ssaoDebuggerGroup = debuggerGUI.addGroup('ssao', false);
+    const ssaoDebuggerGroup = addDebugGroup(debuggerGUI, 'ssao', false);
 
-    ssaoDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(ssaoDebuggerGroup,{
         label: 'ssao pass enabled',
         initialValue: renderer.ambientOcclusionPass.parameters.enabled,
         onChange: (value) => (renderer.ambientOcclusionPass.parameters.enabled = value),
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao occlusion sample length',
         minValue: 0.01,
         maxValue: 1,
@@ -2174,7 +2186,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao occlusion bias',
         minValue: 0.0001,
         maxValue: 0.01,
@@ -2185,7 +2197,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao min distance',
         minValue: 0,
         maxValue: 0.1,
@@ -2196,7 +2208,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao max distance',
         minValue: 0,
         maxValue: 1,
@@ -2207,7 +2219,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addColorDebugger({
+    addColorDebugger(ssaoDebuggerGroup,{
         label: 'ssao color',
         initialValue: renderer.ambientOcclusionPass.occlusionColor.getHexCoord(),
         onChange: (value) => {
@@ -2215,7 +2227,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao occlusion power',
         minValue: 0.5,
         maxValue: 4,
@@ -2226,7 +2238,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao occlusion strength',
         minValue: 0,
         maxValue: 1,
@@ -2237,7 +2249,7 @@ function initDebugger() {
         },
     });
 
-    ssaoDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssaoDebuggerGroup,{
         label: 'ssao blend rate',
         minValue: 0,
         maxValue: 1,
@@ -2252,17 +2264,17 @@ function initDebugger() {
     // light shaft
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const lightShaftDebuggerGroup = debuggerGUI.addGroup('light shaft', false);
+    const lightShaftDebuggerGroup = addDebugGroup(debuggerGUI, 'light shaft', false);
 
-    lightShaftDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(lightShaftDebuggerGroup,{
         label: 'light shaft pass enabled',
         initialValue: renderer.lightShaftPass.parameters.enabled,
         onChange: (value) => (renderer.lightShaftPass.parameters.enabled = value),
     });
 
-    lightShaftDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(lightShaftDebuggerGroup,{
         label: 'blend rate',
         minValue: 0,
         maxValue: 1,
@@ -2273,7 +2285,7 @@ function initDebugger() {
         },
     });
 
-    lightShaftDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(lightShaftDebuggerGroup,{
         label: 'pass scale',
         minValue: 0.001,
         maxValue: 1,
@@ -2284,7 +2296,7 @@ function initDebugger() {
         },
     });
 
-    lightShaftDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(lightShaftDebuggerGroup,{
         label: 'ray step strength',
         minValue: 0.001,
         maxValue: 0.05,
@@ -2299,11 +2311,11 @@ function initDebugger() {
     // light volume pass
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const volumetricLightDebuggerGroup = debuggerGUI.addGroup('volumetric light', false);
+    const volumetricLightDebuggerGroup = addDebugGroup(debuggerGUI, 'volumetric light', false);
 
-    volumetricLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(volumetricLightDebuggerGroup,{
         label: 'ray step',
         initialValue: renderer.volumetricLightPass.parameters.rayStep,
         minValue: 0.001,
@@ -2313,7 +2325,7 @@ function initDebugger() {
             renderer.volumetricLightPass.parameters.rayStep = value;
         },
     });
-    volumetricLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(volumetricLightDebuggerGroup,{
         label: 'density multiplier',
         initialValue: renderer.volumetricLightPass.parameters.densityMultiplier,
         minValue: 0.001,
@@ -2323,7 +2335,7 @@ function initDebugger() {
             renderer.volumetricLightPass.parameters.densityMultiplier = value;
         },
     });
-    volumetricLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(volumetricLightDebuggerGroup,{
         label: 'jitter size x',
         initialValue: renderer.volumetricLightPass.parameters.rayJitterSize.x,
         minValue: 0,
@@ -2333,7 +2345,7 @@ function initDebugger() {
             renderer.volumetricLightPass.parameters.rayJitterSize.x = value;
         },
     });
-    volumetricLightDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(volumetricLightDebuggerGroup,{
         label: 'jitter size y',
         initialValue: renderer.volumetricLightPass.parameters.rayJitterSize.y,
         minValue: 0,
@@ -2348,9 +2360,9 @@ function initDebugger() {
     // fog
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const fogDebuggerGroup = debuggerGUI.addGroup('fog', false);
+    const fogDebuggerGroup = addDebugGroup(debuggerGUI, 'fog', false);
 
     // fogDebuggerGroup.addToggleDebugger({
     //     label: 'fog pass enabled',
@@ -2360,7 +2372,8 @@ function initDebugger() {
 
     // return;
 
-    fogDebuggerGroup.addColorDebugger({
+    addColorDebugger(
+    fogDebuggerGroup, {
         label: 'fog color',
         initialValue: renderer.fogPass.parameters.fogColor.getHexCoord(),
         onChange: (value) => {
@@ -2368,7 +2381,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'strength',
         minValue: 0,
         maxValue: 0.2,
@@ -2379,7 +2392,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'density',
         minValue: 0,
         maxValue: 1,
@@ -2390,7 +2403,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'attenuation',
         minValue: 0,
         maxValue: 1,
@@ -2401,7 +2414,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'fog end height',
         minValue: -5,
         maxValue: 5,
@@ -2412,7 +2425,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'distance fog start',
         minValue: 0,
         maxValue: 300,
@@ -2423,7 +2436,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'distance fog end',
         minValue: 0,
         maxValue: 300,
@@ -2434,7 +2447,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'distance fog power',
         minValue: 0,
         maxValue: 0.2,
@@ -2445,7 +2458,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'sss fog rate',
         minValue: 0,
         maxValue: 1,
@@ -2456,7 +2469,7 @@ function initDebugger() {
         },
     });
 
-    fogDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(fogDebuggerGroup,{
         label: 'blend rate',
         minValue: 0,
         maxValue: 1,
@@ -2471,17 +2484,17 @@ function initDebugger() {
     // depth of field
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const dofDebuggerGroup = debuggerGUI.addGroup('depth of field', false);
+    const dofDebuggerGroup = addDebugGroup(debuggerGUI, 'depth of field', false);
 
-    dofDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(dofDebuggerGroup,{
         label: 'DoF pass enabled',
         initialValue: renderer.depthOfFieldPass.enabled,
         onChange: (value) => (renderer.depthOfFieldPass.enabled = value),
     });
 
-    dofDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(dofDebuggerGroup,{
         label: 'DoF focus distance',
         minValue: 0.1,
         maxValue: 100,
@@ -2492,7 +2505,7 @@ function initDebugger() {
         },
     });
 
-    dofDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(dofDebuggerGroup,{
         label: 'DoF focus range',
         minValue: 0.1,
         maxValue: 20,
@@ -2503,7 +2516,7 @@ function initDebugger() {
         },
     });
 
-    dofDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(dofDebuggerGroup,{
         label: 'DoF bokeh radius',
         minValue: 0.01,
         maxValue: 10,
@@ -2518,17 +2531,17 @@ function initDebugger() {
     // bloom
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI)
 
-    const bloomDebuggerGroup = debuggerGUI.addGroup('bloom', false);
+    const bloomDebuggerGroup = addDebugGroup(debuggerGUI, 'bloom', false);
 
-    bloomDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(bloomDebuggerGroup,{
         label: 'Bloom pass enabled',
         initialValue: renderer.bloomPass.parameters.enabled,
         onChange: (value) => (renderer.bloomPass.parameters.enabled = value),
     });
 
-    bloomDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(bloomDebuggerGroup,{
         label: 'bloom amount',
         minValue: 0,
         maxValue: 4,
@@ -2539,7 +2552,7 @@ function initDebugger() {
         },
     });
 
-    bloomDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(bloomDebuggerGroup, {
         label: 'bloom threshold',
         minValue: 0,
         maxValue: 2,
@@ -2550,7 +2563,7 @@ function initDebugger() {
         },
     });
 
-    bloomDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(bloomDebuggerGroup,{
         label: 'bloom tone',
         minValue: 0,
         maxValue: 1,
@@ -2565,17 +2578,17 @@ function initDebugger() {
     // ssr debuggers
     //
 
-    debuggerGUI.addBorderSpacer();
+    addDebuggerBorderSpacer(debuggerGUI);
 
-    const ssrDebuggerGroup = debuggerGUI.addGroup('ssr', false);
+    const ssrDebuggerGroup = addDebugGroup(debuggerGUI, 'ssr', false);
 
-    ssrDebuggerGroup.addToggleDebugger({
+    addToggleDebugger(debuggerGUI, {
         label: 'ssr pass enabled',
         initialValue: renderer.ssrPass.parameters.enabled,
         onChange: (value) => (renderer.ssrPass.parameters.enabled = value),
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'depth bias',
         minValue: 0.001,
         maxValue: 0.1,
@@ -2586,7 +2599,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'ray nearest distance',
         minValue: 0.001,
         maxValue: 1,
@@ -2597,7 +2610,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'ray max distance',
         minValue: 0.001,
         maxValue: 10,
@@ -2608,7 +2621,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'ray thickness',
         minValue: 0.001,
         maxValue: 1,
@@ -2619,7 +2632,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'jitter size x',
         minValue: 0.001,
         maxValue: 0.1,
@@ -2630,7 +2643,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'jitter size y',
         minValue: 0.001,
         maxValue: 0.1,
@@ -2641,7 +2654,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'fade min distance',
         minValue: 0.001,
         maxValue: 10,
@@ -2652,7 +2665,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'fade max distance',
         minValue: 0.001,
         maxValue: 10,
@@ -2663,7 +2676,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'edge fade factor min x',
         minValue: 0.001,
         maxValue: 1,
@@ -2674,7 +2687,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'edge fade factor max x',
         minValue: 0.001,
         maxValue: 1,
@@ -2685,7 +2698,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'edge fade factor min y',
         minValue: 0.001,
         maxValue: 1,
@@ -2696,7 +2709,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'edge fade factor max y',
         minValue: 0.001,
         maxValue: 1,
@@ -2707,7 +2720,7 @@ function initDebugger() {
         },
     });
 
-    ssrDebuggerGroup.addSliderDebugger({
+    addSliderDebugger(ssrDebuggerGroup,{
         label: 'additional rate',
         minValue: 0.01,
         maxValue: 1,
@@ -2733,7 +2746,7 @@ function initDebugger() {
     // add debugger ui
     //
 
-    wrapperElement.appendChild(debuggerGUI.getDomElement());
+    wrapperElement.appendChild(debuggerGUI.rootElement);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
