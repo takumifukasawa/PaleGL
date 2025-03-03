@@ -21,28 +21,6 @@ import { GPU } from '@/PaleGL/core/GPU';
 //     [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement;
 // };
 
-export function createCubeMapInternal(
-    gpu: GPU,
-    posXImage: HTMLImageElement | HTMLCanvasElement,
-    negXImage: HTMLImageElement | HTMLCanvasElement,
-    posYImage: HTMLImageElement | HTMLCanvasElement,
-    negYImage: HTMLImageElement | HTMLCanvasElement,
-    posZImage: HTMLImageElement | HTMLCanvasElement,
-    negZImage: HTMLImageElement | HTMLCanvasElement
-) {
-    return createCubeMap(
-        gpu,
-        posXImage.width,
-        posXImage.height,
-        posXImage,
-        negXImage,
-        posYImage,
-        negYImage,
-        posZImage,
-        negZImage
-    );
-}
-
 export async function loadCubeMap(
     gpu: GPU,
     posXImage: string,
@@ -99,7 +77,7 @@ export async function loadCubeMap(
         // result.forEach(({ axis, img }) => {
         //     data[axis] = img;
         // });
-        return createCubeMapInternal(gpu, ...result.map(({ img }) => img));
+        return createCubeMap(gpu, ...result.map(({ img }) => img));
         // return new CubeMap({
         //     gpu,
         //     images: data,

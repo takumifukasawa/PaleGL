@@ -95,8 +95,7 @@
 // }
 
 
-import { createGLObject, GlObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-// import { CubeMapAxis } from '@/PaleGL/constants.js';
+import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import {
     GL_RGBA,
@@ -132,7 +131,7 @@ export type CubeMap = GLObjectBase<WebGLTexture> & {
     maxLodLevel: number;
 };
 
-export function createCubeMap(
+function createCubeMapInternal(
     gpu: GPU,
     width: number,
     height: number,
@@ -150,7 +149,7 @@ export function createCubeMap(
     // NOTE: 作れるはずという前提
     const texture = gl.createTexture()!;
 
-    gl.bindTexture(GL_TEXTURE_CUBE_MAP, this.#texture);
+    gl.bindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
     // cubemapの場合は html img でも falseで良い。というのがよくわかってない。そういうもの？
     // ただ、たしかに反転すると上下が反転して見た目がおかしくなる
@@ -179,5 +178,29 @@ export function createCubeMap(
         height,
         maxLodLevel,
     };
+}
+
+export function createCubeMap(
+    gpu: GPU,
+    posXImage: HTMLImageElement | HTMLCanvasElement,
+    negXImage: HTMLImageElement | HTMLCanvasElement,
+    posYImage: HTMLImageElement | HTMLCanvasElement,
+    negYImage: HTMLImageElement | HTMLCanvasElement,
+    posZImage: HTMLImageElement | HTMLCanvasElement,
+    negZImage: HTMLImageElement | HTMLCanvasElement,
+    width: number = -1,
+    height: number = -1
+) {
+    return createCubeMapInternal(
+        gpu,
+        width > -1 ? width : posXImage.width,
+        height > -1 ? height : posXImage.height,
+        posXImage,
+        negXImage,
+        posYImage,
+        negYImage,
+        posZImage,
+        negZImage
+    );
 }
 

@@ -49,10 +49,9 @@ import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
-import { CubeMap } from '@/PaleGL/core/CubeMap';
+import { createCubeMap, CubeMap } from '@/PaleGL/core/CubeMap';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
-import { createCubeMap } from '@/PaleGL/loaders/loadCubeMap.ts';
 import {
     UniformBufferObjectBlockData,
     Uniforms,
