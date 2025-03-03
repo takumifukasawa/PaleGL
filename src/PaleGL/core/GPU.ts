@@ -60,7 +60,7 @@ import {
     UniformStructValue,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
-import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
+import { createUniformBufferObject, UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
@@ -671,7 +671,7 @@ export class GPU {
         const offsets = gl.getActiveUniforms(shader.glObject, indices, GL_UNIFORM_OFFSET) as number[];
         // for debug
         // console.log('[GPU.createUniformBufferObject] offsets', offsets);
-        const uniformBufferObject = new UniformBufferObject(
+        const uniformBufferObject = createUniformBufferObject(
             this,
             blockName,
             blockSize,

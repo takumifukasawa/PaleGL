@@ -1,8 +1,8 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { GLObject } from '@/PaleGL/core/GLObject.ts';
+import { GlObject } from '@/PaleGL/core/glObject.ts';
 import { GL_ARRAY_BUFFER, GL_TRANSFORM_FEEDBACK, GL_TRANSFORM_FEEDBACK_BUFFER } from '@/PaleGL/constants.ts';
 
-export class TransformFeedback extends GLObject {
+export class TransformFeedback extends GlObject {
     _transformFeedback: WebGLTransformFeedback;
     _gpu: GPU;
 

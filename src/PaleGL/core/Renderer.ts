@@ -50,7 +50,11 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Shader } from '@/PaleGL/core/Shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
-import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
+import {
+    UniformBufferObject,
+    updateUniformBufferData,
+    updateUniformBufferValue,
+} from '@/PaleGL/core/UniformBufferObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -3150,7 +3154,7 @@ export class Renderer {
             return;
         }
 
-        targetUbo.updateUniformValue(uniformName, targetUniformData.type, value);
+        updateUniformBufferValue(targetUbo, uniformName, targetUniformData.type, value);
     }
 
     private depthPrePass(depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
@@ -3460,7 +3464,7 @@ export class Renderer {
                 (value as unknown as UniformBufferObjectStructValue).forEach((v) => {
                     const structElementName = `${uniformName}.${v.name}`;
                     const data: number[] = getStructElementValue(v.type, v.value);
-                    targetUbo.updateBufferData(structElementName, new Float32Array(data));
+                    updateUniformBufferData(targetUbo, structElementName, new Float32Array(data));
                 });
                 break;
             case UniformTypes.StructArray:
@@ -3471,7 +3475,7 @@ export class Renderer {
                         if (showLog) {
                             // console.log(structElementName, data);
                         }
-                        targetUbo.updateBufferData(structElementName, new Float32Array(data), showLog);
+                        updateUniformBufferData(targetUbo, structElementName, new Float32Array(data), showLog);
                     });
                 });
                 break;
@@ -3493,9 +3497,10 @@ export class Renderer {
                             data.push(...(v as UniformBufferObjectElementValueNoNeedsPadding).e);
                         }
                     });
-                    targetUbo.updateBufferData(uniformName, new Float32Array(data));
+                    updateUniformBufferData(targetUbo, uniformName, new Float32Array(data));
                 } else {
-                    targetUbo.updateBufferData(
+                    updateUniformBufferData(
+                        targetUbo,
                         uniformName,
                         typeof value === 'number'
                             ? new Float32Array([value])

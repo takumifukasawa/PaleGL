@@ -1,4 +1,4 @@
-﻿import { GLObject } from '@/PaleGL/core/GLObject';
+﻿import { GlObject } from '@/PaleGL/core/glObject.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { GL_FRAGMENT_SHADER, GL_SEPARATE_ATTRIBS, GL_VERTEX_SHADER } from '@/PaleGL/constants.ts';
 
@@ -24,7 +24,7 @@ function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
     return shader;
 }
 
-export class Shader extends GLObject {
+export class Shader extends GlObject {
     _program: WebGLProgram | null;
     _gpu: GPU;
 

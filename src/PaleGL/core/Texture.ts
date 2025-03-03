@@ -1,4 +1,4 @@
-﻿import { GLObject } from '@/PaleGL/core/GLObject';
+﻿import { GlObject } from '@/PaleGL/core/glObject.ts';
 import {
     GL_DEPTH_COMPONENT,
     GL_DEPTH_COMPONENT16,
@@ -94,7 +94,7 @@ export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
 // ref:
 // https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
 // TODO: texStorage2Dを使う場合と出し分ける
-export class Texture extends GLObject {
+export class Texture extends GlObject {
     _texture: WebGLTexture;
     _img: HTMLImageElement | HTMLCanvasElement | null = null;
     _gpu: GPU;

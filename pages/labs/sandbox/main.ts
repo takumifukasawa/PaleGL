@@ -351,8 +351,8 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-const engine = createEngine({ gpu, renderer });
-// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
+// const engine = createEngine({ gpu, renderer });
+const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);

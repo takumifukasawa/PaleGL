@@ -1,4 +1,4 @@
-﻿import { GLObject } from '@/PaleGL/core/GLObject.js';
+﻿import { GlObject } from '@/PaleGL/core/glObject.ts';
 // import { CubeMapAxis } from '@/PaleGL/constants.js';
 import { GPU } from '@/PaleGL/core/GPU';
 import {
@@ -29,7 +29,7 @@ import {
 //     height: number;
 // };
 
-export class CubeMap extends GLObject {
+export class CubeMap extends GlObject {
     #texture: WebGLTexture;
     width: number;
     height: number;
