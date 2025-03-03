@@ -269,7 +269,7 @@
 
 import { GlObject } from '@/PaleGL/core/glObject.ts';
 // import { AttributeUsageType } from '@/PaleGL/constants.js';
-import { createIndexBufferObject, IndexBufferObject, unbindIndexBufferObject } from '@/PaleGL/core/IndexBufferObject';
+import { createIndexBufferObject, IndexBufferObject, unbindIndexBufferObject } from '@/PaleGL/core/indexBufferObject.ts';
 import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
 import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { GL_ARRAY_BUFFER, GL_FLOAT, GL_UNSIGNED_SHORT } from '@/PaleGL/constants.ts';

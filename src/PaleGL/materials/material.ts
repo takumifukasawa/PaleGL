@@ -34,7 +34,7 @@ import {
     UniformsData,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
-// import {UniformBufferObject} from "@/PaleGL/core/UniformBufferObject.ts";
+// import {UniformBufferObject} from "@/PaleGL/core/uniformBufferObject.ts";
 
 export type MaterialArgs = {
     type?: MaterialTypes;

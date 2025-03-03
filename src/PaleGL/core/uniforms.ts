@@ -6,7 +6,7 @@ import { Texture } from '@/PaleGL/core/Texture.ts';
 import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { UniformTypes } from '@/PaleGL/constants.ts';
-import { UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
+import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
 
 //
 // uniform values

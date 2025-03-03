@@ -1,5 +1,5 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
-import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
+import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { GPU } from '@/PaleGL/core/GPU';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';

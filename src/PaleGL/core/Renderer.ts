@@ -54,7 +54,7 @@ import {
     UniformBufferObject,
     updateUniformBufferData,
     updateUniformBufferValue,
-} from '@/PaleGL/core/UniformBufferObject.ts';
+} from '@/PaleGL/core/uniformBufferObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';

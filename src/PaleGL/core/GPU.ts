@@ -42,7 +42,7 @@
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/Shader';
-import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject';
+import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
 import { Framebuffer } from '@/PaleGL/core/Framebuffer';
 // import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';
@@ -60,7 +60,7 @@ import {
     UniformStructValue,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
-import { createUniformBufferObject, UniformBufferObject } from '@/PaleGL/core/UniformBufferObject.ts';
+import { createUniformBufferObject, UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
 
 export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
