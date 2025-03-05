@@ -42,7 +42,7 @@
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/Shader';
-import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
 import { Framebuffer } from '@/PaleGL/core/Framebuffer';
 // import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';
@@ -597,7 +597,8 @@ export class GPU {
         gl.bindVertexArray(this._vao.glObject);
 
         // if (this.#ibo) {
-        if (this._vao.hasIndices) {
+        
+        if (hasIndicesVertexArrayObject(this._vao)) {
             // draw by indices
             // drawCount ... use indices count
             if (instanceCount !== null) {

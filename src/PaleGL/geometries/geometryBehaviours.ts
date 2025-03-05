@@ -1,6 +1,9 @@
 import { Attribute, createAttribute, getAttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeUsageType } from '@/PaleGL/constants.ts';
+import {
+    setVertexArrayObjectAttribute, updateVertexArrayObjectBufferData,
+} from '@/PaleGL/core/VertexArrayObject.ts';
 
 export function setGeometryAttribute(geometry: Geometry, attribute: Attribute) {
     const location = attribute.location ? attribute.location : geometry.attributes.length;
@@ -19,7 +22,7 @@ export function setGeometryAttribute(geometry: Geometry, attribute: Attribute) {
     geometry.attributes.push(attr);
 
     // _vertexArrayObject.setAttribute(attr, true);
-    geometry.vertexArrayObject.setAttribute(attr);
+    setVertexArrayObjectAttribute(geometry.vertexArrayObject, attr);
 }
 
 
@@ -30,7 +33,7 @@ export function updateGeometryAttribute (geometry: Geometry, key: string, data: 
         return;
     }
     attribute.data = data;
-    geometry.vertexArrayObject.updateBufferData(key, attribute.data);
+    updateVertexArrayObjectBufferData(geometry.vertexArrayObject, key, attribute.data);
 };
 
 

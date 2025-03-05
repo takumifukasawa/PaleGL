@@ -1,5 +1,5 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
-import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
 // import { AttributeUsageType } from '@/PaleGL/constants';
 import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
@@ -77,7 +77,7 @@ export class TransformFeedbackBuffer {
         });
         this.attributes = attributes;
 
-        this.vertexArrayObject = new VertexArrayObject({
+        this.vertexArrayObject = createVertexArrayObject({
             gpu,
             attributes,
         });

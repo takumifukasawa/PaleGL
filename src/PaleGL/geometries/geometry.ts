@@ -1,5 +1,5 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
-import { VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+import { createVertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { GPU } from '@/PaleGL/core/GPU';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
@@ -73,7 +73,7 @@ export function createGeometry(args: GeometryArgs) {
     const instanceCount: number | null = typeof args.instanceCount == 'number' ? args.instanceCount : null;
 
     // TODO: vaoの生成2回やっちゃってる? constructorとstartで
-    const vertexArrayObject: VertexArrayObject = new VertexArrayObject({
+    const vertexArrayObject = createVertexArrayObject({
         gpu,
         attributes: [],
         indices: indices,
