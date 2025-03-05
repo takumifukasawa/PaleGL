@@ -99,7 +99,7 @@ import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
-} from '@/PaleGL/core/VertexArrayObject.ts';
+} from '@/PaleGL/core/vertexArrayObject.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 

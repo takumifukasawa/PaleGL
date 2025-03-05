@@ -3,7 +3,7 @@ import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeUsageType } from '@/PaleGL/constants.ts';
 import {
     setVertexArrayObjectAttribute, updateVertexArrayObjectBufferData,
-} from '@/PaleGL/core/VertexArrayObject.ts';
+} from '@/PaleGL/core/vertexArrayObject.ts';
 
 export function setGeometryAttribute(geometry: Geometry, attribute: Attribute) {
     const location = attribute.location ? attribute.location : geometry.attributes.length;

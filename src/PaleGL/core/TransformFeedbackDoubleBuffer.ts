@@ -4,7 +4,7 @@
 // import { TransformFeedbackBufferArgs } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
 // import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 // import {createUniforms, Uniforms} from '@/PaleGL/core/uniforms.ts';
-// import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+// import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // 
 // // TODO: location, divisorをいい感じに指定したい
 // 
@@ -123,7 +123,7 @@ import {
     createVertexArrayObject,
     getVertexArrayObjectBuffers, updateVertexArrayObjectBufferSubData,
     VertexArrayObject,
-} from '@/PaleGL/core/VertexArrayObject.ts';
+} from '@/PaleGL/core/vertexArrayObject.ts';
 
 // TODO: location, divisorをいい感じに指定したい
 

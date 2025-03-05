@@ -42,7 +42,7 @@
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/Shader';
-import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 import { Framebuffer } from '@/PaleGL/core/Framebuffer';
 // import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';

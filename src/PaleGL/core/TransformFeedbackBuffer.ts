@@ -1,5 +1,5 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
-import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/VertexArrayObject.ts';
+import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // import { AttributeUsageType } from '@/PaleGL/constants';
 import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
 import { Shader } from '@/PaleGL/core/Shader.ts';
