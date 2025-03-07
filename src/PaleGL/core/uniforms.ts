@@ -3,7 +3,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';
-import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { UniformTypes } from '@/PaleGL/constants.ts';
 import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';

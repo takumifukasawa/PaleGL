@@ -13,7 +13,7 @@ import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';

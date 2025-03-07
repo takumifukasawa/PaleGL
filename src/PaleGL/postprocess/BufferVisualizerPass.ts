@@ -693,7 +693,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(GBUFFER_A_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.gBufferRenderTargets.$getGBufferATexture()
+                    renderer.gBufferRenderTargets.gBufferATexture
                 );
             }
 
@@ -701,7 +701,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(GBUFFER_B_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.gBufferRenderTargets.$getGBufferBTexture()
+                    renderer.gBufferRenderTargets.gBufferBTexture
                 );
             }
 
@@ -709,7 +709,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(GBUFFER_C_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.gBufferRenderTargets.$getGBufferCTexture()
+                    renderer.gBufferRenderTargets.gBufferCTexture
                 );
             }
 
@@ -717,7 +717,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(GBUFFER_D_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.gBufferRenderTargets.$getGBufferDTexture()
+                    renderer.gBufferRenderTargets.gBufferDTexture
                 );
             }
 

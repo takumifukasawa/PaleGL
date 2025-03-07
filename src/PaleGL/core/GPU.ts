@@ -43,15 +43,15 @@
 import { Texture } from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/Shader';
 import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
-import { Framebuffer } from '@/PaleGL/core/Framebuffer';
+import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/Framebuffer';
 // import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
-import { createCubeMap, CubeMap } from '@/PaleGL/core/CubeMap';
+import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
-import { TransformFeedback } from '@/PaleGL/core/TransformFeedback.ts';
+import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import {
     UniformBufferObjectBlockData,
     Uniforms,
@@ -176,7 +176,7 @@ export class GPU {
             return;
         }
         gl.bindFramebuffer(GL_FRAMEBUFFER, framebuffer.glObject);
-        if (framebuffer.hasMultipleDrawBuffers) {
+        if (hasFramebufferMultipleDrawBuffers(framebuffer)) {
             gl.drawBuffers(framebuffer.drawBufferList);
         }
 

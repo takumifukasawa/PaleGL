@@ -1,5 +1,5 @@
 ﻿import { loadImg } from '@/PaleGL/loaders/loadImg';
-import { createCubeMap, CubeMap } from '@/PaleGL/core/CubeMap';
+import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { CubeMapAxis } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
 

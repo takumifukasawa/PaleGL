@@ -185,22 +185,22 @@ export class PostProcess {
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.GBufferATexture,
-                renderer.gBufferRenderTargets.$getGBufferATexture()
+                renderer.gBufferRenderTargets.gBufferATexture
             );
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.GBufferBTexture,
-                renderer.gBufferRenderTargets.$getGBufferBTexture()
+                renderer.gBufferRenderTargets.gBufferBTexture
             );
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.GBufferCTexture,
-                renderer.gBufferRenderTargets.$getGBufferCTexture()
+                renderer.gBufferRenderTargets.gBufferCTexture
             );
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.GBufferDTexture,
-                renderer.gBufferRenderTargets.$getGBufferDTexture()
+                renderer.gBufferRenderTargets.gBufferDTexture
             );
             // passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
             setMaterialUniformValue(

@@ -43,6 +43,7 @@ import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { createRay, Ray } from '@/PaleGL/math/ray.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
+import { getWriteRenderTarget, setRenderTargetSizeBehaviour } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
 // mainCamera: boolean = false;
 
@@ -78,17 +79,19 @@ export const getCameraRenderTarget = (camera: Camera) => {
     return camera.renderTarget;
 };
 
-export const getWriteRenderTarget = (camera: Camera) => {
+export const getCameraWriteRenderTarget = (camera: Camera) => {
     if (camera.renderTarget) {
         // for double buffer
-        return camera.renderTarget.isSwappable ? camera.renderTarget.write : camera.renderTarget;
+        return camera.renderTarget.isSwappable
+            ? getWriteRenderTarget(camera.renderTarget)
+            : camera.renderTarget;
     }
     return null;
 };
 
 export const setCameraSize = (camera: Camera, width: number, height: number) => {
     if (camera.renderTarget) {
-        camera.renderTarget.setSize(width, height);
+        setRenderTargetSizeBehaviour(camera.renderTarget, width, height);
     }
     if (camera.postProcess) {
         camera.postProcess.setSize(width, height);
@@ -146,7 +149,7 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
                 drawCount: 8 * 6,
                 // prettier-ignore
                 indices: [
-                    ...maton.range(8 * 6, true)
+                    ...maton.range(8 * 6, true),
                     // 0, 1, 2, 3,
                     // 4, 5, 6, 7
 
@@ -277,7 +280,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                 // ...frustumPositions.flb.e, // farLeftBottom: 5
                 // ...frustumPositions.frt.e, // farRightTop: 6
                 // ...frustumPositions.frb.e, // farRightBottom: 7
-            ])
+            ]),
         );
         camera.visibleFrustumMesh.enabled = camera.visibleFrustum;
     }
@@ -291,7 +294,7 @@ export const transformScreenPoint = (camera: Camera, p: Vector3) => {
     const matInProjection = Matrix4.multiplyMatrices(
         camera.projectionMatrix,
         camera.viewMatrix,
-        Matrix4.translationMatrix(p)
+        Matrix4.translationMatrix(p),
     );
     const clipPosition = matInProjection.position;
     const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback

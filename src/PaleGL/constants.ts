@@ -101,7 +101,7 @@ export const MeshTypes = {
     Skinned: 1,
     ObjectSpaceRaymarch: 2,
     ScreenSpaceRaymarch: 3,
-    Text: 4
+    Text: 4,
 } as const;
 
 export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
@@ -193,6 +193,14 @@ export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof
 // render target types
 // -----------------------------------------------------------------------------
 
+export const RenderTargetKinds = {
+    Default: 0,
+    GBuffer: 1,
+    DoubleBuffer: 2
+};
+
+export type RenderTargetKind = (typeof RenderTargetKinds)[keyof typeof RenderTargetKinds];
+
 export const RenderTargetTypes = {
     RGBA: 0,
     Depth: 1,
@@ -247,7 +255,7 @@ export const AttributeNames = {
     InstanceEmissiveColor: 'aInstanceEmissiveColor',
     InstanceVelocity: 'aInstanceVelocity',
     InstanceLookDirection: 'aLookDirection',
-    InstanceState: 'aInstanceState'
+    InstanceState: 'aInstanceState',
 } as const;
 
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
@@ -276,7 +284,7 @@ export const PostProcessPassType = {
     VolumetricLight: 16,
     Fragment: 17,
     Fog: 18,
-    FragmentPass: 19
+    FragmentPass: 19,
 } as const;
 
 export type PostProcessPassType = (typeof PostProcessPassType)[keyof typeof PostProcessPassType];

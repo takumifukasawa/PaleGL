@@ -71,11 +71,11 @@ import {
 } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { CubeMap } from '@/PaleGL/core/CubeMap.ts';
+import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-// import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
-import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/TransformFeedbackDoubleBuffer.ts';
+// import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
+import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';

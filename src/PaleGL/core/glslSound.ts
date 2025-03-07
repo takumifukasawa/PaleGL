@@ -1,5 +1,5 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { TransformFeedbackBuffer } from '@/PaleGL/core/TransformFeedbackBuffer.ts';
+import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 
@@ -46,7 +46,7 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
 
     const varyingName = 'vSound';
 
-    const transformFeedbackBuffer = new TransformFeedbackBuffer({
+    const transformFeedbackBuffer = createTransformFeedbackBuffer({
         gpu,
         attributes: [],
         varyings: [

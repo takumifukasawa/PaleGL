@@ -385,7 +385,12 @@
 
 
 import { Texture } from '@/PaleGL/core/Texture';
-import { Framebuffer } from '@/PaleGL/core/Framebuffer';
+import {
+    bindFramebuffer,
+    createFramebuffer,
+    Framebuffer,
+    registerDrawBufferToFramebuffer, unbindFramebuffer,
+} from '@/PaleGL/core/Framebuffer';
 import { createRenderbuffer, Renderbuffer, setRenderbufferSize } from '@/PaleGL/core/renderbuffer.ts';
 import {
     RenderbufferTypes,
@@ -407,14 +412,16 @@ import {
     GL_READ_FRAMEBUFFER,
     GL_DRAW_FRAMEBUFFER,
     GL_DEPTH_BUFFER_BIT,
-    GLTextureFilter,
+    GLTextureFilter, RenderTargetKind, RenderTargetKinds,
 } from '@/PaleGL/constants';
 import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
 import { GPU } from '@/PaleGL/core/GPU';
+import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
 export type RenderTargetOptions = {
     // require
     gpu: GPU;
+    renderTargetKind?: RenderTargetKind;
     // optional
     width?: number;
     height?: number;
@@ -437,8 +444,9 @@ export class RenderTarget extends AbstractRenderTarget {
     name: string;
     width: number;
     height: number;
+    renderTargetKind: RenderTargetKind;
     type: RenderTargetType;
-    _framebuffer: Framebuffer;
+    framebuffer: Framebuffer;
     _depthRenderbuffer: Renderbuffer | null = null;
     _texture: Texture | null = null;
     _depthTexture: Texture | null = null;
@@ -450,10 +458,6 @@ export class RenderTarget extends AbstractRenderTarget {
 
     $getDepthTexture() {
         return this._depthTexture;
-    }
-
-    $getFramebuffer() {
-        return this._framebuffer;
     }
 
     get read() {
@@ -480,6 +484,7 @@ export class RenderTarget extends AbstractRenderTarget {
     constructor({
                     gpu,
                     name = '',
+                    renderTargetKind = RenderTargetKinds.Default,
                     type = RenderTargetTypes.RGBA,
                     width = 1,
                     height = 1,
@@ -498,13 +503,16 @@ export class RenderTarget extends AbstractRenderTarget {
         const gl = this._gpu.gl;
 
         this.name = name;
+
+        this.renderTargetKind = renderTargetKind;
         this.type = type;
 
         this.width = width;
         this.height = height;
 
-        this._framebuffer = new Framebuffer({ gpu });
-        this._framebuffer.bind();
+        this.framebuffer = createFramebuffer({ gpu });
+
+        bindFramebuffer(this.framebuffer);
 
         // for debug
         // console.log(useDepthBuffer, writeDepthTexture, this.type, writeDepthTexture)
@@ -519,7 +527,7 @@ export class RenderTarget extends AbstractRenderTarget {
                 GL_FRAMEBUFFER,
                 GL_DEPTH_ATTACHMENT,
                 GL_RENDERBUFFER,
-                this._depthRenderbuffer.glObject
+                this._depthRenderbuffer.glObject,
             );
         }
 
@@ -545,7 +553,7 @@ export class RenderTarget extends AbstractRenderTarget {
                     GLColorAttachment.COLOR_ATTACHMENT0,
                     GL_TEXTURE_2D,
                     this._texture.glObject,
-                    0
+                    0,
                 );
                 break;
 
@@ -571,7 +579,7 @@ export class RenderTarget extends AbstractRenderTarget {
                     GLColorAttachment.COLOR_ATTACHMENT0,
                     GL_TEXTURE_2D,
                     this._texture.glObject,
-                    0
+                    0,
                 );
                 break;
 
@@ -599,7 +607,7 @@ export class RenderTarget extends AbstractRenderTarget {
                     GLColorAttachment.COLOR_ATTACHMENT0,
                     GL_TEXTURE_2D,
                     this._texture.glObject,
-                    0
+                    0,
                 );
                 break;
 
@@ -621,7 +629,7 @@ export class RenderTarget extends AbstractRenderTarget {
                     GLColorAttachment.COLOR_ATTACHMENT0,
                     GL_TEXTURE_2D,
                     this._texture.glObject,
-                    0
+                    0,
                 );
                 break;
 
@@ -635,7 +643,7 @@ export class RenderTarget extends AbstractRenderTarget {
             if (checkFramebufferStatus !== GL_FRAMEBUFFER_COMPLETE) {
                 console.error('framebuffer not completed');
             }
-            this._framebuffer.registerDrawBuffer(GLColorAttachment.COLOR_ATTACHMENT0);
+            registerDrawBufferToFramebuffer(this.framebuffer, GLColorAttachment.COLOR_ATTACHMENT0);
         }
 
         // 深度バッファをテクスチャとして扱う場合
@@ -674,7 +682,7 @@ export class RenderTarget extends AbstractRenderTarget {
             gl.bindRenderbuffer(GL_RENDERBUFFER, null);
         }
         // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        this._framebuffer.unbind();
+        unbindFramebuffer(this.framebuffer);
         // Framebuffer.unbind();
     }
 
@@ -695,7 +703,7 @@ export class RenderTarget extends AbstractRenderTarget {
             this._depthTexture.setSize(this.width, this.height);
         }
         if (this._depthRenderbuffer) {
-            setRenderbufferSize(this._depthRenderbuffer, width,  height);
+            setRenderbufferSize(this._depthRenderbuffer, width, height);
         }
     }
 
@@ -706,13 +714,13 @@ export class RenderTarget extends AbstractRenderTarget {
     setTexture(texture: Texture) {
         const gl = this._gpu.gl;
         this._texture = texture;
-        gl.bindFramebuffer(GL_FRAMEBUFFER, this._framebuffer.glObject);
+        gl.bindFramebuffer(GL_FRAMEBUFFER, this.framebuffer.glObject);
         gl.framebufferTexture2D(
             GL_FRAMEBUFFER,
             GLColorAttachment.COLOR_ATTACHMENT0,
             GL_TEXTURE_2D,
             this._texture.glObject,
-            0
+            0,
         );
         gl.bindFramebuffer(GL_FRAMEBUFFER, null);
     }
@@ -724,10 +732,10 @@ export class RenderTarget extends AbstractRenderTarget {
     setDepthTexture(depthTexture: Texture) {
         const gl = this._gpu.gl;
         this._depthTexture = depthTexture;
-        this._framebuffer.bind();
+        bindFramebuffer(this.framebuffer);
         // depth as texture
         gl.framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this._depthTexture.glObject, 0);
-        this._framebuffer.unbind();
+        unbindFramebuffer(this.framebuffer);
     }
 
     /**
@@ -752,8 +760,8 @@ export class RenderTarget extends AbstractRenderTarget {
         height: number;
     }) {
         const gl = gpu.gl;
-        gl.bindFramebuffer(GL_READ_FRAMEBUFFER, sourceRenderTarget.$getFramebuffer().glObject);
-        gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, destRenderTarget.$getFramebuffer().glObject);
+        gl.bindFramebuffer(GL_READ_FRAMEBUFFER, sourceRenderTarget.framebuffer.glObject);
+        gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, destRenderTarget.framebuffer.glObject);
 
         gl.clear(GL_DEPTH_BUFFER_BIT);
 
@@ -768,3 +776,29 @@ export class RenderTarget extends AbstractRenderTarget {
         gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
     }
 }
+
+export type RenderTargetBase = {
+    isSwappable: boolean; // TODO: kind=doublebufferで対応したい
+    renderTargetKind: RenderTargetKind
+}
+
+export function createRenderTargetBase(renderTargetKind: RenderTargetKind, isSwappable: boolean): RenderTargetBase {
+    return { renderTargetKind, isSwappable };
+}
+
+export const setRenderTargetSize: SetRenderTargetSizeFunc = (renderTargetBase: RenderTargetBase, width: number, height: number) => {
+    const renderTarget = renderTargetBase as RenderTarget;
+    const w = Math.floor(width);
+    const h = Math.floor(height);
+    renderTarget.width = w;
+    renderTarget.height = h;
+    if (renderTarget._texture) {
+        renderTarget._texture.setSize(w, h);
+    }
+    if (renderTarget._depthTexture) {
+        renderTarget._depthTexture.setSize(w, h);
+    }
+    if (renderTarget._depthRenderbuffer) {
+        setRenderbufferSize(renderTarget._depthRenderbuffer, w, h);
+    }
+};
