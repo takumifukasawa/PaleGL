@@ -8,7 +8,7 @@ import {
 import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { GPU } from '@/PaleGL/core/GPU.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import {
     PostProcessPassType,
     PrimitiveTypes,

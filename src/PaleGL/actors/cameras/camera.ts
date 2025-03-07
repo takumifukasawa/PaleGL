@@ -10,7 +10,7 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 
 export const FrustumDirection = {
     nlt: 'nlt',

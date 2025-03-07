@@ -35,7 +35,7 @@ import {
     createGBufferRenderTargets,
     GBufferRenderTargets, setGBufferRenderTargetsDepthTexture,
     setGBufferRenderTargetsSize,
-} from '@/PaleGL/core/GBufferRenderTargets';
+} from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';

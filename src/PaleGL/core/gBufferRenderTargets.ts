@@ -203,7 +203,7 @@ import {
     createFramebuffer,
     Framebuffer,
     registerDrawBufferToFramebuffer, unbindFramebuffer,
-} from '@/PaleGL/core/Framebuffer';
+} from '@/PaleGL/core/framebuffer.ts';
 import {
     GL_DEPTH_ATTACHMENT,
     GL_FRAMEBUFFER,

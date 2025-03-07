@@ -4,7 +4,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { GPU } from '@/PaleGL/core/GPU';
 import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
 import { RenderTarget } from '@/PaleGL/core/RenderTarget';
-import { GBufferRenderTargets } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Texture } from '@/PaleGL/core/Texture.ts';

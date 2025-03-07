@@ -390,7 +390,7 @@ import {
     createFramebuffer,
     Framebuffer,
     registerDrawBufferToFramebuffer, unbindFramebuffer,
-} from '@/PaleGL/core/Framebuffer';
+} from '@/PaleGL/core/framebuffer.ts';
 import { createRenderbuffer, Renderbuffer, setRenderbufferSize } from '@/PaleGL/core/renderbuffer.ts';
 import {
     RenderbufferTypes,

@@ -1,6 +1,6 @@
 ﻿import { RenderTargetBase, setRenderTargetSize } from '@/PaleGL/core/RenderTarget.ts';
 import { RenderTargetKind, RenderTargetKinds } from '@/PaleGL/constants.ts';
-import { setGBufferRenderTargetsSize } from '@/PaleGL/core/GBufferRenderTargets.ts';
+import { setGBufferRenderTargetsSize } from '@/PaleGL/core/gBufferRenderTargets.ts';
 
 export type SetRenderTargetSizeFunc = (renderTargetBase: RenderTargetBase, width: number, height: number) => void;
 
