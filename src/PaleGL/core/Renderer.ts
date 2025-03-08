@@ -51,7 +51,7 @@ import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { Shader } from '@/PaleGL/core/Shader.ts';
+import { createShader } from '@/PaleGL/core/shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
 import {
@@ -381,7 +381,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         // initialize global uniform buffer objects
 //         //
 //
-//         const uniformBufferObjectShader = new Shader({
+//         const uniformBufferObjectShader = createShader({
 //             gpu,
 //             vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
 //             fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),
@@ -2144,7 +2144,7 @@ export class Renderer {
         // initialize global uniform buffer objects
         //
 
-        const uniformBufferObjectShader = new Shader({
+        const uniformBufferObjectShader = createShader({
             gpu,
             vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
             fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),

@@ -1,5 +1,4 @@
-﻿import { Shader } from '@/PaleGL/core/Shader';
-import {
+﻿import {
     BlendTypes,
     UniformTypes,
     PrimitiveTypes,
@@ -18,6 +17,7 @@ import {
 } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
+import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 // import { Texture } from '@/PaleGL/core/Texture';
@@ -1291,7 +1291,7 @@ export const startMaterial = (material: Material, { gpu, attributeDescriptors }:
         // console.log(_fragmentShader, shaderDefineOptions, _fragmentShaderModifier, _rawFragmentShader);
     }
 
-    material.shader = new Shader({
+    material.shader = createShader({
         gpu,
         // vertexShader: _vertexShader,
         vertexShader: material.rawVertexShader,

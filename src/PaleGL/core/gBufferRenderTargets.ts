@@ -224,6 +224,11 @@ import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts
 // [GBufferC: RGBA8] r: metallic, g: roughness
 // [GBufferD: R11G11B10] rgb: emissive color
 // [Depth] depth prepass depth
+// ↓ 改善案メモ
+// [GBufferA: RGBA8] rgb: base color, a: shading model
+// [GBufferB: RGBA8] rg: packed normal, g: metallic, g: roughness
+// [GBufferC: R11G11B10] rgb: emissive color
+// [Depth] depth prepass depth
 // ---------------------------------------------------------------------
 
 export type GBufferRenderTargets = RenderTargetBase & {

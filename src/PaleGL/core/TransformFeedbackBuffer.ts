@@ -2,7 +2,7 @@
 // import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // // import { AttributeUsageType } from '@/PaleGL/constants';
 // import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
-// import { Shader } from '@/PaleGL/core/Shader.ts';
+// import { Shader } from '@/PaleGL/core/shader.ts';
 // import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 // import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 // import { AttributeUsageType, GL_ARRAY_BUFFER } from '@/PaleGL/constants.ts';
@@ -110,7 +110,7 @@ import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // import { AttributeUsageType } from '@/PaleGL/constants';
 import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
-import { Shader } from '@/PaleGL/core/Shader.ts';
+import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { createTransformFeedback, TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
 import { AttributeUsageType, GL_ARRAY_BUFFER } from '@/PaleGL/constants.ts';
@@ -172,7 +172,7 @@ export function createTransformFeedbackBuffer(
     // create shader
 
     const transformFeedbackVaryings = varyings.map(({ name }) => name);
-    const shader = new Shader({
+    const shader = createShader({
         gpu,
         vertexShader,
         fragmentShader: transformFeedbackFragmentShader,

@@ -1,5 +1,5 @@
 ﻿// import { Attribute } from '@/PaleGL/core/attribute.ts';
-// import { Shader } from '@/PaleGL/core/Shader.ts';
+// import { Shader } from '@/PaleGL/core/shader.ts';
 // import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 // import { TransformFeedbackBufferArgs } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 // import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
@@ -114,7 +114,7 @@
 
 
 import { Attribute } from '@/PaleGL/core/attribute.ts';
-import { Shader } from '@/PaleGL/core/Shader.ts';
+import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { createTransformFeedback, TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import { TransformFeedbackBufferArgs } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
@@ -161,7 +161,7 @@ export class TransformFeedbackDoubleBuffer {
 
     constructor({ gpu, attributes, drawCount, vertexShader, varyings, uniforms = [], uniformBlockNames = [] }: TransformFeedbackBufferArgs) {
         const transformFeedbackVaryings = varyings.map(({ name }) => name);
-        this.shader = new Shader({
+        this.shader = createShader({
             gpu,
             vertexShader,
             fragmentShader: transformFeedbackFragmentShader,

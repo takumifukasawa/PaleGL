@@ -41,10 +41,9 @@
     UniformTypes,
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/Texture';
-import { Shader } from '@/PaleGL/core/Shader';
+import { Shader } from '@/PaleGL/core/shader.ts';
 import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/framebuffer.ts';
-// import { Uniforms, UniformStructValue, UniformValue } from '@/PaleGL/materials/Material';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
