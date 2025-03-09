@@ -40,7 +40,7 @@
     // UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { Texture } from '@/PaleGL/core/Texture';
+import {createTexture, Texture} from '@/PaleGL/core/Texture';
 import { Shader } from '@/PaleGL/core/shader.ts';
 import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/framebuffer.ts';
@@ -105,13 +105,13 @@ export class GPU {
      */
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
-        this.dummyTexture = new Texture({
+        this.dummyTexture = createTexture({
             gpu: this,
             img: create1x1('white'),
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
-        this.dummyTextureBlack = new Texture({
+        this.dummyTextureBlack = createTexture({
             gpu: this,
             img: create1x1('black'),
             wrapS: TextureWrapTypes.Repeat,

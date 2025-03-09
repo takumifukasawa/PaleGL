@@ -197,7 +197,7 @@
 // }
 
 
-import { Texture } from '@/PaleGL/core/Texture';
+import {createTexture, setTextureSize, Texture} from '@/PaleGL/core/Texture';
 import {
     bindFramebuffer,
     createFramebuffer,
@@ -264,7 +264,7 @@ export function createGBufferRenderTargets(
     // 1: GBufferA
     //
     const gBufferAAttachment = GLColorAttachment.COLOR_ATTACHMENT0;
-    const gBufferATexture = new Texture({
+    const gBufferATexture = createTexture({
         gpu,
         width,
         height,
@@ -281,7 +281,7 @@ export function createGBufferRenderTargets(
     // 2: GBufferB
     //
     const gBufferBAttachment = GLColorAttachment.COLOR_ATTACHMENT1;
-    const gBufferBTexture = new Texture({
+    const gBufferBTexture = createTexture({
         gpu,
         width,
         height,
@@ -298,7 +298,7 @@ export function createGBufferRenderTargets(
     // 3: GBufferC
     //
     const gBufferCAttachment = GLColorAttachment.COLOR_ATTACHMENT2;
-    const gBufferCTexture = new Texture({
+    const gBufferCTexture = createTexture({
         gpu,
         width,
         height,
@@ -315,7 +315,7 @@ export function createGBufferRenderTargets(
     // 4: GBufferD
     //
     const gBufferDAttachment = GLColorAttachment.COLOR_ATTACHMENT3;
-    const gBufferDTexture = new Texture({
+    const gBufferDTexture = createTexture({
         gpu,
         width,
         height,
@@ -366,9 +366,9 @@ export const setGBufferRenderTargetsSize: SetRenderTargetSizeFunc = (renderTarge
     const gBufferRenderTargets = renderTargetBase as GBufferRenderTargets;
     gBufferRenderTargets.width = width;
     gBufferRenderTargets.height = height;
-    gBufferRenderTargets.gBufferTextures.forEach((texture) => texture.setSize(width, height));
+    gBufferRenderTargets.gBufferTextures.forEach((texture) => setTextureSize(texture, width, height));
     if (gBufferRenderTargets.depthTexture) {
-        gBufferRenderTargets.depthTexture.setSize(width, height);
+        setTextureSize(gBufferRenderTargets.depthTexture, width, height);
     }
 }
 

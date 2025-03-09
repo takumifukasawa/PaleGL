@@ -13,7 +13,7 @@ import {
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import {createTexture, Texture, updateTexture} from '@/PaleGL/core/Texture.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -597,7 +597,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
     // 精度は16bitで十分だが jsのtypedarrayには16bitがないので32bitを使う
     // bit容量は下記
     // 32bit (bit per channel) * 16 (4 channel * 4 pixel) * N bones
-    skinnedMesh.jointTexture = new Texture({
+    skinnedMesh.jointTexture = createTexture({
         gpu,
         width: 1,
         height: 1,
@@ -724,7 +724,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
 
         const matrixColNum = 4;
         // const dataPerPixel = 4;
-        skinnedMesh.jointTexture.update({
+        updateTexture(skinnedMesh.jointTexture, {
             width: colNum * matrixColNum,
             height: rowNum,
             data: jointData,
@@ -809,7 +809,7 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
 
         const matrixColNum = 4;
         if (skinnedMesh.jointTexture) {
-            skinnedMesh.jointTexture.update({
+            updateTexture(skinnedMesh.jointTexture, {
                 width: colNum * matrixColNum,
                 height: rowNum,
                 data: jointData,

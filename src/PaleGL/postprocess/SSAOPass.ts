@@ -10,7 +10,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/Texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 import {
     PostProcessPassBase,
@@ -81,7 +81,7 @@ const createSamplingTables: (gpu: GPU) => {
         })
         .flat();
 
-    const samplingTexture = new Texture({
+    const samplingTexture = createTexture({
         gpu,
         width: 4,
         height: 4,
@@ -90,7 +90,7 @@ const createSamplingTables: (gpu: GPU) => {
         wrapT: TextureWrapTypes.Repeat,
     });
 
-    samplingTexture.update({
+    updateTexture(samplingTexture, {
         width: 4,
         height: 4,
         data: new Float32Array(data),

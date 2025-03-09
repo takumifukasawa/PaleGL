@@ -12,7 +12,12 @@ import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GPU } from '@/PaleGL/core/GPU';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import { resolveGLEnumTextureFilterType, resolveGLEnumTextureWrapType, Texture } from '@/PaleGL/core/Texture.ts';
+import {
+    createTexture,
+    resolveGLEnumTextureFilterType,
+    resolveGLEnumTextureWrapType,
+    Texture
+} from '@/PaleGL/core/Texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 import {createSkinnedMesh} from "@/PaleGL/actors/meshes/skinnedMesh.ts";
 import {createMesh} from "@/PaleGL/actors/meshes/mesh.ts";
@@ -272,7 +277,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             })
         ).then((images) => {
             images.forEach(({ img, minFilter, magFilter, wrapS, wrapT }) => {
-                const texture = new Texture({ gpu, img, minFilter, magFilter, wrapS, wrapT });
+                const texture = createTexture({ gpu, img, minFilter, magFilter, wrapS, wrapT });
                 preloadTextures.push(texture);
             });
         });

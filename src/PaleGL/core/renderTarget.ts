@@ -384,7 +384,7 @@
 // }
 
 
-import { Texture } from '@/PaleGL/core/Texture';
+import {createTexture, setTextureSize, Texture} from '@/PaleGL/core/Texture';
 import {
     bindFramebuffer,
     createFramebuffer,
@@ -515,7 +515,7 @@ export function createRenderTarget({
     switch (type) {
         // RGBA8整数バッファ
         case RenderTargetTypes.RGBA:
-            texture = new Texture({
+            texture = createTexture({
                 gpu,
                 width,
                 height,
@@ -541,7 +541,7 @@ export function createRenderTarget({
                 console.error('EXT_color_buffer_float not supported');
                 // return;
             }
-            texture = new Texture({
+            texture = createTexture({
                 gpu,
                 width,
                 height,
@@ -568,7 +568,7 @@ export function createRenderTarget({
                 console.error('EXT_color_buffer_float not supported');
                 // return;
             }
-            texture = new Texture({
+            texture = createTexture({
                 gpu,
                 width,
                 height,
@@ -590,7 +590,7 @@ export function createRenderTarget({
             break;
 
         case RenderTargetTypes.R16F:
-            texture = new Texture({
+            texture = createTexture({
                 gpu,
                 width,
                 height,
@@ -626,7 +626,7 @@ export function createRenderTarget({
 
     // 深度バッファをテクスチャとして扱う場合
     if (type === RenderTargetTypes.Depth || writeDepthTexture) {
-        depthTexture = new Texture({
+        depthTexture = createTexture({
             gpu,
             width,
             height,
@@ -693,35 +693,35 @@ export const setRenderTargetSize: SetRenderTargetSizeFunc = (renderTargetBase: R
     renderTarget.width = w;
     renderTarget.height = h;
     if (renderTarget.texture) {
-        renderTarget.texture.setSize(w, h);
+        setTextureSize(renderTarget.texture, w, h);
     }
     if (renderTarget.depthTexture) {
-        renderTarget.depthTexture.setSize(w, h);
+        setTextureSize(renderTarget.depthTexture, w, h);
     }
     if (renderTarget.depthRenderbuffer) {
         setRenderbufferSize(renderTarget.depthRenderbuffer, w, h);
     }
 };
 
-export function setTextureSize(renderTarget: RenderTarget, width: number, height: number) {
-    // this.width = width;
-    // this.height = height;
-    width = Math.floor(width);
-    height = Math.floor(height);
-    
-    renderTarget.width = width;
-    renderTarget.height = height;
-    
-    if (renderTarget.texture) {
-        renderTarget.texture.setSize(width, height);
-    }
-    if (renderTarget.depthTexture) {
-        renderTarget.depthTexture.setSize(width, height);
-    }
-    if (renderTarget.depthRenderbuffer) {
-        setRenderbufferSize(renderTarget.depthRenderbuffer, width, height);
-    }
-}
+// export function setRenderTargetTextureSize(renderTarget: RenderTarget, width: number, height: number) {
+//     // this.width = width;
+//     // this.height = height;
+//     width = Math.floor(width);
+//     height = Math.floor(height);
+//     
+//     renderTarget.width = width;
+//     renderTarget.height = height;
+//     
+//     if (renderTarget.texture) {
+//         renderTarget.texture.setSize(width, height);
+//     }
+//     if (renderTarget.depthTexture) {
+//         renderTarget.depthTexture.setSize(width, height);
+//     }
+//     if (renderTarget.depthRenderbuffer) {
+//         setRenderbufferSize(renderTarget.depthRenderbuffer, width, height);
+//     }
+// }
 
 export function setRenderTargetTexture(renderTarget: RenderTarget, texture: Texture) {
     const gl = renderTarget.gpu.gl;

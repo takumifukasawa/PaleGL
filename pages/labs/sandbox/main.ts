@@ -9,9 +9,9 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 import { createEngine } from '@/PaleGL/core/engine.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
-import { createRenderTarget } from '@/PaleGL/core/RenderTarget';
+import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import { Texture } from '@/PaleGL/core/Texture';
+import {createTexture, Texture} from '@/PaleGL/core/Texture';
 import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries
@@ -355,8 +355,9 @@ const renderer = new Renderer({
     pixelRatio,
 });
 
-// const engine = createEngine({ gpu, renderer });
-const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
+const engine = createEngine({ gpu, renderer });
+// for debug
+// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
 engine.setScene(captureScene);
@@ -1374,13 +1375,13 @@ const playSound = () => {
 
 const main = async () => {
     const particleImg = await loadImg(smokeImgUrl);
-    const particleMap = new Texture({
+    const particleMap = createTexture({
         gpu,
         img: particleImg,
     });
 
     const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    floorDiffuseMap = new Texture({
+    floorDiffuseMap = createTexture({
         gpu,
         img: floorDiffuseImg,
         // mipmap: true,
@@ -1391,7 +1392,7 @@ const main = async () => {
     });
 
     const floorNormalImg = await loadImg(leaveNormalImgUrl);
-    floorNormalMap = new Texture({
+    floorNormalMap = createTexture({
         gpu,
         img: floorNormalImg,
         // mipmap: true,
@@ -1506,7 +1507,7 @@ const main = async () => {
     const fontAtlasImg = await loadImg(fontAtlasImgUrl);
     const fontAtlasJson = await loadJson<FontAtlasData>(fontAtlasJsonUrl);
 
-    const fontAtlasTexture = new Texture({
+    const fontAtlasTexture = createTexture({
         gpu,
         img: fontAtlasImg,
         flipY: false,
