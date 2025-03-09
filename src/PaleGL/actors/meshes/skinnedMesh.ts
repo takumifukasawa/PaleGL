@@ -13,7 +13,7 @@ import {
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {createTexture, Texture, updateTexture} from '@/PaleGL/core/Texture.ts';
+import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';

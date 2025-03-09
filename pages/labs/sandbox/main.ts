@@ -11,7 +11,7 @@ import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import {createTexture, Texture} from '@/PaleGL/core/Texture';
+import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
 import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries

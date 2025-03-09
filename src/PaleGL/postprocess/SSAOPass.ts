@@ -10,7 +10,7 @@ import { GPU } from '@/PaleGL/core/GPU';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
-import { createTexture, Texture, updateTexture } from '@/PaleGL/core/Texture.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 import {
     PostProcessPassBase,

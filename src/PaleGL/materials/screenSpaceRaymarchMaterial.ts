@@ -12,7 +12,7 @@ import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する

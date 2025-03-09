@@ -7,7 +7,7 @@ import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
 import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';

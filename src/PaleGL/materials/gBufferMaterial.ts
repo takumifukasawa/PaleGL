@@ -9,7 +9,7 @@ import {
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Color } from '@/PaleGL/math/Color';
-import { Texture } from '@/PaleGL/core/Texture';
+import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';

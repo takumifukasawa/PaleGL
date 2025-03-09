@@ -40,7 +40,7 @@
     // UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import {createTexture, Texture} from '@/PaleGL/core/Texture';
+import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
 import { Shader } from '@/PaleGL/core/shader.ts';
 import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/framebuffer.ts';

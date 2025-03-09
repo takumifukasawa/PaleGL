@@ -15,7 +15,7 @@ import {
 } from '@/PaleGL/constants.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Override } from '@/PaleGL/palegl';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';

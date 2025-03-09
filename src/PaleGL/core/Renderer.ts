@@ -87,7 +87,7 @@ import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
 import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
 import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';

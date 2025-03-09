@@ -17,7 +17,7 @@ import {
     resolveGLEnumTextureFilterType,
     resolveGLEnumTextureWrapType,
     Texture
-} from '@/PaleGL/core/Texture.ts';
+} from '@/PaleGL/core/texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 import {createSkinnedMesh} from "@/PaleGL/actors/meshes/skinnedMesh.ts";
 import {createMesh} from "@/PaleGL/actors/meshes/mesh.ts";

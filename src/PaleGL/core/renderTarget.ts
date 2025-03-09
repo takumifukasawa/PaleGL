@@ -384,7 +384,7 @@
 // }
 
 
-import {createTexture, setTextureSize, Texture} from '@/PaleGL/core/Texture';
+import {createTexture, setTextureSize, Texture} from '@/PaleGL/core/texture.ts';
 import {
     bindFramebuffer,
     createFramebuffer,

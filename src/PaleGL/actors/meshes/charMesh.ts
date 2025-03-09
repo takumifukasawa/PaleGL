@@ -1,7 +1,7 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
-import { Texture } from '@/PaleGL/core/Texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     DepthFuncTypes, MeshTypes,
