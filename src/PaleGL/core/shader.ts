@@ -137,7 +137,7 @@ import { GL_FRAGMENT_SHADER, GL_SEPARATE_ATTRIBS, GL_VERTEX_SHADER } from '@/Pal
 
 type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
 
-export type Shader = GLObjectBase<WebGLProgram> & {};
+export type Shader = GLObjectBase<WebGLProgram>;
 
 export function createShader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings }: ShaderParams) {
     const { gl } = gpu;

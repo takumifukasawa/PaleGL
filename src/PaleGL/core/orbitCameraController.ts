@@ -3,122 +3,116 @@ import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import {setLookAtPosition, setTranslation} from "@/PaleGL/core/transform.ts";
 
-export function createOrbitCameraController(camera?: Camera | null) {
-    let _camera = camera ?? null;
-    let _dampingFactor = 0.01;
-    let _minAzimuth = -45;
-    let _maxAzimuth = 45;
-    let _minAltitude = -45;
-    let _maxAltitude = 45;
-    let _azimuthSpeed = 100;
-    let _altitudeSpeed = 100;
-    const _cameraAngle = { azimuth: 0, altitude: 0 };
-    let _lookAtTarget = Vector3.zero;
-    let _distance = 10;
-    let _attenuation = 0.001;
-    let _targetX = 0;
-    let _targetY = 0;
-    let _deltaAzimuthPower = 1;
-    let _deltaAltitudePower = 1;
-    let _defaultAzimuth = 0;
-    let _defaultAltitude = 0;
-    let _enabled = true;
-    let _enabledUpdateCamera = true;
-    let _targetCameraPosition = Vector3.zero;
-    let _currentCameraPosition = Vector3.zero;
+export type OrbitCameraController = ReturnType<typeof createOrbitCameraController>;
 
-    const setCamera = (camera: Camera | null) => {
-        _camera = camera;
-    };
-
-    const start = (daz: number | null = null, dal: number | null = null) => {
-        _cameraAngle.azimuth = daz !== null ? daz : _defaultAzimuth;
-        _cameraAngle.altitude = dal !== null ? dal : _defaultAltitude;
-        _updateCameraPosition(true);
-        // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
-        // this.#currentCameraPosition = this.#targetCameraPosition.clone();
-    };
-
-    const setDelta = (delta: { x: number; y: number }) => {
-        if (!_enabled) {
-            return;
-        }
-        _targetX = delta.x * _deltaAzimuthPower;
-        _targetY = delta.y * _deltaAltitudePower;
-    };
-
-    const fixedUpdate = () => {
-        if (!_enabled) {
-            return;
-        }
-
-        _targetX = Math.sign(_targetX) * Math.max(0, Math.abs(_targetX) - _attenuation);
-        _targetY = Math.sign(_targetY) * Math.max(0, Math.abs(_targetY) - _attenuation);
-
-        _cameraAngle.azimuth += _targetX * _azimuthSpeed;
-        _cameraAngle.altitude += _targetY * _altitudeSpeed;
-
-        _updateCameraPosition();
-    };
-
-    const _updateCameraPosition = (isJump = false) => {
-        // TODO: limit azimuth
-        // this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
-        _cameraAngle.azimuth = clamp(_cameraAngle.azimuth, _minAzimuth, _maxAzimuth);
-        _cameraAngle.altitude = clamp(_cameraAngle.altitude, _minAltitude, _maxAltitude);
-
-        const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), _cameraAngle.altitude);
-        const v2 = Vector3.rotateVectorY(v1, _cameraAngle.azimuth);
-        _targetCameraPosition = Vector3.addVectors(_lookAtTarget, v2.scale(_distance));
-        _currentCameraPosition = Vector3.lerpVectors(
-            _currentCameraPosition,
-            _targetCameraPosition,
-            isJump ? 1 : _dampingFactor
-        );
-
-        if (_camera && _enabledUpdateCamera) {
-            setTranslation(_camera.transform, _currentCameraPosition);
-            setLookAtPosition(_camera.transform, _lookAtTarget);
-        }
-    };
-
+export function createOrbitCameraController(camera: Camera | null = null) {
+    const dampingFactor = 0.01;
+    const minAzimuth = -45;
+    const maxAzimuth = 45;
+    const minAltitude = -45;
+    const maxAltitude = 45;
+    const azimuthSpeed = 100;
+    const altitudeSpeed = 100;
+    const cameraAngle = { azimuth: 0, altitude: 0 };
+    const lookAtTarget = Vector3.zero;
+    const distance = 10;
+    const attenuation = 0.001;
+    const targetX = 0;
+    const targetY = 0;
+    const deltaAzimuthPower = 1;
+    const deltaAltitudePower = 1;
+    const defaultAzimuth = 0;
+    const defaultAltitude = 0;
+    const enabled = true;
+    const enabledUpdateCamera = true;
+    const targetCameraPosition = Vector3.zero;
+    const currentCameraPosition = Vector3.zero;
+    
     return {
-        getDampingFactor: () => _dampingFactor,
-        setDampingFactor: (value: number) => (_dampingFactor = value),
-        getMinAzimuth: () => _minAzimuth,
-        setMinAzimuth: (value: number) => (_minAzimuth = value),
-        getMaxAzimuth: () => _maxAzimuth,
-        setMaxAzimuth: (value: number) => (_maxAzimuth = value),
-        getMinAltitude: () => _minAltitude,
-        setMinAltitude: (value: number) => (_minAltitude = value),
-        getMaxAltitude: () => _maxAltitude,
-        setMaxAltitude: (value: number) => (_maxAltitude = value),
-        getAzimuthSpeed: () => _azimuthSpeed,
-        setAzimuthSpeed: (value: number) => (_azimuthSpeed = value),
-        getAltitudeSpeed: () => _altitudeSpeed,
-        setAltitudeSpeed: (value: number) => (_altitudeSpeed = value),
-        getLookAtTarget: () => _lookAtTarget,
-        setLookAtTarget: (value: Vector3) => (_lookAtTarget = value),
-        getDistance: () => _distance,
-        setDistance: (value: number) => (_distance = value),
-        getAttenuation: () => _attenuation,
-        setAttenuation: (value: number) => (_attenuation = value),
-        getDeltaAzimuthPower: () => _deltaAzimuthPower,
-        setDeltaAzimuthPower: (value: number) => (_deltaAzimuthPower = value),
-        getDeltaAltitudePower: () => _deltaAltitudePower,
-        setDeltaAltitudePower: (value: number) => (_deltaAltitudePower = value),
-        getDefaultAzimuth: () => _defaultAzimuth,
-        setDefaultAzimuth: (value: number) => (_defaultAzimuth = value),
-        getDefaultAltitude: () => _defaultAltitude,
-        setDefaultAltitude: (value: number) => (_defaultAltitude = value),
-        getEnabled: () => _enabled,
-        setEnabled: (value: boolean) => (_enabled = value),
-        getEnabledUpdateCamera: () => _enabledUpdateCamera,
-        setEnabledUpdateCamera: (value: boolean) => (_enabledUpdateCamera = value),
-
-        setCamera,
-        start,
-        setDelta,
-        fixedUpdate,
+        camera,
+        dampingFactor,
+        minAzimuth,
+        maxAzimuth,
+        minAltitude,
+        maxAltitude,
+        azimuthSpeed,
+        altitudeSpeed,
+        cameraAngle,
+        lookAtTarget,
+        distance,
+        attenuation,
+        targetX,
+        targetY,
+        deltaAzimuthPower,
+        deltaAltitudePower,
+        defaultAzimuth,
+        defaultAltitude,
+        enabled,
+        enabledUpdateCamera,
+        targetCameraPosition,
+        currentCameraPosition,
     };
+}
+
+export const setOrbitCameraControllerCamera = (orbitCameraController: OrbitCameraController, camera: Camera | null) => {
+    orbitCameraController.camera = camera;
+};
+
+export const startOrbitCameraController = (orbitCameraController: OrbitCameraController, daz: number | null = null, dal: number | null = null) => {
+    orbitCameraController.cameraAngle.azimuth = daz !== null ? daz : orbitCameraController.defaultAzimuth;
+    orbitCameraController.cameraAngle.altitude = dal !== null ? dal : orbitCameraController.defaultAltitude;
+    updateCameraPosition(orbitCameraController, true);
+    // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
+    // this.#currentCameraPosition = this.#targetCameraPosition.clone();
+}
+
+export function setOrbitCameraControllerDelta (orbitCameraController: OrbitCameraController, delta: { x: number; y: number }) {
+    if (!orbitCameraController.enabled) {
+        return;
+    }
+    orbitCameraController.targetX = delta.x * orbitCameraController.deltaAzimuthPower;
+    orbitCameraController.targetY = delta.y * orbitCameraController.deltaAltitudePower;
+}
+
+export function fixedUpdateOrbitCameraController(orbitCameraController: OrbitCameraController) {
+    if (!orbitCameraController.enabled) {
+        return;
+    }
+
+    orbitCameraController.targetX = Math.sign(orbitCameraController.targetX) * Math.max(0, Math.abs(orbitCameraController.targetX) - orbitCameraController.attenuation);
+    orbitCameraController.targetY = Math.sign(orbitCameraController.targetY) * Math.max(0, Math.abs(orbitCameraController.targetY) - orbitCameraController.attenuation);
+
+    orbitCameraController.cameraAngle.azimuth += orbitCameraController.targetX * orbitCameraController.azimuthSpeed;
+    orbitCameraController.cameraAngle.altitude += orbitCameraController.targetY * orbitCameraController.altitudeSpeed;
+
+    updateCameraPosition(orbitCameraController);
+}
+
+function updateCameraPosition (orbitCameraController: OrbitCameraController, isJump = false) {
+    // TODO: limit azimuth
+    // this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
+    orbitCameraController.cameraAngle.azimuth = clamp(
+        orbitCameraController.cameraAngle.azimuth,
+        orbitCameraController.minAzimuth,
+        orbitCameraController.maxAzimuth
+    );
+    orbitCameraController.cameraAngle.altitude = clamp(
+        orbitCameraController.cameraAngle.altitude,
+        orbitCameraController.minAltitude,
+        orbitCameraController.maxAltitude
+    );
+
+    const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), orbitCameraController.cameraAngle.altitude);
+    const v2 = Vector3.rotateVectorY(v1, orbitCameraController.cameraAngle.azimuth);
+    orbitCameraController.targetCameraPosition = Vector3.addVectors(orbitCameraController.lookAtTarget, v2.scale(orbitCameraController.distance));
+    orbitCameraController.currentCameraPosition = Vector3.lerpVectors(
+        orbitCameraController.currentCameraPosition,
+        orbitCameraController.targetCameraPosition,
+        isJump ? 1 : orbitCameraController.dampingFactor
+    );
+
+    if (orbitCameraController.camera && orbitCameraController.enabledUpdateCamera) {
+        setTranslation(orbitCameraController.camera.transform, orbitCameraController.currentCameraPosition);
+        setLookAtPosition(orbitCameraController.camera.transform, orbitCameraController.lookAtTarget);
+    }
 }

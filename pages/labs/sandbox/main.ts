@@ -12,7 +12,11 @@ import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedba
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
-import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
+import {
+    createOrbitCameraController,
+    fixedUpdateOrbitCameraController,
+    setOrbitCameraControllerDelta, startOrbitCameraController
+} from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
@@ -379,10 +383,10 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.getIsDown() && orbitCameraController.getEnabled()) {
-        orbitCameraController.setDelta(inputController.getDeltaNormalizedInputPosition());
+    if (inputController.getIsDown() && orbitCameraController.enabled) {
+        setOrbitCameraControllerDelta(orbitCameraController, inputController.getDeltaNormalizedInputPosition())
     }
-    orbitCameraController.fixedUpdate();
+    fixedUpdateOrbitCameraController(orbitCameraController);
 };
 
 const directionalLight = createDirectionalLight({
@@ -1878,19 +1882,19 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
-        orbitCameraController.setDistance(isSP ? 20 : 20);
-        orbitCameraController.setAttenuation(0.01);
-        orbitCameraController.setDampingFactor(0.2);
-        orbitCameraController.setAzimuthSpeed(100);
-        orbitCameraController.setAltitudeSpeed(100);
-        orbitCameraController.setDeltaAzimuthPower(2);
-        orbitCameraController.setDeltaAltitudePower(2);
-        orbitCameraController.setMaxAltitude(70);
-        orbitCameraController.setMinAltitude(-70);
-        orbitCameraController.setLookAtTarget(new Vector3(0, -2, 0));
-        orbitCameraController.start(0, -40);
+        orbitCameraController.distance = isSP ? 20 : 20;
+        orbitCameraController.attenuation = 0.01;
+        orbitCameraController.dampingFactor = 0.2;
+        orbitCameraController.azimuthSpeed = 100;
+        orbitCameraController.altitudeSpeed = 100;
+        orbitCameraController.deltaAzimuthPower = 2;
+        orbitCameraController.deltaAltitudePower = 2;
+        orbitCameraController.maxAltitude = 70;
+        orbitCameraController.minAltitude = -70;
+        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
+        startOrbitCameraController(orbitCameraController, 0, -40);
         // orbitCameraController.enabled = false;
-        orbitCameraController.setEnabled(true);
+        orbitCameraController.enabled = true;
     });
 
     // engine.onAfterStart = () => {
@@ -1970,8 +1974,8 @@ function initDebugger() {
             label: 'orbit controls enabled',
             // initialValue: debuggerStates.orbitControlsEnabled,
             // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
-            initialValue: orbitCameraController.getEnabled(),
-            onChange: (value) => orbitCameraController.setEnabled(value),
+            initialValue: orbitCameraController.enabled,
+            onChange: (value) => orbitCameraController.enabled = value
         });
 
     //

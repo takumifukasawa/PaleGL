@@ -16,6 +16,7 @@ export function setRenderTargetSizeBehaviour(renderTargetBase: RenderTargetBase,
 // TODO: fixme
 export function getWriteRenderTarget(renderTarget: RenderTargetBase) {
     console.error('getWriteRenderTarget is deprecated');
-    return renderTarget as RenderTargetBase;
     // return renderTarget.write;
+    // return renderTarget as RenderTargetBase;
+    return renderTarget;
 }
