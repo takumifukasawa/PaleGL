@@ -8,7 +8,7 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
-import { GPU } from '@/PaleGL/core/GPU';
+import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/GPU';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
@@ -324,7 +324,7 @@ if (!gl) {
     throw 'invalid gl';
 }
 
-const gpu = new GPU(gl);
+const gpu = createGPU(gl);
 
 const instanceNumView = document.createElement('p');
 instanceNumView.textContent = `instance num: ${initialInstanceNum}`;
@@ -1115,7 +1115,8 @@ layout (std140) uniform ubCommon {
         if (!targetGlobalUniformBufferObject) {
             return;
         }
-        const blockIndex = gpu.bindUniformBlockAndGetBlockIndex(
+        const blockIndex = bindGPUUniformBlockAndGetBlockIndex(
+            gpu, 
             targetGlobalUniformBufferObject.uniformBufferObject,
             transformFeedbackDoubleBuffer.shader,
             blockName,
@@ -1337,7 +1338,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             'uAttractRate',
             attractRate,
         );
-        gpu.updateTransformFeedback({
+        updateGPUTransformFeedback(gpu, {
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
             vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,

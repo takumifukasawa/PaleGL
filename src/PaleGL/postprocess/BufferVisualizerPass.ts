@@ -5,7 +5,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { GPU } from '@/PaleGL/core/GPU';
+import {GPU, setGPUViewport} from '@/PaleGL/core/GPU';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
@@ -937,7 +937,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
             args.targetCamera.inverseViewProjectionMatrix
         );
 
-        gpu.setSize(0, 0, this.width, this.height / ROW_NUM);
+        setGPUViewport(gpu, 0, 0, this.width, this.height / ROW_NUM);
 
         this.rowPasses.forEach(({ pass, tiles }, i) => {
             if (tiles.size > 0) {
@@ -970,7 +970,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         // for debug
         // this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', 1);
 
-        gpu.setSize(0, 0, tmpRealWidth, tmpRealHeight);
+        setGPUViewport(gpu, 0, 0, tmpRealWidth, tmpRealHeight);
 
         this.compositePass.render({ ...args });
 

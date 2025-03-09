@@ -12,7 +12,13 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import {
+    bindGPUUniformBlockAndGetBlockIndex, clearGPUColor, clearGPUDepth,
+    createGPUUniformBufferObject,
+    drawGPU, flushGPU,
+    GPU, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
+    setGPUViewport
+} from '@/PaleGL/core/GPU';
 import {
     addDrawVertexCountStats,
     addPassInfoStats,
@@ -2208,8 +2214,10 @@ export class Renderer {
                 value: Matrix4.identity,
             },
         ];
+        
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.Transformations,
                 transformationsUniformBlockData,
@@ -2250,7 +2258,8 @@ export class Renderer {
             },
         ];
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.Camera,
                 cameraUniformBufferData,
@@ -2287,7 +2296,8 @@ export class Renderer {
             },
         ];
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.DirectionalLight,
                 directionalLightUniformBufferData,
@@ -2349,7 +2359,8 @@ export class Renderer {
             },
         ];
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.SpotLight,
                 spotLightUniformBufferData,
@@ -2391,7 +2402,8 @@ export class Renderer {
             },
         ];
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.PointLight,
                 pointLightUniformBufferData,
@@ -2412,7 +2424,8 @@ export class Renderer {
             },
         ];
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.Timeline,
                 timelineUniformBufferData,
@@ -2439,7 +2452,8 @@ export class Renderer {
         ];
         // TODO: 一番最初の要素としてpushするとなぜかエラーになる
         this._globalUniformBufferObjects.push({
-            uniformBufferObject: this._gpu.createUniformBufferObject(
+            uniformBufferObject: createGPUUniformBufferObject(
+                this._gpu,
                 uniformBufferObjectShader,
                 UniformBlockNames.Common,
                 commonUniformBlockData,
@@ -2468,7 +2482,8 @@ export class Renderer {
             if (!targetGlobalUniformBufferObject) {
                 return;
             }
-            const blockIndex = this._gpu.bindUniformBlockAndGetBlockIndex(
+            const blockIndex = bindGPUUniformBlockAndGetBlockIndex(
+                this._gpu,
                 targetGlobalUniformBufferObject.uniformBufferObject,
                 material.shader!,
                 blockName,
@@ -2504,7 +2519,7 @@ export class Renderer {
         this._canvas.width = w;
         this._canvas.height = h;
 
-        this._gpu.setSize(0, 0, w, h);
+        setGPUViewport(this._gpu, 0, 0, w, h);
 
         // render targets
         setRenderTargetSize(this._depthPrePassRenderTarget, w, h);
@@ -2543,34 +2558,34 @@ export class Renderer {
     setRenderTarget(renderTarget: CameraRenderTargetType, clearColor: boolean = false, clearDepth: boolean = false) {
         if (renderTarget) {
             this.renderTarget = renderTarget;
-            this._gpu.setFramebuffer(renderTarget.framebuffer);
-            this._gpu.setSize(0, 0, renderTarget.width, renderTarget.height);
+            setGPUFramebuffer(this._gpu, renderTarget.framebuffer);
+            setGPUViewport(this._gpu, 0, 0, renderTarget.width, renderTarget.height);
         } else {
             this.renderTarget = null;
-            this._gpu.setFramebuffer(null);
-            this._gpu.setSize(0, 0, this._realWidth, this._realHeight);
+            setGPUFramebuffer(this._gpu, null);
+            setGPUViewport(this._gpu, 0, 0, this._realWidth, this._realHeight);
         }
         if (clearColor) {
-            this._gpu.clearColor(0, 0, 0, 0);
+            clearGPUColor(this._gpu, 0, 0, 0, 0);
             this.clearColorDirtyFlag = true;
         } else {
             this.clearColorDirtyFlag = false;
         }
         if (clearDepth) {
-            this._gpu.clearDepth(1, 1, 1, 1);
+            clearGPUDepth(this._gpu, 1, 1, 1, 1);
         }
     }
 
     flush() {
-        this._gpu.flush();
+        flushGPU(this._gpu);
     }
 
     clearColor(r: number, g: number, b: number, a: number) {
-        this._gpu.clearColor(r, g, b, a);
+        clearGPUColor(this._gpu, r, g, b, a);
     }
 
     clearDepth(r: number, g: number, b: number, a: number) {
-        this._gpu.clearDepth(r, g, b, a);
+        clearGPUDepth(this._gpu, r, g, b, a);
     }
 
     beforeRender(time: number, deltaTime: number) {
@@ -3069,15 +3084,15 @@ export class Renderer {
         // console.log(`[Renderer.renderMesh] mat: ${material.getName()}`, material.getShader());
 
         // vertex
-        this._gpu.setVertexArrayObject(geometry.vertexArrayObject);
+        setGPUVertexArrayObject(this._gpu, geometry.vertexArrayObject);
         // material
         if (!material.shader) {
             // console.error('invalid material shader');
             return;
         }
-        this._gpu.setShader(material.shader); // TODO: ない場合を判定したい
+        setGPUShader(this._gpu, material.shader); // TODO: ない場合を判定したい
         // uniforms
-        this._gpu.setUniforms(material.uniforms);
+        setGPUUniforms(this._gpu, material.uniforms);
 
         // setup depth write (depth mask)
         let depthWrite;
@@ -3110,7 +3125,8 @@ export class Renderer {
         // )
 
         // draw
-        this._gpu.draw(
+        drawGPU(
+            this._gpu,
             geometry.drawCount,
             material.primitiveType,
             !!material.depthTest,

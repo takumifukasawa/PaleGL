@@ -414,7 +414,7 @@ import {
     GL_DEPTH_BUFFER_BIT,
     GLTextureFilter, RenderTargetKind, RenderTargetKinds,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import {checkGPUExtension, GPU} from '@/PaleGL/core/GPU';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
 export type RenderTargetOptions = {
@@ -537,7 +537,7 @@ export function createRenderTarget({
 
         // RGBA16F浮動小数点バッファ
         case RenderTargetTypes.RGBA16F:
-            if (!gpu.checkExtension(GL_EXT_color_buffer_float)) {
+            if (!checkGPUExtension(gpu, GL_EXT_color_buffer_float)) {
                 console.error('EXT_color_buffer_float not supported');
                 // return;
             }
@@ -564,7 +564,7 @@ export function createRenderTarget({
         // R11G11B10F浮動小数点バッファ
         case RenderTargetTypes.R11F_G11F_B10F:
             // TODO: r11g11b10 の場合はなくてもよい？
-            if (!gpu.checkExtension(GL_EXT_color_buffer_float)) {
+            if (!checkGPUExtension(gpu, GL_EXT_color_buffer_float)) {
                 console.error('EXT_color_buffer_float not supported');
                 // return;
             }

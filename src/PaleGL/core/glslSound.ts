@@ -1,4 +1,4 @@
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import {GPU, updateGPUTransformFeedback} from '@/PaleGL/core/GPU.ts';
 import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
@@ -103,7 +103,7 @@ export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number
         );
 
         // TODO: vao, shader の bind,unbind がたくさん発生するので最適化した方がよい
-        gpu.updateTransformFeedback({
+        updateGPUTransformFeedback(gpu, {
             shader: transformFeedbackBuffer.shader,
             uniforms: transformFeedbackBuffer.uniforms,
             transformFeedback: transformFeedbackBuffer.transformFeedback,
