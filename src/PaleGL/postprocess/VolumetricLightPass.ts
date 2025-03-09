@@ -12,7 +12,7 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import {
     PostProcessPassBase, PostProcessPassParametersBase,
@@ -77,7 +77,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
      *
      * @param args
      */
-    constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
+    constructor(args: { gpu: Gpu; parameters?: VolumetricLightPassParametersArgs }) {
         const { gpu } = args;
         const parameters = generateVolumetricLightParameters(args.parameters ?? {});
 

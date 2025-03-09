@@ -7,7 +7,7 @@ import {
 } from '@/PaleGL/materials/material.ts';
 import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import {
     PostProcessPassType,
@@ -51,7 +51,7 @@ export type PostProcessPassParametersBaseArgs = {
 };
 
 export type PostProcessPassRenderArgs = {
-    gpu: GPU;
+    gpu: Gpu;
     camera: Camera;
     renderer: Renderer;
     prevRenderTarget: RenderTarget | null;
@@ -63,7 +63,7 @@ export type PostProcessPassRenderArgs = {
 };
 
 export class PostProcessPassBase implements IPostProcessPass {
-    // protected gpu: GPU;
+    // protected gpu: Gpu;
     name: string;
     width: number = 1;
     height: number = 1;
@@ -115,7 +115,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         wrapS = TextureWrapTypes.ClampToEdge,
         srcTextureEnabled = true,
     }: {
-        gpu: GPU;
+        gpu: Gpu;
         type: PostProcessPassType;
         parameters: PostProcessPassParametersBaseArgs;
         vertexShader?: string;

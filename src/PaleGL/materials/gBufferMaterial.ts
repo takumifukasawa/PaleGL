@@ -222,7 +222,7 @@ export type GBufferMaterialArgs = {
 //         this.metallicMapTiling = metallicMapTilingValue;
 //     }
 //
-//     start({ gpu, attributeDescriptors = [] }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) {
+//     start({ gpu, attributeDescriptors = [] }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) {
 //         this.vertexShader = gBufferVert;
 //         this.fragmentShader = litFrag;
 //         this.depthFragmentShader = gBufferDepthFrag;

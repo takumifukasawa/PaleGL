@@ -1,7 +1,7 @@
 ﻿import { createGeometry, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export const boxGeometryEdgePairs = [
     [0, 1],
@@ -148,7 +148,7 @@ export function createBoxGeometryData(size: number) {
 
 export type BoxGeometry = Geometry & ReturnType<typeof createBoxGeometry>;
 
-export function createBoxGeometry({ gpu, size = 1 }: { gpu: GPU; size?: number }) {
+export function createBoxGeometry({ gpu, size = 1 }: { gpu: Gpu; size?: number }) {
     const s = size / 2;
     const boxPosition_0 = [-s, s, s];
     const boxPosition_1 = [-s, -s, s];

@@ -6,7 +6,7 @@
     UniformBlockNames,
     PostProcessPassType,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
@@ -33,7 +33,7 @@ export function generateSSAOPassParameters(params: SSAOPassParametersArgs = {}):
  *
  * @param gpu
  */
-const createSamplingTables: (gpu: GPU) => {
+const createSamplingTables: (gpu: Gpu) => {
     samplingRotations: number[];
     samplingDistances: number[];
     samplingTexture: Texture;
@@ -122,7 +122,7 @@ export class SSAOPass extends PostProcessPassBase {
      *
      * @param gpu
      */
-    constructor(args: { gpu: GPU; parameters?: SSAOPassParametersArgs }) {
+    constructor(args: { gpu: Gpu; parameters?: SSAOPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = ssaoFragmentShader;
 

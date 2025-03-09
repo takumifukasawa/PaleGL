@@ -1,16 +1,16 @@
 ﻿// import { GlObject, RawGLObject } from '@/PaleGL/core/GlObject';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // import { GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW } from '@/PaleGL/constants.ts';
 
 // export class IndexBufferObject extends GlObject {
 //     _ibo: WebGLBuffer;
-//     _gpu: GPU;
+//     _gpu: Gpu;
 // 
 //     get glObject() {
 //         return this._ibo;
 //     }
 // 
-//     constructor({ gpu, indices }: { gpu: GPU; indices: number[] }) {
+//     constructor({ gpu, indices }: { gpu: Gpu; indices: number[] }) {
 //         super();
 // 
 //         this._gpu = gpu;
@@ -34,20 +34,20 @@
 //     }
 // }
 
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW } from '@/PaleGL/constants.ts';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 
 export type IndexBufferObject = GLObjectBase<WebGLBuffer>;
 
-export function createIndexBufferObject(gpu: GPU, indices: number[]): IndexBufferObject {
+export function createIndexBufferObject(gpu: Gpu, indices: number[]): IndexBufferObject {
     const ibo = gpu.gl.createBuffer()!;
     bindRawIndexBufferObject(gpu.gl, ibo);
     gpu.gl.bufferData(GL_ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), GL_STATIC_DRAW);
     return createGLObject(gpu, ibo);
 }
 
-// function bindIndexBufferObject(gpu: GPU, ibo: IndexBufferObject) {
+// function bindIndexBufferObject(gpu: Gpu, ibo: IndexBufferObject) {
 //     bindRawIndexBufferObject(gpu.gl, ibo.glObject);
 // }
 

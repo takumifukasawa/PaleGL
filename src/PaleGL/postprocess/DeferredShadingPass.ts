@@ -1,4 +1,4 @@
-﻿import { GPU } from '@/PaleGL/core/GPU';
+﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     PostProcessPassBase,
     PostProcessPassParametersBase,
@@ -30,7 +30,7 @@ export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor(args // name,
     : {
-        gpu: GPU;
+        gpu: Gpu;
         parameters?: DeferredShadingParametersArgs;
     }) {
         const { gpu } = args;

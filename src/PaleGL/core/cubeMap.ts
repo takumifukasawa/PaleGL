@@ -1,6 +1,6 @@
 ﻿// import { GlObject } from '@/PaleGL/core/glObject.ts';
 // // import { CubeMapAxis } from '@/PaleGL/constants.js';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // import {
 //     GL_RGBA,
 //     GL_TEXTURE_CUBE_MAP,
@@ -21,7 +21,7 @@
 // } from '@/PaleGL/constants.ts';
 // 
 // // type CubeMapArgs = {
-// //     gpu: GPU;
+// //     gpu: Gpu;
 // //     // images: {
 // //     //     [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement | null;
 // //     // };
@@ -40,7 +40,7 @@
 //     }
 // 
 //     constructor(
-//         gpu: GPU,
+//         gpu: Gpu,
 //         width: number,
 //         height: number,
 //         posXImage: HTMLImageElement | HTMLCanvasElement,
@@ -96,7 +96,7 @@
 
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     GL_RGBA,
     GL_TEXTURE_CUBE_MAP,
@@ -117,7 +117,7 @@ import {
 } from '@/PaleGL/constants.ts';
 
 // type CubeMapArgs = {
-//     gpu: GPU;
+//     gpu: Gpu;
 //     // images: {
 //     //     [key in CubeMapAxis]: HTMLImageElement | HTMLCanvasElement | null;
 //     // };
@@ -132,7 +132,7 @@ export type CubeMap = GLObjectBase<WebGLTexture> & {
 };
 
 function createCubeMapInternal(
-    gpu: GPU,
+    gpu: Gpu,
     width: number,
     height: number,
     posXImage: HTMLImageElement | HTMLCanvasElement,
@@ -181,7 +181,7 @@ function createCubeMapInternal(
 }
 
 export function createCubeMap(
-    gpu: GPU,
+    gpu: Gpu,
     posXImage: HTMLImageElement | HTMLCanvasElement,
     negXImage: HTMLImageElement | HTMLCanvasElement,
     posYImage: HTMLImageElement | HTMLCanvasElement,
@@ -203,4 +203,3 @@ export function createCubeMap(
         negZImage
     );
 }
-

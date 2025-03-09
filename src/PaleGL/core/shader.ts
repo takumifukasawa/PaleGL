@@ -1,8 +1,8 @@
 ﻿// import { GlObject } from '@/PaleGL/core/glObject.ts';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // import { GL_FRAGMENT_SHADER, GL_SEPARATE_ATTRIBS, GL_VERTEX_SHADER } from '@/PaleGL/constants.ts';
 // 
-// type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
+// type ShaderParams = { gpu: Gpu; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
 // 
 // function createShader(gl: WebGL2RenderingContext, type: number, src: string) {
 //     // create vertex shader
@@ -26,7 +26,7 @@
 // 
 // export class Shader extends GlObject {
 //     _program: WebGLProgram | null;
-//     _gpu: GPU;
+//     _gpu: Gpu;
 // 
 //     get glObject(): WebGLProgram {
 //         return this._program!;
@@ -132,10 +132,10 @@
 // }
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GL_FRAGMENT_SHADER, GL_SEPARATE_ATTRIBS, GL_VERTEX_SHADER } from '@/PaleGL/constants.ts';
 
-type ShaderParams = { gpu: GPU; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
+type ShaderParams = { gpu: Gpu; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
 
 export type Shader = GLObjectBase<WebGLProgram> & {};
 

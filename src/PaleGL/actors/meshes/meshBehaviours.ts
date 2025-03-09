@@ -134,7 +134,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 
 // update mesh material -------------------------------------------------------
 
-// beforeRender({ gpu }: { gpu: GPU }) {
+// beforeRender({ gpu }: { gpu: Gpu }) {
 //     super.beforeRender({ gpu });
 //     // this.materials.forEach(material => material.updateUniforms({ gpu }));
 //     // this.depthMaterial.updateUniforms({ gpu });

@@ -1,5 +1,5 @@
 ﻿import { UniformNames, UniformTypes, UniformBlockNames, PostProcessPassType } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import screenSpaceShadowFragmentShader from '@/PaleGL/shaders/screen-space-shadow-fragment.glsl';
 import {
     PostProcessPassParametersBase,
@@ -59,7 +59,7 @@ export class ScreenSpaceShadowPass extends PostProcessPassBase {
      *
      * @param args
      */
-    constructor(args: { gpu: GPU; parameters?: ScreenSpaceShadowPassParameters }) {
+    constructor(args: { gpu: Gpu; parameters?: ScreenSpaceShadowPassParameters }) {
         const { gpu } = args;
         const fragmentShader = screenSpaceShadowFragmentShader;
         // { gpu, ratio, parameters }

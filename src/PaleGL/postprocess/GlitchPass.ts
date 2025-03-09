@@ -1,5 +1,5 @@
 ﻿import { PostProcessPassType, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import glitchFragment from '@/PaleGL/shaders/glitch-fragment.glsl';
 import {
     PostProcessPassBase,
@@ -26,7 +26,7 @@ const UNIFORM_NAME_BLEND_RATE = UniformNames.BlendRate;
 export class GlitchPass extends PostProcessPassBase {
     parameters: GlitchPassParameters;
 
-    constructor(args: { gpu: GPU; parameters?: GlitchPassParametersArgs }) {
+    constructor(args: { gpu: Gpu; parameters?: GlitchPassParametersArgs }) {
         const { gpu } = args;
 
         const parameters = generateGlitchPassParameters(args.parameters ?? {});

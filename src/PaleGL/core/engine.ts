@@ -1,7 +1,7 @@
 ﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
@@ -52,7 +52,7 @@ export type EngineOnLastUpdateCallback = (args: EngineOnLastUpdateCallbackArgs) 
 export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
 // export class Engine {
-//     _gpu: GPU;
+//     _gpu: Gpu;
 //     _stats: Stats | null = null;
 //     _renderer: Renderer;
 //     _scene: Scene | null = null;
@@ -116,7 +116,7 @@ export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 //         onRender,
 //         showStats = false,
 //     }: {
-//         gpu: GPU;
+//         gpu: Gpu;
 //         renderer: Renderer;
 //         fixedUpdateFps?: number;
 //         updateFps?: number;
@@ -372,7 +372,7 @@ export function createEngine({
     onRender,
     showStats = false,
 }: {
-    gpu: GPU;
+    gpu: Gpu;
     renderer: Renderer;
     fixedUpdateFps?: number;
     updateFps?: number;
@@ -382,7 +382,7 @@ export function createEngine({
     onRender?: EngineOnRenderCallback;
     showStats?: boolean;
 }) {
-    const _gpu: GPU = gpu;
+    const _gpu: Gpu = gpu;
     const _stats: Stats | null = createStats({ showStats, showPipeline: false });
     const _renderer: Renderer = renderer;
     let _scene: Scene | null = null;

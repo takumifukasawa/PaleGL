@@ -4,7 +4,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
@@ -80,7 +80,7 @@ export class LightShaftPass implements IPostProcessPass {
      * @param gpu
      * @param ratio
      */
-    constructor({ gpu, ratio = 0.5, parameters }: { gpu: GPU; ratio?: number; parameters?: LightShaftPassParameters }) {
+    constructor({ gpu, ratio = 0.5, parameters }: { gpu: Gpu; ratio?: number; parameters?: LightShaftPassParameters }) {
         // super();
 
         this.parameters = generateLightShaftPassParameters(parameters);

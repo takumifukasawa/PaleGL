@@ -10,7 +10,7 @@ import {
 import {createMaterial, Material, setMaterialUniformValue, startMaterial} from '@/PaleGL/materials/material.ts';
 import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
@@ -202,10 +202,10 @@ const sharedTextureInfos: SharedTextureInfo[] = [
     ],
 ];
 
-export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Renderer }): SharedTextures {
+export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Renderer }): SharedTextures {
     const planeGeometry = createPlaneGeometry({ gpu });
 
-    const createEffectRenderTarget = ({ gpu, width, height }: { gpu: GPU; width: number; height: number }) => {
+    const createEffectRenderTarget = ({ gpu, width, height }: { gpu: Gpu; width: number; height: number }) => {
         return createRenderTarget({
             gpu,
             width,

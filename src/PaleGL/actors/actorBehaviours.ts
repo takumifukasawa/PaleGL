@@ -7,7 +7,7 @@ import {
     ActorUpdateArgs,
     // SetSizeActorFunc,
 } from '@/PaleGL/actors/actor.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
@@ -99,7 +99,7 @@ const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
     [ActorTypes.Camera]: updateCamera
 };
 
-// update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number } = {}) {
+// update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
 export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTime }) => {
     // updateの場合は必ず共通処理を通す
     tryStartActor(actor, { gpu, scene });
@@ -129,7 +129,7 @@ export const lastUpdateActor = (actor: Actor, { gpu, scene, time, deltaTime }: A
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: GPU }) => {
+export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     if (actor.onBeforeRender) {
         actor.onBeforeRender();
     }

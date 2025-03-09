@@ -1,4 +1,4 @@
-﻿import { GPU } from '@/PaleGL/core/GPU';
+﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
 import copyPassFragmentShader from '@/PaleGL/shaders/copy-pass-fragment.glsl';
 import { PostProcessPassBase, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { PostProcessPassType } from '@/PaleGL/constants.ts';
@@ -14,7 +14,7 @@ export function generateCopyPassParameters(params: CopyPassParametersArgs = {}):
 }
 
 export class CopyPass extends PostProcessPassBase {
-    constructor(args: { gpu: GPU; parameters?: CopyPassParametersArgs }) {
+    constructor(args: { gpu: Gpu; parameters?: CopyPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = copyPassFragmentShader;
         const parameters = generateCopyPassParameters(args.parameters);

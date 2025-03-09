@@ -1,4 +1,4 @@
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { MeshTypes } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -12,7 +12,7 @@ import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 
 type ObjectSpaceRaymarchMeshArgs = {
     name?: string;
-    gpu: GPU;
+    gpu: Gpu;
     size?: number;
     // fragmentShader: string;
     // depthFragmentShader: string;

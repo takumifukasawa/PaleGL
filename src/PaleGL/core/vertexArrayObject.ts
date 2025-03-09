@@ -1,7 +1,7 @@
 ﻿// import { GlObject } from '@/PaleGL/core/GlObject';
 // // import { AttributeUsageType } from '@/PaleGL/constants.js';
 // import { IndexBufferObject } from '@/PaleGL/core/IndexBufferObject';
-// import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
+// import { getAttributeUsage, Gpu } from '@/PaleGL/core/Gpu';
 // import { Attribute } from '@/PaleGL/core/attribute.ts';
 // import { GL_ARRAY_BUFFER, GL_FLOAT, GL_UNSIGNED_SHORT } from '@/PaleGL/constants.ts';
 // 
@@ -15,7 +15,7 @@
 // };
 // 
 // export class VertexArrayObject extends GlObject {
-//     _gpu: GPU;
+//     _gpu: Gpu;
 //     _vao: WebGLVertexArrayObject;
 //     _vboList: VertexBufferObject[] = [];
 //     _ibo: IndexBufferObject | null = null;
@@ -34,7 +34,7 @@
 //         return this._vao;
 //     }
 // 
-//     constructor({ gpu, attributes = [], indices }: { gpu: GPU; attributes: Attribute[]; indices?: number[] | null }) {
+//     constructor({ gpu, attributes = [], indices }: { gpu: Gpu; attributes: Attribute[]; indices?: number[] | null }) {
 //         super();
 // 
 //         this._gpu = gpu;
@@ -270,7 +270,7 @@
 // import { GlObject } from '@/PaleGL/core/glObject.ts';
 // // import { AttributeUsageType } from '@/PaleGL/constants.js';
 // import { createIndexBufferObject, IndexBufferObject, unbindIndexBufferObject } from '@/PaleGL/core/indexBufferObject.ts';
-// import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
+// import { getAttributeUsage, Gpu } from '@/PaleGL/core/Gpu';
 // import { Attribute } from '@/PaleGL/core/attribute.ts';
 // import { GL_ARRAY_BUFFER, GL_FLOAT, GL_UNSIGNED_SHORT } from '@/PaleGL/constants.ts';
 // 
@@ -284,7 +284,7 @@
 // };
 // 
 // export class VertexArrayObject extends GlObject {
-//     _gpu: GPU;
+//     _gpu: Gpu;
 //     _vao: WebGLVertexArrayObject;
 //     _vboList: VertexBufferObject[] = [];
 //     _ibo: IndexBufferObject | null = null;
@@ -303,7 +303,7 @@
 //         return this._vao;
 //     }
 // 
-//     constructor({ gpu, attributes = [], indices }: { gpu: GPU; attributes: Attribute[]; indices?: number[] | null }) {
+//     constructor({ gpu, attributes = [], indices }: { gpu: Gpu; attributes: Attribute[]; indices?: number[] | null }) {
 //         super();
 // 
 //         this._gpu = gpu;
@@ -543,7 +543,7 @@ import {
     IndexBufferObject,
     unbindIndexBufferObject,
 } from '@/PaleGL/core/indexBufferObject.ts';
-import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
+import { getAttributeUsage, Gpu } from '@/PaleGL/core/gpu.ts';
 import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { GL_ARRAY_BUFFER, GL_FLOAT, GL_UNSIGNED_SHORT } from '@/PaleGL/constants.ts';
 
@@ -562,7 +562,7 @@ export type VertexArrayObject = GLObjectBase<WebGLVertexArrayObject> & {
 };
 
 export function createVertexArrayObject({ gpu, attributes = [], indices }: {
-    gpu: GPU;
+    gpu: Gpu;
     attributes: Attribute[];
     indices?: number[] | null
 }): VertexArrayObject {

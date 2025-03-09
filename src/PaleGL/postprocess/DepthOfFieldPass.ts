@@ -9,7 +9,7 @@ import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
@@ -72,7 +72,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
     // bladeCurvature: number = 0;
     // bladeRotation: number = 0;
 
-    // gpu: GPU;
+    // gpu: Gpu;
     name: string = 'DepthOfFieldPass';
     enabled: boolean = true;
     width: number = 1;
@@ -92,7 +92,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
      *
      * @param gpu
      */
-    constructor({ gpu, parameters }: { gpu: GPU; parameters?: DepthOfFieldPassParameters }) {
+    constructor({ gpu, parameters }: { gpu: Gpu; parameters?: DepthOfFieldPassParameters }) {
         // super();
 
         // this.gpu = gpu;

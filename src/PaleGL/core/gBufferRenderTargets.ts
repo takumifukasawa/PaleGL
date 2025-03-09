@@ -9,7 +9,7 @@
 //     TextureTypes
 // } from '@/PaleGL/constants';
 // import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // 
 // // ---------------------------------------------------------------------
 // // TODO: B,Cはまとめられる気がする
@@ -23,7 +23,7 @@
 // 
 // // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 // export class GBufferRenderTargets extends AbstractRenderTarget {
-//     gpu: GPU;
+//     gpu: Gpu;
 //     name: string;
 //     width: number;
 //     height: number;
@@ -71,7 +71,7 @@
 //         return this;
 //     }
 // 
-//     constructor({ gpu, name, width = 1, height = 1 }: { gpu: GPU; name: string; width: number; height: number }) {
+//     constructor({ gpu, name, width = 1, height = 1 }: { gpu: Gpu; name: string; width: number; height: number }) {
 //         super();
 // 
 //         this.gpu = gpu;
@@ -212,7 +212,7 @@ import {
     TextureFilterTypes,
     TextureTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/renderTarget.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
@@ -232,7 +232,7 @@ import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts
 // ---------------------------------------------------------------------
 
 export type GBufferRenderTargets = RenderTargetBase & {
-    gpu: GPU,
+    gpu: Gpu,
     name: string,
     width: number,
     height: number,
@@ -247,7 +247,7 @@ export type GBufferRenderTargets = RenderTargetBase & {
 
 // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 export function createGBufferRenderTargets(
-    { gpu, name, width = 1, height = 1 }: { gpu: GPU; name: string; width: number; height: number },
+    { gpu, name, width = 1, height = 1 }: { gpu: Gpu; name: string; width: number; height: number },
 ): GBufferRenderTargets {
     const gBufferTextures: Texture[] = [];
     const depthTexture: Texture | null = null;

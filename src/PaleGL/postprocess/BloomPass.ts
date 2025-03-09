@@ -17,7 +17,7 @@ import {
 } from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -91,7 +91,7 @@ export function generateDefaultBloomPassParameters({
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
 export class BloomPass implements IPostProcessPass {
-    // gpu: GPU;
+    // gpu: Gpu;
     name: string = 'BloomPass';
     type: PostProcessPassType = PostProcessPassType.Bloom;
 
@@ -156,7 +156,7 @@ export class BloomPass implements IPostProcessPass {
         return this._compositePass.renderTarget;
     }
 
-    constructor({ gpu, parameters }: { gpu: GPU; parameters?: BloomPassParametersArgs }) {
+    constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BloomPassParametersArgs }) {
         this.parameters = generateDefaultBloomPassParameters(parameters);
 
         // NOTE: _geometryは親から渡して使いまわしてもよい

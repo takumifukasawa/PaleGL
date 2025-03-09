@@ -6,7 +6,7 @@ import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/Pale
 import { PostProcessPassType } from '@/PaleGL/constants.ts';
 
 export interface IPostProcessPass {
-    // gpu: GPU;
+    // gpu: Gpu;
     name: string;
     // enabled: boolean;
     type: PostProcessPassType;

@@ -29,12 +29,12 @@
 //     TextureWrapType,
 //     TextureWrapTypes,
 // } from '@/PaleGL/constants';
-// import { GPU } from './GPU';
+// import { Gpu } from './Gpu';
 // import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 //
 // export type TextureArgs = {
 //     // require
-//     gpu: GPU;
+//     gpu: Gpu;
 //     // optional
 //     img?: HTMLImageElement | HTMLCanvasElement | null;
 //     arraybuffer?: ArrayBuffer | null;
@@ -97,7 +97,7 @@
 // export class Texture extends GlObject {
 //     _texture: WebGLTexture;
 //     _img: HTMLImageElement | HTMLCanvasElement | null = null;
-//     _gpu: GPU;
+//     _gpu: Gpu;
 //     type: TextureType;
 //     minFilter: TextureFilterType;
 //     magFilter: TextureFilterType;
@@ -696,12 +696,12 @@ import {
     TextureWrapType,
     TextureWrapTypes,
 } from '@/PaleGL/constants';
-import { GPU } from './GPU';
+import { Gpu } from './gpu.ts';
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type TextureArgs = {
     // require
-    gpu: GPU;
+    gpu: Gpu;
     // optional
     img?: HTMLImageElement | HTMLCanvasElement | null;
     arraybuffer?: ArrayBuffer | null;

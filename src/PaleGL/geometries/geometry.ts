@@ -1,7 +1,7 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { createVertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
 export function createTangentsAndBinormals(normals: number[]) {
@@ -38,7 +38,7 @@ export function createBinormals(normals: number[], tangents: number[]) {
 
 export type GeometryArgs = {
     // required
-    gpu: GPU;
+    gpu: Gpu;
     attributes: Attribute[];
     drawCount: number;
     // optional
@@ -65,7 +65,7 @@ export function createGeometry(args: GeometryArgs) {
         // instanceCount = null,
     } = args;
 
-    // const _gpu: GPU = gpu;
+    // const _gpu: Gpu = gpu;
     // vertexCount: number = 0;
     const attributes: Attribute[] = [];
     const indices = args.indices || null;
@@ -128,7 +128,7 @@ export function createGeometry(args: GeometryArgs) {
     //     _vertexArrayObject.setAttribute(attr);
     // }
 
-    // const _createGeometry = ({ gpu }: { gpu: GPU }) => {
+    // const _createGeometry = ({ gpu }: { gpu: Gpu }) => {
     //     console.log('[Geometry.createGeometry]', attributes);
 
     //     // fallback

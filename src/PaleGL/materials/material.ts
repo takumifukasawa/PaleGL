@@ -19,7 +19,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
@@ -39,7 +39,7 @@ import {
 export type MaterialArgs = {
     type?: MaterialTypes;
 
-    // gpu: GPU,
+    // gpu: Gpu,
     // TODO: required じゃなくて大丈夫??
     vertexShader?: string;
     fragmentShader?: string;
@@ -394,7 +394,7 @@ export type DepthFragmentShaderGenerator = () => string;
 //      * @param gpu
 //      * @param attributeDescriptors
 //      */
-//     start({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }): void {
+//     start({ gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }): void {
 //         // for debug
 //         // console.log("[Material.start] attributeDescriptors", attributeDescriptors)
 //
@@ -637,7 +637,7 @@ export type DepthFragmentShaderGenerator = () => string;
 //     let _uniforms: Uniforms = createUniforms(commonUniforms, uniforms);
 //     let _depthUniforms: Uniforms = createUniforms(commonUniforms, depthUniforms);
 //
-//     const start = ({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
+//     const start = ({ gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) => {
 //         // for debug
 //         // console.log(`[material.start] name: ${_name}`);
 //
@@ -1028,7 +1028,7 @@ export function createMaterial(args: MaterialArgs): Material {
     // 外側から任意のタイミングでcompileした方が都合が良さそう
     const shader: Shader | null = null;
 
-    // const start = ({ gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
+    // const start = ({ gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) => {
     //     // for debug
     //     // console.log(`[material.start] name: ${_name}`);
 
@@ -1228,7 +1228,7 @@ export function createMaterial(args: MaterialArgs): Material {
     };
 }
 
-export const startMaterial = (material: Material, { gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
+export const startMaterial = (material: Material, { gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) => {
     // for debug
     // console.log(`[material.start] name: ${_name}`);
 

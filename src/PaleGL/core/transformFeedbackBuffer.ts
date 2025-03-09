@@ -1,7 +1,7 @@
 ﻿// import { Attribute } from '@/PaleGL/core/attribute.ts';
 // import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // // import { AttributeUsageType } from '@/PaleGL/constants';
-// import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
+// import { getAttributeUsage, Gpu } from '@/PaleGL/core/Gpu';
 // import { Shader } from '@/PaleGL/core/shader.ts';
 // import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 // import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
@@ -11,7 +11,7 @@
 // // TODO: location, divisorをいい感じに指定したい
 // 
 // export type TransformFeedbackBufferArgs = {
-//     gpu: GPU;
+//     gpu: Gpu;
 //     attributes: Attribute[];
 //     drawCount: number;
 //     vertexShader: string;
@@ -26,7 +26,7 @@
 // };
 // 
 // export class TransformFeedbackBuffer {
-//     // private gpu: GPU;
+//     // private gpu: Gpu;
 // 
 //     shader: Shader;
 //     attributes: Attribute[] = [];
@@ -109,7 +109,7 @@
 import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { createVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
 // import { AttributeUsageType } from '@/PaleGL/constants';
-import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU';
+import { getAttributeUsage, Gpu } from '@/PaleGL/core/gpu.ts';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { createTransformFeedback, TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
@@ -119,7 +119,7 @@ import {createUniforms, Uniforms, UniformsData} from '@/PaleGL/core/uniforms.ts'
 // TODO: location, divisorをいい感じに指定したい
 
 export type TransformFeedbackBufferArgs = {
-    gpu: GPU;
+    gpu: Gpu;
     attributes: Attribute[];
     drawCount: number;
     vertexShader: string;

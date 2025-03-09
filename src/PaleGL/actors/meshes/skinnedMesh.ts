@@ -19,7 +19,7 @@ import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/Pal
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
@@ -399,7 +399,7 @@ type FrameData = {
 //         return data;
 //     }
 //
-//     #createSkinDebugger({ gpu }: { gpu: GPU }) {
+//     #createSkinDebugger({ gpu }: { gpu: Gpu }) {
 //         const checkChildNum = (bone: Bone) => {
 //             if (bone.hasChild()) {
 //                 bone.getChildren().forEach((elem) => {
@@ -891,7 +891,7 @@ const getBoneJointMatricesWithBone = (
     return data;
 };
 
-const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: GPU }) => {
+const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => {
     const checkChildNum = (bone: Bone) => {
         if (bone.hasChild()) {
             bone.getChildren().forEach((elem) => {

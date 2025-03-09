@@ -16,9 +16,9 @@ import {
     bindGPUUniformBlockAndGetBlockIndex, clearGPUColor, clearGPUDepth,
     createGPUUniformBufferObject,
     drawGPU, flushGPU,
-    GPU, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
+    Gpu, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
     setGPUViewport
-} from '@/PaleGL/core/GPU';
+} from '@/PaleGL/core/gpu.ts';
 import {
     addDrawVertexCountStats,
     addPassInfoStats,
@@ -311,7 +311,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //      * @param canvas
 //      * @param pixelRatio
 //      */
-//     constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }) {
+//     constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; canvas: HTMLCanvasElement; pixelRatio: number }) {
 //         this._gpu = gpu;
 //         this._canvas = canvas;
 //         this._pixelRatio = pixelRatio;
@@ -2074,7 +2074,7 @@ export class Renderer {
      * @param canvas
      * @param pixelRatio
      */
-    constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }) {
+    constructor({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; canvas: HTMLCanvasElement; pixelRatio: number }) {
         this._gpu = gpu;
         this._canvas = canvas;
         this._pixelRatio = pixelRatio;

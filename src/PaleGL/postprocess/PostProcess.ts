@@ -1,7 +1,7 @@
 ﻿// import {Vector3} from '@/PaleGL/math/Vector3';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
@@ -18,7 +18,7 @@ import {setCameraSize} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 
 type PostProcessRenderArgs = {
-    gpu: GPU;
+    gpu: Gpu;
     renderer: Renderer;
     prevRenderTarget: RenderTarget | null;
     gBufferRenderTargets?: GBufferRenderTargets | null;
@@ -81,7 +81,7 @@ export class PostProcess {
         return lastPass.renderTarget;
     }
 
-    // constructor({gpu}: {gpu: GPU}) {
+    // constructor({gpu}: {gpu: Gpu}) {
     constructor(postProcessCamera?: Camera) {
         // // TODO: renderTargetがいらない時もあるので出し分けたい
         // this.renderTarget = new RenderTarget({

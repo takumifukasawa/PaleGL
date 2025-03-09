@@ -1,4 +1,4 @@
-﻿import { GPU } from '@/PaleGL/core/GPU.ts';
+﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export class GlObject {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -27,10 +27,10 @@ export type RawGLObject =
     ;
 
 export type GLObjectBase<T extends RawGLObject> = {
-    gpu: GPU;
+    gpu: Gpu;
     glObject: T
 }
 
-export function createGLObject<T extends RawGLObject>(gpu: GPU, glObject: T) {
+export function createGLObject<T extends RawGLObject>(gpu: Gpu, glObject: T) {
     return { gpu, glObject };
 }

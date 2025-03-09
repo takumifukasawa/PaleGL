@@ -1,9 +1,9 @@
 ﻿// import { GlObject } from '@/PaleGL/core/glObject.ts';
 // import { RenderbufferType, RenderbufferTypes } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // 
 // export class Renderbuffer extends GlObject {
-//     _gpu: GPU;
+//     _gpu: Gpu;
 //     _type: RenderbufferType;
 //     _renderbuffer: WebGLRenderbuffer;
 // 
@@ -11,7 +11,7 @@
 //         return this._renderbuffer;
 //     }
 // 
-//     constructor({ gpu, type, width, height }: { gpu: GPU; type: RenderbufferType; width: number; height: number }) {
+//     constructor({ gpu, type, width, height }: { gpu: Gpu; type: RenderbufferType; width: number; height: number }) {
 //         super();
 // 
 //         this._gpu = gpu;
@@ -54,13 +54,13 @@
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import { RenderbufferType, RenderbufferTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export type Renderbuffer = GLObjectBase<WebGLRenderbuffer> & {
     type: RenderbufferType;
 };
 
-export function createRenderbuffer(gpu: GPU, type: RenderbufferType, width: number, height: number): Renderbuffer {
+export function createRenderbuffer(gpu: Gpu, type: RenderbufferType, width: number, height: number): Renderbuffer {
     const gl = gpu.gl;
 
     const renderbuffer = gl.createRenderbuffer()!;

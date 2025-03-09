@@ -1,5 +1,5 @@
 // import { GlObject } from '@/PaleGL/core/glObject.ts';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // import { GL_DYNAMIC_DRAW, GL_UNIFORM_BUFFER, UniformTypes } from '@/PaleGL/constants.ts';
 // import {
 //     UniformBufferObjectElementValueArray,
@@ -54,7 +54,7 @@
 // }
 // 
 // export class UniformBufferObject extends GlObject {
-//     gpu: GPU;
+//     gpu: Gpu;
 //     ubo: WebGLBuffer;
 //     _blockName: string;
 //     _blockSize: number;
@@ -71,7 +71,7 @@
 //     }
 // 
 //     constructor(
-//         gpu: GPU,
+//         gpu: Gpu,
 //         blockName: string,
 //         blockSize: number,
 //         variableNames: string[],
@@ -192,7 +192,7 @@
 
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GL_DYNAMIC_DRAW, GL_UNIFORM_BUFFER, UniformTypes } from '@/PaleGL/constants.ts';
 import {
     UniformBufferObjectElementValueArray,
@@ -255,7 +255,7 @@ export type UniformBufferObject = GLObjectBase<WebGLBuffer> & {
 };
 
 export function createUniformBufferObject(
-    gpu: GPU,
+    gpu: Gpu,
     blockName: string,
     blockSize: number,
     variableNames: string[],

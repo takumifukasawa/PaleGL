@@ -1,6 +1,6 @@
 ﻿// import { GlObject } from '@/PaleGL/core/glObject.ts';
 // import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU';
+// import { Gpu } from '@/PaleGL/core/Gpu';
 // 
 // export class Framebuffer extends GlObject {
 //     _framebuffer: WebGLFramebuffer;
@@ -23,7 +23,7 @@
 //         this._drawBufferList.push(drawBufferName);
 //     }
 // 
-//     constructor({ gpu }: { gpu: GPU }) {
+//     constructor({ gpu }: { gpu: Gpu }) {
 //         super();
 // 
 //         this._gpu = gpu;
@@ -50,13 +50,13 @@
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export type Framebuffer = GLObjectBase<WebGLFramebuffer> & {
     drawBufferList: GLColorAttachment[];
 };
 
-export function createFramebuffer({ gpu }: { gpu: GPU }): Framebuffer {
+export function createFramebuffer({ gpu }: { gpu: Gpu }): Framebuffer {
     const { gl } = gpu;
 
     const fb = gl.createFramebuffer()!;

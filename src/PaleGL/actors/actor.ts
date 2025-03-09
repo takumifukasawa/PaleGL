@@ -2,19 +2,19 @@
 import { ActorType, ActorTypes } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
 import { Animator, createAnimator } from '@/PaleGL/core/animator.ts';
-import { GPU } from '@/PaleGL/core/GPU';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Component } from '@/PaleGL/core/component.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 
-export type ActorStartArgs = { scene: Scene; gpu: GPU };
-export type ActorFixedUpdateArgs = { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number };
-export type ActorUpdateArgs = { scene: Scene; gpu: GPU; time: number; deltaTime: number };
-export type ActorLastUpdateArgs = { scene: Scene; gpu: GPU; time: number; deltaTime: number };
+export type ActorStartArgs = { scene: Scene; gpu: Gpu };
+export type ActorFixedUpdateArgs = { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number };
+export type ActorUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime: number };
+export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; gpu: GPU }) => void;
-type OnFixedUpdateCallback = (args: { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnUpdateCallback = (args: { scene: Scene; gpu: GPU; time: number; deltaTime: number }) => void;
-type OnLastUpdateCallback = (args: { scene: Scene; gpu: GPU; time: number; deltaTime: number }) => void;
+type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
+type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
+type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
+type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = (key: string, value: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
@@ -163,7 +163,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 //         }
 //     }
 //
-//     // update({gpu, time, deltaTime}: { gpu: GPU, time: number, deltaTime: number } = {}) {
+//     // update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
 //     update({ gpu, scene, time, deltaTime }: ActorUpdateArgs) {
 //         _tryStart({ gpu, scene });
 //         _components.forEach((component) => {
@@ -191,7 +191,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //     // @ts-ignore
 //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     beforeRender({ gpu }: { gpu: GPU }) {
+//     beforeRender({ gpu }: { gpu: Gpu }) {
 //         if (_onBeforeRender) {
 //             _onBeforeRender(this);
 //         }
@@ -248,7 +248,7 @@ export type ActorArgs = { name?: string; type?: ActorType };
 //     fixedUpdate: (args: ActorFixedUpdateArgs) => void;
 //     update: (args: ActorUpdateArgs) => void;
 //     lastUpdate: (args: ActorLastUpdateArgs) => void;
-//     beforeRender: (args: { gpu: GPU }) => void;
+//     beforeRender: (args: { gpu: Gpu }) => void;
 //     processPropertyBinder: (key: string, value: number) => void;
 //     preProcessTimeline: (timelineTime: number) => void;
 //     postProcessTimeline: (timelineTime: number) => void;
@@ -294,7 +294,7 @@ export type Actor = {
     // fixedUpdate: (actor: Actor, args: ActorFixedUpdateArgs) => void;
     // update: UpdateActorFunc;
     // lastUpdate: (actor: Actor, args: ActorLastUpdateArgs) => void;
-    // beforeRender: (actor: Actor, args: { gpu: GPU }) => void;
+    // beforeRender: (actor: Actor, args: { gpu: Gpu }) => void;
     // processPropertyBinder: (actor: Actor, key: string, value: number) => void;
     // preProcessTimeline: (actor: Actor, timelineTime: number) => void;
     // postProcessTimeline: (actor: Actor, timelineTime: number) => void;

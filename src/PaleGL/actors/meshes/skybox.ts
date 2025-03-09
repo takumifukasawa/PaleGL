@@ -15,7 +15,7 @@ import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -72,7 +72,7 @@ f 6/12/8 2/6/2 4/10/5
 `;
 
 type SkyboxArgs = {
-    gpu: GPU;
+    gpu: Gpu;
     cubeMap: CubeMap;
     diffuseIntensity: number;
     specularIntensity: number;
