@@ -6,7 +6,7 @@ import {
     createRenderTarget,
     RenderTarget,
     setRenderTargetSize,
-} from '@/PaleGL/core/RenderTarget';
+} from '@/PaleGL/core/renderTarget.ts';
 // import {CopyPass} from "./CopyPass";
 import {
     createMaterial,

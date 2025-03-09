@@ -36,7 +36,7 @@ import {
     RenderTarget, setRenderTargetDepthTexture,
     setRenderTargetSize,
     setRenderTargetTexture,
-} from '@/PaleGL/core/RenderTarget';
+} from '@/PaleGL/core/renderTarget.ts';
 import {
     createGBufferRenderTargets,
     GBufferRenderTargets, setGBufferRenderTargetsDepthTexture,

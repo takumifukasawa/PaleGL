@@ -1,5 +1,5 @@
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { createRenderTarget, RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import {
     RenderTargetTypes,
     TextureFilterTypes,

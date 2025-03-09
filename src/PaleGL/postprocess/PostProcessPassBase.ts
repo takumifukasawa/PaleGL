@@ -1,4 +1,4 @@
-import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/RenderTarget.ts';
+import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 import {
     createMaterial,
     isCompiledMaterialShader,

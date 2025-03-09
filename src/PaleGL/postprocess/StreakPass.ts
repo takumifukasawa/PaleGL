@@ -23,7 +23,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-// import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+// import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 

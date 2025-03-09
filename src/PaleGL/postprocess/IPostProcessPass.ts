@@ -1,4 +1,4 @@
-﻿import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+﻿import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { Renderer } from '@/PaleGL/core/Renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';

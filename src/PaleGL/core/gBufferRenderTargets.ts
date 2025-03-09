@@ -213,7 +213,7 @@ import {
     TextureTypes,
 } from '@/PaleGL/constants';
 import { GPU } from '@/PaleGL/core/GPU';
-import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/RenderTarget.ts';
+import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/renderTarget.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
 // ---------------------------------------------------------------------

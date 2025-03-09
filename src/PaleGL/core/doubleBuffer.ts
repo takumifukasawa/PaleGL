@@ -38,7 +38,7 @@ import {
     RenderTarget,
     RenderTargetBase,
     RenderTargetOptions, setRenderTargetSize,
-} from '@/PaleGL/core/RenderTarget';
+} from '@/PaleGL/core/renderTarget.ts';
 import { RenderTargetKinds } from '@/PaleGL/constants.ts';
 
 type DoubleBuffer = RenderTargetBase & {

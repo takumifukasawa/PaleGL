@@ -37,7 +37,7 @@ import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
 import { getWorldForward } from '@/PaleGL/core/transform.ts';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { createRay, Ray } from '@/PaleGL/math/ray.ts';
