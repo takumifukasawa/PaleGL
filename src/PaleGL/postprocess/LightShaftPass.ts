@@ -6,7 +6,7 @@ import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.t
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
 import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';

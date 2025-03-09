@@ -2,7 +2,7 @@
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/Renderer';
+import { applyLightShadowMapUniformValues, LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';

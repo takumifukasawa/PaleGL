@@ -9,7 +9,7 @@ import {Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts'
 import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 // import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 // import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';

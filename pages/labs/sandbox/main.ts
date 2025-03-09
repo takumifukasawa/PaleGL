@@ -7,7 +7,7 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';

@@ -12,7 +12,7 @@ import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { Renderer } from '@/PaleGL/core/Renderer.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';

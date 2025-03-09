@@ -11,7 +11,7 @@ import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
 import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';
 import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';

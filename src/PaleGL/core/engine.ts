@@ -3,7 +3,7 @@ import { ActorTypes } from '@/PaleGL/constants';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';

@@ -2,7 +2,7 @@
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import { Renderer } from '@/PaleGL/core/Renderer';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';

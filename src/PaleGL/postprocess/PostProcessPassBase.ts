@@ -5,7 +5,7 @@ import {
     Material,
     setMaterialUniformValue, startMaterial
 } from '@/PaleGL/materials/material.ts';
-import { LightActors, Renderer } from '@/PaleGL/core/Renderer.ts';
+import { LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';

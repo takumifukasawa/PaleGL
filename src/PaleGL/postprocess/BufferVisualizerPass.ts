@@ -9,7 +9,7 @@ import {Gpu, setGPUViewport} from '@/PaleGL/core/gpu.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
-import { Renderer } from '@/PaleGL/core/Renderer.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
