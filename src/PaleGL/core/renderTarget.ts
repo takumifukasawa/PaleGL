@@ -414,12 +414,12 @@ import {
     GL_DEPTH_BUFFER_BIT,
     GLTextureFilter, RenderTargetKind, RenderTargetKinds,
 } from '@/PaleGL/constants';
-import {checkGPUExtension, Gpu} from '@/PaleGL/core/gpu.ts';
+import {checkGPUExtension, GPU} from '@/PaleGL/core/GPU.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
 export type RenderTargetOptions = {
     // require
-    gpu: Gpu;
+    gpu: GPU;
     renderTargetKind?: RenderTargetKind;
     // optional
     width?: number;
@@ -437,7 +437,7 @@ export type RenderTargetOptions = {
 };
 
 export type RenderTarget = RenderTargetBase & {
-    gpu: Gpu,
+    gpu: GPU,
     type: RenderTargetType,
     name: string,
     width: number,
@@ -747,7 +747,7 @@ export function setRenderTargetDepthTexture(renderTarget: RenderTarget, depthTex
 }
 
 export function blitRenderTargetDepth(
-    gpu: Gpu,
+    gpu: GPU,
     sourceRenderTarget: RenderTarget,
     destRenderTarget: RenderTarget,
     width: number,

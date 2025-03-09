@@ -1,7 +1,7 @@
 ﻿import {createGeometry, createTangentsAndBinormals, Geometry} from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 type PlaneGeometryRawDataOptions = {
@@ -176,7 +176,7 @@ export function createPlaneGeometry({
     gpu,
     ...args
 }: {
-    gpu: Gpu;
+    gpu: GPU;
 } & PlaneGeometryRawDataOptions) {
     const { attributes, indices, drawCount } = createPlaneGeometryData(args);
 

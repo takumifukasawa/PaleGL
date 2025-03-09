@@ -4,7 +4,7 @@ import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 
 const axesHelperGeometryData = `
 # Blender 3.3.1
@@ -162,7 +162,7 @@ f 9/28/17 18/51/17 19/52/17
 f 23/56/18 22/55/18 20/53/18
 `;
 
-export function createAxesHelper({ gpu }: { gpu: Gpu }) {
+export function createAxesHelper({ gpu }: { gpu: GPU }) {
     const objData = parseObj(axesHelperGeometryData);
     const geometry = createGeometry({
         gpu,

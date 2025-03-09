@@ -1,4 +1,4 @@
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
@@ -42,7 +42,7 @@ export type FontAtlasData = {
 // };
 
 type TextMeshArgs = {
-    gpu: Gpu;
+    gpu: GPU;
     name?: string;
     text: string;
     color?: Color;

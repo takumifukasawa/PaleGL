@@ -1,4 +1,4 @@
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
@@ -19,7 +19,7 @@ import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 
 type CharMeshArgs = {
-    gpu: Gpu;
+    gpu: GPU;
     name?: string;
     uniforms?: UniformsData;
     color: Color;

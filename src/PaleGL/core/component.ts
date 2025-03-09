@@ -1,18 +1,18 @@
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 
-export type ComponentStartArgs = { scene: Scene; gpu: Gpu };
-export type ComponentFixedUpdateArgs = { gpu: Gpu; fixedTime: number; fixedDeltaTime: number };
-export type ComponentBeforeUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
-export type ComponentUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
-export type ComponentLastUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
+export type ComponentStartArgs = { scene: Scene; gpu: GPU };
+export type ComponentFixedUpdateArgs = { gpu: GPU; fixedTime: number; fixedDeltaTime: number };
+export type ComponentBeforeUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
+export type ComponentUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
+export type ComponentLastUpdateArgs = { gpu: GPU; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
-type OnFixedUpdateCallback = (args: { gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnBeforeUpdateCallback = (args: { gpu: Gpu; time: number; deltaTime: number }) => void;
-type OnUpdateCallback = (args: { gpu: Gpu; time: number; deltaTime: number }) => void;
-type OnLastUpdateCallback = (args: { gpu: Gpu; time: number; deltaTime: number }) => void;
+type OnStartCallback = (args: { scene: Scene; gpu: GPU }) => void;
+type OnFixedUpdateCallback = (args: { gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
+type OnBeforeUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
+type OnUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
+type OnLastUpdateCallback = (args: { gpu: GPU; time: number; deltaTime: number }) => void;
 type OnProcessPropertyBinderCallback = (key: string, value: number) => void;
 type OnPostProcessTimelineCallback = (timelineTime: number) => void;
 

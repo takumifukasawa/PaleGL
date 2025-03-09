@@ -19,7 +19,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 // import { Texture } from '@/PaleGL/core/Texture';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { CubeMap } from '@/PaleGL/core/CubeMap';
@@ -1228,7 +1228,7 @@ export function createMaterial(args: MaterialArgs): Material {
     };
 }
 
-export const startMaterial = (material: Material, { gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) => {
+export const startMaterial = (material: Material, { gpu, attributeDescriptors }: { gpu: GPU; attributeDescriptors: AttributeDescriptor[] }) => {
     // for debug
     // console.log(`[material.start] name: ${_name}`);
 

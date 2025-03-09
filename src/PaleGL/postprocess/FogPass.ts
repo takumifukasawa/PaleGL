@@ -1,8 +1,10 @@
 ﻿// import { UniformTypes } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import {
-    PostProcessPassBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
@@ -80,7 +82,7 @@ const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 export class FogPass extends PostProcessPassBase {
     parameters: Override<PostProcessPassParametersBase, FogPassParameters>;
 
-    constructor(args: { gpu: Gpu; parameters?: FogPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: FogPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = fogFragmentShader;
 

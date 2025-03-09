@@ -192,7 +192,7 @@
 
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { GL_DYNAMIC_DRAW, GL_UNIFORM_BUFFER, UniformTypes } from '@/PaleGL/constants.ts';
 import {
     UniformBufferObjectElementValueArray,
@@ -255,7 +255,7 @@ export type UniformBufferObject = GLObjectBase<WebGLBuffer> & {
 };
 
 export function createUniformBufferObject(
-    gpu: Gpu,
+    gpu: GPU,
     blockName: string,
     blockSize: number,
     variableNames: string[],

@@ -1,9 +1,15 @@
 ﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import { Renderer } from '@/PaleGL/core/renderer.ts';
+import {
+    beforeRenderRenderer,
+    checkNeedsBindUniformBufferObjectToMaterial,
+    Renderer,
+    setRendererSize,
+    setRendererStats
+} from '@/PaleGL/core/renderer.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
@@ -372,7 +378,7 @@ export function createEngine({
     onRender,
     showStats = false,
 }: {
-    gpu: Gpu;
+    gpu: GPU;
     renderer: Renderer;
     fixedUpdateFps?: number;
     updateFps?: number;
@@ -382,7 +388,7 @@ export function createEngine({
     onRender?: EngineOnRenderCallback;
     showStats?: boolean;
 }) {
-    const _gpu: Gpu = gpu;
+    const _gpu: GPU = gpu;
     const _stats: Stats | null = createStats({ showStats, showPipeline: false });
     const _renderer: Renderer = renderer;
     let _scene: Scene | null = null;
@@ -399,7 +405,7 @@ export function createEngine({
     let _onRender: EngineOnRenderCallback | null = onRender || null;
     const _sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
 
-    _renderer.setStats(_stats);
+    setRendererStats(_renderer, _stats);
 
     const start = () => {
         if (_onBeforeStart) {
@@ -425,7 +431,7 @@ export function createEngine({
         //     scene.traverse((actor) => actor.setSize(w, h));
         // });
         // _renderer.setSize(w, h, rw, rh);
-        _renderer.setSize(rw, rh);
+        setRendererSize(_renderer, rw, rh);
     };
 
     function fixedUpdate(fixedTime: number, fixedDeltaTime: number) {
@@ -482,10 +488,10 @@ export function createEngine({
                     beforeRenderActor(actor, { gpu: _gpu });
                     const mesh = actor as Mesh;
                     mesh.materials.forEach((mat) => {
-                        _renderer.$checkNeedsBindUniformBufferObjectToMaterial(mat);
+                        checkNeedsBindUniformBufferObjectToMaterial(renderer, mat);
                     });
                     mesh.depthMaterials.forEach((mat) => {
-                        _renderer.$checkNeedsBindUniformBufferObjectToMaterial(mat);
+                        checkNeedsBindUniformBufferObjectToMaterial(renderer, mat);
                     });
                     break;
                 default:
@@ -530,7 +536,7 @@ export function createEngine({
 
         clearStats(_stats);
 
-        _renderer.beforeRender(time, deltaTime);
+        beforeRenderRenderer(_renderer, time, deltaTime);
 
         // update and render shared textures
         Object.values(_sharedTextures).forEach((obj) => {

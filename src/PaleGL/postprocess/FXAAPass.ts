@@ -1,7 +1,12 @@
 ﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
-import { PostProcessPassBase, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import {
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
+    PostProcessPassParametersBase
+} from '@/PaleGL/postprocess/PostProcessPassBase';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 // ref:
@@ -21,7 +26,7 @@ export function generateFXAAPassParameters(params: FXAAPassParametersArgs = {}):
 }
 
 export class FXAAPass extends PostProcessPassBase {
-    constructor(args: { gpu: Gpu; parameters?: FXAAPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: FXAAPassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = fxaaFragmentShader;
 

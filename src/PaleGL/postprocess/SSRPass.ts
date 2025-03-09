@@ -5,10 +5,12 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {
-    PostProcessPassBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
@@ -93,7 +95,7 @@ export class SSRPass extends PostProcessPassBase {
      *
      * @param args
      */
-    constructor(args: { gpu: Gpu; parameters?: SSRPassParameters }) {
+    constructor(args: { gpu: GPU; parameters?: SSRPassParameters }) {
         const { gpu } = args;
         const parameters = generateSSRPassParameters(args.parameters ?? {});
 

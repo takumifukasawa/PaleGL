@@ -1,9 +1,9 @@
-﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
+﻿import { GPU } from '@/PaleGL/core/GPU.ts';
+import {PostProcessPassParametersBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
 import {
     PostProcessPassBase,
-    PostProcessPassParametersBase,
-    PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+
 import {
     MAX_SPOT_LIGHT_COUNT,
     PostProcessPassType,
@@ -19,18 +19,21 @@ import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {
+    setMaterialUniformValue
+} from '@/PaleGL/materials/material.ts';
 
-export type DeferredShadingParametersBase = PostProcessPassParametersBase;
+// export type DeferredShadingParametersBase = PostProcessPassParametersBase;
 
 export type DeferredShadingParameters = PostProcessPassParametersBase;
 
 export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
 
+
 export class DeferredShadingPass extends PostProcessPassBase {
     constructor(args // name,
     : {
-        gpu: Gpu;
+        gpu: GPU;
         parameters?: DeferredShadingParametersArgs;
     }) {
         const { gpu } = args;

@@ -36,13 +36,13 @@
 // }
 
 
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import { GL_TRANSFORM_FEEDBACK, GL_TRANSFORM_FEEDBACK_BUFFER } from '@/PaleGL/constants.ts';
 
 export type TransformFeedback = GLObjectBase<WebGLTransformFeedback> & {};
 
-export function createTransformFeedback({ gpu, buffers }: { gpu: Gpu; buffers: WebGLBuffer[] }): TransformFeedback {
+export function createTransformFeedback({ gpu, buffers }: { gpu: GPU; buffers: WebGLBuffer[] }): TransformFeedback {
         const transformFeedback = gpu.gl.createTransformFeedback()!;
         bindRawTransformFeedback(gpu.gl, transformFeedback)
         for (let i = 0; i < buffers.length; i++) {

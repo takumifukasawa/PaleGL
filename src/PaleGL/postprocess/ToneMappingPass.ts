@@ -1,6 +1,8 @@
-﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
+﻿import { GPU } from '@/PaleGL/core/GPU.ts';
 import {
-    PostProcessPassBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
@@ -19,7 +21,7 @@ export function generateToneMappingPassParameters(params: ToneMappingPassParamet
 }
 
 export class ToneMappingPass extends PostProcessPassBase {
-    constructor(args: { gpu: Gpu; parameters?: ToneMappingPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
         const { gpu } = args;
         
         const parameters = generateToneMappingPassParameters(args.parameters);

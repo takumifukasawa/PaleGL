@@ -17,9 +17,9 @@ import {
 } from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Renderer } from '@/PaleGL/core/renderer.ts';
+import {Renderer, renderMesh, setRendererRenderTarget} from '@/PaleGL/core/renderer.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
@@ -156,7 +156,7 @@ export class BloomPass implements IPostProcessPass {
         return this._compositePass.renderTarget;
     }
 
-    constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BloomPassParametersArgs }) {
+    constructor({ gpu, parameters }: { gpu: GPU; parameters?: BloomPassParametersArgs }) {
         this.parameters = generateDefaultBloomPassParameters(parameters);
 
         // NOTE: _geometryは親から渡して使いまわしてもよい
@@ -364,7 +364,7 @@ export class BloomPass implements IPostProcessPass {
         const w = this.width / downSize;
         const h = this.height / downSize;
 
-        renderer.setRenderTarget(horizontalRenderTarget, true);
+        setRendererRenderTarget(renderer, horizontalRenderTarget, true);
         setMaterialUniformValue(
             this._horizontalBlurMaterial,
             UniformNames.SrcTexture,
@@ -372,9 +372,9 @@ export class BloomPass implements IPostProcessPass {
         );
         setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetWidth, w);
         setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetHeight, w);
-        renderer.renderMesh(this._geometry, this._horizontalBlurMaterial);
+        renderMesh(renderer, this._geometry, this._horizontalBlurMaterial);
 
-        renderer.setRenderTarget(verticalRenderTarget, true);
+        setRendererRenderTarget(renderer, verticalRenderTarget, true);
         // renderer.clearColor(0, 0, 0, 1);
         setMaterialUniformValue(
             this._verticalBlurMaterial,
@@ -383,7 +383,7 @@ export class BloomPass implements IPostProcessPass {
         );
         setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetWidth, w);
         setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetHeight, h);
-        renderer.renderMesh(this._geometry, this._verticalBlurMaterial);
+        renderMesh(renderer, this._geometry, this._verticalBlurMaterial);
     }
 
     render({

@@ -788,7 +788,7 @@ export const getAttributeUsage = (usageType: AttributeUsageType) => {
     }
 };
 
-export type Gpu = {
+export type GPU = {
     gl: WebGL2RenderingContext;
     shader: Shader | null;
     vao: VertexArrayObject | null;
@@ -804,7 +804,7 @@ export type Gpu = {
 type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type GPUBase = Modify<
-    Gpu,
+    GPU,
     {
         dummyTexture: Texture | null;
         dummyTextureBlack: Texture | null;
@@ -812,7 +812,7 @@ export type GPUBase = Modify<
     }
 >;
 
-export function createGPU(gl: WebGL2RenderingContext): Gpu {
+export function createGPU(gl: WebGL2RenderingContext): GPU {
     const shader: Shader | null = null;
     const vao: VertexArrayObject | null = null;
     const uniforms: Uniforms | null = null;
@@ -837,7 +837,7 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     };
 
     dummyTexture = createTexture({
-        gpu: gpu as Gpu,
+        gpu: gpu as GPU,
         img: create1x1('white'),
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
@@ -845,7 +845,7 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     gpu.dummyTexture = dummyTexture;
 
     dummyTextureBlack = createTexture({
-        gpu: gpu as Gpu,
+        gpu: gpu as GPU,
         img: create1x1('black'),
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
@@ -853,7 +853,7 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     gpu.dummyTextureBlack = dummyTextureBlack;
 
     dummyCubeTexture = createCubeMap(
-        gpu as Gpu,
+        gpu as GPU,
         create1x1(),
         create1x1(),
         create1x1(),
@@ -863,26 +863,26 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     );
     gpu.dummyCubeTexture = dummyCubeTexture;
 
-    return gpu as Gpu;
+    return gpu as GPU;
 }
 
-export function setGPUShader(gpu: Gpu, shader: Shader) {
+export function setGPUShader(gpu: GPU, shader: Shader) {
     gpu.shader = shader;
 }
 
-export function setGPUVertexArrayObject(gpu: Gpu, vao: VertexArrayObject) {
+export function setGPUVertexArrayObject(gpu: GPU, vao: VertexArrayObject) {
     gpu.vao = vao;
 }
 
-export function setGPUUniforms(gpu: Gpu, uniforms: Uniforms) {
+export function setGPUUniforms(gpu: GPU, uniforms: Uniforms) {
     gpu.uniforms = uniforms;
 }
 
-export function setGPUViewport(gpu: Gpu, x: number, y: number, width: number, height: number) {
+export function setGPUViewport(gpu: GPU, x: number, y: number, width: number, height: number) {
     gpu.gl.viewport(x, y, width, height);
 }
 
-export function setGPUFramebuffer(gpu: Gpu, framebuffer: Framebuffer | null) {
+export function setGPUFramebuffer(gpu: GPU, framebuffer: Framebuffer | null) {
     const gl = gpu.gl;
     if (!framebuffer) {
         gl.bindFramebuffer(GL_FRAMEBUFFER, null);
@@ -899,11 +899,11 @@ export function setGPUFramebuffer(gpu: Gpu, framebuffer: Framebuffer | null) {
     //     : gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-export function flushGPU(gpu: Gpu) {
+export function flushGPU(gpu: GPU) {
     gpu.gl.flush();
 }
 
-export function clearGPUDepth(gpu: Gpu, r: number, g: number, b: number, a: number) {
+export function clearGPUDepth(gpu: GPU, r: number, g: number, b: number, a: number) {
     const gl = gpu.gl;
     gl.depthMask(true);
     gl.colorMask(false, false, false, false);
@@ -911,7 +911,7 @@ export function clearGPUDepth(gpu: Gpu, r: number, g: number, b: number, a: numb
     gl.clear(GL_DEPTH_BUFFER_BIT);
 }
 
-export function clearGPUColor(gpu: Gpu, r: number, g: number, b: number, a: number) {
+export function clearGPUColor(gpu: GPU, r: number, g: number, b: number, a: number) {
     const gl = gpu.gl;
     gl.depthMask(false);
     gl.colorMask(true, true, true, true);
@@ -919,7 +919,7 @@ export function clearGPUColor(gpu: Gpu, r: number, g: number, b: number, a: numb
     gl.clear(GL_COLOR_BUFFER_BIT);
 }
 
-export function clearGPUColorAndDepth(gpu: Gpu, r: number, g: number, b: number, a: number) {
+export function clearGPUColorAndDepth(gpu: GPU, r: number, g: number, b: number, a: number) {
     clearGPUDepth(gpu, r, g, b, a);
     clearGPUColor(gpu, r, g, b, a);
 
@@ -937,7 +937,7 @@ export function clearGPUColorAndDepth(gpu: Gpu, r: number, g: number, b: number,
     //
 }
 
-export function checkGPUExtension(gpu: Gpu, extensionName: string): boolean {
+export function checkGPUExtension(gpu: GPU, extensionName: string): boolean {
     if (gpu.validExtensions.includes(extensionName)) {
         return true;
     }
@@ -973,7 +973,7 @@ export function getGLPrimitive(primitiveType: PrimitiveType) {
     }
 }
 
-export function setGPUUniformValues(gpu: Gpu) {
+export function setGPUUniformValues(gpu: GPU) {
     const gl = gpu.gl;
 
     let activeTextureIndex = 0;
@@ -1111,7 +1111,7 @@ export function setGPUUniformValues(gpu: Gpu) {
 }
 
 export function updateGPUTransformFeedback(
-    gpu: Gpu,
+    gpu: GPU,
     {
         shader,
         uniforms,
@@ -1161,7 +1161,7 @@ export function updateGPUTransformFeedback(
 // start offset と instanceCount は逆の方が良い
 // なんなら object destructuring の方がよさそう
 export function drawGPU(
-    gpu: Gpu,
+    gpu: GPU,
     drawCount: number,
     primitiveType: PrimitiveType,
     depthTest: boolean,
@@ -1289,7 +1289,7 @@ export function drawGPU(
 }
 
 export function createGPUUniformBufferObject(
-    gpu: Gpu,
+    gpu: GPU,
     shader: Shader,
     blockName: string,
     uniformBufferObjectBlockData: UniformBufferObjectBlockData
@@ -1351,7 +1351,7 @@ export function createGPUUniformBufferObject(
 }
 
 export function bindGPUUniformBlockAndGetBlockIndex(
-    gpu: Gpu,
+    gpu: GPU,
     uniformBufferObject: UniformBufferObject,
     shader: Shader,
     blockName: string

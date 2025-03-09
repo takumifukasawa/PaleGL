@@ -12,10 +12,13 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import {
-    PostProcessPassBase, PostProcessPassParametersBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -32,6 +35,7 @@ import {
 } from "@/PaleGL/materials/material.ts";
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import {renderMesh, setRendererRenderTarget} from "@/PaleGL/core/renderer.ts";
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
@@ -77,7 +81,7 @@ export class VolumetricLightPass extends PostProcessPassBase {
      *
      * @param args
      */
-    constructor(args: { gpu: Gpu; parameters?: VolumetricLightPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
         const { gpu } = args;
         const parameters = generateVolumetricLightParameters(args.parameters ?? {});
 
@@ -233,7 +237,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             });
         }
 
-        renderer.setRenderTarget(this.renderTargetSpotLightFrustum, false, true);
+        setRendererRenderTarget(renderer, this.renderTargetSpotLightFrustum, false, true);
 
         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
@@ -241,7 +245,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
                 setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.worldMatrix);
                 // TODO: この描画だけでvolumeを計算したい
-                renderer.renderMesh(spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
+                renderMesh(renderer, spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
             }
         });
 

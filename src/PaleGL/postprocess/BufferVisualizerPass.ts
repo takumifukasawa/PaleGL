@@ -5,7 +5,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import {Gpu, setGPUViewport} from '@/PaleGL/core/gpu.ts';
+import {GPU, setGPUViewport} from '@/PaleGL/core/GPU.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
@@ -116,7 +116,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
         return this.compositePass.renderTarget;
     }
 
-    constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BufferVisualizerPassParametersArgs }) {
+    constructor({ gpu, parameters }: { gpu: GPU; parameters?: BufferVisualizerPassParametersArgs }) {
         window.addEventListener('keydown', (e) => {
             if (e.key === 'b') {
                 this.toggleR = !this.toggleR;

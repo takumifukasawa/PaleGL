@@ -7,8 +7,8 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
-import { Renderer } from '@/PaleGL/core/renderer.ts';
-import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
+import {createRenderer, renderRenderer} from '@/PaleGL/core/renderer.ts';
+import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/GPU.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
@@ -349,7 +349,7 @@ const captureScene = createScene();
 const pixelRatio = Math.min(window.devicePixelRatio, 1);
 // const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
 
-const renderer = new Renderer({
+const renderer = createRenderer({
     gpu,
     canvas: canvasElement,
     pixelRatio,
@@ -1909,7 +1909,7 @@ void main() {
     });
 
     engine.setOnRender((time) => {
-        renderer.render(captureScene, captureSceneCamera, engine.getSharedTextures(), { time });
+        renderRenderer(renderer, captureScene, captureSceneCamera, engine.getSharedTextures(), { time });
     });
 
     const tick = (time: number) => {

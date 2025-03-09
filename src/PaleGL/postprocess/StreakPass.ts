@@ -7,7 +7,7 @@ import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 import {Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -157,7 +157,7 @@ export class StreakPass implements IPostProcessPass {
         // horizontalScale,
         parameters,
     }: {
-        gpu: Gpu;
+        gpu: GPU;
         // threshold?: number;
         // stretch?: number;
         // intensity?: number;

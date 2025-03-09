@@ -1,7 +1,7 @@
 ﻿import { loadImg } from '@/PaleGL/loaders/loadImg';
 import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { CubeMapAxis } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 
 // example
 // images: {
@@ -22,7 +22,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 // };
 
 export async function loadCubeMap(
-    gpu: Gpu,
+    gpu: GPU,
     posXImage: string,
     negXImage: string,
     posYImage: string,

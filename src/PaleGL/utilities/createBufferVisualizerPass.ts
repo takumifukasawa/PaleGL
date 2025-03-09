@@ -1,7 +1,7 @@
 import { BufferVisualizerPass } from '@/PaleGL/postprocess/BufferVisualizerPass.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 
-export function createBufferVisualizerPass({ gpu }: { gpu: Gpu }) {
+export function createBufferVisualizerPass({ gpu }: { gpu: GPU }) {
     const bufferVisualizerPass = new BufferVisualizerPass({
         gpu,
     });

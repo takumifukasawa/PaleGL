@@ -1,4 +1,4 @@
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import {
     MeshTypes,
     PRAGMA_RAYMARCH_SCENE,
@@ -26,7 +26,7 @@ import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 
 type ScreenSpaceRaymarchMeshArgs = {
-    gpu: Gpu;
+    gpu: GPU;
     name?: string;
     geometry?: Geometry;
     uniforms?: UniformsData;

@@ -1,8 +1,11 @@
 ﻿import {PostProcessPassType, UniformNames, UniformTypes} from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
 import {
-    PostProcessPassBase, PostProcessPassParametersBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
+    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Override } from '@/PaleGL/palegl';
@@ -46,7 +49,7 @@ export class VignettePass extends PostProcessPassBase {
     // blendRate: number;
     parameters: Override<PostProcessPassParametersBase, VignettePassParameters>;
 
-    constructor(args: { gpu: Gpu; parameters?: VignettePassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: VignettePassParametersArgs }) {
         const { gpu } = args;
         const fragmentShader = vignetteFragment;
 

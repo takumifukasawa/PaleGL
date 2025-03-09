@@ -1,8 +1,10 @@
 ﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { GPU } from '@/PaleGL/core/GPU.ts';
 import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
 import {
-    PostProcessPassBase,
+    PostProcessPassBase
+} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase';
@@ -38,7 +40,7 @@ export function generateChromaticAberrationPassParameters(
 export class ChromaticAberrationPass extends PostProcessPassBase {
     parameters: Override<PostProcessPassParametersBase, ChromaticAberrationPassParameters>;
 
-    constructor(args: { gpu: Gpu; parameters?: ChromaticAberrationPassParametersArgs }) {
+    constructor(args: { gpu: GPU; parameters?: ChromaticAberrationPassParametersArgs }) {
         const { gpu } = args;
 
         const parameters = generateChromaticAberrationPassParameters(args.parameters ?? {});
