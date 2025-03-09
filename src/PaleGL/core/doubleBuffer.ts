@@ -33,10 +33,11 @@
 // }
 
 import {
+    createRenderTarget,
     createRenderTargetBase,
     RenderTarget,
     RenderTargetBase,
-    RenderTargetOptions,
+    RenderTargetOptions, setRenderTargetSize,
 } from '@/PaleGL/core/RenderTarget';
 import { RenderTargetKinds } from '@/PaleGL/constants.ts';
 
@@ -50,7 +51,7 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
 
     for (let i = 0; i < 2; i++) {
         const options: RenderTargetOptions = { ...renderTargetOptions, ...{ name: `double-buffer_${i}` } };
-        renderTargets.push(new RenderTarget(options));
+        renderTargets.push(createRenderTarget(options));
     }
 
     return {
@@ -61,7 +62,7 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
 }
 
 export function setDoubleBufferSize(doubleBuffer: DoubleBuffer, width: number, height: number) {
-    doubleBuffer.renderTargets.forEach((renderTarget) => renderTarget.setSize(width, height));
+    doubleBuffer.renderTargets.forEach((renderTarget) => setRenderTargetSize(renderTarget, width, height));
 }
 
 export function getReadRenderTargetOfDoubleBuffer(doubleBuffer: DoubleBuffer) {

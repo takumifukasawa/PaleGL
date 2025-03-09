@@ -540,7 +540,7 @@ export class StreakPass implements IPostProcessPass {
             const width = Math.floor(this.width / downScale);
             pass.setSize(width, this.halfHeight);
             setMaterialUniformValue(pass.material, UniformNames.TexelSize, new Vector2(1 / width, 1 / this.halfHeight));
-            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);
             setMaterialUniformValue(pass.material, UNIFORM_NAME_HORIZONTAL_SCALE, this.parameters.horizontalScale);
             pass.render({
                 gpu,
@@ -560,8 +560,8 @@ export class StreakPass implements IPostProcessPass {
 
         this.upSamplePasses.forEach(({ pass, prevPass, downSamplePass }) => {
             pass.setSize(downSamplePass.width, downSamplePass.height);
-            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.$getTexture());
-            setMaterialUniformValue(pass.material, UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, downSamplePass.renderTarget.$getTexture());
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);
+            setMaterialUniformValue(pass.material, UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, downSamplePass.renderTarget.texture);
             setMaterialUniformValue(pass.material, UNIFORM_NAME_STRETCH, this.parameters.stretch);
             pass.render({
                 gpu,
@@ -581,7 +581,7 @@ export class StreakPass implements IPostProcessPass {
 
         setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_STREAK_TEXTURE,
             // correct
-            this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.$getTexture()
+            this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.texture
             // for debug
             // this.prefilterPass.renderTarget.$getTexture()
             );

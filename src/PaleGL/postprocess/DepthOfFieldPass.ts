@@ -379,7 +379,7 @@ export class DepthOfFieldPass implements IPostProcessPass {
         setMaterialUniformValue(
             this.preFilterPass.material,
             UNIFORM_NAME_COC_TEXTURE,
-            this.circleOfConfusionPass.renderTarget.$getTexture()
+            this.circleOfConfusionPass.renderTarget.texture
         );
 
         setMaterialUniformValue(
@@ -455,12 +455,12 @@ export class DepthOfFieldPass implements IPostProcessPass {
         setMaterialUniformValue(
             this.compositePass.material,
             UNIFORM_NAME_COC_TEXTURE,
-            this.circleOfConfusionPass.renderTarget.$getTexture()
+            this.circleOfConfusionPass.renderTarget.texture
         );
         setMaterialUniformValue(
             this.compositePass.material,
             UNIFORM_NAME_DOF_TEXTURE,
-            this.bokehBlurPass.renderTarget.$getTexture()
+            this.bokehBlurPass.renderTarget.texture
         );
 
         this.compositePass.render({

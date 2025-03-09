@@ -206,7 +206,7 @@ export class PostProcess {
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.DepthTexture,
-                renderer.depthPrePassRenderTarget.$getDepthTexture()
+                renderer.depthPrePassRenderTarget.depthTexture
             );
         });
     }

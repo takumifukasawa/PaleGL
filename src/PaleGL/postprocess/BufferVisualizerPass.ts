@@ -662,7 +662,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                         pass.material,
                         tiles.get(DIRECTIONAL_LIGHT_SHADOW_MAP_KEY)!.uniformNameTexture!,
                         // 'uDirectionalLightShadowMap',
-                        lightActors.directionalLight.shadowMap!.read.$getDepthTexture()
+                        lightActors.directionalLight.shadowMap!.depthTexture
                     );
                 }
             }
@@ -674,7 +674,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                             setMaterialUniformValue(
                                 pass.material,
                                 tiles.get(key)!.uniformNameTexture!,
-                                spotLight.shadowMap.read.$getDepthTexture()
+                                spotLight.shadowMap.depthTexture
                             );
                         }
                     }
@@ -685,7 +685,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(DEPTH_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.depthPrePassRenderTarget.$getDepthTexture()
+                    renderer.depthPrePassRenderTarget.depthTexture
                 );
             }
 
@@ -725,7 +725,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(SCREEN_SPACE_SHADOW_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.screenSpaceShadowPass.renderTarget.read.$getTexture()
+                    renderer.screenSpaceShadowPass.renderTarget.texture
                 );
             }
 
@@ -733,7 +733,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(AMBIENT_OCCLUSION_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.ambientOcclusionPass.renderTarget.read.$getTexture()
+                    renderer.ambientOcclusionPass.renderTarget.texture
                 );
             }
 
@@ -741,7 +741,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(DEFERRED_SHADING_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.deferredShadingPass.renderTarget.read.$getTexture()
+                    renderer.deferredShadingPass.renderTarget.texture
                 );
             }
 
@@ -749,7 +749,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(SSR_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.ssrPass.renderTarget.read.$getTexture()
+                    renderer.ssrPass.renderTarget.texture
                 );
             }
 
@@ -757,7 +757,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(LIGHT_SHAFT_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.lightShaftPass.renderTarget.read.$getTexture()
+                    renderer.lightShaftPass.renderTarget.texture
                 );
             }
 
@@ -765,7 +765,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(VOLUMETRIC_LIGHT_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.volumetricLightPass.renderTarget.read.$getTexture()
+                    renderer.volumetricLightPass.renderTarget.texture
                 );
             }
 
@@ -773,7 +773,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(DEPTH_OF_FIELD_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.depthOfFieldPass.renderTarget.read.$getTexture()
+                    renderer.depthOfFieldPass.renderTarget.texture
                 );
             }
 
@@ -781,7 +781,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(FOG_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.fogPass.renderTarget.read.$getTexture()
+                    renderer.fogPass.renderTarget.texture
                 );
             }
 
@@ -789,7 +789,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_PREFILTER_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.prefilterPass.renderTarget.read.$getTexture()
+                    renderer.streakPass.prefilterPass.renderTarget.texture
                 );
             }
 
@@ -797,7 +797,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.downSamplePasses[0].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.downSamplePasses[0].pass.renderTarget.texture
                 );
             }
 
@@ -805,7 +805,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.downSamplePasses[1].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.downSamplePasses[1].pass.renderTarget.texture
                 );
             }
 
@@ -813,7 +813,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.downSamplePasses[2].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.downSamplePasses[2].pass.renderTarget.texture
                 );
             }
 
@@ -821,7 +821,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.downSamplePasses[3].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.downSamplePasses[3].pass.renderTarget.texture
                 );
             }
 
@@ -829,7 +829,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.downSamplePasses[4].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.downSamplePasses[4].pass.renderTarget.texture
                 );
             }
 
@@ -837,7 +837,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_UP_SAMPLE_0_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.upSamplePasses[0].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.upSamplePasses[0].pass.renderTarget.texture
                 );
             }
 
@@ -845,7 +845,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_UP_SAMPLE_1_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.upSamplePasses[1].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.upSamplePasses[1].pass.renderTarget.texture
                 );
             }
 
@@ -853,7 +853,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_UP_SAMPLE_2_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.upSamplePasses[2].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.upSamplePasses[2].pass.renderTarget.texture
                 );
             }
 
@@ -861,7 +861,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_UP_SAMPLE_3_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.upSamplePasses[3].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.upSamplePasses[3].pass.renderTarget.texture
                 );
             }
 
@@ -869,7 +869,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_UP_SAMPLE_4_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.upSamplePasses[4].pass.renderTarget.read.$getTexture()
+                    renderer.streakPass.upSamplePasses[4].pass.renderTarget.texture
                 );
             }
 
@@ -877,7 +877,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(STREAK_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.streakPass.renderTarget.read.$getTexture()
+                    renderer.streakPass.renderTarget.texture
                 );
             }
 
@@ -885,7 +885,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(BLOOM_BLUR_MIP4_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTargetBlurMip4.read.$getTexture()
+                    renderer.bloomPass.renderTargetBlurMip4.texture
                 );
             }
 
@@ -893,7 +893,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(BLOOM_BLUR_MIP8_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTargetBlurMip8.read.$getTexture()
+                    renderer.bloomPass.renderTargetBlurMip8.texture
                 );
             }
 
@@ -901,7 +901,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(BLOOM_BLUR_MIP16_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTargetBlurMip16.read.$getTexture()
+                    renderer.bloomPass.renderTargetBlurMip16.texture
                 );
             }
 
@@ -909,7 +909,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(BLOOM_BLUR_MIP32_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTargetBlurMip32.read.$getTexture()
+                    renderer.bloomPass.renderTargetBlurMip32.texture
                 );
             }
 
@@ -917,7 +917,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     pass.material,
                     tiles.get(BLOOM_BLUR_MIP64_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTargetBlurMip64.read.$getTexture()
+                    renderer.bloomPass.renderTargetBlurMip64.texture
                 );
             }
 
@@ -926,7 +926,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                     pass.material,
                     // 'uBloomTexture',
                     tiles.get(BLOOM_TEXTURE_KEY)!.uniformNameTexture!,
-                    renderer.bloomPass.renderTarget.read.$getTexture()
+                    renderer.bloomPass.renderTarget.texture
                 );
             }
         });
@@ -945,7 +945,7 @@ export class BufferVisualizerPass implements IPostProcessPass {
                 setMaterialUniformValue(
                     this.compositePass.material,
                     `uRow${i}Texture`,
-                    pass.renderTarget.read.$getTexture()
+                    pass.renderTarget.texture
                 );
             }
         });
@@ -956,8 +956,8 @@ export class BufferVisualizerPass implements IPostProcessPass {
             // renderer.depthOfFieldPass.renderTarget.read.$getTexture()
             // renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.read.$getTexture()
             this.toggleR
-                ? renderer.depthOfFieldPass.preFilterPass.renderTarget.read.$getTexture()
-                : renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.read.$getTexture()
+                ? renderer.depthOfFieldPass.preFilterPass.renderTarget.texture
+                : renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.texture
             // renderer.depthOfFieldPass.dofBokehPass.renderTarget.read.$getTexture()
             // renderer.depthOfFieldPass.preFilterPass.renderTarget.read.$getTexture()
         );

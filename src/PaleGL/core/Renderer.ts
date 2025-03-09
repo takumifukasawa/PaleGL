@@ -30,7 +30,13 @@ import {
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import {
+    blitRenderTargetDepth,
+    createRenderTarget,
+    RenderTarget, setRenderTargetDepthTexture,
+    setRenderTargetSize,
+    setRenderTargetTexture,
+} from '@/PaleGL/core/RenderTarget';
 import {
     createGBufferRenderTargets,
     GBufferRenderTargets, setGBufferRenderTargetsDepthTexture,
@@ -124,14 +130,14 @@ export function applyLightShadowMapUniformValues(
         targetMaterial,
         UniformNames.DirectionalLightShadowMap,
         lightActors.directionalLight && lightActors.directionalLight.shadowMap
-            ? lightActors.directionalLight.shadowMap.read.$getDepthTexture()
+            ? lightActors.directionalLight.shadowMap.depthTexture
             : fallbackTexture,
     );
 
     // spotlights
     const spotLightShadowMaps = maton.range(MAX_SPOT_LIGHT_COUNT).map((i) => {
         const spotLight = lightActors.spotLights[i];
-        return spotLight && spotLight.shadowMap ? spotLight.shadowMap.read.$getDepthTexture() : fallbackTexture;
+        return spotLight && spotLight.shadowMap ? spotLight.shadowMap.depthTexture! : fallbackTexture;
     });
     setMaterialUniformValue(targetMaterial, UniformNames.SpotLightShadowMap, spotLightShadowMaps);
 }
@@ -2067,7 +2073,7 @@ export class Renderer {
         this._canvas = canvas;
         this._pixelRatio = pixelRatio;
         this._scenePostProcess = new PostProcess(this._screenQuadCamera);
-        this._depthPrePassRenderTarget = new RenderTarget({
+        this._depthPrePassRenderTarget = createRenderTarget({
             gpu,
             type: RenderTargetTypes.Depth,
             width: 1,
@@ -2081,7 +2087,7 @@ export class Renderer {
             height: 1,
             name: 'g-buffer render target',
         });
-        this._afterDeferredShadingRenderTarget = new RenderTarget({
+        this._afterDeferredShadingRenderTarget = createRenderTarget({
             gpu,
             type: RenderTargetTypes.Empty,
             width: 1,
@@ -2089,7 +2095,7 @@ export class Renderer {
             name: 'after g-buffer render target',
         });
         // console.log(this._afterDeferredShadingRenderTarget)
-        this._copyDepthSourceRenderTarget = new RenderTarget({
+        this._copyDepthSourceRenderTarget = createRenderTarget({
             gpu,
             type: RenderTargetTypes.Empty,
             width: 1,
@@ -2097,7 +2103,7 @@ export class Renderer {
             name: 'copy depth source render target',
             depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
         });
-        this._copyDepthDestRenderTarget = new RenderTarget({
+        this._copyDepthDestRenderTarget = createRenderTarget({
             gpu,
             type: RenderTargetTypes.Depth,
             width: 1,
@@ -2501,11 +2507,11 @@ export class Renderer {
         this._gpu.setSize(0, 0, w, h);
 
         // render targets
-        this._depthPrePassRenderTarget.setSize(w, h);
+        setRenderTargetSize(this._depthPrePassRenderTarget, w, h);
         setGBufferRenderTargetsSize(this._gBufferRenderTargets, w, h);
-        this._afterDeferredShadingRenderTarget.setSize(w, h);
-        this._copyDepthSourceRenderTarget.setSize(w, h);
-        this._copyDepthDestRenderTarget.setSize(w, h);
+        setRenderTargetSize(this._afterDeferredShadingRenderTarget, w, h);
+        setRenderTargetSize(this._copyDepthSourceRenderTarget, w, h);
+        setRenderTargetSize(this._copyDepthDestRenderTarget, w, h);
         // passes
         this._screenSpaceShadowPass.setSize(w, h);
         this._ambientOcclusionPass.setSize(w, h);
@@ -2857,14 +2863,14 @@ export class Renderer {
         setMaterialUniformValue(
             this._deferredShadingPass.material,
             'uScreenSpaceShadowTexture',
-            this._screenSpaceShadowPass.renderTarget.read.$getTexture(),
+            this._screenSpaceShadowPass.renderTarget.texture,
         );
 
         // set ao texture
         setMaterialUniformValue(
             this._deferredShadingPass.material,
             'uAmbientOcclusionTexture',
-            this._ambientOcclusionPass.renderTarget.read.$getTexture(),
+            this._ambientOcclusionPass.renderTarget.texture,
         );
 
         PostProcess.renderPass({
@@ -2942,12 +2948,12 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         this._fogPass.setTextures(
-            this._lightShaftPass.renderTarget.read.$getTexture()!,
+            this._lightShaftPass.renderTarget.texture!,
             // CUSTOM
             //  this._gpu.dummyTextureBlack,
             //
-            this._volumetricLightPass.renderTarget.read.$getTexture()!,
-            this._screenSpaceShadowPass.renderTarget.read.$getTexture()!,
+            this._volumetricLightPass.renderTarget.texture!,
+            this._screenSpaceShadowPass.renderTarget.texture!,
             sharedTextures[SharedTexturesTypes.FBM_NOISE].texture,
         );
 
@@ -2970,12 +2976,12 @@ export class Renderer {
         // ------------------------------------------------------------------------------
 
         // TODO: 直前のパスを明示的に指定する必要があるのはめんどうなのでうまいこと管理したい
-        this._afterDeferredShadingRenderTarget.setTexture(this._fogPass.renderTarget.read.$getTexture()!);
+        setRenderTargetTexture(this._afterDeferredShadingRenderTarget, this._fogPass.renderTarget.texture!);
 
         // pattern1: g-buffer depth
         // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture!);
         // pattern2: depth prepass
-        this._afterDeferredShadingRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.$getDepthTexture()!);
+        setRenderTargetDepthTexture(this._afterDeferredShadingRenderTarget, this._depthPrePassRenderTarget.depthTexture!);
 
         this.copyDepthTexture();
 
@@ -2984,11 +2990,11 @@ export class Renderer {
             setMaterialUniformValue(
                 getMeshMaterial(renderMeshInfo.actor),
                 UniformNames.DepthTexture,
-                this._copyDepthDestRenderTarget.$getDepthTexture(),
+                this._copyDepthDestRenderTarget.depthTexture,
             );
         });
 
-        this.setRenderTarget(this._afterDeferredShadingRenderTarget.write);
+        this.setRenderTarget(this._afterDeferredShadingRenderTarget);
 
         this.$transparentPass(sortedTransparentRenderMeshInfos, camera, lightActors);
 
@@ -3194,14 +3200,14 @@ export class Renderer {
     }
 
     private copyDepthTexture() {
-        this._copyDepthSourceRenderTarget.setDepthTexture(this._depthPrePassRenderTarget.$getDepthTexture()!);
-        RenderTarget.blitDepth({
-            gpu: this._gpu,
-            sourceRenderTarget: this._copyDepthSourceRenderTarget,
-            destRenderTarget: this._copyDepthDestRenderTarget,
-            width: this._realWidth,
-            height: this._realHeight,
-        });
+        setRenderTargetDepthTexture(this._copyDepthSourceRenderTarget, this._depthPrePassRenderTarget.depthTexture!);
+        blitRenderTargetDepth(
+            this._gpu,
+            this._copyDepthSourceRenderTarget,
+            this._copyDepthDestRenderTarget,
+            this._realWidth,
+            this._realHeight
+        );
     }
 
     private shadowPass(castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
@@ -3216,7 +3222,7 @@ export class Renderer {
                 console.error('invalid shadow cameras');
                 return;
             }
-            this.setRenderTarget(lightActor.shadowMap.write, false, true);
+            this.setRenderTarget(lightActor.shadowMap, false, true);
             // this.clear(0, 0, 0, 1);
             // this._gpu.clearDepth(0, 0, 0, 1);
 
@@ -3246,7 +3252,7 @@ export class Renderer {
                     setMaterialUniformValue(
                         depthMaterial,
                         UniformNames.DepthTexture,
-                        this._copyDepthDestRenderTarget.$getDepthTexture(),
+                        this._copyDepthDestRenderTarget.depthTexture,
                     );
 
                     this.renderMesh(actor.geometry, depthMaterial);
@@ -3262,7 +3268,7 @@ export class Renderer {
         // console.log("--------- scene pass ---------");
 
         // NOTE: DepthTextureはあるはず
-        setGBufferRenderTargetsDepthTexture(this._gBufferRenderTargets, this._depthPrePassRenderTarget.$getDepthTexture()!);
+        setGBufferRenderTargetsDepthTexture(this._gBufferRenderTargets, this._depthPrePassRenderTarget.depthTexture!);
 
         this.setRenderTarget(this._gBufferRenderTargets, true);
 
@@ -3306,7 +3312,7 @@ export class Renderer {
             setMaterialUniformValue(
                 targetMaterial,
                 UniformNames.DepthTexture,
-                this._copyDepthDestRenderTarget.$getDepthTexture(),
+                this._copyDepthDestRenderTarget.depthTexture
             );
 
             // TODO:

@@ -1,4 +1,4 @@
-import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/RenderTarget.ts';
 import {
     createMaterial,
     isCompiledMaterialShader,
@@ -190,7 +190,7 @@ export class PostProcessPassBase implements IPostProcessPass {
             material: this.material,
         });
 
-        this._renderTarget = new RenderTarget({
+        this._renderTarget = createRenderTarget({
             gpu,
             width: 1,
             height: 1,
@@ -235,7 +235,7 @@ export class PostProcessPassBase implements IPostProcessPass {
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this._renderTarget.setSize(width, height);
+        setRenderTargetSize(this._renderTarget, width, height);
 
         // TODO: pass base で更新しちゃって大丈夫？
         setMaterialUniformValue(this.material, UniformNames.TargetWidth, this.width);
@@ -291,7 +291,7 @@ export class PostProcessPassBase implements IPostProcessPass {
         // 渡してない場合はなにもしない. src texture がいらないとみなす
         // TODO: 無理やり渡しちゃっても良い気もしなくもない
         if (prevRenderTarget) {
-            setMaterialUniformValue(this.material, UniformNames.SrcTexture, prevRenderTarget.$getTexture());
+            setMaterialUniformValue(this.material, UniformNames.SrcTexture, prevRenderTarget.texture);
         }
 
         if (this.beforeRender) {

@@ -1,5 +1,5 @@
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
+import { createRenderTarget, RenderTarget } from '@/PaleGL/core/RenderTarget.ts';
 import {
     RenderTargetTypes,
     TextureFilterTypes,
@@ -206,7 +206,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
     const planeGeometry = createPlaneGeometry({ gpu });
 
     const createEffectRenderTarget = ({ gpu, width, height }: { gpu: GPU; width: number; height: number }) => {
-        return new RenderTarget({
+        return createRenderTarget({
             gpu,
             width,
             height,
@@ -280,7 +280,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
 
         startMaterial(tmpMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
         startMaterial(ppMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
-        setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.$getTexture());
+        setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.texture);
 
         const render = () => {
             renderMaterial(tmpRenderTarget, tmpMaterial);
@@ -292,7 +292,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         acc[key] = (() => {
             let needsUpdate: boolean = false;
             return {
-                texture: ppRenderTarget.$getTexture()!,
+                texture: ppRenderTarget.texture!,
                 needsUpdate: false,
                 update: (time: number) => {
                     needsUpdate = false;

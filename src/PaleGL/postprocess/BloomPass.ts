@@ -2,7 +2,11 @@
 import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
 import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import {
+    createRenderTarget,
+    RenderTarget,
+    setRenderTargetSize,
+} from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
 import {
     createMaterial,
@@ -159,43 +163,43 @@ export class BloomPass implements IPostProcessPass {
         this._geometry = createPlaneGeometry({ gpu });
 
         // tmp
-        this._renderTargetBlurMip4_Horizontal = new RenderTarget({
+        this._renderTargetBlurMip4_Horizontal = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip4_Vertical = new RenderTarget({
+        this._renderTargetBlurMip4_Vertical = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip8_Horizontal = new RenderTarget({
+        this._renderTargetBlurMip8_Horizontal = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip8_Vertical = new RenderTarget({
+        this._renderTargetBlurMip8_Vertical = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip16_Horizontal = new RenderTarget({
+        this._renderTargetBlurMip16_Horizontal = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip16_Vertical = new RenderTarget({
+        this._renderTargetBlurMip16_Vertical = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip32_Horizontal = new RenderTarget({
+        this._renderTargetBlurMip32_Horizontal = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip32_Vertical = new RenderTarget({
+        this._renderTargetBlurMip32_Vertical = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip64_Horizontal = new RenderTarget({
+        this._renderTargetBlurMip64_Horizontal = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
-        this._renderTargetBlurMip64_Vertical = new RenderTarget({
+        this._renderTargetBlurMip64_Vertical = createRenderTarget({
             gpu,
             type: RenderTargetTypes.R11F_G11F_B10F,
         });
@@ -326,16 +330,18 @@ export class BloomPass implements IPostProcessPass {
 
         this._extractBrightnessPass.setSize(width, height);
 
-        this._renderTargetBlurMip4_Horizontal.setSize(width / 4, height / 4);
-        this._renderTargetBlurMip4_Vertical.setSize(width / 4, height / 4);
-        this._renderTargetBlurMip8_Horizontal.setSize(width / 8, height / 8);
-        this._renderTargetBlurMip8_Vertical.setSize(width / 8, height / 8);
-        this._renderTargetBlurMip16_Horizontal.setSize(width / 16, height / 16);
-        this._renderTargetBlurMip16_Vertical.setSize(width / 16, height / 16);
-        this._renderTargetBlurMip32_Horizontal.setSize(width / 32, height / 32);
-        this._renderTargetBlurMip32_Vertical.setSize(width / 32, height / 32);
-        this._renderTargetBlurMip64_Horizontal.setSize(width / 64, height / 64);
-        this._renderTargetBlurMip64_Vertical.setSize(width / 64, height / 64);
+        setRenderTargetSize(this._renderTargetBlurMip4_Horizontal, width / 4, height / 4);
+        setRenderTargetSize(this._renderTargetBlurMip4_Vertical, width / 4, height / 4);
+        setRenderTargetSize(this._renderTargetBlurMip8_Horizontal, width / 8, height / 8);
+        setRenderTargetSize(this._renderTargetBlurMip8_Vertical, width / 8, height / 8);
+        setRenderTargetSize(this._renderTargetBlurMip16_Horizontal, width / 16, height / 16);
+        setRenderTargetSize(this._renderTargetBlurMip16_Vertical, width / 16, height / 16);
+        setRenderTargetSize(this._renderTargetBlurMip32_Horizontal, width / 32, height / 32);
+        setRenderTargetSize(this._renderTargetBlurMip32_Vertical, width / 32, height / 32);
+        setRenderTargetSize(this._renderTargetBlurMip64_Horizontal, width / 64, height / 64);
+        setRenderTargetSize(this._renderTargetBlurMip64_Vertical, width / 64, height / 64);
+        
+        console.log(this._renderTargetBlurMip4_Horizontal);
 
         this._compositePass.setSize(width, height);
     }
@@ -362,7 +368,7 @@ export class BloomPass implements IPostProcessPass {
         setMaterialUniformValue(
             this._horizontalBlurMaterial,
             UniformNames.SrcTexture,
-            beforeRenderTarget.$getTexture()
+            beforeRenderTarget.texture
         );
         setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetWidth, w);
         setMaterialUniformValue(this._horizontalBlurMaterial, UniformNames.TargetHeight, w);
@@ -373,7 +379,7 @@ export class BloomPass implements IPostProcessPass {
         setMaterialUniformValue(
             this._verticalBlurMaterial,
             UniformNames.SrcTexture,
-            horizontalRenderTarget.$getTexture()
+            horizontalRenderTarget.texture
         );
         setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetWidth, w);
         setMaterialUniformValue(this._verticalBlurMaterial, UniformNames.TargetHeight, h);
@@ -460,7 +466,7 @@ export class BloomPass implements IPostProcessPass {
             setMaterialUniformValue(
                 this._compositePass.material,
                 UniformNames.SrcTexture,
-                prevRenderTarget.$getTexture()
+                prevRenderTarget.texture
             );
         } else {
             console.error('invalid prev render target');
@@ -469,32 +475,32 @@ export class BloomPass implements IPostProcessPass {
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_BLUR_4_TEXTURE,
-            this._renderTargetBlurMip4_Vertical.$getTexture()
+            this._renderTargetBlurMip4_Vertical.texture
         );
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_BLUR_8_TEXTURE,
-            this._renderTargetBlurMip8_Vertical.$getTexture()
+            this._renderTargetBlurMip8_Vertical.texture
         );
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_BLUR_16_TEXTURE,
-            this._renderTargetBlurMip16_Vertical.$getTexture()
+            this._renderTargetBlurMip16_Vertical.texture
         );
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_BLUR_32_TEXTURE,
-            this._renderTargetBlurMip32_Vertical.$getTexture()
+            this._renderTargetBlurMip32_Vertical.texture
         );
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_BLUR_64_TEXTURE,
-            this._renderTargetBlurMip64_Vertical.$getTexture()
+            this._renderTargetBlurMip64_Vertical.texture
         );
         setMaterialUniformValue(
             this._compositePass.material,
             UNIFORM_NAME_EXTRACT_TEXTURE,
-            this._extractBrightnessPass.renderTarget.$getTexture()
+            this._extractBrightnessPass.renderTarget.texture
         );
 
         // this._compositePass.material.uniforms.setValue('uTone', this.parameters.tone);

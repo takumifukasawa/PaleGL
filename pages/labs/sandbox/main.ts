@@ -9,7 +9,7 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 import { createEngine } from '@/PaleGL/core/engine.ts';
 import { Renderer } from '@/PaleGL/core/Renderer';
 import { GPU } from '@/PaleGL/core/GPU';
-import { RenderTarget } from '@/PaleGL/core/RenderTarget';
+import { createRenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import { Texture } from '@/PaleGL/core/Texture';
 import { createOrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
@@ -402,7 +402,7 @@ if (directionalLight.shadowCamera) {
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
     setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
-    directionalLight.shadowMap = new RenderTarget({
+    directionalLight.shadowMap = createRenderTarget({
         gpu,
         width: 1024,
         height: 1024,
@@ -443,7 +443,7 @@ if (spotLight1.shadowCamera) {
     spotLight1.shadowCamera.far = spotLight1.distance;
     // spotLight.shadowCamera.far = 10;
     setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight1.shadowMap = new RenderTarget({
+    spotLight1.shadowMap = createRenderTarget({
         gpu,
         width: 1024,
         height: 1024,
@@ -476,7 +476,7 @@ if (spotLight2.shadowCamera) {
     spotLight2.shadowCamera.far = spotLight2.distance;
     // spotLight.shadowCamera.far = 10;
     setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight2.shadowMap = new RenderTarget({
+    spotLight2.shadowMap = createRenderTarget({
         gpu,
         width: 1024,
         height: 1024,
