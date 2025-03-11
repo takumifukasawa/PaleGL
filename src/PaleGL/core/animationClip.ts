@@ -1,4 +1,4 @@
-﻿import { createRotatorFromMatrix4 } from '@/PaleGL/math/Rotator';
+﻿import { createRotatorFromMatrix4 } from '@/PaleGL/math/rotator.ts';
 import { AnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';

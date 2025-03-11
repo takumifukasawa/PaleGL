@@ -131,7 +131,7 @@ import {
     setRotatorRotationDegreeX,
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
-} from '@/PaleGL/math/Rotator.ts';
+} from '@/PaleGL/math/rotator.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 

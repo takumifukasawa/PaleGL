@@ -25,7 +25,7 @@ import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 import { StartActorFunc, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import {createRotatorFromMatrix4} from "@/PaleGL/math/Rotator.ts";
+import {createRotatorFromMatrix4} from "@/PaleGL/math/rotator.ts";
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;

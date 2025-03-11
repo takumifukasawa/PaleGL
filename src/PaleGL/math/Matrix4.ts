@@ -9,7 +9,7 @@
     v3z,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import { getRotatorAxesRadians, Rotator } from '@/PaleGL/math/Rotator';
+import { getRotatorAxesRadians, Rotator } from '@/PaleGL/math/rotator.ts';
 import { Quaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 
 // memory layout is column order.

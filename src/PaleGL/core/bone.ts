@@ -1,6 +1,6 @@
 ﻿import { NodeBase, createNodeBase } from '@/PaleGL/core/nodeBase.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { createRotatorZero, Rotator } from '@/PaleGL/math/Rotator';
+import { createRotatorZero, Rotator } from '@/PaleGL/math/rotator.ts';
 import { createVector3One, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 // export class Bone extends NodeBase {

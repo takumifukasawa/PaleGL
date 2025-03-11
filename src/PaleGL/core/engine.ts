@@ -22,7 +22,7 @@ import {
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import {cloneRotator, createRotatorFromQuaternion, Rotator} from '@/PaleGL/math/Rotator.ts';
+import {cloneRotator, createRotatorFromQuaternion, Rotator} from '@/PaleGL/math/rotator.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
 import {
     createTimeAccumulator,
