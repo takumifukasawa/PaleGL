@@ -1,6 +1,6 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {Color, createColorWhite} from '@/PaleGL/math/Color.ts';
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { CharMesh, createCharMesh } from '@/PaleGL/actors/meshes/charMesh.ts';
 
@@ -71,7 +71,7 @@ export function createTextMesh({
     gpu,
     name,
     text,
-    color = Color.white,
+    color = createColorWhite(),
     fontTexture,
     fontAtlas,
     align = TextAlignType.Left,

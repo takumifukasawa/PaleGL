@@ -621,7 +621,7 @@ import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fra
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {Color, createColorWhite} from '@/PaleGL/math/Color.ts';
 import {
     PostProcessPassBase,
     createPostProcessPassBase,
@@ -662,7 +662,7 @@ function generateStreakPassParameters(args: StreakPassParametersArgs = {}): Stre
         enabled: args.enabled || true,
         threshold: args.threshold || 0.9,
         stretch: args.stretch || 0.5,
-        color: args.color || Color.white,
+        color: args.color || createColorWhite(),
         intensity: args.intensity || 0.6,
         verticalScale: args.verticalScale || 1.5,
         horizontalScale: args.horizontalScale || 1.25,

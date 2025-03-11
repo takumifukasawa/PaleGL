@@ -292,7 +292,7 @@ import {
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Color } from '@/PaleGL/math/Color';
+import { Color, createColorBlack } from '@/PaleGL/math/Color';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 import {
@@ -408,7 +408,7 @@ export function createSSAOPass(args: { gpu: Gpu; parameters?: SSAOPassParameters
     const occlusionBias: number = 0.0001;
     const occlusionMinDistance: number = 0.006;
     const occlusionMaxDistance: number = 0.2;
-    const occlusionColor: Color = new Color(0, 0, 0, 1);
+    const occlusionColor: Color = createColorBlack();
     const occlusionPower: number = 1.85;
     const occlusionStrength: number = 0.448;
     const blendRate: number = 1;
@@ -515,7 +515,7 @@ export function createSSAOPass(args: { gpu: Gpu; parameters?: SSAOPassParameters
                 {
                     name: 'uOcclusionColor',
                     type: UniformTypes.Color,
-                    value: new Color(0, 0, 0, 1),
+                    value: createColorBlack(),
                 },
                 {
                     name: 'uOcclusionPower',

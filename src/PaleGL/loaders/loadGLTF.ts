@@ -11,7 +11,12 @@ import { Quaternion } from '@/PaleGL/math/Quaternion';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {
+    createColorBlack,
+    createColorFromArray,
+    createColorWhite,
+    multiplyColorScalar
+} from '@/PaleGL/math/Color.ts';
 import {
     createTexture,
     resolveGLEnumTextureFilterType,
@@ -552,23 +557,23 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 : null;
             const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : null;
 
-            let emissiveColor = Color.black;
+            let emissiveColor = createColorBlack();
             // eslint-disable-next-line no-prototype-builtins
             if (targetMaterial.hasOwnProperty('emissiveFactor')) {
                 if (usedExtensions.KHR_materials_emissive_strength) {
                     const emissiveStrength =
                         targetMaterial.extensions!.KHR_materials_emissive_strength!.emissiveStrength;
-                    emissiveColor = Color.fromArray(targetMaterial.emissiveFactor!).multiplyScalar(emissiveStrength);
+                    emissiveColor = multiplyColorScalar(createColorFromArray(targetMaterial.emissiveFactor!), emissiveStrength);
                 } else {
-                    emissiveColor = Color.fromArray(targetMaterial.emissiveFactor!);
+                    emissiveColor = createColorFromArray(targetMaterial.emissiveFactor!);
                 }
             }
 
             return createGBufferMaterial({
                 diffuseMap,
                 diffuseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
-                    ? Color.fromArray(targetMaterial.pbrMetallicRoughness.baseColorFactor)
-                    : Color.white,
+                    ? createColorFromArray(targetMaterial.pbrMetallicRoughness.baseColorFactor)
+                    : createColorWhite(),
                 normalMap,
                 metallic: targetMaterial.pbrMetallicRoughness.metallicFactor,
                 roughness: targetMaterial.pbrMetallicRoughness.roughnessFactor,

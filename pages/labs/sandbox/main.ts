@@ -7,15 +7,16 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
-import {createRenderer, renderRenderer} from '@/PaleGL/core/renderer.ts';
-import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
+import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
+import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
+import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
-    setOrbitCameraControllerDelta, startOrbitCameraController
+    setOrbitCameraControllerDelta,
+    startOrbitCameraController,
 } from '@/PaleGL/core/orbitCameraController.ts';
 
 // geometries
@@ -32,15 +33,22 @@ import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/mate
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
-import { Color } from '@/PaleGL/math/Color';
+import {
+    createColor,
+    createColorFromHex,
+    createColorFromRGB,
+    createColorWhite,
+    getColorHexCoord,
+} from '@/PaleGL/math/Color';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
 // postprocess
 import {
-    createBufferVisualizerPass, hideBufferVisualizerPassDom,
-    showBufferVisualizerPassDom
+    createBufferVisualizerPass,
+    hideBufferVisualizerPassDom,
+    showBufferVisualizerPassDom,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
 
 // inputs
@@ -72,9 +80,12 @@ import {
 import {
     addDebuggerBorderSpacer,
     addButtonDebugger,
-    addSliderDebugger, addToggleDebugger,
+    addSliderDebugger,
+    addToggleDebugger,
     createDebuggerGUI,
-    DebuggerGUI, addDebugGroup, addColorDebugger,
+    DebuggerGUI,
+    addDebugGroup,
+    addColorDebugger,
 } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -107,12 +118,12 @@ import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
-import {DepthOfFieldPassParameters} from "@/PaleGL/postprocess/depthOfFieldPass.ts";
-import {LightShaftPassParameters} from "@/PaleGL/postprocess/lightShaftPass.ts";
-import {VolumetricLightPassParameters} from "@/PaleGL/postprocess/volumetricLightPass.ts";
-import {FogPassParameters} from "@/PaleGL/postprocess/fogPass.ts";
-import {BloomPassParameters} from "@/PaleGL/postprocess/bloomPass.ts";
-import {SSRPassParameters} from "@/PaleGL/postprocess/ssrPass.ts";
+import { DepthOfFieldPassParameters } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+import { LightShaftPassParameters } from '@/PaleGL/postprocess/lightShaftPass.ts';
+import { VolumetricLightPassParameters } from '@/PaleGL/postprocess/volumetricLightPass.ts';
+import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
+import { BloomPassParameters } from '@/PaleGL/postprocess/bloomPass.ts';
+import { SSRPassParameters } from '@/PaleGL/postprocess/ssrPass.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -143,19 +154,17 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
 
     const spotLightDebuggerGroup = addDebugGroup(debuggerGUI, label, false);
 
-    addToggleDebugger(
-        spotLightDebuggerGroup,
-        {
-            label: 'light enabled',
-            initialValue: spotLight.enabled,
-            onChange: (value) => (spotLight.enabled = value),
-        });
+    addToggleDebugger(spotLightDebuggerGroup, {
+        label: 'light enabled',
+        initialValue: spotLight.enabled,
+        onChange: (value) => (spotLight.enabled = value),
+    });
 
     addColorDebugger(spotLightDebuggerGroup, {
         label: 'color',
-        initialValue: spotLight.color.getHexCoord(),
+        initialValue: getColorHexCoord(spotLight.color),
         onChange: (value) => {
-            spotLight.color = Color.fromHex(value);
+            spotLight.color = createColorFromHex(value);
         },
     });
 
@@ -393,7 +402,7 @@ captureSceneCamera.onFixedUpdate = () => {
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
     if (inputController.getIsDown() && orbitCameraController.enabled) {
-        setOrbitCameraControllerDelta(orbitCameraController, inputController.getDeltaNormalizedInputPosition())
+        setOrbitCameraControllerDelta(orbitCameraController, inputController.getDeltaNormalizedInputPosition());
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
 };
@@ -402,7 +411,7 @@ const directionalLight = createDirectionalLight({
     // intensity: 1.2,
     intensity: 0,
     // color: Color.fromRGB(255, 210, 200),
-    color: Color.white,
+    color: createColorWhite(),
 });
 // directionalLight.enabled = false; // NOTE: 一旦ガード
 
@@ -442,7 +451,7 @@ addActorToScene(captureScene, directionalLight);
 
 const spotLight1 = createSpotLight({
     intensity: 1,
-    color: Color.white,
+    color: createColorWhite(),
     distance: 20,
     attenuation: 0.1,
     coneAngle: 0.1 * RAD_TO_DEG,
@@ -475,7 +484,7 @@ addActorToScene(captureScene, spotLight1);
 
 const spotLight2 = createSpotLight({
     intensity: 1,
-    color: Color.white,
+    color: createColorWhite(),
     distance: 20,
     attenuation: 0.1,
     coneAngle: 0.1 * RAD_TO_DEG,
@@ -982,7 +991,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                     Math.random() * range - range * 0.5,
                 ];
             })
-            .flat(),
+            .flat()
     );
 
     const initialVelocity = new Float32Array(
@@ -991,7 +1000,7 @@ const createInstanceUpdater = (instanceNum: number) => {
             .map(() => {
                 return [0, 0, 0];
             })
-            .flat(),
+            .flat()
     );
 
     const initialSeed = new Float32Array(
@@ -1006,7 +1015,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                     // Math.floor(Math.random() * 100000)
                 ];
             })
-            .flat(),
+            .flat()
     );
 
     const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
@@ -1123,16 +1132,16 @@ layout (std140) uniform ubCommon {
     // TODO: rendererかgpuでまとめたい
     transformFeedbackDoubleBuffer.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName,
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
         );
         if (!targetGlobalUniformBufferObject) {
             return;
         }
         const blockIndex = bindGPUUniformBlockAndGetBlockIndex(
-            gpu, 
+            gpu,
             targetGlobalUniformBufferObject.uniformBufferObject,
             transformFeedbackDoubleBuffer.shader,
-            blockName,
+            blockName
         );
         // console.log("hogehoge", blockName, blockIndex)
         // for debug
@@ -1147,7 +1156,7 @@ layout (std140) uniform ubCommon {
             transformFeedbackDoubleBuffer.uniforms,
             blockIndex,
             targetGlobalUniformBufferObject.uniformBufferObject,
-            [],
+            []
         );
     });
 
@@ -1215,10 +1224,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
         instanceInfo.velocity.push([0, 0, 0]);
 
-        const c = Color.fromRGB(
+        const c = createColorFromRGB(
             Math.floor(Math.random() * 200 + 30),
             Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30),
+            Math.floor(Math.random() * 200 + 30)
         );
         instanceInfo.color.push([...c.e]);
     });
@@ -1240,7 +1249,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(instanceInfo.position.flat()),
             size: 3,
             divisor: 1,
-        }),
+        })
     );
     setGeometryAttribute(
         skinningMesh.geometry,
@@ -1249,7 +1258,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(instanceInfo.scale.flat()),
             size: 3,
             divisor: 1,
-        }),
+        })
     );
     setGeometryAttribute(
         skinningMesh.geometry,
@@ -1258,7 +1267,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(instanceInfo.rotation.flat()),
             size: 3,
             divisor: 1,
-        }),
+        })
     );
     // aInstanceAnimationOffsetは予約語
     setGeometryAttribute(
@@ -1268,7 +1277,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(animationOffsetInfo),
             size: 1,
             divisor: 1,
-        }),
+        })
     );
     setGeometryAttribute(
         skinningMesh.geometry,
@@ -1277,7 +1286,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(instanceInfo.color.flat()),
             size: 4,
             divisor: 1,
-        }),
+        })
     );
     setGeometryAttribute(
         skinningMesh.geometry,
@@ -1286,7 +1295,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(maton.range(instanceNum).fill(0).flat()),
             size: 4,
             divisor: 1,
-        }),
+        })
     );
     setGeometryAttribute(
         skinningMesh.geometry,
@@ -1295,7 +1304,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             data: new Float32Array(instanceInfo.velocity.flat()),
             size: 3,
             divisor: 1,
-        }),
+        })
     );
 
     // skinningMesh.material = new PhongMaterial({
@@ -1324,7 +1333,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             useInstanceLookDirection: true,
             useVertexColor: true,
             faceSide: FaceSide.Double,
-        }),
+        })
     );
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
@@ -1337,20 +1346,17 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uNormalizedInputPosition',
-            inputController.getNormalizedInputPosition(),
+            inputController.getNormalizedInputPosition()
         );
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uAttractTargetPosition',
-            attractSphereMesh.transform.position);
+            attractSphereMesh.transform.position
+        );
 
         attractRate += (inputController.getIsDown() ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
-        setUniformValue(
-            transformFeedbackDoubleBuffer.uniforms,
-            'uAttractRate',
-            attractRate,
-        );
+        setUniformValue(transformFeedbackDoubleBuffer.uniforms, 'uAttractRate', attractRate);
         updateGPUTransformFeedback(gpu, {
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
@@ -1364,12 +1370,18 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
             AttributeNames.InstancePosition,
-            findVertexArrayObjectVertexBufferObjectBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject, 'aPosition')!,
+            findVertexArrayObjectVertexBufferObjectBuffer(
+                transformFeedbackDoubleBuffer.read.vertexArrayObject,
+                'aPosition'
+            )!
         );
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
             AttributeNames.InstanceVelocity,
-            findVertexArrayObjectVertexBufferObjectBuffer(transformFeedbackDoubleBuffer.read.vertexArrayObject, 'aVelocity')!,
+            findVertexArrayObjectVertexBufferObjectBuffer(
+                transformFeedbackDoubleBuffer.read.vertexArrayObject,
+                'aVelocity'
+            )!
         );
     };
 
@@ -1423,7 +1435,7 @@ const main = async () => {
         CubeMapPositiveYImgUrl,
         CubeMapNegativeYImgUrl,
         CubeMapPositiveZImgUrl,
-        CubeMapNegativeZImgUrl,
+        CubeMapNegativeZImgUrl
     );
 
     const skyboxMesh = createSkybox({
@@ -1441,9 +1453,9 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            emissiveColor: new Color(2, 2, 2, 1),
+            emissiveColor: createColor(2, 2, 2, 1),
             // receiveShadow: true,
-        }),
+        })
     );
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, new Vector3(0.5, 0.5, 0.5));
@@ -1470,10 +1482,10 @@ const main = async () => {
             // diffuseColor: new Color(1, .05, .05, 1),
             // metallic: 0,
             // roughness: .3
-            diffuseColor: new Color(1, 1, 1, 1),
+            diffuseColor: createColorWhite(),
             metallic: 1,
             roughness: 1,
-        }),
+        })
     );
     setTranslation(testLightingMesh.transform, new Vector3(2.5, 1, 0));
 
@@ -1581,7 +1593,7 @@ const main = async () => {
         getGeometryAttributeDescriptors(skinnedMesh.geometry),
         skinnedMesh.geometry.indices,
         skinnedMesh.geometry.instanceCount,
-        skinnedMesh.geometry.drawCount,
+        skinnedMesh.geometry.drawCount
     );
     // skinnedMesh.enabled = false;
 
@@ -1613,7 +1625,7 @@ const main = async () => {
             // envMap: cubeMap,
             // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
             // diffuseColor: new Color(0, 0, 0, 1),
-            diffuseColor: new Color(1, 1, 1, 1),
+            diffuseColor: createColorWhite(),
             receiveShadow: true,
             // specularAmount: 0.4,
             metallic: 0,
@@ -1651,7 +1663,7 @@ const main = async () => {
                             const z = Math.random() * 18 - 8;
                             return [x, y, z, x, y, z, x, y, z, x, y, z];
                         })
-                        .flat(),
+                        .flat()
                 ),
                 size: 3,
             }),
@@ -1661,7 +1673,7 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
-                        .flat(),
+                        .flat()
                 ),
                 size: 2,
             }),
@@ -1671,15 +1683,15 @@ const main = async () => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const c = Color.fromRGB(
+                            const c = createColorFromRGB(
                                 Math.random() * 50 + 200,
                                 Math.random() * 50 + 190,
                                 Math.random() * 50 + 180,
-                                Math.random() * 150 + 50,
+                                Math.random() * 150 + 50
                             );
                             return [...c.e, ...c.e, ...c.e, ...c.e];
                         })
-                        .flat(),
+                        .flat()
                 ),
                 size: 4,
             }),
@@ -1692,7 +1704,7 @@ const main = async () => {
                             const s = Math.random() * 3.5 + 0.5;
                             return [s, s, s, s];
                         })
-                        .flat(),
+                        .flat()
                 ),
                 size: 1,
             }),
@@ -1705,7 +1717,7 @@ const main = async () => {
                             const r = Math.random();
                             return [r, r, r, r];
                         })
-                        .flat(),
+                        .flat()
                 ),
                 size: 1,
             }),
@@ -1937,18 +1949,16 @@ void main() {
 function initDebugger() {
     debuggerGUI = createDebuggerGUI();
 
-    addSliderDebugger(
-        debuggerGUI,
-        {
-            label: 'instance num',
-            minValue: 1,
-            maxValue: 40000,
-            initialValue: debuggerStates.instanceNum,
-            stepValue: 1,
-            onChange: (value) => {
-                debuggerStates.instanceNum = value;
-            },
-        });
+    addSliderDebugger(debuggerGUI, {
+        label: 'instance num',
+        minValue: 1,
+        maxValue: 40000,
+        initialValue: debuggerStates.instanceNum,
+        stepValue: 1,
+        onChange: (value) => {
+            debuggerStates.instanceNum = value;
+        },
+    });
 
     addButtonDebugger(debuggerGUI, {
         buttonLabel: 'reload',
@@ -1977,15 +1987,13 @@ function initDebugger() {
 
     addDebuggerBorderSpacer(debuggerGUI);
 
-    addToggleDebugger(
-        debuggerGUI,
-        {
-            label: 'orbit controls enabled',
-            // initialValue: debuggerStates.orbitControlsEnabled,
-            // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
-            initialValue: orbitCameraController.enabled,
-            onChange: (value) => orbitCameraController.enabled = value
-        });
+    addToggleDebugger(debuggerGUI, {
+        label: 'orbit controls enabled',
+        // initialValue: debuggerStates.orbitControlsEnabled,
+        // onChange: (value) => (debuggerStates.orbitControlsEnabled = value),
+        initialValue: orbitCameraController.enabled,
+        onChange: (value) => (orbitCameraController.enabled = value),
+    });
 
     //
     // show buffers
@@ -2240,9 +2248,9 @@ function initDebugger() {
 
     addColorDebugger(ssaoDebuggerGroup, {
         label: 'ssao color',
-        initialValue: renderer.ambientOcclusionPass.occlusionColor.getHexCoord(),
+        initialValue: getColorHexCoord(renderer.ambientOcclusionPass.occlusionColor),
         onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionColor = Color.fromHex(value);
+            renderer.ambientOcclusionPass.occlusionColor = createColorFromHex(value);
         },
     });
 
@@ -2391,14 +2399,13 @@ function initDebugger() {
 
     // return;
 
-    addColorDebugger(
-        fogDebuggerGroup, {
-            label: 'fog color',
-            initialValue: (renderer.fogPass.parameters as FogPassParameters).fogColor.getHexCoord(),
-            onChange: (value) => {
-                (renderer.fogPass.parameters as FogPassParameters).fogColor = Color.fromHex(value);
-            },
-        });
+    addColorDebugger(fogDebuggerGroup, {
+        label: 'fog color',
+        initialValue: getColorHexCoord((renderer.fogPass.parameters as FogPassParameters).fogColor),
+        onChange: (value) => {
+            (renderer.fogPass.parameters as FogPassParameters).fogColor = createColorFromHex(value);
+        },
+    });
 
     addSliderDebugger(fogDebuggerGroup, {
         label: 'strength',

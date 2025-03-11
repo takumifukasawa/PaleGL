@@ -8,7 +8,7 @@ import {
     UniformBlockNames,
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Color } from '@/PaleGL/math/Color';
+import {Color, createColorBlack} from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
@@ -43,7 +43,7 @@ export function createUnlitMaterial({
         {
             name: 'uDiffuseColor',
             type: UniformTypes.Color,
-            value: diffuseColor || Color.black,
+            value: diffuseColor || createColorBlack(),
         },
         {
             name: 'uDiffuseMap',
@@ -63,7 +63,7 @@ export function createUnlitMaterial({
         {
             name: 'uEmissiveColor',
             type: UniformTypes.Color,
-            value: emissiveColor || Color.black,
+            value: emissiveColor || createColorBlack(),
         },
         {
             name: UniformNames.ShadingModelId,

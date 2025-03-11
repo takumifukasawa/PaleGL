@@ -230,7 +230,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {Color, createColorWhite} from '@/PaleGL/math/Color.ts';
 import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -277,7 +277,7 @@ type RequiredToOptional<T> = {
 export function generateFogPassParameters(params: RequiredToOptional<FogPassParametersArgs> = {}): FogPassParameters {
     return {
         enabled: params.enabled ?? true,
-        fogColor: params.fogColor ?? Color.white,
+        fogColor: params.fogColor ?? createColorWhite(),
         fogStrength: params.fogStrength ?? 0.01,
         fogDensity: params.fogDensity ?? 0.023,
         fogDensityAttenuation: params.fogDensityAttenuation ?? 0.45,
@@ -286,7 +286,7 @@ export function generateFogPassParameters(params: RequiredToOptional<FogPassPara
         distanceFogPower: params.distanceFogPower ?? 0.1,
         distanceFogEnd: params.distanceFogEnd ?? 100,
         sssFogRate: params.sssFogRate ?? 1,
-        sssFogColor: params.sssFogColor ?? Color.white,
+        sssFogColor: params.sssFogColor ?? createColorWhite(),
         blendRate: 1,
     };
 }
@@ -314,7 +314,7 @@ export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersAr
                 {
                     name: UNIFORM_FOG_COLOR,
                     type: UniformTypes.Color,
-                    value: Color.white,
+                    value: createColorWhite(),
                 },
                 {
                     // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
@@ -380,7 +380,7 @@ export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersAr
                 {
                     name: UNIFORM_SSS_FOG_COLOR,
                     type: UniformTypes.Color,
-                    value: Color.white,
+                    value: createColorWhite(),
                 },
                 {
                     name: UNIFORM_NOISE_TEXTURE,

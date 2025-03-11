@@ -91,7 +91,7 @@ import {
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {Color, createColorBlack} from '@/PaleGL/math/Color.ts';
 import {
     addUniformBlock,
     UniformBufferObjectBlockData,
@@ -2205,7 +2205,7 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
                     {
                         name: UniformNames.LightColor,
                         type: UniformTypes.Color,
-                        value: Color.black,
+                        value: createColorBlack(),
                     },
                     {
                         name: UniformNames.ShadowMapProjectionMatrix,
@@ -2233,7 +2233,7 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
                     {
                         name: UniformNames.LightColor,
                         type: UniformTypes.Color,
-                        value: Color.black,
+                        value: createColorBlack(),
                     },
                     {
                         name: UniformNames.LightPosition,
@@ -2296,7 +2296,7 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
                     {
                         name: UniformNames.LightColor,
                         type: UniformTypes.Color,
-                        value: Color.black,
+                        value: createColorBlack(),
                     },
                     {
                         name: UniformNames.LightPosition,

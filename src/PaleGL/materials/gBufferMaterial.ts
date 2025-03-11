@@ -8,7 +8,7 @@ import {
     VertexShaderModifier,
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
-import { Color } from '@/PaleGL/math/Color';
+import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/Color';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
@@ -255,7 +255,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     ...options
     }: GBufferMaterialArgs = args;
     
-    const diffuseColor: Color = args.diffuseColor || Color.white;
+    const diffuseColor: Color = args.diffuseColor || createColorWhite();
     const diffuseMap: Texture | null = args.diffuseMap || null;
     const diffuseMapUvScale: Vector2 = args.diffuseMapUvScale || Vector2.one;
     const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || Vector2.zero;
@@ -268,14 +268,14 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const normalMap: Texture | null = args.normalMap || null;
     const normalMapUvScale: Vector2 = args.normalMapUvScale || Vector2.one;
     const normalMapUvOffset: Vector2 = args.normalMapUvOffset || Vector2.zero;
-    const emissiveColor: Color = args.emissiveColor || Color.black;
+    const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
    
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.DiffuseColor,
             type: UniformTypes.Color,
-            value: diffuseColor || Color.white,
+            value: diffuseColor || createColorWhite(),
         },
         {
             name: UniformNames.DiffuseMap,

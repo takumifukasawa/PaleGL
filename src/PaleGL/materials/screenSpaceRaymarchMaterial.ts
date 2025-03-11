@@ -10,7 +10,7 @@ import {
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Color } from '@/PaleGL/math/Color.ts';
+import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/Color.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
@@ -218,7 +218,7 @@ export function createScreenSpaceRaymarchMaterial({
     ...options
 }: ScreenSpaceRaymarchMaterialArgs) {
     const _diffuseMap = diffuseMap || null;
-    const _diffuseColor = diffuseColor || Color.white;
+    const _diffuseColor = diffuseColor || createColorWhite();
     const _diffuseMapUvScale = diffuseMapUvScale || Vector2.one;
     const _diffuseMapUvOffset = diffuseMapUvOffset || Vector2.one;
     const _roughnessMap = roughnessMap || null;
@@ -227,7 +227,7 @@ export function createScreenSpaceRaymarchMaterial({
     const _metallic = metallic || 0;
     const _metallicMap = metallicMap || null;
     const _metallicMapTiling = metallicMapTiling || new Vector4(1, 1, 0, 0);
-    const _emissiveColor = emissiveColor || Color.black;
+    const _emissiveColor = emissiveColor || createColorBlack();
 
     const commonUniforms: UniformsData = [
         {
