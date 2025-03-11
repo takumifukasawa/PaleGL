@@ -1,7 +1,7 @@
 ﻿import { Rotator } from '@/PaleGL/math/Rotator';
 import { AnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {createMatrix4FromQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/bone.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
@@ -97,7 +97,7 @@ export function createAnimationClip({
                     // const r = Rotator.fromQuaternion(q);
 
                     const q = frameValue as Quaternion;
-                    const r = Rotator.fromMatrix4(q.toMatrix4());
+                    const r = Rotator.fromMatrix4(createMatrix4FromQuaternion(q));
 
                     // for debug
                     // console.log("[AnimationClip.update] rotation", _currentFrame, frameValue.elements, r.getAxes());

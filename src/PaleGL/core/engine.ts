@@ -8,7 +8,7 @@ import {
     checkNeedsBindUniformBufferObjectToMaterial,
     Renderer,
     setRendererSize,
-    setRendererStats
+    setRendererStats,
 } from '@/PaleGL/core/renderer.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
@@ -23,7 +23,7 @@ import {
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Rotator } from '@/PaleGL/math/Rotator.ts';
-import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
+import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
 import {
     createTimeAccumulator,
     execTimeAccumulator,
@@ -566,7 +566,7 @@ export function createEngine({
             // TODO: mainカメラだけ抽出したい
             if (actor.type === ActorTypes.Camera) {
                 setTranslation(actor.transform, new Vector3(0, 0, 10));
-                setRotation(actor.transform, Rotator.fromQuaternion(Quaternion.fromEulerDegrees(0, 180, 0)));
+                setRotation(actor.transform, Rotator.fromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
             } else {
                 setTranslation(actor.transform, Vector3.zero);
             }

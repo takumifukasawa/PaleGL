@@ -1,6 +1,6 @@
 ﻿import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Rotator } from '@/PaleGL/math/Rotator';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {Quaternion, toEulerRadianFromQuaternion} from '@/PaleGL/math/quaternion.ts';
 
 // memory layout is column order.
 // setter and getter are row order.
@@ -816,7 +816,7 @@ export class Matrix4 {
      * @param q
      */
     static fromQuaternion(q: Quaternion) {
-        const eulerRadian = q.toEulerRadian();
+        const eulerRadian = toEulerRadianFromQuaternion(q);
         return Matrix4.multiplyMatrices(
             Matrix4.rotationYMatrix(eulerRadian.y),
             Matrix4.rotationXMatrix(eulerRadian.x),

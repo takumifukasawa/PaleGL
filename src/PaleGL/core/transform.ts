@@ -3,6 +3,7 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import { Rotator } from '@/PaleGL/math/Rotator.js';
 import { Actor } from '@/PaleGL/actors/actor.ts';
+import {createRotationMatrixFromQuaternion} from "@/PaleGL/math/quaternion.ts";
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
 
 // TODO:
@@ -384,7 +385,7 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
         // const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
         // quaternionから回転を作るケース
-        const rotationMatrix = actor.transform.rotation.quaternion.toRotationMatrix();
+        const rotationMatrix = createRotationMatrixFromQuaternion(actor.transform.rotation.quaternion);
         const scalingMatrix = Matrix4.scalingMatrix(actor.transform.scale);
         actor.transform.localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
     }

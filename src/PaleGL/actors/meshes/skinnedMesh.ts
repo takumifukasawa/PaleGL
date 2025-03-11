@@ -21,7 +21,7 @@ import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Quaternion } from '@/PaleGL/math/Quaternion.ts';
+import {createMatrix4FromQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 import { StartActorFunc, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -678,7 +678,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
                     if (rotation) {
                         // TODO: quaternion-bug: 本当はこっちを使いたい
                         // targetBone.rotation = Rotator.fromQuaternion(rotation);
-                        targetBone.setRotation(Rotator.fromMatrix4(rotation.toMatrix4()));
+                        targetBone.setRotation(Rotator.fromMatrix4(createMatrix4FromQuaternion(rotation)));
                     }
                     if (scale) {
                         targetBone.setScale(scale);

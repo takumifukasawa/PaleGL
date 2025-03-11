@@ -6,7 +6,11 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {
+    createMatrix4FromQuaternion,
+    createQuaternion,
+    createQuaternionIdentity,
+} from '@/PaleGL/math/quaternion.ts';
 // import { Rotator } from '@/PaleGL/math/Rotator';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -356,10 +360,12 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                     : Vector3.zero
             ),
             node.rotation
-                ? new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]).toMatrix4()
-                : Quaternion.identity().toMatrix4(),
+                ? createMatrix4FromQuaternion(createQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]))
+                : createMatrix4FromQuaternion(createQuaternionIdentity()),
             Matrix4.scalingMatrix(node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one)
         );
+
+        
 
         bone.setOffsetMatrix(offsetMatrix);
 

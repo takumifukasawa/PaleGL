@@ -1,4 +1,11 @@
-﻿import { Quaternion } from '@/PaleGL/math/Quaternion';
+﻿import {
+    copyQuaternion,
+    createQuaternionFromEulerDegrees,
+    createQuaternionIdentity,
+    Quaternion,
+    toEulerDegreeFromQuaternion,
+    toEulerRadianFromQuaternion,
+} from '@/PaleGL/math/quaternion.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 
@@ -8,7 +15,7 @@ export class Rotator {
     // そのままdegreeが入る
     // elements: Float32Array = new Float32Array(3);
     _rawMatrix: Matrix4 | null = null;
-    _quaternion: Quaternion = Quaternion.identity();
+    _quaternion: Quaternion = createQuaternionIdentity();
 
     get rawMatrix() {
         return this._rawMatrix;
@@ -25,66 +32,66 @@ export class Rotator {
     // degree
     get x() {
         // return this.elements[0];
-        return this._quaternion.toEulerDegree().x;
+        return toEulerDegreeFromQuaternion(this._quaternion).x;
     }
 
     // degree
     get y() {
         // return this.elements[1];
-        return this._quaternion.toEulerDegree().y;
+        return toEulerDegreeFromQuaternion(this._quaternion).y;
     }
 
     // degree
     get z() {
         // return this.elements[2];
-        return this._quaternion.toEulerDegree().z;
+        return toEulerDegreeFromQuaternion(this._quaternion).z;
     }
 
     // degree
     set x(v: number) {
         // this.elements[0] = v;
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.x = v;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
     // degree
     set y(v: number) {
         // this.elements[1] = v;
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.y = v;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
     // degree
     set z(v: number) {
         // this.elements[2] = v;
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.z = v;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
     // degree
     get roll() {
         // return this.elements[2];
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         return euler.z;
     }
 
     // degree
     get pitch() {
         // return this.elements[0];
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         return euler.x;
     }
 
     // degree
     get yaw() {
         // return this.elements[1];
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         return euler.y;
     }
 
@@ -103,7 +110,7 @@ export class Rotator {
         //     y: (this.elements[1] * Math.PI) / 180,
         //     z: (this.elements[2] * Math.PI) / 180,
         // };
-        const radian = this._quaternion.toEulerRadian();
+        const radian = toEulerRadianFromQuaternion(this._quaternion);
         return {
             x: radian.x,
             y: radian.y,
@@ -135,7 +142,7 @@ export class Rotator {
         // this._updateQuaternionFromEulerDegrees();
         // return this;
 
-        const q = Quaternion.fromEulerDegrees(x, y, z);
+        const q = createQuaternionFromEulerDegrees(x, y, z);
         this._quaternion = q;
         // this._updateQuaternionFromEulerDegrees();
         return this;
@@ -147,7 +154,7 @@ export class Rotator {
         // return this;
 
         // this.elements = new Float32Array([v.x, v.y, v.z]);
-        const q = Quaternion.fromEulerDegrees(v.x, v.y, v.z);
+        const q = createQuaternionFromEulerDegrees(v.x, v.y, v.z);
         this._quaternion = q;
         return this;
     }
@@ -157,7 +164,7 @@ export class Rotator {
         // this._updateQuaternionFromEulerDegrees();
         // return this;
 
-        this._quaternion.copy(r.quaternion);
+        copyQuaternion(this._quaternion, r.quaternion);
         return this;
     }
 
@@ -170,7 +177,7 @@ export class Rotator {
     static get zero() {
         // return new Rotator(0, 0, 0);
 
-        const q = Quaternion.fromEulerDegrees(0, 0, 0);
+        const q = createQuaternionFromEulerDegrees(0, 0, 0);
         return new Rotator(q);
     }
 
@@ -178,9 +185,9 @@ export class Rotator {
         //this.elements[0] = degree;
         //this._updateQuaternionFromEulerDegrees();
 
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.x = degree;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
@@ -188,9 +195,9 @@ export class Rotator {
         // this.elements[1] = degree;
         // this._updateQuaternionFromEulerDegrees();
 
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.y = degree;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
@@ -198,9 +205,9 @@ export class Rotator {
         // this.elements[2] = degree;
         // this._updateQuaternionFromEulerDegrees();
 
-        const euler = this._quaternion.toEulerDegree();
+        const euler = toEulerDegreeFromQuaternion(this._quaternion);
         euler.z = degree;
-        const q = Quaternion.fromEulerDegrees(euler.x, euler.y, euler.z);
+        const q = createQuaternionFromEulerDegrees(euler.x, euler.y, euler.z);
         this._quaternion = q;
     }
 
@@ -214,7 +221,7 @@ export class Rotator {
         const x = (this.x + 180) % 360;
         const y = (this.y + 180) % 360;
         const z = (this.z + 180) % 360;
-        const q = Quaternion.fromEulerDegrees(x, y, z);
+        const q = createQuaternionFromEulerDegrees(x, y, z);
         const rotator = new Rotator(q);
         return rotator;
     }
@@ -241,7 +248,7 @@ export class Rotator {
         // r.rawMatrix = m;
         // return r;
 
-        const q = Quaternion.identity();
+        const q = createQuaternionIdentity();
         const r = new Rotator(q);
         r.rawMatrix = m;
         return r;

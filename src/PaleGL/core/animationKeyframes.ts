@@ -1,6 +1,6 @@
 ﻿import { AnimationKeyframeType, AnimationKeyframeTypes } from '@/PaleGL/constants';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Quaternion } from '@/PaleGL/math/Quaternion';
+import {createQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 import {
     GLTFAnimationChannelTargetPath,
     GLTFAnimationSamplerInterpolation,
@@ -182,7 +182,7 @@ export function createAnimationKeyframes({
                 return new Vector3(arr[0], arr[1], arr[2]);
             case AnimationKeyframeTypes.Quaternion:
                 // return new Quaternion(...arr);
-                return new Quaternion(arr[0], arr[1], arr[2], arr[3]);
+                return createQuaternion(arr[0], arr[1], arr[2], arr[3]);
             default:
                 console.error('[AnimationKeyframes.getFrameValue] invalid type');
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
