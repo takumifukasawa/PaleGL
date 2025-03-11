@@ -1,13 +1,13 @@
 ﻿// // import { UniformTypes } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import {
 //     PostProcessPassType,
 //     RenderTargetTypes,
@@ -79,10 +79,10 @@
 // const volumetricLightTextureUniformName = 'uVolumetricLightTexture';
 // const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 //
-// export class FogPass extends PostProcessPassBase {
+// export class FogPass extends PostProcessPassBaseDEPRECATED {
 //     parameters: Override<PostProcessPassParametersBase, FogPassParameters>;
 //
-//     constructor(args: { gpu: GPU; parameters?: FogPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: FogPassParametersArgs }) {
 //         const { gpu } = args;
 //         const fragmentShader = fogFragmentShader;
 //
@@ -176,7 +176,7 @@
 //                     type: UniformTypes.Float,
 //                     value: 1,
 //                 },
-//                 // ...PostProcessPassBase.commonUniforms,
+//                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
 //             parameters,
@@ -214,14 +214,15 @@
 // }
 
 // import { UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
     PostProcessPassType,
     RenderTargetTypes,
@@ -233,9 +234,7 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour
-} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';
 const UNIFORM_FOG_STRENGTH = 'uFogStrength';
@@ -298,7 +297,7 @@ const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 
 export type FogPass = PostProcessSinglePass;
 
-export function createFogPass(args: { gpu: GPU; parameters?: FogPassParametersArgs }) {
+export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersArgs }) {
     const { gpu } = args;
     const fragmentShader = fogFragmentShader;
 
@@ -393,7 +392,7 @@ export function createFogPass(args: { gpu: GPU; parameters?: FogPassParametersAr
                     type: UniformTypes.Float,
                     value: 1,
                 },
-                // ...PostProcessPassBase.commonUniforms,
+                // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
             parameters,

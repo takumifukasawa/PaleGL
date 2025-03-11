@@ -4,14 +4,14 @@
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 // import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import {
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 //
 // const BLUR_PIXEL_NUM = 7;
@@ -29,7 +29,7 @@
 // }
 //
 // export class GaussianBlurPass implements IPostProcessPass {
-//     // export class GaussianBlurPass extends PostProcessPassBase {
+//     // export class GaussianBlurPass extends PostProcessPassBaseDEPRECATED {
 //     // gpu: Gpu;
 //     name: string = 'GaussianBlurPass';
 //     type: PostProcessPassType = PostProcessPassType.GaussianBlur;
@@ -45,14 +45,14 @@
 //     private horizontalBlurPass: FragmentPass;
 //     private verticalBlurPass: FragmentPass;
 //
-//     #passes: PostProcessPassBase[] = [];
+//     #passes: PostProcessPassBaseDEPRECATED[] = [];
 //
 //     get renderTarget() {
 //         return this.#passes[this.#passes.length - 1].renderTarget;
 //     }
 //
 //     // constructor({ gpu, blurPixelNum = 7 }: { gpu: Gpu; blurPixelNum: number }) {
-//     constructor(args: { gpu: GPU; parameters?: GaussianBlurPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: GaussianBlurPassParametersArgs }) {
 //         const { gpu } = args;
 //
 //         this.parameters = generateGaussianBlurPassParameters(args.parameters);
@@ -207,15 +207,14 @@
 // }
 
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
-import { PostProcessPassBase, PostProcessSinglePass } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+import { PostProcessPassParametersBase, PostProcessPassRenderArgs, PostProcessPassBase, PostProcessSinglePass } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { createPostProcessPassBase } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+import { createPostProcessPassBase } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const BLUR_PIXEL_NUM = 7;
@@ -238,7 +237,7 @@ export type GaussianBlurPass = PostProcessPassBase & {
     verticalBlurPass: FragmentPass;
 };
 
-export function createGaussianBlurPass(args: { gpu: GPU; parameters?: GaussianBlurPassParametersArgs }): GaussianBlurPass {
+export function createGaussianBlurPass(args: { gpu: Gpu; parameters?: GaussianBlurPassParametersArgs }): GaussianBlurPass {
     const { gpu } = args;
 
     const materials: Material[] = [];

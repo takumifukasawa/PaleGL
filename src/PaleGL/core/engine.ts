@@ -1,7 +1,7 @@
 ﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import {
     beforeRenderRenderer,
@@ -378,7 +378,7 @@ export function createEngine({
     onRender,
     showStats = false,
 }: {
-    gpu: GPU;
+    gpu: Gpu;
     renderer: Renderer;
     fixedUpdateFps?: number;
     updateFps?: number;
@@ -388,7 +388,7 @@ export function createEngine({
     onRender?: EngineOnRenderCallback;
     showStats?: boolean;
 }) {
-    const _gpu: GPU = gpu;
+    const _gpu: Gpu = gpu;
     const _stats: Stats | null = createStats({ showStats, showPipeline: false });
     const _renderer: Renderer = renderer;
     let _scene: Scene | null = null;

@@ -6,19 +6,19 @@
 //     UniformBlockNames,
 //     PostProcessPassType,
 // } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Color } from '@/PaleGL/math/Color';
 // import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 // import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBaseArgs,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 //
 // export type SSAOPassParameters = PostProcessPassParametersBaseArgs;
@@ -35,7 +35,7 @@
 //  *
 //  * @param gpu
 //  */
-// const createSamplingTables: (gpu: GPU) => {
+// const createSamplingTables: (gpu: Gpu) => {
 //     samplingRotations: number[];
 //     samplingDistances: number[];
 //     samplingTexture: Texture;
@@ -108,7 +108,7 @@
 // /**
 //  *
 //  */
-// export class SSAOPass extends PostProcessPassBase {
+// export class SsaoPass extends PostProcessPassBaseDEPRECATED {
 //     occlusionSampleLength: number = 0.121;
 //     occlusionBias: number = 0.0001;
 //     occlusionMinDistance: number = 0.006;
@@ -124,7 +124,7 @@
 //      *
 //      * @param gpu
 //      */
-//     constructor(args: { gpu: GPU; parameters?: SSAOPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: SSAOPassParametersArgs }) {
 //         const { gpu } = args;
 //         const fragmentShader = ssaoFragmentShader;
 //
@@ -289,7 +289,7 @@ import {
     UniformBlockNames,
     PostProcessPassType,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/Color';
@@ -299,15 +299,11 @@ import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import {
     PostProcessPassParametersBaseArgs,
     PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour
-} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 export type SSAOPassParameters = PostProcessPassParametersBaseArgs;
 
@@ -323,7 +319,7 @@ export function generateSSAOPassParameters(params: SSAOPassParametersArgs = {}):
  *
  * @param gpu
  */
-const createSamplingTables: (gpu: GPU) => {
+const createSamplingTables: (gpu: Gpu) => {
     samplingRotations: number[];
     samplingDistances: number[];
     samplingTexture: Texture;
@@ -393,7 +389,7 @@ const createSamplingTables: (gpu: GPU) => {
     };
 };
 
-export type SSAOPass = PostProcessSinglePass & {
+export type SsaoPass = PostProcessSinglePass & {
     occlusionSampleLength: number;
     occlusionBias: number;
     occlusionMinDistance: number;
@@ -405,7 +401,7 @@ export type SSAOPass = PostProcessSinglePass & {
     samplingTexture: Texture;
 };
 
-export function createSSAOPass(args: { gpu: GPU; parameters?: SSAOPassParametersArgs }): SSAOPass {
+export function createSSAOPass(args: { gpu: Gpu; parameters?: SSAOPassParametersArgs }): SsaoPass {
     const { gpu } = args;
 
     const occlusionSampleLength: number = 0.121;
@@ -552,8 +548,8 @@ export function createSSAOPass(args: { gpu: GPU; parameters?: SSAOPassParameters
     };
 }
 
-// export function setSSAOPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
-//     const ssaoPass = postProcessPass as SSAOPass;
+// export function setSSAOPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
+//     const ssaoPass = postProcessPass as SsaoPass;
 //     setPostProcessPassSize();
 //     super.setSize(width, height);
 //     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
@@ -561,7 +557,7 @@ export function createSSAOPass(args: { gpu: GPU; parameters?: SSAOPassParameters
 // }
 
 export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
-    const ssaoPass = postProcessPass as SSAOPass;
+    const ssaoPass = postProcessPass as SsaoPass;
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionSampleLength', ssaoPass.occlusionSampleLength);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionBias', ssaoPass.occlusionBias);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionMinDistance', ssaoPass.occlusionMinDistance);

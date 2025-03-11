@@ -1,4 +1,4 @@
-import {GPU, updateGPUTransformFeedback} from '@/PaleGL/core/GPU.ts';
+import {Gpu, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
@@ -21,7 +21,7 @@ export type GlslSound = {
     getCurrentTime: () => number;
 };
 
-export function createGLSLSound(gpu: GPU, vertexShader: string, duration: number) {
+export function createGLSLSound(gpu: Gpu, vertexShader: string, duration: number) {
     const channelNum: number = 2;
     // let audioContext: AudioContext;
     let node: AudioBufferSourceNode | null;

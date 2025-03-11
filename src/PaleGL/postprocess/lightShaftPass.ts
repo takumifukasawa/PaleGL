@@ -4,7 +4,7 @@
 // import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
@@ -12,9 +12,9 @@
 // import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
 // import {
 //     PostProcessPassParametersBase,
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import {transformScreenPoint} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
@@ -80,7 +80,7 @@
 //      * @param gpu
 //      * @param ratio
 //      */
-//     constructor({ gpu, ratio = 0.5, parameters }: { gpu: GPU; ratio?: number; parameters?: LightShaftPassParameters }) {
+//     constructor({ gpu, ratio = 0.5, parameters }: { gpu: Gpu; ratio?: number; parameters?: LightShaftPassParameters }) {
 //         // super();
 //
 //         this.parameters = generateLightShaftPassParameters(parameters);
@@ -110,7 +110,7 @@
 //                     type: UniformTypes.Texture,
 //                     value: null,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             // uniforms: {}
 //         });
@@ -437,19 +437,20 @@
 
 import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
 import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import {
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
     PostProcessPassBase,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP';
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
@@ -494,7 +495,7 @@ export type LightShaftPass = PostProcessPassBase & {
 };
 
 export function createLightShaftPass(args: {
-    gpu: GPU;
+    gpu: Gpu;
     ratio?: number;
     parameters?: LightShaftPassParameters;
 }): LightShaftPass {

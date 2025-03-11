@@ -696,12 +696,12 @@ import {
     TextureWrapType,
     TextureWrapTypes,
 } from '@/PaleGL/constants';
-import { GPU } from './GPU.ts';
+import { Gpu } from './gpu.ts';
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type TextureArgs = {
     // require
-    gpu: GPU;
+    gpu: Gpu;
     // optional
     img?: HTMLImageElement | HTMLCanvasElement | null;
     arraybuffer?: ArrayBuffer | null;

@@ -12,15 +12,15 @@
 //     UniformNames,
 //     UniformTypes,
 // } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
 // import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 // import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -65,7 +65,7 @@
 //     };
 // }
 // 
-// export class VolumetricLightPass extends PostProcessPassBase {
+// export class VolumetricLightPass extends PostProcessPassBaseDEPRECATED {
 //     parameters: Override<PostProcessPassParametersBase, VolumetricLightPassParameters>;
 // 
 //     #spotLights: SpotLight[] = [];
@@ -81,7 +81,7 @@
 //      *
 //      * @param args
 //      */
-//     constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: VolumetricLightPassParametersArgs }) {
 //         const { gpu } = args;
 //         const parameters = generateVolumetricLightParameters(args.parameters ?? {});
 // 
@@ -286,16 +286,14 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import {
     createPostProcessSinglePass,
-    PostProcessPassBase, PostProcessSinglePass
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import {
+    PostProcessPassBase, PostProcessSinglePass,
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -352,7 +350,7 @@ export type VolumetricLightPass = PostProcessSinglePass & {
     materials: Material[];
 }
 
-export function createVolumetricLightPass(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }): VolumetricLightPass {
+export function createVolumetricLightPass(args: { gpu: Gpu; parameters?: VolumetricLightPassParametersArgs }): VolumetricLightPass {
     const { gpu } = args;
 
     const materials: Material[] = [];

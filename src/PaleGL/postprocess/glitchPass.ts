@@ -1,13 +1,13 @@
 ﻿// import { PostProcessPassType, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import glitchFragment from '@/PaleGL/shaders/glitch-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 //
 // export type GlitchPassParameters = PostProcessPassParametersBase & {
@@ -25,10 +25,10 @@
 //
 // const UNIFORM_NAME_BLEND_RATE = UniformNames.BlendRate;
 //
-// export class GlitchPass extends PostProcessPassBase {
+// export class GlitchPass extends PostProcessPassBaseDEPRECATED {
 //     parameters: GlitchPassParameters;
 //
-//     constructor(args: { gpu: GPU; parameters?: GlitchPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: GlitchPassParametersArgs }) {
 //         const { gpu } = args;
 //
 //         const parameters = generateGlitchPassParameters(args.parameters ?? {});
@@ -73,18 +73,17 @@
 // }
 
 import { PostProcessPassType, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import glitchFragment from '@/PaleGL/shaders/glitch-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessSinglePass,
-    PostProcessPassBase
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour
-} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 export type GlitchPassParameters = PostProcessPassParametersBase & {
     blendRate: number;
@@ -103,7 +102,7 @@ const UNIFORM_NAME_BLEND_RATE = UniformNames.BlendRate;
 
 export type GlitchPass = PostProcessSinglePass;
 
-export function createGlitchPass(args: { gpu: GPU; parameters?: GlitchPassParametersArgs }): GlitchPass {
+export function createGlitchPass(args: { gpu: Gpu; parameters?: GlitchPassParametersArgs }): GlitchPass {
     const { gpu } = args;
     const parameters = generateGlitchPassParameters(args.parameters ?? {});
 

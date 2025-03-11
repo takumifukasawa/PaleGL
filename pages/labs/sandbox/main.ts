@@ -8,7 +8,7 @@ import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMe
 // core
 import { createEngine } from '@/PaleGL/core/engine.ts';
 import {createRenderer, renderRenderer} from '@/PaleGL/core/renderer.ts';
-import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/GPU.ts';
+import {bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import {createTexture, Texture} from '@/PaleGL/core/texture.ts';
@@ -41,7 +41,7 @@ import { Vector4 } from '@/PaleGL/math/Vector4';
 import {
     createBufferVisualizerPass, hideBufferVisualizerPassDom,
     showBufferVisualizerPassDom
-} from '@/PaleGL/postprocess/BufferVisualizerPass';
+} from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
 
 // inputs
 import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
@@ -80,7 +80,7 @@ import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.t
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess.ts';
+import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -107,12 +107,12 @@ import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
-import {DepthOfFieldPassParameters} from "@/PaleGL/postprocess/DepthOfFieldPass.ts";
-import {LightShaftPassParameters} from "@/PaleGL/postprocess/LightShaftPass.ts";
-import {VolumetricLightPassParameters} from "@/PaleGL/postprocess/VolumetricLightPass.ts";
-import {FogPassParameters} from "@/PaleGL/postprocess/FogPass.ts";
-import {BloomPassParameters} from "@/PaleGL/postprocess/BloomPass.ts";
-import {SSRPassParameters} from "@/PaleGL/postprocess/SSRPass.ts";
+import {DepthOfFieldPassParameters} from "@/PaleGL/postprocess/depthOfFieldPass.ts";
+import {LightShaftPassParameters} from "@/PaleGL/postprocess/lightShaftPass.ts";
+import {VolumetricLightPassParameters} from "@/PaleGL/postprocess/volumetricLightPass.ts";
+import {FogPassParameters} from "@/PaleGL/postprocess/fogPass.ts";
+import {BloomPassParameters} from "@/PaleGL/postprocess/bloomPass.ts";
+import {SSRPassParameters} from "@/PaleGL/postprocess/ssrPass.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 

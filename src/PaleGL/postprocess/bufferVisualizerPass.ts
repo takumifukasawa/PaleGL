@@ -1,13 +1,13 @@
 ﻿// import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 // import {
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-// import {GPU, setGPUViewport} from '@/PaleGL/core/GPU.ts';
+// import {Gpu, setGPUViewport} from '@/PaleGL/core/Gpu.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-// import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass.ts';
+// import { FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
@@ -116,7 +116,7 @@
 //         return this.compositePass.renderTarget;
 //     }
 // 
-//     constructor({ gpu, parameters }: { gpu: GPU; parameters?: BufferVisualizerPassParametersArgs }) {
+//     constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BufferVisualizerPassParametersArgs }) {
 //         window.addEventListener('keydown', (e) => {
 //             if (e.key === 'b') {
 //                 this.toggleR = !this.toggleR;
@@ -487,7 +487,7 @@
 //                         ];
 //                     })
 //                     .flat(),
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //         });
 // 
@@ -985,14 +985,10 @@
 
 
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import {
-    PostProcessPassParametersBase,
-    PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import {GPU, setGPUViewport} from '@/PaleGL/core/GPU.ts';
+import {Gpu, setGPUViewport} from '@/PaleGL/core/gpu.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/FragmentPass.ts';
+import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/fragmentPass.ts';
 import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
@@ -1002,7 +998,9 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import {
     PostProcessPassBase,
     createPostProcessPassBase, getPostProcessCommonUniforms,
-} from "@/PaleGL/postprocess/postProcessPassBaseWIP.ts";
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from "@/PaleGL/postprocess/postProcessPassBase.ts";
 import {
     getPostProcessPassRenderTarget,
     renderPostProcessPass,
@@ -1092,7 +1090,7 @@ export type BufferVisualizerPass = PostProcessPassBase & {
     toggleR: boolean,
 }
 
-export function createBufferVisualizerPass(args: { gpu: GPU; parameters?: BufferVisualizerPassParametersArgs }) : BufferVisualizerPass {
+export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: BufferVisualizerPassParametersArgs }) : BufferVisualizerPass {
     const { gpu } = args;
     
     const rowPasses: RowPass[] = [];

@@ -212,7 +212,7 @@ import {
     TextureFilterTypes,
     TextureTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/renderTarget.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
 
@@ -232,7 +232,7 @@ import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts
 // ---------------------------------------------------------------------
 
 export type GBufferRenderTargets = RenderTargetBase & {
-    gpu: GPU,
+    gpu: Gpu,
     name: string,
     width: number,
     height: number,
@@ -247,7 +247,7 @@ export type GBufferRenderTargets = RenderTargetBase & {
 
 // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
 export function createGBufferRenderTargets(
-    { gpu, name, width = 1, height = 1 }: { gpu: GPU; name: string; width: number; height: number },
+    { gpu, name, width = 1, height = 1 }: { gpu: Gpu; name: string; width: number; height: number },
 ): GBufferRenderTargets {
     const gBufferTextures: Texture[] = [];
     const depthTexture: Texture | null = null;

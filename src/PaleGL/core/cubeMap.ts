@@ -96,7 +96,7 @@
 
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     GL_RGBA,
     GL_TEXTURE_CUBE_MAP,
@@ -132,7 +132,7 @@ export type CubeMap = GLObjectBase<WebGLTexture> & {
 };
 
 function createCubeMapInternal(
-    gpu: GPU,
+    gpu: Gpu,
     width: number,
     height: number,
     posXImage: HTMLImageElement | HTMLCanvasElement,
@@ -181,7 +181,7 @@ function createCubeMapInternal(
 }
 
 export function createCubeMap(
-    gpu: GPU,
+    gpu: Gpu,
     posXImage: HTMLImageElement | HTMLCanvasElement,
     negXImage: HTMLImageElement | HTMLCanvasElement,
     posYImage: HTMLImageElement | HTMLCanvasElement,

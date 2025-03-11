@@ -543,7 +543,7 @@ import {
     IndexBufferObject,
     unbindIndexBufferObject,
 } from '@/PaleGL/core/indexBufferObject.ts';
-import { getAttributeUsage, GPU } from '@/PaleGL/core/GPU.ts';
+import { getAttributeUsage, Gpu } from '@/PaleGL/core/gpu.ts';
 import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { GL_ARRAY_BUFFER, GL_FLOAT, GL_UNSIGNED_SHORT } from '@/PaleGL/constants.ts';
 
@@ -562,7 +562,7 @@ export type VertexArrayObject = GLObjectBase<WebGLVertexArrayObject> & {
 };
 
 export function createVertexArrayObject({ gpu, attributes = [], indices }: {
-    gpu: GPU;
+    gpu: Gpu;
     attributes: Attribute[];
     indices?: number[] | null
 }): VertexArrayObject {

@@ -17,18 +17,18 @@
 // } from '@/PaleGL/materials/material';
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 // import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 // import {Renderer, renderMesh, setRendererRenderTarget} from '@/PaleGL/core/renderer.ts';
 // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 // import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 // import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
 // import {
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
 //     // IPostProcessPassParameters
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 //
 // const BLUR_PIXEL_NUM = 7;
@@ -156,7 +156,7 @@
 //         return this._compositePass.renderTarget;
 //     }
 //
-//     constructor({ gpu, parameters }: { gpu: GPU; parameters?: BloomPassParametersArgs }) {
+//     constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BloomPassParametersArgs }) {
 //         this.parameters = generateDefaultBloomPassParameters(parameters);
 //
 //         // NOTE: _geometryは親から渡して使いまわしてもよい
@@ -221,7 +221,7 @@
 //         const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, 0.92);
 //
 //         this._horizontalBlurMaterial = createMaterial({
-//             vertexShader: PostProcessPassBase.baseVertexShader,
+//             vertexShader: PostProcessPassBaseDEPRECATED.baseVertexShader,
 //             fragmentShader: gaussianBlurFragmentShader,
 //             uniforms: [
 //                 {
@@ -239,13 +239,13 @@
 //                     type: UniformTypes.Float,
 //                     value: 1,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //         });
 //         this.materials.push(this._horizontalBlurMaterial);
 //
 //         this._verticalBlurMaterial = createMaterial({
-//             vertexShader: PostProcessPassBase.baseVertexShader,
+//             vertexShader: PostProcessPassBaseDEPRECATED.baseVertexShader,
 //             fragmentShader: gaussianBlurFragmentShader,
 //             uniforms: [
 //                 {
@@ -263,7 +263,7 @@
 //                     type: UniformTypes.Float,
 //                     value: 0,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //         });
 //         this.materials.push(this._verticalBlurMaterial);
@@ -317,7 +317,7 @@
 //                     type: UniformTypes.Texture,
 //                     value: null,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
 //         });
@@ -535,7 +535,7 @@
 // }
 
 import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
+import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 // import {CopyPass} from "./CopyPass";
@@ -548,20 +548,17 @@ import {
 } from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {Renderer, renderMesh, setRendererRenderTarget} from '@/PaleGL/core/renderer.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
-import {
-    PostProcessPassParametersBase, PostProcessPassRenderArgs,
-    // IPostProcessPassParameters
-} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import {
     createPostProcessPassBase, getPostProcessBaseVertexShader, getPostProcessCommonUniforms,
     PostProcessPassBase,
-} from "@/PaleGL/postprocess/postProcessPassBaseWIP.ts";
+    PostProcessPassParametersBase, PostProcessPassRenderArgs,
+} from "@/PaleGL/postprocess/postProcessPassBase.ts";
 import {
     renderPostProcessPass, RenderPostProcessPassBehaviour, setPostProcessPassSize,
     SetPostProcessPassSizeBehaviour
@@ -643,7 +640,7 @@ export type BloomPass = PostProcessPassBase & {
 
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
-export function createBloomPass(args: { gpu: GPU; parameters?: BloomPassParametersArgs }): BloomPass {
+export function createBloomPass(args: { gpu: Gpu; parameters?: BloomPassParametersArgs }): BloomPass {
     const { gpu } = args;
     
     const name = 'BloomPass';

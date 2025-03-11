@@ -16,9 +16,9 @@ import {
     bindGPUUniformBlockAndGetBlockIndex, clearGPUColor, clearGPUDepth,
     createGPUUniformBufferObject,
     drawGPU, flushGPU,
-    GPU, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
+    Gpu, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
     setGPUViewport
-} from '@/PaleGL/core/GPU.ts';
+} from '@/PaleGL/core/gpu.ts';
 import {
     addDrawVertexCountStats,
     addPassInfoStats,
@@ -35,7 +35,7 @@ import {
 } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { PostProcess } from '@/PaleGL/postprocess/PostProcess';
+import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import {
     blitRenderTargetDepth,
     createRenderTarget,
@@ -55,28 +55,28 @@ import {
     createDeferredShadingPass,
     DeferredShadingPass,
     updateDeferredShadingPassSkyboxUniforms
-} from '@/PaleGL/postprocess/DeferredShadingPass';
-import {createSSAOPass, SSAOPass} from '@/PaleGL/postprocess/SSAOPass';
-import {createSSRPass, SSRPass} from '@/PaleGL/postprocess/SSRPass';
-import {createToneMappingPass, ToneMappingPass} from '@/PaleGL/postprocess/ToneMappingPass';
+} from '@/PaleGL/postprocess/deferredShadingPass.ts';
+import {createSSAOPass, SsaoPass} from '@/PaleGL/postprocess/ssaoPass.ts';
+import {createSSRPass, SsrPass} from '@/PaleGL/postprocess/ssrPass.ts';
+import {createToneMappingPass, ToneMappingPass} from '@/PaleGL/postprocess/toneMappingPass.ts';
 import {
     BloomPass,
     BloomPassParameters,
     createBloomPass,
     updateBloomPassParameters
-} from '@/PaleGL/postprocess/BloomPass';
-import {createDepthOfFieldPass, DepthOfFieldPass} from '@/PaleGL/postprocess/DepthOfFieldPass';
+} from '@/PaleGL/postprocess/bloomPass.ts';
+import {createDepthOfFieldPass, DepthOfFieldPass} from '@/PaleGL/postprocess/depthOfFieldPass.ts';
 import {
     createLightShaftPass, getLightShaftPassRenderTarget,
     LightShaftPass,
     setLightShaftPassDirectionalLight
-} from '@/PaleGL/postprocess/LightShaftPass.ts';
+} from '@/PaleGL/postprocess/lightShaftPass.ts';
 import {
     createVolumetricLightPass,
     setVolumetricLightPassSpotLights,
     VolumetricLightPass
-} from '@/PaleGL/postprocess/VolumetricLightPass.ts';
-import {createFogPass, FogPass, setFogPassTextures} from '@/PaleGL/postprocess/FogPass.ts';
+} from '@/PaleGL/postprocess/volumetricLightPass.ts';
+import {createFogPass, FogPass, setFogPassTextures} from '@/PaleGL/postprocess/fogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -104,15 +104,15 @@ import {
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/ChromaticAberrationPass.ts';
-import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/VignettePass.ts';
-import {createStreakPass, StreakPass} from '@/PaleGL/postprocess/StreakPass.ts';
-import {createFXAAPass, FXAAPass} from '@/PaleGL/postprocess/FXAAPass.ts';
-import {createScreenSpaceShadowPass, ScreenSpaceShadowPass} from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
+import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
+import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/vignettePass.ts';
+import {createStreakPass, StreakPass} from '@/PaleGL/postprocess/streakPass.ts';
+import {createFXAAPass, FxaaPass} from '@/PaleGL/postprocess/fxaaPass.ts';
+import {createScreenSpaceShadowPass, ScreenSpaceShadowPass} from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
-import {createGlitchPass, GlitchPass} from '@/PaleGL/postprocess/GlitchPass.ts';
+import {createGlitchPass, GlitchPass} from '@/PaleGL/postprocess/glitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -215,9 +215,9 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //     _copyDepthSourceRenderTarget: RenderTarget;
 //     _copyDepthDestRenderTarget: RenderTarget;
 //     _screenSpaceShadowPass: ScreenSpaceShadowPass;
-//     _ambientOcclusionPass: SSAOPass;
+//     _ambientOcclusionPass: SsaoPass;
 //     _deferredShadingPass: DeferredShadingPass;
-//     _ssrPass: SSRPass;
+//     _ssrPass: SsrPass;
 //     _lightShaftPass: LightShaftPass;
 //     _volumetricLightPass: VolumetricLightPass;
 //     _fogPass: FogPass;
@@ -228,7 +228,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //     _chromaticAberrationPass: ChromaticAberrationPass;
 //     _glitchPass: GlitchPass;
 //     _vignettePass: VignettePass;
-//     _fxaaPass: FXAAPass;
+//     _fxaaPass: FxaaPass;
 //
 //     get realWidth() {
 //         return this._realWidth;
@@ -374,14 +374,14 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //         });
 //
 //         this._screenSpaceShadowPass = new ScreenSpaceShadowPass({ gpu });
-//         this._ambientOcclusionPass = new SSAOPass({ gpu });
+//         this._ambientOcclusionPass = new SsaoPass({ gpu });
 //         this._deferredShadingPass = new DeferredShadingPass({ gpu });
-//         this._ssrPass = new SSRPass({ gpu });
+//         this._ssrPass = new SsrPass({ gpu });
 //         this._lightShaftPass = new LightShaftPass({ gpu });
 //         this._volumetricLightPass = new VolumetricLightPass({ gpu });
 //         this._fogPass = new FogPass({ gpu });
 //
-//         this._fxaaPass = new FXAAPass({ gpu });
+//         this._fxaaPass = new FxaaPass({ gpu });
 //         this._scenePostProcess.addPass(this._fxaaPass);
 //
 //         this._depthOfFieldPass = new DepthOfFieldPass({ gpu });
@@ -1954,7 +1954,7 @@ export type Renderer = {
         uniformBufferObject: UniformBufferObject;
         data: UniformBufferObjectBlockData;
     }[],
-    gpu: GPU,
+    gpu: Gpu,
     realWidth: number,
     realHeight: number,
     stats: Stats | null,
@@ -1966,9 +1966,9 @@ export type Renderer = {
     copyDepthSourceRenderTarget: RenderTarget,
     copyDepthDestRenderTarget: RenderTarget,
     screenSpaceShadowPass: ScreenSpaceShadowPass,
-    ambientOcclusionPass: SSAOPass,
+    ambientOcclusionPass: SsaoPass,
     deferredShadingPass: DeferredShadingPass,
-    ssrPass: SSRPass,
+    ssrPass: SsrPass,
     lightShaftPass: LightShaftPass,
     volumetricLightPass: VolumetricLightPass,
     fogPass: FogPass,
@@ -1979,7 +1979,7 @@ export type Renderer = {
     chromaticAberrationPass: ChromaticAberrationPass,
     glitchPass: GlitchPass,
     vignettePass: VignettePass,
-    fxaaPass: FXAAPass,
+    fxaaPass: FxaaPass,
     //
     renderTarget: CameraRenderTargetType | null,
     clearColorDirtyFlag: boolean,
@@ -1997,7 +1997,7 @@ export type Renderer = {
  * - depth prepass 使わない場合。offscreen する時とか
  * - offscreen rendering
  */
-export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; canvas: HTMLCanvasElement; pixelRatio: number }): Renderer {
+export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; canvas: HTMLCanvasElement; pixelRatio: number }): Renderer {
     const globalUniformBufferObjects: {
         uniformBufferObject: UniformBufferObject;
         data: UniformBufferObjectBlockData;

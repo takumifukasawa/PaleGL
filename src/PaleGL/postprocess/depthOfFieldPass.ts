@@ -9,7 +9,7 @@
 // import { FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
 // import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 // import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
 // import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
@@ -18,10 +18,10 @@
 // import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 // import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
 // import {
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 //
 // const UNIFORM_NAME_COC_TEXTURE = 'uCocTexture';
@@ -92,7 +92,7 @@
 //      *
 //      * @param gpu
 //      */
-//     constructor({ gpu, parameters }: { gpu: GPU; parameters?: DepthOfFieldPassParameters }) {
+//     constructor({ gpu, parameters }: { gpu: Gpu; parameters?: DepthOfFieldPassParameters }) {
 //         // super();
 //
 //         // this.gpu = gpu;
@@ -142,7 +142,7 @@
 //                 //     type: UniformTypes.Vector4,
 //                 //     value: Vector4.zero,
 //                 // },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             uniformBlockNames: [
 //                 // UniformBlockNames.Transformations,
@@ -191,7 +191,7 @@
 //                     type: UniformTypes.Vector2,
 //                     value: Vector2.zero,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
 //             renderTargetType: RenderTargetTypes.RGBA16F,
@@ -499,22 +499,22 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/FragmentPass';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
 import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';
 import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
 import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import {
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
     PostProcessPassBase,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+    PostProcessPassParametersBase, PostProcessPassRenderArgs
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const UNIFORM_NAME_COC_TEXTURE = 'uCocTexture';
@@ -553,7 +553,7 @@ export type DepthOfFieldPass = PostProcessPassBase & {
     compositePass: FragmentPass;
 };
 
-export function createDepthOfFieldPass(args: { gpu: GPU; parameters?: DepthOfFieldPassParameters }) {
+export function createDepthOfFieldPass(args: { gpu: Gpu; parameters?: DepthOfFieldPassParameters }) {
     const { gpu } = args;
 
     // NOTE: geometryは親から渡して使いまわしてもよい

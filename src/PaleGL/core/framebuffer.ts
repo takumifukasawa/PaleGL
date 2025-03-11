@@ -50,13 +50,13 @@
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export type Framebuffer = GLObjectBase<WebGLFramebuffer> & {
     drawBufferList: GLColorAttachment[];
 };
 
-export function createFramebuffer({ gpu }: { gpu: GPU }): Framebuffer {
+export function createFramebuffer({ gpu }: { gpu: Gpu }): Framebuffer {
     const { gl } = gpu;
 
     const fb = gl.createFramebuffer()!;

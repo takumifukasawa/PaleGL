@@ -1,13 +1,13 @@
 ﻿// import {PostProcessPassType, UniformNames, UniformTypes} from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { Override } from '@/PaleGL/palegl';
 // import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
 //
@@ -43,13 +43,13 @@
 //     };
 // }
 //
-// export class VignettePass extends PostProcessPassBase {
+// export class VignettePass extends PostProcessPassBaseDEPRECATED {
 //     // vignetteRadius: number;
 //     // vignettePower: number;
 //     // blendRate: number;
 //     parameters: Override<PostProcessPassParametersBase, VignettePassParameters>;
 //
-//     constructor(args: { gpu: GPU; parameters?: VignettePassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: VignettePassParametersArgs }) {
 //         const { gpu } = args;
 //         const fragmentShader = vignetteFragment;
 //
@@ -112,18 +112,17 @@
 // }
 
 import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour
-} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 // ref:
 
@@ -159,7 +158,7 @@ export function generateVignetteParameters(params: VignettePassParametersArgs = 
 
 export type VignettePass = PostProcessSinglePass;
 
-export function createVignettePass(args: { gpu: GPU; parameters?: VignettePassParametersArgs }): VignettePass {
+export function createVignettePass(args: { gpu: Gpu; parameters?: VignettePassParametersArgs }): VignettePass {
     // parameters: Override<PostProcessPassParametersBase, VignettePassParameters>;
 
     const { gpu } = args;

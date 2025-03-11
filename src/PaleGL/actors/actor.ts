@@ -2,19 +2,19 @@
 import { ActorType, ActorTypes } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
 import { Animator, createAnimator } from '@/PaleGL/core/animator.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Component } from '@/PaleGL/core/component.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 
-export type ActorStartArgs = { scene: Scene; gpu: GPU };
-export type ActorFixedUpdateArgs = { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number };
-export type ActorUpdateArgs = { scene: Scene; gpu: GPU; time: number; deltaTime: number };
-export type ActorLastUpdateArgs = { scene: Scene; gpu: GPU; time: number; deltaTime: number };
+export type ActorStartArgs = { scene: Scene; gpu: Gpu };
+export type ActorFixedUpdateArgs = { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number };
+export type ActorUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime: number };
+export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; gpu: GPU }) => void;
-type OnFixedUpdateCallback = (args: { scene: Scene; gpu: GPU; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnUpdateCallback = (args: { scene: Scene; gpu: GPU; time: number; deltaTime: number }) => void;
-type OnLastUpdateCallback = (args: { scene: Scene; gpu: GPU; time: number; deltaTime: number }) => void;
+type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
+type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
+type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
+type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = (key: string, value: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;

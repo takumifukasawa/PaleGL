@@ -7,7 +7,7 @@
 // import {Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
 // // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 // import {createPlaneGeometry, PlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
 // // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -18,15 +18,15 @@
 // import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
 // import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
 // import {
-//     PostProcessPassBase,
+//     PostProcessPassBaseDEPRECATED,
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
 // import { Color } from '@/PaleGL/math/Color.ts';
-// 
+//
 // const UNIFORM_NAME_PREV_TEXTURE = 'uPrevTexture';
 // const UNIFORM_NAME_DOWN_SAMPLE_TEXTURE = 'uDownSampleTexture';
 // const UNIFORM_NAME_STRETCH = 'uStretch';
@@ -34,12 +34,12 @@
 // const UNIFORM_NAME_STREAK_TEXTURE = 'uStreakTexture';
 // const UNIFORM_NAME_COLOR = 'uColor';
 // const UNIFORM_NAME_INTENSITY = 'uIntensity';
-// 
+//
 // // const BLUR_PIXEL_NUM = 7;
-// 
+//
 // // ref:
 // // https://github.com/keijiro/KinoStreak/
-// 
+//
 // type StreakPassParametersBase = {
 //     threshold: number;
 //     stretch: number;
@@ -48,11 +48,11 @@
 //     verticalScale: number;
 //     horizontalScale: number;
 // };
-// 
+//
 // type StreakPassParameters = PostProcessPassParametersBase & StreakPassParametersBase;
-// 
+//
 // type StreakPassParametersArgs = Partial<StreakPassParameters>;
-// 
+//
 // function generateStreakPassParameters(args: StreakPassParametersArgs = {}): StreakPassParameters {
 //     return {
 //         enabled: args.enabled || true,
@@ -64,16 +64,16 @@
 //         horizontalScale: args.horizontalScale || 1.25,
 //     };
 // }
-// 
+//
 // export class StreakPass implements IPostProcessPass {
 //     // gpu: Gpu;
 //     name: string = 'StreakPass';
 //     type: PostProcessPassType = PostProcessPassType.Streak;
-//     
+//
 //     // enabled: boolean = true;
 //     width: number = 1;
 //     height: number = 1;
-// 
+//
 //     // parameters
 //     // threshold: number = 0.9;
 //     // stretch: number = 0.5;
@@ -82,11 +82,11 @@
 //     // verticalScale: number = 1.5;
 //     // horizontalScale: number = 1.25;
 //     parameters: StreakPassParameters;
-// 
+//
 //     materials: Material[] = [];
-// 
+//
 //     // private extractBrightnessPass;
-// 
+//
 //     // tmp
 //     // private renderTargetExtractBrightness: RenderTarget;
 //     // private renderTargetBlurMip4_Horizontal: RenderTarget;
@@ -99,9 +99,9 @@
 //     // private renderTargetBlurMip32_Vertical: RenderTarget;
 //     // private renderTargetBlurMip64_Horizontal: RenderTarget;
 //     // private renderTargetBlurMip64_Vertical: RenderTarget;
-// 
+//
 //     // private renderTargetDownSampleMip2: RenderTarget;
-// 
+//
 //     // get renderTargetBlurMip4() {
 //     //     return this.renderTargetBlurMip4_Vertical;
 //     // }
@@ -117,11 +117,11 @@
 //     // get renderTargetBlurMip64() {
 //     //     return this.renderTargetBlurMip64_Vertical;
 //     // }
-// 
+//
 //     // tmp
 //     // private horizontalBlurPass: FragmentPass;
 //     // private verticalBlurPass: FragmentPass;
-// 
+//
 //     // #lastPass;
 //     // private downSampleMip2Pass: FragmentPass;
 //     // private downSampleMip4Pass: FragmentPass;
@@ -133,20 +133,20 @@
 //     upSamplePasses: { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass }[] = [];
 //     compositePass: FragmentPass;
 //     // private downSampleMaterial: Material;
-// 
+//
 //     geometry: PlaneGeometry;
 //     // horizontalBlurMaterial: Material;
 //     // verticalBlurMaterial: Material;
-// 
+//
 //     //tone: number = 1;
 //     //bloomAmount: number = 0.8;
-// 
+//
 //     halfHeight: number = 0;
-// 
+//
 //     get renderTarget() {
 //         return this.compositePass.renderTarget;
 //     }
-// 
+//
 //     constructor({
 //         gpu,
 //         // threshold,
@@ -157,7 +157,7 @@
 //         // horizontalScale,
 //         parameters,
 //     }: {
-//         gpu: GPU;
+//         gpu: Gpu;
 //         // threshold?: number;
 //         // stretch?: number;
 //         // intensity?: number;
@@ -169,11 +169,11 @@
 //         // bloomAmount?: number;
 //     }) {
 //         // super();
-// 
+//
 //         // this.gpu = gpu;
-// 
+//
 //         this.parameters = generateStreakPassParameters(parameters);
-// 
+//
 //         // this.threshold = threshold !== undefined ? threshold : this.threshold;
 //         // this.color = color !== undefined ? color : this.color;
 //         // this.stretch = stretch !== undefined ? stretch : this.stretch;
@@ -182,10 +182,10 @@
 //         // this.horizontalScale = horizontalScale !== undefined ? horizontalScale : this.horizontalScale;
 //         // this.tone = tone;
 //         // this.bloomAmount = bloomAmount;
-// 
+//
 //         // NOTE: geometryは親から渡して使いまわしてもよい
 //         this.geometry = createPlaneGeometry({ gpu });
-// 
+//
 //         this.prefilterPass = new FragmentPass({
 //             gpu,
 //             fragmentShader: streakPrefilterFragmentShader,
@@ -210,12 +210,12 @@
 //                     type: UniformTypes.Float,
 //                     value: this.parameters.verticalScale,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
 //         });
 //         this.materials.push(...this.prefilterPass.materials);
-// 
+//
 //         const downSamplePassInfos = [2, 4, 8, 16, 32].map((downScale) => {
 //             const pass = new FragmentPass({
 //                 name: `DownSampleMip${downScale}Pass`,
@@ -237,7 +237,7 @@
 //                         type: UniformTypes.Float,
 //                         value: this.parameters.horizontalScale,
 //                     },
-//                     ...PostProcessPassBase.commonUniforms,
+//                     ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //                 ],
 //             });
 //             this.materials.push(...pass.materials);
@@ -250,7 +250,7 @@
 //                 downScale,
 //             };
 //         });
-// 
+//
 //         const upSamplePassInfos = maton.range(5).map((_, index) => {
 //             const pass = new FragmentPass({
 //                 name: `UpSampleMip${index}Pass`,
@@ -272,7 +272,7 @@
 //                         type: UniformTypes.Float,
 //                         value: this.parameters.stretch,
 //                     },
-//                     ...PostProcessPassBase.commonUniforms,
+//                     ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //                 ],
 //             });
 //             this.materials.push(...pass.materials);
@@ -289,7 +289,7 @@
 //                 downSamplePass: this.downSamplePasses[this.downSamplePasses.length - 1 - index].pass,
 //             };
 //         });
-// 
+//
 //         // tmp
 //         // this.renderTargetExtractBrightness = new RenderTarget({gpu});
 //         // this.renderTargetBlurMip4_Horizontal = new RenderTarget({
@@ -346,10 +346,10 @@
 //         //     gpu,
 //         //     type: RenderTargetTypes.R11F_G11F_B10F,
 //         // });
-// 
+//
 //         // const copyPass = new CopyPass({ gpu });
 //         // this.#passes.push(copyPass);
-// 
+//
 //         // this.extractBrightnessPass = new FragmentPass({
 //         //     gpu,
 //         //     fragmentShader: extractBrightnessFragmentShader,
@@ -364,13 +364,13 @@
 //         //     // renderTargetType: RenderTargetTypes.RGBA
 //         // });
 //         // this.materials.push(...this.extractBrightnessPass.materials);
-// 
+//
 //         // // const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 //         // const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, 0.92);
 //         // console.log("blurWeights", blurWeights)
-// 
+//
 //         // this.horizontalBlurMaterial = new Material({
-//         //     vertexShader: PostProcessPassBase.baseVertexShader,
+//         //     vertexShader: PostProcessPassBaseDEPRECATED.baseVertexShader,
 //         //     fragmentShader: gaussianBlurFragmentShader,
 //         //     uniforms: [
 //         //         {
@@ -388,13 +388,13 @@
 //         //             type: UniformTypes.Float,
 //         //             value: 1,
 //         //         },
-//         //         ...PostProcessPassBase.commonUniforms,
+//         //         ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //         //     ],
 //         // });
 //         // this.materials.push(this.horizontalBlurMaterial);
-// 
+//
 //         // this.verticalBlurMaterial = new Material({
-//         //     vertexShader: PostProcessPassBase.baseVertexShader,
+//         //     vertexShader: PostProcessPassBaseDEPRECATED.baseVertexShader,
 //         //     fragmentShader: gaussianBlurFragmentShader,
 //         //     uniforms: [
 //         //         {
@@ -412,13 +412,13 @@
 //         //             type: UniformTypes.Float,
 //         //             value: 0,
 //         //         },
-//         //         ...PostProcessPassBase.commonUniforms,
+//         //         ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //         //     ],
 //         // });
 //         // this.materials.push(this.verticalBlurMaterial);
-// 
+//
 //         // this.downSampleMaterial = new Material({
-//         //     vertexShader: PostProcessPassBase.baseVertexShader,
+//         //     vertexShader: PostProcessPassBaseDEPRECATED.baseVertexShader,
 //         //     fragmentShader: streakDownSampleFragmentShader,
 //         //     uniforms: [
 //         //         {
@@ -431,11 +431,11 @@
 //         //             type: UniformTypes.Vector2,
 //         //             value: Vector2.zero,
 //         //         },
-//         //         ...PostProcessPassBase.commonUniforms,
+//         //         ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //         //     ],
 //         // });
 //         // this.materials.push(this.downSampleMaterial);
-// 
+//
 //         this.compositePass = new FragmentPass({
 //             gpu,
 //             fragmentShader: streakCompositeFragmentShader,
@@ -455,19 +455,19 @@
 //                     type: UniformTypes.Float,
 //                     value: this.parameters.intensity,
 //                 },
-//                 ...PostProcessPassBase.commonUniforms,
+//                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
 //         });
 //         this.materials.push(...this.compositePass.materials);
 //     }
-// 
+//
 //     setSize(width: number, height: number) {
 //         this.width = width;
 //         this.height = height;
-// 
+//
 //         // this.extractBrightnessPass.setSize(width, height);
-// 
+//
 //         // this.renderTargetBlurMip4_Horizontal.setSize(this.width / 4, this.height / 4);
 //         // this.renderTargetBlurMip4_Vertical.setSize(this.width / 4, this.height / 4);
 //         // this.renderTargetBlurMip8_Horizontal.setSize(this.width / 8, this.height / 8);
@@ -478,26 +478,26 @@
 //         // this.renderTargetBlurMip32_Vertical.setSize(this.width / 32, this.height / 32);
 //         // this.renderTargetBlurMip64_Horizontal.setSize(this.width / 64, this.height / 64);
 //         // this.renderTargetBlurMip64_Vertical.setSize(this.width / 64, this.height / 64);
-// 
+//
 //         this.halfHeight = Math.floor(this.height / 2);
 //         this.prefilterPass.setSize(this.width, this.halfHeight);
 //         // this.renderTargetDownSampleMip2.setSize(this.width, this.halfHeight);
-// 
+//
 //         //
 //         // down sample pass のリサイズはrender時にやる
 //         //
-// 
+//
 //         this.compositePass.setSize(this.width, this.height);
 //     }
-// 
+//
 //     // TODO: 空メソッド書かなくていいようにしたい
 //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //     // @ts-ignore
 //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 //     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
-// 
+//
 //     update() {}
-// 
+//
 //     render({
 //         gpu,
 //         camera,
@@ -512,15 +512,15 @@
 //         // this.geometry.start();
 //         // // ppの場合はいらない気がする
 //         // // this.mesh.updateTransform();
-// 
+//
 //         //
 //         // prefilter
 //         //
-// 
+//
 //         setMaterialUniformValue(this.prefilterPass.material, 'uTexelSize', new Vector2(1 / this.width, 1 / this.height));
 //         setMaterialUniformValue(this.prefilterPass.material, 'uThreshold', this.parameters.threshold);
 //         setMaterialUniformValue(this.prefilterPass.material, 'uVerticalScale', this.parameters.verticalScale);
-//         
+//
 //         this.prefilterPass.render({
 //             gpu,
 //             camera,
@@ -531,11 +531,11 @@
 //             gBufferRenderTargets,
 //             time,
 //         });
-// 
+//
 //         //
 //         // down sample
 //         //
-// 
+//
 //         this.downSamplePasses.forEach(({ pass, prevPass, downScale }) => {
 //             const width = Math.floor(this.width / downScale);
 //             pass.setSize(width, this.halfHeight);
@@ -553,11 +553,11 @@
 //                 time,
 //             });
 //         });
-// 
+//
 //         //
 //         // up sample
 //         //
-// 
+//
 //         this.upSamplePasses.forEach(({ pass, prevPass, downSamplePass }) => {
 //             pass.setSize(downSamplePass.width, downSamplePass.height);
 //             setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);
@@ -574,11 +574,11 @@
 //                 time,
 //             });
 //         });
-// 
+//
 //         //
 //         // composite
 //         //
-// 
+//
 //         setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_STREAK_TEXTURE,
 //             // correct
 //             this.upSamplePasses[this.upSamplePasses.length - 1].pass.renderTarget.texture
@@ -587,7 +587,7 @@
 //             );
 //         setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_COLOR, this.parameters.color);
 //         setMaterialUniformValue(this.compositePass.material, UNIFORM_NAME_INTENSITY, this.parameters.intensity);
-//         
+//
 //         this.compositePass.render({
 //             gpu,
 //             camera,
@@ -602,19 +602,15 @@
 //     }
 // }
 
-
-
-
-
 import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/FragmentPass';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 // import { RenderTarget } from '@/PaleGL/core/RenderTarget';
 // import {CopyPass} from "./CopyPass";
-import {Material, setMaterialUniformValue} from '@/PaleGL/materials/material.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import {createPlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 // import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 // import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
@@ -622,11 +618,6 @@ import streakPrefilterFragmentShader from '@/PaleGL/shaders/streak-prefilter-fra
 import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-fragment.glsl';
 import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
 import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
-import {
-    
-    PostProcessPassParametersBase,
-    PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -634,9 +625,11 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import {
     PostProcessPassBase,
     createPostProcessPassBase,
-    getPostProcessCommonUniforms
-} from "@/PaleGL/postprocess/postProcessPassBaseWIP.ts";
-import {renderPostProcessPass, setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+    getPostProcessCommonUniforms,
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const UNIFORM_NAME_PREV_TEXTURE = 'uPrevTexture';
 const UNIFORM_NAME_DOWN_SAMPLE_TEXTURE = 'uDownSampleTexture';
@@ -687,16 +680,9 @@ export type StreakPass = PostProcessPassBase & {
     compositePass: FragmentPass;
 };
 
-export function createStreakPass(
-    args: {
-        gpu: GPU;
-        parameters?: StreakPassParametersArgs;
-    }
-): StreakPass {
-    const {
-        gpu,
-    } = args;
-    
+export function createStreakPass(args: { gpu: Gpu; parameters?: StreakPassParametersArgs }): StreakPass {
+    const { gpu } = args;
+
     // parameters
     // threshold: number = 0.9;
     // stretch: number = 0.5;
@@ -737,7 +723,7 @@ export function createStreakPass(
                 type: UniformTypes.Float,
                 value: parameters.verticalScale,
             },
-            ...getPostProcessCommonUniforms()
+            ...getPostProcessCommonUniforms(),
         ],
         renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
     });
@@ -810,14 +796,12 @@ export function createStreakPass(
         return {
             pass,
             prevPass:
-                index === 0
-                    ? downSamplePasses[downSamplePasses.length - 1].pass
-                    : upSamplePassInfos[index - 1].pass,
+                index === 0 ? downSamplePasses[downSamplePasses.length - 1].pass : upSamplePassInfos[index - 1].pass,
             // downSamplePass: this.downSamplePasses[index].pass,
             downSamplePass: downSamplePasses[downSamplePasses.length - 1 - index].pass,
         };
     });
-    
+
     const compositePass = createFragmentPass({
         gpu,
         fragmentShader: streakCompositeFragmentShader,
@@ -845,17 +829,17 @@ export function createStreakPass(
 
     return {
         ...createPostProcessPassBase({
-            name: "StreakPass",
+            name: 'StreakPass',
             type: PostProcessPassType.Streak,
             parameters,
             geometry,
-            materials
+            materials,
         }),
         halfHeight,
         prefilterPass,
         downSamplePasses,
         upSamplePasses,
-        compositePass
+        compositePass,
     };
 }
 
@@ -865,7 +849,7 @@ export function getStreakPassRenderTarget(PostProcessPass: PostProcessPassBase) 
 
 export function setStreakPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
     const streakPass = postProcessPass as StreakPass;
-    
+
     streakPass.width = width;
     streakPass.height = height;
 
@@ -893,19 +877,22 @@ export function setStreakPassSize(postProcessPass: PostProcessPassBase, width: n
     setPostProcessPassSize(streakPass.compositePass, streakPass.width, streakPass.height);
 }
 
-export function renderStreakPass(postProcessPass: PostProcessPassBase, {
-    gpu,
-    camera,
-    renderer,
-    prevRenderTarget,
-    isLastPass,
-    gBufferRenderTargets,
-    targetCamera,
-    time,
-}: PostProcessPassRenderArgs) {
+export function renderStreakPass(
+    postProcessPass: PostProcessPassBase,
+    {
+        gpu,
+        camera,
+        renderer,
+        prevRenderTarget,
+        isLastPass,
+        gBufferRenderTargets,
+        targetCamera,
+        time,
+    }: PostProcessPassRenderArgs
+) {
     const streakPass = postProcessPass as StreakPass;
     const parameters = streakPass.parameters as StreakPassParameters;
-    
+
     // // 一回だけ呼びたい
     // this.geometry.start();
     // // ppの場合はいらない気がする
@@ -915,7 +902,11 @@ export function renderStreakPass(postProcessPass: PostProcessPassBase, {
     // prefilter
     //
 
-    setMaterialUniformValue(streakPass.prefilterPass.material, 'uTexelSize', new Vector2(1 / streakPass.width, 1 / streakPass.height));
+    setMaterialUniformValue(
+        streakPass.prefilterPass.material,
+        'uTexelSize',
+        new Vector2(1 / streakPass.width, 1 / streakPass.height)
+    );
     setMaterialUniformValue(streakPass.prefilterPass.material, 'uThreshold', parameters.threshold);
     setMaterialUniformValue(streakPass.prefilterPass.material, 'uVerticalScale', parameters.verticalScale);
 
@@ -937,7 +928,11 @@ export function renderStreakPass(postProcessPass: PostProcessPassBase, {
     streakPass.downSamplePasses.forEach(({ pass, prevPass, downScale }) => {
         const width = Math.floor(streakPass.width / downScale);
         setPostProcessPassSize(pass, width, streakPass.halfHeight);
-        setMaterialUniformValue(pass.material, UniformNames.TexelSize, new Vector2(1 / width, 1 / streakPass.halfHeight));
+        setMaterialUniformValue(
+            pass.material,
+            UniformNames.TexelSize,
+            new Vector2(1 / width, 1 / streakPass.halfHeight)
+        );
         setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);
         setMaterialUniformValue(pass.material, UNIFORM_NAME_HORIZONTAL_SCALE, parameters.horizontalScale);
         renderPostProcessPass(pass, {
@@ -977,7 +972,9 @@ export function renderStreakPass(postProcessPass: PostProcessPassBase, {
     // composite
     //
 
-    setMaterialUniformValue(streakPass.compositePass.material, UNIFORM_NAME_STREAK_TEXTURE,
+    setMaterialUniformValue(
+        streakPass.compositePass.material,
+        UNIFORM_NAME_STREAK_TEXTURE,
         // correct
         streakPass.upSamplePasses[streakPass.upSamplePasses.length - 1].pass.renderTarget.texture
         // for debug

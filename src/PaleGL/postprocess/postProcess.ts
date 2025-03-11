@@ -1,7 +1,7 @@
 ﻿// // import {Vector3} from '@/PaleGL/math/Vector3';
 // import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 // import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import {
 //     applyLightShadowMapUniformValues,
 //     LightActors,
@@ -11,7 +11,7 @@
 // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 // import { UniformNames } from '@/PaleGL/constants.ts';
-// import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { Texture } from '@/PaleGL/core/texture.ts';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -21,9 +21,9 @@
 // // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
-// 
+//
 // type PostProcessRenderArgs = {
-//     gpu: GPU;
+//     gpu: Gpu;
 //     renderer: Renderer;
 //     prevRenderTarget: RenderTarget | null;
 //     gBufferRenderTargets?: GBufferRenderTargets | null;
@@ -32,37 +32,37 @@
 //     isCameraLastPass: boolean;
 //     lightActors?: LightActors;
 // };
-// 
+//
 // // TODO: actorを継承してもいいかもしれない
 // export class PostProcess {
 //     passes: IPostProcessPass[] = [];
 //     // renderTarget;
 //     _postProcessCamera: Camera;
-// 
+//
 //     _selfEnabled = true;
-// 
+//
 //     get enabled() {
 //         if (!this._selfEnabled) {
 //             return false;
 //         }
-// 
+//
 //         for (let i = 0; i < this.passes.length; i++) {
 //             if (this.passes[i].parameters.enabled) {
 //                 return true;
 //             }
 //         }
-// 
+//
 //         return false;
 //     }
-// 
+//
 //     getPostProcessCamera() {
 //         return this._postProcessCamera;
 //     }
-// 
+//
 //     set enabled(value) {
 //         this._selfEnabled = value;
 //     }
-// 
+//
 //     get hasEnabledPass() {
 //         for (let i = 0; i < this.passes.length; i++) {
 //             if (this.passes[i].parameters.enabled) {
@@ -71,7 +71,7 @@
 //         }
 //         return false;
 //     }
-// 
+//
 //     get lastRenderTarget() {
 //         let lastPass: IPostProcessPass | null = null;
 //         for (let i = this.passes.length - 1; i >= 0; i--) {
@@ -85,7 +85,7 @@
 //         }
 //         return lastPass.renderTarget;
 //     }
-// 
+//
 //     // constructor({gpu}: {gpu: Gpu}) {
 //     constructor(postProcessCamera?: Camera) {
 //         // // TODO: renderTargetがいらない時もあるので出し分けたい
@@ -96,14 +96,14 @@
 //         //     writeDepthTexture: true, // TODO: 必要ないかもしれないので出し分けたい
 //         //     width: 1, height: 1,
 //         // });
-// 
+//
 //         if (postProcessCamera) {
 //             this._postProcessCamera = postProcessCamera;
 //         } else {
 //             this._postProcessCamera = createFullQuadOrthographicCamera();
 //         }
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param width
@@ -114,7 +114,7 @@
 //         // this.renderTarget.setSize(width, height);
 //         this.passes.forEach((pass) => pass.setSize(width, height));
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param pass
@@ -122,7 +122,7 @@
 //     addPass(pass: IPostProcessPass) {
 //         this.passes.push(pass);
 //     }
-// 
+//
 //     /**
 //      *
 //      */
@@ -131,7 +131,7 @@
 //             pass.update();
 //         });
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param pass
@@ -161,11 +161,11 @@
 //             if (lightActors) {
 //                 applyLightShadowMapUniformValues(passMaterial, lightActors, fallbackTextureBlack);
 //             }
-// 
+//
 //             //
 //             // basic
 //             //
-// 
+//
 //             setMaterialUniformValue(passMaterial, UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
 //             setMaterialUniformValue(
 //                 passMaterial,
@@ -183,9 +183,9 @@
 //                 UniformNames.TransposeInverseViewMatrix,
 //                 targetCamera.viewMatrix.clone().invert().transpose()
 //             );
-// 
+//
 //             // passMaterial.uniforms.setValue(UniformNames.Time, time);
-// 
+//
 //             // g-buffers
 //             setMaterialUniformValue(
 //                 passMaterial,
@@ -215,7 +215,7 @@
 //             );
 //         });
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param pass
@@ -249,13 +249,13 @@
 //             lightActors,
 //             fallbackTextureBlack: gpu.dummyTextureBlack,
 //         });
-// 
+//
 //         //
 //         // cameras
 //         //
-// 
+//
 //         updateRendererCameraUniforms(renderer, targetCamera);
-// 
+//
 //         pass.render({
 //             gpu,
 //             renderer,
@@ -268,7 +268,7 @@
 //             lightActors,
 //         });
 //     }
-// 
+//
 //     /**
 //      *
 //      * @param gpu
@@ -293,7 +293,7 @@
 //         // if (!sceneRenderTarget) {
 //         //     console.error('[PostProcess.render] scene render target is empty.');
 //         // }
-// 
+//
 //         updateActorTransform(this._postProcessCamera);
 //         // TODO: render target を外から渡したほうが分かりやすいかも
 //         // let prevRenderTarget = sceneRenderTarget || this.renderTarget;
@@ -301,19 +301,19 @@
 //         if (!prevRenderTarget) {
 //             console.error('[PostProcess.render] scene render target is empty.');
 //         }
-// 
+//
 //         // const inverseViewProjectionMatrix = Matrix4.multiplyMatrices(
 //         //     targetCamera.projectionMatrix,
 //         //     targetCamera.viewMatrix
 //         // ).invert();
 //         // const inverseProjectionMatrix = targetCamera.projectionMatrix.clone().invert();
-// 
+//
 //         // set uniform and render pass
 //         const enabledPasses = this.passes.filter((pass) => pass.parameters.enabled);
-// 
+//
 //         enabledPasses.forEach((pass, i) => {
 //             const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;
-// 
+//
 //             // this.updatePassMaterial({pass, renderer, targetCamera, time});
 //             // pass.render({
 //             //     gpu,
@@ -325,7 +325,7 @@
 //             //     gBufferRenderTargets,
 //             //     time,
 //             // });
-// 
+//
 //             PostProcess.renderPass({
 //                 pass,
 //                 gpu,
@@ -338,43 +338,43 @@
 //                 time,
 //                 lightActors,
 //             });
-// 
+//
 //             prevRenderTarget = pass.renderTarget;
 //         });
 //     }
 // }
 
-
 // import {Vector3} from '@/PaleGL/math/Vector3';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     applyLightShadowMapUniformValues,
     LightActors,
     Renderer,
-    updateRendererCameraUniforms
+    updateRendererCameraUniforms,
 } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { UniformNames } from '@/PaleGL/constants.ts';
-import { PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import {setCameraSize} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
-import {PostProcessPassBase} from "@/PaleGL/postprocess/postProcessPassBaseWIP.ts";
+import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
-    getPostProcessPassRenderTarget, renderPostProcessPass,
-    setPostProcessPassSize, updatePostProcessPass
-} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+    getPostProcessPassRenderTarget,
+    renderPostProcessPass,
+    setPostProcessPassSize,
+    updatePostProcessPass,
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 
 type PostProcessRenderArgs = {
-    gpu: GPU;
+    gpu: Gpu;
     renderer: Renderer;
     prevRenderTarget: RenderTarget | null;
     gBufferRenderTargets?: GBufferRenderTargets | null;
@@ -493,13 +493,13 @@ export class PostProcess {
      */
     // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
     private static updatePassMaterial({
-                                          pass,
-                                          renderer,
-                                          targetCamera,
-                                          // time,
-                                          lightActors,
-                                          fallbackTextureBlack,
-                                      }: {
+        pass,
+        renderer,
+        targetCamera,
+        // time,
+        lightActors,
+        fallbackTextureBlack,
+    }: {
         pass: PostProcessPassBase;
         renderer: Renderer;
         targetCamera: Camera;
@@ -581,17 +581,21 @@ export class PostProcess {
      * @param lightActors
      */
     static renderPass({
-                          pass,
-                          gpu,
-                          renderer,
-                          camera,
-                          prevRenderTarget,
-                          targetCamera,
-                          gBufferRenderTargets,
-                          time,
-                          isLastPass,
-                          lightActors,
-                      }: PostProcessPassRenderArgs & { pass: PostProcessPassBase; camera: Camera; isLastPass: boolean }) {
+        pass,
+        gpu,
+        renderer,
+        camera,
+        prevRenderTarget,
+        targetCamera,
+        gBufferRenderTargets,
+        time,
+        isLastPass,
+        lightActors,
+    }: PostProcessPassRenderArgs & {
+        pass: PostProcessPassBase;
+        camera: Camera;
+        isLastPass: boolean;
+    }) {
         PostProcess.updatePassMaterial({
             pass,
             renderer,
@@ -632,15 +636,15 @@ export class PostProcess {
      * @param lightActors
      */
     render({
-               gpu,
-               renderer,
-               prevRenderTarget, // TODO: このパラメーターなくしたい
-               gBufferRenderTargets,
-               targetCamera,
-               time,
-               isCameraLastPass,
-               lightActors,
-           }: PostProcessRenderArgs) {
+        gpu,
+        renderer,
+        prevRenderTarget, // TODO: このパラメーターなくしたい
+        gBufferRenderTargets,
+        targetCamera,
+        time,
+        isCameraLastPass,
+        lightActors,
+    }: PostProcessRenderArgs) {
         // if (!sceneRenderTarget) {
         //     console.error('[PostProcess.render] scene render target is empty.');
         // }

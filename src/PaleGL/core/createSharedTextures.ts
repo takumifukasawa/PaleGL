@@ -7,12 +7,11 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import {createMaterial, Material, setMaterialUniformValue, startMaterial} from '@/PaleGL/materials/material.ts';
-import { PostProcessPassBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { createMaterial, Material, setMaterialUniformValue, startMaterial } from '@/PaleGL/materials/material.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import {Renderer, renderMesh, setRendererRenderTarget} from '@/PaleGL/core/renderer.ts';
+import { Renderer, renderMesh, setRendererRenderTarget } from '@/PaleGL/core/renderer.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
@@ -20,6 +19,7 @@ import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
 const gridUniformName = 'uGridSize';
 
@@ -202,10 +202,10 @@ const sharedTextureInfos: SharedTextureInfo[] = [
     ],
 ];
 
-export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Renderer }): SharedTextures {
+export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Renderer }): SharedTextures {
     const planeGeometry = createPlaneGeometry({ gpu });
 
-    const createEffectRenderTarget = ({ gpu, width, height }: { gpu: GPU; width: number; height: number }) => {
+    const createEffectRenderTarget = ({ gpu, width, height }: { gpu: Gpu; width: number; height: number }) => {
         return createRenderTarget({
             gpu,
             width,
@@ -241,13 +241,14 @@ export function createSharedTextures({ gpu, renderer }: { gpu: GPU; renderer: Re
         } = current;
         const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height });
         const ppRenderTarget = createEffectRenderTarget({ gpu, width, height });
+
         const tmpMaterial = createMaterial({
-            vertexShader: PostProcessPassBase.baseVertexShader,
+            vertexShader: getPostProcessBaseVertexShader(),
             fragmentShader: effectFragmentShader,
             uniforms: effectUniforms,
         });
         const ppMaterial = createMaterial({
-            vertexShader: PostProcessPassBase.baseVertexShader,
+            vertexShader: getPostProcessBaseVertexShader(),
             fragmentShader: effectTexturePostProcessFragment,
             uniforms: [
                 {

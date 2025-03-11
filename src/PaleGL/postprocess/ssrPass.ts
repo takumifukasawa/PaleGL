@@ -5,15 +5,15 @@
 //     UniformNames,
 //     UniformTypes,
 // } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 // import { Override } from '@/PaleGL/palegl';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -88,14 +88,14 @@
 //
 // // type Override<Type, NewType> = Omit<Type, keyof NewType> & NewType;
 //
-// export class SSRPass extends PostProcessPassBase {
+// export class SsrPass extends PostProcessPassBaseDEPRECATED {
 //     parameters: Override<PostProcessPassParametersBase, SSRPassParameters>;
 //
 //     /**
 //      *
 //      * @param args
 //      */
-//     constructor(args: { gpu: GPU; parameters?: SSRPassParameters }) {
+//     constructor(args: { gpu: Gpu; parameters?: SSRPassParameters }) {
 //         const { gpu } = args;
 //         const parameters = generateSSRPassParameters(args.parameters ?? {});
 //
@@ -271,20 +271,19 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour
-} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 /*
 float eps = .001;
@@ -354,11 +353,11 @@ export function generateSSRPassParameters(params: SSRPassArgs = {}): SSRPassPara
     };
 }
 
-export type SSRPass = PostProcessSinglePass;
+export type SsrPass = PostProcessSinglePass;
 
 // type Override<Type, NewType> = Omit<Type, keyof NewType> & NewType;
 
-export function createSSRPass(args: { gpu: GPU; parameters?: SSRPassParameters }): SSRPass {
+export function createSSRPass(args: { gpu: Gpu; parameters?: SSRPassParameters }): SsrPass {
     const { gpu } = args;
 
     const parameters: Override<PostProcessPassParametersBase, SSRPassParameters> = generateSSRPassParameters(
@@ -483,14 +482,14 @@ export function createSSRPass(args: { gpu: GPU; parameters?: SSRPassParameters }
 //  * @param width
 //  * @param height
 //  */
-// export function setSSRPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+// export function setSSRPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
 //     super.setSize(width, height);
 //     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
 //     setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
 // }
 
 export function renderSSRPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
-    const ssrPass = postProcessPass as SSRPass;
+    const ssrPass = postProcessPass as SsrPass;
     const parameters = ssrPass.parameters as SSRPassParameters;
     setMaterialUniformValue(ssrPass.material, 'uRayDepthBias', parameters.rayDepthBias);
     setMaterialUniformValue(ssrPass.material, 'uRayNearestDistance', parameters.rayNearestDistance);

@@ -1,11 +1,11 @@
-﻿// import { GPU } from '@/PaleGL/core/GPU.ts';
+﻿// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 // import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -20,8 +20,8 @@
 //     };
 // }
 //
-// export class ToneMappingPass extends PostProcessPassBase {
-//     constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
+// export class ToneMappingPass extends PostProcessPassBaseDEPRECATED {
+//     constructor(args: { gpu: Gpu; parameters?: ToneMappingPassParametersArgs }) {
 //         const { gpu } = args;
 //
 //         const parameters = generateToneMappingPassParameters(args.parameters);
@@ -52,9 +52,12 @@
 //     }
 // }
 
-import { GPU } from '@/PaleGL/core/GPU.ts';
-import { createPostProcessSinglePass, PostProcessPassBase } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {
+    createPostProcessSinglePass,
+    PostProcessPassBase,
+    PostProcessPassParametersBase,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -73,7 +76,7 @@ export function generateToneMappingPassParameters(
 
 export type ToneMappingPass = PostProcessPassBase;
 
-export function createToneMappingPass(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }): ToneMappingPass {
+export function createToneMappingPass(args: { gpu: Gpu; parameters?: ToneMappingPassParametersArgs }): ToneMappingPass {
     const { gpu } = args;
 
     const parameters = generateToneMappingPassParameters(args.parameters);

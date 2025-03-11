@@ -7,7 +7,7 @@ import {
     ActorUpdateArgs,
     // SetSizeActorFunc,
 } from '@/PaleGL/actors/actor.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
@@ -129,7 +129,7 @@ export const lastUpdateActor = (actor: Actor, { gpu, scene, time, deltaTime }: A
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: GPU }) => {
+export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     if (actor.onBeforeRender) {
         actor.onBeforeRender();
     }

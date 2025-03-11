@@ -1,8 +1,8 @@
-﻿// import { GPU } from '@/PaleGL/core/GPU.ts';
+﻿// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import {
 //     PostProcessPass
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-// import { PostProcessPassParametersBaseArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
+// import { PostProcessPassParametersBaseArgs } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { PostProcessPassType, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 //
@@ -18,7 +18,7 @@
 //
 // export class FragmentPass extends PostProcessPass {
 //     constructor(args: {
-//         gpu: GPU;
+//         gpu: Gpu;
 //         fragmentShader: string;
 //         uniforms?: UniformsData;
 //         uniformBlockNames?: UniformBlockName[];
@@ -52,9 +52,12 @@
 //     }
 // }
 
-import { GPU } from '@/PaleGL/core/GPU.ts';
-import { createPostProcessSinglePass, PostProcessSinglePass } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import { PostProcessPassParametersBaseArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {
+    PostProcessPassParametersBaseArgs,
+    createPostProcessSinglePass,
+    PostProcessSinglePass,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { PostProcessPassType, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
@@ -66,13 +69,12 @@ export function generateFragmentPassParameters(params: FragmentPassParametersArg
     return {
         enabled: params.enabled ?? true,
     };
-    
 }
 
 export type FragmentPass = PostProcessSinglePass;
 
 export function createFragmentPass(args: {
-    gpu: GPU;
+    gpu: Gpu;
     fragmentShader: string;
     uniforms?: UniformsData;
     uniformBlockNames?: UniformBlockName[];

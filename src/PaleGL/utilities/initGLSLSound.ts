@@ -1,7 +1,7 @@
 import { createGLSLSound, GlslSound } from '@/PaleGL/core/glslSound.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
-export function initGLSLSound(gpu: GPU, shader: string, duration: number) {
+export function initGLSLSound(gpu: Gpu, shader: string, duration: number) {
     let glslSound: GlslSound | null = null;
     let _isPlaying = false;
 

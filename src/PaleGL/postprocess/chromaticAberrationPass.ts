@@ -1,13 +1,13 @@
 ﻿// import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
 // import {
-//     PostProcessPassBase
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { Override } from '@/PaleGL/palegl';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // 
@@ -37,10 +37,10 @@
 //     };
 // }
 // 
-// export class ChromaticAberrationPass extends PostProcessPassBase {
+// export class ChromaticAberrationPass extends PostProcessPassBaseDEPRECATED {
 //     parameters: Override<PostProcessPassParametersBase, ChromaticAberrationPassParameters>;
 // 
-//     constructor(args: { gpu: GPU; parameters?: ChromaticAberrationPassParametersArgs }) {
+//     constructor(args: { gpu: Gpu; parameters?: ChromaticAberrationPassParametersArgs }) {
 //         const { gpu } = args;
 // 
 //         const parameters = generateChromaticAberrationPassParameters(args.parameters ?? {});
@@ -85,16 +85,14 @@
 
 
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
 import {
     createPostProcessSinglePass,
-    PostProcessPassBase, PostProcessSinglePass
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import {
+    PostProcessPassBase, PostProcessSinglePass,
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase';
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
@@ -129,7 +127,7 @@ export function generateChromaticAberrationPassParameters(
 
 export type ChromaticAberrationPass = PostProcessSinglePass;
 
-export function createChromaticAberrationPass(args: { gpu: GPU; parameters?: ChromaticAberrationPassParametersArgs }): ChromaticAberrationPass {
+export function createChromaticAberrationPass(args: { gpu: Gpu; parameters?: ChromaticAberrationPassParametersArgs }): ChromaticAberrationPass {
     const { gpu } = args;
 
     const parameters: Override<PostProcessPassParametersBase, ChromaticAberrationPassParameters> = generateChromaticAberrationPassParameters(args.parameters ?? {});
@@ -158,7 +156,7 @@ export function createChromaticAberrationPass(args: { gpu: GPU; parameters?: Chr
     }
 }
 
-// export function setChromaticAberrationPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+// export function setChromaticAberrationPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
 //     const pass = postProcessPass as PostProcessSinglePass;
 //     setPostProcessSinglePassSizeBehaviour(pass, width, height);
 //     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);

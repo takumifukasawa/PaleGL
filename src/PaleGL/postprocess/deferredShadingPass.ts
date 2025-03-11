@@ -1,8 +1,8 @@
-﻿// import { GPU } from '@/PaleGL/core/GPU.ts';
-// import {PostProcessPassParametersBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+﻿// import { Gpu } from '@/PaleGL/core/Gpu.ts';
+// import {PostProcessPassParametersBase, PostProcessPassRenderArgs} from "@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts";
 // import {
-//     PostProcessPassBase,
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED,
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 //
 // import {
 //     MAX_SPOT_LIGHT_COUNT,
@@ -30,10 +30,10 @@
 // export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
 //
 //
-// export class DeferredShadingPass extends PostProcessPassBase {
+// export class DeferredShadingPass extends PostProcessPassBaseDEPRECATED {
 //     constructor(args // name,
 //     : {
-//         gpu: GPU;
+//         gpu: Gpu;
 //         parameters?: DeferredShadingParametersArgs;
 //     }) {
 //         const { gpu } = args;
@@ -186,9 +186,12 @@
 //     }
 // }
 
-import { GPU } from '@/PaleGL/core/GPU.ts';
-import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
-import { createPostProcessSinglePass, PostProcessSinglePass } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {
+    PostProcessPassParametersBase,
+    createPostProcessSinglePass,
+    PostProcessSinglePass,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
 import {
     MAX_SPOT_LIGHT_COUNT,
@@ -216,7 +219,7 @@ export type DeferredShadingParametersArgs = Partial<DeferredShadingParameters>;
 export type DeferredShadingPass = PostProcessSinglePass;
 
 export function createDeferredShadingPass(args: {
-    gpu: GPU;
+    gpu: Gpu;
     parameters?: DeferredShadingParametersArgs;
 }): DeferredShadingPass {
     const { gpu } = args;

@@ -1,6 +1,6 @@
 import { createVolume, Volume } from '@/PaleGL/actors/volumes/volume.ts';
 import { ActorTypes, PostProcessPassType } from '@/PaleGL/constants.ts';
-import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { ActorArgs } from '@/PaleGL/actors/actor.ts';
 
 export type PostProcessVolumeParameterSet = {

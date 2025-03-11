@@ -9,7 +9,7 @@ import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { Quaternion } from '@/PaleGL/math/Quaternion';
 // import { Rotator } from '@/PaleGL/math/Rotator';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Color } from '@/PaleGL/math/Color.ts';
 import {
@@ -210,7 +210,7 @@ type GLTFFormat = {
 };
 
 type Args = {
-    gpu: GPU;
+    gpu: Gpu;
     dir?: string;
     path: string;
 };

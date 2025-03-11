@@ -1,12 +1,12 @@
 ﻿// import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import { Gpu } from '@/PaleGL/core/gpu.ts';
 // import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 // import {
-//     PostProcessPassBase, PostProcessSinglePass
-// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+//     PostProcessPassBaseDEPRECATED, PostProcessSinglePass
+// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import {
 //     PostProcessPassParametersBase
-// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // 
 // // ref:
@@ -25,8 +25,8 @@
 //     };
 // }
 // 
-// export class FXAAPass extends PostProcessPassBase {
-//     constructor(args: { gpu: GPU; parameters?: FXAAPassParametersArgs }) {
+// export class FxaaPass extends PostProcessPassBaseDEPRECATED {
+//     constructor(args: { gpu: Gpu; parameters?: FXAAPassParametersArgs }) {
 //         const { gpu } = args;
 //         const fragmentShader = fxaaFragmentShader;
 // 
@@ -69,7 +69,7 @@
 //                     type: UniformTypes.Float,
 //                     value: 0.75,
 //                 },
-//                 // ...PostProcessPassBase.commonUniforms,
+//                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //         });
 //         // this.gpu = gpu;
@@ -84,15 +84,13 @@
 
 
 import {PostProcessPassType, RenderTargetTypes, UniformTypes} from '@/PaleGL/constants';
-import {GPU} from '@/PaleGL/core/GPU.ts';
+import {Gpu} from '@/PaleGL/core/gpu.ts';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 import {
     createPostProcessSinglePass,
-    PostProcessSinglePass
-} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
-import {
+    PostProcessSinglePass,
     PostProcessPassParametersBase
-} from '@/PaleGL/postprocess/PostProcessPassBase';
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import {setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
 
@@ -112,9 +110,9 @@ export function generateFXAAPassParameters(params: FXAAPassParametersArgs = {}):
     };
 }
 
-export type FXAAPass = PostProcessSinglePass;
+export type FxaaPass = PostProcessSinglePass;
 
-export function createFXAAPass(args: { gpu: GPU; parameters?: FXAAPassParametersArgs }): FXAAPass {
+export function createFXAAPass(args: { gpu: Gpu; parameters?: FXAAPassParametersArgs }): FxaaPass {
     const {gpu} = args;
     const fragmentShader = fxaaFragmentShader;
 
@@ -158,13 +156,13 @@ export function createFXAAPass(args: { gpu: GPU; parameters?: FXAAPassParameters
                     type: UniformTypes.Float,
                     value: 0.75,
                 },
-                // ...PostProcessPassBase.commonUniforms,
+                // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
         })
     }
 }
 
-// export function setFXAAPassSize(fxaaPass: FXAAPass, width: number, height: number) {
+// export function setFXAAPassSize(fxaaPass: FxaaPass, width: number, height: number) {
 //     setPostProcessPassSize(fxaaPass, width, height);
 //     setMaterialUniformValue(fxaaPass.material, UniformNames.TargetWidth, width);
 //     setMaterialUniformValue(fxaaPass.material, UniformNames.TargetHeight, height);

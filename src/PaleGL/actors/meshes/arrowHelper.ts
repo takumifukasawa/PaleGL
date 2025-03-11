@@ -3,7 +3,7 @@ import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames, UniformNames } from '@/PaleGL/constants.ts';
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 
 const arrowHelperGeometryData = `
@@ -224,7 +224,7 @@ f 23/56/18 22/55/18 20/53/18
 //     }
 // }
 
-export function createArrowHelper({ gpu }: { gpu: GPU }): Mesh {
+export function createArrowHelper({ gpu }: { gpu: Gpu }): Mesh {
     const objData = parseObj(arrowHelperGeometryData);
     const geometry = createGeometry({
         gpu,

@@ -1,6 +1,6 @@
-﻿// import { GPU } from '@/PaleGL/core/GPU.ts';
+﻿// import { Gpu } from '@/PaleGL/core/Gpu.ts';
 // import copyPassFragmentShader from '@/PaleGL/shaders/copy-pass-fragment.glsl';
-// import { PostProcessPassBase, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// import { PostProcessPassBaseDEPRECATED, PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
 // import { PostProcessPassType } from '@/PaleGL/constants.ts';
 //
 // export type CopyPassParameters = PostProcessPassParametersBase;
@@ -13,8 +13,8 @@
 //     };
 // }
 //
-// export class CopyPass extends PostProcessPassBase {
-//     constructor(args: { gpu: GPU; parameters?: CopyPassParametersArgs }) {
+// export class CopyPass extends PostProcessPassBaseDEPRECATED {
+//     constructor(args: { gpu: Gpu; parameters?: CopyPassParametersArgs }) {
 //         const { gpu } = args;
 //         const fragmentShader = copyPassFragmentShader;
 //         const parameters = generateCopyPassParameters(args.parameters);
@@ -22,11 +22,10 @@
 //     }
 // }
 
-import { GPU } from '@/PaleGL/core/GPU.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import copyPassFragmentShader from '@/PaleGL/shaders/copy-pass-fragment.glsl';
-import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { PostProcessPassType } from '@/PaleGL/constants.ts';
-import { createPostProcessSinglePass, PostProcessSinglePass } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+import { createPostProcessSinglePass, PostProcessSinglePass, PostProcessPassParametersBase } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
 export type CopyPassParameters = PostProcessPassParametersBase;
 
@@ -40,7 +39,7 @@ export function generateCopyPassParameters(params: CopyPassParametersArgs = {}):
 
 export type CopyPass = PostProcessSinglePass;
 
-export function createCopyPass(args: { gpu: GPU; parameters?: CopyPassParametersArgs }): CopyPass {
+export function createCopyPass(args: { gpu: Gpu; parameters?: CopyPassParametersArgs }): CopyPass {
     const { gpu } = args;
     const fragmentShader = copyPassFragmentShader;
     const parameters = generateCopyPassParameters(args.parameters);
