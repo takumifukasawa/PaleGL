@@ -1,6 +1,6 @@
 ﻿import { Rotator } from '@/PaleGL/math/Rotator';
 import { AnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import {createMatrix4FromQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 // import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/bone.ts';

@@ -33,7 +33,7 @@ import {
     multiplyVector3AndMatrix4,
     negateVector3, normalizeVector3, subVector3AndVector3, v3x, v3y, v3z,
     Vector3
-} from '@/PaleGL/math/Vector3.ts';
+} from '@/PaleGL/math/vector3.ts';
 import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';

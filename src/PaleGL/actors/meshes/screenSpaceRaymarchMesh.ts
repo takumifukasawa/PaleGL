@@ -23,7 +23,7 @@ import gbufferScreenSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layo
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { createVector3Zero } from '@/PaleGL/math/Vector3.ts';
+import { createVector3Zero } from '@/PaleGL/math/vector3.ts';
 
 type ScreenSpaceRaymarchMeshArgs = {
     gpu: Gpu;

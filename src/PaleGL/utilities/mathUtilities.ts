@@ -24,7 +24,7 @@
 //
 // ------------------------------------------------------
 
-import {createVector3, setV3, Vector3} from '@/PaleGL/math/Vector3.ts';
+import {createVector3, setV3, Vector3} from '@/PaleGL/math/vector3.ts';
 
 /**
  * ref: https://techblog.kayac.com/unity-light-weight-bloom-effect

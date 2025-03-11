@@ -25,7 +25,7 @@
 // import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 // import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 // import { Override } from '@/PaleGL/palegl';
-// import {Vector3} from "@/PaleGL/math/Vector3.ts";
+// import {Vector3} from "@/PaleGL/math/vector3.ts";
 // import {
 //     createMaterial,
 //     isCompiledMaterialShader,
@@ -297,7 +297,7 @@ import {
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
-import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
     createMaterial,
     isCompiledMaterialShader,

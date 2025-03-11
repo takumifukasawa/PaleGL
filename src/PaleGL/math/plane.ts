@@ -5,7 +5,7 @@ import {
     scaleVector3ByScalar,
     subVector3AndVector3,
     Vector3,
-} from '@/PaleGL/math/Vector3.ts';
+} from '@/PaleGL/math/vector3.ts';
 import { Ray } from '@/PaleGL/math/ray.ts';
 
 export type Plane = ReturnType<typeof createPlane>;

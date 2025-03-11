@@ -6,7 +6,7 @@
     multiplyVector3AndMatrix4,
     normalizeVector3,
     Vector3,
-} from '@/PaleGL/math/Vector3.js';
+} from '@/PaleGL/math/vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import { Rotator } from '@/PaleGL/math/Rotator.js';

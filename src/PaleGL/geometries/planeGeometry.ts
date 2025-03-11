@@ -2,7 +2,7 @@
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 type PlaneGeometryRawDataOptions = {
     calculateTangent?: boolean;

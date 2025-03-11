@@ -7,7 +7,7 @@
     v3y,
     v3z,
     Vector3
-} from '@/PaleGL/math/Vector3';
+} from '@/PaleGL/math/vector3.ts';
 import { Rotator } from '@/PaleGL/math/Rotator';
 import {Quaternion, toEulerRadianFromQuaternion} from '@/PaleGL/math/quaternion.ts';
 

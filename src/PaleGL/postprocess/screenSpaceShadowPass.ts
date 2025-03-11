@@ -8,7 +8,7 @@
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
 // } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
-// import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+// import { Vector3 } from '@/PaleGL/math/vector3.ts';
 // import { Override } from '@/PaleGL/palegl';
 // import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
 //
@@ -160,7 +160,7 @@ import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import {createVector3, createVector3Zero, Vector3} from '@/PaleGL/math/Vector3.ts';
+import {createVector3, createVector3Zero, Vector3} from '@/PaleGL/math/vector3.ts';
 import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {

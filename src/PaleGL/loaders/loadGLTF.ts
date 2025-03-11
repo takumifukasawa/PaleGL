@@ -1,7 +1,7 @@
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { Bone, createBone } from '@/PaleGL/core/bone.ts';
 import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
-import { createVector3, createVector3One, createVector3Zero } from '@/PaleGL/math/Vector3';
+import { createVector3, createVector3One, createVector3Zero } from '@/PaleGL/math/vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';

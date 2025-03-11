@@ -20,7 +20,7 @@ import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import {createMatrix4FromQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';

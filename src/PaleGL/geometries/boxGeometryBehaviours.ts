@@ -1,4 +1,4 @@
-﻿import { createVector3, lerpVector3, Vector3 } from '@/PaleGL/math/Vector3.ts';
+﻿import { createVector3, lerpVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { easeInOutQuad } from '@/PaleGL/utilities/easingUtilities.ts';
 import { BoxGeometry, boxGeometryEdgePairs, boxGeometrySurfacePairs } from '@/PaleGL/geometries/boxGeometry.ts';
 

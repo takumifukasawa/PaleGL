@@ -3,7 +3,7 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { CharMesh, createCharMesh } from '@/PaleGL/actors/meshes/charMesh.ts';
-import { setV3x, setV3y } from '@/PaleGL/math/Vector3.ts';
+import { setV3x, setV3y } from '@/PaleGL/math/vector3.ts';
 
 export type FontAtlasData = {
     chars: {

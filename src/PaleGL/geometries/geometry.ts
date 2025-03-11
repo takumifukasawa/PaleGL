@@ -1,6 +1,6 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { createVertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
-import { createVector3, getBinormalFromTangent, getVector3Tangent } from '@/PaleGL/math/Vector3';
+import { createVector3, getBinormalFromTangent, getVector3Tangent } from '@/PaleGL/math/vector3.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 

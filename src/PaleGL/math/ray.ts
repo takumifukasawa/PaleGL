@@ -1,4 +1,4 @@
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export type Ray = ReturnType<typeof createRay>;
 

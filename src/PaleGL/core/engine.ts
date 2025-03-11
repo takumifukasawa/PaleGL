@@ -12,7 +12,7 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
-import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,

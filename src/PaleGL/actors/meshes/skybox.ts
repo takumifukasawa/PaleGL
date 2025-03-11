@@ -19,7 +19,7 @@ import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-import { createFillVector3 } from '@/PaleGL/math/Vector3.ts';
+import { createFillVector3 } from '@/PaleGL/math/vector3.ts';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `

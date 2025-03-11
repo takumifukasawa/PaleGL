@@ -8,7 +8,7 @@ import {
 // import {Vector3} from "@/PaleGL/math/Vector3";
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 

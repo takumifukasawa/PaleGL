@@ -8,7 +8,7 @@ import {
     createVector3Up,
     negateVector3,
     scaleVector3ByScalar,
-} from '@/PaleGL/math/Vector3.ts';
+} from '@/PaleGL/math/vector3.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 

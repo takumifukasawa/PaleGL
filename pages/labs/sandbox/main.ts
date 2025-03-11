@@ -41,7 +41,7 @@ import {
     getColorHexCoord,
 } from '@/PaleGL/math/color.ts';
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
-import { createVector3, createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/Vector3';
+import { createVector3, createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
 // postprocess

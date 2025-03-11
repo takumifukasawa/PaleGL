@@ -455,7 +455,7 @@ import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/Vector3.ts';
+import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/vector3.ts';
 
 //
 // ref:

@@ -1,5 +1,5 @@
 ﻿import { AnimationKeyframeType, AnimationKeyframeTypes } from '@/PaleGL/constants';
-import {createVector3, Vector3} from '@/PaleGL/math/Vector3';
+import {createVector3, Vector3} from '@/PaleGL/math/vector3.ts';
 import {createQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 import {
     GLTFAnimationChannelTargetPath,

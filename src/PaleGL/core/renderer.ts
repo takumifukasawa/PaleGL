@@ -98,7 +98,7 @@ import {
     normalizeVector3,
     subVectorsV3,
     Vector3,
-} from '@/PaleGL/math/Vector3.ts';
+} from '@/PaleGL/math/vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { Color, createColorBlack } from '@/PaleGL/math/color.ts';

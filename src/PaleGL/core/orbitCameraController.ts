@@ -6,7 +6,7 @@ import {
     rotateVector3DegreeX,
     rotateVector3DegreeY,
     scaleVector3ByScalar,
-} from '@/PaleGL/math/Vector3.js';
+} from '@/PaleGL/math/vector3.ts';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { setLookAtPosition, setTranslation } from '@/PaleGL/core/transform.ts';
