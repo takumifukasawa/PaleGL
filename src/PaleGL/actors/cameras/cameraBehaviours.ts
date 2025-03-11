@@ -43,7 +43,7 @@ import {
     v4w,
     v4x, v4y, v4z,
     Vector4
-} from '@/PaleGL/math/Vector4.ts';
+} from '@/PaleGL/math/vector4.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';

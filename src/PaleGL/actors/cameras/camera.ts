@@ -1,6 +1,6 @@
 ﻿import { Actor, createActor } from '@/PaleGL/actors/actor.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 import {
     ActorTypes,
     CameraType,

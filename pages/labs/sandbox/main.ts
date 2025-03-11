@@ -42,7 +42,7 @@ import {
 } from '@/PaleGL/math/color.ts';
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { createVector4 } from '@/PaleGL/math/Vector4';
+import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
 // postprocess
 import {

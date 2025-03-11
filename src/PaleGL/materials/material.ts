@@ -26,7 +26,7 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 // import { Vector2 } from '@/PaleGL/math/Vector2';
 // import { Color } from '@/PaleGL/math/Color';
 // import { DirectionalLightStruct } from '@/PaleGL/actors/directionalLight.ts';
-// import {Vector4} from "@/PaleGL/math/Vector4.ts";
+// import {Vector4} from "@/PaleGL/math/vector4.ts";
 import {
     addUniformValue,
     createUniforms,

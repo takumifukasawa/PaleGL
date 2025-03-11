@@ -1,6 +1,6 @@
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import { Vector4 } from '@/PaleGL/math/vector4.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';

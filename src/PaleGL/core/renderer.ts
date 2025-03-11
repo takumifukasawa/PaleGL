@@ -102,7 +102,7 @@ import {
     UniformBufferObjectValue,
 } from '@/PaleGL/core/uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
-import {createVector4, createVector4zero, Vector4} from '@/PaleGL/math/Vector4.ts';
+import {createVector4, createVector4zero, Vector4} from '@/PaleGL/math/vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
 import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/vignettePass.ts';

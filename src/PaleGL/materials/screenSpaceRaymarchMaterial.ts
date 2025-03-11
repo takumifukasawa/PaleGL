@@ -13,7 +13,7 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ScreenSpaceRaymarchMaterialArgs = {

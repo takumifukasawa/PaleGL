@@ -15,7 +15,7 @@ import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 
 export type GBufferMaterialArgs = {
     diffuseColor?: Color;

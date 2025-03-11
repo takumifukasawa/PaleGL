@@ -49,7 +49,7 @@
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import { Color } from '@/PaleGL/math/Color';
 // import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
-// import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+// import { Vector4 } from '@/PaleGL/math/vector4.ts';
 // import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 // import {
 //     UniformBufferObjectBlockData,
@@ -750,7 +750,7 @@ import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Color } from '@/PaleGL/math/color.ts';
 import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import { Vector4 } from '@/PaleGL/math/vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import {
     UniformBufferObjectBlockData,

@@ -19,7 +19,7 @@ import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout
 import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ObjectSpaceRaymarchMaterialArgs = {

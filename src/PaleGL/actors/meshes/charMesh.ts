@@ -12,7 +12,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { createVector4 } from '@/PaleGL/math/Vector4.ts';
+import { createVector4 } from '@/PaleGL/math/vector4.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
