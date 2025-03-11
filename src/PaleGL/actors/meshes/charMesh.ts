@@ -4,14 +4,15 @@ import { Color } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
-    DepthFuncTypes, MeshTypes,
+    DepthFuncTypes,
+    MeshTypes,
     PrimitiveTypes,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import { createVector4 } from '@/PaleGL/math/Vector4.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
@@ -82,7 +83,7 @@ export function createCharMesh({
             name: UniformNames.FontTiling,
             type: UniformTypes.Vector4,
             // value: Vector4.one
-            value: new Vector4(sw, sh, sx, sy), // TODO: dummy
+            value: createVector4(sw, sh, sx, sy), // TODO: dummy
         },
     ];
 

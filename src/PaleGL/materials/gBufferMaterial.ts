@@ -15,7 +15,7 @@ import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
 
 export type GBufferMaterialArgs = {
     diffuseColor?: Color;
@@ -261,10 +261,10 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || createVector2One();
     const metallic: number = args.metallic || 0;
     const metallicMap: Texture | null = args.metallicMap || null;
-    const metallicMapTiling: Vector4 = args.metallicMapTiling || new Vector4(1, 1, 0, 0);
+    const metallicMapTiling: Vector4 = args.metallicMapTiling || createVector4(1, 1, 0, 0);
     const roughness: number = args.roughness !== undefined ? args.roughness : 0;
     const roughnessMap: Texture | null = args.roughnessMap || null;
-    const roughnessMapTiling: Vector4 = args.roughnessMapTiling || new Vector4(1, 1, 0, 0);
+    const roughnessMapTiling: Vector4 = args.roughnessMapTiling || createVector4(1, 1, 0, 0);
     const normalMap: Texture | null = args.normalMap || null;
     const normalMapUvScale: Vector2 = args.normalMapUvScale || createVector2One();
     const normalMapUvOffset: Vector2 = args.normalMapUvOffset || createVector2One();

@@ -34,7 +34,16 @@ import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {
+    createVector4,
+    multiplyVector4AndMatrix4,
+    setV4x,
+    setV4y,
+    setV4z,
+    v4w,
+    v4x, v4y, v4z,
+    Vector4
+} from '@/PaleGL/math/Vector4.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -323,12 +332,12 @@ export const getCameraWorldForward = (camera: Camera) => {
 };
 
 export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
-    const clipPos = new Vector4(v2x(viewportPoint) * 2 - 1, v2y(viewportPoint) * 2 - 1, 1, 1);
-    const worldPos = clipPos.multiplyMatrix4(camera.inverseViewProjectionMatrix);
-    worldPos.x = worldPos.x / worldPos.w;
-    worldPos.y = worldPos.y / worldPos.w;
-    worldPos.z = worldPos.z / worldPos.w;
-    const worldPosV3 = new Vector3(worldPos.x, worldPos.y, worldPos.z);
+    const clipPos = createVector4(v2x(viewportPoint) * 2 - 1, v2y(viewportPoint) * 2 - 1, 1, 1);
+    const worldPos = multiplyVector4AndMatrix4(clipPos, camera.inverseViewProjectionMatrix);
+    setV4x(worldPos, v4x(worldPos) / v4w(worldPos));
+    setV4y(worldPos, v4y(worldPos) / v4w(worldPos));
+    setV4z(worldPos, v4z(worldPos) / v4w(worldPos));
+    const worldPosV3 = new Vector3(v4x(worldPos), v4y(worldPos), v4z(worldPos));
     const rayOrigin = getWorldForward(camera.transform);
     const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
     return createRay(rayOrigin, rayDirection);

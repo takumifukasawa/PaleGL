@@ -102,7 +102,7 @@ import {
     UniformBufferObjectValue,
 } from '@/PaleGL/core/uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {createVector4, createVector4zero, Vector4} from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
 import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/vignettePass.ts';
@@ -2367,7 +2367,7 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
             {
                 name: UniformNames.Viewport,
                 type: UniformTypes.Vector4,
-                value: Vector4.zero,
+                value: createVector4zero(),
             },
         ];
         // TODO: 一番最初の要素としてpushするとなぜかエラーになる
@@ -3521,7 +3521,7 @@ function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: n
         renderer,
         UniformBlockNames.Common,
         UniformNames.Viewport,
-        new Vector4(renderer.realWidth, renderer.realHeight, renderer.realWidth / renderer.realHeight, 0),
+        createVector4(renderer.realWidth, renderer.realHeight, renderer.realWidth / renderer.realHeight, 0),
     );
 }
 

@@ -13,7 +13,7 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ScreenSpaceRaymarchMaterialArgs = {
@@ -222,11 +222,11 @@ export function createScreenSpaceRaymarchMaterial({
     const _diffuseMapUvScale = diffuseMapUvScale || createVector2One();
     const _diffuseMapUvOffset = diffuseMapUvOffset || createVector2One();
     const _roughnessMap = roughnessMap || null;
-    const _roughnessMapTiling = roughnessMapTiling || new Vector4(1, 1, 0, 0);
+    const _roughnessMapTiling = roughnessMapTiling || createVector4(1, 1, 0, 0);
     const _roughness = roughness || 0;
     const _metallic = metallic || 0;
     const _metallicMap = metallicMap || null;
-    const _metallicMapTiling = metallicMapTiling || new Vector4(1, 1, 0, 0);
+    const _metallicMapTiling = metallicMapTiling || createVector4(1, 1, 0, 0);
     const _emissiveColor = emissiveColor || createColorBlack();
 
     const commonUniforms: UniformsData = [

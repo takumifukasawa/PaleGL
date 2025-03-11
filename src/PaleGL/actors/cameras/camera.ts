@@ -1,6 +1,6 @@
 ﻿import { Actor, createActor } from '@/PaleGL/actors/actor.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { Vector4 } from '@/PaleGL/math/Vector4.ts';
+import {createVector4, Vector4} from '@/PaleGL/math/Vector4.ts';
 import {
     ActorTypes,
     CameraType,
@@ -375,7 +375,7 @@ export type Camera = Actor & {
 export function createCamera({
     name,
     cameraType,
-    clearColor = new Vector4(0, 0, 0, 1),
+    clearColor = createVector4(0, 0, 0, 1),
     postProcess = null,
 }: {
     name?: string;

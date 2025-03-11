@@ -40,9 +40,9 @@ import {
     createColorWhite,
     getColorHexCoord,
 } from '@/PaleGL/math/color.ts';
-import {createVector2, createVector2Zero, v2o, v2x, v2y} from '@/PaleGL/math/vector2.ts';
+import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
-import { Vector4 } from '@/PaleGL/math/Vector4';
+import { createVector4 } from '@/PaleGL/math/Vector4';
 
 // postprocess
 import {
@@ -393,7 +393,7 @@ addActorToScene(captureScene, captureSceneCamera);
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 
 subscribeActorOnStart(captureSceneCamera, () => {
-    setCameraClearColor(captureSceneCamera, new Vector4(0, 0, 0, 1));
+    setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
 });
 captureSceneCamera.onFixedUpdate = () => {
     // 1: fixed position
