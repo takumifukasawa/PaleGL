@@ -14,7 +14,6 @@ import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
-import { Rotator } from '@/PaleGL/math/Rotator.ts';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
@@ -26,6 +25,7 @@ import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 import { StartActorFunc, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import {createRotatorFromMatrix4} from "@/PaleGL/math/Rotator.ts";
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;
@@ -678,7 +678,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
                     if (rotation) {
                         // TODO: quaternion-bug: 本当はこっちを使いたい
                         // targetBone.rotation = Rotator.fromQuaternion(rotation);
-                        targetBone.setRotation(Rotator.fromMatrix4(createMatrix4FromQuaternion(rotation)));
+                        targetBone.setRotation(createRotatorFromMatrix4(createMatrix4FromQuaternion(rotation)));
                     }
                     if (scale) {
                         targetBone.setScale(scale);

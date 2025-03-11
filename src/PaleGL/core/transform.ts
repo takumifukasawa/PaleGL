@@ -9,7 +9,13 @@
 } from '@/PaleGL/math/vector3.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
-import { Rotator } from '@/PaleGL/math/Rotator.js';
+import {
+    createRotatorZero,
+    Rotator,
+    setRotatorRotationDegreeX,
+    setRotatorRotationDegreeY,
+    setRotatorRotationDegreeZ,
+} from '@/PaleGL/math/Rotator.js';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { createRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
@@ -220,7 +226,7 @@ export function createTransform() {
     const worldMatrix: Matrix4 = Matrix4.identity;
     const localMatrix: Matrix4 = Matrix4.identity;
     const position: Vector3 = createVector3Zero();
-    const rotation: Rotator = Rotator.zero; // degree vector
+    const rotation: Rotator = createRotatorZero(); // degree vector
     const scale: Vector3 = createVector3One();
     // どっちかだけセットされるようにする
     const lookAtTarget: Vector3 | null = null; // world v
@@ -346,9 +352,12 @@ export const getWorldForward = (transform: Transform) =>
 
 export const setScaling = (transform: Transform, s: Vector3) => (transform.scale = s);
 
-export const setRotationX = (transform: Transform, degree: number) => transform.rotation.setRotationX(degree);
-export const setRotationY = (transform: Transform, degree: number) => transform.rotation.setRotationY(degree);
-export const setRotationZ = (transform: Transform, degree: number) => transform.rotation.setRotationZ(degree);
+export const setRotationX = (transform: Transform, degree: number) =>
+    setRotatorRotationDegreeX(transform.rotation, degree);
+export const setRotationY = (transform: Transform, degree: number) =>
+    setRotatorRotationDegreeY(transform.rotation, degree);
+export const setRotationZ = (transform: Transform, degree: number) =>
+    setRotatorRotationDegreeZ(transform.rotation, degree);
 export const setTranslation = (transform: Transform, v: Vector3) => (transform.position = v);
 export const setRotation = (transform: Transform, r: Rotator) => (transform.rotation = r);
 export const setLookAtPosition = (transform: Transform, lookAtTarget: Vector3 | null) => {

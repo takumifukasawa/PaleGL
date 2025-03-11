@@ -22,7 +22,7 @@ import {
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import { Rotator } from '@/PaleGL/math/Rotator.ts';
+import {cloneRotator, createRotatorFromQuaternion, Rotator} from '@/PaleGL/math/Rotator.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
 import {
     createTimeAccumulator,
@@ -562,11 +562,11 @@ export function createEngine({
         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
         traverseScene(_scene!, (actor) => {
             const tmpP = cloneVector3(actor.transform.position);
-            const tmpR = actor.transform.rotation.clone();
+            const tmpR = cloneRotator(actor.transform.rotation);
             // TODO: mainカメラだけ抽出したい
             if (actor.type === ActorTypes.Camera) {
                 setTranslation(actor.transform, createVector3(0, 0, 10));
-                setRotation(actor.transform, Rotator.fromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
+                setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
             } else {
                 setTranslation(actor.transform, createVector3Zero());
             }

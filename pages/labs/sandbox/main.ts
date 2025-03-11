@@ -124,6 +124,14 @@ import { VolumetricLightPassParameters } from '@/PaleGL/postprocess/volumetricLi
 import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
 import { BloomPassParameters } from '@/PaleGL/postprocess/bloomPass.ts';
 import { SSRPassParameters } from '@/PaleGL/postprocess/ssrPass.ts';
+import {
+    getRotatorDegreeX,
+    getRotatorDegreeY,
+    getRotatorDegreeZ,
+    setRotatorRotationDegreeX,
+    setRotatorRotationDegreeY,
+    setRotatorRotationDegreeZ,
+} from '@/PaleGL/math/Rotator.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -2094,9 +2102,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.x,
+        initialValue: getRotatorDegreeX(objectSpaceRaymarchMesh.transform.rotation),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.x = value;
+            setRotatorRotationDegreeX(objectSpaceRaymarchMesh.transform.rotation, value);
         },
     });
 
@@ -2105,9 +2113,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.y,
+        initialValue: getRotatorDegreeY(objectSpaceRaymarchMesh.transform.rotation),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.y = value;
+            setRotatorRotationDegreeY(objectSpaceRaymarchMesh.transform.rotation, value);
         },
     });
 
@@ -2116,9 +2124,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 360,
         stepValue: 0.01,
-        initialValue: objectSpaceRaymarchMesh.transform.rotation.z,
+        initialValue: getRotatorDegreeZ(objectSpaceRaymarchMesh.transform.rotation),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.rotation.z = value;
+            setRotatorRotationDegreeZ(objectSpaceRaymarchMesh.transform.rotation, value);
         },
     });
 

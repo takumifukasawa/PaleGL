@@ -1,15 +1,16 @@
 ﻿import {
     createVector3,
-    createVector3Up, crossVectorsV3,
+    createVector3Up,
+    crossVectorsV3,
     normalizeVector3,
     subVectorsV3,
     v3x,
     v3y,
     v3z,
-    Vector3
+    Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import { Rotator } from '@/PaleGL/math/Rotator';
-import {Quaternion, toEulerRadianFromQuaternion} from '@/PaleGL/math/quaternion.ts';
+import { getRotatorAxesRadians, Rotator } from '@/PaleGL/math/Rotator';
+import { Quaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 
 // memory layout is column order.
 // setter and getter are row order.
@@ -814,7 +815,7 @@ export class Matrix4 {
      * @param scaling
      */
     static fromTRS(position: Vector3, rotation: Rotator, scaling: Vector3) {
-        const rotationRadians = rotation.getAxesRadians();
+        const rotationRadians = getRotatorAxesRadians(rotation);
         return Matrix4.multiplyMatrices(
             Matrix4.translationMatrix(position),
             Matrix4.rotationYMatrix(rotationRadians.y),
