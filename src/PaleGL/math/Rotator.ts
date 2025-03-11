@@ -7,7 +7,7 @@
     toEulerRadianFromQuaternion,
 } from '@/PaleGL/math/quaternion.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 // TODO: quaternion対応
 export class Rotator {
@@ -154,7 +154,7 @@ export class Rotator {
         // return this;
 
         // this.elements = new Float32Array([v.x, v.y, v.z]);
-        const q = createQuaternionFromEulerDegrees(v.x, v.y, v.z);
+        const q = createQuaternionFromEulerDegrees(v3x(v), v3y(v), v3z(v));
         this._quaternion = q;
         return this;
     }

@@ -41,7 +41,7 @@ import {
     getColorHexCoord,
 } from '@/PaleGL/math/color.ts';
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import { createVector3, createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/Vector3';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
 // postprocess
@@ -228,9 +228,9 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.x,
+        initialValue: v3x(spotLight.transform.position),
         onChange: (value) => {
-            spotLight.transform.position.x = value;
+            setV3x(spotLight.transform.position, value);
         },
     });
 
@@ -239,9 +239,9 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.y,
+        initialValue: v3y(spotLight.transform.position),
         onChange: (value) => {
-            spotLight.transform.position.y = value;
+            setV3y(spotLight.transform.position, value);
         },
     });
 
@@ -250,9 +250,9 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: spotLight.transform.position.z,
+        initialValue: v3z(spotLight.transform.position),
         onChange: (value) => {
-            spotLight.transform.position.z = value;
+            setV3z(spotLight.transform.position, value);
         },
     });
 };
@@ -435,8 +435,8 @@ if (directionalLight.shadowCamera) {
 }
 
 subscribeActorOnStart(directionalLight, () => {
-    setTranslation(directionalLight.transform, new Vector3(-8, 8, -2));
-    setLookAtPosition(directionalLight.transform, new Vector3(0, 0, 0));
+    setTranslation(directionalLight.transform, createVector3(-8, 8, -2));
+    setLookAtPosition(directionalLight.transform, createVector3(0, 0, 0));
     // const lightActor = actor as DirectionalLight;
     // lightActor.castShadow = true;
     // // lightActor.castShadow = false;
@@ -476,8 +476,8 @@ if (spotLight1.shadowCamera) {
 }
 
 subscribeActorOnStart(spotLight1, () => {
-    setTranslation(spotLight1.transform, new Vector3(5, 9, -2));
-    setLookAtPosition(spotLight1.transform, new Vector3(0, 0, 0));
+    setTranslation(spotLight1.transform, createVector3(5, 9, -2));
+    setLookAtPosition(spotLight1.transform, createVector3(0, 0, 0));
 });
 
 addActorToScene(captureScene, spotLight1);
@@ -508,8 +508,8 @@ if (spotLight2.shadowCamera) {
     });
 }
 subscribeActorOnStart(spotLight2, () => {
-    setTranslation(spotLight2.transform, new Vector3(-5, 9, -2));
-    setLookAtPosition(spotLight2.transform, new Vector3(0, 0, 0));
+    setTranslation(spotLight2.transform, createVector3(-5, 9, -2));
+    setLookAtPosition(spotLight2.transform, createVector3(0, 0, 0));
 });
 
 addActorToScene(captureScene, spotLight2);
@@ -1117,7 +1117,7 @@ layout (std140) uniform ubCommon {
             {
                 name: 'uAttractTargetPosition',
                 type: UniformTypes.Vector3,
-                value: Vector3.zero,
+                value: createVector3Zero(),
             },
             {
                 name: 'uAttractRate',
@@ -1458,7 +1458,7 @@ const main = async () => {
         })
     );
     subscribeActorOnStart(attractSphereMesh, () => {
-        setScaling(attractSphereMesh.transform, new Vector3(0.5, 0.5, 0.5));
+        setScaling(attractSphereMesh.transform, createVector3(0.5, 0.5, 0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
     attractSphereMesh.onFixedUpdate = () => {
@@ -1469,7 +1469,7 @@ const main = async () => {
         const x = ix * w;
         const z = iy * d;
         const y = 0.5;
-        setTranslation(attractSphereMesh.transform, new Vector3(x, y, z));
+        setTranslation(attractSphereMesh.transform, createVector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     };
 
@@ -1487,7 +1487,7 @@ const main = async () => {
             roughness: 1,
         })
     );
-    setTranslation(testLightingMesh.transform, new Vector3(2.5, 1, 0));
+    setTranslation(testLightingMesh.transform, createVector3(2.5, 1, 0));
 
     //
     // local raymarch mesh
@@ -1507,8 +1507,8 @@ const main = async () => {
         },
         castShadow: true,
     });
-    setScaling(objectSpaceRaymarchMesh.transform, new Vector3(10, 10, 10));
-    setTranslation(objectSpaceRaymarchMesh.transform, new Vector3(0, 1.5, 0));
+    setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
+    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 1.5, 0));
     // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
 
     //
@@ -1523,8 +1523,8 @@ const main = async () => {
         depthFragmentShaderContent: litScreenSpaceRaymarchFragContent,
         materialArgs: {},
     });
-    setScaling(screenSpaceRaymarchMesh.transform, new Vector3(2, 2, 2));
-    setTranslation(screenSpaceRaymarchMesh.transform, new Vector3(0, 4, 0));
+    setScaling(screenSpaceRaymarchMesh.transform, createVector3(2, 2, 2));
+    setTranslation(screenSpaceRaymarchMesh.transform, createVector3(0, 4, 0));
 
     //
     // text mesh
@@ -1550,9 +1550,9 @@ const main = async () => {
         // characterSpacing: -0.2
     });
     addActorToScene(captureScene, textMesh1);
-    setTranslation(textMesh1.transform, new Vector3(0, 1, 6));
+    setTranslation(textMesh1.transform, createVector3(0, 1, 6));
     setRotationX(textMesh1.transform, -90);
-    setScaling(textMesh1.transform, new Vector3(0.4, 0.4, 0.4));
+    setScaling(textMesh1.transform, createVector3(0.4, 0.4, 0.4));
 
     const textMesh2 = createTextMesh({
         gpu,
@@ -1564,9 +1564,9 @@ const main = async () => {
         characterSpacing: -0.16,
     });
     addActorToScene(captureScene, textMesh2);
-    setTranslation(textMesh2.transform, new Vector3(0, 2, 8));
+    setTranslation(textMesh2.transform, createVector3(0, 2, 8));
     setRotationX(textMesh2.transform, -90);
-    setScaling(textMesh2.transform, new Vector3(0.4, 0.4, 0.4));
+    setScaling(textMesh2.transform, createVector3(0.4, 0.4, 0.4));
 
     const textMesh3 = createTextMesh({
         gpu,
@@ -1578,9 +1578,9 @@ const main = async () => {
         characterSpacing: 0.2,
     });
     addActorToScene(captureScene, textMesh3);
-    setTranslation(textMesh3.transform, new Vector3(0, 0.01, 9));
+    setTranslation(textMesh3.transform, createVector3(0, 0.01, 9));
     setRotationX(textMesh3.transform, -90);
-    setScaling(textMesh3.transform, new Vector3(0.4, 0.4, 0.4));
+    setScaling(textMesh3.transform, createVector3(0.4, 0.4, 0.4));
 
     //
     // instancing mesh
@@ -1636,7 +1636,7 @@ const main = async () => {
         castShadow: true,
     });
     subscribeActorOnStart(floorPlaneMesh, () => {
-        setScaling(floorPlaneMesh.transform, new Vector3(10, 10, 10));
+        setScaling(floorPlaneMesh.transform, createVector3(10, 10, 10));
         setRotationX(floorPlaneMesh.transform, -90);
         setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uDiffuseMapUvScale', createVector2(3, 3));
         setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uNormalMapUvScale', createVector2(3, 3));
@@ -1912,7 +1912,7 @@ void main() {
         orbitCameraController.deltaAltitudePower = 2;
         orbitCameraController.maxAltitude = 70;
         orbitCameraController.minAltitude = -70;
-        orbitCameraController.lookAtTarget = new Vector3(0, -2, 0);
+        orbitCameraController.lookAtTarget = createVector3(0, -2, 0);
         startOrbitCameraController(orbitCameraController, 0, -40);
         // orbitCameraController.enabled = false;
         orbitCameraController.enabled = true;
@@ -2028,9 +2028,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.x,
+        initialValue: v3x(objectSpaceRaymarchMesh.transform.position),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.x = value;
+            setV3x(objectSpaceRaymarchMesh.transform.position, value);
         },
     });
 
@@ -2039,9 +2039,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.y,
+        initialValue: v3y(objectSpaceRaymarchMesh.transform.position),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.y = value;
+            setV3y(objectSpaceRaymarchMesh.transform.position, value);
         },
     });
 
@@ -2050,9 +2050,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.position.z,
+        initialValue: v3z(objectSpaceRaymarchMesh.transform.position),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.position.z = value;
+            setV3z(objectSpaceRaymarchMesh.transform.position, value);
         },
     });
 
@@ -2061,9 +2061,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.x,
+        initialValue: v3x(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.x = value;
+            setV3x(objectSpaceRaymarchMesh.transform.scale, value);
         },
     });
 
@@ -2072,9 +2072,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.y,
+        initialValue: v3y(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.y = value;
+            setV3y(objectSpaceRaymarchMesh.transform.scale, value);
         },
     });
 
@@ -2083,9 +2083,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 5,
         stepValue: 0.001,
-        initialValue: objectSpaceRaymarchMesh.transform.scale.z,
+        initialValue: v3z(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {
-            objectSpaceRaymarchMesh.transform.scale.z = value;
+            setV3z(objectSpaceRaymarchMesh.transform.scale, value);
         },
     });
 
@@ -2152,9 +2152,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.x,
+        initialValue: v3x(directionalLight.transform.position),
         onChange: (value) => {
-            directionalLight.transform.position.x = value;
+            setV3x(directionalLight.transform.position, value);
         },
     });
 
@@ -2163,9 +2163,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.y,
+        initialValue: v3y(directionalLight.transform.position),
         onChange: (value) => {
-            directionalLight.transform.position.y = value;
+            setV3y(directionalLight.transform.position, value);
         },
     });
 
@@ -2174,9 +2174,9 @@ function initDebugger() {
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: directionalLight.transform.position.z,
+        initialValue: v3z(directionalLight.transform.position),
         onChange: (value) => {
-            directionalLight.transform.position.z = value;
+            setV3z(directionalLight.transform.position, value);
         },
     });
 
@@ -2364,22 +2364,22 @@ function initDebugger() {
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'jitter size x',
-        initialValue: (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize.x,
+        initialValue: v3x((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize),
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize.x = value;
+            setV3x((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize, value);
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'jitter size y',
-        initialValue: (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize.y,
+        initialValue: v3y((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize),
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize.y = value;
+            setV3y((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize, value);
         },
     });
 
@@ -2608,7 +2608,7 @@ function initDebugger() {
 
     const ssrDebuggerGroup = addDebugGroup(debuggerGUI, 'ssr', false);
 
-    addToggleDebugger(debuggerGUI, {
+    addToggleDebugger(ssrDebuggerGroup, {
         label: 'ssr pass enabled',
         initialValue: renderer.ssrPass.parameters.enabled,
         onChange: (value) => (renderer.ssrPass.parameters.enabled = value),

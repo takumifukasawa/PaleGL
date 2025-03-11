@@ -26,7 +26,14 @@ import {
     setSizeOrthographicCamera,
     updateOrthographicCameraProjectionMatrix,
 } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {
+    cloneVector3,
+    createVector3,
+    createVector3Zero,
+    multiplyVector3AndMatrix4,
+    negateVector3, normalizeVector3, subVector3AndVector3, v3x, v3y, v3z,
+    Vector3
+} from '@/PaleGL/math/Vector3.ts';
 import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
@@ -61,7 +68,7 @@ export const getCameraForward = (camera: Camera) => {
     // ex) (0, 0, 5) -> (0, 0, 0) をみている時、カメラ的には (0, 0, -1) が正しいが (0, 0, 1) が返ってくる
     // なぜなら、projection行列でzを反転させるため
     // pattern_1
-    return getWorldForward(camera.transform).negate();
+    return negateVector3(getWorldForward(camera.transform));
     // pattern_2
     // return new Vector3(this.viewMatrix.m20, this.viewMatrix.m21, this.viewMatrix.m22).negate().normalize();
 };
@@ -305,7 +312,11 @@ export const transformScreenPoint = (camera: Camera, p: Vector3) => {
     );
     const clipPosition = matInProjection.position;
     const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
-    return new Vector3(clipPosition.x / w, clipPosition.y / w, clipPosition.z / w);
+    return createVector3(
+        v3x(clipPosition) / w,
+        v3y(clipPosition) / w,
+        v3z(clipPosition) / w
+    );
 };
 
 export const setCameraRenderTarget = (camera: Camera, renderTarget: RenderTarget | GBufferRenderTargets | null) => {
@@ -328,7 +339,7 @@ export const setCameraRenderTarget = (camera: Camera, renderTarget: RenderTarget
 
 export const getCameraWorldForward = (camera: Camera) => {
     // forwardはカメラの背面を向いている
-    return getWorldForward(camera.transform).clone().negate();
+    return negateVector3(cloneVector3(getWorldForward(camera.transform)));
 };
 
 export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
@@ -337,9 +348,9 @@ export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
     setV4x(worldPos, v4x(worldPos) / v4w(worldPos));
     setV4y(worldPos, v4y(worldPos) / v4w(worldPos));
     setV4z(worldPos, v4z(worldPos) / v4w(worldPos));
-    const worldPosV3 = new Vector3(v4x(worldPos), v4y(worldPos), v4z(worldPos));
+    const worldPosV3 = createVector3(v4x(worldPos), v4y(worldPos), v4z(worldPos));
     const rayOrigin = getWorldForward(camera.transform);
-    const rayDirection = worldPosV3.subVector(rayOrigin).normalize();
+    const rayDirection = normalizeVector3(subVector3AndVector3(worldPosV3, rayOrigin));
     return createRay(rayOrigin, rayDirection);
 };
 
@@ -404,20 +415,20 @@ export const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera):
     const worldPositions: {
         [key in FrustumDirectionType]: Vector3;
     } = {
-        nlt: Vector3.zero,
-        nrt: Vector3.zero,
-        nlb: Vector3.zero,
-        nrb: Vector3.zero,
-        flt: Vector3.zero,
-        frt: Vector3.zero,
-        flb: Vector3.zero,
-        frb: Vector3.zero,
+        nlt: createVector3Zero(),
+        nrt: createVector3Zero(),
+        nlb: createVector3Zero(),
+        nrb: createVector3Zero(),
+        flt: createVector3Zero(),
+        frt: createVector3Zero(),
+        flb: createVector3Zero(),
+        frb: createVector3Zero(),
     };
     const localPositions = getFrustumLocalPositions(camera);
     if (localPositions) {
         for (const d in FrustumDirection) {
             const key = d as FrustumDirectionType;
-            const wp = localPositions[key].multiplyMatrix4(camera.transform.worldMatrix);
+            const wp = multiplyVector3AndMatrix4(localPositions[key], camera.transform.worldMatrix);
             worldPositions[key] = wp;
         }
         return worldPositions;

@@ -1,6 +1,6 @@
 ﻿import { Attribute } from '@/PaleGL/core/attribute.ts';
 import { createVertexArrayObject } from '@/PaleGL/core/vertexArrayObject.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import { createVector3, getBinormalFromTangent, getVector3Tangent } from '@/PaleGL/math/Vector3';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
@@ -11,9 +11,9 @@ export function createTangentsAndBinormals(normals: number[]) {
         const x = normals[i * 3 + 0];
         const y = normals[i * 3 + 1];
         const z = normals[i * 3 + 2];
-        const n = new Vector3(x, y, z);
-        const t = Vector3.getTangent(n);
-        const b = Vector3.getBinormalFromTangent(t, n);
+        const n = createVector3(x, y, z);
+        const t = getVector3Tangent(n);
+        const b = getBinormalFromTangent(t, n);
         tangents.push(...t.e);
         binormals.push(...b.e);
     }
@@ -26,9 +26,9 @@ export function createTangentsAndBinormals(normals: number[]) {
 export function createBinormals(normals: number[], tangents: number[]) {
     const binormals = [];
     for (let i = 0; i < normals.length / 3; i++) {
-        const n = new Vector3(normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2]);
-        const t = new Vector3(tangents[i * 3 + 0], tangents[i * 3 + 1], tangents[i * 3 + 2]);
-        const b = Vector3.getBinormalFromTangent(t, n);
+        const n = createVector3(normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2]);
+        const t = createVector3(tangents[i * 3 + 0], tangents[i * 3 + 1], tangents[i * 3 + 2]);
+        const b = getBinormalFromTangent(t, n);
         binormals.push(...b.e);
     }
     return binormals;
@@ -105,7 +105,7 @@ export function createGeometry(args: GeometryArgs) {
         .forEach((attribute) => {
             setGeometryAttribute(geometry, attribute);
         });
-    
+
     return geometry;
 
     // function setAttribute(attribute: Attribute) {

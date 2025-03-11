@@ -160,7 +160,7 @@ import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {createVector3, createVector3Zero, Vector3} from '@/PaleGL/math/Vector3.ts';
 import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
@@ -193,7 +193,7 @@ export function generateScreenSpaceShadowPassParameters(
     return {
         enabled: params.enabled ?? true,
         bias: params.bias ?? 0,
-        jitterSize: params.jitterSize ?? new Vector3(0.025, 0.025, 0.025),
+        jitterSize: params.jitterSize ?? createVector3(0.025, 0.025, 0.025),
         sharpness: params.sharpness ?? 2,
         strength: params.strength ?? 1,
         ratio: params.ratio ?? 0.5,
@@ -236,7 +236,7 @@ export function createScreenSpaceShadowPass(args: { gpu: Gpu; parameters?: Scree
                 {
                     name: UNIFORM_JITTER_SIZE_NAME,
                     type: UniformTypes.Vector3,
-                    value: Vector3.zero,
+                    value: createVector3Zero(),
                 },
                 {
                     name: UNIFORM_SHARPNESS_NAME,

@@ -1,8 +1,9 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { CharMesh, createCharMesh } from '@/PaleGL/actors/meshes/charMesh.ts';
+import { setV3x, setV3y } from '@/PaleGL/math/Vector3.ts';
 
 export type FontAtlasData = {
     chars: {
@@ -80,13 +81,13 @@ export function createTextMesh({
 }: TextMeshArgs): TextMesh {
     // const charMeshes: CharMesh[] = [];
 
-    const actor = createActor({ name: name || `text-${text}`});
+    const actor = createActor({ name: name || `text-${text}` });
 
     const textMesh: TextMesh = {
         ...actor,
-        charMeshes: []
+        charMeshes: [],
     };
-    
+
     const charArray = text.split('');
 
     let originX = 0;
@@ -141,12 +142,11 @@ export function createTextMesh({
     for (let i = 0; i < textMesh.charMeshes.length; i++) {
         const mesh = textMesh.charMeshes[i];
         originX += mesh.charWidth / 2 + mesh.charOffsetX;
-        mesh.transform.position.x = originX;
-        mesh.transform.position.y = mesh.charOffsetY;
+        setV3x(mesh.transform.position, originX);
+        setV3y(mesh.transform.position, mesh.charOffsetY);
         originX += mesh.charWidth / 2 + characterSpacing;
         // console.log("hogehoge",  mesh.name, mesh.parent)
     }
 
-    
     return textMesh;
 }

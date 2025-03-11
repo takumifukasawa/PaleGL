@@ -455,6 +455,7 @@ import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/Vector3.ts';
 
 //
 // ref:
@@ -728,10 +729,10 @@ export function renderLightShaftPass(
     // 適当に遠いところに飛ばす場合 TODO: directionを考慮。位置だけだとダメ
     const lightPositionInClip = transformScreenPoint(
         targetCamera,
-        lightShaftPass.directionalLight!.transform.position.clone().scale(10000)
+        scaleVector3ByScalar(cloneVector3(lightShaftPass.directionalLight!.transform.position), 10000)
     );
     // 0 ~ 1
-    const lightPositionInUv = createVector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
+    const lightPositionInUv = createVector2(v3x(lightPositionInClip) * 0.5 + 0.5, v3y(lightPositionInClip) * 0.5 + 0.5);
     // this.#directionalLight!.transform.getPositionInScreen(targetCamera);
 
     setMaterialUniformValue(lightShaftPass.blur1Pass.material, radialBlurOriginUniformName, lightPositionInUv);

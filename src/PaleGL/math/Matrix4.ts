@@ -1,4 +1,13 @@
-﻿import { Vector3 } from '@/PaleGL/math/Vector3';
+﻿import {
+    createVector3,
+    createVector3Up, crossVectorsV3,
+    normalizeVector3,
+    subVectorsV3,
+    v3x,
+    v3y,
+    v3z,
+    Vector3
+} from '@/PaleGL/math/Vector3';
 import { Rotator } from '@/PaleGL/math/Rotator';
 import {Quaternion, toEulerRadianFromQuaternion} from '@/PaleGL/math/quaternion.ts';
 
@@ -142,7 +151,7 @@ export class Matrix4 {
     }
 
     get position() {
-        return new Vector3(this.m03, this.m13, this.m23);
+        return createVector3(this.m03, this.m13, this.m23);
     }
 
     getScale() {
@@ -160,7 +169,7 @@ export class Matrix4 {
         const sy = Math.sqrt(m10 ** 2 + m11 ** 2 + m12 ** 2);
         const sz = Math.sqrt(m20 ** 2 + m21 ** 2 + m22 ** 2);
 
-        return new Vector3(sx, sy, sz);
+        return createVector3(sx, sy, sz);
     }
 
     // get clipPosition() {
@@ -247,9 +256,9 @@ export class Matrix4 {
      * @param v
      */
     setTranslation(v: Vector3) {
-        this.m03 = v.x;
-        this.m13 = v.y;
-        this.m23 = v.z;
+        this.m03 = v3x(v);
+        this.m13 = v3y(v);
+        this.m23 = v3z(v);
         return this;
     }
 
@@ -260,9 +269,9 @@ export class Matrix4 {
     static translationMatrix(v: Vector3) {
         // prettier-ignore
         return new Matrix4(
-            1, 0, 0, v.x,
-            0, 1, 0, v.y,
-            0, 0, 1, v.z,
+            1, 0, 0, v3x(v),
+            0, 1, 0, v3y(v),
+            0, 0, 1, v3z(v),
             0, 0, 0, 1
         );
     }
@@ -274,9 +283,9 @@ export class Matrix4 {
     static scalingMatrix(v: Vector3) {
         // prettier-ignore
         return new Matrix4(
-            v.x, 0, 0, 0,
-            0, v.y, 0, 0,
-            0, 0, v.z, 0,
+            v3x(v), 0, 0, 0,
+            0, v3y(v), 0, 0,
+            0, 0, v3z(v), 0,
             0, 0, 0, 1
         );
     }
@@ -775,17 +784,21 @@ export class Matrix4 {
      * @param up
      * @param inverseForward
      */
-    static getLookAtMatrix(eye: Vector3, center: Vector3, up = new Vector3(0, 1, 0), inverseForward = false) {
+    static getLookAtMatrix(eye: Vector3, center: Vector3, up = createVector3Up(), inverseForward = false) {
         const f = inverseForward
-            ? Vector3.subVectors(eye, center).normalize() // ex. 主にカメラ。投影の関係で逆になるので。
-            : Vector3.subVectors(center, eye).normalize();
-        const r = Vector3.crossVectors(up.normalize(), f).normalize();
-        const u = Vector3.crossVectors(f, r);
+            ? normalizeVector3(subVectorsV3(eye, center)) // ex. 主にカメラ。投影の関係で逆になるので。
+            : normalizeVector3(subVectorsV3(center, eye));
+        const r = normalizeVector3(crossVectorsV3(normalizeVector3(up), f));
+        const u = crossVectorsV3(f, r);
         // prettier-ignore
         const result = new Matrix4(
-            r.x, u.x, f.x, eye.x,
-            r.y, u.y, f.y, eye.y,
-            r.z, u.z, f.z, eye.z,
+            // r.x, u.x, f.x, eye.x,
+            // r.y, u.y, f.y, eye.y,
+            // r.z, u.z, f.z, eye.z,
+            // 0, 0, 0, 1
+            v3x(r), v3x(u), v3x(f), v3x(eye),
+            v3y(r), v3y(u), v3y(f), v3y(eye),
+            v3z(r), v3z(u), v3z(f), v3z(eye),
             0, 0, 0, 1
         );
         return result;

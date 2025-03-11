@@ -1,5 +1,5 @@
 ﻿import { AnimationKeyframeType, AnimationKeyframeTypes } from '@/PaleGL/constants';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import {createVector3, Vector3} from '@/PaleGL/math/Vector3';
 import {createQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
 import {
     GLTFAnimationChannelTargetPath,
@@ -179,7 +179,7 @@ export function createAnimationKeyframes({
         switch (_type) {
             case AnimationKeyframeTypes.Vector3:
                 // return new Vector3(...arr);
-                return new Vector3(arr[0], arr[1], arr[2]);
+                return createVector3(arr[0], arr[1], arr[2]);
             case AnimationKeyframeTypes.Quaternion:
                 // return new Quaternion(...arr);
                 return createQuaternion(arr[0], arr[1], arr[2], arr[3]);

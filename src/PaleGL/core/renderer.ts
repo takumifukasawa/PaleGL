@@ -13,39 +13,40 @@
     UniformTypes,
 } from '@/PaleGL/constants';
 import {
-    bindGPUUniformBlockAndGetBlockIndex, clearGPUColor, clearGPUDepth,
+    bindGPUUniformBlockAndGetBlockIndex,
+    clearGPUColor,
+    clearGPUDepth,
     createGPUUniformBufferObject,
-    drawGPU, flushGPU,
-    Gpu, setGPUFramebuffer, setGPUShader, setGPUUniforms, setGPUVertexArrayObject,
-    setGPUViewport
+    drawGPU,
+    flushGPU,
+    Gpu,
+    setGPUFramebuffer,
+    setGPUShader,
+    setGPUUniforms,
+    setGPUVertexArrayObject,
+    setGPUViewport,
 } from '@/PaleGL/core/gpu.ts';
-import {
-    addDrawVertexCountStats,
-    addPassInfoStats,
-    incrementDrawCallStats,
-    Stats,
-} from '@/PaleGL/utilities/stats.ts';
+import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import {
-    Camera,
-    CameraRenderTargetType,
-} from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import {
     blitRenderTargetDepth,
     createRenderTarget,
-    RenderTarget, setRenderTargetDepthTexture,
+    RenderTarget,
+    setRenderTargetDepthTexture,
     setRenderTargetSize,
     setRenderTargetTexture,
 } from '@/PaleGL/core/renderTarget.ts';
 import {
     createGBufferRenderTargets,
-    GBufferRenderTargets, setGBufferRenderTargetsDepthTexture,
+    GBufferRenderTargets,
+    setGBufferRenderTargetsDepthTexture,
     setGBufferRenderTargetsSize,
 } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
@@ -54,29 +55,30 @@ import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import {
     createDeferredShadingPass,
     DeferredShadingPass,
-    updateDeferredShadingPassSkyboxUniforms
+    updateDeferredShadingPassSkyboxUniforms,
 } from '@/PaleGL/postprocess/deferredShadingPass.ts';
-import {createSSAOPass, SsaoPass} from '@/PaleGL/postprocess/ssaoPass.ts';
-import {createSSRPass, SsrPass} from '@/PaleGL/postprocess/ssrPass.ts';
-import {createToneMappingPass, ToneMappingPass} from '@/PaleGL/postprocess/toneMappingPass.ts';
+import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
+import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
+import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
 import {
     BloomPass,
     BloomPassParameters,
     createBloomPass,
-    updateBloomPassParameters
+    updateBloomPassParameters,
 } from '@/PaleGL/postprocess/bloomPass.ts';
-import {createDepthOfFieldPass, DepthOfFieldPass} from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
 import {
-    createLightShaftPass, getLightShaftPassRenderTarget,
+    createLightShaftPass,
+    getLightShaftPassRenderTarget,
     LightShaftPass,
-    setLightShaftPassDirectionalLight
+    setLightShaftPassDirectionalLight,
 } from '@/PaleGL/postprocess/lightShaftPass.ts';
 import {
     createVolumetricLightPass,
     setVolumetricLightPassSpotLights,
-    VolumetricLightPass
+    VolumetricLightPass,
 } from '@/PaleGL/postprocess/volumetricLightPass.ts';
-import {createFogPass, FogPass, setFogPassTextures} from '@/PaleGL/postprocess/fogPass.ts';
+import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -88,10 +90,18 @@ import {
     updateUniformBufferData,
     updateUniformBufferValue,
 } from '@/PaleGL/core/uniformBufferObject.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {
+    cloneVector3,
+    createVector3Zero,
+    getVector3Magnitude,
+    negateVector3,
+    normalizeVector3,
+    subVectorsV3,
+    Vector3,
+} from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import {Color, createColorBlack} from '@/PaleGL/math/color.ts';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import {
     addUniformBlock,
     UniformBufferObjectBlockData,
@@ -102,17 +112,20 @@ import {
     UniformBufferObjectValue,
 } from '@/PaleGL/core/uniforms.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
-import {createVector4, createVector4zero, Vector4} from '@/PaleGL/math/vector4.ts';
+import { createVector4, createVector4zero, Vector4 } from '@/PaleGL/math/vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
-import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/vignettePass.ts';
-import {createStreakPass, StreakPass} from '@/PaleGL/postprocess/streakPass.ts';
-import {createFXAAPass, FxaaPass} from '@/PaleGL/postprocess/fxaaPass.ts';
-import {createScreenSpaceShadowPass, ScreenSpaceShadowPass} from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+import {
+    ChromaticAberrationPass,
+    createChromaticAberrationPass,
+} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
+import { createVignettePass, VignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
+import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
+import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
+import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
-import {createGlitchPass, GlitchPass} from '@/PaleGL/postprocess/glitchPass.ts';
+import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -122,7 +135,7 @@ import {
     hasEnabledPostProcessPass,
     isPerspectiveCamera,
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import {setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -147,7 +160,7 @@ export type LightActors = {
 export function applyLightShadowMapUniformValues(
     targetMaterial: Material,
     lightActors: LightActors,
-    fallbackTexture: Texture,
+    fallbackTexture: Texture
 ) {
     // directional light
     setMaterialUniformValue(
@@ -155,7 +168,7 @@ export function applyLightShadowMapUniformValues(
         UniformNames.DirectionalLightShadowMap,
         lightActors.directionalLight && lightActors.directionalLight.shadowMap
             ? lightActors.directionalLight.shadowMap.depthTexture
-            : fallbackTexture,
+            : fallbackTexture
     );
 
     // spotlights
@@ -176,7 +189,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
     // renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
     const bloomParameter = findPostProcessParameter<BloomPassParameters>(
         postProcessVolumeActor,
-        PostProcessPassType.Bloom,
+        PostProcessPassType.Bloom
     );
     if (bloomParameter) {
         updateBloomPassParameters(renderer.bloomPass, bloomParameter);
@@ -1946,43 +1959,42 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
 //     }
 // }
 
-
 export type Renderer = {
-    canvas: HTMLCanvasElement,
-    pixelRatio: number,
+    canvas: HTMLCanvasElement;
+    pixelRatio: number;
     globalUniformBufferObjects: {
         uniformBufferObject: UniformBufferObject;
         data: UniformBufferObjectBlockData;
-    }[],
-    gpu: Gpu,
-    realWidth: number,
-    realHeight: number,
-    stats: Stats | null,
-    scenePostProcess: PostProcess,
-    screenQuadCamera: Camera,
-    depthPrePassRenderTarget: RenderTarget,
-    gBufferRenderTargets: GBufferRenderTargets,
-    afterDeferredShadingRenderTarget: RenderTarget,
-    copyDepthSourceRenderTarget: RenderTarget,
-    copyDepthDestRenderTarget: RenderTarget,
-    screenSpaceShadowPass: ScreenSpaceShadowPass,
-    ambientOcclusionPass: SsaoPass,
-    deferredShadingPass: DeferredShadingPass,
-    ssrPass: SsrPass,
-    lightShaftPass: LightShaftPass,
-    volumetricLightPass: VolumetricLightPass,
-    fogPass: FogPass,
-    depthOfFieldPass: DepthOfFieldPass,
-    bloomPass: BloomPass,
-    streakPass: StreakPass,
-    toneMappingPass: ToneMappingPass,
-    chromaticAberrationPass: ChromaticAberrationPass,
-    glitchPass: GlitchPass,
-    vignettePass: VignettePass,
-    fxaaPass: FxaaPass,
+    }[];
+    gpu: Gpu;
+    realWidth: number;
+    realHeight: number;
+    stats: Stats | null;
+    scenePostProcess: PostProcess;
+    screenQuadCamera: Camera;
+    depthPrePassRenderTarget: RenderTarget;
+    gBufferRenderTargets: GBufferRenderTargets;
+    afterDeferredShadingRenderTarget: RenderTarget;
+    copyDepthSourceRenderTarget: RenderTarget;
+    copyDepthDestRenderTarget: RenderTarget;
+    screenSpaceShadowPass: ScreenSpaceShadowPass;
+    ambientOcclusionPass: SsaoPass;
+    deferredShadingPass: DeferredShadingPass;
+    ssrPass: SsrPass;
+    lightShaftPass: LightShaftPass;
+    volumetricLightPass: VolumetricLightPass;
+    fogPass: FogPass;
+    depthOfFieldPass: DepthOfFieldPass;
+    bloomPass: BloomPass;
+    streakPass: StreakPass;
+    toneMappingPass: ToneMappingPass;
+    chromaticAberrationPass: ChromaticAberrationPass;
+    glitchPass: GlitchPass;
+    vignettePass: VignettePass;
+    fxaaPass: FxaaPass;
     //
-    renderTarget: CameraRenderTargetType | null,
-    clearColorDirtyFlag: boolean,
+    renderTarget: CameraRenderTargetType | null;
+    clearColorDirtyFlag: boolean;
 };
 
 /**
@@ -1997,7 +2009,15 @@ export type Renderer = {
  * - depth prepass 使わない場合。offscreen する時とか
  * - offscreen rendering
  */
-export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; canvas: HTMLCanvasElement; pixelRatio: number }): Renderer {
+export function createRenderer({
+    gpu,
+    canvas,
+    pixelRatio = 1.5,
+}: {
+    gpu: Gpu;
+    canvas: HTMLCanvasElement;
+    pixelRatio: number;
+}): Renderer {
     const globalUniformBufferObjects: {
         uniformBufferObject: UniformBufferObject;
         data: UniformBufferObjectBlockData;
@@ -2062,329 +2082,329 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
     const glitchPass = createGlitchPass({ gpu });
     const vignettePass = createVignettePass({ gpu });
     const fxaaPass = createFXAAPass({ gpu });
-    
-        scenePostProcess.addPass(fxaaPass);
-        scenePostProcess.addPass(depthOfFieldPass);
-        scenePostProcess.addPass(bloomPass);
-        scenePostProcess.addPass(streakPass);
-        scenePostProcess.addPass(toneMappingPass);
-        scenePostProcess.addPass(vignettePass);
-        scenePostProcess.addPass(chromaticAberrationPass);
-        scenePostProcess.addPass(glitchPass);
 
-        //
-        // initialize global uniform buffer objects
-        //
+    scenePostProcess.addPass(fxaaPass);
+    scenePostProcess.addPass(depthOfFieldPass);
+    scenePostProcess.addPass(bloomPass);
+    scenePostProcess.addPass(streakPass);
+    scenePostProcess.addPass(toneMappingPass);
+    scenePostProcess.addPass(vignettePass);
+    scenePostProcess.addPass(chromaticAberrationPass);
+    scenePostProcess.addPass(glitchPass);
 
-        const uniformBufferObjectShader = createShader({
+    //
+    // initialize global uniform buffer objects
+    //
+
+    const uniformBufferObjectShader = createShader({
+        gpu,
+        vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
+        fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),
+    });
+
+    const transformationsUniformBlockData = [
+        {
+            name: UniformNames.WorldMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.ViewMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.ProjectionMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.NormalMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.InverseWorldMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.ViewProjectionMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.InverseViewMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.InverseProjectionMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.InverseViewProjectionMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+        {
+            name: UniformNames.TransposeInverseViewMatrix,
+            type: UniformTypes.Matrix4,
+            value: Matrix4.identity,
+        },
+    ];
+
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
             gpu,
-            vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
-            fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),
-        });
+            uniformBufferObjectShader,
+            UniformBlockNames.Transformations,
+            transformationsUniformBlockData
+        ),
+        data: transformationsUniformBlockData,
+    });
 
-        const transformationsUniformBlockData = [
-            {
-                name: UniformNames.WorldMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.ViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.ProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.NormalMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseWorldMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.ViewProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.InverseViewProjectionMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-            {
-                name: UniformNames.TransposeInverseViewMatrix,
-                type: UniformTypes.Matrix4,
-                value: Matrix4.identity,
-            },
-        ];
+    const cameraUniformBufferData = [
+        {
+            name: UniformNames.ViewPosition,
+            type: UniformTypes.Vector3,
+            value: createVector3Zero(),
+        },
+        {
+            name: UniformNames.ViewDirection,
+            type: UniformTypes.Vector3,
+            value: createVector3Zero(),
+        },
+        {
+            name: UniformNames.CameraNear,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.CameraFar,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.CameraAspect,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.CameraFov,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+    ];
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.Camera,
+            cameraUniformBufferData
+        ),
+        data: cameraUniformBufferData,
+    });
 
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.Transformations,
-                transformationsUniformBlockData,
-            ),
-            data: transformationsUniformBlockData,
-        });
+    const directionalLightUniformBufferData = [
+        {
+            name: UniformNames.DirectionalLight,
+            type: UniformTypes.Struct,
+            value: [
+                {
+                    name: UniformNames.LightDirection,
+                    type: UniformTypes.Vector3,
+                    value: createVector3Zero(),
+                },
+                {
+                    name: UniformNames.LightIntensity,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightColor,
+                    type: UniformTypes.Color,
+                    value: createColorBlack(),
+                },
+                {
+                    name: UniformNames.ShadowMapProjectionMatrix,
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity,
+                },
+            ],
+        },
+    ];
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.DirectionalLight,
+            directionalLightUniformBufferData
+        ),
+        data: directionalLightUniformBufferData,
+    });
 
-        const cameraUniformBufferData = [
-            {
-                name: UniformNames.ViewPosition,
-                type: UniformTypes.Vector3,
-                value: Vector3.zero,
-            },
-            {
-                name: UniformNames.ViewDirection,
-                type: UniformTypes.Vector3,
-                value: Vector3.zero,
-            },
-            {
-                name: UniformNames.CameraNear,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.CameraFar,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.CameraAspect,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.CameraFov,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-        ];
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.Camera,
-                cameraUniformBufferData,
-            ),
-            data: cameraUniformBufferData,
-        });
+    const spotLightUniformBufferData = [
+        {
+            name: UniformNames.SpotLight,
+            type: UniformTypes.StructArray,
+            value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => [
+                {
+                    name: UniformNames.LightColor,
+                    type: UniformTypes.Color,
+                    value: createColorBlack(),
+                },
+                {
+                    name: UniformNames.LightPosition,
+                    type: UniformTypes.Vector3,
+                    value: createVector3Zero(),
+                },
+                {
+                    name: UniformNames.LightDirection,
+                    type: UniformTypes.Vector3,
+                    value: createVector3Zero(),
+                },
+                {
+                    name: UniformNames.LightIntensity,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightDistance,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightAttenuation,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightConeCos,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightPenumbraCos,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.ShadowMapProjectionMatrix,
+                    type: UniformTypes.Matrix4,
+                    value: Matrix4.identity,
+                },
+            ]),
+        },
+    ];
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.SpotLight,
+            spotLightUniformBufferData
+        ),
+        data: spotLightUniformBufferData,
+    });
 
-        const directionalLightUniformBufferData = [
-            {
-                name: UniformNames.DirectionalLight,
-                type: UniformTypes.Struct,
-                value: [
-                    {
-                        name: UniformNames.LightDirection,
-                        type: UniformTypes.Vector3,
-                        value: Vector3.zero,
-                    },
-                    {
-                        name: UniformNames.LightIntensity,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightColor,
-                        type: UniformTypes.Color,
-                        value: createColorBlack(),
-                    },
-                    {
-                        name: UniformNames.ShadowMapProjectionMatrix,
-                        type: UniformTypes.Matrix4,
-                        value: Matrix4.identity,
-                    },
-                ],
-            },
-        ];
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.DirectionalLight,
-                directionalLightUniformBufferData,
-            ),
-            data: directionalLightUniformBufferData,
-        });
+    const pointLightUniformBufferData = [
+        {
+            name: UniformNames.PointLight,
+            type: UniformTypes.StructArray,
+            value: maton.range(MAX_POINT_LIGHT_COUNT).map(() => [
+                {
+                    name: UniformNames.LightColor,
+                    type: UniformTypes.Color,
+                    value: createColorBlack(),
+                },
+                {
+                    name: UniformNames.LightPosition,
+                    type: UniformTypes.Vector3,
+                    value: createVector3Zero(),
+                },
+                {
+                    name: UniformNames.LightIntensity,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightDistance,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: UniformNames.LightAttenuation,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+            ]),
+        },
+    ];
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.PointLight,
+            pointLightUniformBufferData
+        ),
+        data: pointLightUniformBufferData,
+    });
 
-        const spotLightUniformBufferData = [
-            {
-                name: UniformNames.SpotLight,
-                type: UniformTypes.StructArray,
-                value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => [
-                    {
-                        name: UniformNames.LightColor,
-                        type: UniformTypes.Color,
-                        value: createColorBlack(),
-                    },
-                    {
-                        name: UniformNames.LightPosition,
-                        type: UniformTypes.Vector3,
-                        value: Vector3.zero,
-                    },
-                    {
-                        name: UniformNames.LightDirection,
-                        type: UniformTypes.Vector3,
-                        value: Vector3.zero,
-                    },
-                    {
-                        name: UniformNames.LightIntensity,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightDistance,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightAttenuation,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightConeCos,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightPenumbraCos,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.ShadowMapProjectionMatrix,
-                        type: UniformTypes.Matrix4,
-                        value: Matrix4.identity,
-                    },
-                ]),
-            },
-        ];
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.SpotLight,
-                spotLightUniformBufferData,
-            ),
-            data: spotLightUniformBufferData,
-        });
+    const timelineUniformBufferData = [
+        {
+            name: UniformNames.TimelineTime,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.TimelineDeltaTime,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+    ];
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.Timeline,
+            timelineUniformBufferData
+        ),
+        data: timelineUniformBufferData,
+    });
 
-        const pointLightUniformBufferData = [
-            {
-                name: UniformNames.PointLight,
-                type: UniformTypes.StructArray,
-                value: maton.range(MAX_POINT_LIGHT_COUNT).map(() => [
-                    {
-                        name: UniformNames.LightColor,
-                        type: UniformTypes.Color,
-                        value: createColorBlack(),
-                    },
-                    {
-                        name: UniformNames.LightPosition,
-                        type: UniformTypes.Vector3,
-                        value: Vector3.zero,
-                    },
-                    {
-                        name: UniformNames.LightIntensity,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightDistance,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                    {
-                        name: UniformNames.LightAttenuation,
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                ]),
-            },
-        ];
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.PointLight,
-                pointLightUniformBufferData,
-            ),
-            data: pointLightUniformBufferData,
-        });
+    const commonUniformBlockData = [
+        {
+            name: UniformNames.Time,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.DeltaTime,
+            type: UniformTypes.Float,
+            value: 0,
+        },
+        {
+            name: UniformNames.Viewport,
+            type: UniformTypes.Vector4,
+            value: createVector4zero(),
+        },
+    ];
+    // TODO: 一番最初の要素としてpushするとなぜかエラーになる
+    globalUniformBufferObjects.push({
+        uniformBufferObject: createGPUUniformBufferObject(
+            gpu,
+            uniformBufferObjectShader,
+            UniformBlockNames.Common,
+            commonUniformBlockData
+        ),
+        data: commonUniformBlockData,
+    });
 
-        const timelineUniformBufferData = [
-            {
-                name: UniformNames.TimelineTime,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.TimelineDeltaTime,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-        ];
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.Timeline,
-                timelineUniformBufferData,
-            ),
-            data: timelineUniformBufferData,
-        });
-
-        const commonUniformBlockData = [
-            {
-                name: UniformNames.Time,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.DeltaTime,
-                type: UniformTypes.Float,
-                value: 0,
-            },
-            {
-                name: UniformNames.Viewport,
-                type: UniformTypes.Vector4,
-                value: createVector4zero(),
-            },
-        ];
-        // TODO: 一番最初の要素としてpushするとなぜかエラーになる
-        globalUniformBufferObjects.push({
-            uniformBufferObject: createGPUUniformBufferObject(
-                gpu,
-                uniformBufferObjectShader,
-                UniformBlockNames.Common,
-                commonUniformBlockData,
-            ),
-            data: commonUniformBlockData,
-        });
-
-        // for debug
-        console.log('===== global uniform buffer objects =====');
-        console.log(globalUniformBufferObjects);
-        console.log('=========================================');
+    // for debug
+    console.log('===== global uniform buffer objects =====');
+    console.log(globalUniformBufferObjects);
+    console.log('=========================================');
 
     const renderTarget: CameraRenderTargetType | null = null;
     const clearColorDirtyFlag = false;
@@ -2422,9 +2442,7 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: Gpu; ca
         //
         renderTarget,
         clearColorDirtyFlag,
-    }
-
-
+    };
 }
 
 export function setRendererStats(renderer: Renderer, stats: Stats) {
@@ -2441,7 +2459,7 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
     // for debug
     material.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName,
+            ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
         );
         if (!targetGlobalUniformBufferObject) {
             return;
@@ -2450,7 +2468,7 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
             renderer.gpu,
             targetGlobalUniformBufferObject.uniformBufferObject,
             material.shader!,
-            blockName,
+            blockName
         );
         // // for debug
         // console.log(
@@ -2460,12 +2478,7 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
         //     targetGlobalUniformBufferObject.data,
         //     blockIndex
         // );
-        addUniformBlock(
-            material.uniforms,
-            blockIndex,
-            targetGlobalUniformBufferObject.uniformBufferObject,
-            [],
-        );
+        addUniformBlock(material.uniforms, blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
     });
     // });
 }
@@ -2511,7 +2524,12 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
  * @param clearDepth
  */
 // TODO: 本当はclearcolorの色も渡せるとよい
-export function setRendererRenderTarget(renderer: Renderer, renderTarget: CameraRenderTargetType, clearColor: boolean = false, clearDepth: boolean = false) {
+export function setRendererRenderTarget(
+    renderer: Renderer,
+    renderTarget: CameraRenderTargetType,
+    clearColor: boolean = false,
+    clearDepth: boolean = false
+) {
     if (renderTarget) {
         renderer.renderTarget = renderTarget;
         setGPUFramebuffer(renderer.gpu, renderTarget.framebuffer);
@@ -2557,11 +2575,11 @@ export function renderRenderer(
         time,
         onBeforePostProcess,
     }: {
-    time: number;
-    // timelineTime: number;
-    // timelineDeltaTime: number;
-    onBeforePostProcess?: () => void;
-},
+        time: number;
+        // timelineTime: number;
+        // timelineDeltaTime: number;
+        onBeforePostProcess?: () => void;
+    }
 ) {
     // ------------------------------------------------------------------------------
     // transform feedback
@@ -2595,7 +2613,7 @@ export function renderRenderer(
         switch (actor.type) {
             case ActorTypes.Skybox:
                 renderMeshInfoEachQueue[RenderQueueType.Skybox].push(
-                    buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox),
+                    buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox)
                 );
                 // TODO: skyboxの中で処理したい
                 // actor.transform.parent = cameras.transform;
@@ -2612,20 +2630,20 @@ export function renderRenderer(
                     // }
                     if (material.alphaTest != null) {
                         renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
-                            buildRenderMeshInfo(actor as Mesh, RenderQueueType.AlphaTest, i),
+                            buildRenderMeshInfo(actor as Mesh, RenderQueueType.AlphaTest, i)
                         );
                         return;
                     }
                     switch (material.blendType) {
                         case BlendTypes.Opaque:
                             renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
-                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Opaque, i),
+                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Opaque, i)
                             );
                             return;
                         case BlendTypes.Transparent:
                         case BlendTypes.Additive:
                             renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
-                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Transparent, i),
+                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Transparent, i)
                             );
                             return;
                         default:
@@ -2694,18 +2712,18 @@ export function renderRenderer(
         );
     });
     sortedBasePassRenderMeshInfos.sort((a, b) => {
-        const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-        const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         return al < bl ? -1 : 1;
     });
 
     // transparent mesh infos
     const sortedTransparentRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(
-        (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent,
+        (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
     );
     sortedTransparentRenderMeshInfos.sort((a, b) => {
-        const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-        const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         return al > bl ? -1 : 1;
     });
 
@@ -2738,8 +2756,8 @@ export function renderRenderer(
         return actor;
     });
     depthPrePassRenderMeshInfos.sort((a, b) => {
-        const al = Vector3.subVectors(camera.transform.position, a.actor.transform.position).magnitude;
-        const bl = Vector3.subVectors(camera.transform.position, b.actor.transform.position).magnitude;
+        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         return al < bl ? -1 : 1;
     });
     depthPrePass(renderer, depthPrePassRenderMeshInfos, camera);
@@ -2820,20 +2838,24 @@ export function renderRenderer(
         updateDeferredShadingPassSkyboxUniforms(renderer.deferredShadingPass, skyboxActor);
     });
 
-    applyLightShadowMapUniformValues(renderer.deferredShadingPass.material, lightActors, renderer.gpu.dummyTextureBlack);
+    applyLightShadowMapUniformValues(
+        renderer.deferredShadingPass.material,
+        lightActors,
+        renderer.gpu.dummyTextureBlack
+    );
 
     // set sss texture
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
         'uScreenSpaceShadowTexture',
-        renderer.screenSpaceShadowPass.renderTarget.texture,
+        renderer.screenSpaceShadowPass.renderTarget.texture
     );
 
     // set ao texture
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
         'uAmbientOcclusionTexture',
-        renderer.ambientOcclusionPass.renderTarget.texture,
+        renderer.ambientOcclusionPass.renderTarget.texture
     );
 
     PostProcess.renderPass({
@@ -2910,14 +2932,15 @@ export function renderRenderer(
     // height fog pass
     // ------------------------------------------------------------------------------
 
-    setFogPassTextures(renderer.fogPass,
+    setFogPassTextures(
+        renderer.fogPass,
         getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!,
         // CUSTOM
         //  this._gpu.dummyTextureBlack,
         //
         renderer.volumetricLightPass.renderTarget.texture!,
         renderer.screenSpaceShadowPass.renderTarget.texture!,
-        sharedTextures[SharedTexturesTypes.FBM_NOISE].texture,
+        sharedTextures[SharedTexturesTypes.FBM_NOISE].texture
     );
 
     PostProcess.renderPass({
@@ -2944,7 +2967,10 @@ export function renderRenderer(
     // pattern1: g-buffer depth
     // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture!);
     // pattern2: depth prepass
-    setRenderTargetDepthTexture(renderer.afterDeferredShadingRenderTarget, renderer.depthPrePassRenderTarget.depthTexture!);
+    setRenderTargetDepthTexture(
+        renderer.afterDeferredShadingRenderTarget,
+        renderer.depthPrePassRenderTarget.depthTexture!
+    );
 
     copyDepthTexture(renderer);
 
@@ -2953,7 +2979,7 @@ export function renderRenderer(
         setMaterialUniformValue(
             getMeshMaterial(renderMeshInfo.actor),
             UniformNames.DepthTexture,
-            renderer.copyDepthDestRenderTarget.depthTexture,
+            renderer.copyDepthDestRenderTarget.depthTexture
         );
     });
 
@@ -3082,7 +3108,7 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
         material.depthFuncType,
         material.blendType,
         material.faceSide,
-        geometry.instanceCount,
+        geometry.instanceCount
     );
 }
 
@@ -3094,9 +3120,14 @@ export function buildRenderMeshInfo(actor: Mesh, queue: RenderQueueType, materia
     };
 }
 
-export function setUniformBlockValue(renderer: Renderer, blockName: string, uniformName: string, value: UniformBufferObjectValue) {
+export function setUniformBlockValue(
+    renderer: Renderer,
+    blockName: string,
+    uniformName: string,
+    value: UniformBufferObjectValue
+) {
     const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-        ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName,
+        ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
     );
     if (!targetGlobalUniformBufferObject) {
         console.error(`[Renderer.setUniformBlockData] invalid uniform block object: ${blockName}`);
@@ -3201,7 +3232,7 @@ function shadowPass(renderer: Renderer, castShadowLightActors: Light[], castShad
                 setMaterialUniformValue(
                     depthMaterial,
                     UniformNames.DepthTexture,
-                    renderer.copyDepthDestRenderTarget.depthTexture,
+                    renderer.copyDepthDestRenderTarget.depthTexture
                 );
 
                 renderMesh(renderer, actor.geometry, depthMaterial);
@@ -3288,100 +3319,80 @@ function updateActorTransformUniforms(renderer: Renderer, actor: Actor) {
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.WorldMatrix,
-        actor.transform.worldMatrix,
+        actor.transform.worldMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.InverseWorldMatrix,
-        actor.transform.worldMatrix,
+        actor.transform.worldMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.NormalMatrix,
-        actor.transform.normalMatrix,
+        actor.transform.normalMatrix
     );
 }
 
 export function updateRendererCameraUniforms(renderer: Renderer, camera: Camera) {
-    setUniformBlockValue(
-        renderer,
-        UniformBlockNames.Transformations,
-        UniformNames.ViewMatrix,
-        camera.viewMatrix
-    );
+    setUniformBlockValue(renderer, UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.ProjectionMatrix,
-        camera.projectionMatrix,
+        camera.projectionMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Camera,
         UniformNames.ViewPosition,
-        camera.transform.worldMatrix.position,
+        camera.transform.worldMatrix.position
     );
-    setUniformBlockValue(
-        renderer,
-        UniformBlockNames.Camera,
-        UniformNames.ViewDirection,
-        getCameraForward(camera)
-    );
-    setUniformBlockValue(
-        renderer,
-        UniformBlockNames.Camera,
-        UniformNames.CameraNear,
-        camera.near
-    );
-    setUniformBlockValue(
-        renderer,
-        UniformBlockNames.Camera,
-        UniformNames.CameraFar,
-        camera.far
-    );
+    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.ViewDirection, getCameraForward(camera));
+    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
+    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.CameraFar, camera.far);
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Camera,
         UniformNames.CameraAspect,
-        isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).aspect : (camera as OrthographicCamera).aspect,
+        isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).aspect : (camera as OrthographicCamera).aspect
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Camera,
         UniformNames.CameraFov,
-        isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).fov : 0,
+        isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).fov : 0
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.ViewProjectionMatrix,
-        camera.viewProjectionMatrix,
+        camera.viewProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.InverseViewMatrix,
-        camera.inverseViewMatrix,
+        camera.inverseViewMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.InverseProjectionMatrix,
-        camera.inverseProjectionMatrix,
+        camera.inverseProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.InverseViewProjectionMatrix,
-        camera.inverseViewProjectionMatrix,
+        camera.inverseViewProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.TransposeInverseViewMatrix,
-        camera.viewMatrix.clone().invert().transpose(),
+        camera.viewMatrix.clone().invert().transpose()
     );
 }
 
@@ -3390,10 +3401,10 @@ function updateUniformBlockValue(
     blockName: string,
     uniformName: string,
     value: UniformBufferObjectValue,
-    showLog: boolean = false,
+    showLog: boolean = false
 ) {
     const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
-        ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName,
+        ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
     );
     if (!targetGlobalUniformBufferObject) {
         console.error(`[Renderer.setUniformBlockData] invalid uniform block object: ${blockName}`);
@@ -3496,7 +3507,7 @@ function updateUniformBlockValue(
                     uniformName,
                     typeof value === 'number'
                         ? new Float32Array([value])
-                        : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).e,
+                        : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).e
                 );
             }
             break;
@@ -3505,53 +3516,29 @@ function updateUniformBlockValue(
 
 function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: number; deltaTime: number }) {
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
-    updateUniformBlockValue(
-        renderer,
-        UniformBlockNames.Common,
-        UniformNames.Time,
-        time
-    );
-    updateUniformBlockValue(
-        renderer,
-        UniformBlockNames.Common,
-        UniformNames.DeltaTime,
-        deltaTime
-    );
+    updateUniformBlockValue(renderer, UniformBlockNames.Common, UniformNames.Time, time);
+    updateUniformBlockValue(renderer, UniformBlockNames.Common, UniformNames.DeltaTime, deltaTime);
     updateUniformBlockValue(
         renderer,
         UniformBlockNames.Common,
         UniformNames.Viewport,
-        createVector4(renderer.realWidth, renderer.realHeight, renderer.realWidth / renderer.realHeight, 0),
+        createVector4(renderer.realWidth, renderer.realHeight, renderer.realWidth / renderer.realHeight, 0)
     );
 }
 
 export function updateTimelineUniforms(renderer: Renderer, timelineTime: number, timelineDeltaTime: number) {
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
-    updateUniformBlockValue(
-        renderer,
-        UniformBlockNames.Timeline,
-        UniformNames.TimelineTime,
-        timelineTime
-    );
-    updateUniformBlockValue(
-        renderer,
-        UniformBlockNames.Timeline,
-        UniformNames.TimelineDeltaTime,
-        timelineDeltaTime
-    );
+    updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineTime, timelineTime);
+    updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineDeltaTime, timelineDeltaTime);
 }
 
 function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: DirectionalLight) {
-    updateUniformBlockValue(
-        renderer,
-        UniformBlockNames.DirectionalLight,
-        UniformNames.DirectionalLight,
-        [
+    updateUniformBlockValue(renderer, UniformBlockNames.DirectionalLight, UniformNames.DirectionalLight, [
         {
             name: UniformNames.LightDirection,
             type: UniformTypes.Vector3,
             // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-            value: directionalLight.transform.position.clone().negate().normalize(),
+            value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
         },
         {
             name: UniformNames.LightIntensity,
@@ -3569,8 +3556,7 @@ function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: Di
             type: UniformTypes.Matrix4,
             value: directionalLight.shadowMapProjectionMatrix,
         },
-    ]
-    );
+    ]);
 }
 
 function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
@@ -3593,7 +3579,7 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
                 {
                     name: UniformNames.LightDirection,
                     type: UniformTypes.Vector3,
-                    value: getWorldForward(spotLight.transform).clone(),
+                    value: cloneVector3(getWorldForward(spotLight.transform)),
                 },
                 {
                     name: UniformNames.LightIntensity,
@@ -3626,7 +3612,7 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
                     value: spotLight.shadowMapProjectionMatrix,
                 },
             ];
-        }),
+        })
     );
 }
 
@@ -3664,7 +3650,7 @@ function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]
                 },
             ];
         }),
-        true,
+        true
     );
 }
 
@@ -3672,8 +3658,8 @@ function transparentPass(
     renderer: Renderer,
     sortedRenderMeshInfos: RenderMeshInfo[],
     camera: Camera,
-    lightActors: LightActors,
-// clear: boolean
+    lightActors: LightActors
+    // clear: boolean
 ) {
     // console.log("--------- transparent pass ---------");
 

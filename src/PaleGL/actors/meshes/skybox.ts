@@ -12,14 +12,14 @@ import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import {setScaling, setTranslation} from "@/PaleGL/core/transform.ts";
+import { setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
+import { createFillVector3 } from '@/PaleGL/math/Vector3.ts';
 
 // 法線が内側を向いた単位立方体
 const skyboxGeometryObjText: string = `
@@ -268,7 +268,7 @@ export const updateSkyboxTransform: UpdateActorTransformFunc = (actor, camera) =
     if (camera) {
         setTranslation(skybox.transform, camera.transform.position);
         // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
-        setScaling(skybox.transform, Vector3.fill(camera.far / 1.733));
+        setScaling(skybox.transform, createFillVector3(camera.far / 1.733));
     }
 
     defaultUpdateActorTransform(actor);

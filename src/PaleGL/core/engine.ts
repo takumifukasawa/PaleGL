@@ -12,7 +12,7 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createSharedTextures, SharedTextures } from '@/PaleGL/core/createSharedTextures.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,
@@ -561,14 +561,14 @@ export function createEngine({
         // 描画させたいので全部中央に置いちゃう
         const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
         traverseScene(_scene!, (actor) => {
-            const tmpP = actor.transform.position.clone();
+            const tmpP = cloneVector3(actor.transform.position);
             const tmpR = actor.transform.rotation.clone();
             // TODO: mainカメラだけ抽出したい
             if (actor.type === ActorTypes.Camera) {
-                setTranslation(actor.transform, new Vector3(0, 0, 10));
+                setTranslation(actor.transform, createVector3(0, 0, 10));
                 setRotation(actor.transform, Rotator.fromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
             } else {
-                setTranslation(actor.transform, Vector3.zero);
+                setTranslation(actor.transform, createVector3Zero());
             }
             tmpTransformPair.push({ actor, p: tmpP, r: tmpR });
         });

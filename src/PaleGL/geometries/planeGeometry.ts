@@ -1,8 +1,8 @@
-﻿import {createGeometry, createTangentsAndBinormals, Geometry} from '@/PaleGL/geometries/geometry.ts';
+﻿import { createGeometry, createTangentsAndBinormals, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/Vector3.ts';
 
 type PlaneGeometryRawDataOptions = {
     calculateTangent?: boolean;
@@ -28,7 +28,7 @@ export function createPlaneGeometryRawData({
     flipUvY,
     width = 2,
     height = 2,
-    offset = Vector3.zero,
+    offset = createVector3Zero(),
 }: PlaneGeometryRawDataOptions) {
     // -----------------------------
     // 0 ---- 2
@@ -52,10 +52,14 @@ export function createPlaneGeometryRawData({
 
     // prettier-ignore
     const positions = new Float32Array([
-        -hw + offset.x, hh + offset.y, 0 + offset.z,
-        -hw + offset.x, -hh + offset.y, 0 + offset.z,
-        hw + offset.x, hh + offset.y, 0 + offset.z,
-        hw + offset.x, -hh + offset.y, 0 + offset.z
+        // -hw + offset.x, hh + offset.y, 0 + offset.z,
+        // -hw + offset.x, -hh + offset.y, 0 + offset.z,
+        // hw + offset.x, hh + offset.y, 0 + offset.z,
+        // hw + offset.x, -hh + offset.y, 0 + offset.z,
+        -hw + v3x(offset), hh + v3y(offset), 0 + v3z(offset),
+        -hw + v3x(offset), -hh + v3y(offset), 0 + v3z(offset),
+        hw + v3x(offset), hh + v3y(offset), 0 + v3z(offset),
+        hw + v3x(offset), -hh + v3y(offset), 0 + v3z(offset)
     ]);
 
     // prettier-ignore

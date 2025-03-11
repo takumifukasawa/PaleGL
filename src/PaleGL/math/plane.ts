@@ -1,4 +1,11 @@
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {
+    addVector3Array,
+    cloneVector3,
+    dotVector3,
+    scaleVector3ByScalar,
+    subVector3AndVector3,
+    Vector3,
+} from '@/PaleGL/math/Vector3.ts';
 import { Ray } from '@/PaleGL/math/ray.ts';
 
 export type Plane = ReturnType<typeof createPlane>;
@@ -15,7 +22,7 @@ export function intersectRayWithPlane(ray: Ray, plane: Plane): Vector3 | null {
     const rayDir = ray.dir;
 
     // 平面の法線とレイの方向ベクトルとの内積を計算
-    const dotProduct = Vector3.dot(ray.dir, plane.normal);
+    const dotProduct = dotVector3(ray.dir, plane.normal);
 
     // 内積が0に近い場合、レイは平面と平行であり交差しない
     if (Math.abs(dotProduct) < 0.0001) {
@@ -23,16 +30,16 @@ export function intersectRayWithPlane(ray: Ray, plane: Plane): Vector3 | null {
     }
 
     // rayの原点から平面上の点へのベクトルを計算
-    const vectorFromRayOriginToPlanePoint = plane.point.clone().subVector(rayOrigin);
+    const vectorFromRayOriginToPlanePoint = subVector3AndVector3(cloneVector3(plane.point), rayOrigin);
 
     // 平面までの距離
-    const distanceToPlane = Vector3.dot(vectorFromRayOriginToPlanePoint, plane.normal) / dotProduct;
+    const distanceToPlane = dotVector3(vectorFromRayOriginToPlanePoint, plane.normal) / dotProduct;
 
     // 距離が負の場合、レイは平面の背後から始まる
     if (distanceToPlane < 0) {
         return null; // 視点の後ろなので交差しない
     }
 
-    const dirToPlaneIntersection = rayDir.clone().scale(distanceToPlane);
-    return Vector3.addVectors(rayOrigin, dirToPlaneIntersection);
+    const dirToPlaneIntersection = scaleVector3ByScalar(cloneVector3(rayDir), distanceToPlane);
+    return addVector3Array(rayOrigin, dirToPlaneIntersection);
 }

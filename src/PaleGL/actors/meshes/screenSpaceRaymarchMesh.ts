@@ -15,7 +15,6 @@ import {
     createScreenSpaceRaymarchMaterial,
     ScreenSpaceRaymarchMaterialArgs,
 } from '@/PaleGL/materials/screenSpaceRaymarchMaterial.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { MaterialArgs, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { gbufferScreenSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-screen-space-raymarch-depth-fragment-template.ts';
 // import { litScreenSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-screen-space-raymarch-fragment-template.ts';
@@ -23,7 +22,8 @@ import litScreenSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout
 import gbufferScreenSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-screen-space-raymarch-depth-fragment.glsl';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import {getPostProcessCommonUniforms} from "@/PaleGL/postprocess/postProcessPassBase.ts";
+import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { createVector3Zero } from '@/PaleGL/math/Vector3.ts';
 
 type ScreenSpaceRaymarchMeshArgs = {
     gpu: Gpu;
@@ -46,10 +46,10 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         {
             name: UniformNames.ViewDirection,
             type: UniformTypes.Vector3,
-            value: Vector3.zero,
+            value: createVector3Zero(),
         },
         ...uniforms,
-        ...getPostProcessCommonUniforms()
+        ...getPostProcessCommonUniforms(),
     ];
 
     const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(

@@ -1,7 +1,7 @@
 ﻿import { NodeBase, createNodeBase } from '@/PaleGL/core/nodeBase.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { Rotator } from '@/PaleGL/math/Rotator';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import {createVector3One, createVector3Zero, Vector3} from '@/PaleGL/math/Vector3';
 
 // export class Bone extends NodeBase {
 //     offsetMatrix: Matrix4 = Matrix4.identity; // 初期姿勢のボーンローカル座標
@@ -150,9 +150,9 @@ export function createBone({ index, name }: { name: string; index: number }): Bo
     let _jointMatrix: Matrix4 = Matrix4.identity;
     const _index: number = index;
 
-    let _position: Vector3 = Vector3.zero;
+    let _position: Vector3 = createVector3Zero();
     let _rotation: Rotator = Rotator.zero;
-    let _scale: Vector3 = Vector3.one;
+    let _scale: Vector3 = createVector3One();
 
     // const calcBoneOffsetMatrix = (parentBone?: Bone) => {
     //     _poseMatrix = parentBone ? Matrix4.multiplyMatrices(parentBone.getPoseMatrix(), _offsetMatrix) : _offsetMatrix;

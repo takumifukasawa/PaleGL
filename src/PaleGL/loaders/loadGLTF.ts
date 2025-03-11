@@ -1,35 +1,26 @@
-import {Actor, addChildActor, createActor} from '@/PaleGL/actors/actor.ts';
+import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { Bone, createBone } from '@/PaleGL/core/bone.ts';
 import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3';
+import { createVector3, createVector3One, createVector3Zero } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
-import {
-    createMatrix4FromQuaternion,
-    createQuaternion,
-    createQuaternionIdentity,
-} from '@/PaleGL/math/quaternion.ts';
+import { createMatrix4FromQuaternion, createQuaternion, createQuaternionIdentity } from '@/PaleGL/math/quaternion.ts';
 // import { Rotator } from '@/PaleGL/math/Rotator';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import {
-    createColorBlack,
-    createColorFromArray,
-    createColorWhite,
-    multiplyColorScalar
-} from '@/PaleGL/math/color.ts';
+import { createColorBlack, createColorFromArray, createColorWhite, multiplyColorScalar } from '@/PaleGL/math/color.ts';
 import {
     createTexture,
     resolveGLEnumTextureFilterType,
     resolveGLEnumTextureWrapType,
-    Texture
+    Texture,
 } from '@/PaleGL/core/texture.ts';
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
-import {createSkinnedMesh} from "@/PaleGL/actors/meshes/skinnedMesh.ts";
-import {createMesh} from "@/PaleGL/actors/meshes/mesh.ts";
+import { createSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
+import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
@@ -356,16 +347,18 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         const offsetMatrix = Matrix4.multiplyMatrices(
             Matrix4.translationMatrix(
                 node.translation
-                    ? new Vector3(node.translation[0], node.translation[1], node.translation[2])
-                    : Vector3.zero
+                    ? createVector3(node.translation[0], node.translation[1], node.translation[2])
+                    : createVector3Zero()
             ),
             node.rotation
-                ? createMatrix4FromQuaternion(createQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]))
+                ? createMatrix4FromQuaternion(
+                      createQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])
+                  )
                 : createMatrix4FromQuaternion(createQuaternionIdentity()),
-            Matrix4.scalingMatrix(node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one)
+            Matrix4.scalingMatrix(
+                node.scale ? createVector3(node.scale[0], node.scale[1], node.scale[2]) : createVector3One()
+            )
         );
-
-        
 
         bone.setOffsetMatrix(offsetMatrix);
 
@@ -404,7 +397,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         console.log('[loadGLTG.createMesh] mesh:', mesh);
 
         const materialIndices: number[] = [];
-        
+
         // console.log("======================================")
 
         mesh.primitives.forEach((primitive: GLTFMeshPrimitives) => {
@@ -485,8 +478,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
 
         // for debug
         // console.log("pre", tangents, normals)
-        
-        
+
         if (tangents) {
             // binormals = Geometry.createBinormals(normals, tangents);
             binormals = new Float32Array(createBinormals(Array.from(normals), Array.from(tangents)));
@@ -569,7 +561,10 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 if (usedExtensions.KHR_materials_emissive_strength) {
                     const emissiveStrength =
                         targetMaterial.extensions!.KHR_materials_emissive_strength!.emissiveStrength;
-                    emissiveColor = multiplyColorScalar(createColorFromArray(targetMaterial.emissiveFactor!), emissiveStrength);
+                    emissiveColor = multiplyColorScalar(
+                        createColorFromArray(targetMaterial.emissiveFactor!),
+                        emissiveStrength
+                    );
                 } else {
                     emissiveColor = createColorFromArray(targetMaterial.emissiveFactor!);
                 }
@@ -590,11 +585,13 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         // for debug
         // console.log("[loadGLTF.createMesh]", materialIndices, materials, gltf.materials)
 
-        const result = rootBone ? createSkinnedMesh({ geometry, bones: rootBone }) : createMesh({ geometry, materials });
+        const result = rootBone
+            ? createSkinnedMesh({ geometry, bones: rootBone })
+            : createMesh({ geometry, materials });
 
         // console.log(result, result.geometry.getIndices(), Array.from(indices))
-        
-        return result; 
+
+        return result;
     };
 
     const findNode = (nodeIndex: number, parentActor: Actor): void => {

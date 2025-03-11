@@ -1,7 +1,15 @@
-import { Vector3 } from '@/PaleGL/math/Vector3.js';
+import {
+    addVector3Array,
+    createVector3,
+    createVector3Zero,
+    lerpVector3,
+    rotateVector3DegreeX,
+    rotateVector3DegreeY,
+    scaleVector3ByScalar,
+} from '@/PaleGL/math/Vector3.js';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import {setLookAtPosition, setTranslation} from "@/PaleGL/core/transform.ts";
+import { setLookAtPosition, setTranslation } from '@/PaleGL/core/transform.ts';
 
 export type OrbitCameraController = ReturnType<typeof createOrbitCameraController>;
 
@@ -14,7 +22,7 @@ export function createOrbitCameraController(camera: Camera | null = null) {
     const azimuthSpeed = 100;
     const altitudeSpeed = 100;
     const cameraAngle = { azimuth: 0, altitude: 0 };
-    const lookAtTarget = Vector3.zero;
+    const lookAtTarget = createVector3Zero();
     const distance = 10;
     const attenuation = 0.001;
     const targetX = 0;
@@ -25,9 +33,9 @@ export function createOrbitCameraController(camera: Camera | null = null) {
     const defaultAltitude = 0;
     const enabled = true;
     const enabledUpdateCamera = true;
-    const targetCameraPosition = Vector3.zero;
-    const currentCameraPosition = Vector3.zero;
-    
+    const targetCameraPosition = createVector3Zero();
+    const currentCameraPosition = createVector3Zero();
+
     return {
         camera,
         dampingFactor,
@@ -58,15 +66,25 @@ export const setOrbitCameraControllerCamera = (orbitCameraController: OrbitCamer
     orbitCameraController.camera = camera;
 };
 
-export const startOrbitCameraController = (orbitCameraController: OrbitCameraController, daz: number | null = null, dal: number | null = null) => {
+export const startOrbitCameraController = (
+    orbitCameraController: OrbitCameraController,
+    daz: number | null = null,
+    dal: number | null = null
+) => {
     orbitCameraController.cameraAngle.azimuth = daz !== null ? daz : orbitCameraController.defaultAzimuth;
     orbitCameraController.cameraAngle.altitude = dal !== null ? dal : orbitCameraController.defaultAltitude;
     updateCameraPosition(orbitCameraController, true);
     // this.#targetCameraPosition = new Vector3(0, 0, this.distance);
     // this.#currentCameraPosition = this.#targetCameraPosition.clone();
-}
+};
 
-export function setOrbitCameraControllerDelta (orbitCameraController: OrbitCameraController, delta: { x: number; y: number }) {
+export function setOrbitCameraControllerDelta(
+    orbitCameraController: OrbitCameraController,
+    delta: {
+        x: number;
+        y: number;
+    }
+) {
     if (!orbitCameraController.enabled) {
         return;
     }
@@ -79,8 +97,12 @@ export function fixedUpdateOrbitCameraController(orbitCameraController: OrbitCam
         return;
     }
 
-    orbitCameraController.targetX = Math.sign(orbitCameraController.targetX) * Math.max(0, Math.abs(orbitCameraController.targetX) - orbitCameraController.attenuation);
-    orbitCameraController.targetY = Math.sign(orbitCameraController.targetY) * Math.max(0, Math.abs(orbitCameraController.targetY) - orbitCameraController.attenuation);
+    orbitCameraController.targetX =
+        Math.sign(orbitCameraController.targetX) *
+        Math.max(0, Math.abs(orbitCameraController.targetX) - orbitCameraController.attenuation);
+    orbitCameraController.targetY =
+        Math.sign(orbitCameraController.targetY) *
+        Math.max(0, Math.abs(orbitCameraController.targetY) - orbitCameraController.attenuation);
 
     orbitCameraController.cameraAngle.azimuth += orbitCameraController.targetX * orbitCameraController.azimuthSpeed;
     orbitCameraController.cameraAngle.altitude += orbitCameraController.targetY * orbitCameraController.altitudeSpeed;
@@ -88,7 +110,7 @@ export function fixedUpdateOrbitCameraController(orbitCameraController: OrbitCam
     updateCameraPosition(orbitCameraController);
 }
 
-function updateCameraPosition (orbitCameraController: OrbitCameraController, isJump = false) {
+function updateCameraPosition(orbitCameraController: OrbitCameraController, isJump = false) {
     // TODO: limit azimuth
     // this.#cameraAngle.azimuth = this.#cameraAngle.azimuth % 360;
     orbitCameraController.cameraAngle.azimuth = clamp(
@@ -102,10 +124,13 @@ function updateCameraPosition (orbitCameraController: OrbitCameraController, isJ
         orbitCameraController.maxAltitude
     );
 
-    const v1 = Vector3.rotateVectorX(new Vector3(0, 0, 1), orbitCameraController.cameraAngle.altitude);
-    const v2 = Vector3.rotateVectorY(v1, orbitCameraController.cameraAngle.azimuth);
-    orbitCameraController.targetCameraPosition = Vector3.addVectors(orbitCameraController.lookAtTarget, v2.scale(orbitCameraController.distance));
-    orbitCameraController.currentCameraPosition = Vector3.lerpVectors(
+    const v1 = rotateVector3DegreeX(createVector3(0, 0, 1), orbitCameraController.cameraAngle.altitude);
+    const v2 = rotateVector3DegreeY(v1, orbitCameraController.cameraAngle.azimuth);
+    orbitCameraController.targetCameraPosition = addVector3Array(
+        orbitCameraController.lookAtTarget,
+        scaleVector3ByScalar(v2, orbitCameraController.distance)
+    );
+    orbitCameraController.currentCameraPosition = lerpVector3(
         orbitCameraController.currentCameraPosition,
         orbitCameraController.targetCameraPosition,
         isJump ? 1 : orbitCameraController.dampingFactor

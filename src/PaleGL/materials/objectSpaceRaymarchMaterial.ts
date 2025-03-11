@@ -1,7 +1,8 @@
 import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
-    FaceSide, MaterialTypes,
+    FaceSide,
+    MaterialTypes,
     PRAGMA_RAYMARCH_SCENE,
     PrimitiveTypes,
     ShadingModelIds,
@@ -11,15 +12,15 @@ import {
 } from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
+import { createVector3One } from '@/PaleGL/math/Vector3.ts';
+import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 // import { litObjectSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-object-space-raymarch-fragment-template.ts';
 // import { gbufferObjectSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-object-space-raymarch-depth-fragment-template.ts';
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
 import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
+import { createVector2One, Vector2 } from '@/PaleGL/math/vector2.ts';
+import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ObjectSpaceRaymarchMaterialArgs = {
@@ -298,7 +299,7 @@ export function createObjectSpaceRaymarchMaterial({
         {
             name: UniformNames.ObjectSpaceRaymarchBoundsScale,
             type: UniformTypes.Vector3,
-            value: Vector3.one,
+            value: createVector3One(),
         },
         {
             name: UniformNames.DepthTexture,

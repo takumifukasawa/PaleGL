@@ -1,9 +1,17 @@
-﻿import { Vector3 } from '@/PaleGL/math/Vector3.js';
+﻿import {
+    createVector3,
+    createVector3One,
+    createVector3Up,
+    createVector3Zero,
+    multiplyVector3AndMatrix4,
+    normalizeVector3,
+    Vector3,
+} from '@/PaleGL/math/Vector3.js';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import { Rotator } from '@/PaleGL/math/Rotator.js';
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import {createRotationMatrixFromQuaternion} from "@/PaleGL/math/quaternion.ts";
+import { createRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
 
 // TODO:
@@ -211,9 +219,9 @@ export function createTransform() {
     const inverseWorldMatrix: Matrix4 = Matrix4.identity;
     const worldMatrix: Matrix4 = Matrix4.identity;
     const localMatrix: Matrix4 = Matrix4.identity;
-    const position: Vector3 = Vector3.zero;
+    const position: Vector3 = createVector3Zero();
     const rotation: Rotator = Rotator.zero; // degree vector
-    const scale: Vector3 = Vector3.one;
+    const scale: Vector3 = createVector3One();
     // どっちかだけセットされるようにする
     const lookAtTarget: Vector3 | null = null; // world v
     const lookAtTargetActor: Actor | null = null;
@@ -328,13 +336,13 @@ export function createTransform() {
 }
 
 export const getWorldRight = (transform: Transform) =>
-    new Vector3(transform.worldMatrix.m00, transform.worldMatrix.m10, transform.worldMatrix.m20).normalize();
+    normalizeVector3(createVector3(transform.worldMatrix.m00, transform.worldMatrix.m10, transform.worldMatrix.m20));
 
 export const getWorldUp = (transform: Transform) =>
-    new Vector3(transform.worldMatrix.m01, transform.worldMatrix.m11, transform.worldMatrix.m21).normalize();
+    normalizeVector3(createVector3(transform.worldMatrix.m01, transform.worldMatrix.m11, transform.worldMatrix.m21));
 
 export const getWorldForward = (transform: Transform) =>
-    new Vector3(transform.worldMatrix.m02, transform.worldMatrix.m12, transform.worldMatrix.m22).normalize();
+    normalizeVector3(createVector3(transform.worldMatrix.m02, transform.worldMatrix.m12, transform.worldMatrix.m22));
 
 export const setScaling = (transform: Transform, s: Vector3) => (transform.scale = s);
 
@@ -351,8 +359,10 @@ export const setLookAtActor = (transform: Transform, actor: Actor | null) => {
     transform.lookAtTargetActor = actor;
     transform.lookAtTarget = null;
 };
-export const localPointToWorld = (transform: Transform, p: Vector3) => p.multiplyMatrix4(transform.worldMatrix);
-export const worldToLocalPoint = (transform: Transform, p: Vector3) => p.multiplyMatrix4(transform.inverseWorldMatrix);
+export const localPointToWorld = (transform: Transform, p: Vector3) =>
+    multiplyVector3AndMatrix4(p, transform.worldMatrix);
+export const worldToLocalPoint = (transform: Transform, p: Vector3) =>
+    multiplyVector3AndMatrix4(p, transform.inverseWorldMatrix);
 
 // getActor: () => _actor,
 // setActor,
@@ -371,7 +381,7 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
         const lookAtMatrix =
             actor?.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(actor.transform.position, lookAtTarget, Vector3.up, true)
+                ? Matrix4.getLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
                 : Matrix4.getLookAtMatrix(actor.transform.position, lookAtTarget);
         const scalingMatrix = Matrix4.scalingMatrix(actor.transform.scale);
         actor.transform.localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);

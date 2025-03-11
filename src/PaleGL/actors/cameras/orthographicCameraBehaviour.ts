@@ -1,6 +1,15 @@
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
-import { Vector3 } from '@/PaleGL/math/Vector3.ts';
+import {
+    addVector3Array,
+    cloneVector3,
+    createVector3,
+    createVector3Back,
+    createVector3Right,
+    createVector3Up,
+    negateVector3,
+    scaleVector3ByScalar,
+} from '@/PaleGL/math/Vector3.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { setTranslation } from '@/PaleGL/core/transform.ts';
 import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
@@ -36,36 +45,36 @@ export function updateOrthographicCameraProjectionMatrix(camera: Camera) {
 export function getOrthographicFrustumLocalPositions(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
 
-    const localForward = Vector3.back;
-    const localRight = Vector3.right;
-    const localUp = Vector3.up;
+    const localForward = createVector3Back();
+    const localRight = createVector3Right();
+    const localUp = createVector3Up();
 
     const halfWidth = (Math.abs(orthographicCamera.left) + Math.abs(orthographicCamera.right)) / 2;
     const halfHeight = (Math.abs(orthographicCamera.top) + Math.abs(orthographicCamera.right)) / 2;
 
-    const nearClipCenter = localForward.clone().scale(camera.near);
-    const farClipCenter = localForward.clone().scale(camera.far);
+    const nearClipCenter = scaleVector3ByScalar(cloneVector3(localForward), camera.near);
+    const farClipCenter = scaleVector3ByScalar(cloneVector3(localForward), camera.far);
 
-    const clipRightOffset = localRight.clone().scale(halfWidth);
-    const clipUpOffset = localUp.clone().scale(halfHeight);
+    const clipRightOffset = scaleVector3ByScalar(cloneVector3(localRight), halfWidth);
+    const clipUpOffset = scaleVector3ByScalar(cloneVector3(localUp), halfHeight);
 
-    const nearLeftTop = Vector3.addVectors(nearClipCenter, clipRightOffset.clone().negate(), clipUpOffset);
-    const nearRightTop = Vector3.addVectors(nearClipCenter, clipRightOffset, clipUpOffset);
-    const nearLeftBottom = Vector3.addVectors(
+    const nearLeftTop = addVector3Array(nearClipCenter, negateVector3(cloneVector3(clipRightOffset)), clipUpOffset);
+    const nearRightTop = addVector3Array(nearClipCenter, clipRightOffset, clipUpOffset);
+    const nearLeftBottom = addVector3Array(
         nearClipCenter,
-        clipRightOffset.clone().negate(),
-        clipUpOffset.clone().negate()
+        negateVector3(cloneVector3(clipRightOffset)),
+        negateVector3(cloneVector3(clipUpOffset))
     );
-    const nearRightBottom = Vector3.addVectors(nearClipCenter, clipRightOffset, clipUpOffset.clone().negate());
+    const nearRightBottom = addVector3Array(nearClipCenter, clipRightOffset, negateVector3(cloneVector3(clipUpOffset)));
 
-    const farLeftTop = Vector3.addVectors(farClipCenter, clipRightOffset.clone().negate(), clipUpOffset);
-    const farRightTop = Vector3.addVectors(farClipCenter, clipRightOffset, clipUpOffset);
-    const farLeftBottom = Vector3.addVectors(
+    const farLeftTop = addVector3Array(farClipCenter, negateVector3(cloneVector3(clipRightOffset)), clipUpOffset);
+    const farRightTop = addVector3Array(farClipCenter, clipRightOffset, clipUpOffset);
+    const farLeftBottom = addVector3Array(
         farClipCenter,
-        clipRightOffset.clone().negate(),
-        clipUpOffset.clone().negate()
+        negateVector3(cloneVector3(clipRightOffset)),
+        negateVector3(cloneVector3(clipUpOffset))
     );
-    const farRightBottom = Vector3.addVectors(farClipCenter, clipRightOffset, clipUpOffset.clone().negate());
+    const farRightBottom = addVector3Array(farClipCenter, clipRightOffset, negateVector3(cloneVector3(clipUpOffset)));
 
     return {
         nlt: nearLeftTop,
@@ -129,6 +138,6 @@ export const setOrthoSize = (
 
 export const createFullQuadOrthographicCamera = (): Camera => {
     const camera = createOrthographicCamera(-1, 1, -1, 1, 0, 2);
-    setTranslation(camera.transform, new Vector3(0, 0, 1));
+    setTranslation(camera.transform, createVector3(0, 0, 1));
     return camera;
 };
