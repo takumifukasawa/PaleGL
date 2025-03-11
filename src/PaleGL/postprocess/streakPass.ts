@@ -22,7 +22,7 @@
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
 // } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { Vector2 } from '@/PaleGL/math/vector2.ts';
 // // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
 // import { Color } from '@/PaleGL/math/color.ts';
@@ -618,10 +618,10 @@ import streakPrefilterFragmentShader from '@/PaleGL/shaders/streak-prefilter-fra
 import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-fragment.glsl';
 import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
 import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import {
     PostProcessPassBase,
     createPostProcessPassBase,
@@ -711,7 +711,7 @@ export function createStreakPass(args: { gpu: Gpu; parameters?: StreakPassParame
             {
                 name: UniformNames.TexelSize,
                 type: UniformTypes.Vector2,
-                value: Vector2.zero,
+                value: createVector2Zero(),
             },
             {
                 name: 'uThreshold',
@@ -738,7 +738,7 @@ export function createStreakPass(args: { gpu: Gpu; parameters?: StreakPassParame
                 {
                     name: UniformNames.TexelSize,
                     type: UniformTypes.Vector2,
-                    value: Vector2.zero,
+                    value: createVector2Zero(),
                 },
                 {
                     name: UNIFORM_NAME_PREV_TEXTURE,
@@ -905,7 +905,7 @@ export function renderStreakPass(
     setMaterialUniformValue(
         streakPass.prefilterPass.material,
         'uTexelSize',
-        new Vector2(1 / streakPass.width, 1 / streakPass.height)
+        createVector2(1 / streakPass.width, 1 / streakPass.height)
     );
     setMaterialUniformValue(streakPass.prefilterPass.material, 'uThreshold', parameters.threshold);
     setMaterialUniformValue(streakPass.prefilterPass.material, 'uVerticalScale', parameters.verticalScale);
@@ -931,7 +931,7 @@ export function renderStreakPass(
         setMaterialUniformValue(
             pass.material,
             UniformNames.TexelSize,
-            new Vector2(1 / width, 1 / streakPass.halfHeight)
+            createVector2(1 / width, 1 / streakPass.halfHeight)
         );
         setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);
         setMaterialUniformValue(pass.material, UNIFORM_NAME_HORIZONTAL_SCALE, parameters.horizontalScale);

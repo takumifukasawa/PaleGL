@@ -16,7 +16,7 @@
 //     PostProcessPassRenderArgs,
 // } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { Vector2 } from '@/PaleGL/math/vector2.ts';
 // import {transformScreenPoint} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 //
 // //
@@ -452,7 +452,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
@@ -547,7 +547,7 @@ export function createLightShaftPass(args: {
             {
                 name: radialBlurOriginUniformName,
                 type: UniformTypes.Vector2,
-                value: Vector2.identity,
+                value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
@@ -578,7 +578,7 @@ export function createLightShaftPass(args: {
             {
                 name: radialBlurOriginUniformName,
                 type: UniformTypes.Vector2,
-                value: Vector2.identity,
+                value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
@@ -609,7 +609,7 @@ export function createLightShaftPass(args: {
             {
                 name: radialBlurOriginUniformName,
                 type: UniformTypes.Vector2,
-                value: Vector2.identity,
+                value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
@@ -731,7 +731,7 @@ export function renderLightShaftPass(
         lightShaftPass.directionalLight!.transform.position.clone().scale(10000)
     );
     // 0 ~ 1
-    const lightPositionInUv = new Vector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
+    const lightPositionInUv = createVector2(lightPositionInClip.x * 0.5 + 0.5, lightPositionInClip.y * 0.5 + 0.5);
     // this.#directionalLight!.transform.getPositionInScreen(targetCamera);
 
     setMaterialUniformValue(lightShaftPass.blur1Pass.material, radialBlurOriginUniformName, lightPositionInUv);

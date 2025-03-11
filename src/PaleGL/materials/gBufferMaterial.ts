@@ -7,7 +7,7 @@ import {
     UniformTypes,
     VertexShaderModifier,
 } from '@/PaleGL/constants';
-import { Vector2 } from '@/PaleGL/math/Vector2';
+import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
 import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
@@ -257,8 +257,8 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     
     const diffuseColor: Color = args.diffuseColor || createColorWhite();
     const diffuseMap: Texture | null = args.diffuseMap || null;
-    const diffuseMapUvScale: Vector2 = args.diffuseMapUvScale || Vector2.one;
-    const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || Vector2.zero;
+    const diffuseMapUvScale: Vector2 = args.diffuseMapUvScale || createVector2One();
+    const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || createVector2One();
     const metallic: number = args.metallic || 0;
     const metallicMap: Texture | null = args.metallicMap || null;
     const metallicMapTiling: Vector4 = args.metallicMapTiling || new Vector4(1, 1, 0, 0);
@@ -266,8 +266,8 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const roughnessMap: Texture | null = args.roughnessMap || null;
     const roughnessMapTiling: Vector4 = args.roughnessMapTiling || new Vector4(1, 1, 0, 0);
     const normalMap: Texture | null = args.normalMap || null;
-    const normalMapUvScale: Vector2 = args.normalMapUvScale || Vector2.one;
-    const normalMapUvOffset: Vector2 = args.normalMapUvOffset || Vector2.zero;
+    const normalMapUvScale: Vector2 = args.normalMapUvScale || createVector2One();
+    const normalMapUvOffset: Vector2 = args.normalMapUvOffset || createVector2One();
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
    
@@ -286,13 +286,13 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             name: UniformNames.DiffuseMapUvScale,
             type: UniformTypes.Vector2,
             // value: Vector2.one,
-            value: diffuseMapUvScale || Vector2.one,
+            value: diffuseMapUvScale || createVector2One(),
         },
         {
             name: UniformNames.DiffuseMapUvOffset,
             type: UniformTypes.Vector2,
             // value: Vector2.one,
-            value: diffuseMapUvOffset || Vector2.one,
+            value: diffuseMapUvOffset || createVector2One(),
         },
         // uSpecularAmount: {
         //     type: UniformTypes.Float,

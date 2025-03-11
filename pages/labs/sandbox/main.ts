@@ -40,7 +40,7 @@ import {
     createColorWhite,
     getColorHexCoord,
 } from '@/PaleGL/math/color.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2';
+import {createVector2, createVector2Zero, v2o, v2x, v2y} from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';
 
@@ -402,7 +402,7 @@ captureSceneCamera.onFixedUpdate = () => {
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
     if (inputController.getIsDown() && orbitCameraController.enabled) {
-        setOrbitCameraControllerDelta(orbitCameraController, inputController.getDeltaNormalizedInputPosition());
+        setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.getDeltaNormalizedInputPosition()));
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
 };
@@ -1112,7 +1112,7 @@ layout (std140) uniform ubCommon {
             {
                 name: 'uNormalizedInputPosition',
                 type: UniformTypes.Vector2,
-                value: Vector2.zero,
+                value: createVector2Zero(),
             },
             {
                 name: 'uAttractTargetPosition',
@@ -1464,8 +1464,8 @@ const main = async () => {
     attractSphereMesh.onFixedUpdate = () => {
         const w = 10;
         const d = 10;
-        const ix = inputController.getNormalizedInputPosition().x * 2 - 1;
-        const iy = inputController.getNormalizedInputPosition().y * 2 - 1;
+        const ix = v2x(inputController.getNormalizedInputPosition()) * 2 - 1;
+        const iy = v2y(inputController.getNormalizedInputPosition()) * 2 - 1;
         const x = ix * w;
         const z = iy * d;
         const y = 0.5;
@@ -1638,8 +1638,8 @@ const main = async () => {
     subscribeActorOnStart(floorPlaneMesh, () => {
         setScaling(floorPlaneMesh.transform, new Vector3(10, 10, 10));
         setRotationX(floorPlaneMesh.transform, -90);
-        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uDiffuseMapUvScale', new Vector2(3, 3));
-        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uNormalMapUvScale', new Vector2(3, 3));
+        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uDiffuseMapUvScale', createVector2(3, 3));
+        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uNormalMapUvScale', createVector2(3, 3));
     });
 
     //
@@ -1846,7 +1846,7 @@ void main() {
             {
                 name: 'uBillboardPositionConverters',
                 type: UniformTypes.Vector2Array,
-                value: [new Vector2(-1, 1), new Vector2(-1, -1), new Vector2(1, 1), new Vector2(1, -1)],
+                value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
             },
             // {
             //     name: UniformNames.Time,

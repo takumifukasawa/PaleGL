@@ -6,7 +6,7 @@
 // } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 // import {Gpu, setGPUViewport} from '@/PaleGL/core/Gpu.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { Vector2 } from '@/PaleGL/math/vector2.ts';
 // import { FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // import { Renderer } from '@/PaleGL/core/renderer.ts';
@@ -17,14 +17,14 @@
 // import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
 // import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
-// 
+//
 // // ------------------------------------------------------------------------------
 // // constants
 // // ------------------------------------------------------------------------------
-// 
+//
 // const COL_NUM = 7;
 // const ROW_NUM = 7;
-// 
+//
 // const DEPTH_TEXTURE_KEY = 'depthTexture';
 // const GBUFFER_A_TEXTURE_KEY = 'gBufferATexture';
 // const GBUFFER_B_TEXTURE_KEY = 'gBufferBTexture';
@@ -58,9 +58,9 @@
 // const STREAK_UP_SAMPLE_3_TEXTURE_KEY = 'streakUpSample3Texture';
 // const STREAK_UP_SAMPLE_4_TEXTURE_KEY = 'streakUpSample4Texture';
 // const STREAK_TEXTURE_KEY = 'streakTexture';
-// 
+//
 // // ------------------------------------------------------------------------------
-// 
+//
 // type RowPass = {
 //     pass: FragmentPass;
 //     tiles: Map<
@@ -75,15 +75,15 @@
 //         }
 //     >;
 // };
-// 
+//
 // type BufferVisualizerPassParametersBase = {
 //     fullViewTextureEnabled: boolean;
 // };
-// 
+//
 // type BufferVisualizerPassParameters = PostProcessPassParametersBase & BufferVisualizerPassParametersBase;
-// 
+//
 // type BufferVisualizerPassParametersArgs = Partial<BufferVisualizerPassParameters>;
-// 
+//
 // function generateBufferVisualizerPassParameters(
 //     args: BufferVisualizerPassParametersArgs = {}
 // ): BufferVisualizerPassParameters {
@@ -92,30 +92,30 @@
 //         fullViewTextureEnabled: args.fullViewTextureEnabled || false,
 //     };
 // }
-// 
+//
 // export class BufferVisualizerPass implements IPostProcessPass {
 //     name: string = 'BufferVisualizerPass';
 //     type: PostProcessPassType = PostProcessPassType.BufferVisualizer;
-// 
+//
 //     dom: HTMLDivElement;
 //     rowPasses: RowPass[] = [];
 //     compositePass: FragmentPass;
 //     // enabled: boolean = true;
 //     width: number = 1;
 //     height: number = 1;
-// 
+//
 //     materials: Material[] = [];
-// 
+//
 //     geometry: PlaneGeometry;
-// 
+//
 //     parameters: BufferVisualizerPassParameters;
-// 
+//
 //     // fullViewTextureEnabled: boolean = false;
-// 
+//
 //     get renderTarget() {
 //         return this.compositePass.renderTarget;
 //     }
-// 
+//
 //     constructor({ gpu, parameters }: { gpu: Gpu; parameters?: BufferVisualizerPassParametersArgs }) {
 //         window.addEventListener('keydown', (e) => {
 //             if (e.key === 'b') {
@@ -127,12 +127,12 @@
 //                 this.parameters.fullViewTextureEnabled = !this.parameters.fullViewTextureEnabled;
 //             }
 //         });
-// 
+//
 //         this.parameters = generateBufferVisualizerPassParameters(parameters);
-// 
+//
 //         // NOTE: geometryは親から渡して使いまわしてもよい
 //         this.geometry = createPlaneGeometry({ gpu });
-// 
+//
 //         // row 0
 //         this.rowPasses.push({
 //             pass: new FragmentPass({
@@ -216,7 +216,7 @@
 //                         type: 'Texture',
 //                     },
 //                 ],
-// 
+//
 //                 [
 //                     `${SPOT_LIGHT_SHADOW_MAP_KEY}0`,
 //                     {
@@ -458,7 +458,7 @@
 //                 ],
 //             ]),
 //         });
-// 
+//
 //         this.compositePass = new FragmentPass({
 //             gpu,
 //             name: 'BufferVisualizerPass',
@@ -490,11 +490,11 @@
 //                 ...PostProcessPassBaseDEPRECATED.commonUniforms,
 //             ],
 //         });
-// 
+//
 //         // initialize materials
 //         this.rowPasses.forEach(({ pass }) => this.materials.push(pass.material));
 //         this.materials.push(this.compositePass.material);
-// 
+//
 //         // this.rowPasses.forEach(({ pass, tiles }, rowIndex) => {
 //         this.rowPasses.forEach(({ pass, tiles }, i) => {
 //             let colIndex = 0;
@@ -505,16 +505,16 @@
 //                 const uniformNameTexture = `${uniformNamePrefix}${colIndex}`;
 //                 const uniformNameUvOffset = `${uniformNameTexture}UvOffset`;
 //                 const colOffset = -colIndex;
-// 
+//
 //                 if (!tile.uniformNamePrefix) {
 //                     tiles.get(key)!.uniformNamePrefix = uniformNamePrefix;
 //                 }
-// 
+//
 //                 if (tile.type === 'Texture') {
 //                     tiles.get(key)!.uniformNameTexture = uniformNameTexture;
 //                 }
 //                 tiles.get(key)!.uniformNameUvOffset = uniformNameUvOffset;
-// 
+//
 //                 if (i === 0) {
 //                     addMaterialUniformValue(
 //                         pass.material,
@@ -545,13 +545,13 @@
 //                         gpu.dummyTextureBlack
 //                     );
 //                 }
-// 
+//
 //                 colIndex++;
 //             }
 //         });
-// 
+//
 //         addMaterialUniformValue(this.compositePass.material, 'uTiling', UniformTypes.Vector2, new Vector2(1, ROW_NUM));
-// 
+//
 //         const styleHeader = document.createElement('style');
 //         styleHeader.textContent = `
 // .buffer-visualizer-pass {
@@ -577,7 +577,7 @@
 //     text-shadow: 1px 1px #333;
 //     padding: 4px;
 // }
-// 
+//
 // .buffer-visualizer-pass-row {
 //     // display: flex;
 //     display: grid;
@@ -585,14 +585,14 @@
 // }
 //         `;
 //         document.head.appendChild(styleHeader);
-// 
+//
 //         this.dom = document.createElement('div');
 //         this.dom.classList.add('buffer-visualizer-pass');
 //         const frag = document.createDocumentFragment();
-// 
+//
 //         // for debug
 //         // console.log(this.rowPasses);
-// 
+//
 //         this.rowPasses.forEach(({ tiles }, rowIndex) => {
 //             let colIndex = 0;
 //             const rowContent = document.createElement('div');
@@ -611,26 +611,26 @@
 //         });
 //         this.dom.appendChild(frag);
 //         document.body.appendChild(this.dom);
-// 
+//
 //         this.hideDom();
 //     }
-// 
+//
 //     setSize(width: number, height: number) {
 //         this.width = width;
 //         this.height = height;
-// 
+//
 //         this.rowPasses.forEach(({ pass }) => {
 //             pass.setSize(this.width, this.height / ROW_NUM);
 //         });
 //         this.compositePass.setSize(this.width, this.height);
 //     }
-// 
+//
 //     // TODO: 空メソッド書かなくていいようにしたい
 //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //     // @ts-ignore
 //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 //     setRenderTarget(renderer: Renderer, camera: Camera, isLastPass: boolean) {}
-// 
+//
 //     update() {
 //         // if (this.enabled) {
 //         //     this.showDom();
@@ -638,23 +638,23 @@
 //         //     this.hideDom();
 //         // }
 //     }
-// 
+//
 //     showDom() {
 //         this.dom.classList.remove('hidden');
 //     }
-// 
+//
 //     hideDom() {
 //         this.dom.classList.add('hidden');
 //     }
-// 
+//
 //     render(args: PostProcessPassRenderArgs) {
 //         const { gpu, renderer, lightActors } = args;
-// 
+//
 //         const tmpRealWidth = renderer.realWidth;
 //         const tmpRealHeight = renderer.realHeight;
-// 
+//
 //         // this.geometry.start();
-// 
+//
 //         this.rowPasses.forEach(({ pass, tiles }) => {
 //             if (lightActors?.directionalLight) {
 //                 if (tiles.has(DIRECTIONAL_LIGHT_SHADOW_MAP_KEY)) {
@@ -680,7 +680,7 @@
 //                     }
 //                 });
 //             }
-// 
+//
 //             if (tiles.has(DEPTH_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -688,7 +688,7 @@
 //                     renderer.depthPrePassRenderTarget.depthTexture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(GBUFFER_A_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -696,7 +696,7 @@
 //                     renderer.gBufferRenderTargets.gBufferATexture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(GBUFFER_B_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -704,7 +704,7 @@
 //                     renderer.gBufferRenderTargets.gBufferBTexture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(GBUFFER_C_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -712,7 +712,7 @@
 //                     renderer.gBufferRenderTargets.gBufferCTexture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(GBUFFER_D_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -720,7 +720,7 @@
 //                     renderer.gBufferRenderTargets.gBufferDTexture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -728,7 +728,7 @@
 //                     renderer.screenSpaceShadowPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(AMBIENT_OCCLUSION_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -736,7 +736,7 @@
 //                     renderer.ambientOcclusionPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(DEFERRED_SHADING_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -744,7 +744,7 @@
 //                     renderer.deferredShadingPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(SSR_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -752,7 +752,7 @@
 //                     renderer.ssrPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(LIGHT_SHAFT_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -760,7 +760,7 @@
 //                     renderer.lightShaftPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(VOLUMETRIC_LIGHT_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -768,7 +768,7 @@
 //                     renderer.volumetricLightPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(DEPTH_OF_FIELD_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -776,7 +776,7 @@
 //                     renderer.depthOfFieldPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(FOG_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -784,7 +784,7 @@
 //                     renderer.fogPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_PREFILTER_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -792,7 +792,7 @@
 //                     renderer.streakPass.prefilterPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_2_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -800,7 +800,7 @@
 //                     renderer.streakPass.downSamplePasses[0].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_4_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -808,7 +808,7 @@
 //                     renderer.streakPass.downSamplePasses[1].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_8_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -816,7 +816,7 @@
 //                     renderer.streakPass.downSamplePasses[2].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_16_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -824,7 +824,7 @@
 //                     renderer.streakPass.downSamplePasses[3].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_DOWN_SAMPLE_MIP_32_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -832,7 +832,7 @@
 //                     renderer.streakPass.downSamplePasses[4].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_UP_SAMPLE_0_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -840,7 +840,7 @@
 //                     renderer.streakPass.upSamplePasses[0].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_UP_SAMPLE_1_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -848,7 +848,7 @@
 //                     renderer.streakPass.upSamplePasses[1].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_UP_SAMPLE_2_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -856,7 +856,7 @@
 //                     renderer.streakPass.upSamplePasses[2].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_UP_SAMPLE_3_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -864,7 +864,7 @@
 //                     renderer.streakPass.upSamplePasses[3].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_UP_SAMPLE_4_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -872,7 +872,7 @@
 //                     renderer.streakPass.upSamplePasses[4].pass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(STREAK_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -880,7 +880,7 @@
 //                     renderer.streakPass.renderTarget.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_BLUR_MIP4_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -888,7 +888,7 @@
 //                     renderer.bloomPass.renderTargetBlurMip4.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_BLUR_MIP8_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -896,7 +896,7 @@
 //                     renderer.bloomPass.renderTargetBlurMip8.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_BLUR_MIP16_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -904,7 +904,7 @@
 //                     renderer.bloomPass.renderTargetBlurMip16.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_BLUR_MIP32_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -912,7 +912,7 @@
 //                     renderer.bloomPass.renderTargetBlurMip32.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_BLUR_MIP64_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -920,7 +920,7 @@
 //                     renderer.bloomPass.renderTargetBlurMip64.texture
 //                 );
 //             }
-// 
+//
 //             if (tiles.has(BLOOM_TEXTURE_KEY)) {
 //                 setMaterialUniformValue(
 //                     pass.material,
@@ -930,15 +930,15 @@
 //                 );
 //             }
 //         });
-// 
+//
 //         setMaterialUniformValue(
 //             this.rowPasses[0].pass.material,
 //             'uInverseViewProjectionMatrix',
 //             args.targetCamera.inverseViewProjectionMatrix
 //         );
-// 
+//
 //         setGPUViewport(gpu, 0, 0, this.width, this.height / ROW_NUM);
-// 
+//
 //         this.rowPasses.forEach(({ pass, tiles }, i) => {
 //             if (tiles.size > 0) {
 //                 pass.render({ ...args, isLastPass: false });
@@ -949,7 +949,7 @@
 //                 );
 //             }
 //         });
-// 
+//
 //         setMaterialUniformValue(
 //             this.compositePass.material,
 //             'uFullViewTexture',
@@ -961,7 +961,7 @@
 //             // renderer.depthOfFieldPass.dofBokehPass.renderTarget.read.$getTexture()
 //             // renderer.depthOfFieldPass.preFilterPass.renderTarget.read.$getTexture()
 //         );
-// 
+//
 //         setMaterialUniformValue(
 //             this.compositePass.material,
 //             'uFullViewTextureEnabled',
@@ -969,43 +969,41 @@
 //         );
 //         // for debug
 //         // this.compositePass.material.uniforms.setValue('uFullViewTextureEnabled', 1);
-// 
+//
 //         setGPUViewport(gpu, 0, 0, tmpRealWidth, tmpRealHeight);
-// 
+//
 //         this.compositePass.render({ ...args });
-// 
+//
 //         // for debug
 //         // console.log(this.rowPasses)
 //     }
-// 
+//
 //     toggleR: boolean = true;
 // }
 
-
-
-
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import {Gpu, setGPUViewport} from '@/PaleGL/core/gpu.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
-import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/fragmentPass.ts';
+import { Gpu, setGPUViewport } from '@/PaleGL/core/gpu.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
-import { createPlaneGeometry  } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {
     PostProcessPassBase,
-    createPostProcessPassBase, getPostProcessCommonUniforms,
+    createPostProcessPassBase,
+    getPostProcessCommonUniforms,
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
-} from "@/PaleGL/postprocess/postProcessPassBase.ts";
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
     getPostProcessPassRenderTarget,
     renderPostProcessPass,
-    setPostProcessPassSize
-} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+    setPostProcessPassSize,
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 // ------------------------------------------------------------------------------
 // constants
@@ -1083,16 +1081,19 @@ function generateBufferVisualizerPassParameters(
 }
 
 export type BufferVisualizerPass = PostProcessPassBase & {
-    dom: HTMLDivElement,
+    dom: HTMLDivElement;
     // parameters: BufferVisualizerPassParameters,
-    rowPasses: RowPass[],
-    compositePass: FragmentPass,
-    toggleR: boolean,
-}
+    rowPasses: RowPass[];
+    compositePass: FragmentPass;
+    toggleR: boolean;
+};
 
-export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: BufferVisualizerPassParametersArgs }) : BufferVisualizerPass {
+export function createBufferVisualizerPass(args: {
+    gpu: Gpu;
+    parameters?: BufferVisualizerPassParametersArgs;
+}): BufferVisualizerPass {
     const { gpu } = args;
-    
+
     const rowPasses: RowPass[] = [];
     const materials: Material[] = [];
     let toggleR = true;
@@ -1479,7 +1480,7 @@ export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: Buffer
     rowPasses.forEach(({ pass, tiles }, i) => {
         let colIndex = 0;
         // pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
-        addMaterialUniformValue(pass.material, 'uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, 1));
+        addMaterialUniformValue(pass.material, 'uTiling', UniformTypes.Vector2, createVector2(COL_NUM, 1));
         for (const [key, tile] of tiles) {
             const uniformNamePrefix = tile.uniformNamePrefix || 'uTextureCol';
             const uniformNameTexture = `${uniformNamePrefix}${colIndex}`;
@@ -1500,7 +1501,7 @@ export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: Buffer
                     pass.material,
                     uniformNameUvOffset,
                     UniformTypes.Vector2,
-                    new Vector2(colOffset, 0)
+                    createVector2(colOffset, 0)
                 );
                 if (tile.type === 'Texture') {
                     addMaterialUniformValue(
@@ -1515,22 +1516,17 @@ export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: Buffer
                     pass.material,
                     uniformNameUvOffset,
                     UniformTypes.Vector2,
-                    new Vector2(colOffset, 0)
+                    createVector2(colOffset, 0)
                 );
                 // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
-                addMaterialUniformValue(
-                    pass.material,
-                    uniformNameTexture,
-                    UniformTypes.Texture,
-                    gpu.dummyTextureBlack
-                );
+                addMaterialUniformValue(pass.material, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
             }
 
             colIndex++;
         }
     });
 
-    addMaterialUniformValue(compositePass.material, 'uTiling', UniformTypes.Vector2, new Vector2(1, ROW_NUM));
+    addMaterialUniformValue(compositePass.material, 'uTiling', UniformTypes.Vector2, createVector2(1, ROW_NUM));
 
     const styleHeader = document.createElement('style');
     styleHeader.textContent = `
@@ -1598,17 +1594,16 @@ export function createBufferVisualizerPass(args: { gpu: Gpu; parameters?: Buffer
             type: PostProcessPassType.BufferVisualizer,
             parameters,
             geometry,
-            materials
+            materials,
         }),
         dom,
         rowPasses,
         compositePass,
         toggleR,
-        
-    }
+    };
 
     hideBufferVisualizerPassDom(bufferVisualizerPass);
-    
+
     return bufferVisualizerPass;
 }
 
@@ -1633,12 +1628,12 @@ export function hideBufferVisualizerPassDom(bufferVisualizerPass: BufferVisualiz
 
 export function updateBufferVisualizerPass(postProcessPass: PostProcessPassBase) {
     const bufferVisualizerPass = postProcessPass as BufferVisualizerPass;
-        if (bufferVisualizerPass.enabled) {
-            showBufferVisualizerPassDom(bufferVisualizerPass);
-        } else {
-            hideBufferVisualizerPassDom(bufferVisualizerPass);
-        }
-     }
+    if (bufferVisualizerPass.enabled) {
+        showBufferVisualizerPassDom(bufferVisualizerPass);
+    } else {
+        hideBufferVisualizerPassDom(bufferVisualizerPass);
+    }
+}
 
 export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) {
     const bufferVisualizerPass = postProcessPass as BufferVisualizerPass;
@@ -1714,7 +1709,7 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
                 renderer.gBufferRenderTargets.gBufferDTexture
             );
         }
-        
+
         if (tiles.has(SCREEN_SPACE_SHADOW_TEXTURE_KEY)) {
             setMaterialUniformValue(
                 pass.material,

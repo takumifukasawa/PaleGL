@@ -39,7 +39,7 @@ import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { v2x, v2y, Vector2 } from '@/PaleGL/math/vector2.ts';
 import { createRay, Ray } from '@/PaleGL/math/ray.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -82,9 +82,7 @@ export const getCameraRenderTarget = (camera: Camera) => {
 export const getCameraWriteRenderTarget = (camera: Camera) => {
     if (camera.renderTarget) {
         // for double buffer
-        return camera.renderTarget.isSwappable
-            ? getWriteRenderTarget(camera.renderTarget)
-            : camera.renderTarget;
+        return camera.renderTarget.isSwappable ? getWriteRenderTarget(camera.renderTarget) : camera.renderTarget;
     }
     return null;
 };
@@ -280,7 +278,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                 // ...frustumPositions.flb.e, // farLeftBottom: 5
                 // ...frustumPositions.frt.e, // farRightTop: 6
                 // ...frustumPositions.frb.e, // farRightBottom: 7
-            ]),
+            ])
         );
         camera.visibleFrustumMesh.enabled = camera.visibleFrustum;
     }
@@ -294,7 +292,7 @@ export const transformScreenPoint = (camera: Camera, p: Vector3) => {
     const matInProjection = Matrix4.multiplyMatrices(
         camera.projectionMatrix,
         camera.viewMatrix,
-        Matrix4.translationMatrix(p),
+        Matrix4.translationMatrix(p)
     );
     const clipPosition = matInProjection.position;
     const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
@@ -325,7 +323,7 @@ export const getCameraWorldForward = (camera: Camera) => {
 };
 
 export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
-    const clipPos = new Vector4(viewportPoint.x * 2 - 1, viewportPoint.y * 2 - 1, 1, 1);
+    const clipPos = new Vector4(v2x(viewportPoint) * 2 - 1, v2y(viewportPoint) * 2 - 1, 1, 1);
     const worldPos = clipPos.multiplyMatrix4(camera.inverseViewProjectionMatrix);
     worldPos.x = worldPos.x / worldPos.w;
     worldPos.y = worldPos.y / worldPos.w;

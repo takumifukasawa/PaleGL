@@ -101,7 +101,7 @@ import {
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
 } from '@/PaleGL/core/uniforms.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';

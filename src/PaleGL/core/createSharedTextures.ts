@@ -8,7 +8,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { createMaterial, Material, setMaterialUniformValue, startMaterial } from '@/PaleGL/materials/material.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Renderer, renderMesh, setRendererRenderTarget } from '@/PaleGL/core/renderer.ts';
@@ -72,7 +72,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             {
                 name: gridUniformName,
                 type: UniformTypes.Vector2,
-                value: new Vector2(4.4, 4.4),
+                value: createVector2(4.4, 4.4),
             },
             {
                 name: 'uOctaves',
@@ -115,7 +115,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
-                    value: new Vector2(TEXTURE_SIZE, TEXTURE_SIZE),
+                    value: createVector2(TEXTURE_SIZE, TEXTURE_SIZE),
                 },
             ],
             tilingEnabled: true,
@@ -137,7 +137,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
-                    value: new Vector2(4, 4),
+                    value: createVector2(4, 4),
                 },
                 {
                     name: 'uIsImproved',
@@ -164,7 +164,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
-                    value: new Vector2(4, 4),
+                    value: createVector2(4, 4),
                 },
                 {
                     name: 'uIsImproved',
@@ -191,7 +191,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
-                    value: new Vector2(4, 4),
+                    value: createVector2(4, 4),
                 },
             ],
             tilingEnabled: true,

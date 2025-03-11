@@ -1,11 +1,11 @@
-import { Vector2 } from '@/PaleGL/math/Vector2';
+import {copyVector2, createVector2Zero, setV2, subVectorsV2, v2x, v2y, Vector2} from '@/PaleGL/math/vector2.ts';
 
 export function createAbstractInputController() {
-    let _beforeInputPosition = Vector2.zero;
-    let _currentInputPosition = Vector2.zero;
-    let _deltaInputPosition = Vector2.zero;
-    let _deltaNormalizedInputPosition = Vector2.zero;
-    let _normalizedInputPosition = Vector2.zero;
+    let _beforeInputPosition = createVector2Zero();
+    let _currentInputPosition = createVector2Zero();
+    let _deltaInputPosition = createVector2Zero();
+    let _deltaNormalizedInputPosition = createVector2Zero();
+    let _normalizedInputPosition = createVector2Zero();
 
     let _isPressed = false;
     let _isDown = false;
@@ -74,38 +74,35 @@ export function createAbstractInputController() {
             // NOTE: mousemoveを考慮してreturnしてない
             // return;
         } else if (_isPressed) {
-            _currentInputPosition.copy(inputPosition);
-            _beforeInputPosition.copy(_currentInputPosition);
-            _deltaInputPosition.set(0, 0);
-            _deltaNormalizedInputPosition.set(0, 0);
+            copyVector2(_currentInputPosition, inputPosition);
+            copyVector2(_beforeInputPosition, _currentInputPosition);
+            setV2(_deltaInputPosition, 0, 0);
+            setV2(_deltaNormalizedInputPosition, 0, 0);
             // NOTE: mousemoveを考慮してreturnしてない
             // return;
         }
 
         // move
-        _beforeInputPosition.copy(_currentInputPosition);
-        _currentInputPosition.copy(inputPosition);
-        const diff = Vector2.subVectors(_currentInputPosition, _beforeInputPosition);
-        _deltaInputPosition.copy(diff);
+        copyVector2(_beforeInputPosition, _currentInputPosition);
+        copyVector2(_currentInputPosition, inputPosition);
+        const diff = subVectorsV2(_currentInputPosition, _beforeInputPosition);
+        copyVector2(_deltaInputPosition, diff);
         const vmin = Math.min(_width, _height);
-        _deltaNormalizedInputPosition.set(
-            // _deltaInputPosition.x / _width,
-            // _deltaInputPosition.y / _height
-            // deltaはvminを考慮
-            _deltaInputPosition.x / vmin,
-            _deltaInputPosition.y / vmin
+        setV2(_deltaNormalizedInputPosition,
+           v2x(_deltaInputPosition) / vmin,
+           v2y(_deltaInputPosition) / vmin
         );
-        _normalizedInputPosition.set(
-            _currentInputPosition.x / _width,
-            _currentInputPosition.y / _height
+        setV2(_normalizedInputPosition,
+            v2x(_currentInputPosition) / _width,
+            v2y(_currentInputPosition) / _height
         );
     }
 
     const clearInputPositions = () => {
-        _beforeInputPosition.set(-Infinity, -Infinity);
-        _currentInputPosition.set(-Infinity, -Infinity);
-        _deltaInputPosition.set(-Infinity, -Infinity);
-        _deltaNormalizedInputPosition.set(-Infinity, -Infinity);
+        setV2(_beforeInputPosition, -Infinity, -Infinity);
+        setV2(_currentInputPosition, -Infinity, -Infinity);
+        setV2(_deltaInputPosition, -Infinity, -Infinity);
+        setV2(_deltaNormalizedInputPosition, -Infinity, -Infinity);
     }
 
     const dispose = () => {}

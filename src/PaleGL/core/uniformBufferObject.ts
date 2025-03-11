@@ -8,7 +8,7 @@
 //     UniformBufferObjectStructValue,
 //     UniformBufferObjectValue,
 // } from '@/PaleGL/core/uniforms.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { Vector2 } from '@/PaleGL/math/vector2.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 // import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -201,7 +201,7 @@ import {
     UniformBufferObjectStructValue,
     UniformBufferObjectValue,
 } from '@/PaleGL/core/uniforms.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';

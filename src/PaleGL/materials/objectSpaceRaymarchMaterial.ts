@@ -18,7 +18,7 @@ import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts'
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
 import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
@@ -284,8 +284,8 @@ export function createObjectSpaceRaymarchMaterial({
 
     const _diffuseMap = diffuseMap || null;
     const _diffuseColor = diffuseColor || createColorWhite();
-    const _diffuseMapUvScale = diffuseMapUvScale || Vector2.one;
-    const _diffuseMapUvOffset = diffuseMapUvOffset || Vector2.one;
+    const _diffuseMapUvScale = diffuseMapUvScale || createVector2One();
+    const _diffuseMapUvOffset = diffuseMapUvOffset || createVector2One();
     const _roughnessMap = roughnessMap || null;
     const _roughnessMapTiling = roughnessMapTiling || new Vector4(1, 1, 0, 0);
     const _roughness = roughness || 0;

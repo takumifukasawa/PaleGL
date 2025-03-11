@@ -22,7 +22,7 @@
 //     PostProcessPassParametersBase,
 //     PostProcessPassRenderArgs,
 // } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED.ts';
-// import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+// import { Vector2 } from '@/PaleGL/math/vector2.ts';
 //
 // const UNIFORM_NAME_COC_TEXTURE = 'uCocTexture';
 // const UNIFORM_NAME_DOF_TEXTURE = 'uDofTexture';
@@ -508,12 +508,13 @@ import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment
 import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
 import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
 import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
-import { Vector2 } from '@/PaleGL/math/Vector2.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 import {
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
     PostProcessPassBase,
-    PostProcessPassParametersBase, PostProcessPassRenderArgs
+    PostProcessPassParametersBase,
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
@@ -648,9 +649,9 @@ export function createDepthOfFieldPass(args: { gpu: Gpu; parameters?: DepthOfFie
             {
                 name: UniformNames.TexelSize,
                 type: UniformTypes.Vector2,
-                value: Vector2.zero,
+                value: createVector2Zero(),
             },
-            ...getPostProcessCommonUniforms()
+            ...getPostProcessCommonUniforms(),
         ],
         // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
         renderTargetType: RenderTargetTypes.RGBA16F,
@@ -679,7 +680,7 @@ export function createDepthOfFieldPass(args: { gpu: Gpu; parameters?: DepthOfFie
             {
                 name: 'uTexelSize',
                 type: UniformTypes.Vector2,
-                value: Vector2.zero,
+                value: createVector2Zero(),
             },
             {
                 name: 'uBokehRadius',
@@ -709,7 +710,7 @@ export function createDepthOfFieldPass(args: { gpu: Gpu; parameters?: DepthOfFie
             {
                 name: 'uTexelSize',
                 type: UniformTypes.Vector2,
-                value: Vector2.zero,
+                value: createVector2Zero(),
             },
             {
                 name: 'uBokehRadius',
@@ -854,7 +855,7 @@ export function renderDepthOfFieldPass(
     setMaterialUniformValue(
         depthOfFieldPass.preFilterPass.material,
         UniformNames.TexelSize,
-        new Vector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
+        createVector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
     );
 
     renderPostProcessPass(depthOfFieldPass.preFilterPass, {
@@ -876,7 +877,7 @@ export function renderDepthOfFieldPass(
     setMaterialUniformValue(
         depthOfFieldPass.dofBokehPass.material,
         'uTexelSize',
-        new Vector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
+        createVector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
     );
     setMaterialUniformValue(depthOfFieldPass.dofBokehPass.material, 'uBokehRadius', parameters.bokehRadius);
 
@@ -900,7 +901,7 @@ export function renderDepthOfFieldPass(
         depthOfFieldPass.bokehBlurPass.material,
         'uTexelSize',
         // new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
-        new Vector2(1 / depthOfFieldPass.dofBokehPass.width, 1 / depthOfFieldPass.dofBokehPass.height)
+        createVector2(1 / depthOfFieldPass.dofBokehPass.width, 1 / depthOfFieldPass.dofBokehPass.height)
     );
     setMaterialUniformValue(depthOfFieldPass.bokehBlurPass.material, 'uBokehRadius', parameters.bokehRadius);
 

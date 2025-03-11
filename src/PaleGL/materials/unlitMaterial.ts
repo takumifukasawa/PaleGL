@@ -1,4 +1,4 @@
-import {MaterialArgs, createMaterial, Material} from '@/PaleGL/materials/material.ts';
+import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
     ShadingModelIds,
     DepthFuncTypes,
@@ -7,8 +7,8 @@ import {
     VertexShaderModifier,
     UniformBlockNames,
 } from '@/PaleGL/constants';
-import { Vector2 } from '@/PaleGL/math/Vector2';
-import {Color, createColorBlack} from '@/PaleGL/math/color.ts';
+import { createVector2One, Vector2 } from '@/PaleGL/math/vector2.ts';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
@@ -53,12 +53,12 @@ export function createUnlitMaterial({
         {
             name: 'uDiffuseMapUvScale',
             type: UniformTypes.Vector2,
-            value: diffuseMapUvScale || Vector2.one,
+            value: diffuseMapUvScale || createVector2One(),
         },
         {
             name: 'uDiffuseMapUvOffset',
             type: UniformTypes.Vector2,
-            value: diffuseMapUvOffset || Vector2.one,
+            value: diffuseMapUvOffset || createVector2One(),
         },
         {
             name: 'uEmissiveColor',
@@ -83,12 +83,12 @@ export function createUnlitMaterial({
         {
             name: 'uDiffuseMapUvScale',
             type: UniformTypes.Vector2,
-            value: Vector2.one,
+            value: createVector2One(),
         },
         {
             name: 'uDiffuseMapUvOffset',
             type: UniformTypes.Vector2,
-            value: Vector2.one,
+            value: createVector2One(),
         },
     ];
 
@@ -107,7 +107,7 @@ export function createUnlitMaterial({
         depthFuncType: DepthFuncTypes.Equal, // TODO: これはGBufferの場合
         uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
-    
+
     return {
         ...material,
     };
