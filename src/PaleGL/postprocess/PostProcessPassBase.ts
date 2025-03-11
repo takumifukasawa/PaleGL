@@ -39,7 +39,7 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {updateActorTransform} from "@/PaleGL/actors/actorBehaviours.ts";
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
-type PostProcessPassParametersTemplate = {
+export type PostProcessPassParametersTemplate = {
     enabled: boolean;
 };
 

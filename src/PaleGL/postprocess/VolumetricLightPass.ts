@@ -1,4 +1,278 @@
-﻿import {
+﻿// import {
+//     AttributeNames,
+//     BlendTypes,
+//     DepthFuncTypes,
+//     FaceSide,
+//     MAX_SPOT_LIGHT_COUNT, PostProcessPassType,
+//     PrimitiveTypes,
+//     RenderTargetTypes,
+//     TextureDepthPrecisionType,
+//     // TextureDepthPrecisionType,
+//     UniformBlockNames,
+//     UniformNames,
+//     UniformTypes,
+// } from '@/PaleGL/constants';
+// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
+// import {
+//     PostProcessPassBase
+// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+// import {
+//     PostProcessPassParametersBase,
+//     PostProcessPassRenderArgs,
+// } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
+// import { maton } from '@/PaleGL/utilities/maton.ts';
+// import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+// import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
+// import { Override } from '@/PaleGL/palegl';
+// import {Vector3} from "@/PaleGL/math/Vector3.ts";
+// import {
+//     createMaterial,
+//     isCompiledMaterialShader,
+//     Material,
+//     setMaterialUniformValue,
+//     startMaterial
+// } from "@/PaleGL/materials/material.ts";
+// import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+// import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+// import {renderMesh, setRendererRenderTarget} from "@/PaleGL/core/renderer.ts";
+// 
+// const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
+// const UNIFORM_NAME_RAY_STEP = 'uRayStep';
+// const UNIFORM_NAME_DENSITY_MULTIPLIER = 'uDensityMultiplier';
+// const UNIFORM_NAME_RAY_JITTER_SIZE = 'uRayJitterSize';
+// 
+// export type VolumetricLightPassParametersBase = {
+//     rayStep: number;
+//     blendRate: number;
+//     densityMultiplier: number;
+//     rayJitterSize: Vector3;
+//     ratio: number;
+// };
+// 
+// export type VolumetricLightPassParameters = PostProcessPassParametersBase & VolumetricLightPassParametersBase;
+// 
+// export type VolumetricLightPassParametersArgs = Partial<VolumetricLightPassParameters>;
+// 
+// export function generateVolumetricLightParameters(params: VolumetricLightPassParametersArgs = {}): VolumetricLightPassParameters {
+//     return {
+//         enabled: params.enabled ?? true,
+//         rayStep: params.rayStep ?? 0.62,
+//         blendRate: params.blendRate ?? 1,
+//         densityMultiplier: params.densityMultiplier ?? 1,
+//         rayJitterSize: params.rayJitterSize ?? new Vector3(0.1, 0.1, 0.1),
+//         ratio: params.ratio ?? 0.5,
+//     };
+// }
+// 
+// export class VolumetricLightPass extends PostProcessPassBase {
+//     parameters: Override<PostProcessPassParametersBase, VolumetricLightPassParameters>;
+// 
+//     #spotLights: SpotLight[] = [];
+// 
+//     spotLightFrustumMaterial: Material;
+// 
+//     renderTargetSpotLightFrustum: RenderTarget;
+// 
+//     rawWidth: number = 1;
+//     rawHeight: number = 1;
+// 
+//     /**
+//      *
+//      * @param args
+//      */
+//     constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
+//         const { gpu } = args;
+//         const parameters = generateVolumetricLightParameters(args.parameters ?? {});
+// 
+//         const fragmentShader = volumetricLightFragmentShader;
+// 
+//         super({
+//             gpu,
+//             type: PostProcessPassType.VolumetricLight,
+//             fragmentShader,
+//             uniforms: [
+//                 {
+//                     name: UniformNames.SpotLightShadowMap,
+//                     type: UniformTypes.TextureArray,
+//                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
+//                 },
+//                 {
+//                     name: UNIFORM_NAME_RAY_STEP,
+//                     type: UniformTypes.Float,
+//                     value: 0,
+//                 },
+//                 {
+//                     name: UNIFORM_NAME_DENSITY_MULTIPLIER,
+//                     type: UniformTypes.Float,
+//                     value: 0,
+//                 },
+//                 {
+//                     name: UNIFORM_NAME_RAY_JITTER_SIZE,
+//                     type: UniformTypes.Vector3,
+//                     value: Vector3.zero,
+//                 },
+//                 {
+//                     name: UniformNames.GBufferATexture,
+//                     type: UniformTypes.Texture,
+//                     value: null,
+//                 },
+//                 {
+//                     name: UniformNames.DepthTexture,
+//                     type: UniformTypes.Texture,
+//                     value: null,
+//                 },
+//                 {
+//                     name: UNIFORM_VOLUME_DEPTH_TEXTURE,
+//                     type: UniformTypes.Texture,
+//                     value: null,
+//                 },
+//                 {
+//                     name: UniformNames.BlendRate,
+//                     type: UniformTypes.Float,
+//                     value: 1,
+//                 },
+//             ],
+//             uniformBlockNames: [
+//                 UniformBlockNames.Common,
+//                 UniformBlockNames.Transformations,
+//                 UniformBlockNames.Camera,
+//                 UniformBlockNames.SpotLight,
+//             ],
+//             // renderTargetType: RenderTargetTypes.RGBA
+//             renderTargetType: RenderTargetTypes.RGBA16F,
+//             parameters,
+//         });
+// 
+//         // if (ratio !== undefined) {
+//         //     this.ratio = ratio;
+//         // }
+//         this.parameters = parameters;
+// 
+//         this.renderTargetSpotLightFrustum = createRenderTarget({
+//             // name: 'spot light frustum render target',
+//             // gpu,
+//             // type: RenderTargetTypes.R11F_G11F_B10F,
+//             // useDepthBuffer: true
+//             gpu,
+//             type: RenderTargetTypes.Depth,
+//             width: 1,
+//             height: 1,
+//             depthPrecision: TextureDepthPrecisionType.High,
+//         });
+// 
+//         this.spotLightFrustumMaterial = createMaterial({
+//             vertexShader: `
+// layout (location = 0) in vec3 ${AttributeNames.Position};
+// uniform mat4 ${UniformNames.WorldMatrix};
+// uniform mat4 ${UniformNames.ViewMatrix};
+// uniform mat4 ${UniformNames.ProjectionMatrix};
+// void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
+// `,
+//             fragmentShader: `
+// out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
+//             primitiveType: PrimitiveTypes.Triangles,
+//             blendType: BlendTypes.Opaque,
+//             // blendType: BlendTypes.Additive,
+//             depthFuncType: DepthFuncTypes.Lequal,
+//             depthWrite: true,
+//             depthTest: true,
+//             faceSide: FaceSide.Double, // TODO: doubleである必要ない？
+//             uniforms: [
+//                 {
+//                     name: UniformNames.WorldMatrix,
+//                     type: UniformTypes.Matrix4,
+//                     value: null,
+//                 },
+//                 {
+//                     name: UniformNames.ViewMatrix,
+//                     type: UniformTypes.Matrix4,
+//                     value: null,
+//                 },
+//                 {
+//                     name: UniformNames.ProjectionMatrix,
+//                     type: UniformTypes.Matrix4,
+//                     value: null,
+//                 },
+//             ],
+//         });
+//         // TODO: このmaterialは多分pushしなくていいよね
+//         this.materials.push(this.spotLightFrustumMaterial);
+//     }
+// 
+//     /**
+//      *
+//      * @param width
+//      * @param height
+//      */
+//     setSize(width: number, height: number) {
+//         this.rawWidth = width;
+//         this.rawHeight = height;
+//         this.width = Math.floor(width * this.parameters.ratio);
+//         this.height = Math.floor(height * this.parameters.ratio);
+// 
+//         super.setSize(this.width, this.height);
+// 
+//         setRenderTargetSize(this.renderTarget, this.rawWidth, this.rawHeight);
+//         // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
+// 
+//         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetWidth, this.width);
+//         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetHeight, this.height);
+//     }
+// 
+//     /**
+//      *
+//      * @param options
+//      */
+//     render(options: PostProcessPassRenderArgs) {
+//         const { gpu, renderer } = options;
+// 
+//         if (!isCompiledMaterialShader(this.spotLightFrustumMaterial) && this.#spotLights.length > 0) {
+//             // TODO: shadow map ないケースがあるはず
+//             const geo = this.#spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
+//             startMaterial(this.spotLightFrustumMaterial, {
+//                 gpu,
+//                 attributeDescriptors:
+//                 getGeometryAttributeDescriptors(geo) 
+//             });
+//         }
+// 
+//         setRendererRenderTarget(renderer, this.renderTargetSpotLightFrustum, false, true);
+// 
+//         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
+//         setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
+//         this.#spotLights.forEach((spotLight) => {
+//             if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
+//                 setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.worldMatrix);
+//                 // TODO: この描画だけでvolumeを計算したい
+//                 renderMesh(renderer, spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
+//             }
+//         });
+// 
+//         setMaterialUniformValue(this.material, UniformNames.SpotLightShadowMap, this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.depthTexture : null)));
+//         setMaterialUniformValue(this.material, UNIFORM_VOLUME_DEPTH_TEXTURE, this.renderTargetSpotLightFrustum.depthTexture);
+//         setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_STEP, this.parameters.rayStep);
+//         setMaterialUniformValue(this.material, UNIFORM_NAME_DENSITY_MULTIPLIER, this.parameters.densityMultiplier);
+//         setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_JITTER_SIZE, this.parameters.rayJitterSize);
+//         setMaterialUniformValue(this.material, UniformNames.BlendRate, this.parameters.blendRate);
+//         
+//         // console.log(this.material.uniforms)
+// 
+//         super.render(options);
+//     }
+// 
+//     /**
+//      *
+//      * @param spotLights
+//      */
+//     setSpotLights(spotLights: SpotLight[]) {
+//         this.#spotLights = spotLights;
+//     }
+// }
+
+
+
+import {
     AttributeNames,
     BlendTypes,
     DepthFuncTypes,
@@ -15,8 +289,9 @@
 import { GPU } from '@/PaleGL/core/GPU.ts';
 import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
 import {
-    PostProcessPassBase
-} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
+    createPostProcessSinglePass,
+    PostProcessPassBase, PostProcessSinglePass
+} from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
 import {
     PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
@@ -24,7 +299,6 @@ import {
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
-import { Override } from '@/PaleGL/palegl';
 import {Vector3} from "@/PaleGL/math/Vector3.ts";
 import {
     createMaterial,
@@ -36,6 +310,7 @@ import {
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import {renderMesh, setRendererRenderTarget} from "@/PaleGL/core/renderer.ts";
+import {renderPostProcessPass, setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
@@ -65,29 +340,82 @@ export function generateVolumetricLightParameters(params: VolumetricLightPassPar
     };
 }
 
-export class VolumetricLightPass extends PostProcessPassBase {
-    parameters: Override<PostProcessPassParametersBase, VolumetricLightPassParameters>;
-
-    #spotLights: SpotLight[] = [];
-
+export type VolumetricLightPass = PostProcessSinglePass & {
+    spotLights: SpotLight[];
     spotLightFrustumMaterial: Material;
-
     renderTargetSpotLightFrustum: RenderTarget;
+    rawWidth: number;
+    rawHeight: number;
+    materials: Material[];
+}
 
-    rawWidth: number = 1;
-    rawHeight: number = 1;
+export function createVolumetricLightPass(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }): VolumetricLightPass {
+    const { gpu } = args;
 
-    /**
-     *
-     * @param args
-     */
-    constructor(args: { gpu: GPU; parameters?: VolumetricLightPassParametersArgs }) {
-        const { gpu } = args;
-        const parameters = generateVolumetricLightParameters(args.parameters ?? {});
+    const materials: Material[] = [];
+    
+    const spotLights: SpotLight[] = [];
 
-        const fragmentShader = volumetricLightFragmentShader;
+    const rawWidth: number = 1;
+    const rawHeight: number = 1;
 
-        super({
+    // parameters: Override<PostProcessPassParametersBase, VolumetricLightPassParameters>;
+    const parameters = generateVolumetricLightParameters(args.parameters ?? {});
+
+    const fragmentShader = volumetricLightFragmentShader;
+    
+    const renderTargetSpotLightFrustum = createRenderTarget({
+        // name: 'spot light frustum render target',
+        // gpu,
+        // type: RenderTargetTypes.R11F_G11F_B10F,
+        // useDepthBuffer: true
+        gpu,
+        type: RenderTargetTypes.Depth,
+        width: 1,
+        height: 1,
+        depthPrecision: TextureDepthPrecisionType.High,
+    });
+
+    const spotLightFrustumMaterial = createMaterial({
+        vertexShader: `
+layout (location = 0) in vec3 ${AttributeNames.Position};
+uniform mat4 ${UniformNames.WorldMatrix};
+uniform mat4 ${UniformNames.ViewMatrix};
+uniform mat4 ${UniformNames.ProjectionMatrix};
+void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
+`,
+            fragmentShader: `
+out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
+        primitiveType: PrimitiveTypes.Triangles,
+        blendType: BlendTypes.Opaque,
+        // blendType: BlendTypes.Additive,
+        depthFuncType: DepthFuncTypes.Lequal,
+        depthWrite: true,
+        depthTest: true,
+        faceSide: FaceSide.Double, // TODO: doubleである必要ない？
+        uniforms: [
+            {
+                name: UniformNames.WorldMatrix,
+                type: UniformTypes.Matrix4,
+                value: null,
+            },
+            {
+                name: UniformNames.ViewMatrix,
+                type: UniformTypes.Matrix4,
+                value: null,
+            },
+            {
+                name: UniformNames.ProjectionMatrix,
+                type: UniformTypes.Matrix4,
+                value: null,
+            },
+        ],
+    });
+    // TODO: このmaterialは多分pushしなくていいよね
+    materials.push(spotLightFrustumMaterial);
+
+    return {
+        ...createPostProcessSinglePass({
             gpu,
             type: PostProcessPassType.VolumetricLight,
             fragmentShader,
@@ -142,130 +470,74 @@ export class VolumetricLightPass extends PostProcessPassBase {
             // renderTargetType: RenderTargetTypes.RGBA
             renderTargetType: RenderTargetTypes.RGBA16F,
             parameters,
-        });
+        }),
+        spotLights,
+        spotLightFrustumMaterial,
+        renderTargetSpotLightFrustum,
+        rawWidth,
+        rawHeight,
+    }
 
-        // if (ratio !== undefined) {
-        //     this.ratio = ratio;
-        // }
-        this.parameters = parameters;
+}
 
-        this.renderTargetSpotLightFrustum = createRenderTarget({
-            // name: 'spot light frustum render target',
-            // gpu,
-            // type: RenderTargetTypes.R11F_G11F_B10F,
-            // useDepthBuffer: true
+export function setVolumetricLightPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+    const volumetricLightPass = postProcessPass as VolumetricLightPass;
+    const parameters = volumetricLightPass.parameters as VolumetricLightPassParameters;
+    
+    volumetricLightPass.rawWidth = width;
+    volumetricLightPass.rawHeight = height;
+    volumetricLightPass.width = Math.floor(width * parameters.ratio);
+    volumetricLightPass.height = Math.floor(height * parameters.ratio);
+
+    setPostProcessPassSize(volumetricLightPass, volumetricLightPass.width, volumetricLightPass.height);
+
+    setRenderTargetSize(volumetricLightPass.renderTarget, volumetricLightPass.rawWidth, volumetricLightPass.rawHeight);
+    // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
+
+    setMaterialUniformValue(volumetricLightPass.spotLightFrustumMaterial, UniformNames.TargetWidth, volumetricLightPass.width);
+    setMaterialUniformValue(volumetricLightPass.spotLightFrustumMaterial, UniformNames.TargetHeight, volumetricLightPass.height);
+}
+
+export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+    const volumetricLightPass = postProcessPass as VolumetricLightPass;
+    const parameters = volumetricLightPass.parameters as VolumetricLightPassParameters;
+    
+    const { gpu, renderer } = options;
+
+    if (!isCompiledMaterialShader(volumetricLightPass.spotLightFrustumMaterial) && volumetricLightPass.spotLights.length > 0) {
+        // TODO: shadow map ないケースがあるはず
+        const geo = volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
+        startMaterial(volumetricLightPass.spotLightFrustumMaterial, {
             gpu,
-            type: RenderTargetTypes.Depth,
-            width: 1,
-            height: 1,
-            depthPrecision: TextureDepthPrecisionType.High,
+            attributeDescriptors:
+                getGeometryAttributeDescriptors(geo)
         });
-
-        this.spotLightFrustumMaterial = createMaterial({
-            vertexShader: `
-layout (location = 0) in vec3 ${AttributeNames.Position};
-uniform mat4 ${UniformNames.WorldMatrix};
-uniform mat4 ${UniformNames.ViewMatrix};
-uniform mat4 ${UniformNames.ProjectionMatrix};
-void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
-`,
-            fragmentShader: `
-out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
-            primitiveType: PrimitiveTypes.Triangles,
-            blendType: BlendTypes.Opaque,
-            // blendType: BlendTypes.Additive,
-            depthFuncType: DepthFuncTypes.Lequal,
-            depthWrite: true,
-            depthTest: true,
-            faceSide: FaceSide.Double, // TODO: doubleである必要ない？
-            uniforms: [
-                {
-                    name: UniformNames.WorldMatrix,
-                    type: UniformTypes.Matrix4,
-                    value: null,
-                },
-                {
-                    name: UniformNames.ViewMatrix,
-                    type: UniformTypes.Matrix4,
-                    value: null,
-                },
-                {
-                    name: UniformNames.ProjectionMatrix,
-                    type: UniformTypes.Matrix4,
-                    value: null,
-                },
-            ],
-        });
-        // TODO: このmaterialは多分pushしなくていいよね
-        this.materials.push(this.spotLightFrustumMaterial);
     }
 
-    /**
-     *
-     * @param width
-     * @param height
-     */
-    setSize(width: number, height: number) {
-        this.rawWidth = width;
-        this.rawHeight = height;
-        this.width = Math.floor(width * this.parameters.ratio);
-        this.height = Math.floor(height * this.parameters.ratio);
+    setRendererRenderTarget(renderer, volumetricLightPass.renderTargetSpotLightFrustum, false, true);
 
-        super.setSize(this.width, this.height);
-
-        setRenderTargetSize(this.renderTarget, this.rawWidth, this.rawHeight);
-        // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
-
-        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetWidth, this.width);
-        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.TargetHeight, this.height);
-    }
-
-    /**
-     *
-     * @param options
-     */
-    render(options: PostProcessPassRenderArgs) {
-        const { gpu, renderer } = options;
-
-        if (!isCompiledMaterialShader(this.spotLightFrustumMaterial) && this.#spotLights.length > 0) {
-            // TODO: shadow map ないケースがあるはず
-            const geo = this.#spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
-            startMaterial(this.spotLightFrustumMaterial, {
-                gpu,
-                attributeDescriptors:
-                getGeometryAttributeDescriptors(geo) 
-            });
+    setMaterialUniformValue(volumetricLightPass.spotLightFrustumMaterial, UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
+    setMaterialUniformValue(volumetricLightPass.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
+    volumetricLightPass.spotLights.forEach((spotLight) => {
+        if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
+            setMaterialUniformValue(volumetricLightPass.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.worldMatrix);
+            // TODO: この描画だけでvolumeを計算したい
+            renderMesh(renderer, spotLight.shadowCamera.visibleFrustumMesh.geometry, volumetricLightPass.spotLightFrustumMaterial);
         }
+    });
 
-        setRendererRenderTarget(renderer, this.renderTargetSpotLightFrustum, false, true);
+    setMaterialUniformValue(volumetricLightPass.material, UniformNames.SpotLightShadowMap, volumetricLightPass.spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.depthTexture : null)));
+    setMaterialUniformValue(volumetricLightPass.material, UNIFORM_VOLUME_DEPTH_TEXTURE, volumetricLightPass.renderTargetSpotLightFrustum.depthTexture);
+    setMaterialUniformValue(volumetricLightPass.material, UNIFORM_NAME_RAY_STEP, parameters.rayStep);
+    setMaterialUniformValue(volumetricLightPass.material, UNIFORM_NAME_DENSITY_MULTIPLIER, parameters.densityMultiplier);
+    setMaterialUniformValue(volumetricLightPass.material, UNIFORM_NAME_RAY_JITTER_SIZE, parameters.rayJitterSize);
+    setMaterialUniformValue(volumetricLightPass.material, UniformNames.BlendRate, parameters.blendRate);
 
-        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ViewMatrix, options.targetCamera.viewMatrix);
-        setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.ProjectionMatrix, options.targetCamera.projectionMatrix);
-        this.#spotLights.forEach((spotLight) => {
-            if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
-                setMaterialUniformValue(this.spotLightFrustumMaterial, UniformNames.WorldMatrix, spotLight.shadowCamera.transform.worldMatrix);
-                // TODO: この描画だけでvolumeを計算したい
-                renderMesh(renderer, spotLight.shadowCamera.visibleFrustumMesh.geometry, this.spotLightFrustumMaterial);
-            }
-        });
+    // console.log(this.material.uniforms)
 
-        setMaterialUniformValue(this.material, UniformNames.SpotLightShadowMap, this.#spotLights.map((spotLight) => (spotLight.shadowMap ? spotLight.shadowMap?.depthTexture : null)));
-        setMaterialUniformValue(this.material, UNIFORM_VOLUME_DEPTH_TEXTURE, this.renderTargetSpotLightFrustum.depthTexture);
-        setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_STEP, this.parameters.rayStep);
-        setMaterialUniformValue(this.material, UNIFORM_NAME_DENSITY_MULTIPLIER, this.parameters.densityMultiplier);
-        setMaterialUniformValue(this.material, UNIFORM_NAME_RAY_JITTER_SIZE, this.parameters.rayJitterSize);
-        setMaterialUniformValue(this.material, UniformNames.BlendRate, this.parameters.blendRate);
-        
-        // console.log(this.material.uniforms)
+    renderPostProcessPass(volumetricLightPass, options);
+}
 
-        super.render(options);
-    }
-
-    /**
-     *
-     * @param spotLights
-     */
-    setSpotLights(spotLights: SpotLight[]) {
-        this.#spotLights = spotLights;
-    }
+export function setVolumetricLightPassSpotLights(volumetricLightPass: VolumetricLightPass, spotLights: SpotLight[]) {
+    volumetricLightPass.spotLights = spotLights;
 }

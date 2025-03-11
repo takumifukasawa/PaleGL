@@ -1,11 +1,60 @@
-﻿import { GPU } from '@/PaleGL/core/GPU.ts';
-import {
-    PostProcessPassBase
-} from '@/PaleGL/postprocess/postprocessPassBaseWIP.ts';
-import {
-    PostProcessPassParametersBase,
-    PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/PostProcessPassBase';
+﻿// import { GPU } from '@/PaleGL/core/GPU.ts';
+// import {
+//     PostProcessPassBase
+// } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+// import {
+//     PostProcessPassParametersBase,
+//     PostProcessPassRenderArgs,
+// } from '@/PaleGL/postprocess/PostProcessPassBase';
+// import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+// import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
+// import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+//
+// export type ToneMappingPassParameters = PostProcessPassParametersBase;
+//
+// export type ToneMappingPassParametersArgs = Partial<ToneMappingPassParameters>;
+//
+// export function generateToneMappingPassParameters(params: ToneMappingPassParametersArgs = {}): ToneMappingPassParameters {
+//     return {
+//         enabled: params.enabled ?? true,
+//     };
+// }
+//
+// export class ToneMappingPass extends PostProcessPassBase {
+//     constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
+//         const { gpu } = args;
+//
+//         const parameters = generateToneMappingPassParameters(args.parameters);
+//
+//         const uniforms: UniformsData = [
+//             {
+//                 name: UniformNames.SrcTexture,
+//                 // uSrcTexture: {
+//                 type: UniformTypes.Texture,
+//                 value: null,
+//             },
+//         ];
+//
+//         super({
+//             gpu,
+//             type: PostProcessPassType.ToneMapping,
+//             name: 'ToneMappingPass',
+//             fragmentShader: toneMappingFragmentShader,
+//             uniforms,
+//             // useEnvMap: false,
+//             // receiveShadow: false,
+//             parameters
+//         });
+//     }
+//
+//     render(opts: PostProcessPassRenderArgs) {
+//         super.render(opts);
+//     }
+// }
+
+import { GPU } from '@/PaleGL/core/GPU.ts';
+import { createPostProcessSinglePass, PostProcessPassBase } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
+import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -14,28 +63,32 @@ export type ToneMappingPassParameters = PostProcessPassParametersBase;
 
 export type ToneMappingPassParametersArgs = Partial<ToneMappingPassParameters>;
 
-export function generateToneMappingPassParameters(params: ToneMappingPassParametersArgs = {}): ToneMappingPassParameters {
+export function generateToneMappingPassParameters(
+    params: ToneMappingPassParametersArgs = {}
+): ToneMappingPassParameters {
     return {
         enabled: params.enabled ?? true,
     };
 }
 
-export class ToneMappingPass extends PostProcessPassBase {
-    constructor(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }) {
-        const { gpu } = args;
-        
-        const parameters = generateToneMappingPassParameters(args.parameters);
-        
-        const uniforms: UniformsData = [
-            {
-                name: UniformNames.SrcTexture,
-                // uSrcTexture: {
-                type: UniformTypes.Texture,
-                value: null,
-            },
-        ];
+export type ToneMappingPass = PostProcessPassBase;
 
-        super({
+export function createToneMappingPass(args: { gpu: GPU; parameters?: ToneMappingPassParametersArgs }): ToneMappingPass {
+    const { gpu } = args;
+
+    const parameters = generateToneMappingPassParameters(args.parameters);
+
+    const uniforms: UniformsData = [
+        {
+            name: UniformNames.SrcTexture,
+            // uSrcTexture: {
+            type: UniformTypes.Texture,
+            value: null,
+        },
+    ];
+
+    return {
+        ...createPostProcessSinglePass({
             gpu,
             type: PostProcessPassType.ToneMapping,
             name: 'ToneMappingPass',
@@ -43,11 +96,7 @@ export class ToneMappingPass extends PostProcessPassBase {
             uniforms,
             // useEnvMap: false,
             // receiveShadow: false,
-            parameters
-        });
-    }
-
-    render(opts: PostProcessPassRenderArgs) {
-        super.render(opts);
-    }
+            parameters,
+        }),
+    };
 }

@@ -51,15 +51,32 @@ import {
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import { DeferredShadingPass } from '@/PaleGL/postprocess/DeferredShadingPass';
-import { SSAOPass } from '@/PaleGL/postprocess/SSAOPass';
-import { SSRPass } from '@/PaleGL/postprocess/SSRPass';
-import { ToneMappingPass } from '@/PaleGL/postprocess/ToneMappingPass';
-import { BloomPass, BloomPassParameters } from '@/PaleGL/postprocess/BloomPass';
-import { DepthOfFieldPass } from '@/PaleGL/postprocess/DepthOfFieldPass';
-import { LightShaftPass } from '@/PaleGL/postprocess/LightShaftPass.ts';
-import { VolumetricLightPass } from '@/PaleGL/postprocess/VolumetricLightPass.ts';
-import { FogPass } from '@/PaleGL/postprocess/FogPass.ts';
+import {
+    createDeferredShadingPass,
+    DeferredShadingPass,
+    updateDeferredShadingPassSkyboxUniforms
+} from '@/PaleGL/postprocess/DeferredShadingPass';
+import {createSSAOPass, SSAOPass} from '@/PaleGL/postprocess/SSAOPass';
+import {createSSRPass, SSRPass} from '@/PaleGL/postprocess/SSRPass';
+import {createToneMappingPass, ToneMappingPass} from '@/PaleGL/postprocess/ToneMappingPass';
+import {
+    BloomPass,
+    BloomPassParameters,
+    createBloomPass,
+    updateBloomPassParameters
+} from '@/PaleGL/postprocess/BloomPass';
+import {createDepthOfFieldPass, DepthOfFieldPass} from '@/PaleGL/postprocess/DepthOfFieldPass';
+import {
+    createLightShaftPass, getLightShaftPassRenderTarget,
+    LightShaftPass,
+    setLightShaftPassDirectionalLight
+} from '@/PaleGL/postprocess/LightShaftPass.ts';
+import {
+    createVolumetricLightPass,
+    setVolumetricLightPassSpotLights,
+    VolumetricLightPass
+} from '@/PaleGL/postprocess/VolumetricLightPass.ts';
+import {createFogPass, FogPass, setFogPassTextures} from '@/PaleGL/postprocess/FogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
@@ -87,15 +104,15 @@ import {
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { ChromaticAberrationPass } from '@/PaleGL/postprocess/ChromaticAberrationPass.ts';
-import { VignettePass } from '@/PaleGL/postprocess/VignettePass.ts';
-import { StreakPass } from '@/PaleGL/postprocess/StreakPass.ts';
-import { FXAAPass } from '@/PaleGL/postprocess/FXAAPass.ts';
-import { ScreenSpaceShadowPass } from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
+import {ChromaticAberrationPass, createChromaticAberrationPass} from '@/PaleGL/postprocess/ChromaticAberrationPass.ts';
+import {createVignettePass, VignettePass} from '@/PaleGL/postprocess/VignettePass.ts';
+import {createStreakPass, StreakPass} from '@/PaleGL/postprocess/StreakPass.ts';
+import {createFXAAPass, FXAAPass} from '@/PaleGL/postprocess/FXAAPass.ts';
+import {createScreenSpaceShadowPass, ScreenSpaceShadowPass} from '@/PaleGL/postprocess/ScreenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
-import { GlitchPass } from '@/PaleGL/postprocess/GlitchPass.ts';
+import {createGlitchPass, GlitchPass} from '@/PaleGL/postprocess/GlitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -105,6 +122,7 @@ import {
     hasEnabledPostProcessPass,
     isPerspectiveCamera,
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import {setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -161,7 +179,7 @@ function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeA
         PostProcessPassType.Bloom,
     );
     if (bloomParameter) {
-        renderer.bloomPass.updateParameters(bloomParameter);
+        updateBloomPassParameters(renderer.bloomPass, bloomParameter);
     }
 }
 
@@ -2027,23 +2045,23 @@ export function createRenderer({ gpu, canvas, pixelRatio = 1.5 }: { gpu: GPU; ca
         name: 'copy depth dest render target',
         depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
-    const screenSpaceShadowPass = new ScreenSpaceShadowPass({ gpu });
-    const ambientOcclusionPass = new SSAOPass({ gpu });
-    const deferredShadingPass = new DeferredShadingPass({ gpu });
-    const ssrPass = new SSRPass({ gpu });
-    const lightShaftPass = new LightShaftPass({ gpu });
-    const volumetricLightPass = new VolumetricLightPass({ gpu });
-    const fogPass = new FogPass({ gpu });
-    const depthOfFieldPass = new DepthOfFieldPass({ gpu });
-    const bloomPass = new BloomPass({
+    const screenSpaceShadowPass = createScreenSpaceShadowPass({ gpu });
+    const ambientOcclusionPass = createSSAOPass({ gpu });
+    const deferredShadingPass = createDeferredShadingPass({ gpu });
+    const ssrPass = createSSRPass({ gpu });
+    const lightShaftPass = createLightShaftPass({ gpu });
+    const volumetricLightPass = createVolumetricLightPass({ gpu });
+    const fogPass = createFogPass({ gpu });
+    const depthOfFieldPass = createDepthOfFieldPass({ gpu });
+    const bloomPass = createBloomPass({
         gpu,
     });
-    const streakPass = new StreakPass({ gpu });
-    const toneMappingPass = new ToneMappingPass({ gpu });
-    const chromaticAberrationPass = new ChromaticAberrationPass({ gpu });
-    const glitchPass = new GlitchPass({ gpu });
-    const vignettePass = new VignettePass({ gpu });
-    const fxaaPass = new FXAAPass({ gpu });
+    const streakPass = createStreakPass({ gpu });
+    const toneMappingPass = createToneMappingPass({ gpu });
+    const chromaticAberrationPass = createChromaticAberrationPass({ gpu });
+    const glitchPass = createGlitchPass({ gpu });
+    const vignettePass = createVignettePass({ gpu });
+    const fxaaPass = createFXAAPass({ gpu });
     
         scenePostProcess.addPass(fxaaPass);
         scenePostProcess.addPass(depthOfFieldPass);
@@ -2469,21 +2487,21 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setRenderTargetSize(renderer.copyDepthSourceRenderTarget, w, h);
     setRenderTargetSize(renderer.copyDepthDestRenderTarget, w, h);
     // passes
-    renderer.screenSpaceShadowPass.setSize(w, h);
-    renderer.ambientOcclusionPass.setSize(w, h);
-    renderer.deferredShadingPass.setSize(w, h);
-    renderer.ssrPass.setSize(w, h);
-    renderer.lightShaftPass.setSize(w, h);
-    renderer.volumetricLightPass.setSize(w, h);
-    renderer.fogPass.setSize(w, h);
-    renderer.depthOfFieldPass.setSize(w, h);
-    renderer.bloomPass.setSize(w, h);
-    renderer.streakPass.setSize(w, h);
-    renderer.toneMappingPass.setSize(w, h);
-    renderer.chromaticAberrationPass.setSize(w, h);
-    renderer.glitchPass.setSize(w, h);
-    renderer.vignettePass.setSize(w, h);
-    renderer.fxaaPass.setSize(w, h);
+    setPostProcessPassSize(renderer.screenSpaceShadowPass, w, h);
+    setPostProcessPassSize(renderer.ambientOcclusionPass, w, h);
+    setPostProcessPassSize(renderer.deferredShadingPass, w, h);
+    setPostProcessPassSize(renderer.ssrPass, w, h);
+    setPostProcessPassSize(renderer.lightShaftPass, w, h);
+    setPostProcessPassSize(renderer.volumetricLightPass, w, h);
+    setPostProcessPassSize(renderer.fogPass, w, h);
+    setPostProcessPassSize(renderer.depthOfFieldPass, w, h);
+    setPostProcessPassSize(renderer.bloomPass, w, h);
+    setPostProcessPassSize(renderer.streakPass, w, h);
+    setPostProcessPassSize(renderer.toneMappingPass, w, h);
+    setPostProcessPassSize(renderer.chromaticAberrationPass, w, h);
+    setPostProcessPassSize(renderer.glitchPass, w, h);
+    setPostProcessPassSize(renderer.vignettePass, w, h);
+    setPostProcessPassSize(renderer.fxaaPass, w, h);
 }
 
 /**
@@ -2799,7 +2817,7 @@ export function renderRenderer(
     // TODO: skyboxは一個だけ想定のいいはず
     sortedSkyboxRenderMeshInfos.forEach((skyboxRenderMeshInfo) => {
         const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-        renderer.deferredShadingPass.updateSkyboxUniforms(skyboxActor);
+        updateDeferredShadingPassSkyboxUniforms(renderer.deferredShadingPass, skyboxActor);
     });
 
     applyLightShadowMapUniformValues(renderer.deferredShadingPass.material, lightActors, renderer.gpu.dummyTextureBlack);
@@ -2851,7 +2869,7 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     if (lightActors.directionalLight) {
-        renderer.lightShaftPass.setDirectionalLight(lightActors.directionalLight);
+        setLightShaftPassDirectionalLight(renderer.lightShaftPass, lightActors.directionalLight);
         PostProcess.renderPass({
             pass: renderer.lightShaftPass,
             renderer,
@@ -2870,7 +2888,7 @@ export function renderRenderer(
     // volumetric light pass
     // ------------------------------------------------------------------------------
 
-    renderer.volumetricLightPass.setSpotLights(lightActors.spotLights);
+    setVolumetricLightPassSpotLights(renderer.volumetricLightPass, lightActors.spotLights);
     if (lightActors.spotLights.length > 0) {
         PostProcess.renderPass({
             pass: renderer.volumetricLightPass,
@@ -2892,8 +2910,8 @@ export function renderRenderer(
     // height fog pass
     // ------------------------------------------------------------------------------
 
-    renderer.fogPass.setTextures(
-        renderer.lightShaftPass.renderTarget.texture!,
+    setFogPassTextures(renderer.fogPass,
+        getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!,
         // CUSTOM
         //  this._gpu.dummyTextureBlack,
         //
