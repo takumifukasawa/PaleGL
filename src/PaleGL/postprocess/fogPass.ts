@@ -15,7 +15,7 @@
 //     UniformNames,
 //     UniformTypes,
 // } from '@/PaleGL/constants.ts';
-// import { Color } from '@/PaleGL/math/Color.ts';
+// import { Color } from '@/PaleGL/math/color.ts';
 // import { Override } from '@/PaleGL/palegl';
 // import { Texture } from '@/PaleGL/core/texture.ts';
 // import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -230,7 +230,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import {Color, createColorWhite} from '@/PaleGL/math/Color.ts';
+import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
 import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';

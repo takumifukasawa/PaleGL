@@ -748,7 +748,7 @@ import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/fr
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Color } from '@/PaleGL/math/Color';
+import { Color } from '@/PaleGL/math/color.ts';
 import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';
 import { TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';

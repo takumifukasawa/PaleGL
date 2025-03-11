@@ -8,7 +8,7 @@ import {
     VertexShaderModifier,
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
-import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/Color';
+import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';

@@ -10,7 +10,7 @@ import {
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/Color.ts';
+import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Vector4 } from '@/PaleGL/math/Vector4.ts';

@@ -16,7 +16,7 @@ import {
     createColorFromArray,
     createColorWhite,
     multiplyColorScalar
-} from '@/PaleGL/math/Color.ts';
+} from '@/PaleGL/math/color.ts';
 import {
     createTexture,
     resolveGLEnumTextureFilterType,

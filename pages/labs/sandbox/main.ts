@@ -39,7 +39,7 @@ import {
     createColorFromRGB,
     createColorWhite,
     getColorHexCoord,
-} from '@/PaleGL/math/Color';
+} from '@/PaleGL/math/color.ts';
 import { Vector2 } from '@/PaleGL/math/Vector2';
 import { Vector3 } from '@/PaleGL/math/Vector3';
 import { Vector4 } from '@/PaleGL/math/Vector4';

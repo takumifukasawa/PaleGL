@@ -91,7 +91,7 @@ import {
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import {Color, createColorBlack} from '@/PaleGL/math/Color.ts';
+import {Color, createColorBlack} from '@/PaleGL/math/color.ts';
 import {
     addUniformBlock,
     UniformBufferObjectBlockData,

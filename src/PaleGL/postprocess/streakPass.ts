@@ -25,7 +25,7 @@
 // import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
-// import { Color } from '@/PaleGL/math/Color.ts';
+// import { Color } from '@/PaleGL/math/color.ts';
 //
 // const UNIFORM_NAME_PREV_TEXTURE = 'uPrevTexture';
 // const UNIFORM_NAME_DOWN_SAMPLE_TEXTURE = 'uDownSampleTexture';
@@ -621,7 +621,7 @@ import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fra
 import { Vector2 } from '@/PaleGL/math/Vector2.ts';
 // import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {Color, createColorWhite} from '@/PaleGL/math/Color.ts';
+import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
 import {
     PostProcessPassBase,
     createPostProcessPassBase,

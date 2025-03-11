@@ -8,7 +8,7 @@ import {
     UniformBlockNames,
 } from '@/PaleGL/constants';
 import { Vector2 } from '@/PaleGL/math/Vector2';
-import {Color, createColorBlack} from '@/PaleGL/math/Color';
+import {Color, createColorBlack} from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';

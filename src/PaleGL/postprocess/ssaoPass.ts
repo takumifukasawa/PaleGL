@@ -292,7 +292,7 @@ import {
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Color, createColorBlack } from '@/PaleGL/math/Color';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { randomRange } from '@/PaleGL/utilities/mathUtilities';
 import {

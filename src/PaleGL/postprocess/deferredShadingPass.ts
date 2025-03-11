@@ -13,7 +13,7 @@
 //     UniformTypes,
 // } from '@/PaleGL/constants.ts';
 // // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-// // import { Color } from '@/PaleGL/math/Color.ts';
+// // import { Color } from '@/PaleGL/math/color.ts';
 // import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 // import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -202,7 +202,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-// import { Color } from '@/PaleGL/math/Color.ts';
+// import { Color } from '@/PaleGL/math/color.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';

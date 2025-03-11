@@ -12,7 +12,7 @@ import {
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
-import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/Color.ts';
+import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
 // import { litObjectSpaceRaymarchFragmentTemplate } from '@/PaleGL/shaders/templates/lit-object-space-raymarch-fragment-template.ts';
 // import { gbufferObjectSpaceRaymarchDepthFragmentTemplate } from '@/PaleGL/shaders/templates/gbuffer-object-space-raymarch-depth-fragment-template.ts';
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
