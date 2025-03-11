@@ -82,7 +82,9 @@ import {
 } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
 import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { renderPostProcessPass} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {
+    renderPostProcessSinglePassBehaviour
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 export type GlitchPassParameters = PostProcessPassParametersBase & {
     blendRate: number;
@@ -141,5 +143,5 @@ export function renderGlitchPass(postProcessPass: PostProcessPassBase, options: 
     const glitchPass = postProcessPass as GlitchPass;
     const parameters = glitchPass.parameters as GlitchPassParameters;
     setMaterialUniformValue(glitchPass.material, UNIFORM_NAME_BLEND_RATE, parameters.blendRate);
-    renderPostProcessPass(glitchPass, options);
+    renderPostProcessSinglePassBehaviour(glitchPass, options);
 }

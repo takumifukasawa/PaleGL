@@ -305,7 +305,9 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/PostProcessPassBase.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { renderPostProcessPass } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {
+    renderPostProcessSinglePassBehaviour
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 export type SSAOPassParameters = PostProcessPassParametersBaseArgs;
 
@@ -570,5 +572,5 @@ export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: Po
     setMaterialUniformValue(ssaoPass.material, 'uBlendRate', ssaoPass.blendRate);
     setMaterialUniformValue(ssaoPass.material, 'uSamplingTexture', ssaoPass.samplingTexture);
 
-    renderPostProcessPass(ssaoPass, options);
+    renderPostProcessSinglePassBehaviour(ssaoPass, options);
 }

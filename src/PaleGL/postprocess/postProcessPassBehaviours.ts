@@ -36,6 +36,11 @@ import {renderVignettePass} from "@/PaleGL/postprocess/VignettePass.ts";
 import {getStreakPassRenderTarget, renderStreakPass, setStreakPassSize} from "@/PaleGL/postprocess/StreakPass.ts";
 import {renderSSAOPass} from "@/PaleGL/postprocess/SSAOPass.ts";
 import {renderVolumetricLightPass, setVolumetricLightPassSize} from "@/PaleGL/postprocess/VolumetricLightPass.ts";
+import {
+    getBufferVisualizerPassRenderTarget,
+    renderBufferVisualizerPass,
+    setBufferVisualizerPassSize, updateBufferVisualizerPass
+} from "@/PaleGL/postprocess/BufferVisualizerPass.ts";
 
 // set size
 
@@ -46,7 +51,9 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
     const postProcessPass = pass as PostProcessSinglePass;
     postProcessPass.width = width;
     postProcessPass.height = height;
-    setRenderTargetSize(postProcessPass.renderTarget, width, height);
+    const renderTarget = getPostProcessPassRenderTarget(postProcessPass);
+    setRenderTargetSize(renderTarget, width, height);
+    // setRenderTargetSize(postProcessPass.renderTarget, width, height);
     // TODO: pass base で更新しちゃって大丈夫？
     setMaterialUniformValue(postProcessPass.material, UniformNames.TargetWidth, postProcessPass.width);
     setMaterialUniformValue(postProcessPass.material, UniformNames.TargetHeight, postProcessPass.height);
@@ -57,6 +64,7 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
 
 const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
     [PostProcessPassType.Bloom]: setBloomPassSize,
+    [PostProcessPassType.BufferVisualizer]: setBufferVisualizerPassSize,
     [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,
     [PostProcessPassType.LightShaft]: setLightShaftPassSize,
     [PostProcessPassType.Streak]: setStreakPassSize,
@@ -82,10 +90,15 @@ export function setPostProcessPassRenderTarget(postProcessPass: PostProcessPassB
 
 // update
 
+const updatePostProcessPassBehaviour: Partial<Record<PostProcessPassType, (postProcessPass: PostProcessPassBase) => void>> = {
+    [PostProcessPassType.BufferVisualizer]: updateBufferVisualizerPass,
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function updatePostProcessPass(postProcessPass: PostProcessPassBase) {
+    updatePostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass);
 }
 
 
@@ -104,7 +117,7 @@ export function beforeRenderPostProcessPass(postProcessPass: PostProcessPassBase
 
 export type RenderPostProcessPassBehaviour = (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) => void;
 
-const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviour = (postProcessPass: PostProcessPassBase, { gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs) => {
+export const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviour = (postProcessPass: PostProcessPassBase, { gpu, targetCamera, renderer, prevRenderTarget, isLastPass }: PostProcessPassRenderArgs) => {
     const pass = postProcessPass as PostProcessSinglePass;
     
     // TODO: 整理したい. render時にsetRenderTargetしちゃって問題ない？？
@@ -141,6 +154,7 @@ const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviour = (po
 
 const renderPostProcessPassBehaviour: Partial<Record<PostProcessPassType, (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) => void>> = {
     [PostProcessPassType.Bloom]: renderBloomPass,
+    [PostProcessPassType.BufferVisualizer]: renderBufferVisualizerPass,
     [PostProcessPassType.ChromaticAberration]: renderChromaticAberrationPass,
     [PostProcessPassType.Fog]: renderFogPass,
     [PostProcessPassType.DepthOfField]: renderDepthOfFieldPass,
@@ -169,6 +183,7 @@ type GetPostProcessPassRenderTargetBehaviour = (postProcessPass: PostProcessPass
 
 const getPostProcessPassRenderTargetBehaviour: Partial<Record<PostProcessPassType, GetPostProcessPassRenderTargetBehaviour>> = {
     [PostProcessPassType.Bloom]: getBloomPassRenderTarget,
+    [PostProcessPassType.BufferVisualizer]: getBufferVisualizerPassRenderTarget,
     [PostProcessPassType.DepthOfField]: getDepthOfFieldPassRenderTarget,
     [PostProcessPassType.LightShaft]: getLightShaftPassRenderTarget,
     [PostProcessPassType.Streak]: getStreakPassRenderTarget,

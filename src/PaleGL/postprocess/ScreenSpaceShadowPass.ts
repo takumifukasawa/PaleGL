@@ -165,7 +165,10 @@ import {
 import { Vector3 } from '@/PaleGL/math/Vector3.ts';
 import { Override } from '@/PaleGL/palegl';
 import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
-import {renderPostProcessPass, setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+import {
+    renderPostProcessSinglePassBehaviour,
+    setPostProcessSinglePassSizeBehaviour
+} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
 
 export type ScreenSpaceShadowPassParametersBase = {
     bias: number;
@@ -267,7 +270,7 @@ export function createScreenSpaceShadowPass(args: { gpu: GPU; parameters?: Scree
 export function setScreenSpaceShadowPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
     const screenSpaceShadowPass = postProcessPass as ScreenSpaceShadowPass;
     const parameters = screenSpaceShadowPass.parameters as ScreenSpaceShadowPassParameters;
-    setPostProcessPassSize(screenSpaceShadowPass, width * parameters.ratio, height * parameters.ratio);
+    setPostProcessSinglePassSizeBehaviour(screenSpaceShadowPass, width * parameters.ratio, height * parameters.ratio);
 }
 
 export function renderScreenShadowPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
@@ -278,5 +281,5 @@ export function renderScreenShadowPass(postProcessPass: PostProcessPassBase, opt
     setMaterialUniformValue(screenSpaceShadowPass.material, UNIFORM_SHARPNESS_NAME, parameters.sharpness);
     setMaterialUniformValue(screenSpaceShadowPass.material, UNIFORM_STRENGTH_NAME, parameters.strength);
     setMaterialUniformValue(screenSpaceShadowPass.material, UNIFORM_RAY_STEP_MULTIPLIER_NAME, parameters.rayStepMultiplier);
-    renderPostProcessPass(screenSpaceShadowPass, options);
+    renderPostProcessSinglePassBehaviour(screenSpaceShadowPass, options);
 }

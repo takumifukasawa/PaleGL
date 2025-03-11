@@ -310,7 +310,10 @@ import {
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import {renderMesh, setRendererRenderTarget} from "@/PaleGL/core/renderer.ts";
-import {renderPostProcessPass, setPostProcessPassSize} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+import {
+    renderPostProcessSinglePassBehaviour,
+    setPostProcessSinglePassSizeBehaviour
+} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
@@ -489,7 +492,7 @@ export function setVolumetricLightPassSize(postProcessPass: PostProcessPassBase,
     volumetricLightPass.width = Math.floor(width * parameters.ratio);
     volumetricLightPass.height = Math.floor(height * parameters.ratio);
 
-    setPostProcessPassSize(volumetricLightPass, volumetricLightPass.width, volumetricLightPass.height);
+    setPostProcessSinglePassSizeBehaviour(volumetricLightPass, volumetricLightPass.width, volumetricLightPass.height);
 
     setRenderTargetSize(volumetricLightPass.renderTarget, volumetricLightPass.rawWidth, volumetricLightPass.rawHeight);
     // this.renderTargetSpotLightFrustum.setSize(this.width, this.height);
@@ -535,7 +538,7 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
 
     // console.log(this.material.uniforms)
 
-    renderPostProcessPass(volumetricLightPass, options);
+    renderPostProcessSinglePassBehaviour(volumetricLightPass, options);
 }
 
 export function setVolumetricLightPassSpotLights(volumetricLightPass: VolumetricLightPass, spotLights: SpotLight[]) {

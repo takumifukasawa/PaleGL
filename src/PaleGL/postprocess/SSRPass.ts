@@ -282,7 +282,9 @@ import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/Pale
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { renderPostProcessPass } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {
+    renderPostProcessSinglePassBehaviour
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 /*
 float eps = .001;
@@ -523,5 +525,5 @@ export function renderSSRPass(postProcessPass: PostProcessPassBase, options: Pos
     setMaterialUniformValue(ssrPass.material, 'uReflectionRoughnessPower', parameters.reflectionRoughnessPower);
     setMaterialUniformValue(ssrPass.material, 'uBlendRate', parameters.blendRate);
 
-    renderPostProcessPass(ssrPass, options);
+    renderPostProcessSinglePassBehaviour(ssrPass, options);
 }

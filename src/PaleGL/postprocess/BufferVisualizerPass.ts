@@ -1614,7 +1614,8 @@ export function createBufferVisualizerPass(args: { gpu: GPU; parameters?: Buffer
     return bufferVisualizerPass;
 }
 
-export function setBufferVisualizerPassSize(bufferVisualizerPass: BufferVisualizerPass, width: number, height: number) {
+export function setBufferVisualizerPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+    const bufferVisualizerPass = postProcessPass as BufferVisualizerPass;
     bufferVisualizerPass.rowPasses.forEach(({ pass }) => {
         setPostProcessPassSize(pass, width, height / ROW_NUM);
     });
@@ -1641,7 +1642,8 @@ export function updateBufferVisualizerPass(postProcessPass: PostProcessPassBase)
         }
      }
 
-export function renderBufferVisualizerPass(bufferVisualizerPass: BufferVisualizerPass, args: PostProcessPassRenderArgs) {
+export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) {
+    const bufferVisualizerPass = postProcessPass as BufferVisualizerPass;
     const { gpu, renderer, lightActors } = args;
 
     const tmpRealWidth = renderer.realWidth;
@@ -1970,4 +1972,8 @@ export function renderBufferVisualizerPass(bufferVisualizerPass: BufferVisualize
 
     // for debug
     // console.log(this.rowPasses)
+}
+
+export function getBufferVisualizerPassRenderTarget(postProcessPass: PostProcessPassBase) {
+    return (postProcessPass as BufferVisualizerPass).compositePass.renderTarget;
 }

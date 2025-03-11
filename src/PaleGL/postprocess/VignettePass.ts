@@ -121,7 +121,9 @@ import {
 } from '@/PaleGL/postprocess/postProcessPassBaseWIP.ts';
 import { PostProcessPassParametersBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/PostProcessPassBase';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { renderPostProcessPass } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {
+    renderPostProcessSinglePassBehaviour
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 // ref:
 
@@ -215,5 +217,5 @@ export function renderVignettePass(postProcessPass: PostProcessPassBase, options
     setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_POWER, parameters.vignettePower);
     setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_BLEND_RATE, parameters.blendRate);
 
-    renderPostProcessPass(postProcessPass, options);
+    renderPostProcessSinglePassBehaviour(postProcessPass, options);
 }

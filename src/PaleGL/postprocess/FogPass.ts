@@ -233,7 +233,9 @@ import { Color } from '@/PaleGL/math/Color.ts';
 import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { renderPostProcessPass } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {
+    renderPostProcessSinglePassBehaviour
+} from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';
 const UNIFORM_FOG_STRENGTH = 'uFogStrength';
@@ -428,5 +430,5 @@ export function renderFogPass(postProcessPass: PostProcessPassBase, options: Pos
     setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_COLOR, parameters.sssFogColor);
     setMaterialUniformValue(fogPass.material, UniformNames.BlendRate, parameters.blendRate);
 
-    renderPostProcessPass(fogPass, options);
+    renderPostProcessSinglePassBehaviour(fogPass, options);
 }
