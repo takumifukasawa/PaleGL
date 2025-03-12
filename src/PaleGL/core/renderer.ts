@@ -34,7 +34,16 @@ import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
+import {
+    addPostProcessPass,
+    createPostProcess,
+    getPostProcessLastRenderTarget,
+    hasPostProcessPassEnabled,
+    PostProcess,
+    renderPass,
+    renderPostProcess,
+    updatePostProcess,
+} from '@/PaleGL/postprocess/postProcess.ts';
 import {
     blitRenderTargetDepth,
     createRenderTarget,
@@ -2034,7 +2043,7 @@ export function createRenderer({
     const realHeight: number = 1;
     const stats: Stats | null = null;
     const screenQuadCamera = createFullQuadOrthographicCamera();
-    const scenePostProcess = new PostProcess(screenQuadCamera);
+    const scenePostProcess = createPostProcess(screenQuadCamera);
     const depthPrePassRenderTarget = createRenderTarget({
         gpu,
         type: RenderTargetTypes.Depth,
@@ -2090,14 +2099,14 @@ export function createRenderer({
     const vignettePass = createVignettePass({ gpu });
     const fxaaPass = createFXAAPass({ gpu });
 
-    scenePostProcess.addPass(fxaaPass);
-    scenePostProcess.addPass(depthOfFieldPass);
-    scenePostProcess.addPass(bloomPass);
-    scenePostProcess.addPass(streakPass);
-    scenePostProcess.addPass(toneMappingPass);
-    scenePostProcess.addPass(vignettePass);
-    scenePostProcess.addPass(chromaticAberrationPass);
-    scenePostProcess.addPass(glitchPass);
+    addPostProcessPass(scenePostProcess, fxaaPass);
+    addPostProcessPass(scenePostProcess, depthOfFieldPass);
+    addPostProcessPass(scenePostProcess, bloomPass);
+    addPostProcessPass(scenePostProcess, streakPass);
+    addPostProcessPass(scenePostProcess, toneMappingPass);
+    addPostProcessPass(scenePostProcess, vignettePass);
+    addPostProcessPass(scenePostProcess, chromaticAberrationPass);
+    addPostProcessPass(scenePostProcess, glitchPass);
 
     //
     // initialize global uniform buffer objects
@@ -2158,7 +2167,7 @@ export function createRenderer({
         {
             name: UniformNames.TransposeInverseViewMatrix,
             type: UniformTypes.Matrix4,
-            value: createMat4Identity() 
+            value: createMat4Identity(),
         },
     ];
 
@@ -2804,9 +2813,9 @@ export function renderRenderer(
     // screen space shadow pass
     // ------------------------------------------------------------------------------
 
-    const postProcessCamera = renderer.scenePostProcess.getPostProcessCamera();
+    const postProcessCamera = renderer.scenePostProcess.postProcessCamera;
 
-    PostProcess.renderPass({
+    renderPass({
         pass: renderer.screenSpaceShadowPass,
         renderer,
         targetCamera: camera,
@@ -2822,7 +2831,7 @@ export function renderRenderer(
     // ambient occlusion pass
     // ------------------------------------------------------------------------------
 
-    PostProcess.renderPass({
+    renderPass({
         pass: renderer.ambientOcclusionPass,
         renderer,
         targetCamera: camera,
@@ -2865,7 +2874,7 @@ export function renderRenderer(
         renderer.ambientOcclusionPass.renderTarget.texture
     );
 
-    PostProcess.renderPass({
+    renderPass({
         pass: renderer.deferredShadingPass,
         renderer,
         targetCamera: camera,
@@ -2881,7 +2890,7 @@ export function renderRenderer(
     // ssr pass
     // ------------------------------------------------------------------------------
 
-    PostProcess.renderPass({
+    renderPass({
         pass: renderer.ssrPass,
         renderer,
         targetCamera: camera,
@@ -2899,7 +2908,7 @@ export function renderRenderer(
 
     if (lightActors.directionalLight) {
         setLightShaftPassDirectionalLight(renderer.lightShaftPass, lightActors.directionalLight);
-        PostProcess.renderPass({
+        renderPass({
             pass: renderer.lightShaftPass,
             renderer,
             targetCamera: camera,
@@ -2919,7 +2928,7 @@ export function renderRenderer(
 
     setVolumetricLightPassSpotLights(renderer.volumetricLightPass, lightActors.spotLights);
     if (lightActors.spotLights.length > 0) {
-        PostProcess.renderPass({
+        renderPass({
             pass: renderer.volumetricLightPass,
             renderer,
             targetCamera: camera,
@@ -2950,7 +2959,7 @@ export function renderRenderer(
         sharedTextures[SharedTexturesTypes.FBM_NOISE].texture
     );
 
-    PostProcess.renderPass({
+    renderPass({
         pass: renderer.fogPass,
         renderer,
         targetCamera: camera,
@@ -3003,7 +3012,7 @@ export function renderRenderer(
         onBeforePostProcess();
     }
 
-    if (!renderer.scenePostProcess.hasEnabledPass) {
+    if (!hasPostProcessPassEnabled(renderer.scenePostProcess)) {
         // 何もenabledがないのはおかしい. tonemappingは最低限有効化されていないとおかしい(HDRなので)
         console.error('invalid postprocess');
     }
@@ -3012,8 +3021,8 @@ export function renderRenderer(
 
     let prevRenderTarget: RenderTarget = renderer.afterDeferredShadingRenderTarget;
     const isCameraLastPassAndHasNotPostProcess = !camera.renderTarget && !hasEnabledPostProcessPass(camera);
-    renderer.scenePostProcess.update();
-    renderer.scenePostProcess.render({
+    updatePostProcess(renderer.scenePostProcess);
+    renderPostProcess(renderer.scenePostProcess, {
         gpu: renderer.gpu,
         renderer,
         prevRenderTarget,
@@ -3028,22 +3037,24 @@ export function renderRenderer(
         return;
     }
 
-    prevRenderTarget = renderer.scenePostProcess.lastRenderTarget!;
+    prevRenderTarget = getPostProcessLastRenderTarget(renderer.scenePostProcess)!;
 
     if (hasEnabledPostProcessPass(camera)) {
-        camera.postProcess?.update();
-        camera.postProcess?.render({
-            gpu: renderer.gpu,
-            renderer,
-            prevRenderTarget,
-            // tone mapping 挟む場合
-            // prevRenderTarget: this._toneMappingPass.renderTarget,
-            gBufferRenderTargets: renderer.gBufferRenderTargets,
-            targetCamera: camera,
-            time, // TODO: engineから渡したい
-            isCameraLastPass: !camera.renderTarget,
-            lightActors,
-        });
+        if (camera.postProcess) {
+            updatePostProcess(camera.postProcess);
+            renderPostProcess(camera.postProcess, {
+                gpu: renderer.gpu,
+                renderer,
+                prevRenderTarget,
+                // tone mapping 挟む場合
+                // prevRenderTarget: this._toneMappingPass.renderTarget,
+                gBufferRenderTargets: renderer.gBufferRenderTargets,
+                targetCamera: camera,
+                time, // TODO: engineから渡したい
+                isCameraLastPass: !camera.renderTarget,
+                lightActors,
+            });
+        }
     }
 }
 

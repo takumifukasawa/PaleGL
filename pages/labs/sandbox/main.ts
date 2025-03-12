@@ -91,7 +91,11 @@ import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.t
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
+import {
+    addPostProcessPass,
+    createPostProcess,
+    setPostProcessEnabled
+} from '@/PaleGL/postprocess/postProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -528,16 +532,16 @@ subscribeActorOnStart(spotLight2, () => {
 
 addActorToScene(captureScene, spotLight2);
 
-const cameraPostProcess = new PostProcess();
+const cameraPostProcess = createPostProcess();
 
 (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusDistance = 18.5;
 (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusRange = 17;
 
 const bufferVisualizerPass = createBufferVisualizerPass({ gpu });
 bufferVisualizerPass.parameters.enabled = false;
-cameraPostProcess.addPass(bufferVisualizerPass);
+addPostProcessPass(cameraPostProcess, bufferVisualizerPass);
 
-cameraPostProcess.enabled = true;
+setPostProcessEnabled(cameraPostProcess, true);
 // TODO: set post process いらないかも
 setCameraPostProcess(captureSceneCamera, cameraPostProcess);
 

@@ -57,7 +57,12 @@ import {
     v4x, v4y, v4z,
     Vector4
 } from '@/PaleGL/math/vector4.ts';
-import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
+import {
+    hasPostProcessPassEnabled,
+    isPostProcessEnabled,
+    PostProcess,
+    setPostProcessSize
+} from '@/PaleGL/postprocess/postProcess.ts';
 import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
@@ -87,14 +92,14 @@ export const enabledCameraPostProcess = (camera: Camera) => {
     if (!camera.postProcess) {
         return false;
     }
-    return camera.postProcess.enabled;
+    return isPostProcessEnabled(camera.postProcess);
 };
 
 export const hasEnabledPostProcessPass = (camera: Camera) => {
     if (!enabledCameraPostProcess(camera)) {
         return false;
     }
-    return camera.postProcess!.hasEnabledPass;
+    return hasPostProcessPassEnabled(camera.postProcess!);
 };
 
 export const getCameraRenderTarget = (camera: Camera) => {
@@ -114,7 +119,7 @@ export const setCameraSize = (camera: Camera, width: number, height: number) => 
         setRenderTargetSizeBehaviour(camera.renderTarget, width, height);
     }
     if (camera.postProcess) {
-        camera.postProcess.setSize(width, height);
+        setPostProcessSize(camera.postProcess, width, height);
     }
 };
 
