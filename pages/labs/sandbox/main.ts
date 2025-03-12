@@ -97,7 +97,12 @@ import {
     setPostProcessEnabled
 } from '@/PaleGL/postprocess/postProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
-import { TransformFeedbackDoubleBuffer } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
+import {
+    createTransformFeedbackDoubleBuffer,
+    getReadTransformFeedbackDoubleBuffer,
+    getWriteTransformFeedbackDoubleBuffer,
+    swapTransformFeedbackDoubleBuffer,
+} from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
@@ -1036,7 +1041,7 @@ const createInstanceUpdater = (instanceNum: number) => {
             .flat()
     );
 
-    const transformFeedbackDoubleBuffer = new TransformFeedbackDoubleBuffer({
+    const transformFeedbackDoubleBuffer = createTransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
             createAttribute({
@@ -1378,18 +1383,18 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         updateGPUTransformFeedback(gpu, {
             shader: transformFeedbackDoubleBuffer.shader,
             uniforms: transformFeedbackDoubleBuffer.uniforms,
-            vertexArrayObject: transformFeedbackDoubleBuffer.write.vertexArrayObject,
-            transformFeedback: transformFeedbackDoubleBuffer.write.transformFeedback,
+            vertexArrayObject: getWriteTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
+            transformFeedback: getWriteTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).transformFeedback,
             drawCount: transformFeedbackDoubleBuffer.drawCount,
         });
-        transformFeedbackDoubleBuffer.swap();
+        swapTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer);
         // };
         // mesh.onUpdate = () => {
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
             AttributeNames.InstancePosition,
             findVertexArrayObjectVertexBufferObjectBuffer(
-                transformFeedbackDoubleBuffer.read.vertexArrayObject,
+                getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aPosition'
             )!
         );
@@ -1397,7 +1402,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             skinnedMesh.geometry.vertexArrayObject,
             AttributeNames.InstanceVelocity,
             findVertexArrayObjectVertexBufferObjectBuffer(
-                transformFeedbackDoubleBuffer.read.vertexArrayObject,
+                getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aVelocity'
             )!
         );

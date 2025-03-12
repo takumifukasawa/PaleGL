@@ -134,43 +134,28 @@ type TransformFeedbackBuffer = {
     outputVertexArrayobject: VertexArrayObject;
 };
 
-export class TransformFeedbackDoubleBuffer {
+export type TransformFeedbackDoubleBuffer = {
     shader: Shader;
     drawCount: number;
-    _transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
+    transformFeedbackBuffers: TransformFeedbackBuffer[];
     uniforms: Uniforms;
-    uniformBlockNames: string[] = [];
+    uniformBlockNames: string[];
+}
 
-    // NOTE: readもwriteも実態は同じだがapiとして分ける
+export function createTransformFeedbackDoubleBuffer(args: TransformFeedbackBufferArgs) {
+    const { gpu, attributes, drawCount, vertexShader, varyings, uniformBlockNames = [] } = args;
+    
+    const transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
 
-    get read() {
-        const buffer = this._transformFeedbackBuffers[0];
-        return {
-            vertexArrayObject: buffer.srcVertexArrayObject,
-            transformFeedback: buffer.transformFeedback,
-        };
-    }
-
-    get write() {
-        const buffer = this._transformFeedbackBuffers[0];
-        return {
-            vertexArrayObject: buffer.srcVertexArrayObject,
-            transformFeedback: buffer.transformFeedback,
-        };
-    }
-
-    constructor({ gpu, attributes, drawCount, vertexShader, varyings, uniforms = [], uniformBlockNames = [] }: TransformFeedbackBufferArgs) {
         const transformFeedbackVaryings = varyings.map(({ name }) => name);
-        this.shader = createShader({
+        const shader = createShader({
             gpu,
             vertexShader,
             fragmentShader: transformFeedbackFragmentShader,
             transformFeedbackVaryings,
         });
 
-        this.drawCount = drawCount;
-        this.uniforms = createUniforms(uniforms);
-        this.uniformBlockNames = uniformBlockNames;
+        const uniforms = createUniforms(args.uniforms || []);
 
         attributes.forEach((attribute, i) => {
             attribute.location = i;
@@ -204,30 +189,56 @@ export class TransformFeedbackDoubleBuffer {
             buffers: getVertexArrayObjectBuffers(vertexArrayObject2),
         });
 
-        this._transformFeedbackBuffers.push({
+        transformFeedbackBuffers.push({
             attributes: attributes1,
             srcVertexArrayObject: vertexArrayObject1,
             transformFeedback: transformFeedback2,
             outputVertexArrayobject: vertexArrayObject2,
         });
 
-        this._transformFeedbackBuffers.push({
+        transformFeedbackBuffers.push({
             attributes: attributes2,
             srcVertexArrayObject: vertexArrayObject2,
             transformFeedback: transformFeedback1,
             outputVertexArrayobject: vertexArrayObject1,
         });
-    }
+        
+        
+        return {
+            shader,
+            drawCount,
+            transformFeedbackBuffers,
+            uniforms,
+            uniformBlockNames,
+        }
+}
 
-    swap() {
-        const tmp = this._transformFeedbackBuffers[0];
-        this._transformFeedbackBuffers[0] = this._transformFeedbackBuffers[1];
-        this._transformFeedbackBuffers[1] = tmp;
-    }
 
-    updateBufferSubData(key: string, index: number, data: ArrayBufferView | BufferSource) {
-        this._transformFeedbackBuffers.forEach((buffer) => {
-            updateVertexArrayObjectBufferSubData(buffer.srcVertexArrayObject, key, index, data);
-        });
-    }
+export function getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer: TransformFeedbackDoubleBuffer) {
+    const buffer = transformFeedbackDoubleBuffer.transformFeedbackBuffers[0];
+    return {
+        vertexArrayObject: buffer.srcVertexArrayObject,
+        transformFeedback: buffer.transformFeedback,
+    };
+}
+
+export function getWriteTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer: TransformFeedbackDoubleBuffer) {
+    const buffer = transformFeedbackDoubleBuffer.transformFeedbackBuffers[0];
+    return {
+        vertexArrayObject: buffer.srcVertexArrayObject,
+        transformFeedback: buffer.transformFeedback,
+    };
+}
+
+
+export function swapTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer: TransformFeedbackDoubleBuffer) {
+    const tmp = transformFeedbackDoubleBuffer.transformFeedbackBuffers[0];
+    transformFeedbackDoubleBuffer.transformFeedbackBuffers[0] = transformFeedbackDoubleBuffer.transformFeedbackBuffers[1];
+    transformFeedbackDoubleBuffer.transformFeedbackBuffers[1] = tmp;
+}
+
+export function updateTransformFeedbackDoubleBufferSubData(transformFeedbackDoubleBuffer: TransformFeedbackDoubleBuffer, key: string, index: number, data: ArrayBufferView | BufferSource) {
+    transformFeedbackDoubleBuffer.transformFeedbackBuffers.forEach((buffer) => {
+        updateVertexArrayObjectBufferSubData(buffer.srcVertexArrayObject, key, index, data);
+    });
 }
