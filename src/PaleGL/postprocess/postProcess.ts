@@ -368,6 +368,7 @@ import {
     setPostProcessPassSize,
     updatePostProcessPass,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/Matrix4.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
@@ -532,7 +533,7 @@ export class PostProcess {
             setMaterialUniformValue(
                 passMaterial,
                 UniformNames.TransposeInverseViewMatrix,
-                targetCamera.viewMatrix.clone().invert().transpose()
+                transposeMat4(invertMat4(cloneMat4(targetCamera.viewMatrix)))
             );
 
             // passMaterial.uniforms.setValue(UniformNames.Time, time);

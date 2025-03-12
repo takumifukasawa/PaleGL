@@ -1,5 +1,5 @@
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { createPerspectiveMatrix } from '@/PaleGL/math/Matrix4.ts';
 import {
     addVector3Array,
     cloneVector3,
@@ -25,7 +25,7 @@ export function setSizePerspectiveCamera(camera: Camera, width: number, height: 
 
 export function updatePerspectiveCameraProjectionMatrix(camera: Camera) {
     const perspectiveCamera = camera as PerspectiveCamera;
-    perspectiveCamera.projectionMatrix = Matrix4.getPerspectiveMatrix(
+    perspectiveCamera.projectionMatrix = createPerspectiveMatrix(
         (perspectiveCamera.fov * Math.PI) / 180,
         perspectiveCamera.aspect,
         perspectiveCamera.near,

@@ -10,7 +10,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/Matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
@@ -693,7 +693,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
 
                 // offset行列を踏まえたjoint行列を計算
                 const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) =>
-                    Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix)
+                    multiplyMat4Array(boneJointMatrices[i].matrix, boneOffsetMatrix)
                 );
 
                 // jointMatricesAllFrames[clipIndex].push(jointMatrices);
@@ -716,7 +716,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
             [
                 // ...jointMatricesAllFrames,
                 ...jointMatricesAllFramesFlatten,
-                ...new Array(fillNum).fill(0).map(() => Matrix4.identity),
+                ...new Array(fillNum).fill(0).map(() => createMat4Identity()),
             ]
                 .map((m) => [...m.e])
                 .flat()
@@ -762,7 +762,7 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
         // console.log("--------")
         const boneLinePositions: number[][] = skinnedMesh.boneOrderedIndex.map((bone) => {
             // console.log(bone.jointMatrix.position.e)
-            return [...bone.getJointMatrix().position.e];
+            return [...getMat4Position(bone.getJointMatrix()).e];
         });
         // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
@@ -797,14 +797,14 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
         const boneJointMatrices = getBoneJointMatricesWithBone(skinnedMesh);
 
         const jointMatrices = boneOffsetMatrices.map((boneOffsetMatrix, i) =>
-            Matrix4.multiplyMatrices(boneJointMatrices[i].matrix, boneOffsetMatrix)
+            multiplyMat4Array(boneJointMatrices[i].matrix, boneOffsetMatrix)
         );
 
         const colNum = skinnedMesh.jointTextureColNum;
         const rowNum = Math.ceil(skinnedMesh.boneCount / colNum);
         const fillNum = colNum * rowNum - skinnedMesh.boneCount;
         const jointData = new Float32Array(
-            [...jointMatrices, ...new Array(fillNum).fill(0).map(() => Matrix4.identity)].map((m) => [...m.e]).flat()
+            [...jointMatrices, ...new Array(fillNum).fill(0).map(() => createMat4Identity())].map((m) => [...m.e]).flat()
         );
 
         const matrixColNum = 4;
@@ -862,7 +862,7 @@ const generateSkinningUniforms = (skinnedMesh: SkinnedMesh) => {
 const getBoneOffsetMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
     const matrices: Matrix4[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const m = bone.getBoneOffsetMatrix().clone();
+        const m = cloneMat4(bone.getBoneOffsetMatrix());
         matrices.push(m);
     });
     return matrices;
@@ -871,7 +871,7 @@ const getBoneOffsetMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
 export const getBoneJointMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
     const matrices: Matrix4[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const m = bone.getJointMatrix().clone();
+        const m = cloneMat4(bone.getJointMatrix());
         matrices.push(m);
     });
     return matrices;
@@ -885,7 +885,7 @@ const getBoneJointMatricesWithBone = (
 }[] => {
     const data: { bone: Bone; matrix: Matrix4 }[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const matrix = bone.getJointMatrix().clone();
+        const matrix = cloneMat4(bone.getJointMatrix());
         data.push({ bone, matrix });
     });
     return data;

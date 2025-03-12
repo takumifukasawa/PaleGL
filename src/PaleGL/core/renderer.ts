@@ -81,7 +81,14 @@ import {
 import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {
+    cloneMat4,
+    createMat4Identity,
+    getMat4Position,
+    invertMat4,
+    Matrix4,
+    transposeMat4,
+} from '@/PaleGL/math/Matrix4.ts';
 import { createShader } from '@/PaleGL/core/shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
@@ -2106,52 +2113,52 @@ export function createRenderer({
         {
             name: UniformNames.WorldMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.ViewMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.ProjectionMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.NormalMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.InverseWorldMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.ViewProjectionMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.InverseViewMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.InverseProjectionMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.InverseViewProjectionMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
         {
             name: UniformNames.TransposeInverseViewMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity() 
         },
     ];
 
@@ -2230,7 +2237,7 @@ export function createRenderer({
                 {
                     name: UniformNames.ShadowMapProjectionMatrix,
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
+                    value: createMat4Identity(),
                 },
             ],
         },
@@ -2293,7 +2300,7 @@ export function createRenderer({
                 {
                     name: UniformNames.ShadowMapProjectionMatrix,
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
+                    value: createMat4Identity(),
                 },
             ]),
         },
@@ -3347,7 +3354,7 @@ export function updateRendererCameraUniforms(renderer: Renderer, camera: Camera)
         renderer,
         UniformBlockNames.Camera,
         UniformNames.ViewPosition,
-        camera.transform.worldMatrix.position
+        getMat4Position(camera.transform.worldMatrix)
     );
     setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.ViewDirection, getCameraForward(camera));
     setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
@@ -3392,7 +3399,7 @@ export function updateRendererCameraUniforms(renderer: Renderer, camera: Camera)
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.TransposeInverseViewMatrix,
-        camera.viewMatrix.clone().invert().transpose()
+        transposeMat4(invertMat4(cloneMat4(camera.viewMatrix)))
     );
 }
 

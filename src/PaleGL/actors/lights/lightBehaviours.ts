@@ -1,6 +1,6 @@
 ﻿import { ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
 import { LightType, LightTypes } from '@/PaleGL/constants.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { cloneMat4, createMatrix4, multiplyMat4Array } from '@/PaleGL/math/Matrix4.ts';
 import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { updateSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
@@ -29,15 +29,15 @@ export const updateShadowCamera = (light: Light) => {
     // console.log(light, light.shadowCamera, light.shadowMap)
     // clip coord (-1 ~ 1) to uv (0 ~ 1)
     // prettier-ignore
-    const textureMatrix = new Matrix4(
+    const textureMatrix = createMatrix4(
         0.5, 0, 0, 0.5,
         0, 0.5, 0, 0.5,
         0, 0, 0.5, 0.5,
         0, 0, 0, 1,
     );
-    light.lightViewProjectionMatrix = Matrix4.multiplyMatrices(
-        light.shadowCamera.projectionMatrix.clone(),
-        light.shadowCamera.viewMatrix.clone()
+    light.lightViewProjectionMatrix = multiplyMat4Array(
+        cloneMat4(light.shadowCamera.projectionMatrix),
+        cloneMat4(light.shadowCamera.viewMatrix)
     );
-    light.shadowMapProjectionMatrix = Matrix4.multiplyMatrices(textureMatrix, light.lightViewProjectionMatrix.clone());
+    light.shadowMapProjectionMatrix = multiplyMat4Array(textureMatrix, cloneMat4(light.lightViewProjectionMatrix));
 };

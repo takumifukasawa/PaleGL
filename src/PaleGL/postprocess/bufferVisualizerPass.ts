@@ -982,7 +982,7 @@
 // }
 
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { createMat4Identity } from '@/PaleGL/math/Matrix4';
 import { Gpu, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
@@ -1133,7 +1133,7 @@ export function createBufferVisualizerPass(args: {
                 {
                     name: 'uInverseViewProjectionMatrix',
                     type: UniformTypes.Matrix4,
-                    value: Matrix4.identity,
+                    value: createMat4Identity(),
                 },
                 // {
                 //     name: 'uDepthTexture',

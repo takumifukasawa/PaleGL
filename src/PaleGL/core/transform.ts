@@ -7,7 +7,18 @@
     normalizeVector3,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.js';
+import {
+    cloneMat4,
+    createLookAtMatrix,
+    createMat4Identity, createScalingMatrix, createTranslationMatrix, invertMat4,
+    mat4m00,
+    mat4m01, mat4m02,
+    mat4m10,
+    mat4m11, mat4m12,
+    mat4m20,
+    mat4m21, mat4m22,
+    Matrix4, multiplyMat4Array, transposeMat4,
+} from '@/PaleGL/math/Matrix4.js';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import {
     createRotatorZero,
@@ -222,9 +233,9 @@ export type Transform = {
 export function createTransform() {
     // let _actor: Actor | null = actor;
 
-    const inverseWorldMatrix: Matrix4 = Matrix4.identity;
-    const worldMatrix: Matrix4 = Matrix4.identity;
-    const localMatrix: Matrix4 = Matrix4.identity;
+    const inverseWorldMatrix = createMat4Identity();
+    const worldMatrix: Matrix4 = createMat4Identity();
+    const localMatrix: Matrix4 = createMat4Identity();
     const position: Vector3 = createVector3Zero();
     const rotation: Rotator = createRotatorZero(); // degree vector
     const scale: Vector3 = createVector3One();
@@ -232,7 +243,7 @@ export function createTransform() {
     const lookAtTarget: Vector3 | null = null; // world v
     const lookAtTargetActor: Actor | null = null;
 
-    const normalMatrix: Matrix4 = Matrix4.identity;
+    const normalMatrix: Matrix4 = createMat4Identity();
 
     // get childCount() {
     //     return this.children.length;
@@ -342,13 +353,13 @@ export function createTransform() {
 }
 
 export const getWorldRight = (transform: Transform) =>
-    normalizeVector3(createVector3(transform.worldMatrix.m00, transform.worldMatrix.m10, transform.worldMatrix.m20));
+    normalizeVector3(createVector3(mat4m00(transform.worldMatrix), mat4m10(transform.worldMatrix), mat4m20(transform.worldMatrix)));
 
 export const getWorldUp = (transform: Transform) =>
-    normalizeVector3(createVector3(transform.worldMatrix.m01, transform.worldMatrix.m11, transform.worldMatrix.m21));
+    normalizeVector3(createVector3(mat4m01(transform.worldMatrix), mat4m11(transform.worldMatrix), mat4m21(transform.worldMatrix)));
 
 export const getWorldForward = (transform: Transform) =>
-    normalizeVector3(createVector3(transform.worldMatrix.m02, transform.worldMatrix.m12, transform.worldMatrix.m22));
+    normalizeVector3(createVector3(mat4m02(transform.worldMatrix), mat4m12(transform.worldMatrix), mat4m22(transform.worldMatrix)));
 
 export const setScaling = (transform: Transform, s: Vector3) => (transform.scale = s);
 
@@ -390,12 +401,12 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
         const lookAtMatrix =
             actor?.type === ActorTypes.Camera
-                ? Matrix4.getLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
-                : Matrix4.getLookAtMatrix(actor.transform.position, lookAtTarget);
-        const scalingMatrix = Matrix4.scalingMatrix(actor.transform.scale);
-        actor.transform.localMatrix = Matrix4.multiplyMatrices(lookAtMatrix, scalingMatrix);
+                ? createLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
+                : createLookAtMatrix(actor.transform.position, lookAtTarget);
+        const scalingMatrix = createScalingMatrix(actor.transform.scale);
+        actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
     } else {
-        const translationMatrix = Matrix4.translationMatrix(actor.transform.position);
+        const translationMatrix = createTranslationMatrix(actor.transform.position);
         // eulerから回転行列を作る場合
         // // roll(Z), pitch(X), yaw(Y)
         // const rotationAxes = this.rotation.getAxesDegrees();
@@ -405,16 +416,16 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
         // quaternionから回転を作るケース
         const rotationMatrix = createRotationMatrixFromQuaternion(actor.transform.rotation.quaternion);
-        const scalingMatrix = Matrix4.scalingMatrix(actor.transform.scale);
-        actor.transform.localMatrix = Matrix4.multiplyMatrices(translationMatrix, rotationMatrix, scalingMatrix);
+        const scalingMatrix = createScalingMatrix(actor.transform.scale);
+        actor.transform.localMatrix = multiplyMat4Array(translationMatrix, rotationMatrix, scalingMatrix);
     }
 
     // TODO: parentがちゃんととれてないかも
 
     actor.transform.worldMatrix = actor?.parent
-        ? Matrix4.multiplyMatrices(actor?.parent.transform.worldMatrix, actor.transform.localMatrix)
+        ? multiplyMat4Array(actor?.parent.transform.worldMatrix, actor.transform.localMatrix)
         : actor.transform.localMatrix;
-    actor.transform.inverseWorldMatrix = actor.transform.worldMatrix.clone().invert();
+    actor.transform.inverseWorldMatrix = invertMat4(cloneMat4(actor.transform.worldMatrix));
 
     // // if (_actor?.parent) {
     // // }
@@ -423,5 +434,5 @@ export const updateActorTransformMatrix = (actor: Actor) => {
     // console.log(`hogehoge - update matrix - name: ${actor?.name}`, actor?.transform.getWorldMatrix().e,  actor?.transform.getLocalMatrix().e);
     // // console.log(`hogehoge - update matrix - name: ${_actor?.name}, is started: ${_actor?.isStarted}, actor: ${_actor}, parent: ${_actor?.parent}, ${_worldMatrix.e}, ${_localMatrix.e}`);
 
-    actor.transform.normalMatrix = actor.transform.worldMatrix.clone().invert().transpose();
+    actor.transform.normalMatrix = transposeMat4(invertMat4(cloneMat4(actor.transform.worldMatrix)));
 };

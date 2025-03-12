@@ -35,7 +35,13 @@ import {
     Vector3
 } from '@/PaleGL/math/vector3.ts';
 import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {
+    cloneMat4,
+    createTranslationMatrix,
+    getMat4Position, invertMat4,
+    mat4m33,
+    multiplyMat4Array,
+} from '@/PaleGL/math/Matrix4.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -305,13 +311,13 @@ export const isPerspectiveCamera = (camera: Camera) => {
 };
 
 export const transformScreenPoint = (camera: Camera, p: Vector3) => {
-    const matInProjection = Matrix4.multiplyMatrices(
+    const matInProjection = multiplyMat4Array(
         camera.projectionMatrix,
         camera.viewMatrix,
-        Matrix4.translationMatrix(p)
+        createTranslationMatrix(p)
     );
-    const clipPosition = matInProjection.position;
-    const w = matInProjection.m33 === 0 ? 0.0001 : matInProjection.m33; // TODO: cheap NaN fallback
+    const clipPosition = getMat4Position(matInProjection);
+    const w = mat4m33(matInProjection) === 0 ? 0.0001 : mat4m33(matInProjection); // TODO: cheap NaN fallback
     return createVector3(
         v3x(clipPosition) / w,
         v3y(clipPosition) / w,
@@ -371,11 +377,11 @@ export function setSizeCamera(actor: Actor, width: number, height: number) {
 export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
     const camera = actor as Camera;
     defaultUpdateActorTransform(actor);
-    camera.viewMatrix = camera.transform.worldMatrix.clone().invert();
-    camera.inverseProjectionMatrix = camera.projectionMatrix.clone().invert();
-    camera.inverseViewMatrix = camera.viewMatrix.clone().invert();
-    camera.viewProjectionMatrix = Matrix4.multiplyMatrices(camera.projectionMatrix, camera.viewMatrix);
-    camera.inverseViewProjectionMatrix = camera.viewProjectionMatrix.clone().invert();
+    camera.viewMatrix = invertMat4(cloneMat4(camera.transform.worldMatrix));
+    camera.inverseProjectionMatrix = invertMat4(cloneMat4(camera.projectionMatrix));
+    camera.inverseViewMatrix = invertMat4(cloneMat4(camera.viewMatrix));
+    camera.viewProjectionMatrix = multiplyMat4Array(camera.projectionMatrix, camera.viewMatrix);
+    camera.inverseViewProjectionMatrix = invertMat4(cloneMat4(camera.viewProjectionMatrix));
 };
 
 // -------------------------------------------------------

@@ -2,7 +2,6 @@ import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { Bone, createBone } from '@/PaleGL/core/bone.ts';
 import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
 import { createVector3, createVector3One, createVector3Zero } from '@/PaleGL/math/vector3.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
 import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
@@ -21,6 +20,7 @@ import {
 import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 import { createSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createScalingMatrix, createTranslationMatrix, multiplyMat4Array } from '@/PaleGL/math/Matrix4.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
@@ -344,8 +344,8 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         //     node.scale ? new Vector3(node.scale[0], node.scale[1], node.scale[2]) : Vector3.one
         // );
 
-        const offsetMatrix = Matrix4.multiplyMatrices(
-            Matrix4.translationMatrix(
+        const offsetMatrix = multiplyMat4Array(
+            createTranslationMatrix(
                 node.translation
                     ? createVector3(node.translation[0], node.translation[1], node.translation[2])
                     : createVector3Zero()
@@ -355,7 +355,7 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                       createQuaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3])
                   )
                 : createMatrix4FromQuaternion(createQuaternionIdentity()),
-            Matrix4.scalingMatrix(
+            createScalingMatrix(
                 node.scale ? createVector3(node.scale[0], node.scale[1], node.scale[2]) : createVector3One()
             )
         );

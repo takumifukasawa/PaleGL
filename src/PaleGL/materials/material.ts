@@ -15,7 +15,7 @@
     DepthFuncTypes,
     RenderQueueType, MaterialTypes,
 } from '@/PaleGL/constants';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { createMat4Identity } from '@/PaleGL/math/Matrix4';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
@@ -1002,7 +1002,7 @@ export function createMaterial(args: MaterialArgs): Material {
         {
             name: UniformNames.InverseWorldMatrix,
             type: UniformTypes.Matrix4,
-            value: Matrix4.identity,
+            value: createMat4Identity(),
         },
 
         // TODO: commonを呼んでさえいればいらないはず

@@ -261,7 +261,17 @@
 // }
 
 
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import {
+    createMatrix4,
+    mat4m00, mat4m01,
+    mat4m02, mat4m10,
+    mat4m11,
+    mat4m12,
+    mat4m20,
+    mat4m21,
+    mat4m22,
+    Matrix4,
+} from '@/PaleGL/math/Matrix4.ts';
 
 export type Quaternion = { e :Float32Array };
 
@@ -342,7 +352,7 @@ export function createRotationMatrixFromQuaternion(q: Quaternion) {
     const m32 = 0;
     const m33 = 1;
 
-    return new Matrix4(
+    return createMatrix4(
         m00, m01, m02, m03,
         m10, m11, m12, m13,
         m20, m21, m22, m23,
@@ -352,9 +362,9 @@ export function createRotationMatrixFromQuaternion(q: Quaternion) {
 }
 
 export function rotationMatrixToQuaternion(mat: Matrix4) {
-    const m00 = mat.m00;
-    const m11 = mat.m11;
-    const m22 = mat.m22;
+    const m00 = mat4m00(mat);
+    const m11 = mat4m11(mat);
+    const m22 = mat4m22(mat);
 
     const trace = m00 + m11 + m22;
 
@@ -366,26 +376,26 @@ export function rotationMatrixToQuaternion(mat: Matrix4) {
     if (trace > 0) {
         const s = Math.sqrt(trace + 1.0) * 2;
         w = 0.25 * s;
-        x = (mat.m21 - mat.m12) / s;
-        y = (mat.m02 - mat.m20) / s;
-        z = (mat.m10 - mat.m01) / s;
+        x = (mat4m21(mat) - mat4m12(mat)) / s;
+        y = (mat4m02(mat) - mat4m20(mat)) / s;
+        z = (mat4m10(mat) - mat4m01(mat)) / s;
     } else if (m00 > m11 && m00 > m22) {
         const s = Math.sqrt(1.0 + m00 - m11 - m22) * 2;
-        w = (mat.m21 - mat.m12) / s;
+        w = (mat4m21(mat) - mat4m12(mat)) / s;
         x = 0.25 * s;
-        y = (mat.m01 + mat.m10) / s;
-        z = (mat.m02 + mat.m20) / s;
+        y = (mat4m01(mat) + mat4m10(mat)) / s;
+        z = (mat4m02(mat) + mat4m20(mat)) / s;
     } else if (m11 > m22) {
         const s = Math.sqrt(1.0 + m11 - m00 - m22) * 2;
-        w = (mat.m02 - mat.m20) / s;
-        x = (mat.m01 + mat.m10) / s;
+        w = (mat4m02(mat) - mat4m20(mat)) / s;
+        x = (mat4m01(mat) + mat4m10(mat)) / s;
         y = 0.25 * s;
-        z = (mat.m12 + mat.m21) / s;
+        z = (mat4m12(mat) + mat4m21(mat)) / s;
     } else {
         const s = Math.sqrt(1.0 + m22 - m00 - m11) * 2;
-        w = (mat.m10 - mat.m01) / s;
-        x = (mat.m02 + mat.m20) / s;
-        y = (mat.m12 + mat.m21) / s;
+        w = (mat4m10(mat) - mat4m01(mat)) / s;
+        x = (mat4m02(mat) + mat4m20(mat)) / s;
+        y = (mat4m12(mat) + mat4m21(mat)) / s;
         z = 0.25 * s;
     }
 
@@ -489,7 +499,7 @@ export function createMatrix4FromQuaternion(q: Quaternion) {
     const zz = z * z;
 
     // prettier-ignore
-    return new Matrix4(
+    return createMatrix4(
         1 - 2 * (yy + zz), 2 * (xy - wz), 2 * (xz + wy), 0,
         2 * (xy + wz), 1 - 2 * (xx + zz), 2 * (yz - wx), 0,
         2 * (xz - wy), 2 * (yz + wx), 1 - 2 * (xx + yy), 0,

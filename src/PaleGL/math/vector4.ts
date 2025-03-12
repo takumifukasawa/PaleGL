@@ -70,7 +70,17 @@
 // }
 
 
-import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+import {
+    mat4m00,
+    mat4m01,
+    mat4m02,
+    mat4m03,
+    mat4m10,
+    mat4m11,
+    mat4m12,
+    mat4m13, mat4m20, mat4m21, mat4m22, mat4m23, mat4m30, mat4m31, mat4m32, mat4m33,
+    Matrix4,
+} from '@/PaleGL/math/Matrix4.ts';
 
 export type Vector4 = { e: Float32Array };
 
@@ -100,10 +110,10 @@ export function multiplyVector4AndMatrix4(v: Vector4, m: Matrix4) {
     const tmpY = v4y(v);
     const tmpZ = v4z(v);
     const tmpW = v4w(v);
-    const x = m.m00 * tmpX + m.m01 * tmpY + m.m02 * tmpZ + m.m03 * tmpW;
-    const y = m.m10 * tmpX + m.m11 * tmpY + m.m12 * tmpZ + m.m13 * tmpW;
-    const z = m.m20 * tmpX + m.m21 * tmpY + m.m22 * tmpZ + m.m23 * tmpW;
-    const w = m.m30 * tmpX + m.m31 * tmpY + m.m32 * tmpZ + m.m33 * tmpW;
+    const x = mat4m00(m) * tmpX + mat4m01(m) * tmpY + mat4m02(m) * tmpZ + mat4m03(m) * tmpW;
+    const y = mat4m10(m) * tmpX + mat4m11(m) * tmpY + mat4m12(m) * tmpZ + mat4m13(m) * tmpW;
+    const z = mat4m20(m) * tmpX + mat4m21(m) * tmpY + mat4m22(m) * tmpZ + mat4m23(m) * tmpW;
+    const w = mat4m30(m) * tmpX + mat4m31(m) * tmpY + mat4m32(m) * tmpZ + mat4m33(m) * tmpW;
     setV4x(v, x);
     setV4y(v, y);
     setV4z(v, z);

@@ -1,5 +1,5 @@
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { createOrthographicMatrix } from '@/PaleGL/math/Matrix4.ts';
 import {
     addVector3Array,
     cloneVector3,
@@ -28,7 +28,7 @@ export function setSizeOrthographicCamera(camera: Camera, width: number, height:
 
 export function updateOrthographicCameraProjectionMatrix(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
-    camera.projectionMatrix = Matrix4.getOrthographicMatrix(
+    camera.projectionMatrix = createOrthographicMatrix(
         orthographicCamera.left,
         orthographicCamera.right,
         orthographicCamera.bottom,

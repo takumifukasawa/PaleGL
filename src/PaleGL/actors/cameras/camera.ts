@@ -1,5 +1,5 @@
 ﻿import { Actor, createActor } from '@/PaleGL/actors/actor.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { createMat4Identity, Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 import {
     ActorTypes,
@@ -385,12 +385,12 @@ export function createCamera({
 }): Camera {
     const actor = createActor({ name, type: ActorTypes.Camera });
 
-    const viewMatrix = Matrix4.identity;
-    const projectionMatrix = Matrix4.identity;
-    const viewProjectionMatrix = Matrix4.identity;
-    const inverseViewProjectionMatrix = Matrix4.identity;
-    const inverseViewMatrix = Matrix4.identity;
-    const inverseProjectionMatrix = Matrix4.identity;
+    const viewMatrix = createMat4Identity();
+    const projectionMatrix = createMat4Identity();
+    const viewProjectionMatrix = createMat4Identity();
+    const inverseViewProjectionMatrix = createMat4Identity();
+    const inverseViewMatrix = createMat4Identity();
+    const inverseProjectionMatrix = createMat4Identity();
     const renderTarget: CameraRenderTargetType = null;
     const near: number = 1;
     const far: number = 10;

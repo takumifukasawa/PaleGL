@@ -4,7 +4,7 @@ import { Color } from '@/PaleGL/math/color.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { createMat4Identity, Matrix4 } from '@/PaleGL/math/Matrix4.ts';
 
 export type LightArgs = ActorArgs & {
     intensity: number;
@@ -106,8 +106,8 @@ export function createLight({ name, intensity, color, lightType }: LightArgs & {
     const castShadow: boolean = false; // bool
     const shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;
     const shadowMap: RenderTarget | null = null; // TODO: shadow cameras に持たせたほうが良いような気もする
-    const lightViewProjectionMatrix: Matrix4 = Matrix4.identity;
-    const shadowMapProjectionMatrix: Matrix4 = Matrix4.identity;
+    const lightViewProjectionMatrix: Matrix4 = createMat4Identity();
+    const shadowMapProjectionMatrix: Matrix4 = createMat4Identity();
 
     return {
         ...actor,
