@@ -982,7 +982,7 @@
 // }
 
 import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import { createMat4Identity } from '@/PaleGL/math/Matrix4';
+import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 import { Gpu, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';

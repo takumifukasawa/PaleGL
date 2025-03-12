@@ -287,7 +287,7 @@ import {
     mat4m13,
     mat4m20, mat4m21, mat4m22, mat4m23,
     Matrix4,
-} from '@/PaleGL/math/Matrix4';
+} from '@/PaleGL/math/matrix4.ts';
 
 export type RawVector3 = { x: number; y: number; z: number };
 

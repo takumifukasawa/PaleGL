@@ -747,7 +747,7 @@ import { hasIndicesVertexArrayObject, VertexArrayObject } from '@/PaleGL/core/ve
 import { Framebuffer, hasFramebufferMultipleDrawBuffers } from '@/PaleGL/core/framebuffer.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4';
+import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Vector4 } from '@/PaleGL/math/vector4.ts';

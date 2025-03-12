@@ -15,7 +15,7 @@
     DepthFuncTypes,
     RenderQueueType, MaterialTypes,
 } from '@/PaleGL/constants';
-import { createMat4Identity } from '@/PaleGL/math/Matrix4';
+import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 // import { Vector3 } from '@/PaleGL/math/Vector3';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';

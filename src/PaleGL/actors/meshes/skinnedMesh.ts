@@ -10,7 +10,7 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/Matrix4.ts';
+import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';

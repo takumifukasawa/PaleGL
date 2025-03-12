@@ -17,7 +17,7 @@
 // import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 // import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-// // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// // import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 // import { maton } from '@/PaleGL/utilities/maton.ts';
 // import {
 //     setMaterialUniformValue
@@ -206,7 +206,7 @@ import {
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 

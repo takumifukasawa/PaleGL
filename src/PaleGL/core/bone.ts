@@ -6,7 +6,7 @@ import {
     invertMat4,
     Matrix4,
     multiplyMat4Array,
-} from '@/PaleGL/math/Matrix4';
+} from '@/PaleGL/math/matrix4.ts';
 import { createRotatorZero, Rotator } from '@/PaleGL/math/rotator.ts';
 import { createVector3One, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 

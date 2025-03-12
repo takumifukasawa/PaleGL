@@ -1,5 +1,5 @@
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { createPerspectiveMatrix } from '@/PaleGL/math/Matrix4.ts';
+import { createPerspectiveMatrix } from '@/PaleGL/math/matrix4.ts';
 import {
     addVector3Array,
     cloneVector3,

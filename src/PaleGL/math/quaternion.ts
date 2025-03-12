@@ -1,4 +1,4 @@
-// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 // 
 // export class Quaternion {
 //     e: Float32Array = new Float32Array(4);
@@ -271,7 +271,7 @@ import {
     mat4m21,
     mat4m22,
     Matrix4,
-} from '@/PaleGL/math/Matrix4.ts';
+} from '@/PaleGL/math/matrix4.ts';
 
 export type Quaternion = { e :Float32Array };
 

@@ -33,7 +33,7 @@
 // import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import { IPostProcessPass } from '@/PaleGL/postprocess/IPostProcessPass.ts';
 // // import { Vector3 } from '@/PaleGL/math/vector3.ts';
-// // import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// // import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 // // import { Light } from '@/PaleGL/actors/light.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 // import {updateActorTransform} from "@/PaleGL/actors/actorBehaviours.ts";

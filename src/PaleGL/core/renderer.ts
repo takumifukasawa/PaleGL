@@ -88,7 +88,7 @@ import {
     invertMat4,
     Matrix4,
     transposeMat4,
-} from '@/PaleGL/math/Matrix4.ts';
+} from '@/PaleGL/math/matrix4.ts';
 import { createShader } from '@/PaleGL/core/shader.ts';
 import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';

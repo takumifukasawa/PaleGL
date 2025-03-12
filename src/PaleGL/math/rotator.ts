@@ -6,7 +6,7 @@
 //     toEulerDegreeFromQuaternion,
 //     toEulerRadianFromQuaternion,
 // } from '@/PaleGL/math/quaternion.ts';
-// import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+// import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 // import { v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 // 
 // // TODO: quaternion対応
@@ -270,7 +270,7 @@ import {
     toEulerDegreeFromQuaternion,
     toEulerRadianFromQuaternion,
 } from '@/PaleGL/math/quaternion.ts';
-import { Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export type Rotator = {

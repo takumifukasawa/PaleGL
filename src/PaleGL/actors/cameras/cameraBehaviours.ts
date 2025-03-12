@@ -41,7 +41,7 @@ import {
     getMat4Position, invertMat4,
     mat4m33,
     multiplyMat4Array,
-} from '@/PaleGL/math/Matrix4.ts';
+} from '@/PaleGL/math/matrix4.ts';
 import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';

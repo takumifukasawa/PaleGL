@@ -18,9 +18,9 @@
 // import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 // import {setCameraSize} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 // // import { Light } from '@/PaleGL/actors/light.ts';
-// // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+// // import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 // // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
-// // import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+// // import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 //
 // type PostProcessRenderArgs = {
 //     gpu: Gpu;
@@ -368,11 +368,11 @@ import {
     setPostProcessPassSize,
     updatePostProcessPass,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/Matrix4.ts';
+import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/matrix4.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
-// import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+// import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 // import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
-// import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+// import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 
 type PostProcessRenderArgs = {
     gpu: Gpu;

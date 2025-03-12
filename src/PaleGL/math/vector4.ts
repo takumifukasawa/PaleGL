@@ -1,4 +1,4 @@
-﻿// import {Matrix4} from "@/PaleGL/math/Matrix4.ts";
+﻿// import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 // 
 // export class Vector4 {
 //     e: Float32Array = new Float32Array(4);
@@ -80,7 +80,7 @@ import {
     mat4m12,
     mat4m13, mat4m20, mat4m21, mat4m22, mat4m23, mat4m30, mat4m31, mat4m32, mat4m33,
     Matrix4,
-} from '@/PaleGL/math/Matrix4.ts';
+} from '@/PaleGL/math/matrix4.ts';
 
 export type Vector4 = { e: Float32Array };
 

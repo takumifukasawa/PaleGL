@@ -18,7 +18,7 @@ import {
     mat4m20,
     mat4m21, mat4m22,
     Matrix4, multiplyMat4Array, transposeMat4,
-} from '@/PaleGL/math/Matrix4.js';
+} from '@/PaleGL/math/matrix4.ts';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import {
     createRotatorZero,

@@ -1,6 +1,6 @@
 ﻿import { ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
 import { LightType, LightTypes } from '@/PaleGL/constants.ts';
-import { cloneMat4, createMatrix4, multiplyMat4Array } from '@/PaleGL/math/Matrix4.ts';
+import { cloneMat4, createMatrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
 import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { updateSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';

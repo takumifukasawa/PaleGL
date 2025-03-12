@@ -4,7 +4,7 @@ import { Color } from '@/PaleGL/math/color.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { createMat4Identity, Matrix4 } from '@/PaleGL/math/Matrix4.ts';
+import { createMat4Identity, Matrix4 } from '@/PaleGL/math/matrix4.ts';
 
 export type LightArgs = ActorArgs & {
     intensity: number;
