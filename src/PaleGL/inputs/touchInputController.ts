@@ -1,58 +1,35 @@
-import { createAbstractInputController } from '@/PaleGL/inputs/abstractInputController.ts';
-import {createVector2Zero, setV2x, setV2y} from '@/PaleGL/math/vector2.ts';
+import { createInputController, InputController, InputControllerTypes } from '@/PaleGL/inputs/inputController.ts';
+import { setV2x, setV2y } from '@/PaleGL/math/vector2.ts';
 
-export function createTouchInputController() {
-    let _tmpIsDown = false;
-    const _tmpInputPosition = createVector2Zero();
+export function createTouchInputController(): InputController {
+    return createInputController(InputControllerTypes.Mouse);
+}
 
-    const inputController = createAbstractInputController();
-
-    const start = () => {
-        window.addEventListener('touchstart', _onTouchStart);
-        window.addEventListener('touchmove', _onTouchMove);
-        window.addEventListener('touchend', _onTouchEnd);
-    };
-
-    const update = () => {
-        inputController.updateInternal({
-            inputPosition: _tmpInputPosition,
-            isDown: _tmpIsDown,
-        });
-    };
-
-    const _onTouchStart = (e: TouchEvent) => {
-        _tmpIsDown = true;
+export function startTouchInputController(inputController: InputController) {
+    const onTouchStart = (e: TouchEvent) => {
+        inputController.tmpIsDown = true;
         const t = e.touches[0];
-        _setInputPosition(t.clientX, t.clientY);
+        setInputPosition(inputController, t.clientX, t.clientY);
     };
 
-    const _onTouchMove = (e: TouchEvent) => {
+    const onTouchMove = (e: TouchEvent) => {
         const t = e.touches[0];
-        _setInputPosition(t.clientX, t.clientY);
+        setInputPosition(inputController, t.clientX, t.clientY);
     };
 
-    const _onTouchEnd = (e: TouchEvent) => {
-        _tmpIsDown = false;
+    const onTouchEnd = (e: TouchEvent) => {
+        inputController.tmpIsDown = false;
         const t = e.touches[0];
-        _setInputPosition(t.clientX, t.clientY);
+        setInputPosition(inputController, t.clientX, t.clientY);
         // this.setInputPosition(-Infinity, -Infinity);
     };
 
-    const _setInputPosition = (x: number, y: number) => {
-        setV2x(_tmpInputPosition, x);
-        setV2y(_tmpInputPosition, y);
-    };
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchmove', onTouchMove);
+    window.addEventListener('touchend', onTouchEnd);
+}
 
-    const dispose = () => {
-        window.removeEventListener('touchstart', _onTouchStart);
-        window.removeEventListener('touchmove', _onTouchMove);
-        window.removeEventListener('touchend', _onTouchEnd);
-    };
-
-    return {
-        ...inputController,
-        start,
-        update,
-        dispose,
-    };
+function setInputPosition(inputController: InputController, x: number, y: number) {
+    setV2x(inputController.tmpInputPosition, x);
+    setV2y(inputController.tmpInputPosition, y);
 }

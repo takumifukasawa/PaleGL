@@ -1,55 +1,31 @@
-import { createAbstractInputController } from '@/PaleGL/inputs/abstractInputController.ts';
-import { createVector2Zero, setV2x, setV2y } from '@/PaleGL/math/vector2.ts';
+import { createInputController, InputController, InputControllerTypes } from '@/PaleGL/inputs/inputController.ts';
+import { setV2x, setV2y } from '@/PaleGL/math/vector2.ts';
 
-export function createMouseInputController() {
-    let _tmpIsDown = false;
-    const _tmpInputPosition = createVector2Zero();
+export function createMouseInputController(): InputController {
+    return createInputController(InputControllerTypes.Mouse);
+}
 
-    const inputController = createAbstractInputController();
-
-    const start = () => {
-        window.addEventListener('mousedown', _onMouseDown);
-        window.addEventListener('mousemove', _onMouseMove);
-        window.addEventListener('mouseup', _onMouseUp);
+export function startMouseInputController(inputController: InputController) {
+    const onMouseDown = (e: MouseEvent) => {
+        inputController.tmpIsDown = true;
+        setInputPosition(inputController, e.clientX, e.clientY);
     };
 
-    const update = () => {
-        inputController.updateInternal({
-            inputPosition: _tmpInputPosition,
-            isDown: _tmpIsDown,
-        });
-    };
-
-    const _onMouseDown = (e: MouseEvent) => {
-        _tmpIsDown = true;
-        _setInputPosition(e.clientX, e.clientY);
-    };
-
-    const _onMouseMove = (e: MouseEvent) => {
-        _setInputPosition(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => {
+        setInputPosition(inputController, e.clientX, e.clientY);
     };
 
     const _onMouseUp = (e: MouseEvent) => {
-        _tmpIsDown = false;
-        _setInputPosition(e.clientX, e.clientY);
-        // this.setInputPosition(-Infinity, -Infinity);
+        inputController.tmpIsDown = false;
+        setInputPosition(inputController, e.clientX, e.clientY);
     };
 
-    const _setInputPosition = (x: number, y: number) => {
-        setV2x(_tmpInputPosition, x);
-        setV2y(_tmpInputPosition, y);
-    };
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', _onMouseUp);
+}
 
-    const dispose = () => {
-        window.removeEventListener('mousedown', _onMouseDown);
-        window.removeEventListener('mousemove', _onMouseMove);
-        window.removeEventListener('mouseup', _onMouseUp);
-    };
-
-    return {
-        ...inputController,
-        start,
-        update,
-        dispose,
-    };
+function setInputPosition(inputController: InputController, x: number, y: number) {
+    setV2x(inputController.tmpInputPosition, x);
+    setV2y(inputController.tmpInputPosition, y);
 }

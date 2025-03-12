@@ -132,6 +132,11 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
+import {
+    setInputControllerSize,
+    startInputController,
+    updateInputController
+} from "@/PaleGL/inputs/inputControllerBehaviours.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -337,7 +342,7 @@ let screenSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? createTouchInputController() : createMouseInputController();
-inputController.start();
+startInputController(inputController)
 
 // const wrapperElement = document.getElementById("wrapper")!;
 const wrapperElement = document.createElement('div');
@@ -409,8 +414,8 @@ captureSceneCamera.onFixedUpdate = () => {
 
     // 2: orbit controls
     // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-    if (inputController.getIsDown() && orbitCameraController.enabled) {
-        setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.getDeltaNormalizedInputPosition()));
+    if (inputController.isDown && orbitCameraController.enabled) {
+        setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
 };
@@ -1354,7 +1359,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uNormalizedInputPosition',
-            inputController.getNormalizedInputPosition()
+            inputController.normalizedInputPosition
         );
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
@@ -1362,7 +1367,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             attractSphereMesh.transform.position
         );
 
-        attractRate += (inputController.getIsDown() ? 1 : -1) * deltaTime * 2;
+        attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
         attractRate = saturate(attractRate);
         setUniformValue(transformFeedbackDoubleBuffer.uniforms, 'uAttractRate', attractRate);
         updateGPUTransformFeedback(gpu, {
@@ -1472,8 +1477,8 @@ const main = async () => {
     attractSphereMesh.onFixedUpdate = () => {
         const w = 10;
         const d = 10;
-        const ix = v2x(inputController.getNormalizedInputPosition()) * 2 - 1;
-        const iy = v2y(inputController.getNormalizedInputPosition()) * 2 - 1;
+        const ix = v2x(inputController.normalizedInputPosition) * 2 - 1;
+        const iy = v2y(inputController.normalizedInputPosition) * 2 - 1;
         const x = ix * w;
         const z = iy * d;
         const y = 0.5;
@@ -1903,7 +1908,7 @@ void main() {
     const onWindowResize = () => {
         width = wrapperElement.offsetWidth;
         height = wrapperElement.offsetHeight;
-        inputController.setSize(width, height);
+        setInputControllerSize(inputController, width, height);
         engine.setSize(width, height);
     };
 
@@ -1934,7 +1939,7 @@ void main() {
 
     engine.setOnBeforeUpdate(() => {
         if (!debuggerGUI) initDebugger();
-        inputController.update();
+        updateInputController(inputController)
     });
 
     engine.setOnBeforeFixedUpdate(() => {
