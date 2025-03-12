@@ -5,7 +5,7 @@ import {
     isCompiledMaterialShader,
     Material,
     setMaterialUniformValue,
-    startMaterial
+    startMaterial,
 } from '@/PaleGL/materials/material.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
@@ -20,7 +20,7 @@ import { UniformValue } from '@/PaleGL/core/uniforms.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import {updateMaterial} from "@/PaleGL/materials/materialBehaviours.ts";
+import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
 
 // start actor -------------------------------------------------------
 
@@ -42,7 +42,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
         // for debug
         // console.log(`[Mesh.start] material name: ${material.getName()}, isCompiledShader: ${material.isCompiledShader()}`);
         if (!isCompiledMaterialShader(material)) {
-            startMaterial(material,{
+            startMaterial(material, {
                 gpu,
                 attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
             });

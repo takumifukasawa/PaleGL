@@ -14,6 +14,7 @@ import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {setSizeCamera, updateCamera, updateCameraTransform} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
+import {updateAnimator} from "@/PaleGL/core/animator.ts";
 
 // try start actor -------------------------------------------------------
 
@@ -80,7 +81,7 @@ export const fixedUpdateActor = (actor: Actor, { gpu, scene, fixedTime, fixedDel
         component.fixedUpdate({ gpu, fixedTime, fixedDeltaTime });
     });
     if (actor.animator) {
-        actor.animator.update(fixedDeltaTime);
+        updateAnimator(actor.animator, fixedDeltaTime);
     }
     if (actor.onFixedUpdate) {
         actor.onFixedUpdate({ gpu, scene, fixedTime, fixedDeltaTime });

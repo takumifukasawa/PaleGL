@@ -13,19 +13,18 @@ import {
 import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
-import { Actor, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
+import { AnimationClip, getAllKeyframesValue } from '@/PaleGL/core/animationClip.ts';
+import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
-import {createMatrix4FromQuaternion, Quaternion} from '@/PaleGL/math/quaternion.ts';
+import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
-import { StartActorFunc, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import {createRotatorFromMatrix4} from "@/PaleGL/math/rotator.ts";
+import { createRotatorFromMatrix4 } from '@/PaleGL/math/rotator.ts';
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;
@@ -580,7 +579,7 @@ export function createSkinnedMesh({ bones, debugBoneView, ...options }: SkinnedM
     };
 }
 
-export const startSkinnedMesh: StartActorFunc = (actor, args) => {
+export function startSkinnedMesh(actor: Actor, args: ActorStartArgs) {
     const skinnedMesh = actor as SkinnedMesh;
 
     const { gpu } = args;
@@ -629,7 +628,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
 
         // TODO: refactor
         skinnedMesh.animationClips.forEach((animationClip, i) => {
-            const dataEachKeyframes = animationClip.getAllKeyframesValue();
+            const dataEachKeyframes = getAllKeyframesValue(animationClip);
             animationData[i] = [];
             dataEachKeyframes.forEach((dataKeyframes, frameIndex) => {
                 animationData[i][frameIndex] = [];
@@ -706,7 +705,7 @@ export const startSkinnedMesh: StartActorFunc = (actor, args) => {
         // jointMatricesAllFrames = [...jointMatricesAllFrames].flat(2);
         const jointMatricesAllFramesFlatten: Matrix4[] = [...jointMatricesAllFrames].flat(2);
 
-        const framesDuration = skinnedMesh.animationClips.reduce((acc, cur) => acc + cur.getFrameCount(), 0);
+        const framesDuration = skinnedMesh.animationClips.reduce((acc, cur) => acc + cur.frameCount, 0);
 
         const colNum = skinnedMesh.jointTextureColNum;
         const boneCount = skinnedMesh.boneCount * framesDuration;
@@ -748,9 +747,9 @@ total pixels: ${colNum * matrixColNum * rowNum},
 all e: ${colNum * matrixColNum * rowNum * 4},
 matrix e: ${jointData.length}`);
     }
-};
+}
 
-export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorUpdateArgs) => {
+export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
     const skinnedMesh = actor as SkinnedMesh;
 
     const { time } = options;
@@ -804,7 +803,9 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
         const rowNum = Math.ceil(skinnedMesh.boneCount / colNum);
         const fillNum = colNum * rowNum - skinnedMesh.boneCount;
         const jointData = new Float32Array(
-            [...jointMatrices, ...new Array(fillNum).fill(0).map(() => createMat4Identity())].map((m) => [...m.e]).flat()
+            [...jointMatrices, ...new Array(fillNum).fill(0).map(() => createMat4Identity())]
+                .map((m) => [...m.e])
+                .flat()
         );
 
         const matrixColNum = 4;
@@ -823,7 +824,7 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
             setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, skinnedMesh.jointTexture);
         });
     }
-};
+}
 
 const generateSkinningUniforms = (skinnedMesh: SkinnedMesh) => {
     return [

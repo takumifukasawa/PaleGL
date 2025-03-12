@@ -137,6 +137,7 @@ import {
     startInputController,
     updateInputController
 } from "@/PaleGL/inputs/inputControllerBehaviours.ts";
+import {getAnimatorAnimationClips} from "@/PaleGL/core/animator.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1190,7 +1191,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // animatorは存在しているmeshのはず
     // TODO: set animation clips いらない気がする. animatorの設定さえあれば
     skinningMesh.animator = gltfActor.animator!;
-    setAnimationClips(skinningMesh, gltfActor.animator.getAnimationClips());
+    setAnimationClips(skinningMesh, getAnimatorAnimationClips(gltfActor.animator));
 
     // subscribeActorOnStart(skinningMesh, () => {
     //     // CPU skinning

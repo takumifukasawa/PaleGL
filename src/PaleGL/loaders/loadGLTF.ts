@@ -21,6 +21,7 @@ import { loadImg } from '@/PaleGL/loaders/loadImg.ts';
 import { createSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createScalingMatrix, createTranslationMatrix, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
+import {setAnimatorAnimationClips} from "@/PaleGL/core/animator.ts";
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
@@ -718,7 +719,9 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         const animationClips = createAnimationClips();
         // for debug
         // console.log("animation clips", animationClips);
-        rootActor.animator?.setAnimationClips(animationClips);
+        if (rootActor.animator) {
+            setAnimatorAnimationClips(rootActor.animator, animationClips);
+        }
     }
 
     // for debug

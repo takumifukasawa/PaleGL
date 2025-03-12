@@ -1,40 +1,40 @@
-import { AnimationClip } from '@/PaleGL/core/animationClip.ts';
+import {AnimationClip, playAnimationClip, updateAnimationClip} from '@/PaleGL/core/animationClip.ts';
 
-export type Animator = ReturnType<typeof createAnimator>;
+export type Animator = {
+    animationClips: AnimationClip[]
+    playingAnimationClip: AnimationClip | null
+};
 
 export function createAnimator(animationClips: AnimationClip[] = []) {
-    let _animationClips: AnimationClip[] = animationClips;
-    let _playingAnimationClip: AnimationClip | null = null;
-
-    const getAnimationClips = () => _animationClips;
-
-    const setAnimationClips = (animationClips: AnimationClip[]) => {
-        _animationClips = animationClips;
-    };
-
-    const play = (name: string, loop: boolean = false) => {
-        const animationClip = _animationClips.find((animationClip) => name === animationClip.getName());
-        if (!animationClip) {
-            return;
-        }
-        animationClip.play();
-        animationClip.setLoop(loop);
-        _playingAnimationClip = animationClip;
-    };
-
-    // 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
-    const update = (deltaTime: number) => {
-        if (!_playingAnimationClip) {
-            return;
-        }
-        _playingAnimationClip.setLoop(true);
-        _playingAnimationClip.update(deltaTime);
-    };
-
+    const playingAnimationClip: AnimationClip | null = null;
     return {
-        getAnimationClips,
-        setAnimationClips,
-        play,
-        update,
+        animationClips,
+        playingAnimationClip
     };
 }
+
+
+export const getAnimatorAnimationClips = (animator: Animator) => animator.animationClips;
+
+export function setAnimatorAnimationClips (animator: Animator, animationClips: AnimationClip[]) {
+    animator.animationClips = animationClips;
+};
+
+export function playAnimatorAnimationClip (animator: Animator, name: string, loop: boolean = false) {
+    const animationClip = animator.animationClips.find((animationClip) => name === animationClip.name);
+    if (!animationClip) {
+        return;
+    }
+    playAnimationClip(animationClip);
+    animationClip.loop = loop;
+    animator.playingAnimationClip = animationClip;
+};
+
+// 呼ぶ側によってはdeltaTimeでもfixedDeltaTimeでもOK
+export function updateAnimator (animator: Animator, deltaTime: number) {
+    if (!animator.playingAnimationClip) {
+        return;
+    }
+    animator.playingAnimationClip.loop = true;
+    updateAnimationClip(animator.playingAnimationClip, deltaTime);
+};
