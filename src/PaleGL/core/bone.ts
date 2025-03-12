@@ -81,35 +81,25 @@ import { createVector3One, createVector3Zero, Vector3 } from '@/PaleGL/math/vect
 // }
 
 export type Bone = NodeBase & {
-    getIndex: () => number;
-    getPosition: () => Vector3;
-    setPosition: (position: Vector3) => void;
-    getRotation: () => Rotator;
-    setRotation: (rotation: Rotator) => void;
-    getScale: () => Vector3;
-    setScale: (scale: Vector3) => void;
-    getOffsetMatrix: () => Matrix4;
-    setOffsetMatrix: (matrix: Matrix4) => void;
-    getBoneOffsetMatrix: () => Matrix4;
-    setBoneOffsetMatrix: (matrix: Matrix4) => void;
-    getPoseMatrix: () => Matrix4;
-    setPoseMatrix: (matrix: Matrix4) => void;
-    getJointMatrix: () => Matrix4;
-    setJointMatrix: (matrix: Matrix4) => void;
-    // calcJointMatrix: (parentBone?: Bone) => void;
-    // calcBoneOffsetMatrix: (parentBone?: Bone) => void;
-    // traverse: (callback: (bone: Bone) => void) => void;
+    index: number;
+    position: Vector3;
+    rotation: Rotator;
+    scale: Vector3;
+    offsetMatrix: Matrix4;
+    poseMatrix: Matrix4;
+    boneOffsetMatrix: Matrix4;
+    jointMatrix: Matrix4;
+    // children: Bone[];
 };
 
 export const calcBoneOffsetMatrix = (childBone: Bone, parentBone?: Bone) => {
-    childBone.setPoseMatrix(
+    childBone.poseMatrix = 
         parentBone
-            ? multiplyMat4Array(parentBone.getPoseMatrix(), childBone.getOffsetMatrix())
-            : childBone.getOffsetMatrix()
-    );
+            ? multiplyMat4Array(parentBone.poseMatrix, childBone.offsetMatrix)
+            : childBone.offsetMatrix
 
-    childBone.setBoneOffsetMatrix(invertMat4(cloneMat4(childBone.getPoseMatrix())));
-    childBone.getChildren().forEach((c) => calcBoneOffsetMatrix(c as Bone, childBone));
+    childBone.boneOffsetMatrix = invertMat4(cloneMat4(childBone.poseMatrix));
+    childBone.children.forEach((c) => calcBoneOffsetMatrix(c as Bone, childBone));
 };
 
 export const calcJointMatrix = (childBone: Bone, parentBone?: Bone) => {
@@ -119,30 +109,28 @@ export const calcJointMatrix = (childBone: Bone, parentBone?: Bone) => {
     // 1: update offset matrix
     // TODO: quaternion-bug: 本当はこっちを使いたい
     // _offsetMatrix = Matrix4.fromTRS(_position, _rotation, this.scale);
-    childBone.setOffsetMatrix(
+    childBone.offsetMatrix =
         multiplyMat4Array(
-            createTranslationMatrix(childBone.getPosition()),
-            childBone.getRotation().rawMatrix!,
-            createScalingMatrix(childBone.getScale())
-        )
-    );
+            createTranslationMatrix(childBone.position),
+            childBone.rotation.rawMatrix!,
+            createScalingMatrix(childBone.scale)
+        );
 
     // 2: update joint matrix
-    childBone.setJointMatrix(
+    childBone.jointMatrix =
         parentBone
-            ? multiplyMat4Array(parentBone.getJointMatrix(), childBone.getOffsetMatrix())
-            : childBone.getOffsetMatrix()
-    );
+            ? multiplyMat4Array(parentBone.jointMatrix, childBone.offsetMatrix)
+            : childBone.offsetMatrix;
 
     // NOTE: 無理やりpose状態にする時はこれを使う
     // _jointMatrix = _boneOffsetMatrix.clone().invert();
 
-    childBone.getChildren().forEach((c) => calcJointMatrix(c as Bone, childBone));
+    childBone.children.forEach((c) => calcJointMatrix(c as Bone, childBone));
 };
 
 export const traverseBone = (selfBone: Bone, callback: (bone: Bone) => void) => {
     callback(selfBone);
-    selfBone.getChildren().forEach((child: unknown) => {
+    selfBone.children.forEach((child: unknown) => {
         const c = child as Bone;
         traverseBone(c, callback);
     });
@@ -151,76 +139,25 @@ export const traverseBone = (selfBone: Bone, callback: (bone: Bone) => void) => 
 export function createBone({ index, name }: { name: string; index: number }): Bone {
     const nodeBase = createNodeBase({ name });
 
-    let _offsetMatrix: Matrix4 = createMat4Identity(); // 初期姿勢のボーンローカル座標
-    let _poseMatrix: Matrix4 = createMat4Identity(); // 初期姿勢行列
-    let _boneOffsetMatrix: Matrix4 = createMat4Identity(); // 初期姿勢行列の逆行列
-    let _jointMatrix: Matrix4 = createMat4Identity();
-    const _index: number = index;
+    const offsetMatrix: Matrix4 = createMat4Identity(); // 初期姿勢のボーンローカル座標
+    const poseMatrix: Matrix4 = createMat4Identity(); // 初期姿勢行列
+    const boneOffsetMatrix: Matrix4 = createMat4Identity(); // 初期姿勢行列の逆行列
+    const jointMatrix: Matrix4 = createMat4Identity();
 
-    let _position: Vector3 = createVector3Zero();
-    let _rotation: Rotator = createRotatorZero();
-    let _scale: Vector3 = createVector3One();
-
-    // const calcBoneOffsetMatrix = (parentBone?: Bone) => {
-    //     _poseMatrix = parentBone ? Matrix4.multiplyMatrices(parentBone.getPoseMatrix(), _offsetMatrix) : _offsetMatrix;
-
-    //     _boneOffsetMatrix = _poseMatrix.clone().invert();
-    //     nodeBase.getChildren().forEach((childBone) => (childBone as Bone).calcBoneOffsetMatrix(this));
-    // };
-
-    // const calcJointMatrix = (parentBone?: Bone) => {
-    //     // console.log(this.index, _position.elements, _rotation.elements, this.scale.elements)
-    //     // console.log("[Bone.calcJointMatrix]", this.index, _rotation.elements)
-
-    //     // 1: update offset matrix
-    //     // TODO: quaternion-bug: 本当はこっちを使いたい
-    //     // _offsetMatrix = Matrix4.fromTRS(_position, _rotation, this.scale);
-    //     _offsetMatrix = Matrix4.multiplyMatrices(
-    //         Matrix4.translationMatrix(_position),
-    //         _rotation.rawMatrix!,
-    //         Matrix4.scalingMatrix(_scale)
-    //     );
-
-    //     // 2: update joint matrix
-    //     _jointMatrix = parentBone
-    //         ? Matrix4.multiplyMatrices(parentBone.getJointMatrix(), _offsetMatrix)
-    //         : _offsetMatrix;
-
-    //     // NOTE: 無理やりpose状態にする時はこれを使う
-    //     // _jointMatrix = _boneOffsetMatrix.clone().invert();
-
-    //     nodeBase.getChildren().forEach((childBone) => (childBone as Bone).calcJointMatrix(this));
-    // };
-
-    // const traverse = (callback: (bone: Bone) => void) => {
-    //     callback(this);
-    //     nodeBase.getChildren().forEach((child: unknown) => {
-    //         const c = child as Bone;
-    //         c.traverse(callback);
-    //     });
-    // };
+    const position: Vector3 = createVector3Zero();
+    const rotation: Rotator = createRotatorZero();
+    const scale: Vector3 = createVector3One();
 
     return {
         ...nodeBase,
-        //
-        getIndex: () => _index,
-        getPosition: () => _position,
-        setPosition: (position: Vector3) => (_position = position),
-        getRotation: () => _rotation,
-        setRotation: (rotation: Rotator) => (_rotation = rotation),
-        getScale: () => _scale,
-        setScale: (scale: Vector3) => (_scale = scale),
-        getOffsetMatrix: () => _offsetMatrix,
-        setOffsetMatrix: (matrix: Matrix4) => (_offsetMatrix = matrix),
-        getBoneOffsetMatrix: () => _boneOffsetMatrix,
-        setBoneOffsetMatrix: (matrix: Matrix4) => (_boneOffsetMatrix = matrix),
-        getPoseMatrix: () => _poseMatrix,
-        setPoseMatrix: (matrix: Matrix4) => (_poseMatrix = matrix),
-        getJointMatrix: () => _jointMatrix,
-        setJointMatrix: (matrix: Matrix4) => (_jointMatrix = matrix),
-        //
-        // calcJointMatrix,
-        // calcBoneOffsetMatrix,
-        // traverse,
+        index,
+        position,
+        rotation,
+        scale,
+        offsetMatrix,
+        poseMatrix,
+        boneOffsetMatrix,
+        jointMatrix,
+        // children: [],
     };
 }

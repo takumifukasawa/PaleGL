@@ -25,6 +25,7 @@ import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createRotatorFromMatrix4 } from '@/PaleGL/math/rotator.ts';
+import {hasNodeChild} from "@/PaleGL/core/nodeBase.ts";
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;
@@ -569,7 +570,7 @@ export function createSkinnedMesh({ bones, debugBoneView, ...options }: SkinnedM
     // bone index order な配列を作っておく
     traverseBone(skinnedMeshBase.bones, (bone) => {
         boneCount++;
-        boneOrderedIndex[bone.getIndex()] = bone;
+        boneOrderedIndex[bone.index] = bone;
     });
 
     return {
@@ -634,7 +635,7 @@ export function startSkinnedMesh(actor: Actor, args: ActorStartArgs) {
                 animationData[i][frameIndex] = [];
                 dataKeyframes.forEach((elem) => {
                     // TODO: bone animation じゃない場合の対応
-                    const boneIndex = (elem.target as Bone).getIndex();
+                    const boneIndex = (elem.target as Bone).index;
                     if (!animationData[i][frameIndex][boneIndex]) {
                         animationData[i][frameIndex][boneIndex] = {
                             // NOTE: { [elem.key]: elem.frameValue }
@@ -670,17 +671,17 @@ export function startSkinnedMesh(actor: Actor, args: ActorStartArgs) {
                 // boneにkeyframeごとの計算を割り当て
                 keyframeData.forEach((data) => {
                     const { translation, rotation, scale, bone } = data;
-                    const targetBone = skinnedMesh.boneOrderedIndex[bone.getIndex()];
+                    const targetBone = skinnedMesh.boneOrderedIndex[bone.index];
                     if (translation) {
-                        targetBone.setPosition(translation);
+                        targetBone.position = translation;
                     }
                     if (rotation) {
                         // TODO: quaternion-bug: 本当はこっちを使いたい
                         // targetBone.rotation = Rotator.fromQuaternion(rotation);
-                        targetBone.setRotation(createRotatorFromMatrix4(createMatrix4FromQuaternion(rotation)));
+                        targetBone.rotation = createRotatorFromMatrix4(createMatrix4FromQuaternion(rotation));
                     }
                     if (scale) {
-                        targetBone.setScale(scale);
+                        targetBone.scale = scale;
                     }
                 });
                 // boneごとのjointMatrixを再計算
@@ -761,7 +762,7 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
         // console.log("--------")
         const boneLinePositions: number[][] = skinnedMesh.boneOrderedIndex.map((bone) => {
             // console.log(bone.jointMatrix.position.e)
-            return [...getMat4Position(bone.getJointMatrix()).e];
+            return [...getMat4Position(bone.jointMatrix).e];
         });
         // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
         // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
@@ -863,7 +864,7 @@ const generateSkinningUniforms = (skinnedMesh: SkinnedMesh) => {
 const getBoneOffsetMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
     const matrices: Matrix4[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const m = cloneMat4(bone.getBoneOffsetMatrix());
+        const m = cloneMat4(bone.boneOffsetMatrix);
         matrices.push(m);
     });
     return matrices;
@@ -872,7 +873,7 @@ const getBoneOffsetMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
 export const getBoneJointMatrices = (skinnedMesh: SkinnedMesh): Matrix4[] => {
     const matrices: Matrix4[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const m = cloneMat4(bone.getJointMatrix());
+        const m = cloneMat4(bone.jointMatrix);
         matrices.push(m);
     });
     return matrices;
@@ -886,7 +887,7 @@ const getBoneJointMatricesWithBone = (
 }[] => {
     const data: { bone: Bone; matrix: Matrix4 }[] = [];
     traverseBone(skinnedMesh.bones, (bone) => {
-        const matrix = cloneMat4(bone.getJointMatrix());
+        const matrix = cloneMat4(bone.jointMatrix);
         data.push({ bone, matrix });
     });
     return data;
@@ -894,10 +895,10 @@ const getBoneJointMatricesWithBone = (
 
 const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => {
     const checkChildNum = (bone: Bone) => {
-        if (bone.hasChild()) {
-            bone.getChildren().forEach((elem) => {
+        if (hasNodeChild(bone)) {
+            bone.children.forEach((elem) => {
                 const childBone = elem as Bone;
-                skinnedMesh.boneIndicesForLines.push(bone.getIndex(), childBone.getIndex());
+                skinnedMesh.boneIndicesForLines.push(bone.index, childBone.index);
                 checkChildNum(childBone);
             });
         }

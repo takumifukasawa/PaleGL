@@ -108,7 +108,7 @@ export function updateAnimationClip(animationClip: AnimationClip, deltaTime: num
                 if ((animationKeyframes.target as Actor).transform) {
                     setTranslation((animationKeyframes.target as Actor).transform, p);
                 } else {
-                    (animationKeyframes.target as Bone).setPosition(p);
+                    (animationKeyframes.target as Bone).position = p;
                 }
                 break;
             case 'rotation':
@@ -124,7 +124,7 @@ export function updateAnimationClip(animationClip: AnimationClip, deltaTime: num
                 if ((animationKeyframes.target as Actor).transform) {
                     setRotation((animationKeyframes.target as Actor).transform, r);
                 } else {
-                    (animationKeyframes.target as Bone).setRotation(r);
+                    (animationKeyframes.target as Bone).rotation = r;
                 }
                 break;
             case 'scale':
@@ -132,7 +132,7 @@ export function updateAnimationClip(animationClip: AnimationClip, deltaTime: num
                 if ((animationKeyframes.target as Actor).transform) {
                     setScaling((animationKeyframes.target as Actor).transform, s);
                 } else {
-                    (animationKeyframes.target as Bone).setScale(s);
+                    (animationKeyframes.target as Bone).scale = s;
                 }
                 break;
             default:

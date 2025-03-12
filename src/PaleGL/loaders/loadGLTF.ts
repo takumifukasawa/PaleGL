@@ -22,6 +22,7 @@ import { createSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createScalingMatrix, createTranslationMatrix, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
 import {setAnimatorAnimationClips} from "@/PaleGL/core/animator.ts";
+import {addChildNode} from "@/PaleGL/core/nodeBase.ts";
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type GLTFScene = {
@@ -361,10 +362,10 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             )
         );
 
-        bone.setOffsetMatrix(offsetMatrix);
+        bone.offsetMatrix = offsetMatrix;
 
         if (parentBone) {
-            parentBone.addChild(bone);
+            addChildNode(parentBone, bone);
         }
         if (node.children) {
             node.children.forEach((childNodeIndex) => createGLTFBone(childNodeIndex, bone));
