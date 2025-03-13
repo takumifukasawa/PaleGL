@@ -131,7 +131,6 @@ import { DepthOfFieldPassParameters } from '@/PaleGL/postprocess/depthOfFieldPas
 import { LightShaftPassParameters } from '@/PaleGL/postprocess/lightShaftPass.ts';
 import { VolumetricLightPassParameters } from '@/PaleGL/postprocess/volumetricLightPass.ts';
 import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
-import { BloomPassParameters } from '@/PaleGL/postprocess/bloomPass.ts';
 import { SSRPassParameters } from '@/PaleGL/postprocess/ssrPass.ts';
 import {
     getRotatorDegreeX,
@@ -2595,9 +2594,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 4,
         stepValue: 0.001,
-        initialValue: (renderer.bloomPass.parameters as BloomPassParameters).bloomAmount,
+        initialValue: renderer.bloomPass.bloomAmount,
         onChange: (value) => {
-            (renderer.bloomPass.parameters as BloomPassParameters).bloomAmount = value;
+            renderer.bloomPass.bloomAmount = value;
         },
     });
 
@@ -2606,9 +2605,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 2,
         stepValue: 0.001,
-        initialValue: (renderer.bloomPass.parameters as BloomPassParameters).threshold,
+        initialValue: renderer.bloomPass.threshold,
         onChange: (value) => {
-            (renderer.bloomPass.parameters as BloomPassParameters).threshold = value;
+            renderer.bloomPass.threshold = value;
         },
     });
 
@@ -2617,9 +2616,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.bloomPass.parameters as BloomPassParameters).tone,
+        initialValue: renderer.bloomPass.tone,
         onChange: (value) => {
-            (renderer.bloomPass.parameters as BloomPassParameters).tone = value;
+            renderer.bloomPass.tone = value;
         },
     });
 

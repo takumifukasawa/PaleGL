@@ -29,7 +29,7 @@ export function updateInputController (inputController: InputController) {
 }
 
 // inputPosition ... v2
-// isDown ... bool
+// isDown ... boolAxJWn8ZVoY6AAxJWn8ZVo
 function updateInternal (inputController: InputController, { inputPosition, isDown }: { inputPosition: Vector2; isDown: boolean }) {
     updateState(inputController, isDown);
     updateInputPositions(inputController, inputPosition);

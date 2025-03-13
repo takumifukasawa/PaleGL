@@ -4,7 +4,6 @@
     LightTypes,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
-    PostProcessPassType,
     RenderQueueType,
     RenderTargetTypes,
     TextureDepthPrecisionType,
@@ -71,9 +70,7 @@ import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
 import {
     BloomPass,
-    BloomPassParameters,
     createBloomPass,
-    updateBloomPassParameters,
 } from '@/PaleGL/postprocess/bloomPass.ts';
 import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
 import {
@@ -140,7 +137,7 @@ import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
 import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { findPostProcessParameter, PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
+import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
@@ -195,21 +192,18 @@ export function applyLightShadowMapUniformValues(
     setMaterialUniformValue(targetMaterial, UniformNames.SpotLightShadowMap, spotLightShadowMaps);
 }
 
-/**
- * post process volume の値を各passに適用
- * @param renderer
- * @param postProcessVolumeActor
- */
-function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
-    // bloom
-    // renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
-    const bloomParameter = findPostProcessParameter<BloomPassParameters>(
-        postProcessVolumeActor,
-        PostProcessPassType.Bloom
-    );
-    if (bloomParameter) {
-        updateBloomPassParameters(renderer.bloomPass, bloomParameter);
-    }
+// TODO: 処理を復活させる
+// function applyPostProcessVolumeParameters(renderer: Renderer, postProcessVolumeActor: PostProcessVolume) {
+function applyPostProcessVolumeParameters() {
+    // // bloom
+    // // renderer.bloomPass.updateParameters(postProcessVolumeActor.findParameter<BloomPassParameters>(PostProcessPassType.Bloom));
+    // const bloomParameter = findPostProcessParameter<BloomPassParameters>(
+    //     postProcessVolumeActor,
+    //     PostProcessPassType.Bloom
+    // );
+    // if (bloomParameter) {
+    //     updateBloomPassParameters(renderer.bloomPass, bloomParameter);
+    // }
 }
 
 // /**
@@ -2707,7 +2701,9 @@ export function renderRenderer(
 
     // override postprocess parameters
     if (postProcessVolumeActor) {
-        applyPostProcessVolumeParameters(renderer, postProcessVolumeActor);
+        // TODO: 処理を復活させる
+        // applyPostProcessVolumeParameters(renderer, postProcessVolumeActor);
+        applyPostProcessVolumeParameters();
     }
 
     //
