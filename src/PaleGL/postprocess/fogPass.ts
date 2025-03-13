@@ -1,11 +1,9 @@
-﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
-import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
+﻿import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-    PostProcessPassParametersBase,
-    PostProcessPassRenderArgs,
+    PostProcessPassRenderArgs, PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
     PostProcessPassType,
@@ -15,7 +13,6 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
-import { Override } from '@/PaleGL/palegl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
@@ -32,7 +29,11 @@ const UNIFORM_SSS_FOG_RATE = 'uSSSFogRate';
 const UNIFORM_SSS_FOG_COLOR = 'uSSSFogColor';
 const UNIFORM_NOISE_TEXTURE = 'uNoiseTexture';
 
-export type FogPassParametersBase = {
+const lightShaftTextureUniformName = 'uLightShaftTexture';
+const volumetricLightTextureUniformName = 'uVolumetricLightTexture';
+const screenSpaceShadowTextureUniformName = 'uSSSTexture';
+
+export type FogPassParameters = {
     fogColor: Color;
     fogStrength: number;
     fogDensity: number;
@@ -46,47 +47,26 @@ export type FogPassParametersBase = {
     blendRate: number;
 };
 
-export type FogPassParameters = PostProcessPassParametersBase & FogPassParametersBase;
+export type FogPass = PostProcessSinglePass & FogPassParameters;
 
-export type FogPassParametersArgs = Partial<FogPassParameters>;
+export type FogPassArgs = PostProcessPassParametersBaseArgs & Partial<FogPassParameters>;
 
-type RequiredToOptional<T> = {
-    [K in keyof T]?: T[K]; // `?` adds the optional modifier
-};
-
-// type OptionalToRequired<T> = {
-//     [K in keyof T]-?: T[K]; // `-?` removes the optional modifier
-// };
-
-export function generateFogPassParameters(params: RequiredToOptional<FogPassParametersArgs> = {}): FogPassParameters {
-    return {
-        enabled: params.enabled ?? true,
-        fogColor: params.fogColor ?? createColorWhite(),
-        fogStrength: params.fogStrength ?? 0.01,
-        fogDensity: params.fogDensity ?? 0.023,
-        fogDensityAttenuation: params.fogDensityAttenuation ?? 0.45,
-        fogEndHeight: params.fogEndHeight ?? 1,
-        distanceFogStart: params.distanceFogStart ?? 20,
-        distanceFogPower: params.distanceFogPower ?? 0.1,
-        distanceFogEnd: params.distanceFogEnd ?? 100,
-        sssFogRate: params.sssFogRate ?? 1,
-        sssFogColor: params.sssFogColor ?? createColorWhite(),
-        blendRate: 1,
-    };
-}
-
-const lightShaftTextureUniformName = 'uLightShaftTexture';
-const volumetricLightTextureUniformName = 'uVolumetricLightTexture';
-const screenSpaceShadowTextureUniformName = 'uSSSTexture';
-
-export type FogPass = PostProcessSinglePass;
-
-export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersArgs }) {
-    const { gpu } = args;
+export function createFogPass(args: FogPassArgs) {
+    const { gpu, enabled } = args;
     const fragmentShader = fogFragmentShader;
 
-    const parameters: Override<PostProcessPassParametersBase, FogPassParameters> = generateFogPassParameters();
-
+    const fogColor = args.fogColor ?? createColorWhite();
+    const fogStrength = args.fogStrength ?? 0.01;
+    const fogDensity = args.fogDensity ?? 0.023;
+    const fogDensityAttenuation = args.fogDensityAttenuation ?? 0.45;
+    const fogEndHeight = args.fogEndHeight ?? 1;
+    const distanceFogStart = args.distanceFogStart ?? 20;
+    const distanceFogPower = args.distanceFogPower ?? 0.1;
+    const distanceFogEnd = args.distanceFogEnd ?? 100;
+    const sssFogRate = args.sssFogRate ?? 1;
+    const sssFogColor = args.sssFogColor ?? createColorWhite();
+    const blendRate = args.blendRate ?? 1;
+        
     return {
         ...createPostProcessSinglePass({
             gpu,
@@ -124,42 +104,42 @@ export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersAr
                 {
                     name: UNIFORM_FOG_STRENGTH,
                     type: UniformTypes.Float,
-                    value: parameters.fogStrength,
+                    value: fogStrength,
                 },
                 {
                     name: UNIFORM_FOG_DENSITY,
                     type: UniformTypes.Float,
-                    value: parameters.fogDensity,
+                    value: fogDensity,
                 },
                 {
                     name: UNIFORM_FOG_DENSITY_ATTENUATION,
                     type: UniformTypes.Float,
-                    value: parameters.fogDensityAttenuation,
+                    value: fogDensityAttenuation,
                 },
                 {
                     name: UNIFORM_FOG_END_HEIGHT,
                     type: UniformTypes.Float,
-                    value: parameters.fogEndHeight,
+                    value: fogEndHeight,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_START,
                     type: UniformTypes.Float,
-                    value: parameters.distanceFogStart,
+                    value: distanceFogStart,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_END,
                     type: UniformTypes.Float,
-                    value: parameters.distanceFogEnd,
+                    value: distanceFogEnd,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_POWER,
                     type: UniformTypes.Float,
-                    value: parameters.distanceFogPower,
+                    value: distanceFogPower,
                 },
                 {
                     name: UNIFORM_SSS_FOG_RATE,
                     type: UniformTypes.Float,
-                    value: parameters.sssFogRate,
+                    value: sssFogRate,
                 },
                 {
                     name: UNIFORM_SSS_FOG_COLOR,
@@ -179,8 +159,20 @@ export function createFogPass(args: { gpu: Gpu; parameters?: FogPassParametersAr
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
-            parameters,
+            enabled
         }),
+        // parameters
+        fogColor,
+        fogStrength,
+        fogDensity,
+        fogDensityAttenuation,
+        fogEndHeight,
+        distanceFogStart,
+        distanceFogPower,
+        distanceFogEnd,
+        sssFogRate,
+        sssFogColor,
+        blendRate,
     };
 }
 
@@ -199,19 +191,17 @@ export function setFogPassTextures(
 
 export function renderFogPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const fogPass = postProcessPass as FogPass;
-    const parameters = fogPass.parameters as FogPassParameters;
-
-    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_COLOR, parameters.fogColor);
-    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_STRENGTH, parameters.fogStrength);
-    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_DENSITY, parameters.fogDensity);
-    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_DENSITY_ATTENUATION, parameters.fogDensityAttenuation);
-    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_END_HEIGHT, parameters.fogEndHeight);
-    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_START, parameters.distanceFogStart);
-    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_END, parameters.distanceFogEnd);
-    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_POWER, parameters.distanceFogPower);
-    setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_RATE, parameters.sssFogRate);
-    setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_COLOR, parameters.sssFogColor);
-    setMaterialUniformValue(fogPass.material, UniformNames.BlendRate, parameters.blendRate);
+    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_COLOR, fogPass.fogColor);
+    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_STRENGTH, fogPass.fogStrength);
+    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_DENSITY, fogPass.fogDensity);
+    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_DENSITY_ATTENUATION, fogPass.fogDensityAttenuation);
+    setMaterialUniformValue(fogPass.material, UNIFORM_FOG_END_HEIGHT, fogPass.fogEndHeight);
+    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_START, fogPass.distanceFogStart);
+    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_END, fogPass.distanceFogEnd);
+    setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_POWER, fogPass.distanceFogPower);
+    setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_RATE, fogPass.sssFogRate);
+    setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_COLOR, fogPass.sssFogColor);
+    setMaterialUniformValue(fogPass.material, UniformNames.BlendRate, fogPass.blendRate);
 
     renderPostProcessSinglePassBehaviour(fogPass, options);
 }

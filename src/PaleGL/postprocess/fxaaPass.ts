@@ -3,7 +3,6 @@ import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessSinglePass,
-    PostProcessPassParametersBase,
     PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
@@ -13,11 +12,9 @@ import {
 // https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
 // http://iryoku.com/aacourse/downloads/09-FXAA-3.11-in-15-Slides.pdf
 
-export type FXAAPassParameters = PostProcessPassParametersBase;
-
 export type FxaaPass = PostProcessSinglePass;
 
-export type FXAAPassArgs = PostProcessPassParametersBaseArgs & Partial<FXAAPassParameters>;
+export type FXAAPassArgs = PostProcessPassParametersBaseArgs;
 
 export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
     const { gpu, enabled } = args;

@@ -123,7 +123,6 @@ import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
-import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
 import {
     getRotatorDegreeX,
     getRotatorDegreeY,
@@ -534,7 +533,7 @@ renderer.depthOfFieldPass.focusDistance = 18.5;
 renderer.depthOfFieldPass.focusRange = 17;
 
 const bufferVisualizerPass = createBufferVisualizerPass({ gpu });
-bufferVisualizerPass.parameters.enabled = false;
+bufferVisualizerPass.enabled = false;
 addPostProcessPass(cameraPostProcess, bufferVisualizerPass);
 
 setPostProcessEnabled(cameraPostProcess, true);
@@ -2017,13 +2016,13 @@ function initDebugger() {
 
     addToggleDebugger(debuggerGUI, {
         label: 'show buffers',
-        initialValue: bufferVisualizerPass.parameters.enabled,
+        initialValue: bufferVisualizerPass.enabled,
         onChange: (value) => {
             if (value) {
-                bufferVisualizerPass.parameters.enabled = true;
+                bufferVisualizerPass.enabled = true;
                 showBufferVisualizerPassDom(bufferVisualizerPass);
             } else {
-                bufferVisualizerPass.parameters.enabled = false;
+                bufferVisualizerPass.enabled = false;
                 hideBufferVisualizerPassDom(bufferVisualizerPass);
             }
         },
@@ -2212,8 +2211,8 @@ function initDebugger() {
 
     addToggleDebugger(ssaoDebuggerGroup, {
         label: 'ssao pass enabled',
-        initialValue: renderer.ambientOcclusionPass.parameters.enabled,
-        onChange: (value) => (renderer.ambientOcclusionPass.parameters.enabled = value),
+        initialValue: renderer.ambientOcclusionPass.enabled,
+        onChange: (value) => (renderer.ambientOcclusionPass.enabled = value),
     });
 
     addSliderDebugger(ssaoDebuggerGroup, {
@@ -2311,8 +2310,8 @@ function initDebugger() {
 
     addToggleDebugger(lightShaftDebuggerGroup, {
         label: 'light shaft pass enabled',
-        initialValue: renderer.lightShaftPass.parameters.enabled,
-        onChange: (value) => (renderer.lightShaftPass.parameters.enabled = value),
+        initialValue: renderer.lightShaftPass.enabled,
+        onChange: (value) => (renderer.lightShaftPass.enabled = value),
     });
 
     addSliderDebugger(lightShaftDebuggerGroup, {
@@ -2415,9 +2414,9 @@ function initDebugger() {
 
     addColorDebugger(fogDebuggerGroup, {
         label: 'fog color',
-        initialValue: getColorHexCoord((renderer.fogPass.parameters as FogPassParameters).fogColor),
+        initialValue: getColorHexCoord(renderer.fogPass.fogColor),
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).fogColor = createColorFromHex(value);
+            renderer.fogPass.fogColor = createColorFromHex(value);
         },
     });
 
@@ -2426,9 +2425,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 0.2,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).fogStrength,
+        initialValue: renderer.fogPass.fogStrength,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).fogStrength = value;
+            renderer.fogPass.fogStrength = value;
         },
     });
 
@@ -2437,9 +2436,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).fogDensity,
+        initialValue: renderer.fogPass.fogDensity,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).fogDensity = value;
+            renderer.fogPass.fogDensity = value;
         },
     });
 
@@ -2448,9 +2447,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).fogDensityAttenuation,
+        initialValue: renderer.fogPass.fogDensityAttenuation,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).fogDensityAttenuation = value;
+            renderer.fogPass.fogDensityAttenuation = value;
         },
     });
 
@@ -2459,9 +2458,9 @@ function initDebugger() {
         minValue: -5,
         maxValue: 5,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).fogEndHeight,
+        initialValue: renderer.fogPass.fogEndHeight,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).fogEndHeight = value;
+            renderer.fogPass.fogEndHeight = value;
         },
     });
 
@@ -2470,9 +2469,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 300,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).distanceFogPower,
+        initialValue: renderer.fogPass.distanceFogPower,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).distanceFogStart = value;
+            renderer.fogPass.distanceFogStart = value;
         },
     });
 
@@ -2481,9 +2480,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 300,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).distanceFogEnd,
+        initialValue: renderer.fogPass.distanceFogEnd,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).distanceFogEnd = value;
+            renderer.fogPass.distanceFogEnd = value;
         },
     });
 
@@ -2492,9 +2491,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 0.2,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).distanceFogPower,
+        initialValue: renderer.fogPass.distanceFogPower,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).distanceFogPower = value;
+            renderer.fogPass.distanceFogPower = value;
         },
     });
 
@@ -2503,9 +2502,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).sssFogRate,
+        initialValue: renderer.fogPass.sssFogRate,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).sssFogRate = value;
+            renderer.fogPass.sssFogRate = value;
         },
     });
 
@@ -2514,9 +2513,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.0001,
-        initialValue: (renderer.fogPass.parameters as FogPassParameters).blendRate,
+        initialValue: renderer.fogPass.blendRate,
         onChange: (value) => {
-            (renderer.fogPass.parameters as FogPassParameters).blendRate = value;
+            renderer.fogPass.blendRate = value;
         },
     });
 
@@ -2577,8 +2576,8 @@ function initDebugger() {
 
     addToggleDebugger(bloomDebuggerGroup, {
         label: 'Bloom pass enabled',
-        initialValue: renderer.bloomPass.parameters.enabled,
-        onChange: (value) => (renderer.bloomPass.parameters.enabled = value),
+        initialValue: renderer.bloomPass.enabled,
+        onChange: (value) => (renderer.bloomPass.enabled = value),
     });
 
     addSliderDebugger(bloomDebuggerGroup, {
@@ -2624,8 +2623,8 @@ function initDebugger() {
 
     addToggleDebugger(ssrDebuggerGroup, {
         label: 'ssr pass enabled',
-        initialValue: renderer.ssrPass.parameters.enabled,
-        onChange: (value) => (renderer.ssrPass.parameters.enabled = value),
+        initialValue: renderer.ssrPass.enabled,
+        onChange: (value) => (renderer.ssrPass.enabled = value),
     });
 
     addSliderDebugger(ssrDebuggerGroup, {

@@ -27,19 +27,6 @@ import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 
-export type PostProcessPassParametersTemplate = {
-    // gpu: Gpu;
-    enabled: boolean;
-};
-
-// export type PostProcessPassParametersBase = PostProcessPassParametersTemplate & IPostProcessPassParameters<PostProcessPassParametersBase>;
-export type PostProcessPassParametersBase = PostProcessPassParametersTemplate;
-
-// export interface IPostProcessPassParameters<T extends PostProcessPassParametersBase> {
-//     update?: (parameter: T) => T;
-//     updateKey?: (key: keyof T, value: T[keyof T]) => T;
-// }
-
 export type PostProcessPassParametersBaseArgs = {
     gpu: Gpu;
     enabled?: boolean;
@@ -63,18 +50,16 @@ export type PostProcessPassBase = {
     type: PostProcessPassType;
     width: number;
     height: number;
-    parameters: PostProcessPassParametersBase;
     geometry: Geometry;
     materials: Material[];
     enabled: boolean;
 };
 
-type PostProcessPassBaseArgs = Omit<PostProcessPassBase, 'width' | 'height' | 'enabled' | 'parameters'> &
+type PostProcessPassBaseArgs = Omit<PostProcessPassBase, 'width' | 'height' | 'enabled'> &
     Partial<{
         width: number;
         height: number;
         enabled: boolean;
-        parameters: PostProcessPassParametersBase;
     }>;
 
 export function createPostProcessPassBase(args: PostProcessPassBaseArgs): PostProcessPassBase {
@@ -84,7 +69,6 @@ export function createPostProcessPassBase(args: PostProcessPassBaseArgs): PostPr
         type: args.type,
         width: args.width !== undefined ? args.width : 1, // TODO: asssign 1
         height: args.height !== undefined ? args.height : 1, // TODO: assign 1
-        parameters: args.parameters || { enabled: true },
         geometry: args.geometry,
         materials: args.materials,
         enabled: args.enabled === undefined ? true : args.enabled,
@@ -102,7 +86,6 @@ export type PostProcessSinglePass = PostProcessPassBase & {
 export function createPostProcessSinglePass(args: {
     gpu: Gpu;
     type: PostProcessPassType;
-    parameters?: PostProcessPassParametersTemplate;
     vertexShader?: string;
     fragmentShader?: string;
     rawVertexShader?: string;
@@ -125,7 +108,6 @@ export function createPostProcessSinglePass(args: {
     const {
         gpu,
         type,
-        // parameters,
         vertexShader = postProcessPassVertexShader,
         fragmentShader,
         rawVertexShader,
@@ -147,12 +129,6 @@ export function createPostProcessSinglePass(args: {
     const width = 1;
     const height = 1;
     const materials: Material[] = [];
-
-    const parameters = {
-        ...args.parameters,
-        // type: parameters.type,
-        // enabled: enabled || true,
-    };
 
     // const baseVertexShader = getPostProcessBaseVertexShader();
     // vertexShader = vertexShader || baseVertexShader;
@@ -214,9 +190,6 @@ export function createPostProcessSinglePass(args: {
         gpu,
         name,
         type,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        parameters: parameters || { enabled: true }, // TODO: 削除必須
         width,
         height,
         renderTarget,

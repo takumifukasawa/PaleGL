@@ -1,15 +1,15 @@
 import { createVolume, Volume } from '@/PaleGL/actors/volumes/volume.ts';
 import { ActorTypes, PostProcessPassType } from '@/PaleGL/constants.ts';
-import { PostProcessPassParametersBase } from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { PostProcessPassBase } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { ActorArgs } from '@/PaleGL/actors/actor.ts';
 
 export type PostProcessVolumeParameterSet = {
     type: PostProcessPassType;
-    parameters: PostProcessPassParametersBase;
+    // parameters: PostProcessPassParametersBase;
 };
 
 type PostProcessVolumeArgs = ActorArgs & {
-    parameters: PostProcessVolumeParameterSet[];
+    // parameters: PostProcessVolumeParameterSet[];
 };
 
 export type PostProcessVolume = Volume & ReturnType<typeof createPostProcessVolume>;
@@ -26,7 +26,7 @@ export function createPostProcessVolume(args: PostProcessVolumeArgs) {
     return { ...volume, parameters };
 }
 
-export const findPostProcessParameter = <T extends PostProcessPassParametersBase>(
+export const findPostProcessParameter = <T extends PostProcessPassBase>(
     pp: PostProcessVolume,
     type: PostProcessPassType
 ): T | null => {
@@ -34,5 +34,6 @@ export const findPostProcessParameter = <T extends PostProcessPassParametersBase
     if (!result) {
         return null;
     }
-    return result.parameters as T;
+    // return result.parameters as T;
+    return result as T;
 };
