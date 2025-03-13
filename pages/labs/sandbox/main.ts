@@ -91,11 +91,7 @@ import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.t
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import {
-    addPostProcessPass,
-    createPostProcess,
-    setPostProcessEnabled
-} from '@/PaleGL/postprocess/postProcess.ts';
+import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import {
     createTransformFeedbackDoubleBuffer,
@@ -127,9 +123,7 @@ import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
-import { VolumetricLightPassParameters } from '@/PaleGL/postprocess/volumetricLightPass.ts';
 import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
-import { SSRPassParameters } from '@/PaleGL/postprocess/ssrPass.ts';
 import {
     getRotatorDegreeX,
     getRotatorDegreeY,
@@ -141,9 +135,9 @@ import {
 import {
     setInputControllerSize,
     startInputController,
-    updateInputController
-} from "@/PaleGL/inputs/inputControllerBehaviours.ts";
-import {getAnimatorAnimationClips} from "@/PaleGL/core/animator.ts";
+    updateInputController,
+} from '@/PaleGL/inputs/inputControllerBehaviours.ts';
+import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -349,7 +343,7 @@ let screenSpaceRaymarchMesh: Mesh;
 
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? createTouchInputController() : createMouseInputController();
-startInputController(inputController)
+startInputController(inputController);
 
 // const wrapperElement = document.getElementById("wrapper")!;
 const wrapperElement = document.createElement('div');
@@ -1946,7 +1940,7 @@ void main() {
 
     engine.setOnBeforeUpdate(() => {
         if (!debuggerGUI) initDebugger();
-        updateInputController(inputController)
+        updateInputController(inputController);
     });
 
     engine.setOnBeforeFixedUpdate(() => {
@@ -2364,42 +2358,42 @@ function initDebugger() {
 
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'ray step',
-        initialValue: (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayStep,
+        initialValue: renderer.volumetricLightPass.rayStep,
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayStep = value;
+            renderer.volumetricLightPass.rayStep = value;
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'density multiplier',
-        initialValue: (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).densityMultiplier,
+        initialValue: renderer.volumetricLightPass.densityMultiplier,
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
         onChange: (value) => {
-            (renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).densityMultiplier = value;
+            renderer.volumetricLightPass.densityMultiplier = value;
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'jitter size x',
-        initialValue: v3x((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize),
+        initialValue: v3x(renderer.volumetricLightPass.rayJitterSize),
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            setV3x((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize, value);
+            setV3x(renderer.volumetricLightPass.rayJitterSize, value);
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
         label: 'jitter size y',
-        initialValue: v3y((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize),
+        initialValue: v3y(renderer.volumetricLightPass.rayJitterSize),
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
         onChange: (value) => {
-            setV3y((renderer.volumetricLightPass.parameters as VolumetricLightPassParameters).rayJitterSize, value);
+            setV3y(renderer.volumetricLightPass.rayJitterSize, value);
         },
     });
 
@@ -2639,9 +2633,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).rayDepthBias,
+        initialValue: renderer.ssrPass.rayDepthBias,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).rayDepthBias = value;
+            renderer.ssrPass.rayDepthBias = value;
         },
     });
 
@@ -2650,9 +2644,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).rayNearestDistance,
+        initialValue: renderer.ssrPass.rayNearestDistance,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).rayNearestDistance = value;
+            renderer.ssrPass.rayNearestDistance = value;
         },
     });
 
@@ -2661,9 +2655,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).rayMaxDistance,
+        initialValue: renderer.ssrPass.rayMaxDistance,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).rayMaxDistance = value;
+            renderer.ssrPass.rayMaxDistance = value;
         },
     });
 
@@ -2672,9 +2666,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayThickness,
+        initialValue: renderer.ssrPass.reflectionRayThickness,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayThickness = value;
+            renderer.ssrPass.reflectionRayThickness = value;
         },
     });
 
@@ -2683,9 +2677,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayJitterSizeX,
+        initialValue: renderer.ssrPass.reflectionRayJitterSizeX,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayJitterSizeX = value;
+            renderer.ssrPass.reflectionRayJitterSizeX = value;
         },
     });
 
@@ -2694,9 +2688,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayJitterSizeY,
+        initialValue: renderer.ssrPass.reflectionRayJitterSizeY,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionRayJitterSizeY = value;
+            renderer.ssrPass.reflectionRayJitterSizeY = value;
         },
     });
 
@@ -2705,9 +2699,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionFadeMinDistance,
+        initialValue: renderer.ssrPass.reflectionFadeMinDistance,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionFadeMinDistance = value;
+            renderer.ssrPass.reflectionFadeMinDistance = value;
         },
     });
 
@@ -2716,9 +2710,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionFadeMaxDistance,
+        initialValue: renderer.ssrPass.reflectionFadeMaxDistance,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionFadeMaxDistance = value;
+            renderer.ssrPass.reflectionFadeMaxDistance = value;
         },
     });
 
@@ -2727,9 +2721,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMinX,
+        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMinX = value;
+            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
         },
     });
 
@@ -2738,9 +2732,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMaxX,
+        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMaxX = value;
+            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
         },
     });
 
@@ -2749,9 +2743,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMinY,
+        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMinY = value;
+            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
         },
     });
 
@@ -2760,9 +2754,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMaxY,
+        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionScreenEdgeFadeFactorMaxY = value;
+            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
         },
     });
 
@@ -2771,9 +2765,9 @@ function initDebugger() {
         minValue: 0.01,
         maxValue: 1,
         stepValue: 0.01,
-        initialValue: (renderer.ssrPass.parameters as SSRPassParameters).reflectionAdditionalRate,
+        initialValue: renderer.ssrPass.reflectionAdditionalRate,
         onChange: (value) => {
-            (renderer.ssrPass.parameters as SSRPassParameters).reflectionAdditionalRate = value;
+            renderer.ssrPass.reflectionAdditionalRate = value;
         },
     });
 

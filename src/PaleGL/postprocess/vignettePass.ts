@@ -1,125 +1,11 @@
-﻿// import {PostProcessPassType, UniformNames, UniformTypes} from '@/PaleGL/constants';
-// import { Gpu } from '@/PaleGL/core/gpu.ts';
-// import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
-// import {
-//     PostProcessPassBaseDEPRECATED
-// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-// import {
-//     PostProcessPassParametersBase,
-//     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
-// import { Override } from '@/PaleGL/palegl';
-// import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
-//
-// // ref:
-//
-// const UNIFORM_NAME_VIGNETTE_RADIUS_FROM = 'uVignetteRadiusFrom';
-// const UNIFORM_NAME_VIGNETTE_RADIUS_TO = 'uVignetteRadiusTo';
-// const UNIFORM_VALUE_VIGNETTE_RADIUS_FROM = 1.77;
-// const UNIFORM_VALUE_VIGNETTE_RADIUS_TO = 4.484;
-// const UNIFORM_NAME_VIGNETTE_POWER = 'uVignettePower';
-// const UNIFORM_VALUE_VIGNETTE_POWER = 1.345;
-// const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
-// const UNIFORM_VALUE_BLEND_RATE = 0.73;
-//
-// export type VignettePassParametersBase = {
-//     vignetteRadiusFrom: number;
-//     vignetteRadiusTo: number;
-//     vignettePower: number;
-//     blendRate: number;
-// };
-//
-// export type VignettePassParameters = PostProcessPassParametersBase & VignettePassParametersBase;
-//
-// export type VignettePassParametersArgs = Partial<VignettePassParameters>;
-//
-// export function generateVignetteParameters(params: VignettePassParametersArgs = {}): VignettePassParameters {
-//     return {
-//         enabled: params.enabled ?? true,
-//         vignetteRadiusFrom: params.vignetteRadiusFrom ?? UNIFORM_VALUE_VIGNETTE_RADIUS_FROM,
-//         vignetteRadiusTo: params.vignetteRadiusTo ?? UNIFORM_VALUE_VIGNETTE_RADIUS_TO,
-//         vignettePower: params.vignettePower ?? UNIFORM_VALUE_VIGNETTE_POWER,
-//         blendRate: params.blendRate ?? UNIFORM_VALUE_BLEND_RATE,
-//     };
-// }
-//
-// export class VignettePass extends PostProcessPassBaseDEPRECATED {
-//     // vignetteRadius: number;
-//     // vignettePower: number;
-//     // blendRate: number;
-//     parameters: Override<PostProcessPassParametersBase, VignettePassParameters>;
-//
-//     constructor(args: { gpu: Gpu; parameters?: VignettePassParametersArgs }) {
-//         const { gpu } = args;
-//         const fragmentShader = vignetteFragment;
-//
-//         const parameters = generateVignetteParameters(args.parameters ?? {});
-//
-//         super({
-//             gpu,
-//             type: PostProcessPassType.Vignette,
-//             fragmentShader,
-//             uniforms: [
-//                 {
-//                     name: UNIFORM_NAME_VIGNETTE_RADIUS_FROM,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_VIGNETTE_RADIUS_FROM,
-//                 },
-//                 {
-//                     name: UNIFORM_NAME_VIGNETTE_RADIUS_TO,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_VIGNETTE_RADIUS_TO,
-//                 },
-//                 {
-//                     name: UNIFORM_NAME_VIGNETTE_POWER,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_VIGNETTE_POWER,
-//                 },
-//                 {
-//                     name: UNIFORM_NAME_BLEND_RATE,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_BLEND_RATE,
-//                 },
-//                 {
-//                     name: UniformNames.Aspect,
-//                     type: UniformTypes.Float,
-//                     value: 1,
-//                 },
-//             ],
-//             parameters,
-//         });
-//
-//         this.parameters = parameters;
-//
-//         // this.vignetteRadius = UNIFORM_VALUE_VIGNETTE_RADIUS;
-//         // this.vignettePower = UNIFORM_VALUE_VIGNETTE_POWER;
-//         // this.blendRate = UNIFORM_VALUE_BLEND_RATE;
-//     }
-//
-//     setSize(width: number, height: number) {
-//         super.setSize(width, height);
-//         setMaterialUniformValue(this.material, UniformNames.Aspect, width / height);
-//     }
-//
-//     render(options: PostProcessPassRenderArgs) {
-//         setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_RADIUS_FROM, this.parameters.vignetteRadiusFrom);
-//         setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_RADIUS_TO, this.parameters.vignetteRadiusTo);
-//         setMaterialUniformValue(this.material,UNIFORM_NAME_VIGNETTE_POWER, this.parameters.vignettePower);
-//         setMaterialUniformValue(this.material,UNIFORM_NAME_BLEND_RATE, this.parameters.blendRate);
-//
-//         super.render(options);
-//     }
-// }
-
-import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
     PostProcessSinglePass,
-    PostProcessPassParametersBase,
     PostProcessPassRenderArgs,
+    PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
@@ -135,36 +21,27 @@ const UNIFORM_VALUE_VIGNETTE_POWER = 1.345;
 const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
 const UNIFORM_VALUE_BLEND_RATE = 0.73;
 
-export type VignettePassParametersBase = {
+export type VignettePassParameters = {
     vignetteRadiusFrom: number;
     vignetteRadiusTo: number;
     vignettePower: number;
     blendRate: number;
 };
 
-export type VignettePassParameters = PostProcessPassParametersBase & VignettePassParametersBase;
+export type VignettePass = PostProcessSinglePass & VignettePassParameters;
 
-export type VignettePassParametersArgs = Partial<VignettePassParameters>;
+export type VignettePassArgs = PostProcessPassParametersBaseArgs & Partial<VignettePassParameters>;
 
-export function generateVignetteParameters(params: VignettePassParametersArgs = {}): VignettePassParameters {
-    return {
-        enabled: params.enabled ?? true,
-        vignetteRadiusFrom: params.vignetteRadiusFrom ?? UNIFORM_VALUE_VIGNETTE_RADIUS_FROM,
-        vignetteRadiusTo: params.vignetteRadiusTo ?? UNIFORM_VALUE_VIGNETTE_RADIUS_TO,
-        vignettePower: params.vignettePower ?? UNIFORM_VALUE_VIGNETTE_POWER,
-        blendRate: params.blendRate ?? UNIFORM_VALUE_BLEND_RATE,
-    };
-}
-
-export type VignettePass = PostProcessSinglePass;
-
-export function createVignettePass(args: { gpu: Gpu; parameters?: VignettePassParametersArgs }): VignettePass {
+export function createVignettePass(args: VignettePassArgs): VignettePass {
     // parameters: Override<PostProcessPassParametersBase, VignettePassParameters>;
 
-    const { gpu } = args;
+    const { gpu, enabled } = args;
     const fragmentShader = vignetteFragment;
 
-    const parameters = generateVignetteParameters(args.parameters ?? {});
+    const vignetteRadiusFrom = args.vignetteRadiusFrom ?? UNIFORM_VALUE_VIGNETTE_RADIUS_FROM;
+    const vignetteRadiusTo = args.vignetteRadiusTo ?? UNIFORM_VALUE_VIGNETTE_RADIUS_TO;
+    const vignettePower = args.vignettePower ?? UNIFORM_VALUE_VIGNETTE_POWER;
+    const blendRate = args.blendRate ?? UNIFORM_VALUE_BLEND_RATE;
 
     return {
         ...createPostProcessSinglePass({
@@ -198,8 +75,13 @@ export function createVignettePass(args: { gpu: Gpu; parameters?: VignettePassPa
                     value: 1,
                 },
             ],
-            parameters,
+            enabled,
         }),
+        // parameters
+        vignetteRadiusFrom,
+        vignetteRadiusTo,
+        vignettePower,
+        blendRate,
     };
 }
 
@@ -210,11 +92,10 @@ export function createVignettePass(args: { gpu: Gpu; parameters?: VignettePassPa
 
 export function renderVignettePass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const vignettePass = postProcessPass as VignettePass;
-    const parameters = vignettePass.parameters as VignettePassParameters;
-    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_FROM, parameters.vignetteRadiusFrom);
-    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_TO, parameters.vignetteRadiusTo);
-    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_POWER, parameters.vignettePower);
-    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_BLEND_RATE, parameters.blendRate);
+    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_FROM, vignettePass.vignetteRadiusFrom);
+    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_TO, vignettePass.vignetteRadiusTo);
+    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_POWER, vignettePass.vignettePower);
+    setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_BLEND_RATE, vignettePass.blendRate);
 
     renderPostProcessSinglePassBehaviour(postProcessPass, options);
 }
