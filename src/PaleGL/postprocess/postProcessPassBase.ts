@@ -28,6 +28,7 @@ import { LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 
 export type PostProcessPassParametersTemplate = {
+    // gpu: Gpu;
     enabled: boolean;
 };
 
@@ -40,6 +41,7 @@ export type PostProcessPassParametersBase = PostProcessPassParametersTemplate;
 // }
 
 export type PostProcessPassParametersBaseArgs = {
+    gpu: Gpu;
     enabled?: boolean;
 };
 
@@ -56,6 +58,7 @@ export type PostProcessPassRenderArgs = {
 };
 
 export type PostProcessPassBase = {
+    gpu: Gpu,
     name: string;
     type: PostProcessPassType;
     width: number;
@@ -76,6 +79,7 @@ type PostProcessPassBaseArgs = Omit<PostProcessPassBase, 'width' | 'height' | 'e
 
 export function createPostProcessPassBase(args: PostProcessPassBaseArgs): PostProcessPassBase {
     return {
+        gpu: args.gpu,
         name: args.name,
         type: args.type,
         width: args.width !== undefined ? args.width : 1, // TODO: asssign 1
@@ -98,7 +102,7 @@ export type PostProcessSinglePass = PostProcessPassBase & {
 export function createPostProcessSinglePass(args: {
     gpu: Gpu;
     type: PostProcessPassType;
-    parameters: PostProcessPassParametersBaseArgs;
+    parameters?: PostProcessPassParametersTemplate;
     vertexShader?: string;
     fragmentShader?: string;
     rawVertexShader?: string;
@@ -115,6 +119,8 @@ export function createPostProcessSinglePass(args: {
     wrapT?: TextureWrapType;
     renderTargetType?: RenderTargetType;
     srcTextureEnabled?: boolean;
+    
+    enabled?: boolean;
 }): PostProcessSinglePass {
     const {
         gpu,
@@ -135,6 +141,7 @@ export function createPostProcessSinglePass(args: {
         wrapT = TextureWrapTypes.ClampToEdge,
         wrapS = TextureWrapTypes.ClampToEdge,
         srcTextureEnabled = true,
+        enabled
     } = args;
 
     const width = 1;
@@ -144,12 +151,12 @@ export function createPostProcessSinglePass(args: {
     const parameters = {
         ...args.parameters,
         // type: parameters.type,
-        enabled: args.parameters.enabled || true,
+        // enabled: enabled || true,
     };
 
     // const baseVertexShader = getPostProcessBaseVertexShader();
     // vertexShader = vertexShader || baseVertexShader;
-
+    
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = createPlaneGeometry({ gpu });
     const material = createMaterial({
@@ -202,11 +209,14 @@ export function createPostProcessSinglePass(args: {
         wrapS,
         wrapT,
     });
-
+    
     return {
+        gpu,
         name,
         type,
-        parameters,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        parameters: parameters || { enabled: true }, // TODO: 削除必須
         width,
         height,
         renderTarget,
@@ -214,7 +224,7 @@ export function createPostProcessSinglePass(args: {
         geometry,
         material,
         materials,
-        enabled: parameters.enabled === undefined ? true : parameters.enabled,
+        enabled: enabled === undefined ? true : enabled,
     };
 }
 

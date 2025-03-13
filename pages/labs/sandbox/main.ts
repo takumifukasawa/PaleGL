@@ -127,8 +127,6 @@ import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
-import { DepthOfFieldPassParameters } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
-import { LightShaftPassParameters } from '@/PaleGL/postprocess/lightShaftPass.ts';
 import { VolumetricLightPassParameters } from '@/PaleGL/postprocess/volumetricLightPass.ts';
 import { FogPassParameters } from '@/PaleGL/postprocess/fogPass.ts';
 import { SSRPassParameters } from '@/PaleGL/postprocess/ssrPass.ts';
@@ -538,8 +536,8 @@ addActorToScene(captureScene, spotLight2);
 
 const cameraPostProcess = createPostProcess();
 
-(renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusDistance = 18.5;
-(renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusRange = 17;
+renderer.depthOfFieldPass.focusDistance = 18.5;
+renderer.depthOfFieldPass.focusRange = 17;
 
 const bufferVisualizerPass = createBufferVisualizerPass({ gpu });
 bufferVisualizerPass.parameters.enabled = false;
@@ -2328,9 +2326,9 @@ function initDebugger() {
         minValue: 0,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.lightShaftPass.parameters as LightShaftPassParameters).blendRate,
+        initialValue: renderer.lightShaftPass.blendRate,
         onChange: (value) => {
-            (renderer.lightShaftPass.parameters as LightShaftPassParameters).blendRate = value;
+            renderer.lightShaftPass.blendRate = value;
         },
     });
 
@@ -2339,9 +2337,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 1,
         stepValue: 0.001,
-        initialValue: (renderer.lightShaftPass.parameters as LightShaftPassParameters).passScaleBase,
+        initialValue: renderer.lightShaftPass.passScaleBase,
         onChange: (value) => {
-            (renderer.lightShaftPass.parameters as LightShaftPassParameters).passScaleBase = value;
+            renderer.lightShaftPass.passScaleBase = value;
         },
     });
 
@@ -2350,9 +2348,9 @@ function initDebugger() {
         minValue: 0.001,
         maxValue: 0.05,
         stepValue: 0.001,
-        initialValue: (renderer.lightShaftPass.parameters as LightShaftPassParameters).rayStepStrength,
+        initialValue: renderer.lightShaftPass.rayStepStrength,
         onChange: (value) => {
-            (renderer.lightShaftPass.parameters as LightShaftPassParameters).rayStepStrength = value;
+            renderer.lightShaftPass.rayStepStrength = value;
         },
     });
 
@@ -2547,9 +2545,9 @@ function initDebugger() {
         minValue: 0.1,
         maxValue: 100,
         stepValue: 0.001,
-        initialValue: (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusDistance,
+        initialValue: renderer.depthOfFieldPass.focusDistance,
         onChange: (value) => {
-            (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusDistance = value;
+            renderer.depthOfFieldPass.focusDistance = value;
         },
     });
 
@@ -2558,9 +2556,9 @@ function initDebugger() {
         minValue: 0.1,
         maxValue: 20,
         stepValue: 0.001,
-        initialValue: (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusRange,
+        initialValue: renderer.depthOfFieldPass.focusRange,
         onChange: (value) => {
-            (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).focusRange = value;
+            renderer.depthOfFieldPass.focusRange = value;
         },
     });
 
@@ -2569,9 +2567,9 @@ function initDebugger() {
         minValue: 0.01,
         maxValue: 10,
         stepValue: 0.001,
-        initialValue: (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).bokehRadius,
+        initialValue: renderer.depthOfFieldPass.bokehRadius,
         onChange: (value) => {
-            (renderer.depthOfFieldPass.parameters as DepthOfFieldPassParameters).bokehRadius = value;
+            renderer.depthOfFieldPass.bokehRadius = value;
         },
     });
 

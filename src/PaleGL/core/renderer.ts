@@ -2083,9 +2083,7 @@ export function createRenderer({
     const volumetricLightPass = createVolumetricLightPass({ gpu });
     const fogPass = createFogPass({ gpu });
     const depthOfFieldPass = createDepthOfFieldPass({ gpu });
-    const bloomPass = createBloomPass({
-        gpu,
-    });
+    const bloomPass = createBloomPass({ gpu, });
     const streakPass = createStreakPass({ gpu });
     const toneMappingPass = createToneMappingPass({ gpu });
     const chromaticAberrationPass = createChromaticAberrationPass({ gpu });

@@ -411,7 +411,7 @@ export function isPostProcessEnabled(postProcess: PostProcess) {
     }
 
     for (let i = 0; i < postProcess.passes.length; i++) {
-        if (postProcess.passes[i].parameters.enabled) {
+        if (postProcess.passes[i].parameters.enabled  || postProcess.passes[i].enabled) {
             return true;
         }
     }
@@ -425,7 +425,7 @@ export function setPostProcessEnabled(postProcess: PostProcess, value: boolean) 
 
 export function hasPostProcessPassEnabled(postProcess: PostProcess) {
     for (let i = 0; i < postProcess.passes.length; i++) {
-        if (postProcess.passes[i].parameters.enabled) {
+        if (postProcess.passes[i].parameters.enabled || postProcess.passes[i].parameters) {
             return true;
         }
     }
@@ -435,7 +435,7 @@ export function hasPostProcessPassEnabled(postProcess: PostProcess) {
 export function getPostProcessLastRenderTarget(postProcess: PostProcess) {
     let lastPass: PostProcessPassBase | null = null;
     for (let i = postProcess.passes.length - 1; i >= 0; i--) {
-        if (postProcess.passes[i].parameters.enabled) {
+        if (postProcess.passes[i].parameters.enabled || postProcess.passes[i].enabled) {
             lastPass = postProcess.passes[i];
             break;
         }
@@ -614,7 +614,7 @@ export function renderPostProcess(
     // const inverseProjectionMatrix = targetCamera.projectionMatrix.clone().invert();
 
     // set uniform and render pass
-    const enabledPasses = postProcess.passes.filter((pass) => pass.parameters.enabled);
+    const enabledPasses = postProcess.passes.filter((pass) => pass.parameters.enabled || pass.enabled);
 
     enabledPasses.forEach((pass, i) => {
         const isLastPass = isCameraLastPass && i === enabledPasses.length - 1;

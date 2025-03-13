@@ -1,103 +1,14 @@
-﻿// import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-// import { Gpu } from '@/PaleGL/core/Gpu.ts';
-// import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
-// import {
-//     PostProcessPassBaseDEPRECATED
-// } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-// import {
-//     PostProcessPassParametersBase,
-//     PostProcessPassRenderArgs,
-// } from '@/PaleGL/postprocess/PostProcessPassBaseDEPRECATED';
-// import { Override } from '@/PaleGL/palegl';
-// import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-// 
-// const UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE = 'uScale';
-// const UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE = 0.015;
-// 
-// const UNIFORM_NAME_CHROMATIC_ABERRATION_POWER = 'uPower';
-// const UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER = 1;
-// 
-// export type ChromaticAberrationPassParametersBase = {
-//     scale: number;
-//     power: number;
-//     blendRate: number;
-// };
-// export type ChromaticAberrationPassParameters = PostProcessPassParametersBase & ChromaticAberrationPassParametersBase;
-// 
-// export type ChromaticAberrationPassParametersArgs = Partial<ChromaticAberrationPassParameters>;
-// 
-// export function generateChromaticAberrationPassParameters(
-//     params: ChromaticAberrationPassParametersArgs = {}
-// ): ChromaticAberrationPassParameters {
-//     return {
-//         enabled: params.enabled ?? true,
-//         scale: params.scale ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-//         power: params.power ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
-//         blendRate: params.blendRate ?? 1,
-//     };
-// }
-// 
-// export class ChromaticAberrationPass extends PostProcessPassBaseDEPRECATED {
-//     parameters: Override<PostProcessPassParametersBase, ChromaticAberrationPassParameters>;
-// 
-//     constructor(args: { gpu: Gpu; parameters?: ChromaticAberrationPassParametersArgs }) {
-//         const { gpu } = args;
-// 
-//         const parameters = generateChromaticAberrationPassParameters(args.parameters ?? {});
-// 
-//         const fragmentShader = chromaticAberrationFragment;
-// 
-//         super({
-//             gpu,
-//             type: PostProcessPassType.ChromaticAberration,
-//             fragmentShader,
-//             uniforms: [
-//                 {
-//                     name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-//                 },
-//                 {
-//                     name: UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
-//                     type: UniformTypes.Float,
-//                     value: UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
-//                 },
-//             ],
-//             parameters,
-//         });
-// 
-//         this.parameters = parameters;
-//     }
-// 
-//     setSize(width: number, height: number) {
-//         super.setSize(width, height);
-//         setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
-//         setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
-//     }
-// 
-//     render(options: PostProcessPassRenderArgs) {
-//         setMaterialUniformValue(this.material, UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE, this.parameters.scale);
-//         setMaterialUniformValue(this.material, UNIFORM_NAME_CHROMATIC_ABERRATION_POWER, this.parameters.power);
-// 
-//         super.render(options);
-//     }
-// }
-
-
-import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 import chromaticAberrationFragment from '@/PaleGL/shaders/chromatic-aberration-fragment.glsl';
 import {
     createPostProcessSinglePass,
-    PostProcessPassBase, PostProcessSinglePass,
-    PostProcessPassParametersBase,
+    PostProcessPassBase,
+    PostProcessSinglePass,
     PostProcessPassRenderArgs,
+    PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { Override } from '@/PaleGL/palegl';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import {
-    renderPostProcessSinglePassBehaviour,
-} from "@/PaleGL/postprocess/postProcessPassBehaviours.ts";
+import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 
 const UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE = 'uScale';
 const UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE = 0.015;
@@ -105,55 +16,49 @@ const UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE = 0.015;
 const UNIFORM_NAME_CHROMATIC_ABERRATION_POWER = 'uPower';
 const UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER = 1;
 
-export type ChromaticAberrationPassParametersBase = {
+export type ChromaticAberrationPassParameters = {
     scale: number;
     power: number;
     blendRate: number;
 };
-export type ChromaticAberrationPassParameters = PostProcessPassParametersBase & ChromaticAberrationPassParametersBase;
 
-export type ChromaticAberrationPassParametersArgs = Partial<ChromaticAberrationPassParameters>;
+export type ChromaticAberrationPass = PostProcessSinglePass & ChromaticAberrationPassParameters;
 
-export function generateChromaticAberrationPassParameters(
-    params: ChromaticAberrationPassParametersArgs = {}
-): ChromaticAberrationPassParameters {
-    return {
-        enabled: params.enabled ?? true,
-        scale: params.scale ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-        power: params.power ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
-        blendRate: params.blendRate ?? 1,
-    };
-}
+type ChromaticAberrationPassArgs = PostProcessPassParametersBaseArgs & Partial<ChromaticAberrationPassParameters>;
 
-export type ChromaticAberrationPass = PostProcessSinglePass;
-
-export function createChromaticAberrationPass(args: { gpu: Gpu; parameters?: ChromaticAberrationPassParametersArgs }): ChromaticAberrationPass {
-    const { gpu } = args;
-
-    const parameters: Override<PostProcessPassParametersBase, ChromaticAberrationPassParameters> = generateChromaticAberrationPassParameters(args.parameters ?? {});
+export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs): ChromaticAberrationPass {
+    const { gpu, enabled } = args;
+    
+    const scale = args.scale ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE;
+    const power = args.power ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER;
+    const blendRate = args.blendRate ?? 1;
 
     const fragmentShader = chromaticAberrationFragment;
 
     return {
-    ...createPostProcessSinglePass({
-        gpu,
-        type: PostProcessPassType.ChromaticAberration,
-        fragmentShader,
-        uniforms: [
-            {
-                name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-                type: UniformTypes.Float,
-                value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-            },
-            {
-                name: UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
-                type: UniformTypes.Float,
-                value: UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
-            },
-        ],
-        parameters,
-    })
-    }
+        ...createPostProcessSinglePass({
+            gpu,
+            type: PostProcessPassType.ChromaticAberration,
+            fragmentShader,
+            uniforms: [
+                {
+                    name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
+                    type: UniformTypes.Float,
+                    value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
+                },
+                {
+                    name: UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
+                    type: UniformTypes.Float,
+                    value: UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
+                },
+            ],
+            enabled,
+        }),
+        // parameters
+        scale,
+        power,
+        blendRate,
+    };
 }
 
 // export function setChromaticAberrationPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
@@ -163,10 +68,20 @@ export function createChromaticAberrationPass(args: { gpu: Gpu; parameters?: Chr
 //     setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
 // }
 
-export function renderChromaticAberrationPass (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+export function renderChromaticAberrationPass(
+    postProcessPass: PostProcessPassBase,
+    options: PostProcessPassRenderArgs
+) {
     const chromaticAberrationPass = postProcessPass as ChromaticAberrationPass;
-    const parameters = chromaticAberrationPass.parameters as ChromaticAberrationPassParameters;
-    setMaterialUniformValue(chromaticAberrationPass.material, UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE, parameters.scale);
-    setMaterialUniformValue(chromaticAberrationPass.material, UNIFORM_NAME_CHROMATIC_ABERRATION_POWER, parameters.power);
-    renderPostProcessSinglePassBehaviour(chromaticAberrationPass, options)
+    setMaterialUniformValue(
+        chromaticAberrationPass.material,
+        UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
+        chromaticAberrationPass.scale
+    );
+    setMaterialUniformValue(
+        chromaticAberrationPass.material,
+        UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
+        chromaticAberrationPass.power
+    );
+    renderPostProcessSinglePassBehaviour(chromaticAberrationPass, options);
 }
