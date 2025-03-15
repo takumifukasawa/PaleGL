@@ -906,8 +906,8 @@ const main = async () => {
     });
     setScaling(streetFloorActor.transform, createFillVector3(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
-    setUniformValue(streetFloorMaterial.uniforms, 'uMetallic', 0.5);
-    setUniformValue(streetFloorMaterial.uniforms, 'uRoughness', 1);
+    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
+    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
 
     //
     // street light
@@ -934,7 +934,7 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            emissiveColor: createColor(1, 1, 1, 1),
+            emissiveColor: createColor(1.5, 1.5, 1.5, 1),
         })
     );
     subscribeActorOnStart(attractSphereMesh, () => {
