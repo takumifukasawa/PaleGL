@@ -1239,6 +1239,8 @@ void main() {
         renderer.bloomPass.bloomAmount = 0.26;
         renderer.bloomPass.threshold = 1.534;
         renderer.bloomPass.tone = 0.46;
+        
+        renderer.glitchPass.enabled = false;
 
         startOrbitCameraController(orbitCameraController);
     });
@@ -2018,7 +2020,7 @@ function initDebugger() {
 
     const vignetteDebuggerGroup = addDebugGroup(debuggerGUI, 'vignette', false);
     addSliderDebugger(vignetteDebuggerGroup, {
-        label: 'radius',
+        label: 'radius from',
         minValue: 0,
         maxValue: 3,
         stepValue: 0.001,
@@ -2026,7 +2028,7 @@ function initDebugger() {
         onChange: (value) => (renderer.vignettePass.vignetteRadiusFrom = value),
     });
     addSliderDebugger(vignetteDebuggerGroup, {
-        label: 'radius',
+        label: 'radius to',
         minValue: 0,
         maxValue: 3,
         stepValue: 0.001,
