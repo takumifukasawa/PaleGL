@@ -657,7 +657,9 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
                     pass.material,
                     tiles.get(DIRECTIONAL_LIGHT_SHADOW_MAP_KEY)!.uniformNameTexture!,
                     // 'uDirectionalLightShadowMap',
-                    lightActors.directionalLight.shadowMap!.depthTexture
+                    lightActors.directionalLight.castShadow
+                        ? lightActors.directionalLight.shadowMap!.depthTexture
+                        : postProcessPass.gpu.dummyTextureBlack
                 );
             }
         }
