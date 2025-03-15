@@ -85,7 +85,7 @@ import {
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setCameraClearColor, setCameraPostProcess, viewpointToRay } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+// import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
@@ -109,7 +109,7 @@ import {
     DebuggerGUI,
 } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+// import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 
 // -------------------
@@ -368,22 +368,22 @@ const directionalLight = createDirectionalLight({
     color: createColorWhite(),
 });
 
-// shadows
-// TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
-if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = false;
-    directionalLight.castShadow = true;
-    directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 15;
-    setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
-    directionalLight.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+// // shadows
+// // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
+// if (directionalLight.shadowCamera) {
+//     directionalLight.shadowCamera.visibleFrustum = false;
+//     directionalLight.castShadow = true;
+//     directionalLight.shadowCamera.near = 1;
+//     directionalLight.shadowCamera.far = 15;
+//     setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
+//     directionalLight.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
 
 subscribeActorOnStart(directionalLight, () => {
     setTranslation(directionalLight.transform, createVector3(-8, 8, -2));
@@ -1224,6 +1224,8 @@ void main() {
         renderer.lightShaftPass.enabled = false;
         
         renderer.screenSpaceShadowPass.enabled = false;
+
+        renderer.ssrPass.enabled = false;
         
         renderer.fogPass.fogColor = createColorBlack();
         renderer.fogPass.fogDensity = 0.023;

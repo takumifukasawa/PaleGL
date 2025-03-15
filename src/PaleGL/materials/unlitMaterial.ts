@@ -79,7 +79,7 @@ export function createUnlitMaterial({
             value: diffuseMapTiling || createVector4(1, 1, 0, 0),
         },
     ];
-
+    
     const material = createMaterial({
         ...options,
         name: 'UnlitMaterial',
