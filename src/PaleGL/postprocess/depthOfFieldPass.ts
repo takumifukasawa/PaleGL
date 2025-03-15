@@ -184,12 +184,6 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
                 type: UniformTypes.Float,
                 value: bokehRadius,
             },
-            {
-                name: 'uBokehKernel',
-                type: UniformTypes.Vector4Array,
-                value: [],
-            },
-            // },
         ],
     });
     materials.push(...dofBokehPass.materials);
