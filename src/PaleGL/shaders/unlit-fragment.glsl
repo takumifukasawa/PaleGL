@@ -8,7 +8,7 @@
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
-uniform vec2 uDiffuseMapUvScale;
+uniform vec4 uDiffuseMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
@@ -23,7 +23,7 @@ in vec3 vWorldPosition;
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
 
-    vec2 uv = vUv * uDiffuseMapUvScale;
+    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
 
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
 

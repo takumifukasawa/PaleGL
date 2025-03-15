@@ -396,7 +396,7 @@ const spotLight1 = createSpotLight({
     color: createColorWhite(),
     distance: 15,
     attenuation: 1.06,
-    coneAngle: 0.2 * RAD_TO_DEG,
+    coneAngle: 0.6 * RAD_TO_DEG,
     penumbraAngle: 0.1 * RAD_TO_DEG,
 });
 
@@ -416,7 +416,7 @@ if (spotLight1.shadowCamera) {
 }
 subscribeActorOnStart(spotLight1, () => {
     setTranslation(spotLight1.transform, createVector3(3.4, 8.1, 0));
-    setLookAtPosition(spotLight1.transform, createVector3(2, 0, 0));
+    setLookAtPosition(spotLight1.transform, createVector3(1, 0, 0));
 });
 addActorToScene(captureScene, spotLight1);
 
@@ -425,7 +425,7 @@ const spotLight2 = createSpotLight({
     color: createColorWhite(),
     distance: 15,
     attenuation: 1.06,
-    coneAngle: 0.2 * RAD_TO_DEG,
+    coneAngle: 0.6 * RAD_TO_DEG,
     penumbraAngle: 0.1 * RAD_TO_DEG,
 });
 
@@ -445,7 +445,7 @@ if (spotLight2.shadowCamera) {
 }
 subscribeActorOnStart(spotLight2, () => {
     setTranslation(spotLight2.transform, createVector3(-3.4, 8.1, 0));
-    setLookAtPosition(spotLight2.transform, createVector3(-2, 0, 0));
+    setLookAtPosition(spotLight2.transform, createVector3(-1, 0, 0));
 });
 
 addActorToScene(captureScene, spotLight2);
@@ -904,8 +904,10 @@ const main = async () => {
             (child as Mesh).castShadow = true;
         }
     });
-    setUniformValue((streetFloorActor?.children[0] as Mesh).materials[0].uniforms, 'uMetallic', 0.5);
-    setUniformValue((streetFloorActor?.children[0] as Mesh).materials[0].uniforms, 'uRoughness', 1);
+    setScaling(streetFloorActor.transform, createFillVector3(1));
+    const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
+    setUniformValue(streetFloorMaterial.uniforms, 'uMetallic', 0.5);
+    setUniformValue(streetFloorMaterial.uniforms, 'uRoughness', 1);
 
     //
     // street light
@@ -932,7 +934,7 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            emissiveColor: createColor(3, 3, 3, 1),
+            emissiveColor: createColor(1, 1, 1, 1),
         })
     );
     subscribeActorOnStart(attractSphereMesh, () => {
@@ -1219,11 +1221,16 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
+        renderer.lightShaftPass.enabled = false;
+        
+        renderer.screenSpaceShadowPass.enabled = false;
+        
         renderer.fogPass.fogColor = createColorBlack();
         renderer.fogPass.fogDensity = 0.023;
         renderer.fogPass.fogDensityAttenuation = 0.065;
         renderer.fogPass.distanceFogStart = 18;
         renderer.fogPass.distanceFogPower = 0.29;
+        renderer.fogPass.sssFogRate = 0;
 
         renderer.depthOfFieldPass.focusDistance = 17.78;
         renderer.depthOfFieldPass.focusRange = 9.8;

@@ -24,7 +24,7 @@ in vec4 vInstanceState;
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap;
-uniform vec2 uDiffuseMapUvScale;
+uniform vec4 uDiffuseMapTiling;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
@@ -38,7 +38,7 @@ in mat4 vInverseWorldMatrix;
 out vec4 outColor;
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapUvScale;
+    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
 
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
 

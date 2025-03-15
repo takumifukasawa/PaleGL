@@ -1,4 +1,4 @@
-import {MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
+import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
     ShadingModelIds,
@@ -7,21 +7,19 @@ import {
     UniformTypes,
     VertexShaderModifier,
 } from '@/PaleGL/constants';
-import {createVector2One, Vector2} from '@/PaleGL/math/vector2.ts';
-import {Color, createColorBlack, createColorWhite} from '@/PaleGL/math/color.ts';
+import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
+import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type GBufferMaterialArgs = {
     diffuseColor?: Color;
     diffuseMap?: Texture | null;
-    diffuseMapUvScale?: Vector2;
-    diffuseMapUvOffset?: Vector2;
+    diffuseMapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture | null;
     metallicMapTiling?: Vector4;
@@ -30,235 +28,26 @@ export type GBufferMaterialArgs = {
     roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
     normalMap?: Texture | null;
-    normalMapUvScale?: Vector2;
-    normalMapUvOffset?: Vector2;
+    normalMapTiling?: Vector4;
     vertexShaderModifier?: VertexShaderModifier;
     uniforms?: UniformsData;
     shadingModelId?: ShadingModelIds;
 } & MaterialArgs;
-
-// // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
-// export function createGBufferMaterial(
-//     {
-//         // diffuse
-//         diffuseColor,
-//         diffuseMap,
-//         diffuseMapUvScale, // vec2
-//         diffuseMapUvOffset, // vec2
-//         // normal
-//         normalMap,
-//         normalMapUvScale, // vec2
-//         normalMapUvOffset, // vec2,
-//         // params
-//         // specularAmount,
-//         metallic,
-//         metallicMap,
-//         metallicMapTiling,
-//         roughness,
-//         roughnessMap,
-//         roughnessMapTiling,
-//         // emissive
-//         emissiveColor,
-//         // TODO: 外部化
-//         vertexShaderModifier = {},
-//         shadingModelId = ShadingModelIds.Lit,
-//         uniforms = [],
-//         ...options
-//     }: GBufferMaterialArgs = {}
-// ) {
-//     const _roughness: number = roughness;
-//     const _roughnessMap: Texture | null = roughnessMap || null;
-//     const _roughnessMapTiling: Vector4 = roughnessMapTiling || new Vector4(1, 1, 0, 0);
-//     const _metallic: number = metallic || 0;
-//     const _metallicMap: Texture | null = metallicMap || null;
-//     const _metallicMapTiling: Vector4 = metallicMapTiling || new Vector4(1, 1, 0, 0);
-//
-//     constructor() {
-//         // this.specularAmount =
-//
-//         const roughnessMapValue = roughnessMap || null;
-//         const roughnessMapTilingValue = roughnessMapTiling || new Vector4(1, 1, 0, 0);
-//         const roughnessValue = roughness || 0;
-//         const metallicMapTilingValue = metallicMapTiling || new Vector4(1, 1, 0, 0);
-//         const metallicValue = metallic || 0;
-//         const metallicMapValue = metallicMap || null;
-//
-//         const baseUniforms: UniformsData = [
-//             {
-//                 name: UniformNames.DiffuseColor,
-//                 type: UniformTypes.Color,
-//                 value: diffuseColor || Color.white,
-//             },
-//             {
-//                 name: UniformNames.DiffuseMap,
-//                 type: UniformTypes.Texture,
-//                 value: diffuseMap || null,
-//             },
-//             {
-//                 name: UniformNames.DiffuseMapUvScale,
-//                 type: UniformTypes.Vector2,
-//                 // value: Vector2.one,
-//                 value: diffuseMapUvScale || Vector2.one,
-//             },
-//             {
-//                 name: UniformNames.DiffuseMapUvOffset,
-//                 type: UniformTypes.Vector2,
-//                 // value: Vector2.one,
-//                 value: diffuseMapUvOffset || Vector2.one,
-//             },
-//             // uSpecularAmount: {
-//             //     type: UniformTypes.Float,
-//             //     value: specularAmount || 1,
-//             // },
-//             {
-//                 name: UniformNames.Metallic,
-//                 type: UniformTypes.Float,
-//                 value: metallicValue,
-//             },
-//             {
-//                 name: UniformNames.MetallicMap,
-//                 type: UniformTypes.Texture,
-//                 value: metallicMapValue,
-//             },
-//             {
-//                 name: UniformNames.MetallicMapTiling,
-//                 type: UniformTypes.Vector4,
-//                 value: metallicMapTilingValue,
-//             },
-//             {
-//                 name: UniformNames.Roughness,
-//                 type: UniformTypes.Float,
-//                 value: roughnessValue,
-//             },
-//             {
-//                 name: UniformNames.RoughnessMap,
-//                 type: UniformTypes.Texture,
-//                 value: roughnessMapValue,
-//             },
-//             {
-//                 name: UniformNames.RoughnessMapTiling,
-//                 type: UniformTypes.Vector4,
-//                 value: roughnessMapTilingValue,
-//             },
-//             {
-//                 name: UniformNames.MetallicMap,
-//                 type: UniformTypes.Texture,
-//                 value: metallicMapValue,
-//             },
-//             {
-//                 name: UniformNames.MetallicMapTiling,
-//                 type: UniformTypes.Vector4,
-//                 value: metallicMapTilingValue,
-//             },
-//             {
-//                 name: UniformNames.NormalMap,
-//                 type: UniformTypes.Texture,
-//                 value: normalMap || null,
-//             },
-//             {
-//                 name: UniformNames.NormalMapUvScale,
-//                 type: UniformTypes.Vector2,
-//                 // value: Vector2.one,
-//                 value: normalMapUvScale || Vector2.one,
-//             },
-//             {
-//                 name: UniformNames.NormalMapUvOffset,
-//                 type: UniformTypes.Vector2,
-//                 // value: Vector2.one,
-//                 value: normalMapUvOffset || Vector2.one,
-//             },
-//             {
-//                 name: UniformNames.EmissiveColor,
-//                 type: UniformTypes.Color,
-//                 value: emissiveColor || Color.black,
-//             },
-//             {
-//                 name: UniformNames.ShadingModelId,
-//                 type: UniformTypes.Int, // float,intどちらでもいい
-//                 // value: shadingModelId,
-//                 value: shadingModelId,
-//             },
-//         ];
-//
-//         const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
-//
-//         const depthUniforms: UniformsData = [
-//             {
-//                 name: 'uDiffuseMap',
-//                 type: UniformTypes.Texture,
-//                 value: diffuseMap || null,
-//             },
-//             {
-//                 name: 'uDiffuseMapUvScale',
-//                 type: UniformTypes.Vector2,
-//                 value: Vector2.one,
-//             },
-//             {
-//                 name: 'uDiffuseMapUvOffset',
-//                 type: UniformTypes.Vector2,
-//                 value: Vector2.one,
-//             },
-//         ];
-//
-//         // TODO: できるだけconstructorの直後に持っていきたい
-//         super({
-//             ...options,
-//             name: 'GBufferMaterial',
-//             vertexShaderModifier,
-//             uniforms: mergedUniforms,
-//             depthUniforms,
-//             useNormalMap: !!normalMap,
-//             depthTest: true,
-//             depthWrite: false,
-//             depthFuncType: DepthFuncTypes.Equal,
-//             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
-//         });
-//
-//         this.roughness = roughnessValue;
-//         this.roughnessMap = roughnessMapValue;
-//         this.roughnessMapTiling = roughnessMapTilingValue;
-//         this.metallic = metallicValue;
-//         this.metallicMap = metallicMapValue;
-//         this.metallicMapTiling = metallicMapTilingValue;
-//     }
-//
-//     start({ gpu, attributeDescriptors = [] }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) {
-//         this.vertexShader = gBufferVert;
-//         this.fragmentShader = litFrag;
-//         this.depthFragmentShader = gBufferDepthFrag;
-//
-//         super.start({ gpu, attributeDescriptors });
-//
-//         // console.log(gBufferVert)
-//         // console.log(this.rawFragmentShader)
-//     }
-//
-//     updateUniforms() {
-//         super.updateUniforms();
-//         this.uniforms.setValue(UniformNames.RoughnessMap, this.roughnessMap);
-//         this.uniforms.setValue(UniformNames.Roughness, this.roughnessMap ? 1 : this.roughness);
-//         this.uniforms.setValue(UniformNames.RoughnessMapTiling, this.roughnessMapTiling);
-//         this.uniforms.setValue(UniformNames.MetallicMap, this.metallicMap);
-//         this.uniforms.setValue(UniformNames.Metallic, this.metallicMap ? 1 : this.metallic);
-//         this.uniforms.setValue(UniformNames.MetallicMapTiling, this.metallicMapTiling);
-//     }
-// }
 
 export type GBufferMaterial = ReturnType<typeof createGBufferMaterial>;
 
 // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
 export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const {
-            // TODO: 外部化
-            vertexShaderModifier = {},
-            uniforms = [],
-    ...options
+        // TODO: 外部化
+        vertexShaderModifier = {},
+        uniforms = [],
+        ...options
     }: GBufferMaterialArgs = args;
-    
+
     const diffuseColor: Color = args.diffuseColor || createColorWhite();
     const diffuseMap: Texture | null = args.diffuseMap || null;
-    const diffuseMapUvScale: Vector2 = args.diffuseMapUvScale || createVector2One();
-    const diffuseMapUvOffset: Vector2 = args.diffuseMapUvOffset || createVector2One();
+    const diffuseMapTiling: Vector4 = args.diffuseMapTiling || createVector4(1, 1, 0, 0);
     const metallic: number = args.metallic || 0;
     const metallicMap: Texture | null = args.metallicMap || null;
     const metallicMapTiling: Vector4 = args.metallicMapTiling || createVector4(1, 1, 0, 0);
@@ -266,11 +55,10 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const roughnessMap: Texture | null = args.roughnessMap || null;
     const roughnessMapTiling: Vector4 = args.roughnessMapTiling || createVector4(1, 1, 0, 0);
     const normalMap: Texture | null = args.normalMap || null;
-    const normalMapUvScale: Vector2 = args.normalMapUvScale || createVector2One();
-    const normalMapUvOffset: Vector2 = args.normalMapUvOffset || createVector2One();
+    const normalMapTiling: Vector4 = args.normalMapTiling || createVector4(1, 1, 0, 0);
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
-   
+
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.DiffuseColor,
@@ -283,16 +71,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             value: diffuseMap || null,
         },
         {
-            name: UniformNames.DiffuseMapUvScale,
-            type: UniformTypes.Vector2,
-            // value: Vector2.one,
-            value: diffuseMapUvScale || createVector2One(),
-        },
-        {
-            name: UniformNames.DiffuseMapUvOffset,
-            type: UniformTypes.Vector2,
-            // value: Vector2.one,
-            value: diffuseMapUvOffset || createVector2One(),
+            name: UniformNames.DiffuseMapTiling,
+            type: UniformTypes.Vector4,
+            value: diffuseMapTiling,
         },
         // uSpecularAmount: {
         //     type: UniformTypes.Float,
@@ -344,14 +125,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             value: normalMap,
         },
         {
-            name: UniformNames.NormalMapUvScale,
-            type: UniformTypes.Vector2,
-            value: normalMapUvScale,
-        },
-        {
-            name: UniformNames.NormalMapUvOffset,
-            type: UniformTypes.Vector2,
-            value: normalMapUvOffset,
+            name: UniformNames.NormalMapTiling,
+            type: UniformTypes.Vector4,
+            value: normalMapTiling,
         },
         {
             name: UniformNames.EmissiveColor,
@@ -369,19 +145,14 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
 
     const depthUniforms: UniformsData = [
         {
-            name: 'uDiffuseMap',
+            name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
             value: diffuseMap,
         },
         {
-            name: 'uDiffuseMapUvScale',
-            type: UniformTypes.Vector2,
-            value: diffuseMapUvScale,
-        },
-        {
-            name: 'uDiffuseMapUvOffset',
-            type: UniformTypes.Vector2,
-            value: diffuseMapUvOffset,
+            name: UniformNames.DiffuseMapTiling,
+            type: UniformTypes.Vector4,
+            value: diffuseMapTiling,
         },
     ];
 
@@ -414,8 +185,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         ...material,
         diffuseColor,
         diffuseMap,
-        diffuseMapUvScale,
-        diffuseMapUvOffset,
+        diffuseMapTiling,
         metallic,
         metallicMap,
         metallicMapTiling,
@@ -423,9 +193,8 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         roughnessMap,
         roughnessMapTiling,
         normalMap,
-        normalMapUvScale,
-        normalMapUvOffset,
+        normalMapTiling,
         emissiveColor,
         vertexShaderModifier,
-    }
+    };
 }

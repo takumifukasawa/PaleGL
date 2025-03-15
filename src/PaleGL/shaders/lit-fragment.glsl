@@ -10,7 +10,7 @@
 
 uniform vec4 uDiffuseColor;
 uniform sampler2D uDiffuseMap; 
-uniform vec2 uDiffuseMapUvScale;
+uniform vec4 uDiffuseMapTiling;
 uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
@@ -54,7 +54,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
     
-    vec2 uv = vUv * uDiffuseMapUvScale;
+    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
   
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
     vec4 diffuseColor = uDiffuseColor * diffuseMapColor;

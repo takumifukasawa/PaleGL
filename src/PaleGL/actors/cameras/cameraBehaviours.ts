@@ -360,7 +360,8 @@ export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
     setV4y(worldPos, v4y(worldPos) / v4w(worldPos));
     setV4z(worldPos, v4z(worldPos) / v4w(worldPos));
     const worldPosV3 = createVector3(v4x(worldPos), v4y(worldPos), v4z(worldPos));
-    const rayOrigin = getWorldForward(camera.transform);
+    // const rayOrigin = getWorldForward(camera.transform);
+    const rayOrigin = camera.transform.position;
     const rayDirection = normalizeVector3(subVector3AndVector3(worldPosV3, rayOrigin));
     return createRay(rayOrigin, rayDirection);
 };

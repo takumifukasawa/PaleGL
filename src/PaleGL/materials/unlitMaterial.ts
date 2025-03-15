@@ -7,7 +7,6 @@ import {
     VertexShaderModifier,
     UniformBlockNames,
 } from '@/PaleGL/constants';
-import { createVector2One, Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
@@ -15,12 +14,12 @@ import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type UnlitMaterialArgs = {
     diffuseColor?: Color;
     diffuseMap?: Texture;
-    diffuseMapUvScale?: Vector2;
-    diffuseMapUvOffset?: Vector2;
+    diffuseMapTiling?: Vector4;
     emissiveColor?: Color;
     vertexShaderModifier?: VertexShaderModifier;
     uniforms?: UniformsData;
@@ -31,8 +30,7 @@ export type UnlitMaterial = Material;
 export function createUnlitMaterial({
     diffuseColor,
     diffuseMap,
-    diffuseMapUvScale, // vec2
-    diffuseMapUvOffset, // vec2
+    diffuseMapTiling, // vec4
     emissiveColor,
     // TODO: 外部化
     vertexShaderModifier = {},
@@ -41,27 +39,22 @@ export function createUnlitMaterial({
 }: UnlitMaterialArgs = {}) {
     const baseUniforms: UniformsData = [
         {
-            name: 'uDiffuseColor',
+            name: UniformNames.DiffuseColor,
             type: UniformTypes.Color,
             value: diffuseColor || createColorBlack(),
         },
         {
-            name: 'uDiffuseMap',
+            name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
             value: diffuseMap || null,
         },
         {
-            name: 'uDiffuseMapUvScale',
-            type: UniformTypes.Vector2,
-            value: diffuseMapUvScale || createVector2One(),
+            name: UniformNames.DiffuseMapTiling,
+            type: UniformTypes.Vector4,
+            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: 'uDiffuseMapUvOffset',
-            type: UniformTypes.Vector2,
-            value: diffuseMapUvOffset || createVector2One(),
-        },
-        {
-            name: 'uEmissiveColor',
+            name: UniformNames.EmissiveColor,
             type: UniformTypes.Color,
             value: emissiveColor || createColorBlack(),
         },
@@ -76,19 +69,14 @@ export function createUnlitMaterial({
 
     const depthUniforms: UniformsData = [
         {
-            name: 'uDiffuseMap',
+            name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
             value: diffuseMap || null,
         },
         {
-            name: 'uDiffuseMapUvScale',
-            type: UniformTypes.Vector2,
-            value: createVector2One(),
-        },
-        {
-            name: 'uDiffuseMapUvOffset',
-            type: UniformTypes.Vector2,
-            value: createVector2One(),
+            name: UniformNames.DiffuseMapTiling,
+            type: UniformTypes.Vector4,
+            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
         },
     ];
 

@@ -348,8 +348,7 @@ export const UniformNames = {
     // surface
     DiffuseMap: 'uDiffuseMap',
     DiffuseColor: 'uDiffuseColor',
-    DiffuseMapUvScale: 'uDiffuseMapUvScale',
-    DiffuseMapUvOffset: 'uDiffuseMapUvOffset',
+    DiffuseMapTiling: 'uDiffuseMapTiling',
     Metallic: 'uMetallic',
     MetallicMap: 'uMetallicMap',
     MetallicMapTiling: 'uMetallicMapTiling',
@@ -358,8 +357,7 @@ export const UniformNames = {
     RoughnessMapTiling: 'uRoughnessMapTiling',
     EmissiveColor: 'uEmissiveColor',
     NormalMap: 'uNormalMap',
-    NormalMapUvScale: 'uNormalMapUvScale',
-    NormalMapUvOffset: 'uNormalMapUvOffset',
+    NormalMapTiling: 'uNormalMapTiling',
     // ao
     // AmbientOcclusionTexture: "uAmbientOcclusionTexture",
     // skinning

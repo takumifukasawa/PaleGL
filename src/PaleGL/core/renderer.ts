@@ -68,10 +68,7 @@ import {
 import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
 import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
-import {
-    BloomPass,
-    createBloomPass,
-} from '@/PaleGL/postprocess/bloomPass.ts';
+import { BloomPass, createBloomPass } from '@/PaleGL/postprocess/bloomPass.ts';
 import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
 import {
     createLightShaftPass,
@@ -2083,7 +2080,7 @@ export function createRenderer({
     const volumetricLightPass = createVolumetricLightPass({ gpu });
     const fogPass = createFogPass({ gpu });
     const depthOfFieldPass = createDepthOfFieldPass({ gpu });
-    const bloomPass = createBloomPass({ gpu, });
+    const bloomPass = createBloomPass({ gpu });
     const streakPass = createStreakPass({ gpu });
     const toneMappingPass = createToneMappingPass({ gpu });
     const chromaticAberrationPass = createChromaticAberrationPass({ gpu });
@@ -2809,17 +2806,19 @@ export function renderRenderer(
 
     const postProcessCamera = renderer.scenePostProcess.postProcessCamera;
 
-    renderPass({
-        pass: renderer.screenSpaceShadowPass,
-        renderer,
-        targetCamera: camera,
-        gpu: renderer.gpu,
-        camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-        prevRenderTarget: null,
-        isLastPass: false,
-        time, // TODO: engineから渡したい
-        // lightActors,
-    });
+    if (renderer.screenSpaceShadowPass.enabled) {
+        renderPass({
+            pass: renderer.screenSpaceShadowPass,
+            renderer,
+            targetCamera: camera,
+            gpu: renderer.gpu,
+            camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+            prevRenderTarget: null,
+            isLastPass: false,
+            time, // TODO: engineから渡したい
+            // lightActors,
+        });
+    }
 
     // ------------------------------------------------------------------------------
     // ambient occlusion pass
@@ -2858,7 +2857,9 @@ export function renderRenderer(
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
         'uScreenSpaceShadowTexture',
-        renderer.screenSpaceShadowPass.renderTarget.texture
+        renderer.screenSpaceShadowPass.enabled
+            ? renderer.screenSpaceShadowPass.renderTarget.texture
+            : renderer.gpu.dummyTextureBlack
     );
 
     // set ao texture
@@ -2900,7 +2901,7 @@ export function renderRenderer(
     // light shaft pass
     // ------------------------------------------------------------------------------
 
-    if (lightActors.directionalLight) {
+    if (lightActors.directionalLight && renderer.lightShaftPass.enabled) {
         setLightShaftPassDirectionalLight(renderer.lightShaftPass, lightActors.directionalLight);
         renderPass({
             pass: renderer.lightShaftPass,
@@ -2944,12 +2945,17 @@ export function renderRenderer(
 
     setFogPassTextures(
         renderer.fogPass,
-        getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!,
+        renderer.lightShaftPass.enabled
+            ? getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!
+            : renderer.gpu.dummyTextureBlack,
         // CUSTOM
         //  this._gpu.dummyTextureBlack,
         //
         renderer.volumetricLightPass.renderTarget.texture!,
-        renderer.screenSpaceShadowPass.renderTarget.texture!,
+        renderer.screenSpaceShadowPass.enabled
+            ? renderer.screenSpaceShadowPass.renderTarget.texture!
+            : renderer.gpu.dummyTextureBlack
+        ,
         sharedTextures[SharedTexturesTypes.FBM_NOISE].texture
     );
 

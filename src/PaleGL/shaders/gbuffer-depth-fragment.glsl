@@ -2,7 +2,7 @@
 
 uniform vec4 uColor; // TODO: diffuse color
 uniform sampler2D uDiffuseMap; 
-uniform vec2 uDiffuseMapUvScale;
+uniform vec4 uDiffuseMapTiling;
 
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;
@@ -19,7 +19,7 @@ out vec4 outColor;
 #include <alpha_test>
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapUvScale;
+    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
   
     // TODO: multiply diffuse color
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);

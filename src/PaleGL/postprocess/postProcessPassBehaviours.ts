@@ -30,7 +30,11 @@ import {
     renderLightShaftPass,
     setLightShaftPassSize,
 } from '@/PaleGL/postprocess/lightShaftPass.ts';
-import { renderScreenShadowPass, setScreenSpaceShadowPassSize } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+import {
+    getScreenSpaceShadowRenderTargetTexture,
+    renderScreenShadowPass,
+    setScreenSpaceShadowPassSize
+} from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { renderSSRPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { renderVignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
 import { getStreakPassRenderTarget, renderStreakPass, setStreakPassSize } from '@/PaleGL/postprocess/streakPass.ts';
@@ -42,8 +46,9 @@ import {
     setBufferVisualizerPassSize,
     updateBufferVisualizerPass,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
+import {Texture} from "@/PaleGL/core/texture.ts";
 
-// set size
+// set size ------------------------------------
 
 export type SetPostProcessPassSizeBehaviour = (
     postProcessPass: PostProcessPassBase | PostProcessSinglePass,
@@ -110,7 +115,7 @@ export function setPostProcessPassRenderTarget(
     }
 }
 
-// update
+// update ------------------------------------
 
 const updatePostProcessPassBehaviour: Partial<
     Record<PostProcessPassType, (postProcessPass: PostProcessPassBase) => void>
@@ -125,7 +130,7 @@ export function updatePostProcessPass(postProcessPass: PostProcessPassBase) {
     updatePostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass);
 }
 
-// before render
+// before render ------------------------------------
 
 type BeforeRenderPostProcessPassBehaviour = (postProcessPass: PostProcessPassBase) => void;
 
@@ -136,7 +141,7 @@ export function beforeRenderPostProcessPass(postProcessPass: PostProcessPassBase
     beforeRenderPostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass);
 }
 
-// render
+// render ------------------------------------
 
 export type RenderPostProcessPassBehaviour = (
     postProcessPass: PostProcessPassBase,
@@ -208,7 +213,7 @@ export function renderPostProcessPass(postProcessPass: PostProcessPassBase, args
     renderPostProcessSinglePassBehaviour(postProcessPass, args);
 }
 
-// get render target
+// get render target ------------------------------------
 
 type GetPostProcessPassRenderTargetBehaviour = (postProcessPass: PostProcessPassBase) => RenderTarget;
 
@@ -228,4 +233,22 @@ export function getPostProcessPassRenderTarget(postProcessPass: PostProcessPassB
         return f(postProcessPass);
     }
     return (postProcessPass as PostProcessSinglePass).renderTarget;
+}
+
+// get render target texture ------------------------------------
+
+type GetPostProcessPassRenderTargetTextureBehaviour = (postProcessPass: PostProcessPassBase) => Texture | null;
+
+const getPostProcessPassRenderTargetTextureBehaviour: Partial<
+    Record<PostProcessPassType, GetPostProcessPassRenderTargetTextureBehaviour>
+> = {
+    [PostProcessPassType.ScreenSpaceShadow]: getScreenSpaceShadowRenderTargetTexture,
+};
+
+export function getPostProcessPassRenderTargetTexture(postProcessPass: PostProcessPassBase): Texture | null {
+    if (getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]) {
+        const f = getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]!;
+        return f(postProcessPass);
+    }
+    return getPostProcessPassRenderTarget(postProcessPass).texture;
 }

@@ -128,3 +128,8 @@ export function renderScreenShadowPass(postProcessPass: PostProcessPassBase, opt
     );
     renderPostProcessSinglePassBehaviour(screenSpaceShadowPass, options);
 }
+
+export function getScreenSpaceShadowRenderTargetTexture(postProcessPass: PostProcessPassBase) {
+    const screenSpaceShadowPass = postProcessPass as ScreenSpaceShadowPass;
+    return screenSpaceShadowPass.renderTarget.texture;
+}
