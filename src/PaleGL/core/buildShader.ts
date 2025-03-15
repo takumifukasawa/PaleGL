@@ -10,8 +10,8 @@ import {
     VertexShaderModifierPragmas,
     FragmentShaderModifierPragmas,
     ShaderPragmas,
-    VertexShaderModifier,
-    FragmentShaderModifier,
+    VertexShaderModifiers,
+    FragmentShaderModifiers,
 } from '@/PaleGL/constants.ts';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 // import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
@@ -285,7 +285,7 @@ export const buildVertexShader = (
     shader: string,
     attributeDescriptors: AttributeDescriptor[],
     defineOptions: ShaderDefines,
-    vertexShaderModifier: VertexShaderModifier
+    vertexShaderModifiers: VertexShaderModifiers
 ) => {
     let replacedShader: string = shader;
 
@@ -301,10 +301,11 @@ export const buildVertexShader = (
     Object.values(VertexShaderModifierPragmas).forEach((value) => {
         const pragma = value as VertexShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            if (!vertexShaderModifier[pragma]) {
+            const modifierIndex =  vertexShaderModifiers.findIndex(elem => elem.pragma === pragma);
+            if(modifierIndex < 0) {
                 return '';
             }
-            return vertexShaderModifier[pragma] || '';
+            return vertexShaderModifiers[modifierIndex].value || '';
         });
     });
 
@@ -320,7 +321,7 @@ export const buildVertexShader = (
 export const buildFragmentShader = (
     shader: string,
     defineOptions: ShaderDefines,
-    fragmentShaderModifier: FragmentShaderModifier
+    fragmentShaderModifiers: FragmentShaderModifiers
 ) => {
     let replacedShader: string = shader;
 
@@ -330,10 +331,11 @@ export const buildFragmentShader = (
     Object.values(FragmentShaderModifierPragmas).forEach((value) => {
         const pragma = value as FragmentShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            if (!fragmentShaderModifier[pragma]) {
+            const modifierIndex =  fragmentShaderModifiers.findIndex(elem => elem.pragma === pragma);
+            if(modifierIndex < 0) {
                 return '';
             }
-            return fragmentShaderModifier[pragma] || '';
+            return fragmentShaderModifiers[modifierIndex].value || '';
         });
     });
 

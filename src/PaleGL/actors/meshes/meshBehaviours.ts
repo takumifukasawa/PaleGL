@@ -58,10 +58,9 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
             // TODO: depth material から clone した方がいい気がする
             mesh.depthMaterials[i] = createMaterial({
                 name: `${material.name}/depth`,
-                // gpu,
-                // vertexShader: this.mainMaterial.vertexShader,
-                vertexShader: material.rawVertexShader!, // TDOO: rawじゃだめじゃん？
+                vertexShader: material.rawVertexShader!, // TODO: rawじゃだめじゃん？
                 fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
+                fragmentShaderModifiers: material.depthFragmentShaderModifiers, // TODO: ややこしいけど、depthのときはfragmentShaderModifiersを使う
                 uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
                 faceSide: material.faceSide,
                 depthTest: true,

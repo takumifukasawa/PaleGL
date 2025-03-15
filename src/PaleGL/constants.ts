@@ -115,7 +115,6 @@ export const MaterialTypes = {
 
 export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
 
-
 export const CameraTypes = {
     Perspective: 0,
     Orthographic: 1,
@@ -196,7 +195,7 @@ export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof
 export const RenderTargetKinds = {
     Default: 0,
     GBuffer: 1,
-    DoubleBuffer: 2
+    DoubleBuffer: 2,
 };
 
 export type RenderTargetKind = (typeof RenderTargetKinds)[keyof typeof RenderTargetKinds];
@@ -455,6 +454,7 @@ const ShaderModifierPragmas = {
     END_MAIN: 'END_MAIN',
     APPEND_ATTRIBUTES: 'APPEND_ATTRIBUTES',
     APPEND_UNIFORMS: 'APPEND_UNIFORMS',
+    RAYMARCH_SCENE: 'RAYMARCH_SCENE',
 } as const;
 
 type ShaderModifierPragmas = (typeof ShaderModifierPragmas)[keyof typeof ShaderModifierPragmas];
@@ -473,20 +473,18 @@ export type VertexShaderModifierPragmas =
 
 export const FragmentShaderModifierPragmas = {
     BLOCK_BEFORE_RAYMARCH_CONTENT: 'BLOCK_BEFORE_RAYMARCH_CONTENT',
-    // NOTE: 任意のmodifierを追加
+    BEFORE_OUT: 'BEFORE_OUT',
     ...ShaderModifierPragmas,
 } as const;
 export type FragmentShaderModifierPragmas =
     (typeof FragmentShaderModifierPragmas)[keyof typeof FragmentShaderModifierPragmas];
 
 // TODO: key to type
-export type VertexShaderModifier = {
-    [key in VertexShaderModifierPragmas]?: string;
-};
+export type VertexShaderModifiers = { pragma: VertexShaderModifierPragmas; value: string }[];
 
-export type FragmentShaderModifier = {
-    [key in FragmentShaderModifierPragmas]?: string;
-};
+export type FragmentShaderModifiers = { pragma: FragmentShaderModifierPragmas; value: string }[];
+
+export type DepthFragmentShaderModifiers = { pragma: FragmentShaderModifierPragmas; value: string }[];
 
 export const ShaderPartialPragmas = {
     // ENGINE_UNIFORMS: 'ENGINE_UNIFORMS',
@@ -740,4 +738,5 @@ export type GLColorAttachment = (typeof GLColorAttachment)[keyof typeof GLColorA
 
 // --
 
-export const PRAGMA_RAYMARCH_SCENE = '#pragma RAYMARCH_SCENE';
+// export const PRAGMA_RAYMARCH_SCENE = '#pragma RAYMARCH_SCENE';
+export const PRAGMA_RAYMARCH_SCENE = 'RAYMARCH_SCENE';

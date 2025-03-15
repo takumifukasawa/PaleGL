@@ -1,7 +1,7 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
+    FragmentShaderModifierPragmas,
     MeshTypes,
-    PRAGMA_RAYMARCH_SCENE,
     PrimitiveTypes,
     UniformBlockNames,
     UniformNames,
@@ -52,25 +52,54 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         ...getPostProcessCommonUniforms(),
     ];
 
-    const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
-        PRAGMA_RAYMARCH_SCENE,
-        args.fragmentShaderContent
-    );
-    const depthFragmentShader = (
-        args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
-    ).replace(PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent);
+    // const pragmaKey = `#pragma ${PRAGMA_RAYMARCH_SCENE}`;
+    // const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
+    //     pragmaKey,
+    //     args.fragmentShaderContent
+    // );
+    // const depthFragmentShader = (
+    //     args.depthFragmentShaderTemplate ?? 
+    // ).replace(
+    //     pragmaKey,
+    //     args.depthFragmentShaderContent
+    // );
+
+    // const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
+    //     PRAGMA_RAYMARCH_SCENE,
+    //     args.fragmentShaderContent
+    // );
+    // const depthFragmentShader = (
+    //     args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
+    // ).replace(
+    //     PRAGMA_RAYMARCH_SCENE,
+    //     args.depthFragmentShaderContent
+    // );
+
+
 
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = args.geometry ?? createPlaneGeometry({ gpu });
     const material = createScreenSpaceRaymarchMaterial({
         ...materialArgs,
         // overrides
-        fragmentShader,
-        depthFragmentShader,
+        fragmentShader: litScreenSpaceRaymarchFragmentLayout,
+        depthFragmentShader: gbufferScreenSpaceRaymarchDepthFragmentLayout,
         uniforms: mergedUniforms,
         // receiveShadow: !!receiveShadow,
         primitiveType: PrimitiveTypes.Triangles,
         uniformBlockNames: [UniformBlockNames.Timeline],
+        fragmentShaderModifiers: [
+            {
+                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                value: args.fragmentShaderContent,
+            }
+        ],
+        depthFragmentShaderModifiers: [
+            {
+                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                value: args.depthFragmentShaderContent,
+            }
+        ],
     });
 
     const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.ScreenSpaceRaymarch });

@@ -5,7 +5,6 @@ import {
     UniformBlockNames,
     UniformNames,
     UniformTypes,
-    VertexShaderModifier,
 } from '@/PaleGL/constants';
 import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
@@ -29,7 +28,6 @@ export type GBufferMaterialArgs = {
     emissiveColor?: Color;
     normalMap?: Texture | null;
     normalMapTiling?: Vector4;
-    vertexShaderModifier?: VertexShaderModifier;
     uniforms?: UniformsData;
     shadingModelId?: ShadingModelIds;
 } & MaterialArgs;
@@ -40,11 +38,11 @@ export type GBufferMaterial = ReturnType<typeof createGBufferMaterial>;
 export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const {
         // TODO: 外部化
-        vertexShaderModifier = {},
+        vertexShaderModifiers = [],
         uniforms = [],
         ...options
     }: GBufferMaterialArgs = args;
-
+    
     const diffuseColor: Color = args.diffuseColor || createColorWhite();
     const diffuseMap: Texture | null = args.diffuseMap || null;
     const diffuseMapTiling: Vector4 = args.diffuseMapTiling || createVector4(1, 1, 0, 0);
@@ -75,10 +73,6 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             type: UniformTypes.Vector4,
             value: diffuseMapTiling,
         },
-        // uSpecularAmount: {
-        //     type: UniformTypes.Float,
-        //     value: specularAmount || 1,
-        // },
         {
             name: UniformNames.Metallic,
             type: UniformTypes.Float,
@@ -160,9 +154,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         ...options,
         name: 'GBufferMaterial',
         vertexShader: gBufferVert,
-        fragmentShader: litFrag,
-        depthFragmentShader: gBufferDepthFrag,
-        vertexShaderModifier,
+        fragmentShader: args.fragmentShader || litFrag,
+        depthFragmentShader: args.depthFragmentShader || gBufferDepthFrag,
+        vertexShaderModifiers,
         uniforms: mergedUniforms,
         depthUniforms,
         useNormalMap: !!normalMap,
@@ -195,6 +189,6 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         normalMap,
         normalMapTiling,
         emissiveColor,
-        vertexShaderModifier,
+        vertexShaderModifiers,
     };
 }

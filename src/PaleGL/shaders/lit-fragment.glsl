@@ -52,8 +52,6 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 #include <gbuffer_o>
 
 void main() {
-    vec4 resultColor = vec4(0, 0, 0, 1);
-    
     vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
   
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
@@ -75,20 +73,20 @@ void main() {
     surface.worldNormal = worldNormal;
     surface.diffuseColor = diffuseColor;
     
-    resultColor = surface.diffuseColor;
-    
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl
 
-    resultColor.rgb = gamma(resultColor.rgb);
+    diffuseColor.rgb = gamma(diffuseColor.rgb);
    
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
     metallic *= texture(uMetallicMap, uv * uMetallicMapTiling.xy).r;
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
+    
+    #pragma BEFORE_OUT
 
-    outGBufferA = EncodeGBufferA(resultColor.rgb);
+    outGBufferA = EncodeGBufferA(diffuseColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(metallic, roughness);
     outGBufferD = EncodeGBufferD(uEmissiveColor.rgb);

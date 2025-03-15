@@ -1,9 +1,8 @@
 import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
-    FaceSide,
+    FaceSide, FragmentShaderModifierPragmas,
     MaterialTypes,
-    PRAGMA_RAYMARCH_SCENE,
     PrimitiveTypes,
     ShadingModelIds,
     UniformBlockNames,
@@ -52,14 +51,16 @@ export function createObjectSpaceRaymarchMaterial({
     depthFragmentShaderContent: string;
     materialArgs: ObjectSpaceRaymarchMaterialArgs;
 }) {
-    const fragmentShader = (fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout).replace(
-        PRAGMA_RAYMARCH_SCENE,
-        fragmentShaderContent
-    );
-    const depthFragmentShader = (depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout).replace(
-        PRAGMA_RAYMARCH_SCENE,
-        depthFragmentShaderContent
-    );
+    // const pragmaKey = `#pragma ${PRAGMA_RAYMARCH_SCENE}`;
+
+    // const fragmentShader = (fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout).replace(
+    //     pragmaKey,
+    //     fragmentShaderContent
+    // );
+    // const depthFragmentShader = (depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout).replace(
+    //     pragmaKey,
+    //     depthFragmentShaderContent
+    // );
 
     const {
         // TODO: 外部化
@@ -185,8 +186,8 @@ export function createObjectSpaceRaymarchMaterial({
         type: MaterialTypes.ObjectSpaceRaymarch,
 
         vertexShader: raymarchVert,
-        fragmentShader,
-        depthFragmentShader,
+        fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
+        depthFragmentShader: depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout,
         primitiveType: PrimitiveTypes.Triangles,
         faceSide: FaceSide.Double,
 
@@ -209,6 +210,19 @@ export function createObjectSpaceRaymarchMaterial({
             UniformBlockNames.Transformations,
             UniformBlockNames.Camera,
             ...(uniformBlockNames ? uniformBlockNames : []),
+        ],
+        
+        fragmentShaderModifiers: [
+            {
+                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                value: fragmentShaderContent,
+            }
+        ],
+        depthFragmentShaderModifiers: [
+            {
+                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                value: depthFragmentShaderContent,
+            }
         ],
     });
 

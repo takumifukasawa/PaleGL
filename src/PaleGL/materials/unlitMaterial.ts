@@ -4,8 +4,7 @@ import {
     DepthFuncTypes,
     UniformNames,
     UniformTypes,
-    VertexShaderModifier,
-    UniformBlockNames,
+    UniformBlockNames, VertexShaderModifiers,
 } from '@/PaleGL/constants';
 import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
@@ -21,7 +20,7 @@ export type UnlitMaterialArgs = {
     diffuseMap?: Texture;
     diffuseMapTiling?: Vector4;
     emissiveColor?: Color;
-    vertexShaderModifier?: VertexShaderModifier;
+    vertexShaderModifiers?: VertexShaderModifiers;
     uniforms?: UniformsData;
 } & MaterialArgs;
 
@@ -33,7 +32,7 @@ export function createUnlitMaterial({
     diffuseMapTiling, // vec4
     emissiveColor,
     // TODO: 外部化
-    vertexShaderModifier = {},
+    vertexShaderModifiers = [],
     uniforms = [],
     ...options
 }: UnlitMaterialArgs = {}) {
@@ -83,7 +82,7 @@ export function createUnlitMaterial({
     const material = createMaterial({
         ...options,
         name: 'UnlitMaterial',
-        vertexShaderModifier,
+        vertexShaderModifiers,
         vertexShader: gBufferVert,
         fragmentShader: unlitFrag,
         depthFragmentShader: gBufferDepthFrag,
