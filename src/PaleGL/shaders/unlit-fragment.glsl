@@ -27,7 +27,6 @@ void main() {
 
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
 
-
     vec3 worldNormal = vNormal;
 
 #ifdef USE_NORMAL_MAP
@@ -51,6 +50,5 @@ void main() {
     outGBufferA = EncodeGBufferA(resultColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
-    // outGBufferD = EncodeGBufferD(emissiveColor);
-    outGBufferD = EncodeGBufferD(diffuseMapColor.xyz);
+    outGBufferD = EncodeGBufferD(emissiveColor);
 }
