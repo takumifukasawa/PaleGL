@@ -84,10 +84,12 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
+    vec4 emissiveColor = uEmissiveColor;
+    
     #pragma BEFORE_OUT
 
     outGBufferA = EncodeGBufferA(diffuseColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(metallic, roughness);
-    outGBufferD = EncodeGBufferD(uEmissiveColor.rgb);
+    outGBufferD = EncodeGBufferD(emissiveColor.rgb);
 }

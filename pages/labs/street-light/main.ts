@@ -59,7 +59,7 @@ import {
     TextureDepthPrecisionType,
     UniformBlockNames,
     ActorTypes,
-    RAD_TO_DEG,
+    RAD_TO_DEG, FragmentShaderModifierPragmas,
 } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial';
@@ -906,6 +906,17 @@ const main = async () => {
     });
     setScaling(streetFloorActor.transform, createFillVector3(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
+    streetFloorMaterial.fragmentShaderModifiers = [
+        {
+            pragma: FragmentShaderModifierPragmas.BEFORE_OUT,
+            value: `
+float d = 1. - smoothstep(4., 7., length(uv));
+diffuseColor *= d;
+emissiveColor *= d;
+`,
+        }
+    ];
+    console.log(streetFloorMaterial)
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
 
