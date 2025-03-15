@@ -1208,12 +1208,14 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         rotation: number[][];
         velocity: number[][];
         color: number[][];
+        emissiveColor: number[][];
     } = {
         position: [],
         scale: [],
         rotation: [],
         velocity: [],
         color: [],
+        emissiveColor: []
     };
     maton.range(instanceNum).forEach(() => {
         // const posRangeX = 20;
@@ -1243,6 +1245,9 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             Math.floor(Math.random() * 200 + 30)
         );
         instanceInfo.color.push([...c.e]);
+        
+        const ec = createColorFromRGB(0, 0, 0);
+        instanceInfo.emissiveColor.push([...ec.e]);
     });
     const animationOffsetInfo = maton
         .range(instanceNum)
@@ -1305,7 +1310,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(maton.range(instanceNum).fill(0).flat()),
+            data: new Float32Array(instanceInfo.emissiveColor.flat()),
             size: 4,
             divisor: 1,
         })

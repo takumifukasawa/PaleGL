@@ -574,6 +574,7 @@ const createInstanceUpdater = (instanceNum: number) => {
 
 layout (std140) uniform ubCommon {
     float uTime;
+    float uDeltaTime;
 };
 
         // uniform float uTime;
@@ -588,7 +589,7 @@ layout (std140) uniform ubCommon {
         }
         
         void main() {
-            vPosition = aPosition + aVelocity;
+            vPosition = aPosition + aVelocity * uDeltaTime * 45.;
             vec3 target = uAttractTargetPosition;
             vec2 seed = aSeed;
             float rand = noise(seed);
@@ -701,12 +702,14 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         rotation: number[][];
         velocity: number[][];
         color: number[][];
+        emissiveColor: number[][];
     } = {
         position: [],
         scale: [],
         rotation: [],
         velocity: [],
         color: [],
+        emissiveColor: [],
     };
     maton.range(instanceNum).forEach(() => {
         instanceInfo.position.push([0, 0, 0]);
@@ -726,6 +729,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             Math.floor(Math.random() * 180 + 20)
         );
         instanceInfo.color.push([...c.e]);
+        
+        const ec = createColorFromRGB(0, 0, 0);
+        
+        instanceInfo.emissiveColor.push([...ec.e]);
     });
     const animationOffsetInfo = maton
         .range(instanceNum)
@@ -788,7 +795,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         skinningMesh.geometry,
         createAttribute({
             name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(maton.range(instanceNum).fill(0).flat()),
+            data: new Float32Array(instanceInfo.emissiveColor.flat()),
             size: 4,
             divisor: 1,
         })
