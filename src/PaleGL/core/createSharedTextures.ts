@@ -211,7 +211,6 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
     const planeGeometry = createPlaneGeometry({ gpu });
 
     const createEffectRenderTarget = ({ gpu, width, height }: { gpu: Gpu; width: number; height: number }) => {
-        console.log('----------');
         return createRenderTarget({
             gpu,
             width,
