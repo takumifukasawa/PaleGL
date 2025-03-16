@@ -6,7 +6,14 @@ import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBeh
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
-import {createEngine, Engine, getSharedTexture} from '@/PaleGL/core/engine.ts';
+import {
+    createEngine,
+    Engine,
+    getSharedTexture, runEngine,
+    setEngineSize,
+    setOnBeforeStartEngine, setOnBeforeUpdateEngine, setOnRenderEngine,
+    setSceneToEngine, startEngine
+} from '@/PaleGL/core/engine.ts';
 import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -406,7 +413,7 @@ const engine = createEngine({ gpu, renderer });
 // const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
 
 // engine.setScenes([captureScene, compositeScene]);
-engine.setScene(captureScene);
+setSceneToEngine(engine, captureScene);
 
 // const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);
@@ -1951,10 +1958,10 @@ void main() {
         width = wrapperElement.offsetWidth;
         height = wrapperElement.offsetHeight;
         setInputControllerSize(inputController, width, height);
-        engine.setSize(width, height);
+        setEngineSize(engine, width, height);
     };
 
-    engine.setOnBeforeStart(() => {
+    setOnBeforeStartEngine(engine, () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
@@ -1979,25 +1986,21 @@ void main() {
     //     },1000)
     // }
 
-    engine.setOnBeforeUpdate(() => {
+    setOnBeforeUpdateEngine(engine, () => {
         if (!debuggerGUI) initDebugger();
         updateInputController(inputController);
     });
 
-    engine.setOnBeforeFixedUpdate(() => {
-        // inputController.fixedUpdate();
-    });
-
-    engine.setOnRender((time) => {
-        renderRenderer(renderer, captureScene, captureSceneCamera, engine.getSharedTextures(), { time });
+    setOnRenderEngine(engine, (time) => {
+        renderRenderer(renderer, captureScene, captureSceneCamera, engine.sharedTextures, { time });
     });
 
     const tick = (time: number) => {
-        engine.run(time);
+        runEngine(engine, time);
         requestAnimationFrame(tick);
     };
 
-    engine.start();
+    startEngine(engine);
     requestAnimationFrame(tick);
 };
 

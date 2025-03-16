@@ -1,6 +1,12 @@
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera';
 import { SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh';
-import { createEngine } from '@/PaleGL/core/engine';
+import {
+    createEngine, runEngine,
+    setEngineSize,
+    setOnBeforeStartEngine,
+    setOnBeforeUpdateEngine,
+    setOnRenderEngine, setSceneToEngine, startEngine
+} from '@/PaleGL/core/engine';
 import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget';
@@ -329,7 +335,7 @@ const renderer = createRenderer({
 
 const engine = createEngine({ gpu, renderer, showStats: true });
 
-engine.setScene(captureScene);
+setSceneToEngine(engine, captureScene);
 
 const captureSceneCamera = createPerspectiveCamera(50, 1, 0.1, 50);
 addActorToScene(captureScene, captureSceneCamera);
@@ -1238,10 +1244,11 @@ void main() {
         width = wrapperElement.offsetWidth;
         height = wrapperElement.offsetHeight;
         setInputControllerSize(inputController, width, height);
-        engine.setSize(width, height);
+        setEngineSize(engine, width, height);
+        console.log("fugafuga", width, height)
     };
 
-    engine.setOnBeforeStart(() => {
+    setOnBeforeStartEngine(engine, () => {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
@@ -1278,21 +1285,21 @@ void main() {
         startOrbitCameraController(orbitCameraController);
     });
 
-    engine.setOnBeforeUpdate(() => {
+    setOnBeforeUpdateEngine(engine, () => {
         if (!debuggerGUI) initDebugger();
         updateInputController(inputController);
     });
 
-    engine.setOnRender((time) => {
-        renderRenderer(renderer, captureScene, captureSceneCamera, engine.getSharedTextures(), { time });
+    setOnRenderEngine(engine, (time) => {
+        renderRenderer(renderer, captureScene, captureSceneCamera, engine.sharedTextures, { time });
     });
 
     const tick = (time: number) => {
-        engine.run(time);
+        runEngine(engine, time);
         requestAnimationFrame(tick);
     };
 
-    engine.start();
+    startEngine(engine);
     requestAnimationFrame(tick);
 };
 
