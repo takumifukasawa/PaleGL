@@ -84,7 +84,7 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
-    vec4 emissiveColor = uEmissiveColor;
+    vec4 emissiveColor = gamma(uEmissiveColor);
     
     #pragma BEFORE_OUT
 

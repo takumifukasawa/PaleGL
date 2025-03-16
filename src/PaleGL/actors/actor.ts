@@ -21,253 +21,6 @@ type OnProcessTimeline = (timelineTime: number) => void;
 
 export type ActorArgs = { name?: string; type?: ActorType };
 
-// export class Actor {
-//     name: string;
-//     transform: Transform;
-//     type: ActorType;
-//     uuid: number;
-//     isStarted: boolean = false;
-//     parent: Actor | null = null;
-//     children: Actor[] = [];
-//     components: Component[] = [];
-//     animator: Animator | null = null; // TODO: component化
-//
-//     // lifecycle callback
-//     _onStart: OnStartCallback[] = [];
-//     _onFixedUpdate: OnFixedUpdateCallback | null = null;
-//     _onUpdate: OnUpdateCallback | null = null;
-//     _onLastUpdate: OnLastUpdateCallback | null = null;
-//     _onProcessClipFrame: OnProcessPropertyBinder | null = null;
-//     _onBeforeRender: OnBeforeRenderCallback | null = null;
-//     _onProcessPropertyBinder: OnProcessPropertyBinder | null = null;
-//     _onPreProcessTimeline: OnProcessTimeline | null = null;
-//     _onPostProcessTimeline: OnProcessTimeline | null = null;
-//     _enabled: boolean = true;
-//
-//     get childCount() {
-//         return _children.length;
-//     }
-//
-//     get hasChild() {
-//         return _childCount > 0;
-//     }
-//
-//     set enabled(value: boolean) {
-//         this._enabled = value;
-//     }
-//
-//     get enabled() {
-//         return this._enabled;
-//     }
-//
-//     subscribeOnStart(value: OnStartCallback) {
-//         _onStart.push(value);
-//     }
-//
-//     // TODO: onStartと同じで配列方式にする
-//     set onFixedUpdate(value: OnFixedUpdateCallback) {
-//         _onFixedUpdate = value;
-//     }
-//
-//     // TODO: onStartと同じで配列方式にする
-//     set onUpdate(value: OnUpdateCallback) {
-//         _onUpdate = value;
-//     }
-//
-//     set onLastUpdate(value: OnLastUpdateCallback) {
-//         _onLastUpdate = value;
-//     }
-//
-//     set onBeforeRender(value: OnBeforeRenderCallback) {
-//         _onBeforeRender = value;
-//     }
-//
-//     set onProcessPropertyBinder(value: OnProcessPropertyBinder) {
-//         _onProcessPropertyBinder = value;
-//     }
-//
-//     set onPreProcessTimeline(value: OnProcessTimeline) {
-//         _onPreProcessTimeline = value;
-//     }
-//
-//     set onPostProcessTimeline(value: OnProcessTimeline) {
-//         _onPostProcessTimeline = value;
-//     }
-//
-//     constructor({ name = '', type = ActorTypes.Null }: ActorArgs = {}) {
-//         this.name = name;
-//         _transform = createTransform(this);
-//         this.type = type || ActorTypes.Null;
-//         this.uuid = uuidv4();
-//         _animator = createAnimator();
-//     }
-//
-//     addChild(child: Actor) {
-//         _children.push(child);
-//         // _transform.addChild(child);
-//         // // _transform.addChild(child.transform); // NOTE: こっちが正しいはず？
-//         child.parent = this;
-//     }
-//
-//     addComponent(component: Component) {
-//         _components.push(component);
-//     }
-//
-//     getComponent<T extends Component>(): T | null {
-//         return _components.find((component) => component) as T;
-//     }
-//
-//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//     // @ts-ignore
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     setSize(width: number, height: number) {}
-//
-//     $tryStart({ gpu, scene }: ActorStartArgs) {
-//         if (_isStarted) {
-//             return;
-//         }
-//         _isStarted = true;
-//         this.start({ gpu, scene });
-//     }
-//
-//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//     // @ts-ignore
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     $updateTransform(cameras?: Camera) {
-//         _transform.updateMatrix();
-//     }
-//
-//     // -----------------------------------------------------------------
-//     // actor lifecycle
-//     // -----------------------------------------------------------------
-//
-//     start({ gpu, scene }: ActorStartArgs) {
-//         _components.forEach((component) => {
-//             component.start({ actor: this, gpu, scene });
-//         });
-//         _onStart.forEach((cb) => {
-//             cb({ actor: this, gpu, scene });
-//         });
-//     }
-//
-//     fixedUpdate({ gpu, scene, fixedTime, fixedDeltaTime }: ActorFixedUpdateArgs) {
-//         _tryStart({ gpu, scene });
-//         _components.forEach((component) => {
-//             component.fixedUpdate({ actor: this, gpu, fixedTime, fixedDeltaTime });
-//         });
-//         if (_animator) {
-//             _animator.update(fixedDeltaTime);
-//         }
-//         if (_onFixedUpdate) {
-//             _onFixedUpdate({ actor: this, gpu, scene, fixedTime, fixedDeltaTime });
-//         }
-//     }
-//
-//     // update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
-//     update({ gpu, scene, time, deltaTime }: ActorUpdateArgs) {
-//         _tryStart({ gpu, scene });
-//         _components.forEach((component) => {
-//             component.update({ actor: this, gpu, time, deltaTime });
-//         });
-//         if (_onUpdate) {
-//             _onUpdate({ actor: this, gpu, scene, time, deltaTime });
-//         }
-//     }
-//
-//     lastUpdate({ gpu, scene, time, deltaTime }: ActorLastUpdateArgs) {
-//         _tryStart({ gpu, scene });
-//         _components.forEach((component) => {
-//             component.lastUpdate({ actor: this, gpu, time, deltaTime });
-//         });
-//         if (_onLastUpdate) {
-//             _onLastUpdate({ actor: this, gpu, scene, time, deltaTime });
-//         }
-//     }
-//
-//     // updateTimeline(time: number, prevTime: number, deltaTime: number) {
-//     //     if()
-//     // }
-//
-//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//     // @ts-ignore
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     beforeRender({ gpu }: { gpu: Gpu }) {
-//         if (_onBeforeRender) {
-//             _onBeforeRender(this);
-//         }
-//
-//         // TODO: componentで必要になったら呼ぶ
-//     }
-//
-//     processPropertyBinder(key: string, value: number) {
-//         if (_onProcessPropertyBinder) {
-//             _onProcessPropertyBinder(key, value);
-//         }
-//         _components.forEach((component) => {
-//             component.processPropertyBinder?.(key, value);
-//         });
-//     }
-//
-//     preProcessTimeline(timelineTime: number) {
-//         if (_onPreProcessTimeline) {
-//             _onPreProcessTimeline(timelineTime);
-//         }
-//         // _components.forEach((component) => {
-//         //     component.processTimeline?.(timelineTime, timelinePrevTime, timelineDeltaTime);
-//         // });
-//     }
-//
-//     postProcessTimeline(timelineTime: number) {
-//         if (_onPostProcessTimeline) {
-//             _onPostProcessTimeline(timelineTime);
-//         }
-//         _components.forEach((component) => {
-//             component.postProcessTimeline?.(this, timelineTime);
-//         });
-//     }
-// }
-
-// export type ActorBase = {
-//     getName: () => string;
-//     getType: () => ActorType;
-//     getUUID: () => number;
-//     getEnabled: () => boolean;
-//     setEnabled: (value: boolean) => void;
-//     setOnFixedUpdate: (value: OnFixedUpdateCallback) => void;
-//     setOnUpdate: (value: OnUpdateCallback) => void;
-//     setOnLastUpdate: (value: OnLastUpdateCallback) => void;
-//     setOnBeforeRender: (value: OnBeforeRenderCallback) => void;
-//     setOnProcessPropertyBinder: (value: OnProcessPropertyBinder) => void;
-//     setOnPreProcessTimeline: (value: OnProcessTimeline) => void;
-//     setOnPostProcessTimeline: (value: OnProcessTimeline) => void;
-//     subscribeOnStart: (value: OnStartCallback) => void;
-//     addComponent: (component: Component) => void;
-//     getComponent: <T extends Component>() => T | null;
-//     setSize: (width: number, height: number) => void;
-//     start: (args: ActorStartArgs) => void;
-//     fixedUpdate: (args: ActorFixedUpdateArgs) => void;
-//     update: (args: ActorUpdateArgs) => void;
-//     lastUpdate: (args: ActorLastUpdateArgs) => void;
-//     beforeRender: (args: { gpu: Gpu }) => void;
-//     processPropertyBinder: (key: string, value: number) => void;
-//     preProcessTimeline: (timelineTime: number) => void;
-//     postProcessTimeline: (timelineTime: number) => void;
-// };
-
-// export type Actor = ActorBase & {
-//     // parent: Actor;
-//     getTransform: () => Transform;
-//     updateTransform: (cameras?: Camera) => void;
-//     getChildCount: () => number;
-//     getHasChild: () => boolean;
-//     addChild: (child: Actor) => void;
-//     getParent: () => Actor | null;
-//     setParent: (parent: Actor) => void;
-// };
-
-// export type UpdateActorFunc = (actor: Actor, args: ActorUpdateArgs) => void;
-// export type UpdateActorTransformFunc = (actor: Actor, cameras?: Camera) => void;
-
 export type Actor = {
     name: string;
     type: ActorType;
@@ -280,7 +33,7 @@ export type Actor = {
     animator: Animator;
     onStart: OnStartCallback[];
     onFixedUpdate: OnFixedUpdateCallback | null;
-    onUpdate: OnUpdateCallback | null;
+    onUpdate: OnUpdateCallback[];
     onLastUpdate: OnLastUpdateCallback | null;
     onBeforeRender: OnBeforeRenderCallback | null;
     onProcessPropertyBinder: OnProcessPropertyBinder | null;
@@ -314,7 +67,7 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
     // lifecycle callback
     const onStart: OnStartCallback[] = [];
     const onFixedUpdate: OnFixedUpdateCallback | null = null;
-    const onUpdate: OnUpdateCallback | null = null;
+    const onUpdate: OnUpdateCallback[] = [];
     const onLastUpdate: OnLastUpdateCallback | null = null;
     // TODO: timeline
     // let _onProcessClipFrame: OnProcessPropertyBinder | null = null;
@@ -389,6 +142,10 @@ export const addChildActor = (parent: Actor, child: Actor) => {
 export const subscribeActorOnStart = (actor: Actor, value: OnStartCallback) => {
     actor.onStart.push(value);
 };
+
+export const subscribeActorOnUpdate = (actor: Actor, value: OnUpdateCallback) => {
+    actor.onUpdate.push(value);
+}
 
 export const addActorComponent = (actor: Actor, component: Component) => {
     actor.components.push(component);

@@ -1,4 +1,4 @@
-import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import {
     RenderTargetTypes,
@@ -17,7 +17,7 @@ import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
@@ -35,14 +35,19 @@ export const SharedTexturesTypes = {
 
 export type SharedTexturesType = (typeof SharedTexturesTypes)[keyof typeof SharedTexturesTypes];
 
-export type SharedTextures = {
-    [key in SharedTexturesType]: {
-        texture: Texture;
-        needsUpdate: boolean;
-        update: (time: number) => void;
-        render: () => void;
-    };
+export type SharedTexture = {
+    texture: Texture;
+    needsUpdate: boolean;
+    // update: (time: number) => void;
+    // render: (time: number) => void;
+    planeGeometry: PlaneGeometry;
+    effectMaterial: Material;
+    effectRenderTarget: RenderTarget;
+    compositeMaterial: Material;
+    compositeRenderTarget: RenderTarget;
 };
+
+export type SharedTextures = Map<SharedTexturesType, SharedTexture>;
 
 type SharedTextureInfo = {
     key: SharedTexturesType;
@@ -54,7 +59,7 @@ type SharedTextureInfo = {
     edgeMaskMix: number;
     remapMin: number;
     remapMax: number;
-    update?: (time: number, effectMaterial: Material) => void;
+    // update?: (time: number, effectMaterial: Material) => void;
 };
 
 const sharedTextureInfos: SharedTextureInfo[] = [
@@ -206,6 +211,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
     const planeGeometry = createPlaneGeometry({ gpu });
 
     const createEffectRenderTarget = ({ gpu, width, height }: { gpu: Gpu; width: number; height: number }) => {
+        console.log('----------');
         return createRenderTarget({
             gpu,
             width,
@@ -218,15 +224,12 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
         });
     };
 
-    const renderMaterial = (renderTarget: RenderTarget, material: Material) => {
-        setRendererRenderTarget(renderer, renderTarget, true);
-        renderMesh(renderer, planeGeometry, material);
-        setRendererRenderTarget(renderer, null);
-    };
-
     const planeGeometryAttributeDescriptors = getGeometryAttributeDescriptors(planeGeometry);
 
-    const sharedTextures: SharedTextures = sharedTextureInfos.reduce((acc, current) => {
+    const sharedTextures: SharedTextures = new Map();
+
+    for (let i = 0; i < sharedTextureInfos.length; i++) {
+        const sharedTextureInfo = sharedTextureInfos[i];
         const {
             key,
             width,
@@ -237,8 +240,8 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
             edgeMaskMix,
             remapMin,
             remapMax,
-            update,
-        } = current;
+            // update,
+        } = sharedTextureInfo;
         const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height });
         const ppRenderTarget = createEffectRenderTarget({ gpu, width, height });
 
@@ -283,35 +286,77 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
         startMaterial(ppMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
         setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.texture);
 
-        const render = () => {
-            renderMaterial(tmpRenderTarget, tmpMaterial);
-            renderMaterial(ppRenderTarget, ppMaterial);
+        const sharedTexture: SharedTexture = {
+            // let needsRender: boolean = false;
+            texture: ppRenderTarget.texture!,
+            needsUpdate: false,
+            // update: (time: number) => {
+            //     // needsRender = false;
+            //     if (update) {
+            //         update(time, tmpMaterial);
+            //         // needsRender = true;
+            //     }
+            // },
+            // render: (time: number) => {
+            //     if (false) {
+            //         setUniformValue(tmpMaterial.uniforms, UniformNames.Time, time);
+            //         render();
+            //         // needsRender = false;
+            //     }
+            // },
+            planeGeometry,
+            effectMaterial: tmpMaterial,
+            effectRenderTarget: tmpRenderTarget,
+            compositeMaterial: ppMaterial,
+            compositeRenderTarget: ppRenderTarget,
         };
 
-        render();
+        renderSharedTexture(renderer, sharedTexture, 0); // 最初なので一旦time=0でいいかという判断
 
-        acc[key] = (() => {
-            let needsUpdate: boolean = false;
-            return {
-                texture: ppRenderTarget.texture!,
-                needsUpdate: false,
-                update: (time: number) => {
-                    needsUpdate = false;
-                    if (update) {
-                        update(time, tmpMaterial);
-                        needsUpdate = true;
-                    }
-                },
-                render: () => {
-                    if (needsUpdate) {
-                        render();
-                    }
-                },
-            };
-        })();
-
-        return acc;
-    }, {} as SharedTextures);
+        sharedTextures.set(key, sharedTexture);
+    }
 
     return sharedTextures;
 }
+
+const renderMaterial = (
+    renderer: Renderer,
+    planeGeometry: PlaneGeometry,
+    renderTarget: RenderTarget,
+    material: Material
+) => {
+    setRendererRenderTarget(renderer, renderTarget, true);
+    renderMesh(renderer, planeGeometry, material);
+    setRendererRenderTarget(renderer, null);
+};
+
+const renderSharedTexture = (renderer: Renderer, sharedTexture: SharedTexture, time: number) => {
+    setUniformValue(sharedTexture.effectMaterial.uniforms, UniformNames.Time, time);
+    renderMaterial(
+        renderer,
+        sharedTexture.planeGeometry,
+        sharedTexture.effectRenderTarget,
+        sharedTexture.effectMaterial
+    );
+    renderMaterial(
+        renderer,
+        sharedTexture.planeGeometry,
+        sharedTexture.compositeRenderTarget,
+        sharedTexture.compositeMaterial
+    );
+};
+
+export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedTextures, time: number) {
+    sharedTextures.forEach((sharedTexture) => {
+        if (sharedTexture.needsUpdate) {
+            renderSharedTexture(renderer, sharedTexture, time);
+        }
+    });
+}
+
+// export function getSharedTexture(sharedTextures: SharedTextures, key: SharedTexturesType): SharedTexture {
+//     if (!sharedTextures.has(key)) {
+//         console.error('invalid shared texture key');
+//     }
+//     return sharedTextures.get(key)!;
+// }

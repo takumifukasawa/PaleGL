@@ -4,9 +4,10 @@ import {
     DepthFuncTypes,
     UniformNames,
     UniformTypes,
-    UniformBlockNames, VertexShaderModifiers,
+    UniformBlockNames,
+    VertexShaderModifiers,
 } from '@/PaleGL/constants';
-import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
@@ -16,9 +17,8 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type UnlitMaterialArgs = {
-    diffuseColor?: Color;
-    diffuseMap?: Texture;
-    diffuseMapTiling?: Vector4;
+    emissiveMap?: Texture;
+    emissiveMapTiling?: Vector4;
     emissiveColor?: Color;
     vertexShaderModifiers?: VertexShaderModifiers;
     uniforms?: UniformsData;
@@ -27,9 +27,8 @@ export type UnlitMaterialArgs = {
 export type UnlitMaterial = Material;
 
 export function createUnlitMaterial({
-    diffuseColor,
-    diffuseMap,
-    diffuseMapTiling, // vec4
+    emissiveMap,
+    emissiveMapTiling, // vec4
     emissiveColor,
     // TODO: 外部化
     vertexShaderModifiers = [],
@@ -38,24 +37,19 @@ export function createUnlitMaterial({
 }: UnlitMaterialArgs = {}) {
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseColor,
-            type: UniformTypes.Color,
-            value: diffuseColor || createColorBlack(),
-        },
-        {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.EmissiveMap,
             type: UniformTypes.Texture,
-            value: diffuseMap || null,
+            value: emissiveMap || null,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.EmissiveMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
+            value: emissiveMapTiling || createVector4(1, 1, 0, 0),
         },
         {
             name: UniformNames.EmissiveColor,
             type: UniformTypes.Color,
-            value: emissiveColor || createColorBlack(),
+            value: emissiveColor || createColorWhite(),
         },
         {
             name: UniformNames.ShadingModelId,
@@ -68,17 +62,22 @@ export function createUnlitMaterial({
 
     const depthUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.EmissiveMap,
             type: UniformTypes.Texture,
-            value: diffuseMap || null,
+            value: emissiveMap || null,
         },
         {
             name: UniformNames.DiffuseMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
+            value: emissiveMapTiling || createVector4(1, 1, 0, 0),
+        },
+        {
+            name: UniformNames.EmissiveColor,
+            type: UniformTypes.Color,
+            value: emissiveColor || createColorWhite(),
         },
     ];
-    
+
     const material = createMaterial({
         ...options,
         name: 'UnlitMaterial',
@@ -90,8 +89,8 @@ export function createUnlitMaterial({
         depthUniforms,
         useNormalMap: false,
         depthTest: true,
-        depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき
-        depthFuncType: DepthFuncTypes.Equal, // TODO: これはGBufferの場合
+        depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき??
+        depthFuncType: DepthFuncTypes.Equal, // NOTE: これはGBufferの場合
         uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 

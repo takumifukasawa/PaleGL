@@ -73,7 +73,7 @@ import {
 import { maton } from '@/PaleGL/utilities/maton';
 import { clamp, saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
-import { Actor, subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
+import {Actor, subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
 
 import { createPlane, intersectRayWithPlane } from '@/PaleGL/math/plane.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
@@ -828,7 +828,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createInstanceUpdater(MAX_INSTANCE_NUM);
 
     let attractRate = 0;
-    skinningMesh.onUpdate = ({ deltaTime }) => {
+    subscribeActorOnUpdate(skinningMesh, ({ deltaTime }) => {
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uNormalizedInputPosition',
@@ -870,7 +870,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         );
 
         skinnedMesh.geometry.instanceCount = debuggerStates.instanceNum;
-    };
+    });
 
     return skinningMesh;
 };
@@ -997,7 +997,7 @@ emissiveColor *= d;
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const x = Math.random() * 6 - 4;
+                            const x = Math.random() * 6 - 3;
                             const y = Math.random() * 0.5;
                             const z = Math.random() * 5.4 - 1.4;
                             return [x, y, z, x, y, z, x, y, z, x, y, z];
@@ -1023,7 +1023,7 @@ emissiveColor *= d;
                         .range(particleNum)
                         .map(() => {
                             const v = Math.random() * 150 + 50;
-                            const a = Math.random() * 75 + 25;
+                            const a = Math.random() * 15 + 15;
                             const c = createColorFromRGB(v, v, v, a);
                             return [...c.e, ...c.e, ...c.e, ...c.e];
                         })
@@ -1037,7 +1037,7 @@ emissiveColor *= d;
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const s = Math.random() * 6.25 + 1.75;
+                            const s = Math.random() * 3.25 + 1.45;
                             return [s, s, s, s];
                         })
                         .flat()
@@ -1202,20 +1202,10 @@ void main() {
                 type: UniformTypes.Texture,
                 value: null,
             },
-            {
-                name: UniformNames.CameraNear,
-                type: UniformTypes.Float,
-                value: captureSceneCamera.near,
-            },
-            {
-                name: UniformNames.CameraFar,
-                type: UniformTypes.Float,
-                value: captureSceneCamera.far,
-            },
         ],
         blendType: BlendTypes.Transparent,
         depthWrite: false,
-        uniformBlockNames: [UniformBlockNames.Common],
+        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
     });
     const particleMesh = createMesh({
         geometry: particleGeometry,

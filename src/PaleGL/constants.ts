@@ -355,6 +355,8 @@ export const UniformNames = {
     RoughnessMap: 'uRoughnessMap',
     RoughnessMapTiling: 'uRoughnessMapTiling',
     EmissiveColor: 'uEmissiveColor',
+    EmissiveMap: 'uEmissiveMap',
+    EmissiveMapTiling: 'uEmissiveMapTiling',
     NormalMap: 'uNormalMap',
     NormalMapTiling: 'uNormalMapTiling',
     // ao

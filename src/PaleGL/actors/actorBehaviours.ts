@@ -107,9 +107,9 @@ export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTim
     actor.components.forEach((component) => {
         component.update({ gpu, time, deltaTime });
     });
-    if (actor.onUpdate) {
-        actor.onUpdate({ gpu, scene, time, deltaTime });
-    }
+    actor.onUpdate.forEach((cb) => {
+        cb({ gpu, scene, time,  deltaTime});
+    });
 
     // console.log(actor.type, actor.name)
     updateActorBehaviour[actor.type]?.(actor, { gpu, scene, time, deltaTime });

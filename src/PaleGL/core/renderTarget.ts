@@ -468,20 +468,20 @@ export function createRenderTarget({
         mipmap,
         depthPrecision,
     }: RenderTargetOptions): RenderTarget {
-
+    
     // default variables
-    name =  name || '';
-    renderTargetKind = renderTargetKind || RenderTargetKinds.Default;
-    type = type || RenderTargetTypes.RGBA;
-    width = width || 1;
-    height = height || 1;
-    useDepthBuffer = useDepthBuffer || false;
-    writeDepthTexture = writeDepthTexture || false;
-    minFilter = minFilter || TextureFilterTypes.Linear;
-    magFilter = magFilter || TextureFilterTypes.Linear;
-    wrapT = wrapT || TextureWrapTypes.ClampToEdge;
-    wrapS = wrapS || TextureWrapTypes.ClampToEdge;
-    mipmap = mipmap || false;
+    name = name ?? '';
+    renderTargetKind = renderTargetKind ?? RenderTargetKinds.Default;
+    type = type ?? RenderTargetTypes.RGBA;
+    width = width ?? 1;
+    height = height ?? 1;
+    useDepthBuffer = useDepthBuffer ?? false;
+    writeDepthTexture = writeDepthTexture ?? false;
+    minFilter = minFilter ?? TextureFilterTypes.Linear;
+    magFilter = magFilter ?? TextureFilterTypes.Linear;
+    wrapT = wrapT ?? TextureWrapTypes.ClampToEdge;
+    wrapS = wrapS ?? TextureWrapTypes.ClampToEdge;
+    mipmap = mipmap ?? false;
 
     const gl = gpu.gl;
 

@@ -6,7 +6,7 @@ import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBeh
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
-import { createEngine } from '@/PaleGL/core/engine.ts';
+import {createEngine, Engine, getSharedTexture} from '@/PaleGL/core/engine.ts';
 import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -41,7 +41,17 @@ import {
     getColorHexCoord,
 } from '@/PaleGL/math/color.ts';
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
-import { createVector3, createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
+import {
+    createFillVector3,
+    createVector3,
+    createVector3Zero,
+    setV3x,
+    setV3y,
+    setV3z,
+    v3x,
+    v3y,
+    v3z
+} from '@/PaleGL/math/vector3.ts';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
 // postprocess
@@ -108,8 +118,8 @@ import { createGLSLSound, GlslSound } from '@/PaleGL/core/glslSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import { addActorToScene, createScene } from '@/PaleGL/core/scene.ts';
-import { subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
+import {addActorToScene, createScene} from '@/PaleGL/core/scene.ts';
+import {subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
@@ -137,6 +147,7 @@ import {
     updateInputController,
 } from '@/PaleGL/inputs/inputControllerBehaviours.ts';
 import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
+import {SharedTexturesType, SharedTexturesTypes} from "@/PaleGL/core/createSharedTextures.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1357,7 +1368,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
 
     let attractRate = 0;
-    skinningMesh.onUpdate = ({ deltaTime }) => {
+    subscribeActorOnUpdate(skinningMesh, ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
 
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
@@ -1401,7 +1412,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
                 'aVelocity'
             )!
         );
-    };
+    });
 
     // skinningMesh.debugBoneView = true;
     // skinningMesh.enabled = false;
@@ -1896,9 +1907,35 @@ void main() {
         geometry: particleGeometry,
         material: particleMaterial,
     });
-    // particleMesh.onFixedUpdate = ({ fixedTime }) => {
-    //     particleMaterial.uniforms.setValue('uTime', fixedTime);
-    // };
+  
+    // noise -----------------------------------
+
+    const randomNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.RANDOM_NOISE);
+    setScaling(randomNoiseTextureMesh.transform, createFillVector3(1.5));
+    setTranslation(randomNoiseTextureMesh.transform, createVector3(8, 1.5, 0));
+    addActorToScene(captureScene, randomNoiseTextureMesh);
+    
+    const fbmNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.FBM_NOISE);
+    setScaling(fbmNoiseTextureMesh.transform, createFillVector3(1.5));
+    setTranslation(fbmNoiseTextureMesh.transform, createVector3(8, 1.5, 2));
+    addActorToScene(captureScene, fbmNoiseTextureMesh);
+    
+    const perlinNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.PERLIN_NOISE);
+    setScaling(perlinNoiseTextureMesh.transform, createFillVector3(1.5));
+    setTranslation(perlinNoiseTextureMesh.transform, createVector3(8, 1.5, 4));
+    addActorToScene(captureScene, perlinNoiseTextureMesh);
+  
+    const improvedNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.IMPROVE_NOISE);
+    setScaling(improvedNoiseTextureMesh.transform, createFillVector3(1.5));
+    setTranslation(improvedNoiseTextureMesh.transform, createVector3(8, 1.5, 6));
+    addActorToScene(captureScene, improvedNoiseTextureMesh);
+    
+    const simplexNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.SIMPLEX_NOISE);
+    setScaling(simplexNoiseTextureMesh.transform, createFillVector3(1.5));
+    setTranslation(simplexNoiseTextureMesh.transform, createVector3(8, 1.5, 8));
+    addActorToScene(captureScene, simplexNoiseTextureMesh);
+    
+    // noise -----------------------------------
 
     addActorToScene(captureScene, attractSphereMesh);
     addActorToScene(captureScene, testLightingMesh);
@@ -1963,6 +2000,22 @@ void main() {
     engine.start();
     requestAnimationFrame(tick);
 };
+
+function createSharedTextureMesh(engine: Engine, key: SharedTexturesType) {
+    const textureMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial()
+    });
+    subscribeActorOnUpdate(textureMesh, () => {
+        getSharedTexture(engine, key).needsUpdate = true;
+        setUniformValue(
+            getMeshMaterial(textureMesh).uniforms,
+            UniformNames.EmissiveMap,
+            getSharedTexture(engine, key).texture
+        );
+    });
+    return textureMesh;
+}
 
 function initDebugger() {
     debuggerGUI = createDebuggerGUI();

@@ -1191,7 +1191,7 @@ export function renderRenderer(
             ? renderer.screenSpaceShadowPass.renderTarget.texture!
             : renderer.gpu.dummyTextureBlack
         ,
-        sharedTextures[SharedTexturesTypes.FBM_NOISE].texture
+        sharedTextures.get(SharedTexturesTypes.FBM_NOISE)!.texture
     );
 
     // fog pass の段階で合成

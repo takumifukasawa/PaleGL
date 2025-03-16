@@ -6,10 +6,9 @@
 #include <gbuffer>
 #include <vcolor_fh>
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap;
-uniform vec4 uDiffuseMapTiling;
 uniform vec4 uEmissiveColor;
+uniform sampler2D uEmissiveMap;
+uniform vec4 uEmissiveMapTiling;
 uniform int uShadingModelId;
 
 #include <alpha_test>
@@ -21,11 +20,9 @@ in vec3 vWorldPosition;
 #include <gbuffer_o>
 
 void main() {
-    vec4 resultColor = vec4(0, 0, 0, 1);
-
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
-
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    vec2 uv = vUv * uEmissiveMapTiling.xy + uEmissiveMapTiling.zw;
+    
+    vec4 emissiveColor = texture(uEmissiveMap, uv) * uEmissiveColor;
 
     vec3 worldNormal = vNormal;
 
@@ -36,19 +33,17 @@ void main() {
 #endif
 
 #ifdef USE_VERTEX_COLOR
-    diffuseColor *= vVertexColor;
+    emissiveColor *= vVertexColor;
 #endif
 
-    resultColor = diffuseMapColor; 
+    vec4 resultColor = emissiveColor; // for alpha test
 
-    // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl
 
-    resultColor.rgb = gamma(resultColor.rgb);
-    vec3 emissiveColor = gamma(uEmissiveColor.rgb);
+    emissiveColor = gamma(emissiveColor);
 
-    outGBufferA = EncodeGBufferA(resultColor.rgb);
+    outGBufferA = EncodeGBufferA(vec3(0.));
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(emissiveColor);
+    outGBufferD = EncodeGBufferD(emissiveColor.rgb);
 }

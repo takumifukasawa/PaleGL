@@ -140,6 +140,8 @@ void main() {
     // sss fog
     outColor += vec4(uSSSFogColor.xyz * (1. - sssRate) * uSSSFogRate * fogRate, 0.);
     
+    // outColor = vec4(vec3(noiseRate), 1.);
+    
     // for debug
     // outColor = vec4(vec3(noiseRate2), 1.);
     // outColor = sceneColor;

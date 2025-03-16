@@ -545,8 +545,8 @@ void main() {
 
     // depth guard
     if (step(rawDepth, 1. - eps) < .5) {
-        // outColor = vec4(baseColor, 1.); // TODO: 本当はこっちを使いたい: skyboxを後合成にしたい
-        outColor = vec4(0., 0., 0., 1.);
+        outColor = vec4(baseColor, 1.); 
+        // outColor = vec4(1., 0., 0., 1.); // TODO: 本当はこっちを使いたい: skyboxを後合成にしたい
         // 疑似HDRする場合
         // outColor = encodePseudoHDR(baseColor);
         return;

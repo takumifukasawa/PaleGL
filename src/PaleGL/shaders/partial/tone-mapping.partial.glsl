@@ -24,3 +24,7 @@ vec3 degamma(vec3 color) {
 vec3 gamma(vec3 color) {
     return pow(color, vec3(2.2));
 }
+
+vec4 gamma(vec4 color) {
+    return pow(color, vec4(2.2));
+}
