@@ -392,6 +392,7 @@ subscribeActorOnStart(directionalLight, () => {
 addActorToScene(captureScene, directionalLight);
 
 const spotLight1 = createSpotLight({
+    name: 'spotLight1',
     intensity: 1.4,
     color: createColorWhite(),
     distance: 15,
@@ -407,6 +408,7 @@ if (spotLight1.shadowCamera) {
     spotLight1.shadowCamera.far = spotLight1.distance;
     setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
     spotLight1.shadowMap = createRenderTarget({
+        name: 'spotLight1',
         gpu,
         width: 1024,
         height: 1024,
@@ -421,6 +423,7 @@ subscribeActorOnStart(spotLight1, () => {
 addActorToScene(captureScene, spotLight1);
 
 const spotLight2 = createSpotLight({
+    name: 'spotLight2',
     intensity: 1.4,
     color: createColorWhite(),
     distance: 15,
@@ -437,6 +440,7 @@ if (spotLight2.shadowCamera) {
     setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
     spotLight2.shadowMap = createRenderTarget({
         gpu,
+        name: 'spotLight2',
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
@@ -837,7 +841,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uAttractTargetPosition',
-            addVector3Array(attractSphereMesh.transform.position, createVector3Zero())
+            addVector3Array(
+                attractSphereMesh.transform.position,
+                createVector3(0, 0, 0) // offset attract
+            )
         );
 
         attractRate += (inputController.isDown ? 1 : -1) * deltaTime * 2;
@@ -952,9 +959,10 @@ emissiveColor *= d;
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            emissiveColor: createColor(1.5, 1.5, 1.5, 1),
+            diffuseColor: createColor(1.5, 1.5, 1.5, 1),
         })
     );
+    attractSphereMesh.name = "attractSphere";
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, createFillVector3(0.5));
     });
@@ -966,12 +974,13 @@ emissiveColor *= d;
                 1 - v2y(inputController.normalizedInputPosition)
             )
         );
-        const plane = createPlane(createVector3Zero(), createVector3Up());
+        const posY = 3;
+        const plane = createPlane(createVector3(0, posY, 0), createVector3Up());
         const intersectOnPlane = intersectRayWithPlane(ray, plane);
         if (intersectOnPlane) {
             const x = clamp(v3x(intersectOnPlane), -5, 5);
             const z = clamp(v3z(intersectOnPlane), -5, 5);
-            const p = createVector3(x, 1, z);
+            const p = createVector3(x, posY, z);
             setTranslation(attractSphereMesh.transform, p);
         }
     };

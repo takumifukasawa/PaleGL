@@ -5,7 +5,7 @@ import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/came
 import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import {setRotationY} from "@/PaleGL/core/transform.ts";
+import { setRotationY } from '@/PaleGL/core/transform.ts';
 
 type SpotLightParams = {
     distance: number;

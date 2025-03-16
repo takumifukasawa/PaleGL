@@ -182,8 +182,8 @@ export function applyLightShadowMapUniformValues(
     );
 
     // spotlights
-    const spotLightShadowMaps = maton.range(MAX_SPOT_LIGHT_COUNT).map((i) => {
-        const spotLight = lightActors.spotLights[i];
+    const spotLightShadowMaps = maton.range(MAX_SPOT_LIGHT_COUNT).map((_, key) => {
+        const spotLight = lightActors.spotLights[key];
         return spotLight && spotLight.shadowMap ? spotLight.shadowMap.depthTexture! : fallbackTexture;
     });
     setMaterialUniformValue(targetMaterial, UniformNames.SpotLightShadowMap, spotLightShadowMaps);
@@ -1033,7 +1033,7 @@ export function renderRenderer(
                 return false;
             }
             return actor.castShadow;
-        });
+        })
         shadowPass(renderer, castShadowLightActors, castShadowRenderMeshInfos);
     }
 

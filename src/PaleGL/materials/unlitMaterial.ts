@@ -17,9 +17,9 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type UnlitMaterialArgs = {
-    emissiveMap?: Texture;
-    emissiveMapTiling?: Vector4;
-    emissiveColor?: Color;
+    diffuseMap?: Texture;
+    diffuseMapTiling?: Vector4;
+    diffuseColor?: Color;
     vertexShaderModifiers?: VertexShaderModifiers;
     uniforms?: UniformsData;
 } & MaterialArgs;
@@ -27,9 +27,9 @@ export type UnlitMaterialArgs = {
 export type UnlitMaterial = Material;
 
 export function createUnlitMaterial({
-    emissiveMap,
-    emissiveMapTiling, // vec4
-    emissiveColor,
+    diffuseMap,
+    diffuseMapTiling, // vec4
+    diffuseColor,
     // TODO: 外部化
     vertexShaderModifiers = [],
     uniforms = [],
@@ -37,19 +37,19 @@ export function createUnlitMaterial({
 }: UnlitMaterialArgs = {}) {
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.EmissiveMap,
+            name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
-            value: emissiveMap || null,
+            value: diffuseMap || null,
         },
         {
-            name: UniformNames.EmissiveMapTiling,
+            name: UniformNames.DiffuseMapTiling,
             type: UniformTypes.Vector4,
-            value: emissiveMapTiling || createVector4(1, 1, 0, 0),
+            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.EmissiveColor,
+            name: UniformNames.DiffuseColor,
             type: UniformTypes.Color,
-            value: emissiveColor || createColorWhite(),
+            value: diffuseColor || createColorWhite(),
         },
         {
             name: UniformNames.ShadingModelId,
@@ -62,19 +62,19 @@ export function createUnlitMaterial({
 
     const depthUniforms: UniformsData = [
         {
-            name: UniformNames.EmissiveMap,
+            name: UniformNames.DiffuseMap,
             type: UniformTypes.Texture,
-            value: emissiveMap || null,
+            value: diffuseMap || null,
         },
         {
             name: UniformNames.DiffuseMapTiling,
             type: UniformTypes.Vector4,
-            value: emissiveMapTiling || createVector4(1, 1, 0, 0),
+            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.EmissiveColor,
+            name: UniformNames.DiffuseColor,
             type: UniformTypes.Color,
-            value: emissiveColor || createColorWhite(),
+            value: diffuseColor || createColorWhite(),
         },
     ];
 

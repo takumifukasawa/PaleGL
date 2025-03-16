@@ -93,7 +93,7 @@ void main() {
     vec2 viewCoef = uViewDirection.xy * .4;
     float noiseRate1 = texture(uNoiseTexture, (uv + viewCoef + uTime * vec2(.04, .02)) * aspect * 1.2).x;
     float noiseRate2 = texture(uNoiseTexture, (uv + viewCoef + uTime * vec2(-.03, .015) + noiseRate1 * .02) * aspect * 1.2).x;
-    float noiseRate = 1. - (noiseRate1 * .13 + noiseRate2 * .17);
+    float noiseRate = saturate(1. - (noiseRate1 * .13 + noiseRate2 * .17));
     
     // 高ければ高いほど遮蔽されてる
     float occlusion = saturate(lightShaftColor.x);
@@ -139,8 +139,6 @@ void main() {
 
     // sss fog
     outColor += vec4(uSSSFogColor.xyz * (1. - sssRate) * uSSSFogRate * fogRate, 0.);
-    
-    // outColor = vec4(vec3(noiseRate), 1.);
     
     // for debug
     // outColor = vec4(vec3(noiseRate2), 1.);

@@ -1482,7 +1482,7 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            emissiveColor: createColor(2, 2, 2, 1),
+            diffuseColor: createColor(2, 2, 2, 1),
             // receiveShadow: true,
         })
     );
@@ -2010,7 +2010,7 @@ function createSharedTextureMesh(engine: Engine, key: SharedTexturesType) {
         getSharedTexture(engine, key).needsUpdate = true;
         setUniformValue(
             getMeshMaterial(textureMesh).uniforms,
-            UniformNames.EmissiveMap,
+            UniformNames.DiffuseMap,
             getSharedTexture(engine, key).texture
         );
     });

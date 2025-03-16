@@ -728,19 +728,4 @@ void main() {
     // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
     // vec4 sssRate = texture(uScreenSpaceShadowTexture, uv);
     // outColor = sssRate;
-
-    // vec4 suv = uSpotLight[0].shadowMapProjectionMatrix * vec4(surface.worldPosition, 1.);
-    // vec4 s = texture(uSpotLightShadowMap[0], suv.xy);
-    
-    // float shadow = calcSpotLightShadowAttenuation(
-    //     worldPosition,
-    //     surface.worldNormal,
-    //     uSpotLight[0].direction,
-    //     uSpotLight[0].shadowMapProjectionMatrix,
-    //     uSpotLightShadowMap[0], // constantな必要がある
-    //     uShadowBias,
-    //     vec4(0., 0., 0., 1.), // TODO: pass color
-    //     0.5 // TODO: pass parameter
-    // );
-    // outColor = vec4(shadow);
 }

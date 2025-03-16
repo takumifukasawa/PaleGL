@@ -36,6 +36,7 @@ export type TextureArgs = {
     // require
     gpu: Gpu;
     // optional
+    name?: string;
     img?: HTMLImageElement | HTMLCanvasElement | null;
     arraybuffer?: ArrayBuffer | null;
     type?: TextureType;
@@ -93,6 +94,7 @@ export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
 
 export type Texture = GLObjectBase<WebGLTexture> & {
     type: TextureType;
+    name: string,
     img: HTMLImageElement | HTMLCanvasElement | null;
     minFilter: TextureFilterType;
     magFilter: TextureFilterType;
@@ -107,6 +109,7 @@ export type Texture = GLObjectBase<WebGLTexture> & {
 
 export function createTexture({
     gpu,
+    name,
     img = null,
     arraybuffer,
     type = TextureTypes.RGBA,
@@ -481,6 +484,7 @@ export function createTexture({
 
     return {
         ...createGLObject(gpu, texture),
+        name: name ?? "",
         img,
         type,
         minFilter,
@@ -638,6 +642,7 @@ export function updateTexture(
 export function generateTexture(texture: Texture) {
     return createTexture({
         gpu: texture.gpu,
+        name: texture.name,
         img: texture.img,
         type: texture.type,
         width: texture.width,
