@@ -50,18 +50,18 @@ export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
 
 export const RenderQueueType = {
     // TransformFeedback: 'TransformFeedback',
-    Skybox: 's',
     Opaque: 'o',
     AlphaTest: 'a',
+    Skybox: 's',
     Transparent: 't',
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
 
 export const RenderQueues = {
-    [RenderQueueType.Skybox]: 0,
-    [RenderQueueType.Opaque]: 1,
-    [RenderQueueType.AlphaTest]: 2,
+    [RenderQueueType.Opaque]: 0,
+    [RenderQueueType.AlphaTest]: 1,
+    [RenderQueueType.Skybox]: 2,
     [RenderQueueType.Transparent]: 3,
 } as const;
 

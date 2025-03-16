@@ -2,16 +2,9 @@
 import { AnimationKeyframes, getAnimationKeyframeValue } from '@/PaleGL/core/animationKeyframes.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
-// import { GLTFAnimationChannelTargetPath, GLTFNodeActorKind } from '@/PaleGL/loaders/loadGLTF';
 import { Bone } from '@/PaleGL/core/bone.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { setRotation, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-
-// type UpdateProxyKeyframe = {
-//     target: GLTFNodeActorKind;
-//     key: GLTFAnimationChannelTargetPath;
-//     frameValue: Vector3 | Quaternion;
-// };
 
 export type AnimationClip = {
     name: string;

@@ -2,7 +2,6 @@
     BlendTypes,
     UniformTypes,
     PrimitiveTypes,
-    RenderQueues,
     FaceSide,
     UniformNames,
     PrimitiveType,
@@ -65,7 +64,7 @@ export type MaterialArgs = {
     faceSide?: FaceSide;
     receiveShadow?: boolean;
     blendType?: BlendType;
-    renderQueue?: RenderQueue;
+    renderQueueType?: RenderQueueType;
 
     // normal map
     useNormalMap?: boolean;
@@ -130,7 +129,7 @@ export type Material = {
     shader: Shader | null,
     primitiveType: PrimitiveType,
     blendType: BlendType,
-    renderQueue: RenderQueue,
+    renderQueueType: RenderQueueType,
     uniformBlockNames : string[],
     depthTest: boolean,
     depthWrite: boolean,
@@ -238,24 +237,24 @@ export function createMaterial(args: MaterialArgs): Material {
 
     const canRender: boolean = true;
 
-    const type: MaterialTypes = args.type || MaterialTypes.Misc;
+    const type: MaterialTypes = args.type ?? MaterialTypes.Misc;
 
     // let shader: Shader | null = null;
 
-    const primitiveType: PrimitiveType = args.primitiveType || PrimitiveTypes.Triangles;
-    const blendType: BlendType = args.blendType || BlendTypes.Opaque;
+    const primitiveType: PrimitiveType = args.primitiveType ?? PrimitiveTypes.Triangles;
+    const blendType: BlendType = args.blendType ?? BlendTypes.Opaque;
 
-    // let _renderQueue: RenderQueue | null = renderQueue || null;
-    let renderQueue = args.renderQueue || RenderQueues[RenderQueueType.Opaque]; // TODO: none type が欲しい？
+    // TODO: none type が欲しい？
+    let renderQueueType: RenderQueueType = args.renderQueueType ?? RenderQueueType.Opaque;
 
-    if (renderQueue) {
+    if (renderQueueType !== RenderQueueType.Skybox) {
         switch (blendType) {
             case BlendTypes.Opaque:
-                renderQueue = RenderQueues[RenderQueueType.Opaque];
+                renderQueueType = RenderQueueType.Opaque;
                 break;
             case BlendTypes.Transparent:
             case BlendTypes.Additive:
-                renderQueue = RenderQueues[RenderQueueType.Transparent];
+                renderQueueType = RenderQueueType.Transparent;
                 break;
         }
     }
@@ -312,8 +311,8 @@ export function createMaterial(args: MaterialArgs): Material {
     // const _vertexShaderModifier: VertexShaderModifier = vertexShaderModifier || {};
     // const _fragmentShaderModifier: FragmentShaderModifier = fragmentShaderModifier || {};
 
-    if (!renderQueue) {
-        console.error(`[Material.constructor] invalid render queue: ${renderQueue as unknown as string}`);
+    if (!renderQueueType) {
+        console.error(`[Material.constructor] invalid render queue: ${renderQueueType as unknown as string}`);
     }
 
     // TODO:
@@ -435,7 +434,7 @@ export function createMaterial(args: MaterialArgs): Material {
         type, 
         primitiveType,
         blendType,
-        renderQueue,
+        renderQueueType,
         uniformBlockNames,
         depthTest,
         depthWrite,

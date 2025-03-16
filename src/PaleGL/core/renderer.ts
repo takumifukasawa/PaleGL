@@ -837,11 +837,12 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     const renderMeshInfoEachQueue: RenderMeshInfoEachQueue = {
-        [RenderQueueType.Skybox]: [],
         [RenderQueueType.Opaque]: [],
         [RenderQueueType.AlphaTest]: [],
+        [RenderQueueType.Skybox]: [],
         [RenderQueueType.Transparent]: [],
     };
+   
     const lightActors: LightActors = {
         directionalLight: null,
         spotLights: [],
@@ -850,18 +851,25 @@ export function renderRenderer(
 
     let postProcessVolumeActor: PostProcessVolume | null = null;
 
+    // TODO: material側から設定したrenderQueueをどうやって考慮するか
     // build render mesh info each queue
     traverseScene(scene, (actor) => {
         switch (actor.type) {
             case ActorTypes.Skybox:
+                if (!actor.enabled) {
+                    return;
+                }
                 renderMeshInfoEachQueue[RenderQueueType.Skybox].push(
-                    buildRenderMeshInfo(actor as Mesh, RenderQueueType.Skybox)
+                    buildRenderMeshInfo(actor as Skybox, RenderQueueType.Skybox)
                 );
                 // TODO: skyboxの中で処理したい
                 // actor.transform.parent = cameras.transform;
                 return;
             case ActorTypes.Mesh:
                 // case ActorTypes.SkinnedMesh:
+                if (!actor.enabled) {
+                    return;
+                }
                 if (!(actor as Mesh).renderEnabled) {
                     // skip
                     return;
@@ -918,18 +926,36 @@ export function renderRenderer(
     });
 
     // sort by render queue
-    const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) =>
-        a.actor.materials[a.materialIndex].renderQueue - b.actor.materials[b.materialIndex].renderQueue;
-
+    // const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) => {
+    //     const renderQueueA = RenderQueues[a.actor.materials[a.materialIndex].renderQueueType];
+    //     const renderQueueB = RenderQueues[b.actor.materials[b.materialIndex].renderQueueType];
+    //     return renderQueueA - renderQueueB; 
+    // }
     // all mesh infos
-    const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
-        .map((key) => {
-            const renderQueueType = key as RenderQueueType;
-            const info = renderMeshInfoEachQueue[renderQueueType];
-            return info.sort(sortRenderQueueCompareFunc);
-        })
-        .flat()
-        .filter(({ actor }) => actor.enabled);
+    // const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
+    //     .map((key) => {
+    //         const renderQueueType = key as RenderQueueType;
+    //         const info = renderMeshInfoEachQueue[renderQueueType];
+    //         return info.sort(sortRenderQueueCompareFunc);
+    //     })
+    //     .flat()
+    //     .filter(({ actor }) => actor.enabled);
+    // TODO: ここ、自動化できそうな気がする
+    const sortedRenderMeshInfos: RenderMeshInfo[] = [
+        ...renderMeshInfoEachQueue[RenderQueueType.Opaque],
+        ...renderMeshInfoEachQueue[RenderQueueType.AlphaTest],
+        ...renderMeshInfoEachQueue[RenderQueueType.Skybox],
+        ...renderMeshInfoEachQueue[RenderQueueType.Transparent]
+    ];
+    // sortedRenderMeshInfos.sort()
+    // Object.keys(renderMeshInfoEachQueue)
+    //     .map((key) => {
+    //         const renderQueueType = key as RenderQueueType;
+    //         const info = renderMeshInfoEachQueue[renderQueueType];
+    //         return info.sort(sortRenderQueueCompareFunc);
+    //     })
+    //     .flat()
+    //     .filter(({ actor }) => actor.enabled);
 
     // override postprocess parameters
     if (postProcessVolumeActor) {

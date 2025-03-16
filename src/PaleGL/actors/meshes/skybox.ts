@@ -6,7 +6,7 @@ import {
     AttributeNames,
     UniformNames,
     ShadingModelIds,
-    UniformBlockNames,
+    UniformBlockNames, RenderQueueType,
 } from '@/PaleGL/constants.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
@@ -126,6 +126,7 @@ export function createSkybox({
         vertexShader: skyboxVertexShader,
         fragmentShader: skyboxFragmentShader,
         primitiveType: PrimitiveTypes.Triangles,
+        renderQueueType: RenderQueueType.Skybox,
         depthTest: true,
         depthWrite: false,
         useEnvMap: true,
