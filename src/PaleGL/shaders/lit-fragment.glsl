@@ -55,15 +55,22 @@ void main() {
     vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
   
     vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
+    vec4 diffuseColor = diffuseMapColor;
    
     vec3 worldNormal = vNormal;
+    
+    vec4 emissiveColor = vec4(0.);
 
     // #include <normal_map_f>
     #include ./partial/normal-map-fragment.partial.glsl
 
 #ifdef USE_VERTEX_COLOR
+    // 頂点カラーでuniformのcolorは計算済み
     diffuseColor *= vVertexColor;
+    emissiveColor = vVertexEmissiveColor;
+#else
+    diffuseColor *= uDiffuseColor;
+    emissiveColor = uEmissiveColor;
 #endif
 
     // surface.specularAmount = uSpecularAmount;
@@ -84,7 +91,7 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
-    vec4 emissiveColor = gamma(uEmissiveColor);
+    emissiveColor.rgb = gamma(emissiveColor.rgb);
     
     #pragma BEFORE_OUT
 

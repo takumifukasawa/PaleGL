@@ -8,8 +8,6 @@
 #include <ub>
 #include <vcolor_vh>
 
-
-
 // varyings
 out vec2 vUv;
 out vec3 vLocalPosition;
@@ -20,7 +18,6 @@ out mat4 vInverseWorldMatrix;
 
 #ifdef USE_INSTANCING
 out float vInstanceId;
-out vec4 vInstanceEmissiveColor;
 // TODO
 // out vec4 vInstanceState;
 uniform float uRotMode; // 0: velocity, 1: look direction
@@ -303,7 +300,7 @@ void main() {
 
     // TODO:
     // vInstanceState = aInstanceState;
-    vInstanceEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
 #endif
 
     vec4 worldPosition = worldMatrix * localPosition;
@@ -373,6 +370,11 @@ void main() {
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     // vVertexColor = aInstanceVertexColor;
     vVertexColor = mix(aInstanceVertexColor, uDiffuseColor, uDiffuseMixer);
+    #if defined(USE_INSTANCING)
+        vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #else
+        vVertexEmissiveColor = mix(aVertexEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #endif
 #endif
 
     #pragma END_MAIN

@@ -59,7 +59,8 @@ import {
     TextureDepthPrecisionType,
     UniformBlockNames,
     ActorTypes,
-    RAD_TO_DEG, FragmentShaderModifierPragmas,
+    RAD_TO_DEG,
+    FragmentShaderModifierPragmas,
 } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial';
@@ -73,7 +74,7 @@ import {
 import { maton } from '@/PaleGL/utilities/maton';
 import { clamp, saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
-import {Actor, subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
+import { Actor, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 
 import { createPlane, intersectRayWithPlane } from '@/PaleGL/math/plane.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
@@ -111,6 +112,7 @@ import {
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 // import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 // -------------------
 // constants
@@ -715,7 +717,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         color: [],
         emissiveColor: [],
     };
-    maton.range(instanceNum).forEach(() => {
+    maton.range(instanceNum).forEach((_, index) => {
         instanceInfo.position.push([0, 0, 0]);
 
         const baseScale = 0.25;
@@ -728,14 +730,19 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         instanceInfo.velocity.push([0, 0, 0]);
 
         const c = createColorFromRGB(
-            Math.floor(Math.random() * 180 + 20),
-            Math.floor(Math.random() * 20 + 20),
-            Math.floor(Math.random() * 180 + 20)
+            Math.floor(Math.random() * 200 + 50),
+            Math.floor(Math.random() * 20 + 40),
+            Math.floor(Math.random() * 40 + 20)
         );
         instanceInfo.color.push([...c.e]);
-        
-        const ec = createColorFromRGB(0, 0, 0);
-        
+
+        const useEc = index % 24 === 0 ? 2.4 : .1;
+        const ec = createColorFromRGB(
+            Math.floor(Math.random() * 50 + 200) * useEc,
+            Math.floor(Math.random() * 50 + 50) * useEc,
+            Math.floor(Math.random() * 40 + 20) * useEc
+        );
+
         instanceInfo.emissiveColor.push([...ec.e]);
     });
     const animationOffsetInfo = maton
@@ -928,9 +935,9 @@ float d = 1. - smoothstep(4., 7., length(uv));
 diffuseColor *= d;
 emissiveColor *= d;
 `,
-        }
+        },
     ];
-    console.log(streetFloorMaterial)
+    console.log(streetFloorMaterial);
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
 
@@ -959,10 +966,10 @@ emissiveColor *= d;
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            diffuseColor: createColor(1.5, 1.5, 1.5, 1),
+            diffuseColor: createColor(2, 2, 2, 1),
         })
     );
-    attractSphereMesh.name = "attractSphere";
+    attractSphereMesh.name = 'attractSphere';
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, createFillVector3(0.5));
     });
@@ -1238,12 +1245,14 @@ void main() {
         onWindowResize();
         window.addEventListener('resize', onWindowResize);
 
+        renderer.ambientOcclusionPass.enabled = false;
+
         renderer.lightShaftPass.enabled = false;
-        
+
         renderer.screenSpaceShadowPass.enabled = false;
 
         renderer.ssrPass.enabled = false;
-        
+
         renderer.fogPass.fogColor = createColorBlack();
         renderer.fogPass.fogDensity = 0.023;
         renderer.fogPass.fogDensityAttenuation = 0.065;
@@ -1259,6 +1268,11 @@ void main() {
         renderer.bloomPass.threshold = 1.534;
         renderer.bloomPass.tone = 0.46;
         
+        renderer.streakPass.threshold = .9;
+        renderer.streakPass.verticalScale = 1.12;
+        renderer.streakPass.horizontalScale = 1.9;
+        renderer.streakPass.intensity = 0.03;
+
         renderer.glitchPass.enabled = false;
 
         startOrbitCameraController(orbitCameraController);
@@ -1312,72 +1326,76 @@ function initDebugger() {
     // show buffers
     //
 
-    addDebuggerBorderSpacer(debuggerGUI);
+    if (isDevelopment()) {
+        addDebuggerBorderSpacer(debuggerGUI);
 
-    addToggleDebugger(debuggerGUI, {
-        label: 'show buffers',
-        initialValue: bufferVisualizerPass.enabled,
-        onChange: (value) => {
-            bufferVisualizerPass.enabled = value;
-            if (value) {
-                showBufferVisualizerPassDom(bufferVisualizerPass);
-            } else {
-                hideBufferVisualizerPassDom(bufferVisualizerPass);
-            }
-        },
-    });
+        addToggleDebugger(debuggerGUI, {
+            label: 'show buffers',
+            initialValue: bufferVisualizerPass.enabled,
+            onChange: (value) => {
+                bufferVisualizerPass.enabled = value;
+                if (value) {
+                    showBufferVisualizerPassDom(bufferVisualizerPass);
+                } else {
+                    hideBufferVisualizerPassDom(bufferVisualizerPass);
+                }
+            },
+        });
+    }
 
     //
     // directional light
     //
 
-    addDebuggerBorderSpacer(debuggerGUI);
+    if (isDevelopment()) {
+        addDebuggerBorderSpacer(debuggerGUI);
 
-    const directionalLightDebuggerGroup = addDebugGroup(debuggerGUI, 'directional light', false);
+        const directionalLightDebuggerGroup = addDebugGroup(debuggerGUI, 'directional light', false);
 
-    addSliderDebugger(directionalLightDebuggerGroup, {
-        label: 'intensity',
-        minValue: 0,
-        maxValue: 4,
-        stepValue: 0.001,
-        initialValue: directionalLight.intensity,
-        onChange: (value) => {
-            directionalLight.intensity = value;
-        },
-    });
+        addSliderDebugger(directionalLightDebuggerGroup, {
+            label: 'intensity',
+            minValue: 0,
+            maxValue: 4,
+            stepValue: 0.001,
+            initialValue: directionalLight.intensity,
+            onChange: (value) => {
+                directionalLight.intensity = value;
+            },
+        });
 
-    addSliderDebugger(directionalLightDebuggerGroup, {
-        label: 'pos x',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: v3x(directionalLight.transform.position),
-        onChange: (value) => {
-            setV3x(directionalLight.transform.position, value);
-        },
-    });
+        addSliderDebugger(directionalLightDebuggerGroup, {
+            label: 'pos x',
+            minValue: -10,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: v3x(directionalLight.transform.position),
+            onChange: (value) => {
+                setV3x(directionalLight.transform.position, value);
+            },
+        });
 
-    addSliderDebugger(directionalLightDebuggerGroup, {
-        label: 'pos y',
-        minValue: 0,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: v3y(directionalLight.transform.position),
-        onChange: (value) => {
-            setV3y(directionalLight.transform.position, value);
-        },
-    });
+        addSliderDebugger(directionalLightDebuggerGroup, {
+            label: 'pos y',
+            minValue: 0,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: v3y(directionalLight.transform.position),
+            onChange: (value) => {
+                setV3y(directionalLight.transform.position, value);
+            },
+        });
 
-    addSliderDebugger(directionalLightDebuggerGroup, {
-        label: 'pos z',
-        minValue: -10,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: v3z(directionalLight.transform.position),
-        onChange: (value) => {
-            setV3z(directionalLight.transform.position, value);
-        },
-    });
+        addSliderDebugger(directionalLightDebuggerGroup, {
+            label: 'pos z',
+            minValue: -10,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: v3z(directionalLight.transform.position),
+            onChange: (value) => {
+                setV3z(directionalLight.transform.position, value);
+            },
+        });
+    }
 
     //
     // spot light
@@ -1391,135 +1409,139 @@ function initDebugger() {
     // TODO: ssao pass の参照を renderer に変える
     //
 
-    addDebuggerBorderSpacer(debuggerGUI);
+    if (isDevelopment()) {
+        addDebuggerBorderSpacer(debuggerGUI);
 
-    const ssaoDebuggerGroup = addDebugGroup(debuggerGUI, 'ssao', false);
+        const ssaoDebuggerGroup = addDebugGroup(debuggerGUI, 'ssao', false);
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao occlusion sample length',
-        minValue: 0.01,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ambientOcclusionPass.occlusionSampleLength,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionSampleLength = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao occlusion sample length',
+            minValue: 0.01,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ambientOcclusionPass.occlusionSampleLength,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionSampleLength = value;
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao occlusion bias',
-        minValue: 0.0001,
-        maxValue: 0.01,
-        stepValue: 0.0001,
-        initialValue: renderer.ambientOcclusionPass.occlusionBias,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionBias = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao occlusion bias',
+            minValue: 0.0001,
+            maxValue: 0.01,
+            stepValue: 0.0001,
+            initialValue: renderer.ambientOcclusionPass.occlusionBias,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionBias = value;
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao min distance',
-        minValue: 0,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: renderer.ambientOcclusionPass.occlusionMinDistance,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionMinDistance = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao min distance',
+            minValue: 0,
+            maxValue: 0.1,
+            stepValue: 0.001,
+            initialValue: renderer.ambientOcclusionPass.occlusionMinDistance,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionMinDistance = value;
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao max distance',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ambientOcclusionPass.occlusionMaxDistance,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionMaxDistance = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao max distance',
+            minValue: 0,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ambientOcclusionPass.occlusionMaxDistance,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionMaxDistance = value;
+            },
+        });
 
-    addColorDebugger(ssaoDebuggerGroup, {
-        label: 'ssao color',
-        initialValue: getColorHexCoord(renderer.ambientOcclusionPass.occlusionColor),
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionColor = createColorFromHex(value);
-        },
-    });
+        addColorDebugger(ssaoDebuggerGroup, {
+            label: 'ssao color',
+            initialValue: getColorHexCoord(renderer.ambientOcclusionPass.occlusionColor),
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionColor = createColorFromHex(value);
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao occlusion power',
-        minValue: 0.5,
-        maxValue: 4,
-        stepValue: 0.01,
-        initialValue: renderer.ambientOcclusionPass.occlusionPower,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionPower = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao occlusion power',
+            minValue: 0.5,
+            maxValue: 4,
+            stepValue: 0.01,
+            initialValue: renderer.ambientOcclusionPass.occlusionPower,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionPower = value;
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao occlusion strength',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ambientOcclusionPass.occlusionStrength,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.occlusionStrength = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao occlusion strength',
+            minValue: 0,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ambientOcclusionPass.occlusionStrength,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.occlusionStrength = value;
+            },
+        });
 
-    addSliderDebugger(ssaoDebuggerGroup, {
-        label: 'ssao blend rate',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ambientOcclusionPass.blendRate,
-        onChange: (value) => {
-            renderer.ambientOcclusionPass.blendRate = value;
-        },
-    });
+        addSliderDebugger(ssaoDebuggerGroup, {
+            label: 'ssao blend rate',
+            minValue: 0,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ambientOcclusionPass.blendRate,
+            onChange: (value) => {
+                renderer.ambientOcclusionPass.blendRate = value;
+            },
+        });
+    }
 
     //
     // light shaft
     //
 
-    addDebuggerBorderSpacer(debuggerGUI);
+    if (isDevelopment()) {
+        addDebuggerBorderSpacer(debuggerGUI);
 
-    const lightShaftDebuggerGroup = addDebugGroup(debuggerGUI, 'light shaft', false);
+        const lightShaftDebuggerGroup = addDebugGroup(debuggerGUI, 'light shaft', false);
 
-    addSliderDebugger(lightShaftDebuggerGroup, {
-        label: 'blend rate',
-        minValue: 0,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.blendRate,
-        onChange: (value) => {
-            renderer.lightShaftPass.blendRate = value;
-        },
-    });
+        addSliderDebugger(lightShaftDebuggerGroup, {
+            label: 'blend rate',
+            minValue: 0,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.lightShaftPass.blendRate,
+            onChange: (value) => {
+                renderer.lightShaftPass.blendRate = value;
+            },
+        });
 
-    addSliderDebugger(lightShaftDebuggerGroup, {
-        label: 'pass scale',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.passScaleBase,
-        onChange: (value) => {
-            renderer.lightShaftPass.passScaleBase = value;
-        },
-    });
+        addSliderDebugger(lightShaftDebuggerGroup, {
+            label: 'pass scale',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.lightShaftPass.passScaleBase,
+            onChange: (value) => {
+                renderer.lightShaftPass.passScaleBase = value;
+            },
+        });
 
-    addSliderDebugger(lightShaftDebuggerGroup, {
-        label: 'ray step strength',
-        minValue: 0.001,
-        maxValue: 0.05,
-        stepValue: 0.001,
-        initialValue: renderer.lightShaftPass.rayStepStrength,
-        onChange: (value) => {
-            renderer.lightShaftPass.rayStepStrength = value;
-        },
-    });
+        addSliderDebugger(lightShaftDebuggerGroup, {
+            label: 'ray step strength',
+            minValue: 0.001,
+            maxValue: 0.05,
+            stepValue: 0.001,
+            initialValue: renderer.lightShaftPass.rayStepStrength,
+            onChange: (value) => {
+                renderer.lightShaftPass.rayStepStrength = value;
+            },
+        });
+    }
 
     //
     // light volume pass
@@ -1856,163 +1878,165 @@ function initDebugger() {
     // ssr debuggers
     //
 
-    addDebuggerBorderSpacer(debuggerGUI);
+    if (isDevelopment()) {
+        addDebuggerBorderSpacer(debuggerGUI);
 
-    const ssrDebuggerGroup = addDebugGroup(debuggerGUI, 'ssr', false);
+        const ssrDebuggerGroup = addDebugGroup(debuggerGUI, 'ssr', false);
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'depth bias',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayDepthBias,
-        onChange: (value) => {
-            renderer.ssrPass.rayDepthBias = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'depth bias',
+            minValue: 0.001,
+            maxValue: 0.1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.rayDepthBias,
+            onChange: (value) => {
+                renderer.ssrPass.rayDepthBias = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'ray nearest distance',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayNearestDistance,
-        onChange: (value) => {
-            renderer.ssrPass.rayNearestDistance = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'ray nearest distance',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.rayNearestDistance,
+            onChange: (value) => {
+                renderer.ssrPass.rayNearestDistance = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'ray max distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.rayMaxDistance,
-        onChange: (value) => {
-            renderer.ssrPass.rayMaxDistance = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'ray max distance',
+            minValue: 0.001,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.rayMaxDistance,
+            onChange: (value) => {
+                renderer.ssrPass.rayMaxDistance = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'ray thickness',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayThickness,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionRayThickness = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'ray thickness',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionRayThickness,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionRayThickness = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'jitter size x',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayJitterSizeX,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionRayJitterSizeX = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'jitter size x',
+            minValue: 0.001,
+            maxValue: 0.1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionRayJitterSizeX,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionRayJitterSizeX = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'jitter size y',
-        minValue: 0.001,
-        maxValue: 0.1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionRayJitterSizeY,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionRayJitterSizeY = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'jitter size y',
+            minValue: 0.001,
+            maxValue: 0.1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionRayJitterSizeY,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionRayJitterSizeY = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'roughness power',
-        minValue: 0,
-        maxValue: 5,
-        stepValue: 0.01,
-        initialValue: renderer.ssrPass.reflectionRoughnessPower,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionRoughnessPower = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'roughness power',
+            minValue: 0,
+            maxValue: 5,
+            stepValue: 0.01,
+            initialValue: renderer.ssrPass.reflectionRoughnessPower,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionRoughnessPower = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'fade min distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionFadeMinDistance,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionFadeMinDistance = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'fade min distance',
+            minValue: 0.001,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionFadeMinDistance,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionFadeMinDistance = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'fade max distance',
-        minValue: 0.001,
-        maxValue: 10,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionFadeMaxDistance,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionFadeMaxDistance = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'fade max distance',
+            minValue: 0.001,
+            maxValue: 10,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionFadeMaxDistance,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionFadeMaxDistance = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'edge fade factor min x',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'edge fade factor min x',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionScreenEdgeFadeFactorMinX = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'edge fade factor max x',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'edge fade factor max x',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxX = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'edge fade factor min y',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'edge fade factor min y',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionScreenEdgeFadeFactorMinY = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'edge fade factor max y',
-        minValue: 0.001,
-        maxValue: 1,
-        stepValue: 0.001,
-        initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'edge fade factor max y',
+            minValue: 0.001,
+            maxValue: 1,
+            stepValue: 0.001,
+            initialValue: renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionScreenEdgeFadeFactorMaxY = value;
+            },
+        });
 
-    addSliderDebugger(ssrDebuggerGroup, {
-        label: 'additional rate',
-        minValue: 0.01,
-        maxValue: 1,
-        stepValue: 0.01,
-        initialValue: renderer.ssrPass.reflectionAdditionalRate,
-        onChange: (value) => {
-            renderer.ssrPass.reflectionAdditionalRate = value;
-        },
-    });
+        addSliderDebugger(ssrDebuggerGroup, {
+            label: 'additional rate',
+            minValue: 0.01,
+            maxValue: 1,
+            stepValue: 0.01,
+            initialValue: renderer.ssrPass.reflectionAdditionalRate,
+            onChange: (value) => {
+                renderer.ssrPass.reflectionAdditionalRate = value;
+            },
+        });
+    }
 
     //
     // chromatic aberration

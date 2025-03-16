@@ -1061,6 +1061,7 @@ export function renderRenderer(
     // ambient occlusion pass
     // ------------------------------------------------------------------------------
 
+    if (renderer.ambientOcclusionPass.enabled) {
     renderPass({
         pass: renderer.ambientOcclusionPass,
         renderer,
@@ -1072,6 +1073,7 @@ export function renderRenderer(
         time, // TODO: engineから渡したい
         // lightActors,
     });
+    }
 
     // ------------------------------------------------------------------------------
     // deferred lighting pass
@@ -1103,7 +1105,9 @@ export function renderRenderer(
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
         'uAmbientOcclusionTexture',
-        renderer.ambientOcclusionPass.renderTarget.texture
+        renderer.ambientOcclusionPass.enabled
+            ? renderer.ambientOcclusionPass.renderTarget.texture
+            : renderer.gpu.dummyTexture
     );
 
     renderPass({

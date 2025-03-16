@@ -103,16 +103,6 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
     const materials: Material[] = [];
 
     const toggleR = true;
-    // window.addEventListener('keydown', (e) => {
-    //     if (e.key === 'b') {
-    //         toggleR = !toggleR;
-    //     }
-    // });
-    // window.addEventListener('keydown', (e) => {
-    //     if (e.key === 'f') {
-    //         fullViewTextureEnabled = !fullViewTextureEnabled;
-    //     }
-    // });
 
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = createPlaneGeometry({ gpu });
@@ -610,6 +600,23 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
 
     hideBufferVisualizerPassDom(bufferVisualizerPass);
 
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'b') {
+            bufferVisualizerPass.enabled = !bufferVisualizerPass.enabled;
+            bufferVisualizerPass.toggleR = !bufferVisualizerPass.toggleR;
+            if (bufferVisualizerPass.enabled) {
+                showBufferVisualizerPassDom(bufferVisualizerPass);
+            } else {
+                hideBufferVisualizerPassDom(bufferVisualizerPass);
+            }
+        }
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'f') {
+            bufferVisualizerPass.fullViewTextureEnabled = !bufferVisualizerPass.fullViewTextureEnabled;
+        }
+    });
+
     return bufferVisualizerPass;
 }
 
@@ -947,18 +954,23 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
         }
     });
 
+    // 全画面で出したいテクスチャを任意に指定
     setMaterialUniformValue(
         bufferVisualizerPass.compositePass.material,
         'uFullViewTexture',
-        // renderer.depthOfFieldPass.renderTarget.read.$getTexture()
-        // renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.read.$getTexture()
-        bufferVisualizerPass.toggleR
-            ? renderer.depthOfFieldPass.preFilterPass.renderTarget.texture
-            : renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.texture
-        // renderer.depthOfFieldPass.dofBokehPass.renderTarget.read.$getTexture()
-        // renderer.depthOfFieldPass.preFilterPass.renderTarget.read.$getTexture()
+        // renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.texture
+        // renderer.afterDeferredShadingRenderTarget.texture
+        // renderer.gBufferRenderTargets.gBufferDTexture
+        renderer.gBufferRenderTargets.gBufferATexture
+        // renderer.gBufferRenderTargets.gBufferATexture
+        // renderer.gBufferRenderTargets.gBufferATexture
+        // renderer.gBufferRenderTargets.gBufferATexture
+        // bufferVisualizerPass.toggleR
+        //     // ? renderer.depthOfFieldPass.preFilterPass.renderTarget.texture
+        //     ? renderer.depthOfFieldPass.preFilterPass.renderTarget.texture
+        //     : renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.texture
     );
-
+    
     setMaterialUniformValue(
         bufferVisualizerPass.compositePass.material,
         'uFullViewTextureEnabled',
