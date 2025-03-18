@@ -114,7 +114,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
             name: 'DeferredShadingPass',
             fragmentShader: deferredShadingFragmentShader,
             uniforms,
-            // useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
+            useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniformBlockNames: [

@@ -244,10 +244,17 @@ export function createMaterial(args: MaterialArgs): Material {
     const primitiveType: PrimitiveType = args.primitiveType ?? PrimitiveTypes.Triangles;
     const blendType: BlendType = args.blendType ?? BlendTypes.Opaque;
 
+    alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
+
     // TODO: none type が欲しい？
     let renderQueueType: RenderQueueType = args.renderQueueType ?? RenderQueueType.Opaque;
 
-    if (renderQueueType !== RenderQueueType.Skybox) {
+    if (alphaTest !== null) {
+        renderQueueType = RenderQueueType.AlphaTest;
+    }
+
+    // skyboxじゃないかつrenderQueueの指定がなかったら自動で指定
+    if (renderQueueType !== RenderQueueType.Skybox && args.renderQueueType === undefined) {
         switch (blendType) {
             case BlendTypes.Opaque:
                 renderQueueType = RenderQueueType.Opaque;
@@ -257,6 +264,12 @@ export function createMaterial(args: MaterialArgs): Material {
                 renderQueueType = RenderQueueType.Transparent;
                 break;
         }
+    }
+    
+    console.log(name, type, renderQueueType, args.renderQueueType)
+    
+    if (renderQueueType === RenderQueueType.AlphaTest && alphaTest === null) {
+        console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 
     const uniformBlockNames: string[] = args.uniformBlockNames || [];
@@ -270,7 +283,6 @@ export function createMaterial(args: MaterialArgs): Material {
     // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
     
     // TODO: useAlphaTestのフラグがあった方がよい. あとからalphaTestを追加した場合に対応できる
-    alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
     // culling;
     // let _faceSide: FaceSide = faceSide || FaceSide.Front;
     // let _receiveShadow: boolean = !!receiveShadow;

@@ -11,7 +11,7 @@ struct Surface {
 
 struct Skybox {
     samplerCube cubeMap;
-    float baseIntensity;
+    float diffuseIntensity;
     float specularIntensity;
     float rotationOffset;
     float maxLodLevel;

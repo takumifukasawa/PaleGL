@@ -3,7 +3,7 @@ import {
     DepthFuncTypes,
     FaceSide, FragmentShaderModifierPragmas,
     MaterialTypes,
-    PrimitiveTypes,
+    PrimitiveTypes, RenderQueueType,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -179,7 +179,7 @@ export function createObjectSpaceRaymarchMaterial({
     const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];
 
     // TODO: できるだけconstructorの直後に持っていきたい
-    const material = createMaterial({
+    return createMaterial({
         ...materialArgs,
         // ...options,
         name: 'ObjectSpaceRaymarchMaterial',
@@ -204,6 +204,7 @@ export function createObjectSpaceRaymarchMaterial({
         depthWrite: true,
         depthFuncType: DepthFuncTypes.Lequal,
         skipDepthPrePass: true,
+        renderQueueType: RenderQueueType.AlphaTest,
 
         uniformBlockNames: [
             UniformBlockNames.Common,
@@ -225,8 +226,4 @@ export function createObjectSpaceRaymarchMaterial({
             }
         ],
     });
-
-    return {
-        ...material,
-    };
 }

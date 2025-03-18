@@ -86,15 +86,17 @@ export function createEngine({
     fixedUpdateFps = 60,
     updateFps = 60,
     showStats = false,
+    showPipeline = false,
 }: {
     gpu: Gpu;
     renderer: Renderer;
     fixedUpdateFps?: number;
     updateFps?: number;
     showStats?: boolean;
+    showPipeline?: boolean;
 }): Engine {
     const sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
-    const stats: Stats | null = createStats({ showStats, showPipeline: false });
+    const stats: Stats | null = createStats({ showStats, showPipeline });
 
     const engineBase: EngineBase = {
         sharedTextures,
