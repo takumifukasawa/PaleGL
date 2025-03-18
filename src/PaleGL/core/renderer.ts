@@ -924,49 +924,8 @@ export function renderRenderer(
                 break;
         }
     });
-
-    // sort by render queue
-    // const sortRenderQueueCompareFunc = (a: RenderMeshInfo, b: RenderMeshInfo) => {
-    //     const renderQueueA = RenderQueues[a.actor.materials[a.materialIndex].renderQueueType];
-    //     const renderQueueB = RenderQueues[b.actor.materials[b.materialIndex].renderQueueType];
-    //     return renderQueueA - renderQueueB;
-    // }
-    // all mesh infos
-    // const sortedRenderMeshInfos: RenderMeshInfo[] = Object.keys(renderMeshInfoEachQueue)
-    //     .map((key) => {
-    //         const renderQueueType = key as RenderQueueType;
-    //         const info = renderMeshInfoEachQueue[renderQueueType];
-    //         return info.sort(sortRenderQueueCompareFunc);
-    //     })
-    //     .flat()
-    //     .filter(({ actor }) => actor.enabled);
     
-    // // TODO: ここ、自動化できそうな気がする
-    // const sortedRenderMeshInfos: RenderMeshInfo[] = [
-    //     ...renderMeshInfoEachQueue[RenderQueueType.Opaque],
-    //     ...renderMeshInfoEachQueue[RenderQueueType.AlphaTest],
-    //     ...renderMeshInfoEachQueue[RenderQueueType.Skybox],
-    //     ...renderMeshInfoEachQueue[RenderQueueType.Transparent],
-    // ];
-    
-    const baseRenderMeshInfosByQueueOrder = [
-        RenderQueueType.Opaque,
-        // RenderQueueType.Skybox,
-        RenderQueueType.AlphaTest,
-    ].map(queue => ({
-            queue,
-            renderMeshInfo: renderMeshInfoEachQueue[queue]
-    }));
-   
-    // sortedRenderMeshInfos.sort()
-    // Object.keys(renderMeshInfoEachQueue)
-    //     .map((key) => {
-    //         const renderQueueType = key as RenderQueueType;
-    //         const info = renderMeshInfoEachQueue[renderQueueType];
-    //         return info.sort(sortRenderQueueCompareFunc);
-    //     })
-    //     .flat()
-    //     .filter(({ actor }) => actor.enabled);
+    const currentCameraRenderMeshInfoEachPass = createRenderMeshInfosEachPass(renderMeshInfoEachQueue, camera);
     
     // override postprocess parameters
     if (postProcessVolumeActor) {
@@ -979,42 +938,6 @@ export function renderRenderer(
     // TODO: depth sort
     //
 
-    // skybox
-    // const sortedSkyboxRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
-    //     return renderMeshInfo.queue === RenderQueueType.Skybox;
-    // });
-    // const sortedSkyboxRenderMeshInfo = renderMeshInfoEachQueue[RenderQueueType.Skybox];
-
-    // // base pass mesh infos
-    // const sortedBasePassRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter((renderMeshInfo) => {
-    //     return (
-    //         renderMeshInfo.queue === RenderQueueType.Opaque ||
-    //         renderMeshInfo.queue === RenderQueueType.AlphaTest ||
-    //         renderMeshInfo.queue === RenderQueueType.Skybox
-    //     );
-    // });
-    for (let i = 0; i < baseRenderMeshInfosByQueueOrder.length; i++){
-        baseRenderMeshInfosByQueueOrder[i].renderMeshInfo.sort((a, b) => {
-            const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-            const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
-            return al < bl ? -1 : 1;
-        });
-    }
-    
-    const baseRenderMeshInfosByFlattenQueue = baseRenderMeshInfosByQueueOrder.map(({ renderMeshInfo }) => renderMeshInfo).flat();
-
-    console.log(baseRenderMeshInfosByQueueOrder, baseRenderMeshInfosByFlattenQueue)
-
-    // // transparent mesh infos
-    // const sortedTransparentRenderMeshInfos: RenderMeshInfo[] = sortedRenderMeshInfos.filter(
-    //     (renderMeshInfo) => renderMeshInfo.queue === RenderQueueType.Transparent
-    // );
-    renderMeshInfoEachQueue[RenderQueueType.Transparent].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
-        return al > bl ? -1 : 1;
-    });
-    
     // ------------------------------------------------------------------------------
     // update common uniforms
     // ------------------------------------------------------------------------------
@@ -1037,25 +960,22 @@ export function renderRenderer(
     // depth pre-pass
     // ------------------------------------------------------------------------------
 
-    // const depthPrePassRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({ actor }) => {
-    //     if (actor.type === ActorTypes.Skybox) {
-    //         return false;
-    //     }
-    //     return actor;
-    // });
-    // depthPrePassRenderMeshInfos.sort((a, b) => {
-    //     const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-    //     const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
-    //     return al < bl ? -1 : 1;
-    // });
-    // depthPrePass(renderer, depthPrePassRenderMeshInfos, camera);
-    depthPrePass(renderer, baseRenderMeshInfosByFlattenQueue, camera);
+    depthPrePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
 
     // ------------------------------------------------------------------------------
     // g-buffer opaque pass
     // ------------------------------------------------------------------------------
 
-    scenePass(renderer, baseRenderMeshInfosByFlattenQueue, camera);
+    setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
+    setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, true);
+
+    // TODO: 本当はskyboxをshadingの後にしたい
+    skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
+    basePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
+
+    // ------------------------------------------------------------------------------
+    // skybox pass
+    // ------------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------------
     // shadow pass
@@ -1080,7 +1000,7 @@ export function renderRenderer(
         //     return actor.castShadow;
         // });
         // shadowPass(renderer, castShadowLightActors, castShadowRenderMeshInfos);
-        shadowPass(renderer, castShadowLightActors, baseRenderMeshInfosByFlattenQueue);
+        shadowPass(renderer, castShadowLightActors, renderMeshInfoEachQueue);
     }
 
     // ------------------------------------------------------------------------------
@@ -1494,7 +1414,7 @@ function copyDepthTexture(renderer: Renderer) {
     );
 }
 
-function shadowPass(renderer: Renderer, castShadowLightActors: Light[], castShadowRenderMeshInfos: RenderMeshInfo[]) {
+function shadowPass(renderer: Renderer, castShadowLightActors: Light[], renderMeshInfoEachQueue: RenderMeshInfoEachQueue) {
     // console.log("--------- shadow pass ---------");
 
     castShadowLightActors.forEach((lightActor) => {
@@ -1506,13 +1426,20 @@ function shadowPass(renderer: Renderer, castShadowLightActors: Light[], castShad
             console.error('invalid shadow cameras');
             return;
         }
-        setRendererRenderTarget(renderer, lightActor.shadowMap, false, true);
-        // this.clear(0, 0, 0, 1);
-        // this._gpu.clearDepth(0, 0, 0, 1);
+
+        const currentCameraRenderMeshInfoEachPass = createRenderMeshInfosEachPass(renderMeshInfoEachQueue, lightActor.shadowCamera);
+
+        const castShadowRenderMeshInfos = currentCameraRenderMeshInfoEachPass.basePass.filter(({ actor }) => {
+            return actor.castShadow;
+        });
 
         if (castShadowRenderMeshInfos.length < 1) {
             return;
         }
+
+        setRendererRenderTarget(renderer, lightActor.shadowMap, false, true);
+        // this.clear(0, 0, 0, 1);
+        // this._gpu.clearDepth(0, 0, 0, 1);
 
         updateRendererCameraUniforms(renderer, lightActor.shadowCamera);
 
@@ -1548,13 +1475,45 @@ function shadowPass(renderer: Renderer, castShadowLightActors: Light[], castShad
     });
 }
 
-function scenePass(renderer: Renderer, sortedRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+    updateRendererCameraUniforms(renderer, camera);
+
+    sortedSkyboxPassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+        if (!(actor as Skybox).renderMesh) {
+            return;
+        }
+        
+        // TODO: skyboxのupdateTransformが2回走っちゃうので、sceneかカメラに持たせて特別扱いさせたい
+        // TODO: engineでやるべき
+        updateActorTransform(actor, camera);
+
+        const targetMaterial = actor.materials[materialIndex];
+
+        if (!targetMaterial.canRender) {
+            return;
+        }
+
+        // TODO: material 側でやった方がよい？
+        updateActorTransformUniforms(renderer, actor);
+
+        updateMeshMaterial(actor, { camera });
+
+        renderMesh(renderer, actor.geometry, targetMaterial);
+
+        if (renderer.stats) {
+            addPassInfoStats(renderer.stats, 'skybox pass', actor.name, actor.geometry);
+        }
+    });
+}
+
+function basePass(renderer: Renderer, sortedBasePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
     // console.log("--------- scene pass ---------");
 
-    // NOTE: DepthTextureはあるはず
-    setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
-
-    setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, true);
+    // setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
+    // setRendererRenderTarget(renderer, renderer.gBufferRenderTargets);
+    
+    // setRenderTargetDepthTexture(renderer.deferredShadingPass.renderTarget, renderer.depthPrePassRenderTarget.depthTexture!)
+    // setRendererRenderTarget(renderer, renderer.deferredShadingPass.renderTarget, false, false);
 
     // TODO: depth prepass しない場合は必要
     // if (clear) {
@@ -1563,7 +1522,7 @@ function scenePass(renderer: Renderer, sortedRenderMeshInfos: RenderMeshInfo[], 
 
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
         switch (actor.type) {
             case ActorTypes.Skybox:
                 if (!(actor as Skybox).renderMesh) {
@@ -1993,4 +1952,39 @@ function transparentPass(
             addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
         }
     });
+}
+
+
+type RenderMeshInfosEachPass = {
+    basePass: RenderMeshInfo[];
+    skyboxPass: RenderMeshInfo[];
+    transparentPass: RenderMeshInfo[];
+};
+
+function createRenderMeshInfosEachPass(renderMeshInfoEachQueue: RenderMeshInfoEachQueue, camera: Camera): RenderMeshInfosEachPass  {
+    const basePass = [RenderQueueType.Opaque, RenderQueueType.AlphaTest].map((queue) => {
+        return [...renderMeshInfoEachQueue[queue]].sort((a, b) => {
+            const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+            const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+            return al < bl ? -1 : 1;
+        });
+    }).flat();
+
+    const skyboxPass = [...renderMeshInfoEachQueue[RenderQueueType.Skybox]].sort((a, b) => {
+        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        return al < bl ? -1 : 1;
+    });
+    
+    const transparentPass = [...renderMeshInfoEachQueue[RenderQueueType.Transparent]].sort((a, b) => {
+            const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+            const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+            return al >= bl ? -1 : 1;
+    });
+            
+    return {
+        basePass,
+        skyboxPass,
+        transparentPass
+    };
 }

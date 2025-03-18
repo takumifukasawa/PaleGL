@@ -266,8 +266,6 @@ export function createMaterial(args: MaterialArgs): Material {
         }
     }
     
-    console.log(name, type, renderQueueType, args.renderQueueType)
-    
     if (renderQueueType === RenderQueueType.AlphaTest && alphaTest === null) {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }

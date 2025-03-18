@@ -130,7 +130,6 @@ export function getSharedTexture(engine: Engine, key: SharedTexturesType): Share
 }
 
 export function startEngine (engine: Engine) {
-    console.log("start engine", engine.onBeforeStart)
     if (engine.onBeforeStart) {
         engine.onBeforeStart();
     }

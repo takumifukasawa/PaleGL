@@ -46,8 +46,6 @@ export function createObjectSpaceRaymarchMesh(args: ObjectSpaceRaymarchMeshArgs)
               }),
           ];
     
-    console.log("fugafuga", materials)
-
     // NOTE
     // const material = new GBufferMaterial({
     //     metallic: 0,

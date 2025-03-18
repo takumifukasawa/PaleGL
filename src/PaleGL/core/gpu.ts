@@ -17,7 +17,10 @@
     GL_EQUAL,
     GL_FRAMEBUFFER,
     GL_FRONT,
+    GL_GEQUAL,
+    GL_GREATER,
     GL_LEQUAL,
+    GL_LESS,
     GL_LINE_LOOP,
     GL_LINE_STRIP,
     GL_LINES,
@@ -518,8 +521,17 @@ export function drawGPU(
             case DepthFuncTypes.Equal:
                 gl.depthFunc(GL_EQUAL);
                 break;
+            case DepthFuncTypes.Less:
+                gl.depthFunc(GL_LESS);
+                break;
             case DepthFuncTypes.Lequal:
                 gl.depthFunc(GL_LEQUAL);
+                break;
+            case DepthFuncTypes.Gequal:
+                gl.depthFunc(GL_GEQUAL);
+                break;
+            case DepthFuncTypes.Greater:
+                gl.depthFunc(GL_GREATER);
                 break;
             default:
                 console.error('invalid depth func type');

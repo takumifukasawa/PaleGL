@@ -32,10 +32,11 @@ export const ShadingModelIds = {
 export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
 
 export const DepthFuncTypes = {
-    // Lequal: "Lequal",
-    // Equal: "Equal",
     Lequal: 0,
     Equal: 1,
+    Gequal: 2,
+    Greater: 3,
+    Less: 4
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
@@ -606,6 +607,9 @@ export const GL_CCW = 2305;
 export const GL_FRONT = 1028;
 export const GL_EQUAL = 514;
 export const GL_LEQUAL = 515;
+export const GL_LESS = 513;
+export const GL_GEQUAL = 518;
+export const GL_GREATER = 516;
 export const GL_DEPTH_TEST = 2929;
 
 export const GL_BLEND = 3042;
