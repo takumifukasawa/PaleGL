@@ -401,7 +401,7 @@ addActorToScene(captureScene, directionalLight);
 
 const spotLight1 = createSpotLight({
     name: 'spotLight1',
-    intensity: 1.4,
+    intensity: 1.9,
     color: createColorWhite(),
     distance: 15,
     attenuation: 1.06,
@@ -432,7 +432,7 @@ addActorToScene(captureScene, spotLight1);
 
 const spotLight2 = createSpotLight({
     name: 'spotLight2',
-    intensity: 1.4,
+    intensity: 1.9,
     color: createColorWhite(),
     distance: 15,
     attenuation: 1.06,
@@ -1245,7 +1245,6 @@ void main() {
         height = wrapperElement.offsetHeight;
         setInputControllerSize(inputController, width, height);
         setEngineSize(engine, width, height);
-        console.log("fugafuga", width, height)
     };
 
     setOnBeforeStartEngine(engine, () => {
