@@ -17,9 +17,9 @@ import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
 // TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
 export type ScreenSpaceRaymarchMaterialArgs = {
     shadingModelId?: ShadingModelIds;
-    diffuseColor?: Color;
-    diffuseMap?: Texture;
-    diffuseMapTiling?: Vector4;
+    baseColor?: Color;
+    baseMap?: Texture;
+    baseMapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture | null;
     metallicMapTiling?: Vector4;
@@ -39,9 +39,9 @@ export function createScreenSpaceRaymarchMaterial({
     depthFragmentShader,
     shadingModelId = ShadingModelIds.Lit,
     uniforms = [],
-    diffuseColor,
-    diffuseMap,
-    diffuseMapTiling, // vec4
+    baseColor,
+    baseMap,
+    baseMapTiling, // vec4
     metallic,
     metallicMap,
     metallicMapTiling,
@@ -52,9 +52,9 @@ export function createScreenSpaceRaymarchMaterial({
     uniformBlockNames,
     ...options
 }: ScreenSpaceRaymarchMaterialArgs) {
-    const _diffuseMap = diffuseMap || null;
-    const _diffuseColor = diffuseColor || createColorWhite();
-    const _diffuseMapTiling = diffuseMapTiling || createVector4(1, 1, 0, 0);
+    const _baseMap = baseMap || null;
+    const _baseColor = baseColor || createColorWhite();
+    const _baseMapTiling = baseMapTiling || createVector4(1, 1, 0, 0);
     const _roughnessMap = roughnessMap || null;
     const _roughnessMapTiling = roughnessMapTiling || createVector4(1, 1, 0, 0);
     const _roughness = roughness || 0;
@@ -81,20 +81,20 @@ export function createScreenSpaceRaymarchMaterial({
         },
 
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: _diffuseMap,
+            value: _baseMap,
         },
         {
-            name: UniformNames.DiffuseColor,
+            name: UniformNames.BaseColor,
             type: UniformTypes.Color,
-            value: _diffuseColor,
+            value: _baseColor,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
             // value: Vector2.one,
-            value: _diffuseMapTiling,
+            value: _baseMapTiling,
         },
         {
             name: UniformNames.Metallic,

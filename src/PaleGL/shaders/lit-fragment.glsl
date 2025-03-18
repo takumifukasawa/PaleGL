@@ -8,9 +8,9 @@
 #include <vcolor_fh>
 #include <normal_map_fh>
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap; 
-uniform vec4 uDiffuseMapTiling;
+uniform vec4 uBaseColor;
+uniform sampler2D uBaseMap; 
+uniform vec4 uBaseMapTiling;
 uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
@@ -52,10 +52,10 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 #include <gbuffer_o>
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
+    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
   
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    vec4 diffuseColor = diffuseMapColor;
+    vec4 baseMapColor = texture(uBaseMap, uv);
+    vec4 baseColor = baseMapColor;
    
     vec3 worldNormal = vNormal;
     
@@ -66,10 +66,10 @@ void main() {
 
 #ifdef USE_VERTEX_COLOR
     // 頂点カラーでuniformのcolorは計算済み
-    diffuseColor *= vVertexColor;
+    baseColor *= vVertexColor;
     emissiveColor = vVertexEmissiveColor;
 #else
-    diffuseColor *= uDiffuseColor;
+    baseColor *= uBaseColor;
     emissiveColor = uEmissiveColor;
 #endif
 
@@ -78,12 +78,12 @@ void main() {
     Surface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = diffuseColor;
+    surface.baseColor = baseColor;
     
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl
 
-    diffuseColor.rgb = gamma(diffuseColor.rgb);
+    baseColor.rgb = gamma(baseColor.rgb);
    
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
@@ -95,7 +95,7 @@ void main() {
     
     #pragma BEFORE_OUT
 
-    outGBufferA = EncodeGBufferA(diffuseColor.rgb);
+    outGBufferA = EncodeGBufferA(baseColor.rgb);
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(metallic, roughness);
     outGBufferD = EncodeGBufferD(emissiveColor.rgb);

@@ -74,7 +74,7 @@ f 6/12/8 2/6/2 4/10/5
 type SkyboxArgs = {
     gpu: Gpu;
     cubeMap: CubeMap;
-    diffuseIntensity: number;
+    baseIntensity: number;
     specularIntensity: number;
     rotationOffset?: number;
     renderMesh?: boolean;
@@ -82,7 +82,7 @@ type SkyboxArgs = {
 
 export type Skybox = Mesh & {
     cubeMap: CubeMap;
-    diffuseIntensity: number;
+    baseIntensity: number;
     specularIntensity: number;
     rotationOffset: number;
     renderMesh: boolean;
@@ -91,7 +91,7 @@ export type Skybox = Mesh & {
 export function createSkybox({
     gpu,
     cubeMap,
-    diffuseIntensity = 1,
+    baseIntensity = 1,
     specularIntensity = 1,
     rotationOffset = 0,
     renderMesh = true,
@@ -160,7 +160,7 @@ export function createSkybox({
     return {
         ...mesh,
         cubeMap,
-        diffuseIntensity,
+        baseIntensity,
         specularIntensity,
         rotationOffset,
         renderMesh,

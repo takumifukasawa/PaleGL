@@ -15,23 +15,23 @@
 
 #include <raymarch_sf>
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap;
-uniform vec4 uDiffuseMapTiling;
+uniform vec4 uBaseColor;
+uniform sampler2D uBaseMap;
+uniform vec4 uBaseMapTiling;
 
 in vec2 vUv;
 
 out vec4 outColor;
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
+    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
 
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    vec4 baseMapColor = texture(uBaseMap, uv);
 
-    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
+    vec4 baseColor = uBaseColor * baseMapColor;
 
     #ifdef USE_VERTEX_COLOR
-    diffuseColor *= vVertexColor;
+    baseColor *= vVertexColor;
     #endif
 
     //
@@ -73,7 +73,7 @@ void main() {
         discard;
     }
 
-    vec4 resultColor = diffuseColor;
+    vec4 resultColor = baseColor;
     // #include <alpha_test_f>
     #include ../partial/alpha-test-fragment.partial.glsl
 

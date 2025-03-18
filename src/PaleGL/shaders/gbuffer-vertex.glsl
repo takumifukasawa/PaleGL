@@ -21,8 +21,8 @@ out float vInstanceId;
 // TODO
 // out vec4 vInstanceState;
 uniform float uRotMode; // 0: velocity, 1: look direction
-uniform vec4 uDiffuseColor;
-uniform float uDiffuseMixer;
+uniform vec4 uBaseColor;
+uniform float uBaseMixer;
 uniform vec4 uEmissiveColor;
 uniform float uEmissiveMixer;
 #endif
@@ -369,7 +369,7 @@ void main() {
     
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     // vVertexColor = aInstanceVertexColor;
-    vVertexColor = mix(aInstanceVertexColor, uDiffuseColor, uDiffuseMixer);
+    vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
     #if defined(USE_INSTANCING)
         vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
     #else

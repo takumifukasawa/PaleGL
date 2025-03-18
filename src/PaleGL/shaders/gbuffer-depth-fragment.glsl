@@ -1,8 +1,8 @@
 #pragma DEFINES
 
-uniform vec4 uColor; // TODO: diffuse color
-uniform sampler2D uDiffuseMap; 
-uniform vec4 uDiffuseMapTiling;
+uniform vec4 uColor; // TODO: base color
+uniform sampler2D uBaseMap; 
+uniform vec4 uBaseMapTiling;
 
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;
@@ -19,21 +19,21 @@ out vec4 outColor;
 #include <alpha_test>
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
+    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
   
-    // TODO: multiply diffuse color
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    // TODO: multiply base color
+    vec4 baseMapColor = texture(uBaseMap, uv);
     
-    vec4 diffuseColor = vec4(0.);
+    vec4 baseColor = vec4(0.);
 
 #ifdef USE_VERTEX_COLOR
-    diffuseColor = vVertexColor * uColor * diffuseMapColor;
+    baseColor = vVertexColor * uColor * baseMapColor;
 #else
-    diffuseColor = uColor * diffuseMapColor;
+    baseColor = uColor * baseMapColor;
 #endif   
 
     // TODO: base color を渡して alpha をかける
-    vec4 resultColor = diffuseColor;
+    vec4 resultColor = baseColor;
 
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl

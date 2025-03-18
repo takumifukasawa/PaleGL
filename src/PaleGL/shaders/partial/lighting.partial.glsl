@@ -5,13 +5,13 @@
 struct Surface {
     vec3 worldNormal;
     vec3 worldPosition;
-    vec4 diffuseColor;
+    vec4 baseColor;
     float specularAmount;
 };
 
 struct Skybox {
     samplerCube cubeMap;
-    float diffuseIntensity;
+    float baseIntensity;
     float specularIntensity;
     float rotationOffset;
     float maxLodLevel;

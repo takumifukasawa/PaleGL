@@ -17,9 +17,9 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type UnlitMaterialArgs = {
-    diffuseMap?: Texture;
-    diffuseMapTiling?: Vector4;
-    diffuseColor?: Color;
+    baseMap?: Texture;
+    baseMapTiling?: Vector4;
+    baseColor?: Color;
     vertexShaderModifiers?: VertexShaderModifiers;
     uniforms?: UniformsData;
 } & MaterialArgs;
@@ -27,9 +27,9 @@ export type UnlitMaterialArgs = {
 export type UnlitMaterial = Material;
 
 export function createUnlitMaterial({
-    diffuseMap,
-    diffuseMapTiling, // vec4
-    diffuseColor,
+    baseMap,
+    baseMapTiling, // vec4
+    baseColor,
     // TODO: 外部化
     vertexShaderModifiers = [],
     uniforms = [],
@@ -37,19 +37,19 @@ export function createUnlitMaterial({
 }: UnlitMaterialArgs = {}) {
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: diffuseMap || null,
+            value: baseMap || null,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
+            value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.DiffuseColor,
+            name: UniformNames.BaseColor,
             type: UniformTypes.Color,
-            value: diffuseColor || createColorWhite(),
+            value: baseColor || createColorWhite(),
         },
         {
             name: UniformNames.ShadingModelId,
@@ -62,19 +62,19 @@ export function createUnlitMaterial({
 
     const depthUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: diffuseMap || null,
+            value: baseMap || null,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling || createVector4(1, 1, 0, 0),
+            value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.DiffuseColor,
+            name: UniformNames.BaseColor,
             type: UniformTypes.Color,
-            value: diffuseColor || createColorWhite(),
+            value: baseColor || createColorWhite(),
         },
     ];
 

@@ -22,9 +22,9 @@ in vec4 vInstanceState;
 
 #include <raymarch_sf>
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap;
-uniform vec4 uDiffuseMapTiling;
+uniform vec4 uBaseColor;
+uniform sampler2D uBaseMap;
+uniform vec4 uBaseMapTiling;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
@@ -38,14 +38,14 @@ in mat4 vInverseWorldMatrix;
 out vec4 outColor;
 
 void main() {
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
+    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
 
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
+    vec4 baseMapColor = texture(uBaseMap, uv);
 
-    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
+    vec4 baseColor = uBaseColor * baseMapColor;
 
     #ifdef USE_VERTEX_COLOR
-    diffuseColor *= vVertexColor;
+    baseColor *= vVertexColor;
     #endif
 
     //
@@ -100,7 +100,7 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    float alpha = diffuseColor.a; // TODO: base color を渡して alpha をかける
+    float alpha = baseColor.a; // TODO: base color を渡して alpha をかける
     #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);

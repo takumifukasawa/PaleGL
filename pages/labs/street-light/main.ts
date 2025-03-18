@@ -915,7 +915,7 @@ const main = async () => {
     const skyboxMesh = createSkybox({
         gpu,
         cubeMap,
-        diffuseIntensity: 0.2,
+        baseIntensity: 0.2,
         specularIntensity: 0.2,
         renderMesh: false,
     });
@@ -938,7 +938,7 @@ const main = async () => {
             pragma: FragmentShaderModifierPragmas.BEFORE_OUT,
             value: `
 float d = 1. - smoothstep(4., 7., length(uv));
-diffuseColor *= d;
+baseColor *= d;
 emissiveColor *= d;
 `,
         },
@@ -972,7 +972,7 @@ emissiveColor *= d;
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            diffuseColor: createColor(2, 2, 2, 1),
+            baseColor: createColor(2, 2, 2, 1),
         })
     );
     attractSphereMesh.name = 'attractSphere';

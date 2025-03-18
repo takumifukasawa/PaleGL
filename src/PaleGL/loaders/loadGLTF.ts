@@ -549,10 +549,10 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
 
         const materials = materialIndices.map((materialIndex) => {
             const targetMaterial = gltf.materials[materialIndex];
-            const hasDiffuseMap = !!targetMaterial.pbrMetallicRoughness.baseColorTexture;
+            const hasBaseMap = !!targetMaterial.pbrMetallicRoughness.baseColorTexture;
             const hasNormalMap = !!targetMaterial.normalTexture;
 
-            const diffuseMap = hasDiffuseMap
+            const baseMap = hasBaseMap
                 ? preloadTextures[targetMaterial.pbrMetallicRoughness.baseColorTexture!.index]
                 : null;
             const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : null;
@@ -573,8 +573,8 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             }
 
             return createGBufferMaterial({
-                diffuseMap,
-                diffuseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
+                baseMap,
+                baseColor: targetMaterial.pbrMetallicRoughness.baseColorFactor
                     ? createColorFromArray(targetMaterial.pbrMetallicRoughness.baseColorFactor)
                     : createColorWhite(),
                 normalMap,

@@ -16,9 +16,9 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 export type GBufferMaterialArgs = {
-    diffuseColor?: Color;
-    diffuseMap?: Texture | null;
-    diffuseMapTiling?: Vector4;
+    baseColor?: Color;
+    baseMap?: Texture | null;
+    baseMapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture | null;
     metallicMapTiling?: Vector4;
@@ -43,9 +43,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         ...options
     }: GBufferMaterialArgs = args;
     
-    const diffuseColor: Color = args.diffuseColor || createColorWhite();
-    const diffuseMap: Texture | null = args.diffuseMap || null;
-    const diffuseMapTiling: Vector4 = args.diffuseMapTiling || createVector4(1, 1, 0, 0);
+    const baseColor: Color = args.baseColor || createColorWhite();
+    const baseMap: Texture | null = args.baseMap || null;
+    const baseMapTiling: Vector4 = args.baseMapTiling || createVector4(1, 1, 0, 0);
     const metallic: number = args.metallic || 0;
     const metallicMap: Texture | null = args.metallicMap || null;
     const metallicMapTiling: Vector4 = args.metallicMapTiling || createVector4(1, 1, 0, 0);
@@ -59,19 +59,19 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
 
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseColor,
+            name: UniformNames.BaseColor,
             type: UniformTypes.Color,
-            value: diffuseColor || createColorWhite(),
+            value: baseColor || createColorWhite(),
         },
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: diffuseMap || null,
+            value: baseMap || null,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling,
+            value: baseMapTiling,
         },
         {
             name: UniformNames.Metallic,
@@ -139,14 +139,14 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
 
     const depthUniforms: UniformsData = [
         {
-            name: UniformNames.DiffuseMap,
+            name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: diffuseMap,
+            value: baseMap,
         },
         {
-            name: UniformNames.DiffuseMapTiling,
+            name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
-            value: diffuseMapTiling,
+            value: baseMapTiling,
         },
     ];
 
@@ -177,9 +177,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
 
     return {
         ...material,
-        diffuseColor,
-        diffuseMap,
-        diffuseMapTiling,
+        baseColor,
+        baseMap,
+        baseMapTiling,
         metallic,
         metallicMap,
         metallicMapTiling,

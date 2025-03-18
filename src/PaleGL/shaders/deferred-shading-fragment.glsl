@@ -24,7 +24,7 @@ struct IncidentLight {
 
 struct IncidentSkyboxLight {
 // samplerCube cubeMap;
-// vec3 diffuseColor;
+// vec3 baseColor;
     vec3 diffuseDirection;
     float diffuseIntensity;
 // vec3 specularColor;
@@ -34,9 +34,9 @@ struct IncidentSkyboxLight {
 };
 
 struct ReflectedLight {
-    vec3 directDiffuse;
+    vec3 directBase;
     vec3 directSpecular;
-    vec3 indirectDiffuse;
+    vec3 indirectBase;
     vec3 indirectSpecular;
 };
 
@@ -48,7 +48,6 @@ struct GeometricContext {
 
 struct Material {
     vec3 baseColor;
-    vec3 diffuseColor;
     vec3 specularColor;
     float roughness;
     float metallic;
@@ -188,8 +187,8 @@ void getSkyboxLightIrradiance(const in SkyboxLight skyboxLight, const in Geometr
 
 // normalized lambert
 
-vec3 DiffuseBRDF(vec3 diffuseColor) {
-    return diffuseColor / PI;
+vec3 BaseBRDF(vec3 baseColor) {
+    return baseColor / PI;
 }
 
 // TODO: schlickの公式まとめる
@@ -261,11 +260,11 @@ const in float shadow
     irradiance *= directLight.intensity;
     irradiance *= (1. - shadow);
 
-    // diffuse
-    reflectedLight.directDiffuse +=
+    // base
+    reflectedLight.directBase +=
     irradiance *
     clamp(
-    DiffuseBRDF(material.diffuseColor),
+    BaseBRDF(material.baseColor),
     -10.,
     10.
     ); // overflow fallback
@@ -294,7 +293,7 @@ const in Material material,
 inout ReflectedLight reflectedLight
 ) {
     //
-    // diffuse
+    // base
     //
 
     vec3 envDiffuseColor = textureLod(
@@ -304,8 +303,8 @@ inout ReflectedLight reflectedLight
     ).xyz;
 
     // 拡散: metalness,roughnessを考慮しない
-    reflectedLight.directDiffuse +=
-    material.diffuseColor
+    reflectedLight.directBase +=
+    material.baseColor
     * envDiffuseColor
     * skyboxLight.diffuseIntensity;
 
@@ -589,7 +588,7 @@ void main() {
     Surface surface;
     surface.worldPosition = worldPosition;
     surface.worldNormal = worldNormal;
-    surface.diffuseColor = vec4(baseColor, 1.);
+    surface.baseColor = vec4(baseColor, 1.);
 
     // TODO: bufferから引っ張ってくる
     surface.specularAmount = .5;
@@ -606,7 +605,7 @@ void main() {
     Material material;
     vec3 albedo = baseColor;
     material.baseColor = albedo;
-    material.diffuseColor = mix(albedo, vec3(0.), metallic);// 金属は拡散反射しない
+    material.baseColor = mix(albedo, vec3(0.), metallic);// 金属は拡散反射しない
     material.specularColor = mix(vec3(.04), albedo, metallic);// 非金属でも4%は鏡面反射をさせる（多くの不導体に対応）
     material.roughness = roughness;
     material.metallic = metallic;
@@ -697,9 +696,9 @@ void main() {
     //
 
     vec3 outgoingLight =
-        reflectedLight.directDiffuse
+        reflectedLight.directBase
         + reflectedLight.directSpecular
-        + reflectedLight.indirectDiffuse
+        + reflectedLight.indirectBase
         + reflectedLight.indirectSpecular
         ;
     resultColor = vec4(outgoingLight, opacity);

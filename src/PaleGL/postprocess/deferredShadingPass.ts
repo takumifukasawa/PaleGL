@@ -84,7 +84,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
                     value: null,
                 },
                 {
-                    name: 'diffuseIntensity',
+                    name: 'baseIntensity',
                     type: UniformTypes.Float,
                     value: 0,
                 },
@@ -136,9 +136,9 @@ export function updateDeferredShadingPassSkyboxUniforms(deferredShadingPass: Def
             value: skybox.cubeMap,
         },
         {
-            name: 'diffuseIntensity',
+            name: 'baseIntensity',
             type: UniformTypes.Float,
-            value: skybox.diffuseIntensity,
+            value: skybox.baseIntensity,
         },
         {
             name: 'specularIntensity',

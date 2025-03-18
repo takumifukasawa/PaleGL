@@ -26,9 +26,9 @@ in vec4 vInstanceState;
 
 #include <raymarch_sf>
 
-uniform vec4 uDiffuseColor;
-uniform sampler2D uDiffuseMap;
-uniform vec4 uDiffuseMapTiling;
+uniform vec4 uBaseColor;
+uniform sampler2D uBaseMap;
+uniform vec4 uBaseMapTiling;
 uniform float uSpecularAmount;
 uniform float uAmbientAmount;
 uniform float uMetallic;
@@ -78,10 +78,10 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
 
-    vec2 uv = vUv * uDiffuseMapTiling.xy + uDiffuseMapTiling.zw;
+    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
 
-    vec4 diffuseMapColor = texture(uDiffuseMap, uv);
-    vec4 diffuseColor = uDiffuseColor * diffuseMapColor;
+    vec4 baseMapColor = texture(uBaseMap, uv);
+    vec4 baseColor = uBaseColor * baseMapColor;
 
     vec3 worldNormal = vNormal;
 
@@ -89,10 +89,10 @@ void main() {
     #include ../partial/normal-map-fragment.partial.glsl
 
     #ifdef USE_VERTEX_COLOR
-    diffuseColor *= vVertexColor;
+    baseColor *= vVertexColor;
     #endif
     
-    // diffuseColor = vec4(1.);
+    // baseColor = vec4(1.);
 
     // surface.specularAmount = uSpecularAmount;
 
@@ -160,7 +160,7 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    resultColor = diffuseColor;
+    resultColor = baseColor;
 
     float alpha = resultColor.a;
     #include <alpha_test_f>

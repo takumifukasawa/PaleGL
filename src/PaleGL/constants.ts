@@ -345,9 +345,9 @@ export const UniformNames = {
     // depth
     DepthTexture: 'uDepthTexture',
     // surface
-    DiffuseMap: 'uDiffuseMap',
-    DiffuseColor: 'uDiffuseColor',
-    DiffuseMapTiling: 'uDiffuseMapTiling',
+    BaseMap: 'uBaseMap',
+    BaseColor: 'uBaseColor',
+    BaseMapTiling: 'uBaseMapTiling',
     Metallic: 'uMetallic',
     MetallicMap: 'uMetallicMap',
     MetallicMapTiling: 'uMetallicMapTiling',

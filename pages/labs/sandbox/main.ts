@@ -167,7 +167,7 @@ import {SharedTexturesType, SharedTexturesTypes} from "@/PaleGL/core/createShare
 // console.log('----------------');
 
 const smokeImgUrl = './assets/images/particle-smoke.png';
-const leaveDiffuseImgUrl = './assets/images/brown_mud_leaves_01_diff_1k.jpg';
+const leaveBaseImgUrl = './assets/images/brown_mud_leaves_01_diff_1k.jpg';
 const leaveNormalImgUrl = './assets/images/brown_mud_leaves_01_nor_gl_1k.jpg';
 const CubeMapPositiveXImgUrl = './assets/images/px.jpg';
 const CubeMapNegativeXImgUrl = './assets/images/nx.jpg';
@@ -348,7 +348,7 @@ debuggerStates.instanceNum = initialInstanceNum;
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let floorPlaneMesh: Mesh;
-let floorDiffuseMap: Texture;
+let floorBaseMap: Texture;
 let floorNormalMap: Texture;
 let attractSphereMesh: Mesh;
 let testLightingMesh: Mesh;
@@ -987,13 +987,13 @@ const createGLTFSphereMesh = async (material: Material) => {
 
     // mesh.material = new GBufferMaterial({
     //     // gpu,
-    //     // diffuseMap: floorDiffuseMap,
+    //     // baseMap: floorBaseMap,
     //     // normalMap: floorNormalMap,
     //     // envMap: cubeMap,
-    //     // diffuseColor: new Color(0.5, 0.05, 0.05, 1),
-    //     diffuseColor: new Color(1, 0.76, 0.336, 1),
-    //     // diffuseColor: new Color(0, 0, 0, 1),
-    //     // diffuseColor: new Color(1, 1, 1, 1),
+    //     // baseColor: new Color(0.5, 0.05, 0.05, 1),
+    //     baseColor: new Color(1, 0.76, 0.336, 1),
+    //     // baseColor: new Color(0, 0, 0, 1),
+    //     // baseColor: new Color(1, 1, 1, 1),
     //     receiveShadow: true,
     //     metallic: 0,
     //     roughness: 0,
@@ -1359,7 +1359,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         createGBufferMaterial({
             // gpu,
             // specularAmount: 0.5,
-            // diffuseColor: Color.white(),
+            // baseColor: Color.white(),
             metallic: 0,
             roughness: 1,
             receiveShadow: true,
@@ -1442,10 +1442,10 @@ const main = async () => {
         img: particleImg,
     });
 
-    const floorDiffuseImg = await loadImg(leaveDiffuseImgUrl);
-    floorDiffuseMap = createTexture({
+    const floorBaseImg = await loadImg(leaveBaseImgUrl);
+    floorBaseMap = createTexture({
         gpu,
-        img: floorDiffuseImg,
+        img: floorBaseImg,
         // mipmap: true,
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
@@ -1477,7 +1477,7 @@ const main = async () => {
     const skyboxMesh = createSkybox({
         gpu,
         cubeMap,
-        diffuseIntensity: 0.2,
+        baseIntensity: 0.2,
         specularIntensity: 0.2,
         // rotationOffset: 0.8,
     });
@@ -1489,7 +1489,7 @@ const main = async () => {
 
     attractSphereMesh = await createGLTFSphereMesh(
         createUnlitMaterial({
-            diffuseColor: createColor(2, 2, 2, 1),
+            baseColor: createColor(2, 2, 2, 1),
             // receiveShadow: true,
         })
     );
@@ -1515,10 +1515,10 @@ const main = async () => {
 
     testLightingMesh = await createGLTFSphereMesh(
         createGBufferMaterial({
-            // diffuseColor: new Color(1, .05, .05, 1),
+            // baseColor: new Color(1, .05, .05, 1),
             // metallic: 0,
             // roughness: .3
-            diffuseColor: createColorWhite(),
+            baseColor: createColorWhite(),
             metallic: 1,
             roughness: 1,
         })
@@ -1646,22 +1646,22 @@ const main = async () => {
         geometry: floorGeometry,
         // material: new PhongMaterial({
         //     // gpu,
-        //     // diffuseMap: floorDiffuseMap,
+        //     // baseMap: floorBaseMap,
         //     // normalMap: floorNormalMap,
         //     envMap: cubeMap,
-        //     diffuseColor: new Color(0, 0, 0, 1),
+        //     baseColor: new Color(0, 0, 0, 1),
         //     receiveShadow: true,
         //     specularAmount: 0.4,
         //     ambientAmount: 0.2,
         // }),
         material: createGBufferMaterial({
             // gpu,
-            diffuseMap: floorDiffuseMap,
+            baseMap: floorBaseMap,
             normalMap: floorNormalMap,
             // envMap: cubeMap,
-            // diffuseColor: new Color(0.05, 0.05, 0.05, 1),
-            // diffuseColor: new Color(0, 0, 0, 1),
-            diffuseColor: createColorWhite(),
+            // baseColor: new Color(0.05, 0.05, 0.05, 1),
+            // baseColor: new Color(0, 0, 0, 1),
+            baseColor: createColorWhite(),
             receiveShadow: true,
             // specularAmount: 0.4,
             metallic: 0,
@@ -1674,7 +1674,7 @@ const main = async () => {
     subscribeActorOnStart(floorPlaneMesh, () => {
         setScaling(floorPlaneMesh.transform, createVector3(10, 10, 10));
         setRotationX(floorPlaneMesh.transform, -90);
-        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uDiffuseMapUvScale', createVector2(3, 3));
+        setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uBaseMapUvScale', createVector2(3, 3));
         setMaterialUniformValue(getMeshMaterial(floorPlaneMesh), 'uNormalMapUvScale', createVector2(3, 3));
     });
 
@@ -2013,7 +2013,7 @@ function createSharedTextureMesh(engine: Engine, key: SharedTexturesType) {
         getSharedTexture(engine, key).needsUpdate = true;
         setUniformValue(
             getMeshMaterial(textureMesh).uniforms,
-            UniformNames.DiffuseMap,
+            UniformNames.BaseMap,
             getSharedTexture(engine, key).texture
         );
     });
