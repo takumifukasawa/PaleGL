@@ -481,11 +481,11 @@ subscribeActorOnStart(directionalLight, () => {
 addActorToScene(captureScene, directionalLight);
 
 const spotLight1 = createSpotLight({
-    intensity: 1,
+    intensity: 5,
     color: createColorWhite(),
     distance: 20,
     attenuation: 0.1,
-    coneAngle: 0.1 * RAD_TO_DEG,
+    coneAngle: 0.5 * RAD_TO_DEG,
     penumbraAngle: 0.05 * RAD_TO_DEG,
 });
 // spotLight.enabled = false;
@@ -514,11 +514,11 @@ subscribeActorOnStart(spotLight1, () => {
 addActorToScene(captureScene, spotLight1);
 
 const spotLight2 = createSpotLight({
-    intensity: 1,
+    intensity: 5,
     color: createColorWhite(),
     distance: 20,
     attenuation: 0.1,
-    coneAngle: 0.1 * RAD_TO_DEG,
+    coneAngle: 0.5 * RAD_TO_DEG,
     penumbraAngle: 0.05 * RAD_TO_DEG,
 });
 // spotLight.enabled = false;
@@ -1978,6 +1978,11 @@ void main() {
         startOrbitCameraController(orbitCameraController, 0, -40);
         // orbitCameraController.enabled = false;
         orbitCameraController.enabled = true;
+
+        renderer.fogPass.distanceFogStart = 23;
+        renderer.fogPass.distanceFogEnd = 150;
+
+        initDebugger();
     });
 
     // engine.onAfterStart = () => {
@@ -1987,7 +1992,6 @@ void main() {
     // }
 
     setOnBeforeUpdateEngine(engine, () => {
-        if (!debuggerGUI) initDebugger();
         updateInputController(inputController);
     });
 
@@ -2530,7 +2534,7 @@ function initDebugger() {
         minValue: 0,
         maxValue: 300,
         stepValue: 0.0001,
-        initialValue: renderer.fogPass.distanceFogPower,
+        initialValue: renderer.fogPass.distanceFogStart,
         onChange: (value) => {
             renderer.fogPass.distanceFogStart = value;
         },
