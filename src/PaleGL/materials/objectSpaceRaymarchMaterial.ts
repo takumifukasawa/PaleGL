@@ -68,30 +68,30 @@ export function createObjectSpaceRaymarchMaterial({
         // depthFragmentShader,
         // rawFragmentShader,
         shadingModelId = ShadingModelIds.Lit,
-        baseColor,
-        baseMap,
-        baseMapTiling, // vec4
-        metallic,
-        metallicMap,
-        metallicMapTiling,
-        roughness,
-        roughnessMap,
-        roughnessMapTiling,
-        emissiveColor,
+        // baseColor,
+        // baseMap,
+        // baseMapTiling, // vec4
+        // metallic,
+        // metallicMap,
+        // metallicMapTiling,
+        // roughness,
+        // roughnessMap,
+        // roughnessMapTiling,
+        // emissiveColor,
         uniforms = [],
         uniformBlockNames,
     } = materialArgs;
 
-    const _baseMap = baseMap || null;
-    const _baseColor = baseColor || createColorWhite();
-    const _baseMapTiling = baseMapTiling || createVector4(1, 1, 0, 0);
-    const _roughnessMap = roughnessMap || null;
-    const _roughnessMapTiling = roughnessMapTiling || createVector4(1, 1, 0, 0);
-    const _roughness = roughness || 0;
-    const _metallic = metallic || 0;
-    const _metallicMap = metallicMap || null;
-    const _metallicMapTiling = metallicMapTiling || createVector4(1, 1, 0, 0);
-    const _emissiveColor = emissiveColor || createColorBlack();
+    const baseMap = materialArgs.baseMap ?? null;
+    const baseColor = materialArgs.baseColor ?? createColorWhite();
+    const baseMapTiling = materialArgs.baseMapTiling ?? createVector4(1, 1, 0, 0);
+    const roughnessMap = materialArgs.roughnessMap ?? null;
+    const roughnessMapTiling = materialArgs.roughnessMapTiling ?? createVector4(1, 1, 0, 0);
+    const roughness = materialArgs.roughness ?? 0;
+    const metallic = materialArgs.metallic ?? 0;
+    const metallicMap = materialArgs.metallicMap ?? null;
+    const metallicMapTiling = materialArgs.metallicMapTiling ?? createVector4(1, 1, 0, 0);
+    const emissiveColor = materialArgs.emissiveColor ?? createColorBlack();
 
     const commonUniforms: UniformsData = [
         {
@@ -107,55 +107,55 @@ export function createObjectSpaceRaymarchMaterial({
         {
             name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
-            value: _baseMap,
+            value: baseMap,
         },
         {
             name: UniformNames.BaseColor,
             type: UniformTypes.Color,
-            value: _baseColor,
+            value: baseColor,
         },
         {
             name: UniformNames.BaseMapTiling,
             type: UniformTypes.Vector4,
             // value: Vector2.one,
-            value: _baseMapTiling,
+            value: baseMapTiling,
         },
         {
             name: UniformNames.Metallic,
             type: UniformTypes.Float,
-            value: _metallic,
+            value: metallic,
         },
         {
             name: UniformNames.MetallicMap,
             type: UniformTypes.Texture,
-            value: _metallicMap,
+            value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
             type: UniformTypes.Vector4,
-            value: _metallicMapTiling,
+            value: metallicMapTiling,
         },
 
         {
             name: UniformNames.Roughness,
             type: UniformTypes.Float,
-            value: _roughness,
+            value: roughness,
         },
         {
             name: UniformNames.RoughnessMap,
             type: UniformTypes.Texture,
-            value: _roughnessMap,
+            value: roughnessMap,
         },
         {
             name: UniformNames.RoughnessMapTiling,
             type: UniformTypes.Vector4,
-            value: _roughnessMapTiling,
+            value: roughnessMapTiling,
         },
 
         {
             name: UniformNames.EmissiveColor,
             type: UniformTypes.Color,
-            value: _emissiveColor,
+            value: emissiveColor,
         },
         {
             name: 'uIsPerspective',
