@@ -14,7 +14,7 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector3One } from '@/PaleGL/math/vector3.ts';
 import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
-import gbufferObjectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-gbuffer-object-space-raymarch-depth-fragment.glsl';
+import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
@@ -187,7 +187,7 @@ export function createObjectSpaceRaymarchMaterial({
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
-        depthFragmentShader: depthFragmentShaderTemplate || gbufferObjectSpaceRaymarchDepthFragmentLayout,
+        depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
         primitiveType: PrimitiveTypes.Triangles,
         faceSide: FaceSide.Double,
 
