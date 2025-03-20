@@ -972,7 +972,7 @@ export function renderRenderer(
     // TODO: 本当はskyboxをshadingの後にしたい
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
     basePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
-
+    
     // ------------------------------------------------------------------------------
     // skybox pass
     // ------------------------------------------------------------------------------

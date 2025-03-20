@@ -21,6 +21,7 @@ in vec4 vInstanceState;
 #pragma RAYMARCH_SCENE
 
 #include <raymarch_sf>
+#include <os_raymarch_f>
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
@@ -59,7 +60,6 @@ void main() {
     vec3 rayDirection = uIsPerspective > .5
         ? normalize(wp - uViewPosition)
         : normalize(-uViewPosition);
-    float distance = 0.;
     float accLen = 0.;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = EPS;
@@ -67,22 +67,35 @@ void main() {
     mat4 inverseWorldMatrix = vInverseWorldMatrix;
     // mat4 inverseWorldMatrix = inverse(uWorldMatrix);
     
-    for(int i = 0; i < OI; i++) {
-        currentRayPosition = rayOrigin + rayDirection * accLen;
-        distance = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, uBoundsScale, uUseWorld).x;
-        accLen += distance;
-        if(!isDfInnerBox(toLocal(currentRayPosition, inverseWorldMatrix, uBoundsScale), uBoundsScale)) {
-            break;
-        }
-        if(distance <= minDistance) {
-            break;
-        }
-    }
+    // for(int i = 0; i < OI; i++) {
+    //     currentRayPosition = rayOrigin + rayDirection * accLen;
+    //     result = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, uBoundsScale, uUseWorld);
+    //     accLen += result.x;
+    //     if(!isDfInnerBox(toLocal(currentRayPosition, inverseWorldMatrix, uBoundsScale), uBoundsScale)) {
+    //         break;
+    //     }
+    //     if(result.x <= minDistance) {
+    //         break;
+    //     }
+    // }
 
-    if(distance > minDistance) {
-        discard;
-    }
+    // if(result.x > minDistance) {
+    //     discard;
+    // }
+   
+    vec2 result = osRaymarch(
+        rayOrigin,
+        rayDirection,
+        minDistance,
+        uProjectionMatrix,
+        uViewMatrix,
+        inverseWorldMatrix,
+        uBoundsScale,
+        uUseWorld,
+        currentRayPosition
+    );
 
+    // NOTE: depthの場合はいらないがメモを残す
     // 既存の深度値と比較して、奥にある場合は破棄する
     // float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
     // float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
@@ -92,10 +105,6 @@ void main() {
     //     discard;
     // }
 
-    vec4 rayClipPosition = uProjectionMatrix * uViewMatrix * vec4(currentRayPosition, 1.);
-    float newDepth = (rayClipPosition.z / rayClipPosition.w) * .5 + .5;
-    gl_FragDepth = newDepth;
-
     //
     // NOTE: end raymarch block
     //
@@ -104,6 +113,4 @@ void main() {
     #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);
-    
-    // gl_FragDepth = (currentRayProjectionPosition.z / currentRayProjectionPosition.w) * .5 + .5;
 }

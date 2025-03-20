@@ -204,7 +204,9 @@ export function createObjectSpaceRaymarchMaterial({
         depthWrite: true,
         depthFuncType: DepthFuncTypes.Lequal,
         skipDepthPrePass: true,
-        renderQueueType: RenderQueueType.AlphaTest,
+        renderQueueType: RenderQueueType.Opaque,
+        // renderQueueType: RenderQueueType.Transparent,
+        // blendType: BlendTypes.Transparent,
 
         uniformBlockNames: [
             UniformBlockNames.Common,
