@@ -19,6 +19,7 @@ import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout
 import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
+import {createObjectSpaceRaymarchUniforms} from "@/PaleGL/materials/objectSpaceRaymarchMaterial.ts";
 
 type ObjectSpaceRaymarchGBufferArgs = {
     fragmentShaderTemplate?: string;
@@ -132,16 +133,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
             type: UniformTypes.Color,
             value: emissiveColor,
         },
-        {
-            name: 'uIsPerspective',
-            type: UniformTypes.Float,
-            value: 0,
-        },
-        {
-            name: 'uUseWorld',
-            type: UniformTypes.Float,
-            value: 0,
-        },
+        ...createObjectSpaceRaymarchUniforms()
     ];
     const shadingUniforms: UniformsData = [
         {
@@ -157,7 +149,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
     return createMaterial({
         ...args,
         // ...options,
-        name: 'ObjectSpaceRaymarchMaterial',
+        name: 'ObjectSpaceRaymarchGBufferMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
 
         vertexShader: raymarchVert,
@@ -165,10 +157,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
         primitiveType: PrimitiveTypes.Triangles,
         faceSide: FaceSide.Double,
-
-        // rawFragmentShader,
-        uniforms: mergedUniforms,
-        depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
+        
         // NOTE: GBufferMaterialの設定
         // useNormalMap: !!normalMap,
         // depthTest: true,
@@ -180,9 +169,9 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         depthFuncType: DepthFuncTypes.Lequal,
         skipDepthPrePass: true,
         renderQueueType: RenderQueueType.Opaque,
-        // renderQueueType: RenderQueueType.Transparent,
-        // blendType: BlendTypes.Transparent,
 
+        uniforms: mergedUniforms,
+        depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
         uniformBlockNames: [
             UniformBlockNames.Common,
             UniformBlockNames.Transformations,

@@ -160,7 +160,9 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     minifierOptions.noRemoveUnused = true;
                 } else {
                     // partialじゃない場合
-                    noRenamingList.push(...["main", "dfScene"]);
+                    if (minifierOptions.noRenamingList !== undefined) {
+                        noRenamingList.push(...minifierOptions.noRenamingList);
+                    }
                     
                 }
 

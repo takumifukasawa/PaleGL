@@ -31,7 +31,7 @@ import {
     RenderTargetTypes,
     UniformNames,
     TextureDepthPrecisionType,
-    ActorTypes,
+    ActorTypes, RenderQueueType, BlendTypes,
     // RenderQueueType,
 } from '@/PaleGL/constants';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
@@ -51,11 +51,13 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
-import litObjectSpaceRaymarchFragContent from '../sandbox/shaders/object-space-raymarch-test-scene.glsl';
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
-import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
+// import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
+import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
+// import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
+import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
 
 // -------------------
 // constants
@@ -282,12 +284,22 @@ const main = async () => {
         // fragmentShaderContent: ,
         // depthFragmentShaderContent: ,
         materials: [
-            createObjectSpaceRaymarchGBufferMaterial({
-                fragmentShaderContent: litObjectSpaceRaymarchFragContent,
-                depthFragmentShaderContent: litObjectSpaceRaymarchFragContent,
-                metallic: 0,
-                roughness: 0,
+            // createObjectSpaceRaymarchGBufferMaterial({
+            //     fragmentShaderContent:objectSpaceRaymarchFragContent,
+            //     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
+            //     metallic: 0,
+            //     roughness: 0,
+            //     receiveShadow: false,
+            //     // renderQueueType: RenderQueueType.AlphaTest,
+            //     // alphaTest: 0.5,
+            // }),
+            createObjectSpaceRaymarchUnlitMaterial({
+                // createObjectSpaceRaymarchGBufferMaterial({
+                fragmentShaderContent: objectSpaceRaymarchFragContent,
+                depthFragmentShaderContent: objectSpaceRaymarchFragContent,
                 receiveShadow: false,
+                renderQueueType: RenderQueueType.Transparent,
+                blendType: BlendTypes.Transparent
                 // renderQueueType: RenderQueueType.AlphaTest,
                 // alphaTest: 0.5,
             }),

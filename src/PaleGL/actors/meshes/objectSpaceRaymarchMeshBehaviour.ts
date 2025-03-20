@@ -6,6 +6,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import {isPerspectiveCamera} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
 
 const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
+const UNIFORM_NAME_USE_WORLD_FLAG = 'uUseWorld';
 
 export function updateObjectSpaceRaymarchMesh(actor: Actor) {
     const mesh = actor as ObjectSpaceRaymarchMesh;
@@ -42,5 +43,5 @@ export const updateObjectSpaceRaymarchDepthMaterial: UpdateMeshMaterial = (mesh,
 };
 
 export const setUseWorldSpaceToObjectSpaceRaymarchMesh = (mesh: ObjectSpaceRaymarchMesh, flag: boolean) => {
-    setUniformValueToAllMeshMaterials(mesh, 'uUseWorld', flag ? 1 : 0);
+    setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_USE_WORLD_FLAG, flag ? 1 : 0);
 };

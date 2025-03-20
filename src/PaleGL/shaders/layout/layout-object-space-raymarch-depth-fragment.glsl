@@ -45,67 +45,30 @@ void main() {
 
     vec4 baseColor = uBaseColor * baseMapColor;
 
-    #ifdef USE_VERTEX_COLOR
+#ifdef USE_VERTEX_COLOR
     baseColor *= vVertexColor;
-    #endif
+#endif
 
     //
     // NOTE: raymarch block
     //
 
     vec3 wp = vWorldPosition;
-    // vec3 wp = (vWorldMatrix * vec4(vLocalPosition, 1.)).xyz;
-    
-    vec3 rayOrigin = wp;
-    vec3 rayDirection = uIsPerspective > .5
-        ? normalize(wp - uViewPosition)
-        : normalize(-uViewPosition);
-    float accLen = 0.;
-    vec3 currentRayPosition = rayOrigin;
-    float minDistance = EPS;
+    vec3 currentRayPosition = wp;
 
-    mat4 inverseWorldMatrix = vInverseWorldMatrix;
-    // mat4 inverseWorldMatrix = inverse(uWorldMatrix);
-    
-    // for(int i = 0; i < OI; i++) {
-    //     currentRayPosition = rayOrigin + rayDirection * accLen;
-    //     result = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, uBoundsScale, uUseWorld);
-    //     accLen += result.x;
-    //     if(!isDfInnerBox(toLocal(currentRayPosition, inverseWorldMatrix, uBoundsScale), uBoundsScale)) {
-    //         break;
-    //     }
-    //     if(result.x <= minDistance) {
-    //         break;
-    //     }
-    // }
-
-    // if(result.x > minDistance) {
-    //     discard;
-    // }
-   
-    vec2 result = osRaymarch(
-        rayOrigin,
-        rayDirection,
-        minDistance,
-        uProjectionMatrix,
+    osRaymarch(
+        wp,
+        EPS,
+        uViewPosition,
         uViewMatrix,
-        inverseWorldMatrix,
+        uProjectionMatrix,
+        vInverseWorldMatrix,
         uBoundsScale,
         uUseWorld,
+        uIsPerspective,
         currentRayPosition
     );
 
-    // NOTE: depthの場合はいらないがメモを残す
-    // 既存の深度値と比較して、奥にある場合は破棄する
-    // float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    // float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    // vec4 currentRayViewPosition = (uViewMatrix * vec4(currentRayPosition, 1.));
-    // float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, uNearClip, uFarClip);
-    // if(currentDepth >= sceneDepth) {
-    //     discard;
-    // }
-
-    //
     // NOTE: end raymarch block
     //
 

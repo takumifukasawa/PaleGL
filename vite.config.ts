@@ -17,8 +17,9 @@ type EntryPointInfo = { name: string; path: string };
 // ---------------------------------------------------
 // ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
 const ENTRY_POINTS: { [key: string]: string } = {
-    sandbox: 'labs/sandbox',
-    // 'sandbox-2': 'labs/sandbox-2',
+    ['sandbox']: 'labs/sandbox',
+    ['street-light']: 'labs/street-light',
+    ['morph-glass']: 'labs/morph-glass',
 };
 
 // ---------------------------------------------------
@@ -96,6 +97,15 @@ export default defineConfig(async (config) => {
                 minifierOptions: {
                     preserveExternals: true,
                     aggressiveInlining: false,
+                    noRenamingList: [
+                        // 最低限この2つは置き換える
+                        "main",
+                        "dfScene",
+                        // 適宜置き換える
+                        'baseColor',
+                        'emissiveColor',
+                        'uv',
+                    ]
                 },
             }),
             checker({
@@ -139,7 +149,7 @@ export default defineConfig(async (config) => {
             terserOptions: {
                 mangle: {
                     toplevel: true,
-                    // 関数だけにする場合
+                    // 関数ベースにする場合
                     // properties: true,
                     // class使う場合
                     // properties: {
@@ -147,9 +157,19 @@ export default defineConfig(async (config) => {
                     // },
                 },
                 compress: {
+                    passes: 16,
+                    // arguments: true,
+                    // booleans_as_integers: true,
                     drop_console: isDropConsole,
                     drop_debugger: true,
-                    passes: 16,
+                    // keep_fargs: false,
+                    // module: true,
+                    // pure_getters: true,
+                    // unsafe: true,
+                    // unsafe_math: true,
+                    // unsafe_methods: true,
+                    // unsafe_proto: true,
+                    // unsafe_undefined: true,
                 },
             },
         },

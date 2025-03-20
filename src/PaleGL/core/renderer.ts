@@ -961,7 +961,7 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     depthPrePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
-
+    
     // ------------------------------------------------------------------------------
     // g-buffer opaque pass
     // ------------------------------------------------------------------------------
@@ -972,6 +972,8 @@ export function renderRenderer(
     // TODO: 本当はskyboxをshadingの後にしたい
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
     basePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
+    
+    // console.log(currentCameraRenderMeshInfoEachPass)
     
     // ------------------------------------------------------------------------------
     // skybox pass
@@ -1577,6 +1579,40 @@ function basePass(renderer: Renderer, sortedBasePassRenderMeshInfos: RenderMeshI
     });
 }
 
+
+function transparentPass(
+    renderer: Renderer,
+    sortedRenderMeshInfos: RenderMeshInfo[],
+    camera: Camera,
+    lightActors: LightActors
+    // clear: boolean
+) {
+    // console.log("--------- transparent pass ---------");
+
+    // TODO: 常にclearしない、で良い気がする
+    // if (clear) {
+    //     this._gpu.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
+    // }
+    updateRendererCameraUniforms(renderer, camera);
+
+    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+        const targetMaterial = actor.materials[materialIndex];
+        updateActorTransformUniforms(renderer, actor);
+
+        applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
+
+        updateMeshMaterial(actor, { camera });
+
+        renderMesh(renderer, actor.geometry, targetMaterial);
+
+        if (renderer.stats) {
+            addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
+        }
+    });
+}
+
+
+
 function updateActorTransformUniforms(renderer: Renderer, actor: Actor) {
     setUniformBlockValue(
         renderer,
@@ -1916,44 +1952,6 @@ function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]
         true
     );
 }
-
-function transparentPass(
-    renderer: Renderer,
-    sortedRenderMeshInfos: RenderMeshInfo[],
-    camera: Camera,
-    lightActors: LightActors
-    // clear: boolean
-) {
-    // console.log("--------- transparent pass ---------");
-
-    // TODO: 常にclearしない、で良い気がする
-    // if (clear) {
-    //     this._gpu.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
-    // }
-    updateRendererCameraUniforms(renderer, camera);
-
-    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
-        const targetMaterial = actor.materials[materialIndex];
-        updateActorTransformUniforms(renderer, actor);
-
-        // TODO:
-        // - light actor の中で lightの種類別に処理を分ける
-        // - lightActorsの順番が変わるとprojectionMatrixも変わっちゃうので注意
-        // - opaqueと共通処理なのでまとめたい
-        // lightActors.forEach((light) => {
-        //     light.applyUniformsValues(targetMaterial);
-        // });
-        // TODO: transparentで必要？使わないことを強制してもいい気がする
-        applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
-
-        renderMesh(renderer, actor.geometry, targetMaterial);
-
-        if (renderer.stats) {
-            addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
-        }
-    });
-}
-
 
 type RenderMeshInfosEachPass = {
     basePass: RenderMeshInfo[];

@@ -45,7 +45,7 @@ export function createObjectSpaceRaymarchMesh(args: ObjectSpaceRaymarchMeshArgs)
                   materialArgs: materialArgs!,
               }),
           ];
-    
+
     // NOTE
     // const material = new GBufferMaterial({
     //     metallic: 0,
@@ -60,7 +60,5 @@ export function createObjectSpaceRaymarchMesh(args: ObjectSpaceRaymarchMeshArgs)
     //     primitiveType: PrimitiveTypes.Triangles,
     // });
 
-    const mesh = createMesh({ name, geometry, materials, castShadow, meshType: MeshTypes.ObjectSpaceRaymarch });
-
-    return { ...mesh };
+    return createMesh({ name, geometry, materials, castShadow, meshType: MeshTypes.ObjectSpaceRaymarch });
 }

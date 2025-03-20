@@ -925,6 +925,7 @@ const main = async () => {
     //
 
     streetFloorActor = await createStreetFloorActor();
+    streetFloorActor.name = 'streetFloor';
     addActorToScene(captureScene, streetFloorActor);
     streetFloorActor.children.forEach((child) => {
         if (child.type === ActorTypes.Mesh) {

@@ -151,7 +151,6 @@ export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMat
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
     mesh.materials.forEach((material) => updateMaterial(material));
-
     updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
 };
 
@@ -162,8 +161,7 @@ export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateM
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
     mesh.depthMaterials.forEach((material) => updateMaterial(material));
-
-    updateMeshDepthMaterialBehaviour[mesh.type]?.(mesh, { camera });
+    updateMeshDepthMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
 };
 
 // -------------------------------------------------------
