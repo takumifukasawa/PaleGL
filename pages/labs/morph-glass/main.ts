@@ -24,9 +24,7 @@ import { createColorBlack, createColorWhite } from '@/PaleGL/math/color';
 import { v2o } from '@/PaleGL/math/vector2';
 import { createFillVector3, createVector3 } from '@/PaleGL/math/vector3';
 import { createVector4 } from '@/PaleGL/math/vector4';
-import {
-    createBufferVisualizerPass,
-} from '@/PaleGL/postprocess/bufferVisualizerPass';
+import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualizerPass';
 import { createTouchInputController } from '@/PaleGL/inputs/touchInputController';
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController';
 import {
@@ -50,15 +48,14 @@ import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/tra
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    DebuggerGUI,
-} from '@/PaleGL/utilities/debuggerGUI.ts';
+import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import litObjectSpaceRaymarchFragContent from '../sandbox/shaders/object-space-raymarch-test-scene.glsl';
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
+import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
 
 // -------------------
 // constants
@@ -282,16 +279,19 @@ const main = async () => {
     objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
         name: 'object-space-raymarch-mesh',
         gpu,
-        fragmentShaderContent: litObjectSpaceRaymarchFragContent,
-        // depthFragmentShaderContent: gBufferObjectSpaceRaymarchDepthFrag,
-        depthFragmentShaderContent: litObjectSpaceRaymarchFragContent,
-        materialArgs: {
-            metallic: 0,
-            roughness: 0,
-            receiveShadow: false,
-            // renderQueueType: RenderQueueType.AlphaTest,
-            // alphaTest: 0.5,
-        },
+        // fragmentShaderContent: ,
+        // depthFragmentShaderContent: ,
+        materials: [
+            createObjectSpaceRaymarchGBufferMaterial({
+                fragmentShaderContent: litObjectSpaceRaymarchFragContent,
+                depthFragmentShaderContent: litObjectSpaceRaymarchFragContent,
+                metallic: 0,
+                roughness: 0,
+                receiveShadow: false,
+                // renderQueueType: RenderQueueType.AlphaTest,
+                // alphaTest: 0.5,
+            }),
+        ],
         castShadow: true,
     });
     setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
@@ -371,8 +371,6 @@ const main = async () => {
     startEngine(engine);
     requestAnimationFrame(tick);
 };
-
-
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

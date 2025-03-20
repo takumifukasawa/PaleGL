@@ -1,9 +1,11 @@
-import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
+import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
-    FaceSide, FragmentShaderModifierPragmas,
+    FaceSide,
+    FragmentShaderModifierPragmas,
     MaterialTypes,
-    PrimitiveTypes, RenderQueueType,
+    PrimitiveTypes,
+    RenderQueueType,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -18,8 +20,12 @@ import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layo
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
-// TODO: uniformsは一旦まっさらにしている。metallic,smoothnessの各種パラメーター、必要になりそうだったら適宜追加する
-export type ObjectSpaceRaymarchMaterialArgs = {
+type ObjectSpaceRaymarchGBufferArgs = {
+    fragmentShaderTemplate?: string;
+    fragmentShaderContent: string;
+    depthFragmentShaderTemplate?: string;
+    depthFragmentShaderContent: string;
+} & {
     shadingModelId?: ShadingModelIds;
     baseColor?: Color;
     baseMap?: Texture;
@@ -36,37 +42,31 @@ export type ObjectSpaceRaymarchMaterialArgs = {
     // rawFragmentShader?: string;
 } & MaterialArgs;
 
-export type ObjectSpaceRaymarchMaterial = ReturnType<typeof createObjectSpaceRaymarchMaterial>;
+export type ObjectSpaceRaymarchGBufferMaterial = Material;
 
-export function createObjectSpaceRaymarchMaterial({
-    fragmentShaderTemplate,
-    fragmentShaderContent,
-    depthFragmentShaderTemplate,
-    depthFragmentShaderContent,
-    materialArgs,
-}: {
-    fragmentShaderTemplate?: string;
-    fragmentShaderContent: string;
-    depthFragmentShaderTemplate?: string;
-    depthFragmentShaderContent: string;
-    materialArgs: ObjectSpaceRaymarchMaterialArgs;
-}) {
+export function createObjectSpaceRaymarchGBufferMaterial(
+    args: ObjectSpaceRaymarchGBufferArgs
+): ObjectSpaceRaymarchGBufferMaterial {
     const {
+        fragmentShaderTemplate,
+        fragmentShaderContent,
+        depthFragmentShaderTemplate,
+        depthFragmentShaderContent,
         shadingModelId = ShadingModelIds.Lit,
         uniforms = [],
         uniformBlockNames,
-    } = materialArgs;
+    } = args;
 
-    const baseMap = materialArgs.baseMap ?? null;
-    const baseColor = materialArgs.baseColor ?? createColorWhite();
-    const baseMapTiling = materialArgs.baseMapTiling ?? createVector4(1, 1, 0, 0);
-    const roughnessMap = materialArgs.roughnessMap ?? null;
-    const roughnessMapTiling = materialArgs.roughnessMapTiling ?? createVector4(1, 1, 0, 0);
-    const roughness = materialArgs.roughness ?? 0;
-    const metallic = materialArgs.metallic ?? 0;
-    const metallicMap = materialArgs.metallicMap ?? null;
-    const metallicMapTiling = materialArgs.metallicMapTiling ?? createVector4(1, 1, 0, 0);
-    const emissiveColor = materialArgs.emissiveColor ?? createColorBlack();
+    const baseMap = args.baseMap ?? null;
+    const baseColor = args.baseColor ?? createColorWhite();
+    const baseMapTiling = args.baseMapTiling ?? createVector4(1, 1, 0, 0);
+    const roughnessMap = args.roughnessMap ?? null;
+    const roughnessMapTiling = args.roughnessMapTiling ?? createVector4(1, 1, 0, 0);
+    const roughness = args.roughness ?? 0;
+    const metallic = args.metallic ?? 0;
+    const metallicMap = args.metallicMap ?? null;
+    const metallicMapTiling = args.metallicMapTiling ?? createVector4(1, 1, 0, 0);
+    const emissiveColor = args.emissiveColor ?? createColorBlack();
 
     const commonUniforms: UniformsData = [
         {
@@ -155,7 +155,7 @@ export function createObjectSpaceRaymarchMaterial({
 
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
-        ...materialArgs,
+        ...args,
         // ...options,
         name: 'ObjectSpaceRaymarchMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
@@ -189,18 +189,18 @@ export function createObjectSpaceRaymarchMaterial({
             UniformBlockNames.Camera,
             ...(uniformBlockNames ? uniformBlockNames : []),
         ],
-        
+
         fragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: fragmentShaderContent,
-            }
+            },
         ],
         depthFragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
-            }
+            },
         ],
     });
 }
