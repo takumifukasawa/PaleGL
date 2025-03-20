@@ -44,6 +44,7 @@ import {
     updatePostProcess,
 } from '@/PaleGL/postprocess/postProcess.ts';
 import {
+    blitRenderTarget,
     blitRenderTargetDepth,
     createRenderTarget,
     RenderTarget,
@@ -221,6 +222,8 @@ export type Renderer = {
     afterDeferredShadingRenderTarget: RenderTarget;
     copyDepthSourceRenderTarget: RenderTarget;
     copyDepthDestRenderTarget: RenderTarget;
+    copySceneSourceRenderTarget: RenderTarget;
+    copySceneDestRenderTarget: RenderTarget;
     screenSpaceShadowPass: ScreenSpaceShadowPass;
     ambientOcclusionPass: SsaoPass;
     deferredShadingPass: DeferredShadingPass;
@@ -308,6 +311,20 @@ export function createRenderer({
         height: 1,
         name: 'copy depth dest render target',
         depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+    });
+    const copySceneSourceRenderTarget = createRenderTarget({
+        gpu,
+        type: RenderTargetTypes.Empty,
+        width: 1,
+        height: 1,
+        name: 'copy scene source render target',
+    });
+    const copySceneDestRenderTarget = createRenderTarget({
+        gpu,
+        type: RenderTargetTypes.R11F_G11F_B10F,
+        width: 1,
+        height: 1,
+        name: 'copy scene dest render target'
     });
     const screenSpaceShadowPass = createScreenSpaceShadowPass({ gpu });
     const ambientOcclusionPass = createSSAOPass({ gpu });
@@ -666,6 +683,8 @@ export function createRenderer({
         afterDeferredShadingRenderTarget,
         copyDepthSourceRenderTarget,
         copyDepthDestRenderTarget,
+        copySceneSourceRenderTarget,
+        copySceneDestRenderTarget,
         screenSpaceShadowPass,
         ambientOcclusionPass,
         deferredShadingPass,
@@ -741,6 +760,8 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setRenderTargetSize(renderer.afterDeferredShadingRenderTarget, w, h);
     setRenderTargetSize(renderer.copyDepthSourceRenderTarget, w, h);
     setRenderTargetSize(renderer.copyDepthDestRenderTarget, w, h);
+    setRenderTargetSize(renderer.copySceneSourceRenderTarget, w, h);
+    setRenderTargetSize(renderer.copySceneDestRenderTarget, w, h);
     // passes
     setPostProcessPassSize(renderer.screenSpaceShadowPass, w, h);
     setPostProcessPassSize(renderer.ambientOcclusionPass, w, h);
@@ -963,6 +984,7 @@ export function renderRenderer(
     depthPrePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
     
     // ------------------------------------------------------------------------------
+    // skybox pass
     // g-buffer opaque pass
     // ------------------------------------------------------------------------------
 
@@ -973,12 +995,6 @@ export function renderRenderer(
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
     basePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
     
-    // console.log(currentCameraRenderMeshInfoEachPass)
-    
-    // ------------------------------------------------------------------------------
-    // skybox pass
-    // ------------------------------------------------------------------------------
-
     // ------------------------------------------------------------------------------
     // shadow pass
     // ------------------------------------------------------------------------------
@@ -1186,7 +1202,9 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     // TODO: 直前のパスを明示的に指定する必要があるのはめんどうなのでうまいこと管理したい
-    setRenderTargetTexture(renderer.afterDeferredShadingRenderTarget, renderer.fogPass.renderTarget.texture!);
+    const sceneTexture = renderer.fogPass.renderTarget.texture!;
+
+    setRenderTargetTexture(renderer.afterDeferredShadingRenderTarget, sceneTexture);
 
     // pattern1: g-buffer depth
     // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture!);
@@ -1196,6 +1214,7 @@ export function renderRenderer(
         renderer.depthPrePassRenderTarget.depthTexture!
     );
 
+    copySceneTexture(renderer, sceneTexture);
     copyDepthTexture(renderer);
 
     // TODO: set depth to transparent meshes
@@ -1209,7 +1228,13 @@ export function renderRenderer(
 
     setRendererRenderTarget(renderer, renderer.afterDeferredShadingRenderTarget);
 
-    transparentPass(renderer, renderMeshInfoEachQueue[RenderQueueType.Transparent], camera, lightActors);
+    transparentPass(
+        renderer,
+        renderMeshInfoEachQueue[RenderQueueType.Transparent],
+        camera,
+        lightActors,
+        renderer.copySceneDestRenderTarget.texture!
+    );
 
     // ------------------------------------------------------------------------------
     // full screen pass
@@ -1406,7 +1431,10 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
 }
 
 function copyDepthTexture(renderer: Renderer) {
-    setRenderTargetDepthTexture(renderer.copyDepthSourceRenderTarget, renderer.depthPrePassRenderTarget.depthTexture!);
+    setRenderTargetDepthTexture(
+        renderer.copyDepthSourceRenderTarget,
+        renderer.depthPrePassRenderTarget.depthTexture!
+    );
     blitRenderTargetDepth(
         renderer.gpu,
         renderer.copyDepthSourceRenderTarget,
@@ -1414,6 +1442,23 @@ function copyDepthTexture(renderer: Renderer) {
         renderer.realWidth,
         renderer.realHeight
     );
+}
+
+function copySceneTexture(renderer: Renderer, sceneTexture: Texture) {
+    const tmpRenderTarget = renderer.renderTarget;
+    setRendererRenderTarget(renderer, null, false, false);
+    setRenderTargetTexture(
+        renderer.copySceneSourceRenderTarget,
+        sceneTexture
+    );
+    blitRenderTarget(
+        renderer.gpu,
+        renderer.copySceneSourceRenderTarget,
+        renderer.copySceneDestRenderTarget,
+        renderer.realWidth,
+        renderer.realHeight
+    );
+    setRendererRenderTarget(renderer, tmpRenderTarget);
 }
 
 function shadowPass(renderer: Renderer, castShadowLightActors: Light[], renderMeshInfoEachQueue: RenderMeshInfoEachQueue) {
@@ -1584,8 +1629,8 @@ function transparentPass(
     renderer: Renderer,
     sortedRenderMeshInfos: RenderMeshInfo[],
     camera: Camera,
-    lightActors: LightActors
-    // clear: boolean
+    lightActors: LightActors,
+    sceneTexture: Texture
 ) {
     // console.log("--------- transparent pass ---------");
 
@@ -1600,6 +1645,12 @@ function transparentPass(
         updateActorTransformUniforms(renderer, actor);
 
         applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
+
+        setMaterialUniformValue(
+            targetMaterial,
+            UniformNames.SceneTexture,
+            sceneTexture
+        );
 
         updateMeshMaterial(actor, { camera });
 

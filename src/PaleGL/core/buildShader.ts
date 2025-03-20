@@ -37,8 +37,9 @@ import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/ve
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
 import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
-import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';KeyboardEvent
+import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
 
+KeyboardEvent;
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -270,7 +271,7 @@ const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
     //         return insertShaderPairs[pragma];
     //     });
     // });
-    
+
     // transform unroll
     replacedShader = transformUnroll(replacedShader);
 
@@ -304,8 +305,8 @@ export const buildVertexShader = (
     Object.values(VertexShaderModifierPragmas).forEach((value) => {
         const pragma = value as VertexShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            const modifierIndex =  vertexShaderModifiers.findIndex(elem => elem.pragma === pragma);
-            if(modifierIndex < 0) {
+            const modifierIndex = vertexShaderModifiers.findIndex((elem) => elem.pragma === pragma);
+            if (modifierIndex < 0) {
                 return '';
             }
             return vertexShaderModifiers[modifierIndex].value || '';
@@ -334,8 +335,8 @@ export const buildFragmentShader = (
     Object.values(FragmentShaderModifierPragmas).forEach((value) => {
         const pragma = value as FragmentShaderModifierPragmas;
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            const modifierIndex =  fragmentShaderModifiers.findIndex(elem => elem.pragma === pragma);
-            if(modifierIndex < 0) {
+            const modifierIndex = fragmentShaderModifiers.findIndex((elem) => elem.pragma === pragma);
+            if (modifierIndex < 0) {
                 return '';
             }
             return fragmentShaderModifiers[modifierIndex].value || '';

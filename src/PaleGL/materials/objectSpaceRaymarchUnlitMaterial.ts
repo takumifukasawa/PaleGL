@@ -136,12 +136,14 @@ export function createObjectSpaceRaymarchUnlitMaterial(
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: fragmentShaderContent,
             },
+            ...(args.fragmentShaderModifiers ?? [])
         ],
         depthFragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
             },
+            ...(args.depthFragmentShaderModifiers ?? [])
         ],
     });
 }

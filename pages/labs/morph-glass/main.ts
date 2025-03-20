@@ -31,7 +31,7 @@ import {
     RenderTargetTypes,
     UniformNames,
     TextureDepthPrecisionType,
-    ActorTypes, RenderQueueType, BlendTypes,
+    ActorTypes, RenderQueueType, BlendTypes, FragmentShaderModifierPragmas, UniformTypes,
     // RenderQueueType,
 } from '@/PaleGL/constants';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
@@ -299,9 +299,27 @@ const main = async () => {
                 depthFragmentShaderContent: objectSpaceRaymarchFragContent,
                 receiveShadow: false,
                 renderQueueType: RenderQueueType.Transparent,
-                blendType: BlendTypes.Transparent
+                blendType: BlendTypes.Transparent,
                 // renderQueueType: RenderQueueType.AlphaTest,
                 // alphaTest: 0.5,
+                uniforms: [
+                    {
+                        name: UniformNames.SceneTexture,
+                        type: UniformTypes.Texture,
+                        value: null,
+                    }
+                ],
+                fragmentShaderModifiers: [
+                    {
+                        pragma: FragmentShaderModifierPragmas.BEFORE_OUT,
+                        value: `
+vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
+vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
+vec4 sceneColor = texture(uSceneTexture, screenUv);
+resultColor = vec4(sceneColor.xyz * 2., vWorldPosition.x);
+                        `,
+                    }
+                ]
             }),
         ],
         castShadow: true,

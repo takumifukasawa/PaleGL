@@ -37,6 +37,9 @@ uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
 
+// transparentの時に使用可能
+uniform sampler2D uSceneTexture;
+
 in vec2 vUv;
 
 in vec3 vLocalPosition;
@@ -101,6 +104,8 @@ void main() {
     #include <alpha_test_f>
 
     resultColor.rgb = gamma(resultColor.rgb);
-
-    outColor = vec4(1., 0., 0., .2);
+    
+    #pragma BEFORE_OUT
+    
+    outColor = resultColor;
 }

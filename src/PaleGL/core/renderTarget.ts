@@ -414,7 +414,7 @@ import {
     GL_DEPTH_BUFFER_BIT,
     GLTextureFilter,
     RenderTargetKind,
-    RenderTargetKinds,
+    RenderTargetKinds, GL_COLOR_BUFFER_BIT,
 } from '@/PaleGL/constants';
 import { checkGPUExtension, Gpu } from '@/PaleGL/core/gpu.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
@@ -750,6 +750,24 @@ export function setRenderTargetDepthTexture(renderTarget: RenderTarget, depthTex
     // depth as texture
     gl.framebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renderTarget.depthTexture.glObject, 0);
     unbindFramebuffer(renderTarget.framebuffer);
+}
+
+export function blitRenderTarget(
+    gpu: Gpu,
+    sourceRenderTarget: RenderTarget,
+    destRenderTarget: RenderTarget,
+    width: number,
+    height: number
+){
+    const gl = gpu.gl;
+    gl.bindFramebuffer(GL_READ_FRAMEBUFFER, sourceRenderTarget.framebuffer.glObject);
+    gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, destRenderTarget.framebuffer.glObject);
+
+    gl.clear(GL_COLOR_BUFFER_BIT);
+
+    gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GLTextureFilter.NEAREST);
+    gl.bindFramebuffer(GL_READ_FRAMEBUFFER, null);
+    gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
 }
 
 export function blitRenderTargetDepth(

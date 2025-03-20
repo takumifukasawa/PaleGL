@@ -102,9 +102,10 @@ export default defineConfig(async (config) => {
                         "main",
                         "dfScene",
                         // 適宜置き換える
+                        'uv',
                         'baseColor',
                         'emissiveColor',
-                        'uv',
+                        'resultColor'
                     ]
                 },
             }),

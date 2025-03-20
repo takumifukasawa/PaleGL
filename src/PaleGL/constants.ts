@@ -371,8 +371,6 @@ export const UniformNames = {
     // shadow map
     // ShadowBias: 'uShadowBias',
     // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
-    // mainly post process
-    SrcTexture: 'uSrcTexture',
     // time
     Time: 'uTime',
     DeltaTime: 'uDeltaTime',
@@ -412,7 +410,10 @@ export const UniformNames = {
     LightPenumbraCos: 'penumbraCos',
     SpotLightColor: 'uSpotLightColor',
     SpotLightIntensity: 'uSpotLightIntensity',
+    // renderer
+    SceneTexture: 'uSceneTexture',
     // post process
+    SrcTexture: 'uSrcTexture',
     BlendRate: 'uBlendRate',
     // font
     FontMap: 'uFontMap',
