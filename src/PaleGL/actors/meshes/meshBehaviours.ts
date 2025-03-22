@@ -168,9 +168,9 @@ export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) =>
 
 export const getMeshMaterial = (mesh: Mesh) => {
     if (hasMeshMaterials(mesh)) {
-        console.warn('[Mesh.material getter] materials length > 1. material is head of materials.');
+        // 複数マテリアルがあるかどうかを厳格に検知したい場合
+        // console.warn('[getMeshMaterial] materials length > 1. material is head of materials.');
     }
-    // return this.materials[0];
     return getMeshMainMaterial(mesh);
 };
 

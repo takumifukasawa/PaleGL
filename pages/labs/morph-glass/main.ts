@@ -58,6 +58,7 @@ import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
+import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 
 // -------------------
 // constants
@@ -254,7 +255,7 @@ const main = async () => {
         cubeMap,
         baseIntensity: 20,
         specularIntensity: 0.2,
-        renderMesh: false,
+        // renderMesh: false,
     });
 
     //
@@ -281,18 +282,16 @@ const main = async () => {
     objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
         name: 'object-space-raymarch-mesh',
         gpu,
-        // fragmentShaderContent: ,
-        // depthFragmentShaderContent: ,
         materials: [
-            // createObjectSpaceRaymarchGBufferMaterial({
-            //     fragmentShaderContent:objectSpaceRaymarchFragContent,
-            //     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
-            //     metallic: 0,
-            //     roughness: 0,
-            //     receiveShadow: false,
-            //     // renderQueueType: RenderQueueType.AlphaTest,
-            //     // alphaTest: 0.5,
-            // }),
+            createObjectSpaceRaymarchGBufferMaterial({
+                fragmentShaderContent:objectSpaceRaymarchFragContent,
+                depthFragmentShaderContent: objectSpaceRaymarchFragContent,
+                metallic: 0,
+                roughness: 0,
+                receiveShadow: false,
+                // renderQueueType: RenderQueueType.AlphaTest,
+                // alphaTest: 0.5,
+            }),
             createObjectSpaceRaymarchUnlitMaterial({
                 // createObjectSpaceRaymarchGBufferMaterial({
                 fragmentShaderContent: objectSpaceRaymarchFragContent,
@@ -316,7 +315,7 @@ const main = async () => {
 vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
 vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
 vec4 sceneColor = texture(uSceneTexture, screenUv);
-resultColor = vec4(sceneColor.xyz * 2., vWorldPosition.x);
+resultColor = vec4(sceneColor.xyz * 2., 1.);
                         `,
                     }
                 ]

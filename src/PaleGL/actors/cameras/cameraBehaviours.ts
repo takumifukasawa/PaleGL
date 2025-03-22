@@ -215,7 +215,6 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                 depthWrite: false,
             }),
         });
-        console.log('hogehoge', camera.visibleFrustumMesh);
         addChildActor(camera, camera.visibleFrustumMesh as Actor);
     }
 
@@ -333,20 +332,6 @@ export const transformScreenPoint = (camera: Camera, p: Vector3) => {
 export const setCameraRenderTarget = (camera: Camera, renderTarget: RenderTarget | GBufferRenderTargets | null) => {
     camera.renderTarget = renderTarget;
 };
-
-// export const updateProjectionMatrix: UpdateProjectionMatrixFunc = () => {
-//     console.error('[Camera.updateProjectionMatrix] should implementation');
-// };
-//
-// export const getFrustumLocalPositions: GetFrustumVectorsFunc = () => {
-//     console.error('[getFrustumLocalPositions] should implementation');
-//     return null;
-// };
-//
-// export const getFrustumWorldPositions: GetFrustumVectorsFunc = () => {
-//     console.error('[getFrustumWorldPositions] should implementation');
-//     return null;
-// };
 
 export const getCameraWorldForward = (camera: Camera) => {
     // forwardはカメラの背面を向いている
