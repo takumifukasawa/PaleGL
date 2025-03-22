@@ -4,7 +4,7 @@
     BlendTypes,
     DepthFuncType,
     DepthFuncTypes,
-    FaceSide,
+    FaceSide, GL_ALWAYS,
     GL_BACK,
     GL_BLEND,
     GL_CCW,
@@ -23,7 +23,7 @@
     GL_LESS,
     GL_LINE_LOOP,
     GL_LINE_STRIP,
-    GL_LINES,
+    GL_LINES, GL_NEVER, GL_NOTEQUAL,
     GL_ONE,
     GL_ONE_MINUS_SRC_ALPHA,
     GL_POINTS,
@@ -518,20 +518,30 @@ export function drawGPU(
     if (depthTest) {
         gl.enable(gl.DEPTH_TEST);
         switch (depthFuncType) {
-            case DepthFuncTypes.Equal:
-                gl.depthFunc(GL_EQUAL);
+            case DepthFuncTypes.Never:
+                gl.depthFunc(GL_NEVER);
                 break;
             case DepthFuncTypes.Less:
                 gl.depthFunc(GL_LESS);
                 break;
+            case DepthFuncTypes.Equal:
+                gl.depthFunc(GL_EQUAL);
+                break;
             case DepthFuncTypes.Lequal:
                 gl.depthFunc(GL_LEQUAL);
+                break;
+            case DepthFuncTypes.Greater:
+                gl.depthFunc(GL_GREATER);
+                break;
+            case DepthFuncTypes.NotEqual:
+                gl.depthFunc(GL_NOTEQUAL);
                 break;
             case DepthFuncTypes.Gequal:
                 gl.depthFunc(GL_GEQUAL);
                 break;
-            case DepthFuncTypes.Greater:
-                gl.depthFunc(GL_GREATER);
+            case DepthFuncTypes.Always:
+                console.log("hopeagja")
+                gl.depthFunc(GL_ALWAYS);
                 break;
             default:
                 console.error('invalid depth func type');

@@ -32,11 +32,14 @@ export const ShadingModelIds = {
 export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
 
 export const DepthFuncTypes = {
-    Lequal: 0,
-    Equal: 1,
-    Gequal: 2,
-    Greater: 3,
-    Less: 4
+    Never: 0,
+    Less: 1,
+    Equal: 2,
+    Lequal: 3,
+    Greater: 4,
+    NotEqual: 5,
+    Gequal: 6,
+    Always: 7
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
@@ -478,6 +481,7 @@ export type VertexShaderModifierPragmas =
 export const FragmentShaderModifierPragmas = {
     BLOCK_BEFORE_RAYMARCH_CONTENT: 'BLOCK_BEFORE_RAYMARCH_CONTENT',
     BEFORE_OUT: 'BEFORE_OUT',
+    AFTER_OUT: 'AFTER_OUT',
     ...ShaderModifierPragmas,
 } as const;
 export type FragmentShaderModifierPragmas =
@@ -606,11 +610,14 @@ export const GL_CULL_FACE = 2884;
 export const GL_BACK = 1029;
 export const GL_CCW = 2305;
 export const GL_FRONT = 1028;
+export const GL_NEVER = 512;
+export const GL_LESS = 513;
 export const GL_EQUAL = 514;
 export const GL_LEQUAL = 515;
-export const GL_LESS = 513;
-export const GL_GEQUAL = 518;
 export const GL_GREATER = 516;
+export const GL_NOTEQUAL = 517;
+export const GL_GEQUAL = 518;
+export const GL_ALWAYS = 519;
 export const GL_DEPTH_TEST = 2929;
 
 export const GL_BLEND = 3042;

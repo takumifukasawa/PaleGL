@@ -104,6 +104,8 @@ export function createObjectSpaceRaymarchUnlitMaterial(
 
     const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];
 
+    console.log("hogehoge", args)
+    
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
         ...args,
@@ -118,9 +120,9 @@ export function createObjectSpaceRaymarchUnlitMaterial(
         faceSide: FaceSide.Double,
         uniforms: mergedUniforms,
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
-        depthTest: true,
-        depthWrite: false,
-        depthFuncType: DepthFuncTypes.Lequal,
+        depthTest: args.depthTest ?? true,
+        depthWrite: args.depthWrite ?? false,
+        depthFuncType: args.depthFuncType ?? DepthFuncTypes.Lequal, 
         renderQueueType,
         blendType,
 

@@ -50,7 +50,7 @@ in mat4 vInverseWorldMatrix;
 out vec4 outColor;
 
 void main() {
-    vec4 resultColor = vec4(0, 0, 0, 1);
+    vec4 resultColor = uBaseColor * vec4(0.);
 
     vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
 
@@ -86,13 +86,13 @@ void main() {
         currentRayPosition
     );
     
-    checkDiscardByCompareRayDepthAndSceneDepth(
-        currentRayPosition,
-        uDepthTexture,
-        uNearClip,
-        uFarClip,
-        uViewMatrix
-    );
+    // checkDiscardByCompareRayDepthAndSceneDepth(
+    //     currentRayPosition,
+    //     uDepthTexture,
+    //     uNearClip,
+    //     uFarClip,
+    //     uViewMatrix
+    // );
     
     //
     // NOTE: end raymarch block
@@ -108,4 +108,6 @@ void main() {
     #pragma BEFORE_OUT
     
     outColor = resultColor;
+    
+    #pragma AFTER_OUT
 }
