@@ -143,24 +143,68 @@ void main() {
             uUseWorld
         );
        
+        
+        float rgbShift = .1;
+        float iorShift = .05;
+        
+        vec3 reflTex = vec3(0.);
+        vec2 reflUv = screenUv;
+        vec3 rdOut = vec3(0.);
+      
+        // red
         // 物体内側から屈折して外側に出るベクトル
-        vec3 rdOut = refract(rdIn, nExit, ior);
+        rdOut = refract(rdIn, nExit, ior - rgbShift);
         // 物体内部に全反射するケース
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        
-        vec4 reflTex = texture(uSceneTexture, rdOut.xy);
-        vec2 reflUv = screenUv;
+        reflUv = screenUv;
         if(rdOut.x > 0.) {
             reflUv.x = 1. - reflUv.x;
         }
         if(rdOut.y > 0.) {
             reflUv.y = 1. - reflUv.y;
         }
-        resultColor.xyz = vec3(dIn.y) * 0.;
-        reflUv += rdOut.xy * ior * .2;
-        resultColor.xyz = texture(uSceneTexture, reflUv).xyz;
+        reflUv += rdOut.xy * ior * iorShift;
+        reflTex.r = texture(uSceneTexture, reflUv).r;
+
+        // green
+        // 物体内側から屈折して外側に出るベクトル
+        rdOut = refract(rdIn, nExit, ior);
+        // 物体内部に全反射するケース
+        if(dot(rdOut, rdOut) == 0.) {
+            rdOut = reflect(rdIn, nExit);
+        }
+        reflUv = screenUv;
+        if(rdOut.x > 0.) {
+            reflUv.x = 1. - reflUv.x;
+        }
+        if(rdOut.y > 0.) {
+            reflUv.y = 1. - reflUv.y;
+        }
+        reflUv += rdOut.xy * ior * iorShift;
+        reflTex.g = texture(uSceneTexture, reflUv).g;
+
+        // blue
+        // 物体内側から屈折して外側に出るベクトル
+        rdOut = refract(rdIn, nExit, ior + rgbShift);
+        // 物体内部に全反射するケース
+        if(dot(rdOut, rdOut) == 0.) {
+            rdOut = reflect(rdIn, nExit);
+        }
+        reflUv = screenUv;
+        if(rdOut.x > 0.) {
+            reflUv.x = 1. - reflUv.x;
+        }
+        if(rdOut.y > 0.) {
+            reflUv.y = 1. - reflUv.y;
+        }
+        reflUv += rdOut.xy * ior * iorShift;
+        reflTex.b = texture(uSceneTexture, reflUv).b;
+
+        // tmp
+        resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
+        resultColor.xyz = reflTex;
     }
     
     float alpha = resultColor.a;
