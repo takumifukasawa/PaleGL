@@ -151,27 +151,14 @@ void main() {
         }
         
         vec4 reflTex = texture(uSceneTexture, rdOut.xy);
-        resultColor = reflTex;
-        resultColor = vec4(0.,1.,0.,1.);
-        resultColor.xyz = vec3(step(.5,rdIn.x), 0., 0.);
-        resultColor.xyz = rayDirection;
-        resultColor.xyz = vec3(step(.5,r.x), 0., 0.);
-        resultColor.xyz = n;
-        resultColor.xyz = rdIn;
-        resultColor.xyz = vec3(dot(rdOut,rdOut));
-        resultColor.xyz = vec3(dIn.y);
-        resultColor.xyz = pExit;
-        resultColor.xyz = nExit;
-        resultColor.xyz = rdOut;
-        // resultColor.xyz = texture(uSceneTexture, screenUv + rdOut.xy * .2).xyz;
         vec2 reflUv = screenUv;
-        // reflUv += ior * .1;
         if(rdOut.x > 0.) {
             reflUv.x = 1. - reflUv.x;
         }
         if(rdOut.y > 0.) {
             reflUv.y = 1. - reflUv.y;
         }
+        resultColor.xyz = vec3(dIn.y) * 0.;
         reflUv += rdOut.xy * ior * .2;
         resultColor.xyz = texture(uSceneTexture, reflUv).xyz;
     }
