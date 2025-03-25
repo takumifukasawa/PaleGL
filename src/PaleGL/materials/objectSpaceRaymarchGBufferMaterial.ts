@@ -1,11 +1,8 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
     DepthFuncTypes,
-    FaceSide,
     FragmentShaderModifierPragmas,
     MaterialTypes,
-    PrimitiveTypes,
-    RenderQueueType,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -155,20 +152,15 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
-        primitiveType: PrimitiveTypes.Triangles,
-        faceSide: FaceSide.Double,
         
         // NOTE: GBufferMaterialの設定
         // useNormalMap: !!normalMap,
         // depthTest: true,
         // depthWrite: false,
         // depthFuncType: DepthFuncTypes.Equal,
-        // NOTE: GBufferMaterialと違う点
-        depthTest: true,
-        depthWrite: true,
-        depthFuncType: DepthFuncTypes.Lequal,
+
+        depthFuncType: args.depthFuncType ?? DepthFuncTypes.Lequal,
         skipDepthPrePass: true,
-        renderQueueType: RenderQueueType.Opaque,
 
         uniforms: mergedUniforms,
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り

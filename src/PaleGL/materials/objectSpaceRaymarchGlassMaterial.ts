@@ -11,13 +11,13 @@ import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector3One } from '@/PaleGL/math/vector3.ts';
 import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
-import unlitObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-unlit-object-space-raymarch-fragment.glsl';
+import glassObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-glass-object-space-raymarch-fragment.glsl';
 import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 import {createObjectSpaceRaymarchUniforms} from "@/PaleGL/materials/objectSpaceRaymarchMaterial.ts";
 
-type ObjectSpaceRaymarchUnlitArgs = {
+type ObjectSpaceRaymarchGlassArgs = {
     fragmentShaderTemplate?: string;
     fragmentShaderContent: string;
     depthFragmentShaderTemplate?: string;
@@ -33,11 +33,11 @@ type ObjectSpaceRaymarchUnlitArgs = {
     // rawFragmentShader?: string;
 } & MaterialArgs;
 
-export type ObjectSpaceRaymarchUnlitMaterial = Material;
+export type ObjectSpaceRaymarchGlassMaterial = Material;
 
-export function createObjectSpaceRaymarchUnlitMaterial(
-    args: ObjectSpaceRaymarchUnlitArgs
-): ObjectSpaceRaymarchUnlitMaterial {
+export function createObjectSpaceRaymarchGlassMaterial(
+    args: ObjectSpaceRaymarchGlassArgs
+): ObjectSpaceRaymarchGlassMaterial {
     const {
         fragmentShaderTemplate,
         fragmentShaderContent,
@@ -101,11 +101,11 @@ export function createObjectSpaceRaymarchUnlitMaterial(
     return createMaterial({
         ...args,
         // ...options,
-        name: 'ObjectSpaceRaymarchUnlitMaterial',
+        name: 'ObjectSpaceRaymarchGlassMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
 
         vertexShader: raymarchVert,
-        fragmentShader: fragmentShaderTemplate || unlitObjectSpaceRaymarchFragmentLayout,
+        fragmentShader: fragmentShaderTemplate || glassObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
         uniforms: mergedUniforms,
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り

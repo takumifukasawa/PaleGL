@@ -55,17 +55,18 @@ void main() {
 
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
-
+    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
+    
     osRaymarch(
         wp,
+        rayDirection,
         EPS,
-        uViewPosition,
         uViewMatrix,
         uProjectionMatrix,
         vInverseWorldMatrix,
+        1.,
         uBoundsScale,
         uUseWorld,
-        uIsPerspective,
         currentRayPosition
     );
 

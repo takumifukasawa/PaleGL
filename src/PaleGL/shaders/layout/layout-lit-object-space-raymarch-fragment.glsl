@@ -109,17 +109,18 @@ void main() {
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
     mat4 inverseWorldMatrix = vInverseWorldMatrix;
+    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
 
     vec2 result = osRaymarch(
         wp,
+        rayDirection,
         EPS,
-        uViewPosition,
         uViewMatrix,
         uProjectionMatrix,
         vInverseWorldMatrix,
+        1.,
         uBoundsScale,
         uUseWorld,
-        uIsPerspective,
         currentRayPosition
     );
 

@@ -31,7 +31,13 @@ import {
     RenderTargetTypes,
     UniformNames,
     TextureDepthPrecisionType,
-    ActorTypes, RenderQueueType, BlendTypes, FragmentShaderModifierPragmas, UniformTypes, DepthFuncTypes,
+    ActorTypes,
+    RenderQueueType,
+    BlendTypes,
+    // FragmentShaderModifierPragmas,
+    UniformTypes,
+    DepthFuncTypes,
+    FaceSide,
     // RenderQueueType,
 } from '@/PaleGL/constants';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
@@ -55,10 +61,12 @@ import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviou
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
-import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
+// import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
-import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
+import {createObjectSpaceRaymarchGlassMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts";
+// import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
+// import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 // -------------------
 // constants
@@ -283,16 +291,17 @@ const main = async () => {
         name: 'object-space-raymarch-mesh',
         gpu,
         materials: [
-            createObjectSpaceRaymarchGBufferMaterial({
-                fragmentShaderContent:objectSpaceRaymarchFragContent,
-                depthFragmentShaderContent: objectSpaceRaymarchFragContent,
-                metallic: 0,
-                roughness: 0,
-                receiveShadow: false,
-                // renderQueueType: RenderQueueType.AlphaTest,
-                // alphaTest: 0.5,
-            }),
-            createObjectSpaceRaymarchUnlitMaterial({
+            // createObjectSpaceRaymarchGBufferMaterial({
+            //     fragmentShaderContent:objectSpaceRaymarchFragContent,
+            //     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
+            //     metallic: 0,
+            //     roughness: 0,
+            //     receiveShadow: false,
+            //     // faceSide: FaceSide.Back
+            //     // renderQueueType: RenderQueueType.AlphaTest,
+            //     // alphaTest: 0.5,
+            // }),
+            createObjectSpaceRaymarchGlassMaterial({
                 // createObjectSpaceRaymarchGBufferMaterial({
                 fragmentShaderContent: objectSpaceRaymarchFragContent,
                 depthFragmentShaderContent: objectSpaceRaymarchFragContent,
@@ -304,26 +313,26 @@ const main = async () => {
                 depthTest: false,
                 depthWrite: false,
                 depthFuncType: DepthFuncTypes.Always,
+                faceSide: FaceSide.Front,
                 uniforms: [
                     {
                         name: UniformNames.SceneTexture,
                         type: UniformTypes.Texture,
                         value: null,
-                    }
+                    },
                 ],
-                fragmentShaderModifiers: [
-                    {
-                        pragma: FragmentShaderModifierPragmas.AFTER_OUT,
-                        value: `
-vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
-vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
-vec4 sceneColor = texture(uSceneTexture, screenUv);
-outColor = vec4(sceneColor.xyz * 2., 1.);
-outColor = vec4(1., 0., 0., .1);
-                        `,
-                    }
-                ]
-            }),
+//                 fragmentShaderModifiers: [
+//                     {
+//                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
+//                         value: `
+// vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
+// vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
+// vec4 sceneColor = texture(uSceneTexture, screenUv);
+// outColor = vec4(sceneColor.xyz * 2., 1.);
+// `,
+//                     },
+//                 ],
+             }),
         ],
         castShadow: true,
     });

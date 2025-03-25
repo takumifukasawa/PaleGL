@@ -1,19 +1,15 @@
 vec2 osRaymarch(
     vec3 rayOrigin,
+    vec3 rayDirection,
     float minDistance,
-    vec3 viewPosition,
     mat4 viewMatrix,
     mat4 projectionMatrix,
     mat4 inverseWorldMatrix,
+    float side,
     vec3 boundsScale,
     float useWorld,
-    float isPerspective,
     out vec3 currentRayPosition
 ) {
-    vec3 rayDirection = isPerspective > .5
-        ? normalize(rayOrigin - viewPosition)
-        : normalize(-viewPosition);
-
     vec2 result = vec2(0.);
     float accLen = 0.;
    
@@ -21,7 +17,7 @@ vec2 osRaymarch(
 
     for (int i = 0; i < OI; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        result = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, boundsScale, useWorld);
+        result = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, boundsScale, useWorld) * side;
         accLen += result.x;
         if (!isDfInnerBox(toLocal(currentRayPosition, inverseWorldMatrix, boundsScale), boundsScale)) {
             break;
@@ -59,4 +55,10 @@ void checkDiscardByCompareRayDepthAndSceneDepth(
     if(currentDepth >= sceneDepth) {
         discard;
     }
+}
+
+vec3 getOSRaymarchViewRayDirection(vec3 origin, vec3 viewPosition, float isPerspective) {
+    return isPerspective > .5
+        ? normalize(origin - viewPosition)
+        : normalize(-viewPosition);
 }

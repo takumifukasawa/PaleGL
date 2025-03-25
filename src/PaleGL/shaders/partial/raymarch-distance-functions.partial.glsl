@@ -2,19 +2,12 @@
 // defines
 // 
 
-// #define PI 3.14
-// #define PI2 6.28
-
-// #define OP_ID(p, r) floor((p + r * .5) / r)
-// // #define OP_RE(p, r) mod(p + r * .5, r) - r * .5
-// #define OP_RE(a, b) mod(a, b) - b * .5
-
 #define OP_ID(p, r) round(p / r)
 #define OP_RE(p, r) p - r * round(p / r)
 #define OP_LI_RE(p, r, l) p - r * clamp(round(p / r), -l, l)
 
 #define EPS .0001 // general eps
-#define OI 80 // object space iteration
+#define OI 99 // object space iteration
 #define SI 80 // screen space iteration
 
 //
@@ -91,7 +84,7 @@ float dfRb(vec3 p, vec3 b, float r) {
     return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.) - r;
 }
 
-float dfBo(vec3 p, vec3 b)
+float dfBox(vec3 p, vec3 b)
 {
     vec3 q = abs(p) - b;
     return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
