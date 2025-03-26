@@ -102,10 +102,11 @@ export default defineConfig(async (config) => {
                         "main",
                         "dfScene",
                         // 適宜置き換える
+                        // NOTE: ドキュメント的には関数だけ指定できるみたいだが、変数も可？
                         'uv',
                         'baseColor',
                         'emissiveColor',
-                        'resultColor'
+                        // 'resultColor'
                     ]
                 },
             }),
