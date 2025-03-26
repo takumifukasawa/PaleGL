@@ -11,6 +11,7 @@ import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin
 import string from 'vite-plugin-string';
 import { shaderMinifierPlugin } from './plugins/vite-shader-minifier-plugin.ts';
 import { deleteTmpCachesPlugin } from './plugins/vite-delete-tmp-caches-plugin.ts';
+import { isWin } from './node-libs/env';
 
 type EntryPointInfo = { name: string; path: string };
 
@@ -31,9 +32,9 @@ const ENTRY_POINTS: { [key: string]: string } = {
 export default defineConfig(async (config) => {
     
     const { mode } = config;
-
+    
     const env = loadEnv(mode, process.cwd());
-
+    
     // NOTE: 本来はなくてもいいはず
     Object.assign(process.env, env);
 
@@ -174,12 +175,14 @@ export default defineConfig(async (config) => {
                 },
             },
         },
-        // for WSL
-        server: {
-            watch: {
-                usePolling: true,
-                interval: 2000,
+        ...(isWin(process) ? {
+            // for WSL
+            server: {
+                watch: {
+                    usePolling: true,
+                    interval: 2000,
+                },
             },
-        },
+        } : {})
     };
 });
