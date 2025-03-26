@@ -24,6 +24,8 @@ import * as crypto from 'crypto';
 import { rimraf } from 'rimraf';
 import { wait } from '../node-libs/wait';
 import { readFileAysnc, createDirectoryAsync, writeFileAsync } from '../node-libs/file-io';
+import { isMac } from '../node-libs/env';
+import * as process from 'node:process';
 
 export interface ShaderMinifierOptions {
     hlsl?: boolean;
@@ -246,7 +248,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // }
 
                 // minify
-                const minifyCommand = `./libs/shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
+                const minifyCommand = `${isMac(process) ? "mono " : ""}./libs/shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
                 console.log('command: ', minifyCommand);
                 await exec(minifyCommand).catch((error) => {
                     console.log('error: ', error);
