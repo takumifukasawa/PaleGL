@@ -1,4 +1,14 @@
 
+struct Skybox {
+    samplerCube cubeMap;
+    float diffuseIntensity;
+    float specularIntensity;
+    float rotationOffset;
+    float maxLodLevel;
+};
+
+uniform Skybox uSkybox;
+
 struct SkyboxLight {
     float diffuseIntensity;
     float specularIntensity;

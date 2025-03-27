@@ -465,7 +465,7 @@ uniform sampler2D uAmbientOcclusionTexture;
 // uniform mat4 uInverseViewProjectionMatrix;
        
 // TODO: loop
-uniform Skybox uSkybox;
+// uniform Skybox uSkybox;
 
 layout (location = 0) out vec4 outColor;
 
