@@ -1,6 +1,7 @@
 ﻿import {
     createPostProcessSinglePass,
-    PostProcessSinglePass, PostProcessPassParametersBaseArgs,
+    PostProcessSinglePass,
+    PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
 import {
@@ -15,7 +16,13 @@ import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fra
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+
+const CUBE_MAP_UNIFORM_NAME = 'cubeMap';
+const BASE_INTENSITY_UNIFORM_NAME = 'baseIntensity';
+const SPECULAR_INTENSITY_UNIFORM_NAME = 'specularIntensity';
+const ROTATION_OFFSET_UNIFORM_NAME = 'rotationOffset';
+const MAX_LOD_LEVEL_UNIFORM_NAME = 'maxLodLevel';
 
 export type DeferredShadingPassArgs = PostProcessPassParametersBaseArgs;
 
@@ -74,37 +81,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
             value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
         },
 
-        {
-            name: UniformNames.Skybox,
-            type: UniformTypes.Struct,
-            value: [
-                {
-                    name: 'cubeMap',
-                    type: UniformTypes.CubeMap,
-                    value: null,
-                },
-                {
-                    name: 'baseIntensity',
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                {
-                    name: 'specularIntensity',
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                {
-                    name: 'rotationOffset',
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-                {
-                    name: 'maxLodLevel',
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
-            ],
-        },
+        ...createSkyboxUniforms(),
     ];
 
     return {
@@ -123,35 +100,71 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
                 UniformBlockNames.SpotLight,
                 UniformBlockNames.PointLight,
             ],
-            enabled: args.enabled
+            enabled: args.enabled,
         }),
     };
 }
 
-export function updateDeferredShadingPassSkyboxUniforms(deferredShadingPass: DeferredShadingPass, skybox: Skybox) {
-    setMaterialUniformValue(deferredShadingPass.material, UniformNames.Skybox, [
+export function createSkyboxUniforms(): UniformsData {
+    return [
         {
-            name: 'cubeMap',
+            name: UniformNames.Skybox,
+            type: UniformTypes.Struct,
+            value: [
+                {
+                    name: CUBE_MAP_UNIFORM_NAME,
+                    type: UniformTypes.CubeMap,
+                    value: null,
+                },
+                {
+                    name: BASE_INTENSITY_UNIFORM_NAME,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: SPECULAR_INTENSITY_UNIFORM_NAME,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: ROTATION_OFFSET_UNIFORM_NAME,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+                {
+                    name: MAX_LOD_LEVEL_UNIFORM_NAME,
+                    type: UniformTypes.Float,
+                    value: 0,
+                },
+            ],
+        },
+    ];
+}
+
+export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
+    setMaterialUniformValue(material, UniformNames.Skybox, [
+        {
+            name: CUBE_MAP_UNIFORM_NAME,
             type: UniformTypes.CubeMap,
             value: skybox.cubeMap,
         },
         {
-            name: 'baseIntensity',
+            name: BASE_INTENSITY_UNIFORM_NAME,
             type: UniformTypes.Float,
             value: skybox.baseIntensity,
         },
         {
-            name: 'specularIntensity',
+            name: SPECULAR_INTENSITY_UNIFORM_NAME,
             type: UniformTypes.Float,
             value: skybox.specularIntensity,
         },
         {
-            name: 'rotationOffset',
+            name: ROTATION_OFFSET_UNIFORM_NAME,
             type: UniformTypes.Float,
             value: skybox.rotationOffset,
         },
         {
-            name: 'maxLodLevel',
+            name: MAX_LOD_LEVEL_UNIFORM_NAME,
             type: UniformTypes.Float,
             value: skybox.cubeMap.maxLodLevel,
         },

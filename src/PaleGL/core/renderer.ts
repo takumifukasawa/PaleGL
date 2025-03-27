@@ -64,7 +64,7 @@ import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import {
     createDeferredShadingPass,
     DeferredShadingPass,
-    updateDeferredShadingPassSkyboxUniforms,
+    updateMaterialSkyboxUniforms,
 } from '@/PaleGL/postprocess/deferredShadingPass.ts';
 import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
 import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
@@ -991,7 +991,7 @@ export function renderRenderer(
 
     // TODO: 本当はskyboxをshadingの後にしたい
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
-    basePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
+    renderBasePass(renderer, camera, currentCameraRenderMeshInfoEachPass.basePass, currentCameraRenderMeshInfoEachPass.skyboxPass);
 
     // ------------------------------------------------------------------------------
     // shadow pass
@@ -1065,7 +1065,7 @@ export function renderRenderer(
     // TODO: skyboxは一個だけ想定のいいはず
     renderMeshInfoEachQueue[RenderQueueType.Skybox].forEach((skyboxRenderMeshInfo) => {
         const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
-        updateDeferredShadingPassSkyboxUniforms(renderer.deferredShadingPass, skyboxActor);
+        updateMaterialSkyboxUniforms(renderer.deferredShadingPass.material, skyboxActor);
     });
 
     applyLightShadowMapUniformValues(
@@ -1226,10 +1226,11 @@ export function renderRenderer(
 
     setRendererRenderTarget(renderer, renderer.afterDeferredShadingRenderTarget);
 
-    transparentPass(
+    renderTransparentPass(
         renderer,
-        renderMeshInfoEachQueue[RenderQueueType.Transparent],
         camera,
+        renderMeshInfoEachQueue[RenderQueueType.Transparent],
+        renderMeshInfoEachQueue[RenderQueueType.Skybox],
         lightActors,
         renderer.copySceneDestRenderTarget.texture!
     );
@@ -1564,7 +1565,7 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
     });
 }
 
-function basePass(renderer: Renderer, sortedBasePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
+function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRenderMeshInfos: RenderMeshInfo[], sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[]) {
     // console.log("--------- scene pass ---------");
 
     // setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
@@ -1628,7 +1629,9 @@ function basePass(renderer: Renderer, sortedBasePassRenderMeshInfos: RenderMeshI
             // TODO: g-bufferの時にはlightのuniformsを設定しなくて大丈夫になったのでいらないはず
             // applyLightShadowMapUniformValues(targetMaterial, lightActors);
 
-            updateMeshMaterial(actor, { camera });
+            // TODO: skyboxは一個という前提にしているが・・・
+            updateMeshMaterial(actor, { camera, skybox: sortedSkyboxPassRenderMeshInfos.length !== 0 ? sortedSkyboxPassRenderMeshInfos[0].actor as Skybox : null });
+            // updateMeshMaterial(actor, { camera });
 
             renderMesh(renderer, actor.geometry, targetMaterial);
 
@@ -1639,10 +1642,11 @@ function basePass(renderer: Renderer, sortedBasePassRenderMeshInfos: RenderMeshI
     });
 }
 
-function transparentPass(
+function renderTransparentPass(
     renderer: Renderer,
-    sortedRenderMeshInfos: RenderMeshInfo[],
     camera: Camera,
+    sortedRenderMeshInfos: RenderMeshInfo[],
+    sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[],
     lightActors: LightActors,
     sceneTexture: Texture
 ) {
@@ -1666,7 +1670,9 @@ function transparentPass(
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
-            updateMeshMaterial(actor, { camera });
+            // TODO: skyboxは一個という前提にしているが・・・
+            updateMeshMaterial(actor, { camera, skybox: sortedSkyboxPassRenderMeshInfos.length !== 0 ? sortedSkyboxPassRenderMeshInfos[0].actor as Skybox : null });
+            // updateMeshMaterial(actor, { camera });
 
             renderMesh(renderer, actor.geometry, targetMaterial);
 

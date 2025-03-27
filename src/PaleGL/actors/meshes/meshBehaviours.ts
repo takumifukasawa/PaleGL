@@ -21,6 +21,7 @@ import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skin
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
+import {Skybox} from "@/PaleGL/actors/meshes/skybox.ts";
 
 // start actor -------------------------------------------------------
 
@@ -139,7 +140,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 //     // this.depthMaterial.updateUniforms({ gpu });
 // }
 
-export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera }) => void;
+export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera, skybox?: Skybox | null }) => void;
 
 export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMeshMaterial,
@@ -149,9 +150,9 @@ export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMat
 
 // TODO: render前の方がよい気がする
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
+export const updateMeshMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.materials.forEach((material) => updateMaterial(material));
-    updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
+    updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, args);
 };
 
 export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateMeshMaterial>> = {
@@ -159,9 +160,9 @@ export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateM
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
+export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.depthMaterials.forEach((material) => updateMaterial(material));
-    updateMeshDepthMaterialBehaviour[mesh.meshType]?.(mesh, { camera });
+    updateMeshDepthMaterialBehaviour[mesh.meshType]?.(mesh, args);
 };
 
 // -------------------------------------------------------

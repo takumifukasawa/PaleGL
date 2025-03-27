@@ -15,7 +15,8 @@ import glassObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layo
 import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
-import {createObjectSpaceRaymarchUniforms} from "@/PaleGL/materials/objectSpaceRaymarchMaterial.ts";
+import { createObjectSpaceRaymarchUniforms } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
+import { createSkyboxUniforms } from '@/PaleGL/postprocess/deferredShadingPass.ts';
 
 type ObjectSpaceRaymarchGlassArgs = {
     fragmentShaderTemplate?: string;
@@ -85,7 +86,8 @@ export function createObjectSpaceRaymarchGlassMaterial(
             type: UniformTypes.Color,
             value: emissiveColor,
         },
-        ...createObjectSpaceRaymarchUniforms()
+        ...createObjectSpaceRaymarchUniforms(),
+        ...createSkyboxUniforms(),
     ];
     const shadingUniforms: UniformsData = [
         {
@@ -124,14 +126,14 @@ export function createObjectSpaceRaymarchGlassMaterial(
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: fragmentShaderContent,
             },
-            ...(args.fragmentShaderModifiers ?? [])
+            ...(args.fragmentShaderModifiers ?? []),
         ],
         depthFragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
             },
-            ...(args.depthFragmentShaderModifiers ?? [])
+            ...(args.depthFragmentShaderModifiers ?? []),
         ],
     });
 }

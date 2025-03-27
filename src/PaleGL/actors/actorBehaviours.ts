@@ -42,10 +42,7 @@ export function startActorBehaviourBase(actor: Actor, { gpu, scene }: ActorStart
 
 export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu, scene }: ActorStartArgs) => void>> = {
     [ActorTypes.Mesh]: startMesh,
-    // [ActorTypes.SkinnedMesh]: startSkinnedMesh,
     [ActorTypes.Skybox]: startMesh,
-    // [ActorTypes.ObjectSpaceRaymarchMesh]: startMesh,
-    // [ActorTypes.ScreenSpaceRaymarchMesh]: startMesh,
 };
 
 const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
@@ -173,8 +170,6 @@ export const postProcessActorTimeline = (actor: Actor, timelineTime: number) => 
 export type UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => void;
 
 export const defaultUpdateActorTransform: UpdateActorTransformFunc = (actor) => {
-    // // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted, actor.parent, actor.children, actor.transform.getActor())
-    // console.log("hogehoge - default update actor transform:", `name: ${actor.name}`, actor.isStarted)
     updateActorTransformMatrix(actor);
 };
 

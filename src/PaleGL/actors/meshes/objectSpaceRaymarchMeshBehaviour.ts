@@ -4,6 +4,7 @@ import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import {isPerspectiveCamera} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
+import {updateMaterialSkyboxUniforms} from "@/PaleGL/postprocess/deferredShadingPass.ts";
 
 const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
 const UNIFORM_NAME_USE_WORLD_FLAG = 'uUseWorld';
@@ -30,8 +31,11 @@ export function updateObjectSpaceRaymarchMesh(actor: Actor) {
     });
 }
 
-export const updateObjectSpaceRaymarchMeshMaterial: UpdateMeshMaterial = (mesh, { camera }) => {
+export const updateObjectSpaceRaymarchMeshMaterial: UpdateMeshMaterial = (mesh, { camera, skybox }) => {
     mesh.materials.forEach((material) => {
+        if (skybox) {
+            updateMaterialSkyboxUniforms(material, skybox);
+        }
         setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, isPerspectiveCamera(camera) ? 1 : 0);
     });
 };
