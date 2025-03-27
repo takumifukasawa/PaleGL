@@ -5,7 +5,8 @@
 #include <ub>
 #include <depth>
 #include <gbuffer>
-#include <env_map>
+#include <geometry_h>
+#include <skybox_h>
 
 // -----------------------------------------------------------
 // lighting functions
@@ -22,28 +23,11 @@ struct IncidentLight {
     float intensity;
 };
 
-struct IncidentSkyboxLight {
-// samplerCube cubeMap;
-// vec3 baseColor;
-    vec3 diffuseDirection;
-    float diffuseIntensity;
-// vec3 specularColor;
-    vec3 specularDirection;
-    float specularIntensity;
-    float maxLodLevel;
-};
-
 struct ReflectedLight {
     vec3 directBase;
     vec3 directSpecular;
     vec3 indirectBase;
     vec3 indirectSpecular;
-};
-
-struct GeometricContext {
-    vec3 position;
-    vec3 normal;
-    vec3 viewDir;
 };
 
 struct Material {
@@ -153,35 +137,6 @@ void getPointLightIrradiance(const in PointLight pointLight, const in GeometricC
 }
 
 // -------------------------------------------------------------------------------
-// skybox
-// -------------------------------------------------------------------------------
-
-struct SkyboxLight {
-    float diffuseIntensity;
-    float specularIntensity;
-    float rotationOffset;
-    float maxLodLevel;
-};
-
-void getSkyboxLightIrradiance(const in SkyboxLight skyboxLight, const in GeometricContext geometry, out IncidentSkyboxLight directLight) {
-    vec3 envDir = reflect(
-    -geometry.viewDir,
-    // normalize(geometry.position - camera.worldPosition),
-    normalize(geometry.normal)
-    );
-
-    vec3 envDiffuseDir = calcEnvMapSampleDir(geometry.normal, skyboxLight.rotationOffset);
-    vec3 envSpecularDir = calcEnvMapSampleDir(envDir, skyboxLight.rotationOffset);
-
-    // directLight.cubeMap = skyboxLight.cubeMap;
-    directLight.diffuseDirection = envDiffuseDir;
-    directLight.diffuseIntensity = skyboxLight.diffuseIntensity;
-    directLight.specularDirection = envSpecularDir;
-    directLight.specularIntensity = skyboxLight.specularIntensity;
-    directLight.maxLodLevel = skyboxLight.maxLodLevel;
-}
-
-// -------------------------------------------------------------------------------
 // brdfs
 // -------------------------------------------------------------------------------
 
@@ -245,11 +200,11 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
 // -------------------------------------------------------------------------------
 
 void RE_Direct(
-const in IncidentLight directLight,
-const in GeometricContext geometry,
-const in Material material,
-inout ReflectedLight reflectedLight,
-const in float shadow
+    const in IncidentLight directLight,
+    const in GeometricContext geometry,
+    const in Material material,
+    inout ReflectedLight reflectedLight,
+    const in float shadow
 ) {
     // directionは光源への方向
     float dotNL = saturate(dot(geometry.normal, directLight.direction));
@@ -262,51 +217,51 @@ const in float shadow
 
     // base
     reflectedLight.directBase +=
-    irradiance *
-    clamp(
-    BaseBRDF(material.baseColor),
-    -10.,
-    10.
-    ); // overflow fallback
+        irradiance *
+        clamp(
+            BaseBRDF(material.baseColor),
+            -10.,
+            10.
+        ); // overflow fallback
     // specular
     // reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.roughness);
     reflectedLight.directSpecular +=
-    irradiance *
-    clamp(
-    SpecularBRDF(
-    directLight.direction,
-    geometry,
-    material.specularColor,
-    material.roughness
-    ),
-    -10.,
-    10.
+        irradiance *
+        clamp(
+            SpecularBRDF(
+                directLight.direction,
+                geometry,
+                material.specularColor,
+                material.roughness
+            ),
+        -10.,
+        10.
     ); // overflow fallback
 }
 
 // base: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
 void RE_DirectSkyboxFakeIBL(
-samplerCube cubeMap,
-const in IncidentSkyboxLight skyboxLight,
-const in GeometricContext geometry,
-const in Material material,
-inout ReflectedLight reflectedLight
+    samplerCube cubeMap,
+    const in IncidentSkyboxLight skyboxLight,
+    const in GeometricContext geometry,
+    const in Material material,
+    inout ReflectedLight reflectedLight
 ) {
     //
     // base
     //
 
     vec3 envDiffuseColor = textureLod(
-    cubeMap,
-    skyboxLight.diffuseDirection,
-    skyboxLight.maxLodLevel
+        cubeMap,
+        skyboxLight.diffuseDirection,
+        skyboxLight.maxLodLevel
     ).xyz;
 
     // 拡散: metalness,roughnessを考慮しない
     reflectedLight.directBase +=
-    material.baseColor
-    * envDiffuseColor
-    * skyboxLight.diffuseIntensity;
+        material.baseColor
+        * envDiffuseColor
+        * skyboxLight.diffuseIntensity;
 
     //
     // specular
@@ -316,9 +271,9 @@ inout ReflectedLight reflectedLight
     // TODO: metallicも考慮すべき？
     float specularLod = log2(material.roughness * pow(2., skyboxLight.maxLodLevel));
     vec3 envSpecularColor = textureLod(
-    cubeMap,
-    skyboxLight.specularDirection,
-    specularLod
+        cubeMap,
+        skyboxLight.specularDirection,
+        specularLod
     ).xyz;
 
     // vec3 f0 = mix(vec3(.04), material.baseColor, material.metallic);
@@ -330,9 +285,9 @@ inout ReflectedLight reflectedLight
     //
 
     reflectedLight.directSpecular += mix(
-    envSpecularColor * skyboxLight.specularIntensity * material.specularColor,
-    envSpecularColor * skyboxLight.specularIntensity,
-    fresnel
+        envSpecularColor * skyboxLight.specularIntensity * material.specularColor,
+        envSpecularColor * skyboxLight.specularIntensity,
+        fresnel
     );
 
     // for debug
@@ -687,6 +642,7 @@ void main() {
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     IncidentSkyboxLight directSkyboxLight;
+    directSkyboxLight.diffuseDirection = vec3(0.); // minifierでdirectSkyboxLightを消さないtrick
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
     RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 #endif

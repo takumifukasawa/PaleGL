@@ -4,7 +4,8 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
-#include <env_map>
+#include <geometry_h>
+#include <skybox_h>
 
 in vec2 vUv;
 in vec3 vNormal;

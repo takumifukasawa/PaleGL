@@ -24,6 +24,8 @@ in vec4 vInstanceState;
 
 #include <raymarch_sf>
 #include <os_raymarch_f>
+#include <geometry_h>
+#include <skybox_h>
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;

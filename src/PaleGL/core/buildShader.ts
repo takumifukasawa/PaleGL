@@ -37,6 +37,8 @@ import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/ve
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
 import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
+import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
+import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
 
 KeyboardEvent;
@@ -83,6 +85,8 @@ const includesDict = new Map<string, string>([
     ['normal_map_fh', normalMapFragmentHeaderPartialContent],
     ['normal_map_f', normalMapFragmentPartialContent],
     ['env_map', envMapPartialContent],
+    ['skybox_h', skyboxHeaderPartialContent],
+    ['geometry_h', geometryHeaderPartialContent],
     ['os_raymarch_f', objectSpaceRaymarchFunctionsPartialContent],
 ]);
 
