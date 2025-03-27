@@ -540,7 +540,6 @@ export function drawGPU(
                 gl.depthFunc(GL_GEQUAL);
                 break;
             case DepthFuncTypes.Always:
-                console.log("hopeagja")
                 gl.depthFunc(GL_ALWAYS);
                 break;
             default:

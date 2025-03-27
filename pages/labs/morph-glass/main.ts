@@ -78,12 +78,18 @@ const MODEL_ASSET_DIR = `${ASSET_DIR}/models/`;
 //--------------------
 
 // assets
-const cubeMapPositiveXImgUrl = './assets/images/laufenurg_church/px.jpg';
-const cubeMapNegativeXImgUrl = './assets/images/laufenurg_church/nx.jpg';
-const cubeMapPositiveYImgUrl = './assets/images/laufenurg_church/py.jpg';
-const cubeMapNegativeYImgUrl = './assets/images/laufenurg_church/ny.jpg';
-const cubeMapPositiveZImgUrl = './assets/images/laufenurg_church/pz.jpg';
-const cubeMapNegativeZImgUrl = './assets/images/laufenurg_church/nz.jpg';
+// const cubeMapPositiveXImgUrl = './assets/images/laufenurg_church/px.jpg';
+// const cubeMapNegativeXImgUrl = './assets/images/laufenurg_church/nx.jpg';
+// const cubeMapPositiveYImgUrl = './assets/images/laufenurg_church/py.jpg';
+// const cubeMapNegativeYImgUrl = './assets/images/laufenurg_church/ny.jpg';
+// const cubeMapPositiveZImgUrl = './assets/images/laufenurg_church/pz.jpg';
+// const cubeMapNegativeZImgUrl = './assets/images/laufenurg_church/nz.jpg';
+const cubeMapPositiveXImgUrl = './assets/images/dummy-skybox/dir-x-plus.png';
+const cubeMapNegativeXImgUrl = './assets/images/dummy-skybox/dir-x-minus.png';
+const cubeMapPositiveYImgUrl = './assets/images/dummy-skybox/dir-y-plus.png';
+const cubeMapNegativeYImgUrl = './assets/images/dummy-skybox/dir-y-minus.png';
+const cubeMapPositiveZImgUrl = './assets/images/dummy-skybox/dir-z-plus.png';
+const cubeMapNegativeZImgUrl = './assets/images/dummy-skybox/dir-z-minus.png';
 
 const stylesText = `
 :root {
@@ -310,9 +316,9 @@ const main = async () => {
                 blendType: BlendTypes.Transparent,
                 // renderQueueType: RenderQueueType.AlphaTest,
                 // alphaTest: 0.5,
-                depthTest: false,
+                depthTest: true,
                 depthWrite: false,
-                depthFuncType: DepthFuncTypes.Always,
+                depthFuncType: DepthFuncTypes.Lequal,
                 faceSide: FaceSide.Front,
                 uniforms: [
                     {
@@ -336,6 +342,7 @@ const main = async () => {
         ],
         castShadow: true,
     });
+    console.log(objectSpaceRaymarchMesh)
     setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
     setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 3, 0));
     // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);

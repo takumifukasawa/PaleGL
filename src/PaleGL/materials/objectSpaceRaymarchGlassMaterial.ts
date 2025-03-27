@@ -1,5 +1,6 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
+    DepthFuncTypes,
     FragmentShaderModifierPragmas,
     MaterialTypes,
     ShadingModelIds,
@@ -53,7 +54,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
     const baseColor = args.baseColor ?? createColorWhite();
     const baseMapTiling = args.baseMapTiling ?? createVector4(1, 1, 0, 0);
     const emissiveColor = args.emissiveColor ?? createColorBlack();
-
+    
     const commonUniforms: UniformsData = [
         {
             name: UniformNames.ObjectSpaceRaymarchBoundsScale,
@@ -113,6 +114,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
         depthTest: args.depthTest ?? true,
         depthWrite: args.depthWrite ?? false,
+        depthFuncType: args.depthFuncType ?? DepthFuncTypes.Lequal,
 
         uniformBlockNames: [
             UniformBlockNames.Common,
