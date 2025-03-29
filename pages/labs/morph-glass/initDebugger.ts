@@ -173,7 +173,7 @@ export function initDebugger(
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
         label: 'scale x',
         minValue: 0,
-        maxValue: 5,
+        maxValue: 15,
         stepValue: 0.001,
         initialValue: v3x(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {
@@ -184,7 +184,7 @@ export function initDebugger(
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
         label: 'scale y',
         minValue: 0,
-        maxValue: 5,
+        maxValue: 15,
         stepValue: 0.001,
         initialValue: v3y(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {
@@ -195,7 +195,7 @@ export function initDebugger(
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
         label: 'scale z',
         minValue: 0,
-        maxValue: 5,
+        maxValue: 15,
         stepValue: 0.001,
         initialValue: v3z(objectSpaceRaymarchMesh.transform.scale),
         onChange: (value) => {

@@ -79,12 +79,12 @@ const MODEL_ASSET_DIR = `${ASSET_DIR}models/`;
 //--------------------
 
 // assets
-const cubeMapPositiveXImgUrl = './assets/images/laufenurg_church/px.jpg';
-const cubeMapNegativeXImgUrl = './assets/images/laufenurg_church/nx.jpg';
-const cubeMapPositiveYImgUrl = './assets/images/laufenurg_church/py.jpg';
-const cubeMapNegativeYImgUrl = './assets/images/laufenurg_church/ny.jpg';
-const cubeMapPositiveZImgUrl = './assets/images/laufenurg_church/pz.jpg';
-const cubeMapNegativeZImgUrl = './assets/images/laufenurg_church/nz.jpg';
+const cubeMapPositiveXImgUrl = './assets/images/skybox/px.png';
+const cubeMapNegativeXImgUrl = './assets/images/skybox/nx.png';
+const cubeMapPositiveYImgUrl = './assets/images/skybox/py.png';
+const cubeMapNegativeYImgUrl = './assets/images/skybox/ny.png';
+const cubeMapPositiveZImgUrl = './assets/images/skybox/pz.png';
+const cubeMapNegativeZImgUrl = './assets/images/skybox/nz.png';
 // const cubeMapPositiveXImgUrl = './assets/images/dummy-skybox/dir-x-plus.png';
 // const cubeMapNegativeXImgUrl = './assets/images/dummy-skybox/dir-x-minus.png';
 // const cubeMapPositiveYImgUrl = './assets/images/dummy-skybox/dir-y-plus.png';
@@ -257,8 +257,10 @@ const createStreetFloorActor = async () => {
 
 const createBgObjActor = async () => {
     const gltfActor = await loadGLTF({ gpu, dir: MODEL_ASSET_DIR, path: 'bg-static.gltf' });
-    (gltfActor.children[0] as Mesh).materials = [
-        createGBufferMaterial({})
+    const mesh = gltfActor.children[0] as Mesh;
+    // mesh.castShadow = true;
+    (mesh).materials = [
+        createGBufferMaterial({}),
     ];
     setScaling(gltfActor.transform, createFillVector3(5));
     return gltfActor;
@@ -280,6 +282,7 @@ const main = async () => {
         cubeMap,
         baseIntensity: 20,
         specularIntensity: 0.2,
+        rotationOffset: 10
         // renderMesh: false,
     });
 
@@ -305,6 +308,7 @@ const main = async () => {
 
     bgActor = await createBgObjActor();
     addActorToScene(captureScene, bgActor);
+    setTranslation(bgActor.transform, createVector3(0, .88, 0));
 
     //
     // glass
@@ -360,9 +364,8 @@ const main = async () => {
         ],
         castShadow: true,
     });
-    console.log(objectSpaceRaymarchMesh);
     setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
-    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 3, 0));
+    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 4.5, 0));
     // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
 
     addActorToScene(captureScene, skyboxMesh);

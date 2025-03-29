@@ -8,6 +8,7 @@ vec2 osRaymarch(
     float side,
     vec3 boundsScale,
     float useWorld,
+    bool useDiscard,
     out vec3 currentRayPosition
 ) {
     vec2 result = vec2(0.);
@@ -27,7 +28,7 @@ vec2 osRaymarch(
         }
     }
 
-    if (result.x > minDistance) {
+    if (result.x > minDistance && useDiscard) {
         discard;
     }
 

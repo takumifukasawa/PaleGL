@@ -67,6 +67,7 @@ void main() {
         1.,
         uBoundsScale,
         uUseWorld,
+        true,
         currentRayPosition
     );
 

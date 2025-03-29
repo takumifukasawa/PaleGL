@@ -85,6 +85,7 @@ void main() {
         1.,
         uBoundsScale,
         uUseWorld,
+        true,
         currentRayPosition
     );
    
@@ -101,6 +102,11 @@ void main() {
    
     vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
     resultColor = texture(uSceneTexture, screenUv);
+    
+    vec3 resultBackBufferColor = vec3(0.);
+    vec3 reflTex = vec3(0.);
+    
+    float specBlendRate = 0.;
     
     if(result.x > 0.) {
         float ior = 1.45;
@@ -131,6 +137,7 @@ void main() {
             -1.,
             uBoundsScale,
             uUseWorld,
+            false,
             p
         );
        
@@ -146,11 +153,10 @@ void main() {
         );
        
         
-        float rgbShift = .01;
+        float rgbShift = .05;
         float iorShift = .05;
-        float specBlendRate = .65;
+        // float specBlendRate = 1.;
         
-        vec3 reflTex = vec3(0.);
         vec2 reflUv = screenUv;
         vec3 envSpecularDir = vec3(0.);
         vec3 rdOut = vec3(0.);
@@ -173,11 +179,8 @@ void main() {
         reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.r = mix(
-            texture(uSceneTexture, reflUv).r,
-            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r,
-            specBlendRate
-        );
+        resultBackBufferColor.r = texture(uSceneTexture, reflUv).r;
+        reflTex.r = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r;
 
         // green
         // 物体内側から屈折して外側に出るベクトル
@@ -197,11 +200,8 @@ void main() {
         reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.g = mix(
-            texture(uSceneTexture, reflUv).g,
-            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g,
-            specBlendRate
-        );
+        resultBackBufferColor.g = texture(uSceneTexture, reflUv).g;
+        reflTex.g = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g;
 
         // blue
         // 物体内側から屈折して外側に出るベクトル
@@ -221,20 +221,21 @@ void main() {
         reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.b = mix(
-            texture(uSceneTexture, reflUv).b,
-            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b,
-            specBlendRate
-        );
+        resultBackBufferColor.b = texture(uSceneTexture, reflUv).b;
+        reflTex.b = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b;
 
         resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
-        resultColor.xyz = reflTex;
+        // resultColor.xyz = reflTex;
     }
 
     float alpha = resultColor.a;
     #include <alpha_test_f>
 
-    resultColor.rgb = gamma(resultColor.rgb);
+    resultColor.rgb = mix(
+        resultBackBufferColor,
+        reflTex,
+        specBlendRate
+    );
     
     #pragma BEFORE_OUT
     
