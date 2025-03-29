@@ -148,6 +148,7 @@ void main() {
         
         float rgbShift = .01;
         float iorShift = .05;
+        float specBlendRate = .65;
         
         vec3 reflTex = vec3(0.);
         vec2 reflUv = screenUv;
@@ -161,19 +162,22 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // // 1: backbufferを使う場合
-        // reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-        //     reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-        //     reflUv.y = 1. - reflUv.y;
-        // }
-        // reflUv += rdOut.xy * ior * iorShift;
-        // reflTex.r = texture(uSceneTexture, reflUv).r;
+        // 1: backbufferを使う場合
+        reflUv = screenUv;
+        if(rdOut.x > 0.) {
+            reflUv.x = 1. - reflUv.x;
+        }
+        if(rdOut.y > 0.) {
+            reflUv.y = 1. - reflUv.y;
+        }
+        reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.r = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r;
+        reflTex.r = mix(
+            texture(uSceneTexture, reflUv).r,
+            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r,
+            specBlendRate
+        );
 
         // green
         // 物体内側から屈折して外側に出るベクトル
@@ -182,19 +186,22 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // // 1: backbufferを使う場合
-        // reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-        //     reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-        //     reflUv.y = 1. - reflUv.y;
-        // }
-        // reflUv += rdOut.xy * ior * iorShift;
-        // reflTex.g = texture(uSceneTexture, reflUv).g;
+        // 1: backbufferを使う場合
+        reflUv = screenUv;
+        if(rdOut.x > 0.) {
+            reflUv.x = 1. - reflUv.x;
+        }
+        if(rdOut.y > 0.) {
+            reflUv.y = 1. - reflUv.y;
+        }
+        reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.g = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g;
+        reflTex.g = mix(
+            texture(uSceneTexture, reflUv).g,
+            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g,
+            specBlendRate
+        );
 
         // blue
         // 物体内側から屈折して外側に出るベクトル
@@ -203,19 +210,22 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // // 1: backbufferを使う場合
-        // reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-        //     reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-        //     reflUv.y = 1. - reflUv.y;
-        // }
-        // reflUv += rdOut.xy * ior * iorShift;
-        // reflTex.b = texture(uSceneTexture, reflUv).b;
+        // 1: backbufferを使う場合
+        reflUv = screenUv;
+        if(rdOut.x > 0.) {
+            reflUv.x = 1. - reflUv.x;
+        }
+        if(rdOut.y > 0.) {
+            reflUv.y = 1. - reflUv.y;
+        }
+        reflUv += rdOut.xy * ior * iorShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
-        reflTex.b = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b;
+        reflTex.b = mix(
+            texture(uSceneTexture, reflUv).b,
+            textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b,
+            specBlendRate
+        );
 
         resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
         resultColor.xyz = reflTex;
