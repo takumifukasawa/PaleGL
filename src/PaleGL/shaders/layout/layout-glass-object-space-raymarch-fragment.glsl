@@ -106,7 +106,11 @@ void main() {
     vec3 resultBackBufferColor = vec3(0.);
     vec3 reflTex = vec3(0.);
     
-    float specBlendRate = 0.;
+    float rayIORShift = .015;
+    float uvIORShift = .015;
+    // float specBlendRate = 1.;
+    float specBlendRate = .5;
+        
     
     if(result.x > 0.) {
         float ior = 1.45;
@@ -152,18 +156,13 @@ void main() {
             uUseWorld
         );
        
-        
-        float rgbShift = .05;
-        float iorShift = .05;
-        // float specBlendRate = 1.;
-        
         vec2 reflUv = screenUv;
         vec3 envSpecularDir = vec3(0.);
         vec3 rdOut = vec3(0.);
 
         // red
         // 物体内側から屈折して外側に出るベクトル
-        rdOut = refract(rdIn, nExit, ior - rgbShift);
+        rdOut = refract(rdIn, nExit, ior - rayIORShift);
         // 物体内部に全反射するケース
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
@@ -176,7 +175,7 @@ void main() {
         if(rdOut.y > 0.) {
             reflUv.y = 1. - reflUv.y;
         }
-        reflUv += rdOut.xy * ior * iorShift;
+        reflUv += rdOut.xy * ior * uvIORShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.r = texture(uSceneTexture, reflUv).r;
@@ -197,7 +196,7 @@ void main() {
         if(rdOut.y > 0.) {
             reflUv.y = 1. - reflUv.y;
         }
-        reflUv += rdOut.xy * ior * iorShift;
+        reflUv += rdOut.xy * ior * uvIORShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.g = texture(uSceneTexture, reflUv).g;
@@ -205,7 +204,7 @@ void main() {
 
         // blue
         // 物体内側から屈折して外側に出るベクトル
-        rdOut = refract(rdIn, nExit, ior + rgbShift);
+        rdOut = refract(rdIn, nExit, ior + rayIORShift);
         // 物体内部に全反射するケース
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
@@ -218,7 +217,7 @@ void main() {
         if(rdOut.y > 0.) {
             reflUv.y = 1. - reflUv.y;
         }
-        reflUv += rdOut.xy * ior * iorShift;
+        reflUv += rdOut.xy * ior * uvIORShift;
         // 2: skyboxを使う場合
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.b = texture(uSceneTexture, reflUv).b;
@@ -233,7 +232,7 @@ void main() {
 
     resultColor.rgb = mix(
         resultBackBufferColor,
-        reflTex,
+        gamma(reflTex),
         specBlendRate
     );
     

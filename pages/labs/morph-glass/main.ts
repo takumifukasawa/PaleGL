@@ -282,7 +282,7 @@ const main = async () => {
         cubeMap,
         baseIntensity: 20,
         specularIntensity: 0.2,
-        rotationOffset: 10
+        rotationOffset: 0
         // renderMesh: false,
     });
 
