@@ -30,7 +30,7 @@ export type VertexArrayObject = GLObjectBase<WebGLVertexArrayObject> & {
 export function createVertexArrayObject({ gpu, attributes = [], indices }: {
     gpu: Gpu;
     attributes: Attribute[];
-    indices?: number[] | null
+    indices?: number[] | Uint16Array | null
 }): VertexArrayObject {
     const gl = gpu.gl;
     const vao = gl.createVertexArray()!;

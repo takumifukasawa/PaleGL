@@ -53,7 +53,7 @@ import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.
 import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {  Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
@@ -64,7 +64,8 @@ import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
-import {createObjectSpaceRaymarchGlassMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts";
+import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts';
+import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 // import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
@@ -72,8 +73,8 @@ import {createObjectSpaceRaymarchGlassMaterial} from "@/PaleGL/materials/objectS
 // constants
 // -------------------
 
-const ASSET_DIR = '/labs/street-light/assets/';
-const MODEL_ASSET_DIR = `${ASSET_DIR}/models/`;
+const ASSET_DIR = '/labs/morph-glass/assets/';
+const MODEL_ASSET_DIR = `${ASSET_DIR}models/`;
 
 //--------------------
 
@@ -136,6 +137,7 @@ document.head.appendChild(styleElement);
 let debuggerGUI: DebuggerGUI;
 let width: number, height: number;
 let streetFloorActor: Actor;
+let bgActor: Actor;
 let cubeMap: CubeMap;
 let objectSpaceRaymarchMesh: Mesh;
 
@@ -253,6 +255,15 @@ const createStreetFloorActor = async () => {
     return gltfActor;
 };
 
+const createBgObjActor = async () => {
+    const gltfActor = await loadGLTF({ gpu, dir: MODEL_ASSET_DIR, path: 'bg-static.gltf' });
+    (gltfActor.children[0] as Mesh).materials = [
+        createGBufferMaterial({})
+    ];
+    setScaling(gltfActor.transform, createFillVector3(5));
+    return gltfActor;
+};
+
 const main = async () => {
     cubeMap = await loadCubeMap(
         gpu,
@@ -287,6 +298,13 @@ const main = async () => {
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
     setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
+
+    //
+    // bg actor
+    //
+
+    bgActor = await createBgObjActor();
+    addActorToScene(captureScene, bgActor);
 
     //
     // glass
@@ -327,22 +345,22 @@ const main = async () => {
                         value: null,
                     },
                 ],
-//                 fragmentShaderModifiers: [
-//                     {
-//                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
-//                         value: `
-// vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
-// vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
-// vec4 sceneColor = texture(uSceneTexture, screenUv);
-// outColor = vec4(sceneColor.xyz * 2., 1.);
-// `,
-//                     },
-//                 ],
-             }),
+                //                 fragmentShaderModifiers: [
+                //                     {
+                //                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
+                //                         value: `
+                // vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
+                // vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
+                // vec4 sceneColor = texture(uSceneTexture, screenUv);
+                // outColor = vec4(sceneColor.xyz * 2., 1.);
+                // `,
+                //                     },
+                //                 ],
+            }),
         ],
         castShadow: true,
     });
-    console.log(objectSpaceRaymarchMesh)
+    console.log(objectSpaceRaymarchMesh);
     setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
     setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 3, 0));
     // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);

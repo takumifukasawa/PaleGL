@@ -40,7 +40,7 @@ import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 
 export type IndexBufferObject = GLObjectBase<WebGLBuffer>;
 
-export function createIndexBufferObject(gpu: Gpu, indices: number[]): IndexBufferObject {
+export function createIndexBufferObject(gpu: Gpu, indices: number[] | Uint16Array): IndexBufferObject {
     const ibo = gpu.gl.createBuffer()!;
     bindRawIndexBufferObject(gpu.gl, ibo);
     gpu.gl.bufferData(GL_ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), GL_STATIC_DRAW);

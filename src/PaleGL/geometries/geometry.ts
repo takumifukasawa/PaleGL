@@ -42,7 +42,7 @@ export type GeometryArgs = {
     attributes: Attribute[];
     drawCount: number;
     // optional
-    indices?: number[]; // TODO: Uint16Array
+    indices?: number[] | Uint16Array; // TODO: Uint16Array
     // calculateBinormal: boolean,
     instanceCount?: number | null;
 };

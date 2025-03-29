@@ -1,4 +1,45 @@
-﻿export async function loadObj(path: string) {
+﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import {AttributeNames} from "@/PaleGL/constants.ts";
+
+export async function loadAndCreateOBJGeometry(gpu: Gpu, path: string) {
+    const modelData = await loadObj(path);
+
+    const positions = new Float32Array(modelData.positions);
+    const uvs = new Float32Array(modelData.uvs);
+    const normals = new Float32Array(modelData.normals);
+    const indices = new Uint16Array(modelData.indices);
+    
+    console.log("hogehoge", positions, uvs, normals, indices);
+
+    const geometry = createGeometry({
+        gpu,
+        attributes: [
+            createAttribute({
+                name: AttributeNames.Position,
+                data: positions,
+                size: 3,
+            }),
+            createAttribute({
+                name: AttributeNames.Uv,
+                data: uvs,
+                size: 2,
+            }),
+            createAttribute({
+                name: AttributeNames.Normal,
+                data: normals,
+                size: 3,
+            }),
+        ],
+        drawCount: indices.length,
+        indices: Array.from(indices),
+    });
+
+    return geometry;
+}
+
+export async function loadObj(path: string) {
     const response = await fetch(path);
     const content = await response.text();
     return parseObj(content);
