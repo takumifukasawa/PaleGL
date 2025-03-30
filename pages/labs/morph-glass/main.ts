@@ -41,7 +41,7 @@ import {
     // RenderQueueType,
 } from '@/PaleGL/constants';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
-import { Actor, subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
+import { Actor, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import {
     setInputControllerSize,
     startInputController,
@@ -53,7 +53,7 @@ import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.
 import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import {  Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
@@ -65,7 +65,8 @@ import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
 import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts';
-import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
+import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
+import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
 // import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
@@ -141,6 +142,14 @@ let bgActor: Actor;
 let cubeMap: CubeMap;
 let objectSpaceRaymarchMesh: Mesh;
 
+const debuggerStates: {
+    morphRate: number;
+    morphingEnabled: boolean;
+} = {
+    morphRate: 0,
+    morphingEnabled: true,
+};
+
 const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? createTouchInputController() : createMouseInputController();
 startInputController(inputController);
@@ -174,7 +183,7 @@ const engine = createEngine({ gpu, renderer, showStats: true, showPipeline: true
 
 setSceneToEngine(engine, captureScene);
 
-const captureSceneCamera = createPerspectiveCamera(50, 1, 0.1, 50);
+const captureSceneCamera = createPerspectiveCamera(40, 1, 0.1, 200);
 addActorToScene(captureScene, captureSceneCamera);
 
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
@@ -191,7 +200,7 @@ orbitCameraController.maxAzimuth = 55;
 orbitCameraController.minAzimuth = -55;
 orbitCameraController.defaultAzimuth = 10;
 orbitCameraController.defaultAltitude = -10;
-orbitCameraController.lookAtTarget = createVector3(0, 2, 0);
+orbitCameraController.lookAtTarget = createVector3(0, 4, 0);
 
 subscribeActorOnStart(captureSceneCamera, () => {
     setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
@@ -216,8 +225,8 @@ const directionalLight = createDirectionalLight({
 // shadows
 // TODO: directional light は constructor で shadow camera を生成してるのでこのガードいらない
 if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = true;
-    directionalLight.castShadow = true;
+    directionalLight.shadowCamera.visibleFrustum = false;
+    directionalLight.castShadow = false;
     directionalLight.shadowCamera.near = 1;
     directionalLight.shadowCamera.far = 15;
     setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
@@ -231,7 +240,7 @@ if (directionalLight.shadowCamera) {
 }
 
 subscribeActorOnStart(directionalLight, () => {
-    setTranslation(directionalLight.transform, createVector3(-8, 8, -2));
+    setTranslation(directionalLight.transform, createVector3(-16, 16, -4));
     setLookAtPosition(directionalLight.transform, createVector3(0, 0, 0));
 });
 addActorToScene(captureScene, directionalLight);
@@ -259,10 +268,7 @@ const createBgObjActor = async () => {
     const gltfActor = await loadGLTF({ gpu, dir: MODEL_ASSET_DIR, path: 'bg-static.gltf' });
     const mesh = gltfActor.children[0] as Mesh;
     // mesh.castShadow = true;
-    (mesh).materials = [
-        createGBufferMaterial({}),
-    ];
-    setScaling(gltfActor.transform, createFillVector3(5));
+    mesh.materials = [createGBufferMaterial({})];
     return gltfActor;
 };
 
@@ -282,7 +288,7 @@ const main = async () => {
         cubeMap,
         baseIntensity: 20,
         specularIntensity: 0.2,
-        rotationOffset: 0
+        rotationOffset: 0,
         // renderMesh: false,
     });
 
@@ -293,6 +299,7 @@ const main = async () => {
     streetFloorActor = await createStreetFloorActor();
     addActorToScene(captureScene, streetFloorActor);
     streetFloorActor.children.forEach((child) => {
+        child.enabled = false;
         if (child.type === ActorTypes.Mesh) {
             (child as Mesh).castShadow = true;
         }
@@ -308,7 +315,9 @@ const main = async () => {
 
     bgActor = await createBgObjActor();
     addActorToScene(captureScene, bgActor);
-    setTranslation(bgActor.transform, createVector3(0, .88, 0));
+    // setTranslation(bgActor.transform, createVector3(0, .88, 0));
+    setTranslation(bgActor.transform, createVector3(0, -6, -20));
+    setScaling(bgActor.transform, createFillVector3(8));
 
     //
     // glass
@@ -348,6 +357,11 @@ const main = async () => {
                         type: UniformTypes.Texture,
                         value: null,
                     },
+                    {
+                        name: 'uMorphRate',
+                        type: UniformTypes.Float,
+                        value: 0,
+                    },
                 ],
                 //                 fragmentShaderModifiers: [
                 //                     {
@@ -364,8 +378,14 @@ const main = async () => {
         ],
         castShadow: true,
     });
+    subscribeActorOnUpdate(objectSpaceRaymarchMesh, (args) => {
+        const { time } = args;
+        // console.log(time);
+        const morphRate = debuggerStates.morphingEnabled ? time : debuggerStates.morphRate;
+        setUniformValueToAllMeshMaterials(objectSpaceRaymarchMesh, 'uMorphRate', morphRate);
+    });
     setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
-    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 4.5, 0));
+    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 5, 0));
     // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
 
     addActorToScene(captureScene, skyboxMesh);
@@ -394,7 +414,8 @@ const main = async () => {
         renderer.fogPass.fogColor = createColorBlack();
         renderer.fogPass.fogDensity = 0.023;
         renderer.fogPass.fogDensityAttenuation = 0.065;
-        renderer.fogPass.distanceFogStart = 18;
+        renderer.fogPass.distanceFogStart = 1000;
+        renderer.fogPass.distanceFogEnd = 1000;
         renderer.fogPass.distanceFogPower = 0.29;
         renderer.fogPass.sssFogRate = 0;
 
@@ -413,12 +434,15 @@ const main = async () => {
 
         renderer.glitchPass.enabled = false;
 
+        renderer.vignettePass.vignetteRadiusTo = 5;
+
         startOrbitCameraController(orbitCameraController);
     });
 
     setOnBeforeUpdateEngine(engine, () => {
         if (!debuggerGUI) {
             debuggerGUI = initDebugger(wrapperElement, {
+                debuggerStates,
                 renderer,
                 orbitCameraController,
                 bufferVisualizerPass,

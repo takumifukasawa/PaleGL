@@ -106,14 +106,13 @@ void main() {
     vec3 resultBackBufferColor = vec3(0.);
     vec3 reflTex = vec3(0.);
     
+    float ior = 1.45;
     float rayIORShift = .015;
     float uvIORShift = .015;
     // float specBlendRate = 1.;
-    float specBlendRate = .5;
-        
+    float specBlendRate = .75;
     
     if(result.x > 0.) {
-        float ior = 1.45;
         // 物体表面の位置
         vec3 p = currentRayPosition;
         // 物体表面の法線

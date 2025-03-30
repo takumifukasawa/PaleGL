@@ -27,12 +27,17 @@ import { Renderer } from '@/PaleGL/core/renderer.ts';
 export function initDebugger(
     wrapperElement: HTMLElement,
     {
+        debuggerStates,
         renderer,
         orbitCameraController,
         bufferVisualizerPass,
         directionalLight,
         objectSpaceRaymarchMesh,
     }: {
+        debuggerStates: {
+            morphRate: number;
+            morphingEnabled: boolean;
+        },
         renderer: Renderer,
         orbitCameraController: OrbitCameraController,
         bufferVisualizerPass: BufferVisualizerPass,
@@ -41,6 +46,28 @@ export function initDebugger(
     }
 ): DebuggerGUI {
     const debuggerGUI = createDebuggerGUI();
+
+    //
+    // debugger states
+    //
+
+    addSliderDebugger(debuggerGUI, {
+        label: 'morph rate',
+        minValue: 0,
+        maxValue: 1,
+        stepValue: 0.001,
+        initialValue: debuggerStates.morphRate,
+        onChange: (value) => {
+            debuggerStates.morphRate = value * 9;
+        },
+    });
+
+    addToggleDebugger(debuggerGUI, {
+        label: 'auto morph',
+        initialValue: debuggerStates.morphingEnabled,
+        onChange: (value) => (debuggerStates.morphingEnabled = value),
+    });
+
 
     //
     // orbit controls
@@ -505,7 +532,7 @@ export function initDebugger(
     addSliderDebugger(fogDebuggerGroup, {
         label: 'distance fog start',
         minValue: 0,
-        maxValue: 300,
+        maxValue: 1000,
         stepValue: 0.0001,
         initialValue: renderer.fogPass.distanceFogPower,
         onChange: (value) => {
@@ -516,7 +543,7 @@ export function initDebugger(
     addSliderDebugger(fogDebuggerGroup, {
         label: 'distance fog end',
         minValue: 0,
-        maxValue: 300,
+        maxValue: 1000,
         stepValue: 0.0001,
         initialValue: renderer.fogPass.distanceFogEnd,
         onChange: (value) => {
@@ -897,7 +924,7 @@ export function initDebugger(
     addSliderDebugger(vignetteDebuggerGroup, {
         label: 'radius from',
         minValue: 0,
-        maxValue: 3,
+        maxValue: 5,
         stepValue: 0.001,
         initialValue: renderer.vignettePass.vignetteRadiusFrom,
         onChange: (value) => (renderer.vignettePass.vignetteRadiusFrom = value),
@@ -905,7 +932,7 @@ export function initDebugger(
     addSliderDebugger(vignetteDebuggerGroup, {
         label: 'radius to',
         minValue: 0,
-        maxValue: 3,
+        maxValue: 5,
         stepValue: 0.001,
         initialValue: renderer.vignettePass.vignetteRadiusTo,
         onChange: (value) => (renderer.vignettePass.vignetteRadiusTo = value),
