@@ -142,10 +142,10 @@ void main() {
     vec3 reflTex = vec3(0.);
     
     float ior = 1.45;
-    float rayIORShift = .015;
+    float rayIORShift = .005;
     float uvIORShiftBase = .002;
-    float uvIORShiftPower = .075;
-    float specBlendRate = .9;
+    float uvIORShiftPower = .05;
+    float specBlendRate = .85;
     
     if(result.x > 0.) {
         // 物体表面の位置
