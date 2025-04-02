@@ -183,7 +183,7 @@ const engine = createEngine({ gpu, renderer, showStats: true, showPipeline: true
 
 setSceneToEngine(engine, captureScene);
 
-const captureSceneCamera = createPerspectiveCamera(40, 1, 0.1, 200);
+const captureSceneCamera = createPerspectiveCamera(35, 1, 0.1, 200);
 addActorToScene(captureScene, captureSceneCamera);
 
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
@@ -200,7 +200,7 @@ orbitCameraController.maxAzimuth = 55;
 orbitCameraController.minAzimuth = -55;
 orbitCameraController.defaultAzimuth = 10;
 orbitCameraController.defaultAltitude = -10;
-orbitCameraController.lookAtTarget = createVector3(0, 4, 0);
+orbitCameraController.lookAtTarget = createVector3(0, 4.5, 0);
 
 subscribeActorOnStart(captureSceneCamera, () => {
     setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
