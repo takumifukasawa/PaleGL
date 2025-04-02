@@ -470,8 +470,6 @@ uniform sampler2D uAmbientOcclusionTexture;
 layout (location = 0) out vec4 outColor;
 
 void main() {
-    float eps = .0001;
-
     vec4 resultColor = vec4(0, 0, 0, 1);
 
     vec2 uv = vUv;
@@ -498,7 +496,7 @@ void main() {
     vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
     // depth guard
-    if (step(rawDepth, 1. - eps) < .5) {
+    if (step(rawDepth, 1. - .00001) < .5) {
         outColor = vec4(baseColor, 1.); 
         // outColor = vec4(1., 0., 0., 1.); // TODO: 本当はこっちを使いたい: skyboxを後合成にしたい
         // 疑似HDRする場合
