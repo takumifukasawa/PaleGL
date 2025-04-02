@@ -56,6 +56,25 @@ mat2 rot2(float a) {
     return mat2(c, -s, s, c);
 }
 
+vec2 shiftReflUv(
+    vec2 uv,
+    vec3 rdIn,
+    vec3 rdOut,
+    vec3 n,
+    float ior,
+    float offsetPower,
+    float offsetBase
+) {
+    float angleInOut = acos(dot(rdIn, rdOut));
+    // float reflUvDir = sign(dot(rdOut, n));
+    float reflUvDir = sign(rdOut.x);
+    uv -= .5;
+    uv *= rot2(offsetPower * ior * angleInOut * reflUvDir);
+    uv += .5;
+    uv += offsetBase;
+    return uv;
+}
+
 void main() {
     vec4 resultColor = uBaseColor * vec4(0.);
 
@@ -115,8 +134,8 @@ void main() {
     float ior = 1.45;
     float rayIORShift = .015;
     float uvIORShiftBase = .002;
-    float uvIORShiftPower = .05;
-    float specBlendRate = .25;
+    float uvIORShiftPower = .075;
+    float specBlendRate = .85;
     
     if(result.x > 0.) {
         // 物体表面の位置
@@ -164,8 +183,6 @@ void main() {
         vec2 reflUv = screenUv;
         vec3 envSpecularDir = vec3(0.);
         vec3 rdOut = vec3(0.);
-        float angleInOut = 0.;
-        float reflUvDir = 0.;
 
         // red
         // 物体内側から屈折して外側に出るベクトル
@@ -174,24 +191,9 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // 1: backbufferを使う場合
-        reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-            // reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-            // reflUv.y = 1. - reflUv.y;
-        // }
-        // reflUv += rdOut.xy * ior * uvIORShift * vec2(1., 0.);
-        angleInOut = acos(dot(rdIn, rdOut));
-        reflUvDir = sign(dot(rdOut, n));
-        // reflUv += (rdOut.xy * uvIORShiftPower + uvIORShiftBase) * ior * vec2(1., 1.) * length(diffInOut);
-        // reflUv += uvIORShiftPower * ior * angleInOut + uvIORShiftBase;
-        reflUv -= .5;
-        reflUv *= rot2(uvIORShiftPower * ior * angleInOut * reflUvDir);
-        reflUv += .5;
-        reflUv += uvIORShiftBase;
-        // 2: skyboxを使う場合
+        // 1: backbuffer
+        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, -uvIORShiftBase);
+        // 2: skybox
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.r = texture(uSceneTexture, reflUv).r;
         reflTex.r = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r;
@@ -203,21 +205,9 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // 1: backbufferを使う場合
-        reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-            // reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-            // reflUv.y = 1. - reflUv.y;
-        // }
-        angleInOut = acos(dot(rdIn, rdOut));
-        reflUvDir = sign(dot(rdOut, n));
-        // reflUv -= (rdOut.xy * uvIORShiftPower + uvIORShiftBase) * ior * vec2(1., 1.) * length(diffInOut);
-        reflUv -= .5;
-        reflUv *= rot2(uvIORShiftPower * ior * angleInOut * reflUvDir);
-        reflUv += .5;
-        // 2: skyboxを使う場合
+        // 1: backbuffer
+        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, 0.);
+        // 2: skybox
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.g = texture(uSceneTexture, reflUv).g;
         reflTex.g = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g;
@@ -229,29 +219,14 @@ void main() {
         if(dot(rdOut, rdOut) == 0.) {
             rdOut = reflect(rdIn, nExit);
         }
-        // 1: backbufferを使う場合
-        reflUv = screenUv;
-        // if(rdOut.x > 0.) {
-            // reflUv.x = 1. - reflUv.x;
-        // }
-        // if(rdOut.y > 0.) {
-            // reflUv.y = 1. - reflUv.y;
-        // }
-        // reflUv -= rdOut.xy * ior * uvIORShift * vec2(1., 0.);
-        angleInOut = acos(dot(rdIn, rdOut));
-        reflUvDir = sign(dot(rdOut, n));
-        // reflUv -= (rdOut.xy * uvIORShiftPower + uvIORShiftBase) * ior * vec2(1., 1.) * length(diffInOut);
-        reflUv -= .5;
-        reflUv *= rot2(uvIORShiftPower * ior * angleInOut * reflUvDir);
-        reflUv += .5;
-        reflUv += uvIORShiftBase;
-        // 2: skyboxを使う場合
+        // 1: backbuffer
+        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, uvIORShiftBase);
+        // 2: skybox
         envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.b = texture(uSceneTexture, reflUv).b;
         reflTex.b = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b;
 
         resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
-        // resultColor.xyz = reflTex;
     }
 
     float alpha = resultColor.a;
