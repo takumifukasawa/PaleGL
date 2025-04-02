@@ -20,7 +20,7 @@ import {
 } from '@/PaleGL/core/orbitCameraController';
 import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
 import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
-import { createColorBlack, createColorWhite } from '@/PaleGL/math/color';
+import {createColor, createColorBlack, createColorWhite} from '@/PaleGL/math/color';
 import { v2o } from '@/PaleGL/math/vector2';
 import { createFillVector3, createVector3 } from '@/PaleGL/math/vector3';
 import { createVector4 } from '@/PaleGL/math/vector4';
@@ -266,9 +266,6 @@ const createStreetFloorActor = async () => {
 
 const createBgObjActor = async () => {
     const gltfActor = await loadGLTF({ gpu, dir: MODEL_ASSET_DIR, path: 'bg-static.gltf' });
-    const mesh = gltfActor.children[0] as Mesh;
-    // mesh.castShadow = true;
-    mesh.materials = [createGBufferMaterial({})];
     return gltfActor;
 };
 
@@ -314,6 +311,12 @@ const main = async () => {
     //
 
     bgActor = await createBgObjActor();
+    const bgActorMesh = bgActor.children[0] as Mesh;
+    // mesh.castShadow = true;
+    bgActorMesh.materials = [createGBufferMaterial({
+        emissiveColor: createColor(2, 2, 2, 1)
+    })];
+    
     addActorToScene(captureScene, bgActor);
     // setTranslation(bgActor.transform, createVector3(0, .88, 0));
     setTranslation(bgActor.transform, createVector3(0, -6, -20));
@@ -412,8 +415,8 @@ const main = async () => {
         renderer.ssrPass.enabled = false;
 
         renderer.fogPass.fogColor = createColorBlack();
-        renderer.fogPass.fogDensity = 0.023;
-        renderer.fogPass.fogDensityAttenuation = 0.065;
+        renderer.fogPass.fogDensity = 0.001;
+        renderer.fogPass.fogDensityAttenuation = 0.001;
         renderer.fogPass.distanceFogStart = 1000;
         renderer.fogPass.distanceFogEnd = 1000;
         renderer.fogPass.distanceFogPower = 0.29;
