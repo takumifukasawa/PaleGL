@@ -56,6 +56,14 @@ mat2 rot2(float a) {
     return mat2(c, -s, s, c);
 }
 
+float signedAngle(vec3 a, vec3 b, vec3 axis) {
+    vec3 na = normalize(a);
+    vec3 nb = normalize(b);
+    float angle = acos(clamp(dot(na, nb), -1.0, 1.0)); // 安全な内積
+    float sign = dot(axis, cross(na, nb));
+    return sign < 0.0 ? -angle : angle;
+}
+
 vec2 shiftReflUv(
     vec2 uv,
     vec3 rdIn,
@@ -65,11 +73,13 @@ vec2 shiftReflUv(
     float offsetPower,
     float offsetBase
 ) {
-    float angleInOut = acos(dot(rdIn, rdOut));
-    // float reflUvDir = sign(dot(rdOut, n));
-    float reflUvDir = sign(rdOut.x);
+    // float angleInOut = acos(dot(rdIn, rdOut));
+    float angleInOut = signedAngle(rdIn, rdOut, vec3(0., 0., 1.));
+    // float reflUvDir = sign(dot(rdIn, rdOut));
+    // float reflUvDir = sign(rdOut.x);
     uv -= .5;
-    uv *= rot2(offsetPower * ior * angleInOut * reflUvDir);
+    // uv *= rot2(offsetPower * ior * angleInOut * reflUvDir);
+    uv *= rot2(offsetPower * ior * angleInOut);
     uv += .5;
     uv += offsetBase;
     return uv;
@@ -135,7 +145,7 @@ void main() {
     float rayIORShift = .015;
     float uvIORShiftBase = .002;
     float uvIORShiftPower = .075;
-    float specBlendRate = .85;
+    float specBlendRate = .9;
     
     if(result.x > 0.) {
         // 物体表面の位置
