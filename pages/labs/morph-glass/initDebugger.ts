@@ -534,7 +534,7 @@ export function initDebugger(
         minValue: 0,
         maxValue: 1000,
         stepValue: 0.0001,
-        initialValue: renderer.fogPass.distanceFogPower,
+        initialValue: renderer.fogPass.distanceFogStart,
         onChange: (value) => {
             renderer.fogPass.distanceFogStart = value;
         },
