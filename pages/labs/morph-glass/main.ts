@@ -247,9 +247,6 @@ addActorToScene(captureScene, directionalLight);
 
 const cameraPostProcess = createPostProcess();
 
-renderer.depthOfFieldPass.focusDistance = 18.5;
-renderer.depthOfFieldPass.focusRange = 17;
-
 const bufferVisualizerPass = createBufferVisualizerPass({ gpu });
 bufferVisualizerPass.enabled = false;
 addPostProcessPass(cameraPostProcess, bufferVisualizerPass);
@@ -351,7 +348,7 @@ const main = async () => {
                 // renderQueueType: RenderQueueType.AlphaTest,
                 // alphaTest: 0.5,
                 depthTest: true,
-                depthWrite: false,
+                depthWrite: true,
                 depthFuncType: DepthFuncTypes.Lequal,
                 faceSide: FaceSide.Front,
                 uniforms: [
@@ -413,6 +410,10 @@ const main = async () => {
         renderer.screenSpaceShadowPass.enabled = false;
 
         renderer.ssrPass.enabled = false;
+        
+        // renderer.depthOfFieldPass.enabled = false;
+        renderer.depthOfFieldPass.focusDistance = 18.5;
+        renderer.depthOfFieldPass.focusRange = 17;
 
         renderer.fogPass.fogColor = createColorBlack();
         renderer.fogPass.fogDensity = 0.001;
