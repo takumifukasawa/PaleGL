@@ -6,6 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import gltf from 'vite-plugin-gltf';
 import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
+import eslint from '@nabla/vite-plugin-eslint';
 import * as process from 'process';
 import { transformGlslLayout } from './plugins/vite-transform-glsl-layout-plugin.ts';
 import string from 'vite-plugin-string';
@@ -29,7 +30,7 @@ const ENTRY_POINTS: { [key: string]: string } = {
 // https://ja.vitejs.dev/config/
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
-export default defineConfig(async (config) => {
+export default defineConfig((config) => {
     
     const { mode } = config;
     
@@ -79,6 +80,11 @@ export default defineConfig(async (config) => {
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
             checker({ typescript: true }),
+            eslint({
+                eslintOptions: {
+                    overrideConfigFile: 'eslint.config.js', // 明示
+                },
+            }),
             string({
                 include: '**/*.txt',
             }),
@@ -90,7 +96,6 @@ export default defineConfig(async (config) => {
                 defaultExtension: 'glsl',
                 warnDuplicatedImports: true,
                 exclude: undefined,
-                compress: false,
             }),
             transformGlslLayout(),
             shaderMinifierPlugin({
@@ -111,12 +116,13 @@ export default defineConfig(async (config) => {
                     ]
                 },
             }),
-            checker({
-                typescript: true,
-                eslint: {
-                    lintCommand: 'eslint --ext .ts,.js ./',
-                },
-            }),
+            // checker({
+            //     typescript: true,
+            //     eslint: {
+            //         // lintCommand: 'eslint --ext .ts,.js ./',
+            //         lintCommand: 'ESLINT_USE_FLAT_CONFIG=true eslint --ext .ts,.js ./',
+            //     },
+            // }),
             visualizer({
                 template: 'treemap',
             }),

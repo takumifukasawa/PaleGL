@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# eslint
+.eslintcache
+
 ###
 
 /packer
