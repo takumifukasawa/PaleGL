@@ -17,7 +17,7 @@ import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts'
 import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip, getAllKeyframesValue } from '@/PaleGL/core/animationClip.ts';
-import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from 'src/PaleGL/actors/actor.ts';
+import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
