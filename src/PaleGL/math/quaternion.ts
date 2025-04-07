@@ -279,10 +279,10 @@ export function createQuaternion(x: number, y: number, z: number, w: number) {
     return {e: new Float32Array([x, y, z, w])};
 }
 
-const qx = (q: Quaternion) => q.e[0];
-const qy = (q: Quaternion) => q.e[1];
-const qz = (q: Quaternion) => q.e[2];
-const qw = (q: Quaternion) => q.e[3];
+export const qx = (q: Quaternion) => q.e[0];
+export const qy = (q: Quaternion) => q.e[1];
+export const qz = (q: Quaternion) => q.e[2];
+export const qw = (q: Quaternion) => q.e[3];
 
 export function copyQuaternion(sq: Quaternion, tq: Quaternion) {
     sq.e = new Float32Array(tq.e);

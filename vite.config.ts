@@ -31,11 +31,10 @@ const ENTRY_POINTS: { [key: string]: string } = {
 // https://github.com/vitejs/vite/issues/621
 /** @type {import('vite').UserConfig} */
 export default defineConfig((config) => {
-    
     const { mode } = config;
-    
+
     const env = loadEnv(mode, process.cwd());
-    
+
     // NOTE: 本来はなくてもいいはず
     Object.assign(process.env, env);
 
@@ -68,18 +67,18 @@ export default defineConfig((config) => {
         console.log(`${key}: ${entryPoints[key]}`);
     });
     console.log('======================');
-    
+
     // ref:
     // https://uga-box.hatenablog.com/entry/2022/05/03/000000
     // https://vitejs.dev/config/
     return {
         plugins: [
-            checker({
-                overlay: false,
-            }),
             deleteTmpCachesPlugin(),
             tsconfigPaths(),
-            checker({ typescript: true }),
+            checker({
+                overlay: false,
+                typescript: true,
+            }),
             eslint({
                 eslintOptions: {
                     overrideConfigFile: 'eslint.config.js', // 明示
@@ -105,15 +104,15 @@ export default defineConfig((config) => {
                     aggressiveInlining: false,
                     noRenamingList: [
                         // 最低限この2つは置き換える
-                        "main",
-                        "dfScene",
+                        'main',
+                        'dfScene',
                         // 適宜置き換える
                         // NOTE: ドキュメント的には関数だけ指定できるみたいだが、変数も可？
                         'uv',
                         'baseColor',
                         'emissiveColor',
                         // 'resultColor'
-                    ]
+                    ],
                 },
             }),
             // checker({
@@ -182,14 +181,16 @@ export default defineConfig((config) => {
                 },
             },
         },
-        ...(isWin(process) ? {
-            // for WSL
-            server: {
-                watch: {
-                    usePolling: true,
-                    interval: 2000,
-                },
-            },
-        } : {})
+        ...(isWin(process)
+            ? {
+                  // for WSL
+                  server: {
+                      watch: {
+                          usePolling: true,
+                          interval: 2000,
+                      },
+                  },
+              }
+            : {}),
     };
 });

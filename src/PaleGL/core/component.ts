@@ -8,7 +8,7 @@ export type ComponentBeforeUpdateArgs = { gpu: Gpu; time: number; deltaTime: num
 export type ComponentUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
 export type ComponentLastUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
+type OnStartCallback = (actor: Actor, args: { scene: Scene; gpu: Gpu }) => void;
 type OnFixedUpdateCallback = (args: { gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
 type OnBeforeUpdateCallback = (args: { gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnUpdateCallback = (args: { gpu: Gpu; time: number; deltaTime: number }) => void;
@@ -56,8 +56,8 @@ export function createComponent(args: ComponentArgs) {
     let _actor: Actor | null = null;
 
     const start = (args: ComponentStartArgs) => {
-        if (onStartCallback) {
-            onStartCallback(args);
+        if (onStartCallback && _actor) {
+            onStartCallback(_actor, args);
         }
     };
 

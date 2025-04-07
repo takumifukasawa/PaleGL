@@ -27,8 +27,8 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
 import { createRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
+import {Actor} from "@/PaleGL/actors/actor.ts";
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
 
 // TODO:
