@@ -13,16 +13,23 @@ import string from 'vite-plugin-string';
 import { shaderMinifierPlugin } from './plugins/vite-shader-minifier-plugin.ts';
 import { deleteTmpCachesPlugin } from './plugins/vite-delete-tmp-caches-plugin.ts';
 import { isWin } from './node-libs/env';
+import { viteSingleFile } from 'vite-plugin-singlefile';
+import { createHtmlPlugin } from 'vite-plugin-html';
+import * as path from "node:path";
 
 type EntryPointInfo = { name: string; path: string };
 
 // ---------------------------------------------------
-// ビルドするentryを定義. TODO: 手動で切り替えるの面倒なので自動で分けたい
+
+// ビルドするentryを定義
 const ENTRY_POINTS: { [key: string]: string } = {
     ['sandbox']: 'labs/sandbox',
     ['street-light']: 'labs/street-light',
     ['morph-glass']: 'labs/morph-glass',
 };
+
+// rootモードになってるときは pages直下を使用
+const ROOT_MODE_PATH = '';
 
 // ---------------------------------------------------
 
@@ -40,33 +47,44 @@ export default defineConfig((config) => {
 
     const isDropConsole = env.VITE_DROP_CONSOLE === 'true';
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
+    const isRoot = env.VITE_ROOT === 'true';
+    const isBundle = env.VITE_BUNDLE === 'true';
 
-    console.log(`=== [env] mode: ${mode} ===`);
+    console.log(`===== [env] mode: ${mode} =====`);
     console.log(`isDropConsole: ${isDropConsole}`);
     console.log(`isMinifyShader: ${isMinifyShader}`);
     console.log(`entryNames: ${ENTRY_POINTS}`);
+    console.log(`isRoot: ${isRoot}`);
+    console.log(`isBundle: ${isBundle}`);
 
     // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
 
-    Object.keys(ENTRY_POINTS).forEach((key) => {
-        const path = ENTRY_POINTS[key];
+    if (isRoot) {
         entryPointInfos.push({
-            name: path,
-            path,
+            name: 'index',
+            path: ROOT_MODE_PATH,
         });
-    });
+    } else {
+        Object.keys(ENTRY_POINTS).forEach((key) => {
+            const path = ENTRY_POINTS[key];
+            entryPointInfos.push({
+                name: path,
+                path,
+            });
+        });
+    }
 
     const entryPoints: { [key: string]: string } = {};
     entryPointInfos.forEach((entryPointInfo) => {
-        entryPoints[entryPointInfo.name] = resolve(__dirname, `pages/${entryPointInfo.path}/index.html`); // html含めてビルドする場合
+        entryPoints[entryPointInfo.name] = resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'index.html')); // html含めてビルドする場合
     });
 
-    console.log(`=== [entry_points] ===`);
+    console.log(`===== [entry_points] =====`);
     Object.keys(entryPoints).forEach((key) => {
         console.log(`${key}: ${entryPoints[key]}`);
     });
-    console.log('======================');
+    console.log('==========================');
 
     // ref:
     // https://uga-box.hatenablog.com/entry/2022/05/03/000000
@@ -115,18 +133,12 @@ export default defineConfig((config) => {
                     ],
                 },
             }),
-            // checker({
-            //     typescript: true,
-            //     eslint: {
-            //         // lintCommand: 'eslint --ext .ts,.js ./',
-            //         lintCommand: 'ESLINT_USE_FLAT_CONFIG=true eslint --ext .ts,.js ./',
-            //     },
-            // }),
             visualizer({
                 template: 'treemap',
             }),
+            ...(isBundle ? [viteSingleFile(), createHtmlPlugin()] : []),
         ],
-        // assetsInclude: ['**/*.gltf', '**/*.dxt'],
+        // assetsInclude: ['**/*.gltf', '**/*.dxt'], // dxt使う場合合った方がいい？
         assetsInclude: ['**/*.gltf'],
         root: './pages',
         publicDir: resolve(__dirname, 'public'),
@@ -142,13 +154,13 @@ export default defineConfig((config) => {
                 output: {
                     inlineDynamicImports: false,
                     entryFileNames: (chunk) => {
-                        return `${chunk.name}/assets/main.js`;
+                        return isRoot ? `assets/main.js` : `${chunk.name}/assets/main.js`;
                     },
-                    assetFileNames: (chunk) => {
-                        return `${chunk.name}/assets/[name].[ext]`;
+                    assetFileNames: () => {
+                        return isRoot ? `assets/[name].[ext]` : `assets/[name].[ext]`;
                     },
                     chunkFileNames: () => {
-                        return `assets/chunk-[hash].js`;
+                        return isRoot ? `assets/chunk-[hash].js` : `assets/chunk-[hash].js`;
                     },
                 },
             },
