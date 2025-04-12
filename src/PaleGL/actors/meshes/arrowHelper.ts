@@ -2,9 +2,11 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { AttributeNames, UniformNames } from '@/PaleGL/constants.ts';
+import {AttributeNames, BlendTypes, UniformBlockNames, UniformNames} from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import {setScaling} from "@/PaleGL/core/transform.ts";
+import {createVector3} from "@/PaleGL/math/vector3.ts";
 
 const arrowHelperGeometryData = `
 # Blender 3.3.1
@@ -230,12 +232,12 @@ export function createArrowHelper({ gpu }: { gpu: Gpu }): Mesh {
         gpu,
         attributes: [
             createAttribute({
-                name: 'position',
+                name: AttributeNames.Position,
                 data: new Float32Array(objData.positions),
                 size: 3,
             }),
             createAttribute({
-                name: 'uv',
+                name: AttributeNames.Uv,
                 data: new Float32Array(objData.uvs),
                 size: 2,
             }),
@@ -247,32 +249,43 @@ export function createArrowHelper({ gpu }: { gpu: Gpu }): Mesh {
     const material = createMaterial({
         // gpu,
         vertexShader: `
-            layout (location = 0) in vec3 ${AttributeNames.Position};
-            layout (location = 1) in vec2 ${AttributeNames.Uv};
-            uniform mat4 ${UniformNames.WorldMatrix};
-            uniform mat4 ${UniformNames.ViewMatrix};
-            uniform mat4 ${UniformNames.ProjectionMatrix};
-            out vec2 vUv;
-            void main() {
-                vUv = aUv;
-                gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
-            }
+#pragma DEFINES
+#pragma ATTRIBUTES
+#include <lighting>
+#include <ub>
+precision highp float;
+out vec2 vUv;
+void main() {
+    vUv = aUv;
+    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
+}
             `,
         fragmentShader: `
-            in vec2 vUv;
-            out vec4 outColor;
-            void main() {
-                vec3 color = vec3(1., 0., 0.);
-                if(vUv.x > .5) {
-                    color = vec3(0., 1., 0.);
-                } else if(vUv.x > .25) {
-                    color = vec3(0., 0., 1.);
-                }
-                outColor = vec4(color, 1.);
-            }
+#pragma DEFINES
+#include <lighting>
+#include <ub>
+in vec2 vUv;
+out vec4 outColor;
+void main() {
+    vec3 color = vec3(1., 0., 0.);
+    if(vUv.x > .5) {
+        color = vec3(0., 1., 0.);
+    } else if(vUv.x > .25) {
+        color = vec3(0., 0., 1.);
+    }
+    outColor = vec4(color, 1.);
+}
             `,
+        uniformBlockNames: [
+            UniformBlockNames.Common,
+        ],
+        blendType: BlendTypes.Transparent,
+        depthTest: false,
+        depthWrite: false
     });
     const mesh = createMesh({ geometry, material });
-
+    
+    setScaling(mesh.transform, createVector3(0.3, 0.3, 0.3));
+    
     return mesh;
 }

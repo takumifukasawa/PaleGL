@@ -834,6 +834,8 @@ export function renderRenderer(
     sharedTextures: SharedTextures,
     {
         time,
+        // timelineTime,
+        // timeDeltaTime,
         onBeforePostProcess,
     }: {
         time: number;

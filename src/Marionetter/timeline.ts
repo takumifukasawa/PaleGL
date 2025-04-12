@@ -415,11 +415,16 @@ function createMarionetterAnimationClip(
 
         // TODO: なぜか一回行列に落とさないとうまく動かない. まわりくどいかつ余計な計算が走るが
         if (hasLocalRotationEuler) {
-            const rm  =multiplyMat4Array(
-                // TODO: 本当はc#側でxyを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
-                createRotationYMatrix(v3x(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD),
-                createRotationXMatrix(v3y(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD),
-                createRotationZMatrix(v3z(localRotationEulerDegree) * DEG_TO_RAD)
+            const rm = multiplyMat4Array(
+                // // TODO: 本当はc#側でxyを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
+                // createRotationYMatrix(v3y(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD),
+                // createRotationXMatrix(v3x(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD),
+                // createRotationZMatrix(v3z(localRotationEulerDegree) * DEG_TO_RAD)
+                // TODO: 本当はc#側yzを反転させて渡したいが、なぜかうまくいかないのでここだけフロント側で反転
+                // 旧PaleGLだとxy反転だったが
+                createRotationYMatrix(v3y(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD),
+                createRotationXMatrix(v3x(localRotationEulerDegree) * DEG_TO_RAD),
+                createRotationZMatrix(v3z(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD)
             );
             const q = rotationMatrixToQuaternion(rm);
             setRotation(actor.transform, createRotator(
