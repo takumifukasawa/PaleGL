@@ -272,6 +272,7 @@ import {
     mat4m22,
     Matrix4,
 } from '@/PaleGL/math/matrix4.ts';
+import {createVector3, v3x, v3y, v3z, Vector3} from "@/PaleGL/math/vector3.ts";
 
 export type Quaternion = { e :Float32Array };
 
@@ -513,4 +514,28 @@ export function createQuaternionInvertAxis(q: Quaternion) {
 
 export function createQuaternionIdentity() {
     return createQuaternion(0, 0, 0, 1);
+}
+
+export function rotateVectorByQuaternion(v: Vector3, q: Quaternion) {
+    const x = qx(q);
+    const y = qy(q);
+    const z = qz(q);
+    const w = qw(q);
+    
+    const vx = v3x(v);
+    const vy = v3y(v);
+    const vz = v3z(v);
+
+    // クォータニオンのベクトル部分 (x, y, z) と v のクロス積を計算
+    const tx = 2 * (y * vz - z * vy);
+    const ty = 2 * (z * vx - x * vz);
+    const tz = 2 * (x * vy - y * vx);
+
+    // 回転後のベクトル v′ を計算
+    const rx = vx + w * tx + (y * tz - z * ty);
+    const ry = vy + w * ty + (z * tx - x * tz);
+    const rz = vz + w * tz + (x * ty - y * tx);
+
+    // 回転後のベクトルを生成して返す
+    return createVector3(rx, ry, rz);
 }

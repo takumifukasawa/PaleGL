@@ -102,11 +102,9 @@ import {
     updateUniformBufferValue,
 } from '@/PaleGL/core/uniformBufferObject.ts';
 import {
-    cloneVector3,
+    cloneVector3, createVector3,
     createVector3Zero,
     getVector3Magnitude,
-    negateVector3,
-    normalizeVector3,
     subVectorsV3,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
@@ -147,6 +145,7 @@ import {
     isPerspectiveCamera,
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import {rotateVectorByQuaternion} from "@/PaleGL/math/quaternion.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -1908,8 +1907,10 @@ function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: Di
         {
             name: UniformNames.LightDirection,
             type: UniformTypes.Vector3,
-            // pattern3: normalizeし、光源の位置から降り注ぐとみなす
-            value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
+            // // pattern: normalizeし、光源の位置から降り注ぐとみなす
+            // value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
+            // pattern: 回転を適用
+            value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
         },
         {
             name: UniformNames.LightIntensity,
