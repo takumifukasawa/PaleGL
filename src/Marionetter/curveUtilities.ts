@@ -1,4 +1,8 @@
-import { MarionetterAnimationClipKeyframe, MarionetterCurveKeyframe } from '@/Marionetter/types';
+import {
+    MarionetterAnimationClipKeyframe,
+    MarionetterCurveKeyframe,
+    MarionetterCurveKeyframeProperty,
+} from '@/Marionetter/types';
 
 /**
  *
@@ -28,11 +32,19 @@ function curveUtilityEvaluateRaw(t: number, k0: MarionetterCurveKeyframe, k1: Ma
     const h01 = -2 * t3 + 3 * t2;
     const h11 = t3 - t2;
 
-    const r0 = k0.o * (k1.t - k0.t);
-    const r1 = k1.i * (k1.t - k0.t);
+    const r0 =
+        k0[MarionetterCurveKeyframeProperty.outTangent] *
+        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
+    const r1 =
+        k1[MarionetterCurveKeyframeProperty.inTangent] *
+        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
 
-    return h00 * k0.v + h10 * r0 + h01 * k1.v + h11 * r1;
-    
+    return (
+        h00 * k0[MarionetterCurveKeyframeProperty.value] +
+        h10 * r0 +
+        h01 * k1[MarionetterCurveKeyframeProperty.value] +
+        h11 * r1
+    );
 }
 
 /**
@@ -43,16 +55,28 @@ function curveUtilityEvaluateRaw(t: number, k0: MarionetterCurveKeyframe, k1: Ma
  */
 function curveUtilityEvaluate(t: number, k0: MarionetterCurveKeyframe, k1: MarionetterCurveKeyframe) {
     // const rt = Mathf.InverseLerp(k0.time, k1.time, t);
-    const rt = (t - k0.t) / (k1.t - k0.t);
+    const rt =
+        (t - k0[MarionetterCurveKeyframeProperty.time]) /
+        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
     return curveUtilityEvaluateRaw(rt, k0, k1);
 }
 
 export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): MarionetterCurveKeyframe {
     return {
-        t: keyframe[0],
-        v: keyframe[1],
-        i: keyframe[2],
-        o: keyframe[3],
+        [MarionetterCurveKeyframeProperty.time]: keyframe[0],
+        [MarionetterCurveKeyframeProperty.value]: keyframe[1],
+        [MarionetterCurveKeyframeProperty.inTangent]: keyframe[2],
+        [MarionetterCurveKeyframeProperty.outTangent]: keyframe[3],
+        // TGODO: うまいことまとめたい
+        ["time"]: keyframe[0],
+        ["value"]: keyframe[1],
+        ["inTangent"]: keyframe[2],
+        ["outTangent"]: keyframe[3],
+        // shorten
+        ["t"]: keyframe[0],
+        ["v"]: keyframe[1],
+        ["i"]: keyframe[2],
+        ["o"]: keyframe[3],
     };
 }
 
@@ -66,31 +90,33 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
 
     const firstK = buildKeyframe(keys[0]);
     const lastK = buildKeyframe(keys[keys.length - 1]);
-
+    
     // const keys = curve.keys;
 
     if (keys.length === 0) {
-        console.warn('curve.keys.Length == 0');
+        console.error('[curveUtilityEvaluateCurve] curve.keys.Length == 0');
         return 0;
     }
 
     if (keys.length === 1) {
-        return firstK.v;
+        return firstK[MarionetterCurveKeyframeProperty.value];
     }
 
     if (t < firstK.t) {
-        return firstK.v;
+        return firstK[MarionetterCurveKeyframeProperty.value];
     }
 
     if (t >= lastK.t) {
-        return lastK.v;
+        return lastK[MarionetterCurveKeyframeProperty.value];
     }
 
     // TODO: keyframeが多いとループ数が増えるのでtimeをbinarysearchかけるとよい
     for (let i = 0; i < keys.length - 1; i++) {
         const k0 = buildKeyframe(keys[i]);
         const k1 = buildKeyframe(keys[i + 1]);
-        if (k0.t <= t && t < k1.t) {
+        const k0t = k0[MarionetterCurveKeyframeProperty.time];
+        const k1t = k1[MarionetterCurveKeyframeProperty.time];
+        if (k0t <= t && t < k1t) {
             // for debug
             //Debug.Log($"time: {t}, k0.time: {k0.time}");
             //Debug.Log($"{i} -> {i + 1}");
@@ -98,6 +124,6 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
         }
     }
 
-    console.error(`invalid curve or time. t: ${t}`);
+    console.error(`[curveUtilityEvaluateCurve] invalid curve or time. t: ${t}`);
     return 0;
 }

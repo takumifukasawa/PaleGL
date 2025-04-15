@@ -16,6 +16,7 @@ import { isWin } from './node-libs/env';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import * as path from "node:path";
+// import {importJsonAsStringPlugin} from "./plugins/vite-import-json-as-string.ts";
 
 type EntryPointInfo = { name: string; path: string };
 
@@ -49,6 +50,7 @@ export default defineConfig((config) => {
     const isMinifyShader = env.VITE_MINIFY_SHADER === 'true';
     const isRoot = env.VITE_ROOT === 'true';
     const isBundle = env.VITE_BUNDLE === 'true';
+    const isMangle = env.VITE_MANGLE === 'true';
 
     console.log(`===== [env] mode: ${mode} =====`);
     console.log(`isDropConsole: ${isDropConsole}`);
@@ -56,6 +58,7 @@ export default defineConfig((config) => {
     console.log(`entryNames: ${ENTRY_POINTS}`);
     console.log(`isRoot: ${isRoot}`);
     console.log(`isBundle: ${isBundle}`);
+    console.log(`isMangle: ${isMangle}`);
 
     // NOTE: 今はentryを一つにしているので複数管理前提にする必要はない
     const entryPointInfos: EntryPointInfo[] = [];
@@ -77,7 +80,10 @@ export default defineConfig((config) => {
 
     const entryPoints: { [key: string]: string } = {};
     entryPointInfos.forEach((entryPointInfo) => {
-        entryPoints[entryPointInfo.name] = resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'index.html')); // html含めてビルドする場合
+        entryPoints[entryPointInfo.name] =
+            isBundle
+                ? resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'main.ts')) // isBundleでjs一個にまとめる場合
+                : resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'index.html')); // html含めてビルドする場合
     });
 
     console.log(`===== [entry_points] =====`);
@@ -133,6 +139,7 @@ export default defineConfig((config) => {
                     ],
                 },
             }),
+            // importJsonAsStringPlugin(),
             visualizer({
                 template: 'treemap',
             }),
@@ -154,12 +161,15 @@ export default defineConfig((config) => {
                 output: {
                     inlineDynamicImports: false,
                     entryFileNames: (chunk) => {
+                        console.log("entryFileNames", isRoot)
                         return isRoot ? `assets/main.js` : `${chunk.name}/assets/main.js`;
                     },
                     assetFileNames: () => {
+                        console.log("assetFileNames", isRoot)
                         return isRoot ? `assets/[name].[ext]` : `assets/[name].[ext]`;
                     },
                     chunkFileNames: () => {
+                        console.log("chunkFileNames", isRoot)
                         return isRoot ? `assets/chunk-[hash].js` : `assets/chunk-[hash].js`;
                     },
                 },
@@ -170,14 +180,18 @@ export default defineConfig((config) => {
                 mangle: {
                     toplevel: true,
                     // 関数ベースにする場合
-                    // properties: true,
-                    // class使う場合
-                    // properties: {
-                    //     regex: /^(_|\$)/,
-                    // },
+                    ...(isMangle ? {
+                        properties: {
+                            keep_quoted: true,
+                        }
+                        // class使う場合
+                        // properties: {
+                        //     regex: /^(_|\$)/,
+                        // },
+                    } : {}),
                 },
                 compress: {
-                    passes: 16,
+                    passes: 1,
                     // arguments: true,
                     // booleans_as_integers: true,
                     drop_console: isDropConsole,
@@ -191,6 +205,9 @@ export default defineConfig((config) => {
                     // unsafe_proto: true,
                     // unsafe_undefined: true,
                 },
+                // format: {
+                //     quote_keys: true
+                // }
             },
         },
         ...(isWin(process)

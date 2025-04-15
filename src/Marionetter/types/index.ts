@@ -53,41 +53,50 @@ export type MarionetterArgs = {
 // scene
 //
 
-export type MarionetterScene = NeedsShorten extends true
-    ? {
-          // n: string;
-          o: MarionetterObjectInfo[];
-      }
-    : {
-          // name: string;
-          objects: MarionetterObjectInfo[];
-      };
+export type MarionetterScene = {
+    objects: MarionetterObjectInfo[];
+    // shorten
+    o: MarionetterObjectInfo[];
+};
 
-export type MarionetterObjectInfo = NeedsShorten extends true
-    ? {
-          n: string;
-          t: MarionetterTransformInfo;
-          co: MarionetterComponentInfoKinds[];
-          ch: MarionetterObjectInfo[];
-      }
-    : {
-          name: string;
-          transform: MarionetterTransformInfo;
-          components: MarionetterComponentInfoKinds[];
-          children: MarionetterObjectInfo[];
-      };
+export const MarionetterSceneProperty = {
+    objects: NeedsShorten ? 'o' : 'objects',
+} as const;
 
-export type MarionetterTransformInfo = NeedsShorten extends true
-    ? {
-          lp: { x: number; y: number; z: number };
-          lr: { x: number; y: number; z: number; w: number };
-          ls: { x: number; y: number; z: number };
-      }
-    : {
-          localPosition: { x: number; y: number; z: number };
-          localRotation: { x: number; y: number; z: number; w: number };
-          localScale: { x: number; y: number; z: number };
-      };
+export type MarionetterObjectInfo = {
+    name: string;
+    transform: MarionetterTransformInfo;
+    components: MarionetterComponentInfoKinds[];
+    children: MarionetterObjectInfo[];
+    // shorten
+    n: string;
+    t: MarionetterTransformInfo;
+    co: MarionetterComponentInfoKinds[];
+    ch: MarionetterObjectInfo[];
+};
+
+export const MarionetterObjectInfoProperty = {
+    name: NeedsShorten ? 'n' : 'name',
+    transform: NeedsShorten ? 't' : 'transform',
+    components: NeedsShorten ? 'co' : 'components',
+    children: NeedsShorten ? 'ch' : 'children',
+} as const;
+
+export type MarionetterTransformInfo = {
+    localPosition: { x: number; y: number; z: number };
+    localRotation: { x: number; y: number; z: number; w: number };
+    localScale: { x: number; y: number; z: number };
+    // shorten
+    lp: { x: number; y: number; z: number };
+    lr: { x: number; y: number; z: number; w: number };
+    ls: { x: number; y: number; z: number };
+};
+
+export const MarionetterTransformInfoProperty = {
+    localPosition: NeedsShorten ? 'lp' : 'localPosition',
+    localRotation: NeedsShorten ? 'lr' : 'localRotation',
+    localScale: NeedsShorten ? 'ls' : 'localScale',
+} as const;
 
 //
 // track
@@ -105,45 +114,53 @@ export const MarionetterTrackInfoType = {
 
 export type MarionetterTrackInfoType = (typeof MarionetterTrackInfoType)[keyof typeof MarionetterTrackInfoType];
 
-export type MarionetterTrackInfoBase = NeedsShorten extends true
-    ? {
-          t: MarionetterTrackInfoType;
-      }
-    : {
-          type: MarionetterTrackInfoType;
-      };
+export type MarionetterTrackInfoBase = {
+    type: MarionetterTrackInfoType;
+    // shorten
+    t: MarionetterTrackInfoType;
+};
 
-export type MarionetterDefaultTrackInfo = (NeedsShorten extends true
-    ? {
-          tn: string;
-          cs: MarionetterClipInfoKinds[];
-      }
-    : {
-          targetName: string;
-          clips: MarionetterClipInfoKinds[];
-      }) &
-    MarionetterTrackInfoBase;
+export const MarionetterTrackInfoBaseProperty = {
+    type: NeedsShorten ? 't' : 'type',
+} as const;
 
-export type MarionetterMarkerTrackInfo = (NeedsShorten extends true
-    ? {
-          ses: MarionetterSignalEmitter[];
-      }
-    : {
-          signalEmitters: MarionetterSignalEmitter[];
-      }) &
-    MarionetterTrackInfoBase;
+export type MarionetterDefaultTrackInfo = MarionetterTrackInfoBase & {
+    targetName: string;
+    clips: MarionetterClipInfoKinds[];
+    // shorten
+    tn: string;
+    cs: MarionetterClipInfoKinds[];
+};
+
+export const MarionetterDefaultTrackInfoProperty = {
+    targetName: NeedsShorten ? 'tn' : 'targetName',
+    clips: NeedsShorten ? 'cs' : 'clips',
+} as const;
+
+export type MarionetterMarkerTrackInfo = MarionetterTrackInfoBase & {
+    signalEmitters: MarionetterSignalEmitter[];
+    // shorten
+    ses: MarionetterSignalEmitter[];
+};
+
+export const MarionetterMarkerTrackInfoProperty = {
+    signalEmitters: NeedsShorten ? 'ses' : 'signalEmitters',
+} as const;
 
 export type MarionetterTrackInfoKinds = MarionetterDefaultTrackInfo | MarionetterMarkerTrackInfo;
 
-export type MarionetterSignalEmitter = NeedsShorten extends true
-    ? {
-          n: string;
-          t: number;
-      }
-    : {
-          name: string;
-          time: number;
-      };
+export type MarionetterSignalEmitter = {
+    name: string;
+    time: number;
+    // shorten
+    n: string;
+    t: number;
+};
+
+export const MarionetterSignalEmitterProperty = {
+    name: NeedsShorten ? 'n' : 'name',
+    time: NeedsShorten ? 't' : 'time',
+} as const;
 
 export type MarionetterClipInfoKinds =
     | MarionetterAnimationClipInfo
@@ -161,74 +178,86 @@ export const enum MarionetterClipInfoType {
     ObjectMoveAndLookAtClip = 5,
 }
 
-export type MarionetterClipInfoBase = NeedsShorten extends true
-    ? {
-          t: MarionetterClipInfoType;
-          s: number;
-          d: number;
-      }
-    : {
-          type: MarionetterClipInfoType;
-          start: number;
-          duration: number;
-      };
+export type MarionetterClipInfoBase = {
+    type: MarionetterClipInfoType;
+    start: number;
+    duration: number;
+    // shorten
+    t: MarionetterClipInfoType;
+    s: number;
+    d: number;
+};
 
-export type MarionetterAnimationClipInfo = MarionetterClipInfoBase &
-    (NeedsShorten extends true
-        ? {
-              op: { x: number; y: number; z: number };
-              or: { x: number; y: number; z: number };
-              b: MarionetterClipBinding[];
-          }
-        : {
-              offsetPosition: { x: number; y: number; z: number };
-              offsetRotation: { x: number; y: number; z: number };
-              bindings: MarionetterClipBinding[];
-          });
+export const MarionetterClipInfoBaseProperty = {
+    type: NeedsShorten ? 't' : 'type',
+    start: NeedsShorten ? 's' : 'start',
+    duration: NeedsShorten ? 'd' : 'duration',
+} as const;
 
-export type MarionetterLightControlClipInfo = MarionetterClipInfoBase &
-    (NeedsShorten extends true
-        ? {
-              b: MarionetterClipBinding[];
-          }
-        : {
-              bindings: MarionetterClipBinding[];
-          });
+export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
+    offsetPosition: { x: number; y: number; z: number };
+    offsetRotation: { x: number; y: number; z: number };
+    bindings: MarionetterClipBinding[];
+    // shorten
+    op: { x: number; y: number; z: number };
+    or: { x: number; y: number; z: number };
+    b: MarionetterClipBinding[];
+};
+
+export const MarionetterAnimationClipInfoProperty = {
+    offsetPosition: NeedsShorten ? 'op' : 'offsetPosition',
+    offsetRotation: NeedsShorten ? 'or' : 'offsetRotation',
+    bindings: NeedsShorten ? 'b' : 'bindings',
+} as const;
+
+export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
+    bindings: MarionetterClipBinding[];
+    // shorten
+    b: MarionetterClipBinding[];
+};
+
+export const MarionetterLightControlClipInfoProperty = {
+    bindings: NeedsShorten ? 'b' : 'bindings',
+} as const;
 
 export type MarionetterActivationControlClipInfo = MarionetterClipInfoBase;
 
 // TODO: signal emitter
 
-export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase &
-    (NeedsShorten extends true
-        ? {
-              lp: RawVector3;
-              tn: string;
-              b: MarionetterClipBinding[];
-          }
-        : {
-              localPosition: RawVector3;
-              lookAtTargetName: string;
-              bindings: MarionetterClipBinding[];
-          });
+export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase & {
+    localPosition: RawVector3;
+    lookAtTargetName: string;
+    bindings: MarionetterClipBinding[];
+    // shorten
+    lp: RawVector3;
+    tn: string;
+    b: MarionetterClipBinding[];
+};
 
 export const MarionetterObjectMoveAndLookAtClipInfoProperty = {
+    localPosition: NeedsShorten ? 'lp' : 'localPosition',
+    lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
+    bindings: NeedsShorten ? 'b' : 'bindings',
     localPositionX: NeedsShorten ? 'lp.x' : 'LocalPosition.x',
     localPositionY: NeedsShorten ? 'lp.y' : 'LocalPosition.y',
     localPositionZ: NeedsShorten ? 'lp.z' : 'LocalPosition.z',
 } as const;
+
 export type MarionetterObjectMoveAndLookAtClipInfoProperty =
     (typeof MarionetterObjectMoveAndLookAtClipInfoProperty)[keyof typeof MarionetterObjectMoveAndLookAtClipInfoProperty];
 
-export type MarionetterClipBinding = NeedsShorten extends true
-    ? {
-          n: string;
-          k: MarionetterAnimationClipKeyframe[];
-      }
-    : {
-          propertyName: string;
-          keyframes: MarionetterAnimationClipKeyframe[];
-      };
+export type MarionetterClipBinding = {
+    propertyName: string;
+    keyframes: MarionetterAnimationClipKeyframe[];
+    // shorten
+    n: string;
+    k: MarionetterAnimationClipKeyframe[];
+};
+
+export const MarionetterClipBindingProperty = {
+    propertyName: NeedsShorten ? 'n' : 'propertyName',
+    keyframes: NeedsShorten ? 'k' : 'keyframes',
+} as const;
 
 // // for obj
 // export type MarionetterAnimationClipKeyframe = NeedsShorten extends true
@@ -245,24 +274,40 @@ export type MarionetterClipBinding = NeedsShorten extends true
 //           outTangent: number;
 //       };
 
-
 // for arr
 export type MarionetterAnimationClipKeyframe = number[];
 
 // for obj
-export type MarionetterCurveKeyframe = NeedsShorten extends true
-    ? {
-          t: number;
-          v: number;
-          i: number;
-          o: number;
-      }
-    : {
-          time: number;
-          value: number;
-          inTangent: number;
-          outTangent: number;
-      };
+export type MarionetterCurveKeyframe = {
+    time: number;
+    value: number;
+    inTangent: number;
+    outTangent: number;
+    // shorten
+    t: number;
+    v: number;
+    i: number;
+    o: number;
+};
+
+export type MarionetterCurveKeyframeConstraint = NeedsShorten extends true ? {
+    // shorten
+    t: number;
+    v: number;
+    i: number;
+    o: number;
+} : {
+    time: number;
+    value: number;
+    inTangent: number;
+    outTangent: number;
+};
+export const MarionetterCurveKeyframeProperty = {
+    time: NeedsShorten ? 't' : 'time',
+    value: NeedsShorten ? 'v' : 'value',
+    inTangent: NeedsShorten ? 'i' : 'inTangent',
+    outTangent: NeedsShorten ? 'o' : 'outTangent',
+} as const;
 
 // for arr
 // export type MarionetterCurveKeyframe = number[];
@@ -271,13 +316,15 @@ export type MarionetterCurveKeyframe = NeedsShorten extends true
 // components
 //
 
-export type MarionetterComponentInfoBase = NeedsShorten extends true
-    ? {
-          t: MarionetterComponentType;
-      }
-    : {
-          type: MarionetterComponentType;
-      };
+export type MarionetterComponentInfoBase = {
+    type: MarionetterComponentType;
+    // shorten
+    t: MarionetterComponentType;
+};
+
+export const MarionetterComponentInfoBaseProperty = {
+    type: NeedsShorten ? 't' : 'type',
+} as const;
 
 // unity側に合わせる
 export const MarionetterComponentType = {
@@ -308,105 +355,122 @@ export type MarionetterComponentInfoKinds =
 
 // playable director component
 
-export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              n: string;
-              d: number;
-              ts: MarionetterTrackInfoKinds[];
-          }
-        : {
-              name: string;
-              duration: number;
-              tracks: MarionetterTrackInfoKinds[];
-          });
+export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
+    name: string;
+    duration: number;
+    tracks: MarionetterTrackInfoKinds[];
+    // shorten
+    n: string;
+    d: number;
+    ts: MarionetterTrackInfoKinds[];
+};
 
-export type MarionetterLightComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              l: 'Directional' | 'Point' | 'Spot';
-              i: number;
-              c: string; // hex string
-          }
-        : {
-              lightType: 'Directional' | 'Point' | 'Spot';
-              intensity: number;
-              color: string;
-          });
+export const MarionetterPlayableDirectorComponentInfoProperty = {
+    name: NeedsShorten ? 'n' : 'name',
+    duration: NeedsShorten ? 'd' : 'duration',
+    tracks: NeedsShorten ? 'ts' : 'tracks',
+} as const;
+
+export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
+    lightType: 'Directional' | 'Point' | 'Spot';
+    intensity: number;
+    color: string;
+    // shorten
+    l: 'Directional' | 'Point' | 'Spot';
+    i: number;
+    c: string; // hex string
+};
+
+export const MarionetterLightComponentInfoProperty = {
+    lightType: NeedsShorten ? 'l' : 'lightType',
+    intensity: NeedsShorten ? 'i' : 'intensity',
+    color: NeedsShorten ? 'c' : 'color',
+} as const;
 
 // light: directional light
 
-export type MarionetterDirectionalLightComponentInfo = MarionetterLightComponentInfo &
-    (NeedsShorten extends true
-        ? {
-              l: 'Directional';
-          }
-        : {
-              lightType: 'Directional';
-          });
+export type MarionetterDirectionalLightComponentInfo = MarionetterLightComponentInfo & {
+    lightType: 'Directional';
+    // shorten
+    l: 'Directional';
+};
+
+export const MarionetterDirectionalLightComponentInfoProperty = {
+    lightType: NeedsShorten ? 'l' : 'lightType',
+} as const;
 
 // light: spotlight
 
-export type MarionetterSpotLightComponentInfo = MarionetterLightComponentInfo &
-    (NeedsShorten extends true
-        ? {
-              l: 'Spot';
-              r: number;
-              isa: number;
-              sa: number;
-          }
-        : {
-              lightType: 'Spot';
-              range: number;
-              innerSpotAngle: number;
-              spotAngle: number;
-          });
+export type MarionetterSpotLightComponentInfo = MarionetterLightComponentInfo & {
+    lightType: 'Spot';
+    range: number;
+    innerSpotAngle: number;
+    spotAngle: number;
+    // shorten
+    l: 'Spot';
+    r: number;
+    isa: number;
+    sa: number;
+};
+
+export const MarionetterSpotLightComponentInfoProperty = {
+    lightType: NeedsShorten ? 'l' : 'lightType',
+    range: NeedsShorten ? 'r' : 'range',
+    innerSpotAngle: NeedsShorten ? 'isa' : 'innerSpotAngle',
+    spotAngle: NeedsShorten ? 'sa' : 'spotAngle',
+} as const;
 
 // volume: postprocess
 
-export type MarionetterVolumeVolumeLayerBase = NeedsShorten extends true
-    ? {
-          l: 'Bloom' | 'DepthOfField';
-      }
-    : {
-          layerType: 'Bloom' | 'DepthOfField';
-      };
+export type MarionetterVolumeVolumeLayerBase = {
+    layerType: 'Bloom' | 'DepthOfField';
+    // shorten
+    l: 'Bloom' | 'DepthOfField';
+};
 
-export type MarionetterVolumeLayerBloom = MarionetterVolumeVolumeLayerBase &
-    (NeedsShorten extends true
-        ? {
-              bl_i: number;
-          }
-        : {
-              intensity: number;
-          });
+export const MarionetterVolumeVolumeLayerBaseProperty = {
+    layerType: NeedsShorten ? 'l' : 'layerType',
+} as const;
 
-export type MarionetterVolumeLayerDepthOfField = MarionetterVolumeVolumeLayerBase &
-    (NeedsShorten extends true
-        ? {
-              dof_fd: number;
-          }
-        : {
-              focusDistance: number;
-          });
+export type MarionetterVolumeLayerBloom = MarionetterVolumeVolumeLayerBase & {
+    intensity: number;
+    // shorten
+    bl_i: number;
+};
 
-export type MarionetterVolumeLayerVignette = MarionetterVolumeVolumeLayerBase &
-    (NeedsShorten extends true
-        ? {
-              vi_i: number;
-          }
-        : {
-              intensity: number;
-          });
+export const MarionetterVolumeLayerBloomProperty = {
+    intensity: NeedsShorten ? 'bl_i' : 'intensity',
+} as const;
 
-export type MarionetterVolumeLayerVolumetricLight = MarionetterVolumeVolumeLayerBase &
-    (NeedsShorten extends true
-        ? {
-            vl_rs: number;
-        }
-        : {
-            volumetricLightRayStep: number;
-        });
+export type MarionetterVolumeLayerDepthOfField = MarionetterVolumeVolumeLayerBase & {
+    focusDistance: number;
+    // shorten
+    dof_fd: number;
+};
+
+export const MarionetterVolumeLayerDepthOfFieldProperty = {
+    focusDistance: NeedsShorten ? 'dof_fd' : 'focusDistance',
+} as const;
+
+export type MarionetterVolumeLayerVignette = MarionetterVolumeVolumeLayerBase & {
+    intensity: number;
+    // shorten
+    vi_i: number;
+};
+
+export const MarionetterVolumeLayerVignetteProperty = {
+    intensity: NeedsShorten ? 'vi_i' : 'intensity',
+} as const;
+
+export type MarionetterVolumeLayerVolumetricLight = MarionetterVolumeVolumeLayerBase & {
+    volumetricLightRayStep: number;
+    // shorten
+    vl_rs: number;
+};
+
+export const MarionetterVolumeLayerVolumetricLightProperty = {
+    volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
+} as const;
 
 export type MarionetterVolumeLayerKinds =
     | MarionetterVolumeLayerBloom
@@ -414,102 +478,118 @@ export type MarionetterVolumeLayerKinds =
     | MarionetterVolumeLayerVignette
     | MarionetterVolumeLayerVolumetricLight;
 
-export type MarionetterVolumeComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              vl: MarionetterVolumeLayerKinds[];
-          }
-        : {
-              volumeLayers: MarionetterVolumeLayerKinds[];
-          });
+export type MarionetterVolumeComponentInfo = MarionetterComponentInfoBase & {
+    volumeLayers: MarionetterVolumeLayerKinds[];
+    // shorten
+    vl: MarionetterVolumeLayerKinds[];
+};
+
+export const MarionetterVolumeComponentInfoProperty = {
+    volumeLayers: NeedsShorten ? 'vl' : 'volumeLayers',
+} as const;
 
 // camera
 
-export type MarionetterCameraComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              ct: 'Perspective' | 'Orthographic';
-              im: boolean;
-              f: number;
-          }
-        : {
-              cameraType: 'Perspective' | 'Orthographic';
-              isMain: boolean;
-              fov: number;
-          });
+export type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
+    cameraType: 'Perspective' | 'Orthographic';
+    isMain: boolean;
+    fov: number;
+    // shorten
+    ct: 'Perspective' | 'Orthographic';
+    im: boolean;
+    f: number;
+};
+
+export const MarionetterCameraComponentInfoProperty = {
+    cameraType: NeedsShorten ? 'ct' : 'cameraType',
+    isMain: NeedsShorten ? 'im' : 'isMain',
+    fov: NeedsShorten ? 'f' : 'fov',
+} as const;
+
+// material
 
 export const MarionetterMaterialType = {
     None: 0,
     Lit: 1,
 } as const;
 
-// material
-
 export type MarionetterMaterialType = (typeof MarionetterMaterialType)[keyof typeof MarionetterMaterialType];
 
-export type MarionetterMaterialInfo = NeedsShorten extends true
-    ? {
-          t: MarionetterMaterialType;
-          n: string;
-      }
-    : {
-          type: MarionetterMaterialType;
-          name: string;
-      };
+export type MarionetterMaterialInfo = {
+    type: MarionetterMaterialType;
+    name: string;
+    // shorten
+    t: MarionetterMaterialType;
+    n: string;
+};
 
-export type MarionetterLitMaterialInfo = (NeedsShorten extends true
-    ? {
-          c: string; // hex string
-          m: number;
-          r: number;
-          rs: number;
-      }
-    : {
-          color: string;
-          metallic: number;
-          roughness: number;
-          receiveShadow: number;
-      }) &
-    MarionetterMaterialInfo;
+export const MarionetterMaterialInfoProperty = {
+    type: NeedsShorten ? 't' : 'type',
+    name: NeedsShorten ? 'n' : 'name',
+} as const;
+
+export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
+    color: string;
+    metallic: number;
+    roughness: number;
+    receiveShadow: number;
+    // shorten
+    c: string; // hex string
+    m: number;
+    r: number;
+    rs: number;
+};
+
+export const MarionetterLitMaterialInfoProperty = {
+    color: NeedsShorten ? 'c' : 'color',
+    metallic: NeedsShorten ? 'm' : 'metallic',
+    roughness: NeedsShorten ? 'r' : 'roughness',
+    receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
+} as const;
 
 export type MarionetterMaterialKinds = MarionetterLitMaterialInfo;
 
 // mesh renderer
 
-export type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              mn: string;
-              m: MarionetterMaterialKinds;
-          }
-        : {
-              materialName: string;
-              material: MarionetterMaterialKinds;
-          });
+export type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase & {
+    materialName: string;
+    material: MarionetterMaterialKinds;
+    // shorten
+    mn: string;
+    m: MarionetterMaterialKinds;
+};
+
+export const MarionetterMeshRendererComponentInfoProperty = {
+    materialName: NeedsShorten ? 'mn' : 'materialName',
+    material: NeedsShorten ? 'm' : 'material',
+} as const;
 
 // mesh filter
 
-export type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              mn: string;
-          }
-        : {
-              meshName: string;
-          });
+export type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & {
+    meshName: string;
+    // shorten
+    mn: string;
+};
+
+export const MarionetterMeshFilterComponentInfoProperty = {
+    meshName: NeedsShorten ? 'mn' : 'meshName',
+} as const;
 
 // object move and look at controller component
 
-export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterComponentInfoBase &
-    (NeedsShorten extends true
-        ? {
-              lp: RawVector3;
-              tn: string;
-          }
-        : {
-              localPosition: RawVector3;
-              lookAtTargetName: string;
-          });
+export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterComponentInfoBase & {
+    localPosition: RawVector3;
+    lookAtTargetName: string;
+    // shorten
+    lp: RawVector3;
+    tn: string;
+};
+
+export const MarionetterObjectMoveAndLookAtControllerComponentInfoProperty = {
+    localPosition: NeedsShorten ? 'lp' : 'localPosition',
+    lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
+} as const;
 
 //
 // post process component properties

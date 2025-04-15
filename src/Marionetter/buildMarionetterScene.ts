@@ -2,18 +2,28 @@ import {createVector3, createVector3FromRaw} from '@/PaleGL/math/vector3';
 import {createQuaternion, Quaternion, qw, qx, qy, qz} from '@/PaleGL/math/quaternion.ts';
 import {
     MarionetterCameraComponentInfo,
+    MarionetterCameraComponentInfoProperty,
+    MarionetterComponentInfoBaseProperty,
     MarionetterComponentType,
     MarionetterDirectionalLightComponentInfo,
     MarionetterLightComponentInfo,
+    MarionetterLightComponentInfoProperty,
+    MarionetterLitMaterialInfoProperty,
     MarionetterMeshFilterComponentInfo,
+    MarionetterMeshFilterComponentInfoProperty,
     MarionetterMeshRendererComponentInfo,
+    MarionetterMeshRendererComponentInfoProperty,
     MarionetterObjectInfo,
+    MarionetterObjectInfoProperty,
     MarionetterObjectMoveAndLookAtControllerComponentInfo,
+    MarionetterObjectMoveAndLookAtControllerComponentInfoProperty,
     MarionetterPlayableDirectorComponentInfo,
     MarionetterScene,
+    MarionetterSceneProperty,
     MarionetterSceneStructure,
     MarionetterSpotLightComponentInfo,
-    MarionetterTimeline,
+    MarionetterSpotLightComponentInfoProperty,
+    MarionetterTimeline, MarionetterTransformInfoProperty,
     // ORIGINAL
     // MarionetterVolumeComponentInfo,
     // MarionetterVolumeLayerBloom,
@@ -53,7 +63,7 @@ export function tryParseJsonString<T>(str: string) {
     try {
         json = JSON.parse(str) as T;
     } catch (e) {
-        console.error('Failed to parse JSON string');
+        console.error('Failed to parse JSON string: ', str, e);
     }
     return json;
 }
@@ -92,7 +102,7 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 }
 
 function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
-    return (obj.co.find((c) => c.t === componentType) as T) || null;
+    return (obj[MarionetterObjectInfoProperty.components].find((c) => c[MarionetterComponentInfoBaseProperty.type] === componentType) as T) || null;
 }
 
 // ORIGINAL
@@ -144,13 +154,15 @@ export function buildMarionetterScene(
     // placedScene: Scene
 ): MarionetterSceneStructure {
     const actors: Actor[] = [];
+    
+    console.log(`[buildMarionetterScene] build marionetter scene...`, marionetterScene);
 
     function recursiveBuildActor(
         obj: MarionetterObjectInfo,
         parentActor: Actor | null = null,
         needsFlip: boolean = false
     ) {
-        const name = obj.n;
+        const name = obj[MarionetterObjectInfoProperty.name];
         const mfComponent = findMarionetterComponent<MarionetterMeshFilterComponentInfo>(
             obj,
             MarionetterComponentType.MeshFilter
@@ -192,7 +204,7 @@ export function buildMarionetterScene(
             let material: Material | null = null;
 
             // build geometry
-            switch (meshFilter.mn) {
+            switch (meshFilter[MarionetterMeshFilterComponentInfoProperty.meshName]) {
                 case 'Cube':
                     geometry = createBoxGeometry({ gpu });
                     break;
@@ -202,14 +214,14 @@ export function buildMarionetterScene(
             }
 
             // build material
-            switch (meshRenderer.mn) {
+            switch (meshRenderer[MarionetterMeshRendererComponentInfoProperty.materialName]) {
                 case 'Lit':
-                    const m = meshRenderer.m;
+                    const m = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createGBufferMaterial({
-                        baseColor: createColorFromHex(m.c),
-                        metallic: m.m,
-                        roughness: m.r,
-                        receiveShadow: !!m.rs,
+                        baseColor: createColorFromHex(m[MarionetterLitMaterialInfoProperty.color]),
+                        metallic: m[MarionetterLitMaterialInfoProperty.metallic],
+                        roughness: m[MarionetterLitMaterialInfoProperty.roughness],
+                        receiveShadow: !!m[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;
                 default:
@@ -223,22 +235,22 @@ export function buildMarionetterScene(
             }
         } else if (cameraComponent) {
             const camera = cameraComponent;
-            if (camera.ct === 'Perspective') {
+            if (camera[MarionetterCameraComponentInfoProperty.cameraType] === 'Perspective') {
                 // TODO: near, far を受け取りたい
-                actor = createPerspectiveCamera(camera.f, 1, 0.1, 1000, name);
+                actor = createPerspectiveCamera(camera[MarionetterCameraComponentInfoProperty.fov], 1, 0.1, 1000, name);
             } else {
-                console.error(`[buildMarionetterActors] invalid camera type: ${camera.ct}`);
+                console.error(`[buildMarionetterActors] invalid camera type: ${camera[MarionetterCameraComponentInfoProperty.cameraType]}`);
             }
         } else if (lightComponent) {
             // light
             const light = lightComponent;
-            switch (light.l) {
+            switch (light[MarionetterLightComponentInfoProperty.lightType]) {
                 case 'Directional':
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
                     actor = createDirectionalLight({
                         name,
-                        intensity: directionalLightInfo.i,
-                        color: createColorFromHex(directionalLightInfo.c),
+                        intensity: directionalLightInfo[MarionetterLightComponentInfoProperty.intensity],
+                        color: createColorFromHex(directionalLightInfo[MarionetterLightComponentInfoProperty.color]),
                     });
                     break;
                 case 'Spot':
@@ -246,15 +258,15 @@ export function buildMarionetterScene(
                     const spotLightInfo = light as MarionetterSpotLightComponentInfo;
                     actor = createSpotLight({
                         name,
-                        color: createColorFromHex(spotLightInfo.c),
-                        intensity: spotLightInfo.i,
-                        distance: spotLightInfo.r,
-                        coneAngle: spotLightInfo.sa,
-                        penumbraAngle: spotLightInfo.isa,
+                        color: createColorFromHex(spotLightInfo[MarionetterLightComponentInfoProperty.color]),
+                        intensity: spotLightInfo[MarionetterLightComponentInfoProperty.intensity],
+                        distance: spotLightInfo[MarionetterSpotLightComponentInfoProperty.range],
+                        coneAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.spotAngle],
+                        penumbraAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.innerSpotAngle],
                     });
                     break;
                 default:
-                    console.error(`[buildMarionetterActors] invalid light type: ${light.l}`);
+                    console.error(`[buildMarionetterActors] invalid light type: ${light[MarionetterLightComponentInfoProperty.lightType]}`);
             }
             // ORIGINAL: volumeも一旦生のactorとみなす
             // } else if (volumeComponent) {
@@ -270,11 +282,11 @@ export function buildMarionetterScene(
 
         if (objectMoveAndLookAtControllerComponent) {
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
-                localPosition: createVector3FromRaw(objectMoveAndLookAtControllerComponent.lp),
-                lookAtTargetName: objectMoveAndLookAtControllerComponent.tn,
+                localPosition: createVector3FromRaw(objectMoveAndLookAtControllerComponent[MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.localPosition]),
+                lookAtTargetName: objectMoveAndLookAtControllerComponent[MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.lookAtTargetName]
             });
             if (actor) {
-            addActorComponent(actor, objectMoveAndLookAdController);
+                addActorComponent(actor, objectMoveAndLookAdController);
             }
         }
 
@@ -284,7 +296,11 @@ export function buildMarionetterScene(
 
         if (actor) {
             // actors.push(actor);
-            setScaling(actor.transform, createVector3(obj.t.ls.x, obj.t.ls.y, obj.t.ls.z));
+            setScaling(actor.transform, createVector3(
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].x,
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].y,
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].z
+            ));
             // euler ver
             // actor.transform.rotation.setV(
             //     new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
@@ -310,12 +326,21 @@ export function buildMarionetterScene(
             // );
             setRotation(actor.transform, createRotatorFromQuaternion(
                 resolveInvertRotationLeftHandAxisToRightHandAxis(
-                    createQuaternion(obj.t.lr.x, obj.t.lr.y, obj.t.lr.z, obj.t.lr.w),
+                    createQuaternion(
+                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].x,
+                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].y,
+                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].z,
+                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].w
+                    ),
                     actor,
                     needsFlip
                 )
             ));
-            actor.transform.position = createVector3(obj.t.lp.x, obj.t.lp.y, obj.t.lp.z);
+            actor.transform.position = createVector3(
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].x,
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].y,
+                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].z
+            );
 
             // 親が存在する場合は親に追加、親がない場合はシーン直下に配置したいので配列に追加
             if (parentActor) {
@@ -325,22 +350,22 @@ export function buildMarionetterScene(
             }
 
             // 子要素があれば再帰的に処理
-            for (let i = 0; i < obj.ch.length; i++) {
-                recursiveBuildActor(obj.ch[i], actor, needsFlip);
+            for (let i = 0; i < obj[MarionetterObjectInfoProperty.children].length; i++) {
+                recursiveBuildActor(obj[MarionetterObjectInfoProperty.children][i], actor, needsFlip);
             }
 
             return;
         }
 
-        console.error(`[recursiveBuildActor] actor is null - name: ${obj.n}`);
+        console.error(`[recursiveBuildActor] actor is null - name: ${obj[MarionetterObjectInfoProperty.name]}`);
     }
 
     //
     // parse scene
     //
 
-    for (let i = 0; i < marionetterScene.o.length; i++) {
-        const obj = marionetterScene.o[i];
+    for (let i = 0; i < marionetterScene[MarionetterSceneProperty.objects].length; i++) {
+        const obj = marionetterScene[MarionetterSceneProperty.objects][i];
         // recursiveBuildActor(obj, null, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
         recursiveBuildActor(obj, null, true);
         // actors.push(actor);
@@ -370,8 +395,8 @@ export function buildMarionetterTimelineFromScene(
     // placedScene: Scene
 ): MarionetterTimeline | null {
     let marionetterTimeline: MarionetterTimeline | null = null;
-    marionetterScene.o.forEach((obj) => {
-        const timelineComponent = obj.co.find((c) => c.t === MarionetterComponentType.PlayableDirector);
+    marionetterScene[MarionetterSceneProperty.objects].forEach((obj) => {
+        const timelineComponent = obj[MarionetterObjectInfoProperty.components].find((c) => c[MarionetterComponentInfoBaseProperty.type] === MarionetterComponentType.PlayableDirector);
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(
                 marionetterSceneActors,
