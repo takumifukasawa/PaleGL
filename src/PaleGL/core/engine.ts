@@ -80,6 +80,15 @@ export type Engine = EngineBase & {
     updateFrameTimer: TimeSkipper;
 }
 
+export type EngineArgs = {
+    gpu: Gpu;
+    renderer: Renderer;
+    fixedUpdateFps?: number;
+    updateFps?: number;
+    showStats?: boolean;
+    showPipeline?: boolean;
+}
+
 export function createEngine({
     gpu,
     renderer,
@@ -87,14 +96,7 @@ export function createEngine({
     updateFps = 60,
     showStats = false,
     showPipeline = false,
-}: {
-    gpu: Gpu;
-    renderer: Renderer;
-    fixedUpdateFps?: number;
-    updateFps?: number;
-    showStats?: boolean;
-    showPipeline?: boolean;
-}): Engine {
+}: EngineArgs): Engine {
     const sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
     const stats: Stats | null = createStats({ showStats, showPipeline });
 

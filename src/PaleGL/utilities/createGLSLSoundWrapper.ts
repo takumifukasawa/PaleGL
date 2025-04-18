@@ -1,7 +1,16 @@
 import { createGLSLSound, GlslSound } from '@/PaleGL/core/glslSound.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 
-export function initGLSLSound(gpu: Gpu, shader: string, duration: number) {
+export type GLSLSoundWrapper = {
+    glslSound: GlslSound | null;
+    isPlaying: () => boolean;
+    load: () => void;
+    play: (args?: { volume?: number; time?: number; reload?: boolean }) => void;
+    stop: () => void;
+    getCurrentTime: () => number | undefined;
+}
+
+export function createGLSLSoundWrapper(gpu: Gpu, shader: string, duration: number): GLSLSoundWrapper {
     let glslSound: GlslSound | null = null;
     let _isPlaying = false;
 
@@ -15,7 +24,7 @@ export function initGLSLSound(gpu: Gpu, shader: string, duration: number) {
     // };
 
     const play = ({ volume = 1, time = 0, reload = false }: { volume?: number; time?: number, reload?: boolean } = {}) => {
-        console.log(`[GLSLSound.play] time: ${time}`);
+        console.log(`[glslSoundWrapper.play] play time: ${time}`);
         if (reload) {
             stop();
             // 120BPM x 64measure = 128sec
@@ -31,7 +40,7 @@ export function initGLSLSound(gpu: Gpu, shader: string, duration: number) {
         if(!_isPlaying) {
             return;
         }
-        console.log('[GlslSound.stop]');
+        console.log('[glslSoundWrapper.stop]');
         _isPlaying = false;
         glslSound?.stop();
     };

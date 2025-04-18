@@ -179,8 +179,8 @@ export default defineConfig((config) => {
             terserOptions: {
                 mangle: {
                     toplevel: true,
-                    // 関数ベースにする場合
                     ...(isMangle ? {
+                        // 関数ベースにする場合
                         properties: {
                             keep_quoted: true,
                         }
@@ -192,18 +192,18 @@ export default defineConfig((config) => {
                 },
                 compress: {
                     passes: 1,
-                    // arguments: true,
-                    // booleans_as_integers: true,
+                    arguments: true,
+                    booleans_as_integers: true,
                     drop_console: isDropConsole,
                     drop_debugger: true,
-                    // keep_fargs: false,
-                    // module: true,
-                    // pure_getters: true,
-                    // unsafe: true,
-                    // unsafe_math: true,
-                    // unsafe_methods: true,
-                    // unsafe_proto: true,
-                    // unsafe_undefined: true,
+                    keep_fargs: false,
+                    module: true,
+                    pure_getters: true,
+                    unsafe: true,
+                    unsafe_math: true,
+                    unsafe_methods: true,
+                    unsafe_proto: true,
+                    unsafe_undefined: true,
                 },
                 // format: {
                 //     quote_keys: true
