@@ -1,34 +1,44 @@
 import { exec } from 'child_process';
 import { glob } from 'glob';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
+
+const args = process.argv.slice(2);
+
+const useHash = args[0] === '--hash';
 
 // TODO: 引数を受け取るなりして動的に変えられるようにしたい
-const entryName = 'main';
+// const entryName = 'main';
 const dir = path.join(process.cwd(), 'dist/assets/');
 const findPattern = path.join(dir, '*.js');
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 function padTime(str) {
-    return ("" + str).padStart(2, '0');
+    return ('' + str).padStart(2, '0');
 }
 
 const pack = async (filePath) => {
+    // hashある場合
     // const regex = new RegExp(`${entryName}-([a-zA-Z0-9]*)\.js$`);
+    // hashない場合
     const regex = new RegExp(/main.js/);
 
     const match = filePath.match(regex);
-    // const id = match[1] 
+    // const id = match[1]
     const date = new Date();
     const id = `${padTime(date.getFullYear())}${padTime(date.getMonth() + 1)}${padTime(date.getDate())}${padTime(date.getHours())}${padTime(date.getMinutes())}`;
-    
+
     return new Promise((resolve) => {
-        // // pattern1: packer.js
-        const packShellPath = path.join(process.cwd(), 'libs/packer.js');
-        
+        const packShellPath = path.join(__dirname, '../libs/packer.js');
+
         // id使う場合
-        const distPath = path.join(process.cwd(), `dist/packed-${id}.html`);
         // id追加しない場合
-        // const distPath = path.join(process.cwd(), `dist/packed.html`);
-       
+        const distDir = path.join(__dirname, '../../dist');
+        const distPath = useHash
+            ? path.join(distDir, `packed-${id}.html`)
+            : path.join(distDir, 'packed.html');
+
         const command = `node ${packShellPath} ${filePath} ${distPath}`;
         // // pattern2: jsexe
         // const packShellPath = path.join(process.cwd(), 'libs/jsexe.exe');
