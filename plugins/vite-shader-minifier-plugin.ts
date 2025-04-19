@@ -165,7 +165,6 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                     if (minifierOptions.noRenamingList !== undefined) {
                         noRenamingList.push(...minifierOptions.noRenamingList);
                     }
-                    
                 }
 
                 if (noRenamingList.length > 0) {
@@ -248,7 +247,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // }
 
                 // minify
-                const minifyCommand = `${isMac(process) ? "mono " : ""}./libs/shader_minifier.exe ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
+                const minifyCommand = `${isMac(process) ? 'mono ' : ''}${path.resolve(__dirname, '../', 'libs/shader_minifier.exe')} ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
                 console.log('command: ', minifyCommand);
                 await exec(minifyCommand).catch((error) => {
                     console.log('error: ', error);
