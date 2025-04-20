@@ -7,34 +7,35 @@ const args = process.argv.slice(2);
 
 const useHash = args[0] === '--hash';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const distDir = path.join(__dirname, '../../dist');
+const libDir = path.join(__dirname, '../libs');
+
 // TODO: 引数を受け取るなりして動的に変えられるようにしたい
 // const entryName = 'main';
-const dir = path.join(process.cwd(), 'dist/assets/');
+const dir = path.join(distDir, 'assets');
 const findPattern = path.join(dir, '*.js');
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function padTime(str) {
     return ('' + str).padStart(2, '0');
 }
 
 const pack = async (filePath) => {
-    // hashある場合
+    // srcにhashある場合
     // const regex = new RegExp(`${entryName}-([a-zA-Z0-9]*)\.js$`);
-    // hashない場合
+    // srcにhashない場合
     const regex = new RegExp(/main.js/);
 
     const match = filePath.match(regex);
-    // const id = match[1]
     const date = new Date();
     const id = `${padTime(date.getFullYear())}${padTime(date.getMonth() + 1)}${padTime(date.getDate())}${padTime(date.getHours())}${padTime(date.getMinutes())}`;
 
     return new Promise((resolve) => {
-        const packShellPath = path.join(__dirname, '../libs/packer.js');
+        const packShellPath = path.join(libDir, 'packer.js');
 
         // id使う場合
         // id追加しない場合
-        const distDir = path.join(__dirname, '../../dist');
         const distPath = useHash
             ? path.join(distDir, `packed-${id}.html`)
             : path.join(distDir, 'packed.html');

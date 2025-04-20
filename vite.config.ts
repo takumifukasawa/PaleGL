@@ -22,6 +22,9 @@ type EntryPointInfo = { name: string; path: string };
 
 // ---------------------------------------------------
 
+const PALE_GL_SRC_ROOT = path.resolve(__dirname, 'src');
+const ENTRY_ROOT = path.resolve(__dirname, 'pages');
+
 // ビルドするentryを定義
 const ENTRY_POINTS: { [key: string]: string } = {
     ['sandbox']: 'labs/sandbox',
@@ -82,8 +85,8 @@ export default defineConfig((config) => {
     entryPointInfos.forEach((entryPointInfo) => {
         entryPoints[entryPointInfo.name] =
             isBundle
-                ? resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'main.ts')) // isBundleでjs一個にまとめる場合
-                : resolve(path.join(__dirname, 'pages', entryPointInfo.path, 'index.html')); // html含めてビルドする場合
+                ? resolve(path.join(ENTRY_ROOT, entryPointInfo.path, 'main.ts')) // isBundleでjs一個にまとめる場合
+                : resolve(path.join(ENTRY_ROOT, entryPointInfo.path, 'index.html')); // html含めてビルドする場合
     });
 
     console.log(`===== [entry_points] =====`);
@@ -113,9 +116,12 @@ export default defineConfig((config) => {
             }),
             gltf(),
             glsl({
-                include: ['./src/**/*.glsl', './pages/**/*.glsl'],
+                include: [
+                    `${path.join(PALE_GL_SRC_ROOT, '**/*.glsl')}`,
+                    `${path.join(ENTRY_ROOT, '**/*.glsl')}`,
+                ],
                 watch: true,
-                root: 'src/PaleGL',
+                root: './',
                 defaultExtension: 'glsl',
                 warnDuplicatedImports: true,
                 exclude: undefined,
@@ -147,7 +153,7 @@ export default defineConfig((config) => {
         ],
         // assetsInclude: ['**/*.gltf', '**/*.dxt'], // dxt使う場合合った方がいい？
         assetsInclude: ['**/*.gltf'],
-        root: './pages',
+        root: ENTRY_ROOT,
         publicDir: resolve(__dirname, 'public'),
         build: {
             reportCompressedSize: false,
