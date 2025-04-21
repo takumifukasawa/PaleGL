@@ -352,10 +352,3 @@ export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedT
         }
     });
 }
-
-// export function getSharedTexture(sharedTextures: SharedTextures, key: SharedTexturesType): SharedTexture {
-//     if (!sharedTextures.has(key)) {
-//         console.error('invalid shared texture key');
-//     }
-//     return sharedTextures.get(key)!;
-// }
