@@ -40,8 +40,7 @@ import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl'
 import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
-
-KeyboardEvent;
+import {isDevelopment} from "@/PaleGL/utilities/envUtilities.ts";
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -67,7 +66,7 @@ export type ShaderDefines = {
 
 const includesDict = new Map<string, string>([
     ['common', commonPartialContent],
-    ['buffer_visualizer_h', bufferVisualizerHeaderContent],
+    ['buffer_visualizer_h', isDevelopment() ? bufferVisualizerHeaderContent : ''],
     ['lighting', lightingPartialContent],
     ['ub', uniformBlockPartialContent],
     ['rand', randPartialContent],

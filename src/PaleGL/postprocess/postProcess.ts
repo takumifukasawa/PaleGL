@@ -8,7 +8,7 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { UniformNames } from '@/PaleGL/constants.ts';
+import {PostProcessPassType, UniformNames} from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -83,6 +83,15 @@ export function hasPostProcessPassEnabled(postProcess: PostProcess) {
         }
     }
     return false;
+}
+
+export function getPostProcessPassByType<T extends PostProcessPassBase>(postProcess: PostProcess, passType: PostProcessPassType) {
+    for (let i = 0; i < postProcess.passes.length; i++) {
+        if (postProcess.passes[i].type === passType) {
+            return postProcess.passes[i] as T;
+        }
+    }
+    return null;
 }
 
 export function getPostProcessLastRenderTarget(postProcess: PostProcess) {
