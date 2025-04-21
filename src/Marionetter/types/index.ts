@@ -169,14 +169,16 @@ export type MarionetterClipInfoKinds =
     | MarionetterObjectMoveAndLookAtClipInfo;
 
 // NOTE: unity側に合わせる
-export const enum MarionetterClipInfoType {
-    None = 0,
-    AnimationClip = 1,
-    LightControlClip = 2,
-    ActivationControlClip = 3,
-    SignalEmitter = 4,
-    ObjectMoveAndLookAtClip = 5,
-}
+export const MarionetterClipInfoType = {
+    None: 0,
+    AnimationClip: 1,
+    LightControlClip: 2,
+    ActivationControlClip: 3,
+    SignalEmitter: 4,
+    ObjectMoveAndLookAtClip: 5,
+} as const;
+
+export type MarionetterClipInfoType = (typeof MarionetterClipInfoType)[keyof typeof MarionetterClipInfoType];
 
 export type MarionetterClipInfoBase = {
     type: MarionetterClipInfoType;
