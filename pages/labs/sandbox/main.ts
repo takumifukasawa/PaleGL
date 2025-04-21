@@ -121,7 +121,7 @@ import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 
 import soundVertexShader from './shaders/sound-vertex.glsl';
-import { createGLSLSound, GlslSound } from '@/PaleGL/core/glslSound.ts';
+import {createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound} from '@/PaleGL/core/glslSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
@@ -354,7 +354,7 @@ let attractSphereMesh: Mesh;
 let testLightingMesh: Mesh;
 let skinnedMesh: SkinnedMesh;
 let cubeMap: CubeMap;
-let glslSound: GlslSound;
+let glslSound: GLSLSound | null;
 let objectSpaceRaymarchMesh: Mesh;
 let screenSpaceRaymarchMesh: Mesh;
 
@@ -371,11 +371,7 @@ wrapperElement.setAttribute('id', 'wrapper');
 const canvasElement = document.createElement('canvas');
 wrapperElement.appendChild(canvasElement);
 
-const gl = canvasElement.getContext('webgl2', { antialias: false });
-
-if (!gl) {
-    throw 'invalid gl';
-}
+const gl = canvasElement.getContext('webgl2', { antialias: false })!;
 
 const gpu = createGPU(gl);
 
@@ -1429,10 +1425,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
 const playSound = () => {
     if (glslSound) {
-        glslSound.stop();
+        stopGLSLSound(glslSound);
     }
     glslSound = createGLSLSound(gpu, soundVertexShader, 180);
-    glslSound.play(0);
+    playGLSLSound(glslSound, 0);
 };
 
 const main = async () => {

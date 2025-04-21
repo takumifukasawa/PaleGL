@@ -11,7 +11,12 @@ import {
 } from '@/PaleGL/core/engine.ts';
 import { createRenderer, Renderer, renderRenderer, updateTimelineUniforms } from '@/PaleGL/core/renderer.ts';
 import { Marionetter, MarionetterScene, MarionetterSceneStructure } from '@/Marionetter/types';
-import { GLSLSoundWrapper } from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
+import {
+    getSoundCurrentTime,
+    GLSLSoundWrapper,
+    playSound,
+    stopSound
+} from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
 import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
 import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
 import { addActorToScene, createScene, findActorByName, Scene } from '@/PaleGL/core/scene.ts';
@@ -159,18 +164,24 @@ export function createPlayer(
 
 function onPlayMarionetter(player: Player, time: number) {
     console.log(`[marionetter.onPlay] time: ${time}`);
-    player.glslSoundWrapper?.play({ time });
+    if (player.glslSoundWrapper) {
+        playSound(player.glslSoundWrapper, { time });
+    }
     player.currentTimeForTimeline = time;
 }
 
 function onSeekMarionetter(player: Player, time: number) {
     player.currentTimeForTimeline = time;
-    player.glslSoundWrapper?.stop();
+    if (player.glslSoundWrapper) {
+        stopSound(player.glslSoundWrapper);
+    }
 }
 
 function onStopMarionetter(player: Player) {
     console.log(`[marionetter.onStop]`);
-    player.glslSoundWrapper?.stop();
+    if (player.glslSoundWrapper) {
+        stopSound(player.glslSoundWrapper);
+    }
 }
 
 // export function setResizePlayerCallback(player: Player, cb: () => void) {
@@ -196,7 +207,10 @@ export async function loadPlayer(
 }
 
 export function startPlayer(player: Player) {
-    player.glslSoundWrapper?.play();
+    // player.glslSoundWrapper?.play();
+    if (player.glslSoundWrapper) {
+        playSound(player.glslSoundWrapper);
+    }
     startEngine(player.engine);
 }
 
@@ -206,8 +220,10 @@ export function runPlayer(player: Player, time: number) {
 
 export function beforeUpdatePlayer(player: Player, _: number, deltaTime: number) {
     if (player.marionetterSceneStructure && player.marionetterSceneStructure.marionetterTimeline) {
-        if (player.glslSoundWrapper && player.glslSoundWrapper.isPlaying()) {
-            player.currentTimeForTimeline = player.glslSoundWrapper.getCurrentTime()!;
+        if (player.glslSoundWrapper) {
+           if(player.glslSoundWrapper.isPlaying) {
+               player.currentTimeForTimeline = getSoundCurrentTime(player.glslSoundWrapper);
+           }
         } else {
             player.currentTimeForTimeline += deltaTime;
         }
