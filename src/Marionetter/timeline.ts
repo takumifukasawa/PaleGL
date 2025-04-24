@@ -414,7 +414,8 @@ function createMarionetterAnimationClip(
         if (hasLocalScale) {
             copyVector3(actor.transform.scale, localScale);
         } else {
-            copyVector3(actor.transform.scale, createVector3One());
+            // ない場合はセットしない方（sceneに任せる）
+            // copyVector3(actor.transform.scale, createVector3One());
         }
 
         // TODO: なぜか一回行列に落とさないとうまく動かない. まわりくどいかつ余計な計算が走るが
@@ -440,14 +441,16 @@ function createMarionetterAnimationClip(
                     : q
             ));
         } else {
-            setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionIdentity()));
+            // ない場合はセットしない方（sceneに任せる）
+            // setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionIdentity()));
         }
 
         if (hasLocalPosition) {
             // localPosition.z *= -1;
             copyVector3(actor.transform.position, localPosition);
         } else {
-            copyVector3(actor.transform.position, createVector3Zero());
+            // ない場合はセットしない方（sceneに任せる）
+            // copyVector3(actor.transform.position, createVector3Zero());
         }
     };
 
