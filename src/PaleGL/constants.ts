@@ -327,6 +327,7 @@ export const UniformNames = {
     WorldMatrix: 'uWorldMatrix',
     ViewMatrix: 'uViewMatrix',
     ProjectionMatrix: 'uProjectionMatrix',
+    WVPMatrix: 'uWVPMatrix',
     ViewProjectionMatrix: 'uViewProjectionMatrix',
     NormalMatrix: 'uNormalMatrix',
     InverseWorldMatrix: 'uInverseWorldMatrix',
@@ -457,6 +458,8 @@ export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBl
 // -----------------------------------------------------------------------------
 
 const ShaderModifierPragmas = {
+    APPEND_INCLUDE: 'APPEND_INCLUDE',
+    APPEND_VARYINGS: 'APPEND_VARYINGS',
     BEGIN_MAIN: 'BEGIN_MAIN',
     END_MAIN: 'END_MAIN',
     APPEND_ATTRIBUTES: 'APPEND_ATTRIBUTES',

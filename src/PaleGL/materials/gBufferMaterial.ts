@@ -40,9 +40,10 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         // TODO: 外部化
         vertexShaderModifiers = [],
         uniforms = [],
+        uniformBlockNames = [],
         ...options
     }: GBufferMaterialArgs = args;
-    
+
     const baseColor: Color = args.baseColor || createColorWhite();
     const baseMap: Texture | null = args.baseMap || null;
     const baseMapTiling: Vector4 = args.baseMapTiling || createVector4(1, 1, 0, 0);
@@ -151,7 +152,6 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     ];
 
     const material = createMaterial({
-        ...options,
         name: 'GBufferMaterial',
         vertexShader: gBufferVert,
         fragmentShader: args.fragmentShader || litFrag,
@@ -163,7 +163,13 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         depthTest: true,
         depthWrite: false,
         depthFuncType: DepthFuncTypes.Equal,
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        ...options, // override
+        uniformBlockNames: [
+            UniformBlockNames.Common,
+            UniformBlockNames.Transformations,
+            UniformBlockNames.Camera,
+            ...(uniformBlockNames || []), // merge
+        ],
     });
 
     // const updateUniforms = () => {

@@ -36,7 +36,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
     // mesh.geometry.start();
 
     // for debug
-    // console.log(`[Mesh.start] materials length: ${this.materials.length}`);
+    // console.log(`[startMeshBehaviourBase] mesh: ${mesh.name}, materials length: ${mesh.materials.length}`);
 
     // 未コンパイルであればコンパイルする
     mesh.materials.forEach((material) => {

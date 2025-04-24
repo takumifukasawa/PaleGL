@@ -1,5 +1,5 @@
-import {createVector3, createVector3FromRaw} from '@/PaleGL/math/vector3';
-import {createQuaternion, Quaternion, qw, qx, qy, qz} from '@/PaleGL/math/quaternion.ts';
+import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
+import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import {
     MarionetterCameraComponentInfo,
     MarionetterCameraComponentInfoProperty,
@@ -23,7 +23,8 @@ import {
     MarionetterSceneStructure,
     MarionetterSpotLightComponentInfo,
     MarionetterSpotLightComponentInfoProperty,
-    MarionetterTimeline, MarionetterTransformInfoProperty,
+    MarionetterTimeline,
+    MarionetterTransformInfoProperty,
     // ORIGINAL
     // MarionetterVolumeComponentInfo,
     // MarionetterVolumeLayerBloom,
@@ -31,22 +32,22 @@ import {
 } from '@/Marionetter/types';
 import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
-import {Actor, addActorComponent, addChildActor, createActor} from "@/PaleGL/actors/actor.ts";
-import {Light} from "@/PaleGL/actors/lights/light.ts";
-import {Gpu} from "@/PaleGL/core/gpu.ts";
-import {Geometry} from "@/PaleGL/geometries/geometry.ts";
-import {Material} from "@/PaleGL/materials/material.ts";
-import {createBoxGeometry} from "@/PaleGL/geometries/boxGeometry.ts";
-import {createPlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
-import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
-import {createColorFromHex} from "@/PaleGL/math/color.ts";
-import {createMesh} from "@/PaleGL/actors/meshes/mesh.ts";
-import {createPerspectiveCamera} from "@/PaleGL/actors/cameras/perspectiveCamera.ts";
-import {createDirectionalLight} from "@/PaleGL/actors/lights/directionalLight.ts";
-import {createSpotLight} from "@/PaleGL/actors/lights/spotLight.ts";
-import {setRotation, setScaling} from "@/PaleGL/core/transform.ts";
-import {createRotatorFromQuaternion} from "@/PaleGL/math/rotator.ts";
-import {createObjectMoveAndLookAtController} from "@/PaleGL/components/objectMoveAndLookAtController.ts";
+import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { Material } from '@/PaleGL/materials/material.ts';
+import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
+import { createColorFromHex } from '@/PaleGL/math/color.ts';
+import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
+import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
+import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
@@ -102,7 +103,11 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 }
 
 function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
-    return (obj[MarionetterObjectInfoProperty.components].find((c) => c[MarionetterComponentInfoBaseProperty.type] === componentType) as T) || null;
+    return (
+        (obj[MarionetterObjectInfoProperty.components].find(
+            (c) => c[MarionetterComponentInfoBaseProperty.type] === componentType
+        ) as T) || null
+    );
 }
 
 // ORIGINAL
@@ -154,7 +159,7 @@ export function buildMarionetterScene(
     // placedScene: Scene
 ): MarionetterSceneStructure {
     const actors: Actor[] = [];
-    
+
     console.log(`[buildMarionetterScene] build marionetter scene...`, marionetterScene);
 
     function recursiveBuildActor(
@@ -239,7 +244,9 @@ export function buildMarionetterScene(
                 // TODO: near, far を受け取りたい
                 actor = createPerspectiveCamera(camera[MarionetterCameraComponentInfoProperty.fov], 1, 0.1, 1000, name);
             } else {
-                console.error(`[buildMarionetterActors] invalid camera type: ${camera[MarionetterCameraComponentInfoProperty.cameraType]}`);
+                console.error(
+                    `[buildMarionetterActors] invalid camera type: ${camera[MarionetterCameraComponentInfoProperty.cameraType]}`
+                );
             }
         } else if (lightComponent) {
             // light
@@ -266,7 +273,9 @@ export function buildMarionetterScene(
                     });
                     break;
                 default:
-                    console.error(`[buildMarionetterActors] invalid light type: ${light[MarionetterLightComponentInfoProperty.lightType]}`);
+                    console.error(
+                        `[buildMarionetterActors] invalid light type: ${light[MarionetterLightComponentInfoProperty.lightType]}`
+                    );
             }
             // ORIGINAL: volumeも一旦生のactorとみなす
             // } else if (volumeComponent) {
@@ -282,8 +291,15 @@ export function buildMarionetterScene(
 
         if (objectMoveAndLookAtControllerComponent) {
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
-                localPosition: createVector3FromRaw(objectMoveAndLookAtControllerComponent[MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.localPosition]),
-                lookAtTargetName: objectMoveAndLookAtControllerComponent[MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.lookAtTargetName]
+                localPosition: createVector3FromRaw(
+                    objectMoveAndLookAtControllerComponent[
+                        MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.localPosition
+                    ]
+                ),
+                lookAtTargetName:
+                    objectMoveAndLookAtControllerComponent[
+                        MarionetterObjectMoveAndLookAtControllerComponentInfoProperty.lookAtTargetName
+                    ],
             });
             if (actor) {
                 addActorComponent(actor, objectMoveAndLookAdController);
@@ -296,11 +312,14 @@ export function buildMarionetterScene(
 
         if (actor) {
             // actors.push(actor);
-            setScaling(actor.transform, createVector3(
-                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].x,
-                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].y,
-                obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].z
-            ));
+            setScaling(
+                actor.transform,
+                createVector3(
+                    obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].x,
+                    obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].y,
+                    obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localScale].z
+                )
+            );
             // euler ver
             // actor.transform.rotation.setV(
             //     new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
@@ -324,18 +343,25 @@ export function buildMarionetterScene(
             //         obj.transform.localRotation.w
             //     )
             // );
-            setRotation(actor.transform, createRotatorFromQuaternion(
-                resolveInvertRotationLeftHandAxisToRightHandAxis(
-                    createQuaternion(
-                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].x,
-                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].y,
-                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].z,
-                        obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation].w
-                    ),
-                    actor,
-                    needsFlip
+            setRotation(
+                actor.transform,
+                createRotatorFromQuaternion(
+                    resolveInvertRotationLeftHandAxisToRightHandAxis(
+                        createQuaternion(
+                            obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation]
+                                .x,
+                            obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation]
+                                .y,
+                            obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation]
+                                .z,
+                            obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localRotation]
+                                .w
+                        ),
+                        actor,
+                        needsFlip
+                    )
                 )
-            ));
+            );
             actor.transform.position = createVector3(
                 obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].x,
                 obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].y,
@@ -396,7 +422,9 @@ export function buildMarionetterTimelineFromScene(
 ): MarionetterTimeline | null {
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MarionetterSceneProperty.objects].forEach((obj) => {
-        const timelineComponent = obj[MarionetterObjectInfoProperty.components].find((c) => c[MarionetterComponentInfoBaseProperty.type] === MarionetterComponentType.PlayableDirector);
+        const timelineComponent = obj[MarionetterObjectInfoProperty.components].find(
+            (c) => c[MarionetterComponentInfoBaseProperty.type] === MarionetterComponentType.PlayableDirector
+        );
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(
                 marionetterSceneActors,

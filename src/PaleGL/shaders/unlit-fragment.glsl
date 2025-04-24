@@ -1,10 +1,13 @@
 #pragma DEFINES
 
+#include <common>
 #include <lighting>
 #include <ub>
 #include <tone>
 #include <gbuffer>
 #include <vcolor_fh>
+
+#pragma APPEND_INCLUDE
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
@@ -17,7 +20,11 @@ in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
+#pragma APPEND_VARYINGS
+
 #include <gbuffer_o>
+
+#pragma BEGIN_MAIN
 
 void main() {
     vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
@@ -46,4 +53,6 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(baseColor.rgb);
+    
+    #pragma AFTER_OUT
 }

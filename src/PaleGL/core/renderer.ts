@@ -90,7 +90,7 @@ import {
     createMat4Identity,
     getMat4Position,
     invertMat4,
-    Matrix4,
+    Matrix4, multiplyMat4Array,
     transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
 import { createShader } from '@/PaleGL/core/shader.ts';
@@ -373,6 +373,11 @@ export function createRenderer({
         },
         {
             name: UniformNames.ProjectionMatrix,
+            type: UniformTypes.Matrix4,
+            value: createMat4Identity(),
+        },
+        {
+            name: UniformNames.WVPMatrix,
             type: UniformTypes.Matrix4,
             value: createMat4Identity(),
         },
@@ -728,11 +733,11 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
             material.shader!,
             blockName
         );
-        // // for debug
+        // for debug
         // console.log(
-        //     material.getName(),
+        //     material.name,
         //     'addUniformBlock',
-        //     material.getUniformBlockNames(),
+        //     material.uniformBlockNames,
         //     targetGlobalUniformBufferObject.data,
         //     blockIndex
         // );
@@ -1017,7 +1022,7 @@ export function renderRenderer(
         //     return actor.castShadow;
         // });
         // shadowPass(renderer, castShadowLightActors, castShadowRenderMeshInfos);
-        shadowPass(renderer, castShadowLightActors, renderMeshInfoEachQueue);
+        shadowPass(renderer, camera, castShadowLightActors, renderMeshInfoEachQueue);
     }
 
     // ------------------------------------------------------------------------------
@@ -1405,7 +1410,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
     updateRendererCameraUniforms(renderer, camera);
 
     depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
-        updateActorTransformUniforms(renderer, actor);
+        updateActorTransformUniforms(renderer, actor, camera);
 
         actor.depthMaterials.forEach((depthMaterial, i) => {
             if (!depthMaterial) {
@@ -1461,6 +1466,7 @@ function copySceneTexture(renderer: Renderer, sceneTexture: Texture) {
 
 function shadowPass(
     renderer: Renderer,
+    camera: Camera,
     castShadowLightActors: Light[],
     renderMeshInfoEachQueue: RenderMeshInfoEachQueue
 ) {
@@ -1497,7 +1503,7 @@ function shadowPass(
 
         castShadowRenderMeshInfos.forEach(({ actor, materialIndex }) => {
             // TODO: material 側でやった方がよい？
-            updateActorTransformUniforms(renderer, actor);
+            updateActorTransformUniforms(renderer, actor, camera);
 
             updateMeshDepthMaterial(actor, { camera: lightActor.shadowCamera! });
 
@@ -1553,7 +1559,7 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
             }
 
             // TODO: material 側でやった方がよい？
-            updateActorTransformUniforms(renderer, actor);
+            updateActorTransformUniforms(renderer, actor, camera);
 
             updateMeshMaterial(actor, { camera });
 
@@ -1612,7 +1618,7 @@ function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRender
             }
 
             // TODO: material 側でやった方がよい？
-            updateActorTransformUniforms(renderer, actor);
+            updateActorTransformUniforms(renderer, actor, camera);
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             setMaterialUniformValue(
@@ -1665,7 +1671,7 @@ function renderTransparentPass(
                 return;
             }
 
-            updateActorTransformUniforms(renderer, actor);
+            updateActorTransformUniforms(renderer, actor, camera);
 
             applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
 
@@ -1684,7 +1690,7 @@ function renderTransparentPass(
     });
 }
 
-function updateActorTransformUniforms(renderer: Renderer, actor: Actor) {
+function updateActorTransformUniforms(renderer: Renderer, actor: Actor, camera: Camera) {
     setUniformBlockValue(
         renderer,
         UniformBlockNames.Transformations,
@@ -1696,6 +1702,16 @@ function updateActorTransformUniforms(renderer: Renderer, actor: Actor) {
         UniformBlockNames.Transformations,
         UniformNames.InverseWorldMatrix,
         actor.transform.worldMatrix
+        // invertMat4(actor.transform.worldMatrix) // TODO: こっちの方が正しいが・・・
+    );
+    setUniformBlockValue(
+        renderer,
+        UniformBlockNames.Transformations,
+        UniformNames.WVPMatrix,
+        multiplyMat4Array(
+            camera.viewProjectionMatrix,
+            actor.transform.worldMatrix
+        )
     );
     setUniformBlockValue(
         renderer,
@@ -1791,7 +1807,7 @@ function updateUniformBlockValue(
         console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
         return;
     }
-
+    
     const getStructElementValue = (type: UniformTypes, value: UniformBufferObjectValue) => {
         const data: number[] = [];
         switch (type) {
@@ -1897,9 +1913,12 @@ function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: n
 }
 
 export function updateTimelineUniforms(renderer: Renderer, timelineTime: number, timelineDeltaTime: number) {
+    console.log(timelineTime, timelineDeltaTime)
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
     updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineTime, timelineTime);
     updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineDeltaTime, timelineDeltaTime);
+    // for debug
+    // console.log(timelineTime, timelineDeltaTime);
 }
 
 function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: DirectionalLight) {

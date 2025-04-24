@@ -40,7 +40,8 @@ import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl'
 import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
-import {isDevelopment} from "@/PaleGL/utilities/envUtilities.ts";
+import perlinPartialContent from '@/PaleGL/shaders/partial/perlin.partial.glsl';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -87,6 +88,7 @@ const includesDict = new Map<string, string>([
     ['skybox_h', skyboxHeaderPartialContent],
     ['geometry_h', geometryHeaderPartialContent],
     ['os_raymarch_f', objectSpaceRaymarchFunctionsPartialContent],
+    ['perlin', perlinPartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
@@ -296,8 +298,6 @@ export const buildVertexShader = (
 ) => {
     let replacedShader: string = shader;
 
-    replacedShader = commonReplacementShader(replacedShader, defineOptions);
-
     // replace attributes
     replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
         const attributes = buildVertexAttributeLayouts(attributeDescriptors);
@@ -316,6 +316,8 @@ export const buildVertexShader = (
         });
     });
 
+    replacedShader = commonReplacementShader(replacedShader, defineOptions);
+
     return replacedShader;
 };
 
@@ -332,8 +334,6 @@ export const buildFragmentShader = (
 ) => {
     let replacedShader: string = shader;
 
-    replacedShader = commonReplacementShader(replacedShader, defineOptions);
-
     // replace shader block
     Object.values(FragmentShaderModifierPragmas).forEach((value) => {
         const pragma = value as FragmentShaderModifierPragmas;
@@ -345,6 +345,8 @@ export const buildFragmentShader = (
             return fragmentShaderModifiers[modifierIndex].value || '';
         });
     });
+
+    replacedShader = commonReplacementShader(replacedShader, defineOptions);
 
     return replacedShader;
 };

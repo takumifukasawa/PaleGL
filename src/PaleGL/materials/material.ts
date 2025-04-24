@@ -26,6 +26,7 @@ import {
     UniformsData,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
+import {uniqFunc} from "@/PaleGL/utilities/maton.ts";
 
 export type MaterialArgs = {
     type?: MaterialTypes;
@@ -270,7 +271,7 @@ export function createMaterial(args: MaterialArgs): Material {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 
-    const uniformBlockNames: string[] = args.uniformBlockNames || [];
+    const uniformBlockNames: string[] = uniqFunc(args.uniformBlockNames || []);
     
     // isAddedUniformBlock: boolean = false;
     depthTest = !!depthTest;

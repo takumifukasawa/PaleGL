@@ -26,15 +26,18 @@ export type UnlitMaterialArgs = {
 
 export type UnlitMaterial = Material;
 
-export function createUnlitMaterial({
-    baseMap,
-    baseMapTiling, // vec4
-    baseColor,
-    // TODO: 外部化
-    vertexShaderModifiers = [],
-    uniforms = [],
-    ...options
-}: UnlitMaterialArgs = {}) {
+export function createUnlitMaterial(args: UnlitMaterialArgs = {}) {
+    const {
+        baseMap,
+        baseMapTiling, // vec4
+        baseColor,
+        // TODO: 外部化
+        vertexShaderModifiers = [],
+        uniforms = [],
+        uniformBlockNames = [],
+        ...options
+    } = args;
+
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.BaseMap,
@@ -79,7 +82,6 @@ export function createUnlitMaterial({
     ];
 
     const material = createMaterial({
-        ...options,
         name: 'UnlitMaterial',
         vertexShaderModifiers,
         vertexShader: gBufferVert,
@@ -91,7 +93,13 @@ export function createUnlitMaterial({
         depthTest: true,
         depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき??
         depthFuncType: DepthFuncTypes.Equal, // NOTE: これはGBufferの場合
-        uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        ...options, // overrides
+        uniformBlockNames: [
+            UniformBlockNames.Common,
+            UniformBlockNames.Transformations,
+            UniformBlockNames.Camera,
+            ...(uniformBlockNames ?? []), // merge
+        ],
     });
 
     return {

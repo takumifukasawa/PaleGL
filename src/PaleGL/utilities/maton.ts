@@ -29,6 +29,10 @@ function compactFunc<T>(arr: T[]): T[] {
     return newArr.filter(Boolean);
 }
 
+export function uniqFunc<T>(arr: T[]): T[] {
+    return [...new Set(arr)];
+}
+
 // function float32ArrayFunc(arr: number[]): Float32Array {
 //     return new Float32Array(arr);
 // }
@@ -38,6 +42,7 @@ type MatonWrapper<T> = {
     fill: () => MatonWrapper<T>;
     range: (length: number) => MatonWrapper<T>;
     compact: () => MatonWrapper<Exclude<T, null | undefined>>;
+    uniq: () => MatonWrapper<T>;
     // toFloat32Array: () => Float32Array;
 };
 
@@ -69,6 +74,13 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         return this as MatonWrapper<T>;
     }
     
+    function uniq(): MatonWrapper<T> {
+        uniqFunc(tmp);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return this as MatonWrapper<T>;
+    }
+    
     // function toFloat32Array(): MatonWrapper<T>  {
     //     return float32ArrayFunc(tmp as number[]);
     // }
@@ -82,6 +94,7 @@ function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
         fill,
         range,
         compact,
+        uniq
         // toFloat32Array 
     };
 }
@@ -94,6 +107,7 @@ const maton = <T>(obj: T[] = []) => {
 maton.fill = fillFunc;
 maton.range = rangeFunc;
 maton.compact = compactFunc;
+maton.uniq = uniqFunc;
 // maton.toFloat32Array = float32ArrayFunc;
 
 export { maton };

@@ -68,12 +68,11 @@ export function createPlayer(
 
     setSceneToEngine(engine, scene);
 
-    const timelineTime: number = 0;
-    const timelinePrevTime: number = 0;
-    const timelineDeltaTime: number = 0;
+    // const timelineTime: number = 0;
+    // const timelinePrevTime: number = 0;
+    // const timelineDeltaTime: number = 0;
     // let currentTimeForTimeline = 0;
     // let marionetterSceneStructure: MarionetterSceneStructure | null = null;
-
     // const glslSoundWrapper = initGLSLSound(gpu, soundVertexShader, SOUND_DURATION);
 
     const player: Player = {
@@ -84,9 +83,9 @@ export function createPlayer(
         camera: null,
         marionetter: null,
         marionetterSceneStructure: null,
-        timelineTime,
-        timelinePrevTime,
-        timelineDeltaTime,
+        timelineTime: 0,
+        timelinePrevTime: 0,
+        timelineDeltaTime: 0,
         currentTimeForTimeline: 0,
         glslSoundWrapper: glslSoundWrapper || null,
         timelineDuration,
@@ -147,7 +146,7 @@ export function createPlayer(
     });
 
     setOnRenderEngine(engine, (time) => {
-        updateTimelineUniforms(player.renderer, timelineTime, timelineDeltaTime);
+        updateTimelineUniforms(player.renderer, player.timelineTime, player.timelineDeltaTime);
         renderRenderer(renderer, scene, camera, player.engine.sharedTextures, {
             time,
             // timelineTime,

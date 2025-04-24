@@ -1127,6 +1127,7 @@ export function createRotationZMatrix(rad: number) {
     );
 }
 
+// 配列の後ろほど、頭からかけることになる
 export function multiplyMat4Array(...matrices: Matrix4[]) {
     const m = createMat4Identity();
     matrices.forEach((matrix) => multiplyMat4(m, matrix));
