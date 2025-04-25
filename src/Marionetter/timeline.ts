@@ -2,45 +2,58 @@ import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import {
     copyVector3,
     createVector3One,
-    createVector3Zero, negateVector3,
+    createVector3Zero,
+    negateVector3,
     setV3x,
     setV3y,
-    setV3z, v3x, v3y, v3z,
-    Vector3
+    setV3z,
+    v3x,
+    v3y,
+    v3z,
+    Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import {Actor, getActorComponent} from '@/PaleGL/actors/actor.ts';
+import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
-import {findActorByName, Scene} from '@/PaleGL/core/scene.ts';
+import { findActorByName, Scene } from '@/PaleGL/core/scene.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera';
 import {
     MarionetterActivationControlClip,
     MarionetterActivationControlClipInfo,
     MarionetterAnimationClip,
-    MarionetterAnimationClipInfo, MarionetterAnimationClipInfoProperty,
+    MarionetterAnimationClipInfo,
+    MarionetterAnimationClipInfoProperty,
     MarionetterAnimationClipType,
-    MarionetterClipArgs, MarionetterClipBindingProperty, MarionetterClipInfoBaseProperty,
+    MarionetterClipArgs,
+    MarionetterClipBindingProperty,
+    MarionetterClipInfoBaseProperty,
     MarionetterClipInfoKinds,
     MarionetterClipInfoType,
     MarionetterClipKinds,
-    MarionetterDefaultTrackInfo, MarionetterDefaultTrackInfoProperty,
+    MarionetterDefaultTrackInfo,
+    MarionetterDefaultTrackInfoProperty,
     MarionetterLightControlClip,
-    MarionetterLightControlClipInfo, MarionetterLightControlClipInfoProperty,
-    MarionetterMarkerTrackInfo, MarionetterMarkerTrackInfoProperty,
+    MarionetterLightControlClipInfo,
+    MarionetterLightControlClipInfoProperty,
+    MarionetterMarkerTrackInfo,
+    MarionetterMarkerTrackInfoProperty,
     MarionetterObjectMoveAndLookAtClip,
     MarionetterObjectMoveAndLookAtClipInfo,
     MarionetterObjectMoveAndLookAtClipInfoProperty,
-    MarionetterPlayableDirectorComponentInfo, MarionetterPlayableDirectorComponentInfoProperty,
+    MarionetterPlayableDirectorComponentInfo,
+    MarionetterPlayableDirectorComponentInfoProperty,
     // MarionetterPostProcessBloom,
     // MarionetterPostProcessDepthOfField,
     // MarionetterPostProcessVignette,
     // MarionetterPostProcessVolumetricLight,
-    MarionetterSignalEmitter, MarionetterSignalEmitterProperty,
+    MarionetterSignalEmitter,
+    MarionetterSignalEmitterProperty,
     MarionetterTimeline,
     MarionetterTimelineDefaultTrack,
     MarionetterTimelineMarkerTrack,
     MarionetterTimelineSignalEmitter,
     MarionetterTimelineTrackExecuteArgs,
-    MarionetterTimelineTrackKinds, MarionetterTrackInfoBaseProperty,
+    MarionetterTimelineTrackKinds,
+    MarionetterTrackInfoBaseProperty,
     MarionetterTrackInfoType,
 } from '@/Marionetter/types';
 import {
@@ -65,40 +78,38 @@ import {
     PROPERTY_MATERIAL_BASE_COLOR_R,
     PROPERTY_SPOTLIGHT_RANGE,
 } from '@/Marionetter/constants.ts';
-import {isTimeInClip} from "@/Marionetter/timelineUtilities.ts";
+import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
 import {
     postProcessActorTimeline,
     preProcessActorTimeline,
-    processActorPropertyBinder
-} from "@/PaleGL/actors/actorBehaviours.ts";
-import {updateProjectionMatrix} from "@/PaleGL/actors/cameras/cameraBehaviours.ts";
+    processActorPropertyBinder,
+} from '@/PaleGL/actors/actorBehaviours.ts';
+import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import {
     createRotationXMatrix,
     createRotationYMatrix,
     createRotationZMatrix,
-    multiplyMat4Array
-} from "@/PaleGL/math/matrix4.ts";
-import {ActorTypes, DEG_TO_RAD, LightTypes} from "@/PaleGL/constants.ts";
+    multiplyMat4Array,
+} from '@/PaleGL/math/matrix4.ts';
+import { ActorTypes, DEG_TO_RAD, LightTypes } from '@/PaleGL/constants.ts';
+import { createQuaternionInvertAxis, rotationMatrixToQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { createRotator } from '@/PaleGL/math/rotator.ts';
+import { setRotation } from '@/PaleGL/core/transform.ts';
 import {
-    createQuaternionIdentity,
-    createQuaternionInvertAxis,
-    rotationMatrixToQuaternion
-} from "@/PaleGL/math/quaternion.ts";
-import {createRotator, createRotatorFromQuaternion} from "@/PaleGL/math/rotator.ts";
-import {setRotation} from "@/PaleGL/core/transform.ts";
-import {
-    createColor, getColorA,
+    Color,
+    createColor,
+    getColorA,
     getColorB,
     getColorG,
     getColorR,
     setColorA,
     setColorB,
+    setColorChannel,
     setColorG,
-    setColorR
-} from "@/PaleGL/math/color.ts";
-import {SpotLight} from "@/PaleGL/actors/lights/spotLight.ts";
-import {ObjectMoveAndLookAtController} from "@/PaleGL/components/objectMoveAndLookAtController.ts";
-
+    setColorR,
+} from '@/PaleGL/math/color.ts';
+import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { ObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
@@ -141,11 +152,18 @@ export function buildMarionetterTimeline(
     // build track
     //
 
-    for (let i = 0; i < marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks].length; i++) {
-        const track = marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks][i];
+    for (
+        let i = 0;
+        i < marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks].length;
+        i++
+    ) {
+        const track =
+            marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks][i];
 
         if (track[MarionetterTrackInfoBaseProperty.type] === MarionetterTrackInfoType.MarkerTrack) {
-            const signalEmitters = (track as MarionetterMarkerTrackInfo)[MarionetterMarkerTrackInfoProperty.signalEmitters];
+            const signalEmitters = (track as MarionetterMarkerTrackInfo)[
+                MarionetterMarkerTrackInfoProperty.signalEmitters
+            ];
             tracks.push({
                 signalEmitters: signalEmitters.map((signalEmitter) => {
                     return buildSignalEmitter(signalEmitter);
@@ -183,11 +201,13 @@ export function buildMarionetterTimeline(
                         const { time, scene } = args;
                         const clipAtTime = marionetterClips.find(
                             // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
-                            (clip) => isTimeInClip(
-                                time,
-                                clip.clipInfo[MarionetterClipInfoBaseProperty.start],
-                                clip.clipInfo[MarionetterClipInfoBaseProperty.start] + clip.clipInfo[MarionetterClipInfoBaseProperty.duration]
-                            )
+                            (clip) =>
+                                isTimeInClip(
+                                    time,
+                                    clip.clipInfo[MarionetterClipInfoBaseProperty.start],
+                                    clip.clipInfo[MarionetterClipInfoBaseProperty.start] +
+                                        clip.clipInfo[MarionetterClipInfoBaseProperty.duration]
+                                )
                         );
 
                         // NOTE: 渡されるtimeそのものがframeTimeになった
@@ -195,10 +215,13 @@ export function buildMarionetterTimeline(
 
                         // まずactorのprocessTimelineを実行
                         if (targetActor) {
-                            preProcessActorTimeline(targetActor, time)
+                            preProcessActorTimeline(targetActor, time);
                         }
 
-                        if (track[MarionetterTrackInfoBaseProperty.type] === MarionetterTrackInfoType.ActivationControlTrack) {
+                        if (
+                            track[MarionetterTrackInfoBaseProperty.type] ===
+                            MarionetterTrackInfoType.ActivationControlTrack
+                        ) {
                             if (targetActor != null) {
                                 // const clipAtTime = marionetterClips.find(
                                 //     (clip) => clip.clipInfo.s < time && time < clip.clipInfo.s + clip.clipInfo.d
@@ -220,7 +243,7 @@ export function buildMarionetterTimeline(
                         }
 
                         // clipの実行後にupdate
-                        if(targetActor) {
+                        if (targetActor) {
                             postProcessActorTimeline(targetActor, time);
                         }
                     });
@@ -240,7 +263,8 @@ export function buildMarionetterTimeline(
         // const spf = 1 / fps;
         // const frameTime = Math.floor(rawTime / spf) * spf;
         // pattern2: use raw time
-        const frameTime = time % marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.duration];
+        const frameTime =
+            time % marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.duration];
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute({ time: frameTime, scene });
         }
@@ -325,6 +349,9 @@ function createMarionetterAnimationClip(
         const localRotationEulerDegree: Vector3 = createVector3Zero();
         const localScale: Vector3 = createVector3One();
 
+        const numberPropertyMap = new Map<string, number>();
+        const colorPropertyMap = new Map<string, Color>();
+
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
 
@@ -404,13 +431,36 @@ function createMarionetterAnimationClip(
                 //     console.log(actor)
                 //     break;
                 default:
-                    // // 厳しい場合、propertyが紐づいていない場合はエラーを出す
-                    // // console.error(`[createMarionetterAnimationClip] invalid declared property: ${propertyName}, value: ${value}`);
-                    // 特に紐づいてない場合はactorに流す
-                    processActorPropertyBinder(actor, propertyName, value);
+                    const accessors = propertyName.split('.');
+                    if (accessors.length > 1) {
+                        // vector, color
+                        const [accessorKey, accessorElement] = accessors;
+                        switch (accessorElement) {
+                            case 'x':
+                            case 'y':
+                            case 'z':
+                            case 'w':
+                                break;
+                            case 'r':
+                            case 'g':
+                            case 'b':
+                            case 'a':
+                                if (!colorPropertyMap.has(accessorKey)) {
+                                    colorPropertyMap.set(accessorKey, createColor());
+                                }
+                                setColorChannel(colorPropertyMap.get(accessorKey)!, accessorElement, value);
+                                break;
+                        }
+                    } else {
+                        if (!numberPropertyMap.has(propertyName)) {
+                            numberPropertyMap.set(propertyName, value);
+                        }
+                    }
+                    break;
             }
         });
 
+        // set local scale
         if (hasLocalScale) {
             copyVector3(actor.transform.scale, localScale);
         } else {
@@ -418,6 +468,7 @@ function createMarionetterAnimationClip(
             // copyVector3(actor.transform.scale, createVector3One());
         }
 
+        // set local rotation
         // TODO: なぜか一回行列に落とさないとうまく動かない. まわりくどいかつ余計な計算が走るが
         if (hasLocalRotationEuler) {
             const rm = multiplyMat4Array(
@@ -432,19 +483,23 @@ function createMarionetterAnimationClip(
                 createRotationZMatrix(v3z(negateVector3(localRotationEulerDegree)) * DEG_TO_RAD)
             );
             const q = rotationMatrixToQuaternion(rm);
-            setRotation(actor.transform, createRotator(
-                // actor.type === ActorTypes.Light && (actor as Light).lightType === LightTypes.Spot ? q.invertAxis() : q
-                actor.type === ActorTypes.Light &&
-                ((actor as Light).lightType === LightTypes.Spot ||
-                    (actor as Light).lightType === LightTypes.Directional)
-                    ? createQuaternionInvertAxis(q)
-                    : q
-            ));
+            setRotation(
+                actor.transform,
+                createRotator(
+                    // actor.type === ActorTypes.Light && (actor as Light).lightType === LightTypes.Spot ? q.invertAxis() : q
+                    actor.type === ActorTypes.Light &&
+                        ((actor as Light).lightType === LightTypes.Spot ||
+                            (actor as Light).lightType === LightTypes.Directional)
+                        ? createQuaternionInvertAxis(q)
+                        : q
+                )
+            );
         } else {
             // ない場合はセットしない方（sceneに任せる）
             // setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionIdentity()));
         }
 
+        // set local position
         if (hasLocalPosition) {
             // localPosition.z *= -1;
             copyVector3(actor.transform.position, localPosition);
@@ -452,6 +507,17 @@ function createMarionetterAnimationClip(
             // ない場合はセットしない方（sceneに任せる）
             // copyVector3(actor.transform.position, createVector3Zero());
         }
+
+        // set float
+        // numberの場合はすぐにセットしちゃう
+        numberPropertyMap.forEach((numberValue, numberKey) => {
+            processActorPropertyBinder(actor, numberKey, numberValue);
+        });
+
+        // set color
+        colorPropertyMap.forEach((color, key) => {
+            processActorPropertyBinder(actor, key, color);
+        });
     };
 
     return {
@@ -641,7 +707,10 @@ function createMarionetterObjectMoveAndLookAtClip(
             });
 
             const component = getActorComponent<ObjectMoveAndLookAtController>(actor);
-            component?.execute({ actor, scene, localPosition });
+            if (component) {
+                const [, behaviour] = component;
+                behaviour?.execute({ actor, scene, localPosition });
+            }
         },
     };
 }

@@ -1,12 +1,15 @@
-import {Component, createComponent} from "@/PaleGL/core/component.ts";
-import {Actor} from "@/PaleGL/actors/actor.ts";
-import {Vector3} from "@/PaleGL/math/vector3.ts";
-import {findActorInSceneByName, Scene} from "@/PaleGL/core/scene.ts";
-import {setLookAtActor} from "@/PaleGL/core/transform.ts";
+import { ComponentBehaviour, ComponentModel, createComponent } from '@/PaleGL/components/component.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
+import { findActorInSceneByName, Scene } from '@/PaleGL/core/scene.ts';
+import { setLookAtActor } from '@/PaleGL/core/transform.ts';
 
-export type ObjectMoveAndLookAtController = Component & {
-    execute: (args: { actor: Actor; localPosition: Vector3; scene: Scene }) => void;
-};
+export type ObjectMoveAndLookAtController = [
+    ComponentModel,
+    ComponentBehaviour & {
+        execute: (args: { actor: Actor; localPosition: Vector3; scene: Scene }) => void;
+    },
+];
 
 // timeline から操作される
 export function createObjectMoveAndLookAtController(args: {
@@ -25,14 +28,16 @@ export function createObjectMoveAndLookAtController(args: {
         }
     };
 
-    return {
-        ...createComponent({
-            onStartCallback: (actor, args) => {
-                const { scene } = args;
-                update(actor, scene, initialLocalPosition);
-            },
-        }),
-        ...{
+    const [componentModel, componentBehaviour] = createComponent({
+        onStartCallback: (actor, _model, _gpu, scene) => {
+            update(actor, scene, initialLocalPosition);
+        },
+    });
+
+    return [
+        componentModel,
+        {
+            ...componentBehaviour,
             execute: (args) => {
                 const { actor, scene, localPosition } = args;
                 update(actor, scene, localPosition);
@@ -46,5 +51,5 @@ export function createObjectMoveAndLookAtController(args: {
             //     // }
             // }
         },
-    };
+    ];
 }

@@ -186,6 +186,23 @@ export function setColorA(color: Color, value: number) {
     color.e[3] = value;
 }
 
+export function setColorChannel(color: Color, key: string, value: number) {
+    switch (key) {
+        case 'r':
+            color.e[0] = value;
+            break;
+        case 'g':
+            color.e[1] = value;
+            break;
+        case 'b':
+            color.e[2] = value;
+            break;
+        case 'a':
+            color.e[3] = value;
+            break;
+    }
+}
+
 export function multiplyColorScalar(color: Color, s: number, withAlpha: boolean = false) {
     color.e[0] *= s;
     color.e[1] *= s;

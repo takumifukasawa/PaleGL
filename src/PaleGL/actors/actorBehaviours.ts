@@ -8,13 +8,14 @@ import {
     // SetSizeActorFunc,
 } from '@/PaleGL/actors/actor.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import {Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import {setSizeCamera, updateCamera, updateCameraTransform} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
-import {updateAnimator} from "@/PaleGL/core/animator.ts";
+import { updateAnimator } from '@/PaleGL/core/animator.ts';
+import {TimelinePropertyValue} from "@/Marionetter/types";
 
 // try start actor -------------------------------------------------------
 
@@ -32,8 +33,8 @@ export const tryStartActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
 export type StartActorFunc = (actor: Actor, args: ActorStartArgs) => void;
 
 export function startActorBehaviourBase(actor: Actor, { gpu, scene }: ActorStartArgs) {
-    actor.components.forEach((component) => {
-        component.start({ gpu, scene });
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onStartCallback?.(actor, model, gpu, scene);
     });
     actor.onStart.forEach((cb) => {
         cb({ gpu, scene });
@@ -74,8 +75,8 @@ export const setSizeActor: SetSizeActorFunc = (actor, width, height) => {
 
 export const fixedUpdateActor = (actor: Actor, { gpu, scene, fixedTime, fixedDeltaTime }: ActorFixedUpdateArgs) => {
     tryStartActor(actor, { gpu, scene });
-    actor.components.forEach((component) => {
-        component.fixedUpdate({ gpu, fixedTime, fixedDeltaTime });
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onFixedUpdateCallback?.(actor, model, gpu, fixedTime, fixedDeltaTime);
     });
     if (actor.animator) {
         updateAnimator(actor.animator, fixedDeltaTime);
@@ -94,18 +95,18 @@ export type UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: Ac
 const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
     [ActorTypes.Light]: updateLight,
     [ActorTypes.Mesh]: updateMesh,
-    [ActorTypes.Camera]: updateCamera
+    [ActorTypes.Camera]: updateCamera,
 };
 
 // update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
 export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTime }) => {
     // updateの場合は必ず共通処理を通す
     tryStartActor(actor, { gpu, scene });
-    actor.components.forEach((component) => {
-        component.update({ gpu, time, deltaTime });
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });
     actor.onUpdate.forEach((cb) => {
-        cb({ gpu, scene, time,  deltaTime});
+        cb({ gpu, scene, time, deltaTime });
     });
 
     // console.log(actor.type, actor.name)
@@ -116,8 +117,8 @@ export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTim
 
 export const lastUpdateActor = (actor: Actor, { gpu, scene, time, deltaTime }: ActorLastUpdateArgs) => {
     tryStartActor(actor, { gpu, scene });
-    actor.components.forEach((component) => {
-        component.lastUpdate({ gpu, time, deltaTime });
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onLastUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });
     if (actor.onLastUpdate) {
         actor.onLastUpdate({ gpu, scene, time, deltaTime });
@@ -134,12 +135,12 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     // TODO: componentで必要になったら呼ぶ
 };
 
-export const processActorPropertyBinder = (actor: Actor, key: string, value: number) => {
+export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T) => {
     if (actor.onProcessPropertyBinder) {
         actor.onProcessPropertyBinder(key, value);
     }
-    actor.components.forEach((component) => {
-        component.processPropertyBinder?.(key, value);
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onProcessPropertyBinder?.(actor, model, key, value);
     });
 };
 
@@ -156,8 +157,8 @@ export const postProcessActorTimeline = (actor: Actor, timelineTime: number) => 
     if (actor.onPostProcessTimeline) {
         actor.onPostProcessTimeline(timelineTime);
     }
-    actor.components.forEach((component) => {
-        component.postProcessTimeline?.(timelineTime);
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onPostProcessTimeline?.(actor, model, timelineTime);
     });
 };
 

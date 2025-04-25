@@ -150,7 +150,7 @@ export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformT
 export const setUniformValue = (uniforms: Uniforms, name: string, newValue: UniformValue, log: boolean = false) => {
     const data = findUniformByName(uniforms, name);
     if (log) {
-        console.log(name, newValue, data);
+        console.log(uniforms, name, data, newValue);
     }
     // | UniformStructValue
     // | UniformStructArrayValue

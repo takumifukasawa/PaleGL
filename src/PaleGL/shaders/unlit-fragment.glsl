@@ -14,6 +14,8 @@ uniform sampler2D uBaseMap;
 uniform vec4 uBaseMapTiling;
 uniform int uShadingModelId;
 
+#pragma APPEND_UNIFORMS
+
 #include <alpha_test>
 
 in vec2 vUv;
@@ -43,7 +45,7 @@ void main() {
     baseColor *= vVertexColor;
 #endif
 
-    vec4 resultColor = baseColor; // for alpha test
+    vec4 resultColor = baseColor;
 
     #include ./partial/alpha-test-fragment.partial.glsl
 

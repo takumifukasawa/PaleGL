@@ -1913,7 +1913,6 @@ function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: n
 }
 
 export function updateTimelineUniforms(renderer: Renderer, timelineTime: number, timelineDeltaTime: number) {
-    console.log(timelineTime, timelineDeltaTime)
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
     updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineTime, timelineTime);
     updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineDeltaTime, timelineDeltaTime);

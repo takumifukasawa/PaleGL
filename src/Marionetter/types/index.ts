@@ -1,6 +1,7 @@
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { RawVector3 } from '@/PaleGL/math/vector3.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
+import { Color } from '@/PaleGL/math/color.ts';
 
 //
 // settings
@@ -292,18 +293,20 @@ export type MarionetterCurveKeyframe = {
     o: number;
 };
 
-export type MarionetterCurveKeyframeConstraint = NeedsShorten extends true ? {
-    // shorten
-    t: number;
-    v: number;
-    i: number;
-    o: number;
-} : {
-    time: number;
-    value: number;
-    inTangent: number;
-    outTangent: number;
-};
+export type MarionetterCurveKeyframeConstraint = NeedsShorten extends true
+    ? {
+          // shorten
+          t: number;
+          v: number;
+          i: number;
+          o: number;
+      }
+    : {
+          time: number;
+          value: number;
+          inTangent: number;
+          outTangent: number;
+      };
 export const MarionetterCurveKeyframeProperty = {
     time: NeedsShorten ? 't' : 'time',
     value: NeedsShorten ? 'v' : 'value',
@@ -673,39 +676,46 @@ export type MarionetterClipKinds =
     | MarionetterActivationControlClip
     | MarionetterObjectMoveAndLookAtClip;
 
-export const enum MarionetterAnimationClipType {
-    None = 0,
-    AnimationClip = 1,
-    LightControlClip = 2,
-    ActivationControlClip = 3,
-    SignalEmitter = 4,
-    ObjectMoveAndLookAtClip = 5,
-}
+export const MarionetterAnimationClipType = {
+    None: 0,
+    AnimationClip: 1,
+    LightControlClip: 2,
+    ActivationControlClip: 3,
+    SignalEmitter: 4,
+    ObjectMoveAndLookAtClip: 5,
+} as const;
+
+export type MarionetterAnimationClipType =
+    (typeof MarionetterAnimationClipType)[keyof typeof MarionetterAnimationClipType];
 
 export type MarionetterClipArgs = { actor: Actor; time: number; scene: Scene };
 
-export type MarionetterAnimationClip = {
-    type: MarionetterAnimationClipType.AnimationClip;
+export type MarionetterAnimationClipBase = {
+    type: MarionetterAnimationClipType;
+};
+
+export type MarionetterAnimationClip = MarionetterAnimationClipBase & {
+    // type: MarionetterAnimationClipType.AnimationClip;
     clipInfo: MarionetterAnimationClipInfo;
     execute: (args: MarionetterClipArgs) => void;
 };
 
-export type MarionetterLightControlClip = {
-    type: MarionetterAnimationClipType.LightControlClip;
+export type MarionetterLightControlClip = MarionetterAnimationClipBase & {
+    // type: MarionetterAnimationClipType.LightControlClip;
     clipInfo: MarionetterLightControlClipInfo;
     execute: (args: MarionetterClipArgs) => void;
 };
 
-export type MarionetterActivationControlClip = {
-    type: MarionetterAnimationClipType.ActivationControlClip;
+export type MarionetterActivationControlClip = MarionetterAnimationClipBase & {
+    // type: MarionetterAnimationClipType.ActivationControlClip;
     clipInfo: MarionetterActivationControlClipInfo;
     execute: (args: MarionetterClipArgs) => void;
 };
 
 // TODO: signal emitter
 
-export type MarionetterObjectMoveAndLookAtClip = {
-    type: MarionetterAnimationClipType.ObjectMoveAndLookAtClip;
+export type MarionetterObjectMoveAndLookAtClip = MarionetterAnimationClipBase & {
+    // type: MarionetterAnimationClipType.ObjectMoveAndLookAtClip;
     clipInfo: MarionetterObjectMoveAndLookAtClipInfo;
     execute: (args: MarionetterClipArgs) => void;
 };
@@ -713,3 +723,22 @@ export type MarionetterObjectMoveAndLookAtClip = {
 //
 // timeline properties
 //
+
+export const TimelinePropertyBinderType = {
+    Float: 0,
+    Vector2: 1,
+    Vector3: 2,
+    Vector4: 3,
+    Color: 4,
+} as const;
+
+export type TimelinePropertyBinderType = (typeof TimelinePropertyBinderType)[keyof typeof TimelinePropertyBinderType];
+
+export const TimelinePropertyBinderTarget = {
+    Material: 0,
+} as const;
+
+export type TimelinePropertyBinderTarget =
+    (typeof TimelinePropertyBinderTarget)[keyof typeof TimelinePropertyBinderTarget];
+
+export type TimelinePropertyValue = number | Color;

@@ -194,9 +194,9 @@ export const setUniformValueToMeshPairMaterial = (mesh: Mesh, i: number, name: s
     setMaterialUniformValue(mesh.depthMaterials[i], name, newValue);
 };
 
-export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newValue: UniformValue) => {
-    mesh.materials.forEach((material) => setMaterialUniformValue(material, name, newValue));
-    mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue));
+export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newValue: UniformValue, log?: boolean) => {
+    mesh.materials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
+    mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
 };
 
 export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolean) => {
