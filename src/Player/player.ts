@@ -49,6 +49,7 @@ export function createPlayer(
     canvasElement: HTMLCanvasElement,
     pixelRatio: number,
     sceneJson: string,
+    hotReloadJsonUrl: string,
     timelineDuration: number,
     options: {
         glslSoundWrapper?: GLSLSoundWrapper;
@@ -127,7 +128,9 @@ export function createPlayer(
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         marionetter.connect();
         // initHotReloadAndParseScene();
-        initHotReloadAndParseScene(marionetter, marionetterSceneStructure, scene, (structure) => {
+        initHotReloadAndParseScene(
+            hotReloadJsonUrl,
+            marionetter, marionetterSceneStructure, scene, (structure) => {
             player.marionetterSceneStructure = structure;
         });
     }

@@ -4,6 +4,7 @@ import { Scene } from '@/PaleGL/core/scene.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export const initHotReloadAndParseScene = (
+    hotReloadUrl: string,
     marionetter: Marionetter,
     _marionetterSceneStructure: MarionetterSceneStructure,
     captureScene: Scene,
@@ -12,10 +13,13 @@ export const initHotReloadAndParseScene = (
     const marionetterSceneStructure: MarionetterSceneStructure | null = _marionetterSceneStructure;
     const hotReloadScene = () => {
         if (isDevelopment()) {
-            console.log('hot reload scene...');
-            void fetch('./assets/data/scene-hot-reload.json').then(async (res) => {
+            const fetchUrl = `${hotReloadUrl}?t=${+new Date()}`;
+            console.log('hot reload scene...', fetchUrl);
+            void fetch(fetchUrl, {
+                cache: 'no-cache',
+            }).then(async (res) => {
                 const sceneJson = (await res.json()) as unknown as MarionetterScene;
-                console.log('hot reload: scene', sceneJson);
+                console.log('hot reload scene', sceneJson);
                 if (marionetterSceneStructure) {
                     console.log('hot reload: marionetterSceneStructure', marionetterSceneStructure);
                     marionetterSceneStructure.marionetterTimeline = buildMarionetterTimelineFromScene(
