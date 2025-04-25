@@ -3,8 +3,9 @@ import { ActorType, ActorTypes } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
 import { Animator, createAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Component } from '@/PaleGL/core/component.ts';
+import { Component } from '@/PaleGL/components/component.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
+import {TimelinePropertyValue} from "@/Marionetter/types";
 
 export type ActorStartArgs = { scene: Scene; gpu: Gpu };
 export type ActorFixedUpdateArgs = { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number };
@@ -16,7 +17,7 @@ type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number;
 type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
-type OnProcessPropertyBinder = (key: string, value: number) => void;
+type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(key: string, value: T) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
 
 export type ActorArgs = { name?: string; type?: ActorType };
@@ -150,6 +151,10 @@ export const subscribeActorOnUpdate = (actor: Actor, value: OnUpdateCallback) =>
 export const addActorComponent = (actor: Actor, component: Component) => {
     actor.components.push(component);
 };
+
+export const addActorComponents = (actor: Actor, components: Component[]) => {
+    actor.components.push(...components);
+}
 
 export function getActorComponent<T extends Component>(actor: Actor): T | null {
     return actor.components.find((component) => component) as T;

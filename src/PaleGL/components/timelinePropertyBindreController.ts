@@ -6,15 +6,18 @@ export type TimelinePropertyBinderController = Component;
 
 // timeline から操作される
 export function createTimelineMaterialPropertyBinderController(
-    uniformName: string
+    uniformName: string,
+    propertyName: string,
 ): TimelinePropertyBinderController {
     return createComponent({
-        onProcessPropertyBinder: (actor, _, __, value) => {
-            // for debug
+        onProcessPropertyBinder: (actor, _, key, value) => {
+            // // for debug
             // console.log(
-            //     `[TimelinePropertyBinderController] actor: ${actor.name} component: ${componentModel.name}, key: ${key},`, uniformName, value
+            //     `[TimelinePropertyBinderController] actor: ${actor.name}, key: ${key},`, uniformName, value
             // );
-            setUniformValueToAllMeshMaterials(actor as Mesh, uniformName, value);
+            if(propertyName === key) {
+                setUniformValueToAllMeshMaterials(actor as Mesh, uniformName, value);
+            }
         },
     });
 }
