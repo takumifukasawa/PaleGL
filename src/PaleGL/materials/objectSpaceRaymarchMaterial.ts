@@ -160,7 +160,7 @@ export function createObjectSpaceRaymarchMaterial({
 
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
-        ...materialArgs,
+        ...materialArgs, // TODO: 上書きするためにできるだけ後ろに持っていきたい
         // ...options,
         name: 'ObjectSpaceRaymarchMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
