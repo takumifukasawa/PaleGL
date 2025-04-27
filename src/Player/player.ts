@@ -15,7 +15,7 @@ import {
     getSoundCurrentTime,
     GLSLSoundWrapper,
     playSound,
-    stopSound
+    stopSound,
 } from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
 import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
 import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
@@ -33,6 +33,8 @@ type Player = {
     renderer: Renderer;
     camera: Camera | null;
     // onResize?: (width: number, height: number) => void;
+    isPlaying: boolean;
+    loop: boolean;
     timelineTime: number;
     timelinePrevTime: number;
     timelineDeltaTime: number;
@@ -50,12 +52,13 @@ export function createPlayer(
     pixelRatio: number,
     sceneJson: string,
     hotReloadJsonUrl: string,
-    timelineDuration: number,
     options: {
+        timelineDuration?: number,
         glslSoundWrapper?: GLSLSoundWrapper;
+        loop?: boolean;
     } = {}
 ): Player {
-    const { glslSoundWrapper } = options;
+    const { glslSoundWrapper, loop, timelineDuration } = options;
 
     const renderer = createRenderer({
         gpu,
@@ -75,7 +78,7 @@ export function createPlayer(
     // let currentTimeForTimeline = 0;
     // let marionetterSceneStructure: MarionetterSceneStructure | null = null;
     // const glslSoundWrapper = initGLSLSound(gpu, soundVertexShader, SOUND_DURATION);
-
+    
     const player: Player = {
         gpu,
         engine,
@@ -84,38 +87,51 @@ export function createPlayer(
         camera: null,
         marionetter: null,
         marionetterSceneStructure: null,
+        isPlaying: false,
+        loop: !!loop,
         timelineTime: 0,
         timelinePrevTime: 0,
         timelineDeltaTime: 0,
         currentTimeForTimeline: 0,
         glslSoundWrapper: glslSoundWrapper || null,
-        timelineDuration,
+        timelineDuration: 0,
         // onResize: () => {},
     };
 
     const marionetter = createMarionetter({
         showLog: false,
         onPlay: (time: number) => {
-            // console.log(`[marionetter.onPlay] time: ${time}`);
+            console.log(`[marionetter.onPlay] time: ${time}`);
             // glslSoundWrapper.play({ time });
             // currentTimeForTimeline = time;
-            onPlayMarionetter(player, time);
+            playMarionetter(player, time);
         },
         onSeek: (time: number) => {
+            // console.log(`[marionetter.onSeek]`);
             // currentTimeForTimeline = time;
             // glslSoundWrapper.stop();
-            onSeekMarionetter(player, time);
+            seekMarionetter(player, time);
         },
         onStop: () => {
-            // console.log(`[marionetter.onStop]`);
+            console.log(`[marionetter.onStop]`);
             // glslSoundWrapper.stop();
-            onStopMarionetter(player);
+            stopMarionetter(player);
         },
     });
-
+    
     const marionetterSceneStructure = buildMarionetterScene(gpu, JSON.parse(sceneJson) as unknown as MarionetterScene);
 
     console.log('marionetterSceneStructure', marionetterSceneStructure);
+   
+    if (timelineDuration) {
+        player.timelineDuration = timelineDuration;
+    } else {
+        if (marionetterSceneStructure.marionetterTimeline) {
+            player.timelineDuration = marionetterSceneStructure.marionetterTimeline.duration;
+        } else {
+            console.error(`[marionetter] not specified timelineDuration not found`);
+        }
+    }
 
     // timeline生成したらscene内のactorをbind
     const { actors } = marionetterSceneStructure;
@@ -128,9 +144,7 @@ export function createPlayer(
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         marionetter.connect();
         // initHotReloadAndParseScene();
-        initHotReloadAndParseScene(
-            hotReloadJsonUrl,
-            marionetter, marionetterSceneStructure, scene, (structure) => {
+        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, marionetterSceneStructure, scene, (structure) => {
             player.marionetterSceneStructure = structure;
         });
     }
@@ -164,26 +178,38 @@ export function createPlayer(
     return player;
 }
 
-function onPlayMarionetter(player: Player, time: number) {
-    console.log(`[marionetter.onPlay] time: ${time}`);
+
+// export function renderPlayer(player) {
+// }
+
+// 再生するときはここを呼ぶ
+function playMarionetter(player: Player, time: number) {
+    console.log(`[marionetter.playMarionetter] time: ${time}`);
     if (player.glslSoundWrapper) {
         playSound(player.glslSoundWrapper, { time });
     }
+    player.timelinePrevTime = player.currentTimeForTimeline;
     player.currentTimeForTimeline = time;
+    player.timelineTime = time;
+    player.isPlaying = true;
 }
 
-function onSeekMarionetter(player: Player, time: number) {
+// seekするときはここを呼ぶ
+function seekMarionetter(player: Player, time: number) {
     player.currentTimeForTimeline = time;
     if (player.glslSoundWrapper) {
         stopSound(player.glslSoundWrapper);
     }
+    player.isPlaying = false;
 }
 
-function onStopMarionetter(player: Player) {
-    console.log(`[marionetter.onStop]`);
+// 停止するときはここを呼ぶ
+function stopMarionetter(player: Player) {
+    console.log(`[marionetter.stopMarionetter]`);
     if (player.glslSoundWrapper) {
         stopSound(player.glslSoundWrapper);
     }
+    player.isPlaying = false;
 }
 
 // export function setResizePlayerCallback(player: Player, cb: () => void) {
@@ -210,9 +236,10 @@ export async function loadPlayer(
 
 export function startPlayer(player: Player) {
     // player.glslSoundWrapper?.play();
-    if (player.glslSoundWrapper) {
-        playSound(player.glslSoundWrapper);
-    }
+    // if (player.glslSoundWrapper) {
+    //     playSound(player.glslSoundWrapper);
+    // }
+    playMarionetter(player, 0);
     startEngine(player.engine);
 }
 
@@ -223,22 +250,53 @@ export function runPlayer(player: Player, time: number) {
 export function beforeUpdatePlayer(player: Player, _: number, deltaTime: number) {
     if (player.marionetterSceneStructure && player.marionetterSceneStructure.marionetterTimeline) {
         if (player.glslSoundWrapper) {
-           if(player.glslSoundWrapper.isPlaying) {
-               player.currentTimeForTimeline = getSoundCurrentTime(player.glslSoundWrapper);
-           }
+            if (player.glslSoundWrapper.isPlaying) {
+                // 音源があるかつ再生中の場合は音源に従う
+                // player.currentTimeForTimeline = getSoundCurrentTime(player.glslSoundWrapper);
+                player.currentTimeForTimeline = getSoundCurrentTime(player.glslSoundWrapper);
+            }
         } else {
-            player.currentTimeForTimeline += deltaTime;
+            if (player.isPlaying) {
+                // player.currentTimeForTimeline += deltaTime;
+                player.currentTimeForTimeline += deltaTime;
+            }
         }
-        player.timelineTime = snapToStep(player.currentTimeForTimeline, 1 / 60);
-        player.timelineTime = clamp(player.timelineTime, 0, player.timelineDuration);
-        player.timelineDeltaTime = player.timelineTime - player.timelinePrevTime;
-        player.timelinePrevTime = player.timelineTime;
+        
+        let ended = false;
+
+        if (player.currentTimeForTimeline >= player.timelineDuration) {
+            if (player.loop) {
+                playMarionetter(player, 0);
+            } else {
+                ended = true;
+            }
+        }
+       
+        const currentTimeForTimeline = player.currentTimeForTimeline;
+        const timelineTime = ended
+            ? snapToStep(player.timelineDuration, 1 / 60) - .001
+            : clamp(snapToStep(currentTimeForTimeline, 1 / 60), 0, player.timelineDuration);
+            
+        player.currentTimeForTimeline = currentTimeForTimeline;
         player.marionetterSceneStructure.marionetterTimeline.execute({
-            time: player.timelineTime,
+            time: timelineTime,
             scene: player.scene,
         });
+        player.timelineTime = timelineTime;
+
+        const timelinePrevTime = player.timelinePrevTime;
+        const timelineDeltaTime = timelineTime - timelinePrevTime;
+
+        player.timelineDeltaTime = timelineDeltaTime;
+        player.timelinePrevTime = timelinePrevTime;
+
+        // player.timelineTime = snapToStep(player.currentTimeForTimeline, 1 / 60);
+        // player.timelineTime = clamp(player.timelineTime, 0, player.timelineDuration);
+        // player.timelineDeltaTime = player.timelineTime - player.timelinePrevTime;
+        // player.timelinePrevTime = player.timelineTime;
+        // player.marionetterSceneStructure.marionetterTimeline.execute({
+        //     time: player.timelineTime,
+        //     scene: player.scene,
+        // });
     }
 }
-
-// export function renderPlayer(player) {
-// }

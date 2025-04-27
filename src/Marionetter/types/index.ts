@@ -635,6 +635,7 @@ export type MarionetterTimeline = {
     tracks: MarionetterTimelineTrackKinds[];
     execute: (args: MarionetterTimelineExecuteArgs) => void;
     bindActors: (actors: Actor[]) => void;
+    duration: number;
 };
 
 // export type MarionetterTimelineTrack = {

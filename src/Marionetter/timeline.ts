@@ -124,7 +124,9 @@ export function buildMarionetterTimeline(
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrackKinds[] = [];
-
+    
+    const { d } = marionetterPlayableDirectorComponentInfo;
+    
     // for debug
     // console.log(
     //     `[buildMarionetterTimeline] marionetterPlayableDirectorComponentInfo:`,
@@ -286,7 +288,7 @@ export function buildMarionetterTimeline(
     };
 
     // return { tracks, execute, bindActor };
-    return { tracks, execute, bindActors };
+    return { tracks, execute, bindActors, duration: d };
 }
 
 /**
