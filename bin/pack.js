@@ -32,7 +32,6 @@ const pack = async (filePath) => {
     const id = `${padTime(date.getFullYear())}${padTime(date.getMonth() + 1)}${padTime(date.getDate())}${padTime(date.getHours())}${padTime(date.getMinutes())}`;
 
     return new Promise((resolve) => {
-        const packShellPath = path.join(libDir, 'packer.js');
 
         // id使う場合
         // id追加しない場合
@@ -40,11 +39,12 @@ const pack = async (filePath) => {
             ? path.join(distDir, `packed-${id}.html`)
             : path.join(distDir, 'packed.html');
 
+        // pattern1: compeko
+        const packShellPath = path.join(libDir, 'compeko.js');
         const command = `node ${packShellPath} ${filePath} ${distPath}`;
         // // pattern2: jsexe
-        // const packShellPath = path.join(process.cwd(), 'libs/jsexe.exe');
-        // const distPath = path.join(process.cwd(), `dist/packed-${id}.html`);
-        // const command = `${packShellPath} -po -cn ./dist/assets/main.js ./dist/packed-${id}.html`;
+        //const packShellPath = path.join(libDir, 'jsexe.exe');
+        //const command = `${packShellPath} -po -cn ./dist/assets/main.js ${distPath}`;
         // pattern2: pnginator
         // const packShellPath = path.join(process.cwd(), 'libs/pnginator.rb');
         // const distPath = path.join(process.cwd(), `dist/packed-${id}.html`);

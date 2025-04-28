@@ -29,9 +29,8 @@ dist-ssr
 ###
 
 libs/*
-!libs/.gitignore
+!libs/compeko.js
 
-/packer
 /tmp
 /fonts
 
