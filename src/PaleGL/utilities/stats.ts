@@ -2,9 +2,9 @@
 // import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 // import { calculateFPSCounter, createFPSCounter, FpsCounter } from '@/PaleGL/utilities/fpsCounter.ts';
 // import { getGeometryAttributeByName } from '@/PaleGL/geometries/geometryBehaviours.ts';
-// 
+//
 // type PassInfo = { passLabel: string; vertexCount: number };
-// 
+//
 // type StatsArgs = {
 //     wrapperElement?: HTMLElement;
 //     showPassDetails?: boolean;
@@ -12,12 +12,12 @@
 //     showFPS?: boolean;
 //     showPipeline?: boolean;
 // };
-// 
+//
 // export type Stats = ReturnType<typeof createStats>;
-// 
+//
 // export function createStats(args: StatsArgs = {}) {
 //     const { wrapperElement, showStats = true, showPipeline = true, showPassDetails = true } = args;
-// 
+//
 //     const _domElement = document.createElement('div');
 //     let _passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
 //     let _drawVertexCount = 0;
@@ -26,9 +26,9 @@
 //     const _showStats: boolean = !!showStats;
 //     const _showFPS: boolean = true;
 //     const _showPipeline: boolean = !!showPipeline;
-// 
+//
 //     const _fpsCounter: FpsCounter = createFPSCounter();
-// 
+//
 //     _domElement.style.cssText = `
 // position: absolute;
 // top: 0;
@@ -40,35 +40,35 @@
 // text-shadow: rgba(0, 0, 0, 0.7) 1px 1px;
 // white-space: break-spaces;
 // `;
-// 
+//
 //     // fps counter
 //     const _fpsCounterView = document.createElement('p');
 //     _domElement.appendChild(_fpsCounterView);
-// 
+//
 //     // pipe line wrapper
 //     const _pipelineWrapper = document.createElement('div');
 //     _domElement.appendChild(_pipelineWrapper);
-// 
+//
 //     // pass info
 //     const _passInfoView = document.createElement('p');
 //     _pipelineWrapper.appendChild(_passInfoView);
-// 
+//
 //     // total vertex count
 //     const _drawVertexCountView = document.createElement('p');
 //     _pipelineWrapper.appendChild(_drawVertexCountView);
-// 
+//
 //     // total draw call count
 //     const _drawCallCountView = document.createElement('p');
 //     _pipelineWrapper.appendChild(_drawCallCountView);
-// 
+//
 //     (wrapperElement || document.body).appendChild(_domElement);
-// 
+//
 //     const clear = () => {
 //         _passes = [];
 //         _drawVertexCount = 0;
 //         _drawCallCount = 0;
 //     };
-// 
+//
 //     const addPassInfo = (groupLabel: string, passLabel: string, geometry: Geometry) => {
 //         const passIndex = _passes.findIndex((elem) => elem.groupLabel === groupLabel);
 //         const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
@@ -85,7 +85,7 @@
 //             vertexCount,
 //         });
 //     };
-// 
+//
 //     const addDrawVertexCount = (geometry: Geometry) => {
 //         const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
 //         if (!positionAttribute) {
@@ -93,23 +93,23 @@
 //         }
 //         _drawVertexCount += positionAttribute.data.length / 3;
 //     };
-// 
+//
 //     const incrementDrawCall = () => {
 //         _drawCallCount++;
 //     };
-// 
+//
 //     const update = (time: number) => {
 //         calculateFPSCounter(_fpsCounter, time);
 //         _updateView();
 //     };
-// 
+//
 //     const _updateView = () => {
 //         _domElement.style.display = _showStats ? 'block' : 'none';
 //         _fpsCounterView.style.display = _showFPS ? 'block' : 'none';
 //         _pipelineWrapper.style.display = _showPipeline ? 'block' : 'none';
-// 
+//
 //         _fpsCounterView.textContent = `FPS: ${Math.floor(_fpsCounter.currentFPS)}`;
-// 
+//
 //         const passesStrings = [];
 //         passesStrings.push('-------------');
 //         for (let i = 0; i < _passes.length; i++) {
@@ -135,14 +135,14 @@
 //         _drawVertexCountView.textContent = `vertex count: ${_drawVertexCount}`;
 //         _drawCallCountView.textContent = `draw call count: ${_drawCallCount}`;
 //     };
-// 
+//
 //     const _addPassGroup = (groupLabel: string, passInfo: PassInfo) => {
 //         _passes.push({
 //             groupLabel: groupLabel,
 //             passInfos: [passInfo],
 //         });
 //     };
-// 
+//
 //     return {
 //         addPassInfo,
 //         addDrawVertexCount,
@@ -151,7 +151,6 @@
 //         clear,
 //     };
 // }
-
 
 import { AttributeNames } from '@/PaleGL/constants';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
@@ -229,10 +228,9 @@ white-space: break-spaces;
         drawVertexCount,
         drawCallCount,
         drawVertexCountView,
-        drawCallCountView
+        drawCallCountView,
     };
 }
-
 
 export const clearStats = (stats: Stats) => {
     stats.passes = [];
@@ -240,7 +238,7 @@ export const clearStats = (stats: Stats) => {
     stats.drawCallCount = 0;
 };
 
-export const addPassInfoStats = (stats:Stats, groupLabel: string, passLabel: string, geometry: Geometry) => {
+export const addPassInfoStats = (stats: Stats, groupLabel: string, passLabel: string, geometry: Geometry) => {
     const passIndex = stats.passes.findIndex((elem) => elem.groupLabel === groupLabel);
     const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
     if (!positionAttribute) {
@@ -257,7 +255,7 @@ export const addPassInfoStats = (stats:Stats, groupLabel: string, passLabel: str
     });
 };
 
-export const addDrawVertexCountStats = (stats:Stats, geometry: Geometry) => {
+export const addDrawVertexCountStats = (stats: Stats, geometry: Geometry) => {
     const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
     if (!positionAttribute) {
         return;
@@ -266,7 +264,7 @@ export const addDrawVertexCountStats = (stats:Stats, geometry: Geometry) => {
 };
 
 export const incrementDrawCallStats = (stats: Stats) => {
-     stats.drawCallCount++;
+    stats.drawCallCount++;
 };
 
 export const updateStats = (stats: Stats, time: number) => {

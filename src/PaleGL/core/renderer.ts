@@ -708,7 +708,7 @@ export function createRenderer({
     };
 }
 
-export function setRendererStats(renderer: Renderer, stats: Stats) {
+export function setRendererStats(renderer: Renderer, stats: Stats | null) {
     renderer.stats = stats;
 }
 

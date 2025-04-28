@@ -2,6 +2,7 @@ import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeo
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import {
     RenderTargetTypes,
+    TextureFilterType,
     TextureFilterTypes,
     TextureWrapTypes,
     UniformNames,
@@ -59,7 +60,8 @@ type SharedTextureInfo = {
     edgeMaskMix: number;
     remapMin: number;
     remapMax: number;
-    // update?: (time: number, effectMaterial: Material) => void;
+    minFilter?: TextureFilterType;
+    magFilter?: TextureFilterType;
 };
 
 const sharedTextureInfos: SharedTextureInfo[] = [
@@ -127,6 +129,8 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             edgeMaskMix: 1,
             remapMin: 0,
             remapMax: 1,
+            minFilter: TextureFilterTypes.Nearest,
+            magFilter: TextureFilterTypes.Nearest,
         },
         {
             key: SharedTexturesTypes.PERLIN_NOISE,
@@ -210,14 +214,26 @@ const sharedTextureInfos: SharedTextureInfo[] = [
 export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Renderer }): SharedTextures {
     const planeGeometry = createPlaneGeometry({ gpu });
 
-    const createEffectRenderTarget = ({ gpu, width, height }: { gpu: Gpu; width: number; height: number }) => {
+    const createEffectRenderTarget = ({
+        gpu,
+        width,
+        height,
+        minFilter = TextureFilterTypes.Linear,
+        magFilter = TextureFilterTypes.Linear,
+    }: {
+        gpu: Gpu;
+        width: number;
+        height: number;
+        minFilter?: TextureFilterType;
+        magFilter?: TextureFilterType;
+    }) => {
         return createRenderTarget({
             gpu,
             width,
             height,
             type: RenderTargetTypes.RGBA,
-            minFilter: TextureFilterTypes.Linear,
-            magFilter: TextureFilterTypes.Linear,
+            minFilter,
+            magFilter,
             wrapS: TextureWrapTypes.Repeat,
             wrapT: TextureWrapTypes.Repeat,
         });
@@ -239,10 +255,12 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
             edgeMaskMix,
             remapMin,
             remapMax,
+            minFilter,
+            magFilter,
             // update,
         } = sharedTextureInfo;
-        const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height });
-        const ppRenderTarget = createEffectRenderTarget({ gpu, width, height });
+        const tmpRenderTarget = createEffectRenderTarget({ gpu, width, height, minFilter, magFilter });
+        const ppRenderTarget = createEffectRenderTarget({ gpu, width, height, minFilter, magFilter });
 
         const tmpMaterial = createMaterial({
             vertexShader: getPostProcessBaseVertexShader(),

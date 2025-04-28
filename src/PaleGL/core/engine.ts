@@ -35,6 +35,7 @@ import {
     startTimeAccumulator, TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
+import {isDevelopment} from "@/PaleGL/utilities/envUtilities.ts";
 
 type EngineOnStartCallbackArgs = void;
 
@@ -63,7 +64,7 @@ export type EngineOnLastUpdateCallback = (args: EngineOnLastUpdateCallbackArgs) 
 export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
 export type EngineBase = {
-    stats: Stats;
+    stats: Stats | null;
     scene: Scene | null;
     sharedTextures: SharedTextures;
     renderer: Renderer;
@@ -98,7 +99,7 @@ export function createEngine({
     showPipeline = false,
 }: EngineArgs): Engine {
     const sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
-    const stats: Stats | null = createStats({ showStats, showPipeline });
+    const stats: Stats | null = isDevelopment() ? createStats({ showStats, showPipeline }) : null;
 
     const engineBase: EngineBase = {
         sharedTextures,
@@ -119,7 +120,9 @@ export function createEngine({
     (engineBase as Engine).fixedUpdateFrameTimer = fixedUpdateFrameTimer;
     (engineBase as Engine).updateFrameTimer = updateFrameTimer;
 
-    setRendererStats(renderer, stats);
+    if (isDevelopment() && stats) {
+        setRendererStats(renderer, stats);
+    }
 
     return engineBase as Engine;
 }
@@ -272,7 +275,9 @@ function renderEngine (engine: EngineBase, time: number, deltaTime: number) {
     // for debug
     // console.log(`[Engine.render]`);
 
-    clearStats(engine.stats);
+    if (isDevelopment() && engine.stats) {
+        clearStats(engine.stats);
+    }
 
     beforeRenderRenderer(engine.renderer, time, deltaTime);
 
@@ -285,7 +290,9 @@ function renderEngine (engine: EngineBase, time: number, deltaTime: number) {
     // TODO: ここにrenderer.renderを書く
     // _renderer.renderScene(_scene!);
 
-    updateStats(engine.stats, time);
+    if (isDevelopment() && engine.stats) {
+        updateStats(engine.stats, time);
+    }
 }
 
 export function warmRender (engine: Engine) {
