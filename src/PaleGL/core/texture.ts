@@ -32,12 +32,14 @@ import {
 import { Gpu } from './gpu.ts';
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 
+type TextureImage = HTMLImageElement | HTMLCanvasElement;
+
 export type TextureArgs = {
     // require
     gpu: Gpu;
     // optional
     name?: string;
-    img?: HTMLImageElement | HTMLCanvasElement | null;
+    img?: TextureImage | null;
     arraybuffer?: ArrayBuffer | null;
     type?: TextureType;
     width?: number;
@@ -602,18 +604,29 @@ export function updateTexture(
         width,
         height,
         data,
+        img
     }: {
-        width: number;
-        height: number;
-        data: ArrayBufferView;
+        width?: number;
+        height?: number;
+        data?: ArrayBufferView | null;
+        img?: TextureImage | null;
     }
 ) {
+    if (!data && !img) {
+        console.error('[updateTexture] invalid data or img');
+        return;
+    }
+   
+    width = width ? Math.floor(width) : texture.width;
+    height = height ? Math.floor(height) : texture.height;
+    
+    if (width === undefined || height === undefined) {
+        console.error('[updateTexture] invalid width or height');
+        return;
+    }
+    
     texture.width = width;
     texture.height = height;
-
-    // if (this.img === null) {
-    //     console.error("invalid img");
-    // }
 
     const gl = texture.gpu.gl;
     gl.bindTexture(GL_TEXTURE_2D, texture.glObject);
@@ -627,13 +640,27 @@ export function updateTexture(
         //         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
         //     }
         //     break;
+            
+        case TextureTypes.RGBA:
+            if (data) {
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            }
+            if (img) {
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+            }
+            break;
 
         case TextureTypes.RGBA32F:
-            gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data);
+            if (data) {
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data);
+            }
+            if (img) {
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, img);
+            }
             break;
 
         default:
-            console.error('[Texture.update] invalid type');
+            console.error('[updateTexture] invalid type');
     }
 
     gl.bindTexture(GL_TEXTURE_2D, null);

@@ -155,6 +155,8 @@ import {
 } from '@/PaleGL/inputs/inputControllerBehaviours.ts';
 import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
 import {SharedTexturesType, SharedTexturesTypes} from "@/PaleGL/core/createSharedTextures.ts";
+import {createShapeTextMesh} from "@/PaleGL/actors/meshes/shapeTextMesh.ts";
+import {shapeFontCircuit} from "@/PaleGL/shapFont/shapeFontCircuit.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1613,6 +1615,19 @@ const main = async () => {
     setTranslation(textMesh3.transform, createVector3(0, 0.01, 9));
     setRotationX(textMesh3.transform, -90);
     setScaling(textMesh3.transform, createVector3(0.4, 0.4, 0.4));
+    
+    //
+    // shape text mesh
+    //
+    
+    const shapeText = createShapeTextMesh({
+        gpu,
+        name: 'shape-text-mesh',
+        text: "A",
+        shapeFont: shapeFontCircuit
+    });
+    addActorToScene(captureScene, shapeText);
+    setTranslation(shapeText.transform, createVector3(0, 1, 10));
 
     //
     // instancing mesh
