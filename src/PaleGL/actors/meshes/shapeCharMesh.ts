@@ -133,7 +133,7 @@ export function createShapeCharMesh({
 
     const { aspect } = shapeFontRenderer.shapeFontAtlas;
 
-    const planeWidth = 2;
+    const planeWidth = 1;
     const planeHeight = planeWidth / aspect;
     
     const geometry = createPlaneGeometry({

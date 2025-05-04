@@ -60,6 +60,7 @@ type ShapeTextMeshArgs = {
     name?: string;
     text: string;
     shapeFont: ShapeFont;
+    ratio?: number
     // color?: Color;
     // // fontAtlas: FontAtlasData;
     // // fontTexture: Texture;
@@ -80,6 +81,7 @@ export function createShapeTextMesh({
     name,
     text,
     shapeFont,
+    ratio = 1
     // color = createColorWhite(),
     // fontTexture,
     // fontAtlas,
@@ -91,8 +93,8 @@ export function createShapeTextMesh({
 
     const actor = createActor({ name: name || `shape-text-${text}` });
 
-    const width = 4096;
-    const height = 1024;
+    const width = Math.min(2048 * Math.pow(2, Math.floor(ratio)), 8192);
+    const height = width / 4;
 
     const shapeFontRenderer = createShapeFontRenderer(null, shapeFont, width, height);
 

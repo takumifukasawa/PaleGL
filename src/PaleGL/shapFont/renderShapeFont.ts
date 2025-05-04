@@ -59,8 +59,8 @@ const renderChar: (
     ctx.save();
     ctx.lineWidth = lineWidth * ratio;
     ctx.lineCap = 'round';
-    ctx.fillStyle = 'black';
-    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = 'white';
     for (let i = 0; i < lines.length; i++) {
         const path = lines[i];
         const pathNum = path.length / 2;
@@ -84,8 +84,8 @@ const renderChar: (
     ctx.save();
     ctx.lineWidth = dotLineWidth * ratio;
     ctx.lineCap = 'round';
-    ctx.fillStyle = 'black';
-    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = 'white';
     for (let i = 0; i < dots.length; i++) {
         const dot = dots[i];
         ctx.beginPath();
@@ -100,8 +100,8 @@ const renderChar: (
     ctx.save();
     ctx.lineWidth = dotLineWidth * ratio;
     ctx.lineCap = 'round';
-    ctx.fillStyle = 'white';
-    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'black';
+    ctx.strokeStyle = 'white';
     for (let i = 0; i < strokeDots.length; i++) {
         const dot = strokeDots[i];
         ctx.beginPath();
@@ -117,7 +117,7 @@ export const renderShapeFont: (shapeFontRenderer: ShapeFontRenderer) => void = (
     const { shapeFont, shapeFontAtlas, ctx, canvasWidth, canvasHeight } = shapeFontRenderer;
     const { rowNum, colNum, charNum, cellWidth, cellHeight, ratio } = shapeFontAtlas;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     for (let y = 0; y < rowNum; y++) {
         for (let x = 0; x < colNum; x++) {

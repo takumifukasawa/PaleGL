@@ -1624,7 +1624,8 @@ const main = async () => {
         gpu,
         name: 'shape-text-mesh',
         text: "A",
-        shapeFont: shapeFontCircuit
+        shapeFont: shapeFontCircuit,
+        ratio: 2
     });
     addActorToScene(captureScene, shapeText);
     setTranslation(shapeText.transform, createVector3(0, 1, 10));
