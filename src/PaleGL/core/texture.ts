@@ -96,7 +96,7 @@ export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
 
 export type Texture = GLObjectBase<WebGLTexture> & {
     type: TextureType;
-    name: string,
+    name: string;
     img: HTMLImageElement | HTMLCanvasElement | null;
     minFilter: TextureFilterType;
     magFilter: TextureFilterType;
@@ -127,13 +127,13 @@ export function createTexture({
     dxt1 = false,
 }: TextureArgs): Texture {
     const gl = gpu.gl;
-    
+
     const texture = gl.createTexture()!;
     // if (!texture) {
     //     console.error('[Texture.constructor] invalid texture');
     // }
     img = img || null;
-   
+
     // imgがあるがwidth, heightが指定されていない場合はimgのwidth, heightを使う
     if (img !== null) {
         if (width === undefined) {
@@ -486,7 +486,7 @@ export function createTexture({
 
     return {
         ...createGLObject(gpu, texture),
-        name: name ?? "",
+        name: name ?? '',
         img,
         type,
         minFilter,
@@ -604,7 +604,7 @@ export function updateTexture(
         width,
         height,
         data,
-        img
+        img,
     }: {
         width?: number;
         height?: number;
@@ -616,15 +616,15 @@ export function updateTexture(
         console.error('[updateTexture] invalid data or img');
         return;
     }
-   
+
     width = width ? Math.floor(width) : texture.width;
     height = height ? Math.floor(height) : texture.height;
-    
+
     if (width === undefined || height === undefined) {
         console.error('[updateTexture] invalid width or height');
         return;
     }
-    
+
     texture.width = width;
     texture.height = height;
 
@@ -640,7 +640,7 @@ export function updateTexture(
         //         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
         //     }
         //     break;
-            
+
         case TextureTypes.RGBA:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

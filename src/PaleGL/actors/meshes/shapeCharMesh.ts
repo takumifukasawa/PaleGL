@@ -22,18 +22,20 @@ import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl'
 import unlitShapeTextDepthFrag from '@/PaleGL/shaders/unlit-shape-text-depth-fragment.glsl';
 // import { ShapeFont } from '@/PaleGL/shapFont/shapeFont.ts';
 // import { ShapeFontAtlas } from '@/PaleGL/shapFont/renderShapeFont.ts';
-import {ShapeFontRenderer} from "@/PaleGL/shapFont/shapeFontRenderer.ts";
+import {ShapeFontRenderer} from "@/PaleGL/shapeFont/shapeFontRenderer.ts";
 import {createVector4} from "@/PaleGL/math/vector4.ts";
+import {ShapeFontBase} from "@/PaleGL/shapeFont/shapeFont.ts";
+import {Color, createColorWhite} from "@/PaleGL/math/color.ts";
 
-type ShapeCharMeshArgs = {
+type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
     uniforms?: UniformsData;
-    // color: Color;
+    color?: Color;
     fontTexture: Texture;
     // shapeFont: ShapeFont;
     // shapeFontAtlas: ShapeFontAtlas;
-    shapeFontRenderer: ShapeFontRenderer;
+    shapeFontRenderer: ShapeFontRenderer<T, U>;
     x: number;
     y: number;
     // atlasInfo: {
@@ -62,10 +64,10 @@ export type ShapeCharMesh = Mesh & {
 };
 
 // TODO: なぜかcastshadowがきかない
-export function createShapeCharMesh({
+export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
-    // color,
+    color = createColorWhite(),
     fontTexture,
     // shapeFont,
     // shapeFontAtlas,
@@ -76,7 +78,7 @@ export function createShapeCharMesh({
     // charInfo,
     castShadow,
     uniforms = [],
-}: ShapeCharMeshArgs): ShapeCharMesh {
+}: ShapeCharMeshArgs<T, U>): ShapeCharMesh {
     // const w = atlasInfo.width;
     // const h = atlasInfo.height;
     const { shapeFontAtlas } = shapeFontRenderer;
@@ -89,11 +91,11 @@ export function createShapeCharMesh({
     const sy = (shapeFontAtlas.cellHeight / shapeFontAtlas.textureHeight) * (shapeFontAtlas.rowNum - y - 1) + ySurplus / shapeFontAtlas.textureHeight;
     
     const bUniforms: UniformsData = [
-        // {
-        //     name: 'uColor',
-        //     type: UniformTypes.Color,
-        //     value: color,
-        // },
+        {
+            name: 'uColor',
+            type: UniformTypes.Color,
+            value: color,
+        },
         {
             name: UniformNames.FontMap,
             type: UniformTypes.Texture,
@@ -158,8 +160,13 @@ export function createShapeCharMesh({
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
+    
 
     const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.Text, castShadow });
+    
+    mesh.onStart.push(() => {
+        console.log("hogehoge", mesh)
+    });
 
     // const charWidth = planeWidth;
     // const charHeight = planeHeight;

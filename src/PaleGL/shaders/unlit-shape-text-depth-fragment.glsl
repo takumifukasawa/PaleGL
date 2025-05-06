@@ -1,6 +1,7 @@
 #pragma DEFINES
 
 #include <alpha_test>
+#include <shape_font_h>
 
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
@@ -13,32 +14,10 @@ in vec4 vVertexColor;
 
 out vec4 outColor;
 
-// const float threshold = .5;
-// const float smoothRange = .01;
-
-// float sdf2alpha(float sdf) {
-//     float alpha = smoothstep(
-//         threshold - smoothRange,
-//         threshold + smoothRange,
-//         sdf
-//     );
-//     return alpha;
-// }
-// 
-// float median(vec3 msdf) {
-//     return max(
-//         min(msdf.r, msdf.g),
-//         min(
-//             max(msdf.r, msdf.g),
-//             msdf.b
-//         )
-//     );
-// }
-
 void main() {
-    vec4 resultColor = vec4(0, 0, 0, 1);
+    vec4 resultColor = vec4(1, 1, 1, 1);
 
-    vec2 uv = vUv;
+    // vec2 uv = vUv;
     // uv = uv * uFontTiling.xy + uFontTiling.zw;
 
     // float sdf = median(texture(uFontMap, uv).rgb);
@@ -48,9 +27,15 @@ void main() {
     
     // outColor = texture(uFontMap, uv);
     // return;
-    
+    #include <shape_font_f>
+   
+    // resultColor = texture(uFontMap, uv);
     #include <alpha_test_f>
     // #include ./partial/alpha-test-fragment.partial.glsl
+
+    // if(f < 1.) {
+    //     discard;
+    // }
 
     outColor = vec4(1., 1., 1., 1.);
 }

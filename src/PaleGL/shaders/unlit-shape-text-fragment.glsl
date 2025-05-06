@@ -3,6 +3,7 @@
 #include <tone>
 #include <gbuffer>
 #include <alpha_test>
+#include <shape_font_h>
 #include <vcolor_fh>
 
 uniform vec4 uColor;
@@ -16,52 +17,29 @@ in vec3 vWorldPosition;
 
 #include <gbuffer_o>
 
-// const float threshold = .5;
-// const float smoothRange = .01;
-// float sdf2alpha(float sdf) {
-//     float alpha = smoothstep(
-//         threshold - smoothRange,
-//         threshold + smoothRange,
-//         sdf
-//     );
-//     return alpha;
-// }
-// 
-// float median(vec3 msdf) {
-//     return max(
-//         min(msdf.r, msdf.g),
-//         min(
-//             max(msdf.r, msdf.g),
-//             msdf.b
-//         )
-//     );
-// }
-
 void main() {
     vec4 resultColor = uColor;
 
-    vec2 uv = vUv;
-    uv = uv * uFontTiling.xy + uFontTiling.zw;
+    // vec2 uv = vUv;
+    // uv = uv * uFontTiling.xy + uFontTiling.zw;
+    // 
+    // resultColor = texture(uFontMap, uv);
+
+    // float smoothEdge = .5;
+    // float smoothRange = 0.01;
+    // float font = resultColor.r;
+    // resultColor.a *= smoothstep(
+    //     smoothEdge - smoothRange,
+    //     smoothEdge + smoothRange,
+    //     font
+    // );
+    #include <shape_font_f>
 
     vec3 worldNormal = normalize(vNormal);
   
-    // float sdf = median(texture(uFontMap, uv).rgb);
+    // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
+    #include <alpha_test_f>
 
-    // float alpha = sdf2alpha(sdf);
-    // resultColor.a = alpha;
-
-    resultColor = texture(uFontMap, uv);
-    // resultColor = vec4(uv, 1., 1.);
-    // resultColor = vec4(vUv, 1., 1.);
- 
-    // // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-    // // #include <alpha_test_f>
-    // #include ./partial/alpha-test-fragment.partial.glsl
-
-    // for debug
-    // resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);
-    // resultColor.rgb = mix(vec3(1., 0., 0.), resultColor.rgb, resultColor.a);
-    
     resultColor.rgb = gamma(resultColor.rgb);
     
     outGBufferA = EncodeGBufferA(vec3(0.));
