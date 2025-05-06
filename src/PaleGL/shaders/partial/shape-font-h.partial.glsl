@@ -1,3 +1,6 @@
+uniform sampler2D uFontMap;
+uniform vec4 uFontTiling;
+
 float shapeFontAlpha(float f) {
     float smoothEdge = .5;
     float smoothRange = 0.01;

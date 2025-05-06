@@ -1645,7 +1645,7 @@ const main = async () => {
     const shapeText = createShapeTextMesh({
         gpu,
         name: 'shape-text-mesh',
-        text: 'B',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         // shapeFont: fontCircuit,
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,

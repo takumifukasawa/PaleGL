@@ -22,10 +22,10 @@ import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl'
 import unlitShapeTextDepthFrag from '@/PaleGL/shaders/unlit-shape-text-depth-fragment.glsl';
 // import { ShapeFont } from '@/PaleGL/shapFont/shapeFont.ts';
 // import { ShapeFontAtlas } from '@/PaleGL/shapFont/renderShapeFont.ts';
-import {ShapeFontRenderer} from "@/PaleGL/shapeFont/shapeFontRenderer.ts";
-import {createVector4} from "@/PaleGL/math/vector4.ts";
-import {ShapeFontBase} from "@/PaleGL/shapeFont/shapeFont.ts";
-import {Color, createColorWhite} from "@/PaleGL/math/color.ts";
+import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
+import { createVector4 } from '@/PaleGL/math/vector4.ts';
+import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 
 type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
@@ -33,6 +33,7 @@ type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = {
     uniforms?: UniformsData;
     color?: Color;
     fontTexture: Texture;
+    char: string;
     // shapeFont: ShapeFont;
     // shapeFontAtlas: ShapeFontAtlas;
     shapeFontRenderer: ShapeFontRenderer<T, U>;
@@ -56,11 +57,11 @@ type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = {
 } & MeshOptionsArgs;
 
 export type ShapeCharMesh = Mesh & {
-    // charWidth: number;
-    // charHeight: number;
+    charWidth: number;
+    charHeight: number;
     // charOffsetX: number;
     // charOffsetY: number;
-    // char: string;
+    char: string;
 };
 
 // TODO: なぜかcastshadowがきかない
@@ -69,6 +70,7 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     name = '',
     color = createColorWhite(),
     fontTexture,
+    char,
     // shapeFont,
     // shapeFontAtlas,
     shapeFontRenderer,
@@ -85,11 +87,13 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     const sw = shapeFontAtlas.cellWidth / shapeFontAtlas.textureWidth;
     const sh = shapeFontAtlas.cellHeight / shapeFontAtlas.textureHeight;
     // xは左からでOK
-    const sx = (shapeFontAtlas.cellWidth  / shapeFontAtlas.textureWidth) * x;
+    const sx = (shapeFontAtlas.cellWidth / shapeFontAtlas.textureWidth) * x;
     // atlasは上基準、uvは下基準なので、cellHeightは下から加算し、縦軸の余白を考慮
     const ySurplus = shapeFontAtlas.textureHeight - shapeFontAtlas.cellHeight * shapeFontAtlas.rowNum;
-    const sy = (shapeFontAtlas.cellHeight / shapeFontAtlas.textureHeight) * (shapeFontAtlas.rowNum - y - 1) + ySurplus / shapeFontAtlas.textureHeight;
-    
+    const sy =
+        (shapeFontAtlas.cellHeight / shapeFontAtlas.textureHeight) * (shapeFontAtlas.rowNum - y - 1) +
+        ySurplus / shapeFontAtlas.textureHeight;
+
     const bUniforms: UniformsData = [
         {
             name: 'uColor',
@@ -137,7 +141,14 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
 
     const planeWidth = 1;
     const planeHeight = planeWidth / aspect;
-    
+
+    // // const topPadding = planeHeight * 0.5;
+    // // // 上下: 上に揃えてからoffsetYする. yOffsetは左上が原点なので反転
+    // const offsetY = -planeHeight * 0.5;
+    // // 左右: widthの時点で幅調整がかかっているので、xOffsetのみでよい
+    // // const offsetX = charInfo.xOffset * pixelSizeW;
+    // const offsetX = 0;
+
     const geometry = createPlaneGeometry({
         gpu,
         // flipUvY: true,
@@ -160,13 +171,8 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
-    
 
     const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.Text, castShadow });
-    
-    mesh.onStart.push(() => {
-        console.log("hogehoge", mesh)
-    });
 
     // const charWidth = planeWidth;
     // const charHeight = planeHeight;
@@ -174,15 +180,20 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     // const charOffsetY = offsetY;
     // const char = charInfo.char;
 
+    // const charWidth = planeWidth;
+    // const charHeight = planeHeight;
+    // const charOffsetX = offsetX;
+    // const charOffsetY = offsetY;
+
     // for debug
     // console.log(this.char, planeWidth, planeHeight, offsetX, offsetY);
 
     return {
         ...mesh,
-        // charWidth,
-        // charHeight,
+        charWidth: planeWidth,
+        charHeight: planeHeight,
         // charOffsetX,
         // charOffsetY,
-        // char,
+        char,
     };
 }

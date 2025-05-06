@@ -3,9 +3,6 @@
 #include <alpha_test>
 #include <shape_font_h>
 
-uniform sampler2D uFontMap;
-uniform vec4 uFontTiling;
-
 in vec2 vUv;
 
 #ifdef USE_VERTEX_COLOR

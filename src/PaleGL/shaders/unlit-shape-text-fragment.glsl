@@ -8,8 +8,6 @@
 
 uniform vec4 uColor;
 uniform int uShadingModelId;
-uniform sampler2D uFontMap;
-uniform vec4 uFontTiling;
 
 in vec2 vUv;
 in vec3 vNormal;
