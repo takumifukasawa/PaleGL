@@ -2,14 +2,17 @@ import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createShapeCharMesh, UnlitShapeCharMesh } from '@/PaleGL/actors/meshes/unlitShapeCharMesh.ts';
+import {
+    UnlitShapeCharMesh
+} from '@/PaleGL/actors/meshes/unlitShapeCharMesh.ts';
 import { ShapeFontService } from '@/PaleGL/shapeFont/shapeFontService.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { setV3x, setV3y } from '@/PaleGL/math/vector3.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
+import {CreateShapeCharMeshFunc} from "@/PaleGL/actors/meshes/shapeCharMeshBase.ts";
 
-type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = {
+type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
     text: string;
@@ -19,8 +22,11 @@ type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = {
     shapeFontRenderer: ShapeFontRenderer<T, U>;
     align?: TextAlignType;
     characterSpacing?: number;
+    createCharMeshFunc: CreateShapeCharMeshFunc<T, U>
 };
 
+export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshBaseArgs<T, U>, 'createCharMeshFunc'>;
+    
 export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = Actor & {
     shapeFontService: ShapeFontService<T, U>;
     shapeFontRenderer: ShapeFontRenderer<T, U>;
@@ -30,7 +36,7 @@ export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = Actor & {
 /**
  * TODO: できれば文字のmeshはまとめて1つのgeometryにしたい
  */
-export function createShapeTextMesh<T, U extends ShapeFontBase<T>>({
+export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>({
     gpu,
     name,
     text,
@@ -40,12 +46,11 @@ export function createShapeTextMesh<T, U extends ShapeFontBase<T>>({
     shapeFontService,
     align = TextAlignType.Left,
     characterSpacing = 0,
-}: ShapeTextMeshArgs<T, U>): ShapeTextMesh<T, U> {
+    createCharMeshFunc,
+}: ShapeTextMeshBaseArgs<T, U>): ShapeTextMesh<T, U> {
     const actor = createActor({ name: name || `shape-text-${text}` });
 
-    const [shapeFont, renderFunc] = shapeFontService;
-
-    renderFunc(shapeFontRenderer);
+    const [shapeFont] = shapeFontService;
 
     let originX = 0;
 
@@ -61,7 +66,7 @@ export function createShapeTextMesh<T, U extends ShapeFontBase<T>>({
         const colIndex = ci % shapeFont.colNum;
         const rowIndex = Math.floor(ci / shapeFont.colNum);
 
-        const shapeCharMesh = createShapeCharMesh({
+        const shapeCharMesh = createCharMeshFunc({
             gpu,
             name: `shape-char-${char}`,
             fontTexture: shapeFontTexture,

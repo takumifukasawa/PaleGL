@@ -13,7 +13,7 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { ShapeFontAtlas } from '@/PaleGL/shapeFont/buildShaderFontAtlas.ts';
 
-export type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
+type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
     uniforms?: UniformsData;
@@ -51,8 +51,10 @@ export const getShapeFontTilingOffset: (s: ShapeFontAtlas, x: number, y: number)
     return createVector4(sw, sh, sx, sy);
 };
 
+export type CreateShapeCharMeshFunc<T, U extends ShapeFontBase<T>> = (options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh;
+
 // TODO: なぜかcastshadowがきかない
-export function createShapeCharMeshBase<T, U extends ShapeFontBase<T>>({
+export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshBaseArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     material,
@@ -63,7 +65,7 @@ export function createShapeCharMeshBase<T, U extends ShapeFontBase<T>>({
     castShadow,
     x,
     y
-}: ShapeCharMeshBaseArgs<T, U>): ShapeCharMesh {
+}: ShapeCharMeshBaseArgs<T, U>): ShapeCharMesh => {
     const { shapeFontAtlas } = shapeFontRenderer;
     const { aspect } = shapeFontAtlas;
 
