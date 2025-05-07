@@ -1,12 +1,10 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import {addUniformData, UniformsData} from '@/PaleGL/core/uniforms.ts';
+import { addUniformData, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    MeshTypes, UniformNames, UniformTypes,
-} from '@/PaleGL/constants.ts';
+import { MeshType, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import {Material} from '@/PaleGL/materials/material.ts';
+import { Material } from '@/PaleGL/materials/material.ts';
 import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
@@ -24,9 +22,10 @@ type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     x: number;
     y: number;
     material: Material;
+    meshType: MeshType;
 } & MeshOptionsArgs;
 
-export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, "material">;
+export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;
 
 export type ShapeCharMesh = Mesh & {
     charWidth: number;
@@ -51,10 +50,14 @@ export const getShapeFontTilingOffset: (s: ShapeFontAtlas, x: number, y: number)
     return createVector4(sw, sh, sx, sy);
 };
 
-export type CreateShapeCharMeshFunc<T, U extends ShapeFontBase<T>> = (options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh;
+export type CreateShapeCharMeshFunc<T, U extends ShapeFontBase<T>> = (
+    options: ShapeCharMeshArgs<T, U>
+) => ShapeCharMesh;
 
 // TODO: なぜかcastshadowがきかない
-export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshBaseArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
+export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
+    options: ShapeCharMeshBaseArgs<T, U>
+) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     material,
@@ -64,13 +67,14 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: S
     shapeFontRenderer,
     castShadow,
     x,
-    y
+    y,
+    meshType,
 }: ShapeCharMeshBaseArgs<T, U>): ShapeCharMesh => {
     const { shapeFontAtlas } = shapeFontRenderer;
     const { aspect } = shapeFontAtlas;
 
     const fontTilingOffset = getShapeFontTilingOffset(shapeFontAtlas, x, y);
-    
+
     const bUniforms: UniformsData = [
         {
             name: 'uColor',
@@ -92,7 +96,7 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: S
     // 追加
     addUniformData(material.uniforms, bUniforms);
     addUniformData(material.depthUniforms, bUniforms);
-    
+
     const planeWidth = 1;
     const planeHeight = planeWidth / aspect;
 
@@ -102,7 +106,8 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: S
         height: planeHeight,
     });
 
-    const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.Text, castShadow });
+    // const mesh = createMesh({ name, geometry, material, type: ActorTypes.UIMesh, meshType: MeshTypes.Text, castShadow });
+    const mesh = createMesh({ name, geometry, material, meshType, castShadow });
 
     return {
         ...mesh,
@@ -110,4 +115,4 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(options: S
         charHeight: planeHeight,
         char,
     };
-}
+};

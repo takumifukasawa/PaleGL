@@ -3,15 +3,12 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     DepthFuncTypes, MeshTypes,
     PrimitiveTypes,
-    ShadingModelIds,
     UniformBlockNames,
-    UniformNames,
-    UniformTypes,
 } from '@/PaleGL/constants.ts';
-import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+import uiVert from '@/PaleGL/shaders/ui-vertex.glsl';
+import depthFrag from '@/PaleGL/shaders/depth-fragment.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl';
-import unlitShapeTextDepthFrag from '@/PaleGL/shaders/unlit-shape-text-depth-fragment.glsl';
+// import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import {createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs} from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
@@ -22,43 +19,28 @@ export type UnlitShapeCharMesh = Mesh & {
     char: string;
 };
 
-// TODO: なぜかcastshadowがきかない
-export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
+export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     color = createColorWhite(),
     fontTexture,
     char,
-    // shapeFont,
-    // shapeFontAtlas,
     shapeFontRenderer,
     x,
     y,
-    // atlasInfo,
-    // charInfo,
-    castShadow,
     uniforms = [],
 }: ShapeCharMeshArgs<T, U>): UnlitShapeCharMesh => {
-    const mergedUniforms: UniformsData = [
-        {
-            name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int,
-            value: ShadingModelIds.Unlit,
-        },
-        ...(uniforms || []),
-    ];
-
-    const depthUniforms: UniformsData = [...(uniforms || [])];
+    const mergedUniforms: UniformsData = uniforms || [];
 
     const material = createMaterial({
-        name: 'shapeCharMeshMaterial',
-        vertexShader: gBufferVert,
-        fragmentShader: unlitShapeTextFrag,
-        depthFragmentShader: unlitShapeTextDepthFrag,
+        name: 'uiShapeCharMeshMaterial',
+        vertexShader: uiVert,
+        fragmentShader: depthFrag,
+        depthFragmentShader: depthFrag,
         uniforms: mergedUniforms,
-        depthUniforms,
+        depthUniforms: [],
         alphaTest: 0.5,
-        depthTest: true,
+        depthTest: false,
         depthWrite: false,
         // receiveShadow: !!receiveShadow,
         primitiveType: PrimitiveTypes.Triangles,
@@ -76,8 +58,7 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: 
         shapeFontRenderer,
         x,
         y,
-        castShadow,
         uniforms: mergedUniforms,
-        meshType: MeshTypes.Default
+        meshType: MeshTypes.UI
     });
 }

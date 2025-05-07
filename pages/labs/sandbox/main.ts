@@ -163,6 +163,7 @@ import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSha
 import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
 import {createUnlitShapeTextMesh} from "@/PaleGL/actors/meshes/unlitShapeTextMesh.ts";
+import {createUIShapeTextMesh} from "@/PaleGL/actors/meshes/uiShapeTextMesh.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1625,6 +1626,8 @@ const main = async () => {
     //
     // shape text mesh
     //
+    
+    // unlit mesh
 
     const shapeFontCircuitTextureWidth = 4096;
     const shapeFontCircuitTextureHeight = 1024;
@@ -1654,6 +1657,20 @@ const main = async () => {
     });
     addActorToScene(captureScene, shapeText);
     setTranslation(shapeText.transform, createVector3(0, 1, 10));
+    
+    // ui mesh
+    
+    const uiShapeText = createUIShapeTextMesh({
+        gpu,
+        name: 'ui-shape-text-mesh',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        // shapeFont: fontCircuit,
+        shapeFontTexture: shapeFontCircuitTexture,
+        shapeFontRenderer: shapeFontCircuitRenderer,
+        shapeFontService: shapeFontCircuitService,
+        // ratio: 1,
+    });
+    addActorToScene(captureScene, uiShapeText);
 
     //
     // instancing mesh

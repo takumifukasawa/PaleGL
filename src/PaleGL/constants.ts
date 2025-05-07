@@ -58,6 +58,7 @@ export const RenderQueueType = {
     AlphaTest: 'a',
     Skybox: 's',
     Transparent: 't',
+    AfterTone: 'at',
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
@@ -88,13 +89,13 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
-    UIMesh: 2,
+    // UIMesh: 2,
     // SkinnedMesh: 2,
-    Light: 3,
-    Skybox: 4,
-    Camera: 5,
+    Light: 2,
+    Skybox: 3,
+    Camera: 4,
     // TextMesh: 5,
-    PostProcessVolume: 6,
+    PostProcessVolume: 5,
     // ObjectSpaceRaymarchMesh: 7,
     // ScreenSpaceRaymarchMesh: 8,
 } as const;

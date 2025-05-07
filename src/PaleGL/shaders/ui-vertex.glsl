@@ -16,6 +16,7 @@ void main() {
     #pragma BEGIN_MAIN
     vec4 localPosition = vec4(aPosition, 1.);
     vUv = aUv;
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition 
+    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * localPosition;
+    gl_Position = localPosition;
     #pragma END_MAIN
 }

@@ -125,6 +125,7 @@ export const updateMeshBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = 
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
     [MeshTypes.Skinned]: updateSkinnedMesh,
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMesh,
+
 };
 
 export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
