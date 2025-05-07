@@ -39,7 +39,7 @@ export const DepthFuncTypes = {
     Greater: 4,
     NotEqual: 5,
     Gequal: 6,
-    Always: 7
+    Always: 7,
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
@@ -88,10 +88,11 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
+    UIMesh: 2,
     // SkinnedMesh: 2,
-    Light: 2,
-    Skybox: 3,
-    Camera: 4,
+    Light: 3,
+    Skybox: 4,
+    Camera: 5,
     // TextMesh: 5,
     PostProcessVolume: 6,
     // ObjectSpaceRaymarchMesh: 7,
@@ -106,6 +107,7 @@ export const MeshTypes = {
     ObjectSpaceRaymarch: 2,
     ScreenSpaceRaymarch: 3,
     Text: 4,
+    UI: 5,
 } as const;
 
 export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
@@ -118,6 +120,13 @@ export const MaterialTypes = {
 } as const;
 
 export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
+
+export const UIQueueTypes = {
+    AfterTone: 0,
+    Overlay: 1,
+} as const;
+
+export type UIQueueType = (typeof UIQueueTypes)[keyof typeof UIQueueTypes];
 
 export const CameraTypes = {
     Perspective: 0,

@@ -1,12 +1,12 @@
-import { Vector2 } from '@/PaleGL/math/vector2.ts';
-import { Vector3 } from '@/PaleGL/math/vector3.ts';
-import { Vector4 } from '@/PaleGL/math/vector4.ts';
-import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { Color } from '@/PaleGL/math/color.ts';
-import { UniformTypes } from '@/PaleGL/constants.ts';
-import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
+import {Vector2} from '@/PaleGL/math/vector2.ts';
+import {Vector3} from '@/PaleGL/math/vector3.ts';
+import {Vector4} from '@/PaleGL/math/vector4.ts';
+import {Matrix4} from '@/PaleGL/math/matrix4.ts';
+import {Texture} from '@/PaleGL/core/texture.ts';
+import {CubeMap} from '@/PaleGL/core/cubeMap.ts';
+import {Color} from '@/PaleGL/math/color.ts';
+import {UniformTypes} from '@/PaleGL/constants.ts';
+import {UniformBufferObject} from '@/PaleGL/core/uniformBufferObject.ts';
 
 //
 // uniform values
@@ -101,22 +101,22 @@ export function createUniforms(...dataArray: UniformsData[]) {
         data: UniformBufferObjectBlockData;
         // elements: Float32Array
     }[] = [];
-    
-        for (let i = 0; i < dataArray.length; i++) {
-            for (let j = 0; j < dataArray[i].length; j++) {
-                const elem = dataArray[i][j];
-                const elemIndex = data.findIndex((d) => d.name === elem.name);
-                if (elemIndex < 0) {
-                    data.push(elem);
-                } else {
-                    data[elemIndex].value = elem.value;
-                }
+
+    for (let i = 0; i < dataArray.length; i++) {
+        for (let j = 0; j < dataArray[i].length; j++) {
+            const elem = dataArray[i][j];
+            const elemIndex = data.findIndex((d) => d.name === elem.name);
+            if (elemIndex < 0) {
+                data.push(elem);
+            } else {
+                data[elemIndex].value = elem.value;
             }
         }
+    }
 
 
     return {
-            data,
+        data,
         uniformBlocks
         // getData: () => _data,
         // getUniformBlocks: () => _uniformBlocks,
@@ -140,6 +140,13 @@ export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformT
         type,
         value,
     });
+}
+
+export const addUniformData = (uniforms: Uniforms, uniformsData: UniformsData) => {
+    for (let i = 0; i < uniformsData.length; i++) {
+        const {name, type, value} = uniformsData[i];
+        addUniformValue(uniforms, name, type, value);
+    }
 }
 
 /// uniformの値を上書き。
@@ -186,5 +193,5 @@ export const addUniformBlock = (uniforms: Uniforms, blockIndex: number, uniformB
     //     this.shader.glObject,
     // //     uniformBufferObject.blockName
     // );
-    uniforms.uniformBlocks.push({ blockIndex, uniformBufferObject, data });
+    uniforms.uniformBlocks.push({blockIndex, uniformBufferObject, data});
 }

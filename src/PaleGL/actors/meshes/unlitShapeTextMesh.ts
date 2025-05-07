@@ -2,7 +2,10 @@ import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createShapeCharMesh, UnlitShapeCharMesh } from '@/PaleGL/actors/meshes/unlitShapeCharMesh.ts';
+import {
+    createUnlitShapeCharMesh,
+    UnlitShapeCharMesh
+} from '@/PaleGL/actors/meshes/unlitShapeCharMesh.ts';
 import { ShapeFontService } from '@/PaleGL/shapeFont/shapeFontService.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { Color } from '@/PaleGL/math/color.ts';
@@ -30,7 +33,7 @@ export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = Actor & {
 /**
  * TODO: できれば文字のmeshはまとめて1つのgeometryにしたい
  */
-export function createShapeTextMesh<T, U extends ShapeFontBase<T>>({
+export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>({
     gpu,
     name,
     text,
@@ -61,7 +64,7 @@ export function createShapeTextMesh<T, U extends ShapeFontBase<T>>({
         const colIndex = ci % shapeFont.colNum;
         const rowIndex = Math.floor(ci / shapeFont.colNum);
 
-        const shapeCharMesh = createShapeCharMesh({
+        const shapeCharMesh = createUnlitShapeCharMesh({
             gpu,
             name: `shape-char-${char}`,
             fontTexture: shapeFontTexture,

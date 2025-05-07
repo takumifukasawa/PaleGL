@@ -154,10 +154,6 @@ export function setEngineSize(engine: Engine, width: number, height: number) {
     traverseScene(engine.scene!, (actor) => {
         setSizeActor(actor, w, h);
     });
-    // _scenes.forEach((scene) => {
-    //     scene.traverse((actor) => actor.setSize(w, h));
-    // });
-    // _renderer.setSize(w, h, rw, rh);
     setRendererSize(engine.renderer, rw, rh);
 }
 

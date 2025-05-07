@@ -15,7 +15,7 @@ import {
 // import { createVector4 } from '@/PaleGL/math/vector4.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import { createMaterial } from '@/PaleGL/materials/material.ts';
+import { createMaterial, Material } from '@/PaleGL/materials/material.ts';
 // import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
 // import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl';
@@ -65,7 +65,7 @@ export type ShapeCharMesh = Mesh & {
 };
 
 // TODO: なぜかcastshadowがきかない
-export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
+export function createUIShapeCharMesh<T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     color = createColorWhite(),
@@ -81,8 +81,6 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     castShadow,
     uniforms = [],
 }: ShapeCharMeshArgs<T, U>): ShapeCharMesh {
-    // const w = atlasInfo.width;
-    // const h = atlasInfo.height;
     const { shapeFontAtlas } = shapeFontRenderer;
     const sw = shapeFontAtlas.cellWidth / shapeFontAtlas.textureWidth;
     const sh = shapeFontAtlas.cellHeight / shapeFontAtlas.textureHeight;
@@ -125,29 +123,10 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
 
     const depthUniforms: UniformsData = [...bUniforms, ...uniforms];
 
-    // const maxWidth = 2;
-    // const maxHeight = 2;
-    // const pixelSizeW = maxWidth / atlasInfo.lh;
-    // const pixelSizeH = maxHeight / atlasInfo.lh;
-    // const planeHeight = charInfo.height * pixelSizeH;
-    // const planeWidth = charInfo.width * pixelSizeW;
-    // const topPadding = (maxHeight - planeHeight) * 0.5;
-    // // 上下: 上に揃えてからoffsetYする. yOffsetは左上が原点なので反転
-    // const offsetY = topPadding - charInfo.yOffset * pixelSizeH;
-    // // 左右: widthの時点で幅調整がかかっているので、xOffsetのみでよい
-    // const offsetX = charInfo.xOffset * pixelSizeW;
-
     const { aspect } = shapeFontRenderer.shapeFontAtlas;
 
     const planeWidth = 1;
     const planeHeight = planeWidth / aspect;
-
-    // // const topPadding = planeHeight * 0.5;
-    // // // 上下: 上に揃えてからoffsetYする. yOffsetは左上が原点なので反転
-    // const offsetY = -planeHeight * 0.5;
-    // // 左右: widthの時点で幅調整がかかっているので、xOffsetのみでよい
-    // // const offsetX = charInfo.xOffset * pixelSizeW;
-    // const offsetX = 0;
 
     const geometry = createPlaneGeometry({
         gpu,
@@ -173,20 +152,6 @@ export function createShapeCharMesh<T, U extends ShapeFontBase<T>>({
     });
 
     const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.Text, castShadow });
-
-    // const charWidth = planeWidth;
-    // const charHeight = planeHeight;
-    // const charOffsetX = offsetX;
-    // const charOffsetY = offsetY;
-    // const char = charInfo.char;
-
-    // const charWidth = planeWidth;
-    // const charHeight = planeHeight;
-    // const charOffsetX = offsetX;
-    // const charOffsetY = offsetY;
-
-    // for debug
-    // console.log(this.char, planeWidth, planeHeight, offsetX, offsetY);
 
     return {
         ...mesh,

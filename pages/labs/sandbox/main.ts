@@ -159,10 +159,10 @@ import {
 } from '@/PaleGL/inputs/inputControllerBehaviours.ts';
 import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
 import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
-import { createShapeTextMesh } from '@/PaleGL/actors/meshes/shapeTextMesh.ts';
 // import {fontCircuit} from "@/PaleGL/shapeFont/fontCircuit/fontCircuit.ts";
 import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
+import {createUnlitShapeTextMesh} from "@/PaleGL/actors/meshes/unlitShapeTextMesh.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1642,7 +1642,7 @@ const main = async () => {
         // logEnabled: true
     });
 
-    const shapeText = createShapeTextMesh({
+    const shapeText = createUnlitShapeTextMesh({
         gpu,
         name: 'shape-text-mesh',
         text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
