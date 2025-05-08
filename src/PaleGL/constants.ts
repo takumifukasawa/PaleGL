@@ -123,8 +123,9 @@ export const MaterialTypes = {
 export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
 
 export const UIQueueTypes = {
-    AfterTone: 0,
-    Overlay: 1,
+    None: 0,
+    AfterTone: 1,
+    Overlay: 2,
 } as const;
 
 export type UIQueueType = (typeof UIQueueTypes)[keyof typeof UIQueueTypes];
