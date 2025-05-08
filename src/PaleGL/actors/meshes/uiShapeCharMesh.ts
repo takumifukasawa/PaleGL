@@ -1,17 +1,14 @@
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    DepthFuncTypes, MeshTypes,
-    PrimitiveTypes,
-    UniformBlockNames,
-} from '@/PaleGL/constants.ts';
+import { DepthFuncTypes, MeshTypes, PrimitiveTypes, UniformBlockNames, UniformTypes } from '@/PaleGL/constants.ts';
 import uiVert from '@/PaleGL/shaders/ui-vertex.glsl';
 import depthFrag from '@/PaleGL/shaders/depth-fragment.glsl';
+import uiShapeTextFrag from '@/PaleGL/shaders/ui-shape-text-fragment.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 // import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
-import {createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs} from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
+import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 
 export type UnlitShapeCharMesh = Mesh & {
     charWidth: number;
@@ -19,7 +16,9 @@ export type UnlitShapeCharMesh = Mesh & {
     char: string;
 };
 
-export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
+export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
+    options: ShapeCharMeshArgs<T, U>
+) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     color = createColorWhite(),
@@ -35,11 +34,11 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: Sha
     const material = createMaterial({
         name: 'uiShapeCharMeshMaterial',
         vertexShader: uiVert,
-        fragmentShader: depthFrag,
+        fragmentShader: uiShapeTextFrag,
         depthFragmentShader: depthFrag,
         uniforms: mergedUniforms,
         depthUniforms: [],
-        alphaTest: 0.5,
+        // alphaTest: 0.5,
         depthTest: false,
         depthWrite: false,
         // receiveShadow: !!receiveShadow,
@@ -59,6 +58,6 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: Sha
         x,
         y,
         uniforms: mergedUniforms,
-        meshType: MeshTypes.UI
+        meshType: MeshTypes.UI,
     });
-}
+};

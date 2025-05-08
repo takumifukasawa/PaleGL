@@ -91,6 +91,11 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
             type: UniformTypes.Vector4,
             value: fontTilingOffset,
         },
+        {
+            name: 'uFontAspect',
+            type: UniformTypes.Float,
+            value: shapeFontRenderer.shapeFontAtlas.aspect,
+        },
     ];
 
     // 追加
