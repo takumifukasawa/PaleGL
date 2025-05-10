@@ -428,7 +428,10 @@ export const UniformNames = {
     // renderer
     SceneTexture: 'uSceneTexture',
     // ui
-    UICanvas: 'uUICanvas',
+    // UICanvas: 'uUICanvas',
+    UICharRect: 'uUICharRect',
+    UIFontSize: 'uUIFontSize',
+    UIAnchor: 'uUIAnchor',
     // post process
     SrcTexture: 'uSrcTexture',
     BlendRate: 'uBlendRate',

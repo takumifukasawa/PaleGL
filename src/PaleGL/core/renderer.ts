@@ -1762,21 +1762,21 @@ function renderAfterToneMappingPass(
     // }
     updateRendererCameraUniforms(renderer, camera);
 
-    let uiCanvasSize: Vector4 | null = null;
+    // let uiCanvasSize: Vector4 | null = null;
    
-    switch(camera.cameraType) {
-        case CameraTypes.Orthographic:
-            const orthoCamera = camera as OrthographicCamera;
-            const orthoWidth = orthoCamera.right - orthoCamera.left;
-            const orthoHeight = orthoCamera.top - orthoCamera.bottom;
-            uiCanvasSize = createVector4(
-                orthoWidth,
-                orthoHeight,
-                orthoWidth / orthoHeight,
-                1
-            );
-            break;
-    }
+    // switch(camera.cameraType) {
+    //     case CameraTypes.Orthographic:
+    //         const orthoCamera = camera as OrthographicCamera;
+    //         const orthoWidth = orthoCamera.right - orthoCamera.left;
+    //         const orthoHeight = orthoCamera.top - orthoCamera.bottom;
+    //         uiCanvasSize = createVector4(
+    //             orthoWidth,
+    //             orthoHeight,
+    //             orthoWidth / orthoHeight,
+    //             1
+    //         );
+    //         break;
+    // }
 
 
     sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
@@ -1791,12 +1791,12 @@ function renderAfterToneMappingPass(
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
-            switch(camera.cameraType) {
-                case CameraTypes.Orthographic:
-                    setUniformValueToAllMeshMaterials(actor, UniformNames.UICanvas, uiCanvasSize);
-                    // setUniformValueToAllMeshMaterials(actor, "uUICanvasProjectionMatrix", camera.projectionMatrix);
-                    break;
-            }
+            // switch(camera.cameraType) {
+            //     case CameraTypes.Orthographic:
+            //         setUniformValueToAllMeshMaterials(actor, UniformNames.UICanvas, uiCanvasSize);
+            //         // setUniformValueToAllMeshMaterials(actor, "uUICanvasProjectionMatrix", camera.projectionMatrix);
+            //         break;
+            // }
            
             // TODO: skyboxは一個という前提にしているが・・・
             updateMeshMaterial(actor, {

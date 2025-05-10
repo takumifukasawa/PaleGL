@@ -23,7 +23,7 @@ type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     y: number;
     material: Material;
     meshType: MeshType;
-    planeWidth?: number;
+    planeWidth: number;
 } & MeshOptionsArgs;
 
 export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;
@@ -108,9 +108,10 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
 
     const geometry = createPlaneGeometry({
         gpu,
-        width: planeWidth,
-        height: planeHeight,
+        width: 1,
+        height: 1,
     });
+    console.log(geometry)
 
     // const mesh = createMesh({ name, geometry, material, type: ActorTypes.UIMesh, meshType: MeshTypes.Text, castShadow });
     const mesh = createMesh({ name, geometry, material, meshType, castShadow });

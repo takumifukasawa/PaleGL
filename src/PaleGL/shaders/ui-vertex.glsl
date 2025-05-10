@@ -14,13 +14,20 @@ out vec2 vUv;
 
 #include <shape_font_h>
 
-uniform vec4 uUICanvas;
-uniform mat4 uUICanvasProjectionMatrix;
+uniform vec2 uUICharRect;
+uniform vec2 uUIAnchor; // -1.0 ~ 1.0
+uniform float uUIFontSize;
 
 void main() {
     #pragma BEGIN_MAIN
 
-    vec4 localPosition = vec4(aPosition, 1.);
+    vec4 localPosition = vec4(aPosition, 1.); // -0.5 ~ 0.5
+
+    vec2 anchorOffset = localPosition.xy + (uUIAnchor * .5);
+    // wip anchor offsets
+    // localPosition.xy += uUIAnchor;
+    // localPosition.xy += anchorOffset;
+    localPosition.xy *= uUICharRect * uUIFontSize;
 
     // ローカル座標系でなんとかする場合
     // 
@@ -52,9 +59,11 @@ void main() {
     // end
     
     // 画面の拡縮に合わせてスケールする
-    localPosition.x /= uViewport.z;
-    localPosition.x /= uFontAspect;
-    localPosition.xy *= uViewport.z;
+    // localPosition.x /= uViewport.z;
+    localPosition.y *= uViewport.z;
+    localPosition.y *= uFontAspect;
+    // // 横のリサイズは拡縮しない。縦は追従
+    // // localPosition.xy /= uViewport.z;
     
     vUv = aUv;
     gl_Position = uProjectionMatrix * uWorldMatrix * localPosition;

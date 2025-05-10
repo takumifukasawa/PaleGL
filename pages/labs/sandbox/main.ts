@@ -1617,7 +1617,7 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Left,
+        align: TextAlignType.LeftTop,
         characterSpacing: 0.2,
     });
     addActorToScene(captureScene, textMesh3);
@@ -1676,7 +1676,8 @@ const main = async () => {
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,
         shapeFontService: shapeFontCircuitService,
-        fontSize: 96
+        fontSize: 48,
+        align: TextAlignType.Center,
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeText);
