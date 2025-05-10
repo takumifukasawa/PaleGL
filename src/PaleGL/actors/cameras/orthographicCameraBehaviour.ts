@@ -111,3 +111,10 @@ export const createFullQuadOrthographicCamera = (): Camera => {
     setTranslation(camera.transform, createVector3(0, 0, 1));
     return camera;
 };
+
+export const getOrthoSize = (camera: OrthographicCamera): [number, number] => {
+    const { left, right, bottom, top } = camera;
+    const width = Math.abs(left) + Math.abs(right);
+    const height = Math.abs(bottom) + Math.abs(top);
+    return [ width, height ];
+}

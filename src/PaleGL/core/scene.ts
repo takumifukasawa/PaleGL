@@ -1,10 +1,12 @@
 ﻿import {Actor, getActorHasChild} from '@/PaleGL/actors/actor.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import {Camera} from "@/PaleGL/actors/cameras/camera.ts";
 
 type TraverseFunc = (actor: Actor) => void;
 
 export type Scene = {
     children: Actor[];
+    mainCamera: Camera | null;
     uiCamera: OrthographicCamera | null;
 };
 
@@ -24,6 +26,7 @@ export function createScene(): Scene {
 
     return {
         children,
+        mainCamera: null,
         uiCamera: null,
     };
 }
@@ -42,6 +45,10 @@ export function createSceneUICamera(scene: Scene, w: number = 1920, h: number = 
     // });
     // uiCamera.autoResize = false;
     scene.uiCamera = uiCamera;
+}
+
+export function setMainCamera(scene: Scene, camera: Camera) {
+    scene.mainCamera = camera;
 }
 
 export function findActorByName(actors: Actor[], name: string) {

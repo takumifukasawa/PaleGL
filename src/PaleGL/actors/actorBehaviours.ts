@@ -16,6 +16,7 @@ import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/act
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
 import {TimelinePropertyValue} from "@/Marionetter/types";
+import {OrthographicCamera} from "@/PaleGL/actors/cameras/orthographicCamera.ts";
 
 // try start actor -------------------------------------------------------
 
@@ -60,18 +61,18 @@ const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
 
 // set size -------------------------------------------------------
 
-export type SetSizeActorFunc = (actor: Actor, width: number, height: number) => void;
+export type SetSizeActorFunc = (actor: Actor, width: number, height: number, camera: Camera | null, uiCamera: OrthographicCamera | null) => void;
 
 const setSizeActorBehaviour: Partial<Record<ActorType, SetSizeActorFunc>> = {
     [ActorTypes.Camera]: setSizeCamera,
     [ActorTypes.Mesh]: setSizeMesh,
 };
 
-export const setSizeActor: SetSizeActorFunc = (actor, width, height) => {
+export const setSizeActor: SetSizeActorFunc = (actor, width, height, camera: Camera | null = null, uiCamera: OrthographicCamera | null = null) => {
     actor.onSetSize.forEach((cb) => {
-        cb(width, height);
+        cb(width, height, camera, uiCamera);
     });
-    setSizeActorBehaviour[actor.type]?.(actor, width, height);
+    setSizeActorBehaviour[actor.type]?.(actor, width, height, camera, uiCamera);
 };
 
 // fixed update -------------------------------------------------------

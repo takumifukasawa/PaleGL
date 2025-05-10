@@ -129,7 +129,7 @@ import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/Pale
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import {addActorToScene, createScene, createSceneUICamera} from '@/PaleGL/core/scene.ts';
+import {addActorToScene, createScene, createSceneUICamera, setMainCamera} from '@/PaleGL/core/scene.ts';
 import {subscribeActorOnSetSize, subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
@@ -371,12 +371,10 @@ const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? createTouchInputController() : createMouseInputController();
 startInputController(inputController);
 
-// const wrapperElement = document.getElementById("wrapper")!;
 const wrapperElement = document.createElement('div');
 document.body.appendChild(wrapperElement);
 wrapperElement.setAttribute('id', 'wrapper');
 
-// const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 const canvasElement = document.createElement('canvas');
 wrapperElement.appendChild(canvasElement);
 
@@ -402,12 +400,8 @@ text-align: center;
 wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = createScene();
-// const compositeScene = new Scene();
-
-createSceneUICamera(captureScene);
 
 const pixelRatio = Math.min(window.devicePixelRatio, 1);
-// const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
 
 const renderer = createRenderer({
     gpu,
@@ -416,17 +410,12 @@ const renderer = createRenderer({
 });
 
 const engine = createEngine({ gpu, renderer });
-// for debug
-// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
-
-// engine.setScenes([captureScene, compositeScene]);
 setSceneToEngine(engine, captureScene);
 
-// const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);
 addActorToScene(captureScene, captureSceneCamera);
-// captureScene.mainCamera = captureSceneCamera;
-// captureSceneCamera.mainCamera = true;
+setMainCamera(captureScene, captureSceneCamera);
+createSceneUICamera(captureScene);
 
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 

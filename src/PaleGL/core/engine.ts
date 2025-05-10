@@ -160,7 +160,7 @@ export function setEngineSize(engine: Engine, width: number, height: number) {
     const w = Math.floor(rw);
     const h = Math.floor(rh);
     traverseScene(engine.scene!, (actor) => {
-        setSizeActor(actor, w, h);
+        setSizeActor(actor, w, h, engine.scene!.mainCamera, engine.scene!.uiCamera);
     });
     setRendererSize(engine.renderer, rw, rh);
 }

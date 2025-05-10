@@ -6,6 +6,8 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Component } from '@/PaleGL/components/component.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { TimelinePropertyValue } from '@/Marionetter/types';
+import {Camera} from "@/PaleGL/actors/cameras/camera.ts";
+import {OrthographicCamera} from "@/PaleGL/actors/cameras/orthographicCamera.ts";
 
 export type ActorStartArgs = { scene: Scene; gpu: Gpu };
 export type ActorFixedUpdateArgs = { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number };
@@ -13,7 +15,7 @@ export type ActorUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime:
 export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; time: number; deltaTime: number };
 
 type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
-type OnSetSizeCallback = (width: number, height: number) => void;
+type OnSetSizeCallback = (width: number, height: number, camera: Camera | null, uiCamera: OrthographicCamera | null) => void;
 type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
 type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;

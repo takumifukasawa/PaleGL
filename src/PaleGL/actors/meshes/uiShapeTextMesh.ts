@@ -6,6 +6,7 @@ import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createVector3, setV3x, setV3y } from '@/PaleGL/math/vector3.ts';
 import {setScaling, setTranslation} from '@/PaleGL/core/transform.ts';
 import { subscribeActorOnSetSize } from '@/PaleGL/actors/actor.ts';
+import {getOrthoSize} from "@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts";
 
 type UIShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshArgs<T, U>, 'planeWidth'> & {
     fontSize?: number;
@@ -26,7 +27,12 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
 
     const { shapeCharMeshes } = shapeText;
 
-    subscribeActorOnSetSize(shapeText, (width, height) => {
+    subscribeActorOnSetSize(shapeText, (width, height, _, uiCamera) => {
+        if (!uiCamera) {
+            console.error("uiCamera is null");
+            return;
+        }
+        
         let accWidth = 0;
         let originX = 0;
         let offsetX = 0;
@@ -37,12 +43,13 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         //     accWidth += mesh.charWidth;
         // }
 
+        const [orthoWidth, orthoHeight] = getOrthoSize(uiCamera);
         switch (align) {
             case TextAlignType.LeftTop:
                 break;
             case TextAlignType.Center:
                 // originX -= accWidth / 2 + (characterSpacing * (shapeCharMeshes.length - 1)) / 2;
-                offsetY = height * .5 - (height - 1080) * .5;
+                offsetY = height * .5 - (height - orthoHeight) * .5;
                 break;
         }
 
@@ -58,7 +65,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
             case TextAlignType.Center:
                 // setTranslation(shapeText.transform, createVector3(accWidth * -0.5, 0, 0));
                 // setTranslation(shapeText.transform, createVector3((width - accWidth) * .5, 0, 0));
-                offsetX = (width - accWidth) * .5 - (width - 1920) * .5;
+                offsetX = (width - accWidth) * .5 - (width - orthoWidth) * .5;
                 break;
         }
 
