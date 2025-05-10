@@ -278,7 +278,7 @@ export const shapeFontCircuit: ShapeFontCircuit = {
             ],
         ],
         [
-            'k',
+            'K',
             [
                 // coords
                 // prettier-ignore

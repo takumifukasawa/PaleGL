@@ -35,6 +35,6 @@ export const createShapeFontRenderer: <T, U extends ShapeFontBase<T>>(
     const [shapeFont, renderFunc] = shapeFontService;
 
     const shapeFontAtlas = buildShapeFontAtlas(shapeFont, canvasWidth, canvasHeight);
-
+    
     return { shapeFont, renderFunc, shapeFontAtlas, canvasWidth, canvasHeight, canvas, ctx };
 };

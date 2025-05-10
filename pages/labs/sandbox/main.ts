@@ -1636,6 +1636,12 @@ const main = async () => {
 
     const [,shapeFontCircuitRenderFunc] = shapeFontCircuitService;
     shapeFontCircuitRenderFunc(shapeFontCircuitRenderer);
+  
+    // // for debug
+    // const img = document.createElement('img');
+    // const base64Src = shapeFontCircuitRenderer.canvas.toDataURL();
+    // img.src = base64Src;
+    // document.body.appendChild(img);
     
     const shapeFontCircuitTexture = createTexture({
         gpu,
