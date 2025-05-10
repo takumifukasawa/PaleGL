@@ -1,6 +1,6 @@
 ﻿import {
     ActorTypes,
-    BlendTypes, CameraTypes,
+    BlendTypes,
     LightTypes,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
@@ -8,6 +8,7 @@
     RenderQueueType,
     RenderTargetTypes,
     TextureDepthPrecisionType,
+    UIQueueTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -29,12 +30,7 @@ import {
 import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    getMeshMaterial,
-    setUniformValueToAllMeshMaterials,
-    updateMeshDepthMaterial,
-    updateMeshMaterial
-} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -154,6 +150,7 @@ import {
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import { rotateVectorByQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { UIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -882,6 +879,7 @@ export function renderRenderer(
         [RenderQueueType.Skybox]: [],
         [RenderQueueType.Transparent]: [],
         [RenderQueueType.AfterTone]: [],
+        [RenderQueueType.Overlay]: [],
     };
 
     const lightActors: LightActors = {
@@ -918,9 +916,22 @@ export function renderRenderer(
                 }
                 mesh.materials.forEach((material, i) => {
                     if (mesh.meshType === MeshTypes.UI) {
-                        renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
-                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
-                        );
+                        const uiShapeCharMesh = mesh as UIShapeCharMesh;
+                        switch (uiShapeCharMesh.uiQueueType) {
+                            case UIQueueTypes.AfterTone:
+                                renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
+                                    buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                                );
+                                break;
+                            case UIQueueTypes.Overlay:
+                                renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
+                                    buildRenderMeshInfo(mesh, RenderQueueType.Overlay, i)
+                                );
+                                break;
+                            default:
+                                console.error('[renderRenderer] invalid ui queue type');
+                                return;
+                        }
                     } else {
                         if (material.alphaTest != null) {
                             renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
@@ -1295,7 +1306,8 @@ export function renderRenderer(
         isCameraLastPass: isCameraLastPassAndHasNotPostProcess,
         onAfterRenderPass: (pass) => {
             if (pass === renderer.toneMappingPass) {
-                renderAfterToneMappingPass(
+                renderUIPass(
+                    'after tone mapping',
                     renderer,
                     // camera,
                     scene.uiCamera || camera, // ui camera があったらそっちを優先
@@ -1310,6 +1322,18 @@ export function renderRenderer(
     });
 
     if (isCameraLastPassAndHasNotPostProcess) {
+        // overlay
+        renderUIPass(
+            'overlay',
+            renderer,
+            // camera,
+            scene.uiCamera || camera, // ui camera があったらそっちを優先
+            renderMeshInfoEachQueue[RenderQueueType.Overlay],
+            renderMeshInfoEachQueue[RenderQueueType.Skybox],
+            lightActors,
+            renderer.copySceneDestRenderTarget.texture!
+        );
+
         return;
     }
 
@@ -1332,6 +1356,18 @@ export function renderRenderer(
             });
         }
     }
+
+    // overlay
+    renderUIPass(
+        'overlay',
+        renderer,
+        // camera,
+        scene.uiCamera || camera, // ui camera があったらそっちを優先
+        renderMeshInfoEachQueue[RenderQueueType.Overlay],
+        renderMeshInfoEachQueue[RenderQueueType.Skybox],
+        lightActors,
+        renderer.copySceneDestRenderTarget.texture!
+    );
 }
 
 /**
@@ -1746,7 +1782,8 @@ function renderTransparentPass(
     });
 }
 
-function renderAfterToneMappingPass(
+function renderUIPass(
+    passName: string, 
     renderer: Renderer,
     camera: Camera,
     sortedRenderMeshInfos: RenderMeshInfo[],
@@ -1763,7 +1800,7 @@ function renderAfterToneMappingPass(
     updateRendererCameraUniforms(renderer, camera);
 
     // let uiCanvasSize: Vector4 | null = null;
-   
+
     // switch(camera.cameraType) {
     //     case CameraTypes.Orthographic:
     //         const orthoCamera = camera as OrthographicCamera;
@@ -1777,7 +1814,6 @@ function renderAfterToneMappingPass(
     //         );
     //         break;
     // }
-
 
     sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
         actor.materials.forEach((targetMaterial, i) => {
@@ -1797,7 +1833,7 @@ function renderAfterToneMappingPass(
             //         // setUniformValueToAllMeshMaterials(actor, "uUICanvasProjectionMatrix", camera.projectionMatrix);
             //         break;
             // }
-           
+
             // TODO: skyboxは一個という前提にしているが・・・
             updateMeshMaterial(actor, {
                 camera,
@@ -1811,7 +1847,7 @@ function renderAfterToneMappingPass(
             renderMesh(renderer, actor.geometry, targetMaterial);
 
             if (renderer.stats) {
-                addPassInfoStats(renderer.stats, 'after tone mapping pass', actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, passName, actor.name, actor.geometry);
             }
         });
     });

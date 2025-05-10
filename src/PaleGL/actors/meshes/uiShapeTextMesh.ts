@@ -1,28 +1,32 @@
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createShapeTextMeshBase, ShapeTextMesh, ShapeTextMeshArgs } from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
-import { MeshTypes, UIQueueTypes } from '@/PaleGL/constants.ts';
+import {BlendType, BlendTypes, MeshTypes, UIQueueType} from '@/PaleGL/constants.ts';
 import { createUIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
-import { createVector3, setV3x, setV3y } from '@/PaleGL/math/vector3.ts';
-import {setScaling, setTranslation} from '@/PaleGL/core/transform.ts';
+import { createVector3, setV3x  } from '@/PaleGL/math/vector3.ts';
+import {setTranslation} from '@/PaleGL/core/transform.ts';
 import { subscribeActorOnSetSize } from '@/PaleGL/actors/actor.ts';
 import {getOrthoSize} from "@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts";
+import {ShapeCharMeshArgs} from "@/PaleGL/actors/meshes/shapeCharMeshBase.ts";
 
 type UIShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshArgs<T, U>, 'planeWidth'> & {
     fontSize?: number;
+    blendType?: BlendType;
+    uiQueueType?: UIQueueType
 };
 
 export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     options: UIShapeTextMeshArgs<T, U>
 ): ShapeTextMesh<T, U> {
-    const { align, characterSpacing = 0, fontSize = 13 } = options;
+    const { align, characterSpacing = 0, fontSize = 13, blendType = BlendTypes.Transparent, uiQueueType } = options;
 
     const shapeText = createShapeTextMeshBase({
         ...options,
-        createCharMeshFunc: createUIShapeCharMesh,
-        uiQueueType: UIQueueTypes.AfterTone,
+        createCharMeshFunc: (args: ShapeCharMeshArgs<T, U>) => createUIShapeCharMesh({...args, blendType, uiQueueType}),
+        // uiQueueType: UIQueueTypes.AfterTone,
         meshType: MeshTypes.UI,
         planeWidth: fontSize,
+        uiQueueType
     });
 
     const { shapeCharMeshes } = shapeText;
@@ -55,7 +59,8 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
 
         for (let i = 0; i < shapeCharMeshes.length; i++) {
             const mesh = shapeCharMeshes[i];
-            const offset = i === 0 ? mesh.charWidth * .5 : mesh.charWidth * 1;
+            let offset = i === 0 ? mesh.charWidth * .5 : mesh.charWidth;
+            offset += characterSpacing;
             originX += offset;
             setV3x(mesh.transform.position, originX);
             accWidth += offset;
@@ -69,7 +74,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
                 break;
         }
 
-        setTranslation(shapeText.transform, createVector3(offsetX, offsetY, 0));
+        setTranslation(shapeText.container.transform, createVector3(offsetX, offsetY, 0));
     });
 
     return shapeText;

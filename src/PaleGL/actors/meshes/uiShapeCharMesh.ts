@@ -1,9 +1,11 @@
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
+    BlendType,
     DepthFuncTypes,
     MeshTypes,
-    PrimitiveTypes,
+    PrimitiveTypes, UIAnchorType, UIAnchorTypes,
+    UIQueueType,
+    UIQueueTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -16,15 +18,22 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { UIActor } from '@/PaleGL/actors/meshes/UIActor.ts';
 
-export type UnlitShapeCharMesh = Mesh & {
+export type UIShapeCharMesh = UIActor & {
     charWidth: number;
     charHeight: number;
     char: string;
 };
 
+export type UIShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = ShapeCharMeshArgs<T, U> & {
+    blendType?: BlendType;
+    uiQueueType?: UIQueueType;
+    anchor?: UIAnchorType
+};
+
 export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
-    options: ShapeCharMeshArgs<T, U>
+    options: UIShapeCharMeshArgs<T, U>
 ) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
@@ -36,7 +45,10 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     y,
     uniforms = [],
     planeWidth,
-}: ShapeCharMeshArgs<T, U>): UnlitShapeCharMesh => {
+    blendType,
+    uiQueueType = UIQueueTypes.None,
+    anchor = UIAnchorTypes.Center
+}: UIShapeCharMeshArgs<T, U>): UIShapeCharMesh => {
     const mergedUniforms: UniformsData = [
         {
             name: UniformNames.UICharRect,
@@ -46,7 +58,7 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
         {
             name: UniformNames.UIAnchor,
             type: UniformTypes.Vector2,
-            value: createVector2(0, 0)
+            value: createVector2(0, 0),
         },
         {
             name: UniformNames.UIFontSize,
@@ -63,27 +75,30 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
         depthFragmentShader: depthFrag,
         uniforms: mergedUniforms,
         depthUniforms: [],
-        // alphaTest: 0.5,
         depthTest: false,
         depthWrite: false,
-        // receiveShadow: !!receiveShadow,
+        blendType,
         primitiveType: PrimitiveTypes.Triangles,
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    return createShapeCharMeshBase({
-        gpu,
-        name,
-        color,
-        fontTexture,
-        material,
-        char,
-        shapeFontRenderer,
-        x,
-        y,
-        uniforms: mergedUniforms,
-        meshType: MeshTypes.UI,
-        planeWidth,
-    });
+    return {
+        ...createShapeCharMeshBase({
+            gpu,
+            name,
+            color,
+            fontTexture,
+            material,
+            char,
+            shapeFontRenderer,
+            x,
+            y,
+            uniforms: mergedUniforms,
+            meshType: MeshTypes.UI,
+            planeWidth,
+        }),
+        uiQueueType,
+        anchor,
+    };
 };

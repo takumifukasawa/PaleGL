@@ -14,9 +14,6 @@ void main() {
     vec4 resultColor = uColor;
 
     #include <shape_font_f>
-
-    // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-    #include <alpha_test_f>
-
+    
     outColor = resultColor;
 }

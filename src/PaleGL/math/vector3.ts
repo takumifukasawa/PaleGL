@@ -285,7 +285,10 @@ import {
     mat4m11,
     mat4m12,
     mat4m13,
-    mat4m20, mat4m21, mat4m22, mat4m23,
+    mat4m20,
+    mat4m21,
+    mat4m22,
+    mat4m23,
     Matrix4,
 } from '@/PaleGL/math/matrix4.ts';
 
@@ -297,10 +300,32 @@ export function createVector3FromRaw(raw: RawVector3) {
 
 // export const createVector3Zero = () => new Vector3(0, 0, 0);
 
-export type Vector3 = { e: Float32Array };
+export type Vector3 = { e: Float32Array; x: number; y: number; z: number };
 
-export function createVector3(x: number, y: number, z: number) {
-    return { e: new Float32Array([x, y, z]) };
+export function createVector3(x: number, y: number, z: number): Vector3 {
+    // return { e: new Float32Array([x, y, z]), x:  };
+    const e = new Float32Array([x, y, z]);
+    return {
+        e,
+        get x() {
+            return e[0];
+        },
+        set x(value) {
+            e[0] = value;
+        },
+        get y() {
+            return e[1];
+        },
+        set y(value) {
+            e[1] = value;
+        },
+        get z() {
+            return e[2];
+        },
+        set z(value) {
+            e[2] = value;
+        },
+    };
 }
 
 export const v3x = (v: Vector3) => v.e[0];

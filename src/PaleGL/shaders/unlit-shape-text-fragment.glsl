@@ -18,19 +18,6 @@ in vec3 vWorldPosition;
 void main() {
     vec4 resultColor = uColor;
 
-    // vec2 uv = vUv;
-    // uv = uv * uFontTiling.xy + uFontTiling.zw;
-    // 
-    // resultColor = texture(uFontMap, uv);
-
-    // float smoothEdge = .5;
-    // float smoothRange = 0.01;
-    // float font = resultColor.r;
-    // resultColor.a *= smoothstep(
-    //     smoothEdge - smoothRange,
-    //     smoothEdge + smoothRange,
-    //     font
-    // );
     #include <shape_font_f>
 
     vec3 worldNormal = normalize(vNormal);

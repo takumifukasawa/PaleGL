@@ -95,7 +95,7 @@ import {
     FaceSide,
     TextureDepthPrecisionType,
     UniformBlockNames,
-    RAD_TO_DEG,
+    RAD_TO_DEG, UIQueueTypes,
 } from '@/PaleGL/constants';
 
 import {
@@ -129,8 +129,8 @@ import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/Pale
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import {addActorToScene, createScene, createSceneUICamera, setMainCamera} from '@/PaleGL/core/scene.ts';
-import {subscribeActorOnSetSize, subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
+import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
+import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
@@ -162,8 +162,9 @@ import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSha
 // import {fontCircuit} from "@/PaleGL/shapeFont/fontCircuit/fontCircuit.ts";
 import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
-import {createUnlitShapeTextMesh} from "@/PaleGL/actors/meshes/unlitShapeTextMesh.ts";
-import {createUIShapeTextMesh} from "@/PaleGL/actors/meshes/uiShapeTextMesh.ts";
+import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextMesh.ts';
+import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
+import {setUITranslation} from "@/PaleGL/ui/uiBehaviours.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1617,23 +1618,28 @@ const main = async () => {
     //
     // shape text mesh
     //
-    
+
     // unlit mesh
 
     const shapeFontCircuitTextureWidth = 4096;
     const shapeFontCircuitTextureHeight = 1024;
-    
-    const shapeFontCircuitRenderer = createShapeFontRenderer(shapeFontCircuitService, null, shapeFontCircuitTextureWidth, shapeFontCircuitTextureHeight);
 
-    const [,shapeFontCircuitRenderFunc] = shapeFontCircuitService;
+    const shapeFontCircuitRenderer = createShapeFontRenderer(
+        shapeFontCircuitService,
+        null,
+        shapeFontCircuitTextureWidth,
+        shapeFontCircuitTextureHeight
+    );
+
+    const [, shapeFontCircuitRenderFunc] = shapeFontCircuitService;
     shapeFontCircuitRenderFunc(shapeFontCircuitRenderer);
-  
+
     // // for debug
     // const img = document.createElement('img');
     // const base64Src = shapeFontCircuitRenderer.canvas.toDataURL();
     // img.src = base64Src;
     // document.body.appendChild(img);
-    
+
     const shapeFontCircuitTexture = createTexture({
         gpu,
         img: shapeFontCircuitRenderer.canvas,
@@ -1650,26 +1656,48 @@ const main = async () => {
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,
         shapeFontService: shapeFontCircuitService,
+        planeWidth: 1
         // ratio: 1,
     });
     addActorToScene(captureScene, shapeText);
     setTranslation(shapeText.transform, createVector3(0, 1, 10));
-    
+
     // ui mesh
-    
-    const uiShapeText = createUIShapeTextMesh({
+
+    const uiShapeTextAfterTone = createUIShapeTextMesh({
         gpu,
         name: 'ui-shape-text-mesh',
-        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
         // shapeFont: fontCircuit,
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,
         shapeFontService: shapeFontCircuitService,
-        fontSize: 48,
+        fontSize: 36,
         align: TextAlignType.Center,
+        blendType: BlendTypes.Additive,
+        uiQueueType: UIQueueTypes.AfterTone
         // ratio: 1,
     });
-    addActorToScene(captureScene, uiShapeText);
+    addActorToScene(captureScene, uiShapeTextAfterTone);
+    setUITranslation(uiShapeTextAfterTone, captureScene.uiCamera, createVector3(0, -400, 0))
+
+    const uiShapeTextOverlay = createUIShapeTextMesh({
+        gpu,
+        name: 'ui-shape-text-mesh',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        // shapeFont: fontCircuit,
+        shapeFontTexture: shapeFontCircuitTexture,
+        shapeFontRenderer: shapeFontCircuitRenderer,
+        shapeFontService: shapeFontCircuitService,
+        fontSize: 36,
+        align: TextAlignType.Center,
+        blendType: BlendTypes.Additive,
+        uiQueueType: UIQueueTypes.Overlay
+        // ratio: 1,
+    });
+    addActorToScene(captureScene, uiShapeTextOverlay);
+    setUITranslation(uiShapeTextOverlay, captureScene.uiCamera, createVector3(0, -350, 0))
+
 
     //
     // instancing mesh

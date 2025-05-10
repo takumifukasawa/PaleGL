@@ -59,6 +59,7 @@ export const RenderQueueType = {
     Skybox: 's',
     Transparent: 't',
     AfterTone: 'at',
+    Overlay: 'ol',
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
@@ -89,7 +90,7 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
-    // UIMesh: 2,
+    // UIActor: 2,
     // SkinnedMesh: 2,
     Light: 2,
     Skybox: 3,
@@ -129,6 +130,12 @@ export const UIQueueTypes = {
 } as const;
 
 export type UIQueueType = (typeof UIQueueTypes)[keyof typeof UIQueueTypes];
+
+export const UIAnchorTypes = {
+    Center: 0,
+} as const;
+
+export type UIAnchorType = (typeof UIAnchorTypes)[keyof typeof UIAnchorTypes];
 
 export const CameraTypes = {
     Perspective: 0,
