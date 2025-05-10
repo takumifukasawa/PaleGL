@@ -129,8 +129,8 @@ import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/Pale
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import { addActorToScene, createScene } from '@/PaleGL/core/scene.ts';
-import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import {addActorToScene, createScene, createSceneUICamera} from '@/PaleGL/core/scene.ts';
+import {subscribeActorOnSetSize, subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
@@ -403,6 +403,8 @@ wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = createScene();
 // const compositeScene = new Scene();
+
+createSceneUICamera(captureScene);
 
 const pixelRatio = Math.min(window.devicePixelRatio, 1);
 // const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
@@ -1674,6 +1676,7 @@ const main = async () => {
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,
         shapeFontService: shapeFontCircuitService,
+        fontSize: 96
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeText);
@@ -1684,7 +1687,7 @@ const main = async () => {
 
     skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
     console.log(
-        'hogehoge - butterfly',
+        'gltf butterfly',
         skinnedMesh,
         getGeometryAttributeDescriptors(skinnedMesh.geometry),
         skinnedMesh.geometry.indices,

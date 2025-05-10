@@ -1,6 +1,13 @@
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { DepthFuncTypes, MeshTypes, PrimitiveTypes, UniformBlockNames } from '@/PaleGL/constants.ts';
+import {
+    DepthFuncTypes,
+    MeshTypes,
+    PrimitiveTypes,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes
+} from '@/PaleGL/constants.ts';
 import uiVert from '@/PaleGL/shaders/ui-vertex.glsl';
 import depthFrag from '@/PaleGL/shaders/depth-fragment.glsl';
 import uiShapeTextFrag from '@/PaleGL/shaders/ui-shape-text-fragment.glsl';
@@ -9,6 +16,7 @@ import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
+import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
 export type UnlitShapeCharMesh = Mesh & {
     charWidth: number;
@@ -28,8 +36,21 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     x,
     y,
     uniforms = [],
+    planeWidth,
 }: ShapeCharMeshArgs<T, U>): UnlitShapeCharMesh => {
-    const mergedUniforms: UniformsData = uniforms || [];
+    const mergedUniforms: UniformsData = [
+        {
+            name: UniformNames.UICanvas,
+            type: UniformTypes.Vector4,
+            value: createVector4(1, 1, 1, 1),
+        },
+        // {
+        //     name: "uUICanvasProjectionMatrix",
+        //     type: UniformTypes.Matrix4,
+        //     value: createMat4Identity()
+        // },
+        ...(uniforms || []),
+    ];
 
     const material = createMaterial({
         name: 'uiShapeCharMeshMaterial',
@@ -59,5 +80,6 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
         y,
         uniforms: mergedUniforms,
         meshType: MeshTypes.UI,
+        planeWidth,
     });
 };

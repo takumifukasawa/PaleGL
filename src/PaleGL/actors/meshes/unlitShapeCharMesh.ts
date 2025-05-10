@@ -38,6 +38,7 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: 
     // charInfo,
     castShadow,
     uniforms = [],
+    planeWidth,
 }: ShapeCharMeshArgs<T, U>): UnlitShapeCharMesh => {
     const mergedUniforms: UniformsData = [
         {
@@ -78,6 +79,7 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: 
         y,
         castShadow,
         uniforms: mergedUniforms,
-        meshType: MeshTypes.Default
+        meshType: MeshTypes.Default,
+        planeWidth
     });
 }

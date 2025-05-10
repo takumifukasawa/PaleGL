@@ -427,6 +427,8 @@ export const UniformNames = {
     SpotLightIntensity: 'uSpotLightIntensity',
     // renderer
     SceneTexture: 'uSceneTexture',
+    // ui
+    UICanvas: 'uUICanvas',
     // post process
     SrcTexture: 'uSrcTexture',
     BlendRate: 'uBlendRate',

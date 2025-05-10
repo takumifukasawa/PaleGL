@@ -1,4 +1,4 @@
-﻿import {createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper} from '@/PaleGL/utilities/timeSkipper.ts';
+﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
 import { ActorTypes } from '@/PaleGL/constants';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -13,9 +13,10 @@ import {
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     createSharedTextures,
-    renderSharedTextures, SharedTexture,
+    renderSharedTextures,
+    SharedTexture,
     SharedTextures,
-    SharedTexturesType
+    SharedTexturesType,
 } from '@/PaleGL/core/createSharedTextures.ts';
 import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
@@ -27,15 +28,16 @@ import {
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import {cloneRotator, createRotatorFromQuaternion, Rotator} from '@/PaleGL/math/rotator.ts';
+import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
 import {
     createTimeAccumulator,
     execTimeAccumulator,
-    startTimeAccumulator, TimeAccumulator,
+    startTimeAccumulator,
+    TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
-import {isDevelopment} from "@/PaleGL/utilities/envUtilities.ts";
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -74,12 +76,13 @@ export type EngineBase = {
     onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null;
     onLastUpdate: EngineOnLastUpdateCallback | null;
     onRender: EngineOnRenderCallback | null;
-}
+    // uiCamera: OrthographicCamera | null;
+};
 
 export type Engine = EngineBase & {
     fixedUpdateFrameTimer: TimeAccumulator;
     updateFrameTimer: TimeSkipper;
-}
+};
 
 export type EngineArgs = {
     gpu: Gpu;
@@ -88,7 +91,7 @@ export type EngineArgs = {
     updateFps?: number;
     showStats?: boolean;
     showPipeline?: boolean;
-}
+};
 
 export function createEngine({
     gpu,
@@ -112,10 +115,15 @@ export function createEngine({
         onBeforeFixedUpdate: null,
         onLastUpdate: null,
         onRender: null,
+        // uiCamera: null,
     };
-    
-    const fixedUpdateFrameTimer = createTimeAccumulator(fixedUpdateFps, (lastTime, deltaTime) => fixedUpdateEngine(engineBase, lastTime, deltaTime));
-    const updateFrameTimer = createTimeSkipper(updateFps, (lastTime, deltaTime) => updateEngine(engineBase, lastTime, deltaTime));
+
+    const fixedUpdateFrameTimer = createTimeAccumulator(fixedUpdateFps, (lastTime, deltaTime) =>
+        fixedUpdateEngine(engineBase, lastTime, deltaTime)
+    );
+    const updateFrameTimer = createTimeSkipper(updateFps, (lastTime, deltaTime) =>
+        updateEngine(engineBase, lastTime, deltaTime)
+    );
 
     (engineBase as Engine).fixedUpdateFrameTimer = fixedUpdateFrameTimer;
     (engineBase as Engine).updateFrameTimer = updateFrameTimer;
@@ -134,7 +142,7 @@ export function getSharedTexture(engine: Engine, key: SharedTexturesType): Share
     return engine.sharedTextures.get(key)!;
 }
 
-export function startEngine (engine: Engine) {
+export function startEngine(engine: Engine) {
     if (engine.onBeforeStart) {
         engine.onBeforeStart();
     }
@@ -161,7 +169,7 @@ function fixedUpdateEngine(engine: EngineBase, fixedTime: number, fixedDeltaTime
     if (engine.onBeforeFixedUpdate) {
         engine.onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
     }
-    
+
     if (!engine.scene) {
         console.error('scene is not set');
         return;
@@ -205,7 +213,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
     //
     // update and before render
     //
-    
+
     if (!engine.scene) {
         console.error('scene is not set');
         return;
@@ -217,7 +225,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         switch (actor.type) {
             case ActorTypes.Skybox:
             case ActorTypes.Mesh:
-            // case ActorTypes.UIMesh:
+                // case ActorTypes.UIMesh:
                 // case ActorTypes.SkinnedMesh:
                 beforeRenderActor(actor, { gpu: engine.renderer.gpu });
                 const mesh = actor as Mesh;
@@ -260,15 +268,22 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
     renderEngine(engine, time, deltaTime);
 }
 
-export function lastUpdateEngine (engine: Engine, time: number, deltaTime: number) {
+export function lastUpdateEngine(engine: Engine, time: number, deltaTime: number) {
     if (!engine.scene) {
         console.error('scene is not set');
         return;
     }
-    traverseScene(engine.scene, (actor) => lastUpdateActor(actor, { gpu: engine.renderer.gpu, scene: engine.scene!, time, deltaTime }));
+    traverseScene(engine.scene, (actor) =>
+        lastUpdateActor(actor, {
+            gpu: engine.renderer.gpu,
+            scene: engine.scene!,
+            time,
+            deltaTime,
+        })
+    );
 }
 
-function renderEngine (engine: EngineBase, time: number, deltaTime: number) {
+function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
     // for debug
     // console.log(`[Engine.render]`);
 
@@ -292,10 +307,10 @@ function renderEngine (engine: EngineBase, time: number, deltaTime: number) {
     }
 }
 
-export function warmRender (engine: Engine) {
+export function warmRender(engine: Engine) {
     // for debug
     // console.log(`[Engine.warmRender]`);
-    
+
     if (!engine.scene) {
         console.error('scene is not set');
         return;
@@ -323,14 +338,13 @@ export function warmRender (engine: Engine) {
         setTranslation(pair.actor.transform, pair.p);
         setRotation(pair.actor.transform, pair.r);
     });
-};
+}
 
 // time[sec]
-export function runEngine (engine: Engine, time: number)  {
+export function runEngine(engine: Engine, time: number) {
     execTimeAccumulator(engine.fixedUpdateFrameTimer, time / 1000);
     execTimeSkipper(engine.updateFrameTimer, time / 1000);
 }
-
 
 export function setOnBeforeStartEngine(engine: Engine, cb: EngineOnBeforeStartCallback) {
     engine.onBeforeStart = cb;

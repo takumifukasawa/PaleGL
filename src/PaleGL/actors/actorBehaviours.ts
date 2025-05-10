@@ -68,6 +68,9 @@ const setSizeActorBehaviour: Partial<Record<ActorType, SetSizeActorFunc>> = {
 };
 
 export const setSizeActor: SetSizeActorFunc = (actor, width, height) => {
+    actor.onSetSize.forEach((cb) => {
+        cb(width, height);
+    });
     setSizeActorBehaviour[actor.type]?.(actor, width, height);
 };
 

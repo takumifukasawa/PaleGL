@@ -23,6 +23,7 @@ type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     y: number;
     material: Material;
     meshType: MeshType;
+    planeWidth?: number;
 } & MeshOptionsArgs;
 
 export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;
@@ -69,6 +70,7 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     x,
     y,
     meshType,
+    planeWidth = 1,
 }: ShapeCharMeshBaseArgs<T, U>): ShapeCharMesh => {
     const { shapeFontAtlas } = shapeFontRenderer;
     const { aspect } = shapeFontAtlas;
@@ -102,7 +104,6 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     addUniformData(material.uniforms, bUniforms);
     addUniformData(material.depthUniforms, bUniforms);
 
-    const planeWidth = 1;
     const planeHeight = planeWidth / aspect;
 
     const geometry = createPlaneGeometry({

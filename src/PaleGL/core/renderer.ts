@@ -1,6 +1,6 @@
 ﻿import {
     ActorTypes,
-    BlendTypes,
+    BlendTypes, CameraTypes,
     LightTypes,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
@@ -29,7 +29,12 @@ import {
 import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    getMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+    updateMeshDepthMaterial,
+    updateMeshMaterial
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -162,14 +167,12 @@ export type LightActors = {
     pointLights: PointLight[];
 };
 
-
 type RenderMeshInfosEachPass = {
     basePass: RenderMeshInfo[];
     skyboxPass: RenderMeshInfo[];
     afterTonePass: RenderMeshInfo[];
     transparentPass: RenderMeshInfo[];
 };
-
 
 /**
  * TODO: shadow 用のuniform設定も一緒にされちゃうので出し分けたい
@@ -1294,14 +1297,15 @@ export function renderRenderer(
             if (pass === renderer.toneMappingPass) {
                 renderAfterToneMappingPass(
                     renderer,
-                    camera,
+                    // camera,
+                    scene.uiCamera || camera, // ui camera があったらそっちを優先
                     renderMeshInfoEachQueue[RenderQueueType.AfterTone],
                     renderMeshInfoEachQueue[RenderQueueType.Skybox],
                     lightActors,
                     renderer.copySceneDestRenderTarget.texture!
                 );
             }
-        }
+        },
         // lightActors,
     });
 
@@ -1758,6 +1762,23 @@ function renderAfterToneMappingPass(
     // }
     updateRendererCameraUniforms(renderer, camera);
 
+    let uiCanvasSize: Vector4 | null = null;
+   
+    switch(camera.cameraType) {
+        case CameraTypes.Orthographic:
+            const orthoCamera = camera as OrthographicCamera;
+            const orthoWidth = orthoCamera.right - orthoCamera.left;
+            const orthoHeight = orthoCamera.top - orthoCamera.bottom;
+            uiCanvasSize = createVector4(
+                orthoWidth,
+                orthoHeight,
+                orthoWidth / orthoHeight,
+                1
+            );
+            break;
+    }
+
+
     sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
         actor.materials.forEach((targetMaterial, i) => {
             if (i !== materialIndex) {
@@ -1770,6 +1791,13 @@ function renderAfterToneMappingPass(
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
+            switch(camera.cameraType) {
+                case CameraTypes.Orthographic:
+                    setUniformValueToAllMeshMaterials(actor, UniformNames.UICanvas, uiCanvasSize);
+                    // setUniformValueToAllMeshMaterials(actor, "uUICanvasProjectionMatrix", camera.projectionMatrix);
+                    break;
+            }
+           
             // TODO: skyboxは一個という前提にしているが・・・
             updateMeshMaterial(actor, {
                 camera,
@@ -1788,8 +1816,6 @@ function renderAfterToneMappingPass(
         });
     });
 }
-
-
 
 function updateActorTransformUniforms(renderer: Renderer, actor: Actor, camera: Camera) {
     setUniformBlockValue(
@@ -2161,7 +2187,7 @@ function createRenderMeshInfosEachPass(
         const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         return al < bl ? -1 : 1;
     });
-    
+
     const afterTonePass = [...renderMeshInfoEachQueue[RenderQueueType.AfterTone]].sort((a, b) => {
         const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));

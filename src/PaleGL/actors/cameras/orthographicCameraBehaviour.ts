@@ -15,27 +15,19 @@ import { setTranslation } from '@/PaleGL/core/transform.ts';
 import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 export function setSizeOrthographicCamera(camera: Camera, width: number, height: number) {
-    setCameraSize(camera, width, height);
-    // if (left && right && top && bottom) {
-    //     this.left = left;
-    //     this.right = right;
-    //     this.bottom = bottom;
-    //     this.top = top;
+    // if (!camera.autoResize) {
+    //     return;
     // }
-
+    // console.log("hogehoge - setSizeOrthographicCamera", camera, width, height);
+    setCameraSize(camera, width, height);
+    
     updateOrthographicCameraProjectionMatrix(camera);
 }
 
 export function updateOrthographicCameraProjectionMatrix(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
-    camera.projectionMatrix = createOrthographicMatrix(
-        orthographicCamera.left,
-        orthographicCamera.right,
-        orthographicCamera.bottom,
-        orthographicCamera.top,
-        orthographicCamera.near,
-        orthographicCamera.far
-    );
+    const { left, right, bottom, top, near, far } = orthographicCamera;
+    camera.projectionMatrix = createOrthographicMatrix(left, right, bottom, top, near, far);
 }
 
 // updateTransform() {
@@ -88,32 +80,6 @@ export function getOrthographicFrustumLocalPositions(camera: Camera) {
     };
 }
 
-// const getFrustumWorldPositions: GetFrustumVectorsFunc = (cameras: Camera): FrustumVectors | null => {
-//     const worldPositions: {
-//         [key in FrustumDirectionType]: Vector3;
-//     } = {
-//         nlt: Vector3.zero,
-//         nrt: Vector3.zero,
-//         nlb: Vector3.zero,
-//         nrb: Vector3.zero,
-//         flt: Vector3.zero,
-//         frt: Vector3.zero,
-//         flb: Vector3.zero,
-//         frb: Vector3.zero,
-//     };
-//     const localPositions = getFrustumLocalPositions(cameras);
-//     if (localPositions) {
-//         for (const d in FrustumDirection) {
-//             const key = d as FrustumDirectionType;
-//             const wp = localPositions[key].multiplyMatrix4(cameras.transform.getWorldMatrix());
-//             worldPositions[key] = wp;
-//         }
-//         return worldPositions;
-//     } else {
-//         return null;
-//     }
-// };
-
 export const setOrthoSize = (
     camera: OrthographicCamera,
     width: number | null,
@@ -132,8 +98,12 @@ export const setOrthoSize = (
     if (width !== null && height !== null) {
         setCameraSize(camera, width, height);
     }
+    
+    // console.log("hogehoge - setOrthoSize", width, height, left, right, bottom, top);
 
     camera.aspect = (right - left) / (top - bottom);
+
+    updateOrthographicCameraProjectionMatrix(camera);
 };
 
 export const createFullQuadOrthographicCamera = (): Camera => {

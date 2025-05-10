@@ -21,6 +21,7 @@ type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     createCharMeshFunc: CreateShapeCharMeshFunc<T, U>;
     uiQueueType: UIQueueType;
     meshType: MeshType;
+    planeWidth?: number;
 };
 
 export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
@@ -52,6 +53,7 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>({
     createCharMeshFunc,
     uiQueueType,
     meshType,
+    planeWidth
 }: ShapeTextMeshBaseArgs<T, U>): ShapeTextMesh<T, U> {
     const actor = createActor({ name: name || `shape-text-${text}` });
 
@@ -78,6 +80,7 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>({
             x: colIndex,
             y: rowIndex,
             meshType,
+            planeWidth
         });
 
         shapeCharMeshes.push(shapeCharMesh);

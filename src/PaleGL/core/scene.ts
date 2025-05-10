@@ -1,15 +1,47 @@
 ﻿import {Actor, getActorHasChild} from '@/PaleGL/actors/actor.ts';
+import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 
 type TraverseFunc = (actor: Actor) => void;
 
-export type Scene = ReturnType<typeof createScene>;
+export type Scene = {
+    children: Actor[];
+    uiCamera: OrthographicCamera | null;
+};
 
-export function createScene() {
+// const w = 1920;
+// const h = 720;
+// const uiCamera = createOrthographicCamera(
+//     0,
+//     w,
+//     0,
+//     h,
+//     0,
+//     1
+// );
+
+export function createScene(): Scene {
     const children: Actor[] = [];
-   
+
     return {
-        children
+        children,
+        uiCamera: null,
     };
+}
+
+// export function setSceneUICamera(scene: Scene, camera: OrthographicCamera) {
+//     scene.uiCamera = camera;
+// }
+
+export function createSceneUICamera(scene: Scene, w: number = 1920, h: number = 1080) {
+    const uiCamera = createOrthographicCamera(0, w, 0, h, -1, 1);
+    // const uiCamera = createOrthographicCamera(-w/2, w/2, -h/2, h/2, -1, 100);
+    // const uiCamera = createFullQuadOrthographicCamera();
+    // addActorToScene(scene, uiCamera);
+    // subscribeActorOnSetSize(uiCamera, () => {
+    //     console.log("hogehoge",  uiCamera)
+    // });
+    // uiCamera.autoResize = false;
+    scene.uiCamera = uiCamera;
 }
 
 export function findActorByName(actors: Actor[], name: string) {
@@ -20,9 +52,7 @@ export function addActorToScene(scene: Scene, actor: Actor) {
     scene.children.push(actor);
 }
 
-
-
-function recursiveTraverseActor (actor: Actor, execFunc: TraverseFunc) {
+function recursiveTraverseActor(actor: Actor, execFunc: TraverseFunc) {
     execFunc(actor);
     if (getActorHasChild(actor)) {
         for (let i = 0; i < actor.children.length; i++) {
@@ -37,7 +67,7 @@ export function traverseScene(scene: Scene, execFunc: TraverseFunc) {
     }
 }
 
-export function findActorInSceneByName (scene: Scene, name: string)  {
+export function findActorInSceneByName(scene: Scene, name: string) {
     let result: Actor | undefined;
     traverseScene(scene, (actor) => {
         if (actor.name === name) {
@@ -46,4 +76,3 @@ export function findActorInSceneByName (scene: Scene, name: string)  {
     });
     return result || null;
 }
-    
