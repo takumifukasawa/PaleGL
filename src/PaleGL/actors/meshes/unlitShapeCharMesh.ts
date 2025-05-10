@@ -1,7 +1,8 @@
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
-    DepthFuncTypes, MeshTypes,
+    DepthFuncTypes,
+    MeshTypes,
     PrimitiveTypes,
     ShadingModelIds,
     UniformBlockNames,
@@ -14,7 +15,7 @@ import unlitShapeTextFrag from '@/PaleGL/shaders/unlit-shape-text-fragment.glsl'
 import unlitShapeTextDepthFrag from '@/PaleGL/shaders/unlit-shape-text-depth-fragment.glsl';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
-import {createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs} from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
+import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 
 export type UnlitShapeCharMesh = Mesh & {
     charWidth: number;
@@ -23,7 +24,9 @@ export type UnlitShapeCharMesh = Mesh & {
 };
 
 // TODO: なぜかcastshadowがきかない
-export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: ShapeCharMeshArgs<T, U>) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
+export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(
+    options: ShapeCharMeshArgs<T, U>
+) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     color = createColorWhite(),
@@ -80,6 +83,6 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(options: 
         castShadow,
         uniforms: mergedUniforms,
         meshType: MeshTypes.Default,
-        planeWidth
+        planeWidth,
     });
-}
+};
