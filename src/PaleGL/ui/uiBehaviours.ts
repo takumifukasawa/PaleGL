@@ -1,6 +1,6 @@
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import { getOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+// import { getOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { UIActor } from '@/PaleGL/actors/meshes/UIActor.ts';
 import { UIAnchorTypes } from '@/PaleGL/constants.ts';
 
@@ -9,7 +9,8 @@ export const setUITranslation = (uiActor: UIActor, uiCamera: OrthographicCamera 
         console.warn('uiCamera is null');
         return;
     }
-    const [, orthoH] = getOrthoSize(uiCamera);
+    // wip
+    // const [, orthoH] = getOrthoSize(uiCamera);
     switch (uiActor.anchor) {
         case UIAnchorTypes.Center:
             uiActor.transform.position.x = position.x;
