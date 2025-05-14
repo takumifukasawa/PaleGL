@@ -83,7 +83,6 @@ import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-t
 import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
 import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
 
-
 // others
 import {
     UniformTypes,
@@ -97,7 +96,9 @@ import {
     FaceSide,
     TextureDepthPrecisionType,
     UniformBlockNames,
-    RAD_TO_DEG, UIQueueTypes,
+    RAD_TO_DEG,
+    UIQueueTypes,
+    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import {
@@ -166,8 +167,8 @@ import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts
 import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
 import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextMesh.ts';
 import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
-import {setUITranslation} from "@/PaleGL/ui/uiBehaviours.ts";
-import {createBillboardParticle} from "@/PaleGL/actors/meshes/billboardParticle.ts";
+import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
+import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1659,7 +1660,7 @@ const main = async () => {
         shapeFontTexture: shapeFontCircuitTexture,
         shapeFontRenderer: shapeFontCircuitRenderer,
         shapeFontService: shapeFontCircuitService,
-        planeWidth: 1
+        planeWidth: 1,
         // ratio: 1,
     });
     addActorToScene(captureScene, shapeText);
@@ -1678,11 +1679,11 @@ const main = async () => {
         fontSize: 36,
         align: TextAlignType.Center,
         blendType: BlendTypes.Additive,
-        uiQueueType: UIQueueTypes.AfterTone
+        uiQueueType: UIQueueTypes.AfterTone,
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeTextAfterTone);
-    setUITranslation(uiShapeTextAfterTone, captureScene.uiCamera, createVector3(0, -400, 0))
+    setUITranslation(uiShapeTextAfterTone, captureScene.uiCamera, createVector3(0, -400, 0));
 
     const uiShapeTextOverlay = createUIShapeTextMesh({
         gpu,
@@ -1695,12 +1696,11 @@ const main = async () => {
         fontSize: 36,
         align: TextAlignType.Center,
         blendType: BlendTypes.Additive,
-        uiQueueType: UIQueueTypes.Overlay
+        uiQueueType: UIQueueTypes.Overlay,
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeTextOverlay);
-    setUITranslation(uiShapeTextOverlay, captureScene.uiCamera, createVector3(0, -350, 0))
-
+    setUITranslation(uiShapeTextOverlay, captureScene.uiCamera, createVector3(0, -350, 0));
 
     //
     // instancing mesh
@@ -1780,224 +1780,245 @@ const main = async () => {
         minColor: createColorFromRGB(200, 190, 180, 50),
         maxColor: createColorFromRGB(250, 240, 230, 200),
         particleMap,
+        vertexShaderModifiers: [
+            {
+                pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
+                value: `
+cycleSpeed = .33;
+                `
+            },
+            {
+                pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
+                value: `
+localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+                `,
+            },
+            {
+                pragma: VertexShaderModifierPragmas.VERTEX_COLOR_POST_PROCESS,
+                value: `
+vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+                `,
+            },
+        ],
     });
 
-//     const particleGeometry = createGeometry({
-//         gpu,
-//         attributes: [
-//             createAttribute({
-//                 name: AttributeNames.Position.toString(),
-//                 // dummy data
-//                 data: new Float32Array(
-//                     maton
-//                         .range(particleNum)
-//                         .map(() => {
-//                             const x = Math.random() * 18 - 10;
-//                             const y = Math.random() * 0.5;
-//                             // const y = 3.;
-//                             const z = Math.random() * 18 - 8;
-//                             return [x, y, z, x, y, z, x, y, z, x, y, z];
-//                         })
-//                         .flat()
-//                 ),
-//                 size: 3,
-//             }),
-//             createAttribute({
-//                 name: AttributeNames.Uv.toString(),
-//                 data: new Float32Array(
-//                     maton
-//                         .range(particleNum)
-//                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
-//                         .flat()
-//                 ),
-//                 size: 2,
-//             }),
-//             createAttribute({
-//                 name: AttributeNames.Color.toString(),
-//                 data: new Float32Array(
-//                     maton
-//                         .range(particleNum)
-//                         .map(() => {
-//                             const c = createColorFromRGB(
-//                                 Math.random() * 50 + 200,
-//                                 Math.random() * 50 + 190,
-//                                 Math.random() * 50 + 180,
-//                                 Math.random() * 150 + 50
-//                             );
-//                             return [...c.e, ...c.e, ...c.e, ...c.e];
-//                         })
-//                         .flat()
-//                 ),
-//                 size: 4,
-//             }),
-//             createAttribute({
-//                 name: 'aBillboardSize',
-//                 data: new Float32Array(
-//                     maton
-//                         .range(particleNum)
-//                         .map(() => {
-//                             const s = Math.random() * 3.5 + 0.5;
-//                             return [s, s, s, s];
-//                         })
-//                         .flat()
-//                 ),
-//                 size: 1,
-//             }),
-//             createAttribute({
-//                 name: 'aBillboardRateOffset',
-//                 data: new Float32Array(
-//                     maton
-//                         .range(particleNum)
-//                         .map(() => {
-//                             const r = Math.random();
-//                             return [r, r, r, r];
-//                         })
-//                         .flat()
-//                 ),
-//                 size: 1,
-//             }),
-//         ],
-//         indices: maton
-//             .range(particleNum)
-//             .map((_, i) => {
-//                 const offset = i * 4;
-//                 const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
-//                 return index;
-//             })
-//             .flat(),
-//         drawCount: particleNum * 6,
-//     });
-//     const particleMaterial = createMaterial({
-//         // gpu,
-//         vertexShader: `
-// #pragma DEFINES
-// 
-// #pragma ATTRIBUTES
-// 
-// #include <lighting>
-// #include <ub>
-// 
-// out vec2 vUv;
-// out vec3 vWorldPosition;
-// out vec3 vNormal;
-// 
-// out vec4 vVertexColor;
-// out vec4 vViewPosition;
-// out vec4 vClipPosition;
-// 
-// uniform vec2[4] uBillboardPositionConverters;
-// 
-// void main() {
-//     int particleId = int(mod(float(gl_VertexID), 4.));
-//     float t = 3.;
-//     float r = mod((uTime / t) + aBillboardRateOffset, 1.);
-// 
-//     vec4 localPosition = vec4(aPosition, 1.);
-// 
-//     localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-//     localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
-// 
-//     // assign common varyings 
-//     vUv = aUv; 
-//     vVertexColor = aColor;
-//     vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-// 
-//     vec4 worldPosition = uWorldMatrix * localPosition;
-//   
-//     vWorldPosition = worldPosition.xyz;
-//     
-//     vec4 viewPosition = uViewMatrix * worldPosition;
-//     viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
-//     vViewPosition = viewPosition;
-//     
-//     vec4 clipPosition = uProjectionMatrix * viewPosition;
-//  
-//     gl_Position = clipPosition;
-//     
-//     vClipPosition = clipPosition;
-// }`,
-//         fragmentShader: `
-// #pragma DEFINES
-// 
-// precision highp float;
-// 
-// #include <lighting>
-// #include <ub>
-// #include <depth>
-// 
-// in vec2 vUv;
-// in vec4 vVertexColor;
-// in vec4 vViewPosition;
-// in vec4 vClipPosition;
-// 
-// out vec4 outColor;
-// 
-// uniform sampler2D uParticleMap;
-// 
-// void main() {
-//     // int particleId = int(mod(float(gl_VertexID), 4.));
-// 
-//     vec4 texColor = texture(uParticleMap, vUv);
-//     vec3 baseColor = vVertexColor.xyz;
-//     float alpha = texColor.x * vVertexColor.a;
-//     
-//     // calc soft fade
-//     
-//     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-//     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-//     // for debug
-//     // outColor = vec4(vec3(sceneDepth), 1.);
-// 
-//     float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
-//     // for debug
-//     // outColor = vec4(vec3(currentDepth), 1.);
-//     
-//     float diffDepth = abs(sceneDepth) - abs(currentDepth);
-//     float softFade = smoothstep(0., .01, diffDepth);
-//     // for debug
-//     // outColor = vec4(vec3(softFade), 1.);
-//     
-//     // result
-//     
-//     // outBaseColor = vec4(1., 0., 0., 1.);
-//     // outColor = vec4(1., 0., 0., 1.);
-// 
-//     float fadedAlpha = alpha * softFade;
-//     if(fadedAlpha < .01) {
-//         discard;
-//     }
-// 
-//     outColor = vec4(baseColor, fadedAlpha);
-//     // outBaseColor = vec4(baseColor, fadedAlpha);
-//     // outNormalColor = vec4(0., 0., 1., 1.); // dummy
-// }
-//         `,
-//         uniforms: [
-//             {
-//                 name: 'uParticleMap',
-//                 type: UniformTypes.Texture,
-//                 value: particleMap,
-//             },
-//             {
-//                 name: 'uBillboardPositionConverters',
-//                 type: UniformTypes.Vector2Array,
-//                 value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
-//             },
-//             {
-//                 name: UniformNames.DepthTexture,
-//                 type: UniformTypes.Texture,
-//                 value: null,
-//             },
-//         ],
-//         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
-//         // blendType: BlendTypes.Additive
-//         blendType: BlendTypes.Transparent,
-//         depthWrite: false,
-//     });
-//     const particleMesh = createMesh({
-//         geometry: particleGeometry,
-//         material: particleMaterial,
-//     });
+    //     const particleGeometry = createGeometry({
+    //         gpu,
+    //         attributes: [
+    //             createAttribute({
+    //                 name: AttributeNames.Position.toString(),
+    //                 // dummy data
+    //                 data: new Float32Array(
+    //                     maton
+    //                         .range(particleNum)
+    //                         .map(() => {
+    //                             const x = Math.random() * 18 - 10;
+    //                             const y = Math.random() * 0.5;
+    //                             // const y = 3.;
+    //                             const z = Math.random() * 18 - 8;
+    //                             return [x, y, z, x, y, z, x, y, z, x, y, z];
+    //                         })
+    //                         .flat()
+    //                 ),
+    //                 size: 3,
+    //             }),
+    //             createAttribute({
+    //                 name: AttributeNames.Uv.toString(),
+    //                 data: new Float32Array(
+    //                     maton
+    //                         .range(particleNum)
+    //                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
+    //                         .flat()
+    //                 ),
+    //                 size: 2,
+    //             }),
+    //             createAttribute({
+    //                 name: AttributeNames.Color.toString(),
+    //                 data: new Float32Array(
+    //                     maton
+    //                         .range(particleNum)
+    //                         .map(() => {
+    //                             const c = createColorFromRGB(
+    //                                 Math.random() * 50 + 200,
+    //                                 Math.random() * 50 + 190,
+    //                                 Math.random() * 50 + 180,
+    //                                 Math.random() * 150 + 50
+    //                             );
+    //                             return [...c.e, ...c.e, ...c.e, ...c.e];
+    //                         })
+    //                         .flat()
+    //                 ),
+    //                 size: 4,
+    //             }),
+    //             createAttribute({
+    //                 name: 'aBillboardSize',
+    //                 data: new Float32Array(
+    //                     maton
+    //                         .range(particleNum)
+    //                         .map(() => {
+    //                             const s = Math.random() * 3.5 + 0.5;
+    //                             return [s, s, s, s];
+    //                         })
+    //                         .flat()
+    //                 ),
+    //                 size: 1,
+    //             }),
+    //             createAttribute({
+    //                 name: 'aBillboardRateOffset',
+    //                 data: new Float32Array(
+    //                     maton
+    //                         .range(particleNum)
+    //                         .map(() => {
+    //                             const r = Math.random();
+    //                             return [r, r, r, r];
+    //                         })
+    //                         .flat()
+    //                 ),
+    //                 size: 1,
+    //             }),
+    //         ],
+    //         indices: maton
+    //             .range(particleNum)
+    //             .map((_, i) => {
+    //                 const offset = i * 4;
+    //                 const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
+    //                 return index;
+    //             })
+    //             .flat(),
+    //         drawCount: particleNum * 6,
+    //     });
+    //     const particleMaterial = createMaterial({
+    //         // gpu,
+    //         vertexShader: `
+    // #pragma DEFINES
+    //
+    // #pragma ATTRIBUTES
+    //
+    // #include <lighting>
+    // #include <ub>
+    //
+    // out vec2 vUv;
+    // out vec3 vWorldPosition;
+    // out vec3 vNormal;
+    //
+    // out vec4 vVertexColor;
+    // out vec4 vViewPosition;
+    // out vec4 vClipPosition;
+    //
+    // uniform vec2[4] uBillboardPositionConverters;
+    //
+    // void main() {
+    //     int particleId = int(mod(float(gl_VertexID), 4.));
+    //     float t = 3.;
+    //     float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+    //
+    //     vec4 localPosition = vec4(aPosition, 1.);
+    //
+    //     localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
+    //     localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+    //
+    //     // assign common varyings
+    //     vUv = aUv;
+    //     vVertexColor = aColor;
+    //     vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+    //
+    //     vec4 worldPosition = uWorldMatrix * localPosition;
+    //
+    //     vWorldPosition = worldPosition.xyz;
+    //
+    //     vec4 viewPosition = uViewMatrix * worldPosition;
+    //     viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
+    //     vViewPosition = viewPosition;
+    //
+    //     vec4 clipPosition = uProjectionMatrix * viewPosition;
+    //
+    //     gl_Position = clipPosition;
+    //
+    //     vClipPosition = clipPosition;
+    // }`,
+    //         fragmentShader: `
+    // #pragma DEFINES
+    //
+    // precision highp float;
+    //
+    // #include <lighting>
+    // #include <ub>
+    // #include <depth>
+    //
+    // in vec2 vUv;
+    // in vec4 vVertexColor;
+    // in vec4 vViewPosition;
+    // in vec4 vClipPosition;
+    //
+    // out vec4 outColor;
+    //
+    // uniform sampler2D uParticleMap;
+    //
+    // void main() {
+    //     // int particleId = int(mod(float(gl_VertexID), 4.));
+    //
+    //     vec4 texColor = texture(uParticleMap, vUv);
+    //     vec3 baseColor = vVertexColor.xyz;
+    //     float alpha = texColor.x * vVertexColor.a;
+    //
+    //     // calc soft fade
+    //
+    //     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    //     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    //     // for debug
+    //     // outColor = vec4(vec3(sceneDepth), 1.);
+    //
+    //     float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
+    //     // for debug
+    //     // outColor = vec4(vec3(currentDepth), 1.);
+    //
+    //     float diffDepth = abs(sceneDepth) - abs(currentDepth);
+    //     float softFade = smoothstep(0., .01, diffDepth);
+    //     // for debug
+    //     // outColor = vec4(vec3(softFade), 1.);
+    //
+    //     // result
+    //
+    //     // outBaseColor = vec4(1., 0., 0., 1.);
+    //     // outColor = vec4(1., 0., 0., 1.);
+    //
+    //     float fadedAlpha = alpha * softFade;
+    //     if(fadedAlpha < .01) {
+    //         discard;
+    //     }
+    //
+    //     outColor = vec4(baseColor, fadedAlpha);
+    //     // outBaseColor = vec4(baseColor, fadedAlpha);
+    //     // outNormalColor = vec4(0., 0., 1., 1.); // dummy
+    // }
+    //         `,
+    //         uniforms: [
+    //             {
+    //                 name: 'uParticleMap',
+    //                 type: UniformTypes.Texture,
+    //                 value: particleMap,
+    //             },
+    //             {
+    //                 name: 'uBillboardPositionConverters',
+    //                 type: UniformTypes.Vector2Array,
+    //                 value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
+    //             },
+    //             {
+    //                 name: UniformNames.DepthTexture,
+    //                 type: UniformTypes.Texture,
+    //                 value: null,
+    //             },
+    //         ],
+    //         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
+    //         // blendType: BlendTypes.Additive
+    //         blendType: BlendTypes.Transparent,
+    //         depthWrite: false,
+    //     });
+    //     const particleMesh = createMesh({
+    //         geometry: particleGeometry,
+    //         material: particleMaterial,
+    //     });
 
     // noise -----------------------------------
 

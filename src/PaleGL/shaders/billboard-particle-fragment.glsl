@@ -27,30 +27,16 @@ void main() {
     
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    // for debug
-    // outColor = vec4(vec3(sceneDepth), 1.);
 
     float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
-    // for debug
-    // outColor = vec4(vec3(currentDepth), 1.);
-    
+
     float diffDepth = abs(sceneDepth) - abs(currentDepth);
     float softFade = smoothstep(0., .01, diffDepth);
-    // for debug
-    // outColor = vec4(vec3(softFade), 1.);
-    
-    // result
-    
-    // outBaseColor = vec4(1., 0., 0., 1.);
-    // outColor = vec4(1., 0., 0., 1.);
 
     float fadedAlpha = alpha * softFade;
-    
     if(fadedAlpha < .01) {
         discard;
     }
 
     outColor = vec4(baseColor, fadedAlpha);
-    // outBaseColor = vec4(baseColor, fadedAlpha);
-    // outNormalColor = vec4(0., 0., 1., 1.); // dummy
 }

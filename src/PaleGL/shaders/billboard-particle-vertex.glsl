@@ -17,18 +17,23 @@ uniform vec2[4] uBillboardPositionConverters;
 
 void main() {
     int particleId = int(mod(float(gl_VertexID), 4.));
-    float t = 3.;
-    float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+    float cycleSpeed = 1.;
+    
+    #pragma BEGIN_MAIN
+
+    float r = mod((uTime * cycleSpeed) + aBillboardRateOffset, 1.);
 
     vec4 localPosition = vec4(aPosition, 1.);
 
-    localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-    localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
+    #pragma LOCAL_POSITION_POST_PROCESS
 
-    // assign common varyings 
     vUv = aUv; 
-    vVertexColor = aColor;
-    vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+    
+    vec4 vertexColor = aColor;
+
+    #pragma VERTEX_COLOR_POST_PROCESS
+
+    vVertexColor = vertexColor;
 
     vec4 worldPosition = uWorldMatrix * localPosition;
   

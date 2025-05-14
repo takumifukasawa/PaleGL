@@ -1,7 +1,15 @@
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AttributeNames, BlendTypes, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    AttributeNames,
+    BlendTypes,
+    FragmentShaderModifiers,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+    VertexShaderModifiers,
+} from '@/PaleGL/constants.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Color, getColorRange } from '@/PaleGL/math/color.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
@@ -25,6 +33,8 @@ export type BillboardParticleArgs = {
     maxColor: Color;
     particleNum: number;
     particleMap?: Texture;
+    vertexShaderModifiers?: VertexShaderModifiers;
+    fragmentShaderModifiers?: FragmentShaderModifiers;
 };
 
 export const createBillboardParticle = (args: BillboardParticleArgs) => {
@@ -40,6 +50,8 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         maxSize,
         minColor,
         maxColor,
+        vertexShaderModifiers = [],
+        fragmentShaderModifiers = [],
     } = args;
     const particleGeometry = createGeometry({
         gpu,
@@ -185,6 +197,8 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         ],
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
         // blendType: BlendTypes.Additive
+        vertexShaderModifiers,
+        fragmentShaderModifiers,
         blendType: BlendTypes.Transparent,
         depthWrite: false,
     });
@@ -193,7 +207,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         material: particleMaterial,
     });
 
-    console.log(vertexShader, fragmentShader);
+    console.log(vertexShader, fragmentShader, particleMesh.materials);
 
     return particleMesh;
 };
