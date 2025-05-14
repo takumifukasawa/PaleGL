@@ -8,21 +8,22 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { CreateShapeCharMeshFunc } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
-import {MeshType, UIQueueType, UIQueueTypes} from '@/PaleGL/constants.ts';
-import {createUIActor, UIActor} from "@/PaleGL/actors/meshes/UIActor.ts";
+import { MeshType, UIQueueType, UIQueueTypes } from '@/PaleGL/constants.ts';
 
 type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
+    actor?: Actor;
     text: string;
     color?: Color;
     shapeFontTexture: Texture;
     shapeFontService: ShapeFontService<T, U>;
     shapeFontRenderer: ShapeFontRenderer<T, U>;
     createCharMeshFunc: CreateShapeCharMeshFunc<T, U>;
-    uiQueueType?: UIQueueType;
     meshType: MeshType;
     planeWidth: number;
+    // for ui
+    uiQueueType?: UIQueueType;
 };
 
 export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
@@ -32,40 +33,45 @@ export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
 > & {
     align?: TextAlignType;
     characterSpacing?: number;
+    uiQueueType: UIQueueType;
 };
 
-export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = UIActor & {
+export type ShapeTextMeshBase<T, U extends ShapeFontBase<T>> = {
     container: Actor;
     shapeFontService: ShapeFontService<T, U>;
     shapeFontRenderer: ShapeFontRenderer<T, U>;
     shapeCharMeshes: UnlitShapeCharMesh[];
-    uiQueueType: UIQueueType;
 };
 
 /**
  * TODO: できれば文字のmeshはまとめて1つのgeometryにしたい
  */
-export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(args: ShapeTextMeshBaseArgs<T, U>): ShapeTextMesh<T, U> {
+export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
+    args: ShapeTextMeshBaseArgs<T, U>
+): ShapeTextMeshBase<T, U> {
     const {
         gpu,
-        name,
+        // name,
+        actor,
         text,
         color,
         shapeFontTexture,
         shapeFontRenderer,
         shapeFontService,
         createCharMeshFunc,
-        uiQueueType = UIQueueTypes.None,
         meshType,
-        planeWidth
+        planeWidth,
+        // for ui
+        uiQueueType = UIQueueTypes.None,
     } = args;
-    
+
     // const actor = createActor({ name: name || `shape-text-${text}` });
-    const actor = createUIActor({ name: name || `shape-text-${text}` })
-    
+
     const container = createActor();
-    
-    addChildActor(actor, container);
+
+    if (actor) {
+        addChildActor(actor, container);
+    }
 
     const [shapeFont] = shapeFontService;
 
@@ -79,7 +85,7 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(args: Sha
 
         const colIndex = ci % shapeFont.colNum;
         const rowIndex = Math.floor(ci / shapeFont.colNum);
-        
+
         const shapeCharMesh = createCharMeshFunc({
             gpu,
             name: `shape-char-${char}`,
@@ -90,7 +96,9 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(args: Sha
             x: colIndex,
             y: rowIndex,
             meshType,
-            planeWidth
+            planeWidth,
+            // ui
+            uiQueueType,
         });
 
         shapeCharMeshes.push(shapeCharMesh);
@@ -98,5 +106,5 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(args: Sha
         addChildActor(container, shapeCharMesh);
     }
 
-    return { ...actor, container, shapeFontRenderer, shapeFontService, shapeCharMeshes, uiQueueType };
+    return { container, shapeFontRenderer, shapeFontService, shapeCharMeshes };
 }

@@ -5,6 +5,7 @@ import {
     MeshTypes,
     PrimitiveTypes,
     ShadingModelIds,
+    UIQueueTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -70,19 +71,22 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    return createShapeCharMeshBase({
-        gpu,
-        name,
-        color,
-        fontTexture,
-        material,
-        char,
-        shapeFontRenderer,
-        x,
-        y,
-        castShadow,
-        uniforms: mergedUniforms,
-        meshType: MeshTypes.Default,
-        planeWidth,
-    });
+    return {
+        ...createShapeCharMeshBase({
+            gpu,
+            name,
+            color,
+            fontTexture,
+            material,
+            char,
+            shapeFontRenderer,
+            x,
+            y,
+            castShadow,
+            uniforms: mergedUniforms,
+            meshType: MeshTypes.Default,
+            planeWidth,
+            uiQueueType: UIQueueTypes.None,
+        }),
+    };
 };

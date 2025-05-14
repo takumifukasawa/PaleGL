@@ -2,7 +2,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { addUniformData, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
-import { MeshType, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {MeshType, UIQueueType, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
@@ -24,6 +24,7 @@ type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     material: Material;
     meshType: MeshType;
     planeWidth: number;
+    uiQueueType: UIQueueType;
 } & MeshOptionsArgs;
 
 export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;

@@ -20,7 +20,7 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import { createShapeCharMeshBase, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { UIMesh } from '@/PaleGL/actors/meshes/UIMesh.ts';
+import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 
 export type UIShapeCharMesh = UIMesh & {
     charWidth: number;
@@ -99,6 +99,7 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
             uniforms: mergedUniforms,
             meshType: MeshTypes.UI,
             planeWidth,
+            uiQueueType
         }),
         uiQueueType,
         anchor,

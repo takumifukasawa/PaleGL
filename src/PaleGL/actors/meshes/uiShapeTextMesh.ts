@@ -1,13 +1,18 @@
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
-import { createShapeTextMeshBase, ShapeTextMesh, ShapeTextMeshArgs } from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
+import {
+    createShapeTextMeshBase,
+    ShapeTextMeshArgs,
+    ShapeTextMeshBase
+} from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
 import {BlendType, BlendTypes, MeshTypes, UIQueueType} from '@/PaleGL/constants.ts';
 import { createUIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createVector3, setV3x  } from '@/PaleGL/math/vector3.ts';
 import {setTranslation} from '@/PaleGL/core/transform.ts';
-import { subscribeActorOnSetSize } from '@/PaleGL/actors/actor.ts';
+import {Actor, subscribeActorOnSetSize} from '@/PaleGL/actors/actor.ts';
 import {getOrthoSize} from "@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts";
 import {ShapeCharMeshArgs} from "@/PaleGL/actors/meshes/shapeCharMeshBase.ts";
+import {createUIActor} from "@/PaleGL/actors/meshes/uiActor.ts";
 
 type UIShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshArgs<T, U>, 'planeWidth'> & {
     fontSize?: number;
@@ -15,23 +20,27 @@ type UIShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshArgs
     uiQueueType?: UIQueueType
 };
 
+export type UIShapeTextMesh<T, U extends ShapeFontBase<T>> = ShapeTextMeshBase<T, U> & Actor;
+
 export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     options: UIShapeTextMeshArgs<T, U>
-): ShapeTextMesh<T, U> {
+): UIShapeTextMesh<T, U> {
     const { align, characterSpacing = 0, fontSize = 13, blendType = BlendTypes.Transparent, uiQueueType } = options;
 
+    const actor = options.actor || createUIActor({ name: "ui-shape-text-mesh" });
+    
     const shapeText = createShapeTextMeshBase({
         ...options,
+        actor,
         createCharMeshFunc: (args: ShapeCharMeshArgs<T, U>) => createUIShapeCharMesh({...args, blendType, uiQueueType}),
         // uiQueueType: UIQueueTypes.AfterTone,
         meshType: MeshTypes.UI,
         planeWidth: fontSize,
-        uiQueueType
     });
 
     const { shapeCharMeshes } = shapeText;
 
-    subscribeActorOnSetSize(shapeText, (width, height, _, uiCamera) => {
+    subscribeActorOnSetSize(actor, (width, height, _, uiCamera) => {
         if (!uiCamera) {
             console.error("uiCamera is null");
             return;
@@ -77,5 +86,5 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         setTranslation(shapeText.container.transform, createVector3(offsetX, offsetY, 0));
     });
 
-    return shapeText;
+    return { ...actor, ...shapeText };
 }
