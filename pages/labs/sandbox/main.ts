@@ -1775,8 +1775,8 @@ const main = async () => {
         fragmentShader: billboardParticleFragmentShader,
         minPosition: createVector3(-10, 0, -8),
         maxPosition: createVector3(8, 0.5, 10),
-         minSize: 0.5,
-         maxSize: 4,
+        minSize: 0.5,
+        maxSize: 4,
         minColor: createColorFromRGB(200, 190, 180, 50),
         maxColor: createColorFromRGB(250, 240, 230, 200),
         particleMap,
@@ -1785,7 +1785,7 @@ const main = async () => {
                 pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
                 value: `
 cycleSpeed = .33;
-                `
+                `,
             },
             {
                 pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
