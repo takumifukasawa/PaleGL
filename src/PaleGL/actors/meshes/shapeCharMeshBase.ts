@@ -112,7 +112,7 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
         height: 1,
     });
 
-    // const mesh = createMesh({ name, geometry, material, type: ActorTypes.UIActor, meshType: MeshTypes.Text, castShadow });
+    // const mesh = createMesh({ name, geometry, material, type: ActorTypes.UiActor, meshType: MeshTypes.Text, castShadow });
     const mesh = createMesh({ name, geometry, material, meshType, castShadow });
 
     return {

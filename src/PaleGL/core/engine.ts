@@ -225,7 +225,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         switch (actor.type) {
             case ActorTypes.Skybox:
             case ActorTypes.Mesh:
-                // case ActorTypes.UIActor:
+                // case ActorTypes.UiActor:
                 // case ActorTypes.SkinnedMesh:
                 beforeRenderActor(actor, { gpu: engine.renderer.gpu });
                 const mesh = actor as Mesh;

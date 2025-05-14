@@ -310,21 +310,21 @@ export function createVector3(x: number, y: number, z: number): Vector3 {
         get x() {
             return e[0];
         },
-        set x(value) {
-            e[0] = value;
-        },
+        // set x(value) {
+        //     e[0] = value;
+        // },
         get y() {
             return e[1];
         },
-        set y(value) {
-            e[1] = value;
-        },
+        // set y(value) {
+        //     e[1] = value;
+        // },
         get z() {
             return e[2];
         },
-        set z(value) {
-            e[2] = value;
-        },
+        // set z(value) {
+        //     e[2] = value;
+        // },
     };
 }
 

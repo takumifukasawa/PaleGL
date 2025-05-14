@@ -1,0 +1,56 @@
+
+#pragma DEFINES
+
+precision highp float;
+
+#include <lighting>
+#include <ub>
+#include <depth>
+
+in vec2 vUv;
+in vec4 vVertexColor;
+in vec4 vViewPosition;
+in vec4 vClipPosition;
+
+out vec4 outColor;
+
+uniform sampler2D uParticleMap;
+
+void main() {
+    // int particleId = int(mod(float(gl_VertexID), 4.));
+
+    vec4 texColor = texture(uParticleMap, vUv);
+    vec3 baseColor = vVertexColor.xyz;
+    float alpha = texColor.x * vVertexColor.a;
+    
+    // calc soft fade
+    
+    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    // for debug
+    // outColor = vec4(vec3(sceneDepth), 1.);
+
+    float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
+    // for debug
+    // outColor = vec4(vec3(currentDepth), 1.);
+    
+    float diffDepth = abs(sceneDepth) - abs(currentDepth);
+    float softFade = smoothstep(0., .01, diffDepth);
+    // for debug
+    // outColor = vec4(vec3(softFade), 1.);
+    
+    // result
+    
+    // outBaseColor = vec4(1., 0., 0., 1.);
+    // outColor = vec4(1., 0., 0., 1.);
+
+    float fadedAlpha = alpha * softFade;
+    
+    if(fadedAlpha < .01) {
+        discard;
+    }
+
+    outColor = vec4(baseColor, fadedAlpha);
+    // outBaseColor = vec4(baseColor, fadedAlpha);
+    // outNormalColor = vec4(0., 0., 1., 1.); // dummy
+}

@@ -18,9 +18,9 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { UIActor } from '@/PaleGL/actors/meshes/UIActor.ts';
+import { UiActor } from '@/PaleGL/actors/meshes/uiActor.ts';
 
-export type UIShapeCharMesh = UIActor & {
+export type UIShapeCharMesh = UiActor & {
     charWidth: number;
     charHeight: number;
     char: string;

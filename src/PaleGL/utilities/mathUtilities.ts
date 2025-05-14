@@ -130,3 +130,7 @@ export function randomOnUnitCircle(id: number, scale: number, v: Vector3) {
     // return new Vector3(x * r, 0, z * r);
     setV3(v, x * r, 0, z * r);
 }
+
+export function random() {
+    return Math.random();
+}

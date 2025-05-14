@@ -1,7 +1,7 @@
 import { UIAnchorType, UIAnchorTypes } from '@/PaleGL/constants.ts';
 import { Actor, ActorArgs, createActor } from '@/PaleGL/actors/actor.ts';
 
-export type UIActor = Actor & {
+export type UiActor = Actor & {
     anchor: UIAnchorType;
     // uiQueueType: UIQueueType;
 };
@@ -11,7 +11,7 @@ export type UIActorArgs = ActorArgs & {
     // uiQueueType?: UIQueueType;
 };
 
-export function createUIActor(args: UIActorArgs): UIActor {
+export function createUIActor(args: UIActorArgs): UiActor {
     const { anchor = UIAnchorTypes.Center } = args;
     return {
         ...createActor(args),

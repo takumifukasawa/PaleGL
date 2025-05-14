@@ -90,7 +90,7 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
-    // UIActor: 2,
+    // UiActor: 2,
     // SkinnedMesh: 2,
     Light: 2,
     Skybox: 3,
