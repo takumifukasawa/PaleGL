@@ -3,7 +3,9 @@ import {
     BlendType,
     DepthFuncTypes,
     MeshTypes,
-    PrimitiveTypes, UIAnchorType, UIAnchorTypes,
+    PrimitiveTypes,
+    UIAnchorType,
+    UIAnchorTypes,
     UIQueueType,
     UIQueueTypes,
     UniformBlockNames,
@@ -18,7 +20,7 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
 import { createShapeCharMeshBase, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import {UIMesh} from "@/PaleGL/actors/meshes/UIMesh.ts";
+import { UIMesh } from '@/PaleGL/actors/meshes/UIMesh.ts';
 
 export type UIShapeCharMesh = UIMesh & {
     charWidth: number;
@@ -29,7 +31,7 @@ export type UIShapeCharMesh = UIMesh & {
 export type UIShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = ShapeCharMeshArgs<T, U> & {
     blendType?: BlendType;
     uiQueueType?: UIQueueType;
-    anchor?: UIAnchorType
+    anchor?: UIAnchorType;
 };
 
 export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
@@ -47,7 +49,7 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     planeWidth,
     blendType,
     uiQueueType = UIQueueTypes.None,
-    anchor = UIAnchorTypes.Center
+    anchor = UIAnchorTypes.Center,
 }: UIShapeCharMeshArgs<T, U>): UIShapeCharMesh => {
     const mergedUniforms: UniformsData = [
         {
