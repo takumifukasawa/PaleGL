@@ -18,10 +18,11 @@ uniform vec2[4] uBillboardPositionConverters;
 void main() {
     int particleId = int(mod(float(gl_VertexID), 4.));
     float cycleSpeed = 1.;
+    float cycleOffset = aBillboardCycleOffset;
     
     #pragma BEGIN_MAIN
 
-    float r = mod((uTime * cycleSpeed) + aBillboardRateOffset, 1.);
+    float r = mod((uTime * cycleSpeed) + cycleOffset, 1.);
 
     vec4 localPosition = vec4(aPosition, 1.);
 

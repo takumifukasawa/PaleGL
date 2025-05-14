@@ -76,7 +76,7 @@ export const setV2y = (v2: Vector2, value: number) => (v2.e[1] = value);
 export const setV2 = (v2: Vector2, x: number, y: number) => {
     setV2x(v2, x);
     setV2y(v2, y);
-}
+};
 export const v2o = (v2: Vector2) => ({ x: v2x(v2), y: v2y(v2) });
 
 export function createVector2Identity() {
@@ -111,4 +111,11 @@ export function logVector2(v: Vector2) {
     console.log(`--------------------
 ${v2x(v)}, ${v2y(v)}
 --------------------`);
+}
+
+export function isVector2(v: unknown) {
+    if (Object.hasOwn(v as object, 'e')) {
+        return (v as Vector2).e.length === 2;
+    }
+    return false;
 }

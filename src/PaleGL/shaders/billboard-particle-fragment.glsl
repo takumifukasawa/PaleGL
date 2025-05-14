@@ -18,6 +18,9 @@ uniform sampler2D uParticleMap;
 
 void main() {
     // int particleId = int(mod(float(gl_VertexID), 4.));
+    
+    outColor = vec4(1., 0., 0., 1.);
+    return;
 
     vec4 texColor = texture(uParticleMap, vUv);
     vec3 baseColor = vVertexColor.xyz;

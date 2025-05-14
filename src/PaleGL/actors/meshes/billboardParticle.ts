@@ -2,7 +2,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
-    AttributeNames,
+    AttributeNames, BlendType,
     BlendTypes,
     FragmentShaderModifiers,
     UniformBlockNames,
@@ -13,7 +13,7 @@ import {
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Color, getColorRange } from '@/PaleGL/math/color.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { createVector2, isVector2, v2x, v2y, Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { random, randomRange } from '@/PaleGL/utilities/mathUtilities.ts';
 import { v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
@@ -27,12 +27,13 @@ export type BillboardParticleArgs = {
     fragmentShader: string;
     minPosition: Vector3;
     maxPosition: Vector3;
-    minSize: number;
-    maxSize: number;
+    minSize: Vector2 | number;
+    maxSize: Vector2 | number;
     minColor: Color;
     maxColor: Color;
     particleNum: number;
     particleMap?: Texture;
+    blendType?: BlendType;
     vertexShaderModifiers?: VertexShaderModifiers;
     fragmentShaderModifiers?: FragmentShaderModifiers;
 };
@@ -50,6 +51,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         maxSize,
         minColor,
         maxColor,
+        blendType = BlendTypes.Transparent,
         vertexShaderModifiers = [],
         fragmentShaderModifiers = [],
     } = args;
@@ -121,21 +123,30 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                     maton
                         .range(particleNum)
                         .map(() => {
-                            const s = randomRange(minSize, maxSize);
+                            let sx,
+                                sy = 0;
+                            if (isVector2(minSize) && isVector2(maxSize)) {
+                                sx = randomRange(v2x(minSize as Vector2), v2x(maxSize as Vector2));
+                                sy = randomRange(v2y(minSize as Vector2), v2y(maxSize as Vector2));
+                            } else {
+                                const s = randomRange(minSize as number, maxSize as number);
+                                sx = s;
+                                sy = s;
+                            }
+                            // prettier-ignore
                             return [
-                                // prettier-ignore
-                                s,
-                                s,
-                                s,
-                                s,
+                                sx, sy,
+                                sx, sy,
+                                sx, sy,
+                                sx, sy
                             ];
                         })
                         .flat()
                 ),
-                size: 1,
+                size: 2,
             }),
             createAttribute({
-                name: 'aBillboardRateOffset',
+                name: 'aBillboardCycleOffset',
                 data: new Float32Array(
                     maton
                         .range(particleNum)
@@ -199,15 +210,13 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         // blendType: BlendTypes.Additive
         vertexShaderModifiers,
         fragmentShaderModifiers,
-        blendType: BlendTypes.Transparent,
+        blendType,
         depthWrite: false,
     });
     const particleMesh = createMesh({
         geometry: particleGeometry,
         material: particleMaterial,
     });
-
-    console.log(vertexShader, fragmentShader, particleMesh.materials);
 
     return particleMesh;
 };
