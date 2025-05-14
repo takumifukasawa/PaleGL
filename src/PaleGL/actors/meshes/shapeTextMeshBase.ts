@@ -9,7 +9,7 @@ import { Color } from '@/PaleGL/math/color.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { CreateShapeCharMeshFunc } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import {MeshType, UIQueueType, UIQueueTypes} from '@/PaleGL/constants.ts';
-import {createUIActor, UiActor} from "@/PaleGL/actors/meshes/uiActor.ts";
+import {createUIActor, UIActor} from "@/PaleGL/actors/meshes/UIActor.ts";
 
 type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
@@ -34,7 +34,7 @@ export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
     characterSpacing?: number;
 };
 
-export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = UiActor & {
+export type ShapeTextMesh<T, U extends ShapeFontBase<T>> = UIActor & {
     container: Actor;
     shapeFontService: ShapeFontService<T, U>;
     shapeFontRenderer: ShapeFontRenderer<T, U>;

@@ -16,11 +16,11 @@ import uiShapeTextFrag from '@/PaleGL/shaders/ui-shape-text-fragment.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createColorWhite } from '@/PaleGL/math/color.ts';
-import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
+import { createShapeCharMeshBase, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { UiActor } from '@/PaleGL/actors/meshes/uiActor.ts';
+import {UIMesh} from "@/PaleGL/actors/meshes/UIMesh.ts";
 
-export type UIShapeCharMesh = UiActor & {
+export type UIShapeCharMesh = UIMesh & {
     charWidth: number;
     charHeight: number;
     char: string;
@@ -34,7 +34,7 @@ export type UIShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = ShapeCharMeshAr
 
 export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     options: UIShapeCharMeshArgs<T, U>
-) => ShapeCharMesh = <T, U extends ShapeFontBase<T>>({
+) => UIShapeCharMesh = <T, U extends ShapeFontBase<T>>({
     gpu,
     name = '',
     color = createColorWhite(),

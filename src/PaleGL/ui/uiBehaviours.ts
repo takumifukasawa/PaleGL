@@ -1,10 +1,10 @@
 import { setV3x, setV3y, setV3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 // import { getOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { UiActor } from '@/PaleGL/actors/meshes/uiActor.ts';
+import { UIActor } from '@/PaleGL/actors/meshes/UIActor.ts';
 import { UIAnchorTypes } from '@/PaleGL/constants.ts';
 
-export const setUITranslation = (uiActor: UiActor, uiCamera: OrthographicCamera | null, position: Vector3) => {
+export const setUITranslation = (uiActor: UIActor, uiCamera: OrthographicCamera | null, position: Vector3) => {
     if (!uiCamera) {
         console.warn('uiCamera is null');
         return;
