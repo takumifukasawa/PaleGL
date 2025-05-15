@@ -33,7 +33,7 @@ export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
 > & {
     align?: TextAlignType;
     characterSpacing?: number;
-    uiQueueType: UIQueueType;
+    uiQueueType?: UIQueueType;
 };
 
 export type ShapeTextMeshBase<T, U extends ShapeFontBase<T>> = {
