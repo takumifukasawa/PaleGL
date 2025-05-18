@@ -1,11 +1,10 @@
 import {
     addVector3Array,
-    createVector3,
     createVector3Zero,
     lerpVector3,
-    rotateVector3DegreeX,
-    rotateVector3DegreeY,
-    scaleVector3ByScalar,
+    createRotateVector3DegreeX,
+    createRotateVector3DegreeY,
+    scaleVector3ByScalar, v3forward,
 } from '@/PaleGL/math/vector3.ts';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.js';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
@@ -124,8 +123,8 @@ function updateCameraPosition(orbitCameraController: OrbitCameraController, isJu
         orbitCameraController.maxAltitude
     );
 
-    const v1 = rotateVector3DegreeX(createVector3(0, 0, 1), orbitCameraController.cameraAngle.altitude);
-    const v2 = rotateVector3DegreeY(v1, orbitCameraController.cameraAngle.azimuth);
+    const v1 = createRotateVector3DegreeX(v3forward, orbitCameraController.cameraAngle.altitude);
+    const v2 = createRotateVector3DegreeY(v1, orbitCameraController.cameraAngle.azimuth);
     orbitCameraController.targetCameraPosition = addVector3Array(
         orbitCameraController.lookAtTarget,
         scaleVector3ByScalar(v2, orbitCameraController.distance)
