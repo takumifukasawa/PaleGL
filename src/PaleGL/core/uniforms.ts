@@ -196,9 +196,5 @@ export const addUniformBlock = (
     uniformBufferObject: UniformBufferObject,
     data: UniformBufferObjectBlockData
 ) => {
-    // const blockIndex = uniformBufferObject.gpu.gl.getUniformBlockIndex(
-    //     this.shader.glObject,
-    // //     uniformBufferObject.blockName
-    // );
     uniforms.uniformBlocks.push({ blockIndex, uniformBufferObject, data });
 };
