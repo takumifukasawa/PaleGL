@@ -1821,7 +1821,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
 out vec4 outColor;
 void main() {
-    outColor = vec4(1., 0., 0., 1.);
+    outColor = vec4(sin(uTime * 5.) * .5 + .5, 0., 0., 1.);
 }
     `;
     const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer(gpu, testFragmentShader, [], []);
@@ -1833,12 +1833,14 @@ void main() {
         setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
         setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
         tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
-        updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
         setUniformValue(
             getMeshMaterial(testGraphicsDoubleBufferTextureMesh).uniforms,
             UniformNames.BaseMap,
             getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture
         );
+    });
+    subscribeActorOnUpdate(testGraphicsDoubleBufferTextureMesh, () => {
+        updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
 
