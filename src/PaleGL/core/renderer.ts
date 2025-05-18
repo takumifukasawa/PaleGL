@@ -114,7 +114,7 @@ import {
     createVector3,
     createVector3Zero,
     getVector3Magnitude,
-    subVectorsV3,
+    subVectorsV3, subVectorsV3Ref,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
@@ -732,11 +732,9 @@ export function setRendererStats(renderer: Renderer, stats: Stats | null) {
 
 // TODO: materialのstartの中でやりたい
 export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, material: Material) {
-    // mesh.materials.forEach((material) => {
     if (material.boundUniformBufferObjects) {
         return;
     }
-    material.boundUniformBufferObjects = true;
     // for debug
     material.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
@@ -761,7 +759,7 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
         // );
         addUniformBlock(material.uniforms, blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
     });
-    // });
+    material.boundUniformBufferObjects = true;
 }
 
 export const tryStartMaterial = (gpu: Gpu, renderer: Renderer, geometry: Geometry, material: Material) => {
@@ -2231,6 +2229,10 @@ function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]
     );
 }
 
+// ソート用の一時変数vec3. GC対策
+let tmpSortVA = createVector3Zero();
+let tmpSortVB = createVector3Zero();
+
 function createRenderMeshInfosEachPass(
     renderMeshInfoEachQueue: RenderMeshInfoEachQueue,
     camera: Camera
@@ -2238,28 +2240,44 @@ function createRenderMeshInfosEachPass(
     const basePass = [RenderQueueType.Opaque, RenderQueueType.AlphaTest]
         .map((queue) => {
             return [...renderMeshInfoEachQueue[queue]].sort((a, b) => {
-                const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-                const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+                // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+                // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+                subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+                subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+                const al = getVector3Magnitude(tmpSortVA);
+                const bl = getVector3Magnitude(tmpSortVB);
                 return al < bl ? -1 : 1;
             });
         })
         .flat();
 
     const skyboxPass = [...renderMeshInfoEachQueue[RenderQueueType.Skybox]].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
         return al < bl ? -1 : 1;
     });
 
     const afterTonePass = [...renderMeshInfoEachQueue[RenderQueueType.AfterTone]].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
         return al >= bl ? -1 : 1;
     });
 
     const transparentPass = [...renderMeshInfoEachQueue[RenderQueueType.Transparent]].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        tmpSortVA = subVectorsV3(camera.transform.position, a.actor.transform.position);
+        tmpSortVB = subVectorsV3(camera.transform.position, b.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
         return al >= bl ? -1 : 1;
     });
 
