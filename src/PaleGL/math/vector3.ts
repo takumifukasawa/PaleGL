@@ -241,7 +241,7 @@ export function crossVectorsV3(v1: Vector3, v2: Vector3) {
     );
 }
 
-export function rotateVector3DegreeX(v: Vector3, degree: number) {
+export function createRotateVector3DegreeX(v: Vector3, degree: number) {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
@@ -254,7 +254,7 @@ export function rotateVector3DegreeX(v: Vector3, degree: number) {
     return createVector3(rx, ry, rz);
 }
 
-export function rotateVector3DegreeY(v: Vector3, degree: number) {
+export function createRotateVector3DegreeY(v: Vector3, degree: number) {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
@@ -267,7 +267,7 @@ export function rotateVector3DegreeY(v: Vector3, degree: number) {
     return createVector3(rx, ry, rz);
 }
 
-export function rotateVector3DegreeZ(v: Vector3, degree: number) {
+export function createRotateVector3DegreeZ(v: Vector3, degree: number) {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
