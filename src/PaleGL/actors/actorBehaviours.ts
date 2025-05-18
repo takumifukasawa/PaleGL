@@ -15,18 +15,18 @@ import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshB
 import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
-import {TimelinePropertyValue} from "@/Marionetter/types";
-import {OrthographicCamera} from "@/PaleGL/actors/cameras/orthographicCamera.ts";
+import { TimelinePropertyValue } from '@/Marionetter/types';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 
 // try start actor -------------------------------------------------------
 
-export const tryStartActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
+export const tryStartActor = (actor: Actor, args: ActorStartArgs) => {
     if (actor.isStarted) {
         return;
     }
     actor.isStarted = true;
     // console.log("hogehoge - try start actor", actor.name, actor.isStarted)
-    startActor(actor, { gpu, scene });
+    startActor(actor, args);
 };
 
 // start actor -------------------------------------------------------
@@ -47,7 +47,7 @@ export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu
     [ActorTypes.Skybox]: startMesh,
 };
 
-const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
+const startActor = (actor: Actor, args: ActorStartArgs) => {
     // // startの場合は必ず共通処理を通す
     // actor.components.forEach((component) => {
     //     component.start({ gpu, scene });
@@ -56,19 +56,31 @@ const startActor = (actor: Actor, { gpu, scene }: ActorStartArgs) => {
     //     cb({ gpu, scene });
     // });
 
-    (startActorBehaviour[actor.type] ?? startActorBehaviourBase)(actor, { gpu, scene });
+    (startActorBehaviour[actor.type] ?? startActorBehaviourBase)(actor, args);
 };
 
 // set size -------------------------------------------------------
 
-export type SetSizeActorFunc = (actor: Actor, width: number, height: number, camera: Camera | null, uiCamera: OrthographicCamera | null) => void;
+export type SetSizeActorFunc = (
+    actor: Actor,
+    width: number,
+    height: number,
+    camera: Camera | null,
+    uiCamera: OrthographicCamera | null
+) => void;
 
 const setSizeActorBehaviour: Partial<Record<ActorType, SetSizeActorFunc>> = {
     [ActorTypes.Camera]: setSizeCamera,
     [ActorTypes.Mesh]: setSizeMesh,
 };
 
-export const setSizeActor: SetSizeActorFunc = (actor, width, height, camera: Camera | null = null, uiCamera: OrthographicCamera | null = null) => {
+export const setSizeActor: SetSizeActorFunc = (
+    actor,
+    width,
+    height,
+    camera: Camera | null = null,
+    uiCamera: OrthographicCamera | null = null
+) => {
     actor.onSetSize.forEach((cb) => {
         cb(width, height, camera, uiCamera);
     });
@@ -77,8 +89,9 @@ export const setSizeActor: SetSizeActorFunc = (actor, width, height, camera: Cam
 
 // fixed update -------------------------------------------------------
 
-export const fixedUpdateActor = (actor: Actor, { gpu, scene, fixedTime, fixedDeltaTime }: ActorFixedUpdateArgs) => {
-    tryStartActor(actor, { gpu, scene });
+export const fixedUpdateActor = (actor: Actor, args: ActorFixedUpdateArgs) => {
+    const { gpu, renderer, scene, fixedTime, fixedDeltaTime } = args;
+    tryStartActor(actor, { gpu, scene, renderer });
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onFixedUpdateCallback?.(actor, model, gpu, fixedTime, fixedDeltaTime);
     });
@@ -103,9 +116,10 @@ const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
 };
 
 // update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
-export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTime }) => {
+export const updateActor: UpdateActorFunc = (actor, args) => {
+    const { gpu, scene, renderer, time, deltaTime } = args;
     // updateの場合は必ず共通処理を通す
-    tryStartActor(actor, { gpu, scene });
+    tryStartActor(actor, { gpu, scene, renderer });
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });
@@ -114,13 +128,14 @@ export const updateActor: UpdateActorFunc = (actor, { gpu, scene, time, deltaTim
     });
 
     // console.log(actor.type, actor.name)
-    updateActorBehaviour[actor.type]?.(actor, { gpu, scene, time, deltaTime });
+    updateActorBehaviour[actor.type]?.(actor, { gpu, scene, renderer, time, deltaTime });
 };
 
 //
 
-export const lastUpdateActor = (actor: Actor, { gpu, scene, time, deltaTime }: ActorLastUpdateArgs) => {
-    tryStartActor(actor, { gpu, scene });
+export const lastUpdateActor = (actor: Actor, args: ActorLastUpdateArgs) => {
+    const { gpu, scene, renderer, time, deltaTime } = args;
+    tryStartActor(actor, { gpu, renderer, scene });
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onLastUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });

@@ -33,7 +33,12 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial
+} from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import {
     addPostProcessPass,
@@ -46,8 +51,8 @@ import {
     updatePostProcess,
 } from '@/PaleGL/postprocess/postProcess.ts';
 import {
-    blitRenderTarget,
-    blitRenderTargetDepth,
+    copyRenderTargetColor,
+    copyRenderTargetDepth,
     createRenderTarget,
     RenderTarget,
     setRenderTargetDepthTexture,
@@ -151,6 +156,7 @@ import {
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import { rotateVectorByQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { UIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
+import {getGeometryAttributeDescriptors} from "@/PaleGL/geometries/geometryBehaviours.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
 
@@ -758,6 +764,16 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
     // });
 }
 
+export const tryStartMaterial = (gpu: Gpu, renderer: Renderer, geometry: Geometry, material: Material) => {
+    if (!isCompiledMaterialShader(material)) {
+        startMaterial(material, {
+            gpu,
+            attributeDescriptors: getGeometryAttributeDescriptors(geometry),
+        });
+        checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
+    }
+}
+
 export function setRendererSize(renderer: Renderer, realWidth: number, realHeight: number) {
     const w = Math.floor(realWidth);
     const h = Math.floor(realHeight);
@@ -794,14 +810,8 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setPostProcessPassSize(renderer.fxaaPass, w, h);
 }
 
-/**
- *
- * @param renderTarget
- * @param clearColor
- * @param clearDepth
- */
 // TODO: 本当はclearcolorの色も渡せるとよい
-export function setRendererRenderTarget(
+export function setRenderTargetToRendererAndClear(
     renderer: Renderer,
     renderTarget: CameraRenderTargetType,
     clearColor: boolean = false,
@@ -825,6 +835,23 @@ export function setRendererRenderTarget(
     if (clearDepth) {
         clearGPUDepth(renderer.gpu, 1, 1, 1, 1);
     }
+}
+
+// render target に焼いて元の状態に戻す
+export function blitRenderTarget(
+    renderer: Renderer,
+    renderTarget: RenderTarget,
+    geometry: Geometry,
+    material: Material,
+) {
+    // 前の状態を保持
+    const tmpRenderTarget = renderer.renderTarget;
+    const tmpClearColorDirtyFlag = renderer.clearColorDirtyFlag;
+    setRenderTargetToRendererAndClear(renderer, renderTarget, true, false);
+    renderMesh(renderer, geometry, material);
+    // アサインし直す
+    renderer.renderTarget = tmpRenderTarget;
+    renderer.clearColorDirtyFlag = tmpClearColorDirtyFlag;
 }
 
 export function flushRenderer(renderer: Renderer) {
@@ -1024,7 +1051,7 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
-    setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, true);
+    setRenderTargetToRendererAndClear(renderer, renderer.gBufferRenderTargets, true);
 
     // TODO: 本当はskyboxをshadingの後にしたい
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
@@ -1266,7 +1293,7 @@ export function renderRenderer(
         );
     });
 
-    setRendererRenderTarget(renderer, renderer.afterDeferredShadingRenderTarget);
+    setRenderTargetToRendererAndClear(renderer, renderer.afterDeferredShadingRenderTarget);
 
     renderTransparentPass(
         renderer,
@@ -1480,7 +1507,7 @@ export function setUniformBlockValue(
 export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
     // console.log("--------- depth pre pass ---------");
 
-    setRendererRenderTarget(renderer, renderer.depthPrePassRenderTarget, false, true);
+    setRenderTargetToRendererAndClear(renderer, renderer.depthPrePassRenderTarget, false, true);
     updateRendererCameraUniforms(renderer, camera);
 
     depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
@@ -1515,7 +1542,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
 
 function copyDepthTexture(renderer: Renderer) {
     setRenderTargetDepthTexture(renderer.copyDepthSourceRenderTarget, renderer.depthPrePassRenderTarget.depthTexture!);
-    blitRenderTargetDepth(
+    copyRenderTargetDepth(
         renderer.gpu,
         renderer.copyDepthSourceRenderTarget,
         renderer.copyDepthDestRenderTarget,
@@ -1526,16 +1553,16 @@ function copyDepthTexture(renderer: Renderer) {
 
 function copySceneTexture(renderer: Renderer, sceneTexture: Texture) {
     const tmpRenderTarget = renderer.renderTarget;
-    setRendererRenderTarget(renderer, null, false, false);
+    setRenderTargetToRendererAndClear(renderer, null, false, false);
     setRenderTargetTexture(renderer.copySceneSourceRenderTarget, sceneTexture);
-    blitRenderTarget(
+    copyRenderTargetColor(
         renderer.gpu,
         renderer.copySceneSourceRenderTarget,
         renderer.copySceneDestRenderTarget,
         renderer.realWidth,
         renderer.realHeight
     );
-    setRendererRenderTarget(renderer, tmpRenderTarget);
+    setRenderTargetToRendererAndClear(renderer, tmpRenderTarget);
 }
 
 function shadowPass(
@@ -1570,7 +1597,7 @@ function shadowPass(
             return;
         }
 
-        setRendererRenderTarget(renderer, lightActor.shadowMap, false, true);
+        setRenderTargetToRendererAndClear(renderer, lightActor.shadowMap, false, true);
         // this.clear(0, 0, 0, 1);
         // this._gpu.clearDepth(0, 0, 0, 1);
 
@@ -1692,9 +1719,9 @@ function renderBasePass(
             // pre-passしてないmaterialの場合はdepthをcopy.
             // pre-passしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
             if (targetMaterial.skipDepthPrePass) {
-                setRendererRenderTarget(renderer, null, false, false);
+                setRenderTargetToRendererAndClear(renderer, null, false, false);
                 copyDepthTexture(renderer);
-                setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, false, false);
+                setRenderTargetToRendererAndClear(renderer, renderer.gBufferRenderTargets, false, false);
             }
 
             // TODO: material 側でやった方がよい？

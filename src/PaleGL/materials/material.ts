@@ -12,7 +12,7 @@
     FragmentShaderModifiers,
     DepthFuncType,
     DepthFuncTypes,
-    RenderQueueType, MaterialTypes, DepthFragmentShaderModifiers,
+    RenderQueueType, MaterialTypes, DepthFragmentShaderModifiers, UniformBlockName,
 } from '@/PaleGL/constants';
 import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
@@ -42,7 +42,7 @@ export type MaterialArgs = {
     // optional
 
     uniforms?: UniformsData;
-    uniformBlockNames?: string[];
+    uniformBlockNames?: UniformBlockName[];
 
     name?: string;
 
@@ -131,7 +131,8 @@ export type Material = {
     primitiveType: PrimitiveType,
     blendType: BlendType,
     renderQueueType: RenderQueueType,
-    uniformBlockNames : string[],
+    // uniformBlockNames : string[],
+    uniformBlockNames : UniformBlockName[],
     depthTest: boolean,
     depthWrite: boolean,
     depthFuncType: DepthFuncType,
@@ -271,7 +272,7 @@ export function createMaterial(args: MaterialArgs): Material {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 
-    const uniformBlockNames: string[] = uniqFunc(args.uniformBlockNames || []);
+    const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
     
     // isAddedUniformBlock: boolean = false;
     depthTest = !!depthTest;
@@ -559,4 +560,5 @@ export const startMaterial = (material: Material, { gpu, attributeDescriptors }:
 
     // for debug
     // console.log(`[material.start] shader`, _shader);
+
 }

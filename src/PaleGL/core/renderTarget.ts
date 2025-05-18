@@ -752,7 +752,7 @@ export function setRenderTargetDepthTexture(renderTarget: RenderTarget, depthTex
     unbindFramebuffer(renderTarget.framebuffer);
 }
 
-export function blitRenderTarget(
+export function copyRenderTargetColor(
     gpu: Gpu,
     sourceRenderTarget: RenderTarget,
     destRenderTarget: RenderTarget,
@@ -770,7 +770,7 @@ export function blitRenderTarget(
     gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
 }
 
-export function blitRenderTargetDepth(
+export function copyRenderTargetDepth(
     gpu: Gpu,
     sourceRenderTarget: RenderTarget,
     destRenderTarget: RenderTarget,

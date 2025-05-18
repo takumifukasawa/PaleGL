@@ -18,7 +18,11 @@ import {
     setSceneToEngine,
     startEngine,
 } from '@/PaleGL/core/engine.ts';
-import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
+import {
+    createRenderer,
+    renderRenderer,
+    tryStartMaterial
+} from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
@@ -39,7 +43,10 @@ import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {
+    Material,
+    setMaterialUniformValue,
+} from '@/PaleGL/materials/material.ts';
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
@@ -169,6 +176,8 @@ import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextM
 import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
+import { getReadRenderTargetOfDoubleBuffer } from '@/PaleGL/core/doubleBuffer.ts';
+import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1803,222 +1812,35 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
         ],
     });
 
-    //     const particleGeometry = createGeometry({
-    //         gpu,
-    //         attributes: [
-    //             createAttribute({
-    //                 name: AttributeNames.Position.toString(),
-    //                 // dummy data
-    //                 data: new Float32Array(
-    //                     maton
-    //                         .range(particleNum)
-    //                         .map(() => {
-    //                             const x = Math.random() * 18 - 10;
-    //                             const y = Math.random() * 0.5;
-    //                             // const y = 3.;
-    //                             const z = Math.random() * 18 - 8;
-    //                             return [x, y, z, x, y, z, x, y, z, x, y, z];
-    //                         })
-    //                         .flat()
-    //                 ),
-    //                 size: 3,
-    //             }),
-    //             createAttribute({
-    //                 name: AttributeNames.Uv.toString(),
-    //                 data: new Float32Array(
-    //                     maton
-    //                         .range(particleNum)
-    //                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
-    //                         .flat()
-    //                 ),
-    //                 size: 2,
-    //             }),
-    //             createAttribute({
-    //                 name: AttributeNames.Color.toString(),
-    //                 data: new Float32Array(
-    //                     maton
-    //                         .range(particleNum)
-    //                         .map(() => {
-    //                             const c = createColorFromRGB(
-    //                                 Math.random() * 50 + 200,
-    //                                 Math.random() * 50 + 190,
-    //                                 Math.random() * 50 + 180,
-    //                                 Math.random() * 150 + 50
-    //                             );
-    //                             return [...c.e, ...c.e, ...c.e, ...c.e];
-    //                         })
-    //                         .flat()
-    //                 ),
-    //                 size: 4,
-    //             }),
-    //             createAttribute({
-    //                 name: 'aBillboardSize',
-    //                 data: new Float32Array(
-    //                     maton
-    //                         .range(particleNum)
-    //                         .map(() => {
-    //                             const s = Math.random() * 3.5 + 0.5;
-    //                             return [s, s, s, s];
-    //                         })
-    //                         .flat()
-    //                 ),
-    //                 size: 1,
-    //             }),
-    //             createAttribute({
-    //                 name: 'aBillboardRateOffset',
-    //                 data: new Float32Array(
-    //                     maton
-    //                         .range(particleNum)
-    //                         .map(() => {
-    //                             const r = Math.random();
-    //                             return [r, r, r, r];
-    //                         })
-    //                         .flat()
-    //                 ),
-    //                 size: 1,
-    //             }),
-    //         ],
-    //         indices: maton
-    //             .range(particleNum)
-    //             .map((_, i) => {
-    //                 const offset = i * 4;
-    //                 const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
-    //                 return index;
-    //             })
-    //             .flat(),
-    //         drawCount: particleNum * 6,
-    //     });
-    //     const particleMaterial = createMaterial({
-    //         // gpu,
-    //         vertexShader: `
-    // #pragma DEFINES
-    //
-    // #pragma ATTRIBUTES
-    //
-    // #include <lighting>
-    // #include <ub>
-    //
-    // out vec2 vUv;
-    // out vec3 vWorldPosition;
-    // out vec3 vNormal;
-    //
-    // out vec4 vVertexColor;
-    // out vec4 vViewPosition;
-    // out vec4 vClipPosition;
-    //
-    // uniform vec2[4] uBillboardPositionConverters;
-    //
-    // void main() {
-    //     int particleId = int(mod(float(gl_VertexID), 4.));
-    //     float t = 3.;
-    //     float r = mod((uTime / t) + aBillboardRateOffset, 1.);
-    //
-    //     vec4 localPosition = vec4(aPosition, 1.);
-    //
-    //     localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-    //     localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
-    //
-    //     // assign common varyings
-    //     vUv = aUv;
-    //     vVertexColor = aColor;
-    //     vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-    //
-    //     vec4 worldPosition = uWorldMatrix * localPosition;
-    //
-    //     vWorldPosition = worldPosition.xyz;
-    //
-    //     vec4 viewPosition = uViewMatrix * worldPosition;
-    //     viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
-    //     vViewPosition = viewPosition;
-    //
-    //     vec4 clipPosition = uProjectionMatrix * viewPosition;
-    //
-    //     gl_Position = clipPosition;
-    //
-    //     vClipPosition = clipPosition;
-    // }`,
-    //         fragmentShader: `
-    // #pragma DEFINES
-    //
-    // precision highp float;
-    //
-    // #include <lighting>
-    // #include <ub>
-    // #include <depth>
-    //
-    // in vec2 vUv;
-    // in vec4 vVertexColor;
-    // in vec4 vViewPosition;
-    // in vec4 vClipPosition;
-    //
-    // out vec4 outColor;
-    //
-    // uniform sampler2D uParticleMap;
-    //
-    // void main() {
-    //     // int particleId = int(mod(float(gl_VertexID), 4.));
-    //
-    //     vec4 texColor = texture(uParticleMap, vUv);
-    //     vec3 baseColor = vVertexColor.xyz;
-    //     float alpha = texColor.x * vVertexColor.a;
-    //
-    //     // calc soft fade
-    //
-    //     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    //     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    //     // for debug
-    //     // outColor = vec4(vec3(sceneDepth), 1.);
-    //
-    //     float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
-    //     // for debug
-    //     // outColor = vec4(vec3(currentDepth), 1.);
-    //
-    //     float diffDepth = abs(sceneDepth) - abs(currentDepth);
-    //     float softFade = smoothstep(0., .01, diffDepth);
-    //     // for debug
-    //     // outColor = vec4(vec3(softFade), 1.);
-    //
-    //     // result
-    //
-    //     // outBaseColor = vec4(1., 0., 0., 1.);
-    //     // outColor = vec4(1., 0., 0., 1.);
-    //
-    //     float fadedAlpha = alpha * softFade;
-    //     if(fadedAlpha < .01) {
-    //         discard;
-    //     }
-    //
-    //     outColor = vec4(baseColor, fadedAlpha);
-    //     // outBaseColor = vec4(baseColor, fadedAlpha);
-    //     // outNormalColor = vec4(0., 0., 1., 1.); // dummy
-    // }
-    //         `,
-    //         uniforms: [
-    //             {
-    //                 name: 'uParticleMap',
-    //                 type: UniformTypes.Texture,
-    //                 value: particleMap,
-    //             },
-    //             {
-    //                 name: 'uBillboardPositionConverters',
-    //                 type: UniformTypes.Vector2Array,
-    //                 value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
-    //             },
-    //             {
-    //                 name: UniformNames.DepthTexture,
-    //                 type: UniformTypes.Texture,
-    //                 value: null,
-    //             },
-    //         ],
-    //         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
-    //         // blendType: BlendTypes.Additive
-    //         blendType: BlendTypes.Transparent,
-    //         depthWrite: false,
-    //     });
-    //     const particleMesh = createMesh({
-    //         geometry: particleGeometry,
-    //         material: particleMaterial,
-    //     });
+    // double buffer ---------------------------
+
+    const testFragmentShader = `#pragma DEFINES
+
+#include <lighting>
+#include <ub>
+
+out vec4 outColor;
+void main() {
+    outColor = vec4(1., 0., 0., 1.);
+}
+    `;
+    const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer(gpu, testFragmentShader, [], []);
+    const testGraphicsDoubleBufferTextureMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    subscribeActorOnStart(testGraphicsDoubleBufferTextureMesh, () => {
+        setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
+        setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
+        tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
+        updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
+        setUniformValue(
+            getMeshMaterial(testGraphicsDoubleBufferTextureMesh).uniforms,
+            UniformNames.BaseMap,
+            getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture
+        );
+    });
+    addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
 
     // noise -----------------------------------
 
@@ -2047,7 +1869,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     setTranslation(simplexNoiseTextureMesh.transform, createVector3(8, 1.5, 8));
     addActorToScene(captureScene, simplexNoiseTextureMesh);
 
-    // noise -----------------------------------
+    // ---------------------------------------------
 
     addActorToScene(captureScene, attractSphereMesh);
     addActorToScene(captureScene, testLightingMesh);

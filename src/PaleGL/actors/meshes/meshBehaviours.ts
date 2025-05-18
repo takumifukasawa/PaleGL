@@ -50,6 +50,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
             // for debug
             // console.log(`[Mesh.start] material`, material, material.getShader());
         }
+        
     });
 
     mesh.materials.forEach((material, i) => {

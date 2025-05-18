@@ -178,6 +178,7 @@ function fixedUpdateEngine(engine: EngineBase, fixedTime: number, fixedDeltaTime
     traverseScene(engine.scene, (actor) => {
         fixedUpdateActor(actor, {
             gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
             scene: engine.scene!,
             fixedTime,
             fixedDeltaTime,
@@ -221,7 +222,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
 
     // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
     traverseScene(engine.scene, (actor) => {
-        updateActor(actor, { gpu: engine.renderer.gpu, scene: engine.scene!, time, deltaTime });
+        updateActor(actor, { gpu: engine.renderer.gpu, renderer: engine.renderer, scene: engine.scene!, time, deltaTime });
         switch (actor.type) {
             case ActorTypes.Skybox:
             case ActorTypes.Mesh:
@@ -249,7 +250,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         engine.onLastUpdate({ time, deltaTime });
     }
     traverseScene(engine.scene, (actor) => {
-        lastUpdateActor(actor, { gpu: engine.renderer.gpu, scene: engine.scene!, time, deltaTime });
+        lastUpdateActor(actor, { gpu: engine.renderer.gpu, renderer: engine.renderer, scene: engine.scene!, time, deltaTime });
     });
 
     //
@@ -276,6 +277,7 @@ export function lastUpdateEngine(engine: Engine, time: number, deltaTime: number
     traverseScene(engine.scene, (actor) =>
         lastUpdateActor(actor, {
             gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
             scene: engine.scene!,
             time,
             deltaTime,

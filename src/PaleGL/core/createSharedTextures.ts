@@ -8,18 +8,17 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { createMaterial, Material, setMaterialUniformValue, startMaterial } from '@/PaleGL/materials/material.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { Renderer, renderMesh, setRendererRenderTarget } from '@/PaleGL/core/renderer.ts';
+import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 
 const gridUniformName = 'uGridSize';
@@ -239,8 +238,6 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
         });
     };
 
-    const planeGeometryAttributeDescriptors = getGeometryAttributeDescriptors(planeGeometry);
-
     const sharedTextures: SharedTextures = new Map();
 
     for (let i = 0; i < sharedTextureInfos.length; i++) {
@@ -299,8 +296,8 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
             ],
         });
 
-        startMaterial(tmpMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
-        startMaterial(ppMaterial, { gpu, attributeDescriptors: planeGeometryAttributeDescriptors });
+        tryStartMaterial(gpu, renderer, planeGeometry, tmpMaterial);
+        tryStartMaterial(gpu, renderer, planeGeometry, ppMaterial);
         setMaterialUniformValue(ppMaterial, UniformNames.SrcTexture, tmpRenderTarget.texture);
 
         const sharedTexture: SharedTexture = {
@@ -342,9 +339,9 @@ const renderMaterial = (
     renderTarget: RenderTarget,
     material: Material
 ) => {
-    setRendererRenderTarget(renderer, renderTarget, true);
+    setRenderTargetToRendererAndClear(renderer, renderTarget, true);
     renderMesh(renderer, planeGeometry, material);
-    setRendererRenderTarget(renderer, null);
+    setRenderTargetToRendererAndClear(renderer, null);
 };
 
 const renderSharedTexture = (renderer: Renderer, sharedTexture: SharedTexture, time: number) => {

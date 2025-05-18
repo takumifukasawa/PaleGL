@@ -3,20 +3,13 @@ import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentP
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 // import {CopyPass} from "./CopyPass";
-import {
-    createMaterial,
-    isCompiledMaterialShader,
-    Material,
-    setMaterialUniformValue,
-    startMaterial,
-} from '@/PaleGL/materials/material';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { Renderer, renderMesh, setRendererRenderTarget } from '@/PaleGL/core/renderer.ts';
+import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import {
     createPostProcessPassBase,
     getPostProcessBaseVertexShader,
@@ -320,13 +313,13 @@ function renderBlur(
     const w = bloomPass.width / downSize;
     const h = bloomPass.height / downSize;
 
-    setRendererRenderTarget(renderer, horizontalRenderTarget, true);
+    setRenderTargetToRendererAndClear(renderer, horizontalRenderTarget, true);
     setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.SrcTexture, beforeRenderTarget.texture);
     setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.TargetWidth, w);
     setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.TargetHeight, w);
     renderMesh(renderer, bloomPass.geometry, bloomPass.horizontalBlurMaterial);
 
-    setRendererRenderTarget(renderer, verticalRenderTarget, true);
+    setRenderTargetToRendererAndClear(renderer, verticalRenderTarget, true);
     // renderer.clearColor(0, 0, 0, 1);
     setMaterialUniformValue(bloomPass.verticalBlurMaterial, UniformNames.SrcTexture, horizontalRenderTarget.texture);
     setMaterialUniformValue(bloomPass.verticalBlurMaterial, UniformNames.TargetWidth, w);
@@ -354,18 +347,8 @@ export const renderBloomPass: RenderPostProcessPassBehaviour = (
     // // ppの場合はいらない気がする
     // // this.mesh.updateTransform();
 
-    if (!isCompiledMaterialShader(bloomPass.horizontalBlurMaterial)) {
-        startMaterial(bloomPass.horizontalBlurMaterial, {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(bloomPass.geometry),
-        });
-    }
-    if (!isCompiledMaterialShader(bloomPass.verticalBlurMaterial)) {
-        startMaterial(bloomPass.verticalBlurMaterial, {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(bloomPass.geometry),
-        });
-    }
+    tryStartMaterial(gpu, renderer, bloomPass.geometry, bloomPass.horizontalBlurMaterial);
+    tryStartMaterial(gpu, renderer, bloomPass.geometry, bloomPass.verticalBlurMaterial);
 
     setMaterialUniformValue(bloomPass.extractBrightnessPass.material, UNIFORM_NAME_THRESHOLD, bloomPass.threshold);
     setMaterialUniformValue(bloomPass.compositePass.material, UNIFORM_NAME_TONE, bloomPass.tone);
