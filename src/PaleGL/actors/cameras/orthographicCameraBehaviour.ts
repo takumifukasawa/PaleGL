@@ -8,7 +8,7 @@ import {
     createVector3Right,
     createVector3Up,
     negateVector3,
-    scaleVector3ByScalar,
+    scaleVector3ByScalar, v3back, v3right, v3up,
 } from '@/PaleGL/math/vector3.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { setTranslation } from '@/PaleGL/core/transform.ts';
@@ -37,9 +37,13 @@ export function updateOrthographicCameraProjectionMatrix(camera: Camera) {
 export function getOrthographicFrustumLocalPositions(camera: Camera) {
     const orthographicCamera = camera as OrthographicCamera;
 
-    const localForward = createVector3Back();
-    const localRight = createVector3Right();
-    const localUp = createVector3Up();
+    // const localForward = createVector3Back();
+    // const localRight = createVector3Right();
+    // const localUp = createVector3Up();
+    // NOTE: cloneするのでconst的に参照
+    const localForward = v3back;
+    const localRight = v3right;
+    const localUp = v3up;
 
     const halfWidth = (Math.abs(orthographicCamera.left) + Math.abs(orthographicCamera.right)) / 2;
     const halfHeight = (Math.abs(orthographicCamera.top) + Math.abs(orthographicCamera.right)) / 2;
