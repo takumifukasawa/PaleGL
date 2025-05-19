@@ -3,11 +3,8 @@ import { createPerspectiveMatrix } from '@/PaleGL/math/matrix4.ts';
 import {
     addVector3Array,
     cloneVector3,
-    createVector3Back,
-    createVector3Right,
-    createVector3Up,
     negateVector3,
-    scaleVector3ByScalar,
+    scaleVector3ByScalar, v3back, v3right, v3up,
 } from '@/PaleGL/math/vector3.ts';
 import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
@@ -36,9 +33,9 @@ export function updatePerspectiveCameraProjectionMatrix(camera: Camera) {
 export function getPerspectiveFrustumLocalPositions(camera: Camera) {
     const perspectiveCamera = camera as PerspectiveCamera;
 
-    const localForward = createVector3Back();
-    const localRight = createVector3Right();
-    const localUp = createVector3Up();
+    const localForward = v3back;
+    const localRight = v3right;
+    const localUp = v3up;
 
     const tan = ((perspectiveCamera.fov / 2) * Math.PI) / 180;
 

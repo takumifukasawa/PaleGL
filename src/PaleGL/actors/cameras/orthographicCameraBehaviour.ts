@@ -4,9 +4,6 @@ import {
     addVector3Array,
     cloneVector3,
     createVector3,
-    createVector3Back,
-    createVector3Right,
-    createVector3Up,
     negateVector3,
     scaleVector3ByScalar, v3back, v3right, v3up,
 } from '@/PaleGL/math/vector3.ts';
