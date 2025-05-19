@@ -298,7 +298,7 @@ export function createScalingMatrix(v: Vector3) {
 
 export function multiplyScalingMatrix(refMat: Matrix4, v: Vector3) {
     // prettier-ignore
-    multiplyMat4Elem(
+    return multiplyMat4Elem(
         refMat,
         v3x(v), 0, 0, 0,
         0, v3y(v), 0, 0,
@@ -823,24 +823,54 @@ export function createPerspectiveMatrix(fov: number, aspect: number, near: numbe
     return pjm;
 }
 
-export function createLookAtMatrix(eye: Vector3, center: Vector3, up = createVector3Up(), inverseForward = false) {
+function createLookAtMatrixInternal(
+    eye: Vector3,
+    center: Vector3,
+    up = createVector3Up(),
+    inverseForward = false,
+    refMat?: Matrix4
+) {
     const f = inverseForward
         ? normalizeVector3(subVectorsV3(eye, center)) // ex. 主にカメラ。投影の関係で逆になるので。
         : normalizeVector3(subVectorsV3(center, eye));
     const r = normalizeVector3(crossVectorsV3(normalizeVector3(up), f));
     const u = crossVectorsV3(f, r);
     // prettier-ignore
-    const result = createMatrix4(
-        // r.x, u.x, f.x, eye.x,
-        // r.y, u.y, f.y, eye.y,
-        // r.z, u.z, f.z, eye.z,
-        // 0, 0, 0, 1
-        v3x(r), v3x(u), v3x(f), v3x(eye),
-        v3y(r), v3y(u), v3y(f), v3y(eye),
-        v3z(r), v3z(u), v3z(f), v3z(eye),
-        0, 0, 0, 1,
-    );
-    return result;
+    if (refMat) {
+        // prettier-ignore
+        return copyMat4WithElem(
+            refMat,
+            v3x(r), v3x(u), v3x(f), v3x(eye),
+            v3y(r), v3y(u), v3y(f), v3y(eye),
+            v3z(r), v3z(u), v3z(f), v3z(eye),
+            0, 0, 0, 1,
+        );
+    } else {
+        return createMatrix4(
+            // r.x, u.x, f.x, eye.x,
+            // r.y, u.y, f.y, eye.y,
+            // r.z, u.z, f.z, eye.z,
+            // 0, 0, 0, 1
+            v3x(r), v3x(u), v3x(f), v3x(eye),
+            v3y(r), v3y(u), v3y(f), v3y(eye),
+            v3z(r), v3z(u), v3z(f), v3z(eye),
+            0, 0, 0, 1,
+        );
+    }
+}
+
+export function createLookAtMatrix(eye: Vector3, center: Vector3, up = createVector3Up(), inverseForward = false) {
+    return createLookAtMatrixInternal(eye, center, up, inverseForward);
+}
+
+export function createLookAtMatrixRef(
+    refMat: Matrix4,
+    eye: Vector3,
+    center: Vector3,
+    up = createVector3Up(),
+    inverseForward = false
+) {
+    return createLookAtMatrixInternal(eye, center, up, inverseForward, refMat);
 }
 
 export function createMat4FromTRS(position: Vector3, rotation: Rotator, scaling: Vector3) {

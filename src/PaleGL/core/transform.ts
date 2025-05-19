@@ -16,10 +16,8 @@
 import {
     assignMat4Identity,
     cloneMat4,
-    createLookAtMatrix,
+    createLookAtMatrixRef,
     createMat4Identity,
-    createScalingMatrix,
-    createTranslationMatrix,
     invertMat4,
     mat4m00,
     mat4m01,
@@ -32,7 +30,8 @@ import {
     mat4m22,
     Matrix4,
     multiplyMat4Array,
-    multiplyMat4ArrayRef, multiplyScalingMatrix, multiplyTranslationMatrix,
+    multiplyScalingMatrix,
+    multiplyTranslationMatrix,
     transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
 import { ActorTypes } from '@/PaleGL/constants.js';
@@ -43,7 +42,7 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
-import {createRotationMatrixFromQuaternion, multiplyRotationMatrixFromQuaternion} from '@/PaleGL/math/quaternion.ts';
+import { multiplyRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
 
@@ -423,6 +422,24 @@ export const worldToLocalPoint = (transform: Transform, p: Vector3) =>
 
 export const updateActorTransformMatrix = (actor: Actor) => {
     if (actor.transform.lookAtTarget || actor.transform.lookAtTargetActor) {
+        // tmp
+        // // どっちかはあるのでキャストしちゃう
+        // const lookAtTarget = (
+        //     actor.transform.lookAtTargetActor
+        //         ? actor.transform.lookAtTargetActor.transform.position
+        //         : actor.transform.lookAtTarget
+        // ) as Vector3;
+        // // TODO:
+        // // - up vector 渡せるようにする
+        // // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
+        // const lookAtMatrix =
+        //     actor?.type === ActorTypes.Camera
+        //         ? createLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
+        //         : createLookAtMatrix(actor.transform.position, lookAtTarget);
+        // const scalingMatrix = createScalingMatrix(actor.transform.scale);
+        // actor.transform.localMatrix = multiplyMat4ArrayRef(actor.transform.localMatrix, lookAtMatrix, scalingMatrix);
+        // // actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
+
         // どっちかはあるのでキャストしちゃう
         const lookAtTarget = (
             actor.transform.lookAtTargetActor
@@ -430,15 +447,19 @@ export const updateActorTransformMatrix = (actor: Actor) => {
                 : actor.transform.lookAtTarget
         ) as Vector3;
         // TODO:
-        // - up vector 渡せるようにする
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
+        assignMat4Identity(actor.transform.localMatrix);
         const lookAtMatrix =
             actor?.type === ActorTypes.Camera
-                ? createLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
-                : createLookAtMatrix(actor.transform.position, lookAtTarget);
-        const scalingMatrix = createScalingMatrix(actor.transform.scale);
-        actor.transform.localMatrix = multiplyMat4ArrayRef(actor.transform.localMatrix, lookAtMatrix, scalingMatrix);
-        // actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
+                ? createLookAtMatrixRef(
+                      actor.transform.localMatrix,
+                      actor.transform.position,
+                      lookAtTarget,
+                      createVector3Up(),
+                      true
+                  )
+                : createLookAtMatrixRef(actor.transform.localMatrix, actor.transform.position, lookAtTarget);
+        actor.transform.localMatrix = multiplyScalingMatrix(lookAtMatrix, actor.transform.scale);
     } else {
         // tmp
         // const translationMatrix = createTranslationMatrix(actor.transform.position);
