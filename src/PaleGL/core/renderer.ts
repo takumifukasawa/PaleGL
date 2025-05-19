@@ -2243,7 +2243,7 @@ function createRenderMeshInfosEachPass(
                 // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
                 // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
                 subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
-                subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+                subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
                 const al = getVector3Magnitude(tmpSortVA);
                 const bl = getVector3Magnitude(tmpSortVB);
                 return al < bl ? -1 : 1;
@@ -2255,7 +2255,7 @@ function createRenderMeshInfosEachPass(
         // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
-        subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
         const al = getVector3Magnitude(tmpSortVA);
         const bl = getVector3Magnitude(tmpSortVB);
         return al < bl ? -1 : 1;
@@ -2265,7 +2265,7 @@ function createRenderMeshInfosEachPass(
         // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
-        subVectorsV3Ref(tmpSortVB, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
         const al = getVector3Magnitude(tmpSortVA);
         const bl = getVector3Magnitude(tmpSortVB);
         return al >= bl ? -1 : 1;
