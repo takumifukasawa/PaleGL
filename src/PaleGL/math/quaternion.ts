@@ -262,6 +262,7 @@
 
 
 import {
+    copyMat4WithElem,
     createMatrix4,
     mat4m00, mat4m01,
     mat4m02, mat4m10,
@@ -270,7 +271,7 @@ import {
     mat4m20,
     mat4m21,
     mat4m22,
-    Matrix4,
+    Matrix4, multiplyMat4Elem,
 } from '@/PaleGL/math/matrix4.ts';
 import {createVector3, v3x, v3y, v3z, Vector3} from "@/PaleGL/math/vector3.ts";
 
@@ -292,7 +293,7 @@ export function copyQuaternion(sq: Quaternion, tq: Quaternion) {
 
 // ref:
 // https://zenn.dev/mebiusbox/books/132b654aa02124/viewer/2966c7
-export function createRotationMatrixFromQuaternion(q: Quaternion) {
+function createRotationMatrixFromQuaternionInternal(q: Quaternion, refMat?: Matrix4, isMul: boolean = false) {
     const x = qx(q);
     const y = qy(q);
     const z = qz(q);
@@ -353,13 +354,46 @@ export function createRotationMatrixFromQuaternion(q: Quaternion) {
     const m32 = 0;
     const m33 = 1;
 
-    return createMatrix4(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        m30, m31, m32, m33
-    );
+    if (refMat) {
+        if (isMul) {
+            // prettier-ignore
+            return multiplyMat4Elem(
+                refMat,
+                m00, m01, m02, m03,
+                m10, m11, m12, m13,
+                m20, m21, m22, m23,
+                m30, m31, m32, m33
+            );
+        } else {
+        // prettier-ignore
+        return copyMat4WithElem(
+            refMat,
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        );
+        }
+    } else {
+        return createMatrix4(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        );
+    }
+}
 
+export function createRotationMatrixFromQuaternion(q: Quaternion) {
+    return createRotationMatrixFromQuaternionInternal(q);
+}
+
+export function createRotationMatrixFromQuaternionRef(refMat: Matrix4, q: Quaternion) {
+    return createRotationMatrixFromQuaternionInternal(q, refMat)
+}
+
+export function multiplyRotationMatrixFromQuaternion(srcMat: Matrix4, q: Quaternion) {
+    return createRotationMatrixFromQuaternionInternal(q, srcMat, true);
 }
 
 export function rotationMatrixToQuaternion(mat: Matrix4) {

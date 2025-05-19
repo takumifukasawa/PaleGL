@@ -23,10 +23,10 @@ import { Quaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternio
 export type Matrix4 = { e: Float32Array };
 
 // const pool: Matrix4[] = [];
-// 
+//
 // let poolIndex = 0;
 // const poolNum = 1000;
-// 
+//
 // for (let i = 0; i < poolNum; i++) {
 //     const m = {
 //         // prettier-ignore
@@ -39,7 +39,7 @@ export type Matrix4 = { e: Float32Array };
 //     };
 //     pool.push(m);
 // }
-// 
+//
 // function pickPool() {
 //     const m = pool[poolIndex];
 //     poolIndex = (poolIndex + 1) % poolNum;
@@ -65,8 +65,8 @@ export function createMatrix4(
         n02, n12, n22, n32,
         n03, n13, n23, n33,
     ]);
-    return { e };
-    
+    return {e};
+
     // const sm = pickPool();
     // 
     // copyMat4WithElem(
@@ -275,9 +275,31 @@ export function createTranslationMatrix(v: Vector3) {
     );
 }
 
+export function multiplyTranslationMatrix(refMat: Matrix4, v: Vector3) {
+    // prettier-ignore
+    multiplyMat4Elem(
+        refMat,
+        1, 0, 0, v3x(v),
+        0, 1, 0, v3y(v),
+        0, 0, 1, v3z(v),
+        0, 0, 0, 1,
+    );
+}
+
 export function createScalingMatrix(v: Vector3) {
     // prettier-ignore
     return createMatrix4(
+        v3x(v), 0, 0, 0,
+        0, v3y(v), 0, 0,
+        0, 0, v3z(v), 0,
+        0, 0, 0, 1,
+    );
+}
+
+export function multiplyScalingMatrix(refMat: Matrix4, v: Vector3) {
+    // prettier-ignore
+    multiplyMat4Elem(
+        refMat,
         v3x(v), 0, 0, 0,
         0, v3y(v), 0, 0,
         0, 0, v3z(v), 0,
@@ -413,7 +435,83 @@ export function multiplyMat4(m1: Matrix4, m2: Matrix4) {
     // prettier-ignore
     copyMat4WithElem(
         m1,
-        m00, m01, m02, m03, 
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+    );
+
+    return m1;
+}
+
+// prettier-ignore
+export function multiplyMat4Elem(
+    m1: Matrix4,
+    mb00: number, mb01: number, mb02: number, mb03: number,
+    mb10: number, mb11: number, mb12: number, mb13: number,
+    mb20: number, mb21: number, mb22: number, mb23: number,
+    mb30: number, mb31: number, mb32: number, mb33: number,
+) {
+    // const m1 = this;
+
+    const e1 = m1.e;
+
+    const ma00 = e1[0],
+        ma01 = e1[4],
+        ma02 = e1[8],
+        ma03 = e1[12];
+    const ma10 = e1[1],
+        ma11 = e1[5],
+        ma12 = e1[9],
+        ma13 = e1[13];
+    const ma20 = e1[2],
+        ma21 = e1[6],
+        ma22 = e1[10],
+        ma23 = e1[14];
+    const ma30 = e1[3],
+        ma31 = e1[7],
+        ma32 = e1[11],
+        ma33 = e1[15];
+
+    // r0
+    const m00 = ma00 * mb00 + ma01 * mb10 + ma02 * mb20 + ma03 * mb30;
+    const m01 = ma00 * mb01 + ma01 * mb11 + ma02 * mb21 + ma03 * mb31;
+    const m02 = ma00 * mb02 + ma01 * mb12 + ma02 * mb22 + ma03 * mb32;
+    const m03 = ma00 * mb03 + ma01 * mb13 + ma02 * mb23 + ma03 * mb33;
+
+    // r1
+    const m10 = ma10 * mb00 + ma11 * mb10 + ma12 * mb20 + ma13 * mb30;
+    const m11 = ma10 * mb01 + ma11 * mb11 + ma12 * mb21 + ma13 * mb31;
+    const m12 = ma10 * mb02 + ma11 * mb12 + ma12 * mb22 + ma13 * mb32;
+    const m13 = ma10 * mb03 + ma11 * mb13 + ma12 * mb23 + ma13 * mb33;
+
+    // r2
+    const m20 = ma20 * mb00 + ma21 * mb10 + ma22 * mb20 + ma23 * mb30;
+    const m21 = ma20 * mb01 + ma21 * mb11 + ma22 * mb21 + ma23 * mb31;
+    const m22 = ma20 * mb02 + ma21 * mb12 + ma22 * mb22 + ma23 * mb32;
+    const m23 = ma20 * mb03 + ma21 * mb13 + ma22 * mb23 + ma23 * mb33;
+
+    // r3
+    const m30 = ma30 * mb00 + ma31 * mb10 + ma32 * mb20 + ma33 * mb30;
+    const m31 = ma30 * mb01 + ma31 * mb11 + ma32 * mb21 + ma33 * mb31;
+    const m32 = ma30 * mb02 + ma31 * mb12 + ma32 * mb22 + ma33 * mb32;
+    const m33 = ma30 * mb03 + ma31 * mb13 + ma32 * mb23 + ma33 * mb33;
+
+    // 行列を常に再生成するパターン
+    // // prettier-ignore
+    // const m = createMatrix4(
+    //     m00, m01, m02, m03,
+    //     m10, m11, m12, m13,
+    //     m20, m21, m22, m23,
+    //     m30, m31, m32, m33,
+    // );
+    // copyMat4(m1, m);
+
+    // 行列を使いまわすパターン
+    // prettier-ignore
+    copyMat4WithElem(
+        m1,
+        m00, m01, m02, m03,
         m10, m11, m12, m13,
         m20, m21, m22, m23,
         m30, m31, m32, m33
@@ -425,7 +523,7 @@ export function multiplyMat4(m1: Matrix4, m2: Matrix4) {
 export function copyMat4(sm: Matrix4, tm: Matrix4) {
     // tmp
     // sm.e = new Float32Array([...tm.e]);
-    
+
     setMat4m00(sm, mat4m00(tm));
     setMat4m01(sm, mat4m01(tm));
     setMat4m02(sm, mat4m02(tm));
@@ -473,7 +571,6 @@ export function copyMat4WithElem(
     return sm;
 }
 
-
 export function cloneMat4(sm: Matrix4) {
     const m = createMat4Identity();
     // m.m00 = mat4m00(sm);
@@ -492,22 +589,22 @@ export function cloneMat4(sm: Matrix4) {
     // m.m31 = mat4m31(sm);
     // m.m32 = mat4m32(sm);
     // m.m33 = mat4m33(sm);
-    setMat4m00(m, mat4m00(sm))
-    setMat4m01(m, mat4m01(sm))
-    setMat4m02(m, mat4m02(sm))
-    setMat4m03(m, mat4m03(sm))
-    setMat4m10(m, mat4m10(sm))
-    setMat4m11(m, mat4m11(sm))
-    setMat4m12(m, mat4m12(sm))
-    setMat4m13(m, mat4m13(sm))
-    setMat4m20(m, mat4m20(sm))
-    setMat4m21(m, mat4m21(sm))
-    setMat4m22(m, mat4m22(sm))
-    setMat4m23(m, mat4m23(sm))
-    setMat4m30(m, mat4m30(sm))
-    setMat4m31(m, mat4m31(sm))
-    setMat4m32(m, mat4m32(sm))
-    setMat4m33(m, mat4m33(sm))
+    setMat4m00(m, mat4m00(sm));
+    setMat4m01(m, mat4m01(sm));
+    setMat4m02(m, mat4m02(sm));
+    setMat4m03(m, mat4m03(sm));
+    setMat4m10(m, mat4m10(sm));
+    setMat4m11(m, mat4m11(sm));
+    setMat4m12(m, mat4m12(sm));
+    setMat4m13(m, mat4m13(sm));
+    setMat4m20(m, mat4m20(sm));
+    setMat4m21(m, mat4m21(sm));
+    setMat4m22(m, mat4m22(sm));
+    setMat4m23(m, mat4m23(sm));
+    setMat4m30(m, mat4m30(sm));
+    setMat4m31(m, mat4m31(sm));
+    setMat4m32(m, mat4m32(sm));
+    setMat4m33(m, mat4m33(sm));
     return m;
 }
 
