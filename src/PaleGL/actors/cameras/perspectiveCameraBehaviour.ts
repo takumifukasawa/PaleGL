@@ -33,7 +33,7 @@ export function updatePerspectiveCameraProjectionMatrix(camera: Camera) {
 export function getPerspectiveFrustumLocalPositions(camera: Camera) {
     const perspectiveCamera = camera as PerspectiveCamera;
 
-    const localForward = v3back;
+    const localForward = v3back; // 向き先が逆で正しい
     const localRight = v3right;
     const localUp = v3up;
 
