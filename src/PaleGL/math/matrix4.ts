@@ -238,6 +238,26 @@ export function createMat4Identity() {
     return createMatrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 
+export function assignMat4Identity(m: Matrix4) {
+    setMat4m00(m, 1);
+    setMat4m01(m, 0);
+    setMat4m02(m, 0);
+    setMat4m03(m, 0);
+    setMat4m10(m, 0);
+    setMat4m11(m, 1);
+    setMat4m12(m, 0);
+    setMat4m13(m, 0);
+    setMat4m20(m, 0);
+    setMat4m21(m, 0);
+    setMat4m22(m, 1);
+    setMat4m23(m, 0);
+    setMat4m30(m, 0);
+    setMat4m31(m, 0);
+    setMat4m32(m, 0);
+    setMat4m33(m, 1);
+    return m;
+}
+
 export function setMat4Translation(m: Matrix4, v: Vector3) {
     setMat4m03(m, v3x(v));
     setMat4m13(m, v3y(v));
@@ -301,19 +321,18 @@ export function createRotationZMatrix(rad: number) {
     );
 }
 
-// 配列の後ろほど、頭からかけることになる
+// 配列の後ろほど、頭からかけることになる(ex. TRSの順番のまま渡す)
 export function multiplyMat4Array(...matrices: Matrix4[]) {
     const m = createMat4Identity();
     matrices.forEach((matrix) => multiplyMat4(m, matrix));
     return m;
 }
 
-// 配列の後ろほど、頭からかけることになる
-export function multiplyMat4ArrayRef(...matrices: Matrix4[]) {
-    for (let i = 1; i < matrices.length; i++) {
-        multiplyMat4(matrices[i - 1], matrices[i]);
-    }
-    return matrices[0];
+// 配列の後ろほど、頭からかけることになる(ex. TRSの順番のまま渡す)
+export function multiplyMat4ArrayRef(refMat: Matrix4, ...matrices: Matrix4[]) {
+    refMat = assignMat4Identity(refMat);
+    matrices.forEach((matrix) => multiplyMat4(refMat, matrix));
+    return refMat;
 }
 
 export function multiplyMat4(m1: Matrix4, m2: Matrix4) {
