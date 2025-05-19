@@ -1,6 +1,10 @@
 // actors
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    getMeshMaterial,
+    setMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
@@ -18,11 +22,7 @@ import {
     setSceneToEngine,
     startEngine,
 } from '@/PaleGL/core/engine.ts';
-import {
-    createRenderer,
-    renderRenderer,
-    tryStartMaterial
-} from '@/PaleGL/core/renderer.ts';
+import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
@@ -43,10 +43,7 @@ import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import {
-    Material,
-    setMaterialUniformValue,
-} from '@/PaleGL/materials/material.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
@@ -1814,17 +1811,27 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
     // double buffer ---------------------------
 
-    const testFragmentShader = `#pragma DEFINES
-
+    const testFragmentShader = `
+#pragma DEFINES
 #include <lighting>
 #include <ub>
-
+in vec3 vPosition;
+in vec2 vUv;
+uniform sampler2D uPrevMap;
 out vec4 outColor;
 void main() {
-    outColor = vec4(sin(uTime * 5.) * .5 + .5, 0., 0., 1.);
+    // vec4 prevColor = 
+    // outColor = vec4(sin(uTime * 5.) * .5 + .5, 0., 0., 1.);
+    outColor = vec4(vUv * sin(uTime * 5.) * .5 + .5, 1., 1.);
+    // outColor = vec4(vPosition, 1.);
 }
     `;
-    const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer(gpu, testFragmentShader, [], []);
+    const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
+        gpu,
+        width: 1024,
+        height: 1024,
+        fragmentShader: testFragmentShader,
+    });
     const testGraphicsDoubleBufferTextureMesh = createMesh({
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
@@ -1833,14 +1840,14 @@ void main() {
         setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
         setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
         tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
-        setUniformValue(
-            getMeshMaterial(testGraphicsDoubleBufferTextureMesh).uniforms,
-            UniformNames.BaseMap,
-            getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture
-        );
     });
     subscribeActorOnUpdate(testGraphicsDoubleBufferTextureMesh, () => {
         updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
+        setUniformValueToAllMeshMaterials(
+            testGraphicsDoubleBufferTextureMesh,
+            UniformNames.BaseMap,
+            getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture
+        );
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
 

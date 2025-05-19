@@ -26,7 +26,7 @@ export type UnlitMaterialArgs = {
 
 export type UnlitMaterial = Material;
 
-export function createUnlitMaterial(args: UnlitMaterialArgs = {}) {
+export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial {
     const {
         baseMap,
         baseMapTiling, // vec4
