@@ -1823,13 +1823,13 @@ void main() {
     // vec4 prevColor = 
     // outColor = vec4(sin(uTime * 5.) * .5 + .5, 0., 0., 1.);
     outColor = vec4(vUv * sin(uTime * 5.) * .5 + .5, 1., 1.);
-    // outColor = vec4(vPosition, 1.);
+    outColor = vec4(texture(uPrevMap, vUv).xy * .5 + vUv * .5, 1., 1.);
 }
     `;
     const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
         gpu,
-        width: 1024,
-        height: 1024,
+        width: 8,
+        height: 8,
         fragmentShader: testFragmentShader,
     });
     const testGraphicsDoubleBufferTextureMesh = createMesh({
