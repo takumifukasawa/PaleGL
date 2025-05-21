@@ -26,7 +26,7 @@ import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
+import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
@@ -173,7 +173,11 @@ import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextM
 import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
-import { getReadRenderTargetOfDoubleBuffer } from '@/PaleGL/core/doubleBuffer.ts';
+import {
+    getReadRenderTargetOfDoubleBuffer,
+    getWriteRenderTargetOfDoubleBuffer,
+    swapDoubleBuffer
+} from '@/PaleGL/core/doubleBuffer.ts';
 import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
@@ -1818,18 +1822,27 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 in vec3 vPosition;
 in vec2 vUv;
 uniform sampler2D uPrevMap;
+uniform vec2 uTexelSize;
+uniform float uTargetWidth;
+uniform float uTargetHeight;
 out vec4 outColor;
 void main() {
-    // vec4 prevColor = 
-    // outColor = vec4(sin(uTime * 5.) * .5 + .5, 0., 0., 1.);
-    outColor = vec4(vUv * sin(uTime * 5.) * .5 + .5, 1., 1.);
-    outColor = vec4(texture(uPrevMap, vUv).xy * .5 + vUv * .5, 1., 1.);
+    vec2 rawUv = vUv;
+    vec2 sc = vec2(uTargetWidth, uTargetHeight);
+    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
+    vec2 uv = fid / sc; // 0~1
+    vec4 prevColor = texture(uPrevMap, uv);
+    float r = prevColor.r;
+    float nr = mod(r + uDeltaTime, 1.);
+    outColor = vec4(nr, sin(nr) * .5 + .5, 0, 1.);
 }
     `;
+    const testGraphicsDoubleBufferWidth = 32;
+    const testGraphicsDoubleBufferHeight = 32;
     const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
         gpu,
-        width: 8,
-        height: 8,
+        width: testGraphicsDoubleBufferWidth,
+        height: testGraphicsDoubleBufferHeight,
         fragmentShader: testFragmentShader,
     });
     const testGraphicsDoubleBufferTextureMesh = createMesh({
@@ -1840,6 +1853,31 @@ void main() {
         setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
         setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
         tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
+     
+        const dataArray = maton.range(testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight).map((_, i) => {
+            const r = 255 / (testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight);
+            const v = (r * i) % 255;
+            return [v, 0, 0, 255]
+        }).flat();
+        const data = new Uint8Array(Array.from(dataArray));
+        
+        // prettier-ignore
+        updateTexture(
+            getWriteRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture!,
+            {
+                data
+            }
+        );
+
+        swapDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer);
+
+        // // prettier-ignore
+        // updateTexture(
+        //     getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture!,
+        //     {
+        //         data
+        //     }
+        // );
     });
     subscribeActorOnUpdate(testGraphicsDoubleBufferTextureMesh, () => {
         updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
