@@ -205,3 +205,8 @@ export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolea
     mesh.materials[index].canRender = flag;
     mesh.depthMaterials[index].canRender = flag;
 };
+
+export const iterateAllMeshMaterials = (mesh: Mesh, callback: (mesh: Material) => void) => {
+    mesh.materials.forEach((material) => callback(material));
+    mesh.depthMaterials.forEach((material) => callback(material));
+}

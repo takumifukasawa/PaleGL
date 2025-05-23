@@ -16,6 +16,11 @@ out vec3 vNormal;
 out mat4 vWorldMatrix;
 out mat4 vInverseWorldMatrix;
 
+#ifdef USE_VAT
+uniform sampler2D uPositionMap;
+out float vInstanceId;
+#endif
+
 #ifdef USE_INSTANCING
 out float vInstanceId;
 // TODO
@@ -256,7 +261,14 @@ void main() {
     vLocalPosition = aPosition;
 
     mat4 worldMatrix = uWorldMatrix;
-    
+
+#ifdef USE_VAT
+    vec3 vatPosition = texture(uPositionMap).xyz;
+    mat4 varTranslation = getTranslationMat(vatPosition);
+    // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
+    worldMatrix = uWorldMatrix * vatTranslation;
+#endif
+
 #ifdef USE_INSTANCING
     mat4 instanceTranslation = getTranslationMat(aInstancePosition);
     mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);

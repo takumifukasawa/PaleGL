@@ -56,6 +56,7 @@ export type ShaderDefines = {
     useAlphaTest: boolean;
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
+    useVAT: boolean;
 };
 
 // tmp
@@ -112,6 +113,7 @@ const buildShaderDefines = ({
     useAlphaTest,
     isInstancing,
     useInstanceLookDirection,
+    useVAT,
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -141,6 +143,9 @@ const buildShaderDefines = ({
     }
     if (useInstanceLookDirection) {
         arr.push('#define USE_INSTANCE_LOOK_DIRECTION');
+    }
+    if (useVAT) {
+        arr.push('#define USE_VAT');
     }
 
     return arr;

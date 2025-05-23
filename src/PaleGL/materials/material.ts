@@ -85,6 +85,8 @@ export type MaterialArgs = {
     // instancing
     isInstancing?: boolean;
     useInstanceLookDirection?: boolean;
+    
+    useVAT?: boolean;
 
     // vertex color
     useVertexColor?: boolean;
@@ -151,6 +153,7 @@ export type Material = {
     gpuSkinning: boolean;
     jointNum: number | null;
     isInstancing: boolean;
+    useVAT: boolean;
     useInstanceLookDirection: boolean;
     useVertexColor: boolean;
     vertexShader: string;
@@ -214,6 +217,8 @@ export function createMaterial(args: MaterialArgs): Material {
         isSkinning = false,
         gpuSkinning = false,
         // jointNum = null,
+        
+        useVAT = false,
 
         // instancing
         isInstancing = false,
@@ -462,6 +467,7 @@ export function createMaterial(args: MaterialArgs): Material {
         gpuSkinning,
         jointNum,
         isInstancing,
+        useVAT,
         useInstanceLookDirection,
         useVertexColor,
         showLog,
@@ -513,6 +519,7 @@ export const startMaterial = (
         useReceiveShadow: material.receiveShadow,
         useVertexColor: material.useVertexColor,
         isInstancing: material.isInstancing,
+        useVAT: material.useVAT,
         useAlphaTest: material.alphaTest !== null,
         useInstanceLookDirection: material.useInstanceLookDirection,
     };

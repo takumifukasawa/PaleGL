@@ -26,7 +26,7 @@ import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import {createTexture, Texture, updateTexture} from '@/PaleGL/core/texture.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
@@ -176,9 +176,11 @@ import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticl
 import {
     getReadRenderTargetOfDoubleBuffer,
     getWriteRenderTargetOfDoubleBuffer,
-    swapDoubleBuffer
+    swapDoubleBuffer,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
+import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
+import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1221,138 +1223,142 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     skinningMesh.animator = gltfActor.animator!;
     setAnimationClips(skinningMesh, getAnimatorAnimationClips(gltfActor.animator));
 
-    // subscribeActorOnStart(skinningMesh, () => {
-    //     // CPU skinning
-    //     // gltfActor.animator.play('Fly', true);
-    //     // gltfActor.animator.animationClips[0].speed = 0.2;
+    // // subscribeActorOnStart(skinningMesh, () => {
+    // //     // CPU skinning
+    // //     // gltfActor.animator.play('Fly', true);
+    // //     // gltfActor.animator.animationClips[0].speed = 0.2;
+    // // });
+    // // // skinningMesh.onUpdate = ({ deltaTime }) => {
+    // // //     // skinningMesh.animator.update(deltaTime);
+    // // //     // gltfActor.animator.update(deltaTime);
+    // // // };
+
+    // const instanceInfo: {
+    //     position: number[][];
+    //     scale: number[][];
+    //     rotation: number[][];
+    //     velocity: number[][];
+    //     color: number[][];
+    //     emissiveColor: number[][];
+    //     animationOffset: number[];
+    // } = {
+    //     position: [],
+    //     scale: [],
+    //     rotation: [],
+    //     velocity: [],
+    //     color: [],
+    //     emissiveColor: [],
+    //     animationOffset: []
+    // };
+    // maton.range(instanceNum).forEach(() => {
+    //     // const posRangeX = 20;
+    //     // const posRangeZ = 20;
+    //     // const px = (Math.random() * 2 - 1) * posRangeX;
+    //     // const py = 0.5 + Math.random() * 2.;
+    //     // const pz = (Math.random() * 2 - 1) * posRangeZ;
+    //     // const p = [px, py, pz];
+    //     // instanceInfo.position.push(p);
+    //     instanceInfo.position.push([0, 0, 0]);
+
+    //     // const baseScale = 0.04;
+    //     // const randomScaleRange = 0.08;
+    //     const baseScale = 0.2;
+    //     const randomScaleRange = 0.6;
+    //     const s = Math.random() * randomScaleRange + baseScale;
+    //     // instanceInfo.scale.push([s, s * 2, s]);
+    //     instanceInfo.scale.push([s, s, s]);
+
+    //     instanceInfo.rotation.push([0, 0, 0]);
+
+    //     instanceInfo.velocity.push([0, 0, 0]);
+
+    //     const c = createColorFromRGB(
+    //         Math.floor(Math.random() * 200 + 30),
+    //         Math.floor(Math.random() * 80 + 20),
+    //         Math.floor(Math.random() * 200 + 30)
+    //     );
+    //     instanceInfo.color.push([...c.e]);
+
+    //     const ec = createColorFromRGB(0, 0, 0);
+    //     instanceInfo.emissiveColor.push([...ec.e]);
+    //
+    //     instanceInfo.animationOffset.push(Math.random() * 30)
     // });
-    // // skinningMesh.onUpdate = ({ deltaTime }) => {
-    // //     // skinningMesh.animator.update(deltaTime);
-    // //     // gltfActor.animator.update(deltaTime);
-    // // };
+    // // const animationOffsetInfo = maton
+    // //     .range(instanceNum)
+    // //     .map(() => {
+    // //         return Math.random() * 30;
+    // //     })
+    // //     .flat();
 
-    const instanceInfo: {
-        position: number[][];
-        scale: number[][];
-        rotation: number[][];
-        velocity: number[][];
-        color: number[][];
-        emissiveColor: number[][];
-    } = {
-        position: [],
-        scale: [],
-        rotation: [],
-        velocity: [],
-        color: [],
-        emissiveColor: [],
-    };
-    maton.range(instanceNum).forEach(() => {
-        // const posRangeX = 20;
-        // const posRangeZ = 20;
-        // const px = (Math.random() * 2 - 1) * posRangeX;
-        // const py = 0.5 + Math.random() * 2.;
-        // const pz = (Math.random() * 2 - 1) * posRangeZ;
-        // const p = [px, py, pz];
-        // instanceInfo.position.push(p);
-        instanceInfo.position.push([0, 0, 0]);
+    // skinningMesh.castShadow = true;
+    // skinningMesh.geometry.instanceCount = instanceNum;
 
-        // const baseScale = 0.04;
-        // const randomScaleRange = 0.08;
-        const baseScale = 0.2;
-        const randomScaleRange = 0.6;
-        const s = Math.random() * randomScaleRange + baseScale;
-        // instanceInfo.scale.push([s, s * 2, s]);
-        instanceInfo.scale.push([s, s, s]);
-
-        instanceInfo.rotation.push([0, 0, 0]);
-
-        instanceInfo.velocity.push([0, 0, 0]);
-
-        const c = createColorFromRGB(
-            Math.floor(Math.random() * 200 + 30),
-            Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30)
-        );
-        instanceInfo.color.push([...c.e]);
-
-        const ec = createColorFromRGB(0, 0, 0);
-        instanceInfo.emissiveColor.push([...ec.e]);
-    });
-    const animationOffsetInfo = maton
-        .range(instanceNum)
-        .map(() => {
-            return Math.random() * 30;
-        })
-        .flat();
-
-    skinningMesh.castShadow = true;
-    skinningMesh.geometry.instanceCount = instanceNum;
-
-    // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstancePosition,
-            data: new Float32Array(instanceInfo.position.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceScale,
-            data: new Float32Array(instanceInfo.scale.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceRotation,
-            data: new Float32Array(instanceInfo.rotation.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    // aInstanceAnimationOffsetは予約語
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceAnimationOffset,
-            data: new Float32Array(animationOffsetInfo),
-            size: 1,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVertexColor,
-            data: new Float32Array(instanceInfo.color.flat()),
-            size: 4,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(instanceInfo.emissiveColor.flat()),
-            size: 4,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVelocity,
-            data: new Float32Array(instanceInfo.velocity.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
+    // // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstancePosition,
+    //         data: new Float32Array(instanceInfo.position.flat()),
+    //         size: 3,
+    //         divisor: 1,
+    //     })
+    // );
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceScale,
+    //         data: new Float32Array(instanceInfo.scale.flat()),
+    //         size: 3,
+    //         divisor: 1,
+    //     })
+    // );
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceRotation,
+    //         data: new Float32Array(instanceInfo.rotation.flat()),
+    //         size: 3,
+    //         divisor: 1,
+    //     })
+    // );
+    // // aInstanceAnimationOffsetは予約語
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceAnimationOffset,
+    //         data: new Float32Array(instanceInfo.animationOffset.flat()),
+    //         size: 1,
+    //         divisor: 1,
+    //     })
+    // );
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceVertexColor,
+    //         data: new Float32Array(instanceInfo.color.flat()),
+    //         size: 4,
+    //         divisor: 1,
+    //     })
+    // );
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceEmissiveColor,
+    //         data: new Float32Array(instanceInfo.emissiveColor.flat()),
+    //         size: 4,
+    //         divisor: 1,
+    //     })
+    // );
+    // setGeometryAttribute(
+    //     skinningMesh.geometry,
+    //     createAttribute({
+    //         name: AttributeNames.InstanceVelocity,
+    //         data: new Float32Array(instanceInfo.velocity.flat()),
+    //         size: 3,
+    //         divisor: 1,
+    //     })
+    // );
 
     // skinningMesh.material = new PhongMaterial({
     //     // gpu,
@@ -1383,10 +1389,15 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
 
+    const particle = createGPUParticle({
+        mesh: skinningMesh,
+        instanceCount: instanceNum,
+    });
+
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
 
     let attractRate = 0;
-    subscribeActorOnUpdate(skinningMesh, ({ deltaTime }) => {
+    subscribeActorOnUpdate(particle, ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
 
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
@@ -1831,14 +1842,14 @@ void main() {
     vec2 sc = vec2(uTargetWidth, uTargetHeight);
     vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
     vec2 uv = fid / sc; // 0~1
-    vec4 prevColor = texture(uPrevMap, uv);
-    float r = prevColor.r;
+    vec4 prev = texture(uPrevMap, uv);
+    float r = prev.r;
     float nr = mod(r + uDeltaTime, 1.);
     outColor = vec4(nr, sin(nr) * .5 + .5, 0, 1.);
 }
     `;
-    const testGraphicsDoubleBufferWidth = 32;
-    const testGraphicsDoubleBufferHeight = 32;
+    const testGraphicsDoubleBufferWidth = 8;
+    const testGraphicsDoubleBufferHeight = 8;
     const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
         gpu,
         width: testGraphicsDoubleBufferWidth,
@@ -1853,14 +1864,17 @@ void main() {
         setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
         setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
         tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
-     
-        const dataArray = maton.range(testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight).map((_, i) => {
-            const r = 255 / (testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight);
-            const v = (r * i) % 255;
-            return [v, 0, 0, 255]
-        }).flat();
+
+        const dataArray = maton
+            .range(testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight)
+            .map((_, i) => {
+                const r = 255 / (testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight);
+                const v = (r * i) % 255;
+                return [v, 0, 0, 255];
+            })
+            .flat();
         const data = new Uint8Array(Array.from(dataArray));
-        
+
         // prettier-ignore
         updateTexture(
             getWriteRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture!,
@@ -1888,6 +1902,13 @@ void main() {
         );
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
+
+    // const vatParticle = createGPUParticle({
+    //         geometry: createBoxGeometry({ gpu }),
+    //         material: createUnlitMaterial(),
+    //     // particleNum: 1
+    // });
+    // addActorToScene(captureScene, vatParticle.mesh);
 
     // noise -----------------------------------
 
