@@ -1156,7 +1156,7 @@ export function renderRenderer(
         'uAmbientOcclusionTexture',
         renderer.ambientOcclusionPass.enabled
             ? renderer.ambientOcclusionPass.renderTarget.texture
-            : renderer.gpu.dummyTexture
+            : renderer.gpu.dummyTextureWhite
     );
 
     renderPass({
