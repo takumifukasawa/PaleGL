@@ -21,7 +21,7 @@ import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skin
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
-import {Skybox} from "@/PaleGL/actors/meshes/skybox.ts";
+import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 
 // start actor -------------------------------------------------------
 
@@ -50,7 +50,6 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
             // for debug
             // console.log(`[Mesh.start] material`, material, material.getShader());
         }
-        
     });
 
     mesh.materials.forEach((material, i) => {
@@ -126,7 +125,6 @@ export const updateMeshBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = 
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
     [MeshTypes.Skinned]: updateSkinnedMesh,
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMesh,
-
 };
 
 export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
@@ -142,7 +140,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 //     // this.depthMaterial.updateUniforms({ gpu });
 // }
 
-export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera, skybox?: Skybox | null }) => void;
+export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera; skybox?: Skybox | null }) => void;
 
 export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMeshMaterial,
@@ -196,6 +194,19 @@ export const setUniformValueToMeshPairMaterial = (mesh: Mesh, i: number, name: s
     setMaterialUniformValue(mesh.depthMaterials[i], name, newValue);
 };
 
+export const setUniformValueToMeshMaterials = (mesh: Mesh, name: string, newValue: UniformValue, log?: boolean) => {
+    mesh.materials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
+};
+
+export const setUniformValueToMeshDepthMaterials = (
+    mesh: Mesh,
+    name: string,
+    newValue: UniformValue,
+    log?: boolean
+) => {
+    mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
+};
+
 export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newValue: UniformValue, log?: boolean) => {
     mesh.materials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
     mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
@@ -209,4 +220,4 @@ export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolea
 export const iterateAllMeshMaterials = (mesh: Mesh, callback: (mesh: Material) => void) => {
     mesh.materials.forEach((material) => callback(material));
     mesh.depthMaterials.forEach((material) => callback(material));
-}
+};

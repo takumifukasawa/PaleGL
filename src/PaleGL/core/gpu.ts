@@ -99,9 +99,11 @@ export type Gpu = {
     shader: Shader | null;
     vao: VertexArrayObject | null;
     uniforms: Uniforms | null;
-    dummyTextureWhite: Texture;
-    dummyTextureBlack: Texture;
+    dummyWhiteTextures: Texture[];
+    dummyBlackTextures: Texture[];
     dummyCubeTexture: CubeMap;
+    currentDummyWhiteTextureIndex: number;
+    currentDummyBlackTextureIndex: number;
     validExtensions: string[];
     invalidExtensions: string[];
     uboBindingPoint: number;
@@ -112,8 +114,8 @@ type Modify<T, R> = Omit<T, keyof R> & R;
 export type GPUBase = Modify<
     Gpu,
     {
-        dummyTextureWhite: Texture | null;
-        dummyTextureBlack: Texture | null;
+        dummyWhiteTextures: Texture[];
+        dummyBlackTextures: Texture[];
         dummyCubeTexture: CubeMap | null;
     }
 >;
@@ -122,8 +124,8 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     const shader: Shader | null = null;
     const vao: VertexArrayObject | null = null;
     const uniforms: Uniforms | null = null;
-    let dummyTextureWhite: Texture | null = null;
-    let dummyTextureBlack: Texture | null = null;
+    const dummyWhiteTextures: Texture[] = [];
+    const dummyBlackTextures: Texture[] = [];
     let dummyCubeTexture: CubeMap | null = null;
     const validExtensions: string[] = [];
     const invalidExtensions: string[] = [];
@@ -134,29 +136,35 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
         shader,
         vao,
         uniforms,
-        dummyTextureWhite,
-        dummyTextureBlack,
+        dummyWhiteTextures,
+        dummyBlackTextures,
         dummyCubeTexture,
+        currentDummyWhiteTextureIndex: 0,
+        currentDummyBlackTextureIndex: 0,
         validExtensions,
         invalidExtensions,
         uboBindingPoint,
     };
 
-    dummyTextureWhite = createTexture({
+    for (let i = 0; i < 16; i++) {
+    dummyWhiteTextures.push(createTexture({
         gpu: gpu as Gpu,
         img: create1x1('white'),
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
-    });
-    gpu.dummyTextureWhite = dummyTextureWhite;
+    }));
+    }
+    gpu.dummyWhiteTextures = dummyWhiteTextures;
 
-    dummyTextureBlack = createTexture({
+    for (let i = 0; i < 16; i++) {
+    dummyBlackTextures.push(createTexture({
         gpu: gpu as Gpu,
         img: create1x1('black'),
         wrapS: TextureWrapTypes.Repeat,
         wrapT: TextureWrapTypes.Repeat,
-    });
-    gpu.dummyTextureBlack = dummyTextureBlack;
+    }));
+    }
+    gpu.dummyBlackTextures = dummyBlackTextures;
 
     dummyCubeTexture = createCubeMap(
         gpu as Gpu,
@@ -284,6 +292,7 @@ export function setGPUUniformValues(gpu: Gpu) {
 
     let activeTextureIndex = 0;
     // let dummyTextureIndex = 0;
+    // let dummyTextureIndex = 0;
 
     if (!gpu.shader) {
         console.error('shader is not set');
@@ -347,8 +356,9 @@ export function setGPUUniformValues(gpu: Gpu) {
                 break;
             case UniformTypes.Texture:
                 gl.activeTexture(GL_TEXTURE0 + activeTextureIndex);
-                gl.bindTexture(GL_TEXTURE_2D, value ? (value as Texture).glObject : gpu.dummyTextureWhite.glObject);
+                gl.bindTexture(GL_TEXTURE_2D, value ? (value as Texture).glObject : getDummyWhiteTexture(gpu).glObject);
                 gl.uniform1i(location, activeTextureIndex);
+                // dummyTextureIndex++;
                 activeTextureIndex++;
                 break;
             case UniformTypes.TextureArray:
@@ -356,7 +366,8 @@ export function setGPUUniformValues(gpu: Gpu) {
                 (value as Texture[]).forEach((texture) => {
                     textureArrayIndices.push(activeTextureIndex);
                     gl.activeTexture(GL_TEXTURE0 + activeTextureIndex);
-                    gl.bindTexture(GL_TEXTURE_2D, texture ? texture.glObject : gpu.dummyTextureWhite.glObject);
+                    gl.bindTexture(GL_TEXTURE_2D, texture ? texture.glObject : getDummyWhiteTexture(gpu).glObject);
+                    // dummyTextureIndex++;
                     activeTextureIndex++;
                 });
                 if (textureArrayIndices.length < 1) {
@@ -678,4 +689,16 @@ export function bindGPUUniformBlockAndGetBlockIndex(
     // console.log('bindUniformBlockAndGetBlockIndex', blockName, blockIndex, uniformBufferObject.bindingPoint);
     gpu.gl.uniformBlockBinding(shader.glObject, blockIndex, uniformBufferObject.bindingPoint);
     return blockIndex;
+}
+
+export function getDummyWhiteTexture(gpu: Gpu) {
+    const texture = gpu.dummyWhiteTextures[gpu.currentDummyWhiteTextureIndex];
+    gpu.currentDummyWhiteTextureIndex = (gpu.currentDummyWhiteTextureIndex + 1) % gpu.dummyWhiteTextures.length;
+    return texture;
+}
+
+export function getDummyBlackTexture(gpu: Gpu) {
+    const texture = gpu.dummyBlackTextures[gpu.currentDummyBlackTextureIndex];
+    gpu.currentDummyBlackTextureIndex = (gpu.currentDummyBlackTextureIndex + 1) % gpu.dummyBlackTextures.length;
+    return texture;
 }

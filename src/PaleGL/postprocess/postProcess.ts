@@ -1,5 +1,5 @@
 ﻿import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {getDummyBlackTexture, Gpu} from '@/PaleGL/core/gpu.ts';
 import {
     applyLightShadowMapUniformValues,
     LightActors,
@@ -226,7 +226,7 @@ export function renderPass({
         targetCamera,
         // time,
         lightActors,
-        fallbackTextureBlack: gpu.dummyTextureBlack,
+        fallbackTextureBlack: getDummyBlackTexture(gpu),
     });
 
     //

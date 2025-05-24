@@ -19,7 +19,7 @@ import {
     clearGPUDepth,
     createGPUUniformBufferObject,
     drawGPU,
-    flushGPU,
+    flushGPU, getDummyBlackTexture, getDummyWhiteTexture,
     Gpu,
     setGPUFramebuffer,
     setGPUShader,
@@ -1138,7 +1138,7 @@ export function renderRenderer(
     applyLightShadowMapUniformValues(
         renderer.deferredShadingPass.material,
         lightActors,
-        renderer.gpu.dummyTextureBlack
+        renderer.gpu.dummyBlackTextures[0]
     );
 
     // set sss texture
@@ -1147,7 +1147,7 @@ export function renderRenderer(
         'uScreenSpaceShadowTexture',
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture
-            : renderer.gpu.dummyTextureBlack
+            : renderer.gpu.dummyBlackTextures[0]
     );
 
     // set ao texture
@@ -1156,7 +1156,7 @@ export function renderRenderer(
         'uAmbientOcclusionTexture',
         renderer.ambientOcclusionPass.enabled
             ? renderer.ambientOcclusionPass.renderTarget.texture
-            : renderer.gpu.dummyTextureWhite
+            : getDummyWhiteTexture(renderer.gpu)
     );
 
     renderPass({
@@ -1235,14 +1235,14 @@ export function renderRenderer(
         renderer.fogPass,
         renderer.lightShaftPass.enabled
             ? getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!
-            : renderer.gpu.dummyTextureBlack,
+            : getDummyBlackTexture(renderer.gpu),
         // CUSTOM
         //  this._gpu.dummyTextureBlack,
         //
         renderer.volumetricLightPass.renderTarget.texture!,
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture!
-            : renderer.gpu.dummyTextureBlack,
+            : getDummyBlackTexture(renderer.gpu),
         sharedTextures.get(SharedTexturesTypes.FBM_NOISE)!.texture
     );
 
@@ -1784,7 +1784,7 @@ function renderTransparentPass(
 
             updateActorTransformUniforms(renderer, actor, camera);
 
-            applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
+            applyLightShadowMapUniformValues(targetMaterial, lightActors, getDummyBlackTexture(renderer.gpu));
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
@@ -1848,7 +1848,7 @@ function renderUIPass(
 
             updateActorTransformUniforms(renderer, actor, camera);
 
-            applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
+            applyLightShadowMapUniformValues(targetMaterial, lightActors, getDummyBlackTexture(renderer.gpu));
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
