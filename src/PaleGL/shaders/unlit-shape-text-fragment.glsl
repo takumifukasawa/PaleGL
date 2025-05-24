@@ -16,14 +16,19 @@ in vec3 vWorldPosition;
 #include <gbuffer_o>
 
 void main() {
-    vec4 resultColor = uColor;
+    // vec4 resultColor = uColor;
 
-    #include <shape_font_f>
-
+    // #include <shape_font_f>
+    
+    vec4 resultColor = calcShapeFont(vUv) * uColor;
+ 
     vec3 worldNormal = normalize(vNormal);
   
     // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
-    #include <alpha_test_f>
+    // #include <alpha_test_f>
+#ifdef USE_ALPHA_TEST
+    checkAlphaTest(resultColor, uAlphaTestThreshold);
+#endif
 
     resultColor.rgb = gamma(resultColor.rgb);
     

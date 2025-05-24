@@ -11,3 +11,11 @@ float shapeFontAlpha(float f) {
         f
     );
 }
+
+vec4 calcShapeFont(vec2 suv) {
+    vec2 uv = suv;
+    uv = uv * uFontTiling.xy + uFontTiling.zw;
+    vec4 resultColor = texture(uFontMap, uv);
+    resultColor.a *= shapeFontAlpha(resultColor.r);
+    return resultColor;
+}
