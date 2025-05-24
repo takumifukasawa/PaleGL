@@ -3,7 +3,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     getMeshMaterial,
     setMeshMaterial,
-    setUniformValueToAllMeshMaterials,
+    setUniformValueToMeshMaterials,
 } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
@@ -23,7 +23,12 @@ import {
     startEngine,
 } from '@/PaleGL/core/engine.ts';
 import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
+import {
+    bindGPUUniformBlockAndGetBlockIndex,
+    createGPU,
+    getDummyBlackTexture,
+    updateGPUTransformFeedback
+} from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
@@ -145,7 +150,7 @@ import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpac
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { getGeometryAttributeDescriptors, setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import {
     findVertexArrayObjectVertexBufferObjectBuffer,
@@ -181,6 +186,7 @@ import {
 import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
+import {isMinifyShader} from "@/PaleGL/utilities/envUtilities.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1737,6 +1743,7 @@ const main = async () => {
         skinnedMesh.geometry.drawCount
     );
     // skinnedMesh.enabled = false;
+    
 
     //
     // floor mesh
@@ -1788,7 +1795,7 @@ const main = async () => {
     //
 
     const particleNum = 50;
-
+    
     const particleMesh = createBillboardParticle({
         gpu,
         particleNum,
@@ -1801,7 +1808,7 @@ const main = async () => {
         minColor: createColorFromRGB(200, 190, 180, 50),
         maxColor: createColorFromRGB(250, 240, 230, 200),
         particleMap,
-        vertexShaderModifiers: [
+        vertexShaderModifiers: [...(isMinifyShader() ? [] : [
             {
                 pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
                 value: `
@@ -1821,10 +1828,39 @@ localPosition.z += mix(0., 4., r) * mix(-.4, -.8, cycleOffset);
 vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
                 `,
             },
-        ],
+        ])],
     });
 
-    // double buffer ---------------------------
+    // vat gpu particle ---------------------------
+
+    // vat gpu particle
+    const vatGPUParticle = createGPUParticle({
+        mesh: createMesh({
+            geometry: createBoxGeometry({ gpu, size: 3 }),
+            material: createUnlitMaterial({
+                uniforms: [
+                    {
+                        name: "uPositionMap",
+                        type: UniformTypes.Texture,
+                        value: getDummyBlackTexture(gpu)
+                    }
+                ]
+            }),
+        }),
+        instanceCount: 1,
+        useVAT: true
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+    console.log(vatGPUParticle);
+    
+    // const hoge = createMesh({
+    //     geometry: createBoxGeometry({ gpu, size: 1 }),
+    //     material: createUnlitMaterial({}),
+    // });
+    // addActorToScene(captureScene, hoge);
+    // setScaling(hoge.transform, createVector3(4, 4, 4));
+
+
 
     const testFragmentShader = `
 #pragma DEFINES
@@ -1845,7 +1881,8 @@ void main() {
     vec4 prev = texture(uPrevMap, uv);
     float r = prev.r;
     float nr = mod(r + uDeltaTime, 1.);
-    outColor = vec4(nr, sin(nr) * .5 + .5, 0, 1.);
+    // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
+    outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
 }
     `;
     const testGraphicsDoubleBufferWidth = 8;
@@ -1855,6 +1892,7 @@ void main() {
         width: testGraphicsDoubleBufferWidth,
         height: testGraphicsDoubleBufferHeight,
         fragmentShader: testFragmentShader,
+        type: RenderTargetTypes.R11F_G11F_B10F
     });
     const testGraphicsDoubleBufferTextureMesh = createMesh({
         geometry: createPlaneGeometry({ gpu }),
@@ -1895,11 +1933,22 @@ void main() {
     });
     subscribeActorOnUpdate(testGraphicsDoubleBufferTextureMesh, () => {
         updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
-        setUniformValueToAllMeshMaterials(
+        const readTexture = getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture;
+        setUniformValueToMeshMaterials(
             testGraphicsDoubleBufferTextureMesh,
             UniformNames.BaseMap,
-            getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture
+            readTexture
         );
+        // setUniformValueToMeshMaterials(
+        //     vatGPUParticle,
+        //     "uPositionMap",
+        //     readTexture
+        // );
+        // setUniformValueToMeshMaterials(
+        //     vatGPUParticle,
+        //     "uBaseMap",
+        //     readTexture
+        // );
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
 
@@ -1909,6 +1958,8 @@ void main() {
     //     // particleNum: 1
     // });
     // addActorToScene(captureScene, vatParticle.mesh);
+
+
 
     // noise -----------------------------------
 
