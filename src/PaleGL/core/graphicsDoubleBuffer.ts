@@ -75,7 +75,9 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
         uniformBlockNames: [...uniformBlockNames, UniformBlockNames.Common],
     });
     const doubleBuffer = createDoubleBuffer({
-        gpu,
+        // gpu,
+        ...args,
+        // override
         width,
         height,
         minFilter: TextureFilterTypes.Nearest,
