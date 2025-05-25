@@ -135,8 +135,8 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             value: shadingModelId,
         },
     ];
-
-    const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
+    
+    const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
     const depthUniforms: UniformsData = [
         {
@@ -149,6 +149,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             type: UniformTypes.Vector4,
             value: baseMapTiling,
         },
+        ...uniforms
     ];
 
     const material = createMaterial({

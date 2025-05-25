@@ -2,7 +2,7 @@
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     getMeshMaterial,
-    setMeshMaterial,
+    setMeshMaterial, setUniformValueToAllMeshMaterials,
     setUniformValueToMeshMaterials,
 } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -26,7 +26,7 @@ import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/
 import {
     bindGPUUniformBlockAndGetBlockIndex,
     createGPU,
-    getDummyBlackTexture,
+    getDummyBlackTexture, getDummyWhiteTexture,
     updateGPUTransformFeedback
 } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -1851,7 +1851,6 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
         useVAT: true
     });
     addActorToScene(captureScene, vatGPUParticle);
-    console.log(vatGPUParticle);
     
     // const hoge = createMesh({
     //     geometry: createBoxGeometry({ gpu, size: 1 }),
@@ -1939,15 +1938,32 @@ void main() {
             UniformNames.BaseMap,
             readTexture
         );
+        setUniformValueToAllMeshMaterials(
+            vatGPUParticle,
+            "uPositionMap",
+            readTexture
+            // getDummyWhiteTexture(gpu)
+            // getDummyBlackTexture(gpu)
+        );
+        setUniformValueToAllMeshMaterials(
+            vatGPUParticle,
+            "uBaseMap",
+            getDummyWhiteTexture(gpu)
+        );
+        // console.log(vatGPUParticle)
         // setUniformValueToMeshMaterials(
         //     vatGPUParticle,
         //     "uPositionMap",
-        //     readTexture
+        //     // readTexture
+        //     getDummyWhiteTexture(gpu)
+        //     // getDummyBlackTexture(gpu)
         // );
         // setUniformValueToMeshMaterials(
         //     vatGPUParticle,
         //     "uBaseMap",
-        //     readTexture
+        //     // readTexture
+        //     // getDummyWhiteTexture(gpu)
+        //     getDummyBlackTexture(gpu)
         // );
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);

@@ -61,7 +61,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
         },
     ];
 
-    const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
+    const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
     const depthUniforms: UniformsData = [
         {
@@ -79,6 +79,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
             type: UniformTypes.Color,
             value: baseColor || createColorWhite(),
         },
+        ...uniforms
     ];
 
     const material = createMaterial({
