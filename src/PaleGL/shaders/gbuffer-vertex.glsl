@@ -28,7 +28,7 @@ uniform float uEmissiveMixer;
 #endif
 
 #ifdef USE_VAT
-uniform sampler2D uPositionMap;
+uniform sampler2D uVATPositionMap;
 uniform vec2 uVATResolution;
 #endif
 
@@ -280,7 +280,7 @@ void main() {
             int(mod(fid, uVATResolution.x)),
             int(floor(fid / uVATResolution.y))
         );
-        vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+        vec3 vatPosition = texelFetch(uVATPositionMap, vatUv, 0).xyz;
         mat4 instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
         // TODO: actor自体のworldMatirxは使わない方がいい

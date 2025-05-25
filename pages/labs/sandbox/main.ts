@@ -1755,7 +1755,7 @@ void main() {
             material: createUnlitMaterial({
                 uniforms: [
                     {
-                        name: "uPositionMap",
+                        name: UniformNames.VATPositionMap,
                         type: UniformTypes.Texture,
                         value: null
                     }
@@ -1829,42 +1829,11 @@ void main() {
         );
         setUniformValueToAllMeshMaterials(
             vatGPUParticle,
-            "uPositionMap",
+            UniformNames.VATPositionMap,
             readTexture
-            // getDummyWhiteTexture(gpu)
-            // getDummyBlackTexture(gpu)
         );
-        setUniformValueToAllMeshMaterials(
-            vatGPUParticle,
-            "uBaseMap",
-            getDummyWhiteTexture(gpu)
-        );
-        // console.log(vatGPUParticle)
-        // setUniformValueToMeshMaterials(
-        //     vatGPUParticle,
-        //     "uPositionMap",
-        //     // readTexture
-        //     getDummyWhiteTexture(gpu)
-        //     // getDummyBlackTexture(gpu)
-        // );
-        // setUniformValueToMeshMaterials(
-        //     vatGPUParticle,
-        //     "uBaseMap",
-        //     // readTexture
-        //     // getDummyWhiteTexture(gpu)
-        //     getDummyBlackTexture(gpu)
-        // );
     });
     addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
-
-    // const vatParticle = createGPUParticle({
-    //         geometry: createBoxGeometry({ gpu }),
-    //         material: createUnlitMaterial(),
-    //     // particleNum: 1
-    // });
-    // addActorToScene(captureScene, vatParticle.mesh);
-
-
 
     // noise -----------------------------------
 
