@@ -33,12 +33,13 @@ export const tryStartActor = (actor: Actor, args: ActorStartArgs) => {
 
 export type StartActorFunc = (actor: Actor, args: ActorStartArgs) => void;
 
-export function startActorBehaviourBase(actor: Actor, { gpu, scene }: ActorStartArgs) {
+export function startActorBehaviourBase(actor: Actor, args: ActorStartArgs) {
+    const { gpu, scene } = args;
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onStartCallback?.(actor, model, gpu, scene);
     });
     actor.onStart.forEach((cb) => {
-        cb({ gpu, scene });
+        cb(args);
     });
 }
 
@@ -124,7 +125,7 @@ export const updateActor: UpdateActorFunc = (actor, args) => {
         behaviour.onUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });
     actor.onUpdate.forEach((cb) => {
-        cb({ gpu, scene, time, deltaTime });
+        cb(args);
     });
 
     // console.log(actor.type, actor.name)

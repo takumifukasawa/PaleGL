@@ -30,9 +30,16 @@ export type GPUParticleArgs = {
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
-    // useVAT?: boolean;
-    vatData?: VATData;
     makePerInstanceDataFunction?: (index: number) => PerInstanceData;
+    position?: number[][];
+    scale?: number[][];
+    rotation?: number[][];
+    velocity?: number[][];
+    color?: number[][];
+    emissiveColor?: number[][];
+    animationOffset?: number[];
+    // vat
+    // vatData?: VATData;
 };
 
 export type GPUParticle = Mesh;
@@ -48,8 +55,9 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         // fragmentShader,
         // particleNum,
         instanceCount,
-        // useVAT,
-        vatData,
+        // default
+        // vat
+        // vatData,
         makePerInstanceDataFunction,
     } = args;
 
@@ -160,39 +168,39 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         })
     );
 
-    const useVAT = !!vatData;
+    // const useVAT = !!vatData;
 
     iterateAllMeshMaterials(mesh, (mat) => {
-        mat.useVAT = useVAT;
+        // mat.useVAT = useVAT;
         mat.isInstancing = true; // 強制trueにしちゃう
-        if (useVAT) {
-            // depthが作られる前なのでdepthUniformsにも設定する
-            const vatResolution = createVector2(vatData.width, vatData.height);
-            addUniformValue(
-                mat.uniforms,
-                UniformNames.VATPositionMap,
-                UniformTypes.Texture,
-                null
-            );
-            addUniformValue(
-                mat.depthUniforms,
-                UniformNames.VATPositionMap,
-                UniformTypes.Texture,
-                null
-            );
-            addUniformValue(
-                mat.uniforms,
-                UniformNames.VATResolution,
-                UniformTypes.Vector2,
-                vatResolution
-            );
-            addUniformValue(
-                mat.depthUniforms,
-                UniformNames.VATResolution,
-                UniformTypes.Vector2,
-                vatResolution
-            );
-        }
+        // if (useVAT) {
+        //     // depthが作られる前なのでdepthUniformsにも設定する
+        //     const vatResolution = createVector2(vatData.width, vatData.height);
+        //     addUniformValue(
+        //         mat.uniforms,
+        //         UniformNames.VATPositionMap,
+        //         UniformTypes.Texture,
+        //         null
+        //     );
+        //     addUniformValue(
+        //         mat.depthUniforms,
+        //         UniformNames.VATPositionMap,
+        //         UniformTypes.Texture,
+        //         null
+        //     );
+        //     addUniformValue(
+        //         mat.uniforms,
+        //         UniformNames.VATResolution,
+        //         UniformTypes.Vector2,
+        //         vatResolution
+        //     );
+        //     addUniformValue(
+        //         mat.depthUniforms,
+        //         UniformNames.VATResolution,
+        //         UniformTypes.Vector2,
+        //         vatResolution
+        //     );
+        // }
     });
 
     return mesh;

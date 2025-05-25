@@ -1,10 +1,6 @@
 // actors
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    getMeshMaterial,
-    setMeshMaterial, setUniformValueToAllMeshMaterials,
-    setUniformValueToMeshMaterials,
-} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
@@ -22,16 +18,11 @@ import {
     setSceneToEngine,
     startEngine,
 } from '@/PaleGL/core/engine.ts';
-import { createRenderer, renderRenderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import {
-    bindGPUUniformBlockAndGetBlockIndex,
-    createGPU,
-    getDummyBlackTexture, getDummyWhiteTexture,
-    updateGPUTransformFeedback
-} from '@/PaleGL/core/gpu.ts';
+import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
+import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 // import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
+import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
@@ -186,7 +177,8 @@ import {
 import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
-import {isMinifyShader} from "@/PaleGL/utilities/envUtilities.ts";
+import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
+import { createVATGPUParticle } from '@/PaleGL/actors/meshes/vatGPUParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1271,8 +1263,8 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
                 color: [...c.e],
                 emissiveColor: [...ec.e],
                 animationOffset: Math.random() * 30,
-            }
-        }
+            };
+        },
     });
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
@@ -1618,7 +1610,6 @@ const main = async () => {
         skinnedMesh.geometry.drawCount
     );
     // skinnedMesh.enabled = false;
-    
 
     //
     // floor mesh
@@ -1670,7 +1661,7 @@ const main = async () => {
     //
 
     const particleNum = 50;
-    
+
     const particleMesh = createBillboardParticle({
         gpu,
         particleNum,
@@ -1683,33 +1674,46 @@ const main = async () => {
         minColor: createColorFromRGB(200, 190, 180, 50),
         maxColor: createColorFromRGB(250, 240, 230, 200),
         particleMap,
-        vertexShaderModifiers: [...(isMinifyShader() ? [] : [
-            {
-                pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
-                value: `
+        vertexShaderModifiers: [
+            ...(isMinifyShader()
+                ? []
+                : [
+                      {
+                          pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
+                          value: `
 cycleSpeed = .33;
                 `,
-            },
-            {
-                pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
-                value: `
+                      },
+                      {
+                          pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
+                          value: `
 localPosition.x += mix(0., 4., r) * mix(.4, .8, cycleOffset);
 localPosition.z += mix(0., 4., r) * mix(-.4, -.8, cycleOffset);
                 `,
-            },
-            {
-                pragma: VertexShaderModifierPragmas.VERTEX_COLOR_POST_PROCESS,
-                value: `
+                      },
+                      {
+                          pragma: VertexShaderModifierPragmas.VERTEX_COLOR_POST_PROCESS,
+                          value: `
 vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
                 `,
-            },
-        ])],
+                      },
+                  ]),
+        ],
     });
 
     // vat gpu particle ---------------------------
 
-
-    const testFragmentShader = `
+    // vat gpu particle
+    const vatGPUParticle = createVATGPUParticle({
+        gpu,
+        mesh: createMesh({
+            geometry: createBoxGeometry({ gpu, size: 1 }),
+            material: createUnlitMaterial(),
+        }),
+        instanceCount: 8 * 8,
+        vatWidth: 8,
+        vatHeight: 8,
+        positionFragmentShader: `
 #pragma DEFINES
 #include <lighting>
 #include <ub>
@@ -1732,88 +1736,9 @@ void main() {
     outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
     outColor = texture(uPrevMap, uv);
 }
-    `;
-    const testGraphicsDoubleBufferWidth = 8;
-    const testGraphicsDoubleBufferHeight = 8;
-    const testGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
-        gpu,
-        width: testGraphicsDoubleBufferWidth,
-        height: testGraphicsDoubleBufferHeight,
-        fragmentShader: testFragmentShader,
-        // type: RenderTargetTypes.R11F_G11F_B10F
-        type: RenderTargetTypes.RGBA16F
-    });
-
-    // vat gpu particle
-    const vatGPUParticle = createGPUParticle({
-        mesh: createMesh({
-            geometry: createBoxGeometry({ gpu, size: 1 }),
-            material: createUnlitMaterial(),
-        }),
-        instanceCount: testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight,
-        vatData: {
-            width: testGraphicsDoubleBufferWidth,
-            height: testGraphicsDoubleBufferHeight,
-        }
-        // makePerInstanceDataFunction: () => {
-        //     return {
-        //         position: [
-        //             0,
-        //             0,
-        //             // Math.random() * 4 - 2,
-        //             // Math.random() * 2 + 2,
-        //             Math.random() * 4 - 2
-        //         ]
-        //     }
-        // }
+    `,
     });
     addActorToScene(captureScene, vatGPUParticle);
-
-    // const hoge = createMesh({
-    //     geometry: createBoxGeometry({ gpu, size: 1 }),
-    //     material: createUnlitMaterial({}),
-    // });
-    // addActorToScene(captureScene, hoge);
-    // setScaling(hoge.transform, createVector3(4, 4, 4));
-
-    subscribeActorOnStart(vatGPUParticle, () => {
-        tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
-
-        const dataArray = maton
-            .range(testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight)
-            .map((_, i) => {
-                return [i * 2, 3, i * -2, 255];
-            })
-            .flat();
-        const data = new Float32Array(Array.from(dataArray));
-
-        // prettier-ignore
-        updateTexture(
-            getWriteRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture!,
-            {
-                data
-            }
-        );
-
-        swapDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer);
-
-        // // prettier-ignore
-        // updateTexture(
-        //     getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture!,
-        //     {
-        //         data
-        //     }
-        // );
-    });
-    subscribeActorOnUpdate(vatGPUParticle, () => {
-        updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
-        const readTexture = getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture;
-        setUniformValueToAllMeshMaterials(
-            vatGPUParticle,
-            UniformNames.VATPositionMap,
-            readTexture
-        );
-    });
 
     // noise -----------------------------------
 

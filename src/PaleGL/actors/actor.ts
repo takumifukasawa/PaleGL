@@ -21,7 +21,7 @@ export type ActorFixedUpdateArgs = {
 export type ActorUpdateArgs = { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number };
 export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; renderer: Renderer, time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; gpu: Gpu }) => void;
+type OnStartCallback = (args: { scene: Scene; renderer: Renderer, gpu: Gpu }) => void;
 type OnSetSizeCallback = (
     width: number,
     height: number,
@@ -29,7 +29,7 @@ type OnSetSizeCallback = (
     uiCamera: OrthographicCamera | null
 ) => void;
 type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
+type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer, time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(key: string, value: T) => void;

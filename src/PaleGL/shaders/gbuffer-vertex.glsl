@@ -283,8 +283,6 @@ void main() {
         vec3 vatPosition = texelFetch(uVATPositionMap, vatUv, 0).xyz;
         mat4 instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        // TODO: actor自体のworldMatirxは使わない方がいい
-        // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
         // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
         // worldMatrix = uWorldMatrix;
         worldMatrix = uWorldMatrix * instanceTranslation;
@@ -322,8 +320,6 @@ void main() {
         #endif
    
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        // TODO: actor自体のworldMatirxは使わない方がいい
-        // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
         worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
     #endif
 
