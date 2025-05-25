@@ -274,6 +274,8 @@ void main() {
 #ifdef USE_INSTANCING
     float fid = float(gl_InstanceID);
     vInstanceId = fid;
+    
+    mat4 instanceTranslation = getIdentityMat();
 
     #ifdef USE_VAT
         vec2 vatUv = ivec2(
@@ -281,47 +283,48 @@ void main() {
             int(floor(fid / uVATResolution.y))
         );
         vec3 vatPosition = texelFetch(uVATPositionMap, vatUv, 0).xyz;
-        mat4 instanceTranslation = getTranslationMat(vatPosition);
+        instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
         // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
         // worldMatrix = uWorldMatrix;
         worldMatrix = uWorldMatrix * instanceTranslation;
     #else
-        mat4 instanceTranslation = getTranslationMat(aInstancePosition);
-        mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
-        mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
-        mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
-        mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
-        mat4 instanceRotation =
-            instanceRotationY *
-            instanceRotationX *
-            instanceRotationZ;
-        
-        // instanceごとのvelocityが必要なことに注意
-        // TODO: 追従率をuniformで渡したい
-        #ifdef USE_INSTANCE_LOOK_DIRECTION
-            // pattern_1: 速度ベクトルを使って回転
-            instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
-            // pattern_2: 速度ベクトルをnormalizeして使って回転
-            // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
-            // pattern_3: look direction
-            // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
-            // pattern_4: blend
-            // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
-            // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
-            // // for debug: 回転させない
-            // instanceRotation = mat4(
-            //     1., 0., 0., 0.,
-            //     0., 1., 0., 0.,
-            //     0., 0., 1., 0.,
-            //     0., 0., 0., 1.
-            //     
-            // );
-        #endif
-   
-        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
+        instanceTranslation = getTranslationMat(aInstancePosition);
     #endif
+    
+    mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
+    mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
+    mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
+    mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
+    mat4 instanceRotation =
+        instanceRotationY *
+        instanceRotationX *
+        instanceRotationZ;
+    
+    // instanceごとのvelocityが必要なことに注意
+    // TODO: 追従率をuniformで渡したい
+    #ifdef USE_INSTANCE_LOOK_DIRECTION
+        // pattern_1: 速度ベクトルを使って回転
+        instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+        // pattern_2: 速度ベクトルをnormalizeして使って回転
+        // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
+        // pattern_3: look direction
+        // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
+        // pattern_4: blend
+        // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
+        // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
+        // // for debug: 回転させない
+        // instanceRotation = mat4(
+        //     1., 0., 0., 0.,
+        //     0., 1., 0., 0.,
+        //     0., 0., 1., 0.,
+        //     0., 0., 0., 1.
+        //     
+        // );
+    #endif
+    
+    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+    worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 
     // TODO:
     // vInstanceState = aInstanceState;
