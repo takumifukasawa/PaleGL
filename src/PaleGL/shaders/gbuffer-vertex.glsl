@@ -16,11 +16,6 @@ out vec3 vNormal;
 out mat4 vWorldMatrix;
 out mat4 vInverseWorldMatrix;
 
-#ifdef USE_VAT
-uniform sampler2D uPositionMap;
-out float vInstanceId;
-#endif
-
 #ifdef USE_INSTANCING
 out float vInstanceId;
 // TODO
@@ -30,6 +25,10 @@ uniform vec4 uBaseColor;
 uniform float uBaseMixer;
 uniform vec4 uEmissiveColor;
 uniform float uEmissiveMixer;
+#endif
+
+#ifdef USE_VAT
+uniform sampler2D uPositionMap;
 #endif
 
 #ifdef USE_NORMAL_MAP
@@ -127,6 +126,15 @@ mat4 getLookAtMat(vec3 lookAt, vec3 p) {
         r.x, r.y, r.z, 0.,
         u.x, u.y, u.z, 0.,
         f.x, f.y, f.z, 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getIdentityMat() {
+    return mat4(
+        1., 0., 0., 0.,
+        0., 1., 0., 0.,
+        0., 0., 1., 0.,
         0., 0., 0., 1.
     );
 }
@@ -262,57 +270,65 @@ void main() {
 
     mat4 worldMatrix = uWorldMatrix;
 
-#ifdef USE_VAT
-    vec3 vatPosition = texture(uPositionMap).xyz;
-    mat4 varTranslation = getTranslationMat(vatPosition);
-    // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
-    worldMatrix = uWorldMatrix * vatTranslation;
-#endif
-
 #ifdef USE_INSTANCING
-    mat4 instanceTranslation = getTranslationMat(aInstancePosition);
-    mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
-    mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
-    mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
-    mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
-    mat4 instanceRotation =
-        instanceRotationY *
-        instanceRotationX *
-        instanceRotationZ;
-    
-    // instanceごとのvelocityが必要なことに注意
-    // TODO: 追従率をuniformで渡したい
-    #ifdef USE_INSTANCE_LOOK_DIRECTION
-        // pattern_1: 速度ベクトルを使って回転
-        instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
-        // pattern_2: 速度ベクトルをnormalizeして使って回転
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
-        // pattern_3: look direction
-        // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
-        // pattern_4: blend
-        // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
-        // // for debug: 回転させない
-        // instanceRotation = mat4(
-        //     1., 0., 0., 0.,
-        //     0., 1., 0., 0.,
-        //     0., 0., 1., 0.,
-        //     0., 0., 0., 1.
-        //     
-        // );
-    #endif
-   
-    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-   
-    // TODO: actor自体のworldMatirxは使わない方がいい
-    // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
-    worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
-    
     vInstanceId = float(gl_InstanceID);
+
+    #ifdef USE_VAT
+        vec2 vatUv = vec2(0., 0.);
+        // vec3 vatPosition = textureLod(uPositionMap, vatUv, 0.).xyz;
+        // vec3 vatPosition = texture(uPositionMap, vatUv).xyz;
+        vec3 vatPosition = texelFetch(uPositionMap, ivec2(0., 0.), 0).xyz;
+        mat4 instanceTranslation = getTranslationMat(vatPosition);
+        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        // TODO: actor自体のworldMatirxは使わない方がいい
+        // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
+        // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
+        // worldMatrix = uWorldMatrix;
+        worldMatrix = uWorldMatrix * instanceTranslation;
+    #else
+        mat4 instanceTranslation = getTranslationMat(aInstancePosition);
+        mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
+        mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
+        mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
+        mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
+        mat4 instanceRotation =
+            instanceRotationY *
+            instanceRotationX *
+            instanceRotationZ;
+        
+        // instanceごとのvelocityが必要なことに注意
+        // TODO: 追従率をuniformで渡したい
+        #ifdef USE_INSTANCE_LOOK_DIRECTION
+            // pattern_1: 速度ベクトルを使って回転
+            instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+            // pattern_2: 速度ベクトルをnormalizeして使って回転
+            // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
+            // pattern_3: look direction
+            // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
+            // pattern_4: blend
+            // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
+            // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
+            // // for debug: 回転させない
+            // instanceRotation = mat4(
+            //     1., 0., 0., 0.,
+            //     0., 1., 0., 0.,
+            //     0., 0., 1., 0.,
+            //     0., 0., 0., 1.
+            //     
+            // );
+        #endif
+   
+        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        // TODO: actor自体のworldMatirxは使わない方がいい
+        // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
+        worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
+    #endif
 
     // TODO:
     // vInstanceState = aInstanceState;
-    vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #ifdef USE_VERTEX_COLOR
+        vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #endif
 #endif
 
     vec4 worldPosition = worldMatrix * localPosition;
