@@ -170,6 +170,18 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
             const vatResolution = createVector2(vatData.width, vatData.height);
             addUniformValue(
                 mat.uniforms,
+                UniformNames.VATPositionMap,
+                UniformTypes.Texture,
+                null
+            );
+            addUniformValue(
+                mat.depthUniforms,
+                UniformNames.VATPositionMap,
+                UniformTypes.Texture,
+                null
+            );
+            addUniformValue(
+                mat.uniforms,
                 UniformNames.VATResolution,
                 UniformTypes.Vector2,
                 vatResolution

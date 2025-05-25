@@ -1743,24 +1743,12 @@ void main() {
         // type: RenderTargetTypes.R11F_G11F_B10F
         type: RenderTargetTypes.RGBA16F
     });
-    const testGraphicsDoubleBufferTextureMesh = createMesh({
-        geometry: createPlaneGeometry({ gpu }),
-        material: createUnlitMaterial(),
-    });
 
     // vat gpu particle
     const vatGPUParticle = createGPUParticle({
         mesh: createMesh({
             geometry: createBoxGeometry({ gpu, size: 1 }),
-            material: createUnlitMaterial({
-                uniforms: [
-                    {
-                        name: UniformNames.VATPositionMap,
-                        type: UniformTypes.Texture,
-                        value: null
-                    }
-                ]
-            }),
+            material: createUnlitMaterial(),
         }),
         instanceCount: testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight,
         vatData: {
@@ -1788,9 +1776,7 @@ void main() {
     // addActorToScene(captureScene, hoge);
     // setScaling(hoge.transform, createVector3(4, 4, 4));
 
-    subscribeActorOnStart(testGraphicsDoubleBufferTextureMesh, () => {
-        setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
-        setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
+    subscribeActorOnStart(vatGPUParticle, () => {
         tryStartMaterial(gpu, renderer, testGraphicsDoubleBuffer.geometry, testGraphicsDoubleBuffer.material);
 
         const dataArray = maton
@@ -1819,21 +1805,15 @@ void main() {
         //     }
         // );
     });
-    subscribeActorOnUpdate(testGraphicsDoubleBufferTextureMesh, () => {
+    subscribeActorOnUpdate(vatGPUParticle, () => {
         updateGraphicsDoubleBuffer(renderer, testGraphicsDoubleBuffer);
         const readTexture = getReadRenderTargetOfDoubleBuffer(testGraphicsDoubleBuffer.doubleBuffer).texture;
-        setUniformValueToMeshMaterials(
-            testGraphicsDoubleBufferTextureMesh,
-            UniformNames.BaseMap,
-            readTexture
-        );
         setUniformValueToAllMeshMaterials(
             vatGPUParticle,
             UniformNames.VATPositionMap,
             readTexture
         );
     });
-    addActorToScene(captureScene, testGraphicsDoubleBufferTextureMesh);
 
     // noise -----------------------------------
 
