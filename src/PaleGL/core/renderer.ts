@@ -19,7 +19,9 @@ import {
     clearGPUDepth,
     createGPUUniformBufferObject,
     drawGPU,
-    flushGPU, getDummyBlackTexture, getDummyWhiteTexture,
+    flushGPU,
+    getDummyBlackTexture,
+    getDummyWhiteTexture,
     Gpu,
     setGPUFramebuffer,
     setGPUShader,
@@ -30,14 +32,19 @@ import {
 import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    getMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+    updateMeshDepthMaterial,
+    updateMeshMaterial,
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import {
     isCompiledMaterialShader,
     Material,
     setMaterialUniformValue,
-    startMaterial
+    startMaterial,
 } from '@/PaleGL/materials/material.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import {
@@ -114,7 +121,8 @@ import {
     createVector3,
     createVector3Zero,
     getVector3Magnitude,
-    subVectorsV3, subVectorsV3Ref,
+    subVectorsV3,
+    subVectorsV3Ref,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
 import { Actor } from '@/PaleGL/actors/actor.ts';
@@ -155,10 +163,11 @@ import {
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import { rotateVectorByQuaternion } from '@/PaleGL/math/quaternion.ts';
-import { UIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
-import {getGeometryAttributeDescriptors} from "@/PaleGL/geometries/geometryBehaviours.ts";
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
+import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 
-type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
+type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 
 type RenderMeshInfoEachQueue = {
     [key in RenderQueueType]: RenderMeshInfo[];
@@ -770,7 +779,7 @@ export const tryStartMaterial = (gpu: Gpu, renderer: Renderer, geometry: Geometr
         });
         checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
     }
-}
+};
 
 export function setRendererSize(renderer: Renderer, realWidth: number, realHeight: number) {
     const w = Math.floor(realWidth);
@@ -840,7 +849,7 @@ export function blitRenderTarget(
     renderer: Renderer,
     renderTarget: RenderTarget,
     geometry: Geometry,
-    material: Material,
+    material: Material
 ) {
     // 前の状態を保持
     const tmpRenderTarget = renderer.renderTarget;
@@ -940,45 +949,53 @@ export function renderRenderer(
                     return;
                 }
                 mesh.materials.forEach((material, i) => {
-                    if (mesh.meshType === MeshTypes.UI) {
-                        const uiShapeCharMesh = mesh as UIShapeCharMesh;
-                        switch (uiShapeCharMesh.uiQueueType) {
-                            case UIQueueTypes.AfterTone:
-                                renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
-                                    buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
-                                );
-                                break;
-                            case UIQueueTypes.Overlay:
-                                renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
-                                    buildRenderMeshInfo(mesh, RenderQueueType.Overlay, i)
-                                );
-                                break;
-                            default:
-                                console.error('[renderRenderer] invalid ui queue type');
-                                return;
-                        }
-                    } else {
-                        if (material.alphaTest != null) {
-                            renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
-                                buildRenderMeshInfo(mesh, RenderQueueType.AlphaTest, i)
+                    // switch (uiMesh.uiQueueType) {
+                    //     case UIQueueTypes.AfterTone:
+                    //         renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
+                    //             buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                    //         );
+                    //         break;
+                    //     case UIQueueTypes.Overlay:
+                    //         renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
+                    //             buildRenderMeshInfo(mesh, RenderQueueType.Overlay, i)
+                    //         );
+                    //         break;
+                    //     default:
+                    //         console.error('[renderRenderer] invalid ui queue type');
+                    //         return;
+                    // }
+                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.AfterTone) {
+                        renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
+                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                        );
+                        return;
+                    }
+                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.Overlay) {
+                        renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
+                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                        );
+                        return;
+                    }
+                    if (material.alphaTest != null) {
+                        renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
+                            buildRenderMeshInfo(mesh, RenderQueueType.AlphaTest, i)
+                        );
+                        return;
+                    }
+                    switch (material.blendType) {
+                        case BlendTypes.Opaque:
+                            renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
+                                buildRenderMeshInfo(mesh, RenderQueueType.Opaque, i)
                             );
                             return;
-                        }
-                        switch (material.blendType) {
-                            case BlendTypes.Opaque:
-                                renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
-                                    buildRenderMeshInfo(mesh, RenderQueueType.Opaque, i)
-                                );
-                                return;
-                            case BlendTypes.Transparent:
-                            case BlendTypes.Additive:
-                                renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
-                                    buildRenderMeshInfo(mesh, RenderQueueType.Transparent, i)
-                                );
-                                return;
-                            default:
-                                console.error('[Renderer.render] invalid blend type');
-                        }
+                        case BlendTypes.Transparent:
+                        case BlendTypes.Additive:
+                            renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
+                                buildRenderMeshInfo(mesh, RenderQueueType.Transparent, i)
+                            );
+                            return;
+                        default:
+                            console.error('[Renderer.render] invalid blend type');
                     }
                 });
                 break;
@@ -1400,7 +1417,7 @@ export function renderRenderer(
  * @param geometry
  * @param material
  */
-export function renderMesh(renderer: Renderer, geometry: Geometry, material: Material) {
+export function renderMesh(renderer: Renderer, geometry: Geometry, material: Material, cb?: () => void) {
     // geometry.update();
 
     if (renderer.stats) {
@@ -1453,6 +1470,8 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     //     geometry.getInstanceCount()
     // )
 
+    if (cb) cb();
+
     // draw
     drawGPU(
         renderer.gpu,
@@ -1468,10 +1487,21 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
 }
 
 export function buildRenderMeshInfo(actor: Mesh, queue: RenderQueueType, materialIndex: number = 0): RenderMeshInfo {
+    let cb: (() => void) | undefined;
+    if (actor.meshType === MeshTypes.SpriteAtlas) {
+        const spriteAtlasMesh = actor as SpriteAtlasMesh;
+        cb = () => {
+            // NOTE: マテリアルは共通でuniformだけrender前に上書き
+            // TODO: uniform name の rename
+            setUniformValueToAllMeshMaterials(actor, UniformNames.FontTiling, spriteAtlasMesh.tilingOffset);
+        };
+    }
+
     return {
         actor,
         queue,
         materialIndex,
+        cb,
     };
 }
 
@@ -1508,7 +1538,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
     setRenderTargetToRendererAndClear(renderer, renderer.depthPrePassRenderTarget, false, true);
     updateRendererCameraUniforms(renderer, camera);
 
-    depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         updateActorTransformUniforms(renderer, actor, camera);
 
         actor.depthMaterials.forEach((depthMaterial, i) => {
@@ -1529,7 +1559,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
                 return;
             }
 
-            renderMesh(renderer, actor.geometry, depthMaterial);
+            renderMesh(renderer, actor.geometry, depthMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'depth pre pass', actor.name, actor.geometry);
@@ -1601,7 +1631,7 @@ function shadowPass(
 
         updateRendererCameraUniforms(renderer, lightActor.shadowCamera);
 
-        castShadowRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+        castShadowRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
             // TODO: material 側でやった方がよい？
             updateActorTransformUniforms(renderer, actor, camera);
 
@@ -1628,7 +1658,7 @@ function shadowPass(
                     renderer.copyDepthDestRenderTarget.depthTexture
                 );
 
-                renderMesh(renderer, actor.geometry, depthMaterial);
+                renderMesh(renderer, actor.geometry, depthMaterial, cb);
                 if (renderer.stats) {
                     addPassInfoStats(renderer.stats, 'shadow pass', actor.name, actor.geometry);
                 }
@@ -1640,7 +1670,7 @@ function shadowPass(
 function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedSkyboxPassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedSkyboxPassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         if (!(actor as Skybox).renderMesh) {
             return;
         }
@@ -1663,7 +1693,7 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
 
             updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'skybox pass', actor.name, actor.geometry);
@@ -1693,7 +1723,7 @@ function renderBasePass(
 
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         switch (actor.type) {
             case ActorTypes.Skybox:
                 if (!(actor as Skybox).renderMesh) {
@@ -1751,7 +1781,7 @@ function renderBasePass(
             });
             // updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'scene pass', actor.name, actor.geometry);
@@ -1776,7 +1806,7 @@ function renderTransparentPass(
     // }
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         actor.materials.forEach((targetMaterial, i) => {
             if (i !== materialIndex) {
                 return;
@@ -1798,7 +1828,7 @@ function renderTransparentPass(
             });
             // updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
@@ -1808,7 +1838,7 @@ function renderTransparentPass(
 }
 
 function renderUIPass(
-    passName: string, 
+    passName: string,
     renderer: Renderer,
     camera: Camera,
     sortedRenderMeshInfos: RenderMeshInfo[],
@@ -1840,7 +1870,7 @@ function renderUIPass(
     //         break;
     // }
 
-    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         actor.materials.forEach((targetMaterial, i) => {
             if (i !== materialIndex) {
                 return;
@@ -1869,7 +1899,7 @@ function renderUIPass(
             });
             // updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, passName, actor.name, actor.geometry);

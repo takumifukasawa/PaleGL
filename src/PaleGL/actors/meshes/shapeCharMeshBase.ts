@@ -1,22 +1,20 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { addUniformData, UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
-import {MeshType, UIQueueType, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
+import { createMesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
+import { MeshType, UIQueueType } from '@/PaleGL/constants.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { ShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
-import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { ShapeFontAtlas } from '@/PaleGL/shapeFont/buildShaderFontAtlas.ts';
+import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 
 type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
-    uniforms?: UniformsData;
-    color?: Color;
-    fontTexture: Texture;
+    // uniforms?: UniformsData;
+    // color?: Color;
+    // fontTexture: Texture;
     char: string;
     shapeFontRenderer: ShapeFontRenderer<T, U>;
     x: number;
@@ -27,9 +25,10 @@ type ShapeCharMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     uiQueueType: UIQueueType;
 } & MeshOptionsArgs;
 
-export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;
+// export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeCharMeshBaseArgs<T, U>, 'material'>;
+export type ShapeCharMeshArgs<T, U extends ShapeFontBase<T>> = ShapeCharMeshBaseArgs<T, U>;
 
-export type ShapeCharMesh = Mesh & {
+export type ShapeCharMesh = SpriteAtlasMesh & {
     charWidth: number;
     charHeight: number;
     char: string;
@@ -63,8 +62,8 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     gpu,
     name = '',
     material,
-    color = createColorWhite(),
-    fontTexture,
+    // color = createColorWhite(),
+    // fontTexture,
     char,
     shapeFontRenderer,
     castShadow,
@@ -76,34 +75,34 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     const { shapeFontAtlas } = shapeFontRenderer;
     const { aspect } = shapeFontAtlas;
 
-    const fontTilingOffset = getShapeFontTilingOffset(shapeFontAtlas, x, y);
+    const tilingOffset = getShapeFontTilingOffset(shapeFontAtlas, x, y);
 
-    const bUniforms: UniformsData = [
-        {
-            name: 'uColor',
-            type: UniformTypes.Color,
-            value: color,
-        },
-        {
-            name: UniformNames.FontMap,
-            type: UniformTypes.Texture,
-            value: fontTexture,
-        },
-        {
-            name: UniformNames.FontTiling,
-            type: UniformTypes.Vector4,
-            value: fontTilingOffset,
-        },
-        {
-            name: 'uFontAspect',
-            type: UniformTypes.Float,
-            value: shapeFontRenderer.shapeFontAtlas.aspect,
-        },
-    ];
+    // const bUniforms: UniformsData = [
+    //     {
+    //         name: 'uColor',
+    //         type: UniformTypes.Color,
+    //         value: color,
+    //     },
+    //     {
+    //         name: UniformNames.FontMap,
+    //         type: UniformTypes.Texture,
+    //         value: fontTexture,
+    //     },
+    //     {
+    //         name: UniformNames.FontTiling,
+    //         type: UniformTypes.Vector4,
+    //         value: tilingOffset,
+    //     },
+    //     {
+    //         name: 'uFontAspect',
+    //         type: UniformTypes.Float,
+    //         value: shapeFontRenderer.shapeFontAtlas.aspect,
+    //     },
+    // ];
 
-    // 追加
-    addUniformData(material.uniforms, bUniforms);
-    addUniformData(material.depthUniforms, bUniforms);
+    // // 追加
+    // addUniformData(material.uniforms, bUniforms);
+    // addUniformData(material.depthUniforms, bUniforms);
 
     const planeHeight = planeWidth / aspect;
 
@@ -121,5 +120,6 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
         charWidth: planeWidth,
         charHeight: planeHeight,
         char,
+        tilingOffset,
     };
 };

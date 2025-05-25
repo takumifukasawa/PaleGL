@@ -4,15 +4,34 @@ import {
     ShapeTextMeshArgs,
     ShapeTextMeshBase,
 } from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
-import { BlendType, BlendTypes, MeshTypes, UIAnchorType, UIAnchorTypes, UIQueueType } from '@/PaleGL/constants.ts';
+import {
+    BlendType,
+    BlendTypes,
+    DepthFuncTypes,
+    MeshTypes,
+    PrimitiveTypes,
+    UIAnchorType,
+    UIAnchorTypes,
+    UIQueueType,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
 import { createUIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { createVector3, setV3x } from '@/PaleGL/math/vector3.ts';
 import { setTranslation } from '@/PaleGL/core/transform.ts';
 import { subscribeActorOnSetSize } from '@/PaleGL/actors/actor.ts';
 import { getOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { createUIActor, UIActor } from '@/PaleGL/actors/meshes/uiActor.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
+import uiVert from '@/PaleGL/shaders/ui-vertex.glsl';
+import uiShapeTextFrag from '@/PaleGL/shaders/ui-shape-text-fragment.glsl';
+import depthFrag from '@/PaleGL/shaders/depth-fragment.glsl';
+import {createVector4} from "@/PaleGL/math/vector4.ts";
+import {createColorWhite} from "@/PaleGL/math/color.ts";
 
 type UIShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<ShapeTextMeshArgs<T, U>, 'planeWidth'> & {
     fontSize?: number;
@@ -32,19 +51,85 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         characterSpacing = 0,
         fontSize = 13,
         blendType = BlendTypes.Transparent,
-        uiQueueType,
+        shapeFontRenderer,
+        uniforms,
+        color = createColorWhite(),
+        shapeFontTexture
     } = options;
 
     const actor = options.actor || createUIActor({ name: 'ui-shape-text-mesh' });
 
+    const baseUniforms: UniformsData = [
+        {
+            name: 'uColor',
+            type: UniformTypes.Color,
+            value: color,
+        },
+        {
+            name: UniformNames.FontMap,
+            type: UniformTypes.Texture,
+            value: shapeFontTexture,
+        },
+        {
+            name: UniformNames.FontTiling,
+            type: UniformTypes.Vector4,
+            // value: tilingOffset,
+            value: createVector4(1, 1, 0, 0),
+        },
+        {
+            name: 'uFontAspect',
+            type: UniformTypes.Float,
+            value: shapeFontRenderer.shapeFontAtlas.aspect,
+        },
+    ];
+    
+    const mergedUniforms: UniformsData = [
+        ...baseUniforms,
+        {
+            name: UniformNames.UICharRect,
+            type: UniformTypes.Vector2,
+            value: createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect), // w: 1 を基準とする
+        },
+        {
+            name: UniformNames.UIAnchor,
+            type: UniformTypes.Vector2,
+            value: createVector2(0, 0),
+        },
+        {
+            name: UniformNames.UIFontSize,
+            type: UniformTypes.Float,
+            value: fontSize,
+        },
+        ...(uniforms || []),
+    ];
+
+    const material = createMaterial({
+        name: 'uiShapeCharMeshMaterial',
+        vertexShader: uiVert,
+        fragmentShader: uiShapeTextFrag,
+        depthFragmentShader: depthFrag,
+        uniforms: mergedUniforms,
+        depthUniforms: [],
+        depthTest: false,
+        depthWrite: false,
+        blendType,
+        primitiveType: PrimitiveTypes.Triangles,
+        depthFuncType: DepthFuncTypes.Equal,
+        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+    });
+
     const shapeText = createShapeTextMeshBase({
         ...options,
         actor,
-        createCharMeshFunc: (args: ShapeCharMeshArgs<T, U>) =>
-            createUIShapeCharMesh({ ...args, blendType, uiQueueType }),
-        // uiQueueType: UIQueueTypes.AfterTone,
-        meshType: MeshTypes.UI,
+        createCharMeshFunc: createUIShapeCharMesh,
+        // createCharMeshFunc: (args: ShapeCharMeshArgs<T, U>) =>
+        //     createUIShapeCharMesh({ ...args, blendType, uiQueueType, }),
+        // // uiQueueType: UIQueueTypes.AfterTone,
+        // meshType: MeshTypes.UI,
+        // meshType: MeshTypes.SpriteAtlas,
+        meshType: MeshTypes.Default,
         planeWidth: fontSize,
+        material,
     });
 
     const { shapeCharMeshes } = shapeText;

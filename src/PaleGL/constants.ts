@@ -109,7 +109,8 @@ export const MeshTypes = {
     ObjectSpaceRaymarch: 2,
     ScreenSpaceRaymarch: 3,
     Text: 4,
-    UI: 5,
+    // UI: 5,
+    SpriteAtlas: 6,
 } as const;
 
 export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];

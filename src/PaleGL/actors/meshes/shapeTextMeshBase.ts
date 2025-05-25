@@ -9,6 +9,8 @@ import { Color } from '@/PaleGL/math/color.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { CreateShapeCharMeshFunc } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { MeshType, UIQueueType, UIQueueTypes } from '@/PaleGL/constants.ts';
+import {Material} from "@/PaleGL/materials/material.ts";
+import {UniformsData} from "@/PaleGL/core/uniforms.ts";
 
 type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
@@ -22,18 +24,20 @@ type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     createCharMeshFunc: CreateShapeCharMeshFunc<T, U>;
     meshType: MeshType;
     planeWidth: number;
+    material: Material;
     // for ui
     uiQueueType?: UIQueueType;
 };
 
 export type ShapeTextMeshArgs<T, U extends ShapeFontBase<T>> = Omit<
     ShapeTextMeshBaseArgs<T, U>,
-    'createCharMeshFunc' | 'uiQueueType' | 'meshType'
+    'createCharMeshFunc' | 'uiQueueType' | 'meshType' | 'material'
     // 'createCharMeshFunc' | 'meshType'
 > & {
     align?: TextAlignType;
     characterSpacing?: number;
     uiQueueType?: UIQueueType;
+    uniforms?: UniformsData;
 };
 
 export type ShapeTextMeshBase<T, U extends ShapeFontBase<T>> = {
@@ -54,13 +58,14 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
         // name,
         actor,
         text,
-        color,
-        shapeFontTexture,
+        // color,
+        // shapeFontTexture,
         shapeFontRenderer,
         shapeFontService,
         createCharMeshFunc,
         meshType,
         planeWidth,
+        material,
         // for ui
         uiQueueType = UIQueueTypes.None,
     } = args;
@@ -89,14 +94,15 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
         const shapeCharMesh = createCharMeshFunc({
             gpu,
             name: `shape-char-${char}`,
-            fontTexture: shapeFontTexture,
+            // fontTexture: shapeFontTexture,
             char,
             shapeFontRenderer,
-            color,
+            // color,
             x: colIndex,
             y: rowIndex,
             meshType,
             planeWidth,
+            material,
             // ui
             uiQueueType,
         });
