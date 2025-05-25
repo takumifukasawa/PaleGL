@@ -59,14 +59,15 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(baseColor.rgb);
-    
-    // outGBufferD = vec4(vUv,1.,1.);
-#ifdef USE_VAT
-    // outGBufferD = EncodeGBufferD(texture(uPositionMap, vUv).rgb);
-    // outGBufferD = EncodeGBufferD(texture(uBaseMap, vUv).rgb);
-    outGBufferD = vec4(vUv,1.,1.);
-    outGBufferD = EncodeGBufferD(texture(uPositionMap, vUv).xyz);
-#endif
+
+// for debug    
+//     // outGBufferD = vec4(vUv,1.,1.);
+// #ifdef USE_VAT
+//     // outGBufferD = EncodeGBufferD(texture(uPositionMap, vUv).rgb);
+//     // outGBufferD = EncodeGBufferD(texture(uBaseMap, vUv).rgb);
+//     outGBufferD = vec4(vUv,1.,1.);
+//     outGBufferD = EncodeGBufferD(texture(uPositionMap, vUv).xyz);
+// #endif
     
     #pragma AFTER_OUT
 }

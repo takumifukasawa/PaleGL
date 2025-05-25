@@ -1229,154 +1229,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     skinningMesh.animator = gltfActor.animator!;
     setAnimationClips(skinningMesh, getAnimatorAnimationClips(gltfActor.animator));
 
-    // // subscribeActorOnStart(skinningMesh, () => {
-    // //     // CPU skinning
-    // //     // gltfActor.animator.play('Fly', true);
-    // //     // gltfActor.animator.animationClips[0].speed = 0.2;
-    // // });
-    // // // skinningMesh.onUpdate = ({ deltaTime }) => {
-    // // //     // skinningMesh.animator.update(deltaTime);
-    // // //     // gltfActor.animator.update(deltaTime);
-    // // // };
-
-    // const instanceInfo: {
-    //     position: number[][];
-    //     scale: number[][];
-    //     rotation: number[][];
-    //     velocity: number[][];
-    //     color: number[][];
-    //     emissiveColor: number[][];
-    //     animationOffset: number[];
-    // } = {
-    //     position: [],
-    //     scale: [],
-    //     rotation: [],
-    //     velocity: [],
-    //     color: [],
-    //     emissiveColor: [],
-    //     animationOffset: []
-    // };
-    // maton.range(instanceNum).forEach(() => {
-    //     // const posRangeX = 20;
-    //     // const posRangeZ = 20;
-    //     // const px = (Math.random() * 2 - 1) * posRangeX;
-    //     // const py = 0.5 + Math.random() * 2.;
-    //     // const pz = (Math.random() * 2 - 1) * posRangeZ;
-    //     // const p = [px, py, pz];
-    //     // instanceInfo.position.push(p);
-    //     instanceInfo.position.push([0, 0, 0]);
-
-    //     // const baseScale = 0.04;
-    //     // const randomScaleRange = 0.08;
-    //     const baseScale = 0.2;
-    //     const randomScaleRange = 0.6;
-    //     const s = Math.random() * randomScaleRange + baseScale;
-    //     // instanceInfo.scale.push([s, s * 2, s]);
-    //     instanceInfo.scale.push([s, s, s]);
-
-    //     instanceInfo.rotation.push([0, 0, 0]);
-
-    //     instanceInfo.velocity.push([0, 0, 0]);
-
-    //     const c = createColorFromRGB(
-    //         Math.floor(Math.random() * 200 + 30),
-    //         Math.floor(Math.random() * 80 + 20),
-    //         Math.floor(Math.random() * 200 + 30)
-    //     );
-    //     instanceInfo.color.push([...c.e]);
-
-    //     const ec = createColorFromRGB(0, 0, 0);
-    //     instanceInfo.emissiveColor.push([...ec.e]);
-    //
-    //     instanceInfo.animationOffset.push(Math.random() * 30)
-    // });
-    // // const animationOffsetInfo = maton
-    // //     .range(instanceNum)
-    // //     .map(() => {
-    // //         return Math.random() * 30;
-    // //     })
-    // //     .flat();
-
-    // skinningMesh.castShadow = true;
-    // skinningMesh.geometry.instanceCount = instanceNum;
-
-    // // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstancePosition,
-    //         data: new Float32Array(instanceInfo.position.flat()),
-    //         size: 3,
-    //         divisor: 1,
-    //     })
-    // );
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceScale,
-    //         data: new Float32Array(instanceInfo.scale.flat()),
-    //         size: 3,
-    //         divisor: 1,
-    //     })
-    // );
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceRotation,
-    //         data: new Float32Array(instanceInfo.rotation.flat()),
-    //         size: 3,
-    //         divisor: 1,
-    //     })
-    // );
-    // // aInstanceAnimationOffsetは予約語
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceAnimationOffset,
-    //         data: new Float32Array(instanceInfo.animationOffset.flat()),
-    //         size: 1,
-    //         divisor: 1,
-    //     })
-    // );
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceVertexColor,
-    //         data: new Float32Array(instanceInfo.color.flat()),
-    //         size: 4,
-    //         divisor: 1,
-    //     })
-    // );
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceEmissiveColor,
-    //         data: new Float32Array(instanceInfo.emissiveColor.flat()),
-    //         size: 4,
-    //         divisor: 1,
-    //     })
-    // );
-    // setGeometryAttribute(
-    //     skinningMesh.geometry,
-    //     createAttribute({
-    //         name: AttributeNames.InstanceVelocity,
-    //         data: new Float32Array(instanceInfo.velocity.flat()),
-    //         size: 3,
-    //         divisor: 1,
-    //     })
-    // );
-
-    // skinningMesh.material = new PhongMaterial({
-    //     // gpu,
-    //     specularAmount: 0.5,
-    //     receiveShadow: true,
-    //     isSkinning: true,
-    //     gpuSkinning: true,
-    //     isInstancing: true,
-    //     useVertexColor: true,
-    //     envMap: cubeMap,
-    //     ambientAmount: 0.2,
-    // });
     setMeshMaterial(
         skinningMesh,
         createGBufferMaterial({
@@ -1399,40 +1251,18 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         mesh: skinningMesh,
         instanceCount: instanceNum,
         makePerInstanceDataFunction: () => {
-
-            // // const posRangeX = 20;
-            // // const posRangeZ = 20;
-            // // const px = (Math.random() * 2 - 1) * posRangeX;
-            // // const py = 0.5 + Math.random() * 2.;
-            // // const pz = (Math.random() * 2 - 1) * posRangeZ;
-            // // const p = [px, py, pz];
-            // // instanceInfo.position.push(p);
-            // instanceInfo.position.push([0, 0, 0]);
-
-            // const baseScale = 0.04;
-            // const randomScaleRange = 0.08;
             const baseScale = 0.2;
             const randomScaleRange = 0.6;
             const s = Math.random() * randomScaleRange + baseScale;
-            // // instanceInfo.scale.push([s, s * 2, s]);
-            // instanceInfo.scale.push([s, s, s]);
-
-            // instanceInfo.rotation.push([0, 0, 0]);
-
-            // instanceInfo.velocity.push([0, 0, 0]);
 
             const c = createColorFromRGB(
                 Math.floor(Math.random() * 200 + 30),
                 Math.floor(Math.random() * 80 + 20),
                 Math.floor(Math.random() * 200 + 30)
             );
-            // instanceInfo.color.push([...c.e]);
 
             const ec = createColorFromRGB(0, 0, 0);
-            // instanceInfo.emissiveColor.push([...ec.e]);
 
-            // instanceInfo.animationOffset.push(Math.random() * 30);
-            
             return {
                 position: [0, 0, 0],
                 scale: [s, s, s],
@@ -1878,33 +1708,6 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
     // vat gpu particle ---------------------------
 
-    // vat gpu particle
-    const vatGPUParticle = createGPUParticle({
-        mesh: createMesh({
-            geometry: createBoxGeometry({ gpu, size: 3 }),
-            material: createUnlitMaterial({
-                uniforms: [
-                    {
-                        name: "uPositionMap",
-                        type: UniformTypes.Texture,
-                        value: getDummyBlackTexture(gpu)
-                    }
-                ]
-            }),
-        }),
-        instanceCount: 1,
-        useVAT: true
-    });
-    addActorToScene(captureScene, vatGPUParticle);
-    
-    // const hoge = createMesh({
-    //     geometry: createBoxGeometry({ gpu, size: 1 }),
-    //     material: createUnlitMaterial({}),
-    // });
-    // addActorToScene(captureScene, hoge);
-    // setScaling(hoge.transform, createVector3(4, 4, 4));
-
-
 
     const testFragmentShader = `
 #pragma DEFINES
@@ -1927,6 +1730,7 @@ void main() {
     float nr = mod(r + uDeltaTime, 1.);
     // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
     outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
+    outColor = texture(uPrevMap, uv);
 }
     `;
     const testGraphicsDoubleBufferWidth = 8;
@@ -1936,12 +1740,54 @@ void main() {
         width: testGraphicsDoubleBufferWidth,
         height: testGraphicsDoubleBufferHeight,
         fragmentShader: testFragmentShader,
-        type: RenderTargetTypes.R11F_G11F_B10F
+        // type: RenderTargetTypes.R11F_G11F_B10F
+        type: RenderTargetTypes.RGBA16F
     });
     const testGraphicsDoubleBufferTextureMesh = createMesh({
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
+
+    // vat gpu particle
+    const vatGPUParticle = createGPUParticle({
+        mesh: createMesh({
+            geometry: createBoxGeometry({ gpu, size: 1 }),
+            material: createUnlitMaterial({
+                uniforms: [
+                    {
+                        name: "uPositionMap",
+                        type: UniformTypes.Texture,
+                        value: null
+                    }
+                ]
+            }),
+        }),
+        instanceCount: testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight,
+        vatData: {
+            width: testGraphicsDoubleBufferWidth,
+            height: testGraphicsDoubleBufferHeight,
+        }
+        // makePerInstanceDataFunction: () => {
+        //     return {
+        //         position: [
+        //             0,
+        //             0,
+        //             // Math.random() * 4 - 2,
+        //             // Math.random() * 2 + 2,
+        //             Math.random() * 4 - 2
+        //         ]
+        //     }
+        // }
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // const hoge = createMesh({
+    //     geometry: createBoxGeometry({ gpu, size: 1 }),
+    //     material: createUnlitMaterial({}),
+    // });
+    // addActorToScene(captureScene, hoge);
+    // setScaling(hoge.transform, createVector3(4, 4, 4));
+
     subscribeActorOnStart(testGraphicsDoubleBufferTextureMesh, () => {
         setScaling(testGraphicsDoubleBufferTextureMesh.transform, createFillVector3(1.5));
         setTranslation(testGraphicsDoubleBufferTextureMesh.transform, createVector3(-8, 1.5, 8));
@@ -1950,12 +1796,10 @@ void main() {
         const dataArray = maton
             .range(testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight)
             .map((_, i) => {
-                const r = 255 / (testGraphicsDoubleBufferWidth * testGraphicsDoubleBufferHeight);
-                const v = (r * i) % 255;
-                return [v, 0, 0, 255];
+                return [i * 2, 3, i * -2, 255];
             })
             .flat();
-        const data = new Uint8Array(Array.from(dataArray));
+        const data = new Float32Array(Array.from(dataArray));
 
         // prettier-ignore
         updateTexture(

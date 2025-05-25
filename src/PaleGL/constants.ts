@@ -390,6 +390,11 @@ export const UniformNames = {
     BoneCount: 'uBoneCount',
     JointTextureColNum: 'uJointTextureColNum',
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
+    // vat
+    VATPositionMap: 'uVATPositionMap',
+    // VATWidth: 'uVATWidth',
+    // VATHeight: 'uVATWidth',
+    VATResolution: 'uVATResolution',
     // shadow map
     // ShadowBias: 'uShadowBias',
     // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',

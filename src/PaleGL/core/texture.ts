@@ -633,14 +633,7 @@ export function updateTexture(
 
     // TODO: execute all type
     switch (texture.type) {
-        // case TextureTypes.RGBA16F:
-        //     if (this.img) {
-        //         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, this.img);
-        //     } else {
-        //         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
-        //     }
-        //     break;
-
+        // data: Uint8Array | null
         case TextureTypes.RGBA:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -650,6 +643,16 @@ export function updateTexture(
             }
             break;
 
+        // data: Float32Array | null
+        case TextureTypes.RGBA16F:
+            if (data) {
+                gl.texImage2D(GL_TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, data);
+            } else {
+                gl.texImage2D(GL_TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+            }
+            break;
+            
+        // data: Float32Array | null
         case TextureTypes.RGBA32F:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data);

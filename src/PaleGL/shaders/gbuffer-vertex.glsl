@@ -29,6 +29,7 @@ uniform float uEmissiveMixer;
 
 #ifdef USE_VAT
 uniform sampler2D uPositionMap;
+uniform vec2 uVATResolution;
 #endif
 
 #ifdef USE_NORMAL_MAP
@@ -271,13 +272,15 @@ void main() {
     mat4 worldMatrix = uWorldMatrix;
 
 #ifdef USE_INSTANCING
-    vInstanceId = float(gl_InstanceID);
+    float fid = float(gl_InstanceID);
+    vInstanceId = fid;
 
     #ifdef USE_VAT
-        vec2 vatUv = vec2(0., 0.);
-        // vec3 vatPosition = textureLod(uPositionMap, vatUv, 0.).xyz;
-        // vec3 vatPosition = texture(uPositionMap, vatUv).xyz;
-        vec3 vatPosition = texelFetch(uPositionMap, ivec2(0., 0.), 0).xyz;
+        vec2 vatUv = ivec2(
+            int(mod(fid, uVATResolution.x)),
+            int(floor(fid / uVATResolution.y))
+        );
+        vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
         mat4 instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
         // TODO: actor自体のworldMatirxは使わない方がいい

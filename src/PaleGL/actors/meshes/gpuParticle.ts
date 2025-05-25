@@ -3,10 +3,12 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createColorFromRGB } from '@/PaleGL/math/color.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AttributeNames } from '@/PaleGL/constants.ts';
+import { AttributeNames, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
+import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
 
 type PerInstanceData = {
     position?: number[];
@@ -16,14 +18,20 @@ type PerInstanceData = {
     color?: number[];
     emissiveColor?: number[];
     animationOffset?: number;
-}
+};
+
+type VATData = {
+    width: number;
+    height: number;
+};
 
 export type GPUParticleArgs = {
     mesh?: Mesh;
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
-    useVAT?: boolean;
+    // useVAT?: boolean;
+    vatData?: VATData;
     makePerInstanceDataFunction?: (index: number) => PerInstanceData;
 };
 
@@ -40,8 +48,9 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         // fragmentShader,
         // particleNum,
         instanceCount,
-        useVAT,
-        makePerInstanceDataFunction
+        // useVAT,
+        vatData,
+        makePerInstanceDataFunction,
     } = args;
 
     const mesh =
@@ -69,22 +78,21 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         velocity: [],
         color: [],
         emissiveColor: [],
-        animationOffset: []
+        animationOffset: [],
     };
 
     if (makePerInstanceDataFunction) {
-    maton.range(instanceCount).forEach((i) => {
-        const perData = makePerInstanceDataFunction(i);
-        instanceInfo.position.push(perData.position || [0, 0, 0]);
-        instanceInfo.scale.push(perData.scale || [1, 1, 1]);
-        instanceInfo.rotation.push(perData.rotation || [0, 0, 0]);
-        instanceInfo.velocity.push(perData.velocity || [0, 0, 0]);
-        instanceInfo.color.push(perData.color || [...(createColorFromRGB(1, 1, 1).e)]);
-        instanceInfo.emissiveColor.push(perData.emissiveColor || [...(createColorFromRGB(0, 0, 0).e)]);
-        instanceInfo.animationOffset.push(perData.animationOffset || 0);
-    });
+        maton.range(instanceCount).forEach((_, i) => {
+            const perData = makePerInstanceDataFunction(i);
+            instanceInfo.position.push(perData.position || [0, 0, 0]);
+            instanceInfo.scale.push(perData.scale || [1, 1, 1]);
+            instanceInfo.rotation.push(perData.rotation || [0, 0, 0]);
+            instanceInfo.velocity.push(perData.velocity || [0, 0, 0]);
+            instanceInfo.color.push(perData.color || [...createColorFromRGB(1, 1, 1).e]);
+            instanceInfo.emissiveColor.push(perData.emissiveColor || [...createColorFromRGB(0, 0, 0).e]);
+            instanceInfo.animationOffset.push(perData.animationOffset || 0);
+        });
     }
-
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     setGeometryAttribute(
@@ -152,9 +160,27 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         })
     );
 
+    const useVAT = !!vatData;
+
     iterateAllMeshMaterials(mesh, (mat) => {
-        mat.useVAT = !!useVAT;
+        mat.useVAT = useVAT;
         mat.isInstancing = true; // 強制trueにしちゃう
+        if (useVAT) {
+            // depthが作られる前なのでdepthUniformsにも設定する
+            const vatResolution = createVector2(vatData.width, vatData.height);
+            addUniformValue(
+                mat.uniforms,
+                UniformNames.VATResolution,
+                UniformTypes.Vector2,
+                vatResolution
+            );
+            addUniformValue(
+                mat.depthUniforms,
+                UniformNames.VATResolution,
+                UniformTypes.Vector2,
+                vatResolution
+            );
+        }
     });
 
     return mesh;
