@@ -169,12 +169,6 @@ import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextM
 import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
-import {
-    getReadRenderTargetOfDoubleBuffer,
-    getWriteRenderTargetOfDoubleBuffer,
-    swapDoubleBuffer,
-} from '@/PaleGL/core/doubleBuffer.ts';
-import { createGraphicsDoubleBuffer, updateGraphicsDoubleBuffer } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
@@ -1713,6 +1707,11 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
         instanceCount: 8 * 8,
         vatWidth: 8,
         vatHeight: 8,
+        makePerVATInstanceDataFunction: (i) => {
+            return {
+                position: [i * 2, 3, i * -2, 255]
+            }
+        },
         positionFragmentShader: `
 #pragma DEFINES
 #include <lighting>

@@ -1,14 +1,11 @@
 import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { createColorFromRGB } from '@/PaleGL/math/color.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AttributeNames, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { AttributeNames } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
-import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
-import { createVector2 } from '@/PaleGL/math/vector2.ts';
 
 type PerInstanceData = {
     position?: number[];
@@ -18,11 +15,6 @@ type PerInstanceData = {
     color?: number[];
     emissiveColor?: number[];
     animationOffset?: number;
-};
-
-type VATData = {
-    width: number;
-    height: number;
 };
 
 export type GPUParticleArgs = {
@@ -89,18 +81,34 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         animationOffset: [],
     };
 
-    if (makePerInstanceDataFunction) {
-        maton.range(instanceCount).forEach((_, i) => {
+    let tmpPosition: number[] | undefined;
+    let tmpScale: number[] | undefined;
+    let tmpRotation: number[] | undefined;
+    let tmpVelocity: number[] | undefined;
+    let tmpColor: number[] | undefined;
+    let tmpEmissiveColor: number[] | undefined;
+    let tmpAnimationOffset: number | undefined;
+
+    maton.range(instanceCount).forEach((_, i) => {
+        if (makePerInstanceDataFunction) {
             const perData = makePerInstanceDataFunction(i);
-            instanceInfo.position.push(perData.position || [0, 0, 0]);
-            instanceInfo.scale.push(perData.scale || [1, 1, 1]);
-            instanceInfo.rotation.push(perData.rotation || [0, 0, 0]);
-            instanceInfo.velocity.push(perData.velocity || [0, 0, 0]);
-            instanceInfo.color.push(perData.color || [...createColorFromRGB(1, 1, 1).e]);
-            instanceInfo.emissiveColor.push(perData.emissiveColor || [...createColorFromRGB(0, 0, 0).e]);
-            instanceInfo.animationOffset.push(perData.animationOffset || 0);
-        });
-    }
+            tmpPosition = perData.position;
+            tmpScale = perData.scale;
+            tmpRotation = perData.rotation;
+            tmpVelocity = perData.velocity;
+            tmpColor = perData.color; // RGBA
+            tmpEmissiveColor = perData.emissiveColor; // RGBA
+            tmpAnimationOffset = perData.animationOffset;
+        }
+
+        instanceInfo.position.push(tmpPosition || [0, 0, 0]);
+        instanceInfo.scale.push(tmpScale || [1, 1, 1]);
+        instanceInfo.rotation.push(tmpRotation || [0, 0, 0]);
+        instanceInfo.velocity.push(tmpVelocity || [0, 0, 0]);
+        instanceInfo.color.push(tmpColor || [1, 1, 1, 1]);
+        instanceInfo.emissiveColor.push(tmpEmissiveColor || [0, 0, 0, 1]);
+        instanceInfo.animationOffset.push(tmpAnimationOffset || 0);
+    });
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     setGeometryAttribute(
