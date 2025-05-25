@@ -1398,6 +1398,51 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     const particle = createGPUParticle({
         mesh: skinningMesh,
         instanceCount: instanceNum,
+        makePerInstanceDataFunction: () => {
+
+            // // const posRangeX = 20;
+            // // const posRangeZ = 20;
+            // // const px = (Math.random() * 2 - 1) * posRangeX;
+            // // const py = 0.5 + Math.random() * 2.;
+            // // const pz = (Math.random() * 2 - 1) * posRangeZ;
+            // // const p = [px, py, pz];
+            // // instanceInfo.position.push(p);
+            // instanceInfo.position.push([0, 0, 0]);
+
+            // const baseScale = 0.04;
+            // const randomScaleRange = 0.08;
+            const baseScale = 0.2;
+            const randomScaleRange = 0.6;
+            const s = Math.random() * randomScaleRange + baseScale;
+            // // instanceInfo.scale.push([s, s * 2, s]);
+            // instanceInfo.scale.push([s, s, s]);
+
+            // instanceInfo.rotation.push([0, 0, 0]);
+
+            // instanceInfo.velocity.push([0, 0, 0]);
+
+            const c = createColorFromRGB(
+                Math.floor(Math.random() * 200 + 30),
+                Math.floor(Math.random() * 80 + 20),
+                Math.floor(Math.random() * 200 + 30)
+            );
+            // instanceInfo.color.push([...c.e]);
+
+            const ec = createColorFromRGB(0, 0, 0);
+            // instanceInfo.emissiveColor.push([...ec.e]);
+
+            // instanceInfo.animationOffset.push(Math.random() * 30);
+            
+            return {
+                position: [0, 0, 0],
+                scale: [s, s, s],
+                rotation: [0, 0, 0],
+                velocity: [0, 0, 0],
+                color: [...c.e],
+                emissiveColor: [...ec.e],
+                animationOffset: Math.random() * 30,
+            }
+        }
     });
 
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);

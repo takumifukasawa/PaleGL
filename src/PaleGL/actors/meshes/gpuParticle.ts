@@ -8,12 +8,23 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 
+type PerInstanceData = {
+    position?: number[];
+    scale?: number[];
+    rotation?: number[];
+    velocity?: number[];
+    color?: number[];
+    emissiveColor?: number[];
+    animationOffset?: number;
+}
+
 export type GPUParticleArgs = {
     mesh?: Mesh;
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
     useVAT?: boolean;
+    makePerInstanceDataFunction?: (index: number) => PerInstanceData;
 };
 
 export type GPUParticle = Mesh;
@@ -29,7 +40,8 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         // fragmentShader,
         // particleNum,
         instanceCount,
-        useVAT
+        useVAT,
+        makePerInstanceDataFunction
     } = args;
 
     const mesh =
@@ -60,40 +72,18 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         animationOffset: []
     };
 
-    maton.range(instanceCount).forEach(() => {
-        // const posRangeX = 20;
-        // const posRangeZ = 20;
-        // const px = (Math.random() * 2 - 1) * posRangeX;
-        // const py = 0.5 + Math.random() * 2.;
-        // const pz = (Math.random() * 2 - 1) * posRangeZ;
-        // const p = [px, py, pz];
-        // instanceInfo.position.push(p);
-        instanceInfo.position.push([0, 0, 0]);
-
-        // const baseScale = 0.04;
-        // const randomScaleRange = 0.08;
-        const baseScale = 0.2;
-        const randomScaleRange = 0.6;
-        const s = Math.random() * randomScaleRange + baseScale;
-        // instanceInfo.scale.push([s, s * 2, s]);
-        instanceInfo.scale.push([s, s, s]);
-
-        instanceInfo.rotation.push([0, 0, 0]);
-
-        instanceInfo.velocity.push([0, 0, 0]);
-
-        const c = createColorFromRGB(
-            Math.floor(Math.random() * 200 + 30),
-            Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30)
-        );
-        instanceInfo.color.push([...c.e]);
-
-        const ec = createColorFromRGB(0, 0, 0);
-        instanceInfo.emissiveColor.push([...ec.e]);
-
-        instanceInfo.animationOffset.push(Math.random() * 30);
+    if (makePerInstanceDataFunction) {
+    maton.range(instanceCount).forEach((i) => {
+        const perData = makePerInstanceDataFunction(i);
+        instanceInfo.position.push(perData.position || [0, 0, 0]);
+        instanceInfo.scale.push(perData.scale || [1, 1, 1]);
+        instanceInfo.rotation.push(perData.rotation || [0, 0, 0]);
+        instanceInfo.velocity.push(perData.velocity || [0, 0, 0]);
+        instanceInfo.color.push(perData.color || [...(createColorFromRGB(1, 1, 1).e)]);
+        instanceInfo.emissiveColor.push(perData.emissiveColor || [...(createColorFromRGB(0, 0, 0).e)]);
+        instanceInfo.animationOffset.push(perData.animationOffset || 0);
     });
+    }
 
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
