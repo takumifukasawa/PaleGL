@@ -173,6 +173,7 @@ import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
 import { createVATGPUParticle } from '@/PaleGL/actors/meshes/vatGPUParticle.ts';
+import {isMainThread} from "vite-plugin-checker/dist/utils";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1698,18 +1699,31 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     // vat gpu particle ---------------------------
 
     // vat gpu particle
+    const vatWidth = 128;
+    const vatHeight = 128;
     const vatGPUParticle = createVATGPUParticle({
         gpu,
         mesh: createMesh({
             geometry: createBoxGeometry({ gpu, size: 1 }),
             material: createUnlitMaterial(),
         }),
-        instanceCount: 8 * 8,
-        vatWidth: 8,
-        vatHeight: 8,
-        makePerVATInstanceDataFunction: (i) => {
+        instanceCount: vatWidth * vatHeight,
+        vatWidth,
+        vatHeight,
+        makePerInstanceDataFunction: (i) => {
             return {
-                position: [i * 2, 3, i * -2, 1]
+                scale: [.1,.1,.1]
+            }
+        },
+        makePerVATInstanceDataFunction: (_) => {
+            return {
+                // position: [i * 2, 3, i * -2, 1]
+                position: [
+                    Math.random() * 10 - 5,
+                    Math.random() * 10 - 5,
+                    Math.random() * 10 - 5,
+                    1
+                ]
             }
         },
         positionFragmentShader: `
@@ -1736,25 +1750,58 @@ void main() {
     // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
     vec3 p = texture(uPrevMap, uv).xyz;
     vec3 v = texture(uVATVelocityMap, uv).xyz;
-    outColor = vec4(p + v * uDeltaTime, 1.);
+    // outColor = vec4(p + v * uDeltaTime, 1.);
+    outColor = vec4(p + v, 1.);
 }
     `,
         velocityFragmentShader: `
 #pragma DEFINES
 #include <lighting>
 #include <ub>
+#include <rand>
 in vec3 vPosition;
 in vec2 vUv;
 uniform sampler2D uPrevMap;
-uniform sampler2D uPositionMap;
+uniform sampler2D uVATPositionMap;
 uniform vec2 uTexelSize;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
+
+vec3 curlNoise(vec3 position) {
+    float eps = .0001;
+    float eps2 = 2. * eps;
+    float invEps2 = 1. / eps2;
+    vec3 dx = vec3(eps, 0., 0.);
+    vec3 dy = vec3(0., eps, 0.);
+    vec3 dz = vec3(0., 0., eps);
+    // 勾配検出のためにepsだけずらした地点のnoiseを参照
+    vec3 px0 = snoise3(position - dx);
+    vec3 px1 = snoise3(position + dx);
+    vec3 py0 = snoise3(position - dy);
+    vec3 py1 = snoise3(position + dy);
+    vec3 pz0 = snoise3(position - dz);
+    vec3 pz1 = snoise3(position + dz);
+    // 回転
+    float x = (py1.z - py0.z) - (pz1.y - pz0.y);
+    float y = (pz1.x - pz0.x) - (px1.z - px0.z);
+    float z = (px1.y - px0.y) - (py1.x - py0.x);
+    return vec3(x, y, z) * invEps2;
+}
+
 out vec4 outColor;
+
+uniform float uNoiseScale;
+uniform float uSpeed;
+
 void main() {
     vec3 prevVelocity = texture(uPrevMap, vUv).xyz;
+    vec3 position = texture(uVATPositionMap, vUv).xyz;
+    vec3 force = curlNoise(position * .1) - prevVelocity;
+    vec3 newVelocity = force * 1. * uDeltaTime;
+    // vec3 newPosition = position + newVelocity;
     // outColor = vec4(prevVelocity, 1.);
-    outColor = vec4(vec3(-5., 0., 0.), 1.);
+    outColor = vec4(newVelocity, 1.);
+    // outColor = vec4(1., 0., 0., 1.);
 }
         `
     });

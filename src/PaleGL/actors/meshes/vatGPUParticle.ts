@@ -23,7 +23,7 @@ import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 type PerInstanceData = {
     position: number[];
-    velocity: number[];
+    velocity?: number[];
 };
 
 export type VATGPUParticleArgs = GPUParticleArgs & {
@@ -90,6 +90,13 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         height: vatHeight,
         fragmentShader: velocityFragmentShader,
         type: RenderTargetTypes.RGBA16F,
+        uniforms: [
+            {
+                name: UniformNames.VATPositionMap,
+                type: UniformTypes.Texture,
+                value: null,
+            },
+        ]
     });
 
     const vatGPUParticle = { ...gpuParticle, positionGraphicsDoubleBuffer };
@@ -151,6 +158,13 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
     });
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
+        // velocity 更新前に前フレームのpositionをvelocityのuniformに設定する
+        setMaterialUniformValue(
+            velocityGraphicsDoubleBuffer.material,
+            UniformNames.VATPositionMap,
+            getReadRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer).texture
+        );
+        
         // update velocity
         updateGraphicsDoubleBuffer(renderer, velocityGraphicsDoubleBuffer);
         const readVelocityTexture = getReadRenderTargetOfDoubleBuffer(
@@ -162,7 +176,7 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         setMaterialUniformValue(
             positionGraphicsDoubleBuffer.material,
             UniformNames.VATVelocityMap,
-            getWriteRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer).texture
+            getReadRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer).texture
         );
 
         // update position
