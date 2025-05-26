@@ -393,6 +393,7 @@ export const UniformNames = {
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
     // vat
     VATPositionMap: 'uVATPositionMap',
+    VATVelocityMap: 'uVATVelocityMap',
     // VATWidth: 'uVATWidth',
     // VATHeight: 'uVATWidth',
     VATResolution: 'uVATResolution',

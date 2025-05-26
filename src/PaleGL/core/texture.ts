@@ -646,9 +646,9 @@ export function updateTexture(
         // data: Float32Array | null
         case TextureTypes.RGBA16F:
             if (data) {
-                gl.texImage2D(GL_TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, data);
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, data);
             } else {
-                gl.texImage2D(GL_TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+                gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, null);
             }
             break;
             

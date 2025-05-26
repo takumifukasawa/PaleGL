@@ -1709,7 +1709,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
         vatHeight: 8,
         makePerVATInstanceDataFunction: (i) => {
             return {
-                position: [i * 2, 3, i * -2, 255]
+                position: [i * 2, 3, i * -2, 1]
             }
         },
         positionFragmentShader: `
@@ -1719,6 +1719,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 in vec3 vPosition;
 in vec2 vUv;
 uniform sampler2D uPrevMap;
+uniform sampler2D uVATVelocityMap;
 uniform vec2 uTexelSize;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
@@ -1728,14 +1729,34 @@ void main() {
     vec2 sc = vec2(uTargetWidth, uTargetHeight);
     vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
     vec2 uv = fid / sc; // 0~1
-    vec4 prev = texture(uPrevMap, uv);
-    float r = prev.r;
-    float nr = mod(r + uDeltaTime, 1.);
+    // vec4 prev = texture(uPrevMap, uv);
+    // float r = prev.r;
+    // float nr = mod(r + uDeltaTime, 1.);
     // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
-    outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
-    outColor = texture(uPrevMap, uv);
+    // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
+    vec3 p = texture(uPrevMap, uv).xyz;
+    vec3 v = texture(uVATVelocityMap, uv).xyz;
+    outColor = vec4(p + v * uDeltaTime, 1.);
 }
     `,
+        velocityFragmentShader: `
+#pragma DEFINES
+#include <lighting>
+#include <ub>
+in vec3 vPosition;
+in vec2 vUv;
+uniform sampler2D uPrevMap;
+uniform sampler2D uPositionMap;
+uniform vec2 uTexelSize;
+uniform float uTargetWidth;
+uniform float uTargetHeight;
+out vec4 outColor;
+void main() {
+    vec3 prevVelocity = texture(uPrevMap, vUv).xyz;
+    // outColor = vec4(prevVelocity, 1.);
+    outColor = vec4(vec3(-5., 0., 0.), 1.);
+}
+        `
     });
     addActorToScene(captureScene, vatGPUParticle);
 
