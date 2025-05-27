@@ -81,15 +81,6 @@ export function createPlaneGeometryRawData({
         }
     }
 
-    console.log('PlaneGeometryRawData', {
-        rawPositions,
-        rawUvs,
-        rawNormals,
-        tangents,
-        binormals,
-        indices,
-    });
-
     return {
         positions: new Float32Array(rawPositions),
         uvs: new Float32Array(rawUvs),
