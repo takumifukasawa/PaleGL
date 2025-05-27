@@ -1623,6 +1623,8 @@ const main = async () => {
         gpu,
         calculateTangent: true,
         calculateBinormal: true,
+        divColNum: 10,
+        divRowNum: 10,
     });
     floorPlaneMesh = createMesh({
         geometry: floorGeometry,
@@ -1713,7 +1715,8 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     const vatGPUParticle = createVATGPUParticle({
         gpu,
         mesh: createMesh({
-            geometry: createBoxGeometry({gpu, size: 1}),
+            // geometry: createBoxGeometry({gpu, size: 1}),
+            geometry: createSphereGeometry({ gpu, radius: 1}),
             material: createUnlitMaterial({
                 baseColor: createColor(1.5, 1.5, 1.5, 1)
             }),
