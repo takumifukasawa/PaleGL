@@ -18,13 +18,15 @@ type SphereGeometry = {
 export function createSphereGeometryRawData(
     radius: number,
     widthSegments: number,
-    heightSegments: number
+    heightSegments: number,
+    invertNormals: boolean = false
 ): SphereGeometry {
     widthSegments  = Math.max(3, Math.floor(widthSegments));
     heightSegments = Math.max(2, Math.floor(heightSegments));
 
     const ringCount = heightSegments - 1;
     const ringVerts = widthSegments + 1;
+    const normalSign = invertNormals ? -1 : 1;
 
     const positions: number[] = [];
     const normals:   number[] = [];
@@ -56,7 +58,11 @@ export function createSphereGeometryRawData(
             positions.push(px, py, pz);
 
             // 法線
-            normals.push(sinT * cosP, cosT, sinT * sinP);
+            normals.push(
+                sinT * cosP * normalSign,
+                cosT * normalSign,
+                sinT * sinP * normalSign
+            );
 
             // UV
             uvs.push(u, 1 - v);
@@ -119,12 +125,13 @@ type SphereGeometryArgs = {
     radius?: number;
     widthSegments?: number;
     heightSegments?: number;
+    invertNormals?: boolean;
 };
 
 export function createSphereGeometry(args: SphereGeometryArgs) {
-    const { gpu, radius = 1, widthSegments = 8, heightSegments = 8 } = args;
+    const { gpu, radius = 1, widthSegments = 8, heightSegments = 8, invertNormals } = args;
 
-    const rawData = createSphereGeometryRawData(radius, widthSegments, heightSegments);
+    const rawData = createSphereGeometryRawData(radius, widthSegments, heightSegments, invertNormals);
 
     // TODO: uniqでfilter
     const attributes = [
