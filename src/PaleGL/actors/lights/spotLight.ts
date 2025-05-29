@@ -1,11 +1,14 @@
 ﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { addChildActor } from '@/PaleGL/actors/actor.ts';
-import { DEG_TO_RAD, LightTypes } from '@/PaleGL/constants.ts';
+import { DEG_TO_RAD, LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
 import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setRotationY } from '@/PaleGL/core/transform.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 
 type SpotLightParams = {
     distance: number;
@@ -74,3 +77,32 @@ export function getSpotLightConeCos(light: SpotLight) {
 export function getSpotLightPenumbraCos(light: SpotLight) {
     return angleToCos(light.penumbraAngle);
 }
+
+export const createSpotLightShadow = (
+    gpu: Gpu,
+    light: SpotLight,
+    resolution: number,
+    near: number,
+    visibleFrustum: boolean = false
+) => {
+    light.shadowCamera = createPerspectiveCamera(45, 1, near, 20);
+    light.shadowCamera.fixedAspect = true;
+    // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)
+    setRotationY(light.shadowCamera.transform, 180);
+    // TODO: なぜunknownを噛ませる必要がある？
+
+    addChildActor(light, light.shadowCamera);
+
+    light.shadowCamera.visibleFrustum = visibleFrustum;
+    light.castShadow = true;
+    light.shadowCamera.near = 1;
+    light.shadowCamera.far = light.distance;
+    setPerspectiveSize(light.shadowCamera, 1); // TODO: いらないかも
+    light.shadowMap = createRenderTarget({
+        gpu,
+        width: resolution,
+        height: resolution,
+        type: RenderTargetTypes.Depth,
+        depthPrecision: TextureDepthPrecisionType.High,
+    });
+};

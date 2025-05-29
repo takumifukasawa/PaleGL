@@ -130,7 +130,7 @@ import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/PaleGL/core/glslSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
-import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import {createSpotLight, createSpotLightShadow, SpotLight} from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
@@ -470,7 +470,7 @@ setTranslation(directionalLight.transform, createVector3(-3, 5, 3));
 //         depthPrecision: TextureDepthPrecisionType.High,
 //     });
 // }
-createDirectionalLightShadow(gpu, directionalLight);
+createDirectionalLightShadow(gpu, directionalLight, 1024, 1, 15, 7, true);
 
 subscribeActorOnStart(directionalLight, () => {
     setTranslation(directionalLight.transform, createVector3(-8, 8, -2));
@@ -497,21 +497,23 @@ const spotLight1 = createSpotLight({
 });
 // spotLight.enabled = false;
 
-if (spotLight1.shadowCamera) {
-    spotLight1.shadowCamera.visibleFrustum = true;
-    spotLight1.castShadow = true;
-    spotLight1.shadowCamera.near = 1;
-    spotLight1.shadowCamera.far = spotLight1.distance;
-    // spotLight.shadowCamera.far = 10;
-    setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight1.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+createSpotLightShadow(gpu, spotLight1, 1024, .1, true)
+
+// if (spotLight1.shadowCamera) {
+//     spotLight1.shadowCamera.visibleFrustum = true;
+//     spotLight1.castShadow = true;
+//     spotLight1.shadowCamera.near = 1;
+//     spotLight1.shadowCamera.far = spotLight1.distance;
+//     // spotLight.shadowCamera.far = 10;
+//     setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
+//     spotLight1.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
 
 subscribeActorOnStart(spotLight1, () => {
     setTranslation(spotLight1.transform, createVector3(5, 9, -2));
@@ -530,21 +532,24 @@ const spotLight2 = createSpotLight({
 });
 // spotLight.enabled = false;
 
-if (spotLight2.shadowCamera) {
-    spotLight2.shadowCamera.visibleFrustum = true;
-    spotLight2.castShadow = true;
-    spotLight2.shadowCamera.near = 1;
-    spotLight2.shadowCamera.far = spotLight2.distance;
-    // spotLight.shadowCamera.far = 10;
-    setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight2.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+// if (spotLight2.shadowCamera) {
+//     spotLight2.shadowCamera.visibleFrustum = true;
+//     spotLight2.castShadow = true;
+//     spotLight2.shadowCamera.near = 1;
+//     spotLight2.shadowCamera.far = spotLight2.distance;
+//     // spotLight.shadowCamera.far = 10;
+//     setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
+//     spotLight2.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
+
+createSpotLightShadow(gpu, spotLight2, 1024, .1, true)
+
 subscribeActorOnStart(spotLight2, () => {
     setTranslation(spotLight2.transform, createVector3(-5, 9, -2));
     setLookAtPosition(spotLight2.transform, createVector3(0, 0, 0));
