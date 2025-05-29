@@ -229,15 +229,13 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
     const volumetricLightPass = postProcessPass as VolumetricLightPass;
 
     const { gpu, renderer } = options;
-
-    if (volumetricLightPass.spotLights.length > 0) {
+    
         tryStartMaterial(
             gpu,
             renderer,
-            volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry, // TODO: shadow map ないケースがあるはず
+            volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry,
             volumetricLightPass.spotLightFrustumMaterial
         );
-    }
 
     setRenderTargetToRendererAndClear(renderer, volumetricLightPass.renderTargetSpotLightFrustum, false, true);
 

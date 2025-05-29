@@ -120,7 +120,9 @@ import {
     cloneVector3,
     createVector3,
     createVector3Zero,
-    getVector3Magnitude, negateVector3, normalizeVector3,
+    getVector3Magnitude,
+    negateVector3,
+    normalizeVector3,
     subVectorsV3,
     subVectorsV3Ref,
     Vector3,
@@ -166,6 +168,8 @@ import { rotateVectorByQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
+import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 
@@ -1230,8 +1234,10 @@ export function renderRenderer(
     // volumetric light pass
     // ------------------------------------------------------------------------------
 
-    if (lightActors.spotLights.length > 0) {
-        setVolumetricLightPassSpotLights(renderer.volumetricLightPass, lightActors.spotLights);
+    const needsCastShadowSpotLights = lightActors.spotLights.filter((light) => needsCastShadowOfLight(light));
+
+    if (needsCastShadowSpotLights.length > 0) {
+        setVolumetricLightPassSpotLights(renderer.volumetricLightPass, needsCastShadowSpotLights);
         renderPass({
             pass: renderer.volumetricLightPass,
             renderer,
@@ -1253,10 +1259,9 @@ export function renderRenderer(
         renderer.lightShaftPass.enabled
             ? getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!
             : getDummyBlackTexture(renderer.gpu),
-        // CUSTOM
-        //  this._gpu.dummyTextureBlack,
-        //
-        renderer.volumetricLightPass.renderTarget.texture!,
+        needsCastShadowSpotLights
+            ? renderer.volumetricLightPass.renderTarget.texture!
+            : getDummyBlackTexture(renderer.gpu),
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture!
             : getDummyBlackTexture(renderer.gpu),
