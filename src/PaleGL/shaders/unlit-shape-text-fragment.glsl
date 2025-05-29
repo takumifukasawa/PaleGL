@@ -26,6 +26,7 @@ void main() {
   
     // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
     // #include <alpha_test_f>
+// result color がなぜか minify されちゃうので一旦明示的に
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor, uAlphaTestThreshold);
 #endif

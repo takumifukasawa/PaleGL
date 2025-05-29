@@ -19,6 +19,7 @@ void main() {
     vec4 resultColor = calcShapeFont(vUv);
    
     // #include <alpha_test_f>
+// result color がなぜか minify されちゃうので一旦明示的に
 #ifdef USE_ALPHA_TEST
     checkAlphaTest(resultColor, uAlphaTestThreshold);
 #endif
