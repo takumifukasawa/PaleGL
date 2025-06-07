@@ -1,8 +1,7 @@
 // actors
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
@@ -20,8 +19,6 @@ import {
 } from '@/PaleGL/core/engine.ts';
 import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
-import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
-// import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
 import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
@@ -89,12 +86,10 @@ import {
     TextureWrapTypes,
     TextureFilterTypes,
     BlendTypes,
-    RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
     UniformNames,
     FaceSide,
-    TextureDepthPrecisionType,
     UniformBlockNames,
     RAD_TO_DEG,
     UIQueueTypes,
@@ -111,7 +106,6 @@ import {
     addDebugGroup,
     addColorDebugger,
 } from '@/PaleGL/utilities/debuggerGUI.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
@@ -130,15 +124,14 @@ import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 import soundVertexShader from './shaders/sound-vertex.glsl';
 import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/PaleGL/core/glslSound.ts';
 import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
-import {createSpotLight, createSpotLightShadow, SpotLight} from '@/PaleGL/actors/lights/spotLight.ts';
+import { createSpotLight, createSpotLightShadow, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
-import {createDirectionalLight, createDirectionalLightShadow} from '@/PaleGL/actors/lights/directionalLight.ts';
+import { createDirectionalLight, createDirectionalLightShadow } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
-import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
@@ -497,7 +490,7 @@ const spotLight1 = createSpotLight({
 });
 // spotLight.enabled = false;
 
-createSpotLightShadow(gpu, spotLight1, 1024, .1, true)
+createSpotLightShadow(gpu, spotLight1, 1024, 0.1, true);
 
 // if (spotLight1.shadowCamera) {
 //     spotLight1.shadowCamera.visibleFrustum = true;
@@ -548,7 +541,7 @@ const spotLight2 = createSpotLight({
 //     });
 // }
 
-createSpotLightShadow(gpu, spotLight2, 1024, .1, true)
+createSpotLightShadow(gpu, spotLight2, 1024, 0.1, true);
 
 subscribeActorOnStart(spotLight2, () => {
     setTranslation(spotLight2.transform, createVector3(-5, 9, -2));
