@@ -851,7 +851,7 @@ export function setRenderTargetToRendererAndClear(
 // render target に焼いて元の状態に戻す
 export function blitRenderTarget(
     renderer: Renderer,
-    renderTarget: RenderTarget,
+    renderTarget: CameraRenderTargetType,
     geometry: Geometry,
     material: Material
 ) {

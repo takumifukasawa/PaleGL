@@ -166,6 +166,7 @@ import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
 import { createVATGPUParticle } from '@/PaleGL/actors/meshes/vatGPUParticle.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
+import {MRTDoubleBuffer} from "@/PaleGL/core/doubleBuffer.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -1723,7 +1724,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
         vatHeight,
         makePerInstanceDataFunction: () => {
             return {
-                scale: [0.1, 0.1, 0.1],
+                scale: [.1, .1, .1],
             };
         },
         makePerVATInstanceDataFunction: () => {
@@ -1732,46 +1733,24 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
                 position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
             };
         },
-        positionFragmentShader: `
-#pragma DEFINES
-#include <lighting>
-#include <ub>
-in vec3 vPosition;
-in vec2 vUv;
-uniform sampler2D uPrevMap;
-uniform sampler2D uVATVelocityMap;
-uniform vec2 uTexelSize;
-uniform float uTargetWidth;
-uniform float uTargetHeight;
-out vec4 outColor;
-void main() {
-    vec2 rawUv = vUv;
-    vec2 sc = vec2(uTargetWidth, uTargetHeight);
-    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
-    vec2 uv = fid / sc; // 0~1
-    // vec4 prev = texture(uPrevMap, uv);
-    // float r = prev.r;
-    // float nr = mod(r + uDeltaTime, 1.);
-    // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
-    // outColor = vec4(nr, sin(nr) * .5 + .5, 0., 1.);
-    vec3 p = texture(uPrevMap, uv).xyz;
-    vec3 v = texture(uVATVelocityMap, uv).xyz;
-    // outColor = vec4(p + v * uDeltaTime, 1.);
-    outColor = vec4(p + v, 1.);
-}
-    `,
-        velocityFragmentShader: `
-#pragma DEFINES
+        fragmentShader: `
+ #pragma DEFINES
 #include <lighting>
 #include <ub>
 #include <rand>
 in vec3 vPosition;
 in vec2 vUv;
-uniform sampler2D uPrevMap;
-uniform sampler2D uVATPositionMap;
+uniform sampler2D uVelocityMap;
+uniform sampler2D uPositionMap;
 uniform vec2 uTexelSize;
 uniform float uTargetWidth;
 uniform float uTargetHeight;
+
+uniform float uNoiseScale;
+uniform float uSpeed;
+
+layout (location = 0) out vec3 outVelocity;
+layout (location = 1) out vec3 outPosition;
 
 vec3 curlNoise(vec3 position) {
     float eps = .0001;
@@ -1794,24 +1773,50 @@ vec3 curlNoise(vec3 position) {
     return vec3(x, y, z) * invEps2;
 }
 
-out vec4 outColor;
-
-uniform float uNoiseScale;
-uniform float uSpeed;
-
 void main() {
-    vec3 prevVelocity = texture(uPrevMap, vUv).xyz;
-    vec3 position = texture(uVATPositionMap, vUv).xyz;
-    vec3 force = curlNoise(position * .1) - prevVelocity;
+    vec2 rawUv = vUv;
+    vec2 sc = vec2(uTargetWidth, uTargetHeight);
+    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
+    vec2 uv = fid / sc; // 0~1
+
+    vec3 prevVelocity = texture(uVelocityMap, uv).xyz;
+    vec3 prevPosition = texture(uPositionMap, uv).xyz;
+    vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
     vec3 newVelocity = force * 1. * uDeltaTime;
-    // vec3 newPosition = position + newVelocity;
-    // outColor = vec4(prevVelocity, 1.);
-    outColor = vec4(newVelocity, 1.);
-    // outColor = vec4(1., 0., 0., 1.);
+    
+    vec3 newPosition = prevPosition + newVelocity;
+    
+    outVelocity = prevVelocity;
+    outPosition = prevPosition;
+    // outPosition = prevVelocity;
+    
+    outVelocity = newVelocity;
+    outPosition = newPosition;
+   
+    // outVelocity = vec3(uv * .5, 0.);
+    // outPosition = vec3(uv, 0.);
 }
-        `,
+`
     });
     addActorToScene(captureScene, vatGPUParticle);
+
+    // const testMesh = createMesh({
+    //     geometry: createPlaneGeometry({ gpu }),
+    //     material: createUnlitMaterial(),
+    // });
+    // setScaling(testMesh.transform, createFillVector3(1.5));
+    // setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, testMesh);
+    // subscribeActorOnStart(testMesh, () => {
+    //     setUniformValue(
+    //         getMeshMaterial(testMesh).uniforms,
+    //         UniformNames.BaseMap,
+    //         (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+    //     );
+    // });
+
+
+
 
     // noise -----------------------------------
 

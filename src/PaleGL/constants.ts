@@ -393,8 +393,8 @@ export const UniformNames = {
     JointTextureColNum: 'uJointTextureColNum',
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
     // vat
-    VATPositionMap: 'uVATPositionMap',
-    VATVelocityMap: 'uVATVelocityMap',
+    PositionMap: 'uPositionMap',
+    VelocityMap: 'uVelocityMap',
     // VATWidth: 'uVATWidth',
     // VATHeight: 'uVATWidth',
     VATResolution: 'uVATResolution',

@@ -28,7 +28,7 @@ uniform float uEmissiveMixer;
 #endif
 
 #ifdef USE_VAT
-uniform sampler2D uVATPositionMap;
+uniform sampler2D uPositionMap;
 uniform vec2 uVATResolution;
 #endif
 
@@ -282,7 +282,7 @@ void main() {
             int(mod(fid, uVATResolution.x)),
             int(floor(fid / uVATResolution.y))
         );
-        vec3 vatPosition = texelFetch(uVATPositionMap, vatUv, 0).xyz;
+        vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
         instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
         // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;

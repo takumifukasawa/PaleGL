@@ -26,9 +26,7 @@ export type MultipleRenderTargetOptions = {
     height: number;
     minFilter?: TextureFilterType;
     magFilter?: TextureFilterType;
-    targets: {
-        textureType: TextureType;
-    }[];
+    textureTypes: TextureType[];
 };
 
 export type MultipleRenderTarget = RenderTargetBase & {
@@ -46,27 +44,26 @@ export function createMultipleRenderTargets({
     name,
     width = 1,
     height = 1,
-    targets,
+    textureTypes,
+    minFilter = TextureFilterTypes.Linear,
+    magFilter = TextureFilterTypes.Linear,
 }: MultipleRenderTargetOptions): MultipleRenderTarget {
     const textures: Texture[] = [];
-
-    const minFilter = TextureFilterTypes.Linear;
-    const magFilter = TextureFilterTypes.Linear;
 
     const gl = gpu.gl;
 
     const framebuffer = createFramebuffer({ gpu });
     bindFramebuffer(framebuffer);
 
-    for (let i = 0; i < targets.length; i++) {
-        const target = targets[i];
+    for (let i = 0; i < textureTypes.length; i++) {
+        const type = textureTypes[i];
         const attachment = GLColorAttachments[i];
         const texture = createTexture({
             gpu,
             width,
             height,
             mipmap: false,
-            type: target.textureType,
+            type,
             minFilter,
             magFilter,
         });

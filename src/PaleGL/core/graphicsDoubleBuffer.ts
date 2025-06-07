@@ -1,15 +1,15 @@
 import {
     createDoubleBuffer,
     DoubleBuffer, DoubleBufferBase,
-    getReadRenderTargetOfDoubleBuffer,
-    getWriteRenderTargetOfDoubleBuffer,
+    getReadRenderTargetOfDoubleBuffer, getWriteMultipleRenderTargetOfMRTDoubleBuffer,
+    getWriteRenderTargetOfDoubleBuffer, MRTDoubleBuffer,
     swapDoubleBuffer,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import baseVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { blitRenderTarget, Renderer } from '@/PaleGL/core/renderer.ts';
+import {blitRenderTarget, Renderer, renderRenderer} from '@/PaleGL/core/renderer.ts';
 import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { TextureFilterTypes, UniformBlockName, UniformBlockNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { RenderTargetOptions } from '@/PaleGL/core/renderTarget.ts';
@@ -87,15 +87,6 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
         ],
         uniformBlockNames: [...uniformBlockNames, UniformBlockNames.Common],
     });
-    // const doubleBuffer = createDoubleBuffer({
-    //     // gpu,
-    //     ...args,
-    //     // override
-    //     width,
-    //     height,
-    //     minFilter: TextureFilterTypes.Nearest,
-    //     magFilter: TextureFilterTypes.Nearest,
-    // });
     return {
         doubleBuffer,
         geometry,
@@ -109,5 +100,13 @@ export const updateGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuf
     blitRenderTarget(renderer, getWriteRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer), geometry, material);
     // render target に焼く
     // swap して焼いたものを read にする
-    swapDoubleBuffer(doubleBuffer as DoubleBuffer);
+    swapDoubleBuffer(doubleBuffer);
 };
+
+export const updateMRTGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuffer: GraphicsDoubleBuffer) => {
+    const {doubleBuffer, geometry, material} = graphicsDoubleBuffer;
+    blitRenderTarget(renderer, getWriteMultipleRenderTargetOfMRTDoubleBuffer(doubleBuffer as MRTDoubleBuffer), geometry, material);
+    // render target に焼く
+    // swap して焼いたものを read にする
+    swapDoubleBuffer(doubleBuffer);
+}

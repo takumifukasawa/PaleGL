@@ -3,7 +3,7 @@ import {
     createRenderTargetBase,
     RenderTarget,
     RenderTargetBase,
-    RenderTargetOptions, setRenderTargetSize,
+    RenderTargetOptions,
 } from '@/PaleGL/core/renderTarget.ts';
 import { RenderTargetKinds } from '@/PaleGL/constants.ts';
 import {
@@ -54,9 +54,9 @@ export function createMRTDoubleBuffer(renderTargetOptions: MultipleRenderTargetO
     };
 }
 
-export function setDoubleBufferSize(doubleBuffer: DoubleBuffer, width: number, height: number) {
-    doubleBuffer.renderTargets.forEach((renderTarget) => setRenderTargetSize(renderTarget, width, height));
-}
+// export function setDoubleBufferSize(doubleBuffer: DoubleBuffer, width: number, height: number) {
+//     doubleBuffer.renderTargets.forEach((renderTarget) => setRenderTargetSize(renderTarget, width, height));
+// }
 
 export function getReadRenderTargetOfDoubleBuffer(doubleBuffer: DoubleBuffer) {
     return doubleBuffer.renderTargets[doubleBuffer.currentReadIndex];
@@ -66,6 +66,18 @@ export function getWriteRenderTargetOfDoubleBuffer(doubleBuffer: DoubleBuffer) {
     return doubleBuffer.renderTargets[doubleBuffer.currentReadIndex ^ 1];
 }
 
-export function swapDoubleBuffer(doubleBuffer: DoubleBuffer) {
+export function swapDoubleBuffer(doubleBuffer: DoubleBufferBase) {
     doubleBuffer.currentReadIndex = (doubleBuffer.currentReadIndex + 1) % 2;
+}
+
+export function getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    return mrtDoubleBuffer.multipleRenderTargets[mrtDoubleBuffer.currentReadIndex];
+}
+
+export function getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    return mrtDoubleBuffer.multipleRenderTargets[mrtDoubleBuffer.currentReadIndex ^ 1];
+}
+
+export function swapMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    mrtDoubleBuffer.currentReadIndex = (mrtDoubleBuffer.currentReadIndex + 1) % 2;
 }

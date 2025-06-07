@@ -11,6 +11,7 @@ import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
+import {MultipleRenderTarget} from "@/PaleGL/core/multipleRenderTargets.ts";
 
 export const FrustumDirection = {
     nlt: 'nlt',
@@ -32,7 +33,7 @@ export type GetFrustumVectorsFunc = (camera: Camera) => FrustumVectors | null;
 
 export type UpdateProjectionMatrixFunc = (camera: Camera) => void;
 
-export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | null;
+export type CameraRenderTargetType = RenderTarget | GBufferRenderTargets | MultipleRenderTarget | null;
 
 export type Camera = Actor & {
     clearColor: Vector4;
