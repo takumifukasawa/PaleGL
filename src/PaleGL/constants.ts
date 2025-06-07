@@ -218,7 +218,8 @@ export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof
 export const RenderTargetKinds = {
     Default: 0,
     GBuffer: 1,
-    DoubleBuffer: 2,
+    MRT: 2,
+    DoubleBuffer: 3,
 };
 
 export type RenderTargetKind = (typeof RenderTargetKinds)[keyof typeof RenderTargetKinds];
@@ -783,6 +784,17 @@ export const GLColorAttachment = {
     COLOR_ATTACHMENT7: 36071,
 } as const;
 export type GLColorAttachment = (typeof GLColorAttachment)[keyof typeof GLColorAttachment];
+
+export const GLColorAttachments = [
+    GLColorAttachment.COLOR_ATTACHMENT0,
+    GLColorAttachment.COLOR_ATTACHMENT1,
+    GLColorAttachment.COLOR_ATTACHMENT2,
+    GLColorAttachment.COLOR_ATTACHMENT3,
+    GLColorAttachment.COLOR_ATTACHMENT4,
+    GLColorAttachment.COLOR_ATTACHMENT5,
+    GLColorAttachment.COLOR_ATTACHMENT6,
+    GLColorAttachment.COLOR_ATTACHMENT7,
+];
 
 // --
 

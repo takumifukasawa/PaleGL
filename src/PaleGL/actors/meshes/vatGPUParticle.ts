@@ -1,6 +1,6 @@
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {RenderTargetTypes, TextureFilterTypes, UniformNames, UniformTypes} from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
@@ -11,6 +11,8 @@ import {
     updateGraphicsDoubleBuffer,
 } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import {
+    createDoubleBuffer,
+    DoubleBuffer,
     getReadRenderTargetOfDoubleBuffer,
     getWriteRenderTargetOfDoubleBuffer,
     swapDoubleBuffer,
@@ -30,6 +32,7 @@ export type VATGPUParticleArgs = GPUParticleArgs & {
     gpu: Gpu;
     vatWidth: number;
     vatHeight: number;
+    fragmentShader: string;
     positionFragmentShader: string;
     velocityFragmentShader: string;
     makePerVATInstanceDataFunction?: (index: number) => PerInstanceData;
@@ -69,12 +72,36 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
     });
 
+    // const mrtDoubleBuffer = createMRTDoubleBuffer({});
+
+    const positionDoubleBuffer = createDoubleBuffer({
+        // gpu,
+        ...args,
+        // override
+        width: vatWidth,
+        height: vatHeight,
+        type: RenderTargetTypes.RGBA16F,
+        minFilter: TextureFilterTypes.Nearest,
+        magFilter: TextureFilterTypes.Nearest,
+    });
+
+    const velocityDoubleBuffer = createDoubleBuffer({
+        // gpu,
+        ...args,
+        // override
+        width: vatWidth,
+        height: vatHeight,
+        type: RenderTargetTypes.RGBA16F,
+        minFilter: TextureFilterTypes.Nearest,
+        magFilter: TextureFilterTypes.Nearest,
+    });
+
     const positionGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
         gpu,
         width: vatWidth,
         height: vatHeight,
         fragmentShader: positionFragmentShader,
-        type: RenderTargetTypes.RGBA16F,
+        // type: RenderTargetTypes.RGBA16F,
         uniforms: [
             {
                 name: UniformNames.VATVelocityMap,
@@ -82,6 +109,7 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
                 value: null,
             },
         ],
+        doubleBuffer: positionDoubleBuffer,
     });
 
     const velocityGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
@@ -89,14 +117,15 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         width: vatWidth,
         height: vatHeight,
         fragmentShader: velocityFragmentShader,
-        type: RenderTargetTypes.RGBA16F,
+        // type: RenderTargetTypes.RGBA16F,
         uniforms: [
             {
                 name: UniformNames.VATPositionMap,
                 type: UniformTypes.Texture,
                 value: null,
             },
-        ]
+        ],
+        doubleBuffer: velocityDoubleBuffer,
     });
 
     const vatGPUParticle = { ...gpuParticle, positionGraphicsDoubleBuffer };
@@ -136,25 +165,37 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
 
         // read, write どちらも初期値を与えておく
 
-        updateTexture(getWriteRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer).texture!, {
-            data: positionData,
-        });
-        updateTexture(getWriteRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer).texture!, {
-            data: velocityData,
-        });
+        updateTexture(
+            getWriteRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture!,
+            {
+                data: positionData,
+            }
+        );
+        updateTexture(
+            getWriteRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture!,
+            {
+                data: velocityData,
+            }
+        );
 
-        swapDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer);
-        swapDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer);
+        swapDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer);
+        swapDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer);
 
-        updateTexture(getWriteRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer).texture!, {
-            data: positionData,
-        });
-        updateTexture(getWriteRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer).texture!, {
-            data: velocityData,
-        });
+        updateTexture(
+            getWriteRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture!,
+            {
+                data: positionData,
+            }
+        );
+        updateTexture(
+            getWriteRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture!,
+            {
+                data: velocityData,
+            }
+        );
 
-        swapDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer);
-        swapDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer);
+        swapDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer);
+        swapDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer);
     });
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
@@ -162,13 +203,13 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         setMaterialUniformValue(
             velocityGraphicsDoubleBuffer.material,
             UniformNames.VATPositionMap,
-            getReadRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer).texture
+            getReadRenderTargetOfDoubleBuffer(positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture
         );
-        
+
         // update velocity
         updateGraphicsDoubleBuffer(renderer, velocityGraphicsDoubleBuffer);
         const readVelocityTexture = getReadRenderTargetOfDoubleBuffer(
-            velocityGraphicsDoubleBuffer.doubleBuffer
+            velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer
         ).texture;
         setUniformValueToAllMeshMaterials(vatGPUParticle, UniformNames.VATVelocityMap, readVelocityTexture);
 
@@ -176,13 +217,13 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): GPUParticle => {
         setMaterialUniformValue(
             positionGraphicsDoubleBuffer.material,
             UniformNames.VATVelocityMap,
-            getReadRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer).texture
+            getReadRenderTargetOfDoubleBuffer(velocityGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer).texture
         );
 
         // update position
         updateGraphicsDoubleBuffer(renderer, positionGraphicsDoubleBuffer);
         const readPositionTexture = getReadRenderTargetOfDoubleBuffer(
-            positionGraphicsDoubleBuffer.doubleBuffer
+            positionGraphicsDoubleBuffer.doubleBuffer as DoubleBuffer
         ).texture;
         setUniformValueToAllMeshMaterials(vatGPUParticle, UniformNames.VATPositionMap, readPositionTexture);
     });

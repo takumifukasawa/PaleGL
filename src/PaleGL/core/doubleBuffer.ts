@@ -6,11 +6,23 @@ import {
     RenderTargetOptions, setRenderTargetSize,
 } from '@/PaleGL/core/renderTarget.ts';
 import { RenderTargetKinds } from '@/PaleGL/constants.ts';
+import {
+    createMultipleRenderTargets,
+    MultipleRenderTarget,
+    MultipleRenderTargetOptions
+} from "@/PaleGL/core/multipleRenderTargets.ts";
 
-export type DoubleBuffer = RenderTargetBase & {
+export type DoubleBufferBase = {
     currentReadIndex: number;
+}
+
+export type DoubleBuffer = DoubleBufferBase & RenderTargetBase & {
     renderTargets: RenderTarget[];
 };
+
+export type MRTDoubleBuffer = DoubleBufferBase & RenderTargetBase & {
+    multipleRenderTargets: MultipleRenderTarget[];
+}
 
 export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): DoubleBuffer {
     const renderTargets: RenderTarget[] = [];
@@ -24,6 +36,21 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
         ...createRenderTargetBase(RenderTargetKinds.DoubleBuffer, true),
         currentReadIndex: 0,
         renderTargets: renderTargets,
+    };
+}
+
+export function createMRTDoubleBuffer(renderTargetOptions: MultipleRenderTargetOptions): MRTDoubleBuffer {
+    const multipleRenderTargets: MultipleRenderTarget[] = [];
+
+    for (let i = 0; i < 2; i++) {
+        const options: MultipleRenderTargetOptions = { ...renderTargetOptions, ...{ name: `mrt-double-buffer_${i}` } };
+        multipleRenderTargets.push(createMultipleRenderTargets(options));
+    }
+
+    return {
+        ...createRenderTargetBase(RenderTargetKinds.MRT, true),
+        currentReadIndex: 0,
+        multipleRenderTargets,
     };
 }
 

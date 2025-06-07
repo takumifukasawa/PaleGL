@@ -1,6 +1,6 @@
 import {
     createDoubleBuffer,
-    DoubleBuffer,
+    DoubleBuffer, DoubleBufferBase,
     getReadRenderTargetOfDoubleBuffer,
     getWriteRenderTargetOfDoubleBuffer,
     swapDoubleBuffer,
@@ -15,19 +15,31 @@ import { TextureFilterTypes, UniformBlockName, UniformBlockNames, UniformTypes }
 import { RenderTargetOptions } from '@/PaleGL/core/renderTarget.ts';
 import { RequiredProperty } from '@/PaleGL/types/type-utilities.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import {Gpu} from "@/PaleGL/core/gpu.ts";
 
 export type GraphicsDoubleBuffer = {
-    doubleBuffer: DoubleBuffer;
+    doubleBuffer: DoubleBufferBase;
     geometry: Geometry;
     material: Material;
 };
 
-export type GraphicsDoubleBufferArgs = RenderTargetOptions & {
+// export type GraphicsDoubleBufferArgs = RenderTargetOptions & {
+//     vertexShader?: string;
+//     fragmentShader: string;
+//     uniforms?: UniformsData;
+//     uniformBlockNames?: UniformBlockName[];
+// } & RequiredProperty<RenderTargetOptions, 'width' | 'height'>;
+
+export type GraphicsDoubleBufferArgs = {
+    gpu: Gpu,
     vertexShader?: string;
     fragmentShader: string;
     uniforms?: UniformsData;
     uniformBlockNames?: UniformBlockName[];
-} & RequiredProperty<RenderTargetOptions, 'width' | 'height'>;
+    doubleBuffer: DoubleBufferBase,
+    width: number;
+    height: number;
+};
 
 const prevMapUniformName = 'uPrevMap';
 const targetWidthUniformName = 'uTargetWidth';
@@ -43,6 +55,7 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
         fragmentShader,
         uniforms = [],
         uniformBlockNames = [],
+        doubleBuffer,
     } = args;
 
     const geometry = createPlaneGeometry({ gpu });
@@ -74,15 +87,15 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
         ],
         uniformBlockNames: [...uniformBlockNames, UniformBlockNames.Common],
     });
-    const doubleBuffer = createDoubleBuffer({
-        // gpu,
-        ...args,
-        // override
-        width,
-        height,
-        minFilter: TextureFilterTypes.Nearest,
-        magFilter: TextureFilterTypes.Nearest,
-    });
+    // const doubleBuffer = createDoubleBuffer({
+    //     // gpu,
+    //     ...args,
+    //     // override
+    //     width,
+    //     height,
+    //     minFilter: TextureFilterTypes.Nearest,
+    //     magFilter: TextureFilterTypes.Nearest,
+    // });
     return {
         doubleBuffer,
         geometry,
@@ -92,9 +105,9 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
 
 export const updateGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuffer: GraphicsDoubleBuffer) => {
     const { doubleBuffer, geometry, material } = graphicsDoubleBuffer;
-    setUniformValue(material.uniforms, prevMapUniformName, getReadRenderTargetOfDoubleBuffer(doubleBuffer).texture);
-    blitRenderTarget(renderer, getWriteRenderTargetOfDoubleBuffer(doubleBuffer), geometry, material);
+    setUniformValue(material.uniforms, prevMapUniformName, getReadRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer).texture);
+    blitRenderTarget(renderer, getWriteRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer), geometry, material);
     // render target に焼く
     // swap して焼いたものを read にする
-    swapDoubleBuffer(doubleBuffer);
+    swapDoubleBuffer(doubleBuffer as DoubleBuffer);
 };
