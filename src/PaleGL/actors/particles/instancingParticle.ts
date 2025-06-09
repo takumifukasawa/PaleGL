@@ -7,7 +7,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 
-type PerInstanceData = {
+type DataPerInstance = {
     position?: number[];
     scale?: number[];
     rotation?: number[];
@@ -17,12 +17,12 @@ type PerInstanceData = {
     animationOffset?: number;
 };
 
-export type GPUParticleArgs = {
+export type InstancingParticleArgs = {
     mesh?: Mesh;
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
-    makePerInstanceDataFunction?: (index: number) => PerInstanceData;
+    makeDataPerInstanceFunction?: (index: number) => DataPerInstance;
     position?: number[][];
     scale?: number[][];
     rotation?: number[][];
@@ -34,9 +34,9 @@ export type GPUParticleArgs = {
     // vatData?: VATData;
 };
 
-export type GPUParticle = Mesh;
+export type InstancingParticle = Mesh;
 
-export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
+export const createInstancingParticle = (args: InstancingParticleArgs): InstancingParticle => {
     const {
         // gpu,
         // particleMap = null,
@@ -50,7 +50,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
         // default
         // vat
         // vatData,
-        makePerInstanceDataFunction,
+        makeDataPerInstanceFunction
     } = args;
 
     const mesh =
@@ -90,8 +90,8 @@ export const createGPUParticle = (args: GPUParticleArgs): GPUParticle => {
     let tmpAnimationOffset: number | undefined;
 
     maton.range(instanceCount).forEach((_, i) => {
-        if (makePerInstanceDataFunction) {
-            const perData = makePerInstanceDataFunction(i);
+        if (makeDataPerInstanceFunction) {
+            const perData = makeDataPerInstanceFunction(i);
             tmpPosition = perData.position;
             tmpScale = perData.scale;
             tmpRotation = perData.rotation;

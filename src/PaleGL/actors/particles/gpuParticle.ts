@@ -4,7 +4,7 @@ import { TextureFilterTypes, TextureTypes, UniformNames, UniformTypes } from '@/
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { createGPUParticle, GPUParticleArgs } from '@/PaleGL/actors/meshes/gpuParticle.ts';
+import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
     createGraphicsDoubleBuffer,
     GraphicsDoubleBuffer,
@@ -23,34 +23,34 @@ import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { updateTexture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
-type PerInstanceData = {
+type DataPerInstance = {
     position: number[];
     velocity?: number[];
 };
 
-export type VATGPUParticleArgs = GPUParticleArgs & {
+export type GPUParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
     vatWidth: number;
     vatHeight: number;
     fragmentShader: string;
     // positionFragmentShader: string;
     // velocityFragmentShader: string;
-    makePerVATInstanceDataFunction?: (index: number) => PerInstanceData;
+    makeStateDataPerInstanceFunction?: (index: number) => DataPerInstance;
 };
 
-// export type GPUParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
-export type VATGPUParticle = Mesh & { mrtGraphicsDoubleBuffer: GraphicsDoubleBuffer };
+// export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
+export type GpuParticle = Mesh & { mrtGraphicsDoubleBuffer: GraphicsDoubleBuffer };
 
-const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
-const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
-const getWriteVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getWriteVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
-const getWritePositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getWritePositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
 
-export const createVATGPUParticle = (args: VATGPUParticleArgs): VATGPUParticle => {
+export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     const {
         gpu,
         // particleMap = null,
@@ -68,10 +68,10 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): VATGPUParticle =
         fragmentShader,
         // positionFragmentShader,
         // velocityFragmentShader,
-        makePerVATInstanceDataFunction,
+        makeStateDataPerInstanceFunction,
     } = args;
 
-    const gpuParticle = createGPUParticle(args);
+    const gpuParticle = createInstancingParticle(args);
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -113,7 +113,7 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): VATGPUParticle =
         addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
     });
 
-    const vatGPUParticle: VATGPUParticle = { ...gpuParticle, mrtGraphicsDoubleBuffer };
+    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtGraphicsDoubleBuffer };
 
     subscribeActorOnStart(vatGPUParticle, (args) => {
         tryStartMaterial(gpu, args.renderer, mrtGraphicsDoubleBuffer.geometry, mrtGraphicsDoubleBuffer.material);
@@ -124,8 +124,8 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): VATGPUParticle =
         let tmpVelocity: number[] | undefined;
 
         maton.range(instanceCount).forEach((_, i) => {
-            if (makePerVATInstanceDataFunction) {
-                const perData = makePerVATInstanceDataFunction(i);
+            if (makeStateDataPerInstanceFunction) {
+                const perData = makeStateDataPerInstanceFunction(i);
                 tmpPosition = perData.position;
                 tmpVelocity = perData.velocity;
             }
@@ -139,7 +139,7 @@ export const createVATGPUParticle = (args: VATGPUParticleArgs): VATGPUParticle =
 
         // read, write どちらも初期値を与えておく
 
-        updateTexture(getWritePositionMap(mrtDoubleBuffer), {
+        updateTexture(getWriteVelocityMap(mrtDoubleBuffer), {
             data: velocityData,
         });
         updateTexture(getWritePositionMap(mrtDoubleBuffer), {

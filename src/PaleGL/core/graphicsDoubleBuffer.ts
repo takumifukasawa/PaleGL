@@ -1,24 +1,23 @@
 import {
-    createDoubleBuffer,
-    DoubleBuffer, DoubleBufferBase,
-    getReadRenderTargetOfDoubleBuffer, getWriteMultipleRenderTargetOfMRTDoubleBuffer,
-    getWriteRenderTargetOfDoubleBuffer, MRTDoubleBuffer,
+    DoubleBuffer,
+    getReadRenderTargetOfDoubleBuffer,
+    getWriteMultipleRenderTargetOfMRTDoubleBuffer,
+    getWriteRenderTargetOfDoubleBuffer,
+    MRTDoubleBuffer,
     swapDoubleBuffer,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import baseVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import {blitRenderTarget, Renderer, renderRenderer} from '@/PaleGL/core/renderer.ts';
+import { blitRenderTarget, Renderer } from '@/PaleGL/core/renderer.ts';
 import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { TextureFilterTypes, UniformBlockName, UniformBlockNames, UniformTypes } from '@/PaleGL/constants.ts';
-import { RenderTargetOptions } from '@/PaleGL/core/renderTarget.ts';
-import { RequiredProperty } from '@/PaleGL/types/type-utilities.ts';
+import { UniformBlockName, UniformBlockNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import {Gpu} from "@/PaleGL/core/gpu.ts";
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 
-export type GraphicsDoubleBuffer = {
-    doubleBuffer: DoubleBufferBase;
+export type GraphicsDoubleBuffer<T = DoubleBuffer | MRTDoubleBuffer> = {
+    doubleBuffer: T;
     geometry: Geometry;
     material: Material;
 };
@@ -30,13 +29,13 @@ export type GraphicsDoubleBuffer = {
 //     uniformBlockNames?: UniformBlockName[];
 // } & RequiredProperty<RenderTargetOptions, 'width' | 'height'>;
 
-export type GraphicsDoubleBufferArgs = {
-    gpu: Gpu,
+export type GraphicsDoubleBufferArgs<T = DoubleBuffer | MRTDoubleBuffer> = {
+    gpu: Gpu;
     vertexShader?: string;
     fragmentShader: string;
     uniforms?: UniformsData;
     uniformBlockNames?: UniformBlockName[];
-    doubleBuffer: DoubleBufferBase,
+    doubleBuffer: T;
     width: number;
     height: number;
 };
@@ -96,7 +95,11 @@ export const createGraphicsDoubleBuffer = (args: GraphicsDoubleBufferArgs): Grap
 
 export const updateGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuffer: GraphicsDoubleBuffer) => {
     const { doubleBuffer, geometry, material } = graphicsDoubleBuffer;
-    setUniformValue(material.uniforms, prevMapUniformName, getReadRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer).texture);
+    setUniformValue(
+        material.uniforms,
+        prevMapUniformName,
+        getReadRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer).texture
+    );
     blitRenderTarget(renderer, getWriteRenderTargetOfDoubleBuffer(doubleBuffer as DoubleBuffer), geometry, material);
     // render target に焼く
     // swap して焼いたものを read にする
@@ -104,9 +107,14 @@ export const updateGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuf
 };
 
 export const updateMRTGraphicsDoubleBuffer = (renderer: Renderer, graphicsDoubleBuffer: GraphicsDoubleBuffer) => {
-    const {doubleBuffer, geometry, material} = graphicsDoubleBuffer;
-    blitRenderTarget(renderer, getWriteMultipleRenderTargetOfMRTDoubleBuffer(doubleBuffer as MRTDoubleBuffer), geometry, material);
+    const { doubleBuffer, geometry, material } = graphicsDoubleBuffer;
+    blitRenderTarget(
+        renderer,
+        getWriteMultipleRenderTargetOfMRTDoubleBuffer(doubleBuffer as MRTDoubleBuffer),
+        geometry,
+        material
+    );
     // render target に焼く
     // swap して焼いたものを read にする
     swapDoubleBuffer(doubleBuffer);
-}
+};

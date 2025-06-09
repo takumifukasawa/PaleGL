@@ -18,7 +18,7 @@ import {
     startEngine,
 } from '@/PaleGL/core/engine.ts';
 import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
-import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
+import { bindGPUUniformBlockAndGetBlockIndex, createGPU, Gpu, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
@@ -162,11 +162,10 @@ import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextM
 import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
-import { createGPUParticle } from '@/PaleGL/actors/meshes/gpuParticle.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
-import { createVATGPUParticle } from '@/PaleGL/actors/meshes/vatGPUParticle.ts';
+import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
-import {MRTDoubleBuffer} from "@/PaleGL/core/doubleBuffer.ts";
+import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -298,6 +297,228 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
             setV3z(spotLight.transform.position, value);
         },
     });
+};
+
+const createTestVATGPUParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 32;
+    const vatGPUParticle = createGPUParticle({
+        gpu,
+        mesh: createMesh({
+            // geometry: createBoxGeometry({gpu, size: 1}),
+            geometry: createSphereGeometry({ gpu, radius: 0.75 }),
+            material: createUnlitMaterial({
+                baseColor: createColor(1.5, 1.5, 1.5, 1),
+            }),
+        }),
+        instanceCount: vatWidth * vatHeight,
+        vatWidth,
+        vatHeight,
+        makeDataPerInstanceFunction: () => {
+            return {
+                scale: [0.1, 0.1, 0.1],
+            };
+        },
+        makeStateDataPerInstanceFunction: () => {
+            return {
+                // position: [i * 2, 3, i * -2, 1]
+                position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
+            };
+        },
+        fragmentShader: `
+ #pragma DEFINES
+#include <lighting>
+#include <ub>
+#include <rand>
+in vec3 vPosition;
+in vec2 vUv;
+uniform sampler2D uVelocityMap;
+uniform sampler2D uPositionMap;
+uniform vec2 uTexelSize;
+uniform float uTargetWidth;
+uniform float uTargetHeight;
+
+uniform float uNoiseScale;
+uniform float uSpeed;
+
+layout (location = 0) out vec3 outVelocity;
+layout (location = 1) out vec3 outPosition;
+
+vec3 curlNoise(vec3 position) {
+    float eps = .0001;
+    float eps2 = 2. * eps;
+    float invEps2 = 1. / eps2;
+    vec3 dx = vec3(eps, 0., 0.);
+    vec3 dy = vec3(0., eps, 0.);
+    vec3 dz = vec3(0., 0., eps);
+    // 勾配検出のためにepsだけずらした地点のnoiseを参照
+    vec3 px0 = snoise3(position - dx);
+    vec3 px1 = snoise3(position + dx);
+    vec3 py0 = snoise3(position - dy);
+    vec3 py1 = snoise3(position + dy);
+    vec3 pz0 = snoise3(position - dz);
+    vec3 pz1 = snoise3(position + dz);
+    // 回転
+    float x = (py1.z - py0.z) - (pz1.y - pz0.y);
+    float y = (pz1.x - pz0.x) - (px1.z - px0.z);
+    float z = (px1.y - px0.y) - (py1.x - py0.x);
+    return vec3(x, y, z) * invEps2;
+}
+
+void main() {
+    vec2 rawUv = vUv;
+    vec2 sc = vec2(uTargetWidth, uTargetHeight);
+    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
+    vec2 uv = fid / sc; // 0~1
+
+    vec3 prevVelocity = texture(uVelocityMap, uv).xyz;
+    vec3 prevPosition = texture(uPositionMap, uv).xyz;
+    vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
+    vec3 newVelocity = force * 1. * uDeltaTime;
+    
+    vec3 newPosition = prevPosition + newVelocity;
+    
+    outVelocity = prevVelocity;
+    outPosition = prevPosition;
+    // outPosition = prevVelocity;
+    
+    outVelocity = newVelocity;
+    outPosition = newPosition;
+   
+    // outVelocity = vec3(uv * .5, 0.);
+    // outPosition = vec3(uv, 0.);
+}
+`,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    // const testMesh = createMesh({
+    //     geometry: createPlaneGeometry({ gpu }),
+    //     material: createUnlitMaterial(),
+    // });
+    // setScaling(testMesh.transform, createFillVector3(1.5));
+    // setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, testMesh);
+    // subscribeActorOnStart(testMesh, () => {
+    //     setUniformValue(
+    //         getMeshMaterial(testMesh).uniforms,
+    //         UniformNames.BaseMap,
+    //         (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+    //     );
+    // });
+};
+
+const createTestGPUTrailParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 32;
+    const vatGPUParticle = createGPUParticle({
+        gpu,
+        mesh: createMesh({
+            // geometry: createBoxGeometry({gpu, size: 1}),
+            geometry: createSphereGeometry({ gpu, radius: 0.75 }),
+            material: createUnlitMaterial({
+                baseColor: createColor(1.5, 1.5, 1.5, 1),
+            }),
+        }),
+        instanceCount: vatWidth * vatHeight,
+        vatWidth,
+        vatHeight,
+        makeDataPerInstanceFunction: () => {
+            return {
+                scale: [0.1, 0.1, 0.1],
+            };
+        },
+        makeStateDataPerInstanceFunction: () => {
+            return {
+                // position: [i * 2, 3, i * -2, 1]
+                position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
+            };
+        },
+        fragmentShader: `
+ #pragma DEFINES
+#include <lighting>
+#include <ub>
+#include <rand>
+in vec3 vPosition;
+in vec2 vUv;
+uniform sampler2D uVelocityMap;
+uniform sampler2D uPositionMap;
+uniform vec2 uTexelSize;
+uniform float uTargetWidth;
+uniform float uTargetHeight;
+
+uniform float uNoiseScale;
+uniform float uSpeed;
+
+layout (location = 0) out vec3 outVelocity;
+layout (location = 1) out vec3 outPosition;
+
+vec3 curlNoise(vec3 position) {
+    float eps = .0001;
+    float eps2 = 2. * eps;
+    float invEps2 = 1. / eps2;
+    vec3 dx = vec3(eps, 0., 0.);
+    vec3 dy = vec3(0., eps, 0.);
+    vec3 dz = vec3(0., 0., eps);
+    // 勾配検出のためにepsだけずらした地点のnoiseを参照
+    vec3 px0 = snoise3(position - dx);
+    vec3 px1 = snoise3(position + dx);
+    vec3 py0 = snoise3(position - dy);
+    vec3 py1 = snoise3(position + dy);
+    vec3 pz0 = snoise3(position - dz);
+    vec3 pz1 = snoise3(position + dz);
+    // 回転
+    float x = (py1.z - py0.z) - (pz1.y - pz0.y);
+    float y = (pz1.x - pz0.x) - (px1.z - px0.z);
+    float z = (px1.y - px0.y) - (py1.x - py0.x);
+    return vec3(x, y, z) * invEps2;
+}
+
+void main() {
+    vec2 rawUv = vUv;
+    vec2 sc = vec2(uTargetWidth, uTargetHeight);
+    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
+    vec2 uv = fid / sc; // 0~1
+
+    vec3 prevVelocity = texture(uVelocityMap, uv).xyz;
+    vec3 prevPosition = texture(uPositionMap, uv).xyz;
+    vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
+    vec3 newVelocity = force * 1. * uDeltaTime;
+    
+    vec3 newPosition = prevPosition + newVelocity;
+    
+    outVelocity = prevVelocity;
+    outPosition = prevPosition;
+    // outPosition = prevVelocity;
+    
+    outVelocity = newVelocity;
+    outPosition = newPosition;
+   
+    // outVelocity = vec3(uv * .5, 0.);
+    // outPosition = vec3(uv, 0.);
+}
+`,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    // const testMesh = createMesh({
+    //     geometry: createPlaneGeometry({ gpu }),
+    //     material: createUnlitMaterial(),
+    // });
+    // setScaling(testMesh.transform, createFillVector3(1.5));
+    // setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, testMesh);
+    // subscribeActorOnStart(testMesh, () => {
+    //     setUniformValue(
+    //         getMeshMaterial(testMesh).uniforms,
+    //         UniformNames.BaseMap,
+    //         (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+    //     );
+    // });
 };
 
 const stylesText = `
@@ -1234,10 +1455,10 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
 
-    const particle = createGPUParticle({
+    const particle = createInstancingParticle({
         mesh: skinningMesh,
         instanceCount: instanceNum,
-        makePerInstanceDataFunction: () => {
+        makeDataPerInstanceFunction: () => {
             const baseScale = 0.2;
             const randomScaleRange = 0.6;
             const s = Math.random() * randomScaleRange + baseScale;
@@ -1707,116 +1928,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
     // vat gpu particle ---------------------------
 
-    // vat gpu particle
-    const vatWidth = 32;
-    const vatHeight = 32;
-    const vatGPUParticle = createVATGPUParticle({
-        gpu,
-        mesh: createMesh({
-            // geometry: createBoxGeometry({gpu, size: 1}),
-            geometry: createSphereGeometry({ gpu, radius: 0.75 }),
-            material: createUnlitMaterial({
-                baseColor: createColor(1.5, 1.5, 1.5, 1),
-            }),
-        }),
-        instanceCount: vatWidth * vatHeight,
-        vatWidth,
-        vatHeight,
-        makePerInstanceDataFunction: () => {
-            return {
-                scale: [.1, .1, .1],
-            };
-        },
-        makePerVATInstanceDataFunction: () => {
-            return {
-                // position: [i * 2, 3, i * -2, 1]
-                position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
-            };
-        },
-        fragmentShader: `
- #pragma DEFINES
-#include <lighting>
-#include <ub>
-#include <rand>
-in vec3 vPosition;
-in vec2 vUv;
-uniform sampler2D uVelocityMap;
-uniform sampler2D uPositionMap;
-uniform vec2 uTexelSize;
-uniform float uTargetWidth;
-uniform float uTargetHeight;
-
-uniform float uNoiseScale;
-uniform float uSpeed;
-
-layout (location = 0) out vec3 outVelocity;
-layout (location = 1) out vec3 outPosition;
-
-vec3 curlNoise(vec3 position) {
-    float eps = .0001;
-    float eps2 = 2. * eps;
-    float invEps2 = 1. / eps2;
-    vec3 dx = vec3(eps, 0., 0.);
-    vec3 dy = vec3(0., eps, 0.);
-    vec3 dz = vec3(0., 0., eps);
-    // 勾配検出のためにepsだけずらした地点のnoiseを参照
-    vec3 px0 = snoise3(position - dx);
-    vec3 px1 = snoise3(position + dx);
-    vec3 py0 = snoise3(position - dy);
-    vec3 py1 = snoise3(position + dy);
-    vec3 pz0 = snoise3(position - dz);
-    vec3 pz1 = snoise3(position + dz);
-    // 回転
-    float x = (py1.z - py0.z) - (pz1.y - pz0.y);
-    float y = (pz1.x - pz0.x) - (px1.z - px0.z);
-    float z = (px1.y - px0.y) - (py1.x - py0.x);
-    return vec3(x, y, z) * invEps2;
-}
-
-void main() {
-    vec2 rawUv = vUv;
-    vec2 sc = vec2(uTargetWidth, uTargetHeight);
-    vec2 fid = rawUv * sc - mod(rawUv * sc, 1.); // float 0,1,2...
-    vec2 uv = fid / sc; // 0~1
-
-    vec3 prevVelocity = texture(uVelocityMap, uv).xyz;
-    vec3 prevPosition = texture(uPositionMap, uv).xyz;
-    vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
-    vec3 newVelocity = force * 1. * uDeltaTime;
-    
-    vec3 newPosition = prevPosition + newVelocity;
-    
-    outVelocity = prevVelocity;
-    outPosition = prevPosition;
-    // outPosition = prevVelocity;
-    
-    outVelocity = newVelocity;
-    outPosition = newPosition;
-   
-    // outVelocity = vec3(uv * .5, 0.);
-    // outPosition = vec3(uv, 0.);
-}
-`
-    });
-    addActorToScene(captureScene, vatGPUParticle);
-
-    // const testMesh = createMesh({
-    //     geometry: createPlaneGeometry({ gpu }),
-    //     material: createUnlitMaterial(),
-    // });
-    // setScaling(testMesh.transform, createFillVector3(1.5));
-    // setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
-    // addActorToScene(captureScene, testMesh);
-    // subscribeActorOnStart(testMesh, () => {
-    //     setUniformValue(
-    //         getMeshMaterial(testMesh).uniforms,
-    //         UniformNames.BaseMap,
-    //         (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
-    //     );
-    // });
-
-
-
+    createTestVATGPUParticle(gpu);
 
     // noise -----------------------------------
 
