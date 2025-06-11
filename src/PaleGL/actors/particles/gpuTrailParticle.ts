@@ -268,12 +268,16 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     subscribeActorOnStart(vatGPUParticle, (args) => {
         tryStartMaterial(gpu, args.renderer, mrtGraphicsDoubleBuffer.geometry, mrtGraphicsDoubleBuffer.material);
 
-        const positionDataArray: number[][] = [];
-        const velocityDataArray: number[][] = [];
-        const upDataArray: number[][] = [];
+        const positionColDataArray: number[][] = [];
+        const velocityColDataArray: number[][] = [];
+        const upColDataArray: number[][] = [];
         let tmpPosition: number[] | undefined;
         let tmpVelocity: number[] | undefined;
         let tmpUp: number[] | undefined;
+
+        const positionDataArray: number[][] = [];
+        const velocityDataArray: number[][] = [];
+        const upDataArray: number[][] = [];
 
         maton.range(instanceCount).forEach((_, i) => {
             if (makeStateDataPerInstanceFunction) {
@@ -289,15 +293,22 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
                 }
             }
 
-            for (let j = 0; j < vatHeight; j++) {
-                velocityDataArray.push(tmpVelocity || [0, 0, 0, 1]);
-                positionDataArray.push(tmpPosition || [0, 0, 0, 1]);
-                upDataArray.push(tmpUp || [0, 1, 0, 0]);
+            velocityColDataArray.push(tmpVelocity || [0, 0, 0, 1]);
+            positionColDataArray.push(tmpPosition || [0, 0, 0, 1]);
+            upColDataArray.push(tmpUp || [0, 1, 0, 0]);
+        });
+
+        // 縦の列は同じデータを詰める
+        maton.range(vatHeight).forEach(() => {
+            for (let i = 0; i < vatWidth; i++) {
+                velocityDataArray.push(velocityColDataArray[i]);
+                positionDataArray.push(positionColDataArray[i]);
+                upDataArray.push(upColDataArray[i]);
             }
         });
 
-        const positionData = new Float32Array(Array.from(positionDataArray.flat()));
         const velocityData = new Float32Array(Array.from(velocityDataArray.flat()));
+        const positionData = new Float32Array(Array.from(positionDataArray.flat()));
         const upData = new Float32Array(Array.from(upDataArray.flat()));
 
         // read, write どちらも初期値を与えておく
