@@ -87,6 +87,7 @@ export type MaterialArgs = {
     useInstanceLookDirection?: boolean;
     
     useVAT?: boolean;
+    isTrail?: boolean;
 
     // vertex color
     useVertexColor?: boolean;
@@ -154,6 +155,7 @@ export type Material = {
     jointNum: number | null;
     isInstancing: boolean;
     useVAT: boolean;
+    isTrail: boolean;
     useInstanceLookDirection: boolean;
     useVertexColor: boolean;
     vertexShader: string;
@@ -219,6 +221,7 @@ export function createMaterial(args: MaterialArgs): Material {
         // jointNum = null,
         
         useVAT = false,
+        isTrail = false,
 
         // instancing
         isInstancing = false,
@@ -468,6 +471,7 @@ export function createMaterial(args: MaterialArgs): Material {
         jointNum,
         isInstancing,
         useVAT,
+        isTrail,
         useInstanceLookDirection,
         useVertexColor,
         showLog,
@@ -520,6 +524,7 @@ export const startMaterial = (
         useVertexColor: material.useVertexColor,
         isInstancing: material.isInstancing,
         useVAT: material.useVAT,
+        isTrail: material.isTrail,
         useAlphaTest: material.alphaTest !== null,
         useInstanceLookDirection: material.useInstanceLookDirection,
     };

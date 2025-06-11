@@ -41,13 +41,13 @@ export type GPUParticleArgs = InstancingParticleArgs & {
 // export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
 export type GpuParticle = Mesh & { mrtGraphicsDoubleBuffer: GraphicsDoubleBuffer };
 
-export const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
-export const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
-export const getWriteVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+const getWriteVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
-export const getWritePositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+const getWritePositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
 
 export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {

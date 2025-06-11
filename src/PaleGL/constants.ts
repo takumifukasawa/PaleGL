@@ -395,6 +395,7 @@ export const UniformNames = {
     // vat
     PositionMap: 'uPositionMap',
     VelocityMap: 'uVelocityMap',
+    UpMap: 'uUpMap',
     // VATWidth: 'uVATWidth',
     // VATHeight: 'uVATWidth',
     VATResolution: 'uVATResolution',

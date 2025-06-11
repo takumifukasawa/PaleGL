@@ -1,48 +1,177 @@
-import {Mesh} from "@/PaleGL/actors/meshes/mesh.ts";
-import {createMRTDoubleBuffer, swapMRTDoubleBuffer} from "@/PaleGL/core/doubleBuffer.ts";
-import {TextureFilterTypes, TextureTypes, UniformNames, UniformTypes} from "@/PaleGL/constants.ts";
+import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    createMRTDoubleBuffer,
+    getReadMultipleRenderTargetOfMRTDoubleBuffer,
+    getWriteMultipleRenderTargetOfMRTDoubleBuffer,
+    MRTDoubleBuffer,
+    swapMRTDoubleBuffer,
+} from '@/PaleGL/core/doubleBuffer.ts';
+import {
+    AttributeNames,
+    FaceSide,
+    TextureFilterTypes,
+    TextureTypes,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
 import {
     createGraphicsDoubleBuffer,
     GraphicsDoubleBuffer,
-    updateMRTGraphicsDoubleBuffer
-} from "@/PaleGL/core/graphicsDoubleBuffer.ts";
-import {createInstancingParticle, InstancingParticleArgs} from "@/PaleGL/actors/particles/instancingParticle.ts";
-import {Gpu} from "@/PaleGL/core/gpu.ts";
-import {iterateAllMeshMaterials, setUniformValueToAllMeshMaterials} from "@/PaleGL/actors/meshes/meshBehaviours.ts";
-import {createVector2} from "@/PaleGL/math/vector2.ts";
-import {addUniformValue} from "@/PaleGL/core/uniforms.ts";
-import {subscribeActorOnStart, subscribeActorOnUpdate} from "@/PaleGL/actors/actor.ts";
-import {tryStartMaterial} from "@/PaleGL/core/renderer.ts";
-import {maton} from "@/PaleGL/utilities/maton.ts";
-import {updateTexture} from "@/PaleGL/core/texture.ts";
-import {setMaterialUniformValue} from "@/PaleGL/materials/material.ts";
-import {
-    getReadPositionMap,
-    getReadVelocityMap,
-    getWritePositionMap,
-    getWriteVelocityMap,
-} from "@/PaleGL/actors/particles/gpuParticle.ts";
+    updateMRTGraphicsDoubleBuffer,
+} from '@/PaleGL/core/graphicsDoubleBuffer.ts';
+import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
+import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
+import { updateTexture } from '@/PaleGL/core/texture.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
+import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
+import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 
-type PerInstanceData = {
+type DataPerInstance = {
     position: number[];
     velocity?: number[];
+    up?: number[];
 };
 
 export type GPUTrailParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
+    mesh: Mesh;
     vatWidth: number;
     vatHeight: number;
     fragmentShader: string;
     // positionFragmentShader: string;
     // velocityFragmentShader: string;
-    makePerVATInstanceDataFunction?: (index: number) => PerInstanceData;
+    makeStateDataPerInstanceFunction?: (index: number) => DataPerInstance;
 };
 
 // export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
 export type GPUTrailParticle = Mesh & { mrtGraphicsDoubleBuffer: GraphicsDoubleBuffer };
 
-export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
+const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
+const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
+const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
+const getWriteVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
+const getWritePositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
+const getWriteUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+    getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
 
+const addVertex2 = (vertices: Float32Array, vi: number, x: number, y: number) => {
+    vertices[vi++] = x;
+    vertices[vi++] = y;
+    return vi;
+};
+
+const addVertex3 = (vertices: Float32Array, vi: number, x: number, y: number, z: number) => {
+    vertices[vi++] = x;
+    vertices[vi++] = y;
+    vertices[vi++] = z;
+    return vi;
+};
+
+const addQuad = (indices: Uint16Array, i: number, v00: number, v10: number, v01: number, v11: number) => {
+    indices[i] = v00;
+    indices[i + 1] = indices[i + 5] = v10;
+    indices[i + 2] = indices[i + 4] = v01;
+    indices[i + 3] = v11;
+    return i + 6;
+};
+
+// trail vertex ... min = 2
+const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVertexNum: number) => {
+    const vertexNum = 2 * trailVertexNum;
+    const indexNum = 6 * (trailVertexNum - 1);
+
+    const indices = new Uint16Array(indexNum);
+    const trailVertices = new Float32Array(vertexNum);
+    const positions = new Float32Array(3 * vertexNum);
+    const uvs = new Float32Array(2 * vertexNum);
+    const normals = new Float32Array(3 * vertexNum);
+
+    const halfWidth = planeWidth * 0.5;
+
+    let posCount = 0;
+    let uvCount = 0;
+    let normalCount = 0;
+
+    // for (let i = 0; i < trailVertexNum; i++) {
+    //     posCount = addVertex3(positions, posCount, 1, halfWidth, 0);
+    //     uvCount = addVertex2(uvs, uvCount, 0, 0);
+    //     normalCount = addVertex3(normals, normalCount, 1, 0, 0);
+    //     posCount = addVertex3(positions, posCount, 0, -halfWidth, 0);
+    //     uvCount = addVertex2(uvs, uvCount, 0, 0);
+    //     normalCount = addVertex3(normals, normalCount, 1, 0, 0);
+    //     trailVertices[2 * i] = trailVertices[2 * i + 1] = i;
+    // }
+
+    // 0 2
+    // 1 3
+    posCount = addVertex3(positions, posCount, -halfWidth, halfWidth, 0);
+    uvCount = addVertex2(uvs, uvCount, 0, 0);
+    normalCount = addVertex3(normals, normalCount, 0, 0, 0);
+    posCount = addVertex3(positions, posCount, -halfWidth, -halfWidth, 0);
+    uvCount = addVertex2(uvs, uvCount, 0, 0);
+    normalCount = addVertex3(normals, normalCount, 1, 0, 0);
+    trailVertices[2 * 0] = trailVertices[2 * 0 + 1] = 0;
+
+    posCount = addVertex3(positions, posCount, halfWidth, halfWidth, 0);
+    uvCount = addVertex2(uvs, uvCount, 0, 0);
+    normalCount = addVertex3(normals, normalCount, 0, 0, 0);
+    posCount = addVertex3(positions, posCount, halfWidth, -halfWidth, 0);
+    uvCount = addVertex2(uvs, uvCount, 0, 0);
+    normalCount = addVertex3(normals, normalCount, 1, 0, 0);
+    trailVertices[2 * 1] = trailVertices[2 * 1 + 1] = 1;
+
+    let indexCount = 0;
+    for (let i = 0; i < trailVertexNum - 1; i++) {
+        // prettier-ignore
+        indexCount = addQuad(
+            indices, indexCount,
+            2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 3
+        );
+    }
+
+    const attributes: Attribute[] = [
+        createAttribute({
+            name: AttributeNames.Position,
+            data: positions,
+            size: 3,
+        }),
+        createAttribute({
+            name: AttributeNames.Uv,
+            data: uvs,
+            size: 2,
+        }),
+        createAttribute({
+            name: AttributeNames.Normal,
+            data: normals,
+            size: 3,
+        }),
+    ];
+
+    const geometry = createGeometry({
+        gpu,
+        attributes,
+        indices,
+        drawCount: indices.length,
+    });
+
+    return geometry;
+};
+
+export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     const {
         gpu,
         // particleMap = null,
@@ -60,10 +189,27 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         fragmentShader,
         // positionFragmentShader,
         // velocityFragmentShader,
-        makePerVATInstanceDataFunction,
+        makeStateDataPerInstanceFunction,
     } = args;
 
-    const gpuParticle = createInstancingParticle(args);
+    // TODO: meshは外から渡す
+    // const geometry = createTrailPlaneGeometry(gpu, 5, 2);
+    const geometry = createPlaneGeometry({ gpu });
+    const material = createUnlitMaterial({
+        faceSide: FaceSide.Double,
+    });
+    const mesh = createMesh({
+        geometry,
+        material,
+        name: 'GPUTrailPlaneParticle',
+    });
+
+    const gpuParticle = createInstancingParticle({ ...args, mesh });
+    // const gpuParticle = createInstancingParticle(args);
+
+    subscribeActorOnStart(gpuParticle, () => {
+        console.log(gpuParticle);
+    });
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -72,7 +218,7 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         height: vatHeight,
         minFilter: TextureFilterTypes.Nearest,
         magFilter: TextureFilterTypes.Nearest,
-        textureTypes: [TextureTypes.RGBA16F, TextureTypes.RGBA16F], // 0: velocity, 1: position
+        textureTypes: [TextureTypes.RGBA16F, TextureTypes.RGBA16F, TextureTypes.RGBA16F], // 0: velocity, 1: position
     });
 
     const mrtGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
@@ -91,20 +237,31 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
                 type: UniformTypes.Texture,
                 value: null,
             },
+            {
+                name: UniformNames.UpMap,
+                type: UniformTypes.Texture,
+                value: null,
+            },
         ],
         doubleBuffer: mrtDoubleBuffer,
     });
 
+    // materialの強制更新
+    // uniformsの追加
     iterateAllMeshMaterials(gpuParticle, (mat) => {
         mat.useVAT = true;
+        mat.isTrail = true;
         // depthが作られる前なのでdepthUniformsにも設定する
         const vatResolution = createVector2(vatWidth, vatHeight);
+        addUniformValue(mat.uniforms, UniformNames.VelocityMap, UniformTypes.Texture, null);
         addUniformValue(mat.uniforms, UniformNames.PositionMap, UniformTypes.Texture, null);
-        addUniformValue(mat.depthUniforms, UniformNames.PositionMap, UniformTypes.Texture, null);
+        addUniformValue(mat.uniforms, UniformNames.UpMap, UniformTypes.Texture, null);
         addUniformValue(mat.uniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
+        addUniformValue(mat.depthUniforms, UniformNames.VelocityMap, UniformTypes.Texture, null);
+        addUniformValue(mat.depthUniforms, UniformNames.PositionMap, UniformTypes.Texture, null);
+        addUniformValue(mat.depthUniforms, UniformNames.UpMap, UniformTypes.Texture, null);
         addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
     });
-
 
     const vatGPUParticle: GPUTrailParticle = { ...gpuParticle, mrtGraphicsDoubleBuffer };
 
@@ -113,22 +270,35 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
 
         const positionDataArray: number[][] = [];
         const velocityDataArray: number[][] = [];
+        const upDataArray: number[][] = [];
         let tmpPosition: number[] | undefined;
         let tmpVelocity: number[] | undefined;
+        let tmpUp: number[] | undefined;
 
         maton.range(instanceCount).forEach((_, i) => {
-            if (makePerVATInstanceDataFunction) {
-                const perData = makePerVATInstanceDataFunction(i);
-                tmpPosition = perData.position;
-                tmpVelocity = perData.velocity;
+            if (makeStateDataPerInstanceFunction) {
+                const perData = makeStateDataPerInstanceFunction(i);
+                if (perData.velocity) {
+                    tmpVelocity = [...perData.velocity, 1];
+                }
+                if (perData.position) {
+                    tmpPosition = [...perData.position, 1];
+                }
+                if (perData.up) {
+                    tmpUp = perData.up;
+                }
             }
 
-            positionDataArray.push(tmpPosition || [0, 0, 0, 1]);
-            velocityDataArray.push(tmpVelocity || [0, 0, 0, 0]);
+            for (let j = 0; j < vatHeight; j++) {
+                velocityDataArray.push(tmpVelocity || [0, 0, 0, 1]);
+                positionDataArray.push(tmpPosition || [0, 0, 0, 1]);
+                upDataArray.push(tmpUp || [0, 1, 0, 0]);
+            }
         });
 
         const positionData = new Float32Array(Array.from(positionDataArray.flat()));
         const velocityData = new Float32Array(Array.from(velocityDataArray.flat()));
+        const upData = new Float32Array(Array.from(upDataArray.flat()));
 
         // read, write どちらも初期値を与えておく
 
@@ -138,6 +308,9 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         updateTexture(getWritePositionMap(mrtDoubleBuffer), {
             data: positionData,
         });
+        updateTexture(getWriteUpMap(mrtDoubleBuffer), {
+            data: upData,
+        });
 
         swapMRTDoubleBuffer(mrtDoubleBuffer);
 
@@ -147,32 +320,49 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         updateTexture(getWritePositionMap(mrtDoubleBuffer), {
             data: positionData,
         });
+        updateTexture(getWriteUpMap(mrtDoubleBuffer), {
+            data: upData,
+        });
 
         swapMRTDoubleBuffer(mrtDoubleBuffer);
     });
 
+    let tmpReadVelocityMap;
     let tmpReadPositionMap;
+    let tmpReadUpMap;
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
-        // velocity 更新前に前フレームのpositionをvelocityのuniformに設定する
+        // prettier-ignore
         setMaterialUniformValue(
             mrtGraphicsDoubleBuffer.material,
             UniformNames.VelocityMap,
             getReadVelocityMap(mrtDoubleBuffer)
         );
 
-        // 更新した速度をposition更新doublebufferのuniformに設定
+        // 更新した速度をposition更新. doublebufferのuniformに設定
+        // prettier-ignore
         setMaterialUniformValue(
             mrtGraphicsDoubleBuffer.material,
             UniformNames.PositionMap,
             getReadPositionMap(mrtDoubleBuffer)
         );
 
-        // // update velocity
+        // prettier-ignore
+        setMaterialUniformValue(
+            mrtGraphicsDoubleBuffer.material,
+            UniformNames.UpMap,
+            getReadUpMap(mrtDoubleBuffer)
+        );
+
+        // update velocity
         updateMRTGraphicsDoubleBuffer(renderer, mrtGraphicsDoubleBuffer);
 
+        tmpReadVelocityMap = getReadVelocityMap(mrtDoubleBuffer);
         tmpReadPositionMap = getReadPositionMap(mrtDoubleBuffer);
+        tmpReadUpMap = getReadUpMap(mrtDoubleBuffer);
+        setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.VelocityMap, tmpReadVelocityMap);
         setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.PositionMap, tmpReadPositionMap);
+        setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.UpMap, tmpReadUpMap);
     });
 
     return vatGPUParticle;

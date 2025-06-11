@@ -1,6 +1,6 @@
 ﻿import { createGeometry, createTangentsAndBinormals, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import {Attribute, createAttribute} from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
@@ -95,7 +95,7 @@ export function createPlaneGeometryRawData({
 export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
     const rawData = createPlaneGeometryRawData(args);
 
-    const attributes = [
+    const attributes: Attribute[] = [
         createAttribute({
             name: AttributeNames.Position,
             data: rawData.positions,

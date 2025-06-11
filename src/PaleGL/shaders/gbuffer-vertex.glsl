@@ -28,7 +28,9 @@ uniform float uEmissiveMixer;
 #endif
 
 #ifdef USE_VAT
+uniform sampler2D uVelocityMap;
 uniform sampler2D uPositionMap;
+uniform sampler2D uUpMap;
 uniform vec2 uVATResolution;
 #endif
 
@@ -115,7 +117,19 @@ mat4 getScalingMat(vec3 s) {
     );
 }
 
-mat4 getLookAtMat(vec3 lookAt, vec3 p) {
+mat4 getLookMat(vec3 front, vec3 up) {
+    vec3 z = -normalize(front);
+    vec3 y = up;
+    vec3 x = cross(y, z);
+    return mat4(
+        x.x, x.y, x.z, 0.,
+        y.x, y.y, y.z, 0.,
+        z.x, z.y, z.z, 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getLookAtPMat(vec3 lookAt, vec3 p) {
     vec3 f = mix(
         vec3(0., 1., 0.),// fallback
         normalize(lookAt - p),
@@ -278,16 +292,32 @@ void main() {
     mat4 instanceTranslation = getIdentityMat();
 
     #ifdef USE_VAT
-        vec2 vatUv = ivec2(
-            int(mod(fid, uVATResolution.x)),
-            int(floor(fid / uVATResolution.y))
-        );
-        vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
-        instanceTranslation = getTranslationMat(vatPosition);
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
-        // worldMatrix = uWorldMatrix;
-        worldMatrix = uWorldMatrix * instanceTranslation;
+        #ifdef USE_TRAIL
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                0
+            );
+            vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+            mat4 rotMatrix = getLookMat(normalize(vatVelocity), vatUp);
+            // worldMatrix = uWorldMatrix * rotMatrix * instanceTranslation;
+            worldMatrix = uWorldMatrix * instanceTranslation;
+            // worldMatrix = uWorldMatrix;
+        #else
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                int(floor(fid / uVATResolution.y))
+            );
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+            // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
+            // worldMatrix = uWorldMatrix;
+            // NOTE: 一旦移動だけ
+            worldMatrix = uWorldMatrix * instanceTranslation;
+        #endif
     #else
         instanceTranslation = getTranslationMat(aInstancePosition);
     #endif
@@ -305,14 +335,14 @@ void main() {
     // TODO: 追従率をuniformで渡したい
     #ifdef USE_INSTANCE_LOOK_DIRECTION
         // pattern_1: 速度ベクトルを使って回転
-        instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+        instanceRotation = getLookAtPMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
         // pattern_2: 速度ベクトルをnormalizeして使って回転
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
         // pattern_3: look direction
-        // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + aLookDirection, aInstancePosition);
         // pattern_4: blend
         // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
         // // for debug: 回転させない
         // instanceRotation = mat4(
         //     1., 0., 0., 0.,

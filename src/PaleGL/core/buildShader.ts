@@ -57,6 +57,7 @@ export type ShaderDefines = {
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
     useVAT: boolean;
+    isTrail: boolean;
 };
 
 // tmp
@@ -114,6 +115,7 @@ const buildShaderDefines = ({
     isInstancing,
     useInstanceLookDirection,
     useVAT,
+    isTrail
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -146,6 +148,9 @@ const buildShaderDefines = ({
     }
     if (useVAT) {
         arr.push('#define USE_VAT');
+    }
+    if (isTrail) {
+        arr.push('#define USE_TRAIL');
     }
 
     return arr;
