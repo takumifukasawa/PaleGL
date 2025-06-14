@@ -21,7 +21,7 @@ export function createSphereGeometryRawData(
     heightSegments: number,
     invertNormals: boolean = false
 ): SphereGeometry {
-    widthSegments  = Math.max(3, Math.floor(widthSegments));
+    widthSegments = Math.max(3, Math.floor(widthSegments));
     heightSegments = Math.max(2, Math.floor(heightSegments));
 
     const ringCount = heightSegments - 1;
@@ -29,13 +29,13 @@ export function createSphereGeometryRawData(
     const normalSign = invertNormals ? -1 : 1;
 
     const positions: number[] = [];
-    const normals:   number[] = [];
-    const uvs:       number[] = [];
-    const indices:   number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
     // 1) 上極
     positions.push(0, radius, 0);
-    normals.push( 0, 1,      0);
+    normals.push(0, 1 * normalSign, 0);
     uvs.push(0.5, 0);
 
     // 2) 中間リング
@@ -58,11 +58,7 @@ export function createSphereGeometryRawData(
             positions.push(px, py, pz);
 
             // 法線
-            normals.push(
-                sinT * cosP * normalSign,
-                cosT * normalSign,
-                sinT * sinP * normalSign
-            );
+            normals.push(sinT * cosP * normalSign, cosT * normalSign, sinT * sinP * normalSign);
 
             // UV
             uvs.push(u, 1 - v);
@@ -71,22 +67,18 @@ export function createSphereGeometryRawData(
 
     // 3) 下極
     positions.push(0, -radius, 0);
-    normals.push( 0, -1,      0);
+    normals.push(0, -1 * normalSign, 0);
     uvs.push(0.5, 1);
 
     // --- インデックス生成 ---
     // 上極キャップ（ワインディングをCCWに修正）
     for (let x = 0; x < widthSegments; x++) {
-        indices.push(
-            0,
-            1 + x + 1,
-            1 + x
-        );
+        indices.push(0, 1 + x + 1, 1 + x);
     }
 
     // 中間クワッド → 三角形 2 つ（ワインディングをCCWに修正）
     for (let y = 1; y < ringCount; y++) {
-        const inOffset  = 1 + (y - 1) * ringVerts;
+        const inOffset = 1 + (y - 1) * ringVerts;
         const outOffset = inOffset + ringVerts;
         for (let x = 0; x < widthSegments; x++) {
             const a = inOffset + x;
@@ -102,13 +94,9 @@ export function createSphereGeometryRawData(
     const southIndex = positions.length / 3 - 1;
     const lastRingOffset = 1 + (ringCount - 1) * ringVerts;
     for (let x = 0; x < widthSegments; x++) {
-        indices.push(
-            southIndex,
-            lastRingOffset + x,
-            lastRingOffset + x + 1
-        );
+        indices.push(southIndex, lastRingOffset + x, lastRingOffset + x + 1);
     }
-    
+
     const drawCount = indices.length;
 
     return {
