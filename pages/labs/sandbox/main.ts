@@ -170,7 +170,7 @@ import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
 import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import {createGPUTrailParticle} from "@/PaleGL/actors/particles/gpuTrailParticle.ts";
+import { createGPUTrailParticle, createTrailPlaneGeometry } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -191,7 +191,7 @@ const CubeMapPositiveYImgUrl = './assets/images/py.jpg';
 const CubeMapNegativeYImgUrl = './assets/images/ny.jpg';
 const CubeMapPositiveZImgUrl = './assets/images/pz.jpg';
 const CubeMapNegativeZImgUrl = './assets/images/nz.jpg';
-const gltfSphereModelUrl = './assets/models/sphere-32x32.gltf';
+// const gltfSphereModelUrl = './assets/models/sphere-32x32.gltf';
 const fontAtlasImgUrl = './assets/fonts/NotoSans-Bold/atlas.png';
 const fontAtlasJsonUrl = './assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 const gltfButterflyModelUrl = './assets/models/butterfly-forward-thin.gltf';
@@ -332,7 +332,7 @@ const createTestGPUParticle = (gpu: Gpu) => {
         //     };
         // },
         initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
-        updateFragmentShader: testGPUParticleUpdateFragmentShader
+        updateFragmentShader: testGPUParticleUpdateFragmentShader,
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -356,15 +356,21 @@ const createTestGPUParticle = (gpu: Gpu) => {
 const createTestGPUTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
     const vatWidth = 32;
-    const vatHeight = 64;
+    const vatHeight = 256;
     const vatGPUParticle = createGPUTrailParticle({
         gpu,
         mesh: createMesh({
-            // geometry: createBoxGeometry({gpu, size: 1}),
-            geometry: createSphereGeometry({ gpu, radius: 0.75 }),
-            material: createUnlitMaterial({
-                baseColor: createColor(1.5, 1.5, 1.5, 1),
+            name: 'GPUTrailPlaneParticle',
+            geometry: createTrailPlaneGeometry(gpu, 0.5, vatHeight),
+            material: createGBufferMaterial({
+                metallic: 0,
+                roughness: 1,
+                baseColor: createColor(1, 0, 0, 1),
+                faceSide: FaceSide.Double,
             }),
+            // material: createUnlitMaterial({
+            //     baseColor: createColor(1.5, 1.5, 1.5, 1),
+            // })
         }),
         instanceCount: vatWidth,
         vatWidth,
@@ -386,7 +392,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         //         // position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
         //     };
         // },
-        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader, 
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
         updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
     });
     addActorToScene(captureScene, vatGPUParticle);
@@ -406,7 +412,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
         );
     });
-    
+
     const checkPositionMesh = createMesh({
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
@@ -1124,28 +1130,20 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const createGLTFSphereMesh = async (material: Material) => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const mesh: Mesh = gltfActor.children[0] as Mesh;
+const createGLTFSphereMesh = (material: Material) => {
+    // tmp
+    // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
+    // const mesh: Mesh = gltfActor.children[0] as Mesh;
+    // mesh.castShadow = true;
+    // setMeshMaterial(mesh, material);
+
+    const mesh = createMesh({
+        geometry: createSphereGeometry({ gpu, radius: 2, widthSegments: 32, heightSegments: 32, invertNormals: true }),
+        material,
+    });
     mesh.castShadow = true;
     setMeshMaterial(mesh, material);
 
-    // mesh.material = new GBufferMaterial({
-    //     // gpu,
-    //     // baseMap: floorBaseMap,
-    //     // normalMap: floorNormalMap,
-    //     // envMap: cubeMap,
-    //     // baseColor: new Color(0.5, 0.05, 0.05, 1),
-    //     baseColor: new Color(1, 0.76, 0.336, 1),
-    //     // baseColor: new Color(0, 0, 0, 1),
-    //     // baseColor: new Color(1, 1, 1, 1),
-    //     receiveShadow: true,
-    //     metallic: 0,
-    //     roughness: 0,
-    //     // specularAmount: 0.4,
-    //     // ambientAmount: 0.2,
-    //     emissiveColor: new Color(1., 1., 1., 1.)
-    // });
     return mesh;
 };
 
@@ -1540,7 +1538,7 @@ const main = async () => {
         const iy = v2y(inputController.normalizedInputPosition) * 2 - 1;
         const x = ix * w;
         const z = iy * d;
-        const y = 0.5;
+        const y = 1;
         setTranslation(attractSphereMesh.transform, createVector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     };
@@ -1549,17 +1547,17 @@ const main = async () => {
     // lighting mesh
     //
 
-    testLightingMesh = await createGLTFSphereMesh(
-        createGBufferMaterial({
-            // baseColor: new Color(1, .05, .05, 1),
-            // metallic: 0,
-            // roughness: .3
+    testLightingMesh = createGLTFSphereMesh(
+        // createGBufferMaterial({
+        //     baseColor: createColorWhite(),
+        //     metallic: 1,
+        //     roughness: 1,
+        // })
+        createUnlitMaterial({
             baseColor: createColorWhite(),
-            metallic: 1,
-            roughness: 1,
         })
     );
-    setTranslation(testLightingMesh.transform, createVector3(2.5, 1, 0));
+    setTranslation(testLightingMesh.transform, createVector3(3, 3, 0));
 
     //
     // local raymarch mesh
@@ -1847,9 +1845,9 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     // gpu particle ---------------------------
 
     createTestGPUParticle(gpu);
-    
+
     // gpu trail particle
-    
+
     createTestGPUTrailParticle(gpu);
 
     // noise -----------------------------------

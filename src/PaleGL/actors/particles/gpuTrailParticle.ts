@@ -68,7 +68,7 @@ const addQuad = (indices: Uint16Array, i: number, v00: number, v10: number, v01:
 };
 
 // trail vertex ... min = 2
-const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVertexNum: number) => {
+export const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVertexNum: number) => {
     const vertexNum = 2 * trailVertexNum;
     const indexNum = 6 * (trailVertexNum - 1);
 
@@ -184,27 +184,12 @@ const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDo
 export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     const {
         gpu,
+        mesh,
         vatWidth,
         vatHeight,
         initializeFragmentShader,
         updateFragmentShader,
     } = args;
-
-    // TODO: meshは外から渡す
-    const geometry = createTrailPlaneGeometry(gpu, 0.5, vatHeight);
-
-    // const geometry = createPlaneGeometry({ gpu });
-    const material = createGBufferMaterial({
-        metallic: 0,
-        roughness: 0,
-        baseColor: createColor(1, 0, 0, 1),
-        faceSide: FaceSide.Double,
-    });
-    const mesh = createMesh({
-        geometry,
-        material,
-        name: 'GPUTrailPlaneParticle',
-    });
 
     const gpuParticle = createInstancingParticle({ ...args, mesh });
 

@@ -16,7 +16,8 @@ void main(void) {
   vec2 coord = vec2(float(gl_FragCoord.x), float(gl_FragCoord.y));
   float seed = rand(coord);
   outPosition = randomInSphere(rand(coord)) * maxRadius;
-  outUp = normalize(randomOnSphere(seed * 0.21 + rand(3424.34)));
+  // outUp = normalize(randomOnSphere(seed * 0.21 + rand(3424.34)));
+  outUp = normalize(randomOnSphere(seed));
   
   // for debug
   // ivec2 coord = ivec2(gl_FragCoord.xy);

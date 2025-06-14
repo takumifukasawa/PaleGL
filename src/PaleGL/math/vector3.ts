@@ -312,6 +312,14 @@ export function lerpVector3(v1: Vector3, v2: Vector3, r: number) {
     );
 }
 
+export function averageVector3(...vectors: Vector3[]) {
+    if (vectors.length === 0) {
+        return createVector3Zero();
+    }
+    const sum = vectors.reduce((acc, v) => addVector3AndVector3(acc, v), createVector3Zero());
+    return scaleVector3ByScalar(sum, 1 / vectors.length);
+}
+
 export function logVector3(v: Vector3) {
     console.log(`--------------------
 ${v3x(v)}, ${v3y(v)}, ${v3z(v)}

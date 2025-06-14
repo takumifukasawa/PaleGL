@@ -55,6 +55,9 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(baseColor.rgb);
+   
+    // for debug 
+    // outGBufferD = EncodeGBufferD(worldNormal.rgb);
 
     #pragma AFTER_OUT
 }

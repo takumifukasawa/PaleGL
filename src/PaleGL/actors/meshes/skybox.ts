@@ -120,9 +120,8 @@ export function createSkybox({
     // });
     const geometry = createSphereGeometry({
         gpu,
-        radius: 0.5,
         widthSegments: 32,
-        heightSegments: 16,
+        heightSegments: 32,
         invertNormals: true,
     });
 

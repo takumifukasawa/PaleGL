@@ -119,7 +119,8 @@ mat4 getScalingMat(vec3 s) {
 }
 
 mat4 getLookMat(vec3 front, vec3 up) {
-    vec3 z = -normalize(front);
+    // vec3 z = -normalize(front);
+    vec3 z = normalize(front); // こっちでいいはず？
     vec3 y = up;
     vec3 x = cross(y, z);
     return mat4(
@@ -313,7 +314,7 @@ void main() {
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
             vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
             instanceTranslation = getTranslationMat(vatPosition);
-            instanceRotation = getLookMat(normalize(vatVelocity), vatUp); // TODO: これがあると表示されない
+            instanceRotation = getLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
         #else
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),

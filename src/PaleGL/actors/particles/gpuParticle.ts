@@ -1,5 +1,4 @@
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
 import { TextureFilterTypes, TextureTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
@@ -12,15 +11,12 @@ import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actor
 import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
-    getWriteMultipleRenderTargetOfMRTDoubleBuffer,
     MRTDoubleBuffer,
-    swapMRTDoubleBuffer,
     updateMRTDoubleBufferAndSwap,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { updateTexture } from '@/PaleGL/core/texture.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 
