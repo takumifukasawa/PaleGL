@@ -354,8 +354,8 @@ const createTestGPUParticle = (gpu: Gpu) => {
 
 const createTestGPUTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
-    const vatWidth = 8;
-    const vatHeight = 128;
+    const vatWidth = 32;
+    const vatHeight = 64;
     const vatGPUParticle = createGPUTrailParticle({
         gpu,
         mesh: createMesh({

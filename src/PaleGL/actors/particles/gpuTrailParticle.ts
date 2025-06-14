@@ -23,7 +23,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
-import { subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import {subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { updateTexture } from '@/PaleGL/core/texture.ts';
@@ -312,9 +312,6 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     let isInitialized = false;
 
     const initialize = (renderer: Renderer) => {
-        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
-        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
-
         // const positionColDataArray: number[][] = [];
         // const velocityColDataArray: number[][] = [];
         // const upColDataArray: number[][] = [];
@@ -386,43 +383,35 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
 
         // swapMRTDoubleBuffer(mrtDoubleBuffer);
 
-        //---
 
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-        // renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
-        // renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
-
-        console.log('======= initialize ========');
-        console.log(materialForInitialize);
-        console.log(materialForUpdate);
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 0));
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 1));
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 2));
-        console.log('---------------');
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 0));
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 1));
-        console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 2));
-        console.log('===============');
     };
 
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
     let tmpReadUpMap;
 
-    let skip = 10;
+    subscribeActorOnStart(vatGPUParticle, ({renderer}) => {
+        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
+        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
+
+        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+
+        // for debug
+        // console.log('======= initialize ========');
+        // console.log(materialForInitialize);
+        // console.log(materialForUpdate);
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 0));
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 1));
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[0], 2));
+        // console.log('---------------');
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 0));
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 1));
+        // console.log(readPixelsFromMultipleRenderTarget(mrtDoubleBuffer.multipleRenderTargets[1], 2));
+        // console.log('===============');
+    });
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer, deltaTime }) => {
-        if (skip > 0) {
-            skip--;
-            return;
-        }
-
-        if (!isInitialized) {
-            isInitialized = true;
-            initialize(renderer);
-        }
-        
         // return;
 
         // // prettier-ignore

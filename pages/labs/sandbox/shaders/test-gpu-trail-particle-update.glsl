@@ -73,28 +73,18 @@ void main() {
         prevVelocity = texelFetch(uVelocityMap, coord, 0).xyz;
         prevPosition = texelFetch(uPositionMap, coord, 0).xyz;
         prevUp = texelFetch(uUpMap, coord, 0).xyz;
-        // prevVelocity = texture(uVelocityMap, uv).xyz;
-        // prevPosition = texture(uPositionMap, uv).xyz;
-        // prevUp = texture(uUpMap, uv).xyz;
         vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
-        nextVelocity = force * 1. * max(uDeltaTime, .0001);
+        nextVelocity = force * 2. * min(max(uDeltaTime, 1. / 120.), 1. / 60.); // fallback time step
         nextPosition = prevPosition + nextVelocity;
         vec3 front = normalize(nextVelocity);
         vec3 right = cross(front, normalize(prevUp));
         nextUp = normalize(cross(right, front));
-        // nextUp = vec3(uDeltaTime);
-        // nextUp = nextVelocity;
-        // nextUp = front;
     } else {
         // 先頭以外の場合は1つ上のtexelを参照
         coord = ivec2(coord.x, coord.y - 1);
-        // uv = vec2(uv.x, uv.y - uTexelSize.y);
         nextVelocity = texelFetch(uVelocityMap, coord, 0).xyz;
         nextPosition = texelFetch(uPositionMap, coord, 0).xyz;
         nextUp = texelFetch(uUpMap, coord, 0).xyz;
-        // nextVelocity = texture(uVelocityMap, uv).xyz;
-        // nextPosition = texture(uPositionMap, uv).xyz;
-        // nextUp = texture(uUpMap, uv).xyz;
     }
    
     outVelocity = nextVelocity;
