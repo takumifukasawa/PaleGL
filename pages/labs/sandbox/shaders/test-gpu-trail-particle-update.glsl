@@ -74,7 +74,8 @@ void main() {
         prevPosition = texelFetch(uPositionMap, coord, 0).xyz;
         prevUp = texelFetch(uUpMap, coord, 0).xyz;
         vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
-        nextVelocity = force * 2. * min(max(uDeltaTime, 1. / 120.), 1. / 60.); // fallback time step
+        float dt = min(max(uDeltaTime, 1. / 120.), 1. / 60.);
+        nextVelocity = force * 2. * dt; // fallback time step
         nextPosition = prevPosition + nextVelocity;
         vec3 front = normalize(nextVelocity);
         vec3 right = cross(front, normalize(prevUp));

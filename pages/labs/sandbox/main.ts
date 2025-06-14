@@ -79,7 +79,8 @@ import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-t
 // import gBufferScreenSpaceRaymarchDepthFrag from './shaders/gbuffer-screen-space-raymarch-depth-fragment-test-scene.glsl';
 import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
 import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
-import testGPUParticleFragmentShader from './shaders/test-gpu-particle.glsl';
+import testGPUParticleInitializeFragmentShader from './shaders/test-gpu-particle-initialize.glsl';
+import testGPUParticleUpdateFragmentShader from './shaders/test-gpu-particle-update.glsl';
 import testGPUTrailParticleInitializeFragmentShader from './shaders/test-gpu-trail-particle-initialize.glsl';
 import testGPUTrailParticleUpdateFragmentShader from './shaders/test-gpu-trail-particle-update.glsl';
 
@@ -96,7 +97,7 @@ import {
     UniformBlockNames,
     RAD_TO_DEG,
     UIQueueTypes,
-    VertexShaderModifierPragmas, PrimitiveTypes,
+    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
 import {
@@ -170,7 +171,6 @@ import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {createGPUTrailParticle} from "@/PaleGL/actors/particles/gpuTrailParticle.ts";
-import {MRTDoubleBuffer} from "@/PaleGL/core/doubleBuffer.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -325,13 +325,14 @@ const createTestGPUParticle = (gpu: Gpu) => {
                 scale: [0.1, 0.1, 0.1],
             };
         },
-        makeStateDataPerInstanceFunction: () => {
-            return {
-                // position: [i * 2, 3, i * -2, 1]
-                position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
-            };
-        },
-        fragmentShader: testGPUParticleFragmentShader
+        // makeStateDataPerInstanceFunction: () => {
+        //     return {
+        //         // position: [i * 2, 3, i * -2, 1]
+        //         position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
+        //     };
+        // },
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+        updateFragmentShader: testGPUParticleUpdateFragmentShader
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -373,18 +374,18 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         //         scale: [0.1, 0.1, 0.1],
         //     };
         // },
-        makeStateDataPerInstanceFunction: (i) => {
-            return {
-                // velocity: [1, 1, 1],
-                // position: [i * .5 + .5, 0, i * .5 + .5],
-                // position: [2, 5, 0],
-                // position: [0, 5, 1]
-                position: [-1.5,2.5,3.5]
-                // position: [5, 10, 0]
-                // position: [2, 0, 0]
-                // position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
-            };
-        },
+        // makeStateDataPerInstanceFunction: (i) => {
+        //     return {
+        //         // velocity: [1, 1, 1],
+        //         // position: [i * .5 + .5, 0, i * .5 + .5],
+        //         // position: [2, 5, 0],
+        //         // position: [0, 5, 1]
+        //         position: [-1.5,2.5,3.5]
+        //         // position: [5, 10, 0]
+        //         // position: [2, 0, 0]
+        //         // position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
+        //     };
+        // },
         initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader, 
         updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
     });
@@ -1845,7 +1846,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
     // gpu particle ---------------------------
 
-    // createTestGPUParticle(gpu);
+    createTestGPUParticle(gpu);
     
     // gpu trail particle
     
