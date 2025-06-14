@@ -38,6 +38,7 @@ import {
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+// import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
 
 type EngineOnStartCallbackArgs = void;
 
@@ -69,6 +70,7 @@ export type EngineBase = {
     stats: Stats | null;
     scene: Scene | null;
     sharedTextures: SharedTextures;
+    // sharedQuad: PlaneGeometry;
     renderer: Renderer;
     onBeforeStart: EngineOnBeforeStartCallback | null;
     onAfterStart: EngineOnAfterStartCallback | null;
@@ -102,10 +104,12 @@ export function createEngine({
     showPipeline = false,
 }: EngineArgs): Engine {
     const sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
+    // const sharedQuad = createPlaneGeometry({ gpu });
     const stats: Stats | null = isDevelopment() ? createStats({ showStats, showPipeline }) : null;
 
     const engineBase: EngineBase = {
         sharedTextures,
+        // sharedQuad,
         stats,
         renderer,
         scene: null,

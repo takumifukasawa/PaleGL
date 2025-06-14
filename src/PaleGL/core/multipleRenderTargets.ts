@@ -59,6 +59,7 @@ export function createMultipleRenderTargets({
         const type = textureTypes[i];
         const attachment = GLColorAttachments[i];
         const texture = createTexture({
+            name: `${name}_texture_${i}`,
             gpu,
             width,
             height,
@@ -85,4 +86,31 @@ export function createMultipleRenderTargets({
         framebuffer,
         textures,
     };
+}
+
+export function readPixelsFromMultipleRenderTarget(
+    mrt: MultipleRenderTarget,
+    attachmentIndex: number
+): Float32Array {
+    const gl = mrt.gpu.gl;
+    bindFramebuffer(mrt.framebuffer);
+    const texture = mrt.textures[attachmentIndex];
+   
+    const width = mrt.width;
+    const height = mrt.height;
+   
+    // gl.bindTexture(GL_TEXTURE_2D, texture.glObject);
+
+    // gl.pixelStorei(gl.PACK_ALIGNMENT, 1);
+    
+    gl.readBuffer(GLColorAttachments[attachmentIndex]);
+    
+    const pixels = new Float32Array(width * height * 4); // RGBA
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, pixels);
+    
+    // gl.bindTexture(GL_TEXTURE_2D, null);
+    
+    unbindFramebuffer(mrt.framebuffer);
+    
+    return pixels;
 }

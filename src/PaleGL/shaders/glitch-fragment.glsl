@@ -2,6 +2,7 @@
 
 out vec4 outColor;
 
+#include <common>
 #include <lighting>
 #include <ub>
 #include <rand>

@@ -80,7 +80,8 @@ import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-t
 import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
 import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
 import testGPUParticleFragmentShader from './shaders/test-gpu-particle.glsl';
-import testGPUTrailParticleFragmentShader from './shaders/test-gpu-trail-particle.glsl';
+import testGPUTrailParticleInitializeFragmentShader from './shaders/test-gpu-trail-particle-initialize.glsl';
+import testGPUTrailParticleUpdateFragmentShader from './shaders/test-gpu-trail-particle-update.glsl';
 
 // others
 import {
@@ -353,8 +354,8 @@ const createTestGPUParticle = (gpu: Gpu) => {
 
 const createTestGPUTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
-    const vatWidth = 4;
-    const vatHeight = 4;
+    const vatWidth = 1;
+    const vatHeight = 32;
     const vatGPUParticle = createGPUTrailParticle({
         gpu,
         mesh: createMesh({
@@ -375,13 +376,17 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         makeStateDataPerInstanceFunction: (i) => {
             return {
                 // velocity: [1, 1, 1],
-                position: [i * .5 + .5, 0, i * .5 + .5],
+                // position: [i * .5 + .5, 0, i * .5 + .5],
                 // position: [2, 5, 0],
                 // position: [0, 5, 1]
+                position: [-1.5,2.5,3.5]
+                // position: [5, 10, 0]
+                // position: [2, 0, 0]
                 // position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
             };
         },
-        fragmentShader: testGPUTrailParticleFragmentShader,
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader, 
+        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -397,7 +402,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         setUniformValue(
             getMeshMaterial(checkVelocityMesh).uniforms,
             UniformNames.BaseMap,
-            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[0]
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
         );
     });
     
@@ -412,7 +417,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         setUniformValue(
             getMeshMaterial(checkPositionMesh).uniforms,
             UniformNames.BaseMap,
-            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
         );
     });
 
@@ -427,7 +432,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
         setUniformValue(
             getMeshMaterial(checkUpMesh).uniforms,
             UniformNames.BaseMap,
-            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[2]
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
         );
     });
 };
@@ -536,7 +541,7 @@ wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = createScene();
 
-const pixelRatio = Math.min(window.devicePixelRatio, 1);
+const pixelRatio = Math.min(window.devicePixelRatio, 2);
 
 const renderer = createRenderer({
     gpu,
@@ -545,6 +550,7 @@ const renderer = createRenderer({
 });
 
 const engine = createEngine({ gpu, renderer });
+// const engine = createEngine({ gpu, renderer, updateFps: 2 });
 setSceneToEngine(engine, captureScene);
 
 const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);

@@ -170,6 +170,7 @@ import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 
@@ -245,6 +246,7 @@ export type Renderer = {
     realWidth: number;
     realHeight: number;
     stats: Stats | null;
+    sharedQuad: PlaneGeometry;
     scenePostProcess: PostProcess;
     screenQuadCamera: Camera;
     depthPrePassRenderTarget: RenderTarget;
@@ -304,6 +306,7 @@ export function createRenderer({
     const realHeight: number = 1;
     const stats: Stats | null = null;
     const screenQuadCamera = createFullQuadOrthographicCamera();
+    const sharedQuad = createPlaneGeometry({ gpu });
     const scenePostProcess = createPostProcess(screenQuadCamera);
     const depthPrePassRenderTarget = createRenderTarget({
         gpu,
@@ -711,6 +714,7 @@ export function createRenderer({
         stats,
         scenePostProcess,
         screenQuadCamera,
+        sharedQuad,
         depthPrePassRenderTarget,
         gBufferRenderTargets,
         afterDeferredShadingRenderTarget,

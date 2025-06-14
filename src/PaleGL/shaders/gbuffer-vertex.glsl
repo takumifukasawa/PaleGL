@@ -4,6 +4,7 @@
 
 #pragma APPEND_ATTRIBUTES
 
+#include <common>
 #include <lighting>
 #include <ub>
 #include <vcolor_vh>
@@ -290,38 +291,8 @@ void main() {
     vInstanceId = fid;
     
     mat4 instanceTranslation = getIdentityMat();
+    // mat4 instanceRotation = getIdentityMat();
 
-    #ifdef USE_VAT
-        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        #ifdef USE_TRAIL
-            ivec2 vatUv = ivec2(
-                int(mod(fid, uVATResolution.x)),
-                0
-            );
-            vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
-            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
-            vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
-            instanceTranslation = getTranslationMat(vatPosition);
-            mat4 rotMatrix = getLookMat(normalize(vatVelocity), vatUp);
-            // worldMatrix = uWorldMatrix * rotMatrix * instanceTranslation;
-            worldMatrix = uWorldMatrix * instanceTranslation;
-            // worldMatrix = uWorldMatrix;
-        #else
-            ivec2 vatUv = ivec2(
-                int(mod(fid, uVATResolution.x)),
-                int(floor(fid / uVATResolution.y))
-            );
-            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
-            instanceTranslation = getTranslationMat(vatPosition);
-            // worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
-            // worldMatrix = uWorldMatrix;
-            // NOTE: 一旦移動だけ
-            worldMatrix = uWorldMatrix * instanceTranslation;
-        #endif
-    #else
-        instanceTranslation = getTranslationMat(aInstancePosition);
-    #endif
-    
     mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
     mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
     mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
@@ -330,7 +301,31 @@ void main() {
         instanceRotationY *
         instanceRotationX *
         instanceRotationZ;
-    
+
+    #ifdef USE_VAT
+        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        #ifdef USE_TRAIL
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                aTrailIndex
+            );
+            vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+            instanceRotation = getLookMat(normalize(vatVelocity), vatUp); // TODO: これがあると表示されない
+        #else
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                int(floor(fid / uVATResolution.y))
+            );
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+        #endif
+    #else
+        instanceTranslation = getTranslationMat(aInstancePosition);
+    #endif
+
     // instanceごとのvelocityが必要なことに注意
     // TODO: 追従率をuniformで渡したい
     #ifdef USE_INSTANCE_LOOK_DIRECTION
@@ -354,6 +349,7 @@ void main() {
     #endif
     
     #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+
     worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 
     // TODO:

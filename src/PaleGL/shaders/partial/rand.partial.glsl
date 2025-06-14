@@ -1,3 +1,7 @@
+float rand(float x){
+  return fract(sin(x * 12.9898) * 43758.5453);
+}
+
 // 0 - 1
 // ref: https://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-rand-one-liner
 float rand(vec2 co){
@@ -198,4 +202,28 @@ vec3 snoise3(vec3 v) {
         snoise(v + vec3(100., 200., 300.)),
         snoise(v + vec3(400., 500., 600.))
     );
+}
+
+
+vec3 randomOnSphere(float v) {
+  float z = rand(v * 0.12 + 583.13) * 2.0 - 1.0;
+  // float phi = rand(v * 0.49 + 213.85) * 3.14 * 2.0;
+  float phi = rand(v * 0.49 + 213.85) * PI * 2.0;
+
+  float b = sqrt(1.0 - z * z);
+
+  return vec3(b * cos(phi), b * sin(phi), z);
+}
+
+
+vec3 randomInSphere(float v) {
+  float z = rand(v * 0.42 + 213.23) * 2.0 - 1.0;
+  float phi = rand(v * 0.19 + 313.98) * 3.14 * 2.0;
+  // float phi = rand(v * 0.19 + 313.98) * PI * 2.0;
+  float r = rand(v * 0.35 + 192.75);
+
+  float a = pow(r, 1.0 / 3.0);
+  float b = sqrt(1.0 - z * z);
+
+  return vec3(a * b * cos(phi), a * b * sin(phi), a * z);
 }

@@ -5,23 +5,23 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import {
-    createGraphicsDoubleBuffer,
-    GraphicsDoubleBuffer,
-    updateMRTGraphicsDoubleBuffer,
-} from '@/PaleGL/core/graphicsDoubleBuffer.ts';
+// import {
+//     createGraphicsDoubleBuffer,
+//     GraphicsDoubleBuffer,
+// } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
     getWriteMultipleRenderTargetOfMRTDoubleBuffer,
     MRTDoubleBuffer,
-    swapMRTDoubleBuffer,
+    swapMRTDoubleBuffer, updateMRTDoubleBufferAndSwap,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { updateTexture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import {createGraphicsDoubleBufferMaterial} from "@/PaleGL/core/graphicsDoubleBuffer.ts";
 
 type DataPerInstance = {
     position: number[];
@@ -39,7 +39,7 @@ export type GPUParticleArgs = InstancingParticleArgs & {
 };
 
 // export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
-export type GpuParticle = Mesh & { mrtGraphicsDoubleBuffer: GraphicsDoubleBuffer };
+export type GpuParticle = Mesh & { mrtDoubleBuffer: MRTDoubleBuffer };
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
@@ -82,26 +82,40 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         magFilter: TextureFilterTypes.Nearest,
         textureTypes: [TextureTypes.RGBA16F, TextureTypes.RGBA16F], // 0: velocity, 1: position
     });
+    
+    const uniforms = [
+        {
+            name: UniformNames.VelocityMap,
+            type: UniformTypes.Texture,
+            value: null,
+        },
+        {
+            name: UniformNames.PositionMap,
+            type: UniformTypes.Texture,
+            value: null,
+        }];
+    
+    const materialForUpdate = createGraphicsDoubleBufferMaterial(fragmentShader, vatWidth, vatHeight, uniforms);
 
-    const mrtGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
-        gpu,
-        width: vatWidth,
-        height: vatHeight,
-        fragmentShader,
-        uniforms: [
-            {
-                name: UniformNames.VelocityMap,
-                type: UniformTypes.Texture,
-                value: null,
-            },
-            {
-                name: UniformNames.PositionMap,
-                type: UniformTypes.Texture,
-                value: null,
-            },
-        ],
-        doubleBuffer: mrtDoubleBuffer,
-    });
+    // const mrtGraphicsDoubleBuffer = createGraphicsDoubleBuffer({
+    //     gpu,
+    //     width: vatWidth,
+    //     height: vatHeight,
+    //     fragmentShader,
+    //     uniforms: [
+    //         {
+    //             name: UniformNames.VelocityMap,
+    //             type: UniformTypes.Texture,
+    //             value: null,
+    //         },
+    //         {
+    //             name: UniformNames.PositionMap,
+    //             type: UniformTypes.Texture,
+    //             value: null,
+    //         },
+    //     ],
+    //     doubleBuffer: mrtDoubleBuffer,
+    // });
 
     iterateAllMeshMaterials(gpuParticle, (mat) => {
         mat.useVAT = true;
@@ -113,10 +127,10 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
     });
 
-    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtGraphicsDoubleBuffer };
+    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtDoubleBuffer };
 
-    subscribeActorOnStart(vatGPUParticle, (args) => {
-        tryStartMaterial(gpu, args.renderer, mrtGraphicsDoubleBuffer.geometry, mrtGraphicsDoubleBuffer.material);
+    subscribeActorOnStart(vatGPUParticle, ({renderer}) => {
+        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
 
         const positionDataArray: number[][] = [];
         const velocityDataArray: number[][] = [];
@@ -163,20 +177,22 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
         // velocity 更新前に前フレームのpositionをvelocityのuniformに設定する
         setMaterialUniformValue(
-            mrtGraphicsDoubleBuffer.material,
+            materialForUpdate,
             UniformNames.VelocityMap,
             getReadVelocityMap(mrtDoubleBuffer)
         );
 
         // 更新した速度をposition更新doublebufferのuniformに設定
         setMaterialUniformValue(
-            mrtGraphicsDoubleBuffer.material,
+            materialForUpdate,
             UniformNames.PositionMap,
             getReadPositionMap(mrtDoubleBuffer)
         );
 
         // // update velocity
-        updateMRTGraphicsDoubleBuffer(renderer, mrtGraphicsDoubleBuffer);
+        // updateMRTGraphicsDoubleBuffer(renderer, mrtGraphicsDoubleBuffer);
+        // updateMRTDoubleBuffer(renderer)
+        updateMRTDoubleBufferAndSwap(renderer,  mrtDoubleBuffer, materialForUpdate);
 
         tmpReadPositionMap = getReadPositionMap(mrtDoubleBuffer);
         setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.PositionMap, tmpReadPositionMap);
