@@ -354,8 +354,8 @@ const createTestGPUParticle = (gpu: Gpu) => {
 
 const createTestGPUTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
-    const vatWidth = 1;
-    const vatHeight = 32;
+    const vatWidth = 8;
+    const vatHeight = 128;
     const vatGPUParticle = createGPUTrailParticle({
         gpu,
         mesh: createMesh({
@@ -397,7 +397,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
     });
     setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
     setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
-    addActorToScene(captureScene, checkVelocityMesh);
+    // addActorToScene(captureScene, checkVelocityMesh);
     subscribeActorOnStart(checkVelocityMesh, () => {
         setUniformValue(
             getMeshMaterial(checkVelocityMesh).uniforms,
@@ -412,7 +412,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
     });
     setScaling(checkPositionMesh.transform, createFillVector3(1.5));
     setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
-    addActorToScene(captureScene, checkPositionMesh);
+    // addActorToScene(captureScene, checkPositionMesh);
     subscribeActorOnStart(checkPositionMesh, () => {
         setUniformValue(
             getMeshMaterial(checkPositionMesh).uniforms,
@@ -427,7 +427,7 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
     });
     setScaling(checkUpMesh.transform, createFillVector3(1.5));
     setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
-    addActorToScene(captureScene, checkUpMesh);
+    // addActorToScene(captureScene, checkUpMesh);
     subscribeActorOnStart(checkUpMesh, () => {
         setUniformValue(
             getMeshMaterial(checkUpMesh).uniforms,
