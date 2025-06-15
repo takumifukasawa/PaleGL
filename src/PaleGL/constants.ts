@@ -279,6 +279,8 @@ export const AttributeNames = {
     InstanceVelocity: 'aInstanceVelocity',
     InstanceLookDirection: 'aLookDirection',
     InstanceState: 'aInstanceState',
+    // trail
+    TrailIndex: 'aTrailIndex',
 } as const;
 
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];

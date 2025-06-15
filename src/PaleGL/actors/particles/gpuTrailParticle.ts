@@ -128,7 +128,7 @@ export const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVert
             size: 3,
         }),
         createAttribute({
-            name: 'aTrailIndex',
+            name: AttributeNames.TrailIndex,
             data: trailVertices,
             size: 1,
         }),
@@ -226,7 +226,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
             size: 3,
         }),
         createAttribute({
-            name: 'aTrailIndex',
+            name: AttributeNames.TrailIndex,
             data: trailVertices,
             size: 1,
         }),

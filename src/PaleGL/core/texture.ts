@@ -94,7 +94,12 @@ export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
     }
 }
 
-export type Texture = GLObjectBase<WebGLTexture> & {
+export type TextureBase = {
+    width: number | undefined;
+    height: number | undefined;
+}
+
+export type Texture = GLObjectBase<WebGLTexture> & TextureBase & {
     type: TextureType;
     name: string;
     img: HTMLImageElement | HTMLCanvasElement | null;
@@ -104,8 +109,6 @@ export type Texture = GLObjectBase<WebGLTexture> & {
     wrapS: TextureWrapType;
     wrapT: TextureWrapType;
     flipY: boolean;
-    width: number | undefined;
-    height: number | undefined;
     depthPrecision: TextureDepthPrecisionType | undefined;
 };
 

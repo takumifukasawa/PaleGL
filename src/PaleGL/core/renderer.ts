@@ -118,7 +118,6 @@ import {
 } from '@/PaleGL/core/uniformBufferObject.ts';
 import {
     cloneVector3,
-    createVector3,
     createVector3Zero,
     getVector3Magnitude,
     negateVector3,
@@ -164,13 +163,12 @@ import {
     isPerspectiveCamera,
 } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { rotateVectorByQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
-import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
+import {createFramebuffer} from "@/PaleGL/core/framebuffer.ts";
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 

@@ -405,23 +405,6 @@ void main() {
         vNormal = normalMatrix * aNormal;
     #endif
 
-    // // CUSTOM_CHEAP
-    // #ifdef USE_INSTANCING
-    //     normalMatrix = mat3(transpose(inverse(worldMatrix)));
-    // #else
-    //     normalMatrix = mat3(uNormalMatrix);
-    // #endif
-    // vNormal = normalMatrix * aNormal;
-
-// NOTE: shader minify の時に p * v * w を直接入れないとなぜか掛ける順番がおかしくなる
-//     vec4 viewPosition = uViewMatrix * worldPosition;
-//  
-//     #pragma VIEW_POSITION_POST_PROCESS
-//  
-//     #pragma OUT_CLIP_POSITION_PRE_PROCESS
-//     
-//     gl_Position = uProjectionMatrix * viewPosition;
-
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
     
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)

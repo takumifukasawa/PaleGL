@@ -175,6 +175,11 @@ import {
     createTrailCylinderGeometry,
     createTrailPlaneGeometry
 } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
+import {
+    convertNormalMapFromHeightMap,
+    createNormalMapConverter,
+    createNormalMapRenderTarget
+} from "@/PaleGL/core/normalMap.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -500,6 +505,26 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
         );
     });
 };
+
+const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
+    const converter = createNormalMapConverter(gpu, renderer, { srcTexture: texture });
+
+    const checkMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkMesh.transform, createFillVector3(1.5));
+    setTranslation(checkMesh.transform, createVector3(-8, 1.5, 5));
+    addActorToScene(captureScene, checkMesh);
+    subscribeActorOnUpdate(checkMesh, () => {
+        convertNormalMapFromHeightMap(renderer, converter);
+        setUniformValue(
+            getMeshMaterial(checkMesh).uniforms,
+            UniformNames.BaseMap,
+            converter.renderTarget.texture
+        );
+    });
+}
 
 const stylesText = `
 :root {
@@ -1910,7 +1935,7 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     // gpu cylindar trail particle
     
     createTestGPUCylinderTrailParticle(gpu);
-
+    
     // noise -----------------------------------
 
     const randomNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.RANDOM_NOISE);
@@ -1937,6 +1962,10 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     setScaling(simplexNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(simplexNoiseTextureMesh.transform, createVector3(8, 1.5, 8));
     addActorToScene(captureScene, simplexNoiseTextureMesh);
+
+    // normal map ------------------------------
+
+    createTestNormalMap(gpu, getSharedTexture(engine, SharedTexturesTypes.PERLIN_NOISE).texture);
 
     // ---------------------------------------------
 
