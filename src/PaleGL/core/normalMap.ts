@@ -1,14 +1,12 @@
-import { Texture, TextureBase } from '@/PaleGL/core/texture.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { blitRenderTarget, Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
+import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { RenderTargetTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import vertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import fragmentShader from '@/PaleGL/shaders/normal-map-converter-fragment.glsl';
-import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createVector2, setV2, setV2x } from '@/PaleGL/math/vector2.ts';
-import { createVector3 } from '@/PaleGL/math/vector3.ts';
+import { createVector2, setV2 } from '@/PaleGL/math/vector2.ts';
 
 let convertNormalMapFromHeightMapMaterial: Material;
 
