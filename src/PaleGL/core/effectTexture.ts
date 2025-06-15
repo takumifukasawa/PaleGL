@@ -4,16 +4,17 @@ import {
     TextureFilterType,
     TextureFilterTypes,
     TextureWrapTypes,
+    UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
 
 const createEffectTextureTarget = ({
@@ -53,11 +54,26 @@ export type EffectTextureSystem = {
     needsUpdate: boolean;
 };
 
+export type EffectTextureInfo = {
+    width: number;
+    height: number;
+    effectFragmentShader: string;
+    effectUniforms: UniformsData;
+    minFilter?: TextureFilterType;
+    magFilter?: TextureFilterType;
+    // useComposite: boolean;
+    // composite settings
+    tilingEnabled?: boolean;
+    edgeMaskMix?: number;
+    remapMin?: number;
+    remapMax?: number;
+};
+
 export const createEffectTextureSystem: (
     gpu: Gpu,
     renderer: Renderer,
-    sharedTextureInfo: SharedTextureInfo
-) => EffectTextureSystem = (gpu, renderer, sharedTextureInfo) => {
+    effectTextureInfo: EffectTextureInfo
+) => EffectTextureSystem = (gpu, renderer, effectTextureInfo) => {
     const {
         // key,
         width,
@@ -72,7 +88,7 @@ export const createEffectTextureSystem: (
         magFilter,
         // update,
         // useComposite,
-    } = sharedTextureInfo;
+    } = effectTextureInfo;
 
     const effectRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
     let compositeRenderTarget: RenderTarget | null = null;
@@ -81,6 +97,7 @@ export const createEffectTextureSystem: (
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: effectFragmentShader,
         uniforms: effectUniforms,
+        uniformBlockNames: [UniformBlockNames.Common],
     });
 
     let compositeMaterial: Material | null = null;
@@ -130,6 +147,7 @@ export const createEffectTextureSystem: (
             vertexShader: getPostProcessBaseVertexShader(),
             fragmentShader: effectTexturePostProcessFragment,
             uniforms,
+            uniformBlockNames: [UniformBlockNames.Common],
         });
 
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, compositeMaterial);

@@ -1,9 +1,9 @@
-import { TextureFilterType, TextureFilterTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
-import { createEffectTextureSystem, EffectTextureSystem } from '@/PaleGL/core/effectTexture.ts';
+import { TextureFilterTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { createEffectTextureSystem, EffectTextureInfo, EffectTextureSystem } from '@/PaleGL/core/effectTexture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
@@ -24,34 +24,10 @@ export const SharedTexturesTypes = {
 } as const;
 
 export type SharedTexturesType = (typeof SharedTexturesTypes)[keyof typeof SharedTexturesTypes];
-
-// type SharedTexture = {
-//     texture: Texture;
-//     needsUpdate: boolean;
-//     // update: (time: number) => void;
-//     // render: (time: number) => void;
-//     effectMaterial: Material;
-//     effectRenderTarget: RenderTarget;
-//     compositeMaterial: Material;
-//     compositeRenderTarget: RenderTarget;
-// };
-
 export type SharedTextures = Map<SharedTexturesType, EffectTextureSystem>;
 
-type SharedTextureInfo = {
+type SharedTextureInfo = EffectTextureInfo & {
     key: SharedTexturesType;
-    width: number;
-    height: number;
-    effectFragmentShader: string;
-    effectUniforms: UniformsData;
-    minFilter?: TextureFilterType;
-    magFilter?: TextureFilterType;
-    // useComposite: boolean;
-    // composite settings
-    tilingEnabled?: boolean;
-    edgeMaskMix?: number;
-    remapMin?: number;
-    remapMax?: number;
 };
 
 const sharedTextureInfos: SharedTextureInfo[] = [
@@ -128,11 +104,11 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             height: TEXTURE_SIZE,
             effectFragmentShader: perlinNoiseFragment,
             effectUniforms: [
-                {
-                    name: UniformNames.Time,
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
+                // {
+                //     name: UniformNames.Time,
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
@@ -155,11 +131,11 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             height: TEXTURE_SIZE,
             effectFragmentShader: perlinNoiseFragment,
             effectUniforms: [
-                {
-                    name: UniformNames.Time,
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
+                // {
+                //     name: UniformNames.Time,
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
@@ -182,11 +158,11 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             height: TEXTURE_SIZE,
             effectFragmentShader: simplexNoiseFragment,
             effectUniforms: [
-                {
-                    name: UniformNames.Time,
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
+                // {
+                //     name: UniformNames.Time,
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
@@ -206,77 +182,9 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
 
     for (let i = 0; i < sharedTextureInfos.length; i++) {
         const sharedTextureInfo = sharedTextureInfos[i];
-        const {
-            key,
-            // width,
-            // height,
-            // effectFragmentShader,
-            // effectUniforms,
-            // tilingEnabled,
-            // edgeMaskMix,
-            // remapMin,
-            // remapMax,
-            // minFilter,
-            // magFilter,
-            // update,
-        } = sharedTextureInfo;
+        const { key } = sharedTextureInfo;
 
         const effectTextureSystem = createEffectTextureSystem(gpu, renderer, sharedTextureInfo);
-
-        // const effectRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
-        // const compositeRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
-
-        // const effectMaterial = createMaterial({
-        //     vertexShader: getPostProcessBaseVertexShader(),
-        //     fragmentShader: effectFragmentShader,
-        //     uniforms: effectUniforms,
-        // });
-        // const compositeMaterial = createMaterial({
-        //     vertexShader: getPostProcessBaseVertexShader(),
-        //     fragmentShader: effectTexturePostProcessFragment,
-        //     uniforms: [
-        //         {
-        //             name: UniformNames.SrcTexture,
-        //             type: UniformTypes.Texture,
-        //             value: null,
-        //         },
-        //         {
-        //             name: 'uTilingEnabled',
-        //             type: UniformTypes.Float,
-        //             value: tilingEnabled ? 1 : 0,
-        //         },
-        //         {
-        //             name: 'uEdgeMaskMix',
-        //             type: UniformTypes.Float,
-        //             value: edgeMaskMix,
-        //         },
-        //         {
-        //             name: 'uRemapMin',
-        //             type: UniformTypes.Float,
-        //             value: remapMin,
-        //         },
-        //         {
-        //             name: 'uRemapMax',
-        //             type: UniformTypes.Float,
-        //             value: remapMax,
-        //         },
-        //     ],
-        // });
-
-        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, effectMaterial);
-        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, compositeMaterial);
-        // setMaterialUniformValue(compositeMaterial, UniformNames.SrcTexture, effectRenderTarget.texture);
-
-        // const sharedTexture: SharedTexture = {
-        //     texture: compositeRenderTarget.texture!,
-        //     needsUpdate: false,
-        //     effectMaterial,
-        //     effectRenderTarget,
-        //     compositeMaterial,
-        //     compositeRenderTarget,
-        // };
-
-        // renderSharedTexture(renderer, sharedTexture, 0); // 最初なので一旦time=0でいいかという判断
 
         renderSharedTexture(renderer, effectTextureSystem, 0); // 最初なので一旦time=0でいいかという判断
 
@@ -293,7 +201,7 @@ const renderMaterial = (renderer: Renderer, renderTarget: RenderTarget, material
 };
 
 const renderSharedTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem, time: number) => {
-    setUniformValue(effectTextureSystem.effectMaterial.uniforms, UniformNames.Time, time);
+    // setUniformValue(effectTextureSystem.effectMaterial.uniforms, UniformNames.Time, time);
     renderMaterial(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
     if (effectTextureSystem.useComposite) {
         renderMaterial(renderer, effectTextureSystem.compositeRenderTarget!, effectTextureSystem.compositeMaterial!);

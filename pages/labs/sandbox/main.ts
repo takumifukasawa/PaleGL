@@ -1,7 +1,7 @@
 // actors
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
@@ -17,15 +17,15 @@ import {
     setSceneToEngine,
     startEngine,
 } from '@/PaleGL/core/engine.ts';
-import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
 import { bindGPUUniformBlockAndGetBlockIndex, createGPU, Gpu, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
-import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
     setOrbitCameraControllerDelta,
     startOrbitCameraController,
 } from '@/PaleGL/core/orbitCameraController.ts';
+import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
+import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 
 // geometries
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -69,51 +69,50 @@ import {
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
 
 // inputs
-import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController.ts';
+import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
 
 // shaders
 import litObjectSpaceRaymarchFragContent from './shaders/object-space-raymarch-test-scene.glsl';
 // import gBufferObjectSpaceRaymarchDepthFrag from './shaders/gbuffer-object-space-raymarch-depth-fragment-test-scene.glsl';
 import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-test-scene.glsl';
 // import gBufferScreenSpaceRaymarchDepthFrag from './shaders/gbuffer-screen-space-raymarch-depth-fragment-test-scene.glsl';
-import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
 import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
-import testGPUParticleInitializeFragmentShader from './shaders/test-gpu-particle-initialize.glsl';
+import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
 import testGPUParticleUpdateFragmentShader from './shaders/test-gpu-particle-update.glsl';
 import testGPUTrailParticleInitializeFragmentShader from './shaders/test-gpu-trail-particle-initialize.glsl';
 import testGPUTrailParticleUpdateFragmentShader from './shaders/test-gpu-trail-particle-update.glsl';
 
 // others
 import {
-    UniformTypes,
-    TextureWrapTypes,
-    TextureFilterTypes,
-    BlendTypes,
     AttributeNames,
     AttributeUsageType,
-    UniformNames,
+    BlendTypes,
     FaceSide,
-    UniformBlockNames,
     RAD_TO_DEG,
+    TextureFilterTypes,
+    TextureWrapTypes,
     UIQueueTypes,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
     VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
-import {
-    addDebuggerBorderSpacer,
-    addButtonDebugger,
-    addSliderDebugger,
-    addToggleDebugger,
-    createDebuggerGUI,
-    DebuggerGUI,
-    addDebugGroup,
-    addColorDebugger,
-} from '@/PaleGL/utilities/debuggerGUI.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
+import {
+    addButtonDebugger,
+    addColorDebugger,
+    addDebuggerBorderSpacer,
+    addDebugGroup,
+    addSliderDebugger,
+    addToggleDebugger,
+    createDebuggerGUI,
+    DebuggerGUI,
+} from '@/PaleGL/utilities/debuggerGUI.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import {
     createTransformFeedbackDoubleBuffer,
@@ -121,29 +120,35 @@ import {
     getWriteTransformFeedbackDoubleBuffer,
     swapTransformFeedbackDoubleBuffer,
 } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
-import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
+import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
-import soundVertexShader from './shaders/sound-vertex.glsl';
-import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/PaleGL/core/glslSound.ts';
-import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
-import { createSpotLight, createSpotLightShadow, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { createDirectionalLight, createDirectionalLightShadow } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { createSpotLight, createSpotLightShadow, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
+import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
+import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
+import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/PaleGL/core/glslSound.ts';
+import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import {
+    setInputControllerSize,
+    startInputController,
+    updateInputController,
+} from '@/PaleGL/inputs/inputControllerBehaviours.ts';
+import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import {
     getRotatorDegreeX,
     getRotatorDegreeY,
@@ -152,34 +157,25 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
-import {
-    setInputControllerSize,
-    startInputController,
-    updateInputController,
-} from '@/PaleGL/inputs/inputControllerBehaviours.ts';
-import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
-import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import soundVertexShader from './shaders/sound-vertex.glsl';
 // import {fontCircuit} from "@/PaleGL/shapeFont/fontCircuit/fontCircuit.ts";
-import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
-import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
-import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextMesh.ts';
-import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
-import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
-import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
+import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
+import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextMesh.ts';
 import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
-import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
-import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
     createGPUTrailParticle,
     createTrailCylinderGeometry,
-    createTrailPlaneGeometry
+    createTrailPlaneGeometry,
 } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
-import {
-    convertNormalMapFromHeightMap,
-    createNormalMapConverter,
-    createNormalMapRenderTarget
-} from "@/PaleGL/core/normalMap.ts";
+import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import { convertNormalMapFromHeightMap, createNormalMapConverter } from '@/PaleGL/core/normalMap.ts';
+import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
+import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
+import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
+import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
+import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
+import {createEffectTextureSystem} from "@/PaleGL/core/effectTexture.ts";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -357,7 +353,8 @@ const createTestGPUParticle = (gpu: Gpu) => {
         setUniformValue(
             getMeshMaterial(testMesh).uniforms,
             UniformNames.BaseMap,
-            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0]
+                .textures[1]
         );
     });
 };
@@ -432,8 +429,6 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
         );
     });
 };
-
-
 
 const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
@@ -518,13 +513,9 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
     addActorToScene(captureScene, checkMesh);
     subscribeActorOnUpdate(checkMesh, () => {
         convertNormalMapFromHeightMap(renderer, converter);
-        setUniformValue(
-            getMeshMaterial(checkMesh).uniforms,
-            UniformNames.BaseMap,
-            converter.renderTarget.texture
-        );
+        setUniformValue(getMeshMaterial(checkMesh).uniforms, UniformNames.BaseMap, converter.renderTarget.texture);
     });
-}
+};
 
 const stylesText = `
 :root {
@@ -1212,7 +1203,7 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const createGLTFSphereMesh = (material: Material) => {
+const createTestLightingSphereMesh = (material: Material) => {
     // tmp
     // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
     // const mesh: Mesh = gltfActor.children[0] as Mesh;
@@ -1220,7 +1211,7 @@ const createGLTFSphereMesh = (material: Material) => {
     // setMeshMaterial(mesh, material);
 
     const mesh = createMesh({
-        geometry: createSphereGeometry({ gpu, radius: 2, widthSegments: 32, heightSegments: 32, invertNormals: true }),
+        geometry: createSphereGeometry({ gpu, radius: 1, widthSegments: 32, heightSegments: 32 }),
         material,
     });
     mesh.castShadow = true;
@@ -1629,17 +1620,17 @@ const main = async () => {
     // lighting mesh
     //
 
-    testLightingMesh = createGLTFSphereMesh(
-        // createGBufferMaterial({
-        //     baseColor: createColorWhite(),
-        //     metallic: 1,
-        //     roughness: 1,
-        // })
-        createUnlitMaterial({
+    testLightingMesh = createTestLightingSphereMesh(
+        createGBufferMaterial({
             baseColor: createColorWhite(),
+            metallic: 0,
+            roughness: 1,
         })
+        // createUnlitMaterial({
+        //     baseColor: createColorWhite(),
+        // })
     );
-    setTranslation(testLightingMesh.transform, createVector3(3, 3, 0));
+    setTranslation(testLightingMesh.transform, createVector3(4, 1, 0));
 
     //
     // local raymarch mesh
@@ -1931,11 +1922,11 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     // gpu plane trail particle
 
     // createTestGPUPlaneTrailParticle(gpu);
-    
+
     // gpu cylindar trail particle
-    
+
     createTestGPUCylinderTrailParticle(gpu);
-    
+
     // noise -----------------------------------
 
     const randomNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.RANDOM_NOISE);

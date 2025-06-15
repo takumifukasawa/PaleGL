@@ -2,6 +2,8 @@
 #include <rand>
 #include <etex>
 #include <perlin>
+#include <lighting>
+#include <ub>
 
 void main() {
     vec2 resolution = uResolution;

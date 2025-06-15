@@ -1,25 +1,4 @@
-﻿import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
-import { ActorTypes } from '@/PaleGL/constants';
-import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import {
-    beforeRenderRenderer,
-    checkNeedsBindUniformBufferObjectToMaterial,
-    Renderer,
-    setRendererSize,
-    setRendererStats,
-} from '@/PaleGL/core/renderer.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    createSharedTextures,
-    renderSharedTextures,
-    SharedTexture,
-    SharedTextures,
-    SharedTexturesType,
-} from '@/PaleGL/core/createSharedTextures.ts';
-import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
+﻿import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,
     fixedUpdateActor,
@@ -28,16 +7,38 @@ import {
     updateActor,
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
-import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { ActorTypes } from '@/PaleGL/constants';
+import {
+    createSharedTextures,
+    renderSharedTextures,
+    SharedTexture,
+    SharedTextures,
+    SharedTexturesType,
+} from '@/PaleGL/core/createSharedTextures.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {
+    beforeRenderRenderer,
+    checkNeedsBindUniformBufferObjectToMaterial,
+    Renderer,
+    setRendererSize,
+    setRendererStats,
+} from '@/PaleGL/core/renderer.ts';
+import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
+import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
+import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
+import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import {
     createTimeAccumulator,
     execTimeAccumulator,
     startTimeAccumulator,
     TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
-import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
+import {EffectTextureSystem} from "@/PaleGL/core/effectTexture.ts";
 // import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
 
 type EngineOnStartCallbackArgs = void;
@@ -139,7 +140,7 @@ export function createEngine({
     return engineBase as Engine;
 }
 
-export function getSharedTexture(engine: Engine, key: SharedTexturesType): SharedTexture {
+export function getSharedTexture(engine: Engine, key: SharedTexturesType): EffectTextureSystem {
     if (!engine.sharedTextures.has(key)) {
         console.error('invalid shared texture key');
     }
@@ -226,7 +227,13 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
 
     // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
     traverseScene(engine.scene, (actor) => {
-        updateActor(actor, { gpu: engine.renderer.gpu, renderer: engine.renderer, scene: engine.scene!, time, deltaTime });
+        updateActor(actor, {
+            gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
+            scene: engine.scene!,
+            time,
+            deltaTime,
+        });
         switch (actor.type) {
             case ActorTypes.Skybox:
             case ActorTypes.Mesh:
@@ -254,7 +261,13 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         engine.onLastUpdate({ time, deltaTime });
     }
     traverseScene(engine.scene, (actor) => {
-        lastUpdateActor(actor, { gpu: engine.renderer.gpu, renderer: engine.renderer, scene: engine.scene!, time, deltaTime });
+        lastUpdateActor(actor, {
+            gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
+            scene: engine.scene!,
+            time,
+            deltaTime,
+        });
     });
 
     //

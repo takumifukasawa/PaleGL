@@ -1,6 +1,8 @@
 #include <common>
 #include <rand>
 #include <etex>
+#include <lighting>
+#include <ub>
 
 // ---------------------------------------------------------------------
 
