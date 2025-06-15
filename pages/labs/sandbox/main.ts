@@ -170,7 +170,11 @@ import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
 import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import { createGPUTrailParticle, createTrailPlaneGeometry } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
+import {
+    createGPUTrailParticle,
+    createTrailCylinderGeometry,
+    createTrailPlaneGeometry
+} from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -337,23 +341,23 @@ const createTestGPUParticle = (gpu: Gpu) => {
     addActorToScene(captureScene, vatGPUParticle);
 
     // for debug
-    // const testMesh = createMesh({
-    //     geometry: createPlaneGeometry({ gpu }),
-    //     material: createUnlitMaterial(),
-    // });
-    // setScaling(testMesh.transform, createFillVector3(1.5));
-    // setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
+    const testMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(testMesh.transform, createFillVector3(1.5));
+    setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
     // addActorToScene(captureScene, testMesh);
-    // subscribeActorOnStart(testMesh, () => {
-    //     setUniformValue(
-    //         getMeshMaterial(testMesh).uniforms,
-    //         UniformNames.BaseMap,
-    //         (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
-    //     );
-    // });
+    subscribeActorOnStart(testMesh, () => {
+        setUniformValue(
+            getMeshMaterial(testMesh).uniforms,
+            UniformNames.BaseMap,
+            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0].textures[1]
+        );
+    });
 };
 
-const createTestGPUTrailParticle = (gpu: Gpu) => {
+const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
     const vatWidth = 32;
     const vatHeight = 256;
@@ -368,30 +372,83 @@ const createTestGPUTrailParticle = (gpu: Gpu) => {
                 baseColor: createColor(1, 0, 0, 1),
                 faceSide: FaceSide.Double,
             }),
-            // material: createUnlitMaterial({
-            //     baseColor: createColor(1.5, 1.5, 1.5, 1),
-            // })
         }),
         instanceCount: vatWidth,
         vatWidth,
         vatHeight,
-        // makeDataPerInstanceFunction: () => {
-        //     return {
-        //         scale: [0.1, 0.1, 0.1],
-        //     };
-        // },
-        // makeStateDataPerInstanceFunction: (i) => {
-        //     return {
-        //         // velocity: [1, 1, 1],
-        //         // position: [i * .5 + .5, 0, i * .5 + .5],
-        //         // position: [2, 5, 0],
-        //         // position: [0, 5, 1]
-        //         position: [-1.5,2.5,3.5]
-        //         // position: [5, 10, 0]
-        //         // position: [2, 0, 0]
-        //         // position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
-        //     };
-        // },
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    const checkVelocityMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
+    setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
+    // addActorToScene(captureScene, checkVelocityMesh);
+    subscribeActorOnStart(checkVelocityMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkVelocityMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
+        );
+    });
+
+    const checkPositionMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkPositionMesh.transform, createFillVector3(1.5));
+    setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
+    // addActorToScene(captureScene, checkPositionMesh);
+    subscribeActorOnStart(checkPositionMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkPositionMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
+        );
+    });
+
+    const checkUpMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkUpMesh.transform, createFillVector3(1.5));
+    setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, checkUpMesh);
+    subscribeActorOnStart(checkUpMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkUpMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
+        );
+    });
+};
+
+
+
+const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 128;
+    const vatGPUParticle = createGPUTrailParticle({
+        gpu,
+        mesh: createMesh({
+            name: 'GPUTrailPlaneParticle',
+            geometry: createTrailCylinderGeometry(gpu, 0.1, 8, vatHeight),
+            material: createGBufferMaterial({
+                metallic: 0,
+                roughness: 1,
+                baseColor: createColor(0, 0, 1, 1),
+                faceSide: FaceSide.Double,
+            }),
+        }),
+        instanceCount: vatWidth,
+        vatWidth,
+        vatHeight,
         initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
         updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
     });
@@ -1844,11 +1901,15 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
 
     // gpu particle ---------------------------
 
-    createTestGPUParticle(gpu);
+    // createTestGPUParticle(gpu);
 
-    // gpu trail particle
+    // gpu plane trail particle
 
-    createTestGPUTrailParticle(gpu);
+    // createTestGPUPlaneTrailParticle(gpu);
+    
+    // gpu cylindar trail particle
+    
+    createTestGPUCylinderTrailParticle(gpu);
 
     // noise -----------------------------------
 
