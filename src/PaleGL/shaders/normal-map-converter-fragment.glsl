@@ -12,34 +12,33 @@ out vec4 outColor;
 // ref: https://esprog.hatenablog.com/entry/2016/10/24/183733
 void main() {
 
-
-    // --- tmp
-    
-    vec2 shiftX = vec2(uTexelSize.x, 0);
-    vec2 shiftY = vec2(0, uTexelSize.y);
-    
-    shiftX *= uParallaxScale * uNormalScale;
-    shiftY *= uParallaxScale * uNormalScale;
-    vec2 uv = vUv;
-    
-    vec3 texPx = vec3(texture(uSrcMap, uv + shiftX).r);
-    vec3 texNx = vec3(texture(uSrcMap, uv - shiftX).r);
-    vec3 texPz = vec3(texture(uSrcMap, uv + shiftY).r);
-    vec3 texNz = vec3(texture(uSrcMap, uv - shiftY).r);
-    
-    // // 勾配を計算 
-    vec3 du = vec3(1., 0., uNormalScale) * (texPx - texNx);
-    vec3 dv = vec3(0., 1., uNormalScale) * (texPz - texNz);
-    
-    vec3 n = normalize(cross(du, dv));
-    
-    outColor = vec4(n, 1.0);
-    // outColor = vec4(du, 1.);
-    
-    // debug
-    // outColor = texelFetch(uSrcMap, coord, 0);
-    
-    // --- end tmp
+    // // --- tmp
+    // 
+    // vec2 shiftX = vec2(uTexelSize.x, 0);
+    // vec2 shiftY = vec2(0, uTexelSize.y);
+    // 
+    // shiftX *= uParallaxScale * uNormalScale;
+    // shiftY *= uParallaxScale * uNormalScale;
+    // vec2 uv = vUv;
+    // 
+    // vec3 texPx = vec3(texture(uSrcMap, uv + shiftX).r);
+    // vec3 texNx = vec3(texture(uSrcMap, uv - shiftX).r);
+    // vec3 texPz = vec3(texture(uSrcMap, uv + shiftY).r);
+    // vec3 texNz = vec3(texture(uSrcMap, uv - shiftY).r);
+    // 
+    // // // 勾配を計算 
+    // vec3 du = vec3(1., 0., uNormalScale) * (texPx - texNx);
+    // vec3 dv = vec3(0., 1., uNormalScale) * (texPz - texNz);
+    // 
+    // vec3 n = normalize(cross(du, dv));
+    // 
+    // outColor = vec4(n, 1.0);
+    // // outColor = vec4(du, 1.);
+    // 
+    // // debug
+    // // outColor = texelFetch(uSrcMap, coord, 0);
+    // 
+    // // --- end tmp
 
     vec2 texel = uTexelSize;
     vec2 uv = vUv;

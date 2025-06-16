@@ -1,19 +1,13 @@
-import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
-import {
-    DepthFuncTypes,
-    ShadingModelIds,
-    UniformBlockNames,
-    UniformNames,
-    UniformTypes,
-} from '@/PaleGL/constants';
-import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
+import { DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
+import { createMaterial, MaterialArgs } from '@/PaleGL/materials/material.ts';
+import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 
-import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
-import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
+import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
+import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 
 export type GBufferMaterialArgs = {
     baseColor?: Color;
@@ -28,6 +22,9 @@ export type GBufferMaterialArgs = {
     emissiveColor?: Color;
     normalMap?: Texture | null;
     normalMapTiling?: Vector4;
+    heightMap?: Texture | null;
+    heightMapTiling?: Vector4;
+    heightScale?: number;
     uniforms?: UniformsData;
     shadingModelId?: ShadingModelIds;
 } & MaterialArgs;
@@ -55,15 +52,13 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     const roughnessMapTiling: Vector4 = args.roughnessMapTiling || createVector4(1, 1, 0, 0);
     const normalMap: Texture | null = args.normalMap || null;
     const normalMapTiling: Vector4 = args.normalMapTiling || createVector4(1, 1, 0, 0);
+    const heightMap: Texture | null = args.heightMap || null;
+    const heightScale: number = args.heightScale || 1.0;
+    const heightMapTiling: Vector4 = args.heightMapTiling || createVector4(1, 1, 0, 0);
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
 
-    const baseUniforms: UniformsData = [
-        {
-            name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
-            value: baseColor || createColorWhite(),
-        },
+    const commonUniforms = [
         {
             name: UniformNames.BaseMap,
             type: UniformTypes.Texture,
@@ -74,6 +69,30 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             type: UniformTypes.Vector4,
             value: baseMapTiling,
         },
+        {
+            name: UniformNames.HeightMap,
+            type: UniformTypes.Texture,
+            value: heightMap,
+        },
+        {
+            name: UniformNames.HeightMapTiling,
+            type: UniformTypes.Vector4,
+            value: heightMapTiling,
+        },
+        {
+            name: UniformNames.HeightScale,
+            type: UniformTypes.Float,
+            value: heightScale,
+        },
+    ];
+
+    const gbufferUniforms: UniformsData = [
+        {
+            name: UniformNames.BaseColor,
+            type: UniformTypes.Color,
+            value: baseColor || createColorWhite(),
+        },
+
         {
             name: UniformNames.Metallic,
             type: UniformTypes.Float,
@@ -135,22 +154,10 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
             value: shadingModelId,
         },
     ];
-    
-    const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
-    const depthUniforms: UniformsData = [
-        {
-            name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
-            value: baseMap,
-        },
-        {
-            name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
-            value: baseMapTiling,
-        },
-        ...uniforms
-    ];
+    const mergedUniforms: UniformsData = [...commonUniforms, ...gbufferUniforms, ...uniforms];
+
+    const depthUniforms: UniformsData = [...commonUniforms, ...uniforms];
 
     const material = createMaterial({
         name: 'GBufferMaterial',
@@ -195,6 +202,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
         roughnessMapTiling,
         normalMap,
         normalMapTiling,
+        heightMap,
+        heightMapTiling,
+        heightScale,
         emissiveColor,
         vertexShaderModifiers,
     };

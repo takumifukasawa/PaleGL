@@ -386,6 +386,9 @@ export const UniformNames = {
     EmissiveMapTiling: 'uEmissiveMapTiling',
     NormalMap: 'uNormalMap',
     NormalMapTiling: 'uNormalMapTiling',
+    HeightMap: 'uHeightMap',
+    HeightMapTiling: 'uHeightMapTiling',
+    HeightScale: 'uHeightScale',
     // ao
     // AmbientOcclusionTexture: "uAmbientOcclusionTexture",
     // skinning

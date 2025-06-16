@@ -85,9 +85,13 @@ export type MaterialArgs = {
     // instancing
     isInstancing?: boolean;
     useInstanceLookDirection?: boolean;
-    
+   
+    // vat gpu particle
     useVAT?: boolean;
     isTrail?: boolean;
+    
+    // height map
+    useHeightMap?: boolean;
 
     // vertex color
     useVertexColor?: boolean;
@@ -156,6 +160,7 @@ export type Material = {
     isInstancing: boolean;
     useVAT: boolean;
     isTrail: boolean;
+    useHeightMap: boolean;
     useInstanceLookDirection: boolean;
     useVertexColor: boolean;
     vertexShader: string;
@@ -232,6 +237,9 @@ export function createMaterial(args: MaterialArgs): Material {
 
         // env map
         useEnvMap = false,
+        
+        // height map
+        useHeightMap = false,
 
         // queue,
         // uniforms = [],
@@ -240,7 +248,7 @@ export function createMaterial(args: MaterialArgs): Material {
 
         showLog = false, // depthUniforms = {},
     } = args;
-
+    
     let { depthTest = true, depthWrite = true, alphaTest = null } = args;
 
     // let _name: string = name;
@@ -472,6 +480,7 @@ export function createMaterial(args: MaterialArgs): Material {
         isInstancing,
         useVAT,
         isTrail,
+        useHeightMap,
         useInstanceLookDirection,
         useVertexColor,
         showLog,
@@ -525,6 +534,7 @@ export const startMaterial = (
         isInstancing: material.isInstancing,
         useVAT: material.useVAT,
         isTrail: material.isTrail,
+        useHeightMap: material.useHeightMap,
         useAlphaTest: material.alphaTest !== null,
         useInstanceLookDirection: material.useInstanceLookDirection,
     };

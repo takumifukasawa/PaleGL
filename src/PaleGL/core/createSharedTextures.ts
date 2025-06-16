@@ -1,9 +1,13 @@
 import { TextureFilterTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
-import { createEffectTextureSystem, EffectTextureInfo, EffectTextureSystem } from '@/PaleGL/core/effectTexture.ts';
+import {
+    createEffectTextureSystem,
+    EffectTextureInfo,
+    EffectTextureSystem,
+    renderEffectTexture
+} from '@/PaleGL/core/effectTexture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
@@ -37,11 +41,11 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         height: TEXTURE_SIZE,
         effectFragmentShader: fbmNoiseFragment,
         effectUniforms: [
-            {
-                name: UniformNames.Time,
-                type: UniformTypes.Float,
-                value: 0,
-            },
+            // {
+            //     name: UniformNames.Time,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
             {
                 name: gridUniformName,
                 type: UniformTypes.Vector2,
@@ -80,11 +84,11 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             height: TEXTURE_SIZE,
             effectFragmentShader: randomNoiseFragment,
             effectUniforms: [
-                {
-                    name: UniformNames.Time,
-                    type: UniformTypes.Float,
-                    value: 0,
-                },
+                // {
+                //     name: UniformNames.Time,
+                //     type: UniformTypes.Float,
+                //     value: 0,
+                // },
                 {
                     name: gridUniformName,
                     type: UniformTypes.Vector2,
@@ -169,10 +173,10 @@ const sharedTextureInfos: SharedTextureInfo[] = [
                     value: createVector2(4, 4),
                 },
             ],
-            tilingEnabled: true,
-            edgeMaskMix: 1,
-            remapMin: 0,
-            remapMax: 1,
+            // tilingEnabled: true,
+            // edgeMaskMix: 1,
+            // remapMin: 0,
+            // remapMax: 1,
         },
     ],
 ];
@@ -186,7 +190,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
 
         const effectTextureSystem = createEffectTextureSystem(gpu, renderer, sharedTextureInfo);
 
-        renderSharedTexture(renderer, effectTextureSystem, 0); // 最初なので一旦time=0でいいかという判断
+        renderEffectTexture(renderer, effectTextureSystem);
 
         sharedTextures.set(key, effectTextureSystem);
     }
@@ -194,24 +198,11 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
     return sharedTextures;
 }
 
-const renderMaterial = (renderer: Renderer, renderTarget: RenderTarget, material: Material) => {
-    setRenderTargetToRendererAndClear(renderer, renderTarget, true);
-    renderMesh(renderer, renderer.sharedQuad, material);
-    setRenderTargetToRendererAndClear(renderer, null);
-};
 
-const renderSharedTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem, time: number) => {
-    // setUniformValue(effectTextureSystem.effectMaterial.uniforms, UniformNames.Time, time);
-    renderMaterial(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
-    if (effectTextureSystem.useComposite) {
-        renderMaterial(renderer, effectTextureSystem.compositeRenderTarget!, effectTextureSystem.compositeMaterial!);
-    }
-};
-
-export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedTextures, time: number) {
+export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedTextures) {
     sharedTextures.forEach((sharedTexture) => {
         if (sharedTexture.needsUpdate) {
-            renderSharedTexture(renderer, sharedTexture, time);
+            renderEffectTexture(renderer, sharedTexture);
         }
     });
 }

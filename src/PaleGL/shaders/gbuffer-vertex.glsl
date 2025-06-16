@@ -40,6 +40,12 @@ out vec3 vTangent;
 out vec3 vBinormal;
 #endif
 
+#ifdef USE_HEIGHT_MAP
+uniform sampler2D uHeightMap;
+uniform vec4 uHeightMapTiling;
+uniform float uHeightScale;
+#endif
+
 #pragma APPEND_UNIFORMS
 
 mat4 getRotationXMat(float rad) {
@@ -156,7 +162,7 @@ mat4 getIdentityMat() {
     );
 }
 
-// start skinning ---------------------------------------------------
+// --- start skinning
 
 // #ifdef USE_SKINNING
 #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
@@ -232,7 +238,7 @@ mat4 getJointMatrixGPUSkinning(
 }
 #endif
 
-// end skinning ---------------------------------------------------
+// --- end skinning
 
 void main() {
 
@@ -240,7 +246,7 @@ void main() {
 
     vec4 localPosition = vec4(aPosition, 1.);
 
-    // start calc skinning ---------------------------------------------------
+    // --- start calc skinning
     #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
         mat4 skinMatrix = mat4(
             1., 0., 0., 0.,
@@ -277,7 +283,7 @@ void main() {
         #endif
         localPosition = skinMatrix * localPosition;
     #endif
-    // end calc skinning ---------------------------------------------------
+    // --- end calc skinning
 
     #pragma LOCAL_POSITION_POST_PROCESS
 
@@ -303,6 +309,8 @@ void main() {
         instanceRotationX *
         instanceRotationZ;
 
+    // --- vat
+
     #ifdef USE_VAT
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
         #ifdef USE_TRAIL
@@ -326,6 +334,9 @@ void main() {
     #else
         instanceTranslation = getTranslationMat(aInstancePosition);
     #endif
+
+    // --- instance look direction
+    // TODO: vat velocity方式に統一したい
 
     // instanceごとのvelocityが必要なことに注意
     // TODO: 追従率をuniformで渡したい
@@ -360,16 +371,8 @@ void main() {
     #endif
 #endif
 
-    vec4 worldPosition = worldMatrix * localPosition;
+    // --- normal matrix
 
-    #pragma WORLD_POSITION_POST_PROCESS
-
-    vWorldPosition = worldPosition.xyz;
-    vInverseWorldMatrix = inverse(worldMatrix);
-    
-    vWorldMatrix = worldMatrix;
-
-    // calc normal matrix
     mat3 normalMatrix;
     #ifdef USE_NORMAL_MAP
         #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
@@ -404,9 +407,24 @@ void main() {
         #endif
         vNormal = normalMatrix * aNormal;
     #endif
-
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
     
+    // --- height map
+
+    vec4 worldPosition;
+#ifdef USE_HEIGHT_MAP
+    // height map
+    vec2 heightMapUv = aUv * uHeightMapTiling.xy + uHeightMapTiling.zw;
+    float height = texture(uHeightMap, heightMapUv).r * uHeightScale;
+    // worldPosition = worldMatrix * (localPosition + vec4(vNormal.xyz * height, 0.));
+    worldPosition = worldMatrix * (localPosition + vec4(aNormal.xyz * height, 0.));
+#else
+    worldPosition = worldMatrix * localPosition;
+#endif
+
+    #pragma WORLD_POSITION_POST_PROCESS
+
+    // --- vertex color
+
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     // vVertexColor = aInstanceVertexColor;
     vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
@@ -417,5 +435,13 @@ void main() {
     #endif
 #endif
 
+    // --- end
+
+    vWorldMatrix = worldMatrix;
+    vWorldPosition = worldPosition.xyz;
+    vInverseWorldMatrix = inverse(worldMatrix);
+
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+ 
     #pragma END_MAIN
 }

@@ -72,7 +72,8 @@ export function createPlaneGeometryRawData({
     let binormals: Float32Array = new Float32Array();
 
     if (calculateTangent || calculateBinormal) {
-        const tbs = createTangentsAndBinormals(rawPositions);
+        // const tbs = createTangentsAndBinormals(rawPositions);
+        const tbs = createTangentsAndBinormals(rawNormals);
         if (calculateTangent) {
             tangents = new Float32Array(tbs.tangents);
         }

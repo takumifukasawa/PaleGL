@@ -49,7 +49,7 @@ void main() {
     vec2 gridSize = uGridSize;
     vec2 uv = vUv;
 
-    float result = fbmNoise(uv * gridSize + uTime);
+    float result = fbmNoise(uv * gridSize + uTime * uSpeed);
 
     outColor = vec4(vec3(result), 1.);
 }

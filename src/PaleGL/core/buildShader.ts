@@ -58,7 +58,7 @@ export type ShaderDefines = {
     useInstanceLookDirection: boolean;
     useVAT: boolean;
     isTrail: boolean;
-    useDisplacement: boolean;
+    useHeightMap: boolean;
 };
 
 // tmp
@@ -117,7 +117,7 @@ const buildShaderDefines = ({
     useInstanceLookDirection,
     useVAT,
     isTrail,
-    useDisplacement,
+    useHeightMap,
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -154,8 +154,8 @@ const buildShaderDefines = ({
     if (isTrail) {
         arr.push('#define USE_TRAIL');
     }
-    if (useDisplacement) {
-        arr.push('#define USE_DISPLACEMENT');
+    if (useHeightMap) {
+        arr.push('#define USE_HEIGHT_MAP');
     }
 
     return arr;

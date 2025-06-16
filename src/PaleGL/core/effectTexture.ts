@@ -9,7 +9,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
+import {Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial} from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -82,8 +82,8 @@ export const createEffectTextureSystem: (
         effectUniforms,
         tilingEnabled,
         edgeMaskMix = 1,
-        remapMin = 0,
-        remapMax = 1,
+        remapMin,
+        remapMax,
         minFilter,
         magFilter,
         // update,
@@ -96,7 +96,11 @@ export const createEffectTextureSystem: (
     const effectMaterial = createMaterial({
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: effectFragmentShader,
-        uniforms: effectUniforms,
+        uniforms: [...effectUniforms, {
+            name: 'uSpeed',
+            type: UniformTypes.Float,
+            value: 1.0, // Default speed, can be overridden
+        }],
         uniformBlockNames: [UniformBlockNames.Common],
     });
 
@@ -163,4 +167,17 @@ export const createEffectTextureSystem: (
         useComposite,
         texture: useComposite ? compositeRenderTarget!.texture! : effectRenderTarget.texture!,
     };
+};
+
+const renderEffectTextureInternal = (renderer: Renderer, renderTarget: RenderTarget, material: Material) => {
+    setRenderTargetToRendererAndClear(renderer, renderTarget, true);
+    renderMesh(renderer, renderer.sharedQuad, material);
+    setRenderTargetToRendererAndClear(renderer, null);
+};
+
+export const renderEffectTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem) => {
+    renderEffectTextureInternal(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
+    if (effectTextureSystem.useComposite) {
+        renderEffectTextureInternal(renderer, effectTextureSystem.compositeRenderTarget!, effectTextureSystem.compositeMaterial!);
+    }
 };

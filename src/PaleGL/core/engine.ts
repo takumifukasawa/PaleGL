@@ -12,10 +12,10 @@ import { ActorTypes } from '@/PaleGL/constants';
 import {
     createSharedTextures,
     renderSharedTextures,
-    SharedTexture,
     SharedTextures,
     SharedTexturesType,
 } from '@/PaleGL/core/createSharedTextures.ts';
+import { EffectTextureSystem } from '@/PaleGL/core/effectTexture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     beforeRenderRenderer,
@@ -38,7 +38,6 @@ import {
     TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
-import {EffectTextureSystem} from "@/PaleGL/core/effectTexture.ts";
 // import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
 
 type EngineOnStartCallbackArgs = void;
@@ -312,7 +311,7 @@ function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
 
     beforeRenderRenderer(engine.renderer, time, deltaTime);
 
-    renderSharedTextures(engine.renderer, engine.sharedTextures, time);
+    renderSharedTextures(engine.renderer, engine.sharedTextures);
 
     if (engine.onRender) {
         engine.onRender(time, deltaTime);

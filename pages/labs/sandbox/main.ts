@@ -1,7 +1,11 @@
 // actors
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    getMeshMaterial,
+    setMeshMaterial,
+    setUniformValueToAllMeshMaterials
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
@@ -169,13 +173,15 @@ import {
     createTrailPlaneGeometry,
 } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
 import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import {createEffectTextureSystem, renderEffectTexture} from '@/PaleGL/core/effectTexture.ts';
 import { convertNormalMapFromHeightMap, createNormalMapConverter } from '@/PaleGL/core/normalMap.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
+import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
 import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
-import {createEffectTextureSystem} from "@/PaleGL/core/effectTexture.ts";
+import simplexNoiseFragment from "@/PaleGL/shaders/simplex-noise.glsl";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -502,18 +508,92 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
 };
 
 const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
-    const converter = createNormalMapConverter(gpu, renderer, { srcTexture: texture });
+
+    const TEXTURE_SIZE = 1024;
+
+    const effectTextureSystem = createEffectTextureSystem(gpu, renderer, {
+
+        // width: TEXTURE_SIZE,
+        // height: TEXTURE_SIZE,
+        // effectFragmentShader: simplexNoiseFragment,
+        // effectUniforms: [
+        //     // {
+        //     //     name: UniformNames.Time,
+        //     //     type: UniformTypes.Float,
+        //     //     value: 0,
+        //     // },
+        //     {
+        //         name: "uGridSize",
+        //         type: UniformTypes.Vector2,
+        //         value: createVector2(4, 4),
+        //     },
+        // ],
+        
+        width: TEXTURE_SIZE,
+        height: TEXTURE_SIZE,
+        effectFragmentShader: fbmNoiseFragment,
+        effectUniforms: [
+            // {
+            //     name: UniformNames.Time,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
+            {
+                name: 'uGridSize',
+                type: UniformTypes.Vector2,
+                value: createVector2(4.4, 4.4),
+            },
+            {
+                name: 'uOctaves',
+                type: UniformTypes.Float,
+                value: 8,
+            },
+            {
+                name: 'uAmplitude',
+                type: UniformTypes.Float,
+                value: 0.307,
+            },
+            {
+                name: 'uFrequency',
+                type: UniformTypes.Float,
+                value: 1.357,
+            },
+            {
+                name: 'uFactor',
+                type: UniformTypes.Float,
+                value: 0.597,
+            },
+        ],
+    });
+    const converter = createNormalMapConverter(gpu, renderer, { srcTexture: effectTextureSystem.texture });
+
+    setMaterialUniformValue(effectTextureSystem.effectMaterial, 'uSpeed', 0.1);
 
     const checkMesh = createMesh({
-        geometry: createPlaneGeometry({ gpu }),
-        material: createUnlitMaterial(),
+        geometry: createPlaneGeometry({ gpu, divColNum: 100, divRowNum: 100, calculateTangent: true, calculateBinormal: true }),
+        material: createGBufferMaterial({
+            baseColor: createColor(0, 1, 0, 1),
+            metallic: 0,
+            roughness: 1,
+            useHeightMap: true,
+            useNormalMap: true,
+            // faceSide: FaceSide.Double
+        }),
     });
-    setScaling(checkMesh.transform, createFillVector3(1.5));
-    setTranslation(checkMesh.transform, createVector3(-8, 1.5, 5));
+    setScaling(checkMesh.transform, createFillVector3(2));
+    setTranslation(checkMesh.transform, createVector3(-8, .5, 4));
+    setRotationX(checkMesh.transform, -90);
     addActorToScene(captureScene, checkMesh);
+
+    const tiling = createVector4(.1, .1, 0, 0);
     subscribeActorOnUpdate(checkMesh, () => {
+        renderEffectTexture(renderer, effectTextureSystem);
         convertNormalMapFromHeightMap(renderer, converter);
-        setUniformValue(getMeshMaterial(checkMesh).uniforms, UniformNames.BaseMap, converter.renderTarget.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMap, effectTextureSystem.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMapTiling, tiling);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightScale, .8);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMap, converter.renderTarget.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMapTiling, tiling);
     });
 };
 
