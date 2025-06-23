@@ -1,3 +1,10 @@
+import { RenderTargetKinds } from '@/PaleGL/constants.ts';
+import {
+    createMultipleRenderTargets,
+    MultipleRenderTarget,
+    MultipleRenderTargetOptions,
+} from '@/PaleGL/core/multipleRenderTargets.ts';
+import { blitRenderTarget, Renderer } from '@/PaleGL/core/renderer.ts';
 import {
     createRenderTarget,
     createRenderTargetBase,
@@ -5,27 +12,21 @@ import {
     RenderTargetBase,
     RenderTargetOptions,
 } from '@/PaleGL/core/renderTarget.ts';
-import { RenderTargetKinds } from '@/PaleGL/constants.ts';
-import {
-    createMultipleRenderTargets,
-    MultipleRenderTarget,
-    MultipleRenderTargetOptions
-} from "@/PaleGL/core/multipleRenderTargets.ts";
-import {blitRenderTarget, Renderer} from "@/PaleGL/core/renderer.ts";
-import {GraphicsDoubleBuffer} from "@/PaleGL/core/graphicsDoubleBuffer.ts";
-import {Material} from "@/PaleGL/materials/material.ts";
+import { Material } from '@/PaleGL/materials/material.ts';
 
 export type DoubleBufferBase = {
     currentReadIndex: number;
-}
-
-export type DoubleBuffer = DoubleBufferBase & RenderTargetBase & {
-    renderTargets: RenderTarget[];
 };
 
-export type MRTDoubleBuffer = DoubleBufferBase & RenderTargetBase & {
-    multipleRenderTargets: MultipleRenderTarget[];
-}
+export type DoubleBuffer = DoubleBufferBase &
+    RenderTargetBase & {
+        renderTargets: RenderTarget[];
+    };
+
+export type MRTDoubleBuffer = DoubleBufferBase &
+    RenderTargetBase & {
+        multipleRenderTargets: MultipleRenderTarget[];
+    };
 
 export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): DoubleBuffer {
     const renderTargets: RenderTarget[] = [];
@@ -85,7 +86,11 @@ export function swapMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
     mrtDoubleBuffer.currentReadIndex = (mrtDoubleBuffer.currentReadIndex + 1) % 2;
 }
 
-export const updateMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDoubleBuffer, material: Material) => {
+export const updateMRTDoubleBufferAndSwap = (
+    renderer: Renderer,
+    mrtDoubleBuffer: MRTDoubleBuffer,
+    material: Material
+) => {
     blitRenderTarget(
         renderer,
         getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer),

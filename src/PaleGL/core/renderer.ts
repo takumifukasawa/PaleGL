@@ -1,4 +1,31 @@
-﻿import {
+﻿import { Actor } from '@/PaleGL/actors/actor.ts';
+import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
+import {
+    getCameraForward,
+    hasEnabledPostProcessPass,
+    isPerspectiveCamera,
+} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
+import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
+import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    getMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+    updateMeshDepthMaterial,
+    updateMeshMaterial,
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
+import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
+import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
+import {
     ActorTypes,
     BlendTypes,
     LightTypes,
@@ -13,6 +40,14 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
+import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
+import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import {
+    createGBufferRenderTargets,
+    GBufferRenderTargets,
+    setGBufferRenderTargetsDepthTexture,
+    setGBufferRenderTargetsSize,
+} from '@/PaleGL/core/gBufferRenderTargets.ts';
 import {
     bindGPUUniformBlockAndGetBlockIndex,
     clearGPUColor,
@@ -29,34 +64,6 @@ import {
     setGPUVertexArrayObject,
     setGPUViewport,
 } from '@/PaleGL/core/gpu.ts';
-import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
-import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    getMeshMaterial,
-    setUniformValueToAllMeshMaterials,
-    updateMeshDepthMaterial,
-    updateMeshMaterial,
-} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
-import {
-    isCompiledMaterialShader,
-    Material,
-    setMaterialUniformValue,
-    startMaterial,
-} from '@/PaleGL/materials/material.ts';
-import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import {
-    addPostProcessPass,
-    createPostProcess,
-    getPostProcessLastRenderTarget,
-    hasPostProcessPassEnabled,
-    PostProcess,
-    renderPass,
-    renderPostProcess,
-    updatePostProcess,
-} from '@/PaleGL/postprocess/postProcess.ts';
 import {
     copyRenderTargetColor,
     copyRenderTargetDepth,
@@ -66,39 +73,34 @@ import {
     setRenderTargetSize,
     setRenderTargetTexture,
 } from '@/PaleGL/core/renderTarget.ts';
+import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
+import { createShader } from '@/PaleGL/core/shader.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
+import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import {
-    createGBufferRenderTargets,
-    GBufferRenderTargets,
-    setGBufferRenderTargetsDepthTexture,
-    setGBufferRenderTargetsSize,
-} from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+    UniformBufferObject,
+    updateUniformBufferData,
+    updateUniformBufferValue,
+} from '@/PaleGL/core/uniformBufferObject.ts';
 import {
-    createDeferredShadingPass,
-    DeferredShadingPass,
-    updateMaterialSkyboxUniforms,
-} from '@/PaleGL/postprocess/deferredShadingPass.ts';
-import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
-import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
-import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
-import { BloomPass, createBloomPass } from '@/PaleGL/postprocess/bloomPass.ts';
-import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+    addUniformBlock,
+    UniformBufferObjectBlockData,
+    UniformBufferObjectElementValueArray,
+    UniformBufferObjectElementValueNoNeedsPadding,
+    UniformBufferObjectStructArrayValue,
+    UniformBufferObjectStructValue,
+    UniformBufferObjectValue,
+} from '@/PaleGL/core/uniforms.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import {
-    createLightShaftPass,
-    getLightShaftPassRenderTarget,
-    LightShaftPass,
-    setLightShaftPassDirectionalLight,
-} from '@/PaleGL/postprocess/lightShaftPass.ts';
-import {
-    createVolumetricLightPass,
-    setVolumetricLightPassSpotLights,
-    VolumetricLightPass,
-} from '@/PaleGL/postprocess/volumetricLightPass.ts';
-import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
-import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial,
+} from '@/PaleGL/materials/material.ts';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import {
     cloneMat4,
     createMat4Identity,
@@ -108,14 +110,7 @@ import {
     multiplyMat4Array,
     transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
-import { createShader } from '@/PaleGL/core/shader.ts';
-import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
-import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
-import {
-    UniformBufferObject,
-    updateUniformBufferData,
-    updateUniformBufferValue,
-} from '@/PaleGL/core/uniformBufferObject.ts';
+import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import {
     cloneVector3,
     createVector3Zero,
@@ -126,49 +121,53 @@ import {
     subVectorsV3Ref,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
-import {
-    addUniformBlock,
-    UniformBufferObjectBlockData,
-    UniformBufferObjectElementValueArray,
-    UniformBufferObjectElementValueNoNeedsPadding,
-    UniformBufferObjectStructArrayValue,
-    UniformBufferObjectStructValue,
-    UniformBufferObjectValue,
-} from '@/PaleGL/core/uniforms.ts';
-import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector4, createVector4zero, Vector4 } from '@/PaleGL/math/vector4.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
+import { BloomPass, createBloomPass } from '@/PaleGL/postprocess/bloomPass.ts';
 import {
     ChromaticAberrationPass,
     createChromaticAberrationPass,
 } from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
-import { createVignettePass, VignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
-import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
-import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
-import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
-import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
-import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
-import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
-import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
-import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import { getWorldForward } from '@/PaleGL/core/transform.ts';
 import {
-    getCameraForward,
-    hasEnabledPostProcessPass,
-    isPerspectiveCamera,
-} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+    createDeferredShadingPass,
+    DeferredShadingPass,
+    updateMaterialSkyboxUniforms,
+} from '@/PaleGL/postprocess/deferredShadingPass.ts';
+import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
+import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
+import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
+import {
+    createLightShaftPass,
+    getLightShaftPassRenderTarget,
+    LightShaftPass,
+    setLightShaftPassDirectionalLight,
+} from '@/PaleGL/postprocess/lightShaftPass.ts';
+import {
+    addPostProcessPass,
+    createPostProcess,
+    getPostProcessLastRenderTarget,
+    hasPostProcessPassEnabled,
+    PostProcess,
+    renderPass,
+    renderPostProcess,
+    updatePostProcess,
+} from '@/PaleGL/postprocess/postProcess.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
-import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
-import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
-import {createFramebuffer} from "@/PaleGL/core/framebuffer.ts";
+import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
+import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
+import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
+import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
+import { createVignettePass, VignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
+import {
+    createVolumetricLightPass,
+    setVolumetricLightPassSpotLights,
+    VolumetricLightPass,
+} from '@/PaleGL/postprocess/volumetricLightPass.ts';
+import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
+import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
+import { maton } from '@/PaleGL/utilities/maton.ts';
+import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 
 type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 

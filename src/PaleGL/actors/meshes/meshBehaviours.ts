@@ -1,5 +1,19 @@
-import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
+import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    updateObjectSpaceRaymarchDepthMaterial,
+    updateObjectSpaceRaymarchMesh,
+    updateObjectSpaceRaymarchMeshMaterial,
+} from '@/PaleGL/actors/meshes/objectSpaceRaymarchMeshBehaviour.ts';
+import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
+import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
+import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
+import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
+import { UniformValue } from '@/PaleGL/core/uniforms.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import {
     createMaterial,
     isCompiledMaterialShader,
@@ -7,21 +21,7 @@ import {
     setMaterialUniformValue,
     startMaterial,
 } from '@/PaleGL/materials/material.ts';
-import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
-import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    updateObjectSpaceRaymarchDepthMaterial,
-    updateObjectSpaceRaymarchMesh,
-    updateObjectSpaceRaymarchMeshMaterial,
-} from '@/PaleGL/actors/meshes/objectSpaceRaymarchMeshBehaviour.ts';
-import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { UniformValue } from '@/PaleGL/core/uniforms.ts';
-import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
-import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
-import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 
 // start actor -------------------------------------------------------
 
@@ -121,7 +121,7 @@ export function setSizeMesh(actor: Actor, width: number, height: number) {
 
 // update mesh ----------------------------------------------------------------
 
-export const updateMeshBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
+export const updateMeshBehaviour: Partial<Record<MeshType, UpdateActorFunc>> = {
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
     [MeshTypes.Skinned]: updateSkinnedMesh,
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMesh,
@@ -149,17 +149,15 @@ export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMat
 // update materials
 
 // TODO: render前の方がよい気がする
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.materials.forEach((material) => updateMaterial(material));
     updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, args);
 };
 
-export const updateMeshDepthMaterialBehaviour: Partial<Record<ActorType, UpdateMeshMaterial>> = {
+export const updateMeshDepthMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
     [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchDepthMaterial,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.depthMaterials.forEach((material) => updateMaterial(material));
     updateMeshDepthMaterialBehaviour[mesh.meshType]?.(mesh, args);

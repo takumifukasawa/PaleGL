@@ -4,7 +4,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     getMeshMaterial,
     setMeshMaterial,
-    setUniformValueToAllMeshMaterials
+    setUniformValueToAllMeshMaterials,
 } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
@@ -83,9 +83,9 @@ import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-t
 // import gBufferScreenSpaceRaymarchDepthFrag from './shaders/gbuffer-screen-space-raymarch-depth-fragment-test-scene.glsl';
 import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
 import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
-import testGPUParticleUpdateFragmentShader from './shaders/test-gpu-particle-update.glsl';
-import testGPUTrailParticleInitializeFragmentShader from './shaders/test-gpu-trail-particle-initialize.glsl';
-import testGPUTrailParticleUpdateFragmentShader from './shaders/test-gpu-trail-particle-update.glsl';
+import testGPUParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-particle-update.glsl';
+import testGPUTrailParticleInitializeFragmentShader from '@/PaleGL/shaders/gpu-trail-particle-initialize.glsl';
+import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail-particle-update.glsl';
 
 // others
 import {
@@ -173,7 +173,7 @@ import {
     createTrailPlaneGeometry,
 } from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
 import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import {createEffectTextureSystem, renderEffectTexture} from '@/PaleGL/core/effectTexture.ts';
+import { createEffectTextureSystem, renderEffectTexture } from '@/PaleGL/core/effectTexture.ts';
 import { convertNormalMapFromHeightMap, createNormalMapConverter } from '@/PaleGL/core/normalMap.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
@@ -181,7 +181,6 @@ import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/sha
 import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
 import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
 import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
-import simplexNoiseFragment from "@/PaleGL/shaders/simplex-noise.glsl";
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -508,11 +507,9 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
 };
 
 const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
-
     const TEXTURE_SIZE = 1024;
 
     const effectTextureSystem = createEffectTextureSystem(gpu, renderer, {
-
         // width: TEXTURE_SIZE,
         // height: TEXTURE_SIZE,
         // effectFragmentShader: simplexNoiseFragment,
@@ -528,7 +525,7 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         //         value: createVector2(4, 4),
         //     },
         // ],
-        
+
         width: TEXTURE_SIZE,
         height: TEXTURE_SIZE,
         effectFragmentShader: fbmNoiseFragment,
@@ -570,7 +567,13 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
     setMaterialUniformValue(effectTextureSystem.effectMaterial, 'uSpeed', 0.1);
 
     const checkMesh = createMesh({
-        geometry: createPlaneGeometry({ gpu, divColNum: 100, divRowNum: 100, calculateTangent: true, calculateBinormal: true }),
+        geometry: createPlaneGeometry({
+            gpu,
+            divColNum: 100,
+            divRowNum: 100,
+            calculateTangent: true,
+            calculateBinormal: true,
+        }),
         material: createGBufferMaterial({
             baseColor: createColor(0, 1, 0, 1),
             metallic: 0,
@@ -581,17 +584,17 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         }),
     });
     setScaling(checkMesh.transform, createFillVector3(2));
-    setTranslation(checkMesh.transform, createVector3(-8, .5, 4));
+    setTranslation(checkMesh.transform, createVector3(-8, 0.5, 4));
     setRotationX(checkMesh.transform, -90);
     addActorToScene(captureScene, checkMesh);
 
-    const tiling = createVector4(.1, .1, 0, 0);
+    const tiling = createVector4(0.1, 0.1, 0, 0);
     subscribeActorOnUpdate(checkMesh, () => {
         renderEffectTexture(renderer, effectTextureSystem);
         convertNormalMapFromHeightMap(renderer, converter);
         setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMap, effectTextureSystem.texture);
         setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMapTiling, tiling);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightScale, .8);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightScale, 0.8);
         setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMap, converter.renderTarget.texture);
         setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMapTiling, tiling);
     });

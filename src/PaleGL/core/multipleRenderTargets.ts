@@ -1,12 +1,4 @@
-﻿import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
-import {
-    bindFramebuffer,
-    createFramebuffer,
-    Framebuffer,
-    registerDrawBufferToFramebuffer,
-    unbindFramebuffer,
-} from '@/PaleGL/core/framebuffer.ts';
-import {
+﻿import {
     GL_FRAMEBUFFER,
     GL_TEXTURE_2D,
     GLColorAttachment,
@@ -16,8 +8,16 @@ import {
     TextureFilterTypes,
     TextureType,
 } from '@/PaleGL/constants';
+import {
+    bindFramebuffer,
+    createFramebuffer,
+    Framebuffer,
+    registerDrawBufferToFramebuffer,
+    unbindFramebuffer,
+} from '@/PaleGL/core/framebuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/renderTarget.ts';
+import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 
 export type MultipleRenderTargetOptions = {
     gpu: Gpu;
@@ -88,29 +88,19 @@ export function createMultipleRenderTargets({
     };
 }
 
-export function readPixelsFromMultipleRenderTarget(
-    mrt: MultipleRenderTarget,
-    attachmentIndex: number
-): Float32Array {
+export function readPixelsFromMultipleRenderTarget(mrt: MultipleRenderTarget, attachmentIndex: number): Float32Array {
     const gl = mrt.gpu.gl;
     bindFramebuffer(mrt.framebuffer);
-    const texture = mrt.textures[attachmentIndex];
-   
+
     const width = mrt.width;
     const height = mrt.height;
-   
-    // gl.bindTexture(GL_TEXTURE_2D, texture.glObject);
 
-    // gl.pixelStorei(gl.PACK_ALIGNMENT, 1);
-    
     gl.readBuffer(GLColorAttachments[attachmentIndex]);
-    
+
     const pixels = new Float32Array(width * height * 4); // RGBA
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, pixels);
-    
-    // gl.bindTexture(GL_TEXTURE_2D, null);
-    
+
     unbindFramebuffer(mrt.framebuffer);
-    
+
     return pixels;
 }

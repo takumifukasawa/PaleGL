@@ -9,7 +9,7 @@ import {
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import {Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial} from '@/PaleGL/core/renderer.ts';
+import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -96,11 +96,14 @@ export const createEffectTextureSystem: (
     const effectMaterial = createMaterial({
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: effectFragmentShader,
-        uniforms: [...effectUniforms, {
-            name: 'uSpeed',
-            type: UniformTypes.Float,
-            value: 1.0, // Default speed, can be overridden
-        }],
+        uniforms: [
+            ...effectUniforms,
+            {
+                name: 'uSpeed',
+                type: UniformTypes.Float,
+                value: 1.0, // Default speed, can be overridden
+            },
+        ],
         uniformBlockNames: [UniformBlockNames.Common],
     });
 
@@ -138,12 +141,12 @@ export const createEffectTextureSystem: (
             {
                 name: 'uRemapMin',
                 type: UniformTypes.Float,
-                value: remapMin,
+                value: remapMin!,
             },
             {
                 name: 'uRemapMax',
                 type: UniformTypes.Float,
-                value: remapMax,
+                value: remapMax!,
             },
         ];
 
@@ -178,6 +181,10 @@ const renderEffectTextureInternal = (renderer: Renderer, renderTarget: RenderTar
 export const renderEffectTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem) => {
     renderEffectTextureInternal(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
     if (effectTextureSystem.useComposite) {
-        renderEffectTextureInternal(renderer, effectTextureSystem.compositeRenderTarget!, effectTextureSystem.compositeMaterial!);
+        renderEffectTextureInternal(
+            renderer,
+            effectTextureSystem.compositeRenderTarget!,
+            effectTextureSystem.compositeMaterial!
+        );
     }
 };

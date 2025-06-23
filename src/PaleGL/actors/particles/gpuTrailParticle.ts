@@ -1,32 +1,23 @@
-import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import { AttributeNames, TextureFilterTypes, TextureTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
     MRTDoubleBuffer,
     updateMRTDoubleBufferAndSwap,
 } from '@/PaleGL/core/doubleBuffer.ts';
-import {
-    AttributeNames,
-    FaceSide,
-    TextureFilterTypes,
-    TextureTypes,
-    UniformNames,
-    UniformTypes,
-} from '@/PaleGL/constants.ts';
-import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
-import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
-import {subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
+import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
-import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import { createColor } from '@/PaleGL/math/color.ts';
-import {createVector3, normalizeVector3} from "@/PaleGL/math/vector3.ts";
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { createVector3, normalizeVector3 } from '@/PaleGL/math/vector3.ts';
 
 export type GPUTrailParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
@@ -65,7 +56,7 @@ function addTriangle(indices: Uint16Array, i: number, v0: number, v1: number, v2
     indices[i++] = v1;
     indices[i++] = v2;
     return i;
-};
+}
 
 const addQuad = (indices: Uint16Array, i: number, v00: number, v10: number, v01: number, v11: number) => {
     indices[i] = v00;
@@ -154,7 +145,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
     const uvs = new Float32Array(2 * vertexNum);
     const normals = new Float32Array(3 * vertexNum);
 
-    const angleStep = 2.0 * Math.PI / angleSegment;
+    const angleStep = (2.0 * Math.PI) / angleSegment;
 
     let posCount = 0;
     let normalCount = 0;
@@ -168,13 +159,16 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
             const angle = ai * angleStep + Math.PI * 0.5;
             const position = createVector3(radius * Math.cos(angle), radius * Math.sin(angle), 0.0);
             posCount = addVertex3(positions, posCount, position.x, position.y, position.z);
-            if (ti === 0) { // 前のcap部分
+            if (ti === 0) {
+                // 前のcap部分
                 normalCount = addVertex3(normals, normalCount, 0.0, 0.0, -1.0);
                 trailVertices[trailVertexCount++] = 0;
-            } else if (ti === trailVertexNum + 1) { // 胴体部分
+            } else if (ti === trailVertexNum + 1) {
+                // 胴体部分
                 normalCount = addVertex3(normals, normalCount, 0.0, 0.0, 1.0);
                 trailVertices[trailVertexCount++] = trailVertexNum - 1;
-            } else { // 後ろのcap
+            } else {
+                // 後ろのcap
                 const normal = normalizeVector3(position);
                 normalCount = addVertex3(normals, normalCount, normal.x, normal.y, 0.0);
                 trailVertices[trailVertexCount++] = ti - 1;
@@ -186,12 +180,14 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
     trailVertices[trailVertexCount++] = trailVertexNum - 1;
 
     let indexCount = 0;
-    for (let ai = 0; ai < angleSegment; ai++) { // 前のcap部分のインデックス
+    for (let ai = 0; ai < angleSegment; ai++) {
+        // 前のcap部分のインデックス
         const aj = ai !== angleSegment - 1 ? ai + 1 : 0;
         indexCount = addTriangle(indices, indexCount, 0, ai + 1, aj + 1);
-    };
+    }
     let vertexOffset = angleSegment + 1;
-    for (let ti = 0; ti < trailVertexNum - 1; ti++) { // 胴体部分のインデックス
+    for (let ti = 0; ti < trailVertexNum - 1; ti++) {
+        // 胴体部分のインデックス
         for (let ai = 0; ai < angleSegment; ai++) {
             const aj = ai !== angleSegment - 1 ? ai + 1 : 0;
             const tj = ti + 1;
@@ -203,11 +199,11 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
         }
     }
     vertexOffset += angleSegment * trailVertexNum;
-    for (let ai = 0; ai < angleSegment; ai++) { // 後ろのcap部分のインデックス
+    for (let ai = 0; ai < angleSegment; ai++) {
+        // 後ろのcap部分のインデックス
         const aj = ai !== angleSegment - 1 ? ai + 1 : 0;
         indexCount = addTriangle(indices, indexCount, vertexNum - 1, aj + vertexOffset, ai + vertexOffset);
     }
-
 
     const attributes: Attribute[] = [
         createAttribute({
@@ -238,12 +234,9 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
         indices,
         drawCount: indices.length,
     });
-    
+
     return geometry;
-}
-
-
-
+};
 
 const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDoubleBuffer, material: Material) => {
     // prettier-ignore
@@ -273,14 +266,7 @@ const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDo
 };
 
 export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
-    const {
-        gpu,
-        mesh,
-        vatWidth,
-        vatHeight,
-        initializeFragmentShader,
-        updateFragmentShader,
-    } = args;
+    const { gpu, mesh, vatWidth, vatHeight, initializeFragmentShader, updateFragmentShader } = args;
 
     const gpuParticle = createInstancingParticle({ ...args, mesh });
 
@@ -348,7 +334,7 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     let tmpReadPositionMap;
     let tmpReadUpMap;
 
-    subscribeActorOnStart(vatGPUParticle, ({renderer}) => {
+    subscribeActorOnStart(vatGPUParticle, ({ renderer }) => {
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
 

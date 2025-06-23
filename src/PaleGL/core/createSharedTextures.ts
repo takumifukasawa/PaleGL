@@ -1,14 +1,12 @@
-import { TextureFilterTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { TextureFilterTypes, UniformTypes } from '@/PaleGL/constants.ts';
 import {
     createEffectTextureSystem,
     EffectTextureInfo,
     EffectTextureSystem,
-    renderEffectTexture
+    renderEffectTexture,
 } from '@/PaleGL/core/effectTexture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Renderer, renderMesh, setRenderTargetToRendererAndClear } from '@/PaleGL/core/renderer.ts';
-import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { Material } from '@/PaleGL/materials/material.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
@@ -197,7 +195,6 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
 
     return sharedTextures;
 }
-
 
 export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedTextures) {
     sharedTextures.forEach((sharedTexture) => {
