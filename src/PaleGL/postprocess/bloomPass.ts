@@ -1,12 +1,12 @@
-﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
+﻿import {PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes} from '@/PaleGL/constants';
+import {createFragmentPass, FragmentPass} from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
-import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
+import {createRenderTarget, RenderTarget, setRenderTargetSize} from '@/PaleGL/core/renderTarget.ts';
 // import {CopyPass} from "./CopyPass";
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
-import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
-import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
+import {createMaterial, Material, setMaterialUniformValue} from '@/PaleGL/materials/material';
+import {getGaussianBlurWeights} from '@/PaleGL/utilities/gaussialBlurUtilities';
+import {createPlaneGeometry} from '@/PaleGL/geometries/planeGeometry.ts';
+import {Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial} from '@/PaleGL/core/renderer.ts';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
 import extractBrightnessFragmentShader from '@/PaleGL/shaders/extract-brightness-fragment.glsl';
 import bloomCompositeFragmentShader from '@/PaleGL/shaders/bloom-composite-fragment.glsl';
@@ -19,6 +19,7 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
+    PostProcessPass,
     renderPostProcessPass,
     RenderPostProcessPassBehaviour,
     setPostProcessPassSize,
@@ -47,21 +48,21 @@ type BloomPassParameters = {
 
 export type BloomPass = PostProcessPassBase &
     BloomPassParameters & {
-        extractBrightnessPass: FragmentPass;
-        renderTargetBlurMip4_Horizontal: RenderTarget;
-        renderTargetBlurMip4_Vertical: RenderTarget;
-        renderTargetBlurMip8_Horizontal: RenderTarget;
-        renderTargetBlurMip8_Vertical: RenderTarget;
-        renderTargetBlurMip16_Horizontal: RenderTarget;
-        renderTargetBlurMip16_Vertical: RenderTarget;
-        renderTargetBlurMip32_Horizontal: RenderTarget;
-        renderTargetBlurMip32_Vertical: RenderTarget;
-        renderTargetBlurMip64_Horizontal: RenderTarget;
-        renderTargetBlurMip64_Vertical: RenderTarget;
-        compositePass: FragmentPass;
-        horizontalBlurMaterial: Material;
-        verticalBlurMaterial: Material;
-    };
+    extractBrightnessPass: FragmentPass;
+    renderTargetBlurMip4_Horizontal: RenderTarget;
+    renderTargetBlurMip4_Vertical: RenderTarget;
+    renderTargetBlurMip8_Horizontal: RenderTarget;
+    renderTargetBlurMip8_Vertical: RenderTarget;
+    renderTargetBlurMip16_Horizontal: RenderTarget;
+    renderTargetBlurMip16_Vertical: RenderTarget;
+    renderTargetBlurMip32_Horizontal: RenderTarget;
+    renderTargetBlurMip32_Vertical: RenderTarget;
+    renderTargetBlurMip64_Horizontal: RenderTarget;
+    renderTargetBlurMip64_Vertical: RenderTarget;
+    compositePass: FragmentPass;
+    horizontalBlurMaterial: Material;
+    verticalBlurMaterial: Material;
+};
 
 type BloomPassArgs = PostProcessPassParametersBaseArgs & Partial<BloomPassParameters>;
 
@@ -69,7 +70,7 @@ type BloomPassArgs = PostProcessPassParametersBaseArgs & Partial<BloomPassParame
 // TODO: mipmap使う方法に変えてみる
 // export function createBloomPass(args: { gpu: Gpu; parameters?: BloomPassParametersArgs }): BloomPass {
 export function createBloomPass(args: BloomPassArgs): BloomPass {
-    const { gpu, enabled } = args;
+    const {gpu, enabled} = args;
 
     const name = 'BloomPass';
     const type = PostProcessPassType.Bloom;
@@ -83,7 +84,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
     // const parameters = generateDefaultBloomPassParameters(args.parameters);
 
     // NOTE: _geometryは親から渡して使いまわしてもよい
-    const geometry = createPlaneGeometry({ gpu });
+    const geometry = createPlaneGeometry({gpu});
 
     const renderTargetBlurMip4_Horizontal = createRenderTarget({
         gpu,
@@ -280,7 +281,7 @@ export function getBloomPassRenderTarget(pass: PostProcessPassBase) {
     return (pass as BloomPass).compositePass.renderTarget;
 }
 
-export const setBloomPassSize: SetPostProcessPassSizeBehaviour = (postProcessPass, width, height) => {
+export function setBloomPassSize(postProcessPass: PostProcessPass, width: number, height: number) {
     const bloomPass = postProcessPass as BloomPass;
 
     bloomPass.width = width;
@@ -300,7 +301,7 @@ export const setBloomPassSize: SetPostProcessPassSizeBehaviour = (postProcessPas
     setRenderTargetSize(bloomPass.renderTargetBlurMip64_Vertical, width / 64, height / 64);
 
     setPostProcessPassSize(bloomPass.compositePass, width, height);
-};
+}
 
 function renderBlur(
     bloomPass: BloomPass,
@@ -327,19 +328,13 @@ function renderBlur(
     renderMesh(renderer, bloomPass.geometry, bloomPass.verticalBlurMaterial);
 }
 
-export const renderBloomPass: RenderPostProcessPassBehaviour = (
+export function renderBloomPass(
     postProcessPass: PostProcessPassBase,
-    {
-        gpu,
-        camera,
-        renderer,
-        prevRenderTarget,
-        isLastPass,
-        gBufferRenderTargets,
-        targetCamera,
-        time,
-    }: PostProcessPassRenderArgs
-) => {
+    args: PostProcessPassRenderArgs
+)
+{
+    const {gpu, camera, renderer, prevRenderTarget, isLastPass, gBufferRenderTargets, targetCamera, time} = args;
+
     const bloomPass = postProcessPass as BloomPass;
 
     // // 一回だけ呼びたい
@@ -461,7 +456,8 @@ export const renderBloomPass: RenderPostProcessPassBehaviour = (
         gBufferRenderTargets,
         time,
     });
-};
+}
+;
 
 // export function updateBloomPassParameters(bloomPass: BloomPass, parameters: BloomPassParameters) {
 //     bloomPass.enabled = parameters.enabled ?? bloomPass.enabled;

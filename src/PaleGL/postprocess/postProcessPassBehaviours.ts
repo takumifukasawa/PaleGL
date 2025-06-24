@@ -44,8 +44,10 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 
 // set size ------------------------------------
 
+export type PostProcessPass = PostProcessPassBase | PostProcessSinglePass;
+
 export type SetPostProcessPassSizeBehaviour = (
-    postProcessPass: PostProcessPassBase | PostProcessSinglePass,
+    postProcessPass: PostProcessPass,
     width: number,
     height: number
 ) => void;
@@ -78,7 +80,7 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
     );
 };
 
-const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
+export const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
     [PostProcessPassType.Bloom]: setBloomPassSize,
     [PostProcessPassType.BufferVisualizer]: setBufferVisualizerPassSize,
     [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,

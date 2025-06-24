@@ -1,5 +1,4 @@
 ﻿import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
-import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
@@ -751,7 +750,7 @@ matrix e: ${jointData.length}`);
     }
 }
 
-export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorUpdateArgs) => {
+export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
     const skinnedMesh = actor as SkinnedMesh;
 
     const { time } = options;
@@ -826,7 +825,7 @@ export const updateSkinnedMesh: UpdateActorFunc = (actor: Actor, options: ActorU
             setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, skinnedMesh.jointTexture);
         });
     }
-};
+}
 
 const generateSkinningUniforms = (skinnedMesh: SkinnedMesh) => {
     return [
