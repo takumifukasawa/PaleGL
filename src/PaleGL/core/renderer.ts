@@ -1,16 +1,53 @@
-﻿import {
+﻿import { Actor } from '@/PaleGL/actors/actor.ts';
+import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
+import {
+    getCameraForward,
+    hasEnabledPostProcessPass,
+    isPerspectiveCamera,
+} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
+import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
+import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    getMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+    updateMeshDepthMaterial,
+    updateMeshMaterial,
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
+import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
+import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
+import {
     ActorTypes,
     BlendTypes,
     LightTypes,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
+    MeshTypes,
     RenderQueueType,
     RenderTargetTypes,
     TextureDepthPrecisionType,
+    UIQueueTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
+import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
+import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import {
+    createGBufferRenderTargets,
+    GBufferRenderTargets,
+    setGBufferRenderTargetsDepthTexture,
+    setGBufferRenderTargetsSize,
+} from '@/PaleGL/core/gBufferRenderTargets.ts';
 import {
     bindGPUUniformBlockAndGetBlockIndex,
     clearGPUColor,
@@ -18,6 +55,8 @@ import {
     createGPUUniformBufferObject,
     drawGPU,
     flushGPU,
+    getDummyBlackTexture,
+    getDummyWhiteTexture,
     Gpu,
     setGPUFramebuffer,
     setGPUShader,
@@ -25,14 +64,82 @@ import {
     setGPUVertexArrayObject,
     setGPUViewport,
 } from '@/PaleGL/core/gpu.ts';
-import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
-import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, updateMeshDepthMaterial, updateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    copyRenderTargetColor,
+    copyRenderTargetDepth,
+    createRenderTarget,
+    RenderTarget,
+    setRenderTargetDepthTexture,
+    setRenderTargetSize,
+    setRenderTargetTexture,
+} from '@/PaleGL/core/renderTarget.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
-import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createShader } from '@/PaleGL/core/shader.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
+import { getWorldForward } from '@/PaleGL/core/transform.ts';
+import {
+    UniformBufferObject,
+    updateUniformBufferData,
+    updateUniformBufferValue,
+} from '@/PaleGL/core/uniformBufferObject.ts';
+import {
+    addUniformBlock,
+    UniformBufferObjectBlockData,
+    UniformBufferObjectElementValueArray,
+    UniformBufferObjectElementValueNoNeedsPadding,
+    UniformBufferObjectStructArrayValue,
+    UniformBufferObjectStructValue,
+    UniformBufferObjectValue,
+} from '@/PaleGL/core/uniforms.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import {
+    isCompiledMaterialShader,
+    Material,
+    setMaterialUniformValue,
+    startMaterial,
+} from '@/PaleGL/materials/material.ts';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
+import {
+    cloneMat4,
+    createMat4Identity,
+    getMat4Position,
+    invertMat4,
+    Matrix4,
+    multiplyMat4Array,
+    transposeMat4,
+} from '@/PaleGL/math/matrix4.ts';
+import { Vector2 } from '@/PaleGL/math/vector2.ts';
+import {
+    cloneVector3, createVector3,
+    createVector3Zero,
+    getVector3Magnitude,
+    subVectorsV3,
+    subVectorsV3Ref,
+    Vector3,
+} from '@/PaleGL/math/vector3.ts';
+import { createVector4, createVector4zero, Vector4 } from '@/PaleGL/math/vector4.ts';
+import { BloomPass, createBloomPass } from '@/PaleGL/postprocess/bloomPass.ts';
+import {
+    ChromaticAberrationPass,
+    createChromaticAberrationPass,
+} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
+import {
+    createDeferredShadingPass,
+    DeferredShadingPass,
+    updateMaterialSkyboxUniforms,
+} from '@/PaleGL/postprocess/deferredShadingPass.ts';
+import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
+import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
+import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
+import {
+    createLightShaftPass,
+    getLightShaftPassRenderTarget,
+    LightShaftPass,
+    setLightShaftPassDirectionalLight,
+} from '@/PaleGL/postprocess/lightShaftPass.ts';
 import {
     addPostProcessPass,
     createPostProcess,
@@ -43,111 +150,24 @@ import {
     renderPostProcess,
     updatePostProcess,
 } from '@/PaleGL/postprocess/postProcess.ts';
-import {
-    blitRenderTarget,
-    blitRenderTargetDepth,
-    createRenderTarget,
-    RenderTarget,
-    setRenderTargetDepthTexture,
-    setRenderTargetSize,
-    setRenderTargetTexture,
-} from '@/PaleGL/core/renderTarget.ts';
-import {
-    createGBufferRenderTargets,
-    GBufferRenderTargets,
-    setGBufferRenderTargetsDepthTexture,
-    setGBufferRenderTargetsSize,
-} from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import {
-    createDeferredShadingPass,
-    DeferredShadingPass,
-    updateMaterialSkyboxUniforms,
-} from '@/PaleGL/postprocess/deferredShadingPass.ts';
+import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
 import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
+import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
 import { createToneMappingPass, ToneMappingPass } from '@/PaleGL/postprocess/toneMappingPass.ts';
-import { BloomPass, createBloomPass } from '@/PaleGL/postprocess/bloomPass.ts';
-import { createDepthOfFieldPass, DepthOfFieldPass } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
-import {
-    createLightShaftPass,
-    getLightShaftPassRenderTarget,
-    LightShaftPass,
-    setLightShaftPassDirectionalLight,
-} from '@/PaleGL/postprocess/lightShaftPass.ts';
+import { createVignettePass, VignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
 import {
     createVolumetricLightPass,
     setVolumetricLightPassSpotLights,
     VolumetricLightPass,
 } from '@/PaleGL/postprocess/volumetricLightPass.ts';
-import { createFogPass, FogPass, setFogPassTextures } from '@/PaleGL/postprocess/fogPass.ts';
-import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import {
-    cloneMat4,
-    createMat4Identity,
-    getMat4Position,
-    invertMat4,
-    Matrix4, multiplyMat4Array,
-    transposeMat4,
-} from '@/PaleGL/math/matrix4.ts';
-import { createShader } from '@/PaleGL/core/shader.ts';
-import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import globalUniformBufferObjectFragmentShader from '@/PaleGL/shaders/global-uniform-buffer-object-fragment.glsl';
-import {
-    UniformBufferObject,
-    updateUniformBufferData,
-    updateUniformBufferValue,
-} from '@/PaleGL/core/uniformBufferObject.ts';
-import {
-    cloneVector3, createVector3,
-    createVector3Zero,
-    getVector3Magnitude,
-    subVectorsV3,
-    Vector3,
-} from '@/PaleGL/math/vector3.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
-import {
-    addUniformBlock,
-    UniformBufferObjectBlockData,
-    UniformBufferObjectElementValueArray,
-    UniformBufferObjectElementValueNoNeedsPadding,
-    UniformBufferObjectStructArrayValue,
-    UniformBufferObjectStructValue,
-    UniformBufferObjectValue,
-} from '@/PaleGL/core/uniforms.ts';
-import { Vector2 } from '@/PaleGL/math/vector2.ts';
-import { createVector4, createVector4zero, Vector4 } from '@/PaleGL/math/vector4.ts';
+import globalUniformBufferObjectVertexShader from '@/PaleGL/shaders/global-uniform-buffer-object-vertex.glsl';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import {
-    ChromaticAberrationPass,
-    createChromaticAberrationPass,
-} from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
-import { createVignettePass, VignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
-import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
-import { createFXAAPass, FxaaPass } from '@/PaleGL/postprocess/fxaaPass.ts';
-import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
-import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
-import { createGlitchPass, GlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
-import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
-import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
-import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import { getWorldForward } from '@/PaleGL/core/transform.ts';
-import {
-    getCameraForward,
-    hasEnabledPostProcessPass,
-    isPerspectiveCamera,
-} from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import {rotateVectorByQuaternion} from "@/PaleGL/math/quaternion.ts";
+import { addDrawVertexCountStats, addPassInfoStats, incrementDrawCallStats, Stats } from '@/PaleGL/utilities/stats.ts';
 
-type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType };
+type RenderMeshInfo = { actor: Mesh; materialIndex: number; queue: RenderQueueType; cb?: () => void };
 
 type RenderMeshInfoEachQueue = {
     [key in RenderQueueType]: RenderMeshInfo[];
@@ -157,6 +177,13 @@ export type LightActors = {
     directionalLight: DirectionalLight | null;
     spotLights: SpotLight[];
     pointLights: PointLight[];
+};
+
+type RenderMeshInfosEachPass = {
+    basePass: RenderMeshInfo[];
+    skyboxPass: RenderMeshInfo[];
+    afterTonePass: RenderMeshInfo[];
+    transparentPass: RenderMeshInfo[];
 };
 
 /**
@@ -273,6 +300,7 @@ export function createRenderer({
     const realHeight: number = 1;
     const stats: Stats | null = null;
     const screenQuadCamera = createFullQuadOrthographicCamera();
+    const sharedQuad = createPlaneGeometry({ gpu });
     const scenePostProcess = createPostProcess(screenQuadCamera);
     const depthPrePassRenderTarget = createRenderTarget({
         gpu,
@@ -665,7 +693,7 @@ export function createRenderer({
     });
 
     // for debug
-    console.log("[createRenderer] global uniform buffer objects", globalUniformBufferObjects);
+    console.log('[createRenderer] global uniform buffer objects', globalUniformBufferObjects);
 
     const renderTarget: CameraRenderTargetType | null = null;
     const clearColorDirtyFlag = false;
@@ -680,6 +708,7 @@ export function createRenderer({
         stats,
         scenePostProcess,
         screenQuadCamera,
+        sharedQuad,
         depthPrePassRenderTarget,
         gBufferRenderTargets,
         afterDeferredShadingRenderTarget,
@@ -714,11 +743,9 @@ export function setRendererStats(renderer: Renderer, stats: Stats | null) {
 
 // TODO: materialのstartの中でやりたい
 export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, material: Material) {
-    // mesh.materials.forEach((material) => {
     if (material.boundUniformBufferObjects) {
         return;
     }
-    material.boundUniformBufferObjects = true;
     // for debug
     material.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
@@ -743,8 +770,18 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
         // );
         addUniformBlock(material.uniforms, blockIndex, targetGlobalUniformBufferObject.uniformBufferObject, []);
     });
-    // });
+    material.boundUniformBufferObjects = true;
 }
+
+export const tryStartMaterial = (gpu: Gpu, renderer: Renderer, geometry: Geometry, material: Material) => {
+    if (!isCompiledMaterialShader(material)) {
+        startMaterial(material, {
+            gpu,
+            attributeDescriptors: getGeometryAttributeDescriptors(geometry),
+        });
+        checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
+    }
+};
 
 export function setRendererSize(renderer: Renderer, realWidth: number, realHeight: number) {
     const w = Math.floor(realWidth);
@@ -782,14 +819,8 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setPostProcessPassSize(renderer.fxaaPass, w, h);
 }
 
-/**
- *
- * @param renderTarget
- * @param clearColor
- * @param clearDepth
- */
 // TODO: 本当はclearcolorの色も渡せるとよい
-export function setRendererRenderTarget(
+export function setRenderTargetToRendererAndClear(
     renderer: Renderer,
     renderTarget: CameraRenderTargetType,
     clearColor: boolean = false,
@@ -813,6 +844,23 @@ export function setRendererRenderTarget(
     if (clearDepth) {
         clearGPUDepth(renderer.gpu, 1, 1, 1, 1);
     }
+}
+
+// render target に焼いて元の状態に戻す
+export function blitRenderTarget(
+    renderer: Renderer,
+    renderTarget: CameraRenderTargetType,
+    geometry: Geometry,
+    material: Material
+) {
+    // 前の状態を保持
+    const tmpRenderTarget = renderer.renderTarget;
+    const tmpClearColorDirtyFlag = renderer.clearColorDirtyFlag;
+    setRenderTargetToRendererAndClear(renderer, renderTarget, true, false);
+    renderMesh(renderer, geometry, material);
+    // アサインし直す
+    renderer.renderTarget = tmpRenderTarget;
+    renderer.clearColorDirtyFlag = tmpClearColorDirtyFlag;
 }
 
 export function flushRenderer(renderer: Renderer) {
@@ -866,6 +914,8 @@ export function renderRenderer(
         [RenderQueueType.AlphaTest]: [],
         [RenderQueueType.Skybox]: [],
         [RenderQueueType.Transparent]: [],
+        [RenderQueueType.AfterTone]: [],
+        [RenderQueueType.Overlay]: [],
     };
 
     const lightActors: LightActors = {
@@ -895,30 +945,55 @@ export function renderRenderer(
                 if (!actor.enabled) {
                     return;
                 }
-                if (!(actor as Mesh).renderEnabled) {
+                const mesh = actor as Mesh;
+                if (!mesh.renderEnabled) {
                     // skip
                     return;
                 }
-                (actor as Mesh).materials.forEach((material, i) => {
-                    // if (!material.canRender) {
-                    //     return;
+                mesh.materials.forEach((material, i) => {
+                    // switch (uiMesh.uiQueueType) {
+                    //     case UIQueueTypes.AfterTone:
+                    //         renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
+                    //             buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                    //         );
+                    //         break;
+                    //     case UIQueueTypes.Overlay:
+                    //         renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
+                    //             buildRenderMeshInfo(mesh, RenderQueueType.Overlay, i)
+                    //         );
+                    //         break;
+                    //     default:
+                    //         console.error('[renderRenderer] invalid ui queue type');
+                    //         return;
                     // }
+                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.AfterTone) {
+                        renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
+                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                        );
+                        return;
+                    }
+                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.Overlay) {
+                        renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
+                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                        );
+                        return;
+                    }
                     if (material.alphaTest != null) {
                         renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
-                            buildRenderMeshInfo(actor as Mesh, RenderQueueType.AlphaTest, i)
+                            buildRenderMeshInfo(mesh, RenderQueueType.AlphaTest, i)
                         );
                         return;
                     }
                     switch (material.blendType) {
                         case BlendTypes.Opaque:
                             renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
-                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Opaque, i)
+                                buildRenderMeshInfo(mesh, RenderQueueType.Opaque, i)
                             );
                             return;
                         case BlendTypes.Transparent:
                         case BlendTypes.Additive:
                             renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
-                                buildRenderMeshInfo(actor as Mesh, RenderQueueType.Transparent, i)
+                                buildRenderMeshInfo(mesh, RenderQueueType.Transparent, i)
                             );
                             return;
                         default:
@@ -993,11 +1068,16 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
-    setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, true);
+    setRenderTargetToRendererAndClear(renderer, renderer.gBufferRenderTargets, true);
 
     // TODO: 本当はskyboxをshadingの後にしたい
     skyboxPass(renderer, currentCameraRenderMeshInfoEachPass.skyboxPass, camera);
-    renderBasePass(renderer, camera, currentCameraRenderMeshInfoEachPass.basePass, currentCameraRenderMeshInfoEachPass.skyboxPass);
+    renderBasePass(
+        renderer,
+        camera,
+        currentCameraRenderMeshInfoEachPass.basePass,
+        currentCameraRenderMeshInfoEachPass.skyboxPass
+    );
 
     // ------------------------------------------------------------------------------
     // shadow pass
@@ -1077,7 +1157,7 @@ export function renderRenderer(
     applyLightShadowMapUniformValues(
         renderer.deferredShadingPass.material,
         lightActors,
-        renderer.gpu.dummyTextureBlack
+        renderer.gpu.dummyBlackTextures[0]
     );
 
     // set sss texture
@@ -1086,7 +1166,7 @@ export function renderRenderer(
         'uScreenSpaceShadowTexture',
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture
-            : renderer.gpu.dummyTextureBlack
+            : renderer.gpu.dummyBlackTextures[0]
     );
 
     // set ao texture
@@ -1095,7 +1175,7 @@ export function renderRenderer(
         'uAmbientOcclusionTexture',
         renderer.ambientOcclusionPass.enabled
             ? renderer.ambientOcclusionPass.renderTarget.texture
-            : renderer.gpu.dummyTexture
+            : getDummyWhiteTexture(renderer.gpu)
     );
 
     renderPass({
@@ -1152,8 +1232,10 @@ export function renderRenderer(
     // volumetric light pass
     // ------------------------------------------------------------------------------
 
-    if (lightActors.spotLights.length > 0) {
-        setVolumetricLightPassSpotLights(renderer.volumetricLightPass, lightActors.spotLights);
+    const needsCastShadowSpotLights = lightActors.spotLights.filter((light) => needsCastShadowOfLight(light));
+
+    if (needsCastShadowSpotLights.length > 0) {
+        setVolumetricLightPassSpotLights(renderer.volumetricLightPass, needsCastShadowSpotLights);
         renderPass({
             pass: renderer.volumetricLightPass,
             renderer,
@@ -1174,14 +1256,13 @@ export function renderRenderer(
         renderer.fogPass,
         renderer.lightShaftPass.enabled
             ? getLightShaftPassRenderTarget(renderer.lightShaftPass).texture!
-            : renderer.gpu.dummyTextureBlack,
-        // CUSTOM
-        //  this._gpu.dummyTextureBlack,
-        //
-        renderer.volumetricLightPass.renderTarget.texture!,
+            : getDummyBlackTexture(renderer.gpu),
+        needsCastShadowSpotLights
+            ? renderer.volumetricLightPass.renderTarget.texture!
+            : getDummyBlackTexture(renderer.gpu),
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture!
-            : renderer.gpu.dummyTextureBlack,
+            : getDummyBlackTexture(renderer.gpu),
         sharedTextures.get(SharedTexturesTypes.FBM_NOISE)!.texture
     );
 
@@ -1230,7 +1311,7 @@ export function renderRenderer(
         );
     });
 
-    setRendererRenderTarget(renderer, renderer.afterDeferredShadingRenderTarget);
+    setRenderTargetToRendererAndClear(renderer, renderer.afterDeferredShadingRenderTarget);
 
     renderTransparentPass(
         renderer,
@@ -1268,10 +1349,36 @@ export function renderRenderer(
         targetCamera: camera,
         time, // TODO: engineから渡したい
         isCameraLastPass: isCameraLastPassAndHasNotPostProcess,
+        onAfterRenderPass: (pass) => {
+            if (pass === renderer.toneMappingPass) {
+                renderUIPass(
+                    'after tone mapping',
+                    renderer,
+                    // camera,
+                    scene.uiCamera || camera, // ui camera があったらそっちを優先
+                    renderMeshInfoEachQueue[RenderQueueType.AfterTone],
+                    renderMeshInfoEachQueue[RenderQueueType.Skybox],
+                    lightActors,
+                    renderer.copySceneDestRenderTarget.texture!
+                );
+            }
+        },
         // lightActors,
     });
 
     if (isCameraLastPassAndHasNotPostProcess) {
+        // overlay
+        renderUIPass(
+            'overlay',
+            renderer,
+            // camera,
+            scene.uiCamera || camera, // ui camera があったらそっちを優先
+            renderMeshInfoEachQueue[RenderQueueType.Overlay],
+            renderMeshInfoEachQueue[RenderQueueType.Skybox],
+            lightActors,
+            renderer.copySceneDestRenderTarget.texture!
+        );
+
         return;
     }
 
@@ -1294,6 +1401,18 @@ export function renderRenderer(
             });
         }
     }
+
+    // overlay
+    renderUIPass(
+        'overlay',
+        renderer,
+        // camera,
+        scene.uiCamera || camera, // ui camera があったらそっちを優先
+        renderMeshInfoEachQueue[RenderQueueType.Overlay],
+        renderMeshInfoEachQueue[RenderQueueType.Skybox],
+        lightActors,
+        renderer.copySceneDestRenderTarget.texture!
+    );
 }
 
 /**
@@ -1301,7 +1420,7 @@ export function renderRenderer(
  * @param geometry
  * @param material
  */
-export function renderMesh(renderer: Renderer, geometry: Geometry, material: Material) {
+export function renderMesh(renderer: Renderer, geometry: Geometry, material: Material, cb?: () => void) {
     // geometry.update();
 
     if (renderer.stats) {
@@ -1354,6 +1473,8 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     //     geometry.getInstanceCount()
     // )
 
+    if (cb) cb();
+
     // draw
     drawGPU(
         renderer.gpu,
@@ -1369,10 +1490,21 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
 }
 
 export function buildRenderMeshInfo(actor: Mesh, queue: RenderQueueType, materialIndex: number = 0): RenderMeshInfo {
+    let cb: (() => void) | undefined;
+    if (actor.meshType === MeshTypes.SpriteAtlas) {
+        const spriteAtlasMesh = actor as SpriteAtlasMesh;
+        cb = () => {
+            // NOTE: マテリアルは共通でuniformだけrender前に上書き
+            // TODO: uniform name の rename
+            setUniformValueToAllMeshMaterials(actor, UniformNames.FontTiling, spriteAtlasMesh.tilingOffset);
+        };
+    }
+
     return {
         actor,
         queue,
         materialIndex,
+        cb,
     };
 }
 
@@ -1406,10 +1538,10 @@ export function setUniformBlockValue(
 export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
     // console.log("--------- depth pre pass ---------");
 
-    setRendererRenderTarget(renderer, renderer.depthPrePassRenderTarget, false, true);
+    setRenderTargetToRendererAndClear(renderer, renderer.depthPrePassRenderTarget, false, true);
     updateRendererCameraUniforms(renderer, camera);
 
-    depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         updateActorTransformUniforms(renderer, actor, camera);
 
         actor.depthMaterials.forEach((depthMaterial, i) => {
@@ -1430,7 +1562,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
                 return;
             }
 
-            renderMesh(renderer, actor.geometry, depthMaterial);
+            renderMesh(renderer, actor.geometry, depthMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'depth pre pass', actor.name, actor.geometry);
@@ -1441,7 +1573,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
 
 function copyDepthTexture(renderer: Renderer) {
     setRenderTargetDepthTexture(renderer.copyDepthSourceRenderTarget, renderer.depthPrePassRenderTarget.depthTexture!);
-    blitRenderTargetDepth(
+    copyRenderTargetDepth(
         renderer.gpu,
         renderer.copyDepthSourceRenderTarget,
         renderer.copyDepthDestRenderTarget,
@@ -1452,16 +1584,16 @@ function copyDepthTexture(renderer: Renderer) {
 
 function copySceneTexture(renderer: Renderer, sceneTexture: Texture) {
     const tmpRenderTarget = renderer.renderTarget;
-    setRendererRenderTarget(renderer, null, false, false);
+    setRenderTargetToRendererAndClear(renderer, null, false, false);
     setRenderTargetTexture(renderer.copySceneSourceRenderTarget, sceneTexture);
-    blitRenderTarget(
+    copyRenderTargetColor(
         renderer.gpu,
         renderer.copySceneSourceRenderTarget,
         renderer.copySceneDestRenderTarget,
         renderer.realWidth,
         renderer.realHeight
     );
-    setRendererRenderTarget(renderer, tmpRenderTarget);
+    setRenderTargetToRendererAndClear(renderer, tmpRenderTarget);
 }
 
 function shadowPass(
@@ -1482,6 +1614,7 @@ function shadowPass(
             return;
         }
 
+        // TODO: sortするのはbasepassだけでいい
         const currentCameraRenderMeshInfoEachPass = createRenderMeshInfosEachPass(
             renderMeshInfoEachQueue,
             lightActor.shadowCamera
@@ -1495,13 +1628,13 @@ function shadowPass(
             return;
         }
 
-        setRendererRenderTarget(renderer, lightActor.shadowMap, false, true);
+        setRenderTargetToRendererAndClear(renderer, lightActor.shadowMap, false, true);
         // this.clear(0, 0, 0, 1);
         // this._gpu.clearDepth(0, 0, 0, 1);
 
         updateRendererCameraUniforms(renderer, lightActor.shadowCamera);
 
-        castShadowRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+        castShadowRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
             // TODO: material 側でやった方がよい？
             updateActorTransformUniforms(renderer, actor, camera);
 
@@ -1528,7 +1661,7 @@ function shadowPass(
                     renderer.copyDepthDestRenderTarget.depthTexture
                 );
 
-                renderMesh(renderer, actor.geometry, depthMaterial);
+                renderMesh(renderer, actor.geometry, depthMaterial, cb);
                 if (renderer.stats) {
                     addPassInfoStats(renderer.stats, 'shadow pass', actor.name, actor.geometry);
                 }
@@ -1540,7 +1673,7 @@ function shadowPass(
 function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedSkyboxPassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedSkyboxPassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         if (!(actor as Skybox).renderMesh) {
             return;
         }
@@ -1563,7 +1696,7 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
 
             updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'skybox pass', actor.name, actor.geometry);
@@ -1572,7 +1705,12 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
     });
 }
 
-function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRenderMeshInfos: RenderMeshInfo[], sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[]) {
+function renderBasePass(
+    renderer: Renderer,
+    camera: Camera,
+    sortedBasePassRenderMeshInfos: RenderMeshInfo[],
+    sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[]
+) {
     // console.log("--------- scene pass ---------");
 
     // setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
@@ -1588,7 +1726,7 @@ function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRender
 
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         switch (actor.type) {
             case ActorTypes.Skybox:
                 if (!(actor as Skybox).renderMesh) {
@@ -1612,9 +1750,9 @@ function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRender
             // pre-passしてないmaterialの場合はdepthをcopy.
             // pre-passしてないmaterialが存在する度にdepthをcopyする必要があるので、使用は最小限にとどめる（raymarch以外では使わないなど）
             if (targetMaterial.skipDepthPrePass) {
-                setRendererRenderTarget(renderer, null, false, false);
+                setRenderTargetToRendererAndClear(renderer, null, false, false);
                 copyDepthTexture(renderer);
-                setRendererRenderTarget(renderer, renderer.gBufferRenderTargets, false, false);
+                setRenderTargetToRendererAndClear(renderer, renderer.gBufferRenderTargets, false, false);
             }
 
             // TODO: material 側でやった方がよい？
@@ -1637,10 +1775,16 @@ function renderBasePass(renderer: Renderer, camera: Camera, sortedBasePassRender
             // applyLightShadowMapUniformValues(targetMaterial, lightActors);
 
             // TODO: skyboxは一個という前提にしているが・・・
-            updateMeshMaterial(actor, { camera, skybox: sortedSkyboxPassRenderMeshInfos.length !== 0 ? sortedSkyboxPassRenderMeshInfos[0].actor as Skybox : null });
+            updateMeshMaterial(actor, {
+                camera,
+                skybox:
+                    sortedSkyboxPassRenderMeshInfos.length !== 0
+                        ? (sortedSkyboxPassRenderMeshInfos[0].actor as Skybox)
+                        : null,
+            });
             // updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'scene pass', actor.name, actor.geometry);
@@ -1665,7 +1809,7 @@ function renderTransparentPass(
     // }
     updateRendererCameraUniforms(renderer, camera);
 
-    sortedRenderMeshInfos.forEach(({ actor, materialIndex }) => {
+    sortedRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         actor.materials.forEach((targetMaterial, i) => {
             if (i !== materialIndex) {
                 return;
@@ -1673,18 +1817,95 @@ function renderTransparentPass(
 
             updateActorTransformUniforms(renderer, actor, camera);
 
-            applyLightShadowMapUniformValues(targetMaterial, lightActors, renderer.gpu.dummyTextureBlack);
+            applyLightShadowMapUniformValues(targetMaterial, lightActors, getDummyBlackTexture(renderer.gpu));
 
             setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
 
             // TODO: skyboxは一個という前提にしているが・・・
-            updateMeshMaterial(actor, { camera, skybox: sortedSkyboxPassRenderMeshInfos.length !== 0 ? sortedSkyboxPassRenderMeshInfos[0].actor as Skybox : null });
+            updateMeshMaterial(actor, {
+                camera,
+                skybox:
+                    sortedSkyboxPassRenderMeshInfos.length !== 0
+                        ? (sortedSkyboxPassRenderMeshInfos[0].actor as Skybox)
+                        : null,
+            });
             // updateMeshMaterial(actor, { camera });
 
-            renderMesh(renderer, actor.geometry, targetMaterial);
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
+            }
+        });
+    });
+}
+
+function renderUIPass(
+    passName: string,
+    renderer: Renderer,
+    camera: Camera,
+    sortedRenderMeshInfos: RenderMeshInfo[],
+    sortedSkyboxPassRenderMeshInfos: RenderMeshInfo[],
+    lightActors: LightActors,
+    sceneTexture: Texture
+) {
+    // console.log("--------- transparent pass ---------");
+
+    // TODO: 常にclearしない、で良い気がする
+    // if (clear) {
+    //     this._gpu.clear(cameras.clearColor.x, cameras.clearColor.y, cameras.clearColor.z, cameras.clearColor.w);
+    // }
+    updateRendererCameraUniforms(renderer, camera);
+
+    // let uiCanvasSize: Vector4 | null = null;
+
+    // switch(camera.cameraType) {
+    //     case CameraTypes.Orthographic:
+    //         const orthoCamera = camera as OrthographicCamera;
+    //         const orthoWidth = orthoCamera.right - orthoCamera.left;
+    //         const orthoHeight = orthoCamera.top - orthoCamera.bottom;
+    //         uiCanvasSize = createVector4(
+    //             orthoWidth,
+    //             orthoHeight,
+    //             orthoWidth / orthoHeight,
+    //             1
+    //         );
+    //         break;
+    // }
+
+    sortedRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
+        actor.materials.forEach((targetMaterial, i) => {
+            if (i !== materialIndex) {
+                return;
+            }
+
+            updateActorTransformUniforms(renderer, actor, camera);
+
+            applyLightShadowMapUniformValues(targetMaterial, lightActors, getDummyBlackTexture(renderer.gpu));
+
+            setMaterialUniformValue(targetMaterial, UniformNames.SceneTexture, sceneTexture);
+
+            // switch(camera.cameraType) {
+            //     case CameraTypes.Orthographic:
+            //         setUniformValueToAllMeshMaterials(actor, UniformNames.UICanvas, uiCanvasSize);
+            //         // setUniformValueToAllMeshMaterials(actor, "uUICanvasProjectionMatrix", camera.projectionMatrix);
+            //         break;
+            // }
+
+            // TODO: skyboxは一個という前提にしているが・・・
+            updateMeshMaterial(actor, {
+                camera,
+                skybox:
+                    sortedSkyboxPassRenderMeshInfos.length !== 0
+                        ? (sortedSkyboxPassRenderMeshInfos[0].actor as Skybox)
+                        : null,
+            });
+            // updateMeshMaterial(actor, { camera });
+
+            renderMesh(renderer, actor.geometry, targetMaterial, cb);
+
+            if (renderer.stats) {
+                addPassInfoStats(renderer.stats, passName, actor.name, actor.geometry);
             }
         });
     });
@@ -1708,10 +1929,7 @@ function updateActorTransformUniforms(renderer: Renderer, actor: Actor, camera: 
         renderer,
         UniformBlockNames.Transformations,
         UniformNames.WVPMatrix,
-        multiplyMat4Array(
-            camera.viewProjectionMatrix,
-            actor.transform.worldMatrix
-        )
+        multiplyMat4Array(camera.viewProjectionMatrix, actor.transform.worldMatrix)
     );
     setUniformBlockValue(
         renderer,
@@ -1807,7 +2025,7 @@ function updateUniformBlockValue(
         console.error(`[Renderer.setUniformBlockData] invalid uniform name: ${uniformName}`);
         return;
     }
-    
+
     const getStructElementValue = (type: UniformTypes, value: UniformBufferObjectValue) => {
         const data: number[] = [];
         switch (type) {
@@ -1925,10 +2143,11 @@ function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: Di
         {
             name: UniformNames.LightDirection,
             type: UniformTypes.Vector3,
-            // // pattern: normalizeし、光源の位置から降り注ぐとみなす
-            // value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
+            // pattern: normalizeし、光源の位置から降り注ぐとみなす
+            value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
             // pattern: 回転を適用
-            value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
+            // TODO: quaternion側にバグがありそう
+            // value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
         },
         {
             name: UniformNames.LightIntensity,
@@ -2044,11 +2263,9 @@ function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]
     );
 }
 
-type RenderMeshInfosEachPass = {
-    basePass: RenderMeshInfo[];
-    skyboxPass: RenderMeshInfo[];
-    transparentPass: RenderMeshInfo[];
-};
+// ソート用の一時変数vec3. GC対策
+let tmpSortVA = createVector3Zero();
+let tmpSortVB = createVector3Zero();
 
 function createRenderMeshInfosEachPass(
     renderMeshInfoEachQueue: RenderMeshInfoEachQueue,
@@ -2057,28 +2274,51 @@ function createRenderMeshInfosEachPass(
     const basePass = [RenderQueueType.Opaque, RenderQueueType.AlphaTest]
         .map((queue) => {
             return [...renderMeshInfoEachQueue[queue]].sort((a, b) => {
-                const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-                const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+                // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+                // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+                subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+                subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
+                const al = getVector3Magnitude(tmpSortVA);
+                const bl = getVector3Magnitude(tmpSortVB);
                 return al < bl ? -1 : 1;
             });
         })
         .flat();
 
     const skyboxPass = [...renderMeshInfoEachQueue[RenderQueueType.Skybox]].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
         return al < bl ? -1 : 1;
     });
 
+    const afterTonePass = [...renderMeshInfoEachQueue[RenderQueueType.AfterTone]].sort((a, b) => {
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
+        subVectorsV3Ref(tmpSortVB, camera.transform.position, b.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
+        return al >= bl ? -1 : 1;
+    });
+
     const transparentPass = [...renderMeshInfoEachQueue[RenderQueueType.Transparent]].sort((a, b) => {
-        const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
-        const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
+        // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
+        tmpSortVA = subVectorsV3(camera.transform.position, a.actor.transform.position);
+        tmpSortVB = subVectorsV3(camera.transform.position, b.actor.transform.position);
+        const al = getVector3Magnitude(tmpSortVA);
+        const bl = getVector3Magnitude(tmpSortVB);
         return al >= bl ? -1 : 1;
     });
 
     return {
         basePass,
         skyboxPass,
+        afterTonePass,
         transparentPass,
     };
 }

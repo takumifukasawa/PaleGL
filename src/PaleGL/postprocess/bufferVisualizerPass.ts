@@ -1,6 +1,6 @@
 ﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
 import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
-import { setGPUViewport } from '@/PaleGL/core/gpu.ts';
+import {getDummyBlackTexture, setGPUViewport} from '@/PaleGL/core/gpu.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -442,7 +442,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
             {
                 name: 'uFullViewTexture',
                 type: UniformTypes.Texture,
-                value: gpu.dummyTextureBlack,
+                value: getDummyBlackTexture(gpu),
             },
             {
                 name: 'uFullViewTextureEnabled',
@@ -456,7 +456,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                         {
                             name: `uRow${i}Texture`,
                             type: UniformTypes.Texture,
-                            value: gpu.dummyTextureBlack,
+                            value: getDummyBlackTexture(gpu),
                         },
                     ];
                 })
@@ -501,7 +501,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                         pass.material,
                         uniformNameTexture,
                         UniformTypes.Texture,
-                        gpu.dummyTextureBlack
+                        getDummyBlackTexture(gpu)
                     );
                 }
             } else {
@@ -512,7 +512,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                     createVector2(colOffset, 0)
                 );
                 // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
-                addMaterialUniformValue(pass.material, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
+                addMaterialUniformValue(pass.material, uniformNameTexture, UniformTypes.Texture, getDummyBlackTexture(gpu));
             }
 
             colIndex++;
@@ -666,7 +666,7 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
                     // 'uDirectionalLightShadowMap',
                     lightActors.directionalLight.castShadow
                         ? lightActors.directionalLight.shadowMap!.depthTexture
-                        : postProcessPass.gpu.dummyTextureBlack
+                        : getDummyBlackTexture(gpu)
                 );
             }
         }

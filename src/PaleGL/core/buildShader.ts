@@ -32,6 +32,8 @@ import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/ra
 import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-scene-functions.partial.glsl';
 import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
 import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
+import shapeFontHeaderPartialContent from '@/PaleGL/shaders/partial/shape-font-h.partial.glsl';
+import shapeFontFragmentPartialContent from '@/PaleGL/shaders/partial/shape-font-fragment.partial.glsl';
 import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
@@ -54,6 +56,9 @@ export type ShaderDefines = {
     useAlphaTest: boolean;
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
+    useVAT: boolean;
+    isTrail: boolean;
+    useHeightMap: boolean;
 };
 
 // tmp
@@ -80,6 +85,8 @@ const includesDict = new Map<string, string>([
     ['raymarch_sf', raymarchSceneFunctionsPartialContent],
     ['alpha_test', alphaTestPartialContent],
     ['alpha_test_f', alphaTestFragmentPartialContent],
+    ['shape_font_h', shapeFontHeaderPartialContent],
+    ['shape_font_f', shapeFontFragmentPartialContent],
     ['vcolor_vh', vertexColorVertexHeaderPartialContent],
     ['vcolor_fh', vertexColorFragmentHeaderPartialContent],
     ['normal_map_fh', normalMapFragmentHeaderPartialContent],
@@ -108,6 +115,9 @@ const buildShaderDefines = ({
     useAlphaTest,
     isInstancing,
     useInstanceLookDirection,
+    useVAT,
+    isTrail,
+    useHeightMap,
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
@@ -137,6 +147,15 @@ const buildShaderDefines = ({
     }
     if (useInstanceLookDirection) {
         arr.push('#define USE_INSTANCE_LOOK_DIRECTION');
+    }
+    if (useVAT) {
+        arr.push('#define USE_VAT');
+    }
+    if (isTrail) {
+        arr.push('#define USE_TRAIL');
+    }
+    if (useHeightMap) {
+        arr.push('#define USE_HEIGHT_MAP');
     }
 
     return arr;

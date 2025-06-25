@@ -36,6 +36,7 @@
     "node-zopfli": "^2.1.4",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.39.0",
     "rollup-plugin-visualizer": "^5.14.0",

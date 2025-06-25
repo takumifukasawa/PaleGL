@@ -23,6 +23,11 @@ uniform vec4 uRoughnessMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
+#ifdef USE_HEIGHT_MAP
+uniform sampler2D uHeightMap;
+uniform vec4 uHeightMapTiling;
+#endif
+
 #pragma APPEND_UNIFORMS
 
 in vec2 vUv;
@@ -99,4 +104,12 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(metallic, roughness);
     outGBufferD = EncodeGBufferD(emissiveColor.rgb);
+    
+    // #ifdef USE_HEIGHT_MAP
+    // // outGBufferD = EncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);
+    // // outGBufferD = EncodeGBufferD(texture(uHeightMap, uv * .5).rgb);
+    // outGBufferD = EncodeGBufferD(texture(uNormalMap, uv * 1.).rgb);
+    // outGBufferD = EncodeGBufferD(-vBinormal);
+    // // outGBufferD = EncodeGBufferD(vec3(uv * .1, 1.));
+    // #endif
 }

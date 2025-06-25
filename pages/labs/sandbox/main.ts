@@ -1,33 +1,37 @@
 // actors
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { getMeshMaterial, setMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import {
+    getMeshMaterial,
+    setMeshMaterial,
+    setUniformValueToAllMeshMaterials,
+} from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { setAnimationClips, SkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 
 // core
 import {
     createEngine,
     Engine,
-    getSharedTexture, runEngine,
+    getSharedTexture,
+    runEngine,
     setEngineSize,
-    setOnBeforeStartEngine, setOnBeforeUpdateEngine, setOnRenderEngine,
-    setSceneToEngine, startEngine
+    setOnBeforeStartEngine,
+    setOnBeforeUpdateEngine,
+    setOnRenderEngine,
+    setSceneToEngine,
+    startEngine,
 } from '@/PaleGL/core/engine.ts';
-import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
-import { bindGPUUniformBlockAndGetBlockIndex, createGPU, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
-import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
-// import {GBufferRenderTargets} from '@/PaleGL/core/GBufferRenderTargets';
-import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
+import { bindGPUUniformBlockAndGetBlockIndex, createGPU, Gpu, updateGPUTransformFeedback } from '@/PaleGL/core/gpu.ts';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
     setOrbitCameraControllerDelta,
     startOrbitCameraController,
 } from '@/PaleGL/core/orbitCameraController.ts';
+import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer.ts';
+import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 
 // geometries
-import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 
 // loaders
@@ -36,7 +40,7 @@ import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { loadImg } from '@/PaleGL/loaders/loadImg';
 
 // materials
-import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 // import { PhongMaterial } from '@/PaleGL/materials/PhongMaterial';
 
 // math
@@ -57,7 +61,7 @@ import {
     setV3z,
     v3x,
     v3y,
-    v3z
+    v3z,
 } from '@/PaleGL/math/vector3.ts';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 
@@ -69,46 +73,50 @@ import {
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
 
 // inputs
-import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController.ts';
+import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
 
 // shaders
 import litObjectSpaceRaymarchFragContent from './shaders/object-space-raymarch-test-scene.glsl';
 // import gBufferObjectSpaceRaymarchDepthFrag from './shaders/gbuffer-object-space-raymarch-depth-fragment-test-scene.glsl';
 import litScreenSpaceRaymarchFragContent from './shaders/screen-space-raymarch-test-scene.glsl';
 // import gBufferScreenSpaceRaymarchDepthFrag from './shaders/gbuffer-screen-space-raymarch-depth-fragment-test-scene.glsl';
+import billboardParticleFragmentShader from '@/PaleGL/shaders/billboard-particle-fragment.glsl';
+import billboardParticleVertexShader from '@/PaleGL/shaders/billboard-particle-vertex.glsl';
+import testGPUParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-particle-update.glsl';
+import testGPUTrailParticleInitializeFragmentShader from '@/PaleGL/shaders/gpu-trail-particle-initialize.glsl';
+import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail-particle-update.glsl';
 
 // others
 import {
-    UniformTypes,
-    TextureWrapTypes,
-    TextureFilterTypes,
-    BlendTypes,
-    RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
-    UniformNames,
+    BlendTypes,
     FaceSide,
-    TextureDepthPrecisionType,
-    UniformBlockNames,
     RAD_TO_DEG,
+    TextureFilterTypes,
+    TextureWrapTypes,
+    UIQueueTypes,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+    VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
-import {
-    addDebuggerBorderSpacer,
-    addButtonDebugger,
-    addSliderDebugger,
-    addToggleDebugger,
-    createDebuggerGUI,
-    DebuggerGUI,
-    addDebugGroup,
-    addColorDebugger,
-} from '@/PaleGL/utilities/debuggerGUI.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
+import {
+    addButtonDebugger,
+    addColorDebugger,
+    addDebuggerBorderSpacer,
+    addDebugGroup,
+    addSliderDebugger,
+    addToggleDebugger,
+    createDebuggerGUI,
+    DebuggerGUI,
+} from '@/PaleGL/utilities/debuggerGUI.ts';
 // import { TransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import {
     createTransformFeedbackDoubleBuffer,
@@ -116,30 +124,35 @@ import {
     getWriteTransformFeedbackDoubleBuffer,
     swapTransformFeedbackDoubleBuffer,
 } from '@/PaleGL/core/transformFeedbackDoubleBuffer.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
-import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
+import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
-import soundVertexShader from './shaders/sound-vertex.glsl';
-import {createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound} from '@/PaleGL/core/glslSound.ts';
-import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
-import { createSpotLight, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
-import {addActorToScene, createScene} from '@/PaleGL/core/scene.ts';
-import {subscribeActorOnStart, subscribeActorOnUpdate} from '@/PaleGL/actors/actor.ts';
-import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { createDirectionalLight, createDirectionalLightShadow } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { createSpotLight, createSpotLightShadow, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import { createScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
-import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { createTextMesh, FontAtlasData, TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
+import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
+import { SharedTexturesType, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
+import { createGLSLSound, GLSLSound, playGLSLSound, stopGLSLSound } from '@/PaleGL/core/glslSound.ts';
+import { addActorToScene, createScene, createSceneUICamera, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { setLookAtPosition, setRotationX, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { getGeometryAttributeDescriptors, setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { addUniformBlock, setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import {
     findVertexArrayObjectVertexBufferObjectBuffer,
     replaceVertexArrayObjectBuffer,
 } from '@/PaleGL/core/vertexArrayObject.ts';
+import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import {
+    setInputControllerSize,
+    startInputController,
+    updateInputController,
+} from '@/PaleGL/inputs/inputControllerBehaviours.ts';
+import { loadJson } from '@/PaleGL/loaders/loadJson.ts';
 import {
     getRotatorDegreeX,
     getRotatorDegreeY,
@@ -148,13 +161,26 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
+import soundVertexShader from './shaders/sound-vertex.glsl';
+// import {fontCircuit} from "@/PaleGL/shapeFont/fontCircuit/fontCircuit.ts";
+import { createBillboardParticle } from '@/PaleGL/actors/meshes/billboardParticle.ts';
+import { createUIShapeTextMesh } from '@/PaleGL/actors/meshes/uiShapeTextMesh.ts';
+import { createUnlitShapeTextMesh } from '@/PaleGL/actors/meshes/unlitShapeTextMesh.ts';
+import { createGPUParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import {
-    setInputControllerSize,
-    startInputController,
-    updateInputController,
-} from '@/PaleGL/inputs/inputControllerBehaviours.ts';
-import { getAnimatorAnimationClips } from '@/PaleGL/core/animator.ts';
-import {SharedTexturesType, SharedTexturesTypes} from "@/PaleGL/core/createSharedTextures.ts";
+    createGPUTrailParticle,
+    createTrailCylinderGeometry,
+    createTrailPlaneGeometry,
+} from '@/PaleGL/actors/particles/gpuTrailParticle.ts';
+import { createInstancingParticle } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import { createEffectTextureSystem, renderEffectTexture } from '@/PaleGL/core/effectTexture.ts';
+import { convertNormalMapFromHeightMap, createNormalMapConverter } from '@/PaleGL/core/normalMap.ts';
+import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
+import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
+import { shapeFontCircuitService } from '@/PaleGL/shapeFont/shapeFontCircuit/shapeFontCircuitService.ts';
+import { createShapeFontRenderer } from '@/PaleGL/shapeFont/shapeFontRenderer.ts';
+import { setUITranslation } from '@/PaleGL/ui/uiBehaviours.ts';
+import { isMinifyShader } from '@/PaleGL/utilities/envUtilities.ts';
 // import { BoxGeometry } from '@/PaleGL/geometries/BoxGeometry.ts';
 // import { ObjectSpaceRaymarchMaterial } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 
@@ -175,7 +201,7 @@ const CubeMapPositiveYImgUrl = './assets/images/py.jpg';
 const CubeMapNegativeYImgUrl = './assets/images/ny.jpg';
 const CubeMapPositiveZImgUrl = './assets/images/pz.jpg';
 const CubeMapNegativeZImgUrl = './assets/images/nz.jpg';
-const gltfSphereModelUrl = './assets/models/sphere-32x32.gltf';
+// const gltfSphereModelUrl = './assets/models/sphere-32x32.gltf';
 const fontAtlasImgUrl = './assets/fonts/NotoSans-Bold/atlas.png';
 const fontAtlasJsonUrl = './assets/fonts/NotoSans-Bold/NotoSans-Bold.json';
 const gltfButterflyModelUrl = './assets/models/butterfly-forward-thin.gltf';
@@ -288,6 +314,292 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
     });
 };
 
+const createTestGPUParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 32;
+    const vatGPUParticle = createGPUParticle({
+        gpu,
+        mesh: createMesh({
+            // geometry: createBoxGeometry({gpu, size: 1}),
+            geometry: createSphereGeometry({ gpu, radius: 0.75 }),
+            material: createUnlitMaterial({
+                baseColor: createColor(1.5, 1.5, 1.5, 1),
+            }),
+        }),
+        instanceCount: vatWidth * vatHeight,
+        vatWidth,
+        vatHeight,
+        makeDataPerInstanceFunction: () => {
+            return {
+                scale: [0.1, 0.1, 0.1],
+            };
+        },
+        // makeStateDataPerInstanceFunction: () => {
+        //     return {
+        //         // position: [i * 2, 3, i * -2, 1]
+        //         position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
+        //     };
+        // },
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+        updateFragmentShader: testGPUParticleUpdateFragmentShader,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    const testMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(testMesh.transform, createFillVector3(1.5));
+    setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, testMesh);
+    subscribeActorOnStart(testMesh, () => {
+        setUniformValue(
+            getMeshMaterial(testMesh).uniforms,
+            UniformNames.BaseMap,
+            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0]
+                .textures[1]
+        );
+    });
+};
+
+const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 256;
+    const vatGPUParticle = createGPUTrailParticle({
+        gpu,
+        mesh: createMesh({
+            name: 'GPUTrailPlaneParticle',
+            geometry: createTrailPlaneGeometry(gpu, 0.5, vatHeight),
+            material: createGBufferMaterial({
+                metallic: 0,
+                roughness: 1,
+                baseColor: createColor(1, 0, 0, 1),
+                faceSide: FaceSide.Double,
+            }),
+        }),
+        instanceCount: vatWidth,
+        vatWidth,
+        vatHeight,
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    const checkVelocityMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
+    setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
+    // addActorToScene(captureScene, checkVelocityMesh);
+    subscribeActorOnStart(checkVelocityMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkVelocityMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
+        );
+    });
+
+    const checkPositionMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkPositionMesh.transform, createFillVector3(1.5));
+    setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
+    // addActorToScene(captureScene, checkPositionMesh);
+    subscribeActorOnStart(checkPositionMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkPositionMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
+        );
+    });
+
+    const checkUpMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkUpMesh.transform, createFillVector3(1.5));
+    setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, checkUpMesh);
+    subscribeActorOnStart(checkUpMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkUpMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
+        );
+    });
+};
+
+const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
+    // vat gpu particle
+    const vatWidth = 32;
+    const vatHeight = 128;
+    const vatGPUParticle = createGPUTrailParticle({
+        gpu,
+        mesh: createMesh({
+            name: 'GPUTrailPlaneParticle',
+            geometry: createTrailCylinderGeometry(gpu, 0.1, 8, vatHeight),
+            material: createGBufferMaterial({
+                metallic: 0,
+                roughness: 1,
+                baseColor: createColor(0, 0, 1, 1),
+                faceSide: FaceSide.Double,
+            }),
+        }),
+        instanceCount: vatWidth,
+        vatWidth,
+        vatHeight,
+        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+    });
+    addActorToScene(captureScene, vatGPUParticle);
+
+    // for debug
+    const checkVelocityMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
+    setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
+    // addActorToScene(captureScene, checkVelocityMesh);
+    subscribeActorOnStart(checkVelocityMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkVelocityMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
+        );
+    });
+
+    const checkPositionMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkPositionMesh.transform, createFillVector3(1.5));
+    setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
+    // addActorToScene(captureScene, checkPositionMesh);
+    subscribeActorOnStart(checkPositionMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkPositionMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
+        );
+    });
+
+    const checkUpMesh = createMesh({
+        geometry: createPlaneGeometry({ gpu }),
+        material: createUnlitMaterial(),
+    });
+    setScaling(checkUpMesh.transform, createFillVector3(1.5));
+    setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
+    // addActorToScene(captureScene, checkUpMesh);
+    subscribeActorOnStart(checkUpMesh, () => {
+        setUniformValue(
+            getMeshMaterial(checkUpMesh).uniforms,
+            UniformNames.BaseMap,
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
+        );
+    });
+};
+
+const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
+    const TEXTURE_SIZE = 1024;
+
+    const effectTextureSystem = createEffectTextureSystem(gpu, renderer, {
+        // width: TEXTURE_SIZE,
+        // height: TEXTURE_SIZE,
+        // effectFragmentShader: simplexNoiseFragment,
+        // effectUniforms: [
+        //     // {
+        //     //     name: UniformNames.Time,
+        //     //     type: UniformTypes.Float,
+        //     //     value: 0,
+        //     // },
+        //     {
+        //         name: "uGridSize",
+        //         type: UniformTypes.Vector2,
+        //         value: createVector2(4, 4),
+        //     },
+        // ],
+
+        width: TEXTURE_SIZE,
+        height: TEXTURE_SIZE,
+        effectFragmentShader: fbmNoiseFragment,
+        effectUniforms: [
+            // {
+            //     name: UniformNames.Time,
+            //     type: UniformTypes.Float,
+            //     value: 0,
+            // },
+            {
+                name: 'uGridSize',
+                type: UniformTypes.Vector2,
+                value: createVector2(4.4, 4.4),
+            },
+            {
+                name: 'uOctaves',
+                type: UniformTypes.Float,
+                value: 8,
+            },
+            {
+                name: 'uAmplitude',
+                type: UniformTypes.Float,
+                value: 0.307,
+            },
+            {
+                name: 'uFrequency',
+                type: UniformTypes.Float,
+                value: 1.357,
+            },
+            {
+                name: 'uFactor',
+                type: UniformTypes.Float,
+                value: 0.597,
+            },
+        ],
+    });
+    const converter = createNormalMapConverter(gpu, renderer, { srcTexture: effectTextureSystem.texture });
+
+    setMaterialUniformValue(effectTextureSystem.effectMaterial, 'uSpeed', 0.1);
+
+    const checkMesh = createMesh({
+        geometry: createPlaneGeometry({
+            gpu,
+            divColNum: 100,
+            divRowNum: 100,
+            calculateTangent: true,
+            calculateBinormal: true,
+        }),
+        material: createGBufferMaterial({
+            baseColor: createColor(0, 1, 0, 1),
+            metallic: 0,
+            roughness: 1,
+            useHeightMap: true,
+            useNormalMap: true,
+            // faceSide: FaceSide.Double
+        }),
+    });
+    setScaling(checkMesh.transform, createFillVector3(2));
+    setTranslation(checkMesh.transform, createVector3(-8, 0.5, 4));
+    setRotationX(checkMesh.transform, -90);
+    addActorToScene(captureScene, checkMesh);
+
+    const tiling = createVector4(0.1, 0.1, 0, 0);
+    subscribeActorOnUpdate(checkMesh, () => {
+        renderEffectTexture(renderer, effectTextureSystem);
+        convertNormalMapFromHeightMap(renderer, converter);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMap, effectTextureSystem.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMapTiling, tiling);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightScale, 0.8);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMap, converter.renderTarget.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMapTiling, tiling);
+    });
+};
+
 const stylesText = `
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -362,12 +674,10 @@ const isSP = !!window.navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i);
 const inputController = isSP ? createTouchInputController() : createMouseInputController();
 startInputController(inputController);
 
-// const wrapperElement = document.getElementById("wrapper")!;
 const wrapperElement = document.createElement('div');
 document.body.appendChild(wrapperElement);
 wrapperElement.setAttribute('id', 'wrapper');
 
-// const canvasElement = document.getElementById("js-canvas")! as HTMLCanvasElement;
 const canvasElement = document.createElement('canvas');
 wrapperElement.appendChild(canvasElement);
 
@@ -393,10 +703,8 @@ text-align: center;
 wrapperElement?.appendChild(instanceNumView);
 
 const captureScene = createScene();
-// const compositeScene = new Scene();
 
-const pixelRatio = Math.min(window.devicePixelRatio, 1);
-// const pixelRatio = Math.min(window.devicePixelRatio, 0.1);
+const pixelRatio = Math.min(window.devicePixelRatio, 2);
 
 const renderer = createRenderer({
     gpu,
@@ -405,17 +713,13 @@ const renderer = createRenderer({
 });
 
 const engine = createEngine({ gpu, renderer });
-// for debug
-// const engine = createEngine({ gpu, renderer, fixedUpdateFps: 1, updateFps: 1 });
-
-// engine.setScenes([captureScene, compositeScene]);
+// const engine = createEngine({ gpu, renderer, updateFps: 2 });
 setSceneToEngine(engine, captureScene);
 
-// const captureSceneCamera = new PerspectiveCamera(60, 1, 0.1, 70);
 const captureSceneCamera = createPerspectiveCamera(70, 1, 0.1, 50);
 addActorToScene(captureScene, captureSceneCamera);
-// captureScene.mainCamera = captureSceneCamera;
-// captureSceneCamera.mainCamera = true;
+setMainCamera(captureScene, captureSceneCamera);
+createSceneUICamera(captureScene);
 
 const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 
@@ -436,30 +740,32 @@ captureSceneCamera.onFixedUpdate = () => {
 
 const directionalLight = createDirectionalLight({
     // intensity: 1.2,
-    intensity: 0,
+    intensity: 0.7,
     // color: Color.fromRGB(255, 210, 200),
     color: createColorWhite(),
 });
+setTranslation(directionalLight.transform, createVector3(-3, 5, 3));
 // directionalLight.enabled = false; // NOTE: 一旦ガード
 
-// shadows
-// TODO: directional light は constructor で shadow cameras を生成してるのでこのガードいらない
-if (directionalLight.shadowCamera) {
-    directionalLight.shadowCamera.visibleFrustum = true;
-    directionalLight.castShadow = true;
-    directionalLight.shadowCamera.near = 1;
-    directionalLight.shadowCamera.far = 15;
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
-    // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
-    setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
-    directionalLight.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+// // shadows
+// // TODO: directional light は constructor で shadow cameras を生成してるのでこのガードいらない
+// if (directionalLight.shadowCamera) {
+//     directionalLight.shadowCamera.visibleFrustum = true;
+//     directionalLight.castShadow = true;
+//     directionalLight.shadowCamera.near = 1;
+//     directionalLight.shadowCamera.far = 15;
+//     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -12, 12, -12, 12);
+//     // (directionalLight.shadowCamera as OrthographicCamera).setOrthoSize(null, null, -5, 5, -5, 5);
+//     setOrthoSize(directionalLight.shadowCamera as OrthographicCamera, null, null, -7, 7, -7, 7);
+//     directionalLight.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
+createDirectionalLightShadow(gpu, directionalLight, 1024, 1, 15, 7, true);
 
 subscribeActorOnStart(directionalLight, () => {
     setTranslation(directionalLight.transform, createVector3(-8, 8, -2));
@@ -486,21 +792,23 @@ const spotLight1 = createSpotLight({
 });
 // spotLight.enabled = false;
 
-if (spotLight1.shadowCamera) {
-    spotLight1.shadowCamera.visibleFrustum = true;
-    spotLight1.castShadow = true;
-    spotLight1.shadowCamera.near = 1;
-    spotLight1.shadowCamera.far = spotLight1.distance;
-    // spotLight.shadowCamera.far = 10;
-    setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight1.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+createSpotLightShadow(gpu, spotLight1, 1024, 0.1, true);
+
+// if (spotLight1.shadowCamera) {
+//     spotLight1.shadowCamera.visibleFrustum = true;
+//     spotLight1.castShadow = true;
+//     spotLight1.shadowCamera.near = 1;
+//     spotLight1.shadowCamera.far = spotLight1.distance;
+//     // spotLight.shadowCamera.far = 10;
+//     setPerspectiveSize(spotLight1.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
+//     spotLight1.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
 
 subscribeActorOnStart(spotLight1, () => {
     setTranslation(spotLight1.transform, createVector3(5, 9, -2));
@@ -519,21 +827,24 @@ const spotLight2 = createSpotLight({
 });
 // spotLight.enabled = false;
 
-if (spotLight2.shadowCamera) {
-    spotLight2.shadowCamera.visibleFrustum = true;
-    spotLight2.castShadow = true;
-    spotLight2.shadowCamera.near = 1;
-    spotLight2.shadowCamera.far = spotLight2.distance;
-    // spotLight.shadowCamera.far = 10;
-    setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
-    spotLight2.shadowMap = createRenderTarget({
-        gpu,
-        width: 1024,
-        height: 1024,
-        type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
-    });
-}
+// if (spotLight2.shadowCamera) {
+//     spotLight2.shadowCamera.visibleFrustum = true;
+//     spotLight2.castShadow = true;
+//     spotLight2.shadowCamera.near = 1;
+//     spotLight2.shadowCamera.far = spotLight2.distance;
+//     // spotLight.shadowCamera.far = 10;
+//     setPerspectiveSize(spotLight2.shadowCamera as PerspectiveCamera, 1); // TODO: いらないかも
+//     spotLight2.shadowMap = createRenderTarget({
+//         gpu,
+//         width: 1024,
+//         height: 1024,
+//         type: RenderTargetTypes.Depth,
+//         depthPrecision: TextureDepthPrecisionType.High,
+//     });
+// }
+
+createSpotLightShadow(gpu, spotLight2, 1024, 0.1, true);
+
 subscribeActorOnStart(spotLight2, () => {
     setTranslation(spotLight2.transform, createVector3(-5, 9, -2));
     setLookAtPosition(spotLight2.transform, createVector3(0, 0, 0));
@@ -975,28 +1286,20 @@ const createTransformFeedbackDrivenMesh = () => {
 };
 */
 
-const createGLTFSphereMesh = async (material: Material) => {
-    const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
-    const mesh: Mesh = gltfActor.children[0] as Mesh;
+const createTestLightingSphereMesh = (material: Material) => {
+    // tmp
+    // const gltfActor = await loadGLTF({ gpu, path: gltfSphereModelUrl });
+    // const mesh: Mesh = gltfActor.children[0] as Mesh;
+    // mesh.castShadow = true;
+    // setMeshMaterial(mesh, material);
+
+    const mesh = createMesh({
+        geometry: createSphereGeometry({ gpu, radius: 1, widthSegments: 32, heightSegments: 32 }),
+        material,
+    });
     mesh.castShadow = true;
     setMeshMaterial(mesh, material);
 
-    // mesh.material = new GBufferMaterial({
-    //     // gpu,
-    //     // baseMap: floorBaseMap,
-    //     // normalMap: floorNormalMap,
-    //     // envMap: cubeMap,
-    //     // baseColor: new Color(0.5, 0.05, 0.05, 1),
-    //     baseColor: new Color(1, 0.76, 0.336, 1),
-    //     // baseColor: new Color(0, 0, 0, 1),
-    //     // baseColor: new Color(1, 1, 1, 1),
-    //     receiveShadow: true,
-    //     metallic: 0,
-    //     roughness: 0,
-    //     // specularAmount: 0.4,
-    //     // ambientAmount: 0.2,
-    //     emissiveColor: new Color(1., 1., 1., 1.)
-    // });
     return mesh;
 };
 
@@ -1206,150 +1509,6 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     skinningMesh.animator = gltfActor.animator!;
     setAnimationClips(skinningMesh, getAnimatorAnimationClips(gltfActor.animator));
 
-    // subscribeActorOnStart(skinningMesh, () => {
-    //     // CPU skinning
-    //     // gltfActor.animator.play('Fly', true);
-    //     // gltfActor.animator.animationClips[0].speed = 0.2;
-    // });
-    // // skinningMesh.onUpdate = ({ deltaTime }) => {
-    // //     // skinningMesh.animator.update(deltaTime);
-    // //     // gltfActor.animator.update(deltaTime);
-    // // };
-
-    const instanceInfo: {
-        position: number[][];
-        scale: number[][];
-        rotation: number[][];
-        velocity: number[][];
-        color: number[][];
-        emissiveColor: number[][];
-    } = {
-        position: [],
-        scale: [],
-        rotation: [],
-        velocity: [],
-        color: [],
-        emissiveColor: []
-    };
-    maton.range(instanceNum).forEach(() => {
-        // const posRangeX = 20;
-        // const posRangeZ = 20;
-        // const px = (Math.random() * 2 - 1) * posRangeX;
-        // const py = 0.5 + Math.random() * 2.;
-        // const pz = (Math.random() * 2 - 1) * posRangeZ;
-        // const p = [px, py, pz];
-        // instanceInfo.position.push(p);
-        instanceInfo.position.push([0, 0, 0]);
-
-        // const baseScale = 0.04;
-        // const randomScaleRange = 0.08;
-        const baseScale = 0.2;
-        const randomScaleRange = 0.6;
-        const s = Math.random() * randomScaleRange + baseScale;
-        // instanceInfo.scale.push([s, s * 2, s]);
-        instanceInfo.scale.push([s, s, s]);
-
-        instanceInfo.rotation.push([0, 0, 0]);
-
-        instanceInfo.velocity.push([0, 0, 0]);
-
-        const c = createColorFromRGB(
-            Math.floor(Math.random() * 200 + 30),
-            Math.floor(Math.random() * 80 + 20),
-            Math.floor(Math.random() * 200 + 30)
-        );
-        instanceInfo.color.push([...c.e]);
-        
-        const ec = createColorFromRGB(0, 0, 0);
-        instanceInfo.emissiveColor.push([...ec.e]);
-    });
-    const animationOffsetInfo = maton
-        .range(instanceNum)
-        .map(() => {
-            return Math.random() * 30;
-        })
-        .flat();
-
-    skinningMesh.castShadow = true;
-    skinningMesh.geometry.instanceCount = instanceNum;
-
-    // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstancePosition,
-            data: new Float32Array(instanceInfo.position.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceScale,
-            data: new Float32Array(instanceInfo.scale.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceRotation,
-            data: new Float32Array(instanceInfo.rotation.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-    // aInstanceAnimationOffsetは予約語
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceAnimationOffset,
-            data: new Float32Array(animationOffsetInfo),
-            size: 1,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVertexColor,
-            data: new Float32Array(instanceInfo.color.flat()),
-            size: 4,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(instanceInfo.emissiveColor.flat()),
-            size: 4,
-            divisor: 1,
-        })
-    );
-    setGeometryAttribute(
-        skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVelocity,
-            data: new Float32Array(instanceInfo.velocity.flat()),
-            size: 3,
-            divisor: 1,
-        })
-    );
-
-    // skinningMesh.material = new PhongMaterial({
-    //     // gpu,
-    //     specularAmount: 0.5,
-    //     receiveShadow: true,
-    //     isSkinning: true,
-    //     gpuSkinning: true,
-    //     isInstancing: true,
-    //     useVertexColor: true,
-    //     envMap: cubeMap,
-    //     ambientAmount: 0.2,
-    // });
     setMeshMaterial(
         skinningMesh,
         createGBufferMaterial({
@@ -1368,10 +1527,38 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         })
     );
 
+    const particle = createInstancingParticle({
+        mesh: skinningMesh,
+        instanceCount: instanceNum,
+        makeDataPerInstanceFunction: () => {
+            const baseScale = 0.2;
+            const randomScaleRange = 0.6;
+            const s = Math.random() * randomScaleRange + baseScale;
+
+            const c = createColorFromRGB(
+                Math.floor(Math.random() * 200 + 30),
+                Math.floor(Math.random() * 80 + 20),
+                Math.floor(Math.random() * 200 + 30)
+            );
+
+            const ec = createColorFromRGB(0, 0, 0);
+
+            return {
+                position: [0, 0, 0],
+                scale: [s, s, s],
+                rotation: [0, 0, 0],
+                velocity: [0, 0, 0],
+                color: [...c.e],
+                emissiveColor: [...ec.e],
+                animationOffset: Math.random() * 30,
+            };
+        },
+    });
+
     const transformFeedbackDoubleBuffer = createInstanceUpdater(instanceNum);
 
     let attractRate = 0;
-    subscribeActorOnUpdate(skinningMesh, ({ deltaTime }) => {
+    subscribeActorOnUpdate(particle, ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
 
         // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
@@ -1483,12 +1670,19 @@ const main = async () => {
     // attract mesh
     //
 
-    attractSphereMesh = await createGLTFSphereMesh(
-        createUnlitMaterial({
+    attractSphereMesh = createMesh({
+        geometry: createSphereGeometry({ gpu, radius: 2, widthSegments: 32, heightSegments: 32 }),
+        material: createUnlitMaterial({
             baseColor: createColor(2, 2, 2, 1),
-            // receiveShadow: true,
-        })
-    );
+        }),
+    });
+
+    // attractSphereMesh = await createGLTFSphereMesh(
+    //     createUnlitMaterial({
+    //         baseColor: createColor(2, 2, 2, 1),
+    //         // receiveShadow: true,
+    //     })
+    // );
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, createVector3(0.5, 0.5, 0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
@@ -1500,7 +1694,7 @@ const main = async () => {
         const iy = v2y(inputController.normalizedInputPosition) * 2 - 1;
         const x = ix * w;
         const z = iy * d;
-        const y = 0.5;
+        const y = 1;
         setTranslation(attractSphereMesh.transform, createVector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
     };
@@ -1509,17 +1703,17 @@ const main = async () => {
     // lighting mesh
     //
 
-    testLightingMesh = await createGLTFSphereMesh(
+    testLightingMesh = createTestLightingSphereMesh(
         createGBufferMaterial({
-            // baseColor: new Color(1, .05, .05, 1),
-            // metallic: 0,
-            // roughness: .3
             baseColor: createColorWhite(),
-            metallic: 1,
+            metallic: 0,
             roughness: 1,
         })
+        // createUnlitMaterial({
+        //     baseColor: createColorWhite(),
+        // })
     );
-    setTranslation(testLightingMesh.transform, createVector3(2.5, 1, 0));
+    setTranslation(testLightingMesh.transform, createVector3(4, 1, 0));
 
     //
     // local raymarch mesh
@@ -1606,7 +1800,7 @@ const main = async () => {
         fontTexture: fontAtlasTexture,
         fontAtlas: fontAtlasJson,
         castShadow: true,
-        align: TextAlignType.Left,
+        align: TextAlignType.LeftTop,
         characterSpacing: 0.2,
     });
     addActorToScene(captureScene, textMesh3);
@@ -1615,12 +1809,95 @@ const main = async () => {
     setScaling(textMesh3.transform, createVector3(0.4, 0.4, 0.4));
 
     //
+    // shape text mesh
+    //
+
+    // unlit mesh
+
+    const shapeFontCircuitTextureWidth = 4096;
+    const shapeFontCircuitTextureHeight = 1024;
+
+    const shapeFontCircuitRenderer = createShapeFontRenderer(
+        shapeFontCircuitService,
+        null,
+        shapeFontCircuitTextureWidth,
+        shapeFontCircuitTextureHeight
+    );
+
+    const [, shapeFontCircuitRenderFunc] = shapeFontCircuitService;
+    shapeFontCircuitRenderFunc(shapeFontCircuitRenderer);
+
+    // // for debug
+    // const img = document.createElement('img');
+    // const base64Src = shapeFontCircuitRenderer.canvas.toDataURL();
+    // img.src = base64Src;
+    // document.body.appendChild(img);
+
+    const shapeFontCircuitTexture = createTexture({
+        gpu,
+        img: shapeFontCircuitRenderer.canvas,
+        width: shapeFontCircuitRenderer.canvasWidth,
+        height: shapeFontCircuitRenderer.canvasHeight,
+        // logEnabled: true
+    });
+
+    const shapeText = createUnlitShapeTextMesh({
+        gpu,
+        name: 'shape-text-mesh',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        // shapeFont: fontCircuit,
+        shapeFontTexture: shapeFontCircuitTexture,
+        shapeFontRenderer: shapeFontCircuitRenderer,
+        shapeFontService: shapeFontCircuitService,
+        planeWidth: 1,
+        // ratio: 1,
+    });
+    addActorToScene(captureScene, shapeText);
+    setTranslation(shapeText.transform, createVector3(0, 1, 10));
+
+    // ui mesh
+
+    const uiShapeTextAfterTone = createUIShapeTextMesh({
+        gpu,
+        name: 'ui-shape-text-mesh',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        // shapeFont: fontCircuit,
+        shapeFontTexture: shapeFontCircuitTexture,
+        shapeFontRenderer: shapeFontCircuitRenderer,
+        shapeFontService: shapeFontCircuitService,
+        fontSize: 36,
+        align: TextAlignType.Center,
+        blendType: BlendTypes.Additive,
+        uiQueueType: UIQueueTypes.AfterTone,
+        // ratio: 1,
+    });
+    addActorToScene(captureScene, uiShapeTextAfterTone);
+    setUITranslation(uiShapeTextAfterTone, captureScene.uiCamera, createVector3(0, -400, 0));
+
+    const uiShapeTextOverlay = createUIShapeTextMesh({
+        gpu,
+        name: 'ui-shape-text-mesh',
+        text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        // shapeFont: fontCircuit,
+        shapeFontTexture: shapeFontCircuitTexture,
+        shapeFontRenderer: shapeFontCircuitRenderer,
+        shapeFontService: shapeFontCircuitService,
+        fontSize: 36,
+        align: TextAlignType.Center,
+        blendType: BlendTypes.Additive,
+        uiQueueType: UIQueueTypes.Overlay,
+        // ratio: 1,
+    });
+    addActorToScene(captureScene, uiShapeTextOverlay);
+    setUITranslation(uiShapeTextOverlay, captureScene.uiCamera, createVector3(0, -350, 0));
+
+    //
     // instancing mesh
     //
 
     skinnedMesh = await createGLTFSkinnedMesh(initialInstanceNum);
     console.log(
-        'hogehoge - butterfly',
+        'gltf butterfly',
         skinnedMesh,
         getGeometryAttributeDescriptors(skinnedMesh.geometry),
         skinnedMesh.geometry.indices,
@@ -1637,6 +1914,8 @@ const main = async () => {
         gpu,
         calculateTangent: true,
         calculateBinormal: true,
+        divColNum: 10,
+        divRowNum: 10,
     });
     floorPlaneMesh = createMesh({
         geometry: floorGeometry,
@@ -1679,266 +1958,90 @@ const main = async () => {
     //
 
     const particleNum = 50;
-    const particleGeometry = createGeometry({
+
+    const particleMesh = createBillboardParticle({
         gpu,
-        attributes: [
-            createAttribute({
-                name: AttributeNames.Position.toString(),
-                // dummy data
-                data: new Float32Array(
-                    maton
-                        .range(particleNum)
-                        .map(() => {
-                            const x = Math.random() * 18 - 10;
-                            const y = Math.random() * 0.5;
-                            // const y = 3.;
-                            const z = Math.random() * 18 - 8;
-                            return [x, y, z, x, y, z, x, y, z, x, y, z];
-                        })
-                        .flat()
-                ),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv.toString(),
-                data: new Float32Array(
-                    maton
-                        .range(particleNum)
-                        .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
-                        .flat()
-                ),
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Color.toString(),
-                data: new Float32Array(
-                    maton
-                        .range(particleNum)
-                        .map(() => {
-                            const c = createColorFromRGB(
-                                Math.random() * 50 + 200,
-                                Math.random() * 50 + 190,
-                                Math.random() * 50 + 180,
-                                Math.random() * 150 + 50
-                            );
-                            return [...c.e, ...c.e, ...c.e, ...c.e];
-                        })
-                        .flat()
-                ),
-                size: 4,
-            }),
-            createAttribute({
-                name: 'aBillboardSize',
-                data: new Float32Array(
-                    maton
-                        .range(particleNum)
-                        .map(() => {
-                            const s = Math.random() * 3.5 + 0.5;
-                            return [s, s, s, s];
-                        })
-                        .flat()
-                ),
-                size: 1,
-            }),
-            createAttribute({
-                name: 'aBillboardRateOffset',
-                data: new Float32Array(
-                    maton
-                        .range(particleNum)
-                        .map(() => {
-                            const r = Math.random();
-                            return [r, r, r, r];
-                        })
-                        .flat()
-                ),
-                size: 1,
-            }),
+        particleNum,
+        vertexShader: billboardParticleVertexShader,
+        fragmentShader: billboardParticleFragmentShader,
+        minPosition: createVector3(-10, 0, -8),
+        maxPosition: createVector3(8, 0.5, 10),
+        minSize: 0.5,
+        maxSize: 4,
+        minColor: createColorFromRGB(200, 190, 180, 50),
+        maxColor: createColorFromRGB(250, 240, 230, 200),
+        particleMap,
+        vertexShaderModifiers: [
+            ...(isMinifyShader()
+                ? []
+                : [
+                      {
+                          pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
+                          value: `
+cycleSpeed = .33;
+                `,
+                      },
+                      {
+                          pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
+                          value: `
+localPosition.x += mix(0., 4., r) * mix(.4, .8, cycleOffset);
+localPosition.z += mix(0., 4., r) * mix(-.4, -.8, cycleOffset);
+                `,
+                      },
+                      {
+                          pragma: VertexShaderModifierPragmas.VERTEX_COLOR_POST_PROCESS,
+                          value: `
+vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
+                `,
+                      },
+                  ]),
         ],
-        indices: maton
-            .range(particleNum)
-            .map((_, i) => {
-                const offset = i * 4;
-                const index = [0 + offset, 1 + offset, 2 + offset, 2 + offset, 1 + offset, 3 + offset];
-                return index;
-            })
-            .flat(),
-        drawCount: particleNum * 6,
     });
-    const particleMaterial = createMaterial({
-        // gpu,
-        vertexShader: `
-#pragma DEFINES
 
-#pragma ATTRIBUTES
+    // gpu particle ---------------------------
 
-#include <lighting>
-#include <ub>
+    // createTestGPUParticle(gpu);
 
-out vec2 vUv;
-out vec3 vWorldPosition;
-out vec3 vNormal;
+    // gpu plane trail particle
 
-out vec4 vVertexColor;
-out vec4 vViewPosition;
-out vec4 vClipPosition;
+    // createTestGPUPlaneTrailParticle(gpu);
 
-uniform vec2[4] uBillboardPositionConverters;
+    // gpu cylindar trail particle
 
-void main() {
-    int particleId = int(mod(float(gl_VertexID), 4.));
-    float t = 3.;
-    float r = mod((uTime / t) + aBillboardRateOffset, 1.);
+    createTestGPUCylinderTrailParticle(gpu);
 
-    vec4 localPosition = vec4(aPosition, 1.);
-
-    localPosition.x += mix(0., 4., r) * mix(.4, .8, aBillboardRateOffset);
-    localPosition.z += mix(0., 4., r) * mix(-.4, -.8, aBillboardRateOffset);
-
-    // assign common varyings 
-    vUv = aUv; 
-    vVertexColor = aColor;
-    vVertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-
-    vec4 worldPosition = uWorldMatrix * localPosition;
-  
-    vWorldPosition = worldPosition.xyz;
-    
-    vec4 viewPosition = uViewMatrix * worldPosition;
-    viewPosition.xy += uBillboardPositionConverters[particleId] * aBillboardSize;
-    vViewPosition = viewPosition;
-    
-    vec4 clipPosition = uProjectionMatrix * viewPosition;
- 
-    gl_Position = clipPosition;
-    
-    vClipPosition = clipPosition;
-}`,
-        fragmentShader: `
-#pragma DEFINES
-
-precision highp float;
-
-#include <lighting>
-#include <ub>
-#include <depth>
-
-in vec2 vUv;
-in vec4 vVertexColor;
-in vec4 vViewPosition;
-in vec4 vClipPosition;
-
-out vec4 outColor;
-
-uniform sampler2D uParticleMap;
-
-void main() {
-    // int particleId = int(mod(float(gl_VertexID), 4.));
-
-    vec4 texColor = texture(uParticleMap, vUv);
-    vec3 baseColor = vVertexColor.xyz;
-    float alpha = texColor.x * vVertexColor.a;
-    
-    // calc soft fade
-    
-    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    // for debug
-    // outColor = vec4(vec3(sceneDepth), 1.);
-
-    float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
-    // for debug
-    // outColor = vec4(vec3(currentDepth), 1.);
-    
-    float diffDepth = abs(sceneDepth) - abs(currentDepth);
-    float softFade = smoothstep(0., .01, diffDepth);
-    // for debug
-    // outColor = vec4(vec3(softFade), 1.);
-    
-    // result
-    
-    // outBaseColor = vec4(1., 0., 0., 1.);
-    // outColor = vec4(1., 0., 0., 1.);
-
-    float fadedAlpha = alpha * softFade;
-    if(fadedAlpha < .01) {
-        discard;
-    }
-
-    outColor = vec4(baseColor, fadedAlpha);
-    // outBaseColor = vec4(baseColor, fadedAlpha);
-    // outNormalColor = vec4(0., 0., 1., 1.); // dummy
-}
-        `,
-        uniforms: [
-            {
-                name: 'uParticleMap',
-                type: UniformTypes.Texture,
-                value: particleMap,
-            },
-            {
-                name: 'uBillboardPositionConverters',
-                type: UniformTypes.Vector2Array,
-                value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
-            },
-            // {
-            //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
-            //     value: 0,
-            // },
-            {
-                name: UniformNames.DepthTexture,
-                type: UniformTypes.Texture,
-                value: null,
-            },
-            {
-                name: UniformNames.CameraNear,
-                type: UniformTypes.Float,
-                value: captureSceneCamera.near,
-            },
-            {
-                name: UniformNames.CameraFar,
-                type: UniformTypes.Float,
-                value: captureSceneCamera.far,
-            },
-        ],
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
-        // blendType: BlendTypes.Additive
-        blendType: BlendTypes.Transparent,
-        depthWrite: false,
-    });
-    const particleMesh = createMesh({
-        geometry: particleGeometry,
-        material: particleMaterial,
-    });
-  
     // noise -----------------------------------
 
     const randomNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.RANDOM_NOISE);
     setScaling(randomNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(randomNoiseTextureMesh.transform, createVector3(8, 1.5, 0));
     addActorToScene(captureScene, randomNoiseTextureMesh);
-    
+
     const fbmNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.FBM_NOISE);
     setScaling(fbmNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(fbmNoiseTextureMesh.transform, createVector3(8, 1.5, 2));
     addActorToScene(captureScene, fbmNoiseTextureMesh);
-    
+
     const perlinNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.PERLIN_NOISE);
     setScaling(perlinNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(perlinNoiseTextureMesh.transform, createVector3(8, 1.5, 4));
     addActorToScene(captureScene, perlinNoiseTextureMesh);
-  
+
     const improvedNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.IMPROVE_NOISE);
     setScaling(improvedNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(improvedNoiseTextureMesh.transform, createVector3(8, 1.5, 6));
     addActorToScene(captureScene, improvedNoiseTextureMesh);
-    
+
     const simplexNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.SIMPLEX_NOISE);
     setScaling(simplexNoiseTextureMesh.transform, createFillVector3(1.5));
     setTranslation(simplexNoiseTextureMesh.transform, createVector3(8, 1.5, 8));
     addActorToScene(captureScene, simplexNoiseTextureMesh);
-    
-    // noise -----------------------------------
+
+    // normal map ------------------------------
+
+    createTestNormalMap(gpu, getSharedTexture(engine, SharedTexturesTypes.PERLIN_NOISE).texture);
+
+    // ---------------------------------------------
 
     addActorToScene(captureScene, attractSphereMesh);
     addActorToScene(captureScene, testLightingMesh);
@@ -2007,7 +2110,7 @@ void main() {
 function createSharedTextureMesh(engine: Engine, key: SharedTexturesType) {
     const textureMesh = createMesh({
         geometry: createPlaneGeometry({ gpu }),
-        material: createUnlitMaterial()
+        material: createUnlitMaterial(),
     });
     subscribeActorOnUpdate(textureMesh, () => {
         getSharedTexture(engine, key).needsUpdate = true;

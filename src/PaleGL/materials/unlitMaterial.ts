@@ -26,7 +26,7 @@ export type UnlitMaterialArgs = {
 
 export type UnlitMaterial = Material;
 
-export function createUnlitMaterial(args: UnlitMaterialArgs = {}) {
+export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial {
     const {
         baseMap,
         baseMapTiling, // vec4
@@ -61,7 +61,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}) {
         },
     ];
 
-    const mergedUniforms: UniformsData = [...baseUniforms, ...(uniforms ? uniforms : [])];
+    const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
     const depthUniforms: UniformsData = [
         {
@@ -79,6 +79,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}) {
             type: UniformTypes.Color,
             value: baseColor || createColorWhite(),
         },
+        ...uniforms
     ];
 
     const material = createMaterial({

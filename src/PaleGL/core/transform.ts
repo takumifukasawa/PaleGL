@@ -1,23 +1,38 @@
 ﻿import {
+    createForwardV3,
+    createRightV3,
+    createUpV3,
     createVector3,
     createVector3One,
     createVector3Up,
     createVector3Zero,
     multiplyVector3AndMatrix4,
     normalizeVector3,
+    setV3x,
+    setV3y,
+    setV3z,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
 import {
+    assignMat4Identity,
     cloneMat4,
-    createLookAtMatrix,
-    createMat4Identity, createScalingMatrix, createTranslationMatrix, invertMat4,
+    createLookAtMatrixRef,
+    createMat4Identity,
+    invertMat4,
     mat4m00,
-    mat4m01, mat4m02,
+    mat4m01,
+    mat4m02,
     mat4m10,
-    mat4m11, mat4m12,
+    mat4m11,
+    mat4m12,
     mat4m20,
-    mat4m21, mat4m22,
-    Matrix4, multiplyMat4Array, transposeMat4,
+    mat4m21,
+    mat4m22,
+    Matrix4,
+    multiplyMat4Array,
+    multiplyScalingMatrix,
+    multiplyTranslationMatrix,
+    transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
 import { ActorTypes } from '@/PaleGL/constants.js';
 import {
@@ -27,8 +42,8 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
-import { createRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
-import {Actor} from "@/PaleGL/actors/actor.ts";
+import { multiplyRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
 // import { Camera } from '@/PaleGL/actors/cameras.ts';
 
 // TODO:
@@ -228,6 +243,10 @@ export type Transform = {
     lookAtTarget: Vector3 | null;
     lookAtTargetActor: Actor | null;
     normalMatrix: Matrix4;
+    // TODO: engineでちゃんと更新されるようにする
+    forward: Vector3;
+    up: Vector3;
+    right: Vector3;
 };
 
 export function createTransform() {
@@ -314,6 +333,9 @@ export function createTransform() {
         lookAtTarget,
         lookAtTargetActor,
         normalMatrix,
+        forward: createForwardV3(),
+        up: createUpV3(),
+        right: createRightV3(),
         // getPosition: () => _position,
         // setPosition: (p: Vector3) => (_position = p),
         // getRotation: () => _rotation,
@@ -353,13 +375,23 @@ export function createTransform() {
 }
 
 export const getWorldRight = (transform: Transform) =>
-    normalizeVector3(createVector3(mat4m00(transform.worldMatrix), mat4m10(transform.worldMatrix), mat4m20(transform.worldMatrix)));
+    normalizeVector3(
+        createVector3(mat4m00(transform.worldMatrix), mat4m10(transform.worldMatrix), mat4m20(transform.worldMatrix))
+    );
 
 export const getWorldUp = (transform: Transform) =>
-    normalizeVector3(createVector3(mat4m01(transform.worldMatrix), mat4m11(transform.worldMatrix), mat4m21(transform.worldMatrix)));
+    normalizeVector3(
+        createVector3(mat4m01(transform.worldMatrix), mat4m11(transform.worldMatrix), mat4m21(transform.worldMatrix))
+    );
 
-export const getWorldForward = (transform: Transform) =>
-    normalizeVector3(createVector3(mat4m02(transform.worldMatrix), mat4m12(transform.worldMatrix), mat4m22(transform.worldMatrix)));
+// export const getWorldForward = (transform: Transform) =>
+//     normalizeVector3(createVector3(mat4m02(transform.worldMatrix), mat4m12(transform.worldMatrix), mat4m22(transform.worldMatrix)));
+export const getWorldForward = (transform: Transform) => {
+    setV3x(transform.forward, mat4m02(transform.worldMatrix));
+    setV3y(transform.forward, mat4m12(transform.worldMatrix));
+    setV3z(transform.forward, mat4m22(transform.worldMatrix));
+    return normalizeVector3(transform.forward);
+};
 
 export const setScaling = (transform: Transform, s: Vector3) => (transform.scale = s);
 
@@ -390,6 +422,24 @@ export const worldToLocalPoint = (transform: Transform, p: Vector3) =>
 
 export const updateActorTransformMatrix = (actor: Actor) => {
     if (actor.transform.lookAtTarget || actor.transform.lookAtTargetActor) {
+        // tmp
+        // // どっちかはあるのでキャストしちゃう
+        // const lookAtTarget = (
+        //     actor.transform.lookAtTargetActor
+        //         ? actor.transform.lookAtTargetActor.transform.position
+        //         : actor.transform.lookAtTarget
+        // ) as Vector3;
+        // // TODO:
+        // // - up vector 渡せるようにする
+        // // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
+        // const lookAtMatrix =
+        //     actor?.type === ActorTypes.Camera
+        //         ? createLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
+        //         : createLookAtMatrix(actor.transform.position, lookAtTarget);
+        // const scalingMatrix = createScalingMatrix(actor.transform.scale);
+        // actor.transform.localMatrix = multiplyMat4ArrayRef(actor.transform.localMatrix, lookAtMatrix, scalingMatrix);
+        // // actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
+
         // どっちかはあるのでキャストしちゃう
         const lookAtTarget = (
             actor.transform.lookAtTargetActor
@@ -397,27 +447,53 @@ export const updateActorTransformMatrix = (actor: Actor) => {
                 : actor.transform.lookAtTarget
         ) as Vector3;
         // TODO:
-        // - up vector 渡せるようにする
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
+        assignMat4Identity(actor.transform.localMatrix);
         const lookAtMatrix =
             actor?.type === ActorTypes.Camera
-                ? createLookAtMatrix(actor.transform.position, lookAtTarget, createVector3Up(), true)
-                : createLookAtMatrix(actor.transform.position, lookAtTarget);
-        const scalingMatrix = createScalingMatrix(actor.transform.scale);
-        actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
+                ? createLookAtMatrixRef(
+                      actor.transform.localMatrix,
+                      actor.transform.position,
+                      lookAtTarget,
+                      createVector3Up(),
+                      true
+                  )
+                : createLookAtMatrixRef(actor.transform.localMatrix, actor.transform.position, lookAtTarget);
+        actor.transform.localMatrix = multiplyScalingMatrix(lookAtMatrix, actor.transform.scale);
     } else {
-        const translationMatrix = createTranslationMatrix(actor.transform.position);
-        // eulerから回転行列を作る場合
-        // // roll(Z), pitch(X), yaw(Y)
-        // const rotationAxes = this.rotation.getAxesDegrees();
-        // const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
-        // const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
-        // const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
-        // const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
-        // quaternionから回転を作るケース
-        const rotationMatrix = createRotationMatrixFromQuaternion(actor.transform.rotation.quaternion);
-        const scalingMatrix = createScalingMatrix(actor.transform.scale);
-        actor.transform.localMatrix = multiplyMat4Array(translationMatrix, rotationMatrix, scalingMatrix);
+        // tmp
+        // const translationMatrix = createTranslationMatrix(actor.transform.position);
+        // // eulerから回転行列を作る場合
+        // // // roll(Z), pitch(X), yaw(Y)
+        // // const rotationAxes = this.rotation.getAxesDegrees();
+        // // const rotationXMatrix = Matrix4.rotationXMatrix((rotationAxes.x / 180) * Math.PI);
+        // // const rotationYMatrix = Matrix4.rotationYMatrix((rotationAxes.y / 180) * Math.PI);
+        // // const rotationZMatrix = Matrix4.rotationZMatrix((rotationAxes.z / 180) * Math.PI);
+        // // const rotationMatrix = Matrix4.multiplyMatrices(rotationYMatrix, rotationXMatrix, rotationZMatrix);
+        // // quaternionから回転を作るケース
+        // const rotationMatrix = createRotationMatrixFromQuaternion(
+        //     // actor.transform.localMatrix,
+        //     actor.transform.rotation.quaternion
+        // );
+        // const scalingMatrix = createScalingMatrix(actor.transform.scale);
+        // actor.transform.localMatrix = multiplyMat4ArrayRef(
+        //     actor.transform.localMatrix,
+        //     translationMatrix,
+        //     rotationMatrix,
+        //     scalingMatrix
+        // );
+        // // actor.transform.localMatrix = multiplyMat4ArrayRef(
+        // //     actor.transform.localMatrix,
+        // //     translationMatrix,
+        // //     rotationMatrix,
+        // //     scalingMatrix
+        // // );
+
+        assignMat4Identity(actor.transform.localMatrix);
+        // 後ろからかける
+        multiplyTranslationMatrix(actor.transform.localMatrix, actor.transform.position);
+        multiplyRotationMatrixFromQuaternion(actor.transform.localMatrix, actor.transform.rotation.quaternion);
+        multiplyScalingMatrix(actor.transform.localMatrix, actor.transform.scale);
     }
 
     // TODO: parentがちゃんととれてないかも

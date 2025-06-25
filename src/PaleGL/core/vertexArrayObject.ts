@@ -33,7 +33,7 @@ export function createVertexArrayObject({ gpu, attributes = [], indices }: {
     indices?: number[] | Uint16Array | null
 }): VertexArrayObject {
     const gl = gpu.gl;
-    const vao = gl.createVertexArray()!;
+    const vao = gl.createVertexArray();
     const vboList: VertexBufferObject[] = [];
 
     const vertexArrayObject: VertexArrayObject = {

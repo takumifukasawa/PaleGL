@@ -1,50 +1,32 @@
-// import { RenderTarget, RenderTargetOptions } from '@/PaleGL/core/RenderTarget';
-// // import {RenderTargetTypes} from "@/PaleGL/constants";
-// import { AbstractRenderTarget } from '@/PaleGL/core/AbstractRenderTarget';
-// 
-// export class DoubleBuffer extends AbstractRenderTarget {
-//     #renderTargets: RenderTarget[] = [];
-// 
-//     currentReadIndex = 0;
-// 
-//     constructor(renderTargetOptions: RenderTargetOptions) {
-//         super({ isSwappable: true });
-//         for (let i = 0; i < 2; i++) {
-//             const options: RenderTargetOptions = { ...renderTargetOptions, ...{ name: `double-buffer_${i}` } };
-//             this.#renderTargets.push(new RenderTarget(options));
-//         }
-//     }
-// 
-//     setSize(width: number, height: number) {
-//         this.#renderTargets.forEach((renderTarget) => renderTarget.setSize(width, height));
-//     }
-// 
-//     get read() {
-//         return this.#renderTargets[this.currentReadIndex];
-//     }
-// 
-//     get write() {
-//         return this.#renderTargets[this.currentReadIndex ^ 1];
-//     }
-// 
-//     swap() {
-//         this.currentReadIndex = (this.currentReadIndex + 1) % 2;
-//     }
-// }
-
+import { RenderTargetKinds } from '@/PaleGL/constants.ts';
+import {
+    createMultipleRenderTargets,
+    MultipleRenderTarget,
+    MultipleRenderTargetOptions,
+} from '@/PaleGL/core/multipleRenderTargets.ts';
+import { blitRenderTarget, Renderer } from '@/PaleGL/core/renderer.ts';
 import {
     createRenderTarget,
     createRenderTargetBase,
     RenderTarget,
     RenderTargetBase,
-    RenderTargetOptions, setRenderTargetSize,
+    RenderTargetOptions,
 } from '@/PaleGL/core/renderTarget.ts';
-import { RenderTargetKinds } from '@/PaleGL/constants.ts';
+import { Material } from '@/PaleGL/materials/material.ts';
 
-type DoubleBuffer = RenderTargetBase & {
+export type DoubleBufferBase = {
     currentReadIndex: number;
-    renderTargets: RenderTarget[];
 };
+
+export type DoubleBuffer = DoubleBufferBase &
+    RenderTargetBase & {
+        renderTargets: RenderTarget[];
+    };
+
+export type MRTDoubleBuffer = DoubleBufferBase &
+    RenderTargetBase & {
+        multipleRenderTargets: MultipleRenderTarget[];
+    };
 
 export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): DoubleBuffer {
     const renderTargets: RenderTarget[] = [];
@@ -61,9 +43,24 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
     };
 }
 
-export function setDoubleBufferSize(doubleBuffer: DoubleBuffer, width: number, height: number) {
-    doubleBuffer.renderTargets.forEach((renderTarget) => setRenderTargetSize(renderTarget, width, height));
+export function createMRTDoubleBuffer(renderTargetOptions: MultipleRenderTargetOptions): MRTDoubleBuffer {
+    const multipleRenderTargets: MultipleRenderTarget[] = [];
+
+    for (let i = 0; i < 2; i++) {
+        const options: MultipleRenderTargetOptions = { ...renderTargetOptions, ...{ name: `mrt-double-buffer_${i}` } };
+        multipleRenderTargets.push(createMultipleRenderTargets(options));
+    }
+
+    return {
+        ...createRenderTargetBase(RenderTargetKinds.MRT, true),
+        currentReadIndex: 0,
+        multipleRenderTargets,
+    };
 }
+
+// export function setDoubleBufferSize(doubleBuffer: DoubleBuffer, width: number, height: number) {
+//     doubleBuffer.renderTargets.forEach((renderTarget) => setRenderTargetSize(renderTarget, width, height));
+// }
 
 export function getReadRenderTargetOfDoubleBuffer(doubleBuffer: DoubleBuffer) {
     return doubleBuffer.renderTargets[doubleBuffer.currentReadIndex];
@@ -73,6 +70,34 @@ export function getWriteRenderTargetOfDoubleBuffer(doubleBuffer: DoubleBuffer) {
     return doubleBuffer.renderTargets[doubleBuffer.currentReadIndex ^ 1];
 }
 
-export function swapDoubleBuffer(doubleBuffer: DoubleBuffer) {
+export function swapDoubleBuffer(doubleBuffer: DoubleBufferBase) {
     doubleBuffer.currentReadIndex = (doubleBuffer.currentReadIndex + 1) % 2;
 }
+
+export function getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    return mrtDoubleBuffer.multipleRenderTargets[mrtDoubleBuffer.currentReadIndex];
+}
+
+export function getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    return mrtDoubleBuffer.multipleRenderTargets[mrtDoubleBuffer.currentReadIndex ^ 1];
+}
+
+export function swapMRTDoubleBuffer(mrtDoubleBuffer: MRTDoubleBuffer) {
+    mrtDoubleBuffer.currentReadIndex = (mrtDoubleBuffer.currentReadIndex + 1) % 2;
+}
+
+export const updateMRTDoubleBufferAndSwap = (
+    renderer: Renderer,
+    mrtDoubleBuffer: MRTDoubleBuffer,
+    material: Material
+) => {
+    blitRenderTarget(
+        renderer,
+        getWriteMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer),
+        renderer.sharedQuad,
+        material
+    );
+    // render target に焼く
+    // swap して焼いたものを read にする
+    swapDoubleBuffer(mrtDoubleBuffer);
+};

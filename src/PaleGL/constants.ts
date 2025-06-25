@@ -39,7 +39,7 @@ export const DepthFuncTypes = {
     Greater: 4,
     NotEqual: 5,
     Gequal: 6,
-    Always: 7
+    Always: 7,
 } as const;
 
 export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
@@ -58,6 +58,8 @@ export const RenderQueueType = {
     AlphaTest: 'a',
     Skybox: 's',
     Transparent: 't',
+    AfterTone: 'at',
+    Overlay: 'ol',
 } as const;
 
 export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
@@ -88,12 +90,13 @@ export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
 export const ActorTypes = {
     Null: 0,
     Mesh: 1,
+    // UiActor: 2,
     // SkinnedMesh: 2,
     Light: 2,
     Skybox: 3,
     Camera: 4,
     // TextMesh: 5,
-    PostProcessVolume: 6,
+    PostProcessVolume: 5,
     // ObjectSpaceRaymarchMesh: 7,
     // ScreenSpaceRaymarchMesh: 8,
 } as const;
@@ -106,6 +109,8 @@ export const MeshTypes = {
     ObjectSpaceRaymarch: 2,
     ScreenSpaceRaymarch: 3,
     Text: 4,
+    // UI: 5,
+    SpriteAtlas: 6,
 } as const;
 
 export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
@@ -118,6 +123,20 @@ export const MaterialTypes = {
 } as const;
 
 export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
+
+export const UIQueueTypes = {
+    None: 0,
+    AfterTone: 1,
+    Overlay: 2,
+} as const;
+
+export type UIQueueType = (typeof UIQueueTypes)[keyof typeof UIQueueTypes];
+
+export const UIAnchorTypes = {
+    Center: 0,
+} as const;
+
+export type UIAnchorType = (typeof UIAnchorTypes)[keyof typeof UIAnchorTypes];
 
 export const CameraTypes = {
     Perspective: 0,
@@ -199,7 +218,8 @@ export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof
 export const RenderTargetKinds = {
     Default: 0,
     GBuffer: 1,
-    DoubleBuffer: 2,
+    MRT: 2,
+    DoubleBuffer: 3,
 };
 
 export type RenderTargetKind = (typeof RenderTargetKinds)[keyof typeof RenderTargetKinds];
@@ -259,6 +279,8 @@ export const AttributeNames = {
     InstanceVelocity: 'aInstanceVelocity',
     InstanceLookDirection: 'aLookDirection',
     InstanceState: 'aInstanceState',
+    // trail
+    TrailIndex: 'aTrailIndex',
 } as const;
 
 export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
@@ -364,6 +386,9 @@ export const UniformNames = {
     EmissiveMapTiling: 'uEmissiveMapTiling',
     NormalMap: 'uNormalMap',
     NormalMapTiling: 'uNormalMapTiling',
+    HeightMap: 'uHeightMap',
+    HeightMapTiling: 'uHeightMapTiling',
+    HeightScale: 'uHeightScale',
     // ao
     // AmbientOcclusionTexture: "uAmbientOcclusionTexture",
     // skinning
@@ -372,6 +397,13 @@ export const UniformNames = {
     BoneCount: 'uBoneCount',
     JointTextureColNum: 'uJointTextureColNum',
     TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
+    // vat
+    PositionMap: 'uPositionMap',
+    VelocityMap: 'uVelocityMap',
+    UpMap: 'uUpMap',
+    // VATWidth: 'uVATWidth',
+    // VATHeight: 'uVATWidth',
+    VATResolution: 'uVATResolution',
     // shadow map
     // ShadowBias: 'uShadowBias',
     // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
@@ -416,6 +448,11 @@ export const UniformNames = {
     SpotLightIntensity: 'uSpotLightIntensity',
     // renderer
     SceneTexture: 'uSceneTexture',
+    // ui
+    // UICanvas: 'uUICanvas',
+    UICharRect: 'uUICharRect',
+    UIFontSize: 'uUIFontSize',
+    UIAnchor: 'uUIAnchor',
     // post process
     SrcTexture: 'uSrcTexture',
     BlendRate: 'uBlendRate',
@@ -471,6 +508,7 @@ type ShaderModifierPragmas = (typeof ShaderModifierPragmas)[keyof typeof ShaderM
 
 export const VertexShaderModifierPragmas = {
     LOCAL_POSITION_POST_PROCESS: 'LOCAL_POSITION_POST_PROCESS',
+    VERTEX_COLOR_POST_PROCESS: 'VERTEX_COLOR_POST_PROCESS',
     INSTANCE_TRANSFORM_PRE_PROCESS: 'INSTANCE_TRANSFORM_PRE_PROCESS',
     WORLD_POSITION_POST_PROCESS: 'WORLD_POSITION_POST_PROCESS',
     VIEW_POSITION_POST_PROCESS: 'VIEW_POSITION_POST_PROCESS',
@@ -752,6 +790,17 @@ export const GLColorAttachment = {
     COLOR_ATTACHMENT7: 36071,
 } as const;
 export type GLColorAttachment = (typeof GLColorAttachment)[keyof typeof GLColorAttachment];
+
+export const GLColorAttachments = [
+    GLColorAttachment.COLOR_ATTACHMENT0,
+    GLColorAttachment.COLOR_ATTACHMENT1,
+    GLColorAttachment.COLOR_ATTACHMENT2,
+    GLColorAttachment.COLOR_ATTACHMENT3,
+    GLColorAttachment.COLOR_ATTACHMENT4,
+    GLColorAttachment.COLOR_ATTACHMENT5,
+    GLColorAttachment.COLOR_ATTACHMENT6,
+    GLColorAttachment.COLOR_ATTACHMENT7,
+];
 
 // --
 

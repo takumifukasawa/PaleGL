@@ -90,34 +90,37 @@ export type UniformBufferObjectValue =
 
 export type UniformBufferObjectBlockData = UniformBufferObjectData[];
 
-export type Uniforms = ReturnType<typeof createUniforms>;
+// export type Uniforms = ReturnType<typeof createUniforms>;
+export type Uniforms = { data: UniformsData; uniformBlocks: UniformBlocks };
 
-export function createUniforms(...dataArray: UniformsData[]) {
+type UniformBlock = {
+    blockIndex: number;
+    uniformBufferObject: UniformBufferObject;
+    data: UniformBufferObjectBlockData;
+};
+
+type UniformBlocks = UniformBlock[];
+
+export function createUniforms(...dataArray: UniformsData[]): Uniforms {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも
     const data: UniformsData = [];
-    const uniformBlocks: {
-        blockIndex: number;
-        uniformBufferObject: UniformBufferObject;
-        data: UniformBufferObjectBlockData;
-        // elements: Float32Array
-    }[] = [];
-    
-        for (let i = 0; i < dataArray.length; i++) {
-            for (let j = 0; j < dataArray[i].length; j++) {
-                const elem = dataArray[i][j];
-                const elemIndex = data.findIndex((d) => d.name === elem.name);
-                if (elemIndex < 0) {
-                    data.push(elem);
-                } else {
-                    data[elemIndex].value = elem.value;
-                }
+    const uniformBlocks: UniformBlocks = [];
+
+    for (let i = 0; i < dataArray.length; i++) {
+        for (let j = 0; j < dataArray[i].length; j++) {
+            const elem = dataArray[i][j];
+            const elemIndex = data.findIndex((d) => d.name === elem.name);
+            if (elemIndex < 0) {
+                data.push(elem);
+            } else {
+                data[elemIndex].value = elem.value;
             }
         }
-
+    }
 
     return {
-            data,
-        uniformBlocks
+        data,
+        uniformBlocks,
         // getData: () => _data,
         // getUniformBlocks: () => _uniformBlocks,
         // // methods
@@ -125,13 +128,12 @@ export function createUniforms(...dataArray: UniformsData[]) {
         // addValue,
         // setValue,
         // addUniformBlock,
-    }
-
+    };
 }
 
 export const findUniformByName = (uniforms: Uniforms, name: string) => {
     return uniforms.data.find((d) => d.name === name);
-}
+};
 
 // 新しい要素を追加
 export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value: UniformValue) => {
@@ -140,7 +142,14 @@ export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformT
         type,
         value,
     });
-}
+};
+
+export const addUniformData = (uniforms: Uniforms, uniformsData: UniformsData) => {
+    for (let i = 0; i < uniformsData.length; i++) {
+        const { name, type, value } = uniformsData[i];
+        addUniformValue(uniforms, name, type, value);
+    }
+};
 
 /// uniformの値を上書き。
 // 対象のuniformが存在する場合にのみ上書きをする。
@@ -177,14 +186,15 @@ export const setUniformValue = (uniforms: Uniforms, name: string, newValue: Unif
             data.value = newValue;
         }
     }
-}
+};
 
 // setValues() {}
 
-export const addUniformBlock = (uniforms: Uniforms, blockIndex: number, uniformBufferObject: UniformBufferObject, data: UniformBufferObjectBlockData) => {
-    // const blockIndex = uniformBufferObject.gpu.gl.getUniformBlockIndex(
-    //     this.shader.glObject,
-    // //     uniformBufferObject.blockName
-    // );
+export const addUniformBlock = (
+    uniforms: Uniforms,
+    blockIndex: number,
+    uniformBufferObject: UniformBufferObject,
+    data: UniformBufferObjectBlockData
+) => {
     uniforms.uniformBlocks.push({ blockIndex, uniformBufferObject, data });
-}
+};

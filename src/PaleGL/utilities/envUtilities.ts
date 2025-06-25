@@ -10,3 +10,7 @@ export function isDevelopment() {
 export function isNeededCompact() {
     return import.meta.env.VITE_COMPACT === 'true';
 }
+
+export function isMinifyShader() {
+    return import.meta.env.VITE_MINIFY_SHADER === "true";
+}

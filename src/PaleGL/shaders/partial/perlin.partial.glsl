@@ -1,4 +1,4 @@
-uniform float uTiling;
+// uniform float uTiling;
 uniform float uIsImproved;
 
 float smooth5(float t) {

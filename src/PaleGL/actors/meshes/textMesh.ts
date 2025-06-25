@@ -55,7 +55,7 @@ type TextMeshArgs = {
 };
 
 export const TextAlignType = {
-    Left: 0,
+    LeftTop: 0,
     Center: 1,
 } as const;
 
@@ -75,7 +75,7 @@ export function createTextMesh({
     color = createColorWhite(),
     fontTexture,
     fontAtlas,
-    align = TextAlignType.Left,
+    align = TextAlignType.LeftTop,
     characterSpacing = 0,
     castShadow,
 }: TextMeshArgs): TextMesh {

@@ -1,4 +1,5 @@
-﻿import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
+﻿import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
+import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     AttributeNames,
@@ -10,22 +11,21 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
-import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
-import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { AnimationClip, getAllKeyframesValue } from '@/PaleGL/core/animationClip.ts';
-import { Actor, ActorStartArgs, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/PaleGL/core/bone.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { Vector3 } from '@/PaleGL/math/vector3.ts';
-import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
-import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
+import { hasNodeChild } from '@/PaleGL/core/nodeBase.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { createUniforms } from '@/PaleGL/core/uniforms.ts';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
+import { createMaterial, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { cloneMat4, createMat4Identity, getMat4Position, Matrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
+import { createMatrix4FromQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromMatrix4 } from '@/PaleGL/math/rotator.ts';
-import {hasNodeChild} from "@/PaleGL/core/nodeBase.ts";
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 // import {AnimationKeyframeValue} from "@/PaleGL/core/AnimationKeyframes";
 
 export type SkinnedMeshArgs = { bones: Bone; debugBoneView?: boolean } & MeshArgs;

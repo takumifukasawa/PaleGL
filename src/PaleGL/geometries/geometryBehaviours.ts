@@ -44,5 +44,3 @@ export const getGeometryAttributeByName = (geometry: Geometry, key: string) => {
 export const getGeometryAttributeDescriptors = (geometry: Geometry) => {
     return geometry.attributes.map((attribute) => getAttributeDescriptor(attribute));
 };
-
-

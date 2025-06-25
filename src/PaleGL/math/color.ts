@@ -128,6 +128,8 @@
 //     }
 // }
 
+import { randomRange } from '@/PaleGL/utilities/mathUtilities.ts';
+
 export type Color = { e: Float32Array };
 
 export function createColor(r: number = 0, g: number = 0, b: number = 0, a: number = 1): Color {
@@ -263,4 +265,12 @@ export function createColorFromHex(hex: string) {
     const g = coord.slice(2, 4);
     const b = coord.slice(4, 6);
     return createColor(Number.parseInt(r, 16) / 255, Number.parseInt(g, 16) / 255, Number.parseInt(b, 16) / 255, 1);
+}
+
+export function getColorRange(minColor: Color, maxColor: Color) {
+    const r = randomRange(getColorR(minColor), getColorR(maxColor));
+    const g = randomRange(getColorG(minColor), getColorG(maxColor));
+    const b = randomRange(getColorB(minColor), getColorB(maxColor));
+    const a = randomRange(getColorA(minColor), getColorA(maxColor));
+    return createColor(r, g, b, a);
 }

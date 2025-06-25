@@ -18,7 +18,7 @@ export const boxGeometryEdgePairs = [
     [4, 5],
 ];
 
-export const  boxGeometrySurfacePairs = [
+export const boxGeometrySurfacePairs = [
     // front
     [0, 1, 2, 3],
     // right
@@ -146,9 +146,14 @@ export function createBoxGeometryData(size: number) {
     };
 }
 
-export type BoxGeometry = Geometry & ReturnType<typeof createBoxGeometry>;
+export type BoxGeometry = Geometry & { cornerPositions: number[][] };
 
-export function createBoxGeometry({ gpu, size = 1 }: { gpu: Gpu; size?: number }) {
+// type BoxGeometryArgs = GeometryArgs & { size: number };
+type BoxGeometryArgs = { gpu: Gpu, size: number };
+
+export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
+    const { gpu, size = 1 } = args;
+
     const s = size / 2;
     const boxPosition_0 = [-s, s, s];
     const boxPosition_1 = [-s, -s, s];

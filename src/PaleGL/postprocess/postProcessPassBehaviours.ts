@@ -1,14 +1,8 @@
 import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
-import { isCompiledMaterialShader, setMaterialUniformValue, startMaterial } from '@/PaleGL/materials/material.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
-import {
-    checkNeedsBindUniformBufferObjectToMaterial,
-    Renderer,
-    renderMesh,
-    setRendererRenderTarget,
-} from '@/PaleGL/core/renderer.ts';
+import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import {
     PostProcessSinglePass,
@@ -33,7 +27,7 @@ import {
 import {
     getScreenSpaceShadowRenderTargetTexture,
     renderScreenShadowPass,
-    setScreenSpaceShadowPassSize
+    setScreenSpaceShadowPassSize,
 } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
 import { renderSSRPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { renderVignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
@@ -46,12 +40,14 @@ import {
     setBufferVisualizerPassSize,
     updateBufferVisualizerPass,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
-import {Texture} from "@/PaleGL/core/texture.ts";
+import { Texture } from '@/PaleGL/core/texture.ts';
 
 // set size ------------------------------------
 
+export type PostProcessPass = PostProcessPassBase | PostProcessSinglePass;
+
 export type SetPostProcessPassSizeBehaviour = (
-    postProcessPass: PostProcessPassBase | PostProcessSinglePass,
+    postProcessPass: PostProcessPass,
     width: number,
     height: number
 ) => void;
@@ -84,7 +80,7 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
     );
 };
 
-const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
+export const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
     [PostProcessPassType.Bloom]: setBloomPassSize,
     [PostProcessPassType.BufferVisualizer]: setBufferVisualizerPassSize,
     [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,
@@ -109,9 +105,9 @@ export function setPostProcessPassRenderTarget(
     isLastPass: boolean
 ) {
     if (isLastPass) {
-        setRendererRenderTarget(renderer, camera.renderTarget, true);
+        setRenderTargetToRendererAndClear(renderer, camera.renderTarget, true);
     } else {
-        setRendererRenderTarget(renderer, getPostProcessPassRenderTarget(postProcessPass), true);
+        setRenderTargetToRendererAndClear(renderer, getPostProcessPassRenderTarget(postProcessPass), true);
     }
 }
 
@@ -166,13 +162,7 @@ export const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviou
     //     renderer.checkNeedsBindUniformBufferObjectToMaterial(this.material);
     // }
     postProcessPass.materials.forEach((material) => {
-        if (!isCompiledMaterialShader(material)) {
-            startMaterial(material, {
-                gpu,
-                attributeDescriptors: getGeometryAttributeDescriptors(postProcessPass.geometry),
-            });
-            checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
-        }
+        tryStartMaterial(gpu, renderer, postProcessPass.geometry, material);
     });
 
     // 渡してない場合はなにもしない. src texture がいらないとみなす

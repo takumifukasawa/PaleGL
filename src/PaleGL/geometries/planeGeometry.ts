@@ -1,6 +1,6 @@
 ﻿import { createGeometry, createTangentsAndBinormals, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { AttributeNames } from '@/PaleGL/constants';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import {Attribute, createAttribute} from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
@@ -11,17 +11,10 @@ type PlaneGeometryRawDataOptions = {
     width?: number;
     height?: number;
     offset?: Vector3;
+    divColNum?: number; // 列分割数
+    divRowNum?: number; // 行分割数
 };
 
-/**
- * NOTE: +z方向を向いている板ポリ
- * @param calculateTangent
- * @param calculateBinormal
- * @param flipUvY
- * @param width
- * @param height
- * @param offset
- */
 export function createPlaneGeometryRawData({
     calculateTangent,
     calculateBinormal,
@@ -29,60 +22,58 @@ export function createPlaneGeometryRawData({
     width = 2,
     height = 2,
     offset = createVector3Zero(),
+    divColNum = 1, // 列分割数
+    divRowNum = 1, // 行分割数
 }: PlaneGeometryRawDataOptions) {
-    // -----------------------------
-    // 0 ---- 2
-    // |    / |
-    // |   /  |
-    // |  /   |
-    // | /    |
-    // 1 ---- 3
-    // -----------------------------
+    const normal = [0, 0, 1]; // +z方向を向いている板ポリ
 
-    // prettier-ignore
-    const normalsRaw = [
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1
-    ];
+    const rawPositions: number[] = [];
+    const rawUvs: number[] = [];
+    const rawNormals: number[] = [];
+    const indices: number[] = [];
 
-    const hw = width / 2;
-    const hh = height / 2;
+    const rowCellWidth = width / divColNum; // 列分割数で割った幅
+    const colCellHeight = height / divRowNum; // 行分割数で割った高さ
 
-    // prettier-ignore
-    const positions = new Float32Array([
-        // -hw + offset.x, hh + offset.y, 0 + offset.z,
-        // -hw + offset.x, -hh + offset.y, 0 + offset.z,
-        // hw + offset.x, hh + offset.y, 0 + offset.z,
-        // hw + offset.x, -hh + offset.y, 0 + offset.z,
-        -hw + v3x(offset), hh + v3y(offset), 0 + v3z(offset),
-        -hw + v3x(offset), -hh + v3y(offset), 0 + v3z(offset),
-        hw + v3x(offset), hh + v3y(offset), 0 + v3z(offset),
-        hw + v3x(offset), -hh + v3y(offset), 0 + v3z(offset)
-    ]);
+    const rowCellUv = 1 / divColNum; // 列分割数で割ったUV幅
+    const colCellUv = 1 / divRowNum; // 行分割数で割ったUV高さ
 
-    // prettier-ignore
-    const uvs = new Float32Array(flipUvY ?
-        [
-            0, 0,
-            0, 1,
-            1, 0,
-            1, 1,
-        ] : [
-            0, 1,
-            0, 0,
-            1, 1,
-            1, 0,
-        ]);
+    for (let y = 0; y < divRowNum + 1; y++) {
+        for (let x = 0; x < divColNum + 1; x++) {
+            const posX = rowCellWidth * x - width / 2 + v3x(offset);
+            const posY = colCellHeight * y - height / 2 + v3y(offset);
+            rawPositions.push(posX, posY, v3z(offset));
 
-    const normals = new Float32Array(normalsRaw);
+            // UV座標計算
+            const uvX = rowCellUv * x; // 0から1の範囲
+            // flipUvYがtrueならY軸を反転
+            const uvY = flipUvY ? 1 - colCellUv * y : colCellUv * y; // 0から1の範囲
+            rawUvs.push(uvX, uvY);
+
+            // 法線ベクトルを追加
+            rawNormals.push(...normal);
+        }
+    }
+
+    // インデックス計算
+    for (let y = 0; y < divRowNum; y++) {
+        for (let x = 0; x < divColNum; x++) {
+            const leftBottom = y * (divColNum + 1) + x; // 左下
+            const rightBottom = leftBottom + 1; // 右下
+            const rightTop = rightBottom + (divColNum + 1); // 右上
+            const leftTop = rightTop - 1; // 左上
+
+            indices.push(leftBottom, rightBottom, rightTop);
+            indices.push(rightTop, leftTop, leftBottom);
+        }
+    }
 
     let tangents: Float32Array = new Float32Array();
     let binormals: Float32Array = new Float32Array();
 
     if (calculateTangent || calculateBinormal) {
-        const tbs = createTangentsAndBinormals(normalsRaw);
+        // const tbs = createTangentsAndBinormals(rawPositions);
+        const tbs = createTangentsAndBinormals(rawNormals);
         if (calculateTangent) {
             tangents = new Float32Array(tbs.tangents);
         }
@@ -91,55 +82,33 @@ export function createPlaneGeometryRawData({
         }
     }
 
-    // prettier-ignore
-    const indices = [
-        0, 1, 2,
-        2, 1, 3
-    ];
-
     return {
-        positions,
-        uvs,
-        normals,
+        positions: new Float32Array(rawPositions),
+        uvs: new Float32Array(rawUvs),
+        normals: new Float32Array(rawNormals),
         tangents,
         binormals,
         indices,
-        drawCount: 6,
+        drawCount: indices.length,
     };
 }
 
 export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
-    // -----------------------------
-    // 0 ---- 2
-    // |    / |
-    // |   /  |
-    // |  /   |
-    // | /    |
-    // 1 ---- 3
-    // -----------------------------
-
     const rawData = createPlaneGeometryRawData(args);
 
-    // const normals = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
-    //const { tangents, binormals } = Geometry.createTangentsAndBinormals(normals);
-
-    // TODO: uniqでfilter
-    const attributes = [
+    const attributes: Attribute[] = [
         createAttribute({
             name: AttributeNames.Position,
-            // data: new Float32Array([-1, 1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0]),
             data: rawData.positions,
             size: 3,
         }),
         createAttribute({
             name: AttributeNames.Uv,
-            // data: new Float32Array([0, 1, 0, 0, 1, 1, 1, 0]),
             data: rawData.uvs,
             size: 2,
         }),
         createAttribute({
             name: AttributeNames.Normal,
-            // data: new Float32Array(normals),
             data: rawData.normals,
             size: 3,
         }),
@@ -149,7 +118,6 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
         attributes.push(
             createAttribute({
                 name: AttributeNames.Tangent,
-                // data: new Float32Array(tangents),
                 data: rawData.tangents,
                 size: 3,
             })
@@ -159,7 +127,6 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
         attributes.push(
             createAttribute({
                 name: AttributeNames.Binormal,
-                // data: new Float32Array(binormals),
                 data: rawData.binormals,
                 size: 3,
             })
@@ -168,12 +135,11 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
 
     return {
         attributes,
-        indices: [0, 1, 2, 2, 1, 3],
-        drawCount: 6,
+        indices: rawData.indices,
+        drawCount: rawData.drawCount,
     };
 }
 
-// export type PlaneGeometry = Geometry & ReturnType<typeof createPlaneGeometry>;
 export type PlaneGeometry = Geometry;
 
 export function createPlaneGeometry({
@@ -181,7 +147,7 @@ export function createPlaneGeometry({
     ...args
 }: {
     gpu: Gpu;
-} & PlaneGeometryRawDataOptions) {
+} & PlaneGeometryRawDataOptions): Geometry {
     const { attributes, indices, drawCount } = createPlaneGeometryData(args);
 
     const geometry = createGeometry({
@@ -191,5 +157,5 @@ export function createPlaneGeometry({
         drawCount,
     });
 
-    return { ...geometry };
+    return geometry;
 }

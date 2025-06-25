@@ -47,14 +47,17 @@ void main() {
 
     vec4 resultColor = baseColor;
 
-    #include ./partial/alpha-test-fragment.partial.glsl
+    #include <alpha_test_f>
 
-    baseColor = gamma(baseColor);
+    baseColor = gamma(baseColor); 
 
     outGBufferA = EncodeGBufferA(vec3(0.));
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(baseColor.rgb);
-    
+   
+    // for debug 
+    // outGBufferD = EncodeGBufferD(worldNormal.rgb);
+
     #pragma AFTER_OUT
 }

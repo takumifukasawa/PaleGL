@@ -4,6 +4,7 @@
 
 #pragma APPEND_ATTRIBUTES
 
+#include <common>
 #include <lighting>
 #include <ub>
 #include <vcolor_vh>
@@ -27,9 +28,22 @@ uniform vec4 uEmissiveColor;
 uniform float uEmissiveMixer;
 #endif
 
+#ifdef USE_VAT
+uniform sampler2D uVelocityMap;
+uniform sampler2D uPositionMap;
+uniform sampler2D uUpMap;
+uniform vec2 uVATResolution;
+#endif
+
 #ifdef USE_NORMAL_MAP
 out vec3 vTangent;
 out vec3 vBinormal;
+#endif
+
+#ifdef USE_HEIGHT_MAP
+uniform sampler2D uHeightMap;
+uniform vec4 uHeightMapTiling;
+uniform float uHeightScale;
 #endif
 
 #pragma APPEND_UNIFORMS
@@ -110,7 +124,20 @@ mat4 getScalingMat(vec3 s) {
     );
 }
 
-mat4 getLookAtMat(vec3 lookAt, vec3 p) {
+mat4 getLookMat(vec3 front, vec3 up) {
+    // vec3 z = -normalize(front);
+    vec3 z = normalize(front); // こっちでいいはず？
+    vec3 y = up;
+    vec3 x = cross(y, z);
+    return mat4(
+        x.x, x.y, x.z, 0.,
+        y.x, y.y, y.z, 0.,
+        z.x, z.y, z.z, 0.,
+        0., 0., 0., 1.
+    );
+}
+
+mat4 getLookAtPMat(vec3 lookAt, vec3 p) {
     vec3 f = mix(
         vec3(0., 1., 0.),// fallback
         normalize(lookAt - p),
@@ -126,7 +153,16 @@ mat4 getLookAtMat(vec3 lookAt, vec3 p) {
     );
 }
 
-// start skinning ---------------------------------------------------
+mat4 getIdentityMat() {
+    return mat4(
+        1., 0., 0., 0.,
+        0., 1., 0., 0.,
+        0., 0., 1., 0.,
+        0., 0., 0., 1.
+    );
+}
+
+// --- start skinning
 
 // #ifdef USE_SKINNING
 #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
@@ -202,7 +238,7 @@ mat4 getJointMatrixGPUSkinning(
 }
 #endif
 
-// end skinning ---------------------------------------------------
+// --- end skinning
 
 void main() {
 
@@ -210,7 +246,7 @@ void main() {
 
     vec4 localPosition = vec4(aPosition, 1.);
 
-    // start calc skinning ---------------------------------------------------
+    // --- start calc skinning
     #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
         mat4 skinMatrix = mat4(
             1., 0., 0., 0.,
@@ -247,7 +283,7 @@ void main() {
         #endif
         localPosition = skinMatrix * localPosition;
     #endif
-    // end calc skinning ---------------------------------------------------
+    // --- end calc skinning
 
     #pragma LOCAL_POSITION_POST_PROCESS
 
@@ -256,9 +292,14 @@ void main() {
     vLocalPosition = aPosition;
 
     mat4 worldMatrix = uWorldMatrix;
-    
+
 #ifdef USE_INSTANCING
-    mat4 instanceTranslation = getTranslationMat(aInstancePosition);
+    float fid = float(gl_InstanceID);
+    vInstanceId = fid;
+    
+    mat4 instanceTranslation = getIdentityMat();
+    // mat4 instanceRotation = getIdentityMat();
+
     mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
     mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
     mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
@@ -267,19 +308,48 @@ void main() {
         instanceRotationY *
         instanceRotationX *
         instanceRotationZ;
-    
+
+    // --- vat
+
+    #ifdef USE_VAT
+        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        #ifdef USE_TRAIL
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                aTrailIndex
+            );
+            vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+            instanceRotation = getLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
+        #else
+            ivec2 vatUv = ivec2(
+                int(mod(fid, uVATResolution.x)),
+                int(floor(fid / uVATResolution.y))
+            );
+            vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
+            instanceTranslation = getTranslationMat(vatPosition);
+        #endif
+    #else
+        instanceTranslation = getTranslationMat(aInstancePosition);
+    #endif
+
+    // --- instance look direction
+    // TODO: vat velocity方式に統一したい
+
     // instanceごとのvelocityが必要なことに注意
     // TODO: 追従率をuniformで渡したい
     #ifdef USE_INSTANCE_LOOK_DIRECTION
         // pattern_1: 速度ベクトルを使って回転
-        instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+        instanceRotation = getLookAtPMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
         // pattern_2: 速度ベクトルをnormalizeして使って回転
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
         // pattern_3: look direction
-        // instanceRotation = getLookAtMat(aInstancePosition + aLookDirection, aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + aLookDirection, aInstancePosition);
         // pattern_4: blend
         // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
-        // instanceRotation = getLookAtMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
+        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
         // // for debug: 回転させない
         // instanceRotation = mat4(
         //     1., 0., 0., 0.,
@@ -289,30 +359,20 @@ void main() {
         //     
         // );
     #endif
-   
-    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-   
-    // TODO: actor自体のworldMatirxは使わない方がいい
-    // TODO: もしくはちゃんとした順番をかける(scale -> instance scale -> rotation -> ...)
-    worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
     
-    vInstanceId = float(gl_InstanceID);
+    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+
+    worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 
     // TODO:
     // vInstanceState = aInstanceState;
-    vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #ifdef USE_VERTEX_COLOR
+        vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    #endif
 #endif
 
-    vec4 worldPosition = worldMatrix * localPosition;
+    // --- normal matrix
 
-    #pragma WORLD_POSITION_POST_PROCESS
-
-    vWorldPosition = worldPosition.xyz;
-    vInverseWorldMatrix = inverse(worldMatrix);
-    
-    vWorldMatrix = worldMatrix;
-
-    // calc normal matrix
     mat3 normalMatrix;
     #ifdef USE_NORMAL_MAP
         #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
@@ -347,26 +407,24 @@ void main() {
         #endif
         vNormal = normalMatrix * aNormal;
     #endif
-
-    // // CUSTOM_CHEAP
-    // #ifdef USE_INSTANCING
-    //     normalMatrix = mat3(transpose(inverse(worldMatrix)));
-    // #else
-    //     normalMatrix = mat3(uNormalMatrix);
-    // #endif
-    // vNormal = normalMatrix * aNormal;
-
-// NOTE: shader minify の時に p * v * w を直接入れないとなぜか掛ける順番がおかしくなる
-//     vec4 viewPosition = uViewMatrix * worldPosition;
-//  
-//     #pragma VIEW_POSITION_POST_PROCESS
-//  
-//     #pragma OUT_CLIP_POSITION_PRE_PROCESS
-//     
-//     gl_Position = uProjectionMatrix * viewPosition;
-
-    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
     
+    // --- height map
+
+    vec4 worldPosition;
+#ifdef USE_HEIGHT_MAP
+    // height map
+    vec2 heightMapUv = aUv * uHeightMapTiling.xy + uHeightMapTiling.zw;
+    float height = texture(uHeightMap, heightMapUv).r * uHeightScale;
+    // worldPosition = worldMatrix * (localPosition + vec4(vNormal.xyz * height, 0.));
+    worldPosition = worldMatrix * (localPosition + vec4(aNormal.xyz * height, 0.));
+#else
+    worldPosition = worldMatrix * localPosition;
+#endif
+
+    #pragma WORLD_POSITION_POST_PROCESS
+
+    // --- vertex color
+
 #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
     // vVertexColor = aInstanceVertexColor;
     vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
@@ -377,5 +435,13 @@ void main() {
     #endif
 #endif
 
+    // --- end
+
+    vWorldMatrix = worldMatrix;
+    vWorldPosition = worldPosition.xyz;
+    vInverseWorldMatrix = inverse(worldMatrix);
+
+    gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
+ 
     #pragma END_MAIN
 }

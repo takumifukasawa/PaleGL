@@ -35,11 +35,11 @@ void main() {
     // NOTE: テクスチャはhdrじゃなくてsrgb想定 
     envMapColor = gamma(envMapColor); 
         
-    // outGBufferA = vec4(envMapColor, 1.);
-    // outGBufferB = vec4(0., 0., 0., 1.);
-    // outGBufferC = vec4(0., 0., 0., 1.);
     outGBufferA = EncodeGBufferA(envMapColor);
     outGBufferB = EncodeGBufferB(vec3(0.), uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(vec3(0.));
+    
+    // for debug
+    // outGBufferA = EncodeGBufferD(N);
 }

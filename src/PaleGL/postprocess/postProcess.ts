@@ -1,5 +1,5 @@
 ﻿import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import {getDummyBlackTexture, Gpu} from '@/PaleGL/core/gpu.ts';
 import {
     applyLightShadowMapUniformValues,
     LightActors,
@@ -8,7 +8,7 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import {PostProcessPassType, UniformNames} from '@/PaleGL/constants.ts';
+import { PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -36,6 +36,7 @@ type PostProcessRenderArgs = {
     time: number;
     isCameraLastPass: boolean;
     lightActors?: LightActors;
+    onAfterRenderPass?: (pass: PostProcessPassBase) => void;
 };
 
 export type PostProcess = {
@@ -85,7 +86,10 @@ export function hasPostProcessPassEnabled(postProcess: PostProcess) {
     return false;
 }
 
-export function getPostProcessPassByType<T extends PostProcessPassBase>(postProcess: PostProcess, passType: PostProcessPassType) {
+export function getPostProcessPassByType<T extends PostProcessPassBase>(
+    postProcess: PostProcess,
+    passType: PostProcessPassType
+) {
     for (let i = 0; i < postProcess.passes.length; i++) {
         if (postProcess.passes[i].type === passType) {
             return postProcess.passes[i] as T;
@@ -222,7 +226,7 @@ export function renderPass({
         targetCamera,
         // time,
         lightActors,
-        fallbackTextureBlack: gpu.dummyTextureBlack,
+        fallbackTextureBlack: getDummyBlackTexture(gpu),
     });
 
     //
@@ -255,6 +259,7 @@ export function renderPostProcess(
         time,
         isCameraLastPass,
         lightActors,
+        onAfterRenderPass,
     }: PostProcessRenderArgs
 ) {
     // if (!sceneRenderTarget) {
@@ -307,5 +312,9 @@ export function renderPostProcess(
         });
 
         prevRenderTarget = getPostProcessPassRenderTarget(pass);
+
+        if (onAfterRenderPass) {
+            onAfterRenderPass(pass);
+        }
     });
 }

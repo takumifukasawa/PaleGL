@@ -1,7 +1,7 @@
 layout (std140) uniform ubCommon {
     float uTime; // engine update time
     float uDeltaTime; // engine update delta time
-    vec4 uViewport; // x: width, y: height, z: aspect(wid/hei),  w: 0
+    vec4 uViewport; // x: width, y: height, z: aspect(wid/hei), w: 0
 };
 
 layout (std140) uniform ubTransformations {

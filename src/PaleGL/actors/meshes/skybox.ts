@@ -3,73 +3,72 @@ import {
     UniformTypes,
     PrimitiveTypes,
     ActorTypes,
-    AttributeNames,
     UniformNames,
     ShadingModelIds,
-    UniformBlockNames, RenderQueueType,
+    UniformBlockNames,
+    RenderQueueType,
+    FaceSide,
 } from '@/PaleGL/constants.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
-import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-// import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createFillVector3 } from '@/PaleGL/math/vector3.ts';
+import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 
-// 法線が内側を向いた単位立方体
-const skyboxGeometryObjText: string = `
-# Blender 3.3.1
-# www.blender.org
-mtllib skybox-cube.mtl
-v -1.000000 -1.000000 1.000000
-v -1.000000 1.000000 1.000000
-v -1.000000 -1.000000 -1.000000
-v -1.000000 1.000000 -1.000000
-v 1.000000 -1.000000 1.000000
-v 1.000000 1.000000 1.000000
-v 1.000000 -1.000000 -1.000000
-v 1.000000 1.000000 -1.000000
-vn 0.5774 0.5774 0.5774
-vn 0.5774 -0.5774 -0.5774
-vn 0.5774 0.5774 -0.5774
-vn -0.5774 0.5774 0.5774
-vn 0.5774 -0.5774 0.5774
-vn -0.5774 0.5774 -0.5774
-vn -0.5774 -0.5774 0.5774
-vn -0.5774 -0.5774 -0.5774
-vt 0.375000 0.000000
-vt 0.375000 1.000000
-vt 0.125000 0.750000
-vt 0.625000 0.000000
-vt 0.625000 1.000000
-vt 0.875000 0.750000
-vt 0.125000 0.500000
-vt 0.375000 0.250000
-vt 0.625000 0.250000
-vt 0.875000 0.500000
-vt 0.375000 0.750000
-vt 0.625000 0.750000
-vt 0.375000 0.500000
-vt 0.625000 0.500000
-s 1
-f 3/8/1 2/4/2 1/1/3
-f 7/13/4 4/9/5 3/8/1
-f 5/11/6 8/14/7 7/13/4
-f 1/2/3 6/12/8 5/11/6
-f 1/3/3 7/13/4 3/7/1
-f 6/12/8 4/10/5 8/14/7
-f 3/8/1 4/9/5 2/4/2
-f 7/13/4 8/14/7 4/9/5
-f 5/11/6 6/12/8 8/14/7
-f 1/2/3 2/5/2 6/12/8
-f 1/3/3 5/11/6 7/13/4
-f 6/12/8 2/6/2 4/10/5
-`;
+// tmp
+// // 法線が内側を向いた単位立方体
+// const skyboxGeometryObjText: string = `
+// # Blender 3.3.1
+// # www.blender.org
+// mtllib skybox-cube.mtl
+// v -1.000000 -1.000000 1.000000
+// v -1.000000 1.000000 1.000000
+// v -1.000000 -1.000000 -1.000000
+// v -1.000000 1.000000 -1.000000
+// v 1.000000 -1.000000 1.000000
+// v 1.000000 1.000000 1.000000
+// v 1.000000 -1.000000 -1.000000
+// v 1.000000 1.000000 -1.000000
+// vn 0.5774 0.5774 0.5774
+// vn 0.5774 -0.5774 -0.5774
+// vn 0.5774 0.5774 -0.5774
+// vn -0.5774 0.5774 0.5774
+// vn 0.5774 -0.5774 0.5774
+// vn -0.5774 0.5774 -0.5774
+// vn -0.5774 -0.5774 0.5774
+// vn -0.5774 -0.5774 -0.5774
+// vt 0.375000 0.000000
+// vt 0.375000 1.000000
+// vt 0.125000 0.750000
+// vt 0.625000 0.000000
+// vt 0.625000 1.000000
+// vt 0.875000 0.750000
+// vt 0.125000 0.500000
+// vt 0.375000 0.250000
+// vt 0.625000 0.250000
+// vt 0.875000 0.500000
+// vt 0.375000 0.750000
+// vt 0.625000 0.750000
+// vt 0.375000 0.500000
+// vt 0.625000 0.500000
+// s 1
+// f 3/8/1 2/4/2 1/1/3
+// f 7/13/4 4/9/5 3/8/1
+// f 5/11/6 8/14/7 7/13/4
+// f 1/2/3 6/12/8 5/11/6
+// f 1/3/3 7/13/4 3/7/1
+// f 6/12/8 4/10/5 8/14/7
+// f 3/8/1 4/9/5 2/4/2
+// f 7/13/4 8/14/7 4/9/5
+// f 5/11/6 6/12/8 8/14/7
+// f 1/2/3 2/5/2 6/12/8
+// f 1/3/3 5/11/6 7/13/4
+// f 6/12/8 2/6/2 4/10/5
+// `;
 
 type SkyboxArgs = {
     gpu: Gpu;
@@ -96,28 +95,34 @@ export function createSkybox({
     rotationOffset = 0,
     renderMesh = true,
 }: SkyboxArgs): Skybox {
-    const skyboxObjData = parseObj(skyboxGeometryObjText);
-    const geometry = createGeometry({
+    // const skyboxObjData = parseObj(skyboxGeometryObjText);
+    // const geometry = createGeometry({
+    //     gpu,
+    //     attributes: [
+    //         createAttribute({
+    //             name: AttributeNames.Position,
+    //             data: new Float32Array(skyboxObjData.positions),
+    //             size: 3,
+    //         }),
+    //         createAttribute({
+    //             name: AttributeNames.Uv,
+    //             data: new Float32Array(skyboxObjData.uvs),
+    //             size: 2,
+    //         }),
+    //         createAttribute({
+    //             name: AttributeNames.Normal,
+    //             data: new Float32Array(skyboxObjData.normals),
+    //             size: 3,
+    //         }),
+    //     ],
+    //     indices: skyboxObjData.indices,
+    //     drawCount: skyboxObjData.indices.length,
+    // });
+    const geometry = createSphereGeometry({
         gpu,
-        attributes: [
-            createAttribute({
-                name: AttributeNames.Position,
-                data: new Float32Array(skyboxObjData.positions),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv,
-                data: new Float32Array(skyboxObjData.uvs),
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Normal,
-                data: new Float32Array(skyboxObjData.normals),
-                size: 3,
-            }),
-        ],
-        indices: skyboxObjData.indices,
-        drawCount: skyboxObjData.indices.length,
+        widthSegments: 32,
+        heightSegments: 32,
+        invertNormals: true,
     });
 
     const material = createMaterial({
@@ -130,6 +135,7 @@ export function createSkybox({
         depthTest: true,
         depthWrite: false,
         useEnvMap: true,
+        faceSide: FaceSide.Back,
         uniforms: [
             {
                 name: UniformNames.CubeTexture,

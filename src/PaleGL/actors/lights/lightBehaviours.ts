@@ -41,3 +41,7 @@ export const updateShadowCamera = (light: Light) => {
     );
     light.shadowMapProjectionMatrix = multiplyMat4Array(textureMatrix, cloneMat4(light.lightViewProjectionMatrix));
 };
+
+export const needsCastShadowOfLight = (light: Light) => {
+    return !!light.shadowCamera && light.castShadow && !!light.shadowMap;
+};

@@ -26,14 +26,11 @@ import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/
 import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
     createMaterial,
-    isCompiledMaterialShader,
     Material,
     setMaterialUniformValue,
-    startMaterial,
 } from '@/PaleGL/materials/material.ts';
-import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { renderMesh, setRendererRenderTarget } from '@/PaleGL/core/renderer.ts';
+import { renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import {
     renderPostProcessSinglePassBehaviour,
     setPostProcessSinglePassSizeBehaviour,
@@ -232,20 +229,15 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
     const volumetricLightPass = postProcessPass as VolumetricLightPass;
 
     const { gpu, renderer } = options;
-
-    if (
-        !isCompiledMaterialShader(volumetricLightPass.spotLightFrustumMaterial) &&
-        volumetricLightPass.spotLights.length > 0
-    ) {
-        // TODO: shadow map ないケースがあるはず
-        const geo = volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry;
-        startMaterial(volumetricLightPass.spotLightFrustumMaterial, {
+    
+        tryStartMaterial(
             gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(geo),
-        });
-    }
+            renderer,
+            volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry,
+            volumetricLightPass.spotLightFrustumMaterial
+        );
 
-    setRendererRenderTarget(renderer, volumetricLightPass.renderTargetSpotLightFrustum, false, true);
+    setRenderTargetToRendererAndClear(renderer, volumetricLightPass.renderTargetSpotLightFrustum, false, true);
 
     setMaterialUniformValue(
         volumetricLightPass.spotLightFrustumMaterial,

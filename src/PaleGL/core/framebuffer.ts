@@ -1,53 +1,4 @@
-﻿// import { GlObject } from '@/PaleGL/core/glObject.ts';
-// import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
-// import { Gpu } from '@/PaleGL/core/Gpu';
-// 
-// export class Framebuffer extends GlObject {
-//     _framebuffer: WebGLFramebuffer;
-//     _drawBufferList: GLColorAttachment[] = [];
-//     _gpu;
-// 
-//     get drawBufferList() {
-//         return this._drawBufferList;
-//     }
-// 
-//     get glObject() {
-//         return this._framebuffer;
-//     }
-// 
-//     get hasMultipleDrawBuffers() {
-//         return this._drawBufferList.length >= 2;
-//     }
-// 
-//     registerDrawBuffer(drawBufferName: GLColorAttachment) {
-//         this._drawBufferList.push(drawBufferName);
-//     }
-// 
-//     constructor({ gpu }: { gpu: Gpu }) {
-//         super();
-// 
-//         this._gpu = gpu;
-//         const gl = this._gpu.gl;
-// 
-//         const fb = gl.createFramebuffer()!;
-//         // if (!fb) {
-//         //     console.error('invalid framebuffer');
-//         // }
-//         this._framebuffer = fb;
-//     }
-// 
-//     bind() {
-//         const gl = this._gpu.gl;
-//         gl.bindFramebuffer(GL_FRAMEBUFFER, this._framebuffer);
-//     }
-// 
-//     unbind() {
-//         const gl = this._gpu.gl;
-//         gl.bindFramebuffer(GL_FRAMEBUFFER, null);
-//     }
-// }
-
-
+﻿
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -71,14 +22,6 @@ export function createFramebuffer({ gpu }: { gpu: Gpu }): Framebuffer {
         drawBufferList
     }
 }
-
-// get drawBufferList() {
-//     return this._drawBufferList;
-// }
-
-// get glObject() {
-//     return this._framebuffer;
-// }
 
 export function hasFramebufferMultipleDrawBuffers(framebuffer: Framebuffer) {
     return framebuffer.drawBufferList.length >= 2;

@@ -1,5 +1,6 @@
 ﻿#pragma DEFINES
 
+#include <common>
 #include <lighting>
 #include <ub>
 #include <rand>
