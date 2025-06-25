@@ -5,16 +5,6 @@ import {
     EffectTextureSystem,
     renderEffectTexture,
 } from '@/PaleGL/core/effectTexture.ts';
-import {
-    RenderTargetTypes,
-    TextureFilterType,
-    TextureFilterTypes,
-    TextureWrapTypes,
-    UniformNames,
-    UniformTypes,
-} from '@/PaleGL/constants.ts';
-import { createMaterial, Material, setMaterialUniformValue, startMaterial } from '@/PaleGL/materials/material.ts';
-import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';

@@ -149,7 +149,7 @@ export function createBoxGeometryData(size: number) {
 export type BoxGeometry = Geometry & { cornerPositions: number[][] };
 
 // type BoxGeometryArgs = GeometryArgs & { size: number };
-type BoxGeometryArgs = { gpu: Gpu, size: number };
+type BoxGeometryArgs = { gpu: Gpu, size?: number };
 
 export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
     const { gpu, size = 1 } = args;

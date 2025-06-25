@@ -1,24 +1,21 @@
-import { ActorType, ActorTypes } from '@/PaleGL/constants.ts';
+import { TimelinePropertyValue } from '@/Marionetter/types';
 import {
     Actor,
     ActorFixedUpdateArgs,
     ActorLastUpdateArgs,
     ActorStartArgs,
     ActorUpdateArgs,
-    // SetSizeActorFunc,
 } from '@/PaleGL/actors/actor.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
+import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
+import { ActorType, ActorTypes } from '@/PaleGL/constants.ts';
+import { updateAnimator } from '@/PaleGL/core/animator.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
-import { updateAnimator } from '@/PaleGL/core/animator.ts';
-import { TimelinePropertyValue } from '@/Marionetter/types';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import { updateAnimator } from '@/PaleGL/core/animator.ts';
-import {TimelinePropertyValue} from "@/Marionetter/types";
 
 // try start actor -------------------------------------------------------
 

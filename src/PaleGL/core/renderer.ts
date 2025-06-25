@@ -93,7 +93,7 @@ import {
 } from '@/PaleGL/core/uniforms.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import { createPlaneGeometry, PlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import {
     isCompiledMaterialShader,
     Material,
@@ -112,9 +112,11 @@ import {
 } from '@/PaleGL/math/matrix4.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import {
-    cloneVector3, createVector3,
+    cloneVector3,
     createVector3Zero,
-    getVector3Magnitude, negateVector3, normalizeVector3,
+    getVector3Magnitude,
+    negateVector3,
+    normalizeVector3,
     subVectorsV3,
     subVectorsV3Ref,
     Vector3,
@@ -243,6 +245,7 @@ export type Renderer = {
     stats: Stats | null;
     scenePostProcess: PostProcess;
     screenQuadCamera: Camera;
+    sharedQuad: Geometry;
     depthPrePassRenderTarget: RenderTarget;
     gBufferRenderTargets: GBufferRenderTargets;
     afterDeferredShadingRenderTarget: RenderTarget;
