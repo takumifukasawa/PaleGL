@@ -114,7 +114,7 @@ import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import {
     cloneVector3, createVector3,
     createVector3Zero,
-    getVector3Magnitude,
+    getVector3Magnitude, negateVector3, normalizeVector3,
     subVectorsV3,
     subVectorsV3Ref,
     Vector3,

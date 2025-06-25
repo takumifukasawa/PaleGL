@@ -76,11 +76,9 @@ export function loadSound(glslSoundWrapper: GLSLSoundWrapper) {
 
 export function playSound(glslSoundWrapper: GLSLSoundWrapper, args: { volume?: number; time?: number; reload?: boolean } = {}) {
     const { volume = 1, time = 0, reload = false } = args;
-    console.log(`[glslSoundWrapper.play] play time: ${time}`);
+    console.log(`[glslSoundWrapper.play] args - volume: ${volume}, time: ${time}, reload: ${reload}`);
     if (reload) {
         stop();
-        // 120BPM x 64measure = 128sec
-        // 120BPM x 72measure = 144sec
         loadSound(glslSoundWrapper);
     }
     glslSoundWrapper.isPlaying = true;

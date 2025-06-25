@@ -184,7 +184,7 @@ export function createPlayer(
 
 // 再生するときはここを呼ぶ
 function playMarionetter(player: Player, time: number) {
-    console.log(`[marionetter.playMarionetter] time: ${time}`);
+    console.log(`[marionetter.playMarionetter] time: ${time}, has sound: ${!!player.glslSoundWrapper}`);
     if (player.glslSoundWrapper) {
         playSound(player.glslSoundWrapper, { time });
     }
