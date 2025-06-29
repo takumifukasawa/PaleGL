@@ -586,13 +586,13 @@ export const startMaterial = (
         // console.log(_fragmentShader, shaderDefineOptions, _fragmentShaderModifier, _rawFragmentShader);
     }
 
-    material.shader = createShader({
+    material.shader = createShader(
         gpu,
         // vertexShader: _vertexShader,
-        vertexShader: material.rawVertexShader,
+        material.rawVertexShader,
         // fragmentShader: _fragmentShader
-        fragmentShader: material.rawFragmentShader,
-    });
+        material.rawFragmentShader
+    );
 
     // for debug
     // console.log(`[material.start] shader`, _shader);

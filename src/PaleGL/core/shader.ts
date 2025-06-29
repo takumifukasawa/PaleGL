@@ -2,11 +2,9 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { GL_FRAGMENT_SHADER, GL_SEPARATE_ATTRIBS, GL_VERTEX_SHADER } from '@/PaleGL/constants.ts';
 
-type ShaderParams = { gpu: Gpu; vertexShader: string; fragmentShader: string; transformFeedbackVaryings?: string[] };
-
 export type Shader = GLObjectBase<WebGLProgram>;
 
-export function createShader({ gpu, vertexShader, fragmentShader, transformFeedbackVaryings }: ShaderParams) {
+export const createShader = (gpu: Gpu, vertexShader: string, fragmentShader: string, transformFeedbackVaryings?: string[]) => {
     const { gl } = gpu;
     const program = gl.createProgram()!;
 
