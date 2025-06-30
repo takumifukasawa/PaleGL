@@ -18,17 +18,10 @@ export type AnimationClip = {
     fps: number;
 };
 
-export function createAnimationClip({
-    name,
-    keyframes,
-}: {
-    name: string;
-    // start?: number,
-    // end?: number,
-    // frames: number,
-    // frameCount?: number,
-    keyframes: AnimationKeyframes[];
-}) {
+export function createAnimationClip(
+    name: string,
+    keyframes: AnimationKeyframes[]
+) {
     const frameCount: number = Math.max(...keyframes.map((keyframe) => keyframe.frameCount));
     const currentTime: number = 0;
     const currentFrame: number = 0;

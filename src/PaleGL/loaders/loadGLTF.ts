@@ -702,10 +702,10 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                 return animationKeyframes;
                 // animationClip.addAnimationKeyframes(animationKeyframes);
             });
-            const animationClip = createAnimationClip({
-                name: animation.name,
-                keyframes,
-            });
+            const animationClip = createAnimationClip(
+                animation.name,
+                keyframes
+            );
             return animationClip;
         });
     };
