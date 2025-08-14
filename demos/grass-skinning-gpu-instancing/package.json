@@ -1,0 +1,8 @@
+{
+  "name": "PaleGL",
+  "version": "0.0.1",
+  "scripts": {
+    "watch": "node bundler.js"
+  },
+  "author": "takumifukasawa"
+}
