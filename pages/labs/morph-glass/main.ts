@@ -1,3 +1,25 @@
+import { Actor, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
+import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import {
+    ActorTypes,
+    BlendTypes,
+    DepthFuncTypes,
+    FaceSide, FragmentShaderModifierPragmas,
+    RenderQueueType,
+    RenderTargetTypes,
+    TextureDepthPrecisionType,
+    UniformNames,
+    // FragmentShaderModifierPragmas,
+    UniformTypes,
+} from '@/PaleGL/constants';
+import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import {
     createEngine,
     runEngine,
@@ -8,67 +30,195 @@ import {
     setSceneToEngine,
     startEngine,
 } from '@/PaleGL/core/engine';
-import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer';
 import { createGPU } from '@/PaleGL/core/gpu';
-import { createRenderTarget } from '@/PaleGL/core/renderTarget';
-import { addActorToScene, createScene } from '@/PaleGL/core/scene';
 import {
     createOrbitCameraController,
     fixedUpdateOrbitCameraController,
     setOrbitCameraControllerDelta,
     startOrbitCameraController,
 } from '@/PaleGL/core/orbitCameraController';
-import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
-import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
-import {createColor, createColorBlack, createColorWhite} from '@/PaleGL/math/color';
-import { v2o } from '@/PaleGL/math/vector2';
-import { createFillVector3, createVector3 } from '@/PaleGL/math/vector3';
-import { createVector4 } from '@/PaleGL/math/vector4';
-import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualizerPass';
-import { createTouchInputController } from '@/PaleGL/inputs/touchInputController';
-import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController';
-import {
-    RenderTargetTypes,
-    UniformNames,
-    TextureDepthPrecisionType,
-    ActorTypes,
-    RenderQueueType,
-    BlendTypes,
-    // FragmentShaderModifierPragmas,
-    UniformTypes,
-    DepthFuncTypes,
-    FaceSide,
-    // RenderQueueType,
-} from '@/PaleGL/constants';
-import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
-import { Actor, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { createRenderer, renderRenderer } from '@/PaleGL/core/renderer';
+import { createRenderTarget } from '@/PaleGL/core/renderTarget';
+import { addActorToScene, createScene } from '@/PaleGL/core/scene';
+import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
+import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import {
     setInputControllerSize,
     startInputController,
     updateInputController,
 } from '@/PaleGL/inputs/inputControllerBehaviours.ts';
-import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { setCameraClearColor, setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { setLookAtPosition, setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
-import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController';
+import { createTouchInputController } from '@/PaleGL/inputs/touchInputController';
+import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
+import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
+import { createColor, createColorBlack, createColorWhite } from '@/PaleGL/math/color';
+import { v2o } from '@/PaleGL/math/vector2';
+import { createFillVector3, createVector3 } from '@/PaleGL/math/vector3';
+import { createVector4 } from '@/PaleGL/math/vector4';
+import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualizerPass';
+import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
 import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
-import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
-import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
 // import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
-import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl';
-import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts';
+import { replaceAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
-import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-// import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
-// import {createGBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
+import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts';
+// import {subscribeShader} from "./watchShader.ts";
+// // import {ShaderManager} from "./watchShader.ts";
+//
+import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl?raw';
+import { getMany, subscribe } from './watchShader.ts';
+
+// import {watchShaders} from "./watchShader.ts";
+// watchShaders(() => {});
+// if (import.meta.hot) {
+//      // prettier-ignore
+//     import.meta.hot.accept([
+//         './shaders/object-space-raymarch-glass-scene.glsl?raw',
+//     ], (mod) => {
+//         console.log('hogehoge - onHMR', mod);
+//     });
+// }
+
+// subscribeShader(["./shaders/object-space-raymarch-glass-scene.glsl?raw"], (newContent) => {
+//     console.log("hogehoge - hmr - newContent", newContent);
+//     });
+
+// // function watchShaders() {
+// //     if (!import.meta.hot) return;
+// //
+// //     import.meta.hot.on('vite:beforeUpdate', async (payload: any) => {
+// //         console.log("hogehoge - vite:beforeUpdate", payload);
+// //         // const changedAbs = new Set(
+// //         //     (payload?.updates ?? [])
+// //         //         .map((u: any) => stripQuery(u.acceptedPath ?? u.path))
+// //         //         .filter(Boolean)
+// //         // );
+// //         // console.log("hogehoge - onHMR", changedAbs);
+// //    });
+// // }
+// //
+// // watchShaders();
+//
+// const shaderManager = new ShaderManager();
+// shaderManager.addMany({
+//     createStreetFloorActor: {
+//         vert: "./shaders/object-space-raymarch-glass-scene.glsl",
+//         frag: "./shaders/test.glsl"
+//     }
+// })
+// shaderManager.init();
+//
+// console.log("hogehoge - shaderManager", shaderManager);
+
+// watchShaders("./shaders/object-space-raymarch-glass-scene.glsl?raw", () => {});
+
+// import { initializeShaderWatcher, loadShader, getWatchedFiles } from './watchShader';
+//
+//
+// async function watchShaders() {
+// // 初期化（自動で実行されるが明示的にも可能）
+//     await initializeShaderWatcher();
+// // 特定のシェーダーファイルを読み込み
+// const shaderContent = await loadShader('./shaders/object-space-raymarch-glass-scene.glsl');
+//
+// // 監視対象ファイル一覧を取得
+// const watchedFiles = getWatchedFiles();
+//
+// console.log('Watched shader files:', watchedFiles);
+// }
+//
+// watchShaders();
+//
+
+// export async function reapply() {
+//     // 変更後の内容を改めて import（モジュールIDは同じ）
+//     const mod = await import('./shaders/object-space-raymarch-glass-scene.glsl?raw');
+//     currentFrag = mod.default;
+//     // ここで ShaderMaterial 等へ差し替え、needsUpdate = true
+// }
+
+// async function watchShader() {
+//     // await reapply();
+//     // if (import.meta.hot) {
+//     //     // import.meta.hot.accept(watchShaderPaths, mods => {
+//     //     import.meta.hot.accept(['./shaders/object-space-raymarch-glass-scene.glsl?raw'], mods => {
+//     //         console.log("hogehoge - raw", mods)
+//     //     });
+//     // }
+//
+//     // 依存登録（devだけでOK）
+//     const shaders = import.meta.glob('./shaders/**/*.glsl', {
+//         query: '?raw', import: 'default', eager: true
+//     });
+//     console.log(shaders)
+// // ↑ これで *.glsl がこのモジュールの依存になる
+//     if (import.meta.hot) {
+//         import.meta.hot.accept((mod) => {
+//             // // 必要なファイルだけ再 import して差し替え
+//             // const content = await import('./shaders/object-space-raymarch-glass-scene.glsl?raw');
+//             console.log("hogehoge - raw - hmr", mod);
+//             // 反映...
+//         });
+//     }
+// }
+//
+// watchShader();
+
+// const files = import.meta.glob('./shaders/*.glsl', { as: 'raw' });
+// export async function loadShaderFile(path: string) {
+//     const load = files[path];
+//     if (!load)
+//     {
+//         throw new Error(`not found: ${path}`);
+//     }
+//     const res = await load();
+//     console.log("fugafuga", res);
+// }
+
+// export function watchShaders(paths: string[], onUpdate: () => void) {
+//     if (import.meta.hot) {
+//         console.log("hogehoge - watchShaders", paths);
+//         import.meta.hot.accept(paths, (mod) => {
+//             console.log("hogehoge - onHMR", mod);
+//             if (onUpdate) {
+//                 onUpdate();
+//             }
+//         })
+//     }
+// }
+//
+// watchShaders(watchShaderPaths, (mod) => {
+//     // console.log(mod)
+// });
+
+// const shaderModules = import.meta.glob('./shaders/**/*.glsl', { as: 'raw' });
+//
+// async function load(path: string) {
+//     const mod = await shaderModules[path]();
+//     console.log("hogehoge - load", path);
+//     // return mod.default as string;
+//     return mod;
+// }
+//
+// async function watchShader () {
+//     const files = Object.keys(shaderModules);
+//     await Promise.all(files.map(async (file) => load(file)));
+//
+//     // HMR: glob で得たキーを監視して差し替え
+//     if (import.meta.hot) {
+//         import.meta.hot.accept(Object.keys(shaderModules),
+//              (mod) => {
+//             // 変更されたファイルだけ拾ってもOK。簡単のため全部読み直し
+//             // await reloadShaders();
+//             console.log("hogehoge - onHMR", mod);
+//         });
+//     }
+// }
+//
+// watchShader();
 
 // -------------------
 // constants
@@ -158,13 +308,13 @@ const wrapperElement = document.createElement('div');
 document.body.appendChild(wrapperElement);
 wrapperElement.setAttribute('id', 'wrapper');
 
-const canvasElement = document.createElement('canvas')!;
+const canvasElement = document.createElement('canvas');
 wrapperElement.appendChild(canvasElement);
 
 const gl = canvasElement.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
 
 if (!gl) {
-    throw 'invalid gl';
+    throw new Error('invalid gl');
 }
 
 const gpu = createGPU(gl);
@@ -286,6 +436,8 @@ const main = async () => {
         // renderMesh: false,
     });
 
+    addActorToScene(captureScene, skyboxMesh);
+
     //
     // street floor
     //
@@ -310,10 +462,12 @@ const main = async () => {
     bgActor = await createBgObjActor();
     const bgActorMesh = bgActor.children[0] as Mesh;
     // mesh.castShadow = true;
-    bgActorMesh.materials = [createGBufferMaterial({
-        emissiveColor: createColor(2, 2, 2, 1)
-    })];
-    
+    bgActorMesh.materials = [
+        createGBufferMaterial({
+            emissiveColor: createColor(2, 2, 2, 1),
+        }),
+    ];
+
     addActorToScene(captureScene, bgActor);
     // setTranslation(bgActor.transform, createVector3(0, .88, 0));
     setTranslation(bgActor.transform, createVector3(0, -6, -20));
@@ -323,73 +477,101 @@ const main = async () => {
     // glass
     //
 
-    // TODO:
-    objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
-        name: 'object-space-raymarch-mesh',
-        gpu,
-        materials: [
-            // createObjectSpaceRaymarchGBufferMaterial({
-            //     fragmentShaderContent:objectSpaceRaymarchFragContent,
-            //     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
-            //     metallic: 0,
-            //     roughness: 0,
-            //     receiveShadow: false,
-            //     // faceSide: FaceSide.Back
-            //     // renderQueueType: RenderQueueType.AlphaTest,
-            //     // alphaTest: 0.5,
-            // }),
-            createObjectSpaceRaymarchGlassMaterial({
+    const createGlassActor = (objectSpaceRaymarchFragContent: string) => {
+        // TODO:
+        objectSpaceRaymarchMesh = createObjectSpaceRaymarchMesh({
+            name: 'object-space-raymarch-mesh',
+            gpu,
+            materials: [
                 // createObjectSpaceRaymarchGBufferMaterial({
-                fragmentShaderContent: objectSpaceRaymarchFragContent,
-                depthFragmentShaderContent: objectSpaceRaymarchFragContent,
-                receiveShadow: false,
-                renderQueueType: RenderQueueType.Transparent,
-                blendType: BlendTypes.Transparent,
-                // renderQueueType: RenderQueueType.AlphaTest,
-                // alphaTest: 0.5,
-                depthTest: true,
-                depthWrite: true,
-                depthFuncType: DepthFuncTypes.Lequal,
-                faceSide: FaceSide.Front,
-                uniforms: [
-                    {
-                        name: UniformNames.SceneTexture,
-                        type: UniformTypes.Texture,
-                        value: null,
-                    },
-                    {
-                        name: 'uMorphRate',
-                        type: UniformTypes.Float,
-                        value: 0,
-                    },
-                ],
-                //                 fragmentShaderModifiers: [
-                //                     {
-                //                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
-                //                         value: `
-                // vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
-                // vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
-                // vec4 sceneColor = texture(uSceneTexture, screenUv);
-                // outColor = vec4(sceneColor.xyz * 2., 1.);
-                // `,
-                //                     },
-                //                 ],
-            }),
-        ],
-        castShadow: true,
-    });
-    subscribeActorOnUpdate(objectSpaceRaymarchMesh, (args) => {
-        const { time } = args;
-        // console.log(time);
-        const morphRate = debuggerStates.morphingEnabled ? time : debuggerStates.morphRate;
-        setUniformValueToAllMeshMaterials(objectSpaceRaymarchMesh, 'uMorphRate', morphRate);
-    });
-    setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
-    setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 5, 0));
-    // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
+                //     fragmentShaderContent:objectSpaceRaymarchFragContent,
+                //     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
+                //     metallic: 0,
+                //     roughness: 0,
+                //     receiveShadow: false,
+                //     // faceSide: FaceSide.Back
+                //     // renderQueueType: RenderQueueType.AlphaTest,
+                //     // alphaTest: 0.5,
+                // }),
+                createObjectSpaceRaymarchGlassMaterial({
+                    // createObjectSpaceRaymarchGBufferMaterial({
+                    fragmentShaderContent: objectSpaceRaymarchFragContent,
+                    depthFragmentShaderContent: objectSpaceRaymarchFragContent,
+                    receiveShadow: false,
+                    renderQueueType: RenderQueueType.Transparent,
+                    blendType: BlendTypes.Transparent,
+                    // renderQueueType: RenderQueueType.AlphaTest,
+                    // alphaTest: 0.5,
+                    depthTest: true,
+                    depthWrite: true,
+                    depthFuncType: DepthFuncTypes.Lequal,
+                    faceSide: FaceSide.Front,
+                    uniforms: [
+                        {
+                            name: UniformNames.SceneTexture,
+                            type: UniformTypes.Texture,
+                            value: null,
+                        },
+                        {
+                            name: 'uMorphRate',
+                            type: UniformTypes.Float,
+                            value: 0,
+                        },
+                    ],
+                    //                 fragmentShaderModifiers: [
+                    //                     {
+                    //                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
+                    //                         value: `
+                    // vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
+                    // vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
+                    // vec4 sceneColor = texture(uSceneTexture, screenUv);
+                    // outColor = vec4(sceneColor.xyz * 2., 1.);
+                    // `,
+                    //                     },
+                    //                 ],
+                }),
+            ],
+            castShadow: true,
+        });
+        subscribeActorOnUpdate(objectSpaceRaymarchMesh, (args) => {
+            const { time } = args;
+            // console.log(time);
+            const morphRate = debuggerStates.morphingEnabled ? time : debuggerStates.morphRate;
+            setUniformValueToAllMeshMaterials(objectSpaceRaymarchMesh, 'uMorphRate', morphRate);
+        });
+        setScaling(objectSpaceRaymarchMesh.transform, createVector3(10, 10, 10));
+        setTranslation(objectSpaceRaymarchMesh.transform, createVector3(0, 5, 0));
+        // setUseWorldSpaceToObjectSpaceRaymarchMesh(objectSpaceRaymarchMesh, true);
 
-    addActorToScene(captureScene, skyboxMesh);
-    addActorToScene(captureScene, objectSpaceRaymarchMesh);
+        addActorToScene(captureScene, objectSpaceRaymarchMesh);
+    };
+    
+    const replaceGlassMaterial = (content: string) => {
+        replaceAllMeshMaterials(objectSpaceRaymarchMesh, gpu,
+            {fragmentShaderModifiers: [
+            {
+                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                value: content,
+            }
+            ]}
+            );
+    }
+
+    //
+    // events
+    //
+
+    // hot reload
+
+    const shaders = ['./shaders/object-space-raymarch-glass-scene.glsl'];
+    createGlassActor(getMany(shaders)[shaders[0]])
+    subscribe(shaders, (changed, map) => {
+        // console.log('hogehoge - receive', changed, map[shaders[0]]);
+        console.log('hogehoge - receive');
+        replaceGlassMaterial(map[shaders[0]]);
+    });
+
+    // main
 
     // TODO: engine側に移譲したい
     const onWindowResize = () => {
@@ -410,7 +592,7 @@ const main = async () => {
         renderer.screenSpaceShadowPass.enabled = false;
 
         renderer.ssrPass.enabled = false;
-        
+
         // renderer.depthOfFieldPass.enabled = false;
         renderer.depthOfFieldPass.focusDistance = 18.5;
         renderer.depthOfFieldPass.focusRange = 17;
@@ -451,7 +633,7 @@ const main = async () => {
                 orbitCameraController,
                 bufferVisualizerPass,
                 directionalLight,
-                objectSpaceRaymarchMesh,
+                // objectSpaceRaymarchMesh,
             });
         }
         updateInputController(inputController);
