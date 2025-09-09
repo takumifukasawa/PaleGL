@@ -565,10 +565,11 @@ const main = async () => {
 
     const shaders = ['./shaders/object-space-raymarch-glass-scene.glsl'];
     createGlassActor(getMany(shaders)[shaders[0]])
-    subscribe(shaders, (changed, map) => {
+    subscribe(shaders, (changed) => {
         // console.log('hogehoge - receive', changed, map[shaders[0]]);
-        console.log('hogehoge - receive');
-        replaceGlassMaterial(map[shaders[0]]);
+        console.log('HMR - update glass shader', changed);
+        // replaceGlassMaterial(map[shaders[0]]);
+        replaceGlassMaterial(getMany(shaders)[shaders[0]]);
     });
 
     // main
