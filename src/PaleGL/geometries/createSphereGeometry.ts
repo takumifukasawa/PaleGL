@@ -123,21 +123,21 @@ export function createSphereGeometry(args: SphereGeometryArgs) {
 
     // TODO: uniqでfilter
     const attributes = [
-        createAttribute({
-            name: AttributeNames.Position,
-            data: new Float32Array(rawData.positions),
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.Uv,
-            data: new Float32Array(rawData.uvs),
-            size: 2,
-        }),
-        createAttribute({
-            name: AttributeNames.Normal,
-            data: new Float32Array(rawData.normals),
-            size: 3,
-        }),
+        createAttribute(
+            AttributeNames.Position,
+            new Float32Array(rawData.positions),
+            3
+        ),
+        createAttribute(
+            AttributeNames.Uv,
+            new Float32Array(rawData.uvs),
+            2
+        ),
+        createAttribute(
+            AttributeNames.Normal,
+            new Float32Array(rawData.normals),
+            3
+        ),
     ];
 
     const geometry = createGeometry({

@@ -12,12 +12,15 @@ import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skin
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { deleteProgram } from '@/PaleGL/core/shader.ts';
 import { UniformValue } from '@/PaleGL/core/uniforms.ts';
 import { getGeometryAttributeDescriptors } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import {
     createMaterial,
     isCompiledMaterialShader,
     Material,
+    MaterialArgs,
     setMaterialUniformValue,
     startMaterial,
 } from '@/PaleGL/materials/material.ts';
@@ -27,13 +30,9 @@ import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
 
 // export const startMesh: StartActorFunc = (actor: Actor, args: ActorStartArgs) => {
 export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
-    // const {gpu} = options;
-
     startActorBehaviourBase(mesh, args);
 
     const { gpu } = args;
-
-    // mesh.geometry.start();
 
     // for debug
     // console.log(`[startMeshBehaviourBase] mesh: ${mesh.name}, materials length: ${mesh.materials.length}`);
@@ -104,8 +103,49 @@ export const startMeshBehaviour: Partial<Record<MeshType, (mesh: Mesh, { gpu, sc
 
 export function startMesh(actor: Actor, args: ActorStartArgs) {
     const mesh = actor as Mesh;
-    // startMeshBehaviourBase(mesh, args);
     (startMeshBehaviour[mesh.meshType] ?? startMeshBehaviourBase)(mesh, args);
+}
+
+export function replaceAllMeshMaterials(mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}) {
+    // TODO: uniformsとかも引き継ぎたい
+
+    // shaderを削除しつつ、新しいmaterialを生成して差し替え
+    mesh.materials.forEach((material, i) => {
+        if (material.shader) {
+            deleteProgram(gpu.gl, material.shader.glObject);
+        }
+        mesh.materials[i] = createMaterial({
+            ...material.cachedArgs,
+            ...args, // NOTE: ここだけ差し替えればいいはず・・・
+        });
+    });
+    // 差し替えたmaterialをコンパイル
+    mesh.materials.forEach((material, i) => {
+        if (!isCompiledMaterialShader(material)) {
+            startMaterial(material, {
+                gpu,
+                attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+            });
+        }
+    });
+
+    // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
+    mesh.depthMaterials.forEach((material, i) => {
+        if (material.shader) {
+            deleteProgram(gpu.gl, material.shader?.glObject);
+        }
+        mesh.depthMaterials[i] = createMaterial({
+            ...material.cachedArgs,
+        });
+    });
+    mesh.depthMaterials.forEach((material) => {
+        if (!isCompiledMaterialShader(material)) {
+            startMaterial(material, {
+                gpu,
+                attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+            });
+        }
+    });
 }
 
 // set size -------------------------------------------------------

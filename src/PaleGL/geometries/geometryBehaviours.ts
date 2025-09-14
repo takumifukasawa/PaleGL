@@ -10,15 +10,15 @@ export function setGeometryAttribute(geometry: Geometry, attribute: Attribute) {
     const divisor = attribute.divisor ? attribute.divisor : 0;
 
     // TODO: attrを受け取ってるのにまた生成しちゃってるのよくない
-    const attr = createAttribute({
-        name: attribute.name,
-        data: attribute.data,
+    const attr = createAttribute(
+        attribute.name,
+        attribute.data,
+        attribute.size,
         location,
-        size: attribute.size,
-        offset: attribute.offset,
-        usageType: attribute.usageType || AttributeUsageType.StaticDraw,
-        divisor,
-    });
+        attribute.offset || 0,
+        attribute.usageType || AttributeUsageType.StaticDraw,
+        divisor
+    );
     geometry.attributes.push(attr);
 
     // _vertexArrayObject.setAttribute(attr, true);

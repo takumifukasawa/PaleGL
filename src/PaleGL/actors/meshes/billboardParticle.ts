@@ -58,10 +58,10 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
     const particleGeometry = createGeometry({
         gpu,
         attributes: [
-            createAttribute({
-                name: AttributeNames.Position.toString(),
+            createAttribute(
+                AttributeNames.Position.toString(),
                 // dummy data
-                data: new Float32Array(
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -78,11 +78,11 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                         })
                         .flat()
                 ),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv.toString(),
-                data: new Float32Array(
+                3
+            ),
+            createAttribute(
+                AttributeNames.Uv.toString(),
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() =>
@@ -96,11 +96,11 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                         )
                         .flat()
                 ),
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Color.toString(),
-                data: new Float32Array(
+                2
+            ),
+            createAttribute(
+                AttributeNames.Color.toString(),
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -115,11 +115,11 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                         })
                         .flat()
                 ),
-                size: 4,
-            }),
-            createAttribute({
-                name: 'aBillboardSize',
-                data: new Float32Array(
+                4
+            ),
+            createAttribute(
+                'aBillboardSize',
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -143,11 +143,11 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                         })
                         .flat()
                 ),
-                size: 2,
-            }),
-            createAttribute({
-                name: 'aBillboardCycleOffset',
-                data: new Float32Array(
+                2
+            ),
+            createAttribute(
+                'aBillboardCycleOffset',
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -162,8 +162,8 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                         })
                         .flat()
                 ),
-                size: 1,
-            }),
+                1
+            ),
         ],
         indices: maton
             .range(particleNum)

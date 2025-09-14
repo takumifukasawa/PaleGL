@@ -500,47 +500,47 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
         const geometry = createGeometry({
             gpu,
             attributes: [
-                createAttribute({
-                    name: 'aPosition',
-                    data: positions,
-                    size: 3,
-                }),
-                createAttribute({
-                    name: 'aUv',
-                    data: uvFlippedY,
-                    size: 2,
-                }),
-                createAttribute({
-                    name: 'aNormal',
-                    data: normals,
-                    size: 3,
-                }),
+                createAttribute(
+                    'aPosition',
+                    positions,
+                    3
+                ),
+                createAttribute(
+                    'aUv',
+                    uvFlippedY,
+                    2
+                ),
+                createAttribute(
+                    'aNormal',
+                    normals,
+                    3
+                ),
                 // bone があるならjointとweightもあるはず
                 ...(rootBone
                     ? [
-                          createAttribute({
-                              name: 'aBoneIndices',
-                              data: joints,
-                              size: 4,
-                          }),
-                          createAttribute({
-                              name: 'aBoneWeights',
-                              data: weights,
-                              size: 4,
-                          }),
+                          createAttribute(
+                              'aBoneIndices',
+                              joints,
+                              4
+                          ),
+                          createAttribute(
+                              'aBoneWeights',
+                              weights,
+                              4
+                          ),
                       ]
                     : []),
                 // TODO: tangent, binormal がいらない場合もあるのでオプションを作りたい
-                createAttribute({
-                    name: 'aTangent',
-                    data: new Float32Array(tangents),
-                    size: 3,
-                }),
-                createAttribute({
-                    name: 'aBinormal',
-                    data: new Float32Array(binormals),
-                    size: 3,
-                }),
+                createAttribute(
+                    'aTangent',
+                    new Float32Array(tangents),
+                    3
+                ),
+                createAttribute(
+                    'aBinormal',
+                    new Float32Array(binormals),
+                    3
+                ),
             ],
             // indices,
             indices: Array.from(indices),

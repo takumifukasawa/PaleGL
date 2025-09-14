@@ -11,7 +11,8 @@ import {
     ActorTypes,
     BlendTypes,
     DepthFuncTypes,
-    FaceSide, FragmentShaderModifierPragmas,
+    FaceSide,
+    FragmentShaderModifierPragmas,
     RenderQueueType,
     RenderTargetTypes,
     TextureDepthPrecisionType,
@@ -68,7 +69,6 @@ import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objec
 // import {subscribeShader} from "./watchShader.ts";
 // // import {ShaderManager} from "./watchShader.ts";
 //
-import objectSpaceRaymarchFragContent from './shaders/object-space-raymarch-glass-scene.glsl?raw';
 import { getMany, subscribe } from './watchShader.ts';
 
 // import {watchShaders} from "./watchShader.ts";
@@ -545,17 +545,17 @@ const main = async () => {
 
         addActorToScene(captureScene, objectSpaceRaymarchMesh);
     };
-    
+
     const replaceGlassMaterial = (content: string) => {
-        replaceAllMeshMaterials(objectSpaceRaymarchMesh, gpu,
-            {fragmentShaderModifiers: [
-            {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
-                value: content,
-            }
-            ]}
-            );
-    }
+        replaceAllMeshMaterials(objectSpaceRaymarchMesh, gpu, {
+            fragmentShaderModifiers: [
+                {
+                    pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                    value: content,
+                },
+            ],
+        });
+    };
 
     //
     // events
@@ -564,7 +564,7 @@ const main = async () => {
     // hot reload
 
     const shaders = ['./shaders/object-space-raymarch-glass-scene.glsl'];
-    createGlassActor(getMany(shaders)[shaders[0]])
+    createGlassActor(getMany(shaders)[shaders[0]]);
     subscribe(shaders, (changed) => {
         // console.log('hogehoge - receive', changed, map[shaders[0]]);
         console.log('HMR - update glass shader', changed);
@@ -634,7 +634,7 @@ const main = async () => {
                 orbitCameraController,
                 bufferVisualizerPass,
                 directionalLight,
-                // objectSpaceRaymarchMesh,
+                objectSpaceRaymarchMesh,
             });
         }
         updateInputController(inputController);

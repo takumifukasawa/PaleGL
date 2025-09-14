@@ -16,21 +16,21 @@ export async function loadAndCreateOBJGeometry(gpu: Gpu, path: string) {
     const geometry = createGeometry({
         gpu,
         attributes: [
-            createAttribute({
-                name: AttributeNames.Position,
-                data: positions,
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv,
-                data: uvs,
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Normal,
-                data: normals,
-                size: 3,
-            }),
+            createAttribute(
+                AttributeNames.Position,
+                positions,
+                3
+            ),
+            createAttribute(
+                AttributeNames.Uv,
+                uvs,
+                2
+            ),
+            createAttribute(
+                AttributeNames.Normal,
+                normals,
+                3
+            ),
         ],
         drawCount: indices.length,
         indices: Array.from(indices),

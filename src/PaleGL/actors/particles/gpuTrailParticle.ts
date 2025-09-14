@@ -103,26 +103,26 @@ export const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVert
     }
 
     const attributes: Attribute[] = [
-        createAttribute({
-            name: AttributeNames.Position,
-            data: positions,
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.Uv,
-            data: uvs,
-            size: 2,
-        }),
-        createAttribute({
-            name: AttributeNames.Normal,
-            data: normals,
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.TrailIndex,
-            data: trailVertices,
-            size: 1,
-        }),
+        createAttribute(
+            AttributeNames.Position,
+            positions,
+            3
+        ),
+        createAttribute(
+            AttributeNames.Uv,
+            uvs,
+            2
+        ),
+        createAttribute(
+            AttributeNames.Normal,
+            normals,
+            3
+        ),
+        createAttribute(
+            AttributeNames.TrailIndex,
+            trailVertices,
+            1
+        ),
     ];
 
     const geometry = createGeometry({
@@ -206,26 +206,26 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
     }
 
     const attributes: Attribute[] = [
-        createAttribute({
-            name: AttributeNames.Position,
-            data: positions,
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.Uv,
-            data: uvs,
-            size: 2,
-        }),
-        createAttribute({
-            name: AttributeNames.Normal,
-            data: normals,
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.TrailIndex,
-            data: trailVertices,
-            size: 1,
-        }),
+        createAttribute(
+            AttributeNames.Position,
+            positions,
+            3
+        ),
+        createAttribute(
+            AttributeNames.Uv,
+            uvs,
+            2
+        ),
+        createAttribute(
+            AttributeNames.Normal,
+            normals,
+            3
+        ),
+        createAttribute(
+            AttributeNames.TrailIndex,
+            trailVertices,
+            1
+        ),
     ];
 
     const geometry = createGeometry({

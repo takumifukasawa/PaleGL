@@ -122,21 +122,21 @@ export function createBoxGeometryData(size: number) {
 
     // TODO: uniqでfilter
     const attributes = [
-        createAttribute({
-            name: AttributeNames.Position,
-            data: new Float32Array(rawData.positions),
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.Uv,
-            data: new Float32Array(rawData.uvs),
-            size: 2,
-        }),
-        createAttribute({
-            name: AttributeNames.Normal,
-            data: new Float32Array(rawData.normals),
-            size: 3,
-        }),
+        createAttribute(
+            AttributeNames.Position,
+            new Float32Array(rawData.positions),
+            3
+        ),
+        createAttribute(
+            AttributeNames.Uv,
+            new Float32Array(rawData.uvs),
+            2
+        ),
+        createAttribute(
+            AttributeNames.Normal,
+            new Float32Array(rawData.normals),
+            3
+        ),
     ];
 
     return {
@@ -217,26 +217,26 @@ export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
             // |/     |/
             // 1 ---- 3
             // -----------------------------
-            createAttribute({
-                name: AttributeNames.Position,
-                data: new Float32Array(localPositions),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv,
-                data: new Float32Array(
+            createAttribute(
+                AttributeNames.Position,
+                new Float32Array(localPositions),
+                3
+            ),
+            createAttribute(
+                AttributeNames.Uv,
+                new Float32Array(
                     new Array(6)
                         .fill(0)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
                         .flat()
                 ),
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Normal,
-                data: new Float32Array(normals.map((normal) => new Array(4).fill(0).map(() => normal)).flat(2)),
-                size: 3,
-            }),
+                2
+            ),
+            createAttribute(
+                AttributeNames.Normal,
+                new Float32Array(normals.map((normal) => new Array(4).fill(0).map(() => normal)).flat(2)),
+                3
+            ),
         ],
         indices: Array.from(Array(6).keys())
             .map((i) => [i * 4 + 0, i * 4 + 1, i * 4 + 2, i * 4 + 2, i * 4 + 1, i * 4 + 3])

@@ -20,6 +20,12 @@ import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layo
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
+if (import.meta.hot) {
+   import.meta.hot.accept(['@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl'], mods => {
+       console.log(mods);
+       });
+}
+
 export function createObjectSpaceRaymarchUniforms() {
     return [
         {

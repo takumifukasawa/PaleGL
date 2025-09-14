@@ -1,27 +1,26 @@
 ﻿import {
-    BlendTypes,
-    UniformTypes,
-    PrimitiveTypes,
-    FaceSide,
-    UniformNames,
-    PrimitiveType,
     BlendType,
-    RenderQueue,
-    // UniformType
-    VertexShaderModifiers,
-    FragmentShaderModifiers,
+    BlendTypes,
+    DepthFragmentShaderModifiers,
     DepthFuncType,
     DepthFuncTypes,
-    RenderQueueType,
+    FaceSide,
+    FragmentShaderModifiers,
     MaterialTypes,
-    DepthFragmentShaderModifiers,
+    PrimitiveType,
+    PrimitiveTypes,
+    RenderQueue,
+    RenderQueueType,
     UniformBlockName,
+    UniformNames,
+    UniformTypes,
+    // UniformType
+    VertexShaderModifiers,
 } from '@/PaleGL/constants';
-import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
-import { createShader, Shader } from '@/PaleGL/core/shader.ts';
-import { buildVertexShader, buildFragmentShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
+import { buildFragmentShader, buildVertexShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import {
     addUniformValue,
     createUniforms,
@@ -30,6 +29,7 @@ import {
     UniformsData,
     UniformValue,
 } from '@/PaleGL/core/uniforms.ts';
+import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 import { uniqFunc } from '@/PaleGL/utilities/maton.ts';
 
 export type MaterialArgs = {
@@ -85,11 +85,11 @@ export type MaterialArgs = {
     // instancing
     isInstancing?: boolean;
     useInstanceLookDirection?: boolean;
-   
+
     // vat gpu particle
     useVAT?: boolean;
     isTrail?: boolean;
-    
+
     // height map
     useHeightMap?: boolean;
 
@@ -178,7 +178,8 @@ export type Material = {
     depthFragmentShaderModifiers: DepthFragmentShaderModifiers;
     uniforms: Uniforms;
     depthUniforms: Uniforms;
-    // updateUniforms: () => void,
+    //
+    cachedArgs: MaterialArgs;
 };
 
 export const isCompiledMaterialShader = (material: Material) => material.shader !== null;
@@ -187,17 +188,7 @@ export const useMaterialAlphaTest = (material: Material) => material.alphaTest !
 
 export function createMaterial(args: MaterialArgs): Material {
     const {
-        // gpu,
-
         name = '',
-        // type = MaterialTypes.Misc,
-
-        // vertexShader = '',
-        // fragmentShader = '',
-        // depthFragmentShader,
-        // rawVertexShader,
-        // rawFragmentShader,
-        // rawDepthFragmentShader,
 
         vertexShaderGenerator = null,
         fragmentShaderGenerator = null,
@@ -207,24 +198,17 @@ export function createMaterial(args: MaterialArgs): Material {
         fragmentShaderModifiers = [],
         depthFragmentShaderModifiers = [],
 
-        // primitiveType,
-        // depthTest = true,
-        // depthWrite = true,
         skipDepthPrePass = false,
         depthFuncType = DepthFuncTypes.Lequal,
-        // alphaTest = null,
         faceSide = FaceSide.Front,
         receiveShadow = false,
-        // blendType = BlendTypes.Opaque,
-        // renderQueue,
 
         useNormalMap = false,
 
         // skinning
         isSkinning = false,
         gpuSkinning = false,
-        // jointNum = null,
-        
+
         useVAT = false,
         isTrail = false,
 
@@ -237,27 +221,18 @@ export function createMaterial(args: MaterialArgs): Material {
 
         // env map
         useEnvMap = false,
-        
+
         // height map
         useHeightMap = false,
 
-        // queue,
-        // uniforms = [],
-        // uniformBlockNames = [],
-        // depthUniforms = [], // uniforms = {},
-
         showLog = false, // depthUniforms = {},
     } = args;
-    
-    let { depthTest = true, depthWrite = true, alphaTest = null } = args;
 
-    // let _name: string = name;
+    let { depthTest = true, depthWrite = true, alphaTest = null } = args;
 
     const canRender: boolean = true;
 
     const type: MaterialTypes = args.type ?? MaterialTypes.Misc;
-
-    // let shader: Shader | null = null;
 
     const primitiveType: PrimitiveType = args.primitiveType ?? PrimitiveTypes.Triangles;
     const blendType: BlendType = args.blendType ?? BlendTypes.Opaque;
@@ -290,35 +265,14 @@ export function createMaterial(args: MaterialArgs): Material {
 
     const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
 
-    // isAddedUniformBlock: boolean = false;
     depthTest = !!depthTest;
-    // let _depthWrite: boolean | null = !!depthWrite;
     depthWrite = !!depthWrite;
 
-    // let _depthFuncType: DepthFuncType = depthFuncType;
-    // let _skipDepthPrePass: boolean = !!skipDepthPrePass;
-
     // TODO: useAlphaTestのフラグがあった方がよい. あとからalphaTestを追加した場合に対応できる
-    // culling;
-    // let _faceSide: FaceSide = faceSide || FaceSide.Front;
-    // let _receiveShadow: boolean = !!receiveShadow;
+
     const queue: RenderQueue | null = args.queue || null;
 
-    // let _useNormalMap: boolean | null = !!useNormalMap;
-
-    // let _useEnvMap: boolean | null = !!useEnvMap;
-
-    // skinning
-    //let _isSkinning: boolean | null = !!isSkinning;
-    //let _gpuSkinning: boolean | null = !!gpuSkinning;
     const jointNum: number | null = typeof args.jointNum === 'number' ? args.jointNum : null;
-
-    // instancing
-    // let _isInstancing: boolean = !!isInstancing;
-    // let _useInstanceLookDirection: boolean = !!useInstanceLookDirection;
-
-    // vertex color
-    // let useVertexColor: boolean = !!useVertexColor;
 
     const vertexShader: string = args.vertexShader || '';
     const fragmentShader: string = args.fragmentShader || '';
@@ -327,17 +281,7 @@ export function createMaterial(args: MaterialArgs): Material {
     const rawVertexShader: string | null = args.rawVertexShader || null;
     const rawFragmentShader: string | null = args.rawFragmentShader || null;
 
-    // rawDepthFragmentShader: string | null = null;
-
-    // let showLog: boolean = !!showLog;
-
     const boundUniformBufferObjects: boolean = false;
-
-    // const _vertexShaderGenerator: VertexShaderGenerator | null = vertexShaderGenerator || null;
-    // const _fragmentShaderGenerator: FragmentShaderGenerator | null = fragmentShaderGenerator || null;
-    // const _depthFragmentShaderGenerator: DepthFragmentShaderGenerator | null = depthFragmentShaderGenerator || null;
-    // const _vertexShaderModifier: VertexShaderModifier = vertexShaderModifier || {};
-    // const _fragmentShaderModifier: FragmentShaderModifier = fragmentShaderModifier || {};
 
     if (!renderQueueType) {
         console.error(`[Material.constructor] invalid render queue: ${renderQueueType as unknown as string}`);
@@ -375,81 +319,6 @@ export function createMaterial(args: MaterialArgs): Material {
 
     // 外側から任意のタイミングでcompileした方が都合が良さそう
     const shader: Shader | null = null;
-
-    // const start = ({ gpu, attributeDescriptors }: { gpu: Gpu; attributeDescriptors: AttributeDescriptor[] }) => {
-    //     // for debug
-    //     // console.log(`[material.start] name: ${_name}`);
-
-    //     if (!_depthFragmentShader && _depthFragmentShaderGenerator) {
-    //         _depthFragmentShader = _depthFragmentShaderGenerator();
-    //     }
-
-    //     const shaderDefineOptions: ShaderDefines = {
-    //         receiveShadow,
-    //         isSkinning: !!isSkinning,
-    //         gpuSkinning: !!gpuSkinning,
-    //         useNormalMap: !!useNormalMap,
-    //         useEnvMap,
-    //         useReceiveShadow: receiveShadow,
-    //         useVertexColor,
-    //         isInstancing,
-    //         useAlphaTest: alphaTest !== null,
-    //         useInstanceLookDirection: useInstanceLookDirection,
-    //     };
-
-    //     if (!_rawVertexShader) {
-    //         if (!_vertexShader && _vertexShaderGenerator) {
-    //             _vertexShader = _vertexShaderGenerator({
-    //                 attributeDescriptors,
-    //                 isSkinning: !!isSkinning,
-    //                 jointNum,
-    //                 gpuSkinning: gpuSkinning,
-    //                 isInstancing,
-    //                 useInstanceLookDirection,
-    //             });
-    //         }
-    //         const rawVertexShader = buildVertexShader(
-    //             _vertexShader,
-    //             attributeDescriptors,
-    //             shaderDefineOptions,
-    //             _vertexShaderModifier
-    //         );
-    //         _rawVertexShader = rawVertexShader;
-    //     }
-
-    //     if (!_rawFragmentShader) {
-    //         if (!_fragmentShader && _fragmentShaderGenerator) {
-    //             _fragmentShader = _fragmentShaderGenerator({
-    //                 attributeDescriptors,
-    //             });
-    //         }
-    //         const rawFragmentShader = buildFragmentShader(
-    //             _fragmentShader,
-    //             shaderDefineOptions,
-    //             _fragmentShaderModifier
-    //         );
-    //         _rawFragmentShader = rawFragmentShader;
-    //     }
-
-    //     // for debug
-    //     if (showLog) {
-    //         console.log('-------------------------------');
-    //         // console.log(this.name);
-    //         console.log(_vertexShader, shaderDefineOptions, _vertexShaderModifier, _rawVertexShader);
-    //         // console.log(_fragmentShader, shaderDefineOptions, _fragmentShaderModifier, _rawFragmentShader);
-    //     }
-
-    //     _shader = new Shader({
-    //         gpu,
-    //         // vertexShader: _vertexShader,
-    //         vertexShader: _rawVertexShader,
-    //         // fragmentShader: _fragmentShader
-    //         fragmentShader: _rawFragmentShader,
-    //     });
-
-    //     // for debug
-    //     // console.log(`[material.start] shader`, _shader);
-    // };
 
     /**
      * マテリアルごとにアップデートしたいuniformがあるとき
@@ -503,6 +372,8 @@ export function createMaterial(args: MaterialArgs): Material {
         vertexShaderModifiers,
         fragmentShaderModifiers,
         depthFragmentShaderModifiers,
+
+        cachedArgs: args,
     };
 }
 

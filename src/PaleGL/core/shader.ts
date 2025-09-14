@@ -6,7 +6,7 @@ export type Shader = GLObjectBase<WebGLProgram>;
 
 export const createShader = (gpu: Gpu, vertexShader: string, fragmentShader: string, transformFeedbackVaryings?: string[]) => {
     const { gl } = gpu;
-    const program = gl.createProgram()!;
+    const program = gl.createProgram();
 
     if (!program) {
         console.error('invalid program');
@@ -74,6 +74,20 @@ function createRawShader(gl: WebGL2RenderingContext, type: number, src: string) 
 
     return shader;
 }
+
+// export function deleteRawShader(gl: WebGL2RenderingContext, shader: WebGLShader) {
+//     console.log("hogehoge",  shader)
+//     gl.deleteShader(shader);
+// }
+
+export function deleteProgram(gl: WebGL2RenderingContext, program: WebGLProgram) {
+    gl.deleteProgram(program);
+}
+
+// 
+// function detachRawShader(gl: WebGL2RenderingContext, program: WebGLProgram, shader: WebGLShader) {
+//     gl.detachShader(program, shader);
+// }
 
 // export function disposeShader(shader: Shader) {
 //     shader.gpu.gl.deleteShader(shader.glObject);

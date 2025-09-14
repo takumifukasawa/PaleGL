@@ -140,12 +140,14 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
             geometry: createGeometry({
                 gpu,
                 attributes: [
-                    createAttribute({
-                        name: AttributeNames.Position,
-                        data: new Float32Array(maton.range(3 * 8 * 6).fill(0)),
-                        size: 3,
-                        usageType: AttributeUsageType.DynamicDraw,
-                    }),
+                    createAttribute(
+                        AttributeNames.Position,
+                        new Float32Array(maton.range(3 * 8 * 6).fill(0)),
+                        3,
+                        0,
+                        0,
+                        AttributeUsageType.DynamicDraw
+                    ),
                 ],
                 // index list
                 // 0: nearLeftTop
