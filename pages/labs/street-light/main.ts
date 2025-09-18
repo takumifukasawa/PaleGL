@@ -541,24 +541,30 @@ const createInstanceUpdater = (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createTransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
-            createAttribute({
-                name: 'aPosition',
-                data: initialPosition,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            createAttribute({
-                name: 'aVelocity',
-                data: initialVelocity,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            createAttribute({
-                name: 'aSeed',
-                data: initialSeed,
-                size: 2,
-                usageType: AttributeUsageType.StaticDraw,
-            }),
+            createAttribute(
+                'aPosition',
+                initialPosition,
+                3,
+                0,
+                0,
+                AttributeUsageType.DynamicDraw
+            ),
+            createAttribute(
+                'aVelocity',
+                initialVelocity,
+                3,
+                0,
+                0,
+                AttributeUsageType.DynamicDraw
+            ),
+            createAttribute(
+                'aSeed',
+                initialSeed,
+                2,
+                0,
+                0,
+                AttributeUsageType.StaticDraw
+            ),
         ],
         varyings: [
             {
@@ -764,67 +770,88 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstancePosition,
-            data: new Float32Array(instanceInfo.position.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstancePosition,
+            new Float32Array(instanceInfo.position.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceScale,
-            data: new Float32Array(instanceInfo.scale.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceScale,
+            new Float32Array(instanceInfo.scale.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceRotation,
-            data: new Float32Array(instanceInfo.rotation.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceRotation,
+            new Float32Array(instanceInfo.rotation.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     // aInstanceAnimationOffsetは予約語
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceAnimationOffset,
-            data: new Float32Array(animationOffsetInfo),
-            size: 1,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceAnimationOffset,
+            new Float32Array(animationOffsetInfo),
+            1,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVertexColor,
-            data: new Float32Array(instanceInfo.color.flat()),
-            size: 4,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceVertexColor,
+            new Float32Array(instanceInfo.color.flat()),
+            4,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(instanceInfo.emissiveColor.flat()),
-            size: 4,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceEmissiveColor,
+            new Float32Array(instanceInfo.emissiveColor.flat()),
+            4,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         skinningMesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVelocity,
-            data: new Float32Array(instanceInfo.velocity.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceVelocity,
+            new Float32Array(instanceInfo.velocity.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
 
     setMeshMaterial(
@@ -1013,10 +1040,10 @@ emissiveColor *= d;
     const particleGeometry = createGeometry({
         gpu,
         attributes: [
-            createAttribute({
-                name: AttributeNames.Position.toString(),
+            createAttribute(
+                AttributeNames.Position.toString(),
                 // dummy data
-                data: new Float32Array(
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -1027,21 +1054,21 @@ emissiveColor *= d;
                         })
                         .flat()
                 ),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv.toString(),
-                data: new Float32Array(
+                3
+            ),
+            createAttribute(
+                AttributeNames.Uv.toString(),
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => [0, 1, 0, 0, 1, 1, 1, 0])
                         .flat()
                 ),
-                size: 2,
-            }),
-            createAttribute({
-                name: AttributeNames.Color.toString(),
-                data: new Float32Array(
+                2
+            ),
+            createAttribute(
+                AttributeNames.Color.toString(),
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -1052,11 +1079,11 @@ emissiveColor *= d;
                         })
                         .flat()
                 ),
-                size: 4,
-            }),
-            createAttribute({
-                name: 'aBillboardSize',
-                data: new Float32Array(
+                4
+            ),
+            createAttribute(
+                'aBillboardSize',
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -1065,11 +1092,11 @@ emissiveColor *= d;
                         })
                         .flat()
                 ),
-                size: 1,
-            }),
-            createAttribute({
-                name: 'aBillboardRateOffset',
-                data: new Float32Array(
+                1
+            ),
+            createAttribute(
+                'aBillboardRateOffset',
+                new Float32Array(
                     maton
                         .range(particleNum)
                         .map(() => {
@@ -1078,8 +1105,8 @@ emissiveColor *= d;
                         })
                         .flat()
                 ),
-                size: 1,
-            }),
+                1
+            ),
         ],
         indices: maton
             .range(particleNum)

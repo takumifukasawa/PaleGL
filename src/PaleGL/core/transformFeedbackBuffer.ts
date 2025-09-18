@@ -62,12 +62,12 @@ export function createTransformFeedbackBuffer(args: TransformFeedbackBufferArgs)
     // create shader
 
     const transformFeedbackVaryings = varyings.map(({ name }) => name);
-    const shader = createShader({
+    const shader = createShader(
         gpu,
         vertexShader,
-        fragmentShader: transformFeedbackFragmentShader,
-        transformFeedbackVaryings,
-    });
+        transformFeedbackFragmentShader,
+        transformFeedbackVaryings
+    );
 
     // create uniforms
 

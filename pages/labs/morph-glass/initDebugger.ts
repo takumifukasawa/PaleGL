@@ -1,28 +1,32 @@
+import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
+import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
+import { OrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
+import { createColorFromHex, getColorHexCoord } from '@/PaleGL/math/color.ts';
 import {
-    addColorDebugger,
-    addDebuggerBorderSpacer, addDebugGroup,
-    addSliderDebugger,
-    addToggleDebugger,
-    createDebuggerGUI, DebuggerGUI,
-} from '@/PaleGL/utilities/debuggerGUI.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+    getRotatorDegreeX,
+    getRotatorDegreeY,
+    getRotatorDegreeZ,
+    setRotatorRotationDegreeX,
+    setRotatorRotationDegreeY,
+    setRotatorRotationDegreeZ,
+} from '@/PaleGL/math/rotator.ts';
+import { setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
     BufferVisualizerPass,
     hideBufferVisualizerPassDom,
     showBufferVisualizerPassDom,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
-import { setV3x, setV3y, setV3z, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
-    getRotatorDegreeX,
-    getRotatorDegreeY, getRotatorDegreeZ,
-    setRotatorRotationDegreeX,
-    setRotatorRotationDegreeY, setRotatorRotationDegreeZ,
-} from '@/PaleGL/math/rotator.ts';
-import { createColorFromHex, getColorHexCoord } from '@/PaleGL/math/color.ts';
-import { OrbitCameraController } from '@/PaleGL/core/orbitCameraController.ts';
-import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
-import { Renderer } from '@/PaleGL/core/renderer.ts';
+    addColorDebugger,
+    addDebuggerBorderSpacer,
+    addDebugGroup,
+    addSliderDebugger,
+    addToggleDebugger,
+    createDebuggerGUI,
+    DebuggerGUI,
+} from '@/PaleGL/utilities/debuggerGUI.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export function initDebugger(
     wrapperElement: HTMLElement,
@@ -37,12 +41,12 @@ export function initDebugger(
         debuggerStates: {
             morphRate: number;
             morphingEnabled: boolean;
-        },
-        renderer: Renderer,
-        orbitCameraController: OrbitCameraController,
-        bufferVisualizerPass: BufferVisualizerPass,
-        directionalLight: DirectionalLight,
-        objectSpaceRaymarchMesh: ObjectSpaceRaymarchMesh
+        };
+        renderer: Renderer;
+        orbitCameraController: OrbitCameraController;
+        bufferVisualizerPass: BufferVisualizerPass;
+        directionalLight: DirectionalLight;
+        objectSpaceRaymarchMesh: ObjectSpaceRaymarchMesh;
     }
 ): DebuggerGUI {
     const debuggerGUI = createDebuggerGUI();
@@ -67,7 +71,6 @@ export function initDebugger(
         initialValue: debuggerStates.morphingEnabled,
         onChange: (value) => (debuggerStates.morphingEnabled = value),
     });
-
 
     //
     // orbit controls
@@ -973,6 +976,6 @@ export function initDebugger(
     //
 
     wrapperElement.appendChild(debuggerGUI.rootElement);
-    
+
     return debuggerGUI;
 }

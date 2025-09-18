@@ -1351,24 +1351,30 @@ const createInstanceUpdater = (instanceNum: number) => {
     const transformFeedbackDoubleBuffer = createTransformFeedbackDoubleBuffer({
         gpu,
         attributes: [
-            createAttribute({
-                name: 'aPosition',
-                data: initialPosition,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            createAttribute({
-                name: 'aVelocity',
-                data: initialVelocity,
-                size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
-            }),
-            createAttribute({
-                name: 'aSeed',
-                data: initialSeed,
-                size: 2,
-                usageType: AttributeUsageType.StaticDraw,
-            }),
+            createAttribute(
+                'aPosition',
+                initialPosition,
+                3,
+                0,
+                0,
+                AttributeUsageType.DynamicDraw
+            ),
+            createAttribute(
+                'aVelocity',
+                initialVelocity,
+                3,
+                0,
+                0,
+                AttributeUsageType.DynamicDraw
+            ),
+            createAttribute(
+                'aSeed',
+                initialSeed,
+                2,
+                0,
+                0,
+                AttributeUsageType.StaticDraw
+            ),
         ],
         varyings: [
             {

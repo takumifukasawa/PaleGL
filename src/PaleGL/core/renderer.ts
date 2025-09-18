@@ -385,11 +385,11 @@ export function createRenderer({
     // initialize global uniform buffer objects
     //
 
-    const uniformBufferObjectShader = createShader({
+    const uniformBufferObjectShader = createShader(
         gpu,
-        vertexShader: replaceShaderIncludes(globalUniformBufferObjectVertexShader),
-        fragmentShader: replaceShaderIncludes(globalUniformBufferObjectFragmentShader),
-    });
+        replaceShaderIncludes(globalUniformBufferObjectVertexShader),
+        replaceShaderIncludes(globalUniformBufferObjectFragmentShader)
+    );
 
     const transformationsUniformBlockData = [
         {

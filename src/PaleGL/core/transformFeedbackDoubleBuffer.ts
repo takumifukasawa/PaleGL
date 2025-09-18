@@ -34,12 +34,12 @@ export function createTransformFeedbackDoubleBuffer(args: TransformFeedbackBuffe
     const transformFeedbackBuffers: TransformFeedbackBuffer[] = [];
 
     const transformFeedbackVaryings = varyings.map(({ name }) => name);
-    const shader = createShader({
+    const shader = createShader(
         gpu,
         vertexShader,
-        fragmentShader: transformFeedbackFragmentShader,
-        transformFeedbackVaryings,
-    });
+        transformFeedbackFragmentShader,
+        transformFeedbackVaryings
+    );
 
     const uniforms = createUniforms(args.uniforms || []);
 

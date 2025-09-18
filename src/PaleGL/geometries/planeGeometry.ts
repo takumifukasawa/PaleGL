@@ -97,39 +97,39 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
     const rawData = createPlaneGeometryRawData(args);
 
     const attributes: Attribute[] = [
-        createAttribute({
-            name: AttributeNames.Position,
-            data: rawData.positions,
-            size: 3,
-        }),
-        createAttribute({
-            name: AttributeNames.Uv,
-            data: rawData.uvs,
-            size: 2,
-        }),
-        createAttribute({
-            name: AttributeNames.Normal,
-            data: rawData.normals,
-            size: 3,
-        }),
+        createAttribute(
+            AttributeNames.Position,
+            rawData.positions,
+            3
+        ),
+        createAttribute(
+            AttributeNames.Uv,
+            rawData.uvs,
+            2
+        ),
+        createAttribute(
+            AttributeNames.Normal,
+            rawData.normals,
+            3
+        ),
     ];
 
     if (args.calculateTangent) {
         attributes.push(
-            createAttribute({
-                name: AttributeNames.Tangent,
-                data: rawData.tangents,
-                size: 3,
-            })
+            createAttribute(
+                AttributeNames.Tangent,
+                rawData.tangents,
+                3
+            )
         );
     }
     if (args.calculateBinormal) {
         attributes.push(
-            createAttribute({
-                name: AttributeNames.Binormal,
-                data: rawData.binormals,
-                size: 3,
-            })
+            createAttribute(
+                AttributeNames.Binormal,
+                rawData.binormals,
+                3
+            )
         );
     }
 

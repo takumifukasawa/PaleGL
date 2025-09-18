@@ -167,16 +167,16 @@ export function createAxesHelper({ gpu }: { gpu: Gpu }) {
     const geometry = createGeometry({
         gpu,
         attributes: [
-            createAttribute({
-                name: AttributeNames.Position,
-                data: new Float32Array(objData.positions),
-                size: 3,
-            }),
-            createAttribute({
-                name: AttributeNames.Uv,
-                data: new Float32Array(objData.uvs),
-                size: 2,
-            }),
+            createAttribute(
+                AttributeNames.Position,
+                new Float32Array(objData.positions),
+                3
+            ),
+            createAttribute(
+                AttributeNames.Uv,
+                new Float32Array(objData.uvs),
+                2
+            ),
         ],
         indices: objData.indices,
         drawCount: objData.indices.length,

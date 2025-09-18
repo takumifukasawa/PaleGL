@@ -2,7 +2,7 @@ import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.t
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AttributeNames } from '@/PaleGL/constants.ts';
+import { AttributeNames, AttributeUsageType } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -113,67 +113,88 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstancePosition,
-            data: new Float32Array(instanceInfo.position.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstancePosition,
+            new Float32Array(instanceInfo.position.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceScale,
-            data: new Float32Array(instanceInfo.scale.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceScale,
+            new Float32Array(instanceInfo.scale.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceRotation,
-            data: new Float32Array(instanceInfo.rotation.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceRotation,
+            new Float32Array(instanceInfo.rotation.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     // aInstanceAnimationOffsetは予約語
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceAnimationOffset,
-            data: new Float32Array(instanceInfo.animationOffset.flat()),
-            size: 1,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceAnimationOffset,
+            new Float32Array(instanceInfo.animationOffset.flat()),
+            1,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVertexColor,
-            data: new Float32Array(instanceInfo.color.flat()),
-            size: 4,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceVertexColor,
+            new Float32Array(instanceInfo.color.flat()),
+            4,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceEmissiveColor,
-            data: new Float32Array(instanceInfo.emissiveColor.flat()),
-            size: 4,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceEmissiveColor,
+            new Float32Array(instanceInfo.emissiveColor.flat()),
+            4,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
     setGeometryAttribute(
         mesh.geometry,
-        createAttribute({
-            name: AttributeNames.InstanceVelocity,
-            data: new Float32Array(instanceInfo.velocity.flat()),
-            size: 3,
-            divisor: 1,
-        })
+        createAttribute(
+            AttributeNames.InstanceVelocity,
+            new Float32Array(instanceInfo.velocity.flat()),
+            3,
+            0,
+            0,
+            AttributeUsageType.StaticDraw,
+            1
+        )
     );
 
     // const useVAT = !!vatData;

@@ -3,7 +3,7 @@ uniform float uMorphRate;
 
 float blend(float a, float b, float c, float d, float t1, float t2, float t) {
     float segTime = t1 + t2;
-    float totalTime = 3. * segTime;
+    float totalTime = 3.0 * segTime;
 
     float localT = mod(t, totalTime);
 
@@ -114,7 +114,7 @@ vec2 dfScene(vec3 p) {
     
     vec3 q = p;
 
-    float t = uMorphRate * 1.;
+    float t = uMorphRate;
 
     vec3 scale = vec3(1.);
     

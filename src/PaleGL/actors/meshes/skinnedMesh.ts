@@ -910,12 +910,14 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
         geometry: createGeometry({
             gpu,
             attributes: [
-                createAttribute({
-                    name: AttributeNames.Position,
-                    data: new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
-                    size: 3,
-                    usageType: AttributeUsageType.DynamicDraw,
-                }),
+                createAttribute(
+                    AttributeNames.Position,
+                    new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
+                    3,
+                    0,
+                    0,
+                    AttributeUsageType.DynamicDraw
+                ),
             ],
             indices: skinnedMesh.boneIndicesForLines,
             drawCount: skinnedMesh.boneIndicesForLines.length,
@@ -952,12 +954,14 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
         geometry: createGeometry({
             gpu,
             attributes: [
-                createAttribute({
-                    name: AttributeNames.Position.toString(),
-                    data: new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
-                    size: 3,
-                    usageType: AttributeUsageType.DynamicDraw,
-                }),
+                createAttribute(
+                    AttributeNames.Position.toString(),
+                    new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
+                    3,
+                    0,
+                    0,
+                    AttributeUsageType.DynamicDraw
+                ),
             ],
             drawCount: skinnedMesh.boneOrderedIndex.length,
         }),

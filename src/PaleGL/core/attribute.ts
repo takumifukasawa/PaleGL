@@ -23,14 +23,15 @@ export type AttributeArgs = {
 
 export type Attribute = ReturnType<typeof createAttribute>;
 
-export function createAttribute(args: AttributeArgs) {
-    const name: string = args.name;
-    const data: Float32Array | Uint16Array = args.data; // data
-    const location: number = args.location || 0; // layout location index
-    const size: number = args.size; // data per vertex. ex) position: 3, uv: 2
-    const offset = args.offset || 0;
-    const usageType: AttributeUsageType = args.usageType || AttributeUsageType.StaticDraw;
-    const divisor = args.divisor || 0;
+export function createAttribute(
+    name: string,
+    data: Float32Array | Uint16Array,
+    size: number,
+    location: number = 0,
+    offset: number = 0,
+    usageType: AttributeUsageType = AttributeUsageType.StaticDraw,
+    divisor: number = 0
+) {
 
     // const getDescriptor: () => AttributeDescriptor = () => {
     //     return {

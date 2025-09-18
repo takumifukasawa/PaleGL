@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --force --port 8001",
+    "dev": "vite --host --force --port 8000",
     "dev:watch": "vite --watch",
     "build:page": "tsc && vite build --mode page",
     "build:demo": "tsc && vite build --mode demo",
