@@ -468,3 +468,20 @@ export const startMaterial = (
     // for debug
     // console.log(`[material.start] shader`, _shader);
 };
+
+
+// materialのuniform値をまるっとコピーする
+export const copyUniformValues = (source: Material, destination: Material) => {
+    source.uniforms.data.forEach((srcData) => {
+        const dstData = destination.uniforms.data.find((d) => d.name === srcData.name);
+        if (dstData) {
+            dstData.value = srcData.value;
+        }
+    });
+    source.depthUniforms.data.forEach((srcData) => {
+        const dstData = destination.depthUniforms.data.find((d) => d.name === srcData.name);
+        if (dstData) {
+            dstData.value = srcData.value;
+        }
+    });
+}

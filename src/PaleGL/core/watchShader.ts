@@ -14,7 +14,10 @@ if (hot) hot.data.__shaderStore = store;
 
 // 2) 全シェーダを「文字列」で eager import（?raw不要）
 // glob pattern は literalを入れる必要がある
-export const shaders = import.meta.glob(['./shaders/**/*.{glsl,vert,frag,wgsl,comp}'], {
+export const shaders = import.meta.glob([
+    // prettier-ignore
+    '../../../pages/**/*.{glsl,vert,frag,wgsl,comp}'
+], {
     as: 'raw',
     eager: true,
 }) as Record<string, string>;

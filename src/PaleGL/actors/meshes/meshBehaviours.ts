@@ -107,7 +107,7 @@ export function startMesh(actor: Actor, args: ActorStartArgs) {
 }
 
 export function replaceAllMeshMaterials(mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}) {
-    // TODO: uniformsとかも引き継ぎたい
+    // TODO: uniformsの中身を引き継いだ方がいいと思われる
 
     // shaderを削除しつつ、新しいmaterialを生成して差し替え
     mesh.materials.forEach((material, i) => {
@@ -116,11 +116,11 @@ export function replaceAllMeshMaterials(mesh: Mesh, gpu: Gpu, args: MaterialArgs
         }
         mesh.materials[i] = createMaterial({
             ...material.cachedArgs,
-            ...args, // NOTE: ここだけ差し替えればいいはず・・・
+            ...args, // NOTE: 追加したい何かがあるときはここでoverride・
         });
     });
     // 差し替えたmaterialをコンパイル
-    mesh.materials.forEach((material, i) => {
+    mesh.materials.forEach((material) => {
         if (!isCompiledMaterialShader(material)) {
             startMaterial(material, {
                 gpu,
