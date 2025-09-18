@@ -69,7 +69,7 @@ import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objec
 // import {subscribeShader} from "./watchShader.ts";
 // // import {ShaderManager} from "./watchShader.ts";
 //
-import { getMany, subscribe } from '@/PaleGL/core/watchShader.ts';
+import { getMany, subscribeShaders } from '@/PaleGL/core/watchShader.ts';
 
 // import {watchShaders} from "./watchShader.ts";
 // watchShaders(() => {});
@@ -568,7 +568,7 @@ const main = async () => {
 
     const shaders = [getShaderPath('object-space-raymarch-glass-scene.glsl')];
     createGlassActor(getMany(shaders)[shaders[0]]);
-    subscribe(shaders, (changed) => {
+    subscribeShaders(shaders, (changed) => {
         // console.log('hogehoge - receive', changed, map[shaders[0]]);
         console.log('HMR - update glass shader', changed);
         // replaceGlassMaterial(map[shaders[0]]);

@@ -16,7 +16,8 @@ if (hot) hot.data.__shaderStore = store;
 // glob pattern は literalを入れる必要がある
 export const shaders = import.meta.glob([
     // prettier-ignore
-    '../../../pages/**/*.{glsl,vert,frag,wgsl,comp}'
+    // '../../../pages/**/*.{glsl,vert,frag,wgsl,comp}', // pages
+    '../../../../src/pages/**/*.{glsl,vert,frag,wgsl,comp}' // root
 ], {
     as: 'raw',
     eager: true,
@@ -44,7 +45,7 @@ export function getMany(paths: string[]) {
     return Object.fromEntries(paths.map((p) => [p, store.CURRENT[p] ?? ''])) as Record<string, string>;
 }
 
-export function subscribe(paths: string[], cb: Listener) {
+export function subscribeShaders(paths: string[], cb: Listener) {
     store.subs.set(cb, new Set(paths));
     // 解除したい時だけ呼ぶ。呼ばなければずっと呼ばれ続けます。
     return () => store.subs.delete(cb);
