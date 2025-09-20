@@ -12,7 +12,7 @@
 
 //
 // operators
-// TRSをしたいときは基本的に opTrasnalte -> opRoaet -> opPreScale -> distanceFunction -> opPostScale の順でやる 
+// TRSをしたいときは基本的に opTrasnalte -> opRotate -> opPreScale -> distanceFunction -> opPostScale の順でやる 
 //
 
 // ref: https://www.shadertoy.com/view/ldlcRf
@@ -74,7 +74,7 @@ float opSm( float d1, float d2, float k )
 //
 
 // radius ... 半径
-float dfSphere(vec3 p, float radius) {
+float dfSp(vec3 p, float radius) {
     return length(p) - radius;
 }
 
@@ -84,11 +84,62 @@ float dfRb(vec3 p, vec3 b, float r) {
     return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.) - r;
 }
 
+// box
+// b...辺の半分の長さ
 float dfBox(vec3 p, vec3 b)
 {
     vec3 q = abs(p) - b;
     return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
+
+// box
+// b...辺の長さ
+float dfBoxt(vec3 p, vec3 b)
+{
+    return dfBox(p, b * .5);
+}
+
+// capsule
+// a ... capsuleの下の球の中心
+// b ... capsuleの上の球の中心
+// r ... 大きさ
+float dfCa(vec3 p, vec3 a, vec3 b, float r)
+{
+    vec3 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0., 1.);
+    return length(pa - ba * h) - r;
+}
+
+// capsule - 直立 & 中心基準
+// c ... capsuleの中心
+// h ... 高さ
+// r ... 球の大きさ
+// 合計の高さは h + r * 2
+float dfCac(vec3 p, vec3 c, float h, float r)
+{
+    float hh = h * .5;
+    vec3 a = c - vec3(0., hh, 0.);
+    vec3 b = c + vec3(0., hh, 0.);
+    return dfCa(p, a, b, r);
+}
+
+// capsule - 下の球がy=0に接地
+// c ... capsuleの中心
+// h ... 高さ
+// r ... 球の大きさ
+// 合計の高さは h + r * 2
+float dfCaa(vec3 p, vec3 c, float h, float r)
+{
+    vec3 a = c;
+    vec3 b = c + vec3(0., h, 0.);
+    return dfCa(p, a, b, r);
+}
+
+// float dfCav(vec3 p, float h, float r)
+// {
+//     p.y -= clamp(p.y, 0.0, h);
+//     return length(p) - r;
+// }
 
 // float dfTo(vec3 p, vec2 t)
 // {
