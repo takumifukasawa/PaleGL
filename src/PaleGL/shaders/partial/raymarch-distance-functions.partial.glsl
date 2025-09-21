@@ -39,8 +39,8 @@ vec2 opRo(vec2 p, float a) {
 }
 
 // p: 座標
-// xz: 前後回転: +で前
-// xy: 上下回転: +で上
+// xz: 前後回転: -で前
+// xy: 上下回転: -で上
 // yz: ひねり: +で[+z->-y]側へひねり
 vec3 opRot3(vec3 p, float xz, float xy, float yz) {
     p.xz = opRo(p.xz, -xz);
