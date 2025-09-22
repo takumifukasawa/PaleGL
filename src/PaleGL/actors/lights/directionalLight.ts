@@ -44,7 +44,7 @@ export const createDirectionalLightShadow = (
     setRotationY(light.shadowCamera.transform, 180);
 
     addChildActor(light, light.shadowCamera);
-
+    
     light.shadowCamera.visibleFrustum = visibleFrustum;
     light.castShadow = true;
     light.shadowCamera.near = near;

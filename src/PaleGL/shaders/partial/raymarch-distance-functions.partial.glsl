@@ -55,15 +55,15 @@ vec3 opTr(vec3 p, vec3 t) {
 }
 
 // NOTE: sが1以下だとおかしくなることに注意
-vec3 opScale(vec3 p, vec3 s) {
+vec3 opSc(vec3 p, vec3 s) {
     return p * (1. / s);
 }
 
-vec3 opPreScale(vec3 p, vec3 s) {
+vec3 opPrSc(vec3 p, vec3 s) {
     return p / s;
 }
 
-float opPostScale(float d, vec3 s) {
+float opPoSc(float d, vec3 s) {
     return d * min(s.x, min(s.y, s.z));
 }
 
@@ -109,6 +109,17 @@ float dfBox(vec3 p, vec3 b)
 float dfBoxt(vec3 p, vec3 b)
 {
     return dfBox(p, b * .5);
+}
+
+float dfRBox(vec3 p, vec3 b, float r)
+{
+    vec3 q = abs(p) - b + r;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r;
+}
+
+float dfRBoxt(vec3 p, vec3 b, float r)
+{
+    return dfRBox(p, b * .5, r);
 }
 
 // capsule
@@ -175,13 +186,13 @@ float dfCaa(vec3 p, vec3 c, float h, float r)
 // ra: 太さ
 // rb: R
 // h: 高さ
-float dfRoundedCylinder(vec3 p, float ra, float rb, float h)
+float dfRoundedCylinder(vec3 p, float h, float ra, float rb)
 {
     vec2 d = vec2(length(p.xz)-2.0*ra+rb, abs(p.y) - h);
     return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rb;
 }
 
-float dfCone(vec3 p, vec2 c, float h)
+float dfCone(vec3 p, float h, vec2 c)
 {
     // c is the sin/cos of the angle, h is height
     // Alternatively pass q instead of (c,h),
@@ -195,4 +206,26 @@ float dfCone(vec3 p, vec2 c, float h)
     float d = min(dot(a, a), dot(b, b));
     float s = max(k*(w.x*q.y-w.y*q.x), k*(w.y-q.y));
     return sqrt(d)*sign(s);
+}
+
+// p ... position
+// r1 ... bottom radius
+// r2 ... top radius
+// h ... height
+// r2の中心が基準の位置
+float dfRco(vec3 p, float h, float r1, float r2)
+{
+    float b = (r1-r2)/h;
+    float a = sqrt(1.0-b*b);
+    
+    vec2 q = vec2( length(p.xz), p.y );
+    float k = dot(q,vec2(-b,a));
+    if( k<0.0 ) return length(q) - r1;
+    if( k>a*h ) return length(q-vec2(0.0,h)) - r2;
+    return dot(q, vec2(a,b) ) - r1;
+}
+
+float dfRcot(vec3 p, float h, float r1, float r2) {
+    p.y += h;
+    return dfRco(p, h, r1, r2);
 }

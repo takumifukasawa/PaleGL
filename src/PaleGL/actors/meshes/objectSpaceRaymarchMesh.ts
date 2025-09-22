@@ -8,12 +8,13 @@ import {
     ObjectSpaceRaymarchMaterialArgs,
 } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
+import { Vector3 } from '@/PaleGL/math/vector3.ts';
 // import {GBufferMaterial} from "@/PaleGL/materials/gBufferMaterial.ts";
 
 type ObjectSpaceRaymarchMeshArgs = {
     name?: string;
     gpu: Gpu;
-    size?: number;
+    size?: Vector3;
     // fragmentShader: string;
     // depthFragmentShader: string;
     // uniforms?: UniformsData;

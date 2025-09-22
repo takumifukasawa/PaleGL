@@ -2,6 +2,7 @@
 import { AttributeNames } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { createVector3One, scaleVector3ByScalar, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export const boxGeometryEdgePairs = [
     [0, 1],
@@ -33,8 +34,8 @@ export const boxGeometrySurfacePairs = [
     [1, 7, 3, 5],
 ];
 
-export function createBoxGeometryRawData(size: number = 1) {
-    const s = size / 2;
+export function createBoxGeometryRawData(size: Vector3 = createVector3One()) {
+    const s = scaleVector3ByScalar(size, 0.5);
 
     // -----------------------------
     //
@@ -46,14 +47,14 @@ export function createBoxGeometryRawData(size: number = 1) {
     // 1 ---- 3
     // -----------------------------
 
-    const boxPosition_0 = [-s, s, s];
-    const boxPosition_1 = [-s, -s, s];
-    const boxPosition_2 = [s, s, s];
-    const boxPosition_3 = [s, -s, s];
-    const boxPosition_4 = [s, s, -s];
-    const boxPosition_5 = [s, -s, -s];
-    const boxPosition_6 = [-s, s, -s];
-    const boxPosition_7 = [-s, -s, -s];
+    const boxPosition_0 = [-s.x, s.y, s.z];
+    const boxPosition_1 = [-s.x, -s.y, s.z];
+    const boxPosition_2 = [s.x, s.y, s.z];
+    const boxPosition_3 = [s.x, -s.y, s.z];
+    const boxPosition_4 = [s.x, s.y, -s.z];
+    const boxPosition_5 = [s.x, -s.y, -s.z];
+    const boxPosition_6 = [-s.x, s.y, -s.z];
+    const boxPosition_7 = [-s.x, -s.y, -s.z];
 
     const normalsRaw = [
         [0, 0, 1], // front
@@ -117,7 +118,7 @@ export function createBoxGeometryRawData(size: number = 1) {
     };
 }
 
-export function createBoxGeometryData(size: number) {
+export function createBoxGeometryData(size: Vector3) {
     const rawData = createBoxGeometryRawData(size);
 
     // TODO: uniqでfilter
@@ -149,20 +150,20 @@ export function createBoxGeometryData(size: number) {
 export type BoxGeometry = Geometry & { cornerPositions: number[][] };
 
 // type BoxGeometryArgs = GeometryArgs & { size: number };
-type BoxGeometryArgs = { gpu: Gpu, size?: number };
+type BoxGeometryArgs = { gpu: Gpu, size?: Vector3 };
 
 export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
-    const { gpu, size = 1 } = args;
+    const { gpu, size = createVector3One() } = args; // デフォルトが長さ1
 
-    const s = size / 2;
-    const boxPosition_0 = [-s, s, s];
-    const boxPosition_1 = [-s, -s, s];
-    const boxPosition_2 = [s, s, s];
-    const boxPosition_3 = [s, -s, s];
-    const boxPosition_4 = [s, s, -s];
-    const boxPosition_5 = [s, -s, -s];
-    const boxPosition_6 = [-s, s, -s];
-    const boxPosition_7 = [-s, -s, -s];
+    const s = scaleVector3ByScalar(size, 0.5);
+    const boxPosition_0 = [-s.x, s.y, s.z];
+    const boxPosition_1 = [-s.x, -s.y, s.z];
+    const boxPosition_2 = [s.x, s.y, s.z];
+    const boxPosition_3 = [s.x, -s.y, s.z];
+    const boxPosition_4 = [s.x, s.y, -s.z];
+    const boxPosition_5 = [s.x, -s.y, -s.z];
+    const boxPosition_6 = [-s.x, s.y, -s.z];
+    const boxPosition_7 = [-s.x, -s.y, -s.z];
 
     const localPositions = [
         // front
