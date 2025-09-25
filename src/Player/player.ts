@@ -153,7 +153,7 @@ export function createPlayer(
 
     player.marionetter = marionetter;
     player.marionetterSceneStructure = marionetterSceneStructure;
-    player.camera = camera;
+    setPlayerCamera(player, camera);
 
     setOnBeforeUpdateEngine(engine, ({ time, deltaTime }) => {
         // if (player.onBeforeUpdate) {
@@ -164,7 +164,7 @@ export function createPlayer(
 
     setOnRenderEngine(engine, (time) => {
         updateTimelineUniforms(player.renderer, player.timelineTime, player.timelineDeltaTime);
-        renderRenderer(renderer, scene, camera, player.engine.sharedTextures, {
+        renderRenderer(renderer, scene, player.camera, player.engine.sharedTextures, {
             time,
             // timelineTime,
             // timelineDeltaTime
@@ -176,6 +176,10 @@ export function createPlayer(
     // });
 
     return player;
+}
+
+export function setPlayerCamera(player: Player, camera: Camera) {
+    player.camera = camera;
 }
 
 

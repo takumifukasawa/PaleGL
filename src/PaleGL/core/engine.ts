@@ -72,12 +72,12 @@ export type EngineBase = {
     sharedTextures: SharedTextures;
     // sharedQuad: PlaneGeometry;
     renderer: Renderer;
-    onBeforeStart: EngineOnBeforeStartCallback | null;
-    onAfterStart: EngineOnAfterStartCallback | null;
-    onBeforeUpdate: EngineOnBeforeUpdateCallback | null;
-    onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback | null;
-    onLastUpdate: EngineOnLastUpdateCallback | null;
-    onRender: EngineOnRenderCallback | null;
+    onBeforeStart: EngineOnBeforeStartCallback[];
+    onAfterStart: EngineOnAfterStartCallback[];
+    onBeforeUpdate: EngineOnBeforeUpdateCallback[];
+    onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback[];
+    onLastUpdate: EngineOnLastUpdateCallback[];
+    onRender: EngineOnRenderCallback[];
     // uiCamera: OrthographicCamera | null;
 };
 
@@ -113,12 +113,12 @@ export function createEngine({
         stats,
         renderer,
         scene: null,
-        onBeforeStart: null,
-        onAfterStart: null,
-        onBeforeUpdate: null,
-        onBeforeFixedUpdate: null,
-        onLastUpdate: null,
-        onRender: null,
+        onBeforeStart: [],
+        onAfterStart: [],
+        onBeforeUpdate: [],
+        onBeforeFixedUpdate: [],
+        onLastUpdate: [],
+        onRender: [],
         // uiCamera: null,
     };
 
@@ -145,14 +145,14 @@ export function getSharedTexture(engine: Engine, key: SharedTexturesType): Effec
 }
 
 export function startEngine(engine: Engine) {
-    if (engine.onBeforeStart) {
-        engine.onBeforeStart();
+    for (let i = 0; i < engine.onBeforeStart.length; i++) {
+        engine.onBeforeStart[i]();
     }
     const t = performance.now() / 1000;
     startTimeAccumulator(engine.fixedUpdateFrameTimer, t);
     startTimeSkipper(engine.updateFrameTimer, t);
-    if (engine.onAfterStart) {
-        engine.onAfterStart();
+    for (let i = 0; i < engine.onAfterStart.length; i++) {
+        engine.onAfterStart[i]();
     }
 }
 
@@ -168,8 +168,8 @@ export function setEngineSize(engine: Engine, width: number, height: number) {
 }
 
 function fixedUpdateEngine(engine: EngineBase, fixedTime: number, fixedDeltaTime: number) {
-    if (engine.onBeforeFixedUpdate) {
-        engine.onBeforeFixedUpdate({ fixedTime, fixedDeltaTime });
+    for (let i = 0; i < engine.onBeforeFixedUpdate.length; i++) {
+        engine.onBeforeFixedUpdate[i]({ fixedTime, fixedDeltaTime });
     }
 
     if (!engine.scene) {
@@ -209,8 +209,8 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
     // before update
     //
 
-    if (engine.onBeforeUpdate) {
-        engine.onBeforeUpdate({ time, deltaTime });
+    for (let i = 0; i < engine.onBeforeUpdate.length; i++) {
+        engine.onBeforeUpdate[i]({ time, deltaTime });
     }
 
     //
@@ -254,8 +254,8 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
     // last update
     //
 
-    if (engine.onLastUpdate) {
-        engine.onLastUpdate({ time, deltaTime });
+    for (let i = 0; i < engine.onLastUpdate.length; i++) {
+        engine.onLastUpdate[i]({ time, deltaTime });
     }
     traverseScene(engine.scene, (actor) => {
         lastUpdateActor(actor, {
@@ -311,8 +311,8 @@ function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
 
     renderSharedTextures(engine.renderer, engine.sharedTextures);
 
-    if (engine.onRender) {
-        engine.onRender(time, deltaTime);
+    for (let i = 0; i < engine.onRender.length; i++) {
+        engine.onRender[i](time, deltaTime);
     }
 
     // TODO: ここにrenderer.renderを書く
@@ -363,19 +363,20 @@ export function runEngine(engine: Engine, time: number) {
 }
 
 export function setOnBeforeStartEngine(engine: Engine, cb: EngineOnBeforeStartCallback) {
-    engine.onBeforeStart = cb;
+    engine.onBeforeStart.push(cb);
 }
 
 export function setOnBeforeFixedUpdateEngine(engine: Engine, cb: EngineOnBeforeFixedUpdateCallback) {
-    engine.onBeforeFixedUpdate = cb;
+    engine.onBeforeFixedUpdate.push(cb);
 }
 
 export function setOnBeforeUpdateEngine(engine: Engine, cb: EngineOnBeforeUpdateCallback) {
-    engine.onBeforeUpdate = cb;
+    console.log('setOnBeforeUpdateEngine');
+    engine.onBeforeUpdate.push(cb);
 }
 
 export function setOnRenderEngine(engine: Engine, cb: EngineOnRenderCallback) {
-    engine.onRender = cb;
+    engine.onRender.push(cb);
 }
 
 export function setSceneToEngine(engine: Engine, scene: Scene) {
