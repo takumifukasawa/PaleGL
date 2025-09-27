@@ -19,12 +19,24 @@ import {
 } from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
 import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
 import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
-import { addActorToScene, createScene, findActorByName, Scene } from '@/PaleGL/core/scene.ts';
+import { addActorToScene, createScene, findActorByName, Scene, setMainCamera } from '@/PaleGL/core/scene.ts';
 import { initHotReloadAndParseScene } from '@/Marionetter/initHotReloadAndParseScene.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { snapToStep } from '@/Marionetter/timelineUtilities.ts';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import {
+    createOrbitCameraController,
+    fixedUpdateOrbitCameraController,
+    setOrbitCameraControllerDelta,
+    startOrbitCameraController,
+} from '@/PaleGL/core/orbitCameraController.ts';
+import { v2o } from '@/PaleGL/math/vector2.ts';
+import { createVector3 } from '@/PaleGL/math/vector3.ts';
+import { InputController } from '@/PaleGL/inputs/inputController.ts';
+import { setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 
 type Player = {
     gpu: Gpu;
@@ -52,6 +64,8 @@ export function createPlayer(
     pixelRatio: number,
     sceneJson: string,
     hotReloadJsonUrl: string,
+    inputController: InputController,
+    cameraPostProcess: PostProcess,
     options: {
         timelineDuration?: number,
         glslSoundWrapper?: GLSLSoundWrapper;
@@ -164,7 +178,7 @@ export function createPlayer(
 
     setOnRenderEngine(engine, (time) => {
         updateTimelineUniforms(player.renderer, player.timelineTime, player.timelineDeltaTime);
-        renderRenderer(renderer, scene, player.camera, player.engine.sharedTextures, {
+        renderRenderer(renderer, scene, player.camera!, player.engine.sharedTextures, {
             time,
             // timelineTime,
             // timelineDeltaTime
@@ -175,6 +189,50 @@ export function createPlayer(
     //     resizePlayer(player);
     // });
 
+    // orbit camera の切り替え
+    const orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50);
+    // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
+    const orbitCameraController = createOrbitCameraController(orbitCameraEntity);
+    // for orbit camera
+    setCameraPostProcess(orbitCameraEntity, cameraPostProcess);
+    orbitCameraController.enabled = true;
+    orbitCameraController.distance = 5;
+    orbitCameraController.attenuation = 0.01;
+    orbitCameraController.dampingFactor = 0.2;
+    orbitCameraController.azimuthSpeed = 100;
+    orbitCameraController.altitudeSpeed = 100;
+    orbitCameraController.deltaAzimuthPower = 2;
+    orbitCameraController.deltaAltitudePower = 2;
+    orbitCameraController.maxAltitude = 5;
+    orbitCameraController.minAltitude = -45;
+    orbitCameraController.maxAzimuth = 55;
+    orbitCameraController.minAzimuth = -55;
+    orbitCameraController.defaultAzimuth = 10;
+    orbitCameraController.defaultAltitude = -10;
+    orbitCameraController.lookAtTarget = createVector3(0, 0, 0);
+    orbitCameraEntity.onFixedUpdate = () => {
+        // 1: fixed position
+        // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+
+        // 2: orbit controls
+        // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+        if (inputController.isDown && orbitCameraController.enabled) {
+            setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
+        }
+        fixedUpdateOrbitCameraController(orbitCameraController);
+    };
+    startOrbitCameraController(orbitCameraController);
+    addActorToScene(player.scene, orbitCameraEntity);
+    setMainCamera(player.scene, orbitCameraEntity);
+    let isOrbitCameraEnabled = false;
+    const cachedPlayerCamera = player.camera!;
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'o') {
+            isOrbitCameraEnabled = !isOrbitCameraEnabled;
+            setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
+        }
+    });
+    
     return player;
 }
 
