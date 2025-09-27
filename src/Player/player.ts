@@ -326,7 +326,7 @@ function initOrbitController(player: Player, inputController: InputController, c
     orbitCameraController.defaultAzimuth = 10;
     orbitCameraController.defaultAltitude = -10;
     orbitCameraController.lookAtTarget = createVector3(0, 0, 0);
-    orbitCameraEntity.onFixedUpdate = () => {
+    orbitCameraEntity.onFixedUpdate.push(() => {
         // 1: fixed position
         // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -336,7 +336,7 @@ function initOrbitController(player: Player, inputController: InputController, c
             setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
         }
         fixedUpdateOrbitCameraController(orbitCameraController);
-    };
+    });
     startOrbitCameraController(orbitCameraController);
     addActorToScene(player.scene, orbitCameraEntity);
     // setMainCamera(player.scene, orbitCameraEntity);

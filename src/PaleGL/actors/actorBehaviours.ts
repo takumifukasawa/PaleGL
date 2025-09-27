@@ -98,9 +98,9 @@ export const fixedUpdateActor = (actor: Actor, args: ActorFixedUpdateArgs) => {
     if (actor.animator) {
         updateAnimator(actor.animator, fixedDeltaTime);
     }
-    if (actor.onFixedUpdate) {
-        actor.onFixedUpdate({ gpu, scene, fixedTime, fixedDeltaTime });
-    }
+    actor.onFixedUpdate.forEach((cb) => {
+        cb({ gpu, scene, fixedTime, fixedDeltaTime });
+    })
 };
 
 // update -------------------------------------------------------
@@ -139,18 +139,18 @@ export const lastUpdateActor = (actor: Actor, args: ActorLastUpdateArgs) => {
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onLastUpdateCallback?.(actor, model, gpu, time, deltaTime);
     });
-    if (actor.onLastUpdate) {
-        actor.onLastUpdate({ gpu, scene, time, deltaTime });
-    }
+    actor.onLastUpdate.forEach((cb) => {
+        cb({ gpu, scene, time, deltaTime });
+    });
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
-    if (actor.onBeforeRender) {
-        actor.onBeforeRender();
-    }
+    actor.onBeforeRender.forEach((cb) => {
+        cb();
+    });
     // TODO: componentで必要になったら呼ぶ
 };
 

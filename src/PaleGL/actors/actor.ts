@@ -49,10 +49,10 @@ export type Actor = {
     animator: Animator;
     onStart: OnStartCallback[];
     onSetSize: OnSetSizeCallback[];
-    onFixedUpdate: OnFixedUpdateCallback | null;
+    onFixedUpdate: OnFixedUpdateCallback[];
     onUpdate: OnUpdateCallback[];
-    onLastUpdate: OnLastUpdateCallback | null;
-    onBeforeRender: OnBeforeRenderCallback | null;
+    onLastUpdate: OnLastUpdateCallback[];
+    onBeforeRender: OnBeforeRenderCallback[];
     onProcessPropertyBinder: OnProcessPropertyBinder | null;
     onPreProcessTimeline: OnProcessTimeline | null;
     onPostProcessTimeline: OnProcessTimeline | null;
@@ -70,12 +70,12 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
     // lifecycle callback
     const onStart: OnStartCallback[] = [];
     const onSetSize: OnSetSizeCallback[] = [];
-    const onFixedUpdate: OnFixedUpdateCallback | null = null;
+    const onFixedUpdate: OnFixedUpdateCallback[] = [];
     const onUpdate: OnUpdateCallback[] = [];
-    const onLastUpdate: OnLastUpdateCallback | null = null;
+    const onLastUpdate: OnLastUpdateCallback[] = [];
+    const onBeforeRender: OnBeforeRenderCallback[] = [];
     // TODO: timeline
     // let _onProcessClipFrame: OnProcessPropertyBinder | null = null;
-    const onBeforeRender: OnBeforeRenderCallback | null = null;
     const onProcessPropertyBinder: OnProcessPropertyBinder | null = null;
     const onPreProcessTimeline: OnProcessTimeline | null = null;
     const onPostProcessTimeline: OnProcessTimeline | null = null;

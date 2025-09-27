@@ -15,10 +15,8 @@
 } from '@/PaleGL/math/vector3.ts';
 import {
     assignMat4Identity,
-    cloneMat4,
     createLookAtMatrixRef,
     createMat4Identity,
-    invertMat4,
     invertMat4Ref,
     mat4m00,
     mat4m01,
