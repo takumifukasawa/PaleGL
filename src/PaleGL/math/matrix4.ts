@@ -520,6 +520,7 @@ export function multiplyMat4Elem(
     return m1;
 }
 
+// smの内容をtmで上書き
 export function copyMat4(sm: Matrix4, tm: Matrix4) {
     // tmp
     // sm.e = new Float32Array([...tm.e]);
@@ -642,6 +643,13 @@ export function transposeMat4(m: Matrix4) {
     return m;
 }
 
+export function invertMat4Ref(refMat: Matrix4, m: Matrix4) {
+    // refMatにmの内容をコピーしてから、refMatを逆行列化する
+    copyMat4(refMat, m);
+    return invertMat4(refMat);
+}
+
+// 逆行列計算 / 引数の行列を書き換える
 export function invertMat4(m: Matrix4) {
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     const te = m.e,

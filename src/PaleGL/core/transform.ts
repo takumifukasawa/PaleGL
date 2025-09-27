@@ -19,6 +19,7 @@ import {
     createLookAtMatrixRef,
     createMat4Identity,
     invertMat4,
+    invertMat4Ref,
     mat4m00,
     mat4m01,
     mat4m02,
@@ -501,7 +502,8 @@ export const updateActorTransformMatrix = (actor: Actor) => {
     actor.transform.worldMatrix = actor?.parent
         ? multiplyMat4Array(actor?.parent.transform.worldMatrix, actor.transform.localMatrix)
         : actor.transform.localMatrix;
-    actor.transform.inverseWorldMatrix = invertMat4(cloneMat4(actor.transform.worldMatrix));
+    // actor.transform.inverseWorldMatrix = invertMat4(cloneMat4(actor.transform.worldMatrix));
+    actor.transform.inverseWorldMatrix = invertMat4Ref(actor.transform.inverseWorldMatrix, actor.transform.worldMatrix);
 
     // // if (_actor?.parent) {
     // // }
@@ -510,5 +512,6 @@ export const updateActorTransformMatrix = (actor: Actor) => {
     // console.log(`hogehoge - update matrix - name: ${actor?.name}`, actor?.transform.getWorldMatrix().e,  actor?.transform.getLocalMatrix().e);
     // // console.log(`hogehoge - update matrix - name: ${_actor?.name}, is started: ${_actor?.isStarted}, actor: ${_actor}, parent: ${_actor?.parent}, ${_worldMatrix.e}, ${_localMatrix.e}`);
 
-    actor.transform.normalMatrix = transposeMat4(invertMat4(cloneMat4(actor.transform.worldMatrix)));
+    // actor.transform.normalMatrix = transposeMat4(invertMat4(cloneMat4(actor.transform.worldMatrix)));
+    actor.transform.normalMatrix = transposeMat4(invertMat4Ref(actor.transform.normalMatrix, actor.transform.worldMatrix));
 };
