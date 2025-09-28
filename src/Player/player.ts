@@ -1,4 +1,4 @@
-import { buildMarionetterScene } from '@/Marionetter/buildMarionetterScene.ts';
+import { buildMarionetterScene, buildMarionetterTimelineFromScene } from '@/Marionetter/buildMarionetterScene.ts';
 import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
 import { initHotReloadAndParseScene } from '@/Marionetter/initHotReloadAndParseScene.ts';
 import { snapToStep } from '@/Marionetter/timelineUtilities.ts';
@@ -29,6 +29,7 @@ import {
     addActorToScene,
     createScene,
     createSceneUICamera,
+    disposeScene,
     findActorByName,
     Scene,
     setMainCamera,
@@ -62,8 +63,11 @@ type Player = {
     marionetter: Marionetter | null;
     marionetterSceneStructure: MarionetterSceneStructure | null;
     timelineDuration: number;
+    onHotReload?: () => void;
     // onBeforeUpdate?: (time: number, deltaTime: number) => void;
 };
+
+let isOrbitCameraEnabled = false;
 
 export function createPlayer(
     gpu: Gpu,
@@ -71,6 +75,7 @@ export function createPlayer(
     pixelRatio: number,
     sceneJson: string,
     hotReloadJsonUrl: string,
+    onHotReload: () => void,
     inputController: InputController,
     cameraPostProcess: PostProcess,
     options: {
@@ -109,6 +114,7 @@ export function createPlayer(
         currentTimeForTimeline: 0,
         glslSoundWrapper: glslSoundWrapper || null,
         timelineDuration: 0,
+        onHotReload,
     };
 
     const marionetter = createMarionetter({
@@ -126,7 +132,20 @@ export function createPlayer(
         },
     });
 
-    const marionetterSceneStructure = buildMarionetterScene(gpu, JSON.parse(sceneJson) as unknown as MarionetterScene);
+    const marionetterSceneStructure = rebuildScene(
+        // prettier-ignore
+        gpu, 
+        player,
+        marionetter,
+        JSON.parse(sceneJson) as unknown as MarionetterScene,
+        // marionetterSceneStructure,
+        inputController,
+        cameraPostProcess,
+        true
+    );
+
+    // const marionetterSceneStructure = buildMarionetterScene(gpu, );
+    // const marionetterSceneStructure = marionetter.
 
     console.log('marionetterSceneStructure', marionetterSceneStructure);
 
@@ -140,29 +159,22 @@ export function createPlayer(
         }
     }
 
-    // timeline生成したらscene内のactorをbind
-    const { actors } = marionetterSceneStructure;
-
-    marionetterSceneStructure.marionetterTimeline?.bindActors(scene.children);
-    for (let i = 0; i < actors.length; i++) {
-        addActorToScene(scene, actors[i]);
-    }
-
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         marionetter.connect();
-        // initHotReloadAndParseScene();
-        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, marionetterSceneStructure, scene, (structure) => {
-            player.marionetterSceneStructure = structure;
+        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, marionetterSceneStructure, (sceneJson) => {
+            rebuildScene(
+                // prettier-ignore
+                gpu, 
+                player,
+                marionetter,
+                sceneJson,
+                inputController,
+                cameraPostProcess,
+                false
+            );
+            onHotReload();
         });
     }
-
-    const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
-    setMainCamera(player.scene, camera);
-    createSceneUICamera(player.scene);
-
-    player.marionetter = marionetter;
-    player.marionetterSceneStructure = marionetterSceneStructure;
-    setPlayerCamera(player, camera);
 
     setOnBeforeUpdateEngine(engine, ({ time, deltaTime }) => {
         // if (player.onBeforeUpdate) {
@@ -190,9 +202,57 @@ export function createPlayer(
         }
     });
 
+    return player;
+}
+
+// TODO: 差分更新
+function rebuildScene(
+    gpu: Gpu, 
+    player: Player,
+    marionetter: Marionetter,
+    sceneJson: MarionetterScene,
+    // structure: MarionetterSceneStructure,
+    inputController: InputController,
+    cameraPostProcess: PostProcess,
+    isFirst: boolean
+) {
+    // sceneを空にする
+    disposeScene(player.scene);
+
+    // marionetterを構築
+    const structure = buildMarionetterScene(gpu, sceneJson)
+
+    // sceneをreflesh
+    const { actors } = structure;
+    console.log('hogehoge', actors.length, actors);
+    for (let i = 0; i < actors.length; i++) {
+        addActorToScene(player.scene, actors[i]);
+    }
+
+    // timelineにactorをbind
+    structure.marionetterTimeline = buildMarionetterTimelineFromScene(
+        sceneJson,
+        player.scene.children
+        // structure.actors
+    );
+    structure.marionetterTimeline?.bindActors(player.scene.children);
+
+    // camera
+    const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
+    setMainCamera(player.scene, camera);
+    // if (isFirst) {
+        createSceneUICamera(player.scene);
+    // }
+    setPlayerCamera(player, camera);
+    isOrbitCameraEnabled = false;
+    
+    // orbit camera controller
     initOrbitController(player, inputController, cameraPostProcess);
 
-    return player;
+    player.marionetter = marionetter;
+    player.marionetterSceneStructure = structure;
+    
+    return structure;
 }
 
 export function setPlayerCamera(player: Player, camera: Camera) {
@@ -306,7 +366,7 @@ function initOrbitController(player: Player, inputController: InputController, c
     // });
 
     // orbit camera の切り替え
-    const orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50);
+    const orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
     // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
     const orbitCameraController = createOrbitCameraController(orbitCameraEntity);
     // for orbit camera
@@ -340,7 +400,6 @@ function initOrbitController(player: Player, inputController: InputController, c
     startOrbitCameraController(orbitCameraController);
     addActorToScene(player.scene, orbitCameraEntity);
     // setMainCamera(player.scene, orbitCameraEntity);
-    let isOrbitCameraEnabled = false;
     const cachedPlayerCamera = player.camera!;
     window.addEventListener('keydown', (e) => {
         if (e.key === 'o') {

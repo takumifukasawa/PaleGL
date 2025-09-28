@@ -8,6 +8,8 @@ import {
     MarionetterLightComponentInfo,
     MarionetterLightComponentInfoProperty,
     MarionetterLitMaterialInfoProperty,
+    MarionetterMaterialInfoProperty,
+    MarionetterMaterialType,
     MarionetterMeshFilterComponentInfo,
     MarionetterMeshFilterComponentInfoProperty,
     MarionetterMeshRendererComponentInfo,
@@ -24,6 +26,7 @@ import {
     MarionetterSpotLightComponentInfoProperty,
     MarionetterTimeline,
     MarionetterTransformInfoProperty,
+    // MarionetterUnlitMaterialInfoProperty,
 } from '@/Marionetter/types';
 import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -41,7 +44,7 @@ import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
-import { createColorFromHex } from '@/PaleGL/math/color.ts';
+import { createColorFromHex, createEmissiveColorFromHex } from '@/PaleGL/math/color.ts';
 import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
@@ -216,20 +219,22 @@ export function buildMarionetterScene(
             }
 
             // build material
-            switch (meshRenderer[MarionetterMeshRendererComponentInfoProperty.materialName]) {
-                case 'Lit':
+            switch (meshRenderer[MarionetterMeshRendererComponentInfoProperty.material][MarionetterMaterialInfoProperty.type]) {
+                case MarionetterMaterialType.Lit:
                     const litMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createGBufferMaterial({
                         baseColor: createColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.color]),
                         metallic: litMaterial[MarionetterLitMaterialInfoProperty.metallic],
                         roughness: litMaterial[MarionetterLitMaterialInfoProperty.roughness],
+                        emissiveColor: createEmissiveColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.emission]),
                         receiveShadow: !!litMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;
-                case 'Unlit':
+                case MarionetterMaterialType.Unlit:
                     const unlitMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createUnlitMaterial({
                         baseColor: createColorFromHex(unlitMaterial[MarionetterLitMaterialInfoProperty.color]),
+                        // emissiveColor: createEmissiveColorFromHex(unlitMaterial[MarionetterUnlitMaterialInfoProperty.emission]),
                         receiveShadow: !!unlitMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;

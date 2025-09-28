@@ -267,6 +267,22 @@ export function createColorFromHex(hex: string) {
     return createColor(Number.parseInt(r, 16) / 255, Number.parseInt(g, 16) / 255, Number.parseInt(b, 16) / 255, 1);
 }
 
+// hex ... #rrggbbi or rrggbbii (ii = intensity 0~10)
+export function createEmissiveColorFromHex(hex: string) {
+    const coord = hex.slice(0, 1) === '#' ? hex.slice(1) : hex;
+    const r = coord.slice(0, 2);
+    const g = coord.slice(2, 4);
+    const b = coord.slice(4, 6);
+    const i = coord.slice(6, 8);
+    const ni = Number.parseInt(i) / (255 / 10);
+    return createColor(
+        (Number.parseInt(r, 16) / 255) * ni,
+        (Number.parseInt(g, 16) / 255) * ni,
+        (Number.parseInt(b, 16) / 255) * ni,
+        1
+    );
+}
+
 export function getColorRange(minColor: Color, maxColor: Color) {
     const r = randomRange(getColorR(minColor), getColorR(maxColor));
     const g = randomRange(getColorG(minColor), getColorG(maxColor));

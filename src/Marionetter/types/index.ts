@@ -538,11 +538,13 @@ export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
     color: string;
     metallic: number;
     roughness: number;
+    emission: string;
     receiveShadow: number;
     // shorten
     c: string; // hex string
     m: number;
     r: number;
+    e : string; // hex string (rgbi ... i is intensity)
     rs: number;
 };
 
@@ -550,19 +552,23 @@ export const MarionetterLitMaterialInfoProperty = {
     color: NeedsShorten ? 'c' : 'color',
     metallic: NeedsShorten ? 'm' : 'metallic',
     roughness: NeedsShorten ? 'r' : 'roughness',
+    emission: NeedsShorten ? 'e' : 'emission',
     receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
 } as const;
 
 export type MarionetterUnlitMaterialInfo = MarionetterMaterialInfo & {
     color: string;
     receiveShadow: number;
+    // emission: string;
     // shorten
     c: string; // hex string
+    // e : string; // hex string (rgbi ... i is intensity)
     rs: number;
 };
 
 export const MarionetterUnlitMaterialInfoProperty = {
     color: NeedsShorten ? 'c' : 'color',
+    // emission: NeedsShorten ? 'e' : 'emission',
     receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
 } as const;
 

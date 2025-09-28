@@ -688,3 +688,7 @@ export function generateTexture(texture: Texture) {
         flipY: texture.flipY,
     });
 }
+
+export function disposeTexture(texture: Texture) {
+    texture.gpu.gl.deleteTexture(texture.glObject);
+}

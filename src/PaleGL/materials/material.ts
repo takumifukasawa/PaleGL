@@ -20,7 +20,7 @@
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { buildFragmentShader, buildVertexShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createShader, Shader } from '@/PaleGL/core/shader.ts';
+import { createShader, deleteProgram, Shader } from '@/PaleGL/core/shader.ts';
 import {
     addUniformValue,
     createUniforms,
@@ -469,7 +469,6 @@ export const startMaterial = (
     // console.log(`[material.start] shader`, _shader);
 };
 
-
 // materialのuniform値をまるっとコピーする
 export const copyUniformValues = (source: Material, destination: Material) => {
     source.uniforms.data.forEach((srcData) => {
@@ -484,4 +483,10 @@ export const copyUniformValues = (source: Material, destination: Material) => {
             dstData.value = srcData.value;
         }
     });
-}
+};
+
+export const disposeMaterial = (material: Material) => {
+    if (material.shader) {
+        deleteProgram(material.shader.gpu.gl, material.shader.glObject);
+    }
+};

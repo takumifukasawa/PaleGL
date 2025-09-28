@@ -5,7 +5,7 @@ import { UIActor } from '@/PaleGL/actors/meshes/uiActor.ts';
 import { UIAnchorTypes } from '@/PaleGL/constants.ts';
 
 export const setUITranslation = (uiActor: UIActor, uiCamera: OrthographicCamera | null, position: Vector3) => {
-    console.log(uiActor)
+    // console.log(uiActor)
     if (!uiCamera) {
         console.warn('uiCamera is null');
         return;

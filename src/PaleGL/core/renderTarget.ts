@@ -1,7 +1,8 @@
-﻿import { createTexture, setTextureSize, Texture } from '@/PaleGL/core/texture.ts';
+﻿import { createTexture, disposeTexture, setTextureSize, Texture } from '@/PaleGL/core/texture.ts';
 import {
     bindFramebuffer,
     createFramebuffer,
+    disposeFramebuffer,
     Framebuffer,
     registerDrawBufferToFramebuffer,
     unbindFramebuffer,
@@ -407,4 +408,21 @@ export function copyRenderTargetDepth(
     gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GLTextureFilter.NEAREST);
     gl.bindFramebuffer(GL_READ_FRAMEBUFFER, null);
     gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
+}
+
+export function disposeRenderTarget(renderTarget: RenderTarget) {
+    const { gpu, framebuffer, texture, depthTexture, depthRenderbuffer } = renderTarget;
+    if (texture) {
+        disposeTexture(texture);
+        renderTarget.texture = null;
+    }
+    if (depthTexture) {
+        disposeTexture(depthTexture);
+        renderTarget.depthTexture = null;
+    }
+    if (depthRenderbuffer) {
+        gpu.gl.deleteRenderbuffer(depthRenderbuffer.glObject);
+        renderTarget.depthRenderbuffer = null;
+    }
+    disposeFramebuffer(framebuffer);
 }

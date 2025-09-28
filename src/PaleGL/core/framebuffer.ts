@@ -1,6 +1,5 @@
-﻿
+﻿import { GL_FRAMEBUFFER, GLColorAttachment } from '@/PaleGL/constants';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import {GL_FRAMEBUFFER, GLColorAttachment} from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export type Framebuffer = GLObjectBase<WebGLFramebuffer> & {
@@ -10,17 +9,17 @@ export type Framebuffer = GLObjectBase<WebGLFramebuffer> & {
 export function createFramebuffer({ gpu }: { gpu: Gpu }): Framebuffer {
     const { gl } = gpu;
 
-    const fb = gl.createFramebuffer()!;
+    const fb = gl.createFramebuffer();
     // if (!fb) {
     //     console.error('invalid framebuffer');
     // }
-    
+
     const drawBufferList: GLColorAttachment[] = [];
-  
+
     return {
         ...createGLObject(gpu, fb),
-        drawBufferList
-    }
+        drawBufferList,
+    };
 }
 
 export function hasFramebufferMultipleDrawBuffers(framebuffer: Framebuffer) {
@@ -45,4 +44,9 @@ function bindRawFramebuffer(gl: WebGL2RenderingContext, glObject: WebGLFramebuff
 
 function unbindRawFramebuffer(gl: WebGL2RenderingContext) {
     gl.bindFramebuffer(GL_FRAMEBUFFER, null);
+}
+
+export function disposeFramebuffer(framebuffer: Framebuffer) {
+    const { gl } = framebuffer.gpu;
+    gl.deleteFramebuffer(framebuffer.glObject);
 }

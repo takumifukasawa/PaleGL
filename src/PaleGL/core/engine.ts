@@ -38,7 +38,6 @@ import {
     TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
-// import {createPlaneGeometry, PlaneGeometry} from "@/PaleGL/geometries/planeGeometry.ts";
 
 type EngineOnStartCallbackArgs = void;
 
@@ -223,6 +222,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
     }
 
     // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
+    // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
     traverseScene(engine.scene, (actor) => {
         updateActor(actor, {
             gpu: engine.renderer.gpu,
@@ -239,10 +239,14 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
                 beforeRenderActor(actor, { gpu: engine.renderer.gpu });
                 const mesh = actor as Mesh;
                 mesh.materials.forEach((mat) => {
-                    checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    if (mat) {
+                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    }
                 });
                 mesh.depthMaterials.forEach((mat) => {
-                    checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    if (mat) {
+                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    }
                 });
                 break;
             default:

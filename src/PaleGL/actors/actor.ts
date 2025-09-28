@@ -142,3 +142,10 @@ export const addActorComponents = (actor: Actor, components: Component[]) => {
 export function getActorComponent<T extends Component>(actor: Actor): T | null {
     return actor.components.find((component) => component) as T;
 }
+
+// export const disposeActor = (actor: Actor) => {
+//     // dispose components
+//     actor.components.forEach((component) => {
+//         disposeComponent(component);
+//     });
+// }

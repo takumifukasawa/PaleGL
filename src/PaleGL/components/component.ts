@@ -148,3 +148,6 @@ export function createComponent(args: ComponentArgs): Component {
 export function setActorToComponent(componentModel: ComponentModel, actor: Actor) {
     componentModel.actor = actor;
 }
+
+// export const disposeComponent = (component: Component) => {
+// }

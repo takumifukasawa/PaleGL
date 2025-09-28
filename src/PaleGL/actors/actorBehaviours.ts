@@ -9,13 +9,17 @@ import {
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { setSizeCamera, updateCamera, updateCameraTransform } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { iterateAllMeshMaterials, setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
 import { ActorType, ActorTypes } from '@/PaleGL/constants.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
+import { disposeMaterial } from '@/PaleGL/materials/material.ts';
 
 // try start actor -------------------------------------------------------
 
@@ -100,7 +104,7 @@ export const fixedUpdateActor = (actor: Actor, args: ActorFixedUpdateArgs) => {
     }
     actor.onFixedUpdate.forEach((cb) => {
         cb({ gpu, scene, fixedTime, fixedDeltaTime });
-    })
+    });
 };
 
 // update -------------------------------------------------------
@@ -200,4 +204,25 @@ const updateActorTransformBehaviour: Partial<Record<ActorType, UpdateActorTransf
 
 export const updateActorTransform: UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => {
     (updateActorTransformBehaviour[actor.type] ?? defaultUpdateActorTransform)(actor, camera);
+};
+
+// dispose actor -------------------------------------------------------
+
+export const disposeActor = (actor: Actor) => {
+    switch (actor.type) {
+        case ActorTypes.Mesh:
+            const mesh = actor as Mesh;
+            iterateAllMeshMaterials(mesh, (material) => {
+                // disposeMaterial(material);
+            });
+            mesh.materials = [];
+            mesh.depthMaterials = [];
+            break;
+        case ActorTypes.Light:
+            const light = actor as Light;
+            if (light.shadowMap) {
+                // disposeRenderTarget(light.shadowMap);
+            }
+            break;
+    }
 };

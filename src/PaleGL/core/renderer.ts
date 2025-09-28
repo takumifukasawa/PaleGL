@@ -749,6 +749,9 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
     if (material.boundUniformBufferObjects) {
         return;
     }
+    if (!material.shader) {
+        return;
+    }
     // for debug
     material.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
