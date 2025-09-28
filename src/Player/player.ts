@@ -134,7 +134,7 @@ export function createPlayer(
 
     const marionetterSceneStructure = rebuildScene(
         // prettier-ignore
-        gpu, 
+        gpu,
         player,
         marionetter,
         JSON.parse(sceneJson) as unknown as MarionetterScene,
@@ -161,10 +161,10 @@ export function createPlayer(
 
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         marionetter.connect();
-        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, marionetterSceneStructure, (sceneJson) => {
+        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, (sceneJson) => {
             rebuildScene(
                 // prettier-ignore
-                gpu, 
+                gpu,
                 player,
                 marionetter,
                 sceneJson,
@@ -207,7 +207,7 @@ export function createPlayer(
 
 // TODO: 差分更新
 function rebuildScene(
-    gpu: Gpu, 
+    gpu: Gpu,
     player: Player,
     marionetter: Marionetter,
     sceneJson: MarionetterScene,
@@ -220,7 +220,7 @@ function rebuildScene(
     disposeScene(player.scene);
 
     // marionetterを構築
-    const structure = buildMarionetterScene(gpu, sceneJson)
+    const structure = buildMarionetterScene(gpu, sceneJson);
 
     // sceneをreflesh
     const { actors } = structure;
@@ -241,17 +241,17 @@ function rebuildScene(
     const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
     setMainCamera(player.scene, camera);
     // if (isFirst) {
-        createSceneUICamera(player.scene);
+    createSceneUICamera(player.scene);
     // }
     setPlayerCamera(player, camera);
     isOrbitCameraEnabled = false;
-    
+
     // orbit camera controller
-    initOrbitController(player, inputController, cameraPostProcess);
+    initOrbitController(player, inputController, cameraPostProcess, isFirst);
 
     player.marionetter = marionetter;
     player.marionetterSceneStructure = structure;
-    
+
     return structure;
 }
 
@@ -360,17 +360,24 @@ function stopMarionetter(player: Player) {
     player.isPlaying = false;
 }
 
-function initOrbitController(player: Player, inputController: InputController, cameraPostProcess: PostProcess) {
+let orbitCameraEntity: Camera | null = null;
+let cachedPlayerCamera: Camera | null = null;
+
+function initOrbitController(
+    player: Player,
+    inputController: InputController,
+    cameraPostProcess: PostProcess,
+    isFirst: boolean
+) {
     // window.addEventListener('resize', () => {
     //     resizePlayer(player);
     // });
 
     // orbit camera の切り替え
-    const orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
+    orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
     // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
     const orbitCameraController = createOrbitCameraController(orbitCameraEntity);
     // for orbit camera
-    setCameraPostProcess(orbitCameraEntity, cameraPostProcess);
     orbitCameraController.enabled = true;
     orbitCameraController.distance = 5;
     orbitCameraController.attenuation = 0.01;
@@ -400,11 +407,16 @@ function initOrbitController(player: Player, inputController: InputController, c
     startOrbitCameraController(orbitCameraController);
     addActorToScene(player.scene, orbitCameraEntity);
     // setMainCamera(player.scene, orbitCameraEntity);
-    const cachedPlayerCamera = player.camera!;
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'o') {
-            isOrbitCameraEnabled = !isOrbitCameraEnabled;
-            setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
-        }
-    });
+    cachedPlayerCamera = player.camera!;
+
+    setCameraPostProcess(orbitCameraEntity, cameraPostProcess);
+
+    if (isFirst) {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'o') {
+                isOrbitCameraEnabled = !isOrbitCameraEnabled;
+                setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity! : cachedPlayerCamera!);
+            }
+        });
+    }
 }
