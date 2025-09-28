@@ -1,4 +1,4 @@
-import { Marionetter, MarionetterScene, MarionetterSceneStructure } from '@/Marionetter/types';
+import { Marionetter, MarionetterScene } from '@/Marionetter/types';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export const initHotReloadAndParseScene = (

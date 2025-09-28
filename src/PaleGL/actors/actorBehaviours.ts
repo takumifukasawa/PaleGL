@@ -213,7 +213,7 @@ export const disposeActor = (actor: Actor) => {
         case ActorTypes.Mesh:
             const mesh = actor as Mesh;
             iterateAllMeshMaterials(mesh, (material) => {
-                // disposeMaterial(material);
+                disposeMaterial(material);
             });
             mesh.materials = [];
             mesh.depthMaterials = [];
@@ -221,7 +221,7 @@ export const disposeActor = (actor: Actor) => {
         case ActorTypes.Light:
             const light = actor as Light;
             if (light.shadowMap) {
-                // disposeRenderTarget(light.shadowMap);
+                disposeRenderTarget(light.shadowMap);
             }
             break;
     }
