@@ -1,7 +1,7 @@
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import { RawVector3 } from '@/PaleGL/math/vector3.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Color } from '@/PaleGL/math/color.ts';
+import { RawVector3 } from '@/PaleGL/math/vector3.ts';
 
 //
 // settings
@@ -516,6 +516,7 @@ export const MarionetterCameraComponentInfoProperty = {
 export const MarionetterMaterialType = {
     None: 0,
     Lit: 1,
+    Unlit: 2,
 } as const;
 
 export type MarionetterMaterialType = (typeof MarionetterMaterialType)[keyof typeof MarionetterMaterialType];
@@ -552,9 +553,23 @@ export const MarionetterLitMaterialInfoProperty = {
     receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
 } as const;
 
-export type MarionetterMaterialKinds = MarionetterLitMaterialInfo;
+export type MarionetterUnlitMaterialInfo = MarionetterMaterialInfo & {
+    color: string;
+    receiveShadow: number;
+    // shorten
+    c: string; // hex string
+    rs: number;
+};
 
-// mesh renderer
+export const MarionetterUnlitMaterialInfoProperty = {
+    color: NeedsShorten ? 'c' : 'color',
+    receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
+} as const;
+
+// merge
+export type MarionetterMaterialKinds = MarionetterLitMaterialInfo & MarionetterUnlitMaterialInfo;
+
+// --- mesh renderer
 
 export type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase & {
     materialName: string;

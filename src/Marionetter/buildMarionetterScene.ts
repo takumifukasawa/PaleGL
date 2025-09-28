@@ -40,6 +40,7 @@ import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
+import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
 import { createColorFromHex } from '@/PaleGL/math/color.ts';
 import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
@@ -217,12 +218,19 @@ export function buildMarionetterScene(
             // build material
             switch (meshRenderer[MarionetterMeshRendererComponentInfoProperty.materialName]) {
                 case 'Lit':
-                    const m = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
+                    const litMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createGBufferMaterial({
-                        baseColor: createColorFromHex(m[MarionetterLitMaterialInfoProperty.color]),
-                        metallic: m[MarionetterLitMaterialInfoProperty.metallic],
-                        roughness: m[MarionetterLitMaterialInfoProperty.roughness],
-                        receiveShadow: !!m[MarionetterLitMaterialInfoProperty.receiveShadow],
+                        baseColor: createColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.color]),
+                        metallic: litMaterial[MarionetterLitMaterialInfoProperty.metallic],
+                        roughness: litMaterial[MarionetterLitMaterialInfoProperty.roughness],
+                        receiveShadow: !!litMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
+                    });
+                    break;
+                case 'Unlit':
+                    const unlitMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
+                    material = createUnlitMaterial({
+                        baseColor: createColorFromHex(unlitMaterial[MarionetterLitMaterialInfoProperty.color]),
+                        receiveShadow: !!unlitMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;
                 default:
