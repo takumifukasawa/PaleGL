@@ -46,7 +46,7 @@ import {
 } from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 
-type Player = {
+export type Player = {
     gpu: Gpu;
     engine: Engine;
     scene: Scene;
