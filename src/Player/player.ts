@@ -68,6 +68,8 @@ export type Player = {
 };
 
 let isOrbitCameraEnabled = false;
+let orbitCameraEntity: Camera | null = null;
+let cachedPlayerCamera: Camera | null = null;
 
 export function createPlayer(
     gpu: Gpu,
@@ -186,6 +188,13 @@ export function createPlayer(
     let isRenderEnabled = true;
 
     window.addEventListener('keydown', (e) => {
+        if (e.key === 'o') {
+            isOrbitCameraEnabled = !isOrbitCameraEnabled;
+            setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity! : cachedPlayerCamera!);
+        }
+    });
+
+    window.addEventListener('keydown', (e) => {
         if (e.key === 'p') {
             isRenderEnabled = !isRenderEnabled;
         }
@@ -214,7 +223,7 @@ function rebuildScene(
     // structure: MarionetterSceneStructure,
     inputController: InputController,
     cameraPostProcess: PostProcess,
-    isFirst: boolean
+    // isFirst: boolean
 ) {
     // sceneを空にする
     disposeScene(player.scene);
@@ -240,17 +249,19 @@ function rebuildScene(
     // camera
     const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
     setMainCamera(player.scene, camera);
-    // if (isFirst) {
     createSceneUICamera(player.scene);
-    // }
-    setPlayerCamera(player, camera);
-    isOrbitCameraEnabled = false;
+    // setPlayerCamera(player, camera);
+    // isOrbitCameraEnabled = false;
 
     // orbit camera controller
-    initOrbitController(player, inputController, cameraPostProcess, isFirst);
+    orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
+    
+    cachedPlayerCamera = camera;
 
     player.marionetter = marionetter;
     player.marionetterSceneStructure = structure;
+
+    setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
 
     return structure;
 }
@@ -360,23 +371,15 @@ function stopMarionetter(player: Player) {
     player.isPlaying = false;
 }
 
-let orbitCameraEntity: Camera | null = null;
-let cachedPlayerCamera: Camera | null = null;
-
-function initOrbitController(
-    player: Player,
-    inputController: InputController,
-    cameraPostProcess: PostProcess,
-    isFirst: boolean
-) {
+function createOrbitCamera(player: Player, inputController: InputController, cameraPostProcess: PostProcess) {
     // window.addEventListener('resize', () => {
     //     resizePlayer(player);
     // });
 
     // orbit camera の切り替え
-    orbitCameraEntity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
+    const entity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
     // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
-    const orbitCameraController = createOrbitCameraController(orbitCameraEntity);
+    const orbitCameraController = createOrbitCameraController(entity);
     // for orbit camera
     orbitCameraController.enabled = true;
     orbitCameraController.distance = 5;
@@ -393,7 +396,7 @@ function initOrbitController(
     orbitCameraController.defaultAzimuth = 10;
     orbitCameraController.defaultAltitude = -10;
     orbitCameraController.lookAtTarget = createVector3(0, 0, 0);
-    orbitCameraEntity.onFixedUpdate.push(() => {
+    entity.onFixedUpdate.push(() => {
         // 1: fixed position
         // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -405,18 +408,9 @@ function initOrbitController(
         fixedUpdateOrbitCameraController(orbitCameraController);
     });
     startOrbitCameraController(orbitCameraController);
-    addActorToScene(player.scene, orbitCameraEntity);
-    // setMainCamera(player.scene, orbitCameraEntity);
-    cachedPlayerCamera = player.camera!;
+    addActorToScene(player.scene, entity);
 
-    setCameraPostProcess(orbitCameraEntity, cameraPostProcess);
-
-    if (isFirst) {
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'o') {
-                isOrbitCameraEnabled = !isOrbitCameraEnabled;
-                setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity! : cachedPlayerCamera!);
-            }
-        });
-    }
+    setCameraPostProcess(entity, cameraPostProcess);
+    
+    return entity;
 }
