@@ -26,7 +26,6 @@ import {
     MarionetterSpotLightComponentInfoProperty,
     MarionetterTimeline,
     MarionetterTransformInfoProperty,
-    // MarionetterUnlitMaterialInfoProperty,
 } from '@/Marionetter/types';
 import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -39,7 +38,7 @@ import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
-import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { createGeometry, Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -216,17 +215,29 @@ export function buildMarionetterScene(
                 case 'Quad':
                     geometry = createPlaneGeometry({ gpu, width: 1, height: 1 });
                     break;
+                default:
+                    console.warn(
+                        `[buildMarionetterActors] invalid mesh name: ${meshFilter[MarionetterMeshFilterComponentInfoProperty.meshName]}`
+                    );
+                    // for dummy
+                    geometry = createPlaneGeometry({ gpu, width: 1, height: 1 });
             }
 
             // build material
-            switch (meshRenderer[MarionetterMeshRendererComponentInfoProperty.material][MarionetterMaterialInfoProperty.type]) {
+            switch (
+                meshRenderer[MarionetterMeshRendererComponentInfoProperty.material][
+                    MarionetterMaterialInfoProperty.type
+                ]
+            ) {
                 case MarionetterMaterialType.Lit:
                     const litMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createGBufferMaterial({
                         baseColor: createColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.color]),
                         metallic: litMaterial[MarionetterLitMaterialInfoProperty.metallic],
                         roughness: litMaterial[MarionetterLitMaterialInfoProperty.roughness],
-                        emissiveColor: createEmissiveColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.emission]),
+                        emissiveColor: createEmissiveColorFromHex(
+                            litMaterial[MarionetterLitMaterialInfoProperty.emission]
+                        ),
                         receiveShadow: !!litMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;

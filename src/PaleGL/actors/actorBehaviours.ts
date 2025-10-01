@@ -208,6 +208,7 @@ export const updateActorTransform: UpdateActorTransformFunc = (actor: Actor, cam
 
 // dispose actor -------------------------------------------------------
 
+// TODO: disposeするものを適宜列挙していく
 export const disposeActor = (actor: Actor) => {
     switch (actor.type) {
         case ActorTypes.Mesh:

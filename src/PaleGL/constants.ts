@@ -464,6 +464,12 @@ export const UniformNames = {
     RotationOffset: 'uRotationOffset', // TODO: 名前変えたい
     // raymarch
     ObjectSpaceRaymarchBoundsScale: 'uBoundsScale',
+    // effect texture
+    GridSize: 'uGridSize',
+    Octaves: 'uOctaves',
+    Amplitude: 'uAmplitude',
+    Frequency: 'uFrequency',
+    Factor: 'uFactor'
     // misc
 } as const;
 

@@ -12,7 +12,7 @@ let convertNormalMapFromHeightMapMaterial: Material;
 
 const uniformNameSrcMap = 'uSrcMap';
 
-type NormalMapFromHeightMapConverter = {
+export type NormalMapFromHeightMapConverter = {
     renderTarget: RenderTarget;
     srcTexture?: Texture;
     srcRenderTarget?: RenderTarget;

@@ -1,7 +1,7 @@
 ﻿import { Actor, ActorArgs, createActor } from '@/PaleGL/actors/actor.ts';
-import {ActorTypes, MeshType, MeshTypes} from '@/PaleGL/constants.ts';
-import { Material } from '@/PaleGL/materials/material.ts';
+import { ActorTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { Material } from '@/PaleGL/materials/material.ts';
 
 export type MeshOptionsArgs = {
     castShadow?: boolean;
@@ -61,7 +61,7 @@ export function createMesh({
 
     return {
         ...actor,
-        meshType : meshType ?? MeshTypes.Default,
+        meshType: meshType ?? MeshTypes.Default,
         // meshType,
         geometry,
         materials,
@@ -73,4 +73,10 @@ export function createMesh({
         // methods
         // start: startMesh,
     };
+}
+
+export function replaceMesh(mesh: Mesh, geometry: Geometry, material: Material) {
+    mesh.geometry = geometry;
+    mesh.materials = [material];
+    return mesh;
 }
