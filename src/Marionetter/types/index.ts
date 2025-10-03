@@ -2,6 +2,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { RawVector3 } from '@/PaleGL/math/vector3.ts';
+import { RawVector4 } from '@/PaleGL/math/vector4.ts';
 
 //
 // settings
@@ -537,11 +538,13 @@ export const MarionetterMaterialInfoProperty = {
 export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
     color: string;
     metallic: number;
+    tiling: RawVector4;
     roughness: number;
     emission: string;
     receiveShadow: number;
     // shorten
     c: string; // hex string
+    ti: RawVector4;
     m: number;
     r: number;
     e : string; // hex string (rgbi ... i is intensity)
@@ -550,6 +553,7 @@ export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
 
 export const MarionetterLitMaterialInfoProperty = {
     color: NeedsShorten ? 'c' : 'color',
+    tiling: NeedsShorten ? 'ti' : 'tiling',
     metallic: NeedsShorten ? 'm' : 'metallic',
     roughness: NeedsShorten ? 'r' : 'roughness',
     emission: NeedsShorten ? 'e' : 'emission',

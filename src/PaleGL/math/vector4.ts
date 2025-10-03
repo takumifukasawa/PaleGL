@@ -1,57 +1,57 @@
 ﻿// import {Matrix4} from "@/PaleGL/math/matrix4.ts";
-// 
+//
 // export class Vector4 {
 //     e: Float32Array = new Float32Array(4);
-// 
+//
 //     constructor(x: number, y: number, z: number, w: number) {
 //         this.set(x, y, z, w);
 //     }
-//     
+//
 //     static get one() {
 //         return new Vector4(1, 1, 1, 1);
 //     }
-//     
+//
 //     static get zero() {
 //         return new Vector4(0, 0, 0, 0);
 //     }
-// 
+//
 //     get x() {
 //         return this.e[0];
 //     }
-// 
+//
 //     get y() {
 //         return this.e[1];
 //     }
-// 
+//
 //     get z() {
 //         return this.e[2];
 //     }
-// 
+//
 //     get w() {
 //         return this.e[3];
 //     }
-// 
+//
 //     set x(value) {
 //         this.e[0] = value;
 //     }
-// 
+//
 //     set y(value) {
 //         this.e[1] = value;
 //     }
-// 
+//
 //     set z(value) {
 //         this.e[2] = value;
 //     }
-// 
+//
 //     set w(value) {
 //         this.e[3] = value;
 //     }
-// 
+//
 //     set(x: number, y: number, z: number, w: number) {
 //         this.e = new Float32Array([x, y, z, w]);
 //     }
-// 
-// 
+//
+//
 //     multiplyMatrix4(m: Matrix4) {
 //         const tmpX = this.x;
 //         const tmpY = this.y;
@@ -69,7 +69,6 @@
 //     }
 // }
 
-
 import {
     mat4m00,
     mat4m01,
@@ -78,14 +77,24 @@ import {
     mat4m10,
     mat4m11,
     mat4m12,
-    mat4m13, mat4m20, mat4m21, mat4m22, mat4m23, mat4m30, mat4m31, mat4m32, mat4m33,
+    mat4m13,
+    mat4m20,
+    mat4m21,
+    mat4m22,
+    mat4m23,
+    mat4m30,
+    mat4m31,
+    mat4m32,
+    mat4m33,
     Matrix4,
 } from '@/PaleGL/math/matrix4.ts';
+
+export type RawVector4 = { x: number; y: number; z: number; w: number };
 
 export type Vector4 = { e: Float32Array };
 
 export function createVector4(x: number, y: number, z: number, w: number): Vector4 {
-    return {e: new Float32Array([x, y, z, w])}
+    return { e: new Float32Array([x, y, z, w]) };
 }
 
 export function createVector4One() {
@@ -96,14 +105,18 @@ export function createVector4zero() {
     return createVector4(0, 0, 0, 0);
 }
 
+export function createVector4FromRawVector4(obj: { x: number; y: number; z: number; w: number }) {
+    return createVector4(obj.x, obj.y, obj.z, obj.w);
+}
+
 export const v4x = (v: Vector4) => v.e[0];
 export const v4y = (v: Vector4) => v.e[1];
 export const v4z = (v: Vector4) => v.e[2];
 export const v4w = (v: Vector4) => v.e[3];
-export const setV4x = (v: Vector4, value: number) => v.e[0] = value;
-export const setV4y = (v: Vector4, value: number) => v.e[1] = value;
-export const setV4z = (v: Vector4, value: number) => v.e[2] = value;
-export const setV4w = (v: Vector4, value: number) => v.e[3] = value;
+export const setV4x = (v: Vector4, value: number) => (v.e[0] = value);
+export const setV4y = (v: Vector4, value: number) => (v.e[1] = value);
+export const setV4z = (v: Vector4, value: number) => (v.e[2] = value);
+export const setV4w = (v: Vector4, value: number) => (v.e[3] = value);
 
 export function multiplyVector4AndMatrix4(v: Vector4, m: Matrix4) {
     const tmpX = v4x(v);

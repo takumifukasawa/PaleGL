@@ -143,7 +143,7 @@ export function createPlayer(
         // marionetterSceneStructure,
         inputController,
         cameraPostProcess,
-        true
+        // true
     );
 
     // const marionetterSceneStructure = buildMarionetterScene(gpu, );
@@ -172,7 +172,7 @@ export function createPlayer(
                 sceneJson,
                 inputController,
                 cameraPostProcess,
-                false
+                // false
             );
             onHotReload();
         });

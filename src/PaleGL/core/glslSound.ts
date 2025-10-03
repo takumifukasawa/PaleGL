@@ -2,6 +2,7 @@ import {Gpu, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
 import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
+import { buildVertexShader } from '@/PaleGL/core/buildShader.ts';
 
 // ------------------------------------------------------------------------------
 // ref:
@@ -48,9 +49,18 @@ export function createGLSLSound(gpu: Gpu, vertexShader: string, duration: number
 
     const audioContext = new AudioContext();
 
+    const rawVertexShader = buildVertexShader(
+        vertexShader,
+        [],
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+        // @ts-ignore
+        {},
+        []
+    );
+
     return {
         gpu,
-        vertexShader,
+        vertexShader: rawVertexShader,
         duration,
         channelNum,
         audioContext,

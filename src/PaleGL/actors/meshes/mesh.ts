@@ -80,3 +80,13 @@ export function replaceMesh(mesh: Mesh, geometry: Geometry, material: Material) 
     mesh.materials = [material];
     return mesh;
 }
+
+export function replaceGeometry(mesh: Mesh, geometry: Geometry) {
+    mesh.geometry = geometry;
+    return mesh;
+}
+
+export function replaceMaterial(mesh: Mesh, material: Material) {
+    mesh.materials = [material];
+    return mesh;
+}

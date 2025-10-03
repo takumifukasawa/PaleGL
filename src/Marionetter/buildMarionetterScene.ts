@@ -38,7 +38,7 @@ import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
-import { createGeometry, Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -47,6 +47,7 @@ import { createColorFromHex, createEmissiveColorFromHex } from '@/PaleGL/math/co
 import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
+import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
@@ -231,10 +232,14 @@ export function buildMarionetterScene(
             ) {
                 case MarionetterMaterialType.Lit:
                     const litMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
+                    const tiling = createVector4FromRawVector4(litMaterial[MarionetterLitMaterialInfoProperty.tiling]);
                     material = createGBufferMaterial({
                         baseColor: createColorFromHex(litMaterial[MarionetterLitMaterialInfoProperty.color]),
+                        baseMapTiling: tiling,
                         metallic: litMaterial[MarionetterLitMaterialInfoProperty.metallic],
+                        metallicMapTiling: tiling,
                         roughness: litMaterial[MarionetterLitMaterialInfoProperty.roughness],
+                        roughnessMapTiling: tiling,
                         emissiveColor: createEmissiveColorFromHex(
                             litMaterial[MarionetterLitMaterialInfoProperty.emission]
                         ),
