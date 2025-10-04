@@ -98,6 +98,7 @@ export function roundNumbersInJson(obj: objType, decimalPlaces: number): unknown
 export const roundFloatPlugin: () => Plugin = () => {
     return {
         name: 'vite-plugin-round-float', // プラグイン名
+        enforce: 'pre', // 他のプラグインよりも前に実行されるように設定
         transform(code, id) {
             // 拡張子が`.json`の場合に処理
             if (id.endsWith('.json')) {
