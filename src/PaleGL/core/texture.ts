@@ -30,7 +30,7 @@ import {
     TextureWrapTypes,
 } from '@/PaleGL/constants';
 import { Gpu } from './gpu.ts';
-import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
+import { isNeededCompact, isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 type TextureImage = HTMLImageElement | HTMLCanvasElement;
 
@@ -131,7 +131,7 @@ export function createTexture({
 }: TextureArgs): Texture {
     const gl = gpu.gl;
 
-    const texture = gl.createTexture()!;
+    const texture = gl.createTexture();
     // if (!texture) {
     //     console.error('[Texture.constructor] invalid texture');
     // }
@@ -166,7 +166,7 @@ export function createTexture({
     gl.bindTexture(GL_TEXTURE_2D, texture);
 
     if (!isNeededCompact()) {
-        if (dxt1) {
+        if (dxt1 && isDevelopment()) {
             const extDXT1 = gl.getExtension('WEBGL_compressed_texture_s3tc');
             console.log(`[Texture.constructor] extDXT1`, extDXT1);
 
