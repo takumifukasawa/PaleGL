@@ -101,7 +101,7 @@ export interface ShaderMinifierPluginOptions {
 export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({ minify, minifierOptions }) => {
     return {
         name: 'shader-minifier',
-        enforce: 'post',
+        enforce: 'pre',
         async transform(src: string, id: string) {
             const fileRegex = /\.glsl$/;
             if (fileRegex.test(id)) {

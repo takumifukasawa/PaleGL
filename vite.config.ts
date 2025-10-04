@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 // @ts-ignore
 import gltf from 'vite-plugin-gltf';
-import glsl from 'vite-plugin-glsl';
+// import glsl from 'vite-plugin-glsl';
 import checker from 'vite-plugin-checker';
 import eslint from '@nabla/vite-plugin-eslint';
 import * as process from 'process';
@@ -22,7 +22,7 @@ type EntryPointInfo = { name: string; path: string };
 
 // ---------------------------------------------------
 
-const PALE_GL_SRC_ROOT = path.resolve(__dirname, 'src');
+// const PALE_GL_SRC_ROOT = path.resolve(__dirname, 'src');
 const ENTRY_ROOT = path.resolve(__dirname, 'pages');
 
 // ビルドするentryを定義
@@ -115,17 +115,17 @@ export default defineConfig((config) => {
                 include: '**/*.txt',
             }),
             gltf(),
-            glsl({
-                include: [
-                    `${path.join(PALE_GL_SRC_ROOT, '**/*.glsl')}`,
-                    `${path.join(ENTRY_ROOT, '**/*.glsl')}`,
-                ],
-                watch: true,
-                root: './',
-                defaultExtension: 'glsl',
-                warnDuplicatedImports: true,
-                exclude: undefined,
-            }),
+            // glsl({
+            //     include: [
+            //         `${path.join(PALE_GL_SRC_ROOT, '**/*.glsl')}`,
+            //         `${path.join(ENTRY_ROOT, '**/*.glsl')}`,
+            //     ],
+            //     watch: true,
+            //     root: './',
+            //     defaultExtension: 'glsl',
+            //     warnDuplicatedImports: true,
+            //     exclude: undefined,
+            // }),
             transformGlslLayout(),
             shaderMinifierPlugin({
                 minify: isMinifyShader,
