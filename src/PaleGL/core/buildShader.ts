@@ -351,6 +351,12 @@ export const buildFragmentShader = (
     defineOptions: ShaderDefines,
     fragmentShaderModifiers: FragmentShaderModifiers
 ) => {
+    // 型チェックとエラーハンドリング
+    if (typeof shader !== 'string') {
+        console.error('[buildFragmentShader] Invalid shader type:', typeof shader, shader);
+        throw new Error(`Expected string shader, got ${typeof shader}`);
+    }
+    
     let replacedShader: string = shader;
 
     // replace shader block
