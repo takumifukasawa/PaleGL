@@ -40,7 +40,7 @@ export function initDebugger(
         },
         renderer: Renderer,
         orbitCameraController: OrbitCameraController,
-        bufferVisualizerPass: BufferVisualizerPass,
+        bufferVisualizerPass: BufferVisualizerPass | null,
         directionalLight: DirectionalLight,
         objectSpaceRaymarchMesh: ObjectSpaceRaymarchMesh
     }
@@ -85,7 +85,7 @@ export function initDebugger(
     // show buffers
     //
 
-    if (isDevelopment()) {
+    if (bufferVisualizerPass) {
         addDebuggerBorderSpacer(debuggerGUI);
 
         addToggleDebugger(debuggerGUI, {

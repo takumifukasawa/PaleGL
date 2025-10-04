@@ -1,14 +1,9 @@
-import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import {
-    PostProcessSinglePass,
-    PostProcessPassBase,
-    PostProcessPassRenderArgs,
-} from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { getBloomPassRenderTarget, renderBloomPass, setBloomPassSize } from '@/PaleGL/postprocess/bloomPass.ts';
 import { renderChromaticAberrationPass } from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
 import {
@@ -16,8 +11,8 @@ import {
     renderDepthOfFieldPass,
     setDepthOfFieldPassSize,
 } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
-import { renderGaussianBlurPass } from '@/PaleGL/postprocess/gaussianBlurPass.ts';
 import { renderFogPass } from '@/PaleGL/postprocess/fogPass.ts';
+import { renderGaussianBlurPass } from '@/PaleGL/postprocess/gaussianBlurPass.ts';
 import { renderGlitchPass } from '@/PaleGL/postprocess/glitchPass.ts';
 import {
     getLightShaftPassRenderTarget,
@@ -25,32 +20,35 @@ import {
     setLightShaftPassSize,
 } from '@/PaleGL/postprocess/lightShaftPass.ts';
 import {
+    PostProcessPassBase,
+    PostProcessPassRenderArgs,
+    PostProcessSinglePass,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
+import {
     getScreenSpaceShadowRenderTargetTexture,
     renderScreenShadowPass,
     setScreenSpaceShadowPassSize,
 } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
-import { renderSSRPass } from '@/PaleGL/postprocess/ssrPass.ts';
-import { renderVignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
-import { getStreakPassRenderTarget, renderStreakPass, setStreakPassSize } from '@/PaleGL/postprocess/streakPass.ts';
 import { renderSSAOPass } from '@/PaleGL/postprocess/ssaoPass.ts';
+import { renderSSRPass } from '@/PaleGL/postprocess/ssrPass.ts';
+import { getStreakPassRenderTarget, renderStreakPass, setStreakPassSize } from '@/PaleGL/postprocess/streakPass.ts';
+import { renderVignettePass } from '@/PaleGL/postprocess/vignettePass.ts';
 import { renderVolumetricLightPass, setVolumetricLightPassSize } from '@/PaleGL/postprocess/volumetricLightPass.ts';
+// 条件付きインポート: 開発時のみ bufferVisualizerPass を読み込み
+import { Texture } from '@/PaleGL/core/texture.ts';
 import {
     getBufferVisualizerPassRenderTarget,
     renderBufferVisualizerPass,
     setBufferVisualizerPassSize,
     updateBufferVisualizerPass,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 // set size ------------------------------------
 
 export type PostProcessPass = PostProcessPassBase | PostProcessSinglePass;
 
-export type SetPostProcessPassSizeBehaviour = (
-    postProcessPass: PostProcessPass,
-    width: number,
-    height: number
-) => void;
+export type SetPostProcessPassSizeBehaviour = (postProcessPass: PostProcessPass, width: number, height: number) => void;
 
 // 特に指定がないときはsingle-passとみなす
 export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehaviour = (
@@ -80,15 +78,27 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
     );
 };
 
-export const setPostProcessPassSizeBehaviour: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
-    [PostProcessPassType.Bloom]: setBloomPassSize,
-    [PostProcessPassType.BufferVisualizer]: setBufferVisualizerPassSize,
-    [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,
-    [PostProcessPassType.LightShaft]: setLightShaftPassSize,
-    [PostProcessPassType.Streak]: setStreakPassSize,
-    [PostProcessPassType.ScreenSpaceShadow]: setScreenSpaceShadowPassSize,
-    [PostProcessPassType.VolumetricLight]: setVolumetricLightPassSize,
+// 動的にBufferVisualizerのビヘイビアを設定
+const createSetPostProcessPassSizeBehaviour = (): Partial<
+    Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>
+> => {
+    const behaviours: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
+        [PostProcessPassType.Bloom]: setBloomPassSize,
+        [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,
+        [PostProcessPassType.LightShaft]: setLightShaftPassSize,
+        [PostProcessPassType.Streak]: setStreakPassSize,
+        [PostProcessPassType.ScreenSpaceShadow]: setScreenSpaceShadowPassSize,
+        [PostProcessPassType.VolumetricLight]: setVolumetricLightPassSize,
+    };
+
+    if (isDevelopment()) {
+        behaviours[PostProcessPassType.BufferVisualizer] = setBufferVisualizerPassSize;
+    }
+
+    return behaviours;
 };
+
+export const setPostProcessPassSizeBehaviour = createSetPostProcessPassSizeBehaviour();
 
 export function setPostProcessPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
     if (setPostProcessPassSizeBehaviour[postProcessPass.type]) {
@@ -113,11 +123,21 @@ export function setPostProcessPassRenderTarget(
 
 // update ------------------------------------
 
-const updatePostProcessPassBehaviour: Partial<
+// 動的にBufferVisualizerのアップデートビヘイビアを設定
+const createUpdatePostProcessPassBehaviour = (): Partial<
     Record<PostProcessPassType, (postProcessPass: PostProcessPassBase) => void>
-> = {
-    [PostProcessPassType.BufferVisualizer]: updateBufferVisualizerPass,
+> => {
+    const behaviours: Partial<Record<PostProcessPassType, (postProcessPass: PostProcessPassBase) => void>> = {};
+
+    // 開発時のみBufferVisualizerを追加
+    if (isDevelopment()) {
+        behaviours[PostProcessPassType.BufferVisualizer] = updateBufferVisualizerPass;
+    }
+
+    return behaviours;
 };
+
+const updatePostProcessPassBehaviour = createUpdatePostProcessPassBehaviour();
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -176,24 +196,37 @@ export const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviou
     renderMesh(renderer, postProcessPass.geometry, pass.material);
 };
 
-const renderPostProcessPassBehaviour: Partial<
+// 動的にBufferVisualizerのレンダービヘイビアを設定
+const createRenderPostProcessPassBehaviour = (): Partial<
     Record<PostProcessPassType, (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) => void>
-> = {
-    [PostProcessPassType.Bloom]: renderBloomPass,
-    [PostProcessPassType.BufferVisualizer]: renderBufferVisualizerPass,
-    [PostProcessPassType.ChromaticAberration]: renderChromaticAberrationPass,
-    [PostProcessPassType.Fog]: renderFogPass,
-    [PostProcessPassType.DepthOfField]: renderDepthOfFieldPass,
-    [PostProcessPassType.GaussianBlur]: renderGaussianBlurPass,
-    [PostProcessPassType.Glitch]: renderGlitchPass,
-    [PostProcessPassType.LightShaft]: renderLightShaftPass,
-    [PostProcessPassType.ScreenSpaceShadow]: renderScreenShadowPass,
-    [PostProcessPassType.SSAO]: renderSSAOPass,
-    [PostProcessPassType.SSR]: renderSSRPass,
-    [PostProcessPassType.Streak]: renderStreakPass,
-    [PostProcessPassType.Vignette]: renderVignettePass,
-    [PostProcessPassType.VolumetricLight]: renderVolumetricLightPass,
+> => {
+    const behaviours: Partial<
+        Record<PostProcessPassType, (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) => void>
+    > = {
+        [PostProcessPassType.Bloom]: renderBloomPass,
+        [PostProcessPassType.ChromaticAberration]: renderChromaticAberrationPass,
+        [PostProcessPassType.Fog]: renderFogPass,
+        [PostProcessPassType.DepthOfField]: renderDepthOfFieldPass,
+        [PostProcessPassType.GaussianBlur]: renderGaussianBlurPass,
+        [PostProcessPassType.Glitch]: renderGlitchPass,
+        [PostProcessPassType.LightShaft]: renderLightShaftPass,
+        [PostProcessPassType.ScreenSpaceShadow]: renderScreenShadowPass,
+        [PostProcessPassType.SSAO]: renderSSAOPass,
+        [PostProcessPassType.SSR]: renderSSRPass,
+        [PostProcessPassType.Streak]: renderStreakPass,
+        [PostProcessPassType.Vignette]: renderVignettePass,
+        [PostProcessPassType.VolumetricLight]: renderVolumetricLightPass,
+    };
+
+    // 開発時のみBufferVisualizerを追加
+    if (isDevelopment()) {
+        behaviours[PostProcessPassType.BufferVisualizer] = renderBufferVisualizerPass;
+    }
+
+    return behaviours;
 };
+
+const renderPostProcessPassBehaviour = createRenderPostProcessPassBehaviour();
 
 export function renderPostProcessPass(postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs): void {
     if (renderPostProcessPassBehaviour[postProcessPass.type]) {
@@ -207,15 +240,26 @@ export function renderPostProcessPass(postProcessPass: PostProcessPassBase, args
 
 type GetPostProcessPassRenderTargetBehaviour = (postProcessPass: PostProcessPassBase) => RenderTarget;
 
-const getPostProcessPassRenderTargetBehaviour: Partial<
+// 動的にBufferVisualizerのレンダーターゲットビヘイビアを設定
+const createGetPostProcessPassRenderTargetBehaviour = (): Partial<
     Record<PostProcessPassType, GetPostProcessPassRenderTargetBehaviour>
-> = {
-    [PostProcessPassType.Bloom]: getBloomPassRenderTarget,
-    [PostProcessPassType.BufferVisualizer]: getBufferVisualizerPassRenderTarget,
-    [PostProcessPassType.DepthOfField]: getDepthOfFieldPassRenderTarget,
-    [PostProcessPassType.LightShaft]: getLightShaftPassRenderTarget,
-    [PostProcessPassType.Streak]: getStreakPassRenderTarget,
+> => {
+    const behaviours: Partial<Record<PostProcessPassType, GetPostProcessPassRenderTargetBehaviour>> = {
+        [PostProcessPassType.Bloom]: getBloomPassRenderTarget,
+        [PostProcessPassType.DepthOfField]: getDepthOfFieldPassRenderTarget,
+        [PostProcessPassType.LightShaft]: getLightShaftPassRenderTarget,
+        [PostProcessPassType.Streak]: getStreakPassRenderTarget,
+    };
+
+    // 開発時のみBufferVisualizerを追加
+    if (isDevelopment()) {
+        behaviours[PostProcessPassType.BufferVisualizer] = getBufferVisualizerPassRenderTarget;
+    }
+
+    return behaviours;
 };
+
+const getPostProcessPassRenderTargetBehaviour = createGetPostProcessPassRenderTargetBehaviour();
 
 export function getPostProcessPassRenderTarget(postProcessPass: PostProcessPassBase): RenderTarget {
     if (getPostProcessPassRenderTargetBehaviour[postProcessPass.type]) {
