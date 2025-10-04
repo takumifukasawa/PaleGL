@@ -329,6 +329,8 @@ function createMarionetterClips(
                 console.error(`[createMarionetterClips] invalid animation clip type`);
         }
     }
+    
+    console.log("hogehoge", marionetterClips);
 
     return marionetterClips;
 }

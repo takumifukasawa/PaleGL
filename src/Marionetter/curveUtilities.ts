@@ -63,11 +63,11 @@ function curveUtilityEvaluate(t: number, k0: MarionetterCurveKeyframe, k1: Mario
 
 export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): MarionetterCurveKeyframe {
     return {
-        [MarionetterCurveKeyframeProperty.time]: keyframe[0],
-        [MarionetterCurveKeyframeProperty.value]: keyframe[1],
-        [MarionetterCurveKeyframeProperty.inTangent]: keyframe[2],
-        [MarionetterCurveKeyframeProperty.outTangent]: keyframe[3],
-        // TGODO: うまいことまとめたい
+        // [MarionetterCurveKeyframeProperty.time]: keyframe[0],
+        // [MarionetterCurveKeyframeProperty.value]: keyframe[1],
+        // [MarionetterCurveKeyframeProperty.inTangent]: keyframe[2],
+        // [MarionetterCurveKeyframeProperty.outTangent]: keyframe[3],
+        // // TODO: うまいことproperty名をまとめられるはず
         ["time"]: keyframe[0],
         ["value"]: keyframe[1],
         ["inTangent"]: keyframe[2],
@@ -77,7 +77,7 @@ export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): Mario
         ["v"]: keyframe[1],
         ["i"]: keyframe[2],
         ["o"]: keyframe[3],
-    };
+    } as MarionetterCurveKeyframe;
 }
 
 /**
@@ -91,7 +91,8 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
     const firstK = buildKeyframe(keys[0]);
     const lastK = buildKeyframe(keys[keys.length - 1]);
     
-    // const keys = curve.keys;
+    // for debug
+    // console.log(`[curveUtilityEvaluateCurve] debug - keys.length: ${keys.length}, firstK.v: ${firstK["v"]}, lastK.v: ${lastK["v"]}, t: ${t}`, keys, firstK, lastK, MarionetterCurveKeyframeProperty.value);
 
     if (keys.length === 0) {
         console.error('[curveUtilityEvaluateCurve] curve.keys.Length == 0');
@@ -102,11 +103,11 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
         return firstK[MarionetterCurveKeyframeProperty.value];
     }
 
-    if (t < firstK.t) {
+    if (t < firstK[MarionetterCurveKeyframeProperty.time]) {
         return firstK[MarionetterCurveKeyframeProperty.value];
     }
 
-    if (t >= lastK.t) {
+    if (t >= lastK[MarionetterCurveKeyframeProperty.time]) {
         return lastK[MarionetterCurveKeyframeProperty.value];
     }
 

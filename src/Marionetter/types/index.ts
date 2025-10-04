@@ -283,6 +283,7 @@ export type MarionetterAnimationClipKeyframe = number[];
 
 // for obj
 export type MarionetterCurveKeyframe = {
+    // TODO: うまいことproperty名をまとめられるはず
     time: number;
     value: number;
     inTangent: number;
