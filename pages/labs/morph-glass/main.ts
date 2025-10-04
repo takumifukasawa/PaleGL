@@ -59,6 +59,7 @@ import { createVector4 } from '@/PaleGL/math/vector4';
 import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualizerPass';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
 import { DebuggerGUI } from '@/PaleGL/utilities/debuggerGUI.ts';
+import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
 // import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
@@ -567,13 +568,18 @@ const main = async () => {
     const getShaderPath = (relativePath: string) => `../../../pages/labs/morph-glass/shaders/${relativePath}`;
 
     const shaders = [getShaderPath('object-space-raymarch-glass-scene.glsl')];
-    createGlassActor(getMany(shaders)[shaders[0]]);
-    subscribeShaders(shaders, (changed) => {
-        // console.log('hogehoge - receive', changed, map[shaders[0]]);
-        console.log('HMR - update glass shader', changed);
-        // replaceGlassMaterial(map[shaders[0]]);
-        replaceGlassMaterial(getMany(shaders)[shaders[0]]);
-    });
+    
+    if (isNeededCompact()) {
+        createGlassActor('');
+    } else {
+        createGlassActor(getMany(shaders)[shaders[0]]);
+        subscribeShaders(shaders, (changed) => {
+            // console.log('hogehoge - receive', changed, map[shaders[0]]);
+            console.log('HMR - update glass shader', changed);
+            // replaceGlassMaterial(map[shaders[0]]);
+            replaceGlassMaterial(getMany(shaders)[shaders[0]]);
+        });
+    }
 
     // main
 
