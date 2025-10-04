@@ -14,10 +14,9 @@ export type ShapeFontCircuit = ShapeFontBase<ShapeFontCircuitChar> & {
     charInfo: [string, ShapeFontCircuitChar][];
 };
 
-const ty = 19; // yの上端
-const by = 109; // yの下端
-
-const closePathIndex = -1;
+const T = 19; // yの上端 (ty)
+const B = 109; // yの下端 (by)
+const C = -1; // closePathIndex
 
 export const shapeFontCircuit: ShapeFontCircuit = {
     rawCellWidth: 91,
@@ -30,21 +29,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
         [
             'A',
             [
-                // coords
+                // coords - 文字列エンコード版（よりファイルサイズ削減効果大）
                 // prettier-ignore
-                [
-                    15, by, // 0
-                    45, ty, // 1
-                    76, by, // 2
-                    25, 82, // 3 // 横線
-                    67, 82, // 4
-                ],
+                `15,${B},45,${T},76,${B},25,82,67,82`.split(',').map(n => +n),
                 // lines
                 // prettier-ignore
-                [
-                    [0, 1, 2],
-                    [3, 4]
-                ],
+                "0,1,2;3,4".split(';').map(s => s.split(',').map(n => +n)),
                 // dots
                 [3, 4],
                 // stroke dots
@@ -57,21 +47,21 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    23, ty, // 0: 左上
-                    59, ty, // 1
+                    23, T, // 0: 左上
+                    59, T, // 1
                     70, 28, // 2
                     70, 52, // 3: 上に反時計回りに進む
                     60, 61, // 4: 右の中点
                     73, 73, // 5
                     73, 97, // 6
-                    59, by, // 7
-                    23, by, // 8
+                    59, B, // 7
+                    23, B, // 8
                     22, 61, // 9: 左側の中点
                 ],
                 // lines
                 // prettier-ignore
                 [
-                    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, closePathIndex],
+                    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, C],
                     [4, 9]
                 ],
                 // dots
@@ -86,12 +76,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    74, ty, // 0
-                    40, ty, // 1
+                    74, T, // 0
+                    40, T, // 1
                     19, 38, // 2
                     19, 89, // 3
-                    40, by, // 4
-                    74, by, // 5
+                    40, B, // 4
+                    74, B, // 5
                 ],
                 // lines
                 // prettier-ignore
@@ -110,17 +100,17 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    19, ty, // 0
-                    55, ty, // 1
+                    19, T, // 0
+                    55, T, // 1
                     76, 37, // 2
                     76, 90, // 3
-                    55, by, // 4
-                    19, by, // 5
+                    55, B, // 4
+                    19, B, // 5
                 ],
                 // lines
                 // prettier-ignore
                 [
-                    [0, 1, 2, 3, 4, 5, closePathIndex]
+                    [0, 1, 2, 3, 4, 5, C]
                 ],
                 // dots
                 [0, 5],
@@ -134,10 +124,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    71, ty, // 0: 右上
-                    23, ty, // 1: 左上
-                    23, by, // 2: 左下
-                    71, by, // 3: 右下
+                    71, T, // 0: 右上
+                    23, T, // 1: 左上
+                    23, B, // 2: 左下
+                    71, B, // 3: 右下
                     23, 61, // 4
                     68, 61, // 5
                 ],
@@ -159,9 +149,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    71, ty, // 0: 右上
-                    23, ty, // 1: 左上
-                    23, by, // 2: 左下
+                    71, T, // 0: 右上
+                    23, T, // 1: 左上
+                    23, B, // 2: 左下
                     23, 66, // 3
                     68, 66, // 4
                 ],
@@ -183,12 +173,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    75, ty, // 0: 右上
-                    38, ty, // 1
+                    75, T, // 0: 右上
+                    38, T, // 1
                     17, 38, // 2
                     17, 90, // 3
-                    38, by, // 4
-                    75, by, // 5
+                    38, B, // 4
+                    75, B, // 5
                     75, 66, // 6
                     53, 66, // 7
                 ],
@@ -209,10 +199,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    19, ty, // 0: 左上
-                    19, by, // 1: 左下
-                    74, ty, // 2: 右上
-                    74, by, // 3: 右下
+                    19, T, // 0: 左上
+                    19, B, // 1: 左下
+                    74, T, // 2: 右上
+                    74, B, // 3: 右下
                     19, 61, // 4
                     74, 61, // 5
                 ],
@@ -235,12 +225,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    22, ty, // 0
-                    70, ty, // 1
-                    46, ty, // 2
-                    46, by, // 3
-                    22, by, // 4
-                    70, by, // 5
+                    22, T, // 0
+                    70, T, // 1
+                    46, T, // 2
+                    46, B, // 3
+                    22, B, // 4
+                    70, B, // 5
                 ],
                 // lines
                 // prettier-ignore
@@ -261,10 +251,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    66, ty,
+                    66, T,
                     65, 90,
-                    44, by,
-                    22, by,
+                    44, B,
+                    22, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -283,11 +273,11 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    18, ty,
-                    18, by,
-                    70, ty,
+                    18, T,
+                    18, B,
+                    70, T,
                     18, 83,
-                    70, by,
+                    70, B,
                     40, 57,
                 ],
                 // lines
@@ -309,9 +299,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    25, ty,
-                    25, by,
-                    72, by,
+                    25, T,
+                    25, B,
+                    72, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -330,11 +320,11 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    16, by,
-                    16, ty,
+                    16, B,
+                    16, T,
                     46, 83,
-                    76, ty,
-                    76, by,
+                    76, T,
+                    76, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -353,10 +343,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    16, by,
-                    16, ty,
-                    76, by,
-                    76, ty,
+                    16, B,
+                    16, T,
+                    76, B,
+                    76, T,
                 ],
                 // lines
                 // prettier-ignore
@@ -375,19 +365,19 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    37, ty, // 左上から
-                    57, ty,
+                    37, T, // 左上から
+                    57, T,
                     75, 36,
                     75, 90,
-                    57, by,
-                    37, by,
+                    57, B,
+                    37, B,
                     19, 90,
                     19, 36,
                 ],
                 // lines
                 // prettier-ignore
                 [
-                    [0, 1, 2, 3, 4, 5, 6, 7, closePathIndex],
+                    [0, 1, 2, 3, 4, 5, 6, 7, C],
                 ],
                 // dots
                 [0, 4],
@@ -401,9 +391,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    23, by, // 0: 左下
-                    23, ty,
-                    57, ty,
+                    23, B, // 0: 左下
+                    23, T,
+                    57, T,
                     75, 31,
                     75, 57,
                     57, 73,
@@ -427,13 +417,13 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // prettier-ignore
                 [
                     70, 139,
-                    57, by,
-                    37, ty, // 左上から
-                    57, ty,
+                    57, B,
+                    37, T, // 左上から
+                    57, T,
                     75, 36,
                     75, 90,
-                    57, by,
-                    37, by,
+                    57, B,
+                    37, B,
                     19, 90,
                     19, 36,
                 ],
@@ -441,7 +431,7 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // prettier-ignore
                 [
                     [0, 1],
-                    [2, 3, 4, 5, 6, 7, 8, 9, closePathIndex],
+                    [2, 3, 4, 5, 6, 7, 8, 9, C],
                 ],
                 // dots
                 [1],
@@ -455,13 +445,13 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    23, by, // 0: 左下から
-                    23, ty, // 1
-                    58, ty, // 2
+                    23, B, // 0: 左下から
+                    23, T, // 1
+                    58, T, // 2
                     71, 31, // 3
                     71, 57, // 4
                     50, 70, // 5: 右のつなぎ目
-                    75, by, // 6
+                    75, B, // 6
                     23, 70  // 7: 左のつなぎ目
                 ],
                 // lines
@@ -481,16 +471,16 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    68, ty,
-                    36, ty,
+                    68, T,
+                    36, T,
                     23, 32,
                     23, 51,
                     37, 63,
                     55, 63,
                     70, 77,
                     70, 96,
-                    55, by,
-                    23, by
+                    55, B,
+                    23, B
                 ],
                 // lines
                 // prettier-ignore
@@ -509,10 +499,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    14, ty,
-                    78, ty,
-                    46, ty,
-                    46, by,
+                    14, T,
+                    78, T,
+                    46, T,
+                    46, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -532,12 +522,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    17, ty,
+                    17, T,
                     17, 89,
-                    34, by,
-                    57, by,
+                    34, B,
+                    57, B,
                     75, 89,
-                    75, ty
+                    75, T
                 ],
                 // lines
                 // prettier-ignore
@@ -556,9 +546,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    15, ty,
-                    46, by,
-                    77, ty
+                    15, T,
+                    46, B,
+                    77, T
                 ],
                 // lines
                 // prettier-ignore
@@ -577,11 +567,11 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    12, ty,
-                    25, by,
+                    12, T,
+                    25, B,
                     46, 40,
-                    67, by,
-                    80, ty
+                    67, B,
+                    80, T
                 ],
                 // lines
                 // prettier-ignore
@@ -600,10 +590,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    22, ty,
-                    78, by,
-                    76, ty,
-                    20, by,
+                    22, T,
+                    78, B,
+                    76, T,
+                    20, B,
                     49, 62
                 ],
                 // lines
@@ -624,10 +614,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    19, ty,
+                    19, T,
                     46, 58,
-                    46, by,
-                    73, ty
+                    46, B,
+                    73, T
                 ],
                 // lines
                 // prettier-ignore
@@ -647,10 +637,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    23, ty,
-                    72, ty,
-                    22, by,
-                    73, by,
+                    23, T,
+                    72, T,
+                    22, B,
+                    73, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -669,12 +659,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    35, ty, // 0: 左上から
-                    57, ty,
+                    35, T, // 0: 左上から
+                    57, T,
                     75, 38,
                     75, 89,
-                    57, by,
-                    35, by,
+                    57, B,
+                    35, B,
                     17, 89,
                     17, 38,
                     65, 29, // 8:
@@ -683,7 +673,7 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // lines
                 // prettier-ignore
                 [
-                    [0, 1, 2, 3, 4, 5, 6, 7, closePathIndex],
+                    [0, 1, 2, 3, 4, 5, 6, 7, C],
                     [8, 9]
                 ],
                 // dots
@@ -699,10 +689,10 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // prettier-ignore
                 [
                     22, 32,
-                    49, ty,
-                    49, by,
-                    24, by,
-                    74, by
+                    49, T,
+                    49, B,
+                    24, B,
+                    74, B
                 ],
                 // lines
                 // prettier-ignore
@@ -723,13 +713,13 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // prettier-ignore
                 [
                     19, 30, // 0: 左上
-                    32, ty,
-                    57, ty,
+                    32, T,
+                    57, T,
                     69, 30,
                     69, 52,
                     19, 99,
-                    19, by,
-                    78, by
+                    19, B,
+                    78, B
                 ],
                 // lines
                 // prettier-ignore
@@ -748,15 +738,15 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    23, ty,
-                    56, ty,
+                    23, T,
+                    56, T,
                     70, 32,
                     70, 55,
                     56, 63, // 4: 右の中点
                     70, 78,
                     70, 95,
-                    56, by,
-                    23, by,
+                    56, B,
+                    23, B,
                     31, 63, // 9: 左の中点
                 ],
                 // lines
@@ -779,9 +769,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 [
                     77, 86,
                     18, 86,
-                    62, ty,
+                    62, T,
                     62, 86,
-                    62, by
+                    62, B
                 ],
                 // lines
                 // prettier-ignore
@@ -800,14 +790,14 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    67, ty,
-                    23, ty,
+                    67, T,
+                    23, T,
                     23, 59,
                     54, 59,
                     70, 73,
                     70, 95,
-                    56, by,
-                    23, by,
+                    56, B,
+                    23, B,
                 ],
                 // lines
                 // prettier-ignore
@@ -826,12 +816,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    69, ty,
-                    36, ty,
+                    69, T,
+                    36, T,
                     21, 33,
                     21, 94,
-                    35, by,
-                    59, by,
+                    35, B,
+                    59, B,
                     74, 94,
                     74, 73,
                     59, 60,
@@ -855,9 +845,9 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    18, ty,
-                    76, ty,
-                    35, by
+                    18, T,
+                    76, T,
+                    35, B
                 ],
                 // lines
                 // prettier-ignore
@@ -879,22 +869,22 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                     34, 64, // 0: 左の中点から上に時計まわりに進む
                     21, 51,
                     21, 32,
-                    34, ty,
-                    58, ty,
+                    34, T,
+                    58, T,
                     73, 32,
                     73, 51,
                     58, 64, // 7: 右の中点
                     73, 78,
                     73, 97,
-                    58, by,
-                    34, by,
+                    58, B,
+                    34, B,
                     21, 97,
                     21, 78,
                 ],
                 // lines
                 // prettier-ignore
                 [
-                    [0, 1, 2, 3, 4, 5, 6, 7, closePathIndex],
+                    [0, 1, 2, 3, 4, 5, 6, 7, C],
                     [7, 8, 9, 10, 11, 12, 13, 0],
                 ],
                 // dots
@@ -909,12 +899,12 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 // coords
                 // prettier-ignore
                 [
-                    24, by, // 0: 左下から反時計
+                    24, B, // 0: 左下から反時計
                     57, 109,
                     72, 95,
                     72, 33,
-                    58, ty,
-                    34, ty,
+                    58, T,
+                    34, T,
                     19, 33,
                     19, 53,
                     34, 68,
