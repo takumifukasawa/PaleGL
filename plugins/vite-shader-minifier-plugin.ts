@@ -125,8 +125,8 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // rename list の生成
                 //
 
-                // const noRenamingList: string[] = minifierOptions.noRenamingList || [];
-                const noRenamingList: string[] = [];
+                const noRenamingList: string[] = minifierOptions.noRenamingList ? [...minifierOptions.noRenamingList] : [];
+                // const noRenamingList: string[] = [...options.noRenamingList];
 
                 const functionPattern = /(float|vec2|vec3|vec4|mat2|mat3|mat4|void)\s*(\w+)\s*\(/gm;
                 // const functionPattern = /\s*(float|vec2|vec3|vec4|mat2|mat3|mat4|void)\s*(\w+)\s*\(/gm;
