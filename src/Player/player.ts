@@ -146,10 +146,8 @@ export function createPlayer(
         // true
     );
 
-    // const marionetterSceneStructure = buildMarionetterScene(gpu, );
-    // const marionetterSceneStructure = marionetter.
-
-    console.log('marionetterSceneStructure', marionetterSceneStructure);
+    // for debug
+    // console.log('marionetterSceneStructure', marionetterSceneStructure);
 
     if (timelineDuration) {
         player.timelineDuration = timelineDuration;
@@ -233,7 +231,6 @@ function rebuildScene(
 
     // sceneをreflesh
     const { actors } = structure;
-    console.log('hogehoge', actors.length, actors);
     for (let i = 0; i < actors.length; i++) {
         addActorToScene(player.scene, actors[i]);
     }
