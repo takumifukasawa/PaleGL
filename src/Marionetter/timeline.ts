@@ -330,8 +330,6 @@ function createMarionetterClips(
         }
     }
     
-    console.log("hogehoge", marionetterClips);
-
     return marionetterClips;
 }
 
