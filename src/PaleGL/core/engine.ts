@@ -375,7 +375,6 @@ export function setOnBeforeFixedUpdateEngine(engine: Engine, cb: EngineOnBeforeF
 }
 
 export function setOnBeforeUpdateEngine(engine: Engine, cb: EngineOnBeforeUpdateCallback) {
-    console.log('setOnBeforeUpdateEngine');
     engine.onBeforeUpdate.push(cb);
 }
 
