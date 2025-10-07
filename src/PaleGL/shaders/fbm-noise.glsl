@@ -52,4 +52,7 @@ void main() {
     float result = fbmNoise(uv * gridSize + uTime * uSpeed);
 
     outColor = vec4(vec3(result), 1.);
+   
+    // for debug
+    // outColor = vec4(uv, 1.,1.);
 }

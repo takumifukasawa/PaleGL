@@ -2,7 +2,7 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 import { blitRenderTarget, Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { RenderTargetTypes, TextureWrapTypes, UniformTypes } from '@/PaleGL/constants.ts';
+import { RenderTargetTypes, TextureWrapTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import vertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import fragmentShader from '@/PaleGL/shaders/normal-map-converter-fragment.glsl';
@@ -13,11 +13,12 @@ let convertNormalMapFromHeightMapMaterial: Material;
 const uniformNameSrcMap = 'uSrcMap';
 
 export type NormalMapFromHeightMapConverter = {
-    renderTarget: RenderTarget;
-    srcTexture?: Texture;
-    srcRenderTarget?: RenderTarget;
+    renderTarget: RenderTarget; // 出力先
     width: number;
     height: number;
+    // どちらかが入力元
+    srcTexture?: Texture; // 入力元テクスチャ
+    srcRenderTarget?: RenderTarget; // 入力元レンダーターゲット
 };
 
 type Options = { srcTexture?: Texture; srcRenderTarget?: RenderTarget };
@@ -63,7 +64,7 @@ export const createNormalMapConverter: (
                     value: 1.0,
                 },
                 {
-                    name: 'uTexelSize',
+                    name: UniformNames.TexelSize,
                     type: UniformTypes.Vector2,
                     value: createVector2(1, 1),
                 },
@@ -84,7 +85,7 @@ export const convertNormalMapFromHeightMap = (renderer: Renderer, converter: Nor
         converter.srcTexture || converter.srcRenderTarget!.texture
     );
     setV2(tmpTexelSize, 1 / converter.width, 1 / converter.height);
-    setMaterialUniformValue(convertNormalMapFromHeightMapMaterial, 'uTexelSize', tmpTexelSize);
+    setMaterialUniformValue(convertNormalMapFromHeightMapMaterial, UniformNames.TexelSize, tmpTexelSize);
 
     blitRenderTarget(renderer, converter.renderTarget, renderer.sharedQuad, convertNormalMapFromHeightMapMaterial);
 };

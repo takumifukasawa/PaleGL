@@ -47,7 +47,7 @@ vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, v
     // 2: normal from normal map
     vec3 resultNormal = normalize(tbn * nt);
     // blend mesh normal ~ normal map
-    // vec3 normal = mix(normal, normalize(tbn * nt));
+    // vec3 resultNormal = mix(normal, normalize(tbn * nt));
     // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
 
     return resultNormal;
@@ -104,6 +104,11 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(metallic, roughness);
     outGBufferD = EncodeGBufferD(emissiveColor.rgb);
+   
+// #ifdef USE_NORMAL_MAP
+//     // outGBufferA = EncodeGBufferA(texture(uNormalMap, uv).xyz);
+// #endif
+//     outGBufferA = vec4(uv, 1., 1.);
     
     // #ifdef USE_HEIGHT_MAP
     // // outGBufferD = EncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);

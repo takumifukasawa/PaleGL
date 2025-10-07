@@ -41,6 +41,7 @@ float edgeMask(in vec2 uv, float band, float rate) {
 void main() {
     vec2 uv = vUv;
     vec4 textureColor = texture(uSrcTexture, vUv);
+    outColor = textureColor;
 
     float centerCircularScale = 2.;
     float edgeCircularScale = 2.;
@@ -136,10 +137,11 @@ void main() {
     outColor.xyz = c;
   
     // for debug
-    // outColor =
-    //     centerColor * accCenterMask
-    //     + edgeColor * accEdgeMask
-    //     + leftRightColor * accLeftRightMask
-    //     + topBottomColor * accTopBottomMask
-    // ;
+    outColor =
+        centerColor * accCenterMask
+        + edgeColor * accEdgeMask
+        + leftRightColor * accLeftRightMask
+        + topBottomColor * accTopBottomMask
+    ;
+    // outColor = textureColor;
 }

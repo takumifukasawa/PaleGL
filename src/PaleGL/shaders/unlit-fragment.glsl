@@ -55,9 +55,10 @@ void main() {
     outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = EncodeGBufferC(0., 0.);
     outGBufferD = EncodeGBufferD(baseColor.rgb);
-   
+    
     // for debug 
     // outGBufferD = EncodeGBufferD(worldNormal.rgb);
+    // outGBufferD = vec4(step(.5, uv.x), 0., 0., 1.);
 
     #pragma AFTER_OUT
 }
