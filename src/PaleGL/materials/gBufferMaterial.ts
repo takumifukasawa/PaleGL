@@ -1,6 +1,13 @@
-import { DepthFuncTypes, ShadingModelIds, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {
+    DepthFuncTypes,
+    MaterialTypes,
+    ShadingModelIds,
+    UniformBlockNames,
+    UniformNames,
+    UniformTypes,
+} from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { createMaterial, MaterialArgs } from '@/PaleGL/materials/material.ts';
+import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
 import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
 
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -9,7 +16,7 @@ import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 
-export type GBufferMaterialArgs = {
+export type GBufferMaterialIndividualParameters = {
     baseColor?: Color;
     baseMap?: Texture | null;
     baseMapTiling?: Vector4;
@@ -25,17 +32,24 @@ export type GBufferMaterialArgs = {
     heightMap?: Texture | null;
     heightMapTiling?: Vector4;
     heightScale?: number;
-    uniforms?: UniformsData;
-    shadingModelId?: ShadingModelIds;
-} & MaterialArgs;
+};
 
-export type GBufferMaterial = ReturnType<typeof createGBufferMaterial>;
+export type GBufferMaterialArgs = MaterialArgs &
+    GBufferMaterialIndividualParameters & {
+        shadingModelId?: ShadingModelIds;
+    };
+
+// export type GBufferMaterial = ReturnType<typeof createGBufferMaterial>;
+// export type GBufferMaterial = Material & GBufferMaterialIndividualParameters & {
+export type GBufferMaterial = Material & {
+    cachedGBufferArgs: GBufferMaterialArgs;
+}
 
 // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
-export function createGBufferMaterial(args: GBufferMaterialArgs) {
+export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMaterial {
     const {
         // TODO: 外部化
-        vertexShaderModifiers = [],
+        // vertexShaderModifiers = [],
         uniforms = [],
         uniformBlockNames = [],
         ...options
@@ -161,10 +175,11 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
 
     const material = createMaterial({
         name: 'GBufferMaterial',
+        type: MaterialTypes.GBuffer,
         vertexShader: gBufferVert,
         fragmentShader: args.fragmentShader || litFrag,
         depthFragmentShader: args.depthFragmentShader || gBufferDepthFrag,
-        vertexShaderModifiers,
+        // vertexShaderModifiers,
         uniforms: mergedUniforms,
         depthUniforms,
         useNormalMap: !!normalMap,
@@ -188,24 +203,29 @@ export function createGBufferMaterial(args: GBufferMaterialArgs) {
     //     setMaterialUniformValue(material, UniformNames.Metallic, _metallicMap ? 1 : _metallic);
     //     setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
     // };
-
+    
+    // const gBufferIndividualParameters: GBufferMaterialIndividualParameters = {
+    //     baseColor,
+    //     baseMap,
+    //     baseMapTiling,
+    //     metallic,
+    //     metallicMap,
+    //     metallicMapTiling,
+    //     roughness,
+    //     roughnessMap,
+    //     roughnessMapTiling,
+    //     normalMap,
+    //     normalMapTiling,
+    //     heightMap,
+    //     heightMapTiling,
+    //     heightScale,
+    //     emissiveColor,
+    // };
+    
     return {
+        cachedGBufferArgs: args,
+        // ...gBufferIndividualParameters,
         ...material,
-        baseColor,
-        baseMap,
-        baseMapTiling,
-        metallic,
-        metallicMap,
-        metallicMapTiling,
-        roughness,
-        roughnessMap,
-        roughnessMapTiling,
-        normalMap,
-        normalMapTiling,
-        heightMap,
-        heightMapTiling,
-        heightScale,
-        emissiveColor,
-        vertexShaderModifiers,
+        // vertexShaderModifiers,
     };
 }
